@@ -330,7 +330,9 @@ Current status:
 - `tools/lookup_39k_reference.py` builds kind-specific HTTPS discovery paths
   and verifies complete 11th Edition faction, detachment, and datasheet URLs
   for 39k PRO. These links are secondary references only; official GW artifacts
-  and hashes remain authoritative provenance, and no site content is ingested.
+  and hashes remain authoritative provenance. Reviewed provider observations may
+  be retained as assignment-level evidence under `data/source_audits/39k_pro`,
+  but no provider content is loaded by the runtime.
 - README milestone anchors retained for code-quality audits: Phase 14H is complete;
   Phase 14I is complete; Phase 14K is complete; Phase 17A.1 is complete.
   Phase 14H anchors: runtime Attached Unit formation; structured army-list Leader/Support declarations; first-class attached rules-unit formation records; healing, revival, persisting effects; Movement-phase Combat Disembark fallback with engine-owned evidence; setup-time Strategic Reserve declarations; repositioned-unit Advance/Fall Back/Disembark history.
