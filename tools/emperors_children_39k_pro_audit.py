@@ -17,7 +17,10 @@ from warhammer40k_core.rules.external_reference_lookup import (
     ExternalReferenceKind,
     verify_thirty_nine_k_pro_reference_url,
 )
-from warhammer40k_core.rules.source_overlay import SourceOverlayOperationKind
+from warhammer40k_core.rules.source_overlay import (
+    SourceOverlayOperation,
+    SourceOverlayOperationKind,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     emperors_children_datasheet_overlay_2026_06 as source_overlay,
 )
@@ -35,7 +38,7 @@ SOURCE_DIR = (
     / "2026-06-14"
     / "json"
 )
-AUDIT_SCHEMA_VERSION = "1"
+AUDIT_SCHEMA_VERSION = "2"
 
 _PROVIDER_IDENTIFIER_PATTERN = re.compile(r"[A-Za-z0-9_-]{1,128}\Z")
 _SHA256_PATTERN = re.compile(r"[0-9a-f]{64}\Z")
@@ -93,6 +96,7 @@ class ThirtyNineKProAssignmentObservation:
     source_qualifiers: tuple[str, ...]
     source_category: str
     audit_category: str
+    observed_provider_datasheet_id: str
     observed_provider_surface: str
     observed_provider_assignment_id: str | None
     observed_provider_definition_id: str
@@ -113,8 +117,11 @@ class ThirtyNineKProDeltaObservation:
     subject: str
     field: str
     expected_value: str
+    observed_provider_record_kind: str
     observed_provider_record_id: str
+    observed_provider_datasheet_id: str
     observed_provider_value: str
+    evidence_sha256: str
     comparison_result: str
 
 
@@ -182,8 +189,8 @@ def load_emperors_children_thirty_nine_k_pro_audit(
     )
     _validate_datasheets(datasheets, assignments)
     _validate_source_assignments(datasheets, assignments)
-    _validate_provider_assignments(assignments)
-    _validate_deltas(datasheet_deltas)
+    _validate_provider_assignments(datasheets, assignments)
+    _validate_deltas(datasheets, assignments, datasheet_deltas)
     return EmperorsChildrenThirtyNineKProAudit(
         provider=provider,
         datasheets=datasheets,
@@ -301,6 +308,7 @@ def _parse_assignment(raw: object) -> ThirtyNineKProAssignmentObservation:
             "source_qualifiers",
             "source_category",
             "audit_category",
+            "observed_provider_datasheet_id",
             "observed_provider_surface",
             "observed_provider_assignment_id",
             "observed_provider_definition_id",
@@ -326,6 +334,9 @@ def _parse_assignment(raw: object) -> ThirtyNineKProAssignmentObservation:
         source_qualifiers=_qualifiers(payload, "source_qualifiers"),
         source_category=_required_text(payload, "source_category"),
         audit_category=_required_text(payload, "audit_category"),
+        observed_provider_datasheet_id=_provider_identifier(
+            payload, "observed_provider_datasheet_id"
+        ),
         observed_provider_surface=_required_text(payload, "observed_provider_surface"),
         observed_provider_assignment_id=provider_assignment_id,
         observed_provider_definition_id=_provider_identifier(
@@ -339,6 +350,7 @@ def _parse_assignment(raw: object) -> ThirtyNineKProAssignmentObservation:
     )
     evidence = {
         "observed_provider_assignment_id": row.observed_provider_assignment_id,
+        "observed_provider_datasheet_id": row.observed_provider_datasheet_id,
         "observed_provider_definition_id": row.observed_provider_definition_id,
         "observed_provider_name": row.observed_provider_name,
         "observed_provider_qualifiers": list(row.observed_provider_qualifiers),
@@ -360,21 +372,41 @@ def _parse_delta(raw: object) -> ThirtyNineKProDeltaObservation:
             "subject",
             "field",
             "expected_value",
+            "observed_provider_record_kind",
             "observed_provider_record_id",
+            "observed_provider_datasheet_id",
             "observed_provider_value",
+            "evidence_sha256",
             "comparison_result",
         },
         "datasheet delta observation",
     )
-    return ThirtyNineKProDeltaObservation(
+    row = ThirtyNineKProDeltaObservation(
         source_operation_id=_required_text(payload, "source_operation_id"),
         subject=_required_text(payload, "subject"),
         field=_required_text(payload, "field"),
         expected_value=_required_text(payload, "expected_value"),
+        observed_provider_record_kind=_required_text(payload, "observed_provider_record_kind"),
         observed_provider_record_id=_provider_identifier(payload, "observed_provider_record_id"),
+        observed_provider_datasheet_id=_provider_identifier(
+            payload, "observed_provider_datasheet_id"
+        ),
         observed_provider_value=_required_text(payload, "observed_provider_value"),
+        evidence_sha256=_required_sha256(payload, "evidence_sha256"),
         comparison_result=_required_text(payload, "comparison_result"),
     )
+    evidence = {
+        "field": row.field,
+        "observed_provider_datasheet_id": row.observed_provider_datasheet_id,
+        "observed_provider_record_id": row.observed_provider_record_id,
+        "observed_provider_record_kind": row.observed_provider_record_kind,
+        "observed_provider_value": row.observed_provider_value,
+    }
+    if row.evidence_sha256 != _canonical_sha256(evidence):
+        raise ValueError(
+            f"39k PRO delta evidence hash drifted for {row.source_operation_id}:{row.field}."
+        )
+    return row
 
 
 def _validate_source_snapshot(raw: object) -> None:
@@ -523,8 +555,10 @@ def _validate_source_assignments(
 
 
 def _validate_provider_assignments(
+    datasheets: tuple[ThirtyNineKProDatasheetObservation, ...],
     assignments: tuple[ThirtyNineKProAssignmentObservation, ...],
 ) -> None:
+    provider_datasheet_ids_by_source = _provider_datasheet_ids_by_source(datasheets)
     relationship_ids = tuple(
         row.observed_provider_assignment_id
         for row in assignments
@@ -533,6 +567,13 @@ def _validate_provider_assignments(
     if len(relationship_ids) != len(set(relationship_ids)):
         raise ValueError("39k PRO audit contains duplicate provider relationship IDs.")
     for row in assignments:
+        if (
+            provider_datasheet_ids_by_source.get(row.source_datasheet_id)
+            != row.observed_provider_datasheet_id
+        ):
+            raise ValueError(
+                f"Provider parent datasheet mismatched for {row.source_assignment_id}."
+            )
         expected_surface = _SURFACE_BY_SOURCE_TYPE[row.source_category]
         if row.match_status == "matched":
             if row.observed_provider_assignment_id is None:
@@ -564,7 +605,11 @@ def _validate_provider_assignments(
             )
 
 
-def _validate_deltas(deltas: tuple[ThirtyNineKProDeltaObservation, ...]) -> None:
+def _validate_deltas(
+    datasheets: tuple[ThirtyNineKProDatasheetObservation, ...],
+    assignments: tuple[ThirtyNineKProAssignmentObservation, ...],
+    deltas: tuple[ThirtyNineKProDeltaObservation, ...],
+) -> None:
     if not deltas:
         raise ValueError("39k PRO audit must retain datasheet delta observations.")
     operation_fields = tuple((row.source_operation_id, row.field) for row in deltas)
@@ -573,6 +618,8 @@ def _validate_deltas(deltas: tuple[ThirtyNineKProDeltaObservation, ...]) -> None
     operations = {
         operation.op_id: operation for operation in source_overlay.overlay_pack().operations
     }
+    assignments_by_id = {row.source_assignment_id: row for row in assignments}
+    provider_datasheet_ids_by_source = _provider_datasheet_ids_by_source(datasheets)
     for row in deltas:
         operation = operations.get(row.source_operation_id)
         if operation is None:
@@ -580,6 +627,32 @@ def _validate_deltas(deltas: tuple[ThirtyNineKProDeltaObservation, ...]) -> None
                 f"Unknown source operation in 39k PRO audit: {row.source_operation_id}."
             )
         operation_fields_by_name = dict(operation.fields)
+        source_datasheet_id = operation.source_row_id.split(":", 1)[0]
+        expected_provider_datasheet_id = provider_datasheet_ids_by_source.get(source_datasheet_id)
+        if expected_provider_datasheet_id is None:
+            raise ValueError(
+                f"39k PRO delta references an unaudited source datasheet: {source_datasheet_id}."
+            )
+        if row.observed_provider_datasheet_id != expected_provider_datasheet_id:
+            raise ValueError(
+                f"Provider parent datasheet mismatched for delta {row.source_operation_id}."
+            )
+        expected_record_kind = _provider_record_kind_for_delta(operation)
+        if row.observed_provider_record_kind != expected_record_kind:
+            raise ValueError(f"Provider record kind drifted for delta {row.source_operation_id}.")
+        if operation.source_table == "Datasheets_abilities":
+            assignment = assignments_by_id.get(operation.source_row_id)
+            if assignment is None:
+                raise ValueError(
+                    f"39k PRO ability delta has no assignment evidence: {operation.source_row_id}."
+                )
+            if (
+                row.observed_provider_record_id != assignment.observed_provider_definition_id
+                or row.observed_provider_datasheet_id != assignment.observed_provider_datasheet_id
+            ):
+                raise ValueError(
+                    f"Provider ability evidence drifted for delta {row.source_operation_id}."
+                )
         if (
             operation.operation_kind is SourceOverlayOperationKind.UPDATE_ROW
             and operation_fields_by_name.get(row.field) != row.expected_value
@@ -600,6 +673,37 @@ def _validate_deltas(deltas: tuple[ThirtyNineKProDeltaObservation, ...]) -> None
             raise ValueError(
                 f"39k PRO datasheet delta result drifted for {row.source_operation_id}."
             )
+
+
+def _provider_record_kind_for_delta(
+    operation: SourceOverlayOperation,
+) -> str:
+    if operation.source_table == "Datasheets_abilities":
+        return "datasheet_ability"
+    if operation.source_table == "Datasheets_wargear":
+        return "wargear_item_profile"
+    if operation.source_table == "Datasheets_models":
+        return "miniature"
+    if (
+        operation.source_table == "Datasheets_keywords"
+        and operation.operation_kind is SourceOverlayOperationKind.ADD_ROW
+    ):
+        return "miniature_keyword"
+    if (
+        operation.source_table == "Datasheets_keywords"
+        and operation.operation_kind is SourceOverlayOperationKind.SUPERSEDE_ROW
+    ):
+        return "miniature_keyword_inventory"
+    raise ValueError(f"Unsupported source operation for 39k PRO delta: {operation.op_id}.")
+
+
+def _provider_datasheet_ids_by_source(
+    datasheets: tuple[ThirtyNineKProDatasheetObservation, ...],
+) -> dict[str, str]:
+    return {
+        row.source_datasheet_id: urlsplit(row.observed_provider_url).path.rsplit("/", 1)[-1]
+        for row in datasheets
+    }
 
 
 def _split_qualified_name(value: str) -> tuple[str, tuple[str, ...]]:

@@ -132,6 +132,15 @@ def test_emperors_children_39k_pro_audit_retains_assignment_level_evidence() -> 
     assert len(audit.datasheets) == 23
     assert len(audit.assignments) == 101
     assert len({row.observed_provider_url for row in audit.datasheets}) == 23
+    provider_datasheet_ids_by_source = {
+        row.source_datasheet_id: row.observed_provider_url.rsplit("/", 1)[-1]
+        for row in audit.datasheets
+    }
+    assert all(
+        row.observed_provider_datasheet_id
+        == provider_datasheet_ids_by_source[row.source_datasheet_id]
+        for row in audit.assignments
+    )
     assert all(
         row.source_datasheet_name.replace("\u2019", "'").casefold()
         == row.observed_provider_name.replace("\u2019", "'").casefold()
@@ -165,6 +174,12 @@ def test_emperors_children_39k_pro_audit_retains_assignment_level_evidence() -> 
         "000004086:4": ("Excessive Vigour (Aura)", ("Aura",), ("Aura",)),
         "000004097:4": ("Daemon Lord of Slaanesh (Aura)", ("Aura",), ("Aura",)),
     }
+    assert len(audit.datasheet_deltas) == 12
+    assert all(row.evidence_sha256 for row in audit.datasheet_deltas)
+    assert all(
+        row.observed_provider_datasheet_id in provider_datasheet_ids_by_source.values()
+        for row in audit.datasheet_deltas
+    )
 
 
 def test_emperors_children_39k_pro_audit_rejects_swapped_provider_urls(tmp_path: Path) -> None:
@@ -179,6 +194,87 @@ def test_emperors_children_39k_pro_audit_rejects_swapped_provider_urls(tmp_path:
     tampered_path.write_text(json.dumps(payload), encoding="utf-8")
 
     with pytest.raises(ValueError, match="datasheet evidence hash drifted"):
+        load_emperors_children_thirty_nine_k_pro_audit(tampered_path)
+
+
+def test_emperors_children_39k_pro_audit_rejects_cross_datasheet_assignment_evidence(
+    tmp_path: Path,
+) -> None:
+    payload = json.loads(AUDIT_PATH.read_text(encoding="utf-8"))
+    fulgrim_deep_strike = next(
+        row for row in payload["assignments"] if row["source_assignment_id"] == "000004077:2"
+    )
+    terminator_deep_strike = next(
+        row for row in payload["assignments"] if row["source_assignment_id"] == "000004081:1"
+    )
+    provider_evidence_fields = (
+        "observed_provider_datasheet_id",
+        "observed_provider_surface",
+        "observed_provider_assignment_id",
+        "observed_provider_definition_id",
+        "observed_provider_name",
+        "observed_provider_qualifiers",
+        "evidence_sha256",
+    )
+    for field in provider_evidence_fields:
+        fulgrim_deep_strike[field], terminator_deep_strike[field] = (
+            terminator_deep_strike[field],
+            fulgrim_deep_strike[field],
+        )
+    tampered_path = tmp_path / "cross-datasheet-assignment-audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Provider parent datasheet mismatched"):
+        load_emperors_children_thirty_nine_k_pro_audit(tampered_path)
+
+
+def test_emperors_children_39k_pro_audit_rejects_unhashed_delta_record_change(
+    tmp_path: Path,
+) -> None:
+    payload = json.loads(AUDIT_PATH.read_text(encoding="utf-8"))
+    heldrake_movement = next(
+        row
+        for row in payload["datasheet_deltas"]
+        if row["source_operation_id"] == "ec-heldrake-profile" and row["field"] == "M"
+    )
+    heldrake_movement["observed_provider_record_id"] = "mv-ZCUK3B6I"
+    tampered_path = tmp_path / "changed-delta-record-audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="delta evidence hash drifted"):
+        load_emperors_children_thirty_nine_k_pro_audit(tampered_path)
+
+
+def test_emperors_children_39k_pro_audit_rejects_cross_datasheet_delta_evidence(
+    tmp_path: Path,
+) -> None:
+    payload = json.loads(AUDIT_PATH.read_text(encoding="utf-8"))
+    tormentor_power_sword = next(
+        row
+        for row in payload["datasheet_deltas"]
+        if row["source_operation_id"] == "ec-tormentors-power-sword-strength"
+    )
+    infractor_power_sword = next(
+        row
+        for row in payload["datasheet_deltas"]
+        if row["source_operation_id"] == "ec-infractors-power-sword-strength"
+    )
+    provider_evidence_fields = (
+        "observed_provider_record_kind",
+        "observed_provider_record_id",
+        "observed_provider_datasheet_id",
+        "observed_provider_value",
+        "evidence_sha256",
+    )
+    for field in provider_evidence_fields:
+        tormentor_power_sword[field], infractor_power_sword[field] = (
+            infractor_power_sword[field],
+            tormentor_power_sword[field],
+        )
+    tampered_path = tmp_path / "cross-datasheet-delta-audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Provider parent datasheet mismatched"):
         load_emperors_children_thirty_nine_k_pro_audit(tampered_path)
 
 

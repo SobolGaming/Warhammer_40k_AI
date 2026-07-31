@@ -447,14 +447,19 @@ def emperors_children_secondary_reference_audit_markdown(
             "",
             "The retained July datasheet-delta observations compare as follows.",
             "",
-            "| Source operation | Subject | Field | Provider record | Comparison |",
-            "| --- | --- | --- | --- | --- |",
+            (
+                "| Source operation | Subject | Field | Provider record | Provider parent | "
+                "Comparison |"
+            ),
+            "| --- | --- | --- | --- | --- | --- |",
         )
     )
     for delta in audit.datasheet_deltas:
         lines.append(
             f"| `{delta.source_operation_id}` | {_markdown_text(delta.subject)} | "
-            f"`{_markdown_text(delta.field)}` | `{delta.observed_provider_record_id}` | "
+            f"`{_markdown_text(delta.field)}` | "
+            f"`{delta.observed_provider_record_kind}:{delta.observed_provider_record_id}` | "
+            f"`{delta.observed_provider_datasheet_id}` | "
             f"{_markdown_text(delta.comparison_result)} |"
         )
     lines.append("")

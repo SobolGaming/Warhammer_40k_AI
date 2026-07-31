@@ -185,20 +185,20 @@ The retained non-Legends inventory matches all 23 reviewed datasheet names. Of 1
 
 The retained July datasheet-delta observations compare as follows.
 
-| Source operation | Subject | Field | Provider record | Comparison |
-| --- | --- | --- | --- | --- |
-| `ec-chaos-terminators-lethal-obsession` | Chaos Terminators - Lethal Obsession | `description` | `WXuX7Fg5d_c` | matched |
-| `ec-chaos-spawn-scuttling-horrors` | Chaos Spawn - Scuttling Horrors | `description` | `3clu0_dcZ3Q` | matched |
-| `ec-fulgrim-serpentine` | Fulgrim - Serpentine definition | `description` | `S3DBCLV4Ou0` | matched |
-| `ec-flawless-blades-blissblade-attacks` | Flawless Blades - Blissblade | `A` | `ltDU6RTtMKE` | matched |
-| `ec-tormentors-power-sword-strength` | Tormentors - power sword | `S` | `6cftUW2989M` | matched |
-| `ec-infractors-power-sword-strength` | Infractors - power sword | `S` | `9MjNXsR1v9o` | matched |
-| `ec-heldrake-profile` | Heldrake | `M` | `bW1Q89iLpFA` | matched |
-| `ec-heldrake-profile` | Heldrake | `Sv` | `bW1Q89iLpFA` | matched |
-| `ec-heldrake-profile` | Heldrake | `OC` | `bW1Q89iLpFA` | matched |
-| `ec-heldrake-remove-aircraft` | Heldrake - Aircraft keyword | `presence` | `bW1Q89iLpFA` | matched |
-| `ec-chaos-land-raider-frame` | Chaos Land Raider - Frame keyword | `presence` | `l2bJqjxzCvA` | matched |
-| `ec-chaos-rhino-frame` | Chaos Rhino - Frame keyword | `presence` | `mv-ZCUK3B6I` | matched |
+| Source operation | Subject | Field | Provider record | Provider parent | Comparison |
+| --- | --- | --- | --- | --- | --- |
+| `ec-chaos-terminators-lethal-obsession` | Chaos Terminators - Lethal Obsession | `description` | `datasheet_ability:WXuX7Fg5d_c` | `WlGvCaQ9g5A` | matched |
+| `ec-chaos-spawn-scuttling-horrors` | Chaos Spawn - Scuttling Horrors | `description` | `datasheet_ability:3clu0_dcZ3Q` | `C1d0aHQqOGQ` | matched |
+| `ec-fulgrim-serpentine` | Fulgrim - Serpentine definition | `description` | `datasheet_ability:S3DBCLV4Ou0` | `hUMCUGv2Rtw` | matched |
+| `ec-flawless-blades-blissblade-attacks` | Flawless Blades - Blissblade | `A` | `wargear_item_profile:5lM18V4oXjI` | `ltDU6RTtMKE` | matched |
+| `ec-tormentors-power-sword-strength` | Tormentors - power sword | `S` | `wargear_item_profile:M5RMmGX2wiM` | `6cftUW2989M` | matched |
+| `ec-infractors-power-sword-strength` | Infractors - power sword | `S` | `wargear_item_profile:qCG1n9t2lcw` | `9MjNXsR1v9o` | matched |
+| `ec-heldrake-profile` | Heldrake | `M` | `miniature:qM2baRq292k` | `bW1Q89iLpFA` | matched |
+| `ec-heldrake-profile` | Heldrake | `Sv` | `miniature:qM2baRq292k` | `bW1Q89iLpFA` | matched |
+| `ec-heldrake-profile` | Heldrake | `OC` | `miniature:qM2baRq292k` | `bW1Q89iLpFA` | matched |
+| `ec-heldrake-remove-aircraft` | Heldrake - Aircraft keyword | `presence` | `miniature_keyword_inventory:qM2baRq292k` | `bW1Q89iLpFA` | matched |
+| `ec-chaos-land-raider-frame` | Chaos Land Raider - Frame keyword | `presence` | `miniature_keyword:hjbNCTf_kgY` | `l2bJqjxzCvA` | matched |
+| `ec-chaos-rhino-frame` | Chaos Rhino - Frame keyword | `presence` | `miniature_keyword:qPj4EL3OXzk` | `mv-ZCUK3B6I` | matched |
 
 **Serpentine:** The exact provider ability definition is present, but no provider relationship assigns it to Fulgrim. The official source assignment remains authoritative, so this report retains the rule and categorizes its runtime semantics as still needed.
 
