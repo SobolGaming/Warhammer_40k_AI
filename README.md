@@ -327,10 +327,10 @@ Current status:
   `data/source_manifests`, `data/raw/faction_packs`, and generated source
   package artifacts. Runtime engine code must consume structured descriptors,
   not raw PDFs, CSV rows, HTML, or prose parsing.
-- `tools/lookup_39k_reference.py` builds typed 11th Edition faction,
-  detachment, and datasheet lookup URLs for 39k PRO. These links are secondary
-  references only; official GW artifacts and hashes remain authoritative
-  provenance, and no 39k PRO content is ingested into runtime catalogs.
+- `tools/lookup_39k_reference.py` builds kind-specific HTTPS discovery paths
+  and verifies complete 11th Edition faction, detachment, and datasheet URLs
+  for 39k PRO. These links are secondary references only; official GW artifacts
+  and hashes remain authoritative provenance, and no site content is ingested.
 - README milestone anchors retained for code-quality audits: Phase 14H is complete;
   Phase 14I is complete; Phase 14K is complete; Phase 17A.1 is complete.
   Phase 14H anchors: runtime Attached Unit formation; structured army-list Leader/Support declarations; first-class attached rules-unit formation records; healing, revival, persisting effects; Movement-phase Combat Disembark fallback with engine-owned evidence; setup-time Strategic Reserve declarations; repositioned-unit Advance/Fall Back/Disembark history.

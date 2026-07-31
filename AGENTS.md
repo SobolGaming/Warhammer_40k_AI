@@ -86,11 +86,13 @@ Do not add AI/ranker/training logic before the deterministic rules core, decisio
 - Build lookups through
   `warhammer40k_core.rules.external_reference_lookup.build_thirty_nine_k_pro_reference_lookup`
   or `uv run python tools/lookup_39k_reference.py <faction|detachment|datasheet> <name>`.
-  The lookup emits `http://39k.pro/search?q=<url-encoded-name>` and identifies
-  the required result route as `/faction/<id>`, `/detachment/<id>`, or
-  `/datasheet/<id>`.
-- Confirm the result kind before recording a direct reference. A matching name
-  on a different route is not an acceptable reference.
+  Datasheets use `https://39k.pro/search?q=<url-encoded-name>`, factions use the
+  site's faction navigation, and detachments require `--parent-faction-url`
+  before following that faction page's detachment navigation.
+- Verify an observed complete result URL with `--reference-url` before recording
+  it. Verification requires HTTPS, the exact `39k.pro` host, a canonical
+  `/faction/<id>`, `/detachment/<id>`, or `/datasheet/<id>` path, and a path kind
+  matching the requested reference kind.
 - 39k PRO identifiers are provider-local reference IDs. They must not replace
   stable source rule IDs, descriptor IDs, catalog IDs, package hashes, or
   official provenance.

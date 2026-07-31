@@ -20,19 +20,33 @@ def main() -> None:
     )
     parser.add_argument("query")
     parser.add_argument(
-        "--reference-id",
-        help="Optional 39k PRO result ID used to emit the typed direct reference URL.",
+        "--parent-faction-url",
+        help="Required verified faction URL used to discover a detachment.",
+    )
+    parser.add_argument(
+        "--reference-url",
+        help="Optional complete observed result URL to validate for the requested kind.",
     )
     args = parser.parse_args()
 
+    reference_kind = ExternalReferenceKind(args.reference_kind)
+    if reference_kind is ExternalReferenceKind.DETACHMENT and args.parent_faction_url is None:
+        parser.error("detachment lookups require --parent-faction-url")
+    if (
+        reference_kind is not ExternalReferenceKind.DETACHMENT
+        and args.parent_faction_url is not None
+    ):
+        parser.error("--parent-faction-url is valid only for detachment lookups")
+
     lookup = build_thirty_nine_k_pro_reference_lookup(
         target_edition=THIRTY_NINE_K_PRO_TARGET_EDITION,
-        reference_kind=ExternalReferenceKind(args.reference_kind),
+        reference_kind=reference_kind,
         query=args.query,
+        parent_faction_url=args.parent_faction_url,
     )
-    payload: dict[str, str] = dict(lookup.to_payload())
-    if args.reference_id is not None:
-        payload["reference_url"] = lookup.reference_url(args.reference_id)
+    payload: dict[str, object] = dict(lookup.to_payload())
+    if args.reference_url is not None:
+        payload["reference"] = lookup.verify_reference_url(args.reference_url).to_payload()
     print(json.dumps(payload, indent=2, sort_keys=True))
 
 
