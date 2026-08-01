@@ -135,6 +135,23 @@ def chaos_daemons_runtime_updates() -> JulyChaosDaemonsRuntimeArtifact:
     )
 
 
+def chaos_daemons_keyword_overlay_for_datasheet(
+    datasheet_id: str,
+) -> JulyChaosDaemonsRuntimeRow | None:
+    matches = tuple(
+        row
+        for row in chaos_daemons_runtime_updates().rows
+        if row.row_kind == "keyword_overlay" and row.datasheet_id == datasheet_id
+    )
+    if len(matches) > 1:
+        raise JulyFactionPackStagingError(
+            "July Chaos Daemons keyword overlays must be unique by datasheet."
+        )
+    if not matches:
+        return None
+    return matches[0]
+
+
 def exalted_patron() -> JulyExaltedPatronArtifact:
     return july_exalted_patron_from_json_bytes(
         _staged_artifact_bytes("gw-11e-july-emperors-children-exalted-patron-2026-07")

@@ -25,6 +25,7 @@ from tests.support.wahapedia_bridge_fixtures import (
     keeper_of_secrets_bridge_artifacts,
     lord_of_change_bridge_artifacts,
     no_equipment_daemon_fortification_bridge_artifacts,
+    screamers_bridge_artifacts,
     soul_grinder_bridge_artifacts,
     weirdboy_bridge_artifacts,
 )
@@ -224,6 +225,21 @@ def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog
         "roll_type": "charge",
     }
     assert package.to_payload() == type(package).from_payload(package.to_payload()).to_payload()
+
+
+def test_phase17k_screamers_bridge_consumes_current_july_keyword_overlay() -> None:
+    datasheet_row = artifact_by_table(screamers_bridge_artifacts(), "Datasheets").rows[0]
+    fields = datasheet_row.runtime_fields_payload()
+
+    assert fields["keywords"] == "BEAST,CHAOS,DAEMON,FLY,SCREAMERS,TZEENTCH"
+    assert fields["faction_keywords"] == "Legiones Daemonica"
+    assert "FRAME" not in fields["keywords"]
+    assert "SHADOW LEGION" not in fields["keywords"]
+    assert "data-package:pdf:source-corrections:2026-07-22" in fields["source_ids"]
+    assert (
+        "gw-11e-faction-packs-2026-07:datasheet-keywords:chaos-daemons:000001127"
+        in fields["source_ids"]
+    )
 
 
 def test_phase17k_bridged_title_case_keywords_support_exact_runtime_keyword_gate() -> None:
@@ -827,6 +843,10 @@ def test_phase17k_bridge_supports_pdf_declared_no_equipment_and_no_wargear_optio
     artifacts = no_equipment_daemon_fortification_bridge_artifacts()
     wargear_rows = optional_artifact_rows(artifacts, "Datasheets_wargear")
     option_rows = optional_artifact_rows(artifacts, "Datasheets_options")
+    datasheet_rows = artifact_by_table(artifacts, "Datasheets").rows
+    datasheet_fields_by_id = {
+        row.runtime_fields_payload()["id"]: row.runtime_fields_payload() for row in datasheet_rows
+    }
     model_rows = artifact_by_table(artifacts, "Datasheets_models").rows
     model_fields_by_datasheet_id = {
         row.runtime_fields_payload()["datasheet_id"]: row.runtime_fields_payload()
@@ -841,6 +861,13 @@ def test_phase17k_bridge_supports_pdf_declared_no_equipment_and_no_wargear_optio
             row.runtime_fields_payload()["datasheet_id"] == datasheet_id for row in option_rows
         )
         assert model_fields_by_datasheet_id[datasheet_id]["base_size"] == "Hull"
+        fields = datasheet_fields_by_id[datasheet_id]
+        keywords = set(fields["keywords"].split(","))
+        faction_keywords = set(fields["faction_keywords"].split(","))
+        assert "FRAME" in keywords
+        assert "SHADOW LEGION" not in keywords
+        assert faction_keywords == {"Legiones Daemonica"}
+        assert "data-package:pdf:source-corrections:2026-07-22" in fields["source_ids"]
     assert model_fields_by_datasheet_id["000001588"]["height"] == "6.5"
     assert (
         model_fields_by_datasheet_id["000001588"]["height_document_reference"]

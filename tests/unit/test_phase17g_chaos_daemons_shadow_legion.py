@@ -39,6 +39,9 @@ from warhammer40k_core.engine import (
     stratagems_generic_metadata as generic_metadata,
 )
 from warhammer40k_core.engine import (
+    stratagems_generic_rule_ir_context as generic_rule_ir_context,
+)
+from warhammer40k_core.engine import (
     stratagems_generic_rule_ir_runtime as generic_rule_ir_runtime,
 )
 from warhammer40k_core.engine.advance_eligibility_hooks import AdvanceEligibilityContext
@@ -164,11 +167,16 @@ from warhammer40k_core.engine.stratagems import (
     GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     HIT_ENEMY_UNIT_CONTEXT_KEY,
     HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+    TARGET_BINDING_UNIT_CONTEXT_KEY,
+    VISIBLE_ENEMY_RANGE_INCHES_KEY,
+    VISIBLE_ENEMY_SOURCE_UNIT_CONTEXT_KEY,
+    VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND,
     StratagemCatalogRecord,
     StratagemDefinition,
     StratagemEligibilityContext,
     StratagemTargetBinding,
     StratagemUseRecord,
+    visible_enemy_unit_effect_selection,
 )
 from warhammer40k_core.engine.stratagems_generic_metadata import (
     companion_unit_effect_selection,
@@ -393,6 +401,31 @@ def test_shadow_legion_shade_path_modifies_charge_and_forces_battle_shock() -> N
     state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Nurgle"))
     defender = _unit_for_player(state, player_id="player-a")
     charger = _unit_for_player(state, player_id="player-b")
+    _place_unit_poses(
+        state,
+        unit_instance_id=defender.unit_instance_id,
+        poses=_unit_line_poses(x=10.0, y=20.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=charger.unit_instance_id,
+        poses=_unit_line_poses(x=18.0, y=20.0),
+    )
+
+    definition = _shadow_legion_stratagem_record(
+        shadow_legion_ir.SHADE_PATH_STRATAGEM_ID
+    ).definition
+    assert definition.timing.trigger_kind is TimingTriggerKind.START_PHASE
+    assert definition.when_descriptor == "Start of your opponent's Charge phase."
+    assert definition.target_descriptor == "One friendly SHADOW LEGION unit."
+    assert isinstance(definition.effect_payload, dict)
+    assert definition.effect_payload[generic_metadata.EFFECT_SELECTION_KIND_KEY] == (
+        VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND
+    )
+    assert definition.effect_payload[VISIBLE_ENEMY_SOURCE_UNIT_CONTEXT_KEY] == (
+        TARGET_BINDING_UNIT_CONTEXT_KEY
+    )
+    assert definition.effect_payload[VISIBLE_ENEMY_RANGE_INCHES_KEY] == 12
 
     decisions, _use_record = _use_shadow_legion_stratagem(
         state,
@@ -400,11 +433,8 @@ def test_shadow_legion_shade_path_modifies_charge_and_forces_battle_shock() -> N
         target_unit_id=defender.unit_instance_id,
         phase=BattlePhase.CHARGE,
         active_player_id="player-b",
-        trigger_kind=TimingTriggerKind.DURING_PHASE,
-        trigger_payload={
-            shadow_legion_ir.SHADOW_LEGION_CHARGING_UNIT_CONTEXT_KEY: charger.unit_instance_id,
-            stratagems.CHARGE_TARGET_UNIT_IDS_CONTEXT_KEY: [defender.unit_instance_id],
-        },
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        effect_selection=visible_enemy_unit_effect_selection(charger.unit_instance_id),
     )
 
     modifiers = RuntimeModifierRegistry.empty().charge_roll_modifiers(
@@ -415,7 +445,7 @@ def test_shadow_legion_shade_path_modifies_charge_and_forces_battle_shock() -> N
         )
     )
 
-    assert [modifier.operand for modifier in modifiers] == [-2]
+    assert [modifier.operand for modifier in modifiers] == [-1]
     assert _event_count(decisions, "battle_shock_test_resolved") == 1
 
 
@@ -1196,7 +1226,7 @@ def test_shadow_legion_generic_runtime_trigger_and_selection_helpers_are_fail_fa
     )
 
     assert (
-        generic_rule_ir_runtime._trigger_payload_identifier(
+        generic_rule_ir_context._trigger_payload_identifier(
             context,
             key="target_unit",
         )
@@ -1222,14 +1252,14 @@ def test_shadow_legion_generic_runtime_trigger_and_selection_helpers_are_fail_fa
         },
     )
     assert (
-        generic_rule_ir_runtime._effect_selection_unit_id(
+        generic_rule_ir_context.effect_selection_unit_id(
             hit_record,
             expected_selection_kind=HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
         )
         == enemy_unit.unit_instance_id
     )
     assert (
-        generic_rule_ir_runtime._effect_selection_unit_id(
+        generic_rule_ir_context.effect_selection_unit_id(
             engaged_record,
             expected_selection_kind=ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
         )
@@ -1242,7 +1272,7 @@ def test_shadow_legion_generic_runtime_trigger_and_selection_helpers_are_fail_fa
 
     trigger_error_contexts: tuple[tuple[JsonValue, str], ...] = (
         (None, "requires structured trigger payload"),
-        ({"target_unit": 1}, "missing identifier"),
+        ({"target_unit": 1}, "missing a unit"),
         ({"target_units": "enemy-unit"}, "list is missing"),
         (
             {"target_units": [enemy_unit.unit_instance_id, 1]},
@@ -1265,7 +1295,7 @@ def test_shadow_legion_generic_runtime_trigger_and_selection_helpers_are_fail_fa
                 )
         else:
             with pytest.raises(GameLifecycleError, match=expected_message):
-                generic_rule_ir_runtime._trigger_payload_identifier(
+                generic_rule_ir_context._trigger_payload_identifier(
                     bad_context,
                     key="target_unit",
                 )
@@ -1313,7 +1343,7 @@ def test_shadow_legion_generic_runtime_trigger_and_selection_helpers_are_fail_fa
     )
     for bad_record, expected_selection_kind, expected_message in effect_selection_error_records:
         with pytest.raises(GameLifecycleError, match=expected_message):
-            generic_rule_ir_runtime._effect_selection_unit_id(
+            generic_rule_ir_context.effect_selection_unit_id(
                 bad_record,
                 expected_selection_kind=expected_selection_kind,
             )

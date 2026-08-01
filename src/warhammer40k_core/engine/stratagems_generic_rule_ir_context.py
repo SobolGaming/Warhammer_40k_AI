@@ -55,6 +55,29 @@ def effect_selection_unit_id(
     return _validate_identifier("effect_selection_unit_id", value)
 
 
+def rule_effect_target_unit_id_for_context(
+    *,
+    context: StratagemEligibilityContext,
+    use_record: StratagemUseRecord,
+    context_key: str,
+) -> str:
+    requested_key = _validate_identifier("target_unit_context_key", context_key)
+    if requested_key == TARGET_BINDING_UNIT_CONTEXT_KEY:
+        return _single_target_unit_id(use_record)
+    selection_kind_by_context_key = {
+        HIT_ENEMY_UNIT_CONTEXT_KEY: HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+        ENGAGED_ENEMY_UNIT_CONTEXT_KEY: ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+        VISIBLE_ENEMY_UNIT_CONTEXT_KEY: VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+    }
+    selection_kind = selection_kind_by_context_key.get(requested_key)
+    if selection_kind is not None:
+        return effect_selection_unit_id(
+            use_record,
+            expected_selection_kind=selection_kind,
+        )
+    return _trigger_payload_identifier(context, key=requested_key)
+
+
 def _single_target_unit_id(use_record: StratagemUseRecord) -> str:
     if type(use_record) is not StratagemUseRecord:
         raise GameLifecycleError("Generic Stratagem effect requires use record.")

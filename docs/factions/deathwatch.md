@@ -8,7 +8,7 @@ Current source package: `gw-11e-deathwatch-faction-pack-2026-06`
 
 ## Summary
 
-| Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-supported rows |
+| Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
 | 1 | 0 | 0 | 0 | 0 |
 

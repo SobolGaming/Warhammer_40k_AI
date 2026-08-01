@@ -184,7 +184,7 @@ This generated section reports pregame army-list rules enforced by `army_musteri
 
 Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into generated per-faction files under `docs/factions/`. The exact rows expose their coverage row IDs, source IDs, timing/category metadata, and current support status. Supported detachment counts report semantic engine support, not just source-row intake.
 
-| Faction | Detachments | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-supported rows | File |
+| Faction | Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows | File |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | Orks | 12 | 1 | 44 | 66 | 13 | [orks](factions/orks.md) |
 | Aeldari | 15 | 2 | 51 | 75 | 16 | [aeldari](factions/aeldari.md) |

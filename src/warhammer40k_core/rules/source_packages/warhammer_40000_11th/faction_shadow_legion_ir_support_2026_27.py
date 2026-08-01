@@ -125,6 +125,7 @@ SHADOW_LEGION_STRATAGEM_PROFILE_IDS = tuple(
 SHADOW_LEGION_SELECTED_COMPANION_UNIT_EFFECT_SELECTION_KIND = "selected_friendly_companion_unit"
 SHADOW_LEGION_SELECTED_COMPANION_UNIT_CONTEXT_KEY = "companion_unit_instance_id"
 SHADOW_LEGION_CHARGING_UNIT_CONTEXT_KEY = "charging_unit_instance_id"
+VISIBLE_ENEMY_UNIT_CONTEXT_KEY = "visible_enemy_unit_instance_id"
 SHADOW_LEGION_DESTROYED_LAST_MODEL_CONTEXT_KEY = "destroyed_last_model_instance_id"
 SHADOW_LEGION_ENGAGED_ENEMY_UNITS_CONTEXT_KEY = "engaged_enemy_unit_instance_ids"
 
@@ -351,9 +352,14 @@ def _stratagem_coverage_payload(stratagem_id: str) -> RuleIRPayload:
 
 def _stratagem_activation_payload(profile_id: str) -> RuleIRPayload:
     stratagem_id = profile_id.rsplit(":", maxsplit=1)[-1]
-    source_id = (
-        f"{STRATAGEM_SOURCE_PACKAGE_ID}:stratagem:chaos-daemons:shadow-legion:{stratagem_id}"
-    )
+    if stratagem_id == SHADE_PATH_STRATAGEM_ID:
+        source_id = (
+            f"gw-11e-faction-packs-2026-07:stratagem:chaos-daemons:shadow-legion:{stratagem_id}"
+        )
+    else:
+        source_id = (
+            f"{STRATAGEM_SOURCE_PACKAGE_ID}:stratagem:chaos-daemons:shadow-legion:{stratagem_id}"
+        )
     return _stratagem_payload_by_id(stratagem_id, rule_id=profile_id, source_id=source_id)
 
 
@@ -601,9 +607,9 @@ def _encroaching_darkness_payload(*, rule_id: str, source_id: str) -> RuleIRPayl
 def _shade_path_payload(*, rule_id: str, source_id: str) -> RuleIRPayload:
     normalized_text = (
         "stratagem_activation_target_binding\n"
-        "Until the end of the phase, subtract 2 from Charge rolls made for that enemy "
-        "unit. In addition, if your unit has the Nurgle keyword, that enemy unit must "
-        "take a Battle-shock test."
+        "Select one visible enemy unit within 12 inches of your unit. Until the end of "
+        "the phase, subtract 1 from Charge rolls made for that enemy unit. If your unit "
+        "has the Nurgle keyword, that enemy unit must take a Battle-shock test."
     )
     duration = _end_phase_duration(normalized_text)
     return _payload(
@@ -616,19 +622,19 @@ def _shade_path_payload(*, rule_id: str, source_id: str) -> RuleIRPayload:
                 clause_id=f"{rule_id}:effect:001",
                 template_id=DICE_ROLL_MODIFIER_TEMPLATE_ID,
                 normalized_text=normalized_text,
-                source_text="subtract 2 from Charge rolls made for that enemy unit",
+                source_text="subtract 1 from Charge rolls made for that enemy unit",
                 target=None,
                 effects=(
                     _effect(
                         "modify_dice_roll",
                         normalized_text,
-                        "subtract 2 from Charge rolls",
+                        "subtract 1 from Charge rolls",
                         (
                             _parameter("roll_type", "charge"),
-                            _parameter("delta", -2),
+                            _parameter("delta", -1),
                             _parameter(
                                 "target_unit_context_key",
-                                SHADOW_LEGION_CHARGING_UNIT_CONTEXT_KEY,
+                                VISIBLE_ENEMY_UNIT_CONTEXT_KEY,
                             ),
                             _parameter("replay_effect_kind", "shadow_legion_shade_path"),
                         ),
@@ -651,7 +657,7 @@ def _shade_path_payload(*, rule_id: str, source_id: str) -> RuleIRPayload:
                             _parameter("status", "force_battle_shock_test"),
                             _parameter(
                                 "target_unit_context_key",
-                                SHADOW_LEGION_CHARGING_UNIT_CONTEXT_KEY,
+                                VISIBLE_ENEMY_UNIT_CONTEXT_KEY,
                             ),
                             _parameter("required_source_keyword", NURGLE_KEYWORD),
                             _parameter("roll_modifier", 0),

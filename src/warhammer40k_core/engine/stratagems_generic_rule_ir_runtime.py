@@ -32,11 +32,11 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     unit_by_id,
     unit_has_keyword,
 )
+from warhammer40k_core.engine.stratagems_generic_rule_ir_context import (
+    effect_selection_unit_id,
+    rule_effect_target_unit_id_for_context,
+)
 from warhammer40k_core.engine.stratagems_model import (
-    ENGAGED_ENEMY_UNIT_CONTEXT_KEY,
-    ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND,
-    HIT_ENEMY_UNIT_CONTEXT_KEY,
-    HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
     StratagemEligibilityContext,
     StratagemUseRecord,
 )
@@ -93,9 +93,13 @@ def record_generic_rule_ir_charge_roll_modifier(
 ) -> None:
     if _required_rule_effect_string_parameter(effect_payload, "roll_type") != "charge":
         raise GameLifecycleError("Generic charge modifier requires charge roll_type.")
-    target_unit_id = _trigger_payload_identifier(
-        context,
-        key=_required_rule_effect_string_parameter(effect_payload, "target_unit_context_key"),
+    target_unit_id = rule_effect_target_unit_id_for_context(
+        context=context,
+        use_record=use_record,
+        context_key=_required_rule_effect_string_parameter(
+            effect_payload,
+            "target_unit_context_key",
+        ),
     )
     source_rule_id = _rule_effect_source_id(effect_payload)
     effect = PersistingEffect(
@@ -144,9 +148,13 @@ def resolve_generic_rule_ir_context_battle_shock(
             required_source_keyword,
         ):
             return
-    target_unit_id = _trigger_payload_identifier(
-        context,
-        key=_required_rule_effect_string_parameter(effect_payload, "target_unit_context_key"),
+    target_unit_id = rule_effect_target_unit_id_for_context(
+        context=context,
+        use_record=use_record,
+        context_key=_required_rule_effect_string_parameter(
+            effect_payload,
+            "target_unit_context_key",
+        ),
     )
     _resolve_battle_shock_test(
         state=state,
@@ -409,7 +417,7 @@ def _resolve_generic_roll_pool_mortal_wounds(
         unit = unit_by_id(state=state, unit_instance_id=unit_id)
         if not unit_has_keyword(unit, required_keyword):
             return
-    target_unit_id = _effect_selection_unit_id(
+    target_unit_id = effect_selection_unit_id(
         use_record,
         expected_selection_kind=_required_rule_effect_string_parameter(
             effect_payload,
@@ -797,29 +805,6 @@ def _single_execution_target_unit_id(use_record: StratagemUseRecord) -> str:
     return target_ids[0]
 
 
-def _effect_selection_unit_id(
-    use_record: StratagemUseRecord,
-    *,
-    expected_selection_kind: str,
-) -> str:
-    selection_kind = _validate_identifier("effect_selection_kind", expected_selection_kind)
-    selection = use_record.effect_selection
-    if not isinstance(selection, dict):
-        raise GameLifecycleError("Generic Stratagem effect requires effect selection.")
-    if selection.get("effect_selection_kind") != selection_kind:
-        raise GameLifecycleError("Generic Stratagem effect selection kind drift.")
-    if selection_kind == HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND:
-        key = HIT_ENEMY_UNIT_CONTEXT_KEY
-    elif selection_kind == ENGAGED_ENEMY_UNIT_EFFECT_SELECTION_KIND:
-        key = ENGAGED_ENEMY_UNIT_CONTEXT_KEY
-    else:
-        raise GameLifecycleError("Generic Stratagem effect selection kind is unsupported.")
-    value = selection.get(key)
-    if type(value) is not str:
-        raise GameLifecycleError("Generic Stratagem effect selection is missing unit.")
-    return _validate_identifier("effect_selection_unit_id", value)
-
-
 def _source_keyword_bonus(
     *,
     source_unit: UnitInstance,
@@ -829,21 +814,6 @@ def _source_keyword_bonus(
     if keyword is None or not unit_has_keyword(source_unit, keyword):
         return 0
     return _required_rule_effect_int_parameter(effect_payload, "bonus")
-
-
-def _trigger_payload_identifier(
-    context: StratagemEligibilityContext,
-    *,
-    key: str,
-) -> str:
-    requested_key = _validate_identifier("trigger_payload key", key)
-    payload = context.trigger_payload
-    if not isinstance(payload, dict):
-        raise GameLifecycleError("Generic Stratagem requires structured trigger payload.")
-    value = payload.get(requested_key)
-    if type(value) is not str:
-        raise GameLifecycleError("Generic Stratagem trigger payload is missing identifier.")
-    return _validate_identifier(requested_key, value)
 
 
 def _trigger_payload_identifier_list(

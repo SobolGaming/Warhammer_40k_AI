@@ -8,6 +8,9 @@ from warhammer40k_core.core.model_geometry_catalog import (
     GeometrySourceUnits,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    july_faction_packs_2026_07 as july_source,
+)
 
 
 class WahapediaBridgeDefaultsError(ValueError):
@@ -19,6 +22,8 @@ class PdfDatasheetCorrection:
     datasheet_id: str
     source_id: str
     removed_keywords: tuple[str, ...] = ()
+    replacement_keywords: tuple[str, ...] | None = None
+    source_package_version: str = "2026-06-10"
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -31,6 +36,28 @@ class PdfDatasheetCorrection:
             self,
             "removed_keywords",
             _validate_identifier_tuple("removed_keywords", self.removed_keywords),
+        )
+        if self.replacement_keywords is not None:
+            object.__setattr__(
+                self,
+                "replacement_keywords",
+                _validate_identifier_tuple(
+                    "replacement_keywords",
+                    self.replacement_keywords,
+                ),
+            )
+            if not self.replacement_keywords:
+                raise WahapediaBridgeDefaultsError(
+                    "replacement_keywords must not be empty when provided."
+                )
+        if self.removed_keywords and self.replacement_keywords is not None:
+            raise WahapediaBridgeDefaultsError(
+                "A PDF correction cannot remove and replace keywords simultaneously."
+            )
+        object.__setattr__(
+            self,
+            "source_package_version",
+            _validate_identifier("source_package_version", self.source_package_version),
         )
 
 
@@ -97,6 +124,49 @@ CHAOS_DAEMONS_BLOODCRUSHERS_PDF_CORRECTION = PdfDatasheetCorrection(
     datasheet_id="000001115",
     source_id="pdf:chaos-daemons-faction-pack:2026-06-10:p30-p31",
     removed_keywords=("Shadow Legion",),
+)
+
+
+def _july_chaos_daemons_keyword_correction(datasheet_id: str) -> PdfDatasheetCorrection:
+    row = july_source.chaos_daemons_keyword_overlay_for_datasheet(datasheet_id)
+    if row is None:
+        raise WahapediaBridgeDefaultsError(
+            "Required July Chaos Daemons keyword overlay is unavailable."
+        )
+    return PdfDatasheetCorrection(
+        datasheet_id=datasheet_id,
+        source_id=row.source_row_id,
+        replacement_keywords=tuple(row.replacement_keywords),
+        source_package_version=july_source.SOURCE_VERSION,
+    )
+
+
+CHAOS_DAEMONS_SCREAMERS_PDF_CORRECTION = _july_chaos_daemons_keyword_correction("000001127")
+CHAOS_DAEMONS_FECULENT_GNARLMAW_PDF_CORRECTION = PdfDatasheetCorrection(
+    datasheet_id="000001470",
+    source_id=("gw-11e-faction-packs-2026-07:datasheet-keywords:chaos-daemons:000001470"),
+    replacement_keywords=(
+        "FORTIFICATION",
+        "CHAOS",
+        "DAEMON",
+        "FRAME",
+        "NURGLE",
+        "FECULENT GNARLMAW",
+    ),
+    source_package_version=july_source.SOURCE_VERSION,
+)
+CHAOS_DAEMONS_SKULL_ALTAR_PDF_CORRECTION = PdfDatasheetCorrection(
+    datasheet_id="000001588",
+    source_id=("gw-11e-faction-packs-2026-07:datasheet-keywords:chaos-daemons:000001588"),
+    replacement_keywords=(
+        "FORTIFICATION",
+        "CHAOS",
+        "DAEMON",
+        "FRAME",
+        "KHORNE",
+        "SKULL ALTAR",
+    ),
+    source_package_version=july_source.SOURCE_VERSION,
 )
 
 CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES = (
@@ -619,6 +689,9 @@ CHAOS_DEFILER_HEIGHT_OVERRIDES = (
 
 DEFAULT_PDF_CORRECTIONS = (
     CHAOS_DAEMONS_BLOODCRUSHERS_PDF_CORRECTION,
+    CHAOS_DAEMONS_SCREAMERS_PDF_CORRECTION,
+    CHAOS_DAEMONS_FECULENT_GNARLMAW_PDF_CORRECTION,
+    CHAOS_DAEMONS_SKULL_ALTAR_PDF_CORRECTION,
     *CHAOS_DEFILER_PDF_CORRECTIONS,
 )
 DEFAULT_HEIGHT_OVERRIDES = (

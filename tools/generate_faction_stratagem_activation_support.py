@@ -104,6 +104,44 @@ class SourceOnlyActivationMetadata:
     excluded_faction_keywords: tuple[str, ...] = ()
 
 
+CURRENT_SOURCE_ACTIVATION_METADATA_BY_ROW_ID: dict[str, SourceOnlyActivationMetadata] = {
+    "stratagem:chaos-daemons:blood-legion:000009816006": SourceOnlyActivationMetadata(
+        when_descriptor=(
+            "Your opponent's Movement phase, when an enemy unit ends a Fall Back move."
+        ),
+        target_descriptor=(
+            'One friendly unengaged LEGIONES DAEMONICA KHORNE unit that is within 6" '
+            "of that enemy unit."
+        ),
+        effect_descriptor=(
+            "Declare a charge with your unit. When selecting charge targets, you can only "
+            "select enemy units that made a Fall Back move this phase and are within the "
+            "maximum distance."
+        ),
+        trigger_kind="after_enemy_unit_ends_move",
+        phase_tokens=("movement",),
+        target_kind="friendly_unit",
+        target_policy_id="friendly_unit",
+        required_keywords=("KHORNE",),
+        required_faction_keywords=("LEGIONES DAEMONICA",),
+    ),
+    "stratagem:chaos-daemons:shadow-legion:000009979006": SourceOnlyActivationMetadata(
+        when_descriptor="Start of your opponent's Charge phase.",
+        target_descriptor="One friendly SHADOW LEGION unit.",
+        effect_descriptor=(
+            'Select one visible enemy unit within 12" of your unit. Until the end of the '
+            "phase, subtract 1 from Charge rolls made for that enemy unit. If your unit has "
+            "the NURGLE keyword, that enemy unit must take a Battle-shock test."
+        ),
+        trigger_kind="start_phase",
+        phase_tokens=("charge",),
+        target_kind="friendly_unit",
+        target_policy_id="friendly_unit",
+        required_keywords=("SHADOW LEGION",),
+    ),
+}
+
+
 SOURCE_ONLY_ACTIVATION_METADATA_BY_ROW_ID: dict[str, SourceOnlyActivationMetadata] = {
     "stratagem:emperors-children:spectacle-of-slaughter:000010901002": (
         SourceOnlyActivationMetadata(
@@ -260,6 +298,12 @@ def _activation_profile_for_source_row(
     source_row: faction_subrules_2026_27.SourceStratagemRow,
     raw_rows: dict[str, dict[str, object]],
 ) -> ActivationProfile:
+    current_metadata = CURRENT_SOURCE_ACTIVATION_METADATA_BY_ROW_ID.get(source_row.source_row_id)
+    if current_metadata is not None:
+        return _activation_profile_from_current_source_metadata(
+            source_row=source_row,
+            metadata=current_metadata,
+        )
     raw_row = raw_rows.get(source_row.stratagem_id)
     if raw_row is not None:
         return _activation_profile(source_row=source_row, raw_row=raw_row)
@@ -272,6 +316,60 @@ def _activation_profile_for_source_row(
     return _activation_profile_from_source_only_metadata(
         source_row=source_row,
         metadata=metadata,
+    )
+
+
+def _activation_profile_from_current_source_metadata(
+    *,
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+    metadata: SourceOnlyActivationMetadata,
+) -> ActivationProfile:
+    profile_id = (
+        "phase17s:stratagem:"
+        f"{source_row.faction_id}:{source_row.detachment_id}:{source_row.stratagem_id}"
+    )
+    rule_target_kind = _rule_target_kind(
+        target_kind=metadata.target_kind,
+        target_policy_id=metadata.target_policy_id,
+    )
+    return ActivationProfile(
+        profile_id=profile_id,
+        source_row_id=source_row.source_row_id,
+        source_id=(
+            "gw-11e-faction-packs-2026-07:"
+            f"stratagem:{source_row.faction_id}:{source_row.detachment_id}:"
+            f"{source_row.stratagem_id}"
+        ),
+        faction_id=source_row.faction_id,
+        detachment_id=source_row.detachment_id,
+        stratagem_id=source_row.stratagem_id,
+        name=source_row.name,
+        command_point_cost=source_row.command_point_cost,
+        category=_category_token(source_row.category),
+        when_descriptor=metadata.when_descriptor,
+        target_descriptor=metadata.target_descriptor,
+        effect_descriptor=metadata.effect_descriptor,
+        restrictions_descriptor="matched play same stratagem per phase",
+        trigger_kind=metadata.trigger_kind,
+        phase_tokens=metadata.phase_tokens,
+        target_kind=metadata.target_kind,
+        target_policy_id=metadata.target_policy_id,
+        required_keywords=metadata.required_keywords,
+        required_keywords_any=metadata.required_keywords_any,
+        required_faction_keywords=metadata.required_faction_keywords,
+        excluded_keywords=metadata.excluded_keywords,
+        excluded_faction_keywords=metadata.excluded_faction_keywords,
+        rule_ir_hash=_rule_ir_hash(
+            profile_id=profile_id,
+            source_id=(
+                "gw-11e-faction-packs-2026-07:"
+                f"stratagem:{source_row.faction_id}:{source_row.detachment_id}:"
+                f"{source_row.stratagem_id}"
+            ),
+            rule_target_kind=rule_target_kind,
+        ),
+        compiled_rule_ir_payload=None,
+        effect_selection_kind=None,
     )
 
 
