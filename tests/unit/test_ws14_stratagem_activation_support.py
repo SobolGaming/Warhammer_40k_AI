@@ -84,17 +84,10 @@ def test_ws14_stratagem_activation_profiles_cover_source_only_detachment_rows() 
         | set(lords_ir.LORDS_OF_THE_WARP_STRATAGEM_SOURCE_ROW_IDS)
         | set(warptide_ir.WARPTIDE_STRATAGEM_SOURCE_ROW_IDS)
     )
-    runtime_supported_profile_row_ids = set(
-        faction_generic_ir_support_2026_27.supported_daemonic_incursion_stratagem_source_row_ids()
-    )
-
     assert len(source_only_rows) == 1080
-    assert len(profiles) == 1076
+    assert len(profiles) == 1070
     assert source_backed_generic_row_ids <= source_only_row_ids
-    assert (
-        profile_source_row_ids
-        == (source_only_row_ids - source_backed_generic_row_ids) | runtime_supported_profile_row_ids
-    )
+    assert profile_source_row_ids == source_only_row_ids - source_backed_generic_row_ids
 
     for profile in profiles:
         rule_ir = RuleIR.from_payload(cast(RuleIRPayload, profile.rule_ir_payload()))
@@ -125,13 +118,40 @@ def test_ws14_generated_stratagem_rule_ir_freezes_supported_effect_durations() -
         )
     ]
 
-    assert len(effect_profiles) == 171
-    assert len(duration_profiles) == 167
+    assert len(effect_profiles) == 187
+    assert len(duration_profiles) == 183
 
     payload = effect_profiles[0].rule_ir_payload()
     payload["rule_id"] = "tampered"
 
     assert effect_profiles[0].rule_ir_payload()["rule_id"] == effect_profiles[0].profile_id
+
+
+def test_ws14_chaos_daemons_profiles_use_current_july_stratagem_text() -> None:
+    profiles = {
+        profile.stratagem_id: profile
+        for profile in faction_stratagem_activation_2026_27.stratagem_activation_profiles()
+        if profile.faction_id == "chaos-daemons"
+        and profile.stratagem_id in {"000009816006", "000009979006"}
+    }
+
+    fools_flight = profiles["000009816006"]
+    assert fools_flight.source_id.startswith("gw-11e-faction-packs-2026-07:")
+    assert fools_flight.trigger_kind == "after_enemy_unit_ends_move"
+    assert fools_flight.required_keywords == ("KHORNE",)
+    assert fools_flight.required_faction_keywords == ("LEGIONES DAEMONICA",)
+    assert "unengaged" in fools_flight.target_descriptor
+    assert "made a Fall Back move this phase" in fools_flight.effect_descriptor
+    assert "does not receive any Charge bonus" not in fools_flight.effect_descriptor
+
+    shade_path = profiles["000009979006"]
+    assert shade_path.source_id.startswith("gw-11e-faction-packs-2026-07:")
+    assert shade_path.trigger_kind == "start_phase"
+    assert shade_path.when_descriptor == "Start of your opponent's Charge phase."
+    assert shade_path.target_descriptor == "One friendly SHADOW LEGION unit."
+    assert 'visible enemy unit within 12"' in shade_path.effect_descriptor
+    assert "subtract 1 from Charge rolls" in shade_path.effect_descriptor
+    assert "subtract 2 from Charge rolls" not in shade_path.effect_descriptor
 
 
 def test_ws14_source_backed_stratagem_activation_records_are_runtime_loadable() -> None:
@@ -142,7 +162,7 @@ def test_ws14_source_backed_stratagem_activation_records_are_runtime_loadable() 
         faction_stratagem_activation_2026_27.SOURCE_PACKAGE_ID
     )
     assert len(records) == sum(len(profile.phase_tokens) for profile in profiles)
-    assert len(records) == 1260
+    assert len(records) == 1253
     assert StratagemCatalogIndex.from_records(records).all_records() == tuple(
         sorted(records, key=lambda record: record.record_id)
     )

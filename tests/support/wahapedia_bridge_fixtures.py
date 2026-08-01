@@ -66,6 +66,24 @@ def bloodthirster_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     )
 
 
+def screamers_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=wahapedia_source_artifacts(),
+        bridge_package_id=bridge_package_id(),
+        datasheet_ids=("000001127",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="000001127",
+                model_name="Screamers",
+                height=2.0,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:chaos-daemons:screamers:test-height",
+                height_document_reference="Chaos Daemons Screamers bridge regression fixture",
+            ),
+        ),
+    )
+
+
 def kairos_fateweaver_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     return build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=wahapedia_source_artifacts(),

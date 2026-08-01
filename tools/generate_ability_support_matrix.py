@@ -272,6 +272,29 @@ AELDARI_YRIEL_VYPERS_STARFANGS_DATASHEET_IDS = (
     "000004195",
 )
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
+CHAOS_DAEMONS_SUPPORTED_DETACHMENT_RULE_NAMES = (
+    "Blood Tainted",
+    "Loci of Power",
+    "Murdercall",
+    "Shadow Legion",
+    "Shudderblink",
+    "Unholy Avalanche",
+    "Warp Rifts",
+)
+CHAOS_DAEMONS_UNSUPPORTED_DETACHMENT_RULE_NAMES = (
+    "Beguiling Aura",
+    "Fates In Flux",
+    "Melancholic Miasma",
+    "Seductive Gambit",
+)
+CHAOS_DAEMONS_SPLIT_UNSUPPORTED_SEMANTICS = (
+    "Split model-addition and Pink-to-Blue datasheet-handoff semantics, including the "
+    "FAQ constraints that only attack destruction (including Hazardous failures) can "
+    "trigger Split, non-attack damage cannot, Split can grow the unit above its starting "
+    "strength, the original Pink Horrors starting-strength baseline is retained after "
+    "handoff, returned models cannot be Pink Horrors after handoff, and returned models "
+    "cannot exceed that original starting strength"
+)
 BELAKOR_DATASHEET_IDS = ("000001148",)
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
 UNDIVIDED_DAEMON_DATASHEET_IDS = ("000001149", "000002758", "000001151")
@@ -3010,7 +3033,7 @@ def _faction_support_markdown(
         "## Summary",
         "",
         (
-            "| Detachment rules | Supported detachment rules | Exact Enhancements | "
+            "| Detachments | Supported detachments | Exact Enhancements | "
             "Exact Stratagems | Engine-supported rows |"
         ),
         "| ---: | ---: | ---: | ---: | ---: |",
@@ -3304,6 +3327,15 @@ def _chaos_daemons_detachment_snapshot_markdown() -> list[str]:
         "| Fully supported | Still needs semantic support |",
         "| --- | --- |",
         f"| {_markdown_line_list(fully_supported)} | {_markdown_line_list(needs_support)} |",
+        "",
+        "### Detachment rules",
+        "",
+        "| Runtime supported / executable | Still source-only / blocked |",
+        "| --- | --- |",
+        (
+            f"| {_markdown_line_list(CHAOS_DAEMONS_SUPPORTED_DETACHMENT_RULE_NAMES)} | "
+            f"{_markdown_line_list(CHAOS_DAEMONS_UNSUPPORTED_DETACHMENT_RULE_NAMES)} |"
+        ),
     ]
 
 
@@ -3956,10 +3988,12 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
                 "Leadership modifier semantics are structured paths."
             ),
             semantics_needed=(
-                "Split model-addition semantics; Exploding Horrors self-destruction and "
-                "mortal-wound routing."
+                f"{CHAOS_DAEMONS_SPLIT_UNSUPPORTED_SEMANTICS}; Exploding Horrors "
+                "self-destruction and mortal-wound routing."
             ),
-            catalog_blockers="PDF-backed Split composition normalization still needs review.",
+            catalog_blockers=(
+                "PDF- and FAQ-backed Split composition normalization still needs review."
+            ),
         ),
         DatasheetGroupReviewRow(
             datasheet="Burning Chariot",
@@ -4072,11 +4106,10 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
                 "Deep Strike, The Shadow of Chaos, Daemonic Icon Leadership, and "
                 "Instrument of Chaos charge modifier semantics are structured paths."
             ),
-            semantics_needed=(
-                "Split model-addition semantics and Blue Horrors datasheet handoff when "
-                "no Pink Horror models remain."
+            semantics_needed=(f"{CHAOS_DAEMONS_SPLIT_UNSUPPORTED_SEMANTICS}."),
+            catalog_blockers=(
+                "PDF- and FAQ-backed Split composition normalization still needs review."
             ),
-            catalog_blockers="PDF-backed Split composition normalization still needs review.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Screamers",
@@ -4388,7 +4421,7 @@ def _chaos_daemons_slaanesh_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             source_basis="PDF pages 88-89; supersedes Wahapedia.",
             ir_coverage="All consumed",
             supported_semantics=(
-                "Deep Strike, Deadly Demise D6, The Shadow of Chaos, No Prey Too Great "
+                "Deep Strike, Deadly Demise D6, The Shadow of Chaos, No Prey Can Evade "
                 "Advance/Charge rerolls, Monarch of the Hunt quarry rerolls, and Greater "
                 "Daemon of Slaanesh Shadow aura are consumed."
             ),
@@ -5926,7 +5959,7 @@ def _faction_index_section_markdown() -> list[str]:
         ),
         "",
         (
-            "| Faction | Detachments | Supported detachment rules | Exact Enhancements | "
+            "| Faction | Detachments | Supported detachments | Exact Enhancements | "
             "Exact Stratagems | Engine-supported rows | File |"
         ),
         "| --- | ---: | ---: | ---: | ---: | ---: | --- |",

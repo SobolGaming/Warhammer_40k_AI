@@ -8,7 +8,7 @@ Current source package: `gw-11e-genestealer-cults-faction-pack-2026-07`
 
 ## Summary
 
-| Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-supported rows |
+| Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
 | 9 | 0 | 20 | 30 | 3 |
 

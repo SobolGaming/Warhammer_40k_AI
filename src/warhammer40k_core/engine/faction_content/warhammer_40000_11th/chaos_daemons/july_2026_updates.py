@@ -123,9 +123,9 @@ def runtime_contribution() -> RuntimeContentContribution:
 
 
 def replacement_keywords_for_datasheet(datasheet_id: str) -> tuple[str, ...] | None:
-    if datasheet_id != SCREAMERS_DATASHEET_ID:
+    row = july_source.chaos_daemons_keyword_overlay_for_datasheet(datasheet_id)
+    if row is None:
         return None
-    row = _runtime_row("chaos-daemons:screamers:keywords")
     return tuple(row.replacement_keywords)
 
 

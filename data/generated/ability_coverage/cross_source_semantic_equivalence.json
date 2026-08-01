@@ -100271,12 +100271,12 @@
       "content_kind": "stratagem",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "9b069ffa0cb2d24536e6be8950b830f82b1e62dea81953ed729bbcd417590c23",
+      "equivalence_hash": "46b5ee7959f43c66e2f76fabe46425517d0572338bb04952884cf8a7f08c50c5",
       "execution_status": "generic_ir_executable",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:chaos-daemons:shadow-legion:000009979006",
-      "normalized_text_hash": "f1b691bda126f90b9fd5922a6e9a227767a065a1b2c1ed9ef025cc7ecd2c3132",
+      "normalized_text_hash": "3b4e04b60cde2ac7d95a31bc1c0c324f859914f80b86c47fcc9f1c62c873c339",
       "owner_id": "shadow-legion",
       "owner_name": "Shadow Legion",
       "rule_id": "000009979006",
@@ -100284,7 +100284,7 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "7ab745c3865ddf3c718af40de5ce1fbb864be372d63a1608696a8bd145b14b2e",
-      "semantic_hash": "e4dd1d592760114f898b56f9b322aae8d9f87655e31473b6125ee06d7b4413aa",
+      "semantic_hash": "7ebe92f8310a67aa35d7e8ac327ba91ad0ed5e3a7b721c36761c4caf1d75f370",
       "source_row_ids": [
         "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:shadow-legion",
         "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000009979006",
@@ -124252,8 +124252,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "39d9d492860633a04ebca28eb2d7507ab91b9fdf5af0f5ecc65a57ac76455f02",
+  "source_payload_checksum_sha256": "7fbbf1a36032649fbf1d931a9d09fcfaad0608c1d0adda22a31dc87895d8ed29",
   "source_text_unavailable_member_count": 100,
   "structured_member_count": 709,
-  "upstream_execution_checksum_sha256": "e0891821a29789028855176d5f03077aa1572b31067c66e6b2619affb2771ef0"
+  "upstream_execution_checksum_sha256": "4d1f3c0248296eb28e71a8fc5150ef4d80d33661719c519028d87afbaf023ddc"
 }

@@ -519,7 +519,12 @@ def _keywords_for_datasheet(
         raise WahapediaBridgeError("Datasheet has no keyword rows.")
     correction = context.corrections_by_datasheet.get(datasheet_id)
     removed = set(correction.removed_keywords if correction is not None else ())
-    keywords: list[str] = []
+    keywords: list[str] = list(
+        correction.replacement_keywords
+        if correction is not None and correction.replacement_keywords is not None
+        else ()
+    )
+    replaces_keywords = correction is not None and correction.replacement_keywords is not None
     faction_keywords: list[str] = []
     source_rows: list[NormalizedSourceRow] = []
     for row in keyword_rows:
@@ -537,7 +542,7 @@ def _keywords_for_datasheet(
             continue
         if _required_field(row, "is_faction_keyword") == "true":
             faction_keywords.append(keyword)
-        else:
+        elif not replaces_keywords:
             keywords.append(keyword)
         source_rows.append(row)
     if correction is not None:
@@ -1795,7 +1800,9 @@ def _split_source_ids(value: str) -> list[str]:
 def _correction_source_row(correction: PdfDatasheetCorrection) -> NormalizedSourceRow:
     return NormalizedSourceRow(
         source_package_id=DataPackageId(
-            namespace="pdf", package_name="source-corrections", version="2026-06-10"
+            namespace="pdf",
+            package_name="source-corrections",
+            version=correction.source_package_version,
         ),
         source_table="PdfCorrections",
         source_row_id=f"{correction.datasheet_id}:keyword-correction",

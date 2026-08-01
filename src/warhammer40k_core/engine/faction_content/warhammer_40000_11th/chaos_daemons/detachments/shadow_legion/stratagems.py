@@ -7,8 +7,12 @@ from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContri
 from warhammer40k_core.engine.faction_content.stratagem_activation import (
     source_backed_detachment_stratagem_activation_records,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.stratagems import (
+    TARGET_BINDING_UNIT_CONTEXT_KEY,
+    VISIBLE_ENEMY_RANGE_INCHES_KEY,
+    VISIBLE_ENEMY_SOURCE_UNIT_CONTEXT_KEY,
+    VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND,
     StratagemCatalogRecord,
     StratagemTargetSpec,
     StratagemTimingDescriptor,
@@ -22,7 +26,6 @@ from warhammer40k_core.engine.stratagems_generic_metadata import (
     REQUIRED_TRIGGER_CONTEXT_KEYS_KEY,
     SELECTED_FRIENDLY_COMPANION_UNIT_EFFECT_SELECTION_KIND,
     TARGET_REQUIRED_REINFORCEMENT_ARRIVAL_THIS_TURN_KEY,
-    TARGET_REQUIRED_TRIGGER_CONTEXT_LIST_KEY,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -32,7 +35,6 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:stratagems"
 SHADOW_LEGION_DETACHMENT_ID = "shadow-legion"
 SHADOW_LEGION_PROFILE_PREFIX = "phase17s:stratagem:chaos-daemons:shadow-legion"
-CHARGE_TARGET_UNIT_IDS_CONTEXT_KEY = "charge_target_unit_instance_ids"
 TARGET_REQUIRED_NOT_IN_ENGAGEMENT_RANGE = "target_forbidden_if_within_engagement_range"
 
 
@@ -81,11 +83,6 @@ def _shadow_legion_timing(record: StratagemCatalogRecord) -> StratagemTimingDesc
     stratagem_id = record.definition.stratagem_id
     if stratagem_id == shadow_legion_ir.SPITEFUL_DEMISE_STRATAGEM_ID:
         return StratagemTimingDescriptor(trigger_kind=TimingTriggerKind.AFTER_UNIT_DESTROYED)
-    if stratagem_id == shadow_legion_ir.SHADE_PATH_STRATAGEM_ID:
-        return StratagemTimingDescriptor(
-            trigger_kind=TimingTriggerKind.DURING_PHASE,
-            phase=BattlePhase.CHARGE,
-        )
     return record.definition.timing
 
 
@@ -138,10 +135,10 @@ def _shadow_legion_effect_metadata(stratagem_id: str) -> dict[str, object]:
         }
     if stratagem_id == shadow_legion_ir.SHADE_PATH_STRATAGEM_ID:
         return {
-            REQUIRED_TRIGGER_CONTEXT_KEYS_KEY: [
-                shadow_legion_ir.SHADOW_LEGION_CHARGING_UNIT_CONTEXT_KEY,
-            ],
-            TARGET_REQUIRED_TRIGGER_CONTEXT_LIST_KEY: CHARGE_TARGET_UNIT_IDS_CONTEXT_KEY,
+            "requires_opponent_turn": True,
+            EFFECT_SELECTION_KIND_KEY: VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+            VISIBLE_ENEMY_SOURCE_UNIT_CONTEXT_KEY: TARGET_BINDING_UNIT_CONTEXT_KEY,
+            VISIBLE_ENEMY_RANGE_INCHES_KEY: 12,
         }
     if stratagem_id == shadow_legion_ir.BINDING_SHADOW_STRATAGEM_ID:
         return {

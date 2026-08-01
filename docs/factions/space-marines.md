@@ -8,7 +8,7 @@ Current source package: `gw-11e-space-marines-faction-pack-2026-07`
 
 ## Summary
 
-| Detachment rules | Supported detachment rules | Exact Enhancements | Exact Stratagems | Engine-supported rows |
+| Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
 | 22 | 0 | 80 | 119 | 2 |
 
