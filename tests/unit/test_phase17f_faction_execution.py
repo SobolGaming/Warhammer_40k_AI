@@ -432,13 +432,13 @@ def test_phase17f_malice_made_manifest_execution_record_is_generic_rule_ir() -> 
         (
             path_outcast_ir.ASSASSINS_EYE_SOURCE_ROW_ID,
             path_outcast_ir.ASSASSINS_EYE_ENHANCEMENT_ID,
-            "Assassins Eye Upgrade",
+            "Assassins' Eye (Upgrade)",
             ASSASSINS_EYE_RUNTIME_CONSUMERS,
         ),
         (
             path_outcast_ir.CAMOUFLAGED_SNIPERS_SOURCE_ROW_ID,
             path_outcast_ir.CAMOUFLAGED_SNIPERS_ENHANCEMENT_ID,
-            "Camouflaged Snipers Upgrade",
+            "Camouflaged Snipers (Upgrade)",
             CAMOUFLAGED_SNIPERS_RUNTIME_CONSUMERS,
         ),
     ],

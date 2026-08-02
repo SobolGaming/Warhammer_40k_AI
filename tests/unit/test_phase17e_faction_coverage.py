@@ -69,12 +69,19 @@ BRIDGE_JSON_DIR = (
 )
 APPROVED_RUNTIME_ONLY_SOURCE_ROW_IDS = frozenset(
     (
-        "enhancement:aeldari:corsair-coterie:infamy",
-        "enhancement:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:assassins-eye-upgrade",
-        "enhancement:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:camouflaged-snipers-upgrade",
-        "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:casting-back-the-veil",
-        "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:eldritch-suppression",
-        "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:nomads-of-the-hidden-way",
+        "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:from-beyond-the-veil",
+        "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:inescapable-manifestations",
+        "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:warp-riders",
+        "stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:bilious-blessing",
+        "stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:call-to-murder",
+        "stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:carnival-of-excess",
+        "stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:skirling-magicks",
+        "stratagem:chaos-daemons:warptide:chaos-daemons:warptide:daemonic-infestation",
+        "stratagem:chaos-daemons:warptide:chaos-daemons:warptide:incorporeal-entities",
+        "stratagem:chaos-daemons:warptide:chaos-daemons:warptide:soulseeing",
+        "stratagem:emperors-children:spectacle-of-slaughter:000010901002",
+        "stratagem:emperors-children:spectacle-of-slaughter:000010901003",
+        "stratagem:emperors-children:spectacle-of-slaughter:000010901004",
     )
 )
 ASSASSINS_EYE_RUNTIME_CONSUMERS = (
@@ -237,6 +244,9 @@ GENERIC_ENGINE_CONSUMED_ENHANCEMENT_RUNTIME_CONSUMERS_BY_SOURCE_ROW_ID = {
     LEAPING_SHADOWS_SOURCE_ROW_ID: LEAPING_SHADOWS_RUNTIME_CONSUMERS,
     MALICE_MADE_MANIFEST_SOURCE_ROW_ID: MALICE_MADE_MANIFEST_RUNTIME_CONSUMERS,
     MANTLE_OF_GLOOM_SOURCE_ROW_ID: MANTLE_OF_GLOOM_RUNTIME_CONSUMERS,
+    warptide_ir.SOUL_HUNGRY_SLAUGHTERERS_SOURCE_ROW_ID: (
+        warptide_ir.SOUL_HUNGRY_SLAUGHTERERS_COST_MODIFIER_ID,
+    ),
 }
 GENERIC_DETACHMENT_RULE_KEYS = frozenset(
     {
@@ -631,11 +641,12 @@ def test_phase17e_exact_subrule_source_audit_accounts_for_every_bridge_input_row
 
     assert identity["skipped_bridge_row_count"] == str(len(skipped_rows))
     assert identity["runtime_only_row_count"] == str(len(runtime_only_rows))
-    assert len(skipped_rows) == 607
+    assert len(skipped_rows) == 692
     assert Counter(row.skip_reason for row in skipped_rows) == Counter(
         {
             "missing_owner_fields": 28,
-            "owner_not_in_current_source_package": 573,
+            "owner_not_in_current_source_package": 653,
+            "superseded_by_current_source": 5,
             "unsupported_source_type": 6,
         }
     )
@@ -666,6 +677,58 @@ def test_phase17e_exact_subrule_source_audit_accounts_for_every_bridge_input_row
     assert all(
         faction_subrule_source.SourceRuntimeOnlyRow.from_payload(row.to_payload()) == row
         for row in runtime_only_rows
+    )
+
+
+def test_phase17e_aeldari_exact_subrules_match_current_july_inventory() -> None:
+    enhancements = tuple(
+        row for row in faction_subrule_source.enhancement_rows() if row.faction_id == "aeldari"
+    )
+    stratagems = tuple(
+        row for row in faction_subrule_source.stratagem_rows() if row.faction_id == "aeldari"
+    )
+
+    assert len(enhancements) == 52
+    assert len(stratagems) == 78
+    detachment_ids = {row.detachment_id for row in enhancements} | {
+        row.detachment_id for row in stratagems
+    }
+    assert len(detachment_ids) == 15
+    infamy_rows = tuple(row for row in enhancements if row.name == "Infamy (Aura)")
+    assert len(infamy_rows) == 1
+    assert infamy_rows[0].points == 25
+    assert infamy_rows[0].runtime_support_status.value == "engine_consumed"
+    assert any(
+        source_id.startswith("gw-11e-mfm-2026-07:") for source_id in infamy_rows[0].source_ids
+    )
+    assert {
+        row.name for row in enhancements if row.runtime_support_status.value == "engine_consumed"
+    } == {
+        "Archraider",
+        "Infamy (Aura)",
+        "Voidstone",
+        "Webway Pathstone",
+        "Assassins' Eye (Upgrade)",
+        "Camouflaged Snipers (Upgrade)",
+    }
+    assert {row.name for row in enhancements}.isdisjoint(
+        {"Guileful Strategist", "Harmonisation Matrix"}
+    )
+    assert {row.name for row in stratagems}.isdisjoint(
+        {"Anti-Grav Repulsion", "Cloudstrike", "Swift Deployment"}
+    )
+    assert {row.name for row in stratagems if row.detachment_id == "fateful-performance"} == {
+        "Deceptive Feint",
+        "Exit the Stage",
+        "Heroes' Fall",
+    }
+    assert {row.name for row in stratagems if row.detachment_id == "twilight-flickers"} == {
+        "Captivating Performance",
+        "Phantasmal Mirage",
+        "Presaged Rehearsal",
+    }
+    assert not any(
+        row.faction_id == "aeldari" for row in faction_subrule_source.runtime_only_rows()
     )
 
 
@@ -1043,7 +1106,7 @@ def test_phase17e_malice_made_manifest_exact_row_is_generic_rule_ir_supported() 
         (
             corsair_ir.INFAMY_SOURCE_ROW_ID,
             corsair_ir.INFAMY_ENHANCEMENT_ID,
-            "Infamy",
+            "Infamy (Aura)",
             CORSAIR_INFAMY_RUNTIME_CONSUMERS,
         ),
         (

@@ -50,23 +50,23 @@ This generated snapshot answers the support question directly. Detachment-rule s
 
 | Detachment | Runtime supported / executable | Still source-only / blocked |
 | --- | --- | --- |
-| Blood Legion | None | Brazenmaw<br>Fury’s Cage<br>Gateway Unto Damnation<br>Slaughterthirst (Aura) |
-| Cavalcade of Chaos | Apocalyptic Steeds Upgrade<br>Soul Shattering Charge Upgrade | None |
-| Daemonic Incursion | A’rgath, the King of Blades<br>Soulstealer<br>The Endless Gift<br>The Everstave | None |
+| Blood Legion | None | Brazenmaw<br>Fury's Cage<br>Gateway Unto Damnation<br>Slaughterthirst (Aura) |
+| Cavalcade of Chaos | Apocalyptic Steeds (Upgrade)<br>Soul-shattering Charge (Upgrade) | None |
+| Daemonic Incursion | A'rgath, the King of Blades<br>Soulstealer<br>The Endless Gift<br>The Everstave | None |
 | Legion of Excess | None | Avatar of Perfection<br>Dreaming Crown (Aura)<br>False Majesty (Aura)<br>Soul Glutton |
-| Lords of the Warp | Swollen with Power Upgrade | None |
+| Lords of the Warp | Swollen with Power (Upgrade) | None |
 | Plague Legion | None | Cankerblight<br>Droning Shroud (Aura)<br>Font of Spores (Aura)<br>Maggot Maws |
 | Scintillating Legion | None | Improbable Shield (Aura)<br>Inescapable Eye<br>Infernal Puppeteer<br>Neverblade |
 | Shadow Legion | Fade to Darkness<br>Leaping Shadows<br>Malice Made Manifest<br>Mantle of Gloom (Aura) | None |
-| Warptide | Bane-forged Weapons Upgrade<br>Soul-hungry Slaughterers Upgrade | None |
+| Warptide | Bane-forged Weapons (Upgrade)<br>Soul-hungry Slaughterers (Upgrade) | None |
 
 ### Stratagems
 
 | Detachment | Runtime supported / executable | Still source-only / blocked |
 | --- | --- | --- |
-| Blood Legion | None | BLOOD BEGETS SKULLS<br>FOOLS’ FLIGHT<br>GORE‑HUNGRY ONSLAUGHT<br>SHEATHED IN BRASS<br>SKULLS BEGET BLOOD<br>WRATH UNDENIABLE |
+| Blood Legion | None | BLOOD BEGETS SKULLS<br>FOOLS' FLIGHT<br>GORE-HUNGRY ONSLAUGHT<br>SHEATHED IN BRASS<br>SKULLS BEGET BLOOD<br>WRATH UNDENIABLE |
 | Cavalcade of Chaos | From Beyond the Veil<br>Inescapable Manifestations<br>Warp-Riders | None |
-| Daemonic Incursion | CORRUPT REALSPACE<br>DAEMONIC INVULNERABILITY<br>DENIZENS OF THE WARP<br>DRAUGHT OF TERROR<br>THE REALM OF CHAOS<br>WARP SURGE | None |
+| Daemonic Incursion | Corrupt Realspace<br>Daemonic Invulnerability<br>Denizens of the Warp<br>Draught of Terror<br>The Realm of Chaos<br>Warp Surge | None |
 | Legion of Excess | None | ARCHAGONISTS<br>CAVALCADE OF BLADES<br>OVERWHELMING EXCESS<br>PHANTASMAL LONGING<br>SENSORY EXCRUCIATION<br>THIEVES OF PAIN |
 | Lords of the Warp | Bilious Blessing<br>Call to Murder<br>Carnival of Excess<br>Skirling Magicks | None |
 | Plague Legion | None | FEVER VISIONS<br>FOETID RESURGENCE<br>MURKSHADOWS<br>PLAGUE OF WOES<br>ROT AND RENEWAL<br>SEEPING VIRULENCE |

@@ -3078,16 +3078,18 @@
         {
           "ability_id": "000002539:acrobatic-grace",
           "ability_name": "Acrobatic Grace",
-          "catalog_support": "generic_rule_ir",
-          "diagnostic_reasons": [],
-          "normalized_text_sha256": "d8235b4e3443ef997cf78b2fb42ad5dad6f153bc4179ff9c929448956a075376",
-          "raw_text": "Each time an attack targets this unit, subtract 1 from the Hit roll.",
-          "raw_text_sha256": "d8235b4e3443ef997cf78b2fb42ad5dad6f153bc4179ff9c929448956a075376",
+          "catalog_support": "unsupported",
+          "diagnostic_reasons": [
+            "unsupported_language"
+          ],
+          "normalized_text_sha256": "fde9a4b1f91f6754f499cee36de95b44933c61fa7a62848d2c3e19ea9c76cbda",
+          "raw_text": "This unit has Stealth. Melee attacks that target this unit have -1 to Hit rolls.",
+          "raw_text_sha256": "fde9a4b1f91f6754f499cee36de95b44933c61fa7a62848d2c3e19ea9c76cbda",
           "runtime_consumer_ids": [],
           "semantic_consumers": [
             {
               "runtime_consumer_ids": [],
-              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002539:3:description:clause:001:effect:0",
+              "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002539:3:description:clause:002:effect:0",
               "semantic_kind": "modify_dice_roll"
             }
           ],
@@ -3096,15 +3098,15 @@
           ],
           "source_kind": "datasheet",
           "source_row_id": "000002539:3",
-          "support_stage": "generic_ir_executable"
+          "support_stage": "ir_compiled_unsupported"
         }
       ],
       "datasheet_id": "000002539",
       "datasheet_name": "Skyweavers",
       "group": "Harlequins",
-      "pdf_page_reference": null,
-      "semantic_bucket": "Exact IR parsed; host needed",
-      "treatment": "unchanged_predecessor"
+      "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
+      "semantic_bucket": "Exact ability IR unsupported",
+      "treatment": "rules_update"
     },
     {
       "abilities": [
@@ -3355,9 +3357,9 @@
           "diagnostic_reasons": [
             "unsupported_language"
           ],
-          "normalized_text_sha256": "b20c3feef7db3e55c431e108f51e7f0224d316a0de3ac014bfeddcb6b7cb0d36",
-          "raw_text": "Once in each of your opponent's turns, if this model is on the battlefield when another friendly AELDARI unit is destroyed, just after removing the last model in that unit, you can remove this model from the battlefield and set it up as close as possible to where that destroyed model was destroyed and not within Engagement Range of one or more enemy units.",
-          "raw_text_sha256": "b20c3feef7db3e55c431e108f51e7f0224d316a0de3ac014bfeddcb6b7cb0d36",
+          "normalized_text_sha256": "7f4921118e3a4ccf85504e4795699e05af2f1f543067563f7b619e1a2cb9d6e5",
+          "raw_text": "Once in each of your opponent's turns, if this model is on the battlefield when another friendly AELDARI unit is destroyed, just after removing the last model in that unit, you can remove this model from the battlefield and set it up as close as possible to where that destroyed model was destroyed and not within Engagement Range of one or more enemy units. Doing so does not prevent this model from being eligible to move.",
+          "raw_text_sha256": "7f4921118e3a4ccf85504e4795699e05af2f1f543067563f7b619e1a2cb9d6e5",
           "runtime_consumer_ids": [],
           "semantic_consumers": [],
           "source_ids": [
@@ -3371,9 +3373,9 @@
       "datasheet_id": "000002544",
       "datasheet_name": "The Yncarne",
       "group": "Ynnari",
-      "pdf_page_reference": null,
+      "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
       "semantic_bucket": "Exact ability IR unsupported",
-      "treatment": "unchanged_predecessor"
+      "treatment": "rules_update"
     },
     {
       "abilities": [
@@ -4440,35 +4442,36 @@
   "faction_name": "Aeldari",
   "generated_by": "uv run python tools/generate_aeldari_datasheet_semantic_coverage.py",
   "overlay_pack_hashes": {
-    "data-package:gw:aeldari-faction-pack-datasheet-overlay:11th-2026-06-09": "672c6c8b7b51dbd775172d488af3cc7a8038c3c0881a8e97a5e255b5d17de524",
-    "data-package:gw:aeldari-tacoma-open-frame-keyword-overlay:11th-2026-07-10": "85ba1b52ddcc4dec798d2b60143c8a0769e35ab9bb0727aaebdbbbf59502eec3"
+    "data-package:gw:aeldari-faction-pack-datasheet-overlay:11th-2026-06-09": "84dce73d1e4b1ed53ed09b413ae79b53cfb615f7965040d9d475d07b4f03f283",
+    "data-package:gw:aeldari-faction-pack-july-datasheet-overlay:11th-2026-07-22": "49b87ce73f8f592b2f79eb49c4f4f5a4deff09b8a3efa4806589d808ebec6c5c",
+    "data-package:gw:aeldari-tacoma-open-frame-keyword-overlay:11th-2026-07-10": "3eec5374ec16c686cba3ab69c793b06e1ff539c96d5c37854020fec41ff549be"
   },
   "pdf_filename": "eng_22-07_warhammer_40,000_faction_pack_aeldari-qe1ykopo7h-blfkukhecc.pdf",
   "pdf_sha256": "2a1954801042948256c002095937be88c9d334994f0b01d7a63510c94d39fe1d",
-  "release_hash": "379616e1abaf64a4e6de5c9614d452b146783a0efccab03c18f3cb82e07e6eed",
+  "release_hash": "72b3d3b2ccaf2dd42ef98a77b5fae256b01551df5e20fe644f78623bed802982",
   "schema_version": "aeldari-datasheet-semantic-coverage-v4",
   "semantic_bucket_counts": {
     "All exact abilities consumed": 29,
-    "Exact IR parsed; host needed": 4,
-    "Exact ability IR unsupported": 37
+    "Exact IR parsed; host needed": 3,
+    "Exact ability IR unsupported": 38
   },
   "source_artifact_hashes": {
-    "Abilities": "d9df2cbda5ca051740170c848d01a0acbab4555854c6fdfe87161e7ef07785fc",
-    "Datasheets": "2bf5947d110eee88b45f8b3f497b7668ecc57da1c5a61ac178a46fe80f06155b",
-    "Datasheets_abilities": "3fc470bcc767cbdd639be7f59e0acf83b7e097d6dc561bf1ed558795e20a35c6",
-    "Datasheets_keywords": "8f12694d8ee4ed809909c93cc13e69115f69b92814a017cd01b17f1aa5b4d16e",
-    "Datasheets_leader": "9755aef3625f217650aa962a8f0a7dbddf4d408733839bb70f66ddd4a8055164",
-    "Datasheets_models": "79e95a6a7fda882999396fd139e53d027f981776ff4cc455222b9f367710b360",
-    "Datasheets_models_cost": "e94cd1d1de0a654b8252aac45119f568f481c81f43ddf7abeda883c1c4f8f315",
-    "Datasheets_options": "c82552cdeb02b63085d82804c2fcbdaa4eede18d173dba873111368c95e5dfd4",
-    "Datasheets_unit_composition": "95c648a833a4461fbc3e8105a22aa7ed5543f5c2cd1ef4d82e52551a5e3f658e",
-    "Datasheets_wargear": "7f9d5ba4d4a2211d2b06f5d29f304c601fc055cad725bc081d7ff41170da9727",
-    "Factions": "a0c2301683d4e3a1a4a29292325fdc6aa312ed7c5803f40a5a2acbb07bb642b4"
+    "Abilities": "7bade63473d67cda845e6d94c83fd2fad3710964438fe5593a932542671ab577",
+    "Datasheets": "9bcc837967440f2eb0de154eac6bc57631d700b897ef15d1cc11bcfb1feb73f6",
+    "Datasheets_abilities": "2adc17f55714a4dfba03e361fb2439ff05f95107c4a893592a483239211f3303",
+    "Datasheets_keywords": "68470358186cbf9d3c5c90e0f8d81c95d4c0ae9e0f7a315ba47a8918ca5c92df",
+    "Datasheets_leader": "6ad393d4b334d642e19e116aa94743f4ea8d2ecf9a068315e3d4209af8b1888a",
+    "Datasheets_models": "4937c06377cb4929a469312119c2dd79361ee12cf05b6d4aeda5dc9209bf5339",
+    "Datasheets_models_cost": "0702686286ef39400e734e61da3743d3c95bb51d88fbb1b8e88409954daacaab",
+    "Datasheets_options": "efa8c79fb7c891a4c4b631b4baf92ffb35b021aca5e9c09cddee371a6125098c",
+    "Datasheets_unit_composition": "5df0c919e11b811afab2fe970071d97774e96ee3d0d17aef0905e5f866a5389d",
+    "Datasheets_wargear": "625d37d4f7c8ca7683890a2cd93df0a1b3e369d4dfc41c7bd96b7320f6d74e17",
+    "Factions": "1c7972e00c1694216f6637ad01353937f774428b88eb4266cf724d0881652ce2"
   },
   "source_snapshot_path": "data/source_snapshots/wahapedia/10th-edition/2026-06-14/json",
   "treatment_counts": {
     "complete_pdf": 5,
-    "rules_update": 24,
-    "unchanged_predecessor": 41
+    "rules_update": 26,
+    "unchanged_predecessor": 39
   }
 }

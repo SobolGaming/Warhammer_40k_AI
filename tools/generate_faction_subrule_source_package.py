@@ -6,6 +6,7 @@ import re
 import unicodedata
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
+from dataclasses import fields as dataclass_fields
 from pathlib import Path
 from typing import Any, cast
 
@@ -17,10 +18,29 @@ from warhammer40k_core.engine.faction_content.manifest import RuntimeContentSupp
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.generated_manifest import (
     generated_runtime_content_rows,
 )
+from warhammer40k_core.engine.generic_rule_ability_registry import GenericRuleAbilitySource
+from warhammer40k_core.engine.generic_rule_ability_registry_defaults import (
+    DEFAULT_GENERIC_RULE_ABILITY_REGISTRY,
+)
 from warhammer40k_core.engine.stratagems import StratagemCatalogRecord
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_coverage_2026_27,
     faction_detachments_2026_27,
+    faction_execution_2026_27,
+    faction_generic_ir_support_2026_27,
+    mfm_2026_07,
 )
+
+if __package__:
+    from tools.aeldari_39k_pro_audit import (
+        AeldariSupplementalStratagemAuditRow,
+        aeldari_thirty_nine_k_pro_audit,
+    )
+else:
+    from aeldari_39k_pro_audit import (
+        AeldariSupplementalStratagemAuditRow,
+        aeldari_thirty_nine_k_pro_audit,
+    )
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_JSON_DIR = (
@@ -42,6 +62,7 @@ OUTPUT_PATH = (
     / "faction_subrules_2026_27.py"
 )
 BRIDGE_SOURCE_PACKAGE_ID = "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row"
+EXACT_SOURCE_PACKAGE_ID = "gw-11e-phase17e-exact-faction-subrules-2026-27"
 CURRENT_SOURCE_OWNER_IDS = frozenset(
     (row.faction_id, row.detachment_id) for row in faction_detachments_2026_27.detachment_rows()
 )
@@ -56,15 +77,20 @@ FACTION_SLUG_OVERRIDES = {
     "emperor-s-children": "emperors-children",
     "t-au-empire": "tau-empire",
 }
+DETACHMENT_SLUG_OVERRIDES = {
+    ("aeldari", "serpent-s-brood"): "serpents-brood",
+}
 SOURCE_ONLY_STATUS = "source_only"
 ENGINE_CONSUMED_STATUS = "engine_consumed"
 SKIP_REASON_MISSING_OWNER_FIELDS = "missing_owner_fields"
 SKIP_REASON_OWNER_NOT_IN_CURRENT_SOURCE_PACKAGE = "owner_not_in_current_source_package"
+SKIP_REASON_SUPERSEDED_BY_CURRENT_SOURCE = "superseded_by_current_source"
 SKIP_REASON_UNSUPPORTED_SOURCE_TYPE = "unsupported_source_type"
 APPROVED_SKIPPED_BRIDGE_REASONS = frozenset(
     (
         SKIP_REASON_MISSING_OWNER_FIELDS,
         SKIP_REASON_OWNER_NOT_IN_CURRENT_SOURCE_PACKAGE,
+        SKIP_REASON_SUPERSEDED_BY_CURRENT_SOURCE,
         SKIP_REASON_UNSUPPORTED_SOURCE_TYPE,
     )
 )
@@ -81,19 +107,29 @@ UNSUPPORTED_SOURCE_MARKERS = frozenset(
 RUNTIME_ONLY_PROVENANCE_REASON = "runtime_handler_without_bridge_source_row"
 APPROVED_RUNTIME_ONLY_SOURCE_ROW_IDS = frozenset(
     (
-        "enhancement:aeldari:corsair-coterie:infamy",
-        "enhancement:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:assassins-eye-upgrade",
-        "enhancement:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:camouflaged-snipers-upgrade",
-        "enhancement:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade",
-        "enhancement:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:soul-shattering-charge-upgrade",
-        "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:casting-back-the-veil",
-        "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:eldritch-suppression",
-        "stratagem:aeldari:path-of-the-outcast:aeldari:path-of-the-outcast:nomads-of-the-hidden-way",
         "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:from-beyond-the-veil",
         "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:inescapable-manifestations",
         "stratagem:chaos-daemons:cavalcade-of-chaos:chaos-daemons:cavalcade-of-chaos:warp-riders",
+        "stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:bilious-blessing",
+        "stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:call-to-murder",
+        "stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:carnival-of-excess",
+        "stratagem:chaos-daemons:lords-of-the-warp:chaos-daemons:lords-of-the-warp:skirling-magicks",
+        "stratagem:chaos-daemons:warptide:chaos-daemons:warptide:daemonic-infestation",
+        "stratagem:chaos-daemons:warptide:chaos-daemons:warptide:incorporeal-entities",
+        "stratagem:chaos-daemons:warptide:chaos-daemons:warptide:soulseeing",
+        "stratagem:emperors-children:spectacle-of-slaughter:000010901002",
+        "stratagem:emperors-children:spectacle-of-slaughter:000010901003",
+        "stratagem:emperors-children:spectacle-of-slaughter:000010901004",
     )
 )
+CURRENT_GENERIC_ENHANCEMENT_MFM_NAME_BY_SOURCE_ROW_ID = {
+    "enhancement:emperors-children:spectacle-of-slaughter:000010900002": (
+        "Beguiling Grotesquerie (Upgrade)"
+    ),
+    "enhancement:emperors-children:spectacle-of-slaughter:000010900003": (
+        "Eager Patrons (Upgrade)"
+    ),
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -168,6 +204,21 @@ class RuntimeStratagemSeed:
 
 
 @dataclass(frozen=True, slots=True)
+class CurrentMfmEnhancementSeed:
+    detachment_id: str
+    enhancement_id: str
+    name: str
+    points: int
+    source_id: str
+
+
+@dataclass(frozen=True, slots=True)
+class EnhancementRuntimeMetadata:
+    enhancement_id: str | None
+    runtime_consumer_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class GeneratedSkippedBridgeRow:
     table: str
     bridge_source_row_id: str
@@ -237,6 +288,9 @@ def _bridge_enhancement_rows(
 ) -> tuple[tuple[GeneratedEnhancementRow, ...], tuple[GeneratedSkippedBridgeRow, ...]]:
     rows: list[GeneratedEnhancementRow] = []
     skipped_rows: list[GeneratedSkippedBridgeRow] = []
+    current_aeldari_rows = _current_aeldari_enhancements_by_name()
+    generic_runtime_metadata = _generic_enhancement_runtime_metadata_by_source_row_id()
+    matched_current_aeldari_ids: set[tuple[str, str]] = set()
     for row in _source_rows("Enhancements"):
         fields = row["fields"]
         bridge_faction_id = fields["faction_id"]
@@ -257,7 +311,10 @@ def _bridge_enhancement_rows(
             faction_rows_by_bridge_id=faction_rows_by_bridge_id,
             bridge_faction_id=bridge_faction_id,
         )
-        detachment_id = _slug_for_label(detachment_name)
+        detachment_id = _current_detachment_id_for_bridge_label(
+            faction_id=faction_id,
+            label=detachment_name,
+        )
         owner_id = (faction_id, detachment_id)
         if owner_id not in CURRENT_SOURCE_OWNER_IDS:
             skipped_rows.append(
@@ -286,19 +343,121 @@ def _bridge_enhancement_rows(
                 )
             )
             continue
+        source_ids = (_bridge_source_id(table="Enhancements", source_row_id=row["source_row_id"]),)
+        enhancement_id = fields["id"]
+        name = fields["name"]
+        points = _optional_int(fields["cost"])
+        if faction_id == "aeldari":
+            current_key = (
+                detachment_id,
+                _aeldari_enhancement_name_key(_repair_utf8_mojibake(name)),
+            )
+            current_row = current_aeldari_rows.get(current_key)
+            if current_row is None:
+                skipped_rows.append(
+                    _skipped_bridge_row(
+                        table="Enhancements",
+                        source_row_id=row["source_row_id"],
+                        faction_rows_by_bridge_id=faction_rows_by_bridge_id,
+                        bridge_faction_id=bridge_faction_id,
+                        detachment_name=detachment_name,
+                        skip_reason=SKIP_REASON_SUPERSEDED_BY_CURRENT_SOURCE,
+                    )
+                )
+                continue
+            enhancement_id = current_row.enhancement_id
+            name = current_row.name
+            if _normalized_name(_repair_utf8_mojibake(fields["name"])) == "infamy-aura":
+                name = "Infamy (Aura)"
+            points = current_row.points
+            source_ids = _sorted_unique((*source_ids, current_row.source_id))
+            matched_current_aeldari_ids.add((current_row.detachment_id, current_row.enhancement_id))
+        source_row_id = f"enhancement:{faction_id}:{detachment_id}:{enhancement_id}"
+        runtime_metadata = generic_runtime_metadata.get(source_row_id)
+        if runtime_metadata is not None and runtime_metadata.enhancement_id is not None:
+            enhancement_id = runtime_metadata.enhancement_id
         rows.append(
             GeneratedEnhancementRow(
                 faction_id=faction_id,
                 faction_name=CURRENT_FACTION_NAMES_BY_ID[faction_id],
                 detachment_id=detachment_id,
                 detachment_name=CURRENT_DETACHMENT_NAMES_BY_OWNER_ID[owner_id],
-                enhancement_id=fields["id"],
-                name=fields["name"],
-                points=_optional_int(fields["cost"]),
-                source_ids=(
-                    _bridge_source_id(table="Enhancements", source_row_id=row["source_row_id"]),
+                enhancement_id=enhancement_id,
+                name=name,
+                points=points,
+                source_ids=source_ids,
+                runtime_consumer_ids=(
+                    () if runtime_metadata is None else runtime_metadata.runtime_consumer_ids
                 ),
+            )
+        )
+    for current_row in current_aeldari_rows.values():
+        current_id = (current_row.detachment_id, current_row.enhancement_id)
+        if current_id in matched_current_aeldari_ids:
+            continue
+        owner_id = ("aeldari", current_row.detachment_id)
+        source_row_id = (
+            f"enhancement:aeldari:{current_row.detachment_id}:{current_row.enhancement_id}"
+        )
+        runtime_metadata = generic_runtime_metadata.get(source_row_id)
+        if runtime_metadata is None:
+            runtime_metadata = _generic_runtime_metadata_for_aeldari_enhancement(
+                generic_runtime_metadata,
+                detachment_id=current_row.detachment_id,
+                name=current_row.name,
+            )
+        enhancement_id = current_row.enhancement_id
+        if runtime_metadata is not None and runtime_metadata.enhancement_id is not None:
+            enhancement_id = runtime_metadata.enhancement_id
+        rows.append(
+            GeneratedEnhancementRow(
+                faction_id="aeldari",
+                faction_name=CURRENT_FACTION_NAMES_BY_ID["aeldari"],
+                detachment_id=current_row.detachment_id,
+                detachment_name=CURRENT_DETACHMENT_NAMES_BY_OWNER_ID[owner_id],
+                enhancement_id=enhancement_id,
+                name=current_row.name,
+                points=current_row.points,
+                source_ids=(current_row.source_id,),
+                runtime_consumer_ids=(
+                    () if runtime_metadata is None else runtime_metadata.runtime_consumer_ids
+                ),
+            )
+        )
+    emitted_source_row_ids = {row.source_row_id for row in rows}
+    generic_source_row_ids = set(
+        faction_generic_ir_support_2026_27.supported_generic_enhancement_source_row_ids()
+    )
+    for source_row_id in sorted(generic_source_row_ids | set(generic_runtime_metadata)):
+        if source_row_id in emitted_source_row_ids:
+            continue
+        faction_id, detachment_id, rule_id = _enhancement_owner_and_rule_id(source_row_id)
+        current_row = _current_mfm_enhancement_for_runtime_metadata(
+            source_row_id=source_row_id,
+            faction_id=faction_id,
+            detachment_id=detachment_id,
+            rule_id=rule_id,
+        )
+        if current_row is None:
+            continue
+        runtime_metadata = generic_runtime_metadata.get(source_row_id)
+        if runtime_metadata is None:
+            runtime_metadata = EnhancementRuntimeMetadata(
+                enhancement_id=None,
                 runtime_consumer_ids=(),
+            )
+        owner_id = (faction_id, detachment_id)
+        rows.append(
+            GeneratedEnhancementRow(
+                faction_id=faction_id,
+                faction_name=CURRENT_FACTION_NAMES_BY_ID[faction_id],
+                detachment_id=detachment_id,
+                detachment_name=CURRENT_DETACHMENT_NAMES_BY_OWNER_ID[owner_id],
+                enhancement_id=(runtime_metadata.enhancement_id or rule_id),
+                name=current_row.name,
+                points=current_row.points,
+                source_ids=(current_row.source_id,),
+                runtime_consumer_ids=runtime_metadata.runtime_consumer_ids,
             )
         )
     return (
@@ -313,6 +472,11 @@ def _bridge_stratagem_rows(
 ) -> tuple[tuple[GeneratedStratagemRow, ...], tuple[GeneratedSkippedBridgeRow, ...]]:
     rows: list[GeneratedStratagemRow] = []
     skipped_rows: list[GeneratedSkippedBridgeRow] = []
+    current_aeldari_rows = _current_aeldari_supplemental_stratagems_by_name()
+    current_aeldari_detachment_ids = {
+        detachment_id for detachment_id, _rule_name in current_aeldari_rows
+    }
+    matched_current_aeldari_ids: set[tuple[str, str]] = set()
     for row in _source_rows("Stratagems"):
         fields = row["fields"]
         bridge_faction_id = fields["faction_id"]
@@ -333,7 +497,10 @@ def _bridge_stratagem_rows(
             faction_rows_by_bridge_id=faction_rows_by_bridge_id,
             bridge_faction_id=bridge_faction_id,
         )
-        detachment_id = _slug_for_label(detachment_name)
+        detachment_id = _current_detachment_id_for_bridge_label(
+            faction_id=faction_id,
+            label=detachment_name,
+        )
         owner_id = (faction_id, detachment_id)
         if owner_id not in CURRENT_SOURCE_OWNER_IDS:
             skipped_rows.append(
@@ -362,20 +529,68 @@ def _bridge_stratagem_rows(
                 )
             )
             continue
+        stratagem_id = fields["id"]
+        name = fields["name"]
+        command_point_cost = _required_int(fields["cp_cost"])
+        timing = _bridge_timing_descriptor(fields)
+        category = fields["type"]
+        source_ids = (_bridge_source_id(table="Stratagems", source_row_id=row["source_row_id"]),)
+        if faction_id == "aeldari":
+            name = _repair_utf8_mojibake(name)
+        if faction_id == "aeldari" and detachment_id in current_aeldari_detachment_ids:
+            current_key = (detachment_id, _normalized_name(name))
+            current_row = current_aeldari_rows.get(current_key)
+            if current_row is None:
+                skipped_rows.append(
+                    _skipped_bridge_row(
+                        table="Stratagems",
+                        source_row_id=row["source_row_id"],
+                        faction_rows_by_bridge_id=faction_rows_by_bridge_id,
+                        bridge_faction_id=bridge_faction_id,
+                        detachment_name=detachment_name,
+                        skip_reason=SKIP_REASON_SUPERSEDED_BY_CURRENT_SOURCE,
+                    )
+                )
+                continue
+            stratagem_id = current_row.stratagem_id
+            name = current_row.stratagem_name
+            command_point_cost = current_row.command_point_cost
+            timing = current_row.timing_descriptor
+            category = current_row.category
+            source_ids = _sorted_unique((*source_ids, current_row.official_source_id))
+            matched_current_aeldari_ids.add((current_row.detachment_id, current_row.stratagem_id))
         rows.append(
             GeneratedStratagemRow(
                 faction_id=faction_id,
                 faction_name=CURRENT_FACTION_NAMES_BY_ID[faction_id],
                 detachment_id=detachment_id,
                 detachment_name=CURRENT_DETACHMENT_NAMES_BY_OWNER_ID[owner_id],
-                stratagem_id=fields["id"],
-                name=fields["name"],
-                command_point_cost=_required_int(fields["cp_cost"]),
-                timing=_bridge_timing_descriptor(fields),
-                category=fields["type"],
-                source_ids=(
-                    _bridge_source_id(table="Stratagems", source_row_id=row["source_row_id"]),
-                ),
+                stratagem_id=stratagem_id,
+                name=name,
+                command_point_cost=command_point_cost,
+                timing=timing,
+                category=category,
+                source_ids=source_ids,
+                runtime_consumer_ids=(),
+            )
+        )
+    for current_row in current_aeldari_rows.values():
+        current_id = (current_row.detachment_id, current_row.stratagem_id)
+        if current_id in matched_current_aeldari_ids:
+            continue
+        owner_id = ("aeldari", current_row.detachment_id)
+        rows.append(
+            GeneratedStratagemRow(
+                faction_id="aeldari",
+                faction_name=CURRENT_FACTION_NAMES_BY_ID["aeldari"],
+                detachment_id=current_row.detachment_id,
+                detachment_name=CURRENT_DETACHMENT_NAMES_BY_OWNER_ID[owner_id],
+                stratagem_id=current_row.stratagem_id,
+                name=current_row.stratagem_name,
+                command_point_cost=current_row.command_point_cost,
+                timing=current_row.timing_descriptor,
+                category=current_row.category,
+                source_ids=(current_row.official_source_id,),
                 runtime_consumer_ids=(),
             )
         )
@@ -391,7 +606,7 @@ def _overlay_runtime_enhancements(
     runtime_rows: tuple[RuntimeEnhancementSeed, ...],
 ) -> tuple[tuple[GeneratedEnhancementRow, ...], tuple[GeneratedRuntimeOnlyRow, ...]]:
     bridge_by_source_row_id = {row.source_row_id: row for row in bridge_rows}
-    bridge_by_name = {_rule_name_key(row): row for row in bridge_rows}
+    bridge_by_name = {_enhancement_rule_name_key(row): row for row in bridge_rows}
     runtime_by_id = _merged_runtime_enhancement_rows(runtime_rows)
     output: list[GeneratedEnhancementRow] = []
     runtime_only_rows: list[GeneratedRuntimeOnlyRow] = []
@@ -399,9 +614,9 @@ def _overlay_runtime_enhancements(
         owner_id = (runtime_row.faction_id, runtime_row.detachment_id)
         bridge_row = bridge_by_source_row_id.get(_enhancement_source_row_id(runtime_row))
         if bridge_row is not None:
-            bridge_by_name.pop(_rule_name_key(bridge_row), None)
+            bridge_by_name.pop(_enhancement_rule_name_key(bridge_row), None)
         else:
-            bridge_row = bridge_by_name.pop(_rule_name_key(runtime_row), None)
+            bridge_row = bridge_by_name.pop(_enhancement_rule_name_key(runtime_row), None)
         source_ids = runtime_row.source_ids
         points: int | None = None
         name = runtime_row.name
@@ -409,6 +624,15 @@ def _overlay_runtime_enhancements(
             source_ids = _sorted_unique((*bridge_row.source_ids, *runtime_row.source_ids))
             points = bridge_row.points
             name = bridge_row.name
+        generated_source_id = (
+            f"{EXACT_SOURCE_PACKAGE_ID}:enhancement:{runtime_row.faction_id}:"
+            f"{runtime_row.detachment_id}:{runtime_row.enhancement_id}"
+        )
+        source_ids = tuple(
+            source_id for source_id in source_ids if source_id != generated_source_id
+        )
+        if not source_ids:
+            source_ids = (f"{generated_source_id}:runtime-contribution",)
         generated_row = GeneratedEnhancementRow(
             faction_id=runtime_row.faction_id,
             faction_name=CURRENT_FACTION_NAMES_BY_ID[runtime_row.faction_id],
@@ -449,12 +673,21 @@ def _overlay_runtime_stratagems(
     bridge_by_name = {_rule_name_key(row): row for row in bridge_rows}
     output: list[GeneratedStratagemRow] = []
     runtime_only_rows: list[GeneratedRuntimeOnlyRow] = []
-    for runtime_row in runtime_rows:
+    for runtime_row in _merged_runtime_stratagem_rows(runtime_rows):
         owner_id = (runtime_row.faction_id, runtime_row.detachment_id)
         bridge_row = bridge_by_name.pop(_rule_name_key(runtime_row), None)
         source_ids = runtime_row.source_ids
         if bridge_row is not None:
             source_ids = _sorted_unique((*bridge_row.source_ids, *runtime_row.source_ids))
+        generated_source_id = (
+            f"{EXACT_SOURCE_PACKAGE_ID}:stratagem:{runtime_row.faction_id}:"
+            f"{runtime_row.detachment_id}:{runtime_row.stratagem_id}"
+        )
+        source_ids = tuple(
+            source_id for source_id in source_ids if source_id != generated_source_id
+        )
+        if not source_ids:
+            source_ids = (f"{generated_source_id}:runtime-contribution",)
         generated_row = GeneratedStratagemRow(
             faction_id=runtime_row.faction_id,
             faction_name=CURRENT_FACTION_NAMES_BY_ID[runtime_row.faction_id],
@@ -581,6 +814,8 @@ def _runtime_stratagem_seeds(
     handler_ids = {binding.handler_id for binding in contribution.stratagem_handler_bindings}
     rows: list[RuntimeStratagemSeed] = []
     for record in contribution.stratagem_records:
+        if _owner_id_or_none_from_runtime_stratagem(record) is None:
+            continue
         rows.append(_runtime_stratagem_seed(record, handler_ids=handler_ids))
     return tuple(rows)
 
@@ -631,8 +866,45 @@ def _merged_runtime_enhancement_rows(
     return tuple(sorted(rows_by_identity.values(), key=_runtime_enhancement_sort_key))
 
 
+def _merged_runtime_stratagem_rows(
+    rows: tuple[RuntimeStratagemSeed, ...],
+) -> tuple[RuntimeStratagemSeed, ...]:
+    rows_by_identity: dict[tuple[str, str, str], RuntimeStratagemSeed] = {}
+    for row in rows:
+        identity = (row.faction_id, row.detachment_id, row.stratagem_id)
+        existing = rows_by_identity.get(identity)
+        if existing is None:
+            rows_by_identity[identity] = row
+            continue
+        if (existing.name, existing.command_point_cost, existing.category) != (
+            row.name,
+            row.command_point_cost,
+            row.category,
+        ):
+            raise TypeError("Duplicate runtime Stratagem identity has conflicting source fields.")
+        rows_by_identity[identity] = RuntimeStratagemSeed(
+            faction_id=row.faction_id,
+            detachment_id=row.detachment_id,
+            stratagem_id=row.stratagem_id,
+            name=row.name,
+            command_point_cost=row.command_point_cost,
+            timing=" | ".join(sorted({existing.timing, row.timing})),
+            category=row.category,
+            source_ids=_sorted_unique((*existing.source_ids, *row.source_ids)),
+            runtime_consumer_ids=_sorted_unique(
+                (*existing.runtime_consumer_ids, *row.runtime_consumer_ids)
+            ),
+        )
+    return tuple(
+        sorted(
+            rows_by_identity.values(),
+            key=lambda row: (row.faction_id, row.detachment_id, row.stratagem_id),
+        )
+    )
+
+
 def _runtime_content_contributions() -> tuple[RuntimeContentContribution, ...]:
-    contributions: list[RuntimeContentContribution] = []
+    contributions_by_id: dict[str, RuntimeContentContribution] = {}
     for row in generated_runtime_content_rows():
         if row.support_status is not RuntimeContentSupportStatus.SUPPORTED:
             continue
@@ -648,8 +920,11 @@ def _runtime_content_contributions() -> tuple[RuntimeContentContribution, ...]:
             raise TypeError("Runtime content module returned invalid RuntimeContentContribution.")
         if contribution.contribution_id == DEFAULT_RUNTIME_CONTENT_CONTRIBUTION_ID:
             contribution = contribution.with_contribution_id(row.module_path)
-        contributions.append(contribution)
-    return tuple(contributions)
+        existing = contributions_by_id.get(contribution.contribution_id)
+        if existing is not None and existing != contribution:
+            raise TypeError("Duplicate runtime contribution ID has conflicting content.")
+        contributions_by_id[contribution.contribution_id] = contribution
+    return tuple(contributions_by_id.values())
 
 
 def _source_rows(table: str) -> tuple[dict[str, Any], ...]:
@@ -782,7 +1057,24 @@ def _current_faction_id_for_bridge_slug(slug: str) -> str:
     return FACTION_SLUG_OVERRIDES.get(slug, slug)
 
 
+def _current_detachment_id_for_bridge_label(*, faction_id: str, label: str) -> str:
+    slug = _slug_for_label(label)
+    return DETACHMENT_SLUG_OVERRIDES.get((faction_id, slug), slug)
+
+
 def _owner_id_from_runtime_stratagem(record: StratagemCatalogRecord) -> tuple[str, str]:
+    owner_id = _owner_id_or_none_from_runtime_stratagem(record)
+    if owner_id is None:
+        raise TypeError(
+            "Runtime Stratagem does not include a current faction/detachment owner: "
+            f"{record.definition.source_id}"
+        )
+    return owner_id
+
+
+def _owner_id_or_none_from_runtime_stratagem(
+    record: StratagemCatalogRecord,
+) -> tuple[str, str] | None:
     pieces = record.definition.stratagem_id.split(":")
     if len(pieces) >= 3:
         owner_id = (pieces[0], pieces[1])
@@ -792,7 +1084,7 @@ def _owner_id_from_runtime_stratagem(record: StratagemCatalogRecord) -> tuple[st
         for faction_id, detachment_id in CURRENT_SOURCE_OWNER_IDS:
             if detachment_id == record.detachment_id:
                 return (faction_id, detachment_id)
-    return _owner_id_from_runtime_source_id(record.definition.source_id)
+    return _owner_id_or_none_from_runtime_source_id(record.definition.source_id)
 
 
 def _owner_id_from_runtime_source_id(source_id: str) -> tuple[str, str]:
@@ -859,6 +1151,15 @@ def _rule_name_key(
     return (row.faction_id, row.detachment_id, _normalized_name(row.name))
 
 
+def _enhancement_rule_name_key(
+    row: GeneratedEnhancementRow | RuntimeEnhancementSeed,
+) -> tuple[str, str, str]:
+    normalized_name = _normalized_name(row.name)
+    if row.faction_id == "aeldari":
+        normalized_name = _aeldari_enhancement_name_key(row.name)
+    return (row.faction_id, row.detachment_id, normalized_name)
+
+
 def _runtime_enhancement_sort_key(row: RuntimeEnhancementSeed) -> str:
     return f"{row.faction_id}:{row.detachment_id}:{row.enhancement_id}"
 
@@ -874,6 +1175,198 @@ def _label_for_identifier(identifier: str) -> str:
 
 def _normalized_name(name: str) -> str:
     return _slug_for_label(name).replace("-the-", "-")
+
+
+def _aeldari_enhancement_name_key(name: str) -> str:
+    normalized = _normalized_name(name)
+    for suffix in ("-aura", "-upgrade"):
+        if normalized.endswith(suffix):
+            return normalized.removesuffix(suffix)
+    return normalized
+
+
+def _current_aeldari_enhancements_by_name() -> dict[tuple[str, str], CurrentMfmEnhancementSeed]:
+    rows: dict[tuple[str, str], CurrentMfmEnhancementSeed] = {}
+    for detachment in mfm_2026_07.faction_record("aeldari").detachments:
+        for enhancement in detachment.enhancements:
+            row = CurrentMfmEnhancementSeed(
+                detachment_id=detachment.detachment_id,
+                enhancement_id=enhancement.enhancement_id,
+                name=enhancement.name,
+                points=enhancement.points,
+                source_id=enhancement.source_id,
+            )
+            key = (row.detachment_id, _aeldari_enhancement_name_key(row.name))
+            if key in rows:
+                raise TypeError("Current Aeldari MFM Enhancement names must be unique per owner.")
+            rows[key] = row
+    return rows
+
+
+def _current_aeldari_supplemental_stratagems_by_name() -> dict[
+    tuple[str, str], AeldariSupplementalStratagemAuditRow
+]:
+    rows: dict[tuple[str, str], AeldariSupplementalStratagemAuditRow] = {}
+    for row in aeldari_thirty_nine_k_pro_audit().supplemental_stratagems:
+        key = (row.detachment_id, _normalized_name(row.stratagem_name))
+        if key in rows:
+            raise TypeError(
+                "Current Aeldari supplemental Stratagem names must be unique per owner."
+            )
+        rows[key] = row
+    return rows
+
+
+def _generic_enhancement_runtime_metadata_by_source_row_id() -> dict[
+    str, EnhancementRuntimeMetadata
+]:
+    descriptors_by_coverage_id: dict[str, list[object]] = {}
+    for registry_field in dataclass_fields(DEFAULT_GENERIC_RULE_ABILITY_REGISTRY):
+        for descriptor in getattr(DEFAULT_GENERIC_RULE_ABILITY_REGISTRY, registry_field.name):
+            coverage_descriptor_id = descriptor.coverage_descriptor_id
+            if not coverage_descriptor_id.startswith("phase17e:enhancement:"):
+                continue
+            descriptors_by_coverage_id.setdefault(coverage_descriptor_id, []).append(descriptor)
+
+    execution_records = {
+        record.coverage_descriptor_id: record
+        for record in faction_execution_2026_27.execution_records()
+    }
+    metadata: dict[str, EnhancementRuntimeMetadata] = {}
+    for coverage_descriptor_id, descriptors in descriptors_by_coverage_id.items():
+        record = execution_records.get(coverage_descriptor_id)
+        rule_ir = faction_generic_ir_support_2026_27.generic_rule_ir_by_coverage_descriptor_id(
+            coverage_descriptor_id
+        )
+        if rule_ir is None:
+            raise TypeError(
+                "Generic Enhancement runtime descriptor lacks execution source metadata."
+            )
+        if record is None:
+            record = _bootstrap_generic_enhancement_execution_record(
+                coverage_descriptor_id=coverage_descriptor_id,
+                rule_ir_hash=rule_ir.ir_hash(),
+            )
+        source = GenericRuleAbilitySource(record=record, rule_ir=rule_ir)
+        enhancement_ids: set[str] = set()
+        runtime_consumer_ids: set[str] = set()
+        for descriptor in descriptors:
+            enhancement_id = getattr(descriptor, "enhancement_id", None)
+            if type(enhancement_id) is str:
+                enhancement_ids.add(enhancement_id)
+            for method_name in ("effect_id", "hook_id", "modifier_id"):
+                method = getattr(descriptor, method_name, None)
+                if callable(method):
+                    runtime_consumer_ids.add(method(source))
+                    break
+            else:
+                raise TypeError("Generic Enhancement descriptor lacks a runtime consumer ID.")
+        if len(enhancement_ids) > 1:
+            raise TypeError("Generic Enhancement descriptors disagree on Enhancement ID.")
+        source_row_id = coverage_descriptor_id.removeprefix("phase17e:")
+        metadata[source_row_id] = EnhancementRuntimeMetadata(
+            enhancement_id=next(iter(enhancement_ids), None),
+            runtime_consumer_ids=tuple(sorted(runtime_consumer_ids)),
+        )
+    return metadata
+
+
+def _bootstrap_generic_enhancement_execution_record(
+    *,
+    coverage_descriptor_id: str,
+    rule_ir_hash: str,
+) -> faction_execution_2026_27.Phase17FExecutionRecord:
+    source_row_id = coverage_descriptor_id.removeprefix("phase17e:")
+    faction_id, detachment_id, rule_id = _enhancement_owner_and_rule_id(source_row_id)
+    owner_id = (faction_id, detachment_id)
+    return faction_execution_2026_27.Phase17FExecutionRecord(
+        execution_id=f"phase17f:{coverage_descriptor_id}",
+        coverage_descriptor_id=coverage_descriptor_id,
+        coverage_kind=faction_coverage_2026_27.Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
+        coverage_status=faction_coverage_2026_27.Phase17ECoverageStatus.GENERIC_SUPPORTED,
+        execution_status=faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        faction_id=faction_id,
+        faction_name=CURRENT_FACTION_NAMES_BY_ID[faction_id],
+        source_ids=(f"{EXACT_SOURCE_PACKAGE_ID}:{source_row_id}",),
+        source_pdf_package_id="gw-11e-mfm-2026-07",
+        rule_name=_label_for_identifier(rule_id.rsplit(":", 1)[-1]),
+        rule_id=rule_id,
+        timing_descriptor="army_construction",
+        rule_category="enhancement",
+        runtime_support_status=ENGINE_CONSUMED_STATUS,
+        detachment_id=detachment_id,
+        detachment_name=CURRENT_DETACHMENT_NAMES_BY_OWNER_ID[owner_id],
+        rule_ir_hash=rule_ir_hash,
+    )
+
+
+def _enhancement_owner_and_rule_id(source_row_id: str) -> tuple[str, str, str]:
+    pieces = source_row_id.split(":", 3)
+    if len(pieces) != 4 or pieces[0] != "enhancement":
+        raise TypeError("Enhancement source row ID does not contain a stable owner.")
+    return (pieces[1], pieces[2], pieces[3])
+
+
+def _current_mfm_enhancement_for_runtime_metadata(
+    *,
+    source_row_id: str,
+    faction_id: str,
+    detachment_id: str,
+    rule_id: str,
+) -> CurrentMfmEnhancementSeed | None:
+    if faction_id not in mfm_2026_07.supported_faction_ids():
+        return None
+    source_name = CURRENT_GENERIC_ENHANCEMENT_MFM_NAME_BY_SOURCE_ROW_ID.get(
+        source_row_id,
+        rule_id.rsplit(":", 1)[-1],
+    )
+    name_key = _aeldari_enhancement_name_key(source_name)
+    matches = tuple(
+        CurrentMfmEnhancementSeed(
+            detachment_id=detachment.detachment_id,
+            enhancement_id=enhancement.enhancement_id,
+            name=enhancement.name,
+            points=enhancement.points,
+            source_id=enhancement.source_id,
+        )
+        for detachment in mfm_2026_07.faction_record(faction_id).detachments
+        if detachment.detachment_id == detachment_id
+        for enhancement in detachment.enhancements
+        if _aeldari_enhancement_name_key(enhancement.name) == name_key
+    )
+    if len(matches) > 1:
+        raise TypeError("Runtime Enhancement matches multiple current MFM rows.")
+    return matches[0] if matches else None
+
+
+def _generic_runtime_metadata_for_aeldari_enhancement(
+    metadata: dict[str, EnhancementRuntimeMetadata],
+    *,
+    detachment_id: str,
+    name: str,
+) -> EnhancementRuntimeMetadata | None:
+    expected_prefix = f"enhancement:aeldari:{detachment_id}:"
+    expected_name_key = _aeldari_enhancement_name_key(name)
+    matches = tuple(
+        row
+        for source_row_id, row in metadata.items()
+        if source_row_id.startswith(expected_prefix)
+        and row.enhancement_id is not None
+        and _aeldari_enhancement_name_key(row.enhancement_id.rsplit(":", 1)[-1])
+        == expected_name_key
+    )
+    if len(matches) > 1:
+        raise TypeError("Current Aeldari Enhancement matches multiple runtime descriptors.")
+    return matches[0] if matches else None
+
+
+def _repair_utf8_mojibake(value: str) -> str:
+    if "â" not in value and "Ã" not in value:
+        return value
+    try:
+        return value.encode("cp1252").decode("utf-8")
+    except UnicodeError as exc:
+        raise TypeError("Aeldari source label contains unrepairable UTF-8 mojibake.") from exc
 
 
 def _slug_for_label(label: str) -> str:
@@ -936,7 +1429,7 @@ def _module_content(
     skipped_bridge_rows: tuple[GeneratedSkippedBridgeRow, ...],
     runtime_only_rows: tuple[GeneratedRuntimeOnlyRow, ...],
 ) -> str:
-    return "\n".join(
+    content = "\n".join(
         (
             "# Generated by tools/generate_faction_subrule_source_package.py.",
             "# Regenerate with `uv run python tools/generate_faction_subrule_source_package.py`.",
@@ -950,6 +1443,8 @@ def _module_content(
             "from enum import StrEnum",
             "from typing import Self, TypedDict, cast",
             "",
+            "from warhammer40k_core.core.validation import FixedMessageIdentifierValidator",
+            "",
             'EDITION_ID = "warhammer_40000_11th"',
             'SOURCE_EDITION = "11th"',
             'SOURCE_PACKAGE_ID = "gw-11e-phase17e-exact-faction-subrules-2026-27"',
@@ -960,7 +1455,8 @@ def _module_content(
             'IMPORTED_AT_SCHEMA_VERSION = "core-v2-phase17-exact-faction-subrules-v1"',
             (
                 'APPROVED_SKIPPED_BRIDGE_REASONS = frozenset(("missing_owner_fields", '
-                '"owner_not_in_current_source_package", "unsupported_source_type"))'
+                '"owner_not_in_current_source_package", "superseded_by_current_source", '
+                '"unsupported_source_type"))'
             ),
             (
                 "APPROVED_RUNTIME_ONLY_PROVENANCE_REASONS = "
@@ -979,6 +1475,7 @@ def _module_content(
             "",
         )
     )
+    return content.replace("\n\n\n", "\n\n")
 
 
 def _module_class_content() -> str:
@@ -1443,17 +1940,12 @@ def _validate_unique_exact_rows(exact_ids: tuple[tuple[str, str, str], ...]) -> 
         raise ValueError("Exact faction subrule owner/rule IDs must be unique.")
 
 
-def _validate_identifier(value: object) -> str:
-    if type(value) is not str:
-        raise ValueError("Exact faction subrule identifiers must be strings.")
-    stripped = value.strip()
-    if not stripped:
-        raise ValueError("Exact faction subrule identifiers must not be empty.")
-    return stripped
-
-
-def _validate_text(value: object) -> str:
-    return _validate_identifier(value)
+_validate_identifier = FixedMessageIdentifierValidator(
+    ValueError,
+    "Exact faction subrule identifiers must be strings.",
+    "Exact faction subrule identifiers must not be empty.",
+)
+_validate_text = _validate_identifier
 
 
 def _validate_identifier_tuple(

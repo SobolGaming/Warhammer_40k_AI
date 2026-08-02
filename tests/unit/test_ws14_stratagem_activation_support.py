@@ -15,9 +15,6 @@ from warhammer40k_core.engine.faction_content.stratagem_activation import (
     source_backed_detachment_stratagem_activation_records,
     source_backed_stratagem_activation_source_package_id,
 )
-from warhammer40k_core.engine.faction_content.stratagem_record_merge import (
-    merge_stratagem_records_with_contribution_overrides,
-)
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -57,16 +54,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    faction_generic_ir_support_2026_27,
     faction_stratagem_activation_2026_27,
     faction_subrules_2026_27,
     july_rules_updates_2026_07,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    faction_lords_of_the_warp_ir_support_2026_27 as lords_ir,
-)
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    faction_warptide_ir_support_2026_27 as warptide_ir,
 )
 
 
@@ -77,17 +67,40 @@ def test_ws14_stratagem_activation_profiles_cover_source_only_detachment_rows() 
     profiles = faction_stratagem_activation_2026_27.stratagem_activation_profiles()
     source_only_row_ids = {row.source_row_id for row in source_only_rows}
     profile_source_row_ids = {profile.source_row_id for profile in profiles}
-    source_backed_generic_row_ids = (
-        set(
-            faction_generic_ir_support_2026_27.supported_cavalcade_of_chaos_stratagem_source_row_ids()
-        )
-        | set(lords_ir.LORDS_OF_THE_WARP_STRATAGEM_SOURCE_ROW_IDS)
-        | set(warptide_ir.WARPTIDE_STRATAGEM_SOURCE_ROW_IDS)
-    )
-    assert len(source_only_rows) == 1080
-    assert len(profiles) == 1070
-    assert source_backed_generic_row_ids <= source_only_row_ids
-    assert profile_source_row_ids == source_only_row_ids - source_backed_generic_row_ids
+    activation_bridge_row_ids = {
+        row.source_row_id
+        for row in faction_subrules_2026_27.stratagem_rows()
+        if row.detachment_id
+        in {
+            "court-of-the-phoenician",
+            "more-dakka",
+            "shadow-legion",
+            "spectacle-of-slaughter",
+        }
+    }
+    assert len(source_only_rows) == 1004
+    assert len(activation_bridge_row_ids) == 21
+    assert len(profiles) == 1025
+    assert profile_source_row_ids == source_only_row_ids | activation_bridge_row_ids
+
+    aeldari_current_profile_names = {
+        profile.name
+        for profile in profiles
+        if profile.faction_id == "aeldari"
+        and profile.detachment_id
+        in {"armoured-warhost", "fateful-performance", "twilight-flickers"}
+    }
+    assert aeldari_current_profile_names == {
+        "Captivating Performance",
+        "Deceptive Feint",
+        "Exit the Stage",
+        "Heroes' Fall",
+        "Layered Wards",
+        "Phantasmal Mirage",
+        "Presaged Rehearsal",
+        "Soulsight",
+        "Vectored Engines",
+    }
 
     for profile in profiles:
         rule_ir = RuleIR.from_payload(cast(RuleIRPayload, profile.rule_ir_payload()))
@@ -118,8 +131,8 @@ def test_ws14_generated_stratagem_rule_ir_freezes_supported_effect_durations() -
         )
     ]
 
-    assert len(effect_profiles) == 187
-    assert len(duration_profiles) == 183
+    assert len(effect_profiles) == 176
+    assert len(duration_profiles) == 172
 
     payload = effect_profiles[0].rule_ir_payload()
     payload["rule_id"] = "tampered"
@@ -162,7 +175,7 @@ def test_ws14_source_backed_stratagem_activation_records_are_runtime_loadable() 
         faction_stratagem_activation_2026_27.SOURCE_PACKAGE_ID
     )
     assert len(records) == sum(len(profile.phase_tokens) for profile in profiles)
-    assert len(records) == 1253
+    assert len(records) == 1199
     assert StratagemCatalogIndex.from_records(records).all_records() == tuple(
         sorted(records, key=lambda record: record.record_id)
     )
@@ -463,35 +476,24 @@ def test_ws14_source_backed_stratagem_effect_duration_persists_and_expires() -> 
 
 
 def test_ws14_source_backed_stratagem_activation_does_not_shadow_named_records() -> None:
-    records = source_backed_detachment_stratagem_activation_records()
-    source_backed = next(
-        record
-        for record in records
-        if record.detachment_id == "more-dakka" and record.definition.stratagem_id == "000009992003"
-    )
-    retained = next(
-        record
-        for record in records
-        if record.detachment_id == "more-dakka" and record.definition.stratagem_id == "000009992004"
-    )
-    named_record = replace(
-        source_backed,
-        record_id="ws14:named-handler:more-dakka:000009992003",
-        definition=replace(
-            source_backed.definition,
-            handler_id="ws14:named-handler",
-        ),
-    )
+    profiles = faction_stratagem_activation_2026_27.stratagem_activation_profiles()
+    profile_source_row_ids = {profile.source_row_id for profile in profiles}
+    runtime_owned_rows_by_id = {
+        row.source_row_id: row
+        for row in faction_subrules_2026_27.stratagem_rows()
+        if row.runtime_consumer_ids
+    }
+    bridged_runtime_row_ids = profile_source_row_ids.intersection(runtime_owned_rows_by_id)
 
-    merged = merge_stratagem_records_with_contribution_overrides(records, (named_record,))
-
-    assert named_record in merged
-    assert retained in merged
-    assert tuple(
-        record
-        for record in merged
-        if record.detachment_id == "more-dakka" and record.definition.stratagem_id == "000009992003"
-    ) == (named_record,)
+    assert {
+        runtime_owned_rows_by_id[source_row_id].detachment_id
+        for source_row_id in bridged_runtime_row_ids
+    } == {
+        "court-of-the-phoenician",
+        "more-dakka",
+        "shadow-legion",
+        "spectacle-of-slaughter",
+    }
 
 
 def _unit(*, catalog: ArmyCatalog, army_id: str, unit_selection_id: str) -> UnitInstance:

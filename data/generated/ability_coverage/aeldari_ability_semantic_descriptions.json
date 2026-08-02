@@ -1,7 +1,7 @@
 {
   "coverage_schema_version": "aeldari-datasheet-semantic-coverage-v4",
-  "coverage_sha256": "f8486c02e87d7abd7ac3dc486125ff15e01b6faa5dd9bada8420689deb135795",
-  "description_text_sha256": "82155583b778896de3a0c55ff7865ef95580295aeff135611b1c27fd93179986",
+  "coverage_sha256": "665ee3d943f8217a6fd246a022fd7226de858720bfd2845a6c5a6473050f0602",
+  "description_text_sha256": "d59b60413f1f1f3ff2a20f3c67f9c0b1edb517a94649bcffb1b529ce9fa8e072",
   "descriptions": [
     {
       "ability_id": "000000568:diviner-of-futures",
@@ -3010,20 +3010,22 @@
     {
       "ability_id": "000002539:acrobatic-grace",
       "ability_name": "Acrobatic Grace",
-      "catalog_support": "generic_rule_ir",
+      "catalog_support": "unsupported",
       "datasheet_id": "000002539",
       "datasheet_name": "Skyweavers",
-      "description": "The incoming-attack -1 Hit modifier is parsed; the attack-query host is still needed.",
-      "diagnostic_reasons": [],
+      "description": "The current replacement is overlaid, but its combined Stealth grant and melee-only -1 Hit modifier still require supported IR and an attack-query host.",
+      "diagnostic_reasons": [
+        "unsupported_language"
+      ],
       "documentation_bucket": "still_needed",
-      "evidence_sha256": "1a3fce36ab5559355ea91ec92ed0bcb2542ab31ec4adf562da5016037b6b0a06",
-      "normalized_text_sha256": "d8235b4e3443ef997cf78b2fb42ad5dad6f153bc4179ff9c929448956a075376",
-      "raw_text_sha256": "d8235b4e3443ef997cf78b2fb42ad5dad6f153bc4179ff9c929448956a075376",
+      "evidence_sha256": "347d04547dc01185c9a51d50b30a4ab415f08fe5f2dc7dee2c0a079dc3bb7c68",
+      "normalized_text_sha256": "fde9a4b1f91f6754f499cee36de95b44933c61fa7a62848d2c3e19ea9c76cbda",
+      "raw_text_sha256": "fde9a4b1f91f6754f499cee36de95b44933c61fa7a62848d2c3e19ea9c76cbda",
       "runtime_consumer_ids": [],
       "semantic_consumers": [
         {
           "runtime_consumer_ids": [],
-          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002539:3:description:clause:001:effect:0",
+          "semantic_id": "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002539:3:description:clause:002:effect:0",
           "semantic_kind": "modify_dice_roll"
         }
       ],
@@ -3032,7 +3034,7 @@
       ],
       "source_kind": "datasheet",
       "source_row_id": "000002539:3",
-      "support_stage": "generic_ir_executable"
+      "support_stage": "ir_compiled_unsupported"
     },
     {
       "ability_id": "000002540:polychromatic-camouflage",
@@ -3280,14 +3282,14 @@
       "catalog_support": "unsupported",
       "datasheet_id": "000002544",
       "datasheet_name": "The Yncarne",
-      "description": "A once-per-opponent-turn teleport setup at a destroyed friendly unit's location is still needed.",
+      "description": "The current replacement is overlaid, but its once-per-opponent-turn teleport setup and explicit exception preserving later move eligibility still require supported IR.",
       "diagnostic_reasons": [
         "unsupported_language"
       ],
       "documentation_bucket": "still_needed",
-      "evidence_sha256": "7c19216c4ca35f03baba4c23a470c37b6c89e70ee8a33317ecfe930e8faeed21",
-      "normalized_text_sha256": "b20c3feef7db3e55c431e108f51e7f0224d316a0de3ac014bfeddcb6b7cb0d36",
-      "raw_text_sha256": "b20c3feef7db3e55c431e108f51e7f0224d316a0de3ac014bfeddcb6b7cb0d36",
+      "evidence_sha256": "267b2b69233dd0850fbf46365bdd827161101c830d5ea50248f32265102092e8",
+      "normalized_text_sha256": "7f4921118e3a4ccf85504e4795699e05af2f1f543067563f7b619e1a2cb9d6e5",
+      "raw_text_sha256": "7f4921118e3a4ccf85504e4795699e05af2f1f543067563f7b619e1a2cb9d6e5",
       "runtime_consumer_ids": [],
       "semantic_consumers": [],
       "source_ids": [
@@ -3939,7 +3941,7 @@
       "catalog_support": "unsupported",
       "datasheet_id": "000003917",
       "datasheet_name": "Ynnari Wyches",
-      "description": "Eligible nearby enemies that Fall Back need forced Desperate Escape tests, with the Battle-shocked modifier and Monster/Vehicle exclusions.",
+      "description": "Eligible nearby non-Monster, non-Vehicle enemies that Fall Back must test as if Battle-shocked; enemies that are actually Battle-shocked also subtract 1 from those tests.",
       "diagnostic_reasons": [
         "unsupported_language"
       ],

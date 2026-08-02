@@ -17,6 +17,7 @@ from tools.aeldari_ability_semantic_descriptions import (
 )
 from tools.aeldari_datasheet_semantic_coverage import (
     COVERAGE_PATH,
+    JULY_OVERLAY_PACK_PATH,
     OVERLAY_PACK_PATH,
     RELEASE_MANIFEST_PATH,
     SEMANTIC_BUCKET_ALL_CONSUMED,
@@ -108,8 +109,10 @@ AELDARI_UPDATE_IDS = frozenset(
         "000000609",
         "000002531",
         "000002535",
+        "000002539",
         "000002541",
         "000002542",
+        "000002544",
         "000003918",
         "000003921",
     }
@@ -199,8 +202,8 @@ def test_aeldari_treatments_are_the_exact_reviewed_sets() -> None:
     assert unchanged_ids == all_ids - AELDARI_COMPLETE_IDS - AELDARI_UPDATE_IDS
     assert review.treatment_counts() == {
         DatasheetSourceTreatment.COMPLETE_PDF: 5,
-        DatasheetSourceTreatment.RULES_UPDATE: 24,
-        DatasheetSourceTreatment.UNCHANGED_PREDECESSOR: 41,
+        DatasheetSourceTreatment.RULES_UPDATE: 26,
+        DatasheetSourceTreatment.UNCHANGED_PREDECESSOR: 39,
     }
     assert {
         cast(str, row.datasheet_id): row.pdf_page_reference
@@ -491,8 +494,8 @@ def test_aeldari_semantic_coverage_bridges_every_exact_ability() -> None:
     assert sum(len(row.abilities) for row in artifact.rows) == 145
     assert Counter(row.semantic_bucket for row in artifact.rows) == {
         SEMANTIC_BUCKET_ALL_CONSUMED: 29,
-        SEMANTIC_BUCKET_HOST_NEEDED: 4,
-        SEMANTIC_BUCKET_UNSUPPORTED_IR: 37,
+        SEMANTIC_BUCKET_HOST_NEEDED: 3,
+        SEMANTIC_BUCKET_UNSUPPORTED_IR: 38,
     }
     assert {
         row.datasheet_id: row.pdf_page_reference
@@ -693,18 +696,28 @@ def test_aeldari_night_spinner_catalog_geometry_is_source_reviewed() -> None:
 
 
 def test_aeldari_semantic_coverage_artifacts_are_current() -> None:
-    overlay_pack, tacoma_overlay_pack, release_manifest, coverage_payload = (
-        generated_aeldari_datasheet_semantic_coverage()
-    )
+    (
+        overlay_pack,
+        tacoma_overlay_pack,
+        july_overlay_pack,
+        release_manifest,
+        coverage_payload,
+    ) = generated_aeldari_datasheet_semantic_coverage()
 
     assert json.loads(COVERAGE_PATH.read_text(encoding="utf-8")) == coverage_payload
     assert json.loads(OVERLAY_PACK_PATH.read_text(encoding="utf-8")) == (overlay_pack.to_payload())
     assert json.loads(TACOMA_OVERLAY_PACK_PATH.read_text(encoding="utf-8")) == (
         tacoma_overlay_pack.to_payload()
     )
+    assert json.loads(JULY_OVERLAY_PACK_PATH.read_text(encoding="utf-8")) == (
+        july_overlay_pack.to_payload()
+    )
     assert tacoma_overlay_pack.operations[0].source_reference == (
         tacoma_open_2026.FRAME_KEYWORD_ADDITIONS_SOURCE_ID
     )
+    assert {operation.source_reference for operation in july_overlay_pack.operations} == {
+        "pdf:aeldari-faction-pack:2026-07-22:p23"
+    }
     assert json.loads(RELEASE_MANIFEST_PATH.read_text(encoding="utf-8")) == (
         release_manifest.to_payload()
     )

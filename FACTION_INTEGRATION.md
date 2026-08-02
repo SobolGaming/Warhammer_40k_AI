@@ -116,7 +116,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v3`
 - source-payload SHA-256 checksum:
-  `15207a4da9fc4b1e400d59dfc53184514ec60dfb26dc007c45f52b665249ceeb`
+  `4c68c7c1dcc32375726563b60722d5e28db2abf158e803a6441f8d784898cb8f`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -152,11 +152,12 @@ hide missing detail, and no unapproved unsupported descriptor remains for Phase
 17E matched-play coverage.
 The exact subrule source package also exposes checksum-covered
 `skipped_bridge_rows()` and `runtime_only_rows()` audit APIs. Current bridge
-input accounting captures 607 approved skipped bridge rows: 573 rows whose
+input accounting captures 692 approved skipped bridge rows: 653 rows whose
 derived owner is not in the current source package, 28 Stratagem rows with
-missing bridge owner fields, and 6 rows linked to unsupported source types.
+missing bridge owner fields, 6 rows linked to unsupported source types, and 5
+rows superseded by current source evidence.
 Runtime-only exact rows are limited to an explicit
-6-row allowlist for runtime-backed rows without a bridge source-row match;
+13-row allowlist for runtime-backed rows without a bridge source-row match;
 new runtime-only rows fail generation until their provenance is approved.
 
 ## Phase 17F Execution Gate
@@ -176,15 +177,15 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v3`
 - source-payload SHA-256 checksum:
-  `4d1f3c0248296eb28e71a8fc5150ef4d80d33661719c519028d87afbaf023ddc`
+  `33f066d0b292580042270148e7e4e190666ecf2720a511d749a0d05d424a9367`
 - upstream Phase 17E checksum:
-  `15207a4da9fc4b1e400d59dfc53184514ec60dfb26dc007c45f52b665249ceeb`
+  `4c68c7c1dcc32375726563b60722d5e28db2abf158e803a6441f8d784898cb8f`
 
-The package emits 2149 execution records, one for every Phase 17E coverage row:
-1999 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+The package emits 2073 execution records, one for every Phase 17E coverage row:
+1923 rows are blocked as `structured_rule_semantics_required`, 28 rows are
 blocked as `approved_phase17e_source_gap`, 99 rows are executable generic IR
 rows, and 23 rows are executable named-handler rows because they already have
-runtime consumers: 23 faction army rules.
+runtime consumers.
 The engine dispatcher can route every record and returns typed `unsupported`
 diagnostics unless a matching executor is registered. No Phase 17E row remains a
 missing handler, runtime no-op, raw-PDF parse, or silent fallback. Future
@@ -443,16 +444,16 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `5df5a355516ebb69d8f5ef2edd10b36d720554794b08cee29a924f28a5bc3b31`
+  `d86da9a2ab52ae21ae49c27865fae1fc19868404986ea51eacaa41ee880ea067`
 - upstream Phase 17F checksum:
-  `4d1f3c0248296eb28e71a8fc5150ef4d80d33661719c519028d87afbaf023ddc`
+  `33f066d0b292580042270148e7e4e190666ecf2720a511d749a0d05d424a9367`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
 
-The report emits 1999 classification rows, one for every Phase 17F row blocked
-as `blocked_structured_semantics_required`. It compiles 1910 rows from Wahapedia
-bridge descriptions through Phase 17C and marks 89 rows as
+The report emits 1923 classification rows, one for every Phase 17F row blocked
+as `blocked_structured_semantics_required`. It compiles 1824 rows from Wahapedia
+bridge descriptions through Phase 17C and marks 99 rows as
 `source_text_not_available` metadata-only rows. Each row records the existing
 Phase 17C template IDs and template families that can already express clauses,
 unsupported diagnostic reason tokens, and missing capability families grouped by
@@ -485,9 +486,9 @@ WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-named-handler-budget-v1`
 - source-payload SHA-256 checksum:
-  `c0b729e034292abd0fdc47557148b68e9f3b4dbd200be92ef27a46f1e23a6dd5`
+  `0e498c0675fee6090b47903a9633a230bd2b2771f296bf47c40406384537781c`
 - upstream Phase 17F checksum:
-  `4d1f3c0248296eb28e71a8fc5150ef4d80d33661719c519028d87afbaf023ddc`
+  `33f066d0b292580042270148e7e4e190666ecf2720a511d749a0d05d424a9367`
 
 The budget report tracks 23 executable named-handler Phase 17F rows and 23
 approved entries. The current approved reason is
@@ -547,9 +548,9 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 15 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 45 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 46 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 6 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 66 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 69 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 9 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
@@ -559,8 +560,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 30 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Tyranids Execution Status
@@ -613,8 +614,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 7 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 30 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 16 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Space Marines Execution Status
@@ -623,9 +624,9 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 22 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 79 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 71 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 1 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 119 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 107 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Dark Angels Execution Status
@@ -684,9 +685,9 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 17 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 58 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 54 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 2 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 90 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 84 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### World Eaters Execution Status
@@ -706,9 +707,9 @@ already engine-consumed named handlers.
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 2 | `executable_generic_ir` | `applied` | `none` |
-| Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 6 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 30 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Stratagems | 9 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
@@ -718,8 +719,8 @@ already engine-consumed named handlers.
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Enhancements | 28 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 30 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Thousand Sons Execution Status

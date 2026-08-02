@@ -52,6 +52,13 @@ COVERAGE_PATH = (
 OVERLAY_DIR = REPO_ROOT / "data" / "source_overlays" / "aeldari_faction_pack_2026_06"
 OVERLAY_PACK_PATH = OVERLAY_DIR / "aeldari-faction-pack-datasheet-overlay.overlay-pack.json"
 RELEASE_MANIFEST_PATH = OVERLAY_DIR / "source_release_manifest.json"
+JULY_OVERLAY_PACK_PATH = (
+    REPO_ROOT
+    / "data"
+    / "source_overlays"
+    / "aeldari_faction_pack_2026_07"
+    / "aeldari-july-datasheet-overlay.overlay-pack.json"
+)
 TACOMA_OVERLAY_PACK_PATH = (
     REPO_ROOT
     / "data"
@@ -580,6 +587,9 @@ def _canonical_source_provenance() -> tuple[
     tacoma_overlay_pack = SourceOverlayPack.from_payload(
         cast(SourceOverlayPackPayload, _load_object(TACOMA_OVERLAY_PACK_PATH))
     )
+    july_overlay_pack = SourceOverlayPack.from_payload(
+        cast(SourceOverlayPackPayload, _load_object(JULY_OVERLAY_PACK_PATH))
+    )
     release_manifest = SourceReleaseManifest.from_payload(
         cast(SourceReleaseManifestPayload, _load_object(RELEASE_MANIFEST_PATH))
     )
@@ -589,7 +599,7 @@ def _canonical_source_provenance() -> tuple[
     effective_artifacts = apply_source_release_overlays(
         source_artifacts=source_artifacts,
         release_manifest=release_manifest,
-        overlay_packs=(overlay_pack, tacoma_overlay_pack),
+        overlay_packs=(overlay_pack, tacoma_overlay_pack, july_overlay_pack),
     )
     source_hashes = tuple(
         sorted(
@@ -613,7 +623,7 @@ def _canonical_source_provenance() -> tuple[
     return (
         tuple(
             (pack.package_id.stable_identity(), pack.package_hash())
-            for pack in (overlay_pack, tacoma_overlay_pack)
+            for pack in (overlay_pack, tacoma_overlay_pack, july_overlay_pack)
         ),
         release_manifest.release_hash(),
         source_hashes,

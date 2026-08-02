@@ -187,24 +187,24 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Faction | Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows | File |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | Orks | 12 | 1 | 44 | 66 | 13 | [orks](factions/orks.md) |
-| Aeldari | 15 | 2 | 51 | 75 | 16 | [aeldari](factions/aeldari.md) |
-| Drukhari | 9 | 0 | 24 | 36 | 1 | [drukhari](factions/drukhari.md) |
+| Aeldari | 15 | 2 | 52 | 78 | 16 | [aeldari](factions/aeldari.md) |
+| Drukhari | 9 | 0 | 20 | 30 | 1 | [drukhari](factions/drukhari.md) |
 | Tyranids | 10 | 0 | 32 | 48 | 2 | [tyranids](factions/tyranids.md) |
 | Genestealer Cults | 9 | 0 | 20 | 30 | 3 | [genestealer-cults](factions/genestealer-cults.md) |
 | Necrons | 12 | 0 | 36 | 54 | 4 | [necrons](factions/necrons.md) |
 | Leagues of Votann | 10 | 0 | 28 | 42 | 2 | [leagues-of-votann](factions/leagues-of-votann.md) |
-| T'au Empire | 7 | 0 | 20 | 30 | 1 | [tau-empire](factions/tau-empire.md) |
-| Space Marines | 22 | 0 | 80 | 119 | 2 | [space-marines](factions/space-marines.md) |
+| T'au Empire | 7 | 0 | 16 | 24 | 1 | [tau-empire](factions/tau-empire.md) |
+| Space Marines | 22 | 0 | 72 | 107 | 2 | [space-marines](factions/space-marines.md) |
 | Dark Angels | 8 | 0 | 0 | 0 | 0 | [dark-angels](factions/dark-angels.md) |
 | Blood Angels | 8 | 0 | 0 | 0 | 0 | [blood-angels](factions/blood-angels.md) |
 | Space Wolves | 7 | 0 | 0 | 0 | 0 | [space-wolves](factions/space-wolves.md) |
 | Black Templars | 6 | 0 | 0 | 0 | 1 | [black-templars](factions/black-templars.md) |
 | Deathwatch | 1 | 0 | 0 | 0 | 0 | [deathwatch](factions/deathwatch.md) |
 | Grey Knights | 9 | 0 | 24 | 36 | 1 | [grey-knights](factions/grey-knights.md) |
-| Chaos Space Marines | 17 | 0 | 60 | 90 | 3 | [chaos-space-marines](factions/chaos-space-marines.md) |
+| Chaos Space Marines | 17 | 0 | 56 | 84 | 3 | [chaos-space-marines](factions/chaos-space-marines.md) |
 | World Eaters | 8 | 0 | 24 | 36 | 1 | [world-eaters](factions/world-eaters.md) |
-| Emperor's Children | 10 | 2 | 30 | 45 | 18 | [emperors-children](factions/emperors-children.md) |
-| Death Guard | 9 | 0 | 28 | 42 | 1 | [death-guard](factions/death-guard.md) |
+| Emperor's Children | 10 | 2 | 26 | 39 | 18 | [emperors-children](factions/emperors-children.md) |
+| Death Guard | 9 | 0 | 20 | 30 | 1 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 1 | [chaos-knights](factions/chaos-knights.md) |
 | Chaos Daemons | 9 | 6 | 29 | 46 | 42 | [chaos-daemons](factions/chaos-daemons.md) |

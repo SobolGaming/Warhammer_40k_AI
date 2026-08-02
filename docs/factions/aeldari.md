@@ -10,7 +10,7 @@ Current source package: `gw-11e-aeldari-faction-pack-2026-07`
 
 | Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 15 | 2 | 51 | 75 | 16 |
+| 15 | 2 | 52 | 78 | 16 |
 
 ## July 22, 2026 Source Status
 
@@ -32,21 +32,29 @@ This generated snapshot separates source review from semantic execution. Detachm
 | --- | --- |
 | Corsair Coterie<br>Path of the Outcast | Armoured Warhost<br>Aspect Host<br>Devoted of Ynnead<br>Eldritch Raiders<br>Fateful Performance<br>Ghosts of the Webway<br>Guardian Battlehost<br>Seer Council<br>Serpent's Brood<br>Spirit Conclave<br>Twilight Flickers<br>Warhost<br>Windrider Host |
 
+### Detachment rules
+
+| Runtime supported / executable | Still source-only / blocked |
+| --- | --- |
+| Corsair Coterie — Relentless Raiders<br>Corsair Coterie — Veterans of the Void<br>Path of the Outcast — Far-reaching Doom | Armoured Warhost — Skilled Crews<br>Aspect Host — Path of the Warrior<br>Devoted of Ynnead — Strength from Death<br>Eldritch Raiders — Veterans of the Void<br>Eldritch Raiders — Yriel's Own<br>Fateful Performance — Acrobatic Onslaught<br>Ghosts of the Webway — Acrobatic Onslaught<br>Guardian Battlehost — Defend At All Costs<br>Seer Council — Strands of Fate<br>Serpent's Brood — Boons of the Brood<br>Spirit Conclave — Shepherds of the Dead<br>Twilight Flickers — Dance of Distortion<br>Warhost — Martial Grace<br>Windrider Host — Ride the Wind |
+
 ### Enhancements
 
 | Detachment | Runtime supported / executable | Still source-only / blocked |
 | --- | --- | --- |
-| Armoured Warhost | None | Guiding Presence<br>Guileful Strategist<br>Harmonisation Matrix<br>Spirit Stone of Raelyth |
+| Armoured Warhost | None | Guiding Presence<br>Spirit Stone of Raelyth |
 | Aspect Host | None | Aspect of Murder<br>Mantle of Wisdom<br>Shimmerstone<br>Strategic Savant |
-| Corsair Coterie | Archraider<br>Infamy<br>Voidstone<br>Webway Pathstone | Infamy (Aura) |
+| Corsair Coterie | Archraider<br>Infamy (Aura)<br>Voidstone<br>Webway Pathstone | None |
 | Devoted of Ynnead | None | Borrowed Vigour<br>Gaze of Ynnead<br>Morbid Might<br>Storm of Whispers |
 | Eldritch Raiders | None | Adrenal Infusions<br>Alacritous Assault<br>Exotic Munitions<br>Pirate Prince |
-| Ghosts of the Webway | None | Cegorach’s Coil<br>Mask of Secrets<br>Mistweave<br>Murder’s Jest |
-| Guardian Battlehost | None | Breath of Vaul<br>Craftworld’s Champion<br>Ethereal Pathway<br>Protector of the Paths |
-| Path of the Outcast | Assassins Eye Upgrade<br>Camouflaged Snipers Upgrade | None |
+| Fateful Performance | None | A Foot in the Future<br>Mistweave |
+| Ghosts of the Webway | None | Cegorach's Coil<br>Mask of Secrets<br>Mistweave<br>Murder's Jest |
+| Guardian Battlehost | None | Breath of Vaul<br>Craftworld's Champion<br>Ethereal Pathway<br>Protector of the Paths |
+| Path of the Outcast | Assassins' Eye (Upgrade)<br>Camouflaged Snipers (Upgrade) | None |
 | Seer Council | None | Lucid Eye<br>Runes of Warding<br>Stone of Eldritch Fury<br>Torc of Morai-Heg |
-| Serpent's Brood | None | Fanged Leer<br>Key of Ghosts<br>Shedskin Raiment<br>Weavers’ Wail |
+| Serpent's Brood | None | Fanged Leer<br>Key of Ghosts<br>Shedskin Raiment<br>Weavers' Wail |
 | Spirit Conclave | None | Higher Duty<br>Light of Clarity<br>Rune of Mists<br>Stave of Kurnous |
+| Twilight Flickers | None | Prelude Performer<br>Shadowfall Masks (Upgrade) |
 | Warhost | None | Gift of Foresight<br>Phoenix Gem<br>Psychic Destroyer<br>Timeless Strategist |
 | Windrider Host | None | Echoes of Ulthanesh<br>Firstdrawn Blade<br>Mirage Field<br>Seersight Strike |
 
@@ -54,17 +62,19 @@ This generated snapshot separates source review from semantic execution. Detachm
 
 | Detachment | Runtime supported / executable | Still source-only / blocked |
 | --- | --- | --- |
-| Armoured Warhost | None | ANTI‑GRAV REPULSION<br>CLOUDSTRIKE<br>LAYERED WARDS<br>SOULSIGHT<br>SWIFT DEPLOYMENT<br>VECTORED ENGINES |
-| Aspect Host | None | DOOM INESCAPABLE<br>KHAINE’S VENGEANCE<br>PRETERNATURAL PRECISION<br>SKYBORNE SANCTUARY<br>TO THEIR FINAL BREATH<br>WARRIOR FOCUS |
+| Armoured Warhost | None | Layered Wards<br>Soulsight<br>Vectored Engines |
+| Aspect Host | None | DOOM INESCAPABLE<br>KHAINE'S VENGEANCE<br>PRETERNATURAL PRECISION<br>SKYBORNE SANCTUARY<br>TO THEIR FINAL BREATH<br>WARRIOR FOCUS |
 | Corsair Coterie | Cloak and Shadow<br>Into the Breach<br>Lethal Ruse<br>Outcast Ambush<br>Pirates' Due<br>Vengeful Sorrow | None |
 | Devoted of Ynnead | None | DEATH ANSWERS DEATH<br>EMISSARIES OF YNNEAD<br>MACABRE RESILIENCE<br>PALL OF DREAD<br>PARTING THE VEIL<br>SOULSIGHT |
-| Eldritch Raiders | None | IMPEDING FIRE<br>NO PREY TOO BIG<br>RAIDERS’ SPOILS<br>RUTHLESS KILLERS<br>WITHDRAW AND REINFORCE<br>YRIEL’S EXAMPLE |
-| Ghosts of the Webway | None | BLOODY DANCE<br>EXIT THE STAGE<br>HEROES’ FALL<br>MOCKING FLIGHT<br>STAGED DEATH<br>TRICKSTERS’ RETORT |
-| Guardian Battlehost | None | BLADES OF ASURYAN<br>COST OF VICTORY<br>SHIELD NODES<br>TIME TO STRIKE<br>VAUL’S VENGEANCE<br>WARDING SALVOES |
+| Eldritch Raiders | None | IMPEDING FIRE<br>NO PREY TOO BIG<br>RAIDERS' SPOILS<br>RUTHLESS KILLERS<br>WITHDRAW AND REINFORCE<br>YRIEL'S EXAMPLE |
+| Fateful Performance | None | Deceptive Feint<br>Exit the Stage<br>Heroes' Fall |
+| Ghosts of the Webway | None | BLOODY DANCE<br>EXIT THE STAGE<br>HEROES' FALL<br>MOCKING FLIGHT<br>STAGED DEATH<br>TRICKSTERS' RETORT |
+| Guardian Battlehost | None | BLADES OF ASURYAN<br>COST OF VICTORY<br>SHIELD NODES<br>TIME TO STRIKE<br>VAUL'S VENGEANCE<br>WARDING SALVOES |
 | Path of the Outcast | Casting Back the Veil<br>Eldritch Suppression<br>Nomads of the Hidden Way | None |
-| Seer Council | None | FATE INESCAPABLE<br>FOREWARNED<br>ISHA’S FURY<br>PRESENTIMENT OF DREAD<br>PSYCHIC SHIELD<br>UNSHROUDED TRUTH |
-| Serpent's Brood | None | FANGS OF THE BROOD<br>SKYWARD LUNGE<br>STRIKING STRIDE<br>VENOMOUS WRATH<br>WEAVERS’ COILS<br>WEAVING STRIDE |
-| Spirit Conclave | None | BLADES FROM BEYOND<br>CRUSHING STRIDES<br>SEER’S EYE<br>SOUL BRIDGE<br>SPIRIT TOKEN<br>WRAITHBONE ARMOUR |
+| Seer Council | None | FATE INESCAPABLE<br>FOREWARNED<br>ISHA'S FURY<br>PRESENTIMENT OF DREAD<br>PSYCHIC SHIELD<br>UNSHROUDED TRUTH |
+| Serpent's Brood | None | FANGS OF THE BROOD<br>SKYWARD LUNGE<br>STRIKING STRIDE<br>VENOMOUS WRATH<br>WEAVERS' COILS<br>WEAVING STRIDE |
+| Spirit Conclave | None | BLADES FROM BEYOND<br>CRUSHING STRIDES<br>SEER'S EYE<br>SOUL BRIDGE<br>SPIRIT TOKEN<br>WRAITHBONE ARMOUR |
+| Twilight Flickers | None | Captivating Performance<br>Phantasmal Mirage<br>Presaged Rehearsal |
 | Warhost | None | BLITZING FIREPOWER<br>FEIGNED RETREAT<br>FIRE AND FADE<br>LIGHTNING-FAST REACTIONS<br>SKYBORNE SANCTUARY<br>WEBWAY TUNNEL |
 | Windrider Host | None | DARING RIDERS<br>DEATH FROM ON HIGH<br>FOCUSED FIREPOWER<br>OVERFLIGHT<br>SPIRALLING EVASION<br>WIND OF BLADES |
 
@@ -74,7 +84,7 @@ This generated snapshot separates source review from semantic execution. Detachm
 | --- | --- | --- | --- | --- |
 | Craftworlds / Asuryani | Autarch (`000000577`)<br>Autarch Wayleaper (`000002759`)<br>Dire Avengers (`000000593`)<br>Eldrad Ulthran (`000000568`)<br>Fire Dragons (`000000596`)<br>Fuegan (`000000574`)<br>Howling Banshees (`000000594`)<br>Jain Zar (`000000572`)<br>Lhykhis (`000003909`)<br>Night Spinner (`000000611`)<br>Rangers (`000000592`)<br>Shining Spears (`000000602`)<br>Shroud Runners (`000002533`)<br>Spiritseer (`000000588`)<br>Striking Scorpions (`000000595`)<br>Swooping Hawks (`000000600`)<br>Vypers (`000000605`)<br>War Walkers (`000000612`)<br>Warp Spiders (`000000601`)<br>Wave Serpent (`000000599`)<br>Wraithblades (`000000598`)<br>Wraithguard (`000000597`)<br>Wraithlord (`000000613`) | Crimson Hunter (`000000603`)<br>Dark Reapers (`000000607`)<br>Falcon (`000000609`) | Asurmen (`000000571`)<br>Avatar of Khaine (`000000581`)<br>Baharroth (`000000575`)<br>D-cannon Platform (`000003910`)<br>Farseer (`000000582`)<br>Farseer Skyrunner (`000000583`)<br>Fire Prism (`000000610`)<br>Guardian Defenders (`000000589`)<br>Hemlock Wraithfighter (`000000606`)<br>Maugan Ra (`000000576`)<br>Shadow Weaver Platform (`000003911`)<br>Storm Guardians (`000000590`)<br>Vibro Cannon Platform (`000003912`)<br>Warlock (`000000585`)<br>Warlock Conclave (`000000584`)<br>Warlock Skyrunners (`000000587`)<br>Windriders (`000000591`)<br>Wraithknight (`000000614`)<br>Wraithknight with Ghostglaive (`000003913`) | None |
 | Anhrathe / Corsairs | Corsair Skyreavers (`000004196`)<br>Corsair Voidreavers (`000002531`)<br>Corsair Voidscarred (`000002532`)<br>Kharseth (`000004194`)<br>Prince Yriel (`000004193`)<br>Starfangs (`000004195`) | None | None | None |
-| Harlequins | None | Skyweavers (`000002539`) | Death Jester (`000002537`)<br>Shadowseer (`000002535`)<br>Solitaire (`000002538`)<br>Starweaver (`000002541`)<br>Troupe (`000002536`)<br>Troupe Master (`000002534`)<br>Voidweaver (`000002540`) | None |
+| Harlequins | None | None | Death Jester (`000002537`)<br>Shadowseer (`000002535`)<br>Skyweavers (`000002539`)<br>Solitaire (`000002538`)<br>Starweaver (`000002541`)<br>Troupe (`000002536`)<br>Troupe Master (`000002534`)<br>Voidweaver (`000002540`) | None |
 | Ynnari | None | None | The Visarch (`000002543`)<br>The Yncarne (`000002544`)<br>Ynnari Archon (`000003914`)<br>Ynnari Incubi (`000003918`)<br>Ynnari Kabalite Warriors (`000003916`)<br>Ynnari Raider (`000003920`)<br>Ynnari Reavers (`000003919`)<br>Ynnari Succubus (`000003915`)<br>Ynnari Venom (`000003921`)<br>Ynnari Wyches (`000003917`)<br>Yvraine (`000002542`) | None |
 
 ## Detachment Rule Support
@@ -83,10 +93,10 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 
 | Detachment | Overall support | Engine support | Tests | Notes |
 | --- | --- | --- | --- | --- |
-| Armoured Warhost | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: grant Assault to ranged weapons of friendly Aeldari Vehicle models and grant Advance rerolls to friendly Aeldari Vehicle Fly units. |
+| Armoured Warhost | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: grant Assault to ranged weapons equipped by friendly Aeldari Vehicle models. |
 | Aspect Host | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: when an Aspect Warriors or Avatar of Khaine unit is selected to shoot or fight, offer a phase-scoped choice between Hit-rolls-of-1 and Wound-rolls-of-1 rerolls. |
 | Corsair Coterie | `Full` | Relentless Raiders movement/charge completion mortal-wound hook, Void Thieves sticky objective-control hook, four enhancements, and six named Stratagem handlers | Focused mustering, objective-control, movement-completion, turn-end, Stratagem-cost, runtime-modifier, Stratagem effect, targeting-restriction, and triggered-movement tests | Includes Veterans of the Void mustering, objective-control ownership checks after sticky states, D6 2+ into D3 mortal wounds for enemies ending Normal/Advance/Fall Back/Charge moves on controlled objectives, Anhrathe sticky control, and Corsair Coterie Stratagem support. |
-| Devoted of Ynnead | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: Ynnari mustering/keyword/Warlord rules; an end-of-opponent-Shooting-phase D6+1 reactive move after a nearby Ynnari unit is destroyed; a Fade Back replacement move that can enter Engagement Range; and a Fight-start Fights First grant below Starting Strength. |
+| Devoted of Ynnead | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: Ynnari mustering/keyword/Warlord rules; an end-of-opponent-Shooting-phase D6+1 reactive move after a nearby Ynnari unit is destroyed; a Fade Back replacement D6+1 surge move; and a Fight-start Fights First grant below Starting Strength. |
 | Eldritch Raiders | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: army-wide charge-after-Advance, Advance rerolls for Anhrathe/Rangers/Shroud Runners, and Veterans of the Void mustering for unique paid Corsair Enhancements. |
 | Fateful Performance | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: Harlequins Charge moves through enemy models and mustering-time exclusive ACROBATIC detachment-tag validation. |
 | Ghosts of the Webway | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: Harlequins Charge transit through enemy models, Troupe Battleline and Objective Control 2 grants, and the three-copy Death Jester/Shadowseer/Troupe Master cap. |
@@ -178,7 +188,7 @@ This source-review subsection alone makes no catalog-load or semantic-execution 
 | --- | --- | --- | --- |
 | Death Jester (`000002537`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 | Shadowseer (`000002535`) | `rules_update` | Rules Updates, physical PDF page 23 (contents page 27) | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
-| Skyweavers (`000002539`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| Skyweavers (`000002539`) | `rules_update` | Rules Updates, physical PDF page 23 (contents page 27) | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 | Solitaire (`000002538`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 | Starweaver (`000002541`) | `rules_update` | Rules Updates, physical PDF page 23 (contents page 27) | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 | Troupe (`000002536`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
@@ -190,7 +200,7 @@ This source-review subsection alone makes no catalog-load or semantic-execution 
 | Datasheet | Explicit treatment | PDF reference | Review note |
 | --- | --- | --- | --- |
 | The Visarch (`000002543`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
-| The Yncarne (`000002544`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
+| The Yncarne (`000002544`) | `rules_update` | Rules Updates, physical PDF page 23 (contents page 27) | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 | Ynnari Archon (`000003914`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 | Ynnari Incubi (`000003918`) | `rules_update` | Rules Updates, physical PDF page 23 (contents page 27) | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 | Ynnari Kabalite Warriors (`000003916`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
@@ -200,6 +210,34 @@ This source-review subsection alone makes no catalog-load or semantic-execution 
 | Ynnari Venom (`000003921`) | `rules_update` | Rules Updates, physical PDF page 23 (contents page 27) | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
 | Ynnari Wyches (`000003917`) | `unchanged_predecessor` | Not reprinted or updated | Explicitly reviewed: the Faction Pack neither reprints nor updates this row. |
 | Yvraine (`000002542`) | `rules_update` | Rules Updates, physical PDF page 23 (contents page 27) | Apply the Faction Pack datasheet Rules Update to the pinned predecessor row. |
+
+## 39k PRO Secondary Reference Audit
+
+Audit `39k-pro-aeldari-2026-08-01` checked the current [Codex: Aeldari](https://39k.pro/faction/-utUCEwvtbI) publication and all current detachment pages on 2026-08-01. 39k PRO is secondary cross-check evidence only; the hashed Games Workshop Faction Pack and July 2026 Munitorum Field Manual remain the authoritative catalog provenance.
+
+The reconciliation matched all 70 in-scope datasheets and all 145 exact abilities. It records 15 detachments, 52 Enhancements, and 78 Stratagems. Excluded content remains out of CORE V2 scope: Imperial Armour, Legends, Warhammer Legends.
+
+Official evidence: `data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_aeldari-qe1ykopo7h-blfkukhecc.pdf` (SHA-256 `2a1954801042948256c002095937be88c9d334994f0b01d7a63510c94d39fe1d`).
+
+Navigation note: 39k PRO labels datasheet 000000605 as Vyper; the official Faction Pack datasheet heading and stable source row remain Vypers.
+
+| Detachment | Verified 39k PRO reference | Named rules | Enhancements | Stratagems |
+| --- | --- | --- | ---: | ---: |
+| Armoured Warhost | [39k PRO](https://39k.pro/detachment/p1wVZLW_vjA) | Skilled Crews | 2 | 3 |
+| Aspect Host | [39k PRO](https://39k.pro/detachment/mE_ck6Yuw4o) | Path of the Warrior | 4 | 6 |
+| Corsair Coterie | [39k PRO](https://39k.pro/detachment/-pNM9njdl5I) | Relentless Raiders<br>Veterans of the Void | 4 | 6 |
+| Devoted of Ynnead | [39k PRO](https://39k.pro/detachment/ORwGrXjanQM) | Strength from Death | 4 | 6 |
+| Eldritch Raiders | [39k PRO](https://39k.pro/detachment/9WTJbql97EM) | Veterans of the Void<br>Yriel's Own | 4 | 6 |
+| Fateful Performance | [39k PRO](https://39k.pro/detachment/fPaMgt_y_lE) | Acrobatic Onslaught | 2 | 3 |
+| Ghosts of the Webway | [39k PRO](https://39k.pro/detachment/kVja2920vrE) | Acrobatic Onslaught | 4 | 6 |
+| Guardian Battlehost | [39k PRO](https://39k.pro/detachment/y63o6ssMqQo) | Defend At All Costs | 4 | 6 |
+| Path of the Outcast | [39k PRO](https://39k.pro/detachment/-DkoEgrDkD0) | Far-reaching Doom | 2 | 3 |
+| Seer Council | [39k PRO](https://39k.pro/detachment/ecgTNVmjAWo) | Strands of Fate | 4 | 6 |
+| Serpent's Brood | [39k PRO](https://39k.pro/detachment/ivZhnRZTWZE) | Boons of the Brood | 4 | 6 |
+| Spirit Conclave | [39k PRO](https://39k.pro/detachment/lwUZoioUEUs) | Shepherds of the Dead | 4 | 6 |
+| Twilight Flickers | [39k PRO](https://39k.pro/detachment/x4BFJKs6oiU) | Dance of Distortion | 2 | 3 |
+| Warhost | [39k PRO](https://39k.pro/detachment/G2IByiBHSZA) | Martial Grace | 4 | 6 |
+| Windrider Host | [39k PRO](https://39k.pro/detachment/4FEBuGuye6Q) | Ride the Wind | 4 | 6 |
 
 ## Datasheet / Unit Support
 
@@ -278,7 +316,7 @@ This source-review table covers the pinned Harlequins Aeldari datasheets. Comple
 | --- | --- | --- | --- | --- | --- |
 | Death Jester (`000002537`) | Pinned Wahapedia predecessor row; not reprinted or updated in PDF. | Unsupported IR | None. | Cruel Amusement (`000002537:cruel-amusement`): A selected-to-shoot finite choice among Ignores Cover, Precision, or Sustained Hits 3 is still needed.<br>Death is Not Enough (`000002537:death-is-not-enough`): Post-shoot Battle-shock with a destroyed-model test modifier is still needed.<br>TRAVELLING PLAYERS (`000002537:travelling-players`): A one-model army cap is still needed.<br>Flip Belt (`000002537:flip-belt`): Vertical-distance-free bearer movement with PathWitness validation is still needed. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
 | Shadowseer (`000002535`) | Pinned Wahapedia predecessor row plus PDF Rules Updates, physical PDF page 23 (contents page 27). | Unsupported IR | None. | Fog of Dreams (Psychic) (`000002535:fog-of-dreams-psychic`): An 18-inch ranged target restriction for the led unit is still needed.<br>TRAVELLING PLAYERS (`000002535:travelling-players`): A one-model army cap is still needed.<br>Treacherous Illusion (Psychic) (`000002535:treacherous-illusion-psychic`): The Hazardous grant is partly parsed; enemy melee-weapon targeting and duration still need a host.<br>Flip Belt (`000002535:flip-belt`): Vertical-distance-free bearer movement with PathWitness validation is still needed. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
-| Skyweavers (`000002539`) | Pinned Wahapedia predecessor row; not reprinted or updated in PDF. | IR parsed; host needed | None. | Acrobatic Grace (`000002539:acrobatic-grace`): The incoming-attack -1 Hit modifier is parsed; the attack-query host is still needed. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
+| Skyweavers (`000002539`) | Pinned Wahapedia predecessor row plus PDF Rules Updates, physical PDF page 23 (contents page 27). | Unsupported IR | None. | Acrobatic Grace (`000002539:acrobatic-grace`): The current replacement is overlaid, but its combined Stealth grant and melee-only -1 Hit modifier still require supported IR and an attack-query host. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
 | Solitaire (`000002538`) | Pinned Wahapedia predecessor row; not reprinted or updated in PDF. | Unsupported IR | PATH OF DAMNATION (`000002538:path-of-damnation`): The Warlord restriction is consumed by army mustering. | Blitz (`000002538:blitz`): A once-per-battle pre-move 2D6-inch Move and +3 Attacks modifier through turn end are still needed.<br>Blur of Movement (`000002538:blur-of-movement`): Charge-after-Advance eligibility is parsed; the movement/charge query host is still needed.<br>Flip Belt (`000002538:flip-belt`): Vertical-distance-free bearer movement with PathWitness validation is still needed. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
 | Starweaver (`000002541`) | Pinned Wahapedia predecessor row plus PDF Rules Updates, physical PDF page 23 (contents page 27). | Unsupported IR | None. | Rapid Embarkation (`000002541:rapid-embarkation`): Fight-end conditional Transport embarkation needs same-turn re-embarkation, capacity, unit-shape, distance, and Engagement Range validation. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
 | Troupe (`000002536`) | Pinned Wahapedia predecessor row; not reprinted or updated in PDF. | Unsupported IR | None. | Dance of Death (`000002536:dance-of-death`): A Fight-phase-start finite choice among Hit rerolls, +1 Wound, or defensive -1 Hit is still needed.<br>Flip Belt (`000002536:flip-belt`): Vertical-distance-free bearer movement with PathWitness validation is still needed. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
@@ -292,7 +330,7 @@ This source-review table covers the pinned Ynnari Aeldari datasheets. Complete F
 | Datasheet | Source basis | IR coverage | Supported semantics | IR semantics still needed | Bridge / catalog blockers |
 | --- | --- | --- | --- | --- | --- |
 | The Visarch (`000002543`) | Pinned Wahapedia predecessor row; not reprinted or updated in PDF. | Unsupported IR | None. | SERVANT OF THE WHISPERING GOD (`000002543:servant-of-the-whispering-god`): Visarch/Epic Hero mutual-exclusion mustering is still needed.<br>Way of the Blade (`000002543:way-of-the-blade`): A led-unit Fights First grant is still needed.<br>Yvraine’s Champion (`000002543:yvraines-champion`): Feel No Pain 4+ for other attached Character models is partly parsed and still needs a damage-query host. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
-| The Yncarne (`000002544`) | Pinned Wahapedia predecessor row; not reprinted or updated in PDF. | Unsupported IR | None. | AVATAR OF THE WHISPERING GOD (`000002544:avatar-of-the-whispering-god`): Yncarne/Epic Hero mutual-exclusion mustering is still needed.<br>Ethereal Form (`000002544:ethereal-form`): D3 lost-wound restoration after this model destroys a unit is still needed.<br>Inevitable Death (`000002544:inevitable-death`): A once-per-opponent-turn teleport setup at a destroyed friendly unit's location is still needed. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
+| The Yncarne (`000002544`) | Pinned Wahapedia predecessor row plus PDF Rules Updates, physical PDF page 23 (contents page 27). | Unsupported IR | None. | AVATAR OF THE WHISPERING GOD (`000002544:avatar-of-the-whispering-god`): Yncarne/Epic Hero mutual-exclusion mustering is still needed.<br>Ethereal Form (`000002544:ethereal-form`): D3 lost-wound restoration after this model destroys a unit is still needed.<br>Inevitable Death (`000002544:inevitable-death`): The current replacement is overlaid, but its once-per-opponent-turn teleport setup and explicit exception preserving later move eligibility still require supported IR. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
 | Ynnari Archon (`000003914`) | Pinned Wahapedia predecessor row; not reprinted or updated in PDF. | Unsupported IR | Reborn Mastermind (`000003914:reborn-mastermind`): The once-per-round Stratagem CP-cost reduction is consumed. | Overlord (`000003914:overlord`): Led-unit Wound rerolls of 1 are partly parsed; the below-Starting-Strength predicate and upgrade to full rerolls still need a query host.<br>Shadow Field (`000003914:shadow-field`): A save state that forbids save rerolls and permanently removes the save after its first failure is still needed. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
 | Ynnari Incubi (`000003918`) | Pinned Wahapedia predecessor row plus PDF Rules Updates, physical PDF page 23 (contents page 27). | Unsupported IR | None. | Tormentors (`000003918:tormentors`): Fight-phase-start forced Battle-shock tests for every enemy unit in Engagement Range are still needed. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
 | Ynnari Kabalite Warriors (`000003916`) | Pinned Wahapedia predecessor row; not reprinted or updated in PDF. | Unsupported IR | None. | Sadistic Raiders (`000003916:sadistic-raiders`): Sticky objective control while this unit or its Transport is in range is still needed.<br>Phantasm Grenade Launcher (`000003916:phantasm-grenade-launcher`): A wargear-based Grenades keyword grant is still needed. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
@@ -300,7 +338,7 @@ This source-review table covers the pinned Ynnari Aeldari datasheets. Complete F
 | Ynnari Reavers (`000003919`) | Pinned Wahapedia predecessor row; not reprinted or updated in PDF. | Unsupported IR | None. | Eviscerating Fly-by (`000003919:eviscerating-fly-by`): PathWitness-backed moved-over enemy selection and per-model mortal wounds are still needed.<br>Cluster Caltrops (`000003919:cluster-caltrops`): Bearer-specific rerolls for Eviscerating Fly-by mortal-wound dice are still needed.<br>Grav-talon (`000003919:grav-talon`): A bearer melee Lance grant is partly parsed and still needs the bearer/weapon entitlement host. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
 | Ynnari Succubus (`000003915`) | Pinned Wahapedia predecessor row; not reprinted or updated in PDF. | Unsupported IR | Storm of Blades (`000003915:storm-of-blades`): The led-unit melee Sustained Hits 1 grant is consumed. | Empowered by Death (`000003915:empowered-by-death`): A Fight-phase-start below-Starting-Strength predicate that grants Fights First is still needed. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
 | Ynnari Venom (`000003921`) | Pinned Wahapedia predecessor row plus PDF Rules Updates, physical PDF page 23 (contents page 27). | Unsupported IR | None. | Lithe Embarkation (`000003921:lithe-embarkation`): Fight-end conditional Transport embarkation needs Ynnari unit-shape, same-turn re-embarkation, capacity, distance, and Engagement Range validation. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
-| Ynnari Wyches (`000003917`) | Pinned Wahapedia predecessor row; not reprinted or updated in PDF. | Unsupported IR | None. | No Escape (`000003917:no-escape`): Eligible nearby enemies that Fall Back need forced Desperate Escape tests, with the Battle-shocked modifier and Monster/Vehicle exclusions. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
+| Ynnari Wyches (`000003917`) | Pinned Wahapedia predecessor row; not reprinted or updated in PDF. | Unsupported IR | None. | No Escape (`000003917:no-escape`): Eligible nearby non-Monster, non-Vehicle enemies that Fall Back must test as if Battle-shocked; enemies that are actually Battle-shocked also subtract 1 from those tests. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
 | Yvraine (`000002542`) | Pinned Wahapedia predecessor row plus PDF Rules Updates, physical PDF page 23 (contents page 27). | Unsupported IR | None. | Herald of Ynnead (`000002542:herald-of-ynnead`): Fight-phase enemy selection and friendly Aeldari Wound rerolls are parsed; the phase selection and query host are still needed.<br>SERVANT OF THE WHISPERING GOD (`000002542:servant-of-the-whispering-god`): Yvraine/Epic Hero mutual-exclusion mustering is still needed.<br>Word of the Phoenix (Psychic) (`000002542:word-of-the-phoenix-psychic`): A Command-phase D3+1 Bodyguard model return on 2+, excluding Support Weapon models, is still needed. | No generated DatasheetSupportRow; catalog/model/wargear/geometry playability remains unproven. |
 
 ## Cross-source Semantic Equivalence
@@ -309,7 +347,7 @@ This section is generated from the repository-wide semantic audit. It is separat
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 304 | 54 | 44 |
+| 308 | 54 | 44 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |

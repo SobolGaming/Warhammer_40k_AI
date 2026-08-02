@@ -10,7 +10,7 @@ Current source package: `gw-11e-emperors-children-faction-pack-2026-07`
 
 | Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 10 | 2 | 30 | 45 | 18 |
+| 10 | 2 | 26 | 39 | 18 |
 
 ## July 22, 2026 Source Status
 
@@ -93,8 +93,7 @@ This generated snapshot separates source review from semantic execution. Detachm
 | Mercurial Host | None | Intoxicating Musk<br>Loathsome Dexterity<br>Steeped in Suffering<br>Tactical Perfection |
 | Peerless Bladesmen | None | Blinding Speed<br>Distortion<br>Faultless Opportunist<br>Rise to the Challenge |
 | Rapid Evisceration | None | Accomplished Tactician<br>Heretek Adept<br>Spearhead Striker<br>Sublime Prescience |
-| Slaanesh's Chosen | None | Eager to Prove<br>Proud and Vainglorious<br>Repulsed by Weakness<br>Slayer of Champions |
-| Spectacle of Slaughter | Beguiling Grotesquerie Upgrade<br>Eager Patrons Upgrade | None |
+| Spectacle of Slaughter | Beguiling Grotesquerie (Upgrade)<br>Eager Patrons (Upgrade) | None |
 
 ### Stratagems
 
@@ -106,7 +105,6 @@ This generated snapshot separates source review from semantic execution. Detachm
 | Mercurial Host | None | CAPRICIOUS REACTIONS<br>COMBAT STIMMS<br>CRUEL RAIDERS<br>DARK VIGOUR<br>HONOUR THE PRINCE<br>VIOLENT EXCESS |
 | Peerless Bladesmen | None | CRUEL BLADESMAN<br>CUT DOWN THE WEAK<br>DEATH ECSTASY<br>DEFT PARRY<br>INCESSANT VIOLENCE<br>TERRIFYING SPECTACLE |
 | Rapid Evisceration | None | ADVANCE AND CLAIM<br>CEASELESS ONSLAUGHT<br>DYNAMIC BREAKTHROUGH<br>ONTO THE NEXT<br>OUTFLANKING STRIKE<br>REACTIVE DISEMBARKATION |
-| Slaanesh's Chosen | None | BEAUTIFUL DEATH<br>DEVOTED DUELLISTS<br>DIABOLIC MAJESTY<br>HEIGHTENED JEALOUSY<br>REFUSAL TO BE OUTDONE<br>VENGEFUL SURGE |
 | Spectacle of Slaughter | HONOUR IS FOR FOOLS<br>INTOXICATED BY TRIUMPH<br>SINGLE-MINDED STRIKE | None |
 
 ## Detachment Rule Support
@@ -282,7 +280,7 @@ This section is generated from the repository-wide semantic audit. It is separat
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 129 | 33 | 20 |
+| 119 | 33 | 20 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |
