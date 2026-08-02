@@ -154,6 +154,7 @@ def _daemonic_poisons_rule_ir(text: str) -> RuleIR:
                 text=text,
                 source_text="In your Shooting phase",
                 phase="shooting",
+                owner="active_player",
                 timing_window="just_after_friendly_unit_has_shot",
                 weapon_names=(
                     "Daemonic blades - strike",
@@ -174,6 +175,7 @@ def _daemonic_poisons_rule_ir(text: str) -> RuleIR:
                 text=text,
                 source_text="the Fight phase",
                 phase="fight",
+                owner="attacking_model_controller",
                 timing_window="just_after_friendly_model_finished_attacks",
             ),
             _poisoned_status_clause(
@@ -193,13 +195,14 @@ def _hit_target_selection_clause(
     text: str,
     source_text: str,
     phase: str,
+    owner: str,
     timing_window: str,
     weapon_names: tuple[str, ...] | None = None,
 ) -> RuleClause:
     trigger_parameters: list[tuple[str, RuleParameterValue]] = [
         ("attacker_model_reference", "this_model"),
         ("edge", "after"),
-        ("owner", "active_player"),
+        ("owner", owner),
         ("phase", phase),
         ("subject", "this_model"),
         ("target_relationship", "hit_by_those_attacks"),

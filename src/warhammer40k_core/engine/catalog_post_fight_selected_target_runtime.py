@@ -209,7 +209,6 @@ def _post_fight_hit_target_effect_groups(
     if (
         context.source_phase is not BattlePhase.FIGHT
         or context.attack_sequence.source_phase is not BattlePhase.FIGHT
-        or context.attack_sequence.attacker_player_id != context.state.active_player_id
     ):
         return ()
     player_id = context.attack_sequence.attacker_player_id

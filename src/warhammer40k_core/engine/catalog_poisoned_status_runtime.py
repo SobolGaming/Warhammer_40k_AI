@@ -237,10 +237,8 @@ def _current_poisoned_targets(
     for effect in sorted(context.state.persisting_effects, key=lambda item: item.effect_id):
         if not _is_poisoned_effect(effect):
             continue
-        if len(effect.target_unit_instance_ids) != 1:
-            raise GameLifecycleError("Catalog poisoned status must target exactly one rules unit.")
-        target_id = effect.target_unit_instance_ids[0]
-        effects_by_target_id.setdefault(target_id, []).append(effect)
+        for target_id in effect.target_unit_instance_ids:
+            effects_by_target_id.setdefault(target_id, []).append(effect)
     targets: list[tuple[RulesUnitView, tuple[PersistingEffect, ...]]] = []
     for target_id, effects in sorted(effects_by_target_id.items()):
         target = rules_unit_view_by_id(state=context.state, unit_instance_id=target_id)
@@ -269,11 +267,7 @@ def _is_poisoned_effect(effect: PersistingEffect) -> bool:
             return False
         parameters[key] = raw_parameter["value"]
     selected_target_id = parameters.pop("selected_target_unit_instance_id", None)
-    return (
-        parameters == _EXPECTED_POISON_PARAMETERS
-        and type(selected_target_id) is str
-        and selected_target_id in effect.target_unit_instance_ids
-    )
+    return parameters == _EXPECTED_POISON_PARAMETERS and type(selected_target_id) is str
 
 
 def _rules_unit_is_on_battlefield(

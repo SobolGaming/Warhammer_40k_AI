@@ -262,7 +262,7 @@ def clause_is_post_fight_hit_target_selection(clause: RuleClause) -> bool:
         and frozenset(parameters) == _POST_FIGHT_FILTERED_TRIGGER_KEYS
         and parameters.get("timing_window") == "just_after_friendly_model_finished_attacks"
         and parameters.get("target_relationship") == "hit_by_those_attacks"
-        and parameters.get("owner") == "active_player"
+        and parameters.get("owner") == "attacking_model_controller"
         and parameters.get("phase") == BattlePhase.FIGHT.value
         and parameters.get("edge") == "after"
         and parameters.get("subject") == "this_model"

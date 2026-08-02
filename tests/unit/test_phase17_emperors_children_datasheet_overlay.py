@@ -17,7 +17,9 @@ from tools.generate_emperors_children_fulgrim_rule_ir import (
     generated_artifact_payload as generated_fulgrim_rule_ir_artifact_payload,
 )
 
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.attributes import Characteristic
+from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
@@ -26,7 +28,12 @@ from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
     catalog_ability_records_from_catalog,
 )
-from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    ArmyMusterRequest,
+    muster_army,
+)
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSequenceStep
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
@@ -40,6 +47,7 @@ from warhammer40k_core.engine.catalog_poisoned_status_support import (
     CATALOG_IR_POISONED_COMMAND_MORTAL_WOUNDS_CONSUMER_ID,
 )
 from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
+    SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE,
     apply_catalog_post_fight_hit_target_effect_result,
     invalid_catalog_post_fight_hit_target_effect_status,
 )
@@ -71,20 +79,54 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
-from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_controller import (
+    DecisionController,
+    DecisionControllerPayload,
+)
+from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.fight_order import (
+    FIGHT_ACTIVATION_DECISION_TYPE,
+)
+from warhammer40k_core.engine.fight_resolution import (
+    SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+    MeleeDeclarationProposalRequest,
+)
 from warhammer40k_core.engine.fights_first import FightsFirstRegistry
-from warhammer40k_core.engine.game_state import GameState, GameStatePayload
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    GameStatePayload,
+    SecondaryMissionChoice,
+    SecondaryMissionMode,
+)
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+)
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleStage,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.replay import ReplayArtifact, ReplayArtifactPayload, ReplayRunner
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     RuntimeModifierRegistry,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
+from warhammer40k_core.engine.stratagems import (
+    DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    STRATAGEM_DECISION_TYPE,
+)
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
@@ -495,6 +537,202 @@ def test_fulgrim_daemonic_poisons_routes_shooting_and_fight_hits_then_ticks_once
     assert updated_enemy.own_models[0].wounds_remaining == 9
 
 
+def test_fulgrim_opponent_turn_fight_poison_uses_lifecycle_dispatch_and_replays() -> None:
+    session, fulgrim, enemy = _fulgrim_opponent_turn_fight_session()
+    status = _advance_fight_session_to_poison_request(
+        session=session,
+        fulgrim=fulgrim,
+    )
+    request = _decision_request(status)
+
+    assert request.decision_type == SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE
+    assert request.actor_id == "player-a"
+    assert session.lifecycle.state is not None
+    assert session.lifecycle.state.active_player_id == "player-b"
+    option_payload = cast(dict[str, JsonValue], request.options[0].payload)
+    selected_target_payload = cast(
+        dict[str, JsonValue],
+        option_payload["selected_catalog_target_effect"],
+    )
+    assert selected_target_payload["target_unit_instance_id"] == enemy.unit_instance_id
+    pending_poison_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+    assert GameLifecycle.from_payload(pending_poison_payload).to_payload() == pending_poison_payload
+
+    submitted = session.submit_option(
+        request_id=request.request_id,
+        option_id=request.options[0].option_id,
+        result_id="fulgrim-opponent-turn-poison-selection",
+    )
+    assert submitted.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert session.lifecycle.state is not None
+    poison_effects = session.lifecycle.state.persisting_effects_for_unit(enemy.unit_instance_id)
+    assert len(poison_effects) == 1
+    assert session.lifecycle.decision_controller.records[-1].request.decision_type == (
+        SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE
+    )
+
+    lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+    assert GameLifecycle.from_payload(lifecycle_payload).to_payload() == lifecycle_payload
+    replay_payload = cast(
+        ReplayArtifactPayload,
+        json.loads(
+            json.dumps(
+                ReplayArtifact.capture(
+                    artifact_id="fulgrim-opponent-turn-fight-poison",
+                    initial_lifecycle_payload=pending_poison_payload,
+                    final_lifecycle=session.lifecycle,
+                ).to_payload(),
+                sort_keys=True,
+            )
+        ),
+    )
+    replay_result = ReplayRunner.from_payload(replay_payload).run()
+    assert replay_result.reproduced_exactly, replay_result.to_payload()
+
+
+def test_fulgrim_poison_survives_attached_unit_split_and_deduplicates_each_survivor() -> None:
+    package = _catalog_package()
+    factory = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    )
+    fulgrim = _instantiate_unit(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id=_FULGRIM_ID,
+        selection_id="fulgrim",
+    )
+    bodyguard = _instantiate_unit(
+        factory=factory,
+        army_id="army-b",
+        datasheet_id=_NIGHT_SPINNER_ID,
+        selection_id="poisoned-bodyguard",
+    )
+    leader = _instantiate_unit(
+        factory=factory,
+        army_id="army-b",
+        datasheet_id=_NIGHT_SPINNER_ID,
+        selection_id="poisoned-leader",
+    )
+    attached_id = "attached-unit:army-b:poisoned-formation"
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+        ),
+        source_id="test:fulgrim-poisoned-attached-unit",
+        attachment_source_ids=("test:fulgrim-poisoned-attached-unit:eligibility",),
+    )
+    armies = (
+        _army(
+            catalog=package.army_catalog,
+            army_id="army-a",
+            player_id="player-a",
+            faction_id="emperors-children",
+            units=(fulgrim,),
+        ),
+        _army(
+            catalog=package.army_catalog,
+            army_id="army-b",
+            player_id="player-b",
+            faction_id="aeldari",
+            units=(bodyguard, leader),
+            attached_units=(formation,),
+        ),
+    )
+    state = _battle_state(
+        armies=armies,
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-a",
+        game_id="fulgrim-attached-poison-replay",
+    )
+    records = catalog_ability_records_from_catalog(package.army_catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(
+            records,
+            army=army,
+            catalog=package.army_catalog,
+        )
+        for army in armies
+    }
+    decisions = DecisionController()
+    runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
+    for suffix in ("first", "duplicate"):
+        _select_poisoned_target(
+            phase=BattlePhase.SHOOTING,
+            runtime=runtime,
+            state=state,
+            decisions=decisions,
+            indexes=indexes,
+            fulgrim=fulgrim,
+            enemy=bodyguard,
+            profile=_weapon_profile(_FULGRIM_ID, "Malefic lash"),
+            sequence_suffix=suffix,
+        )
+
+    assert len(state.persisting_effects) == 2
+    assert {effect.target_unit_instance_ids for effect in state.persisting_effects} == {
+        (attached_id,)
+    }
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-b",
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=(bodyguard.unit_instance_id, leader.unit_instance_id),
+        event_log=decisions.event_log,
+    )
+    expected_survivor_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    assert {effect.target_unit_instance_ids for effect in state.persisting_effects} == {
+        expected_survivor_ids
+    }
+    for effect in state.persisting_effects:
+        effect_payload = cast(dict[str, Any], effect.effect_payload)
+        rule_effect = cast(dict[str, Any], effect_payload["effect"])
+        parameters = {
+            parameter["key"]: parameter["value"]
+            for parameter in cast(list[dict[str, Any]], rule_effect["parameters"])
+        }
+        assert parameters["selected_target_unit_instance_id"] == attached_id
+
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
+    state_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    decisions_payload = json.loads(json.dumps(decisions.to_payload(), sort_keys=True))
+    resolved_state, resolved_decisions = _resolve_poisoned_snapshot(
+        state_payload=state_payload,
+        decisions_payload=decisions_payload,
+        indexes=indexes,
+    )
+    replayed_state, replayed_decisions = _resolve_poisoned_snapshot(
+        state_payload=state_payload,
+        decisions_payload=decisions_payload,
+        indexes=indexes,
+    )
+
+    resolved_events = tuple(
+        cast(dict[str, Any], event.payload)
+        for event in resolved_decisions.event_log.records
+        if event.event_type == CATALOG_POISONED_COMMAND_RESOLVED_EVENT
+    )
+    assert {payload["target_unit_instance_id"] for payload in resolved_events} == set(
+        expected_survivor_ids
+    )
+    assert len(resolved_events) == 2
+    expected_effect_ids = sorted(effect.effect_id for effect in state.persisting_effects)
+    assert all(payload["poison_effect_ids"] == expected_effect_ids for payload in resolved_events)
+    assert replayed_state.to_payload() == resolved_state.to_payload()
+    assert replayed_decisions.to_payload() == resolved_decisions.to_payload()
+
+
 def _select_poisoned_target(
     *,
     phase: BattlePhase,
@@ -505,9 +743,11 @@ def _select_poisoned_target(
     fulgrim: UnitInstance,
     enemy: UnitInstance,
     profile: WeaponProfile,
+    sequence_suffix: str | None = None,
 ) -> None:
+    sequence_token = phase.value if sequence_suffix is None else sequence_suffix
     sequence = AttackSequence(
-        sequence_id=f"fulgrim-poison-{phase.value}",
+        sequence_id=f"fulgrim-poison-{sequence_token}",
         attacker_player_id="player-a",
         attacking_unit_instance_id=fulgrim.unit_instance_id,
         source_phase=phase,
@@ -529,7 +769,7 @@ def _select_poisoned_target(
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         source_phase=phase,
         attack_sequence=sequence,
-        attack_sequence_completed_event_id=f"fulgrim-poison-completed-{phase.value}",
+        attack_sequence_completed_event_id=f"fulgrim-poison-completed-{sequence_token}",
     )
     status = (
         runtime.post_shoot_hit_target_request(context)
@@ -540,7 +780,7 @@ def _select_poisoned_target(
     request = decisions.queue.peek_next()
     assert len(request.options) == 1
     result = DecisionResult.for_request(
-        result_id=f"fulgrim-poison-result-{phase.value}",
+        result_id=f"fulgrim-poison-result-{sequence_token}",
         request=request,
         selected_option_id=request.options[0].option_id,
     )
@@ -579,6 +819,284 @@ def _select_poisoned_target(
             )
             is None
         )
+
+
+def _fulgrim_opponent_turn_fight_session(
+    *, game_id: str = "fulgrim-opponent-turn-fight-lifecycle-007"
+) -> tuple[
+    LocalGameSession,
+    UnitInstance,
+    UnitInstance,
+]:
+    package = _catalog_package()
+    catalog = replace(
+        package.army_catalog,
+        detachments=(
+            DetachmentDefinition(
+                detachment_id="fulgrim-lifecycle-test",
+                name="Fulgrim lifecycle test",
+                faction_id="EC",
+                detachment_point_cost=1,
+                unit_datasheet_ids=(_FULGRIM_ID,),
+                force_disposition_ids=("purge-the-foe",),
+                source_ids=("test:fulgrim-lifecycle:detachment:emperors-children",),
+            ),
+            DetachmentDefinition(
+                detachment_id="night-spinner-lifecycle-test",
+                name="Night Spinner lifecycle test",
+                faction_id="AE",
+                detachment_point_cost=1,
+                unit_datasheet_ids=(_NIGHT_SPINNER_ID,),
+                force_disposition_ids=("purge-the-foe",),
+                source_ids=("test:fulgrim-lifecycle:detachment:aeldari",),
+            ),
+        ),
+    )
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    muster_requests = (
+        ArmyMusterRequest(
+            army_id="army-a",
+            player_id="player-a",
+            catalog_id=catalog.catalog_id,
+            source_package_id=catalog.source_package_id,
+            ruleset_id=catalog.ruleset_id,
+            detachment_selection=DetachmentSelection(
+                faction_id="EC",
+                detachment_ids=("fulgrim-lifecycle-test",),
+            ),
+            force_disposition_id="purge-the-foe",
+            unit_selections=(
+                _unit_muster_selection(
+                    catalog=catalog,
+                    datasheet_id=_FULGRIM_ID,
+                    unit_selection_id="fulgrim",
+                ),
+            ),
+        ),
+        ArmyMusterRequest(
+            army_id="army-b",
+            player_id="player-b",
+            catalog_id=catalog.catalog_id,
+            source_package_id=catalog.source_package_id,
+            ruleset_id=catalog.ruleset_id,
+            detachment_selection=DetachmentSelection(
+                faction_id="AE",
+                detachment_ids=("night-spinner-lifecycle-test",),
+            ),
+            force_disposition_id="purge-the-foe",
+            unit_selections=(
+                _unit_muster_selection(
+                    catalog=catalog,
+                    datasheet_id=_NIGHT_SPINNER_ID,
+                    unit_selection_id="night-spinner",
+                ),
+            ),
+        ),
+    )
+    config = GameConfig(
+        game_id=game_id,
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=descriptor,
+        army_catalog=catalog,
+        army_muster_requests=muster_requests,
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down"),
+        mission_setup=_mission_setup(),
+    )
+    armies = tuple(
+        muster_army(
+            catalog=catalog,
+            request=request,
+        )
+        for request in muster_requests
+    )
+    fulgrim = armies[0].units[0]
+    enemy = armies[1].units[0]
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    state.record_battlefield_state(
+        create_deterministic_battlefield_scenario(
+            battlefield_id="fulgrim-opponent-turn-fight-battlefield",
+            armies=armies,
+        ).battlefield_state
+    )
+    state.stage = GameLifecycleStage.BATTLE
+    state.setup_step_index = None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.battle_round = 1
+    state.active_player_id = "player-b"
+    for player_id in state.player_ids:
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player_id=player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("assassination", "bring_it_down"),
+            )
+        )
+    _move_unit(state, fulgrim.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(state, enemy.unit_instance_id, x=15.5, y=10.0)
+    lifecycle = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            {
+                "config": config.to_payload(),
+                "parameterized_movement_proposals": True,
+                "state": state.to_payload(),
+                "decisions": DecisionController().to_payload(),
+                "reaction_queue": ReactionQueue().to_payload(),
+            },
+        )
+    )
+    return LocalGameSession(lifecycle=lifecycle), fulgrim, enemy
+
+
+def _advance_fight_session_to_poison_request(
+    *,
+    session: LocalGameSession,
+    fulgrim: UnitInstance,
+) -> LifecycleStatus:
+    status = session.advance_until_decision_or_terminal()
+    for index in range(256):
+        request = _decision_request(status)
+        if request.decision_type == SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE:
+            return status
+        result_id = f"fulgrim-opponent-turn-auto-{index:03d}"
+        if request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
+            movement_request = MovementProposalRequest.from_decision_request_payload(
+                request.payload
+            )
+            context = cast(dict[str, JsonValue], movement_request.context)
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=result_id,
+                payload=cast(
+                    JsonValue,
+                    {
+                        "proposal_request_id": movement_request.request_id,
+                        "proposal_kind": movement_request.proposal_kind.value,
+                        "unit_instance_id": movement_request.unit_instance_id,
+                        "movement_phase_action": movement_request.movement_phase_action,
+                        "movement_mode": context["movement_mode"],
+                    },
+                ),
+            )
+            continue
+        if request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE:
+            if request.actor_id == "player-a":
+                option_id = next(
+                    option.option_id
+                    for option in request.options
+                    if cast(dict[str, JsonValue], option.payload).get("unit_instance_id")
+                    == fulgrim.unit_instance_id
+                )
+            else:
+                option_id = request.options[0].option_id
+            status = session.submit_option(
+                request_id=request.request_id,
+                option_id=option_id,
+                result_id=result_id,
+            )
+            continue
+        if request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
+            melee_request = MeleeDeclarationProposalRequest.from_decision_request(request)
+            weapon = (
+                next(
+                    cast(dict[str, Any], value)
+                    for value in melee_request.available_weapons
+                    if cast(dict[str, Any], value)["weapon_profile_id"]
+                    == _weapon_profile(_FULGRIM_ID, "Daemonic blades - sweep").profile_id
+                )
+                if melee_request.actor_id == "player-a"
+                else cast(dict[str, Any], melee_request.available_weapons[0])
+            )
+            target_ids = cast(list[str], weapon["engaged_target_unit_instance_ids"])
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=result_id,
+                payload=cast(
+                    JsonValue,
+                    {
+                        "proposal_request_id": melee_request.request_id,
+                        "proposal_kind": melee_request.proposal_kind,
+                        "player_id": melee_request.actor_id,
+                        "battle_round": melee_request.battle_round,
+                        "unit_instance_id": melee_request.unit_instance_id,
+                        "source_decision_request_id": melee_request.source_decision_request_id,
+                        "source_decision_result_id": melee_request.source_decision_result_id,
+                        "declarations": [
+                            {
+                                "attacker_model_instance_id": weapon["model_instance_id"],
+                                "wargear_id": weapon["wargear_id"],
+                                "weapon_profile_id": weapon["weapon_profile_id"],
+                                "target_allocations": [{"target_unit_instance_id": target_ids[0]}],
+                            }
+                        ],
+                    },
+                ),
+            )
+            continue
+        if request.decision_type == STRATAGEM_DECISION_TYPE:
+            option_id = DECLINE_STRATAGEM_WINDOW_OPTION_ID
+        else:
+            if request.is_parameterized_submission_request():
+                raise AssertionError(
+                    f"Unexpected parameterized Fight decision {request.decision_type}."
+                )
+            option_id = request.options[0].option_id
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=option_id,
+            result_id=result_id,
+        )
+    raise AssertionError("Fulgrim Fight did not reach the poison target decision.")
+
+
+def _resolve_poisoned_snapshot(
+    *,
+    state_payload: GameStatePayload,
+    decisions_payload: object,
+    indexes: dict[str, AbilityCatalogIndex],
+) -> tuple[GameState, DecisionController]:
+    state = GameState.from_payload(state_payload)
+    decisions = DecisionController.from_payload(cast(DecisionControllerPayload, decisions_payload))
+    registry = CommandPhaseStartHookRegistry.from_bindings(
+        catalog_poisoned_command_start_bindings(ability_indexes_by_player_id=indexes)
+    )
+    assert (
+        registry.resolve_effects(
+            CommandPhaseStartEffectContext(
+                state=state,
+                decisions=decisions,
+                active_player_id="player-a",
+            )
+        )
+        is None
+    )
+    return state, decisions
+
+
+def _unit_muster_selection(
+    *,
+    catalog: Any,
+    datasheet_id: str,
+    unit_selection_id: str,
+) -> UnitMusterSelection:
+    datasheet = catalog.datasheet_by_id(datasheet_id)
+    return UnitMusterSelection(
+        unit_selection_id=unit_selection_id,
+        datasheet_id=datasheet_id,
+        model_profile_selections=(
+            ModelProfileSelection(datasheet.model_profiles[0].model_profile_id, 1),
+        ),
+    )
+
+
+def _decision_request(status: LifecycleStatus) -> DecisionRequest:
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    return status.decision_request
 
 
 @lru_cache(maxsize=1)
@@ -670,6 +1188,7 @@ def _army(
     player_id: str,
     faction_id: str,
     units: tuple[UnitInstance, ...],
+    attached_units: tuple[AttachedUnitFormation, ...] = (),
 ) -> ArmyDefinition:
     return ArmyDefinition(
         army_id=army_id,
@@ -683,6 +1202,7 @@ def _army(
         ),
         force_disposition_id="purge-the-foe",
         units=units,
+        attached_units=attached_units,
     )
 
 
