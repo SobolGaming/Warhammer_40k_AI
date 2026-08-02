@@ -5,8 +5,8 @@
     "version": "10th-edition-2026-06-14"
   },
   "catalog_version": {
-    "source_date": "2026-07-10",
-    "version_id": "warhammer-40000-11th-aeldari-tacoma-open-2026-07"
+    "source_date": "2026-07-22",
+    "version_id": "warhammer-40000-11th-aeldari-faction-pack-2026-07"
   },
   "effective_date": "2026-06-09",
   "operations": [
@@ -598,7 +598,7 @@
       "target_edition": "warhammer-40000-11th"
     }
   ],
-  "package_hash": "672c6c8b7b51dbd775172d488af3cc7a8038c3c0881a8e97a5e255b5d17de524",
+  "package_hash": "84dce73d1e4b1ed53ed09b413ae79b53cfb615f7965040d9d475d07b4f03f283",
   "package_id": {
     "namespace": "gw",
     "package_name": "aeldari-faction-pack-datasheet-overlay",

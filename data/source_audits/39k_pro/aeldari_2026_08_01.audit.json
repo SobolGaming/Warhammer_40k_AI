@@ -1,0 +1,271 @@
+{
+  "audit_schema": "core-v2-39k-pro-aeldari-audit-v1",
+  "audit_id": "39k-pro-aeldari-2026-08-01",
+  "audited_at": "2026-08-01",
+  "official_source": {
+    "package_id": "gw-11e-aeldari-faction-pack-2026-07",
+    "pdf_path": "data/raw/faction_packs/eng_22-07_warhammer_40,000_faction_pack_aeldari-qe1ykopo7h-blfkukhecc.pdf",
+    "pdf_sha256": "2a1954801042948256c002095937be88c9d334994f0b01d7a63510c94d39fe1d"
+  },
+  "provider": {
+    "faction_reference_url": "https://39k.pro/faction/-utUCEwvtbI",
+    "publication_id": "-utUCEwvtbI",
+    "publication_name": "Codex: Aeldari",
+    "errata_date": "22 July 2026"
+  },
+  "datasheet_reconciliation": {
+    "in_scope_datasheet_count": 70,
+    "exact_ability_count": 145,
+    "matched_exact_ability_count": 145,
+    "excluded_content": [
+      "Imperial Armour",
+      "Legends",
+      "Warhammer Legends"
+    ],
+    "provider_navigation_name_discrepancy": "39k PRO labels datasheet 000000605 as Vyper; the official Faction Pack datasheet heading and stable source row remain Vypers."
+  },
+  "detachments": [
+    {
+      "detachment_id": "armoured-warhost",
+      "detachment_name": "Armoured Warhost",
+      "provider_url": "https://39k.pro/detachment/p1wVZLW_vjA",
+      "rule_names": ["Skilled Crews"],
+      "enhancement_count": 2,
+      "stratagem_count": 3
+    },
+    {
+      "detachment_id": "aspect-host",
+      "detachment_name": "Aspect Host",
+      "provider_url": "https://39k.pro/detachment/mE_ck6Yuw4o",
+      "rule_names": ["Path of the Warrior"],
+      "enhancement_count": 4,
+      "stratagem_count": 6
+    },
+    {
+      "detachment_id": "corsair-coterie",
+      "detachment_name": "Corsair Coterie",
+      "provider_url": "https://39k.pro/detachment/-pNM9njdl5I",
+      "rule_names": ["Relentless Raiders", "Veterans of the Void"],
+      "enhancement_count": 4,
+      "stratagem_count": 6
+    },
+    {
+      "detachment_id": "devoted-of-ynnead",
+      "detachment_name": "Devoted of Ynnead",
+      "provider_url": "https://39k.pro/detachment/ORwGrXjanQM",
+      "rule_names": ["Strength from Death"],
+      "enhancement_count": 4,
+      "stratagem_count": 6
+    },
+    {
+      "detachment_id": "eldritch-raiders",
+      "detachment_name": "Eldritch Raiders",
+      "provider_url": "https://39k.pro/detachment/9WTJbql97EM",
+      "rule_names": ["Veterans of the Void", "Yriel's Own"],
+      "enhancement_count": 4,
+      "stratagem_count": 6
+    },
+    {
+      "detachment_id": "fateful-performance",
+      "detachment_name": "Fateful Performance",
+      "provider_url": "https://39k.pro/detachment/fPaMgt_y_lE",
+      "rule_names": ["Acrobatic Onslaught"],
+      "enhancement_count": 2,
+      "stratagem_count": 3
+    },
+    {
+      "detachment_id": "ghosts-of-the-webway",
+      "detachment_name": "Ghosts of the Webway",
+      "provider_url": "https://39k.pro/detachment/kVja2920vrE",
+      "rule_names": ["Acrobatic Onslaught"],
+      "enhancement_count": 4,
+      "stratagem_count": 6
+    },
+    {
+      "detachment_id": "guardian-battlehost",
+      "detachment_name": "Guardian Battlehost",
+      "provider_url": "https://39k.pro/detachment/y63o6ssMqQo",
+      "rule_names": ["Defend At All Costs"],
+      "enhancement_count": 4,
+      "stratagem_count": 6
+    },
+    {
+      "detachment_id": "path-of-the-outcast",
+      "detachment_name": "Path of the Outcast",
+      "provider_url": "https://39k.pro/detachment/-DkoEgrDkD0",
+      "rule_names": ["Far-reaching Doom"],
+      "enhancement_count": 2,
+      "stratagem_count": 3
+    },
+    {
+      "detachment_id": "seer-council",
+      "detachment_name": "Seer Council",
+      "provider_url": "https://39k.pro/detachment/ecgTNVmjAWo",
+      "rule_names": ["Strands of Fate"],
+      "enhancement_count": 4,
+      "stratagem_count": 6
+    },
+    {
+      "detachment_id": "serpents-brood",
+      "detachment_name": "Serpent's Brood",
+      "provider_url": "https://39k.pro/detachment/ivZhnRZTWZE",
+      "rule_names": ["Boons of the Brood"],
+      "enhancement_count": 4,
+      "stratagem_count": 6
+    },
+    {
+      "detachment_id": "spirit-conclave",
+      "detachment_name": "Spirit Conclave",
+      "provider_url": "https://39k.pro/detachment/lwUZoioUEUs",
+      "rule_names": ["Shepherds of the Dead"],
+      "enhancement_count": 4,
+      "stratagem_count": 6
+    },
+    {
+      "detachment_id": "twilight-flickers",
+      "detachment_name": "Twilight Flickers",
+      "provider_url": "https://39k.pro/detachment/x4BFJKs6oiU",
+      "rule_names": ["Dance of Distortion"],
+      "enhancement_count": 2,
+      "stratagem_count": 3
+    },
+    {
+      "detachment_id": "warhost",
+      "detachment_name": "Warhost",
+      "provider_url": "https://39k.pro/detachment/G2IByiBHSZA",
+      "rule_names": ["Martial Grace"],
+      "enhancement_count": 4,
+      "stratagem_count": 6
+    },
+    {
+      "detachment_id": "windrider-host",
+      "detachment_name": "Windrider Host",
+      "provider_url": "https://39k.pro/detachment/4FEBuGuye6Q",
+      "rule_names": ["Ride the Wind"],
+      "enhancement_count": 4,
+      "stratagem_count": 6
+    }
+  ],
+  "supplemental_stratagems": [
+    {
+      "detachment_id": "armoured-warhost",
+      "detachment_name": "Armoured Warhost",
+      "stratagem_id": "layered-wards",
+      "stratagem_name": "Layered Wards",
+      "command_point_cost": 1,
+      "timing_descriptor": "Any phase, when a friendly Aeldari Vehicle unit suffers a mortal wound",
+      "category": "Uncategorised",
+      "official_pdf_page": 2
+    },
+    {
+      "detachment_id": "armoured-warhost",
+      "detachment_name": "Armoured Warhost",
+      "stratagem_id": "soulsight",
+      "stratagem_name": "Soulsight",
+      "command_point_cost": 1,
+      "timing_descriptor": "Your Shooting phase, when a friendly Aeldari Vehicle unit is selected to shoot",
+      "category": "Uncategorised",
+      "official_pdf_page": 2
+    },
+    {
+      "detachment_id": "armoured-warhost",
+      "detachment_name": "Armoured Warhost",
+      "stratagem_id": "vectored-engines",
+      "stratagem_name": "Vectored Engines",
+      "command_point_cost": 1,
+      "timing_descriptor": "Your Movement phase, when a friendly Aeldari Vehicle unit makes a Fall Back move",
+      "category": "Uncategorised",
+      "official_pdf_page": 2
+    },
+    {
+      "detachment_id": "fateful-performance",
+      "detachment_name": "Fateful Performance",
+      "stratagem_id": "deceptive-feint",
+      "stratagem_name": "Deceptive Feint",
+      "command_point_cost": 1,
+      "timing_descriptor": "Opponent's Movement phase, when an enemy unit ends a move within 8 inches",
+      "category": "Uncategorised",
+      "official_pdf_page": 3
+    },
+    {
+      "detachment_id": "fateful-performance",
+      "detachment_name": "Fateful Performance",
+      "stratagem_id": "exit-the-stage",
+      "stratagem_name": "Exit the Stage",
+      "command_point_cost": 1,
+      "timing_descriptor": "End of your opponent's Fight phase",
+      "category": "Uncategorised",
+      "official_pdf_page": 3
+    },
+    {
+      "detachment_id": "fateful-performance",
+      "detachment_name": "Fateful Performance",
+      "stratagem_id": "heroes-fall",
+      "stratagem_name": "Heroes' Fall",
+      "command_point_cost": 1,
+      "timing_descriptor": "Fight phase, when an enemy unit targets a friendly Harlequins unit",
+      "category": "Uncategorised",
+      "official_pdf_page": 3
+    },
+    {
+      "detachment_id": "path-of-the-outcast",
+      "detachment_name": "Path of the Outcast",
+      "stratagem_id": "casting-back-the-veil",
+      "stratagem_name": "Casting Back the Veil",
+      "command_point_cost": 1,
+      "timing_descriptor": "Your Shooting phase, when a friendly Rangers or Shroud Runners unit has shot",
+      "category": "Uncategorised",
+      "official_pdf_page": 4
+    },
+    {
+      "detachment_id": "path-of-the-outcast",
+      "detachment_name": "Path of the Outcast",
+      "stratagem_id": "eldritch-suppression",
+      "stratagem_name": "Eldritch Suppression",
+      "command_point_cost": 1,
+      "timing_descriptor": "Your Shooting phase, when a friendly Rangers or Shroud Runners unit has shot",
+      "category": "Uncategorised",
+      "official_pdf_page": 4
+    },
+    {
+      "detachment_id": "path-of-the-outcast",
+      "detachment_name": "Path of the Outcast",
+      "stratagem_id": "nomads-of-the-hidden-way",
+      "stratagem_name": "Nomads of the Hidden Way",
+      "command_point_cost": 1,
+      "timing_descriptor": "Your Shooting phase, when a friendly Rangers or Shroud Runners unit has shot",
+      "category": "Uncategorised",
+      "official_pdf_page": 4
+    },
+    {
+      "detachment_id": "twilight-flickers",
+      "detachment_name": "Twilight Flickers",
+      "stratagem_id": "captivating-performance",
+      "stratagem_name": "Captivating Performance",
+      "command_point_cost": 1,
+      "timing_descriptor": "End of your Movement phase",
+      "category": "Uncategorised",
+      "official_pdf_page": 5
+    },
+    {
+      "detachment_id": "twilight-flickers",
+      "detachment_name": "Twilight Flickers",
+      "stratagem_id": "phantasmal-mirage",
+      "stratagem_name": "Phantasmal Mirage",
+      "command_point_cost": 1,
+      "timing_descriptor": "Your Shooting phase, when a friendly Harlequins Vehicle unit has shot",
+      "category": "Uncategorised",
+      "official_pdf_page": 5
+    },
+    {
+      "detachment_id": "twilight-flickers",
+      "detachment_name": "Twilight Flickers",
+      "stratagem_id": "presaged-rehearsal",
+      "stratagem_name": "Presaged Rehearsal",
+      "command_point_cost": 1,
+      "timing_descriptor": "Fight phase, when a friendly Troupe unit is selected to fight",
+      "category": "Uncategorised",
+      "official_pdf_page": 5
+    }
+  ]
+}

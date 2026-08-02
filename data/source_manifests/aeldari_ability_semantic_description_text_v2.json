@@ -493,8 +493,8 @@
     },
     {
       "ability_id": "000002539:acrobatic-grace",
-      "description": "The incoming-attack -1 Hit modifier is parsed; the attack-query host is still needed.",
-      "evidence_sha256": "1a3fce36ab5559355ea91ec92ed0bcb2542ab31ec4adf562da5016037b6b0a06"
+      "description": "The current replacement is overlaid, but its combined Stealth grant and melee-only -1 Hit modifier still require supported IR and an attack-query host.",
+      "evidence_sha256": "347d04547dc01185c9a51d50b30a4ab415f08fe5f2dc7dee2c0a079dc3bb7c68"
     },
     {
       "ability_id": "000002540:polychromatic-camouflage",
@@ -548,8 +548,8 @@
     },
     {
       "ability_id": "000002544:inevitable-death",
-      "description": "A once-per-opponent-turn teleport setup at a destroyed friendly unit's location is still needed.",
-      "evidence_sha256": "7c19216c4ca35f03baba4c23a470c37b6c89e70ee8a33317ecfe930e8faeed21"
+      "description": "The current replacement is overlaid, but its once-per-opponent-turn teleport setup and explicit exception preserving later move eligibility still require supported IR.",
+      "evidence_sha256": "267b2b69233dd0850fbf46365bdd827161101c830d5ea50248f32265102092e8"
     },
     {
       "ability_id": "000002759:indomitable-strength-of-will",
@@ -663,7 +663,7 @@
     },
     {
       "ability_id": "000003917:no-escape",
-      "description": "Eligible nearby enemies that Fall Back need forced Desperate Escape tests, with the Battle-shocked modifier and Monster/Vehicle exclusions.",
+      "description": "Eligible nearby non-Monster, non-Vehicle enemies that Fall Back must test as if Battle-shocked; enemies that are actually Battle-shocked also subtract 1 from those tests.",
       "evidence_sha256": "7475d68c158a90d6de73cd96a5250d196f1a8df401079aa786e1e49bc2300349"
     },
     {

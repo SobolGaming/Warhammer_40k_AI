@@ -16,6 +16,7 @@ if TYPE_CHECKING or __package__:
         aeldari_datasheet_support_markdown,
         aeldari_detachment_semantics_needed,
         aeldari_semantic_snapshot_markdown,
+        aeldari_thirty_nine_k_pro_audit_markdown,
     )
     from tools.cross_source_semantic_equivalence import (
         DEFAULT_DOCS_PATH as DEFAULT_SEMANTIC_EQUIVALENCE_DOCS_PATH,
@@ -45,6 +46,7 @@ else:
         aeldari_datasheet_support_markdown,
         aeldari_detachment_semantics_needed,
         aeldari_semantic_snapshot_markdown,
+        aeldari_thirty_nine_k_pro_audit_markdown,
     )
     from cross_source_semantic_equivalence import (
         DEFAULT_DOCS_PATH as DEFAULT_SEMANTIC_EQUIVALENCE_DOCS_PATH,
@@ -1568,6 +1570,16 @@ def _ability_support_catalog_package(
             ),
         )
     )
+    aeldari_july_overlay_pack = SourceOverlayPack.from_payload(
+        cast(
+            SourceOverlayPackPayload,
+            json.loads(
+                aeldari_datasheet_semantic_coverage.JULY_OVERLAY_PACK_PATH.read_text(
+                    encoding="utf-8"
+                )
+            ),
+        )
+    )
     aeldari_release_manifest = SourceReleaseManifest.from_payload(
         cast(
             SourceReleaseManifestPayload,
@@ -1581,7 +1593,11 @@ def _ability_support_catalog_package(
     overlaid_artifacts = apply_source_release_overlays(
         source_artifacts=chaos_overlaid_artifacts,
         release_manifest=aeldari_release_manifest,
-        overlay_packs=(aeldari_overlay_pack, aeldari_tacoma_overlay_pack),
+        overlay_packs=(
+            aeldari_overlay_pack,
+            aeldari_tacoma_overlay_pack,
+            aeldari_july_overlay_pack,
+        ),
     )
     bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=overlaid_artifacts,
@@ -3124,6 +3140,8 @@ def _faction_support_markdown(
     if faction_row.faction_id in reviewed_faction_ids():
         lines.extend(("", "## Datasheet Source Review", ""))
         lines.extend(faction_pack_datasheet_review_markdown(faction_row.faction_id))
+    if faction_row.faction_id == AELDARI_FACTION_ID:
+        lines.extend(aeldari_thirty_nine_k_pro_audit_markdown())
     if faction_row.faction_id == EMPERORS_CHILDREN_FACTION_ID:
         review = faction_pack_datasheet_review(EMPERORS_CHILDREN_FACTION_ID)
         lines.extend(

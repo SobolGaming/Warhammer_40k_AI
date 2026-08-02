@@ -1234,10 +1234,10 @@
           "datasheet_id": "000002539",
           "datasheet_name": "Skyweavers",
           "group": "Harlequins",
-          "pdf_page_reference": null,
-          "review_note": "Explicitly reviewed: the Faction Pack neither reprints nor updates this row.",
+          "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
+          "review_note": "Apply the Faction Pack datasheet Rules Update to the pinned predecessor row.",
           "review_row_id": "source:000002539",
-          "treatment": "unchanged_predecessor"
+          "treatment": "rules_update"
         },
         {
           "datasheet_id": "000002540",
@@ -1279,10 +1279,10 @@
           "datasheet_id": "000002544",
           "datasheet_name": "The Yncarne",
           "group": "Ynnari",
-          "pdf_page_reference": null,
-          "review_note": "Explicitly reviewed: the Faction Pack neither reprints nor updates this row.",
+          "pdf_page_reference": "Rules Updates, physical PDF page 23 (contents page 27)",
+          "review_note": "Apply the Faction Pack datasheet Rules Update to the pinned predecessor row.",
           "review_row_id": "source:000002544",
-          "treatment": "unchanged_predecessor"
+          "treatment": "rules_update"
         },
         {
           "datasheet_id": "000002759",

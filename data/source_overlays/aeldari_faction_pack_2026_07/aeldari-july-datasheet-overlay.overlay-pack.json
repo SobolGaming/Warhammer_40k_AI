@@ -1,0 +1,52 @@
+{
+  "base_source_package_id": {
+    "namespace": "wahapedia",
+    "package_name": "source-mirror",
+    "version": "10th-edition-2026-06-14"
+  },
+  "catalog_version": {
+    "source_date": "2026-07-22",
+    "version_id": "warhammer-40000-11th-aeldari-faction-pack-2026-07"
+  },
+  "effective_date": "2026-07-22",
+  "operations": [
+    {
+      "effective_date": "2026-07-22",
+      "expected_preimage_hash": "2de8b26096cc4e1a8dc20f28844e2a87946cb31ff65d77a122ed7add739f47ba",
+      "fields": {
+        "description": "This unit has Stealth. Melee attacks that target this unit have -1 to Hit rolls."
+      },
+      "op_id": "aeldari-july-update-001-000002539",
+      "operation_kind": "update_row",
+      "order_index": 1,
+      "reason": "Apply the Acrobatic Grace Faction Pack update.",
+      "source_reference": "pdf:aeldari-faction-pack:2026-07-22:p23",
+      "source_row_id": "000002539:3",
+      "source_table": "Datasheets_abilities",
+      "target_edition": "warhammer-40000-11th"
+    },
+    {
+      "effective_date": "2026-07-22",
+      "expected_preimage_hash": "92633bc742f6e5d18f618eaffe76b7a0f0f225e6b4b41b90a783adfb97e32063",
+      "fields": {
+        "description": "Once in each of your opponent's turns, if this model is on the battlefield when another friendly AELDARI unit is destroyed, just after removing the last model in that unit, you can remove this model from the battlefield and set it up as close as possible to where that destroyed model was destroyed and not within Engagement Range of one or more enemy units. Doing so does not prevent this model from being eligible to move."
+      },
+      "op_id": "aeldari-july-update-002-000002544",
+      "operation_kind": "update_row",
+      "order_index": 2,
+      "reason": "Apply the Inevitable Death Faction Pack update.",
+      "source_reference": "pdf:aeldari-faction-pack:2026-07-22:p23",
+      "source_row_id": "000002544:5",
+      "source_table": "Datasheets_abilities",
+      "target_edition": "warhammer-40000-11th"
+    }
+  ],
+  "package_hash": "49b87ce73f8f592b2f79eb49c4f4f5a4deff09b8a3efa4806589d808ebec6c5c",
+  "package_id": {
+    "namespace": "gw",
+    "package_name": "aeldari-faction-pack-july-datasheet-overlay",
+    "version": "11th-2026-07-22"
+  },
+  "schema_version": "phase17-source-overlay-v1",
+  "target_edition": "warhammer-40000-11th"
+}

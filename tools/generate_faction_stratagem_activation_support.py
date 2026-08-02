@@ -54,9 +54,14 @@ RULE_IR_TEMPLATE_ID = "phase17s:stratagem-activation-target-binding"
 
 UNTYPED_STRATAGEM_CATEGORIES_AS_STRATEGIC_PLOY = frozenset(
     (
+        "Uncategorised",
+        "Court of the Phoenician - Stratagem",
         "Court of the Phoenician \u2013 Stratagem",
+        "Grizzled Company - Stratagem",
         "Grizzled Company \u2013 Stratagem",
+        "Nightmare Hunt - Stratagem",
         "Nightmare Hunt \u2013 Stratagem",
+        "Serpent's Brood - Stratagem",
         "Serpent\u2019s Brood \u2013 Stratagem",
     )
 )
@@ -87,6 +92,18 @@ SOURCE_ROW_REQUIRED_KEYWORD_OVERRIDES: dict[str, tuple[str, ...]] = {
     "stratagem:emperors-children:court-of-the-phoenician:000010655006": ("DAEMON",),
 }
 
+# These source-backed providers deliberately replace the base activation RuleIR while
+# retaining the generated timing, target, and restriction profile. Other runtime-owned
+# Stratagems supply complete records and must not also receive a base activation record.
+RUNTIME_CONSUMER_DETACHMENT_IDS_REQUIRING_ACTIVATION_PROFILE = frozenset(
+    (
+        "court-of-the-phoenician",
+        "more-dakka",
+        "shadow-legion",
+        "spectacle-of-slaughter",
+    )
+)
+
 
 @dataclass(frozen=True, slots=True)
 class SourceOnlyActivationMetadata:
@@ -105,6 +122,133 @@ class SourceOnlyActivationMetadata:
 
 
 CURRENT_SOURCE_ACTIVATION_METADATA_BY_ROW_ID: dict[str, SourceOnlyActivationMetadata] = {
+    "stratagem:aeldari:armoured-warhost:layered-wards": SourceOnlyActivationMetadata(
+        when_descriptor=("Any phase, when a friendly AELDARI VEHICLE unit suffers a mortal wound."),
+        target_descriptor="That AELDARI VEHICLE unit.",
+        effect_descriptor="Your unit has Feel No Pain 5+ against mortal wounds.",
+        trigger_kind="start_phase",
+        phase_tokens=("any",),
+        target_kind="friendly_unit",
+        target_policy_id="friendly_unit",
+        required_keywords=("VEHICLE",),
+    ),
+    "stratagem:aeldari:armoured-warhost:soulsight": SourceOnlyActivationMetadata(
+        when_descriptor=(
+            "Your Shooting phase, when a friendly AELDARI VEHICLE unit is selected to shoot."
+        ),
+        target_descriptor="That AELDARI VEHICLE unit.",
+        effect_descriptor=(
+            "Your unit's attacks can re-roll one Hit roll, one Wound roll and one Damage roll."
+        ),
+        trigger_kind="just_after_friendly_unit_selected_to_shoot",
+        phase_tokens=("shooting",),
+        target_kind="friendly_unit",
+        target_policy_id="not_selected_to_shoot_unit",
+        required_keywords=("VEHICLE",),
+    ),
+    "stratagem:aeldari:armoured-warhost:vectored-engines": (
+        SourceOnlyActivationMetadata(
+            when_descriptor=(
+                "Your Movement phase, when a friendly AELDARI VEHICLE unit makes a Fall Back move."
+            ),
+            target_descriptor="That AELDARI VEHICLE unit.",
+            effect_descriptor=(
+                "That move does not prevent your unit from being eligible to shoot."
+            ),
+            trigger_kind="just_after_friendly_unit_falls_back",
+            phase_tokens=("movement",),
+            target_kind="friendly_unit",
+            target_policy_id="friendly_unit",
+            required_keywords=("VEHICLE",),
+        )
+    ),
+    "stratagem:aeldari:fateful-performance:deceptive-feint": (
+        SourceOnlyActivationMetadata(
+            when_descriptor=(
+                "Your opponent's Movement phase, when an enemy unit ends a move within 8\" "
+                "of a friendly unengaged HARLEQUINS INFANTRY unit."
+            ),
+            target_descriptor="That HARLEQUINS INFANTRY unit.",
+            effect_descriptor='Your unit can make a Normal move of up to D3+3".',
+            trigger_kind="after_enemy_unit_ends_move",
+            phase_tokens=("movement",),
+            target_kind="friendly_unit",
+            target_policy_id="friendly_unit",
+            required_keywords=("INFANTRY",),
+            required_faction_keywords=("HARLEQUINS",),
+        )
+    ),
+    "stratagem:aeldari:fateful-performance:exit-the-stage": (
+        SourceOnlyActivationMetadata(
+            when_descriptor="End of your opponent's Fight phase.",
+            target_descriptor="One friendly unengaged HARLEQUINS unit.",
+            effect_descriptor="Place your unit in Strategic Reserves.",
+            trigger_kind="end_phase",
+            phase_tokens=("fight",),
+            target_kind="friendly_unit",
+            target_policy_id="friendly_unit",
+            required_faction_keywords=("HARLEQUINS",),
+        )
+    ),
+    "stratagem:aeldari:fateful-performance:heroes-fall": SourceOnlyActivationMetadata(
+        when_descriptor=("Fight phase, when an enemy unit targets a friendly HARLEQUINS unit."),
+        target_descriptor="That HARLEQUINS unit.",
+        effect_descriptor=(
+            "When a model in your unit is destroyed, if your unit has not been selected to "
+            "fight this phase, roll one D6. On a 4+, do not remove that model from the "
+            "battlefield. When your unit has fought, or at the end of the phase, whichever "
+            "comes first, that model is removed from the battlefield."
+        ),
+        trigger_kind="after_unit_selected_as_target",
+        phase_tokens=("fight",),
+        target_kind="friendly_unit",
+        target_policy_id="selected_target_unit",
+        required_faction_keywords=("HARLEQUINS",),
+    ),
+    "stratagem:aeldari:twilight-flickers:captivating-performance": (
+        SourceOnlyActivationMetadata(
+            when_descriptor="End of your Movement phase.",
+            target_descriptor="One friendly TROUPE unit.",
+            effect_descriptor=(
+                "Select one objective your unit is controlling. That objective is secured."
+            ),
+            trigger_kind="end_phase",
+            phase_tokens=("movement",),
+            target_kind="friendly_unit",
+            target_policy_id="friendly_unit",
+            required_faction_keywords=("TROUPE",),
+        )
+    ),
+    "stratagem:aeldari:twilight-flickers:phantasmal-mirage": (
+        SourceOnlyActivationMetadata(
+            when_descriptor=(
+                "Your Shooting phase, when a friendly HARLEQUINS VEHICLE unit has shot."
+            ),
+            target_descriptor="That HARLEQUINS VEHICLE unit.",
+            effect_descriptor=(
+                'Your unit can make a Normal move of up to D6". Your unit is not eligible '
+                "to declare a charge until the end of the turn."
+            ),
+            trigger_kind="just_after_friendly_unit_has_shot",
+            phase_tokens=("shooting",),
+            target_kind="friendly_unit",
+            target_policy_id="just_shot_unit",
+            required_keywords=("VEHICLE",),
+            required_faction_keywords=("HARLEQUINS",),
+        )
+    ),
+    "stratagem:aeldari:twilight-flickers:presaged-rehearsal": (
+        SourceOnlyActivationMetadata(
+            when_descriptor="Fight phase, when a friendly TROUPE unit is selected to fight.",
+            target_descriptor="That TROUPE unit.",
+            effect_descriptor="Your unit's melee attacks have [LANCE].",
+            trigger_kind="just_after_friendly_unit_selected_to_fight",
+            phase_tokens=("fight",),
+            target_kind="friendly_unit",
+            target_policy_id="friendly_unit",
+            required_faction_keywords=("TROUPE",),
+        )
+    ),
     "stratagem:chaos-daemons:blood-legion:000009816006": SourceOnlyActivationMetadata(
         when_descriptor=(
             "Your opponent's Movement phase, when an enemy unit ends a Fall Back move."
@@ -281,16 +425,28 @@ def _raw_stratagem_rows_by_id() -> dict[str, dict[str, object]]:
 def _source_rows_with_activation_profiles(
     raw_rows: dict[str, dict[str, object]],
 ) -> tuple[faction_subrules_2026_27.SourceStratagemRow, ...]:
-    rows: list[faction_subrules_2026_27.SourceStratagemRow] = []
-    for row in faction_subrules_2026_27.stratagem_rows():
-        if row.runtime_consumer_ids:
-            continue
-        if (
-            row.stratagem_id in raw_rows
-            or row.source_row_id in SOURCE_ONLY_ACTIVATION_METADATA_BY_ROW_ID
-        ):
-            rows.append(row)
-    return tuple(rows)
+    return tuple(
+        row
+        for row in faction_subrules_2026_27.stratagem_rows()
+        if _source_row_requires_activation_profile(row=row, raw_rows=raw_rows)
+    )
+
+
+def _source_row_requires_activation_profile(
+    *,
+    row: faction_subrules_2026_27.SourceStratagemRow,
+    raw_rows: dict[str, dict[str, object]],
+) -> bool:
+    if (
+        row.runtime_consumer_ids
+        and row.detachment_id not in RUNTIME_CONSUMER_DETACHMENT_IDS_REQUIRING_ACTIVATION_PROFILE
+    ):
+        return False
+    return (
+        row.stratagem_id in raw_rows
+        or row.source_row_id in CURRENT_SOURCE_ACTIVATION_METADATA_BY_ROW_ID
+        or row.source_row_id in SOURCE_ONLY_ACTIVATION_METADATA_BY_ROW_ID
+    )
 
 
 def _activation_profile_for_source_row(
@@ -978,16 +1134,15 @@ def _validate_profile_coverage(
     *,
     raw_rows: dict[str, dict[str, object]],
 ) -> None:
-    source_only_rows = tuple(
+    expected_rows = tuple(
         row
         for row in faction_subrules_2026_27.stratagem_rows()
-        if not row.runtime_consumer_ids
-        and (
-            row.stratagem_id in raw_rows
-            or row.source_row_id in SOURCE_ONLY_ACTIVATION_METADATA_BY_ROW_ID
+        if _source_row_requires_activation_profile(
+            row=row,
+            raw_rows=raw_rows,
         )
     )
-    expected = {row.source_row_id for row in source_only_rows}
+    expected = {row.source_row_id for row in expected_rows}
     actual = {profile.source_row_id for profile in profiles}
     if actual != expected:
         raise ValueError("Generated Stratagem activation profiles do not cover source-only rows.")

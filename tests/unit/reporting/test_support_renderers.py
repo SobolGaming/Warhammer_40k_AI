@@ -5,6 +5,13 @@ import json
 from pathlib import Path
 
 import pytest
+from tools.aeldari_39k_pro_audit import (
+    AUDIT_PATH as AELDARI_AUDIT_PATH,
+)
+from tools.aeldari_39k_pro_audit import (
+    aeldari_thirty_nine_k_pro_audit,
+    load_aeldari_thirty_nine_k_pro_audit,
+)
 from tools.emperors_children_39k_pro_audit import (
     AUDIT_PATH,
     emperors_children_thirty_nine_k_pro_audit,
@@ -63,6 +70,21 @@ def test_faction_support_renderer_preserves_section_order() -> None:
     assert aeldari.index("## Detachment Rule Support") < aeldari.index(
         "## Datasheet / Unit Support"
     )
+    assert (
+        aeldari.index("## Semantic Support Snapshot")
+        < aeldari.index("## Detachment Rule Support")
+        < aeldari.index("## Datasheet Source Review")
+        < aeldari.index("## 39k PRO Secondary Reference Audit")
+        < aeldari.index("## Datasheet / Unit Support")
+    )
+    assert "Corsair Coterie — Relentless Raiders" in aeldari
+    assert "Armoured Warhost — Skilled Crews" in aeldari
+    assert "15 detachments, 52 Enhancements, and 78 Stratagems" in aeldari
+    assert "| 15 | 2 | 52 | 78 | 16 |" in aeldari
+    assert "https://39k.pro/faction/-utUCEwvtbI" in aeldari
+    assert aeldari.count("https://39k.pro/detachment/") == 15
+    assert "Guileful Strategist" not in aeldari
+    assert "Harmonisation Matrix" not in aeldari
     assert "## 11th Edition Faction Pack Review" in emperors_children
     assert "Elegant Brutes | Yes | Physical PDF page 2" in emperors_children
     assert "Frenzied Host | Yes | Physical PDF page 3" in emperors_children
@@ -180,6 +202,42 @@ def test_emperors_children_39k_pro_audit_retains_assignment_level_evidence() -> 
         row.observed_provider_datasheet_id in provider_datasheet_ids_by_source.values()
         for row in audit.datasheet_deltas
     )
+
+
+def test_aeldari_39k_pro_audit_retains_current_exact_inventory() -> None:
+    audit = aeldari_thirty_nine_k_pro_audit()
+
+    assert len(audit.detachments) == 15
+    assert audit.enhancement_count == 52
+    assert audit.stratagem_count == 78
+    assert audit.in_scope_datasheet_count == 70
+    assert audit.exact_ability_count == audit.matched_exact_ability_count == 145
+    assert len({row.provider_url for row in audit.detachments}) == 15
+    assert {row.detachment_id for row in audit.detachments} >= {
+        "fateful-performance",
+        "serpents-brood",
+        "twilight-flickers",
+    }
+
+
+def test_aeldari_39k_pro_audit_rejects_duplicate_detachment_urls(tmp_path: Path) -> None:
+    payload = json.loads(AELDARI_AUDIT_PATH.read_text(encoding="utf-8"))
+    payload["detachments"][1]["provider_url"] = payload["detachments"][0]["provider_url"]
+    tampered_path = tmp_path / "duplicate-url-audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="detachment URLs must be unique"):
+        load_aeldari_thirty_nine_k_pro_audit(tampered_path)
+
+
+def test_aeldari_39k_pro_audit_rejects_official_source_hash_drift(tmp_path: Path) -> None:
+    payload = json.loads(AELDARI_AUDIT_PATH.read_text(encoding="utf-8"))
+    payload["official_source"]["pdf_sha256"] = "0" * 64
+    tampered_path = tmp_path / "stale-official-hash-audit.json"
+    tampered_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="official PDF hash is stale"):
+        load_aeldari_thirty_nine_k_pro_audit(tampered_path)
 
 
 def test_emperors_children_39k_pro_audit_rejects_swapped_provider_urls(tmp_path: Path) -> None:

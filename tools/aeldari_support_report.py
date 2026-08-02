@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from tools.generate_ability_support_matrix import DatasheetSupportRow
 
 if TYPE_CHECKING or __package__:
+    from tools.aeldari_39k_pro_audit import aeldari_thirty_nine_k_pro_audit
     from tools.aeldari_ability_semantic_descriptions import (
         DOCUMENTATION_BUCKET_STILL_NEEDED,
         DOCUMENTATION_BUCKET_SUPPORTED,
@@ -25,6 +26,7 @@ if TYPE_CHECKING or __package__:
         aeldari_datasheet_semantic_snapshot_markdown,
     )
 else:
+    from aeldari_39k_pro_audit import aeldari_thirty_nine_k_pro_audit
     from aeldari_ability_semantic_descriptions import (
         DOCUMENTATION_BUCKET_STILL_NEEDED,
         DOCUMENTATION_BUCKET_SUPPORTED,
@@ -54,10 +56,32 @@ _ACCEPTED_OVERALL_STATUSES = frozenset({"Full", "Playable"})
 _ACCEPTED_WEAPON_KEYWORD_STATUSES = frozenset({"Full", "None"})
 _HOST_LIMITATION_PREFIX = "host limitation: "
 
+_SUPPORTED_DETACHMENT_RULE_NAMES = (
+    "Corsair Coterie — Relentless Raiders",
+    "Corsair Coterie — Veterans of the Void",
+    "Path of the Outcast — Far-reaching Doom",
+)
+_UNSUPPORTED_DETACHMENT_RULE_NAMES = (
+    "Armoured Warhost — Skilled Crews",
+    "Aspect Host — Path of the Warrior",
+    "Devoted of Ynnead — Strength from Death",
+    "Eldritch Raiders — Veterans of the Void",
+    "Eldritch Raiders — Yriel's Own",
+    "Fateful Performance — Acrobatic Onslaught",
+    "Ghosts of the Webway — Acrobatic Onslaught",
+    "Guardian Battlehost — Defend At All Costs",
+    "Seer Council — Strands of Fate",
+    "Serpent's Brood — Boons of the Brood",
+    "Spirit Conclave — Shepherds of the Dead",
+    "Twilight Flickers — Dance of Distortion",
+    "Warhost — Martial Grace",
+    "Windrider Host — Ride the Wind",
+)
+
 _DETACHMENT_SEMANTICS_NEEDED_BY_ID = {
     "armoured-warhost": (
-        "IR still needed: grant Assault to ranged weapons of friendly Aeldari Vehicle models and "
-        "grant Advance rerolls to friendly Aeldari Vehicle Fly units."
+        "IR still needed: grant Assault to ranged weapons equipped by friendly Aeldari Vehicle "
+        "models."
     ),
     "aspect-host": (
         "IR still needed: when an Aspect Warriors or Avatar of Khaine unit is selected to shoot or "
@@ -66,8 +90,8 @@ _DETACHMENT_SEMANTICS_NEEDED_BY_ID = {
     "devoted-of-ynnead": (
         "IR still needed: Ynnari mustering/keyword/Warlord rules; an end-of-opponent-"
         "Shooting-phase D6+1 reactive move after a nearby Ynnari unit is destroyed; a Fade Back "
-        "replacement move that can enter Engagement Range; and a Fight-start Fights First grant "
-        "below Starting Strength."
+        "replacement D6+1 surge move; and a Fight-start Fights First grant below Starting "
+        "Strength."
     ),
     "eldritch-raiders": (
         "IR still needed: army-wide charge-after-Advance, Advance rerolls for Anhrathe/Rangers/"
@@ -143,10 +167,68 @@ def aeldari_semantic_snapshot_markdown(
             f"| {_markdown_line_list(name for name, supported in detachment_rows if supported)} | "
             f"{_markdown_line_list(name for name, supported in detachment_rows if not supported)} |"
         ),
+        "",
+        "### Detachment rules",
+        "",
+        "| Runtime supported / executable | Still source-only / blocked |",
+        "| --- | --- |",
+        (
+            f"| {_markdown_line_list(_SUPPORTED_DETACHMENT_RULE_NAMES)} | "
+            f"{_markdown_line_list(_UNSUPPORTED_DETACHMENT_RULE_NAMES)} |"
+        ),
     ]
     lines.extend(_exact_source_rows_snapshot_markdown("Enhancements", enhancement_rows))
     lines.extend(_exact_source_rows_snapshot_markdown("Stratagems", stratagem_rows))
     lines.extend(aeldari_datasheet_semantic_snapshot_markdown())
+    return lines
+
+
+def aeldari_thirty_nine_k_pro_audit_markdown() -> list[str]:
+    audit = aeldari_thirty_nine_k_pro_audit()
+    lines = [
+        "",
+        "## 39k PRO Secondary Reference Audit",
+        "",
+        (
+            f"Audit `{audit.audit_id}` checked the current [{audit.publication_name}]"
+            f"({audit.faction_reference_url}) publication and all current detachment pages on "
+            f"{audit.audited_at}. 39k PRO is secondary cross-check evidence only; the hashed "
+            "Games Workshop Faction Pack and July 2026 Munitorum Field Manual remain the "
+            "authoritative catalog provenance."
+        ),
+        "",
+        (
+            f"The reconciliation matched all {audit.in_scope_datasheet_count} in-scope "
+            f"datasheets and all {audit.matched_exact_ability_count} exact abilities. It records "
+            f"{len(audit.detachments)} detachments, {audit.enhancement_count} Enhancements, and "
+            f"{audit.stratagem_count} Stratagems. Excluded content remains out of CORE V2 scope: "
+            f"{', '.join(audit.excluded_content)}."
+        ),
+        "",
+        (
+            f"Official evidence: `{audit.official_pdf_path}` (SHA-256 "
+            f"`{audit.official_pdf_sha256}`)."
+        ),
+        "",
+        f"Navigation note: {audit.provider_navigation_name_discrepancy}",
+        "",
+        "| Detachment | Verified 39k PRO reference | Named rules | Enhancements | Stratagems |",
+        "| --- | --- | --- | ---: | ---: |",
+    ]
+    for row in audit.detachments:
+        lines.append(
+            "| "
+            + " | ".join(
+                (
+                    _markdown_text(row.detachment_name),
+                    f"[39k PRO]({row.provider_url})",
+                    _markdown_line_list(row.rule_names),
+                    str(row.enhancement_count),
+                    str(row.stratagem_count),
+                )
+            )
+            + " |"
+        )
     return lines
 
 

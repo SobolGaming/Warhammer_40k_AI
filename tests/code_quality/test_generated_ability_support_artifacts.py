@@ -157,8 +157,8 @@ def test_cross_source_semantic_audit_covers_every_supported_content_surface() ->
         SemanticContentKind.FACTION_RULE: 28,
         SemanticContentKind.DATASHEET_ABILITY: 2049,
         SemanticContentKind.DETACHMENT_RULE: 266,
-        SemanticContentKind.ENHANCEMENT: 732,
-        SemanticContentKind.STRATAGEM: 1095,
+        SemanticContentKind.ENHANCEMENT: 701,
+        SemanticContentKind.STRATAGEM: 1050,
     }
     assert CrossSourceSemanticAudit.from_payload(audit.to_payload()) == audit
     assert (

@@ -74,11 +74,15 @@ OUTPUT_PATH = (
 OVERLAY_DIR = REPO_ROOT / "data" / "source_overlays" / "aeldari_faction_pack_2026_06"
 OVERLAY_PACK_PATH = OVERLAY_DIR / "aeldari-faction-pack-datasheet-overlay.overlay-pack.json"
 RELEASE_MANIFEST_PATH = OVERLAY_DIR / "source_release_manifest.json"
+JULY_OVERLAY_DIR = REPO_ROOT / "data" / "source_overlays" / "aeldari_faction_pack_2026_07"
+JULY_OVERLAY_PACK_PATH = JULY_OVERLAY_DIR / "aeldari-july-datasheet-overlay.overlay-pack.json"
 TACOMA_OVERLAY_DIR = REPO_ROOT / "data" / "source_overlays" / "tacoma_open_2026"
 TACOMA_OVERLAY_PACK_PATH = TACOMA_OVERLAY_DIR / "aeldari-frame-keyword.overlay-pack.json"
 SOURCE_DATE = "2026-06-09"
+JULY_SOURCE_DATE = "2026-07-22"
 TACOMA_SOURCE_DATE = "2026-07-10"
 SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p23"
+JULY_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-07-22:p23"
 KHARSETH_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p14-15"
 PRINCE_YRIEL_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p12-13"
 VYPERS_SOURCE_REFERENCE = "pdf:aeldari-faction-pack:2026-06-09:p16-17"
@@ -103,9 +107,14 @@ TACOMA_OVERLAY_PACKAGE_ID = DataPackageId(
     package_name="aeldari-tacoma-open-frame-keyword-overlay",
     version="11th-2026-07-10",
 )
+JULY_OVERLAY_PACKAGE_ID = DataPackageId(
+    namespace="gw",
+    package_name="aeldari-faction-pack-july-datasheet-overlay",
+    version="11th-2026-07-22",
+)
 CATALOG_VERSION = CatalogVersion.dated(
-    version_id="warhammer-40000-11th-aeldari-tacoma-open-2026-07",
-    source_date=date.fromisoformat(TACOMA_SOURCE_DATE),
+    version_id="warhammer-40000-11th-aeldari-faction-pack-2026-07",
+    source_date=date.fromisoformat(JULY_SOURCE_DATE),
 )
 SUPPORT_ABILITY_ID = "core-v2-11e-support"
 
@@ -123,6 +132,7 @@ ASPECT_SHRINE_DATASHEET_IDS = (
     "000000600",
     "000000601",
 )
+JULY_RULES_UPDATE_DATASHEET_IDS = frozenset({"000002539", "000002544"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,18 +145,21 @@ class _UpdateSpec:
 
 
 def main() -> None:
-    overlay_pack, tacoma_overlay_pack, release_manifest, coverage_payload = (
+    overlay_pack, tacoma_overlay_pack, july_overlay_pack, release_manifest, coverage_payload = (
         generated_aeldari_datasheet_semantic_coverage()
     )
     OVERLAY_DIR.mkdir(parents=True, exist_ok=True)
     TACOMA_OVERLAY_DIR.mkdir(parents=True, exist_ok=True)
+    JULY_OVERLAY_DIR.mkdir(parents=True, exist_ok=True)
     _write_json(OVERLAY_PACK_PATH, overlay_pack.to_payload())
     _write_json(TACOMA_OVERLAY_PACK_PATH, tacoma_overlay_pack.to_payload())
+    _write_json(JULY_OVERLAY_PACK_PATH, july_overlay_pack.to_payload())
     _write_json(RELEASE_MANIFEST_PATH, release_manifest.to_payload())
     _write_json(OUTPUT_PATH, coverage_payload)
 
 
 def generated_aeldari_datasheet_semantic_coverage() -> tuple[
+    SourceOverlayPack,
     SourceOverlayPack,
     SourceOverlayPack,
     SourceReleaseManifest,
@@ -159,19 +172,26 @@ def generated_aeldari_datasheet_semantic_coverage() -> tuple[
     )
     overlay_pack = _overlay_pack(rows_by_table)
     tacoma_overlay_pack = _tacoma_overlay_pack()
+    july_overlay_pack = _july_overlay_pack(rows_by_table)
     release_manifest = _release_manifest()
     effective_artifacts = apply_source_release_overlays(
         source_artifacts=source_artifacts,
         release_manifest=release_manifest,
-        overlay_packs=(overlay_pack, tacoma_overlay_pack),
+        overlay_packs=(overlay_pack, tacoma_overlay_pack, july_overlay_pack),
     )
     _validate_effective_updates(effective_artifacts)
     coverage_payload = _coverage_payload(
         effective_artifacts=effective_artifacts,
-        overlay_packs=(overlay_pack, tacoma_overlay_pack),
+        overlay_packs=(overlay_pack, tacoma_overlay_pack, july_overlay_pack),
         release_manifest=release_manifest,
     )
-    return overlay_pack, tacoma_overlay_pack, release_manifest, coverage_payload
+    return (
+        overlay_pack,
+        tacoma_overlay_pack,
+        july_overlay_pack,
+        release_manifest,
+        coverage_payload,
+    )
 
 
 def _overlay_pack(
@@ -185,7 +205,7 @@ def _overlay_pack(
         if row.datasheet_id is not None
     }
     actual_update_ids = {spec.datasheet_id for spec in specs}
-    if actual_update_ids != expected_update_ids:
+    if actual_update_ids != expected_update_ids - JULY_RULES_UPDATE_DATASHEET_IDS:
         raise ValueError(
             "Aeldari overlay operations must cover every reviewed rules-update datasheet."
         )
@@ -441,7 +461,45 @@ def _release_manifest() -> SourceReleaseManifest:
         base_source_package_id=BASE_SOURCE_PACKAGE_ID,
         base_source_edition="warhammer-40000-10th",
         target_edition=TARGET_EDITION,
-        overlay_package_ids=(OVERLAY_PACKAGE_ID, TACOMA_OVERLAY_PACKAGE_ID),
+        overlay_package_ids=(
+            OVERLAY_PACKAGE_ID,
+            TACOMA_OVERLAY_PACKAGE_ID,
+            JULY_OVERLAY_PACKAGE_ID,
+        ),
+    )
+
+
+def _july_overlay_pack(
+    rows_by_table: dict[str, tuple[NormalizedSourceRow, ...]],
+) -> SourceOverlayPack:
+    specs = _july_update_specs(rows_by_table)
+    if {spec.datasheet_id for spec in specs} != JULY_RULES_UPDATE_DATASHEET_IDS:
+        raise ValueError("Aeldari July overlay scope drifted.")
+    operations = tuple(
+        SourceOverlayOperation(
+            op_id=f"aeldari-july-update-{index:03d}-{spec.datasheet_id}",
+            order_index=index,
+            operation_kind=SourceOverlayOperationKind.UPDATE_ROW,
+            target_edition=TARGET_EDITION,
+            source_table=spec.source_table,
+            source_row_id=spec.source_row_id,
+            source_reference=JULY_SOURCE_REFERENCE,
+            effective_date=JULY_SOURCE_DATE,
+            reason=spec.reason,
+            expected_preimage_hash=source_row_hash(
+                _required_row(rows_by_table, spec.source_table, spec.source_row_id)
+            ),
+            fields=spec.fields,
+        )
+        for index, spec in enumerate(specs, start=1)
+    )
+    return SourceOverlayPack(
+        package_id=JULY_OVERLAY_PACKAGE_ID,
+        catalog_version=CATALOG_VERSION,
+        base_source_package_id=BASE_SOURCE_PACKAGE_ID,
+        target_edition=TARGET_EDITION,
+        effective_date=JULY_SOURCE_DATE,
+        operations=operations,
     )
 
 
@@ -656,6 +714,34 @@ def _update_specs(
         )
     )
     return tuple(specs)
+
+
+def _july_update_specs(
+    rows_by_table: dict[str, tuple[NormalizedSourceRow, ...]],
+) -> tuple[_UpdateSpec, ...]:
+    return (
+        _ability_update(
+            rows_by_table,
+            datasheet_id="000002539",
+            ability_name="Acrobatic Grace",
+            description=(
+                "This unit has Stealth. Melee attacks that target this unit have -1 to Hit rolls."
+            ),
+        ),
+        _ability_update(
+            rows_by_table,
+            datasheet_id="000002544",
+            ability_name="Inevitable Death",
+            description=(
+                "Once in each of your opponent's turns, if this model is on the battlefield "
+                "when another friendly AELDARI unit is destroyed, just after removing the "
+                "last model in that unit, you can remove this model from the battlefield and "
+                "set it up as close as possible to where that destroyed model was destroyed "
+                "and not within Engagement Range of one or more enemy units. Doing so does "
+                "not prevent this model from being eligible to move."
+            ),
+        ),
+    )
 
 
 def _coverage_payload(
