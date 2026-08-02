@@ -306,6 +306,28 @@ def _supported_ignore_vertical_distance_parameters(
 def _supported_move_over_as_if_absent_parameters(
     parameters: Mapping[str, object],
 ) -> _SupportedMovementTransitEffectParameters | None:
+    if frozenset(parameters) == frozenset(
+        {
+            "movement_modes",
+            "permission",
+            "terrain_height_max_inches",
+            "terrain_scope",
+        }
+    ):
+        if parameters.get("terrain_scope") != "terrain_features":
+            return None
+        movement_modes = _validate_movement_mode_tokens(parameters["movement_modes"])
+        if not set(movement_modes).issubset({"advance", "fall_back", "normal"}):
+            return None
+        return _SupportedMovementTransitEffectParameters(
+            movement_modes=movement_modes,
+            permission="move_over_as_if_not_there",
+            model_allegiance="any",
+            terrain_height_max_inches=_validate_non_negative_float(
+                "terrain_height_max_inches",
+                parameters.get("terrain_height_max_inches"),
+            ),
+        )
     if (
         parameters.get("model_allegiance") != "friendly"
         or parameters.get("terrain_scope") != "terrain_features"

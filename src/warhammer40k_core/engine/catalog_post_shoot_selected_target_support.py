@@ -40,6 +40,27 @@ def post_shoot_selected_target_effect_clauses_after(
     return tuple(selected)
 
 
+def post_fight_selected_target_effect_clauses_after(
+    clauses: tuple[RuleClause, ...],
+    selection_index: int,
+) -> tuple[RuleClause, ...]:
+    if type(clauses) is not tuple or any(type(clause) is not RuleClause for clause in clauses):
+        raise GameLifecycleError("Post-fight selected-target discovery requires RuleClause values.")
+    if type(selection_index) is not int or not 0 <= selection_index < len(clauses):
+        raise GameLifecycleError("Post-fight selected-target selection_index is invalid.")
+    selection_clause = clauses[selection_index]
+    selected: list[RuleClause] = []
+    for clause in clauses[selection_index + 1 :]:
+        if clause.template_id == "phase17c:selected-target-constraint":
+            break
+        if post_shoot_selected_target_pair_is_supported(
+            selection_clause=selection_clause,
+            effect_clause=clause,
+        ):
+            selected.append(clause)
+    return tuple(selected)
+
+
 def post_shoot_selected_target_pair_is_supported(
     *,
     selection_clause: RuleClause,

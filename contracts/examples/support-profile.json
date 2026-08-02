@@ -118,6 +118,13 @@
       "submission_kind": "finite"
     },
     {
+      "decision_type": "select_catalog_post_fight_hit_target_effect",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
       "decision_type": "select_catalog_post_shoot_hit_target_effect",
       "interaction_kinds": [
         "entity_selection"

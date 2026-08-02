@@ -262,6 +262,10 @@ def _apply_movement_action_decision(  # noqa: RET503
         )
 
     if action is MovementPhaseActionKind.FALL_BACK:
+        from warhammer40k_core.engine.catalog_selectable_ability_mode_runtime import (
+            resolve_catalog_fall_back_leadership_denial,
+        )
+
         movement_mode = _movement_mode_from_payload(payload=payload, action=action)
         fall_back_mode = _fall_back_mode_from_payload(payload)
         pending_action = PendingMovementActionSelection.from_result(
@@ -273,6 +277,27 @@ def _apply_movement_action_decision(  # noqa: RET503
             movement_mode=movement_mode,
             fall_back_mode=fall_back_mode,
         )
+        if resolve_catalog_fall_back_leadership_denial(
+            state=state,
+            decisions=decisions,
+            target_unit_instance_id=active_selection.unit_instance_id,
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            runtime_modifier_registry=runtime_modifier_registry,
+        ):
+            _complete_movement_activation(
+                state=state,
+                decisions=decisions,
+                result=result,
+                action=MovementPhaseActionKind.REMAIN_STATIONARY,
+                witness=None,
+                movement_payload={
+                    "movement_inches": 0,
+                    "model_movements": [],
+                    "fall_back_denied": True,
+                    "declared_movement_phase_action": MovementPhaseActionKind.FALL_BACK.value,
+                },
+            )
+            return None
         fall_back_stratagem_status = _request_selected_to_fall_back_stratagem_if_available(
             state=state,
             decisions=decisions,

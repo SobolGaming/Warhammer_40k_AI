@@ -646,6 +646,19 @@ EMPERORS_CHILDREN_DEFILER_PDF_CORRECTION = PdfDatasheetCorrection(
     datasheet_id="000004208",
     source_id="pdf:emperors-children-faction-pack:2026-06-10:p7-p8",
 )
+EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000004077",
+        model_name="Fulgrim - EPIC HERO",
+        height=5.5,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:emperors-children:fulgrim:height",
+        height_document_reference=(
+            "Emperor's Children Faction Pack Fulgrim assembled miniature imagery; "
+            "Warhammer Event Companion 2026-06-12 p.61 (130mm base)"
+        ),
+    ),
+)
 CHAOS_DEFILER_PDF_CORRECTIONS = (
     DEATH_GUARD_DEFILER_PDF_CORRECTION,
     WORLD_EATERS_DEFILER_PDF_CORRECTION,
@@ -702,4 +715,5 @@ DEFAULT_HEIGHT_OVERRIDES = (
     *CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES,
     *CHAOS_DEFILER_HEIGHT_OVERRIDES,
+    *EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES,
 )

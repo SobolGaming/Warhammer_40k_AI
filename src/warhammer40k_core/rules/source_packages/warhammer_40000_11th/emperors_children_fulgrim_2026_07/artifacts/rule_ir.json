@@ -1,0 +1,706 @@
+{
+  "artifact_schema": "core-v2-emperors-children-fulgrim-rule-ir-v1",
+  "datasheet_id": "000004077",
+  "datasheet_name": "Fulgrim",
+  "official_document_filename": "eng_22-07_warhammer_40,000_faction_pack_emperor_s_children-srspmclqtm-i8ey7hgk2s.pdf",
+  "official_document_pages": [
+    8,
+    9
+  ],
+  "official_document_sha256": "1808fabb911f7a3e917ae5f2f12a6a7436ed97e1e5382238566dfd5e4540aa3c",
+  "overlay_package_hash": "b56dd1dc6370054e563f6fc1ad108761886ddf8fa3f25e480aaa0e15ef83d628",
+  "package_hash": "1df07f68c48e4050e1d14a4f38bd48264d6a1c86ca975d1c231e6de1c31a3bd4",
+  "records": {
+    "000004077:4": {
+      "ability_name": "Daemonic Poisons",
+      "normalized_text_sha256": "ed6e82c65c733f6e0beef6f8eeeba69d65fc7497edebd7d4d167a374471839d6",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:4:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [],
+            "source_span": {
+              "end": 22,
+              "start": 0,
+              "text": "In your Shooting phase"
+            },
+            "target": {
+              "kind": "enemy_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "enemy"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                }
+              ],
+              "source_span": {
+                "end": 115,
+                "start": 101,
+                "text": "one enemy unit"
+              }
+            },
+            "template_id": "phase17c:selected-target-constraint",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "attacker_model_reference",
+                  "value": "this_model"
+                },
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "shooting"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_model"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "just_after_friendly_unit_has_shot"
+                },
+                {
+                  "key": "weapon_names",
+                  "value": [
+                    "Daemonic blades - strike",
+                    "Daemonic blades - sweep",
+                    "Malefic lash",
+                    "Serpentine tail"
+                  ]
+                }
+              ],
+              "source_span": {
+                "end": 92,
+                "start": 44,
+                "text": "after this model has finished making its attacks"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:4:clause:002",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": {
+              "kind": "permanent",
+              "parameters": [],
+              "source_span": {
+                "end": 180,
+                "start": 153,
+                "text": "Until the end of the battle"
+              }
+            },
+            "effects": [
+              {
+                "kind": "set_contextual_status",
+                "parameters": [
+                  {
+                    "key": "command_phase_mortal_wounds",
+                    "value": "D3"
+                  },
+                  {
+                    "key": "command_phase_roll_threshold",
+                    "value": 4
+                  },
+                  {
+                    "key": "command_phase_timing",
+                    "value": "start_each_players_command_phase"
+                  },
+                  {
+                    "key": "status",
+                    "value": "poisoned"
+                  }
+                ],
+                "source_span": {
+                  "end": 209,
+                  "start": 182,
+                  "text": "that enemy unit is poisoned"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 42,
+              "start": 0,
+              "text": "In your Shooting phase and the Fight phase"
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 197,
+                "start": 182,
+                "text": "that enemy unit"
+              }
+            },
+            "template_id": "phase17k:persistent-selected-target-status",
+            "trigger": null,
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:4:clause:003",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [],
+            "source_span": {
+              "end": 42,
+              "start": 27,
+              "text": "the Fight phase"
+            },
+            "target": {
+              "kind": "enemy_unit",
+              "parameters": [
+                {
+                  "key": "allegiance",
+                  "value": "enemy"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                }
+              ],
+              "source_span": {
+                "end": 115,
+                "start": 101,
+                "text": "one enemy unit"
+              }
+            },
+            "template_id": "phase17c:selected-target-constraint",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "attacker_model_reference",
+                  "value": "this_model"
+                },
+                {
+                  "key": "edge",
+                  "value": "after"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "fight"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_model"
+                },
+                {
+                  "key": "target_relationship",
+                  "value": "hit_by_those_attacks"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "just_after_friendly_model_finished_attacks"
+                }
+              ],
+              "source_span": {
+                "end": 92,
+                "start": 44,
+                "text": "after this model has finished making its attacks"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:4:clause:004",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": {
+              "kind": "permanent",
+              "parameters": [],
+              "source_span": {
+                "end": 180,
+                "start": 153,
+                "text": "Until the end of the battle"
+              }
+            },
+            "effects": [
+              {
+                "kind": "set_contextual_status",
+                "parameters": [
+                  {
+                    "key": "command_phase_mortal_wounds",
+                    "value": "D3"
+                  },
+                  {
+                    "key": "command_phase_roll_threshold",
+                    "value": 4
+                  },
+                  {
+                    "key": "command_phase_timing",
+                    "value": "start_each_players_command_phase"
+                  },
+                  {
+                    "key": "status",
+                    "value": "poisoned"
+                  }
+                ],
+                "source_span": {
+                  "end": 209,
+                  "start": 182,
+                  "text": "that enemy unit is poisoned"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 210,
+              "start": 153,
+              "text": "Until the end of the battle, that enemy unit is poisoned."
+            },
+            "target": {
+              "kind": "selected_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 197,
+                "start": 182,
+                "text": "that enemy unit"
+              }
+            },
+            "template_id": "phase17k:persistent-selected-target-status",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "e0f99d5d8c6a95ca28c0a60a70e29ee5161c53414f83eb7288683ad571dbbe06",
+        "normalized_text": "In your Shooting phase and the Fight phase, after this model has finished making its attacks, select one enemy unit hit by one or more of those attacks. Until the end of the battle, that enemy unit is poisoned. At the start of each player's Command phase, roll one D6 for each poisoned enemy unit on the battlefield: on a 4+,that enemy unit suffers D3 mortal wounds.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:4"
+      }
+    },
+    "000004077:5": {
+      "ability_name": "Daemon Primarch of Slaanesh",
+      "normalized_text_sha256": "d6371a6970e67fdc559b1dd5e59c2e4b81b59f699b6d31597c33e3e85f88ac43",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:5:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": {
+              "kind": "until_timing_endpoint",
+              "parameters": [
+                {
+                  "key": "battle_round_offset",
+                  "value": 1
+                },
+                {
+                  "key": "boundary",
+                  "value": "start"
+                },
+                {
+                  "key": "endpoint",
+                  "value": "phase"
+                },
+                {
+                  "key": "owner",
+                  "value": "opponent"
+                },
+                {
+                  "key": "phase",
+                  "value": "command"
+                }
+              ],
+              "source_span": {
+                "end": 172,
+                "start": 119,
+                "text": "Until the start of your opponent's next Command phase"
+              }
+            },
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "select_one_self_ability_mode"
+                  },
+                  {
+                    "key": "option_source_rule_ids",
+                    "value": [
+                      "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:7",
+                      "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:8",
+                      "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:9"
+                    ]
+                  }
+                ],
+                "source_span": {
+                  "end": 117,
+                  "start": 47,
+                  "text": "select one of the abilities in the Daemon Primarch of Slaanesh section"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 202,
+              "start": 0,
+              "text": "At the start of your opponent's Command phase, select one of the abilities in the Daemon Primarch of Slaanesh section. Until the start of your opponent's next Command phase, this model has that ability."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 184,
+                "start": 174,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17k:command-phase-self-ability-choice",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "start"
+                },
+                {
+                  "key": "owner",
+                  "value": "opponent"
+                },
+                {
+                  "key": "phase",
+                  "value": "command"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_model"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "start_opponents_command_phase"
+                }
+              ],
+              "source_span": {
+                "end": 45,
+                "start": 0,
+                "text": "At the start of your opponent's Command phase"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "2a0620dae48ca13cf2a4702498baafa516056d590fc4d1be918e71f0e29f2738",
+        "normalized_text": "At the start of your opponent's Command phase, select one of the abilities in the Daemon Primarch of Slaanesh section. Until the start of your opponent's next Command phase, this model has that ability.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:5",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:5"
+      }
+    },
+    "000004077:6": {
+      "ability_name": "Serpentine",
+      "normalized_text_sha256": "f0d95df44df5a9eda03d2ca38ef8292a6c85d7d748846c0c4a993139cd34410a",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:6:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "movement_transit_permission",
+                "parameters": [
+                  {
+                    "key": "movement_modes",
+                    "value": [
+                      "normal",
+                      "advance",
+                      "fall_back"
+                    ]
+                  },
+                  {
+                    "key": "permission",
+                    "value": "move_over_as_if_not_there"
+                  },
+                  {
+                    "key": "terrain_height_max_inches",
+                    "value": 4.0
+                  },
+                  {
+                    "key": "terrain_scope",
+                    "value": "terrain_features"
+                  }
+                ],
+                "source_span": {
+                  "end": 139,
+                  "start": 71,
+                  "text": "move over sections of terrain features that are 4\" or less in height"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 140,
+              "start": 0,
+              "text": "Each time this model makes a Normal, Advance or Fall Back move, it can move over sections of terrain features that are 4\" or less in height."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 20,
+                "start": 10,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17k:model-terrain-height-transit",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "during"
+                },
+                {
+                  "key": "movement_modes",
+                  "value": [
+                    "normal",
+                    "advance",
+                    "fall_back"
+                  ]
+                },
+                {
+                  "key": "phase",
+                  "value": "movement"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_model"
+                },
+                {
+                  "key": "timing_window",
+                  "value": "model_makes_move"
+                }
+              ],
+              "source_span": {
+                "end": 62,
+                "start": 0,
+                "text": "Each time this model makes a Normal, Advance or Fall Back move"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "a2b9852dabed5009928bd7e7123b5b558ec309604d7f52808ae35809b20b11d3",
+        "normalized_text": "Each time this model makes a Normal, Advance or Fall Back move, it can move over sections of terrain features that are 4\" or less in height.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:6",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:6"
+      }
+    },
+    "000004077:7": {
+      "ability_name": "Beguiling Form",
+      "normalized_text_sha256": "b1d72de189090371262e4a02612769a0dd06ae044981c6baf2f883812d0c6739",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:7:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "modify_dice_roll",
+                "parameters": [
+                  {
+                    "key": "attack_role",
+                    "value": "target"
+                  },
+                  {
+                    "key": "delta",
+                    "value": -1
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "hit"
+                  }
+                ],
+                "source_span": {
+                  "end": 87,
+                  "start": 59,
+                  "text": "subtract 1 from the Hit roll"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 88,
+              "start": 0,
+              "text": "Each time a model makes an attack that targets this model, subtract 1 from the Hit roll."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 57,
+                "start": 47,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17k:selectable-self-ability-option",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "0e4d1e2f522a01e3466f05c2ffdaef5f71889540780f8d576c5beec013890bf3",
+        "normalized_text": "Each time a model makes an attack that targets this model, subtract 1 from the Hit roll.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:7",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:7"
+      }
+    },
+    "000004077:8": {
+      "ability_name": "Daemonic Speed",
+      "normalized_text_sha256": "0a3e79a2525c27a8a9e8529cfb2cf708c9a9b68d015a79edcb63c064245b59e0",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:8:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "grant_ability",
+                "parameters": [
+                  {
+                    "key": "ability",
+                    "value": "fights_first"
+                  }
+                ],
+                "source_span": {
+                  "end": 39,
+                  "start": 19,
+                  "text": "Fights First ability"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 40,
+              "start": 0,
+              "text": "This model has the Fights First ability."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 10,
+                "start": 0,
+                "text": "This model"
+              }
+            },
+            "template_id": "phase17k:selectable-self-ability-option",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "170626f05d330817cbe21375ed5c7a06b40633b02ffd6029e0e88dfdd2b4e743",
+        "normalized_text": "This model has the Fights First ability.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:8",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:8"
+      }
+    },
+    "000004077:9": {
+      "ability_name": "Enthralling Hypnosis (Aura)",
+      "normalized_text_sha256": "a4ea46fbde811946433ad6c0f8e82eb3e643dfeff6594625de877ba398e49a45",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:9:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "set_contextual_status",
+                "parameters": [
+                  {
+                    "key": "aura_range_inches",
+                    "value": 6.0
+                  },
+                  {
+                    "key": "failure_effect",
+                    "value": "remain_stationary"
+                  },
+                  {
+                    "key": "status",
+                    "value": "fall_back_leadership_test_denial"
+                  },
+                  {
+                    "key": "test_characteristic",
+                    "value": "leadership"
+                  }
+                ],
+                "source_span": {
+                  "end": 202,
+                  "start": 0,
+                  "text": "While an enemy unit is within 6\" of this model, each time that unit is selected to Fall Back, it must take a Leadership test. If that test is failed, that unit must Remain Stationary this phase instead."
+                }
+              }
+            ],
+            "source_span": {
+              "end": 202,
+              "start": 0,
+              "text": "While an enemy unit is within 6\" of this model, each time that unit is selected to Fall Back, it must take a Leadership test. If that test is failed, that unit must Remain Stationary this phase instead."
+            },
+            "target": {
+              "kind": "this_model",
+              "parameters": [],
+              "source_span": {
+                "end": 46,
+                "start": 36,
+                "text": "this model"
+              }
+            },
+            "template_id": "phase17k:selectable-self-ability-option",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "cfcf2a14b012da3b02d59acd6ca67502db38ce8e8aebe120e6f361619de3caa2",
+        "normalized_text": "While an enemy unit is within 6\" of this model, each time that unit is selected to Fall Back, it must take a Leadership test. If that test is failed, that unit must Remain Stationary this phase instead.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17k:emperors-children:fulgrim:datasheet:000004077:9",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07:datasheet:000004077:9"
+      }
+    }
+  },
+  "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+  "source_package_id": "gw-11e-emperors-children-fulgrim-datasheet-2026-07",
+  "source_snapshot_filename": "Datasheets_abilities.json",
+  "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+}

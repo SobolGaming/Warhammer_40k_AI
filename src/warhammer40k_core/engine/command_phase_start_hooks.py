@@ -12,7 +12,12 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+)
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
 if TYPE_CHECKING:
@@ -25,6 +30,10 @@ SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE = (
 
 
 type CommandPhaseStartHandler = Callable[["CommandPhaseStartContext"], None]
+type CommandPhaseStartEffectHandler = Callable[
+    ["CommandPhaseStartEffectContext"],
+    "LifecycleStatus | None",
+]
 type CommandPhaseStartRequestHandler = Callable[
     ["CommandPhaseStartRequestContext"],
     DecisionRequest | None,
@@ -89,6 +98,36 @@ class CommandPhaseStartRequestContext:
 
 
 @dataclass(frozen=True, slots=True)
+class CommandPhaseStartEffectContext:
+    state: GameState
+    decisions: DecisionController
+    active_player_id: str
+    runtime_modifier_registry: RuntimeModifierRegistry = field(
+        default_factory=RuntimeModifierRegistry.empty
+    )
+
+    def __post_init__(self) -> None:
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(self.state) is not GameState:
+            raise GameLifecycleError("CommandPhaseStartEffectContext state must be GameState.")
+        if type(self.decisions) is not DecisionController:
+            raise GameLifecycleError(
+                "CommandPhaseStartEffectContext decisions must be DecisionController."
+            )
+        object.__setattr__(
+            self,
+            "active_player_id",
+            _validate_identifier("active_player_id", self.active_player_id),
+        )
+        if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
+            raise GameLifecycleError(
+                "CommandPhaseStartEffectContext runtime_modifier_registry must be a registry."
+            )
+        _validate_command_phase_start_state(self.state, active_player_id=self.active_player_id)
+
+
+@dataclass(frozen=True, slots=True)
 class CommandPhaseStartResultContext:
     state: GameState
     decisions: DecisionController
@@ -148,16 +187,26 @@ class CommandPhaseStartHookBinding:
     hook_id: str
     source_id: str
     handler: CommandPhaseStartHandler | None = None
+    effect_handler: CommandPhaseStartEffectHandler | None = None
     request_handler: CommandPhaseStartRequestHandler | None = None
     result_handler: CommandPhaseStartResultHandler | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "hook_id", _validate_identifier("hook_id", self.hook_id))
         object.__setattr__(self, "source_id", _validate_identifier("source_id", self.source_id))
-        if self.handler is None and self.request_handler is None and self.result_handler is None:
+        if (
+            self.handler is None
+            and self.effect_handler is None
+            and self.request_handler is None
+            and self.result_handler is None
+        ):
             raise GameLifecycleError("CommandPhaseStartHookBinding requires a handler.")
         if self.handler is not None and not callable(self.handler):
             raise GameLifecycleError("CommandPhaseStartHookBinding handler must be callable.")
+        if self.effect_handler is not None and not callable(self.effect_handler):
+            raise GameLifecycleError(
+                "CommandPhaseStartHookBinding effect_handler must be callable."
+            )
         if self.request_handler is not None and not callable(self.request_handler):
             raise GameLifecycleError(
                 "CommandPhaseStartHookBinding request_handler must be callable."
@@ -224,6 +273,27 @@ class CommandPhaseStartHookRegistry:
         if not requests:
             return None
         return requests[0]
+
+    def resolve_effects(
+        self,
+        context: CommandPhaseStartEffectContext,
+    ) -> LifecycleStatus | None:
+        from warhammer40k_core.engine.phase import LifecycleStatus
+
+        if type(context) is not CommandPhaseStartEffectContext:
+            raise GameLifecycleError("Command-phase start effect hooks require context.")
+        for binding in self.bindings:
+            if binding.effect_handler is None:
+                continue
+            status = binding.effect_handler(context)
+            if status is None:
+                continue
+            if type(status) is not LifecycleStatus:
+                raise GameLifecycleError(
+                    "Command-phase start effect handlers must return LifecycleStatus or None."
+                )
+            return status
+        return None
 
     def apply_result(
         self,

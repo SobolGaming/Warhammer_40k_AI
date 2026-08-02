@@ -3,14 +3,18 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Callable, Mapping
 from types import MappingProxyType
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserve_arrival_hooks import (
     ReserveArrivalDistanceHookRegistry,
     ReserveArrivalRestrictionHookRegistry,
 )
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.faction_rule_execution import FactionRuleNamedHandler
 
 
 def contribution_values[TContribution, TValue](
@@ -128,6 +132,47 @@ def validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...
         seen.add(identifier)
         identifiers.append(identifier)
     return tuple(sorted(identifiers))
+
+
+def validate_armies(armies: object) -> tuple[ArmyDefinition, ...]:
+    if type(armies) is not tuple:
+        raise GameLifecycleError("Runtime content bundle armies must be a tuple.")
+    validated: list[ArmyDefinition] = []
+    seen: set[str] = set()
+    for army in cast(tuple[object, ...], armies):
+        if type(army) is not ArmyDefinition:
+            raise GameLifecycleError("Runtime content bundle armies must contain ArmyDefinition.")
+        if army.player_id in seen:
+            raise GameLifecycleError("Runtime content bundle player IDs must be unique.")
+        seen.add(army.player_id)
+        validated.append(army)
+    return tuple(sorted(validated, key=lambda army: army.player_id))
+
+
+def validate_named_handlers(value: object) -> Mapping[str, FactionRuleNamedHandler]:
+    if not isinstance(value, Mapping):
+        raise GameLifecycleError("Runtime content named handlers must be a mapping.")
+    validated: dict[str, FactionRuleNamedHandler] = {}
+    for raw_handler_id, raw_handler in cast(Mapping[object, object], value).items():
+        handler_id = validate_identifier("faction handler id", raw_handler_id)
+        if not callable(raw_handler):
+            raise GameLifecycleError("Runtime content named handlers must be callable.")
+        if handler_id in validated:
+            raise GameLifecycleError("Runtime content named handler IDs must be unique.")
+        validated[handler_id] = cast("FactionRuleNamedHandler", raw_handler)
+    return MappingProxyType(validated)
+
+
+def merge_named_handlers(
+    handler_mappings: tuple[Mapping[str, FactionRuleNamedHandler], ...],
+) -> Mapping[str, FactionRuleNamedHandler]:
+    handlers: dict[str, FactionRuleNamedHandler] = {}
+    for handler_mapping in handler_mappings:
+        for handler_id, handler in validate_named_handlers(handler_mapping).items():
+            if handler_id in handlers:
+                raise GameLifecycleError("Runtime content faction handler IDs must be unique.")
+            handlers[handler_id] = handler
+    return MappingProxyType(handlers)
 
 
 def summary_hash(payload: Mapping[str, JsonValue]) -> str:

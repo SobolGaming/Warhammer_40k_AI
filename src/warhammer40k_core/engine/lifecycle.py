@@ -49,6 +49,10 @@ from warhammer40k_core.engine.catalog_movement_target_pair_runtime import (
     SELECT_CATALOG_MOVEMENT_TARGET_PAIR_DECISION_TYPE,
     invalid_catalog_movement_target_pair_status,
 )
+from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
+    SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE,
+    invalid_catalog_post_fight_hit_target_effect_status,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     SELECT_CATALOG_UNIT_MOVE_COMPLETED_MORTAL_WOUNDS_TARGET_DECISION_TYPE,
 )
@@ -169,6 +173,9 @@ from warhammer40k_core.engine.lifecycle_state_queries import (
 )
 from warhammer40k_core.engine.lifecycle_state_queries import (
     unarrived_reserve_unit_ids_for_player as _unarrived_reserve_unit_ids_for_player,
+)
+from warhammer40k_core.engine.lifecycle_state_validation import (
+    validate_disembarked_unit_state_consistency,
 )
 from warhammer40k_core.engine.mission_decisions import (
     MISSION_DECISION_TYPES,
@@ -388,6 +395,7 @@ _SHOOTING_DECISION_TYPES = frozenset(
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
         DICE_RESULT_OVERRIDE_DECISION_TYPE,
         DICE_REROLL_DECISION_TYPE,
+        SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE,
     )
 )
 _ATTACK_SEQUENCE_DECISION_TYPES = frozenset(
@@ -1941,6 +1949,14 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
+        if request.decision_type == SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE:
+            invalid_status = invalid_catalog_post_fight_hit_target_effect_status(
+                state=state,
+                request=request,
+                result=result,
+            )
+            if invalid_status is not None:
+                return invalid_status
         invalid_status = invalid_fight_phase_faction_rule_status(
             state=state,
             request=request,
@@ -3374,7 +3390,7 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     _validate_shooting_phase_state_consistency(state=state)
     _validate_charge_phase_state_consistency(state=state)
     _validate_fight_phase_state_consistency(state=state)
-    _validate_disembarked_unit_state_consistency(state=state)
+    validate_disembarked_unit_state_consistency(state=state)
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
     _validate_normal_move_state_consistency(state=state)
@@ -3821,29 +3837,6 @@ def _validate_advanced_unit_state_consistency(*, state: GameState) -> None:
             and advanced_state.unit_instance_id not in fully_removed_active_player_unit_ids
         ):
             raise GameLifecycleError("advanced_unit_states unit is not active player's unit.")
-
-
-def _validate_disembarked_unit_state_consistency(*, state: GameState) -> None:
-    if not state.disembarked_unit_states:
-        return
-    if state.stage is not GameLifecycleStage.BATTLE:
-        raise GameLifecycleError("disembarked_unit_states require battle stage.")
-    unit_owner_by_id = {
-        unit.unit_instance_id: army.player_id
-        for army in state.army_definitions
-        for unit in army.units
-    }
-    for disembarked_state in state.disembarked_unit_states:
-        owner = unit_owner_by_id.get(disembarked_state.unit_instance_id)
-        if owner is None:
-            raise GameLifecycleError("disembarked_unit_states unit is unknown.")
-        if owner != disembarked_state.player_id:
-            raise GameLifecycleError("disembarked_unit_states player drift.")
-        transport_owner = unit_owner_by_id.get(disembarked_state.transport_unit_instance_id)
-        if transport_owner is None:
-            raise GameLifecycleError("disembarked_unit_states transport unit is unknown.")
-        if transport_owner != disembarked_state.player_id:
-            raise GameLifecycleError("disembarked_unit_states transport owner drift.")
 
 
 def _validate_fell_back_unit_state_consistency(*, state: GameState) -> None:

@@ -23,6 +23,7 @@ from warhammer40k_core.engine.battle_shock_resolution import (
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
     CommandPhaseStartContext,
+    CommandPhaseStartEffectContext,
     CommandPhaseStartHookRegistry,
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
@@ -159,6 +160,17 @@ class CommandPhaseHandler:
                 command_phase_start_hooks=self.command_phase_start_hooks,
             )
             command_state = _command_step_state(state)
+        if not command_state.scoring_hooks_resolved:
+            command_start_effect_status = self.command_phase_start_hooks.resolve_effects(
+                CommandPhaseStartEffectContext(
+                    state=state,
+                    decisions=decisions,
+                    active_player_id=active_player_id,
+                    runtime_modifier_registry=self.runtime_modifier_registry,
+                )
+            )
+            if command_start_effect_status is not None:
+                return command_start_effect_status
         if not command_state.scoring_hooks_resolved:
             command_start_status = _request_command_phase_start_faction_rule_if_available(
                 state=state,
