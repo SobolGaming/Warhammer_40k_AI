@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from types import MappingProxyType
 from typing import TYPE_CHECKING, cast
 
@@ -12,12 +12,6 @@ from warhammer40k_core.engine.abilities import (
     AbilityCatalogRecord,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
-from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldRemovalKind,
-    BattlefieldTransitionBatch,
-    ModelRemovalRecord,
-    PlacementError,
-)
 from warhammer40k_core.engine.catalog_attack_context_rule_runtime import (
     CatalogDatasheetClauseSource,
     current_source_model_ids,
@@ -33,10 +27,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
     catalog_rule_record_source_matches_unit,
 )
-from warhammer40k_core.engine.damage_allocation import (
-    destroy_model_by_rule,
-    model_owner_player_id,
-)
+from warhammer40k_core.engine.damage_allocation import model_owner_player_id
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
@@ -61,6 +52,9 @@ from warhammer40k_core.engine.rule_execution import (
     generic_rule_effect_payload,
     rule_ir_from_execution_payload,
 )
+from warhammer40k_core.engine.rule_model_destruction import (
+    destroy_model_with_rule_reactions,
+)
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.rules.rule_ir import RuleClause, RuleIR
 
@@ -80,7 +74,7 @@ class _FightEndCandidate:
     rule_ir: RuleIR
     activation_clause: RuleClause
     destruction_clause: RuleClause
-    persisting_effect: PersistingEffect
+    persisting_effects: tuple[PersistingEffect, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -157,7 +151,7 @@ class CatalogSelectedToFightRiskRuntime:
             "rule_ir_hash": candidate.rule_ir.ir_hash(),
             "activation_clause_id": candidate.activation_clause.clause_id,
             "destruction_clause_id": candidate.destruction_clause.clause_id,
-            "persisting_effect_id": candidate.persisting_effect.effect_id,
+            "persisting_effect_ids": [effect.effect_id for effect in candidate.persisting_effects],
             "rules_unit_instance_id": candidate.rules_unit_instance_id,
         }
         return DecisionRequest(
@@ -197,7 +191,7 @@ class CatalogSelectedToFightRiskRuntime:
         ):
             return False
         result_payload = _object_payload(context.result.payload, "result")
-        effect_id = _payload_string(result_payload, "persisting_effect_id")
+        effect_ids = _payload_string_tuple(result_payload, "persisting_effect_ids")
         candidate = next(
             (
                 item
@@ -205,7 +199,7 @@ class CatalogSelectedToFightRiskRuntime:
                     state=context.state,
                     records=context.decisions.event_log.records,
                 )
-                if item.persisting_effect.effect_id == effect_id
+                if tuple(effect.effect_id for effect in item.persisting_effects) == effect_ids
             ),
             None,
         )
@@ -235,43 +229,19 @@ class CatalogSelectedToFightRiskRuntime:
         if model_id not in current_model_ids:
             return _invalid_result(context, "selected_to_fight_risk_model_state_drift")
 
-        placement_payload = _destroyed_model_placement_payload(
+        destruction = destroy_model_with_rule_reactions(
             state=context.state,
+            decisions=context.decisions,
             model_instance_id=model_id,
-        )
-        destroy_model_by_rule(state=context.state, model_instance_id=model_id)
-        removal_record = ModelRemovalRecord(
-            model_instance_id=model_id,
-            removal_kind=BattlefieldRemovalKind.DESTROYED,
-            source_phase=BattlePhase.FIGHT.value,
-            source_step="fight_phase_end",
+            rules_unit_instance_id=rules_unit_id,
+            destroying_player_id=candidate.owner_player_id,
             source_rule_id=candidate.rule_ir.source_id,
-            source_event_id=context.result.result_id,
+            source_effect_ids=effect_ids,
+            source_phase=BattlePhase.FIGHT,
+            source_step="fight_phase_end",
+            source_result_id=context.result.result_id,
         )
-        transition_batch = BattlefieldTransitionBatch(removals=(removal_record,))
-        destroyed_event = context.decisions.event_log.append(
-            _MODEL_DESTROYED_EVENT,
-            validate_json_value(
-                {
-                    "game_id": context.state.game_id,
-                    "battle_round": context.state.battle_round,
-                    "active_player_id": _active_player_id(context.state),
-                    "phase": BattlePhase.FIGHT.value,
-                    "destroying_player_id": candidate.owner_player_id,
-                    "target_unit_instance_id": rules_unit_id,
-                    "model_instance_id": model_id,
-                    "damage_kind": None,
-                    "damage_event_id": None,
-                    "source_rule_id": candidate.rule_ir.source_id,
-                    "source_effect_id": candidate.persisting_effect.effect_id,
-                    "removal_record": removal_record.to_payload(),
-                    "transition_batch": transition_batch.to_payload(),
-                    "destroyed_model_placement": placement_payload,
-                    "destroyed_model_rules_triggered": True,
-                }
-            ),
-        )
-        context.state.remove_persisting_effects_by_id((candidate.persisting_effect.effect_id,))
+        _consume_liability_for_target(state=context.state, candidate=candidate)
         context.decisions.event_log.append(
             _RESOLVED_EVENT,
             validate_json_value(
@@ -285,16 +255,16 @@ class CatalogSelectedToFightRiskRuntime:
                     "rule_ir_hash": candidate.rule_ir.ir_hash(),
                     "activation_clause_id": candidate.activation_clause.clause_id,
                     "destruction_clause_id": candidate.destruction_clause.clause_id,
-                    "persisting_effect_id": candidate.persisting_effect.effect_id,
+                    "persisting_effect_ids": list(effect_ids),
                     "rules_unit_instance_id": rules_unit_id,
                     "destroyed_model_instance_id": model_id,
-                    "model_destroyed_event_id": destroyed_event.event_id,
+                    "model_destroyed_event_id": destruction.model_destroyed_event_id,
                     "request_id": context.request.request_id,
                     "result_id": context.result.result_id,
                 }
             ),
         )
-        return True
+        return True if destruction.status is None else destruction.status
 
     def _grant_handler(
         self,
@@ -440,7 +410,18 @@ class CatalogSelectedToFightRiskRuntime:
         state: GameState,
         records: tuple[EventRecord, ...],
     ) -> tuple[_FightEndCandidate, ...]:
-        candidates: list[_FightEndCandidate] = []
+        candidates_by_key: dict[
+            tuple[str, str, str, str],
+            tuple[
+                str,
+                str,
+                AbilityCatalogRecord,
+                RuleIR,
+                RuleClause,
+                RuleClause,
+                list[PersistingEffect],
+            ],
+        ] = {}
         record_rows = self._records_with_risk()
         for effect in state.persisting_effects:
             for owner_id, record, rule_ir, activation_clause, destruction_clause in record_rows:
@@ -452,36 +433,58 @@ class CatalogSelectedToFightRiskRuntime:
                     activation_clause=activation_clause,
                 ):
                     continue
-                if len(effect.target_unit_instance_ids) != 1:
-                    raise GameLifecycleError(
-                        "Selected-to-fight risk effect must target exactly one rules unit."
-                    )
-                unit_id = effect.target_unit_instance_ids[0]
-                if _enemy_model_was_destroyed_by_unit_attacks(
-                    state=state,
-                    records=records,
+                for unit_id in effect.target_unit_instance_ids:
+                    key = (owner_id, rule_ir.source_id, rule_ir.ir_hash(), unit_id)
+                    existing = candidates_by_key.get(key)
+                    if existing is None:
+                        candidates_by_key[key] = (
+                            owner_id,
+                            unit_id,
+                            record,
+                            rule_ir,
+                            activation_clause,
+                            destruction_clause,
+                            [effect],
+                        )
+                        continue
+                    existing[6].append(effect)
+        candidates: list[_FightEndCandidate] = []
+        for (
+            owner_id,
+            unit_id,
+            record,
+            rule_ir,
+            activation_clause,
+            destruction_clause,
+            effects,
+        ) in candidates_by_key.values():
+            effect_tuple = tuple(sorted(effects, key=lambda item: item.effect_id))
+            if _enemy_model_was_destroyed_by_unit_attacks(
+                state=state,
+                records=records,
+                owner_player_id=owner_id,
+                rules_unit_instance_id=unit_id,
+                persisting_effects=effect_tuple,
+            ):
+                continue
+            candidates.append(
+                _FightEndCandidate(
                     owner_player_id=owner_id,
                     rules_unit_instance_id=unit_id,
-                ):
-                    continue
-                candidates.append(
-                    _FightEndCandidate(
-                        owner_player_id=owner_id,
-                        rules_unit_instance_id=unit_id,
-                        record=record,
-                        rule_ir=rule_ir,
-                        activation_clause=activation_clause,
-                        destruction_clause=destruction_clause,
-                        persisting_effect=effect,
-                    )
+                    record=record,
+                    rule_ir=rule_ir,
+                    activation_clause=activation_clause,
+                    destruction_clause=destruction_clause,
+                    persisting_effects=effect_tuple,
                 )
+            )
         return tuple(
             sorted(
                 candidates,
                 key=lambda item: (
                     item.owner_player_id,
                     item.rules_unit_instance_id,
-                    item.persisting_effect.effect_id,
+                    tuple(effect.effect_id for effect in item.persisting_effects),
                 ),
             )
         )
@@ -524,9 +527,13 @@ def _enemy_model_was_destroyed_by_unit_attacks(
     records: tuple[EventRecord, ...],
     owner_player_id: str,
     rules_unit_instance_id: str,
+    persisting_effects: tuple[PersistingEffect, ...],
 ) -> bool:
-    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=rules_unit_instance_id)
-    model_ids = {model.model_instance_id for model in rules_unit.own_models}
+    attack_lineage = _liability_attack_lineage(
+        state=state,
+        rules_unit_instance_id=rules_unit_instance_id,
+        persisting_effects=persisting_effects,
+    )
     for event in records:
         if event.event_type != _MODEL_DESTROYED_EVENT:
             continue
@@ -535,13 +542,18 @@ def _enemy_model_was_destroyed_by_unit_attacks(
             payload.get("game_id") != state.game_id
             or payload.get("battle_round") != state.battle_round
             or payload.get("phase") != BattlePhase.FIGHT.value
+            or payload.get("active_player_id") != _active_player_id(state)
             or payload.get("destroying_player_id") != owner_player_id
         ):
             continue
+        attacking_unit_id = payload.get("attacking_unit_instance_id")
         attacking_model_id = payload.get("attacking_model_instance_id")
         target_unit_id = payload.get("target_unit_instance_id")
         destroyed_model_id = payload.get("model_instance_id")
-        if type(attacking_model_id) is not str or attacking_model_id not in model_ids:
+        if type(attacking_unit_id) is not str or type(attacking_model_id) is not str:
+            continue
+        allowed_model_ids = attack_lineage.get(attacking_unit_id)
+        if allowed_model_ids is None or attacking_model_id not in allowed_model_ids:
             continue
         if type(target_unit_id) is not str:
             raise GameLifecycleError("Attack model_destroyed event target unit is invalid.")
@@ -558,19 +570,91 @@ def _enemy_model_was_destroyed_by_unit_attacks(
     return False
 
 
-def _destroyed_model_placement_payload(
+def _liability_attack_lineage(
     *,
     state: GameState,
-    model_instance_id: str,
-) -> JsonValue:
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Rule model destruction requires battlefield state.")
-    try:
-        placement = battlefield.model_placement_by_id(model_instance_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Rule model destruction requires a placed model.") from exc
-    return validate_json_value(placement.to_payload())
+    rules_unit_instance_id: str,
+    persisting_effects: tuple[PersistingEffect, ...],
+) -> dict[str, frozenset[str]]:
+    current_component_ids = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=rules_unit_instance_id,
+    ).component_unit_instance_ids
+    lineage = {
+        rules_unit_instance_id: _model_ids_for_units(
+            state=state,
+            unit_instance_ids=current_component_ids,
+        )
+    }
+    for effect in persisting_effects:
+        for origin_id in _effect_original_target_ids(effect):
+            starting_record = next(
+                (
+                    record
+                    for record in state.starting_attached_unit_records
+                    if record.attached_unit_instance_id == origin_id
+                ),
+                None,
+            )
+            origin_component_ids = (
+                starting_record.component_unit_instance_ids
+                if starting_record is not None
+                else rules_unit_view_by_id(
+                    state=state,
+                    unit_instance_id=origin_id,
+                ).component_unit_instance_ids
+            )
+            lineage[origin_id] = _model_ids_for_units(
+                state=state,
+                unit_instance_ids=origin_component_ids,
+            )
+    return lineage
+
+
+def _model_ids_for_units(
+    *,
+    state: GameState,
+    unit_instance_ids: tuple[str, ...],
+) -> frozenset[str]:
+    requested_ids = set(unit_instance_ids)
+    return frozenset(
+        model.model_instance_id
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id in requested_ids
+        for model in unit.own_models
+    )
+
+
+def _effect_original_target_ids(effect: PersistingEffect) -> tuple[str, ...]:
+    payload = effect.effect_payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Selected-to-fight risk effect payload must be an object.")
+    target_ids = payload.get("target_unit_instance_ids")
+    if not isinstance(target_ids, list) or not all(
+        type(unit_id) is str and unit_id for unit_id in target_ids
+    ):
+        raise GameLifecycleError("Selected-to-fight risk original targets are invalid.")
+    return tuple(cast(list[str], target_ids))
+
+
+def _consume_liability_for_target(
+    *,
+    state: GameState,
+    candidate: _FightEndCandidate,
+) -> None:
+    effect_ids = tuple(effect.effect_id for effect in candidate.persisting_effects)
+    state.remove_persisting_effects_by_id(effect_ids)
+    for effect in candidate.persisting_effects:
+        remaining_targets = tuple(
+            unit_id
+            for unit_id in effect.target_unit_instance_ids
+            if unit_id != candidate.rules_unit_instance_id
+        )
+        if remaining_targets:
+            state.record_persisting_effect(
+                replace(effect, target_unit_instance_ids=remaining_targets)
+            )
 
 
 def catalog_selected_to_fight_risk_end_hook_bindings(

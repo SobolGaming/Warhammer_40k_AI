@@ -6,6 +6,9 @@ from typing import cast
 
 import pytest
 from tests.setup_completion_helpers import enter_battle_for_fixture
+from tests.support.selected_to_fight_risk_fixtures import (
+    attached_selected_to_fight_risk_fixture,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceRollResult, RollOffRequest
@@ -24,6 +27,10 @@ from warhammer40k_core.engine.effects import (
     effect_expiration_kind_from_token,
 )
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
+from warhammer40k_core.engine.fight_phase_end_hooks import (
+    FightPhaseEndRequestContext,
+    FightPhaseEndResultContext,
+)
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
@@ -613,6 +620,80 @@ def test_persisting_effect_survives_attached_unit_split() -> None:
     )
     assert state.persisting_effects_for_unit("army-alpha:intercessor-unit-1") == (expected,)
     assert state.persisting_effects_for_unit("army-alpha:intercessor-unit-2") == (expected,)
+
+
+def test_selected_to_fight_risk_split_creates_one_liability_per_survivor() -> None:
+    state, runtime, decisions, bodyguard, leader, _enemy, _attached_id = (
+        attached_selected_to_fight_risk_fixture()
+    )
+    first = runtime.next_fight_phase_end_request(
+        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    )
+    assert first is not None
+    decisions.request_decision(first)
+    record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="attached-risk-first-destruction",
+            request=first,
+            selected_option_id=first.options[0].option_id,
+        )
+    )
+    assert (
+        runtime.apply_fight_phase_end_result(
+            FightPhaseEndResultContext(
+                state=state, decisions=decisions, request=record.request, result=record.result
+            )
+        )
+        is True
+    )
+    second = runtime.next_fight_phase_end_request(
+        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    )
+    assert second is not None
+    first_unit = cast(str, cast(dict[str, JsonValue], first.payload)["rules_unit_instance_id"])
+    second_unit = cast(str, cast(dict[str, JsonValue], second.payload)["rules_unit_instance_id"])
+    assert {first_unit, second_unit} == {bodyguard.unit_instance_id, leader.unit_instance_id}
+    assert len(state.persisting_effects) == 2
+
+
+@pytest.mark.parametrize(
+    ("attacking_unit_kind", "expected_candidate_kind"),
+    [("attached", None), ("bodyguard", "leader")],
+)
+def test_selected_to_fight_risk_split_preserves_exact_attack_lineage(
+    attacking_unit_kind: str,
+    expected_candidate_kind: str | None,
+) -> None:
+    state, runtime, decisions, bodyguard, leader, enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture()
+    )
+    attacking_unit_id = (
+        attached_id if attacking_unit_kind == "attached" else bodyguard.unit_instance_id
+    )
+    decisions.event_log.append(
+        "model_destroyed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": BattlePhase.FIGHT.value,
+            "destroying_player_id": "player-source",
+            "attacking_unit_instance_id": attacking_unit_id,
+            "attacking_model_instance_id": bodyguard.own_models[0].model_instance_id,
+            "target_unit_instance_id": enemy.unit_instance_id,
+            "model_instance_id": enemy.own_models[0].model_instance_id,
+        },
+    )
+    request = runtime.next_fight_phase_end_request(
+        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    )
+    if expected_candidate_kind is None:
+        assert request is None
+        return
+    assert request is not None
+    assert cast(dict[str, JsonValue], request.payload)["rules_unit_instance_id"] == (
+        leader.unit_instance_id
+    )
 
 
 def test_persisting_effects_expire_at_deterministic_lifecycle_boundaries() -> None:

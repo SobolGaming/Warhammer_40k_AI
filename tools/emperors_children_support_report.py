@@ -196,11 +196,13 @@ _DATASHEET_REVIEW_ROWS = (
         ir_coverage="All consumed",
         supported_semantics=(
             "Daemonic Patrons uses an optional selected-to-fight decision, persists a Critical "
-            "Wound 3+ threshold through the Fight phase, attributes enemy model destruction to "
-            "attacks by models in the affected rules unit, and destroys one controller-selected "
-            "model at Fight-phase end if no such enemy model was destroyed. The Thrill Seekers "
-            "army-rule handler and the updated Blissblade Attacks characteristic are also "
-            "implemented."
+            "Wound 3+ threshold through the Fight phase, groups repeated uses into one liability "
+            "per current rules unit, attributes enemy model destruction only to that unit's "
+            "attacks in the current player's Fight phase, preserves pre-split Attached Unit "
+            "lineage, and destroys one controller-selected model through the shared "
+            "destruction-reaction path if no qualifying enemy model was destroyed. The Thrill "
+            "Seekers army-rule handler and the updated Blissblade Attacks characteristic are "
+            "also implemented."
         ),
         semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(

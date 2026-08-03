@@ -15,6 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
     ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
@@ -438,6 +439,13 @@ class FightPhaseHandler:
                 decisions=decisions,
             )
             return None
+        if result.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE:
+            request = decisions.record_for_result(result).request
+            if rule_model_destruction.is_rule_model_destruction_reaction_request(request):
+                rule_model_destruction.apply_rule_model_destruction_reaction_decision(
+                    state=state, decisions=decisions, result=result
+                )
+                return None
         if result.decision_type in ATTACK_ALLOCATION_DECISION_TYPES:
             return _apply_fight_attack_sequence_decision(
                 handler=self,

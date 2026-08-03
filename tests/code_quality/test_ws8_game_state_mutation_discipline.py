@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE_ROOT = ROOT / "src" / "warhammer40k_core" / "engine"
 GAME_STATE_PATH = ENGINE_ROOT / "game_state.py"
+RULE_MODEL_DESTRUCTION_PATH = ENGINE_ROOT / "rule_model_destruction.py"
 
 # Defense-in-depth audit for the production pattern used today: functions that name
 # `state: GameState` and directly assign `state.field = ...`. It does not attempt
@@ -26,6 +27,25 @@ def test_engine_game_state_mutations_go_through_game_state_methods() -> None:
     assert not violations, (
         "Engine modules outside game_state.py must mutate GameState through narrow "
         "GameState mutator methods:\n" + "\n".join(violations)
+    )
+
+
+def test_direct_rule_model_destruction_uses_shared_reaction_host() -> None:
+    violations: list[str] = []
+    for path in sorted(ENGINE_ROOT.rglob("*.py")):
+        if path == RULE_MODEL_DESTRUCTION_PATH:
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        violations.extend(
+            f"{path.relative_to(ROOT).as_posix()}:{node.lineno}"
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "destroy_model_by_rule"
+        )
+    assert not violations, (
+        "Direct rule destruction must use destroy_model_with_rule_reactions:\n"
+        + "\n".join(violations)
     )
 
 

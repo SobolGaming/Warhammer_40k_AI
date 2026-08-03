@@ -72,7 +72,12 @@ from warhammer40k_core.engine.critical_wounds import (
     WoundRollCriticalThresholdContext,
     generic_rule_critical_wound_threshold,
 )
-from warhammer40k_core.engine.damage_allocation import model_by_id
+from warhammer40k_core.engine.damage_allocation import (
+    DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+    DestructionReactionKind,
+    DestructionReactionSource,
+    model_by_id,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -114,6 +119,7 @@ from warhammer40k_core.engine.phase import (
     BattlePhase,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.phases.fight import FightPhaseHandler
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
@@ -1109,6 +1115,9 @@ def test_daemonic_patrons_grant_critical_wounds_and_destroy_a_model_after_no_kil
             effect_payload=grants[0].unit_effect_payload,
         )
     )
+    state.record_persisting_effect(
+        replace(state.persisting_effects[0], effect_id="daemonic-patrons-effect-repeat")
+    )
     assert (
         generic_rule_critical_wound_threshold(
             WoundRollCriticalThresholdContext(
@@ -1131,6 +1140,10 @@ def test_daemonic_patrons_grant_critical_wounds_and_destroy_a_model_after_no_kil
     assert request is not None
     assert request.actor_id == "player-source"
     assert len(request.options) == 1
+    assert cast(dict[str, JsonValue], request.payload)["persisting_effect_ids"] == [
+        "daemonic-patrons-effect",
+        "daemonic-patrons-effect-repeat",
+    ]
     assert type(request).from_payload(request.to_payload()) == request
     result = DecisionResult.for_request(
         result_id="daemonic-patrons-destroy-result",
@@ -1155,6 +1168,9 @@ def test_daemonic_patrons_grant_critical_wounds_and_destroy_a_model_after_no_kil
         model_instance_id=source.own_models[0].model_instance_id,
     ).is_alive
 
+    state.clear_model_destruction_reaction_sources(
+        model_instance_id=source.own_models[0].model_instance_id
+    )
     decisions.request_decision(request)
     record = decisions.submit_result(result)
     assert (
@@ -1174,6 +1190,7 @@ def test_daemonic_patrons_grant_critical_wounds_and_destroy_a_model_after_no_kil
     ).is_alive
     assert state.battlefield_state is not None
     assert source.own_models[0].model_instance_id not in state.battlefield_state.placed_model_ids()
+    assert not state.persisting_effects
     assert any(record.event_type == "model_destroyed" for record in decisions.event_log.records)
     assert "object at 0x" not in json.dumps(
         {"state": state.to_payload(), "decisions": decisions.to_payload()},
@@ -1188,8 +1205,10 @@ def test_daemonic_patrons_counts_only_enemy_models_destroyed_by_that_units_attac
     base_payload = {
         "game_id": state.game_id,
         "battle_round": 1,
+        "active_player_id": "player-source",
         "phase": BattlePhase.FIGHT.value,
         "destroying_player_id": "player-source",
+        "attacking_unit_instance_id": source.unit_instance_id,
         "attacking_model_instance_id": source.own_models[0].model_instance_id,
     }
     decisions.event_log.append(
@@ -1213,6 +1232,7 @@ def test_daemonic_patrons_counts_only_enemy_models_destroyed_by_that_units_attac
         validate_json_value(
             {
                 **base_payload,
+                "active_player_id": "player-enemy",
                 "target_unit_instance_id": enemy.unit_instance_id,
                 "model_instance_id": enemy.own_models[0].model_instance_id,
             }
@@ -1221,6 +1241,77 @@ def test_daemonic_patrons_counts_only_enemy_models_destroyed_by_that_units_attac
     assert (
         runtime.next_fight_phase_end_request(
             FightPhaseEndRequestContext(state=state, decisions=decisions)
+        )
+        is not None
+    )
+    decisions.event_log.append(
+        "model_destroyed",
+        validate_json_value(
+            {
+                **base_payload,
+                "target_unit_instance_id": enemy.unit_instance_id,
+                "model_instance_id": enemy.own_models[0].model_instance_id,
+            }
+        ),
+    )
+    assert (
+        runtime.next_fight_phase_end_request(
+            FightPhaseEndRequestContext(state=state, decisions=decisions)
+        )
+        is None
+    )
+
+
+def test_daemonic_patrons_destruction_routes_optional_reactions_and_physical_unit() -> None:
+    state, runtime, source, _enemy, _profile = _daemonic_patrons_runtime_fixture()
+    decisions = DecisionController()
+    _record_daemonic_patrons_effect(state=state, runtime=runtime, source=source)
+    model_id = source.own_models[0].model_instance_id
+    reaction_source = DestructionReactionSource(
+        source_id="test:daemonic-patrons:fight-on-death",
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+        source_rule_id="test:daemonic-patrons:fight-on-death",
+    )
+    state.clear_model_destruction_reaction_sources(model_instance_id=model_id)
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=model_id, sources=(reaction_source,)
+    )
+    request = runtime.next_fight_phase_end_request(
+        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    decisions.request_decision(request)
+    record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="daemonic-patrons-reaction-destruction",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+    )
+    status = runtime.apply_fight_phase_end_result(
+        FightPhaseEndResultContext(
+            state=state, decisions=decisions, request=record.request, result=record.result
+        )
+    )
+    assert type(status) is not bool
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    destroyed = next(
+        item for item in decisions.event_log.records if item.event_type == "model_destroyed"
+    )
+    assert cast(dict[str, JsonValue], destroyed.payload)["target_unit_instance_id"] == (
+        source.unit_instance_id
+    )
+    reaction_request = decisions.queue.peek_next()
+    reaction_record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="daemonic-patrons-decline-reaction",
+            request=reaction_request,
+            selected_option_id=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+        )
+    )
+    assert (
+        FightPhaseHandler().apply_decision(
+            state=state, decisions=decisions, result=reaction_record.result
         )
         is None
     )

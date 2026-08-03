@@ -16,6 +16,7 @@ from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import fight_activation_abilities as _fa
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
+from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_muster_consistency import validate_mustered_army_consistency
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -3335,6 +3336,10 @@ def _invalid_destruction_reaction_status(
     )
     if invalid_status is not None:
         return invalid_status
+    if rule_model_destruction.is_rule_model_destruction_reaction_request(request):
+        return rule_model_destruction.invalid_rule_model_destruction_reaction_status(
+            state=state, request=request, result=result
+        )
     request_payload = request.payload
     if not isinstance(request_payload, Mapping):
         raise GameLifecycleError("Destruction reaction request payload must be an object.")
