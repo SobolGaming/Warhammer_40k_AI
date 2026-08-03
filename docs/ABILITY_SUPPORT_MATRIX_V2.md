@@ -253,6 +253,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:can-fallback-and-shoot` | No current generated rows |
 | `catalog-ir:charge-roll-modifier` | Instrument of Chaos |
 | `catalog-ir:charge-roll-reroll` | No current generated rows |
+| `catalog-ir:command-phase-ability-mode` | Beguiling Form<br>Daemon Primarch of Slaanesh<br>Daemonic Speed<br>Enthralling Hypnosis (Aura) |
 | `catalog-ir:command-point-gain` | Diviner of Futures |
 | `catalog-ir:command-restoration` | Tears of Isha (Psychic) |
 | `catalog-ir:conditional-ability:lone-operative` | Daemonic Lord<br>Spiritseer |
@@ -302,13 +303,15 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:movement-end-reactive-normal-move` | Path of the Outcast |
 | `catalog-ir:movement-end-selected-target-effect` | Doom (Psychic) |
 | `catalog-ir:movement-friendly-enemy-target-pair` | Spirit Mark (Psychic) |
-| `catalog-ir:movement-transit-permission` | Extreme Mobility<br>Scuttling Walker |
+| `catalog-ir:movement-transit-permission` | Extreme Mobility<br>Scuttling Walker<br>Serpentine |
 | `catalog-ir:named-weapon-ability-choice` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
 | `catalog-ir:once-per-battle-ability` | Malefic Destruction<br>Unholy Vigour |
 | `catalog-ir:passive-hit-reroll` | Reavers of the Void |
-| `catalog-ir:post-shoot-hit-target-effect` | Crystalline Targeting<br>Fury of the Void (Psychic)<br>Harassment Fire<br>Monofilament Web |
+| `catalog-ir:poisoned-command-mortal-wounds` | Daemonic Poisons |
+| `catalog-ir:post-fight-hit-target-effect` | Daemonic Poisons |
+| `catalog-ir:post-shoot-hit-target-effect` | Crystalline Targeting<br>Daemonic Poisons<br>Fury of the Void (Psychic)<br>Harassment Fire<br>Monofilament Web |
 | `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth<br>Target Acquisition |
 | `catalog-ir:prebattle-redeploy-permission` | Prince of Corsairs |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |

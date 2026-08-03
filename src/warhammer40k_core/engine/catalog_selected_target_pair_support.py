@@ -372,7 +372,9 @@ def selected_target_effect_uses_unit_context(
         raise GameLifecycleError("Selected-target unit-context resolution requires RuleIR values.")
     if effect not in clause.effects:
         raise GameLifecycleError("Selected-target unit-context effect is not owned by the clause.")
-    return _selected_target_unit_modifier_is_supported(effect, clause=clause)
+    return _selected_target_unit_modifier_is_supported(
+        effect, clause=clause
+    ) or _selected_target_poison_status_is_supported(effect, clause=clause)
 
 
 def clause_has_immediate_selected_target_effect(clause: RuleClause) -> bool:
@@ -705,12 +707,33 @@ def _selected_target_effect_is_supported(
             frozenset(parameters) == frozenset({"ability"})
             and parameters.get("ability") == "stealth"
         )
+    elif effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        return _selected_target_poison_status_is_supported(effect, clause=clause)
     else:
         return False
     return (
         effect_is_supported
         and _resolved_effect_attack_role(clause=clause, effect=effect) is not None
         and _effect_weapon_scope_matches_attack_kind(clause=clause, effect=effect)
+    )
+
+
+def _selected_target_poison_status_is_supported(
+    effect: RuleEffectSpec,
+    *,
+    clause: RuleClause,
+) -> bool:
+    return (
+        effect.kind is RuleEffectKind.SET_CONTEXTUAL_STATUS
+        and parameter_payload(effect.parameters)
+        == {
+            "command_phase_mortal_wounds": "D3",
+            "command_phase_roll_threshold": 4,
+            "command_phase_timing": "start_each_players_command_phase",
+            "status": "poisoned",
+        }
+        and clause.duration is not None
+        and clause.duration.kind is RuleDurationKind.PERMANENT
     )
 
 

@@ -630,7 +630,7 @@ class RuntimeContentContribution:
         object.__setattr__(
             self,
             "faction_named_handlers",
-            _validate_named_handlers(faction_named_handlers),
+            _bundle_validation.validate_named_handlers(faction_named_handlers),
         )
 
     @property
@@ -1046,7 +1046,9 @@ def combine_runtime_content_contributions(
             ),
             lambda binding: binding.modifier_id,
         ),
-        faction_named_handlers=_merged_named_handlers(validated_contributions),
+        faction_named_handlers=_bundle_validation.merge_named_handlers(
+            tuple(contribution.faction_named_handlers for contribution in validated_contributions)
+        ),
     )
 
 
@@ -1293,7 +1295,7 @@ class RuntimeContentBundle:
             raise GameLifecycleError("Runtime content bundle requires activation.")
         if type(include_unselected_faction_execution_records) is not bool:
             raise GameLifecycleError("Runtime content faction execution scope flag is invalid.")
-        validated_armies = _validate_armies(armies)
+        validated_armies = _bundle_validation.validate_armies(armies)
         if type(catalog) is not ArmyCatalog:
             raise GameLifecycleError("Runtime content bundle requires ArmyCatalog.")
         validated_contributions = _validate_contributions(contributions)
@@ -1335,7 +1337,9 @@ class RuntimeContentBundle:
                 lambda contribution: contribution.rule_runtime_bindings,
             ),
         )
-        named_handlers = _merged_named_handlers(validated_contributions)
+        named_handlers = _bundle_validation.merge_named_handlers(
+            tuple(contribution.faction_named_handlers for contribution in validated_contributions)
+        )
         available_records = (
             _xrecords() if faction_execution_records is None else faction_execution_records
         )
@@ -1602,6 +1606,7 @@ class RuntimeContentBundle:
         mortal_wound_feel_no_pain_hook_registry = (
             MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
                 (
+                    *catalog_generic_hooks.mortal_wound_feel_no_pain(ability_indexes_by_player_id),
                     *generic_rule_lifecycle_hooks.mortal_wound_feel_no_pain_hook_bindings(
                         activation=activation,
                         execution_records=records,
@@ -1791,6 +1796,7 @@ class RuntimeContentBundle:
                 lambda contribution: contribution.unit_characteristic_modifier_bindings,
             ),
             hit_roll_modifier_bindings=catalog_rules.hit_roll_modifier_bindings()
+            + catalog_generic_hooks.hit_roll_modifiers(ability_indexes_by_player_id)
             + _contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.hit_roll_modifier_bindings,
@@ -1934,33 +1940,6 @@ def _validate_contributions(contributions: object) -> tuple[RuntimeContentContri
     return _validate_runtime_contributions(contributions, RuntimeContentContribution)
 
 
-def _validate_armies(armies: object) -> tuple[ArmyDefinition, ...]:
-    if type(armies) is not tuple:
-        raise GameLifecycleError("Runtime content bundle armies must be a tuple.")
-    validated: list[ArmyDefinition] = []
-    seen: set[str] = set()
-    for army in cast(tuple[object, ...], armies):
-        if type(army) is not ArmyDefinition:
-            raise GameLifecycleError("Runtime content bundle armies must contain ArmyDefinition.")
-        if army.player_id in seen:
-            raise GameLifecycleError("Runtime content bundle player IDs must be unique.")
-        seen.add(army.player_id)
-        validated.append(army)
-    return tuple(sorted(validated, key=lambda army: army.player_id))
-
-
-def _merged_named_handlers(
-    contributions: tuple[RuntimeContentContribution, ...],
-) -> Mapping[str, FactionRuleNamedHandler]:
-    handlers: dict[str, FactionRuleNamedHandler] = {}
-    for contribution in contributions:
-        for handler_id, handler in contribution.faction_named_handlers.items():
-            if handler_id in handlers:
-                raise GameLifecycleError("Runtime content faction handler IDs must be unique.")
-            handlers[handler_id] = handler
-    return MappingProxyType(handlers)
-
-
 def _selected_faction_execution_records(
     available_records: tuple[_Phase17FExecutionRecord, ...],
     selected_execution_record_ids: tuple[str, ...],
@@ -1983,17 +1962,3 @@ def _selected_faction_execution_records(
             f"Runtime content selected unknown faction execution records: {', '.join(missing_ids)}."
         )
     return tuple(records_by_id[execution_id] for execution_id in sorted(selected_ids))
-
-
-def _validate_named_handlers(value: object) -> Mapping[str, FactionRuleNamedHandler]:
-    if not isinstance(value, Mapping):
-        raise GameLifecycleError("Runtime content named handlers must be a mapping.")
-    validated: dict[str, FactionRuleNamedHandler] = {}
-    for raw_handler_id, raw_handler in cast(Mapping[object, object], value).items():
-        handler_id = _validate_identifier("faction handler id", raw_handler_id)
-        if not callable(raw_handler):
-            raise GameLifecycleError("Runtime content named handlers must be callable.")
-        if handler_id in validated:
-            raise GameLifecycleError("Runtime content named handler IDs must be unique.")
-        validated[handler_id] = cast(FactionRuleNamedHandler, raw_handler)
-    return MappingProxyType(validated)

@@ -56,19 +56,22 @@ _DATASHEET_REVIEW_ROWS = (
         group=_EMPERORS_CHILDREN_GROUP,
         datasheet="Fulgrim",
         datasheet_id="000004077",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All consumed",
         supported_semantics=(
-            "Deadly Demise D6, Deep Strike, Supreme Commander mustering, and the Thrill Seekers "
-            "army-rule handler are implemented generic or faction paths."
+            "Deadly Demise D6, Daemonic Poisons post-Shooting and post-Fight selection plus "
+            "persistent Command-phase mortal wounds, Daemon Primarch of Slaanesh mode "
+            "selection, Beguiling Form hit modifier, Daemonic Speed Fights First, Deep Strike, "
+            "Enthralling Hypnosis (Aura) Fall Back Leadership denial, Serpentine terrain "
+            "transit, Supreme Commander mustering, and the Thrill Seekers army-rule handler "
+            "are implemented source-backed generic or faction paths."
         ),
-        semantics_needed=(
-            "Daemonic Poisons persistent target state and Command-phase mortal wounds; Daemon "
-            "Primarch of Slaanesh mode selection; Beguiling Form hit modifier; Daemonic Speed "
-            "Fights First; Enthralling Hypnosis (Aura) Fall Back test and denial; Serpentine "
-            "4-inch terrain-transit permission. The source overlay carries the authoritative "
-            "updated Serpentine text."
+        semantics_needed="None in the exact source ability rows.",
+        catalog_blockers=(
+            "No known Fulgrim blocker; catalog, model geometry, wargear, weapon-keyword, "
+            "datasheet-ability, and Thrill Seekers runtime-consumption evidence are Full. "
+            "The generated overall row remains Playable while faction-wide detachment "
+            "interaction coverage is partial."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_EMPERORS_CHILDREN_GROUP,
@@ -470,7 +473,8 @@ def emperors_children_secondary_reference_audit_markdown(
                     f"**{_markdown_text(discrepancy.source_assignment_name)}:** "
                     f"{_markdown_text(discrepancy.discrepancy_reason)} The official source "
                     "assignment remains authoritative, so this report retains the rule and "
-                    "categorizes its runtime semantics as still needed."
+                    "records its source-backed runtime semantics as consumed where reported "
+                    "in the datasheet support table below."
                 ),
                 "",
             )
@@ -825,7 +829,7 @@ def emperors_children_datasheet_support_markdown(
         raise ValueError(
             "Emperor's Children datasheet semantic review must cover every manifest row exactly."
         )
-    if generated_support_datasheet_ids != frozenset({"000004208"}):
+    if generated_support_datasheet_ids != frozenset({"000004077", "000004208"}):
         raise ValueError(
             "Emperor's Children generated support-row inventory changed; review the custom "
             "datasheet evidence before regenerating documentation."

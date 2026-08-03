@@ -144,6 +144,10 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
             InteractionKind.ENTITY_SELECTION,
             ("target_unit",),
         ),
+        "select_catalog_post_fight_hit_target_effect": InteractionSpec(
+            InteractionKind.ENTITY_SELECTION,
+            ("target_unit",),
+        ),
         "select_catalog_post_shoot_hit_target_status": InteractionSpec(
             InteractionKind.ENTITY_SELECTION,
             ("target_unit",),

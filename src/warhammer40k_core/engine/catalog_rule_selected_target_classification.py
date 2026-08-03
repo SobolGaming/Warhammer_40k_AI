@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import cast
 
 from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import (
+    post_fight_selected_target_effect_clauses_after,
     post_shoot_selected_target_effect_clauses_after,
 )
 from warhammer40k_core.engine.catalog_selected_target_pair_support import (
@@ -27,6 +28,7 @@ from warhammer40k_core.rules.rule_ir import (
 
 CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID = "catalog-ir:selected-target-effect"
 CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID = "catalog-ir:post-shoot-hit-target-effect"
+CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID = "catalog-ir:post-fight-hit-target-effect"
 CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID = (
     "catalog-ir:shooting-start-selected-target-effect"
 )
@@ -48,6 +50,17 @@ _POST_SHOOT_FILTERED_TRIGGER_KEYS = _POST_SHOOT_TRIGGER_KEYS | {
     "attacker_model_reference",
     "weapon_names",
 }
+_POST_FIGHT_FILTERED_TRIGGER_KEYS = frozenset(
+    {
+        "attacker_model_reference",
+        "edge",
+        "owner",
+        "phase",
+        "subject",
+        "target_relationship",
+        "timing_window",
+    }
+)
 
 
 def rule_has_fight_start_selected_target_effect(rule_ir: RuleIR) -> bool:
@@ -88,6 +101,25 @@ def post_shoot_hit_target_effect_clause_ids(rule_ir: RuleIR) -> tuple[str, ...]:
     return tuple(sorted(clause_ids))
 
 
+def rule_has_post_fight_hit_target_effect(rule_ir: RuleIR) -> bool:
+    return bool(post_fight_hit_target_effect_clause_ids(rule_ir))
+
+
+def post_fight_hit_target_effect_clause_ids(rule_ir: RuleIR) -> tuple[str, ...]:
+    clause_ids: set[str] = set()
+    for index, clause in enumerate(rule_ir.clauses):
+        if not clause_is_post_fight_hit_target_selection(clause):
+            continue
+        clause_ids.update(
+            effect_clause.clause_id
+            for effect_clause in post_fight_selected_target_effect_clauses_after(
+                rule_ir.clauses,
+                index,
+            )
+        )
+    return tuple(sorted(clause_ids))
+
+
 def rule_has_shooting_start_selected_target_effect(rule_ir: RuleIR) -> bool:
     return bool(shooting_start_selected_target_effect_clause_ids(rule_ir))
 
@@ -121,6 +153,10 @@ def selected_target_effect_consumer_ids_for_rule(rule_ir: RuleIR) -> tuple[str, 
         (
             rule_has_post_shoot_hit_target_effect,
             CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+        ),
+        (
+            rule_has_post_fight_hit_target_effect,
+            CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
         ),
         (
             rule_has_shooting_start_selected_target_effect,
@@ -166,6 +202,8 @@ def contextual_consumers_for_clause(
         consumer_ids.add(CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID)
     if clause.clause_id in post_shoot_hit_target_effect_clause_ids(rule_ir):
         consumer_ids.add(CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID)
+    if clause.clause_id in post_fight_hit_target_effect_clause_ids(rule_ir):
+        consumer_ids.add(CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID)
     if clause.clause_id in shooting_start_selected_target_effect_clause_ids(rule_ir):
         consumer_ids.add(CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID)
     if clause.clause_id in movement_end_selected_target_effect_clause_ids(rule_ir):
@@ -197,6 +235,38 @@ def clause_is_post_shoot_hit_target_selection(clause: RuleClause) -> bool:
         and parameters.get("owner") == "active_player"
         and parameters.get("phase") == BattlePhase.SHOOTING.value
         and parameters.get("edge") == "after"
+        and set(target_parameters) == {"allegiance", "target_relationship"}
+        and target_parameters.get("allegiance") == "enemy"
+        and target_parameters.get("target_relationship") == "hit_by_those_attacks"
+    )
+
+
+def clause_is_post_fight_hit_target_selection(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog post-fight matcher requires RuleClause.")
+    if clause.trigger is None or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW:
+        return False
+    if clause.target is None or clause.target.kind is not RuleTargetKind.ENEMY_UNIT:
+        return False
+    parameters = parameter_payload(clause.trigger.parameters)
+    target_parameters = parameter_payload(clause.target.parameters)
+    return (
+        clause.is_supported
+        and clause.template_id == "phase17c:selected-target-constraint"
+        and all(
+            selected_target_selection_condition_is_supported(condition)
+            for condition in clause.conditions
+        )
+        and not clause.effects
+        and clause.duration is None
+        and frozenset(parameters) == _POST_FIGHT_FILTERED_TRIGGER_KEYS
+        and parameters.get("timing_window") == "just_after_friendly_model_finished_attacks"
+        and parameters.get("target_relationship") == "hit_by_those_attacks"
+        and parameters.get("owner") == "attacking_model_controller"
+        and parameters.get("phase") == BattlePhase.FIGHT.value
+        and parameters.get("edge") == "after"
+        and parameters.get("subject") == "this_model"
+        and parameters.get("attacker_model_reference") == "this_model"
         and set(target_parameters) == {"allegiance", "target_relationship"}
         and target_parameters.get("allegiance") == "enemy"
         and target_parameters.get("target_relationship") == "hit_by_those_attacks"

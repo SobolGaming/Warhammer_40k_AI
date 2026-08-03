@@ -39,6 +39,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_daemons_datasheet_ir_support_2026_27 as chaos_daemons_datasheet_ir_source,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    emperors_children_fulgrim_2026_07 as fulgrim_source,
+)
 
 
 def compact_json(payload: object) -> str:
@@ -73,6 +76,7 @@ def datasheet_rule_ir_payload_by_source_row_id(source_row_id: str) -> RuleIRPayl
             chaos_daemons_datasheet_ir_source.datasheet_rule_ir_payload_by_source_row_id(
                 source_row_id
             ),
+            fulgrim_source.datasheet_rule_ir_payload_by_source_row_id(source_row_id),
         )
         if payload is not None
     )

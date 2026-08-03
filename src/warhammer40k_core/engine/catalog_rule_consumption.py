@@ -34,6 +34,7 @@ from warhammer40k_core.engine import catalog_prebattle_redeploy as _prebattle_re
 from warhammer40k_core.engine import (
     catalog_reserve_arrival_restriction_classification as _reserve_restriction,
 )
+from warhammer40k_core.engine import catalog_rule_extension_support as _extensions
 from warhammer40k_core.engine import catalog_rule_selected_target_classification as _st
 from warhammer40k_core.engine import catalog_start_battle_keyword_choice_support as _keyword_choice
 from warhammer40k_core.engine import catalog_triggered_movement_support as _triggered_move
@@ -1290,6 +1291,8 @@ def catalog_rule_ir_registered_hook_definitions() -> tuple[CatalogRuleIrHookDefi
         CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID,
         CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+        _st.CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
+        *_extensions.registered_consumer_ids(),
         CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_MOVEMENT_END_SELECTED_TARGET_EFFECT_CONSUMER_ID,
         CATALOG_IR_PREBATTLE_REDEPLOY_PERMISSION_CONSUMER_ID,
@@ -3763,6 +3766,7 @@ def catalog_rule_ir_consumers_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if _keyword_choice.clause_has_invalid_exact_start_battle_keyword_choice_shape(clause):
         return ()
     consumer_ids = set(_command_points.command_point_consumer_ids_for_clause(clause))
+    consumer_ids.update(_extensions.consumer_ids_for_clause(clause))
     consumer_ids.update(_datasheet.consumer_ids_for_clause(clause))
     if _keyword_choice.clause_is_start_battle_keyword_choice(clause):
         consumer_ids.add(CATALOG_IR_START_BATTLE_KEYWORD_CHOICE_CONSUMER_ID)
@@ -3885,6 +3889,7 @@ def catalog_rule_ir_hook_ids_for_rule(rule_ir: RuleIR) -> tuple[str, ...]:
 
 def _catalog_ir_hook_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     hook_ids = set(_command_points.command_point_consumer_ids_for_clause(clause))
+    hook_ids.update(_extensions.consumer_ids_for_clause(clause))
     hook_ids.update(_datasheet.consumer_ids_for_clause(clause))
     if _frequency.clause_is_runtime_once_per_battle_activation(clause):
         hook_ids.add(CATALOG_IR_ONCE_PER_BATTLE_ABILITY_CONSUMER_ID)

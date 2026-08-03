@@ -3057,6 +3057,203 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/core/000008339/none",
+    "datasheet_id": "000004077",
+    "datasheet_name": "Fulgrim",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/core/000008343/none",
+    "datasheet_id": "000004077",
+    "datasheet_name": "Fulgrim",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004077:beguiling-form",
+    "ability_name": "Beguiling Form",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:beguiling-form/none",
+    "datasheet_id": "000004077",
+    "datasheet_name": "Fulgrim",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-phase-ability-mode"
+    ],
+    "semantic_categories": [
+      "datasheet.roll_modifier.hit.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004077:daemon-primarch-of-slaanesh",
+    "ability_name": "Daemon Primarch of Slaanesh",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemon-primarch-of-slaanesh/none",
+    "datasheet_id": "000004077",
+    "datasheet_name": "Fulgrim",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-phase-ability-mode"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004077:daemonic-poisons",
+    "ability_name": "Daemonic Poisons",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemonic-poisons/none",
+    "datasheet_id": "000004077",
+    "datasheet_name": "Fulgrim",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:poisoned-command-mortal-wounds",
+      "catalog-ir:post-fight-hit-target-effect",
+      "catalog-ir:post-shoot-hit-target-effect"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.set_contextual_status.selected_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004077:daemonic-speed",
+    "ability_name": "Daemonic Speed",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemonic-speed/none",
+    "datasheet_id": "000004077",
+    "datasheet_name": "Fulgrim",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-phase-ability-mode"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004077:enthralling-hypnosis-aura",
+    "ability_name": "Enthralling Hypnosis (Aura)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:enthralling-hypnosis-aura/none",
+    "datasheet_id": "000004077",
+    "datasheet_name": "Fulgrim",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-phase-ability-mode"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.set_contextual_status.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004077:supreme-commander",
+    "ability_name": "SUPREME COMMANDER",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:supreme-commander/none",
+    "datasheet_id": "000004077",
+    "datasheet_name": "Fulgrim",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "army-mustering:supreme-commander"
+    ],
+    "semantic_categories": [
+      "datasheet.mustering.supreme_commander"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004077:serpentine",
+    "ability_name": "Serpentine",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:serpentine/none",
+    "datasheet_id": "000004077",
+    "datasheet_name": "Fulgrim",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:movement-transit-permission"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.movement_transit_permission.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009994",
+    "ability_name": "Thrill Seekers",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/faction/000009994/none",
+    "datasheet_id": "000004077",
+    "datasheet_name": "Fulgrim",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.thrill_seekers"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008346",
     "ability_name": "Leader",
     "catalog_id": "chaos-daemons-bridge-catalog",

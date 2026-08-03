@@ -47,6 +47,10 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
 )
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
+from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
+    SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE,
+    apply_catalog_post_fight_hit_target_effect_result,
+)
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
     SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
@@ -200,6 +204,7 @@ from warhammer40k_core.engine.timing_windows import (
     TimingWindowDescriptor,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.unit_keyword_queries import unit_has_keyword
 from warhammer40k_core.geometry.pose import GeometryError
 
 if TYPE_CHECKING:
@@ -479,6 +484,12 @@ class FightPhaseHandler:
         if result.decision_type == SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE:
             return apply_fight_phase_end_result(
                 registry=self.fight_phase_end_hooks,
+                state=state,
+                decisions=decisions,
+                result=result,
+            )
+        if result.decision_type == SELECT_CATALOG_POST_FIGHT_HIT_TARGET_EFFECT_DECISION_TYPE:
+            return apply_catalog_post_fight_hit_target_effect_result(
                 state=state,
                 decisions=decisions,
                 result=result,
@@ -3557,7 +3568,7 @@ def _request_epic_challenge_if_available(
     activation: FightActivationSelection,
 ) -> LifecycleStatus | None:
     unit = _unit_by_id(state=state, unit_instance_id=activation.unit_instance_id)
-    if not _unit_has_keyword(unit, "CHARACTER"):
+    if not unit_has_keyword(unit, "CHARACTER"):
         return None
     window_id = f"epic-challenge-round-{state.battle_round:02d}-unit-{activation.unit_instance_id}"
     trigger_payload = validate_json_value(
@@ -4032,20 +4043,6 @@ def _active_player_id(state: GameState) -> str:
     if state.active_player_id is None:
         raise GameLifecycleError("Fight phase requires an active player.")
     return state.active_player_id
-
-
-def _unit_has_keyword(unit: UnitInstance, keyword: str) -> bool:
-    canonical = _canonical_keyword(keyword)
-    return canonical in {_canonical_keyword(unit_keyword) for unit_keyword in unit.keywords}
-
-
-def _canonical_keyword(keyword: str) -> str:
-    if type(keyword) is not str:
-        raise GameLifecycleError("Unit keyword must be a string.")
-    stripped = keyword.strip()
-    if not stripped:
-        raise GameLifecycleError("Unit keyword must not be empty.")
-    return stripped.upper().replace(" ", "_").replace("-", "_")
 
 
 def _next_player_id(*, player_ids: tuple[str, ...], current_player_id: str) -> str:

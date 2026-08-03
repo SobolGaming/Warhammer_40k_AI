@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import cast
 
-from warhammer40k_core.core.datasheet import DatasheetAbilityDescriptor
+from warhammer40k_core.core.datasheet import CatalogAbilitySupport, DatasheetAbilityDescriptor
 from warhammer40k_core.core.validation import IdentifierValidator, canonical_keyword_token
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_resources import UnitStartingResourceAllocation
@@ -94,8 +94,12 @@ def dice_result_override_descriptors_for_abilities(
             raise GameLifecycleError(
                 "Dice result override abilities must contain DatasheetAbilityDescriptor values."
             )
-        if ability.rule_ir_payload is None:
+        if ability.support is not CatalogAbilitySupport.GENERIC_RULE_IR:
             continue
+        if ability.rule_ir_payload is None:
+            raise GameLifecycleError(
+                "GENERIC_RULE_IR dice result override ability is missing rule_ir_payload."
+            )
         rule_ir = RuleIR.from_payload(cast(RuleIRPayload, ability.rule_ir_payload))
         for clause in rule_ir.clauses:
             for effect_index, effect in enumerate(clause.effects):

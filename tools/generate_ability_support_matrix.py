@@ -189,6 +189,9 @@ from warhammer40k_core.rules.source_overlay import (
     apply_source_release_overlays,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    emperors_children_datasheet_overlay_2026_06 as emperors_children_overlay,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27,
     faction_detachments_2026_27,
     faction_execution_2026_27,
@@ -221,6 +224,7 @@ from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_YRIEL_VYPERS_STARFANGS_HEIGHT_OVERRIDES,
     CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     CHAOS_DEFILER_HEIGHT_OVERRIDES,
+    EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES,
 )
 from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaJsonArtifact,
@@ -301,6 +305,7 @@ BELAKOR_DATASHEET_IDS = ("000001148",)
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
 UNDIVIDED_DAEMON_DATASHEET_IDS = ("000001149", "000002758", "000001151")
 CHAOS_DEFILER_DATASHEET_IDS = chaos_defiler_overlay.ALIGNED_DEFILER_DATASHEET_IDS
+EMPERORS_CHILDREN_FULGRIM_DATASHEET_IDS = ("000004077",)
 ABILITY_SUPPORT_DATASHEET_IDS = (
     *AELDARI_ASPECT_WARRIORS_DATASHEET_IDS,
     *AELDARI_AUTARCHS_DATASHEET_IDS,
@@ -318,6 +323,7 @@ ABILITY_SUPPORT_DATASHEET_IDS = (
     *DAEMON_WARGEAR_DATASHEET_IDS,
     *UNDIVIDED_DAEMON_DATASHEET_IDS,
     *CHAOS_DEFILER_DATASHEET_IDS,
+    *EMPERORS_CHILDREN_FULGRIM_DATASHEET_IDS,
 )
 BELAKOR_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
@@ -1552,6 +1558,11 @@ def _ability_support_catalog_package(
         release_manifest=chaos_defiler_overlay.source_release_manifest(),
         overlay_packs=(chaos_defiler_overlay.overlay_pack(),),
     )
+    emperors_children_overlaid_artifacts = apply_source_release_overlays(
+        source_artifacts=chaos_overlaid_artifacts,
+        release_manifest=emperors_children_overlay.source_release_manifest(),
+        overlay_packs=(emperors_children_overlay.overlay_pack(),),
+    )
     aeldari_overlay_pack = SourceOverlayPack.from_payload(
         cast(
             SourceOverlayPackPayload,
@@ -1591,7 +1602,7 @@ def _ability_support_catalog_package(
         )
     )
     overlaid_artifacts = apply_source_release_overlays(
-        source_artifacts=chaos_overlaid_artifacts,
+        source_artifacts=emperors_children_overlaid_artifacts,
         release_manifest=aeldari_release_manifest,
         overlay_packs=(
             aeldari_overlay_pack,
@@ -1622,6 +1633,7 @@ def _ability_support_catalog_package(
             + BLOODLETTERS_HEIGHT_OVERRIDES
             + FLESH_HOUNDS_HEIGHT_OVERRIDES
             + CHAOS_DEFILER_HEIGHT_OVERRIDES
+            + EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES
         ),
     )
     return build_canonical_catalog_package(
@@ -1641,7 +1653,31 @@ def _ability_support_matrix_rows_from_package(
         datasheet_ids=ABILITY_SUPPORT_DATASHEET_IDS,
     )
     rows = _promote_july_runtime_backed_datasheet_abilities(rows)
+    rows = _promote_emperors_children_runtime_backed_faction_abilities(rows)
     return (*rows, *_runtime_faction_army_rule_rows())
+
+
+def _promote_emperors_children_runtime_backed_faction_abilities(
+    rows: tuple[AbilityCoverageRow, ...],
+) -> tuple[AbilityCoverageRow, ...]:
+    promoted: list[AbilityCoverageRow] = []
+    for row in rows:
+        if (
+            row.source_kind is not CatalogAbilitySourceKind.FACTION
+            or row.ability_id != emperors_children_army_rule.THRILL_SEEKERS_SOURCE_ABILITY_ID
+            or row.datasheet_id != "000004077"
+        ):
+            promoted.append(row)
+            continue
+        promoted.append(
+            replace(
+                row,
+                support_stage=AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                semantic_categories=("faction.army_rule.thrill_seekers",),
+                runtime_consumer_ids=_emperors_children_runtime_consumer_ids(),
+            )
+        )
+    return tuple(promoted)
 
 
 def _promote_july_runtime_backed_datasheet_abilities(

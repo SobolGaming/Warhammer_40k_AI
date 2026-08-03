@@ -20,11 +20,17 @@ from warhammer40k_core.engine.battle_shock_resolution import (
     apply_battle_shock_reroll_resolution_decision,
     is_battle_shock_reroll_request,
 )
+from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
+    post_fight_hit_target_request,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
+)
+from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
+    CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
 )
 from warhammer40k_core.engine.catalog_selected_target_battle_shock import (
     payload_optional_string as _payload_optional_string,
@@ -88,6 +94,9 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     has_fight_start_selected_target_runtime_records as _has_runtime_fight_start_records,
+)
+from warhammer40k_core.engine.catalog_selected_target_effects_support import (
+    has_post_fight_hit_target_effect_runtime_records as _has_runtime_post_fight_records,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     has_post_shoot_hit_target_effect_runtime_records as _has_runtime_post_shoot_records,
@@ -259,15 +268,24 @@ class CatalogSelectedTargetEffectRuntime:
     def attack_sequence_completed_bindings(
         self,
     ) -> tuple[AttackSequenceCompletedHookBinding, ...]:
-        if not _has_runtime_post_shoot_records(self.ability_indexes_by_player_id, self.armies):
-            return ()
-        return (
-            AttackSequenceCompletedHookBinding(
-                hook_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
-                source_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
-                handler=self.post_shoot_hit_target_request,
-            ),
-        )
+        bindings: list[AttackSequenceCompletedHookBinding] = []
+        if _has_runtime_post_shoot_records(self.ability_indexes_by_player_id, self.armies):
+            bindings.append(
+                AttackSequenceCompletedHookBinding(
+                    hook_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+                    source_id=CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+                    handler=self.post_shoot_hit_target_request,
+                )
+            )
+        if _has_runtime_post_fight_records(self.ability_indexes_by_player_id, self.armies):
+            bindings.append(
+                AttackSequenceCompletedHookBinding(
+                    hook_id=CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
+                    source_id=CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
+                    handler=self.post_fight_hit_target_request,
+                )
+            )
+        return tuple(bindings)
 
     def shooting_phase_start_bindings(self) -> tuple[ShootingPhaseStartHookBinding, ...]:
         if not _has_runtime_shooting_start_records(
@@ -481,6 +499,16 @@ class CatalogSelectedTargetEffectRuntime:
                     "phase_body_status": "catalog_post_shoot_hit_target_effect_pending",
                 }
             ),
+        )
+
+    def post_fight_hit_target_request(
+        self,
+        context: AttackSequenceCompletedContext,
+    ) -> LifecycleStatus | None:
+        return post_fight_hit_target_request(
+            ability_indexes_by_player_id=self.ability_indexes_by_player_id,
+            armies=self.armies,
+            context=context,
         )
 
 

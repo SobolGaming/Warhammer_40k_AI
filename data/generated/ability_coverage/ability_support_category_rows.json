@@ -562,6 +562,14 @@
       {
         "ability_id": "000008339",
         "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/core/000008339/none",
+        "datasheet_id": "000004077",
+        "datasheet_name": "Fulgrim",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000611/core/000008339/none",
         "datasheet_id": "000000611",
         "datasheet_name": "Night Spinner",
@@ -613,7 +621,7 @@
     ],
     "category_id": "core.deadly_demise",
     "category_name": "Core Deadly Demise",
-    "coverage_row_count": 13,
+    "coverage_row_count": 14,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
       "chaos-daemons-bridge-catalog/000002758/core/000008339/none",
@@ -622,6 +630,7 @@
       "chaos-daemons-bridge-catalog/000004207/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004208/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004209/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000004077/core/000008339/none",
       "chaos-daemons-bridge-catalog/000000611/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001151/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004195/core/000008339/none",
@@ -634,6 +643,7 @@
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
       "Defiler",
+      "Fulgrim",
       "Night Spinner",
       "Soul Grinder",
       "Starfangs",
@@ -646,7 +656,7 @@
       "descriptor:destruction-reaction:deadly-demise-source"
     ],
     "source_kind_counts": {
-      "core": 13
+      "core": 14
     },
     "support_stages": [
       "engine_consumed"
@@ -1107,25 +1117,37 @@
         "datasheet_id": "000004208",
         "datasheet_name": "Defiler",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000004077:beguiling-form",
+        "ability_name": "Beguiling Form",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:beguiling-form/none",
+        "datasheet_id": "000004077",
+        "datasheet_name": "Fulgrim",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
+      "Beguiling Form",
       "Revel in Desecration"
     ],
     "category_id": "datasheet.roll_modifier.hit.this_model",
     "category_name": "Datasheet Roll Modifier Hit This Model",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000004208/datasheet/000004208:revel-in-desecration/none"
+      "chaos-daemons-bridge-catalog/000004208/datasheet/000004208:revel-in-desecration/none",
+      "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:beguiling-form/none"
     ],
     "datasheet_names": [
-      "Defiler"
+      "Defiler",
+      "Fulgrim"
     ],
     "runtime_consumer_ids": [
+      "catalog-ir:command-phase-ability-mode",
       "catalog-ir:hit-roll-modifier"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -1395,6 +1417,22 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000004077:daemon-primarch-of-slaanesh",
+        "ability_name": "Daemon Primarch of Slaanesh",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemon-primarch-of-slaanesh/none",
+        "datasheet_id": "000004077",
+        "datasheet_name": "Fulgrim",
+        "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000004077:daemonic-speed",
+        "ability_name": "Daemonic Speed",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemonic-speed/none",
+        "datasheet_id": "000004077",
+        "datasheet_name": "Fulgrim",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000588:spiritseer",
         "ability_name": "Spiritseer",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spiritseer/none",
@@ -1413,26 +1451,32 @@
     ],
     "ability_names": [
       "ASPECT TRAINING",
+      "Daemon Primarch of Slaanesh",
       "Daemonic Lord",
+      "Daemonic Speed",
       "Malevolent Souls",
       "Spiritseer"
     ],
     "category_id": "datasheet.rule_ir.grant_ability.this_model",
     "category_name": "Datasheet Rule Ir Grant Ability This Model",
-    "coverage_row_count": 4,
+    "coverage_row_count": 6,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:aspect-training/none",
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-lord/none",
+      "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemon-primarch-of-slaanesh/none",
+      "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemonic-speed/none",
       "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spiritseer/none",
       "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:malevolent-souls/none"
     ],
     "datasheet_names": [
       "Autarch",
       "Daemon Prince of Chaos",
+      "Fulgrim",
       "Spiritseer",
       "Wraithblades"
     ],
     "runtime_consumer_ids": [
+      "catalog-ir:command-phase-ability-mode",
       "catalog-ir:conditional-ability:lone-operative",
       "catalog-ir:conditional-leading-ability:fights-first",
       "catalog-ir:conditional-leading-ability:infiltrators",
@@ -1441,7 +1485,7 @@
       "catalog-ir:fight-on-death-source"
     ],
     "source_kind_counts": {
-      "datasheet": 4
+      "datasheet": 6
     },
     "support_stages": [
       "engine_consumed"
@@ -2099,6 +2143,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000004077:serpentine",
+        "ability_name": "Serpentine",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:serpentine/none",
+        "datasheet_id": "000004077",
+        "datasheet_name": "Fulgrim",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000001151:scuttling-walker",
         "ability_name": "Scuttling Walker",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001151/datasheet/000001151:scuttling-walker/none",
@@ -2108,22 +2160,25 @@
       }
     ],
     "ability_names": [
-      "Scuttling Walker"
+      "Scuttling Walker",
+      "Serpentine"
     ],
     "category_id": "datasheet.rule_ir.movement_transit_permission.this_model",
     "category_name": "Datasheet Rule Ir Movement Transit Permission This Model",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:serpentine/none",
       "chaos-daemons-bridge-catalog/000001151/datasheet/000001151:scuttling-walker/none"
     ],
     "datasheet_names": [
+      "Fulgrim",
       "Soul Grinder"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:movement-transit-permission"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -2929,6 +2984,74 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000004077:daemonic-poisons",
+        "ability_name": "Daemonic Poisons",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemonic-poisons/none",
+        "datasheet_id": "000004077",
+        "datasheet_name": "Fulgrim",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Daemonic Poisons"
+    ],
+    "category_id": "datasheet.rule_ir.set_contextual_status.selected_unit",
+    "category_name": "Datasheet Rule Ir Set Contextual Status Selected Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemonic-poisons/none"
+    ],
+    "datasheet_names": [
+      "Fulgrim"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:poisoned-command-mortal-wounds",
+      "catalog-ir:post-fight-hit-target-effect",
+      "catalog-ir:post-shoot-hit-target-effect"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000004077:enthralling-hypnosis-aura",
+        "ability_name": "Enthralling Hypnosis (Aura)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:enthralling-hypnosis-aura/none",
+        "datasheet_id": "000004077",
+        "datasheet_name": "Fulgrim",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Enthralling Hypnosis (Aura)"
+    ],
+    "category_id": "datasheet.rule_ir.set_contextual_status.this_model",
+    "category_name": "Datasheet Rule Ir Set Contextual Status This Model",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:enthralling-hypnosis-aura/none"
+    ],
+    "datasheet_names": [
+      "Fulgrim"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-phase-ability-mode"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001148:shadow-form",
         "ability_name": "Shadow Form",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-form/none",
@@ -3079,6 +3202,14 @@
       {
         "ability_id": "000008343",
         "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/core/000008343/none",
+        "datasheet_id": "000004077",
+        "datasheet_name": "Fulgrim",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000003909/core/000008343/none",
         "datasheet_id": "000003909",
         "datasheet_name": "Lhykhis",
@@ -3114,7 +3245,7 @@
     ],
     "category_id": "core.reserve.deep_strike",
     "category_name": "Deep Strike Reserve Arrival",
-    "coverage_row_count": 12,
+    "coverage_row_count": 13,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000002759/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001148/core/000008343/none",
@@ -3124,6 +3255,7 @@
       "chaos-daemons-bridge-catalog/000002758/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001149/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001112/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000004077/core/000008343/none",
       "chaos-daemons-bridge-catalog/000003909/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001151/core/000008343/none",
       "chaos-daemons-bridge-catalog/000000600/core/000008343/none",
@@ -3138,6 +3270,7 @@
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
       "Flesh Hounds",
+      "Fulgrim",
       "Lhykhis",
       "Soul Grinder",
       "Swooping Hawks",
@@ -3148,7 +3281,7 @@
       "descriptor:reserve-declaration:deep-strike"
     ],
     "source_kind_counts": {
-      "core": 12
+      "core": 13
     },
     "support_stages": [
       "engine_consumed"
@@ -3230,6 +3363,14 @@
         "datasheet_id": "emperors-children",
         "datasheet_name": "Emperor's Children",
         "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/faction/000009994/none",
+        "datasheet_id": "000004077",
+        "datasheet_name": "Fulgrim",
+        "source_kind": "faction"
       }
     ],
     "ability_names": [
@@ -3237,12 +3378,14 @@
     ],
     "category_id": "faction.army_rule.thrill_seekers",
     "category_name": "Emperor's Children Army Rule",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none"
+      "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none",
+      "chaos-daemons-bridge-catalog/000004077/faction/000009994/none"
     ],
     "datasheet_names": [
-      "Emperor's Children"
+      "Emperor's Children",
+      "Fulgrim"
     ],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
@@ -3251,7 +3394,7 @@
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
     ],
     "source_kind_counts": {
-      "faction": 1
+      "faction": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -4134,6 +4277,14 @@
         "datasheet_id": "000001148",
         "datasheet_name": "Be'lakor",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000004077:supreme-commander",
+        "ability_name": "SUPREME COMMANDER",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:supreme-commander/none",
+        "datasheet_id": "000004077",
+        "datasheet_name": "Fulgrim",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
@@ -4141,18 +4292,20 @@
     ],
     "category_id": "datasheet.mustering.supreme_commander",
     "category_name": "Supreme Commander",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:supreme-commander/none"
+      "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:supreme-commander/none",
+      "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:supreme-commander/none"
     ],
     "datasheet_names": [
-      "Be'lakor"
+      "Be'lakor",
+      "Fulgrim"
     ],
     "runtime_consumer_ids": [
       "army-mustering:supreme-commander"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"

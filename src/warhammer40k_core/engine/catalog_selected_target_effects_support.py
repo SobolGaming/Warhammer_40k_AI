@@ -26,9 +26,15 @@ from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import 
     post_shoot_selected_target_pair_is_supported,
     post_shoot_selection_clause_binds_source_model,
 )
+from warhammer40k_core.engine.catalog_post_shoot_selected_target_support import (
+    post_fight_selected_target_effect_clauses_after as _post_fight_clauses_after,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_record_current_wargear_bearer_model_ids,
     catalog_rule_unit_scoped_generic_records,
+)
+from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
+    clause_is_post_fight_hit_target_selection as clause_is_post_fight_hit_target_selection,
 )
 from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
     clause_is_post_shoot_hit_target_selection as clause_is_post_shoot_hit_target_selection,
@@ -78,6 +84,14 @@ from warhammer40k_core.rules.rule_ir import (
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
+
+
+def post_fight_selected_target_effect_clauses_after(
+    clauses: tuple[RuleClause, ...],
+    selection_index: int,
+) -> tuple[RuleClause, ...]:
+    return _post_fight_clauses_after(clauses, selection_index)
+
 
 __all__ = (
     "clause_has_immediate_selected_target_effect",
@@ -772,6 +786,50 @@ def has_post_shoot_hit_target_effect_runtime_records(
     return False
 
 
+def has_post_fight_hit_target_effect_runtime_records(
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
+    armies: tuple[ArmyDefinition, ...],
+) -> bool:
+    for army in armies:
+        index = ability_indexes_by_player_id.get(army.player_id)
+        if index is None:
+            raise GameLifecycleError("Catalog selected-target runtime missing ability index.")
+        for unit in army.units:
+            current_model_ids = tuple(
+                sorted(model.model_instance_id for model in unit.own_models if model.is_alive)
+            )
+            for record in unit_scoped_generic_records_for_timing(
+                ability_index=index,
+                unit=unit,
+                current_model_instance_ids=current_model_ids,
+                trigger_kind=TimingTriggerKind.ANY_PHASE,
+            ):
+                clauses = catalog_selected_target_clauses_from_record(record)
+                runtime_clause_id = runtime_clause_id_from_record(record)
+                for selection_index, selection_clause in enumerate(clauses):
+                    effect_clauses = post_fight_selected_target_effect_clauses_after(
+                        clauses,
+                        selection_index,
+                    )
+                    if (
+                        (
+                            runtime_clause_id is None
+                            or runtime_clause_id == selection_clause.clause_id
+                        )
+                        and clause_is_post_fight_hit_target_selection(selection_clause)
+                        and effect_clauses
+                        and selection_source_model_ids_for_record(
+                            record,
+                            unit,
+                            selection_clause,
+                            effect_clauses,
+                            current_model_ids,
+                        )
+                    ):
+                        return True
+    return False
+
+
 def has_shooting_start_selected_target_runtime_records(
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
@@ -882,6 +940,19 @@ def record_has_supported_post_shoot_selected_target_effect(
         (runtime_clause_id is None or runtime_clause_id == clause.clause_id)
         and clause_is_post_shoot_hit_target_selection(clause)
         and bool(post_shoot_selected_target_effect_clauses_after(clauses, index))
+        for index, clause in enumerate(clauses)
+    )
+
+
+def record_has_supported_post_fight_selected_target_effect(
+    record: AbilityCatalogRecord,
+) -> bool:
+    clauses = catalog_selected_target_clauses_from_record(record)
+    runtime_clause_id = runtime_clause_id_from_record(record)
+    return any(
+        (runtime_clause_id is None or runtime_clause_id == clause.clause_id)
+        and clause_is_post_fight_hit_target_selection(clause)
+        and bool(post_fight_selected_target_effect_clauses_after(clauses, index))
         for index, clause in enumerate(clauses)
     )
 
