@@ -21,8 +21,14 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
     AbilityTimingDescriptor,
 )
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
-from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState, PlacedArmy
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRuntimeState,
+    ModelPlacement,
+    PlacedArmy,
+    UnitPlacement,
+)
 from warhammer40k_core.engine.catalog_selected_to_fight_risk_runtime import (
     CatalogSelectedToFightRiskRuntime,
 )
@@ -39,11 +45,17 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import BattlePhase
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
 from warhammer40k_core.rules.source_data import RuleSourceText
 
 
-def attached_selected_to_fight_risk_fixture() -> tuple[
+def attached_selected_to_fight_risk_fixture(
+    *,
+    pre_split: bool = True,
+    bodyguard_model_count: int = 1,
+    enemy_x: float = 16.0,
+) -> tuple[
     GameState,
     CatalogSelectedToFightRiskRuntime,
     DecisionController,
@@ -60,6 +72,20 @@ def attached_selected_to_fight_risk_fixture() -> tuple[
         unit_selection_id="risk-bodyguard",
         army_id="army-source",
     )
+    if bodyguard_model_count not in {1, 2}:
+        raise ValueError("Attached risk fixture supports one or two bodyguard models.")
+    if bodyguard_model_count == 2:
+        first_model = bodyguard.own_models[0]
+        bodyguard = replace(
+            bodyguard,
+            own_models=(
+                first_model,
+                replace(
+                    first_model,
+                    model_instance_id=f"{bodyguard.unit_instance_id}:daemon-prince-of-chaos:002",
+                ),
+            ),
+        )
     leader = daemon_prince_unit(
         package=package,
         datasheet_id="000001149",
@@ -110,14 +136,14 @@ def attached_selected_to_fight_risk_fixture() -> tuple[
                 army_id=source_army.army_id,
                 player_id=source_army.player_id,
                 unit_placements=(
-                    single_model_unit_placement(source_army, bodyguard, x=12.0),
+                    _unit_placement(source_army, bodyguard, x=12.0),
                     single_model_unit_placement(source_army, leader, x=13.0),
                 ),
             ),
             PlacedArmy(
                 army_id=enemy_army.army_id,
                 player_id=enemy_army.player_id,
-                unit_placements=(single_model_unit_placement(enemy_army, enemy, x=16.0),),
+                unit_placements=(single_model_unit_placement(enemy_army, enemy, x=enemy_x),),
             ),
         ),
     )
@@ -175,15 +201,34 @@ def attached_selected_to_fight_risk_fixture() -> tuple[
             )
         )
     decisions = DecisionController()
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id=source_army.player_id,
-        attached_unit_instance_id=attached_id,
-        surviving_unit_instance_ids=(bodyguard.unit_instance_id, leader.unit_instance_id),
-        event_log=decisions.event_log,
-    )
+    if pre_split:
+        state.recover_starting_strength_after_attached_unit_split(
+            player_id=source_army.player_id,
+            attached_unit_instance_id=attached_id,
+            surviving_unit_instance_ids=(bodyguard.unit_instance_id, leader.unit_instance_id),
+            event_log=decisions.event_log,
+        )
     for model in (*bodyguard.own_models, *leader.own_models):
         state.clear_model_destruction_reaction_sources(model_instance_id=model.model_instance_id)
     return state, runtime, decisions, bodyguard, leader, enemy, attached_id
+
+
+def _unit_placement(army: ArmyDefinition, unit: UnitInstance, *, x: float) -> UnitPlacement:
+    return UnitPlacement(
+        army_id=army.army_id,
+        player_id=army.player_id,
+        unit_instance_id=unit.unit_instance_id,
+        model_placements=tuple(
+            ModelPlacement(
+                army_id=army.army_id,
+                player_id=army.player_id,
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                pose=Pose.at(x + (index * 2.0), 12.0),
+            )
+            for index, model in enumerate(unit.own_models)
+        ),
+    )
 
 
 def _selected_to_fight_risk_records(*, datasheet_id: str) -> tuple[AbilityCatalogRecord, ...]:

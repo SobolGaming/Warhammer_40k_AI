@@ -90,7 +90,6 @@ from warhammer40k_core.engine.fight_activation_abilities import (
 from warhammer40k_core.engine.fight_eligibility_queries import (
     unit_was_eligible_to_fight_this_phase,
 )
-from warhammer40k_core.engine.fight_on_death import remove_models_awaiting_fight_on_death
 from warhammer40k_core.engine.fight_order import (
     DECLINE_FIGHT_INTERRUPT_OPTION_ID,
     ELIGIBLE_TO_FIGHT_PASS_OPTION_ID,
@@ -179,6 +178,10 @@ from warhammer40k_core.engine.phases.fight_attack_sequence_selection import (
     apply_fight_attack_sequence_selection_decision,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.rule_model_destruction_fight_continuation import (
+    apply_rule_destruction_reaction_and_schedule_fight_on_death,
+    remove_rule_fight_on_death_models_for_completed_activation,
+)
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
 from warhammer40k_core.engine.stratagems import (
@@ -442,8 +445,10 @@ class FightPhaseHandler:
         if result.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE:
             request = decisions.record_for_result(result).request
             if rule_model_destruction.is_rule_model_destruction_reaction_request(request):
-                rule_model_destruction.apply_rule_model_destruction_reaction_decision(
-                    state=state, decisions=decisions, result=result
+                apply_rule_destruction_reaction_and_schedule_fight_on_death(
+                    state=state,
+                    decisions=decisions,
+                    result=result,
                 )
                 return None
         if result.decision_type in ATTACK_ALLOCATION_DECISION_TYPES:
@@ -821,25 +826,12 @@ def _complete_active_fight_activation(
 ) -> LifecycleStatus | None:
     fight_state = _require_fight_state(state)
     state.replace_fight_phase_state(fight_state.with_active_activation(None))
-    if unit_attacked:
-        removed_model_ids = remove_models_awaiting_fight_on_death(
-            state=state,
-            unit_instance_id=activation.unit_instance_id,
-        )
-        if removed_model_ids:
-            decisions.event_log.append(
-                "fight_on_death_models_removed",
-                validate_json_value(
-                    {
-                        "game_id": state.game_id,
-                        "battle_round": state.battle_round,
-                        "phase": BattlePhase.FIGHT.value,
-                        "unit_instance_id": activation.unit_instance_id,
-                        "model_instance_ids": list(removed_model_ids),
-                        "reason": "unit_attacked",
-                    }
-                ),
-            )
+    fight_on_death_completion = remove_rule_fight_on_death_models_for_completed_activation(
+        state=state,
+        decisions=decisions,
+        activation=activation,
+        unit_attacked=unit_attacked,
+    )
     event = decisions.event_log.append(
         "unit_has_fought",
         validate_json_value(
@@ -852,6 +844,13 @@ def _complete_active_fight_activation(
             }
         ),
     )
+    if fight_on_death_completion is not None:
+        rule_model_destruction.finalize_rule_model_destruction(
+            state=state,
+            decisions=decisions,
+            context=fight_on_death_completion,
+        )
+        return None
     counteroffensive_status = _request_counteroffensive_if_available(
         handler=handler,
         state=state,

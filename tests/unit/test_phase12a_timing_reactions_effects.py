@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 from tests.setup_completion_helpers import enter_battle_for_fixture
+from tests.support.catalog_package_fixtures import undivided_daemon_package
 from tests.support.selected_to_fight_risk_fixtures import (
     attached_selected_to_fight_risk_fixture,
 )
@@ -13,7 +14,14 @@ from tests.support.selected_to_fight_risk_fixtures import (
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceRollResult, RollOffRequest
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatus
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.damage_allocation import (
+    DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+    DestructionReactionKind,
+    DestructionReactionSource,
+    model_by_id,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -30,6 +38,9 @@ from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.fight_phase_end_hooks import (
     FightPhaseEndRequestContext,
     FightPhaseEndResultContext,
+)
+from warhammer40k_core.engine.fight_resolution import (
+    SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
@@ -49,6 +60,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.phases.fight import FightPhaseHandler
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_queue import (
     REACTION_DECISION_TYPE,
@@ -654,6 +666,330 @@ def test_selected_to_fight_risk_split_creates_one_liability_per_survivor() -> No
     second_unit = cast(str, cast(dict[str, JsonValue], second.payload)["rules_unit_instance_id"])
     assert {first_unit, second_unit} == {bodyguard.unit_instance_id, leader.unit_instance_id}
     assert len(state.persisting_effects) == 2
+
+
+@pytest.mark.parametrize("destroyed_component", ["bodyguard", "leader"])
+def test_selected_to_fight_risk_destruction_splits_attached_unit_after_final_component_model(
+    destroyed_component: str,
+) -> None:
+    state, runtime, decisions, bodyguard, leader, _enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture(pre_split=False)
+    )
+    target = bodyguard if destroyed_component == "bodyguard" else leader
+    carried_effect = replace(
+        _persisting_effect(
+            effect_id=f"attached-risk-carried-effect:{destroyed_component}",
+            target_unit_instance_ids=(attached_id,),
+            expiration=EffectExpiration.end_battle_round(battle_round=1),
+        ),
+        owner_player_id="player-source",
+    )
+    state.record_persisting_effect(carried_effect)
+    mission_action = MissionActionState.start(
+        action_id=f"attached-risk-action:{destroyed_component}",
+        player_id="player-source",
+        unit_instance_id=attached_id,
+        target_id="attached-risk-objective",
+        mission_id="attached-risk-mission",
+        battle_round=state.battle_round,
+        phase=BattlePhase.FIGHT.value,
+        start_timing="fight_phase",
+        completion_timing="turn_end",
+        eligible_unit_instance_ids=(attached_id,),
+        interruption_conditions=("unit_destroyed",),
+        scoring_source_id="attached-risk-mission",
+        victory_points=0,
+    )
+    state.record_mission_action_state(mission_action)
+    request = runtime.next_fight_phase_end_request(
+        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    option = next(
+        item
+        for item in request.options
+        if cast(dict[str, JsonValue], item.payload)["selected_model_instance_id"]
+        == target.own_models[0].model_instance_id
+    )
+    decisions.request_decision(request)
+    record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id=f"attached-risk-destroy-{destroyed_component}",
+            request=request,
+            selected_option_id=option.option_id,
+        )
+    )
+
+    assert (
+        runtime.apply_fight_phase_end_result(
+            FightPhaseEndResultContext(
+                state=state,
+                decisions=decisions,
+                request=record.request,
+                result=record.result,
+            )
+        )
+        is True
+    )
+    assert all(
+        formation.attached_unit_instance_id != attached_id
+        for army in state.army_definitions
+        for formation in army.attached_units
+    )
+    assert attached_id not in {item.unit_instance_id for item in state.starting_strength_records}
+    expected_survivor_id = (
+        leader.unit_instance_id
+        if destroyed_component == "bodyguard"
+        else bodyguard.unit_instance_id
+    )
+    assert expected_survivor_id in {
+        item.unit_instance_id for item in state.starting_strength_records
+    }
+    expected_carried_effect = carried_effect.with_attached_unit_split(
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=(expected_survivor_id,),
+    )
+    assert state.persisting_effects == [expected_carried_effect]
+    interrupted_action = state.mission_action_state_by_id(mission_action.action_id)
+    assert interrupted_action.status is MissionActionStatus.INTERRUPTED
+    assert interrupted_action.interrupted_reason == "unit_destroyed"
+    assert any(
+        item.event_type == "mission_action_interrupted" for item in decisions.event_log.records
+    )
+    assert any(
+        item.event_type == "catalog_failed_fight_activation_model_destroyed"
+        for item in decisions.event_log.records
+    )
+
+
+def test_selected_to_fight_risk_non_final_bodyguard_destruction_keeps_attached_unit() -> None:
+    state, runtime, decisions, bodyguard, _leader, _enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture(
+            pre_split=False,
+            bodyguard_model_count=2,
+        )
+    )
+    request = runtime.next_fight_phase_end_request(
+        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    target_model_id = bodyguard.own_models[0].model_instance_id
+    option = next(
+        item
+        for item in request.options
+        if cast(dict[str, JsonValue], item.payload)["selected_model_instance_id"] == target_model_id
+    )
+    decisions.request_decision(request)
+    record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="attached-risk-destroy-non-final-bodyguard",
+            request=request,
+            selected_option_id=option.option_id,
+        )
+    )
+
+    assert (
+        runtime.apply_fight_phase_end_result(
+            FightPhaseEndResultContext(
+                state=state,
+                decisions=decisions,
+                request=record.request,
+                result=record.result,
+            )
+        )
+        is True
+    )
+    assert any(
+        formation.attached_unit_instance_id == attached_id
+        for army in state.army_definitions
+        for formation in army.attached_units
+    )
+    assert attached_id in {item.unit_instance_id for item in state.starting_strength_records}
+    assert model_by_id(
+        state=state,
+        model_instance_id=bodyguard.own_models[1].model_instance_id,
+    ).is_alive
+    assert not state.persisting_effects
+
+
+def test_selected_to_fight_risk_fight_on_death_defers_attached_split_until_activation() -> None:
+    state, runtime, decisions, bodyguard, leader, _enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture(
+            pre_split=False,
+            enemy_x=30.0,
+        )
+    )
+    model_id = bodyguard.own_models[0].model_instance_id
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=model_id,
+        sources=(
+            DestructionReactionSource(
+                source_id="test:attached-risk:fight-on-death",
+                reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+                source_rule_id="test:attached-risk:fight-on-death",
+            ),
+        ),
+    )
+    request = runtime.next_fight_phase_end_request(
+        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    option = next(
+        item
+        for item in request.options
+        if cast(dict[str, JsonValue], item.payload)["selected_model_instance_id"] == model_id
+    )
+    decisions.request_decision(request)
+    destruction_record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="attached-risk-fight-on-death-destruction",
+            request=request,
+            selected_option_id=option.option_id,
+        )
+    )
+    status = runtime.apply_fight_phase_end_result(
+        FightPhaseEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=destruction_record.request,
+            result=destruction_record.result,
+        )
+    )
+    assert type(status) is not bool
+    reaction_request = decisions.queue.peek_next()
+    reaction_option = next(
+        item
+        for item in reaction_request.options
+        if item.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
+    )
+    reaction_record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="attached-risk-fight-on-death-accepted",
+            request=reaction_request,
+            selected_option_id=reaction_option.option_id,
+        )
+    )
+    package = undivided_daemon_package()
+    handler = FightPhaseHandler(
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        army_catalog=package.army_catalog,
+    )
+
+    assert (
+        handler.apply_decision(
+            state=state,
+            decisions=decisions,
+            result=reaction_record.result,
+        )
+        is None
+    )
+    assert any(
+        formation.attached_unit_instance_id == attached_id
+        for army in state.army_definitions
+        for formation in army.attached_units
+    )
+    assert state.persisting_effects
+
+    completed = handler.begin_phase(state=state, decisions=decisions)
+
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    assert all(
+        formation.attached_unit_instance_id != attached_id
+        for army in state.army_definitions
+        for formation in army.attached_units
+    )
+    assert leader.unit_instance_id in {
+        item.unit_instance_id for item in state.starting_strength_records
+    }
+    assert not state.persisting_effects
+    assert state.battlefield_state is not None
+    assert model_id not in state.battlefield_state.placed_model_ids()
+
+
+def test_selected_to_fight_risk_fight_on_death_exposes_only_destroyed_models_weapons() -> None:
+    state, runtime, decisions, bodyguard, _leader, _enemy, _attached_id = (
+        attached_selected_to_fight_risk_fixture(
+            pre_split=False,
+            bodyguard_model_count=2,
+        )
+    )
+    model_id = bodyguard.own_models[1].model_instance_id
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=model_id,
+        sources=(
+            DestructionReactionSource(
+                source_id="test:attached-risk:model-only-fight-on-death",
+                reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+                source_rule_id="test:attached-risk:model-only-fight-on-death",
+            ),
+        ),
+    )
+    request = runtime.next_fight_phase_end_request(
+        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    option = next(
+        item
+        for item in request.options
+        if cast(dict[str, JsonValue], item.payload)["selected_model_instance_id"] == model_id
+    )
+    decisions.request_decision(request)
+    destruction_record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="attached-risk-model-only-fight-on-death-destruction",
+            request=request,
+            selected_option_id=option.option_id,
+        )
+    )
+    status = runtime.apply_fight_phase_end_result(
+        FightPhaseEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=destruction_record.request,
+            result=destruction_record.result,
+        )
+    )
+    assert type(status) is not bool
+    reaction_request = decisions.queue.peek_next()
+    reaction_option = next(
+        item
+        for item in reaction_request.options
+        if item.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
+    )
+    reaction_record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="attached-risk-model-only-fight-on-death-accepted",
+            request=reaction_request,
+            selected_option_id=reaction_option.option_id,
+        )
+    )
+    package = undivided_daemon_package()
+    handler = FightPhaseHandler(
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        army_catalog=package.army_catalog,
+    )
+    assert (
+        handler.apply_decision(
+            state=state,
+            decisions=decisions,
+            result=reaction_record.result,
+        )
+        is None
+    )
+
+    melee_status = handler.begin_phase(state=state, decisions=decisions)
+
+    assert melee_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert melee_status.decision_request is not None
+    assert melee_status.decision_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    payload = cast(dict[str, JsonValue], melee_status.decision_request.payload)
+    proposal_request = cast(dict[str, JsonValue], payload["proposal_request"])
+    available_weapons = cast(list[JsonValue], proposal_request["available_weapons"])
+    assert available_weapons
+    assert {
+        cast(str, cast(dict[str, JsonValue], weapon)["model_instance_id"])
+        for weapon in available_weapons
+    } == {model_id}
 
 
 @pytest.mark.parametrize(

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, cast
 
@@ -240,11 +240,8 @@ class CatalogSelectedToFightRiskRuntime:
             source_phase=BattlePhase.FIGHT,
             source_step="fight_phase_end",
             source_result_id=context.result.result_id,
-        )
-        _consume_liability_for_target(state=context.state, candidate=candidate)
-        context.decisions.event_log.append(
-            _RESOLVED_EVENT,
-            validate_json_value(
+            completion_event_type=_RESOLVED_EVENT,
+            completion_event_payload=validate_json_value(
                 {
                     "game_id": context.state.game_id,
                     "battle_round": context.state.battle_round,
@@ -258,7 +255,6 @@ class CatalogSelectedToFightRiskRuntime:
                     "persisting_effect_ids": list(effect_ids),
                     "rules_unit_instance_id": rules_unit_id,
                     "destroyed_model_instance_id": model_id,
-                    "model_destroyed_event_id": destruction.model_destroyed_event_id,
                     "request_id": context.request.request_id,
                     "result_id": context.result.result_id,
                 }
@@ -636,25 +632,6 @@ def _effect_original_target_ids(effect: PersistingEffect) -> tuple[str, ...]:
     ):
         raise GameLifecycleError("Selected-to-fight risk original targets are invalid.")
     return tuple(cast(list[str], target_ids))
-
-
-def _consume_liability_for_target(
-    *,
-    state: GameState,
-    candidate: _FightEndCandidate,
-) -> None:
-    effect_ids = tuple(effect.effect_id for effect in candidate.persisting_effects)
-    state.remove_persisting_effects_by_id(effect_ids)
-    for effect in candidate.persisting_effects:
-        remaining_targets = tuple(
-            unit_id
-            for unit_id in effect.target_unit_instance_ids
-            if unit_id != candidate.rules_unit_instance_id
-        )
-        if remaining_targets:
-            state.record_persisting_effect(
-                replace(effect, target_unit_instance_ids=remaining_targets)
-            )
 
 
 def catalog_selected_to_fight_risk_end_hook_bindings(

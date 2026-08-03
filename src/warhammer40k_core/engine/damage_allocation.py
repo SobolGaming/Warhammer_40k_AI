@@ -51,6 +51,7 @@ SELECT_ALLOCATION_ORDER_DECISION_TYPE = "select_allocation_order"
 SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE = "select_damage_allocation_model"
 SELECT_PRECISION_ALLOCATION_DECISION_TYPE = "select_precision_allocation"
 SELECT_FEEL_NO_PAIN_DECISION_TYPE = "select_feel_no_pain"
+DECLINE_FEEL_NO_PAIN_OPTION_ID = "decline"
 SELECT_DESTRUCTION_REACTION_DECISION_TYPE = "select_destruction_reaction"
 
 
@@ -2088,7 +2089,7 @@ def build_feel_no_pain_request(
     if decline_allowed:
         options.append(
             DecisionOption(
-                option_id="decline",
+                option_id=DECLINE_FEEL_NO_PAIN_OPTION_ID,
                 label="Decline Feel No Pain",
                 payload={"source_id": None},
             )
@@ -2427,8 +2428,11 @@ def destroy_model_by_rule(
     *,
     state: GameState,
     model_instance_id: str,
+    remove_from_battlefield: bool = True,
 ) -> ModelInstance:
     """Destroy one model directly, without routing the destruction through damage."""
+    if type(remove_from_battlefield) is not bool:
+        raise GameLifecycleError("remove_from_battlefield must be a bool.")
     model = model_by_id(state=state, model_instance_id=model_instance_id)
     if not model.is_alive:
         raise GameLifecycleError("A rule cannot destroy a model that is already destroyed.")
@@ -2437,10 +2441,11 @@ def destroy_model_by_rule(
         model_instance_id=model_instance_id,
         wounds_remaining=0,
     )
-    remove_destroyed_model_from_battlefield(
-        state=state,
-        model_instance_id=model_instance_id,
-    )
+    if remove_from_battlefield:
+        remove_destroyed_model_from_battlefield(
+            state=state,
+            model_instance_id=model_instance_id,
+        )
     return model
 
 

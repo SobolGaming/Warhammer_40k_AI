@@ -79,6 +79,8 @@ def restore_selected_model_awaiting_fight_on_death(
     source_id: str,
     source_rule_id: str,
     source_phase: BattlePhaseKind,
+    activation_result_id: str | None = None,
+    completion_context: JsonValue = None,
 ) -> ModelPlacement:
     requested_event_id = _validate_identifier(
         "model_destroyed_event_id",
@@ -110,6 +112,8 @@ def restore_selected_model_awaiting_fight_on_death(
         effect_id=effect_id,
         source_rule_id=requested_source_rule_id,
         source_phase=source_phase,
+        activation_result_id=activation_result_id,
+        completion_context=completion_context,
     )
     decisions.event_log.append(
         "fight_on_death_model_awaiting_attack",
@@ -135,11 +139,27 @@ def restore_model_awaiting_fight_on_death(
     effect_id: str,
     source_rule_id: str,
     source_phase: BattlePhaseKind,
+    activation_result_id: str | None = None,
+    completion_context: JsonValue = None,
 ) -> None:
     if type(placement) is not ModelPlacement:
         raise GameLifecycleError("Fight On Death restore requires ModelPlacement.")
     requested_effect_id = _validate_identifier("effect_id", effect_id)
     requested_source_rule_id = _validate_identifier("source_rule_id", source_rule_id)
+    requested_activation_result_id = (
+        None
+        if activation_result_id is None
+        else _validate_identifier("activation_result_id", activation_result_id)
+    )
+    validated_completion_context = validate_json_value(completion_context)
+    if (requested_activation_result_id is None) != (validated_completion_context is None):
+        raise GameLifecycleError(
+            "Fight On Death activation_result_id and completion_context must be provided together."
+        )
+    if validated_completion_context is not None and not isinstance(
+        validated_completion_context, dict
+    ):
+        raise GameLifecycleError("Fight On Death completion_context must be an object.")
     if type(source_phase) is not BattlePhaseKind:
         raise GameLifecycleError("Fight On Death source_phase must be a BattlePhaseKind.")
     model, unit, army_id, player_id = _model_unit_and_owner_by_id(
@@ -187,11 +207,65 @@ def restore_model_awaiting_fight_on_death(
             {
                 "effect_kind": FIGHT_ON_DEATH_AWAITING_EFFECT_KIND,
                 "model_instance_id": model.model_instance_id,
+                **(
+                    {}
+                    if requested_activation_result_id is None
+                    else {
+                        "activation_result_id": requested_activation_result_id,
+                        "completion_context": validated_completion_context,
+                    }
+                ),
             }
         ),
     )
     state.replace_battlefield_state(restored)
     state.record_persisting_effect(effect)
+
+
+def fight_on_death_model_ids_for_activation(
+    *,
+    state: GameState,
+    activation_result_id: str,
+) -> tuple[str, ...] | None:
+    requested_result_id = _validate_identifier("activation_result_id", activation_result_id)
+    matching = tuple(
+        effect
+        for effect in state.persisting_effects
+        if _is_fight_on_death_awaiting_effect(effect)
+        and _awaiting_effect_activation_result_id(effect) == requested_result_id
+    )
+    if not matching:
+        return None
+    model_ids = tuple(sorted(_awaiting_effect_model_id(effect) for effect in matching))
+    if len(model_ids) != len(set(model_ids)):
+        raise GameLifecycleError("Fight On Death activation has duplicate awaiting models.")
+    return model_ids
+
+
+def fight_on_death_completion_context_for_activation(
+    *,
+    state: GameState,
+    activation_result_id: str,
+) -> dict[str, JsonValue] | None:
+    requested_result_id = _validate_identifier("activation_result_id", activation_result_id)
+    matching = tuple(
+        effect
+        for effect in state.persisting_effects
+        if _is_fight_on_death_awaiting_effect(effect)
+        and _awaiting_effect_activation_result_id(effect) == requested_result_id
+    )
+    if not matching:
+        return None
+    if len(matching) != 1:
+        raise GameLifecycleError("Rule Fight On Death continuation must target exactly one model.")
+    payload = _payload_object(
+        matching[0].effect_payload,
+        field_name="Fight On Death effect_payload",
+    )
+    context = payload.get("completion_context")
+    if not isinstance(context, dict):
+        raise GameLifecycleError("Fight On Death completion context is invalid.")
+    return context
 
 
 def remove_models_awaiting_fight_on_death(
@@ -331,6 +405,16 @@ def _awaiting_effect_model_id(effect: PersistingEffect) -> str:
     return _validate_identifier(
         "Fight On Death model_instance_id", payload.get("model_instance_id")
     )
+
+
+def _awaiting_effect_activation_result_id(effect: PersistingEffect) -> str | None:
+    payload = _payload_object(effect.effect_payload, field_name="Fight On Death effect_payload")
+    if payload.get("effect_kind") != FIGHT_ON_DEATH_AWAITING_EFFECT_KIND:
+        raise GameLifecycleError("PersistingEffect is not a Fight On Death awaiting effect.")
+    value = payload.get("activation_result_id")
+    if value is None:
+        return None
+    return _validate_identifier("Fight On Death activation_result_id", value)
 
 
 def _model_and_unit_by_id(

@@ -17,6 +17,12 @@ from warhammer40k_core.engine.destruction_reaction_conditions import (
 from warhammer40k_core.engine.destruction_reaction_conditions import (
     optional_destruction_reaction_trigger_conditions_met as _optional_destruction_reaction_trigger_conditions_met,
 )
+from warhammer40k_core.engine.deadly_demise import (
+    deadly_demise_descriptor as _shared_deadly_demise_descriptor,
+    deadly_demise_mortal_wounds_for_target as _shared_deadly_demise_mortal_wounds_for_target,
+    deadly_demise_target_unit_ids as _shared_deadly_demise_target_unit_ids,
+    resolve_deadly_demise_trigger,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -676,18 +682,13 @@ def _resolve_deadly_demise_before_removal(
     destroyed_model_controller_player_id: str,
     pending_sources: tuple[DestructionReactionSource, ...],
 ) -> LifecycleStatus | None:
-    descriptor = _deadly_demise_descriptor(source)
-    trigger_roll_threshold = _payload_positive_int(descriptor, key="trigger_roll_threshold")
-    range_inches = _payload_positive_number(descriptor, key="range_inches")
-    trigger_roll = manager.roll(
-        deadly_demise_trigger_roll_spec(
-            source=source,
-            player_id=destroyed_model_controller_player_id,
-            model_instance_id=damage.model_instance_id,
-        )
+    descriptor, trigger_roll_payload, triggered = resolve_deadly_demise_trigger(
+        manager=manager,
+        source=source,
+        player_id=destroyed_model_controller_player_id,
+        model_instance_id=damage.model_instance_id,
     )
-    trigger_roll_payload = validate_json_value(trigger_roll.to_payload())
-    triggered = trigger_roll.current_total >= trigger_roll_threshold
+    range_inches = _payload_positive_number(descriptor, key="range_inches")
     if not triggered:
         _emit_mandatory_destruction_reaction_record(
             decisions=decisions,
@@ -1189,31 +1190,13 @@ def _deadly_demise_mortal_wounds_for_target(
     player_id: str,
     target_unit_instance_id: str,
 ) -> tuple[int, JsonValue]:
-    wound_descriptor = _payload_object(descriptor["mortal_wounds"])
-    kind = _payload_string(wound_descriptor, key="kind")
-    if kind == "fixed":
-        return _payload_positive_int(wound_descriptor, key="value"), None
-    if kind == "d3":
-        reason = (
-            f"Deadly Demise mortal wounds for {source.source_id} into {target_unit_instance_id}"
-        )
-        result = manager.roll_d3(
-            reason=reason,
-            roll_type="destruction_reaction.deadly_demise.mortal_wounds",
-            actor_id=player_id,
-        )
-        return result.value, validate_json_value(result.to_payload())
-    if kind == "d6":
-        roll = manager.roll(
-            deadly_demise_mortal_wounds_roll_spec(
-                source=source,
-                player_id=player_id,
-                target_unit_instance_id=target_unit_instance_id,
-                sides=6,
-            )
-        )
-        return roll.current_total, validate_json_value(roll.to_payload())
-    raise GameLifecycleError("Unsupported Deadly Demise mortal-wound descriptor.")
+    return _shared_deadly_demise_mortal_wounds_for_target(
+        manager=manager,
+        source=source,
+        descriptor=descriptor,
+        player_id=player_id,
+        target_unit_instance_id=target_unit_instance_id,
+    )
 
 
 def _emit_deadly_demise_mortal_wounds_applied(
@@ -1247,32 +1230,11 @@ def _deadly_demise_target_unit_ids(
     source_model_instance_id: str,
     range_inches: float,
 ) -> tuple[str, ...]:
-    battlefield = state.battlefield_state
-    if battlefield is None:
-        raise GameLifecycleError("Deadly Demise requires battlefield_state.")
-    source_model_id = _validate_identifier("source_model_instance_id", source_model_instance_id)
-    try:
-        source_placement = battlefield.model_placement_by_id(source_model_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Deadly Demise source model must remain placed.") from exc
-    source_model = geometry_model_for_placement(
-        model=model_by_id(state=state, model_instance_id=source_model_id),
-        placement=source_placement,
+    return _shared_deadly_demise_target_unit_ids(
+        state=state,
+        source_model_instance_id=source_model_instance_id,
+        range_inches=range_inches,
     )
-    placed_model_ids = set(battlefield.placed_model_ids())
-    target_unit_ids: list[str] = []
-    for army in state.army_definitions:
-        for unit in army.units:
-            if _unit_has_model_within_deadly_demise_range(
-                state=state,
-                unit=unit,
-                source_model_id=source_model_id,
-                source_model=source_model,
-                placed_model_ids=placed_model_ids,
-                range_inches=range_inches,
-            ):
-                target_unit_ids.append(unit.unit_instance_id)
-    return tuple(sorted(target_unit_ids))
 
 
 def _unit_has_model_within_deadly_demise_range(
@@ -1304,24 +1266,7 @@ def _unit_has_model_within_deadly_demise_range(
 
 
 def _deadly_demise_descriptor(source: DestructionReactionSource) -> dict[str, JsonValue]:
-    if source.reaction_kind is not DestructionReactionKind.DEADLY_DEMISE:
-        raise GameLifecycleError("Deadly Demise descriptor requires a Deadly Demise source.")
-    payload = _payload_object(source.payload)
-    range_inches = _payload_positive_number(payload, key="range_inches")
-    mortal_wounds = _payload_object(payload["mortal_wounds"])
-    kind = _payload_string(mortal_wounds, key="kind")
-    if kind == "fixed":
-        _payload_positive_int(mortal_wounds, key="value")
-    elif kind not in {"d3", "d6"}:
-        raise GameLifecycleError("Unsupported Deadly Demise mortal-wound descriptor.")
-    return {
-        "trigger_roll_threshold": _validate_d6_target(
-            "Deadly Demise trigger_roll_threshold",
-            payload["trigger_roll_threshold"],
-        ),
-        "range_inches": range_inches,
-        "mortal_wounds": validate_json_value(mortal_wounds),
-    }
+    return _shared_deadly_demise_descriptor(source)
 
 
 def _deadly_demise_source_context_payload(
