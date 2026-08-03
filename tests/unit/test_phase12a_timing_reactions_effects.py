@@ -1110,12 +1110,172 @@ def test_rule_deadly_demise_collateral_chain_restores_nested_fnp_continuation() 
         for payload in applied
         if cast(dict[str, JsonValue], payload["source"])["source_id"] == root_source.source_id
     )
+    collateral_reactions = tuple(
+        cast(dict[str, JsonValue], event.payload)
+        for event in restored_decisions.event_log.records
+        if event.event_type == "destruction_reaction_resolved"
+        and cast(dict[str, JsonValue], event.payload)["selected_reaction_kind"]
+        == DestructionReactionKind.DEADLY_DEMISE.value
+        and cast(
+            dict[str, JsonValue],
+            cast(dict[str, JsonValue], event.payload)["selected_source"],
+        )["source_id"]
+        == collateral_source.source_id
+    )
     assert len(root_packets) == 1
     assert root_packets[0]["target_unit_instance_id"] == attached_id
+    assert len(collateral_reactions) == 1
+    assert (
+        cast(dict[str, JsonValue], collateral_reactions[0]["destruction_provenance"])[
+            "destruction_source_kind"
+        ]
+        == "deadly_demise"
+    )
     assert GameState.from_payload(restored_state.to_payload()).to_payload() == (
         restored_state.to_payload()
     )
     assert DecisionController.from_payload(restored_decisions.to_payload()) == restored_decisions
+
+
+@pytest.mark.parametrize(
+    ("mandatory_kind", "expected_action_host"),
+    [
+        (DestructionReactionKind.FIGHT_ON_DEATH, "fight"),
+        (DestructionReactionKind.SHOOT_ON_DEATH, "shooting"),
+    ],
+)
+def test_rule_deadly_demise_collateral_routes_mandatory_action_host_after_restore(
+    mandatory_kind: DestructionReactionKind,
+    expected_action_host: str,
+) -> None:
+    state, _runtime, decisions, bodyguard, leader, enemy, _attached_id = (
+        attached_selected_to_fight_risk_fixture(
+            pre_split=True,
+            bodyguard_model_count=2,
+            enemy_x=16.0,
+        )
+    )
+    root_model_id = enemy.own_models[0].model_instance_id
+    first_casualty_id = bodyguard.own_models[0].model_instance_id
+    pending_casualty_id = bodyguard.own_models[1].model_instance_id
+    pending_target_model_id = leader.own_models[0].model_instance_id
+    source_id = f"test:rule-deadly-demise:mandatory:{mandatory_kind.value}"
+    liability = _record_rule_destruction_liability(
+        state=state,
+        effect_id=f"{source_id}:liability",
+        target_unit_instance_id=enemy.unit_instance_id,
+        owner_player_id="player-enemy",
+    )
+    state.clear_model_destruction_reaction_sources(model_instance_id=root_model_id)
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=root_model_id,
+        sources=(
+            _deadly_demise_source(
+                source_id="test:rule-deadly-demise:root",
+                mortal_wounds=sum(model.wounds_remaining for model in bodyguard.own_models),
+            ),
+        ),
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=first_casualty_id,
+        sources=(
+            DestructionReactionSource(
+                source_id=source_id,
+                reaction_kind=mandatory_kind,
+                source_rule_id=source_id,
+                optional=False,
+            ),
+            DestructionReactionSource(
+                source_id=f"{source_id}:optional-pause",
+                reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+                source_rule_id=f"{source_id}:optional-pause",
+            ),
+        ),
+    )
+
+    destruction = rule_model_destruction.destroy_model_with_rule_reactions(
+        state=state,
+        decisions=decisions,
+        model_instance_id=root_model_id,
+        rules_unit_instance_id=enemy.unit_instance_id,
+        destroying_player_id="player-enemy",
+        source_rule_id=f"{source_id}:root-destruction",
+        source_effect_ids=(liability.effect_id,),
+        source_phase=BattlePhase.FIGHT,
+        source_step="fight_phase_end",
+        source_result_id=f"{source_id}:root-result",
+        completion_event_type="test_rule_deadly_demise_mandatory_completed",
+        completion_event_payload={"root_model_instance_id": root_model_id},
+    )
+
+    assert destruction.status is not None
+    assert destruction.status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert state.battlefield_state is not None
+    assert first_casualty_id not in state.battlefield_state.placed_model_ids()
+    assert pending_casualty_id in state.battlefield_state.placed_model_ids()
+    assert pending_target_model_id in state.battlefield_state.placed_model_ids()
+    restored_state = GameState.from_payload(state.to_payload())
+    restored_decisions = DecisionController.from_payload(decisions.to_payload())
+    pause_request = restored_decisions.queue.peek_next()
+    pause_record = restored_decisions.submit_result(
+        DecisionResult.for_request(
+            result_id=f"{source_id}:optional-declined",
+            request=pause_request,
+            selected_option_id=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+        )
+    )
+
+    assert (
+        rule_model_destruction.apply_rule_model_destruction_reaction_decision(
+            state=restored_state,
+            decisions=restored_decisions,
+            result=pause_record.result,
+        )
+        is None
+    )
+    assert restored_state.battlefield_state is not None
+    placed_model_ids = restored_state.battlefield_state.placed_model_ids()
+    assert root_model_id not in placed_model_ids
+    assert pending_casualty_id not in placed_model_ids
+    assert pending_target_model_id not in placed_model_ids
+    records = restored_decisions.event_log.records
+    mandatory_index, mandatory_record = next(
+        (index, record)
+        for index, record in enumerate(records)
+        if record.event_type == "destruction_reaction_resolved"
+        and cast(
+            dict[str, JsonValue],
+            cast(dict[str, JsonValue], record.payload)["selected_source"],
+        )["source_id"]
+        == source_id
+    )
+    mandatory_payload = cast(dict[str, JsonValue], mandatory_record.payload)
+    pending_casualty_index = next(
+        index
+        for index, record in enumerate(records)
+        if record.event_type == "model_destroyed"
+        and cast(dict[str, JsonValue], record.payload)["model_instance_id"] == pending_casualty_id
+    )
+    pending_target_index = next(
+        index
+        for index, record in enumerate(records)
+        if record.event_type == "deadly_demise_mortal_wounds_applied"
+        and cast(dict[str, JsonValue], record.payload)["target_unit_instance_id"]
+        == leader.unit_instance_id
+    )
+    assert mandatory_payload["selected_reaction_kind"] == mandatory_kind.value
+    assert mandatory_payload["action_host"] == expected_action_host
+    assert mandatory_payload["execution_status"] == "recorded_for_action_host"
+    assert (
+        cast(dict[str, JsonValue], mandatory_payload["destruction_provenance"])[
+            "destruction_source_kind"
+        ]
+        == "deadly_demise"
+    )
+    assert mandatory_index < pending_casualty_index < pending_target_index
+    assert all(
+        effect.effect_id != liability.effect_id for effect in restored_state.persisting_effects
+    )
 
 
 def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction() -> None:

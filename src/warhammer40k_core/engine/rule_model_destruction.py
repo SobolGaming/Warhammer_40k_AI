@@ -41,7 +41,6 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_provenance import (
     DestructionProvenance,
-    DestructionSourceKind,
 )
 from warhammer40k_core.engine.destruction_reaction_conditions import (
     optional_destruction_reaction_trigger_conditions_for_target,
@@ -729,8 +728,8 @@ def _emit_rule_deadly_demise_resolution(
                 "target_unit_instance_id": _payload_string(root_context, "target_unit_instance_id"),
                 "rules_unit_instance_id": _payload_string(root_context, "rules_unit_instance_id"),
                 "model_destroyed_event_id": None,
-                "destruction_provenance": DestructionProvenance.for_non_attack(
-                    DestructionSourceKind.ABILITY
+                "destruction_provenance": destruction_provenance_from_rule_context(
+                    root_context
                 ).to_payload(),
                 "battle_round": root_context.get("battle_round"),
                 "deadly_demise": {
@@ -808,7 +807,11 @@ def _continue_rule_deadly_demise_secondary_destroyed_models(
             state=state,
             decisions=decisions,
             root_context=secondary_context,
-            sources=tuple(item for item in sources if not item.optional),
+            sources=tuple(
+                item
+                for item in sources
+                if not item.optional and item.reaction_kind is DestructionReactionKind.DEADLY_DEMISE
+            ),
         )
         if mandatory_status is not None:
             return mandatory_status

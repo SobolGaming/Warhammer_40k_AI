@@ -140,6 +140,7 @@ def test_rule_deadly_demise_collateral_uses_shared_destruction_continuation() ->
         path=RULE_MODEL_DESTRUCTION,
         function_name="_continue_rule_deadly_demise_secondary_destroyed_models",
     )
+    function_source = ast.unparse(function)
     call_names = {
         node.func.id
         for node in ast.walk(function)
@@ -151,6 +152,22 @@ def test_rule_deadly_demise_collateral_uses_shared_destruction_continuation() ->
         "_remove_rule_destroyed_model_and_continue",
     }.issubset(call_names)
     assert "remove_destroyed_model_from_battlefield" not in call_names
+    assert "not item.optional" in function_source
+    assert "item.reaction_kind is DestructionReactionKind.DEADLY_DEMISE" in function_source
+
+
+def test_rule_deadly_demise_resolution_uses_context_destruction_provenance() -> None:
+    function = _function_node(
+        path=RULE_MODEL_DESTRUCTION,
+        function_name="_emit_rule_deadly_demise_resolution",
+    )
+    call_names = {
+        node.func.id
+        for node in ast.walk(function)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+
+    assert "destruction_provenance_from_rule_context" in call_names
 
 
 def _function_node(*, path: Path, function_name: str) -> ast.FunctionDef:
