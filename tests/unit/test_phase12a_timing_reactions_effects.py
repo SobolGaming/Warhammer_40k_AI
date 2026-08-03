@@ -14,14 +14,18 @@ from tests.support.selected_to_fight_risk_fixtures import (
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceRollResult, RollOffRequest
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatus
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.damage_allocation import (
     DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+    DECLINE_FEEL_NO_PAIN_OPTION_ID,
     DestructionReactionKind,
     DestructionReactionSource,
+    FeelNoPainSource,
     model_by_id,
 )
+from warhammer40k_core.engine.deadly_demise import deadly_demise_target_unit_ids
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -992,6 +996,229 @@ def test_selected_to_fight_risk_fight_on_death_exposes_only_destroyed_models_wea
     } == {model_id}
 
 
+def test_deadly_demise_targets_attached_rules_unit_once() -> None:
+    state, _runtime, _decisions, _bodyguard, _leader, enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture(
+            pre_split=False,
+            enemy_x=16.0,
+        )
+    )
+
+    target_ids = deadly_demise_target_unit_ids(
+        state=state,
+        source_model_instance_id=enemy.own_models[0].model_instance_id,
+        range_inches=6.0,
+    )
+
+    assert target_ids == (attached_id,)
+
+
+def test_rule_deadly_demise_collateral_chain_restores_nested_fnp_continuation() -> None:
+    state, _runtime, decisions, bodyguard, leader, enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture(
+            pre_split=False,
+            enemy_x=16.0,
+        )
+    )
+    root_model_id = enemy.own_models[0].model_instance_id
+    bodyguard_model_id = bodyguard.own_models[0].model_instance_id
+    leader_model_id = leader.own_models[0].model_instance_id
+    liability = _record_rule_destruction_liability(
+        state=state,
+        effect_id="test:rule-deadly-demise:nested-fnp-liability",
+        target_unit_instance_id=enemy.unit_instance_id,
+        owner_player_id="player-enemy",
+    )
+    root_source = _deadly_demise_source(
+        source_id="test:rule-deadly-demise:root",
+        mortal_wounds=bodyguard.own_models[0].wounds_remaining,
+    )
+    collateral_source = _deadly_demise_source(
+        source_id="test:rule-deadly-demise:collateral",
+        mortal_wounds=1,
+    )
+    state.clear_model_destruction_reaction_sources(model_instance_id=root_model_id)
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=root_model_id,
+        sources=(root_source,),
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=bodyguard_model_id,
+        sources=(collateral_source,),
+    )
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=leader_model_id,
+        sources=(FeelNoPainSource(source_id="test:nested-deadly-demise:fnp", threshold=5),),
+        decline_allowed=True,
+    )
+
+    destruction = rule_model_destruction.destroy_model_with_rule_reactions(
+        state=state,
+        decisions=decisions,
+        model_instance_id=root_model_id,
+        rules_unit_instance_id=enemy.unit_instance_id,
+        destroying_player_id="player-enemy",
+        source_rule_id="test:rule-deadly-demise:root-destruction",
+        source_effect_ids=(liability.effect_id,),
+        source_phase=BattlePhase.FIGHT,
+        source_step="fight_phase_end",
+        source_result_id="test:rule-deadly-demise:root-result",
+        completion_event_type="test_rule_deadly_demise_completed",
+        completion_event_payload={"root_model_instance_id": root_model_id},
+    )
+
+    assert destruction.status is not None
+    assert destruction.status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert state.battlefield_state is not None
+    assert root_model_id in state.battlefield_state.placed_model_ids()
+    assert bodyguard_model_id in state.battlefield_state.placed_model_ids()
+    restored_state = GameState.from_payload(state.to_payload())
+    restored_decisions = DecisionController.from_payload(decisions.to_payload())
+    fnp_request = restored_decisions.queue.peek_next()
+    assert rule_model_destruction.is_rule_model_destruction_mortal_wound_request(fnp_request)
+    fnp_record = restored_decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="test:rule-deadly-demise:nested-fnp-declined",
+            request=fnp_request,
+            selected_option_id=DECLINE_FEEL_NO_PAIN_OPTION_ID,
+        )
+    )
+
+    final_status = rule_model_destruction.apply_rule_model_destruction_mortal_wound_decision(
+        state=restored_state,
+        decisions=restored_decisions,
+        result=fnp_record.result,
+    )
+    assert final_status is None
+    assert restored_state.battlefield_state is not None
+    assert root_model_id not in restored_state.battlefield_state.placed_model_ids()
+    assert bodyguard_model_id not in restored_state.battlefield_state.placed_model_ids()
+    assert model_by_id(
+        state=restored_state,
+        model_instance_id=leader_model_id,
+    ).wounds_remaining == (leader.own_models[0].starting_wounds - 1)
+    assert all(
+        effect.effect_id != liability.effect_id for effect in restored_state.persisting_effects
+    )
+    applied = tuple(
+        cast(dict[str, JsonValue], event.payload)
+        for event in restored_decisions.event_log.records
+        if event.event_type == "deadly_demise_mortal_wounds_applied"
+    )
+    root_packets = tuple(
+        payload
+        for payload in applied
+        if cast(dict[str, JsonValue], payload["source"])["source_id"] == root_source.source_id
+    )
+    assert len(root_packets) == 1
+    assert root_packets[0]["target_unit_instance_id"] == attached_id
+    assert GameState.from_payload(restored_state.to_payload()).to_payload() == (
+        restored_state.to_payload()
+    )
+    assert DecisionController.from_payload(restored_decisions.to_payload()) == restored_decisions
+
+
+def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction() -> None:
+    state, _runtime, decisions, bodyguard, _leader, enemy, _attached_id = (
+        attached_selected_to_fight_risk_fixture(
+            pre_split=False,
+            enemy_x=16.0,
+        )
+    )
+    root_model_id = enemy.own_models[0].model_instance_id
+    bodyguard_model_id = bodyguard.own_models[0].model_instance_id
+    liability = _record_rule_destruction_liability(
+        state=state,
+        effect_id="test:rule-deadly-demise:collateral-fod-liability",
+        target_unit_instance_id=enemy.unit_instance_id,
+        owner_player_id="player-enemy",
+    )
+    state.clear_model_destruction_reaction_sources(model_instance_id=root_model_id)
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=root_model_id,
+        sources=(
+            _deadly_demise_source(
+                source_id="test:rule-deadly-demise:fod-root",
+                mortal_wounds=bodyguard.own_models[0].wounds_remaining,
+            ),
+        ),
+    )
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=bodyguard_model_id,
+        sources=(
+            DestructionReactionSource(
+                source_id="test:rule-deadly-demise:collateral-fod",
+                reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+                source_rule_id="test:rule-deadly-demise:collateral-fod",
+            ),
+        ),
+    )
+
+    destruction = rule_model_destruction.destroy_model_with_rule_reactions(
+        state=state,
+        decisions=decisions,
+        model_instance_id=root_model_id,
+        rules_unit_instance_id=enemy.unit_instance_id,
+        destroying_player_id="player-enemy",
+        source_rule_id="test:rule-deadly-demise:fod-root-destruction",
+        source_effect_ids=(liability.effect_id,),
+        source_phase=BattlePhase.FIGHT,
+        source_step="fight_phase_end",
+        source_result_id="test:rule-deadly-demise:fod-root-result",
+        completion_event_type="test_rule_deadly_demise_fod_completed",
+        completion_event_payload={"root_model_instance_id": root_model_id},
+    )
+
+    assert destruction.status is not None
+    reaction_request = decisions.queue.peek_next()
+    reaction_option = next(
+        option
+        for option in reaction_request.options
+        if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
+    )
+    reaction_record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="test:rule-deadly-demise:collateral-fod-accepted",
+            request=reaction_request,
+            selected_option_id=reaction_option.option_id,
+        )
+    )
+    package = undivided_daemon_package()
+    handler = FightPhaseHandler(
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        army_catalog=package.army_catalog,
+    )
+
+    assert (
+        handler.apply_decision(
+            state=state,
+            decisions=decisions,
+            result=reaction_record.result,
+        )
+        is None
+    )
+    round_tripped_state = GameState.from_payload(state.to_payload())
+    round_tripped_decisions = DecisionController.from_payload(decisions.to_payload())
+    completed = handler.begin_phase(
+        state=round_tripped_state,
+        decisions=round_tripped_decisions,
+    )
+
+    assert completed.status_kind is LifecycleStatusKind.ADVANCED
+    assert round_tripped_state.battlefield_state is not None
+    assert root_model_id not in round_tripped_state.battlefield_state.placed_model_ids()
+    assert bodyguard_model_id not in round_tripped_state.battlefield_state.placed_model_ids()
+    assert all(
+        effect.effect_id != liability.effect_id for effect in round_tripped_state.persisting_effects
+    )
+    destroyed_ids = tuple(
+        cast(dict[str, JsonValue], event.payload)["model_instance_id"]
+        for event in round_tripped_decisions.event_log.records
+        if event.event_type == "model_destroyed"
+    )
+    assert destroyed_ids[-2:] == (bodyguard_model_id, root_model_id)
+
+
 @pytest.mark.parametrize(
     ("attacking_unit_kind", "expected_candidate_kind"),
     [("attached", None), ("bodyguard", "leader")],
@@ -1489,6 +1716,49 @@ def _persisting_effect(
         started_phase=BattlePhase.MOVEMENT,
         expiration=expiration,
         effect_payload={"modifier": "benefit_of_cover"},
+    )
+
+
+def _record_rule_destruction_liability(
+    *,
+    state: GameState,
+    effect_id: str,
+    target_unit_instance_id: str,
+    owner_player_id: str,
+) -> PersistingEffect:
+    effect = PersistingEffect(
+        effect_id=effect_id,
+        source_rule_id="test:rule-deadly-demise:liability",
+        owner_player_id=owner_player_id,
+        target_unit_instance_ids=(target_unit_instance_id,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhase.FIGHT,
+        expiration=EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=BattlePhase.FIGHT,
+            player_id=owner_player_id,
+        ),
+        effect_payload={"effect_kind": "test_rule_destruction_liability"},
+    )
+    state.record_persisting_effect(effect)
+    return effect
+
+
+def _deadly_demise_source(
+    *,
+    source_id: str,
+    mortal_wounds: int,
+) -> DestructionReactionSource:
+    return DestructionReactionSource(
+        source_id=source_id,
+        reaction_kind=DestructionReactionKind.DEADLY_DEMISE,
+        source_rule_id=source_id,
+        payload={
+            "trigger_roll_threshold": 2,
+            "range_inches": 6.0,
+            "mortal_wounds": {"kind": "fixed", "value": mortal_wounds},
+        },
+        optional=False,
     )
 
 

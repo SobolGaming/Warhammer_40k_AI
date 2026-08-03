@@ -56,6 +56,7 @@ from warhammer40k_core.engine.abilities import (
 )
 from warhammer40k_core.engine.ability_catalog import build_player_ability_index
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
+from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState, PlacedArmy
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
@@ -92,6 +93,8 @@ from warhammer40k_core.engine.faction_content.events import (
 )
 from warhammer40k_core.engine.fight_order import FightPhaseState
 from warhammer40k_core.engine.fight_phase_end_hooks import (
+    SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE,
+    FightPhaseEndHookRegistry,
     FightPhaseEndRequestContext,
     FightPhaseEndResultContext,
 )
@@ -1412,10 +1415,105 @@ def test_daemonic_patrons_deadly_demise_routes_mortal_wound_fnp_before_removal()
 
 
 def test_daemonic_patrons_fight_on_death_interrupts_fight_end_and_completes_destruction() -> None:
-    state, runtime, source, _enemy, _profile = _daemonic_patrons_runtime_fixture(enemy_x=30.0)
+    (
+        state,
+        decisions,
+        runtime,
+        next_liability_source,
+        model_id,
+        reaction_request_id,
+        reaction_option_id,
+    ) = _pending_daemonic_patrons_fight_on_death_fixture()
+    session, resume_config = _daemonic_patrons_session(
+        state=state,
+        decisions=decisions,
+    )
+    replay_session = session.fork()
+    _install_daemonic_patrons_resume_runtime(
+        session=session,
+        config=resume_config,
+        runtime=runtime,
+    )
+    _install_daemonic_patrons_resume_runtime(
+        session=replay_session,
+        config=resume_config,
+        runtime=runtime,
+    )
+    completed = session.submit_option(
+        request_id=reaction_request_id,
+        option_id=reaction_option_id,
+        result_id="daemonic-patrons-fight-on-death-accepted",
+    )
+    replay_completed = replay_session.submit_option(
+        request_id=reaction_request_id,
+        option_id=reaction_option_id,
+        result_id="daemonic-patrons-fight-on-death-accepted",
+    )
+    completed_state = session.lifecycle.state
+    assert completed_state is not None
+
+    assert completed.status_kind is not LifecycleStatusKind.INVALID
+    assert replay_completed.to_payload() == completed.to_payload()
+    assert replay_session.lifecycle.to_payload() == session.lifecycle.to_payload()
+    assert completed.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert completed.decision_request is not None
+    assert (
+        completed.decision_request.decision_type
+        == SELECT_FACTION_RULE_FIGHT_PHASE_END_OPTION_DECISION_TYPE
+    )
+    assert completed.decision_request.actor_id == "player-source"
+    next_request_payload = cast(dict[str, JsonValue], completed.decision_request.payload)
+    assert next_request_payload["rules_unit_instance_id"] == (
+        next_liability_source.unit_instance_id
+    )
+    assert completed_state.fight_phase_state is not None
+    assert completed_state.battlefield_state is not None
+    assert model_id not in completed_state.battlefield_state.placed_model_ids()
+    assert tuple(effect.effect_id for effect in completed_state.persisting_effects) == (
+        "daemonic-patrons-kill-effect",
+    )
+    event_types = [
+        record.event_type for record in session.lifecycle.decision_controller.event_log.records
+    ]
+    assert "fight_on_death_activation_started" in event_types
+    assert "unit_has_fought" in event_types
+    assert "fight_on_death_models_removed" in event_types
+    assert event_types.index("unit_has_fought") < event_types.index(
+        "catalog_failed_fight_activation_model_destroyed"
+    )
+
+
+def _pending_daemonic_patrons_fight_on_death_fixture() -> tuple[
+    GameState,
+    DecisionController,
+    CatalogSelectedToFightRiskRuntime,
+    UnitInstance,
+    str,
+    str,
+    str,
+]:
+    state, _runtime, source, enemy, _profile = _daemonic_patrons_runtime_fixture(enemy_x=30.0)
+    runtime = CatalogSelectedToFightRiskRuntime(
+        {
+            "player-source": AbilityCatalogIndex.from_records(
+                _daemonic_patrons_records(source=source)
+            ),
+            "player-enemy": AbilityCatalogIndex.from_records(
+                _daemonic_patrons_records(source=enemy)
+            ),
+        },
+        tuple(state.army_definitions),
+    )
     decisions = DecisionController()
     _record_daemonic_patrons_effect(state=state, runtime=runtime, source=source)
-    model_id = source.own_models[0].model_instance_id
+    _record_daemonic_patrons_effect(
+        state=state,
+        runtime=runtime,
+        source=enemy,
+        owner_player_id="player-enemy",
+        effect_id="daemonic-patrons-next-liability-effect",
+    )
+    model_id = enemy.own_models[0].model_instance_id
     reaction_source = DestructionReactionSource(
         source_id="test:daemonic-patrons:fight-on-death:end-interrupt",
         reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
@@ -1430,6 +1528,7 @@ def test_daemonic_patrons_fight_on_death_interrupts_fight_end_and_completes_dest
         FightPhaseEndRequestContext(state=state, decisions=decisions)
     )
     assert request is not None
+    assert request.actor_id == "player-enemy"
     decisions.request_decision(request)
     destruction_record = decisions.submit_result(
         DecisionResult.for_request(
@@ -1453,52 +1552,96 @@ def test_daemonic_patrons_fight_on_death_interrupts_fight_end_and_completes_dest
         for option in reaction_request.options
         if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
     )
-    reaction_record = decisions.submit_result(
-        DecisionResult.for_request(
-            result_id="daemonic-patrons-fight-on-death-accepted",
-            request=reaction_request,
-            selected_option_id=reaction_option.option_id,
+    return (
+        state,
+        decisions,
+        runtime,
+        source,
+        model_id,
+        reaction_request.request_id,
+        reaction_option.option_id,
+    )
+
+
+def _daemonic_patrons_session(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+) -> tuple[LocalGameSession, GameConfig]:
+    session = LocalGameSession(
+        lifecycle=GameLifecycle.from_payload(
+            cast(
+                Any,
+                {
+                    "config": None,
+                    "parameterized_movement_proposals": True,
+                    "state": state.to_payload(),
+                    "decisions": decisions.to_payload(),
+                    "reaction_queue": ReactionQueue().to_payload(),
+                },
+            )
         )
     )
     package = undivided_daemon_package()
-    handler = FightPhaseHandler(
-        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+    resume_config = GameConfig(
+        game_id=state.game_id,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         army_catalog=package.army_catalog,
+        army_muster_requests=tuple(
+            ArmyMusterRequest(
+                army_id=army.army_id,
+                player_id=army.player_id,
+                catalog_id=army.catalog_id,
+                source_package_id=army.source_package_id,
+                ruleset_id=army.ruleset_id,
+                detachment_selection=army.detachment_selection,
+                force_disposition_id=army.force_disposition_id,
+                unit_selections=tuple(
+                    UnitMusterSelection(
+                        unit_selection_id=unit.unit_instance_id.removeprefix(f"{army.army_id}:"),
+                        datasheet_id=unit.datasheet_id,
+                        model_profile_selections=(
+                            ModelProfileSelection(
+                                model_profile_id=unit.own_models[0].model_profile_id,
+                                model_count=len(unit.own_models),
+                            ),
+                        ),
+                        wargear_selections=unit.wargear_selections,
+                        mustering_option_selections=unit.mustering_option_selections,
+                    )
+                    for unit in army.units
+                ),
+            )
+            for army in state.army_definitions
+        ),
+        player_ids=state.player_ids,
+        turn_order=state.turn_order,
+        fixed_secondary_mission_ids=("assassination", "bring_it_down"),
+        mission_setup=state.mission_setup,
+        allow_legacy_non_strict_rosters=True,
     )
+    return session, resume_config
 
-    assert (
-        handler.apply_decision(
-            state=state,
-            decisions=decisions,
-            result=reaction_record.result,
-        )
-        is None
+
+def _install_daemonic_patrons_resume_runtime(
+    *,
+    session: LocalGameSession,
+    config: GameConfig,
+    runtime: CatalogSelectedToFightRiskRuntime,
+) -> None:
+    fight_handler = FightPhaseHandler(
+        ruleset_descriptor=config.ruleset_descriptor,
+        army_catalog=config.army_catalog,
+        fight_phase_end_hooks=FightPhaseEndHookRegistry.from_bindings(
+            runtime.fight_phase_end_hook_bindings()
+        ),
     )
-    assert state.fight_phase_state is not None
-    assert state.fight_phase_state.current_step is FightPhaseStepKind.END
-    assert state.fight_phase_state.active_activation is not None
-    assert state.fight_phase_state.active_activation.unit_instance_id == source.unit_instance_id
-    round_tripped_state = GameState.from_payload(state.to_payload())
-    assert round_tripped_state.fight_phase_state is not None
-    assert round_tripped_state.fight_phase_state.active_activation == (
-        state.fight_phase_state.active_activation
-    )
-    assert DecisionController.from_payload(decisions.to_payload()) == decisions
-
-    completed = handler.begin_phase(state=state, decisions=decisions)
-
-    assert completed.status_kind is LifecycleStatusKind.ADVANCED
-    assert state.fight_phase_state is not None
-    assert state.fight_phase_state.phase_complete
-    assert state.battlefield_state is not None
-    assert model_id not in state.battlefield_state.placed_model_ids()
-    assert not state.persisting_effects
-    event_types = [record.event_type for record in decisions.event_log.records]
-    assert "fight_on_death_activation_started" in event_types
-    assert "unit_has_fought" in event_types
-    assert "fight_on_death_models_removed" in event_types
-    assert event_types.index("unit_has_fought") < event_types.index(
-        "catalog_failed_fight_activation_model_destroyed"
+    session.lifecycle._config = config
+    session.lifecycle._fight_phase_handler = fight_handler
+    session.lifecycle._battle_round_flow = BattleRoundFlow(
+        phase_handlers=session.lifecycle._phase_handlers(),
+        ruleset_descriptor=config.ruleset_descriptor,
+        army_catalog=config.army_catalog,
     )
 
 
@@ -1590,13 +1733,17 @@ def _record_daemonic_patrons_effect(
     state: GameState,
     runtime: CatalogSelectedToFightRiskRuntime,
     source: UnitInstance,
+    owner_player_id: str = "player-source",
+    effect_id: str = "daemonic-patrons-kill-effect",
 ) -> None:
+    active_player_id = state.active_player_id
+    assert active_player_id is not None
     grants = FightUnitSelectedGrantRegistry.from_bindings(
         runtime.fight_unit_selected_grant_bindings()
     ).grants_for(
         FightUnitSelectedContext(
             state=state,
-            player_id="player-source",
+            player_id=owner_player_id,
             battle_round=1,
             unit_instance_id=source.unit_instance_id,
             fight_type="normal",
@@ -1607,16 +1754,16 @@ def _record_daemonic_patrons_effect(
     )
     state.record_persisting_effect(
         PersistingEffect(
-            effect_id="daemonic-patrons-kill-effect",
+            effect_id=effect_id,
             source_rule_id=grants[0].source_id,
-            owner_player_id="player-source",
+            owner_player_id=owner_player_id,
             target_unit_instance_ids=(source.unit_instance_id,),
             started_battle_round=1,
             started_phase=BattlePhaseKind.FIGHT,
             expiration=EffectExpiration.end_phase(
                 battle_round=1,
                 phase=BattlePhaseKind.FIGHT,
-                player_id="player-source",
+                player_id=active_player_id,
             ),
             effect_payload=grants[0].unit_effect_payload,
         )

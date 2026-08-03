@@ -16,7 +16,7 @@ from warhammer40k_core.engine.damage_allocation import (
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_from_armies
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.volume import Model as GeometryModel
 
@@ -100,12 +100,11 @@ def deadly_demise_target_unit_ids(
     )
     placed_model_ids = set(battlefield.placed_model_ids())
     target_unit_ids = tuple(
-        unit.unit_instance_id
-        for army in state.army_definitions
-        for unit in army.units
-        if _unit_has_model_within_deadly_demise_range(
+        rules_unit.unit_instance_id
+        for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+        if _rules_unit_has_model_within_deadly_demise_range(
             state=state,
-            unit=unit,
+            rules_unit=rules_unit,
             source_model_id=source_model_id,
             source_model=source_model,
             placed_model_ids=placed_model_ids,
@@ -138,10 +137,10 @@ def deadly_demise_descriptor(
     }
 
 
-def _unit_has_model_within_deadly_demise_range(
+def _rules_unit_has_model_within_deadly_demise_range(
     *,
     state: GameState,
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
     source_model_id: str,
     source_model: GeometryModel,
     placed_model_ids: set[str],
@@ -150,7 +149,7 @@ def _unit_has_model_within_deadly_demise_range(
     battlefield = state.battlefield_state
     if battlefield is None:
         raise GameLifecycleError("Deadly Demise requires battlefield_state.")
-    for model in unit.own_models:
+    for model in rules_unit.own_models:
         if model.model_instance_id == source_model_id:
             continue
         if not model.is_alive or model.model_instance_id not in placed_model_ids:

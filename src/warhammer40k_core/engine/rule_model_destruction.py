@@ -14,6 +14,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+    DamageApplication,
     DestructionReactionDecision,
     DestructionReactionKind,
     DestructionReactionSource,
@@ -56,13 +57,22 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.rule_deadly_demise_continuation import (
+    RULE_MODEL_DESTRUCTION_COLLATERAL_COMPLETION_KIND,
+    RULE_MODEL_DESTRUCTION_CONTEXT_KIND,
+    RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND,
+    RuleDeadlyDemiseSecondaryContinuation,
+    build_rule_deadly_demise_secondary_root_context,
+    damage_application_from_rule_context,
+    destroyed_damage_applications,
+    destruction_provenance_from_rule_context,
+)
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
-RULE_MODEL_DESTRUCTION_CONTEXT_KIND = "rule_model_destroyed"
 RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND = "rule_model_destruction_deadly_demise"
 
 
@@ -173,6 +183,7 @@ def destroy_model_with_rule_reactions(
                 "destroyed_model_placement": placement_payload,
                 "completion_event_type": requested_completion_event_type,
                 "completion_event_payload": validated_completion_payload,
+                "completion_kind": RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND,
                 "post_removal_mandatory_sources": [
                     source.to_payload()
                     for source in mandatory_sources
@@ -288,14 +299,22 @@ def apply_rule_model_destruction_mortal_wound_decision(
         application=routed.application,
         wound_roll_payload=wound_roll,
     )
-    _finalize_rule_deadly_demise_secondary_destroyed_models(
+    pending_target_ids = _payload_identifier_list(source_context, "pending_target_unit_ids")
+    pending_sources = _payload_source_tuple(source_context, "pending_sources")
+    status = _continue_rule_deadly_demise_secondary_destroyed_models(
         state=state,
         decisions=decisions,
         root_context=root_context,
         source=source,
-        application=routed.application,
+        descriptor=descriptor,
+        trigger_roll_payload=trigger_roll,
+        affected_target_unit_ids=affected_target_ids,
+        pending_target_unit_ids=pending_target_ids,
+        pending_sources=pending_sources,
+        secondary_damage_applications=destroyed_damage_applications(routed.application),
     )
-    pending_sources = _payload_source_tuple(source_context, "pending_sources")
+    if status is not None:
+        return status
     status = _route_rule_deadly_demise_targets(
         state=state,
         decisions=decisions,
@@ -305,7 +324,7 @@ def apply_rule_model_destruction_mortal_wound_decision(
         descriptor=descriptor,
         trigger_roll_payload=trigger_roll,
         affected_target_unit_ids=affected_target_ids,
-        target_unit_ids=_payload_identifier_list(source_context, "pending_target_unit_ids"),
+        target_unit_ids=pending_target_ids,
         pending_sources=pending_sources,
     )
     if status is not None:
@@ -340,27 +359,45 @@ def finalize_rule_model_destruction(
     state: GameState,
     decisions: DecisionController,
     context: dict[str, JsonValue],
-) -> None:
+    resume_completion_continuation: bool = True,
+) -> LifecycleStatus | None:
     _validate_post_removal_context_matches_state(state=state, decisions=decisions, context=context)
     rules_unit_id = _payload_string(context, "rules_unit_instance_id")
     source_effect_ids = _payload_identifier_list(context, "source_effect_ids")
-    _consume_source_liabilities(
-        state=state,
-        source_effect_ids=source_effect_ids,
-        rules_unit_instance_id=rules_unit_id,
-    )
+    completion_kind = _payload_string(context, "completion_kind")
+    if completion_kind == RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND:
+        _consume_source_liabilities(
+            state=state,
+            source_effect_ids=source_effect_ids,
+            rules_unit_instance_id=rules_unit_id,
+        )
+    elif completion_kind != RULE_MODEL_DESTRUCTION_COLLATERAL_COMPLETION_KIND:
+        raise GameLifecycleError("Rule destruction completion kind is unsupported.")
+    elif source_effect_ids:
+        raise GameLifecycleError("Collateral rule destruction cannot consume source liabilities.")
     _split_attached_rules_unit_if_required(
         state=state,
         decisions=decisions,
         rules_unit_instance_id=rules_unit_id,
     )
-    completion_payload = _payload_object_value(context, "completion_event_payload").copy()
-    completion_payload["model_destroyed_event_id"] = _payload_string(
-        context, "model_destroyed_event_id"
-    )
-    decisions.event_log.append(
-        _payload_string(context, "completion_event_type"),
-        validate_json_value(completion_payload),
+    if completion_kind == RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND:
+        completion_payload = _payload_object_value(context, "completion_event_payload").copy()
+        completion_payload["model_destroyed_event_id"] = _payload_string(
+            context, "model_destroyed_event_id"
+        )
+        decisions.event_log.append(
+            _payload_string(context, "completion_event_type"),
+            validate_json_value(completion_payload),
+        )
+    continuation = context.get("completion_continuation")
+    if continuation is None or not resume_completion_continuation:
+        return None
+    if not isinstance(continuation, dict):
+        raise GameLifecycleError("Rule destruction completion continuation must be an object.")
+    return _resume_rule_deadly_demise_secondary_continuation(
+        state=state,
+        decisions=decisions,
+        continuation=continuation,
     )
 
 
@@ -496,13 +533,20 @@ def _route_rule_deadly_demise_targets(
             application=routed.application,
             wound_roll_payload=wound_roll_payload,
         )
-        _finalize_rule_deadly_demise_secondary_destroyed_models(
+        status = _continue_rule_deadly_demise_secondary_destroyed_models(
             state=state,
             decisions=decisions,
             root_context=root_context,
             source=source,
-            application=routed.application,
+            descriptor=descriptor,
+            trigger_roll_payload=trigger_roll_payload,
+            affected_target_unit_ids=affected_target_unit_ids,
+            pending_target_unit_ids=target_unit_ids[target_index + 1 :],
+            pending_sources=pending_sources,
+            secondary_damage_applications=destroyed_damage_applications(routed.application),
         )
+        if status is not None:
+            return status
     return None
 
 
@@ -528,6 +572,7 @@ def _remove_rule_destroyed_model_and_continue(
     state: GameState,
     decisions: DecisionController,
     root_context: dict[str, JsonValue],
+    resume_completion_continuation: bool = True,
 ) -> RuleModelDestructionResult:
     _validate_pre_removal_context_matches_state(state=state, context=root_context)
     model_id = _payload_string(root_context, "model_instance_id")
@@ -543,7 +588,8 @@ def _remove_rule_destroyed_model_and_continue(
         source_event_id=_payload_string(root_context, "source_result_id"),
     )
     transition_batch = BattlefieldTransitionBatch(removals=(removal_record,))
-    provenance = DestructionProvenance.for_non_attack(DestructionSourceKind.ABILITY)
+    damage = damage_application_from_rule_context(root_context)
+    provenance = destruction_provenance_from_rule_context(root_context)
     destroyed_event = decisions.event_log.append(
         "model_destroyed",
         validate_json_value(
@@ -556,7 +602,7 @@ def _remove_rule_destroyed_model_and_continue(
                 "target_unit_instance_id": physical_unit_id,
                 "rules_unit_instance_id": rules_unit_id,
                 "model_instance_id": model_id,
-                "damage_kind": None,
+                "damage_kind": None if damage is None else damage.damage_kind.value,
                 "damage_event_id": None,
                 "source_rule_id": _payload_string(root_context, "source_rule_id"),
                 "source_effect_ids": list(
@@ -566,6 +612,7 @@ def _remove_rule_destroyed_model_and_continue(
                 "removal_record": removal_record.to_payload(),
                 "transition_batch": transition_batch.to_payload(),
                 "destroyed_model_placement": root_context.get("destroyed_model_placement"),
+                "damage_application": None if damage is None else damage.to_payload(),
                 "destroyed_model_rules_triggered": True,
             }
         ),
@@ -636,7 +683,7 @@ def _remove_rule_destroyed_model_and_continue(
             decision_request=request,
             payload=validate_json_value(
                 {
-                    "phase": BattlePhase.FIGHT.value,
+                    "phase": _payload_string(root_context, "phase"),
                     "decision_type": request.decision_type,
                     "context_kind": RULE_MODEL_DESTRUCTION_CONTEXT_KIND,
                     "model_destroyed_event_id": destroyed_event.event_id,
@@ -644,10 +691,11 @@ def _remove_rule_destroyed_model_and_continue(
             ),
         )
     else:
-        finalize_rule_model_destruction(
+        status = finalize_rule_model_destruction(
             state=state,
             decisions=decisions,
             context=destruction_context,
+            resume_completion_continuation=resume_completion_continuation,
         )
     return RuleModelDestructionResult(
         model_destroyed_event_id=destroyed_event.event_id,
@@ -722,70 +770,119 @@ def _emit_rule_deadly_demise_mortal_wounds_applied(
     )
 
 
-def _finalize_rule_deadly_demise_secondary_destroyed_models(
+def _continue_rule_deadly_demise_secondary_destroyed_models(
     *,
     state: GameState,
     decisions: DecisionController,
     root_context: dict[str, JsonValue],
     source: DestructionReactionSource,
-    application: MortalWoundApplication,
-) -> None:
-    for damage in application.applications:
-        if not damage.destroyed:
-            continue
+    descriptor: dict[str, JsonValue],
+    trigger_roll_payload: JsonValue,
+    affected_target_unit_ids: tuple[str, ...],
+    pending_target_unit_ids: tuple[str, ...],
+    pending_sources: tuple[DestructionReactionSource, ...],
+    secondary_damage_applications: tuple[DamageApplication, ...],
+) -> LifecycleStatus | None:
+    for damage_index, damage in enumerate(secondary_damage_applications):
+        continuation = RuleDeadlyDemiseSecondaryContinuation(
+            root_context=root_context,
+            source=source,
+            descriptor=descriptor,
+            trigger_roll_payload=trigger_roll_payload,
+            affected_target_unit_ids=affected_target_unit_ids,
+            pending_target_unit_ids=pending_target_unit_ids,
+            pending_sources=pending_sources,
+            pending_secondary_damage_applications=secondary_damage_applications[damage_index + 1 :],
+        ).to_payload()
+        secondary_context = build_rule_deadly_demise_secondary_root_context(
+            state=state,
+            parent_root_context=root_context,
+            source=source,
+            damage=damage,
+            completion_continuation=continuation,
+        )
         sources = state.destruction_reaction_sources_for_model(
             model_instance_id=damage.model_instance_id
         )
-        if sources:
-            source_ids = ", ".join(item.source_id for item in sources)
-            raise GameLifecycleError(
-                "Rule Deadly Demise secondary destruction reactions require a continuation: "
-                f"{source_ids}."
-            )
-        rules_unit = rules_unit_view_by_id(
-            state=state,
-            unit_instance_id=damage.target_unit_instance_id,
-        )
-        placement_payload = _model_placement_payload(
-            state=state,
-            model_instance_id=damage.model_instance_id,
-        )
-        remove_destroyed_model_from_battlefield(
-            state=state,
-            model_instance_id=damage.model_instance_id,
-        )
-        decisions.event_log.append(
-            "model_destroyed",
-            validate_json_value(
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "active_player_id": _active_player_id(state),
-                    "phase": BattlePhase.FIGHT.value,
-                    "destroying_player_id": _payload_string(
-                        root_context, "destroyed_model_controller_player_id"
-                    ),
-                    "target_unit_instance_id": damage.target_unit_instance_id,
-                    "rules_unit_instance_id": rules_unit.unit_instance_id,
-                    "model_instance_id": damage.model_instance_id,
-                    "damage_kind": damage.damage_kind.value,
-                    "damage_event_id": None,
-                    "source_rule_id": source.source_rule_id,
-                    "source_effect_ids": [],
-                    "destruction_provenance": DestructionProvenance.for_non_attack(
-                        DestructionSourceKind.DEADLY_DEMISE
-                    ).to_payload(),
-                    "destroyed_model_placement": placement_payload,
-                    "damage_application": damage.to_payload(),
-                    "destroyed_model_rules_triggered": True,
-                }
-            ),
-        )
-        _split_attached_rules_unit_if_required(
+        mandatory_status = _continue_rule_deadly_demise_sources(
             state=state,
             decisions=decisions,
-            rules_unit_instance_id=rules_unit.unit_instance_id,
+            root_context=secondary_context,
+            sources=tuple(item for item in sources if not item.optional),
         )
+        if mandatory_status is not None:
+            return mandatory_status
+        removal = _remove_rule_destroyed_model_and_continue(
+            state=state,
+            decisions=decisions,
+            root_context=secondary_context,
+            resume_completion_continuation=False,
+        )
+        if removal.status is not None:
+            return removal.status
+    return None
+
+
+def _resume_rule_deadly_demise_secondary_continuation(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    continuation: dict[str, JsonValue],
+) -> LifecycleStatus | None:
+    restored = RuleDeadlyDemiseSecondaryContinuation.from_payload(continuation)
+    root_context = restored.root_context
+    _validate_pre_removal_context_matches_state(state=state, context=root_context)
+    status = _continue_rule_deadly_demise_secondary_destroyed_models(
+        state=state,
+        decisions=decisions,
+        root_context=root_context,
+        source=restored.source,
+        descriptor=restored.descriptor,
+        trigger_roll_payload=restored.trigger_roll_payload,
+        affected_target_unit_ids=restored.affected_target_unit_ids,
+        pending_target_unit_ids=restored.pending_target_unit_ids,
+        pending_sources=restored.pending_sources,
+        secondary_damage_applications=restored.pending_secondary_damage_applications,
+    )
+    if status is not None:
+        return status
+    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    status = _route_rule_deadly_demise_targets(
+        state=state,
+        decisions=decisions,
+        manager=manager,
+        root_context=root_context,
+        source=restored.source,
+        descriptor=restored.descriptor,
+        trigger_roll_payload=restored.trigger_roll_payload,
+        affected_target_unit_ids=restored.affected_target_unit_ids,
+        target_unit_ids=restored.pending_target_unit_ids,
+        pending_sources=restored.pending_sources,
+    )
+    if status is not None:
+        return status
+    _emit_rule_deadly_demise_resolution(
+        decisions=decisions,
+        root_context=root_context,
+        source=restored.source,
+        descriptor=restored.descriptor,
+        trigger_roll_payload=restored.trigger_roll_payload,
+        triggered=True,
+        affected_target_unit_ids=restored.affected_target_unit_ids,
+    )
+    status = _continue_rule_deadly_demise_sources(
+        state=state,
+        decisions=decisions,
+        root_context=root_context,
+        sources=restored.pending_sources,
+    )
+    if status is not None:
+        return status
+    return _remove_rule_destroyed_model_and_continue(
+        state=state,
+        decisions=decisions,
+        root_context=root_context,
+    ).status
 
 
 def _consume_source_liabilities(
@@ -869,6 +966,16 @@ def is_rule_model_destruction_reaction_request(request: DecisionRequest) -> bool
     return isinstance(context, dict) and context.get("context_kind") == (
         RULE_MODEL_DESTRUCTION_CONTEXT_KIND
     )
+
+
+def rule_model_destruction_phase(request: DecisionRequest) -> BattlePhase:
+    if not is_rule_model_destruction_reaction_request(request):
+        raise GameLifecycleError("Rule destruction phase requires a rule destruction request.")
+    phase_token = _payload_string(_destruction_context(request), "phase")
+    matches = tuple(phase for phase in BattlePhase if phase.value == phase_token)
+    if len(matches) != 1:
+        raise GameLifecycleError("Rule destruction request phase is unsupported.")
+    return matches[0]
 
 
 def invalid_rule_model_destruction_reaction_status(

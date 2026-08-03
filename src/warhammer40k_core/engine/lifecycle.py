@@ -1727,6 +1727,13 @@ class GameLifecycle:
             and is_mortal_wound_feel_no_pain_request(record.request)
         ):
             return self._apply_mortal_wound_feel_no_pain_decision(record=record, result=result)
+        if rule_model_destruction.is_rule_model_destruction_reaction_request(record.request):
+            destruction_phase = rule_model_destruction.rule_model_destruction_phase(record.request)
+            if destruction_phase is BattlePhase.FIGHT:
+                return self._apply_fight_phase_decision(record, result)
+            if destruction_phase is BattlePhase.SHOOTING:
+                return self._apply_shooting_phase_decision(record, result)
+            raise GameLifecycleError("Rule destruction reaction phase has no action host.")
         if record.request.decision_type in _FIGHT_DECISION_TYPES and _fight_decision_owns_request(
             state=state,
             request=record.request,

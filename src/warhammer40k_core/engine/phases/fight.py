@@ -845,12 +845,11 @@ def _complete_active_fight_activation(
         ),
     )
     if fight_on_death_completion is not None:
-        rule_model_destruction.finalize_rule_model_destruction(
+        return rule_model_destruction.finalize_rule_model_destruction(
             state=state,
             decisions=decisions,
             context=fight_on_death_completion,
         )
-        return None
     counteroffensive_status = _request_counteroffensive_if_available(
         handler=handler,
         state=state,

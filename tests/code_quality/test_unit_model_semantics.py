@@ -12,6 +12,8 @@ MOVEMENT_PHASE_FILES = (
     *sorted(MOVEMENT_PHASE.parent.glob("movement_*.py")),
 )
 PATHING = ROOT / "src" / "warhammer40k_core" / "geometry" / "pathing.py"
+DEADLY_DEMISE = ROOT / "src" / "warhammer40k_core" / "engine" / "deadly_demise.py"
+RULE_MODEL_DESTRUCTION = ROOT / "src" / "warhammer40k_core" / "engine" / "rule_model_destruction.py"
 UNIT_MODULES = (
     CORE / "unit.py",
     CORE / "attached_unit.py",
@@ -117,3 +119,46 @@ def test_movement_phase_has_no_public_reinforcements_step_tokens() -> None:
     violations = [token for token in forbidden_tokens if token in source]
 
     assert not violations, "Reserve arrivals must stay inside Move Units:\n" + "\n".join(violations)
+
+
+def test_deadly_demise_enumerates_canonical_rules_units() -> None:
+    function = _function_node(
+        path=DEADLY_DEMISE,
+        function_name="deadly_demise_target_unit_ids",
+    )
+    call_names = {
+        node.func.id
+        for node in ast.walk(function)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+
+    assert "rules_unit_views_from_armies" in call_names
+
+
+def test_rule_deadly_demise_collateral_uses_shared_destruction_continuation() -> None:
+    function = _function_node(
+        path=RULE_MODEL_DESTRUCTION,
+        function_name="_continue_rule_deadly_demise_secondary_destroyed_models",
+    )
+    call_names = {
+        node.func.id
+        for node in ast.walk(function)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+
+    assert {
+        "_continue_rule_deadly_demise_sources",
+        "_remove_rule_destroyed_model_and_continue",
+    }.issubset(call_names)
+    assert "remove_destroyed_model_from_battlefield" not in call_names
+
+
+def _function_node(*, path: Path, function_name: str) -> ast.FunctionDef:
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    matches = tuple(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == function_name
+    )
+    assert len(matches) == 1, f"Expected exactly one {function_name} in {path}."
+    return matches[0]
