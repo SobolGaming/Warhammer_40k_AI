@@ -266,14 +266,30 @@ class CatalogDatasheetRuleRuntime:
         ).record_static_effects(state=state)
 
     def event_handler_bindings(self) -> tuple[RuntimeContentEventHandlerBinding, ...]:
-        return CatalogAnyPhaseOncePerBattleRuntime(
+        from warhammer40k_core.engine.catalog_conditional_leader_abilities import (
+            CatalogConditionalLeaderAbilityRuntime,
+        )
+
+        once_per_battle = CatalogAnyPhaseOncePerBattleRuntime(
             self.ability_indexes_by_player_id, self.armies
-        ).event_handler_bindings()
+        )
+        conditional = CatalogConditionalLeaderAbilityRuntime(
+            self.ability_indexes_by_player_id, self.armies
+        )
+        return (*once_per_battle.event_handler_bindings(), *conditional.event_handler_bindings())
 
     def event_subscriptions(self) -> tuple[RuntimeContentEventSubscription, ...]:
-        return CatalogAnyPhaseOncePerBattleRuntime(
+        from warhammer40k_core.engine.catalog_conditional_leader_abilities import (
+            CatalogConditionalLeaderAbilityRuntime,
+        )
+
+        once_per_battle = CatalogAnyPhaseOncePerBattleRuntime(
             self.ability_indexes_by_player_id, self.armies
-        ).event_subscriptions()
+        )
+        conditional = CatalogConditionalLeaderAbilityRuntime(
+            self.ability_indexes_by_player_id, self.armies
+        )
+        return (*once_per_battle.event_subscriptions(), *conditional.event_subscriptions())
 
     def movement_budget_modifier_bindings(self) -> tuple[MovementBudgetModifierBinding, ...]:
         passive = tuple(
@@ -878,7 +894,7 @@ class CatalogDatasheetRuleRuntime:
                 descriptor_roll_type = "damage_roll"
             if (
                 context.player_id != source.player_id
-                or context.source_phase.value != descriptor.phase
+                or (descriptor.phase is not None and context.source_phase.value != descriptor.phase)
                 or context.timing_window != context.roll_type
                 or descriptor_roll_type not in descriptor.roll_types
                 or not _source_applies_to_rules_unit(
@@ -887,11 +903,6 @@ class CatalogDatasheetRuleRuntime:
                     state=context.state,
                 )
                 or context.attacker_model_instance_id is None
-                or context.attacker_model_instance_id
-                not in _alive_rules_unit_model_ids(
-                    state=context.state,
-                    unit_instance_id=context.attacking_unit_instance_id,
-                )
                 or not _rules_unit_has_any_keyword(
                     rules_unit_view_by_id(
                         state=context.state,
@@ -900,6 +911,17 @@ class CatalogDatasheetRuleRuntime:
                     descriptor.required_target_keywords,
                 )
             ):
+                return None
+            if descriptor.source_scope == "this_model":
+                source_model_ids = _current_source_model_ids(state=context.state, source=source)
+            elif descriptor.source_scope == "this_unit":
+                source_model_ids = _alive_rules_unit_model_ids(
+                    state=context.state,
+                    unit_instance_id=context.attacking_unit_instance_id,
+                )
+            else:
+                raise GameLifecycleError("Catalog conditional attack source scope is unsupported.")
+            if context.attacker_model_instance_id not in source_model_ids:
                 return None
             return SourceBackedRerollPermissionContext(
                 permission=RerollPermission(
@@ -914,6 +936,8 @@ class CatalogDatasheetRuleRuntime:
                     "catalog_record_id": source.record.record_id,
                     "source_rule_id": source.rule_ir.source_id,
                     "source_unit_instance_id": source.unit.unit_instance_id,
+                    "attack_kind": descriptor.attack_kind,
+                    "source_scope": descriptor.source_scope,
                     "required_target_keywords": list(descriptor.required_target_keywords),
                     "roll_type": descriptor_roll_type,
                 },

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
@@ -15,10 +16,13 @@ from warhammer40k_core.engine.catalog_conditional_leader_queries import (
     CONDITIONAL_LEADING_CHARGE_AFTER_MOVEMENT_ACTION_DESCRIPTOR_ID,
     CONDITIONAL_LEADING_ROLL_REROLL_DESCRIPTOR_ID,
     CONDITIONAL_LEADING_WEAPON_RANGE_DESCRIPTOR_ID,
+    CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID,
     FACTION_RESOURCE_REFUND_ROLL_DESCRIPTOR_ID,
+    conditional_not_leading_source_applies,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     conditional_leader_ability_grant_descriptor_for_clause,
+    conditional_not_leading_ability_grant_descriptor_for_clause,
     faction_resource_refund_roll_descriptor_for_clause,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_extensions import (
@@ -35,12 +39,19 @@ from warhammer40k_core.engine.effects import (
     generic_rule_persisting_effect,
 )
 from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.faction_content.events import (
+    RuntimeContentEventContext,
+    RuntimeContentEventHandlerBinding,
+    RuntimeContentEventResult,
+    RuntimeContentEventSubscription,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     generic_rule_effect_payload,
     rule_ir_from_execution_payload,
 )
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -72,6 +83,23 @@ class _ConditionalLeaderRuleSource:
             f"{self.clause.clause_id}:conditional-rule"
         )
 
+    @property
+    def event_handler_id(self) -> str:
+        return f"{self.effect_id}:fight-phase-start-handler"
+
+    @property
+    def event_subscription_id(self) -> str:
+        return f"{self.effect_id}:fight-phase-start-subscription"
+
+    def event_subscription(self) -> RuntimeContentEventSubscription:
+        return RuntimeContentEventSubscription(
+            subscription_id=self.event_subscription_id,
+            source_rule_id=self.rule_ir.source_id,
+            trigger_kind=TimingTriggerKind.START_PHASE,
+            handler_id=self.event_handler_id,
+            filters={"phase": BattlePhaseKind.FIGHT.value, "player_id": self.player_id},
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class CatalogConditionalLeaderAbilityRuntime:
@@ -98,10 +126,63 @@ class CatalogConditionalLeaderAbilityRuntime:
         _require_game_state(state)
         effects: list[PersistingEffect] = []
         for source in self._sources():
+            if source.descriptor_id == CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID:
+                continue
             effect = _persisting_effect_for_source(state=state, source=source)
-            _record_static_effect(state=state, effect=effect)
+            _record_effect_once(state=state, effect=effect)
             effects.append(effect)
         return tuple(sorted(effects, key=lambda effect: effect.effect_id))
+
+    def event_handler_bindings(self) -> tuple[RuntimeContentEventHandlerBinding, ...]:
+        return tuple(
+            RuntimeContentEventHandlerBinding(
+                handler_id=source.event_handler_id,
+                handler=self._not_leading_fight_phase_start_handler(source),
+            )
+            for source in self._not_leading_sources()
+        )
+
+    def event_subscriptions(self) -> tuple[RuntimeContentEventSubscription, ...]:
+        return tuple(source.event_subscription() for source in self._not_leading_sources())
+
+    def _not_leading_sources(self) -> tuple[_ConditionalLeaderRuleSource, ...]:
+        return tuple(
+            source
+            for source in self._sources()
+            if source.descriptor_id == CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID
+        )
+
+    def _not_leading_fight_phase_start_handler(
+        self,
+        source: _ConditionalLeaderRuleSource,
+    ) -> Callable[[RuntimeContentEventContext], RuntimeContentEventResult]:
+        def handler(context: RuntimeContentEventContext) -> RuntimeContentEventResult:
+            if type(context) is not RuntimeContentEventContext:
+                raise GameLifecycleError("Conditional not-leading runtime event requires context.")
+            subscription = source.event_subscription()
+            if not conditional_not_leading_source_applies(
+                state=context.state,
+                source_unit_instance_id=source.unit.unit_instance_id,
+            ):
+                return RuntimeContentEventResult.applied(
+                    subscription,
+                    replay_payload={
+                        "granted": False,
+                        "reason": "source_is_unavailable_or_leading",
+                        "source_unit_instance_id": source.unit.unit_instance_id,
+                    },
+                )
+            effect = _fight_phase_not_leading_effect_for_source(context=context, source=source)
+            _record_effect_once(state=context.state, effect=effect)
+            return RuntimeContentEventResult.applied(
+                subscription,
+                replay_payload={
+                    "granted": True,
+                    "persisting_effect": validate_json_value(effect.to_payload()),
+                },
+            )
+
+        return handler
 
     def _sources(self) -> tuple[_ConditionalLeaderRuleSource, ...]:
         sources: list[_ConditionalLeaderRuleSource] = []
@@ -178,7 +259,59 @@ def _persisting_effect_for_source(
     )
 
 
-def _record_static_effect(*, state: GameState, effect: PersistingEffect) -> None:
+def _fight_phase_not_leading_effect_for_source(
+    *,
+    context: RuntimeContentEventContext,
+    source: _ConditionalLeaderRuleSource,
+) -> PersistingEffect:
+    event = context.event
+    if event.phase is not BattlePhaseKind.FIGHT or event.active_player_id is None:
+        raise GameLifecycleError("Conditional not-leading event requires a Fight phase owner.")
+    effect = source.clause.effects[0]
+    execution_context = RuleExecutionContext(
+        game_id=context.state.game_id,
+        player_id=source.player_id,
+        battle_round=event.battle_round,
+        phase=BattlePhaseKind.FIGHT,
+        active_player_id=event.active_player_id,
+        timing_window_id=event.event_id,
+        source_unit_instance_id=source.unit.unit_instance_id,
+        source_keywords=tuple(sorted({*source.unit.keywords, *source.unit.faction_keywords})),
+        state=context.state,
+        event_log=context.decisions.event_log,
+        record_persisting_effects=False,
+    )
+    payload = generic_rule_effect_payload(
+        rule_ir=source.rule_ir,
+        clause=source.clause,
+        effect=effect,
+        context=execution_context,
+        target_unit_instance_ids=(source.unit.unit_instance_id,),
+        effect_index=0,
+    )
+    payload["descriptor_id"] = source.descriptor_id
+    payload["template_id"] = source.clause.template_id
+    payload["condition_snapshot"] = {
+        "event_id": event.event_id,
+        "not_leading": True,
+    }
+    return generic_rule_persisting_effect(
+        effect_id=f"{source.effect_id}:{event.event_id}:grant",
+        source_rule_id=source.rule_ir.source_id,
+        owner_player_id=source.player_id,
+        target_unit_instance_ids=(source.unit.unit_instance_id,),
+        started_battle_round=event.battle_round,
+        started_phase=BattlePhaseKind.FIGHT,
+        expiration=EffectExpiration.end_phase(
+            battle_round=event.battle_round,
+            phase=BattlePhaseKind.FIGHT,
+            player_id=event.active_player_id,
+        ),
+        effect_payload=validate_json_value(payload),
+    )
+
+
+def _record_effect_once(*, state: GameState, effect: PersistingEffect) -> None:
     for existing in state.persisting_effects:
         if existing.effect_id != effect.effect_id:
             continue
@@ -191,6 +324,8 @@ def _record_static_effect(*, state: GameState, effect: PersistingEffect) -> None
 def _conditional_descriptor_id_for_clause(clause: RuleClause) -> str | None:
     if conditional_leader_ability_grant_descriptor_for_clause(clause) is not None:
         return CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID
+    if conditional_not_leading_ability_grant_descriptor_for_clause(clause) is not None:
+        return CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID
     if _conditional_leading_reroll_roll_type(clause) is not None:
         return CONDITIONAL_LEADING_ROLL_REROLL_DESCRIPTOR_ID
     if faction_resource_refund_roll_descriptor_for_clause(clause) is not None:

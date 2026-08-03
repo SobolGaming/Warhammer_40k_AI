@@ -26,11 +26,17 @@ CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID = "phase17c:conditional-ranged-
 CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID = (
     "phase17l:conditional-ranged-attack-full-rerolls"
 )
+CONDITIONAL_TARGET_KEYWORD_ATTACK_REROLLS_TEMPLATE_ID = (
+    "phase17k:conditional-target-keyword-attack-rerolls"
+)
 OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID = (
     "phase17l:optional-normal-move-characteristic-set-and-phase-end-risk"
 )
 CONDITIONAL_LEADING_BODYGUARD_ABILITY_GRANT_TEMPLATE_ID = (
     "phase17m:conditional-leading-bodyguard-ability-grant"
+)
+CONDITIONAL_NOT_LEADING_SELF_ABILITY_GRANT_TEMPLATE_ID = (
+    "phase17k:conditional-not-leading-self-ability-grant"
 )
 AGILE_MANOEUVRE_ROLL_REROLL_TEMPLATE_ID = "phase17m:agile-manoeuvre-roll-reroll"
 FACTION_RESOURCE_REFUND_ROLL_TEMPLATE_ID = "phase17m:faction-resource-refund-roll"
@@ -43,8 +49,10 @@ EXACT_DATASHEET_RUNTIME_TEMPLATE_IDS = frozenset(
         CONDITIONAL_MODEL_FIGHT_ON_DEATH_TEMPLATE_ID,
         CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID,
         CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID,
+        CONDITIONAL_TARGET_KEYWORD_ATTACK_REROLLS_TEMPLATE_ID,
         OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID,
         CONDITIONAL_LEADING_BODYGUARD_ABILITY_GRANT_TEMPLATE_ID,
+        CONDITIONAL_NOT_LEADING_SELF_ABILITY_GRANT_TEMPLATE_ID,
         AGILE_MANOEUVRE_ROLL_REROLL_TEMPLATE_ID,
         FACTION_RESOURCE_REFUND_ROLL_TEMPLATE_ID,
     }
@@ -99,10 +107,11 @@ class CatalogConditionalInvulnerableSaveDescriptor:
 
 @dataclass(frozen=True, slots=True)
 class CatalogConditionalAttackRerollDescriptor:
-    attack_kind: str
-    phase: str
+    attack_kind: str | None
+    phase: str | None
     required_target_keywords: tuple[str, ...]
     roll_types: tuple[str, ...]
+    source_scope: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -119,6 +128,11 @@ class CatalogConditionalLeaderAbilityGrantDescriptor:
     ability: str
     required_bodyguard_keyword: str
     distance_inches: float | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogConditionalNotLeadingAbilityGrantDescriptor:
+    ability: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -145,6 +159,7 @@ CatalogDatasheetRuntimeDescriptor = (
     | CatalogConditionalAttackRerollDescriptor
     | CatalogMovementActionGrantDescriptor
     | CatalogConditionalLeaderAbilityGrantDescriptor
+    | CatalogConditionalNotLeadingAbilityGrantDescriptor
     | CatalogConditionalLeadingRollRerollDescriptor
     | CatalogFactionResourceRefundRollDescriptor
 )
@@ -173,12 +188,17 @@ def exact_datasheet_runtime_descriptor_for_clause(
         return fight_on_death_descriptor_for_clause(clause)
     if clause.template_id == CONDITIONAL_RANGED_INVULNERABLE_SAVE_TEMPLATE_ID:
         return conditional_invulnerable_save_descriptor_for_clause(clause)
-    if clause.template_id == CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID:
+    if clause.template_id in {
+        CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID,
+        CONDITIONAL_TARGET_KEYWORD_ATTACK_REROLLS_TEMPLATE_ID,
+    }:
         return conditional_attack_reroll_descriptor_for_clause(clause)
     if clause.template_id == OPTIONAL_NORMAL_MOVE_GRANT_TEMPLATE_ID:
         return movement_action_grant_descriptor_for_clause(clause)
     if clause.template_id == CONDITIONAL_LEADING_BODYGUARD_ABILITY_GRANT_TEMPLATE_ID:
         return conditional_leader_ability_grant_descriptor_for_clause(clause)
+    if clause.template_id == CONDITIONAL_NOT_LEADING_SELF_ABILITY_GRANT_TEMPLATE_ID:
+        return conditional_not_leading_ability_grant_descriptor_for_clause(clause)
     if clause.template_id == AGILE_MANOEUVRE_ROLL_REROLL_TEMPLATE_ID:
         return conditional_leading_roll_reroll_descriptor_for_clause(clause)
     if clause.template_id == FACTION_RESOURCE_REFUND_ROLL_TEMPLATE_ID:
@@ -252,6 +272,44 @@ def conditional_leader_ability_grant_descriptor_for_clause(
         required_bodyguard_keyword=canonical_keyword_token(required_keyword),
         distance_inches=distance_inches,
     )
+
+
+def conditional_not_leading_ability_grant_descriptor_for_clause(
+    clause: RuleClause,
+) -> CatalogConditionalNotLeadingAbilityGrantDescriptor | None:
+    if (
+        not clause.is_supported
+        or clause.template_id != CONDITIONAL_NOT_LEADING_SELF_ABILITY_GRANT_TEMPLATE_ID
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW
+        or parameter_payload(clause.trigger.parameters)
+        != {
+            "edge": "start",
+            "phase": "fight",
+            "timing_window": "start_fight_phase",
+        }
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_MODEL
+        or clause.target.parameters
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT
+        or parameter_payload(clause.duration.parameters) != {"endpoint": "phase", "phase": "fight"}
+        or len(clause.conditions) != 1
+        or len(clause.effects) != 1
+    ):
+        return None
+    condition = clause.conditions[0]
+    effect = clause.effects[0]
+    parameters = parameter_payload(effect.parameters)
+    if (
+        condition.kind is not RuleConditionKind.TARGET_CONSTRAINT
+        or parameter_payload(condition.parameters)
+        != {"relationship": "this_model_not_leading_unit"}
+        or effect.kind is not RuleEffectKind.GRANT_ABILITY
+        or parameters != {"ability": "fights_first", "target_scope": "this_model"}
+    ):
+        return None
+    return CatalogConditionalNotLeadingAbilityGrantDescriptor(ability="fights_first")
 
 
 def conditional_leading_roll_reroll_descriptor_for_clause(
@@ -417,6 +475,8 @@ def movement_action_grant_descriptor_for_clause(
 def conditional_attack_reroll_descriptor_for_clause(
     clause: RuleClause,
 ) -> CatalogConditionalAttackRerollDescriptor | None:
+    if clause.template_id == CONDITIONAL_TARGET_KEYWORD_ATTACK_REROLLS_TEMPLATE_ID:
+        return _conditional_target_keyword_attack_reroll_descriptor_for_clause(clause)
     if (
         not clause.is_supported
         or clause.template_id != CONDITIONAL_RANGED_ATTACK_FULL_REROLLS_TEMPLATE_ID
@@ -466,6 +526,66 @@ def conditional_attack_reroll_descriptor_for_clause(
         phase="shooting",
         required_target_keywords=("MONSTER", "VEHICLE"),
         roll_types=tuple(effect_roll_types),
+        source_scope="this_unit",
+    )
+
+
+def _conditional_target_keyword_attack_reroll_descriptor_for_clause(
+    clause: RuleClause,
+) -> CatalogConditionalAttackRerollDescriptor | None:
+    if (
+        not clause.is_supported
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.DICE_ROLL
+        or parameter_payload(clause.trigger.parameters)
+        != {
+            "actor": "this_model",
+            "roll_types": ("hit", "wound"),
+            "timing_window": "attack_sequence",
+        }
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_MODEL
+        or clause.target.parameters
+        or clause.duration is not None
+        or len(clause.conditions) != 1
+        or len(clause.effects) != 2
+    ):
+        return None
+    condition = clause.conditions[0]
+    if condition.kind is not RuleConditionKind.KEYWORD_GATE:
+        return None
+    condition_parameters = parameter_payload(condition.parameters)
+    required_keywords = condition_parameters.get("required_keyword_any")
+    if (
+        condition_parameters.get("gate_subject") != "attack_target"
+        or set(condition_parameters) != {"gate_subject", "required_keyword_any"}
+        or type(required_keywords) is not tuple
+        or not required_keywords
+        or not all(type(keyword) is str and keyword for keyword in required_keywords)
+    ):
+        return None
+    effect_roll_types: list[str] = []
+    for effect in clause.effects:
+        parameters = parameter_payload(effect.parameters)
+        roll_type = parameters.get("roll_type")
+        if (
+            effect.kind is not RuleEffectKind.REROLL_PERMISSION
+            or parameters.get("selection") != "whole_roll"
+            or roll_type not in {"hit_roll", "wound_roll"}
+            or set(parameters) != {"roll_type", "selection"}
+        ):
+            return None
+        effect_roll_types.append(str(roll_type))
+    if tuple(effect_roll_types) != ("hit_roll", "wound_roll"):
+        return None
+    return CatalogConditionalAttackRerollDescriptor(
+        attack_kind=None,
+        phase=None,
+        required_target_keywords=tuple(
+            canonical_keyword_token(keyword) for keyword in required_keywords
+        ),
+        roll_types=tuple(effect_roll_types),
+        source_scope="this_model",
     )
 
 

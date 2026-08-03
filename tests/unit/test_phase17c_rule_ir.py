@@ -211,6 +211,10 @@ CHAMPION_SLAYER_TEXT = (
     "you can re-roll the Wound roll. Each time this model destroys an enemy Character or "
     "Monster unit, this model regains up to D6 lost wounds."
 )
+THREE_KEYWORD_TARGET_REROLL_TEXT = (
+    "Each time this model makes an attack that targets a CHARACTER, MONSTER or WALKER unit, "
+    "you can re-roll the Hit roll and you can re-roll the Wound roll."
+)
 SKULLS_FOR_KHORNE_TEXT = (
     "Each time this model makes an attack that targets a Character unit, you can re-roll "
     "the Hit roll and you can re-roll the Wound roll. Each time this model destroys an "
@@ -1178,6 +1182,20 @@ def test_phase17c_champion_slayer_clause_one_has_melee_target_gate_and_wound_rer
     }
     assert tuple(effect.kind for effect in clause.effects) == (RuleEffectKind.REROLL_PERMISSION,)
     assert parameter_payload(clause.effects[0].parameters) == {"roll_type": "wound"}
+
+
+def test_phase17c_this_model_attack_preserves_three_keyword_any_target_gate() -> None:
+    clause = _compiled(THREE_KEYWORD_TARGET_REROLL_TEXT).rule_ir.clauses[0]
+
+    assert clause.is_supported
+    assert _condition_payload(clause, RuleConditionKind.KEYWORD_GATE) == {
+        "gate_subject": "attack_target",
+        "required_keyword_any": ("CHARACTER", "MONSTER", "WALKER"),
+    }
+    assert tuple(parameter_payload(effect.parameters) for effect in clause.effects) == (
+        {"roll_type": "hit"},
+        {"roll_type": "wound"},
+    )
 
 
 def test_phase17c_this_model_half_strength_attack_hit_modifier_compiles_to_generic_ir() -> None:

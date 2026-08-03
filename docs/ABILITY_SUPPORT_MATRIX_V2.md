@@ -264,6 +264,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:conditional-leading-charge-after-movement-action` | Empyric Ambush |
 | `catalog-ir:conditional-leading-fixed-advance` | Whirling Death |
 | `catalog-ir:conditional-leading-weapon-range-modifier` | Burning Lance |
+| `catalog-ir:conditional-not-leading-ability:fights-first` | Duellist's Hubris |
 | `catalog-ir:critical-hit-value-modifier` | No current generated rows |
 | `catalog-ir:critical-wound-value-modifier` | No current generated rows |
 | `catalog-ir:damage-characteristic-modifier` | No current generated rows |
@@ -292,7 +293,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:fortification-target-permission` | No current generated rows |
 | `catalog-ir:granted-ability:stealth` | No current generated rows |
 | `catalog-ir:hit-roll-modifier` | Piratical Hero<br>Psychic Guidance<br>Revel in Desecration |
-| `catalog-ir:hit-roll-reroll` | Assured Destruction<br>Fated Hero<br>Reavers of the Void<br>Shadow Lord (Aura, Psychic) |
+| `catalog-ir:hit-roll-reroll` | A Challenge Worthy of Skill<br>Assured Destruction<br>Fated Hero<br>Reavers of the Void<br>Shadow Lord (Aura, Psychic) |
 | `catalog-ir:invulnerable-save-characteristic-modifier` | No current generated rows |
 | `catalog-ir:invulnerable-save-characteristic-query` | Forceshield<br>Mistshield<br>Ranged Invulnerable Save<br>Shimmershield |
 | `catalog-ir:invulnerable-save-roll-modifier` | No current generated rows |
@@ -366,7 +367,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-skill-characteristic-modifier` | Psychic Guidance |
 | `catalog-ir:weapon-skill-characteristic-query` | No current generated rows |
 | `catalog-ir:wound-roll-modifier` | Wave Serpent Shield |
-| `catalog-ir:wound-roll-reroll` | Assured Destruction<br>Fated Hero<br>Storm of Silence |
+| `catalog-ir:wound-roll-reroll` | A Challenge Worthy of Skill<br>Assured Destruction<br>Fated Hero<br>Storm of Silence |
 | `catalog-ir:wounds-characteristic-modifier` | No current generated rows |
 | `catalog-ir:wounds-characteristic-query` | No current generated rows |
 | `core:command-reroll` | Command Re-roll |
@@ -385,10 +386,13 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `descriptor:destruction-reaction:deadly-demise-resolution` | Deadly Demise |
 | `descriptor:destruction-reaction:deadly-demise-source` | Deadly Demise |
 | `descriptor:fight-order:fights-first` | Fights First |
+| `descriptor:lost-wound:feel-no-pain-resolution` | Feel No Pain |
+| `descriptor:lost-wound:feel-no-pain-source` | Feel No Pain |
 | `descriptor:movement:deep-strike-placement` | Deep Strike |
 | `descriptor:prebattle:infiltrators` | Infiltrators |
 | `descriptor:prebattle:scouts` | Scouts |
 | `descriptor:reserve-declaration:deep-strike` | Deep Strike |
+| `descriptor:shooting-target:lone-operative` | Lone Operative |
 | `generic:rule-ir` | BINDING SHADOW<br>Bilious Blessing<br>CALL DAT DAKKA?<br>CATALYTIC STIMULUS<br>CHANNELLED WRATH<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>Call to Murder<br>Casting Back the Veil<br>Cloak and Shadow<br>Corrupt Realspace<br>DEATH DENIED<br>Daemonic Infestation<br>Daemonic Invulnerability<br>Denizens of the Warp<br>Draught of Terror<br>ENCROACHING DARKNESS<br>EUPHORIC INSPIRATION<br>Eldritch Suppression<br>Fluxmaster<br>From Beyond the Veil<br>GET STUCK IN, LADZ!<br>HONOUR IS FOR FOOLS<br>HUGE SHOW-OFFS<br>INTOXICATED BY TRIUMPH<br>Incorporeal Entities<br>Inescapable Manifestations<br>Into the Breach<br>LONG, UNCONTROLLED BURSTS<br>Lethal Ruse<br>Nomads of the Hidden Way<br>ORKS IS STILL ORKS<br>One Head Looks Back<br>Outcast Ambush<br>PRIDEFUL SUPERIORITY<br>Pirates' Due<br>SHADE PATH<br>SINGLE-MINDED STRIKE<br>SINUOUS BREACH<br>SPESHUL SHELLS<br>SPITEFUL DEMISE<br>Skirling Magicks<br>Soulseeing<br>The Realm of Chaos<br>Vengeful Sorrow<br>Warp Surge<br>Warp-Riders |
 | `phase17g:space-marines:space-marine-chapters` | Space Marine Chapters |
 | `warhammer_40000_11th:adepta_sororitas:army_rule:acts_of_faith:battle-round-start` | Acts of Faith |

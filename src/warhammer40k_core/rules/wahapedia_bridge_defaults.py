@@ -659,6 +659,19 @@ EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES = (
         ),
     ),
 )
+EMPERORS_CHILDREN_LUCIUS_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000004083",
+        model_name="Lucius the Eternal - EPIC HERO",
+        height=2.25,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:emperors-children:lucius-the-eternal:height",
+        height_document_reference=(
+            "Lucius the Eternal assembled miniature imagery; "
+            "Warhammer Event Companion 2026-07-22 p.74 (50mm base)"
+        ),
+    ),
+)
 EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000004089",
@@ -730,4 +743,5 @@ DEFAULT_HEIGHT_OVERRIDES = (
     *CHAOS_DEFILER_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES,
+    *EMPERORS_CHILDREN_LUCIUS_HEIGHT_OVERRIDES,
 )

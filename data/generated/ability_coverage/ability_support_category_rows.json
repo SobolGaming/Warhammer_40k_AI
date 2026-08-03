@@ -665,6 +665,40 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000008338",
+        "ability_name": "Feel No Pain",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/core/000008338/none",
+        "datasheet_id": "000004083",
+        "datasheet_name": "Lucius the Eternal",
+        "source_kind": "core"
+      }
+    ],
+    "ability_names": [
+      "Feel No Pain"
+    ],
+    "category_id": "core.feel_no_pain",
+    "category_name": "Core Feel No Pain",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004083/core/000008338/none"
+    ],
+    "datasheet_names": [
+      "Lucius the Eternal"
+    ],
+    "runtime_consumer_ids": [
+      "descriptor:lost-wound:feel-no-pain-resolution",
+      "descriptor:lost-wound:feel-no-pain-source"
+    ],
+    "source_kind_counts": {
+      "core": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000008340",
         "ability_name": "Fights First",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000594/core/000008340/none",
@@ -743,6 +777,39 @@
     ],
     "source_kind_counts": {
       "core": 2
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000008336",
+        "ability_name": "Lone Operative",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/core/000008336/none",
+        "datasheet_id": "000004083",
+        "datasheet_name": "Lucius the Eternal",
+        "source_kind": "core"
+      }
+    ],
+    "ability_names": [
+      "Lone Operative"
+    ],
+    "category_id": "core.lone_operative",
+    "category_name": "Core Lone Operative",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004083/core/000008336/none"
+    ],
+    "datasheet_names": [
+      "Lucius the Eternal"
+    ],
+    "runtime_consumer_ids": [
+      "descriptor:shooting-target:lone-operative"
+    ],
+    "source_kind_counts": {
+      "core": 1
     },
     "support_stages": [
       "engine_consumed"
@@ -1467,6 +1534,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000004083:duellists-hubris",
+        "ability_name": "Duellist's Hubris",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/datasheet/000004083:duellists-hubris/none",
+        "datasheet_id": "000004083",
+        "datasheet_name": "Lucius the Eternal",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000588:spiritseer",
         "ability_name": "Spiritseer",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spiritseer/none",
@@ -1488,17 +1563,19 @@
       "Daemon Primarch of Slaanesh",
       "Daemonic Lord",
       "Daemonic Speed",
+      "Duellist's Hubris",
       "Malevolent Souls",
       "Spiritseer"
     ],
     "category_id": "datasheet.rule_ir.grant_ability.this_model",
     "category_name": "Datasheet Rule Ir Grant Ability This Model",
-    "coverage_row_count": 6,
+    "coverage_row_count": 7,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/datasheet/000000577:aspect-training/none",
       "chaos-daemons-bridge-catalog/000001149/datasheet/000001149:daemonic-lord/none",
       "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemon-primarch-of-slaanesh/none",
       "chaos-daemons-bridge-catalog/000004077/datasheet/000004077:daemonic-speed/none",
+      "chaos-daemons-bridge-catalog/000004083/datasheet/000004083:duellists-hubris/none",
       "chaos-daemons-bridge-catalog/000000588/datasheet/000000588:spiritseer/none",
       "chaos-daemons-bridge-catalog/000000598/datasheet/000000598:malevolent-souls/none"
     ],
@@ -1506,6 +1583,7 @@
       "Autarch",
       "Daemon Prince of Chaos",
       "Fulgrim",
+      "Lucius the Eternal",
       "Spiritseer",
       "Wraithblades"
     ],
@@ -1516,10 +1594,11 @@
       "catalog-ir:conditional-leading-ability:infiltrators",
       "catalog-ir:conditional-leading-ability:scouts",
       "catalog-ir:conditional-leading-ability:stealth",
+      "catalog-ir:conditional-not-leading-ability:fights-first",
       "catalog-ir:fight-on-death-source"
     ],
     "source_kind_counts": {
-      "datasheet": 6
+      "datasheet": 7
     },
     "support_stages": [
       "engine_consumed"
@@ -2631,6 +2710,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000004083:a-challenge-worthy-of-skill",
+        "ability_name": "A Challenge Worthy of Skill",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/datasheet/000004083:a-challenge-worthy-of-skill/none",
+        "datasheet_id": "000004083",
+        "datasheet_name": "Lucius the Eternal",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000613:fated-hero",
         "ability_name": "Fated Hero",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000613/datasheet/000000613:fated-hero/none",
@@ -2640,18 +2727,21 @@
       }
     ],
     "ability_names": [
+      "A Challenge Worthy of Skill",
       "Fated Hero",
       "Storm of Silence"
     ],
     "category_id": "datasheet.rule_ir.reroll_permission.this_model",
     "category_name": "Datasheet Rule Ir Reroll Permission This Model",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000572/datasheet/000000572:storm-of-silence/none",
+      "chaos-daemons-bridge-catalog/000004083/datasheet/000004083:a-challenge-worthy-of-skill/none",
       "chaos-daemons-bridge-catalog/000000613/datasheet/000000613:fated-hero/none"
     ],
     "datasheet_names": [
       "Jain Zar",
+      "Lucius the Eternal",
       "Wraithlord"
     ],
     "runtime_consumer_ids": [
@@ -2660,7 +2750,7 @@
       "catalog-ir:wound-roll-reroll"
     ],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -3426,6 +3516,14 @@
         "datasheet_id": "000004077",
         "datasheet_name": "Fulgrim",
         "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/faction/000009994/none",
+        "datasheet_id": "000004083",
+        "datasheet_name": "Lucius the Eternal",
+        "source_kind": "faction"
       }
     ],
     "ability_names": [
@@ -3433,16 +3531,18 @@
     ],
     "category_id": "faction.army_rule.thrill_seekers",
     "category_name": "Emperor's Children Army Rule",
-    "coverage_row_count": 3,
+    "coverage_row_count": 4,
     "coverage_row_ids": [
       "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none",
       "chaos-daemons-bridge-catalog/000004089/faction/000009994/none",
-      "chaos-daemons-bridge-catalog/000004077/faction/000009994/none"
+      "chaos-daemons-bridge-catalog/000004077/faction/000009994/none",
+      "chaos-daemons-bridge-catalog/000004083/faction/000009994/none"
     ],
     "datasheet_names": [
       "Emperor's Children",
       "Flawless Blades",
-      "Fulgrim"
+      "Fulgrim",
+      "Lucius the Eternal"
     ],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
@@ -3451,7 +3551,7 @@
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
     ],
     "source_kind_counts": {
-      "faction": 3
+      "faction": 4
     },
     "support_stages": [
       "engine_consumed"
@@ -4054,6 +4154,14 @@
       {
         "ability_id": "000008346",
         "ability_name": "Leader",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/core/000008346/none",
+        "datasheet_id": "000004083",
+        "datasheet_name": "Lucius the Eternal",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008346",
+        "ability_name": "Leader",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004193/core/000008346/none",
         "datasheet_id": "000004193",
         "datasheet_name": "Prince Yriel",
@@ -4065,7 +4173,7 @@
     ],
     "category_id": "core.leader",
     "category_name": "Leader",
-    "coverage_row_count": 8,
+    "coverage_row_count": 9,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000577/core/000008346/none",
       "chaos-daemons-bridge-catalog/000002759/core/000008346/none",
@@ -4074,6 +4182,7 @@
       "chaos-daemons-bridge-catalog/000000572/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004194/core/000008346/none",
       "chaos-daemons-bridge-catalog/000003909/core/000008346/none",
+      "chaos-daemons-bridge-catalog/000004083/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004193/core/000008346/none"
     ],
     "datasheet_names": [
@@ -4084,13 +4193,14 @@
       "Jain Zar",
       "Kharseth",
       "Lhykhis",
+      "Lucius the Eternal",
       "Prince Yriel"
     ],
     "runtime_consumer_ids": [
       "descriptor:army-mustering:leader-attachment"
     ],
     "source_kind_counts": {
-      "core": 8
+      "core": 9
     },
     "support_stages": [
       "engine_consumed"

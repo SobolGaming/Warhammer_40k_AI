@@ -1523,7 +1523,16 @@ def _lone_operative_target_allowed(
 def _rules_unit_has_lone_operative(rules_unit: RulesUnitView) -> bool:
     if type(rules_unit) is not RulesUnitView:
         raise GameLifecycleError("Lone Operative target lookup requires a rules unit.")
-    return any(unit_has_lone_operative(component.unit) for component in rules_unit.components)
+    if any(
+        component.role == "bodyguard" and any(model.is_alive for model in component.unit.own_models)
+        for component in rules_unit.components
+    ):
+        return False
+    return any(
+        any(model.is_alive for model in component.unit.own_models)
+        and unit_has_lone_operative(component.unit)
+        for component in rules_unit.components
+    )
 
 
 def _rules_unit_has_stealth(rules_unit: RulesUnitView) -> bool:

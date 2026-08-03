@@ -12,6 +12,7 @@ from warhammer40k_core.engine.catalog_datasheet_rule_descriptors import (
     conditional_invulnerable_save_descriptor_for_clause,
     conditional_leader_ability_grant_descriptor_for_clause,
     conditional_leading_roll_reroll_descriptor_for_clause,
+    conditional_not_leading_ability_grant_descriptor_for_clause,
     conditional_proximity_effects_descriptor_for_clause,
     exact_datasheet_runtime_descriptor_for_clause,
     faction_resource_refund_roll_descriptor_for_clause,
@@ -105,6 +106,9 @@ CATALOG_IR_WEAPON_RANGE_MODIFIER_CONSUMER_ID = (
 CATALOG_IR_CHARGE_AFTER_MOVEMENT_ACTION_CONSUMER_ID = (
     "catalog-ir:conditional-leading-charge-after-movement-action"
 )
+CATALOG_IR_CONDITIONAL_NOT_LEADING_FIGHTS_FIRST_CONSUMER_ID = (
+    "catalog-ir:conditional-not-leading-ability:fights-first"
+)
 CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID = "catalog-ir:movement-friendly-enemy-target-pair"
 CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID = "catalog-ir:command-restoration"
 CATALOG_IR_CLAUSE_WIDE_COMPOUND_CONSUMER_IDS = (
@@ -183,13 +187,15 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_ALLOCATED_ATTACK_DAMAGE_MODIFIER_CONSUMER_ID)
     if clause_is_passive_hit_reroll(clause):
         consumer_ids.add(CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID)
-    if conditional_attack_reroll_descriptor_for_clause(clause) is not None:
+    conditional_attack_rerolls = conditional_attack_reroll_descriptor_for_clause(clause)
+    if conditional_attack_rerolls is not None:
+        consumer_by_roll_type = {
+            "hit_roll": CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
+            "wound_roll": CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
+            "damage_roll": CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID,
+        }
         consumer_ids.update(
-            {
-                CATALOG_IR_HIT_ROLL_REROLL_CONSUMER_ID,
-                CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID,
-                CATALOG_IR_DAMAGE_ROLL_REROLL_CONSUMER_ID,
-            }
+            consumer_by_roll_type[roll_type] for roll_type in conditional_attack_rerolls.roll_types
         )
     if movement_action_grant_descriptor_for_clause(clause) is not None:
         consumer_ids.add(CATALOG_IR_MOVEMENT_ACTION_GRANT_CONSUMER_ID)
@@ -198,6 +204,13 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(
             CATALOG_IR_CONDITIONAL_LEADER_ABILITY_CONSUMER_IDS[conditional_leader_grant.ability]
         )
+    conditional_not_leading_grant = conditional_not_leading_ability_grant_descriptor_for_clause(
+        clause
+    )
+    if conditional_not_leading_grant is not None:
+        if conditional_not_leading_grant.ability != "fights_first":
+            raise GameLifecycleError("Conditional not-leading ability consumer drifted.")
+        consumer_ids.add(CATALOG_IR_CONDITIONAL_NOT_LEADING_FIGHTS_FIRST_CONSUMER_ID)
     if conditional_leading_roll_reroll_descriptor_for_clause(clause) is not None:
         consumer_ids.add(CATALOG_IR_AGILE_MANOEUVRE_ROLL_REROLL_CONSUMER_ID)
     if faction_resource_refund_roll_descriptor_for_clause(clause) is not None:
@@ -309,6 +322,7 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_CHARGE_AFTER_MOVEMENT_ACTION_CONSUMER_ID,
                 CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID,
                 CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID,
+                CATALOG_IR_CONDITIONAL_NOT_LEADING_FIGHTS_FIRST_CONSUMER_ID,
                 *CATALOG_IR_CONDITIONAL_LEADER_ABILITY_CONSUMER_IDS.values(),
             }
         )
