@@ -11,13 +11,13 @@ When RuleIR is incomplete, the audit records exact normalized-text identity only
 | Content kind | Source members | Structured RuleIR |
 | --- | ---: | ---: |
 | `faction_rule` | 28 | 0 |
-| `datasheet_ability` | 2049 | 585 |
+| `datasheet_ability` | 2049 | 586 |
 | `detachment_rule` | 266 | 11 |
 | `enhancement` | 701 | 66 |
 | `stratagem` | 1050 | 47 |
-| **Total** | **4094** | **709** |
+| **Total** | **4094** | **710** |
 
-Equivalent groups: **332**; cross-faction groups: **162**; exact-text-only members: **3275**; source-text-unavailable members: **110**.
+Equivalent groups: **332**; cross-faction groups: **162**; exact-text-only members: **3274**; source-text-unavailable members: **110**.
 
 ## Equivalence Groups
 

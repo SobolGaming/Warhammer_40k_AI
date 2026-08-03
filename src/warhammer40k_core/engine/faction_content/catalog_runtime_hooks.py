@@ -35,6 +35,9 @@ from warhammer40k_core.engine.catalog_selected_target_effects import (
     CatalogSelectedTargetEffectRuntime,
     catalog_selected_target_attack_sequence_completed_hook_bindings,
 )
+from warhammer40k_core.engine.catalog_selected_to_fight_risk_runtime import (
+    catalog_selected_to_fight_risk_end_hook_bindings,
+)
 from warhammer40k_core.engine.catalog_shadow_form_runtime import (
     catalog_shadow_form_battle_round_start_hook_bindings,
 )
@@ -236,9 +239,15 @@ def fight_end_hooks(
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
 ) -> tuple[FightPhaseEndHookBinding, ...]:
-    return catalog_fight_end_triggered_movement_hook_bindings(
-        ability_indexes_by_player_id=ability_indexes_by_player_id,
-        armies=armies,
+    return (
+        *catalog_selected_to_fight_risk_end_hook_bindings(
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            armies=armies,
+        ),
+        *catalog_fight_end_triggered_movement_hook_bindings(
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            armies=armies,
+        ),
     )
 
 

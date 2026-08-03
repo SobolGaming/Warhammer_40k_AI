@@ -193,16 +193,24 @@ _DATASHEET_REVIEW_ROWS = (
         group=_EMPERORS_CHILDREN_GROUP,
         datasheet="Flawless Blades",
         datasheet_id="000004089",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All consumed",
         supported_semantics=(
-            "The Thrill Seekers army-rule handler is implemented; the source overlay applies "
-            "the updated Blissblade Attacks characteristic."
+            "Daemonic Patrons uses an optional selected-to-fight decision, persists a Critical "
+            "Wound 3+ threshold through the Fight phase, groups repeated uses into one liability "
+            "per current rules unit, attributes enemy model destruction only to that unit's "
+            "attacks in the current player's Fight phase, preserves pre-split Attached Unit "
+            "lineage, and destroys one controller-selected model through the shared "
+            "destruction-reaction path if no qualifying enemy model was destroyed. The Thrill "
+            "Seekers army-rule handler and the updated Blissblade Attacks characteristic are "
+            "also implemented."
         ),
-        semantics_needed=(
-            "Daemonic Patrons Critical Wound threshold, phase-scoped state, destroyed-enemy "
-            "attribution, and end-of-Fight self-destruction."
+        semantics_needed="None in the exact source ability rows.",
+        catalog_blockers=(
+            "No known Flawless Blades blocker; catalog, model geometry, wargear, "
+            "weapon-keyword, datasheet-ability, and Thrill Seekers runtime-consumption evidence "
+            "are Full. The generated overall row remains Playable while faction-wide detachment "
+            "interaction coverage is partial."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_VEHICLES_GROUP,
@@ -829,7 +837,7 @@ def emperors_children_datasheet_support_markdown(
         raise ValueError(
             "Emperor's Children datasheet semantic review must cover every manifest row exactly."
         )
-    if generated_support_datasheet_ids != frozenset({"000004077", "000004208"}):
+    if generated_support_datasheet_ids != frozenset({"000004077", "000004089", "000004208"}):
         raise ValueError(
             "Emperor's Children generated support-row inventory changed; review the custom "
             "datasheet evidence before regenerating documentation."

@@ -16,6 +16,7 @@ from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import fight_activation_abilities as _fa
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
+from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_muster_consistency import validate_mustered_army_consistency
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -28,7 +29,6 @@ from warhammer40k_core.engine.attack_sequence import (
     current_legal_damage_allocation_model_ids,
     invalid_destroyed_transport_disembark_proposal_status,
     is_destroyed_transport_disembark_proposal_request,
-    validate_destruction_reaction_context_matches_sequence,
 )
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
@@ -97,6 +97,9 @@ from warhammer40k_core.engine.deployment import (
     SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
     invalid_deployment_placement_status,
     is_deployment_placement_request,
+)
+from warhammer40k_core.engine.destruction_reaction_decision_validation import (
+    invalid_destruction_reaction_context_status,
 )
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.dice_result_overrides import (
@@ -1669,6 +1672,16 @@ class GameLifecycle:
             )
             if invalid_status is not None:
                 return invalid_status
+            if rule_model_destruction.is_rule_model_destruction_mortal_wound_request(request):
+                invalid_status = (
+                    rule_model_destruction.invalid_rule_model_destruction_mortal_wound_status(
+                        state=state,
+                        request=request,
+                        result=result,
+                    )
+                )
+                if invalid_status is not None:
+                    return invalid_status
         if request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE:
             invalid_status = _invalid_destruction_reaction_status(
                 state=state,
@@ -1714,6 +1727,13 @@ class GameLifecycle:
             and is_mortal_wound_feel_no_pain_request(record.request)
         ):
             return self._apply_mortal_wound_feel_no_pain_decision(record=record, result=result)
+        if rule_model_destruction.is_rule_model_destruction_reaction_request(record.request):
+            destruction_phase = rule_model_destruction.rule_model_destruction_phase(record.request)
+            if destruction_phase is BattlePhase.FIGHT:
+                return self._apply_fight_phase_decision(record, result)
+            if destruction_phase is BattlePhase.SHOOTING:
+                return self._apply_shooting_phase_decision(record, result)
+            raise GameLifecycleError("Rule destruction reaction phase has no action host.")
         if record.request.decision_type in _FIGHT_DECISION_TYPES and _fight_decision_owns_request(
             state=state,
             request=record.request,
@@ -1731,6 +1751,15 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus:
         state = self._require_state()
+        if rule_model_destruction.is_rule_model_destruction_mortal_wound_request(record.request):
+            status = rule_model_destruction.apply_rule_model_destruction_mortal_wound_decision(
+                state=state,
+                decisions=self.decision_controller,
+                result=result,
+            )
+            if status is not None:
+                return status
+            return self.advance_until_decision_or_terminal()
         movement_fnp_status = _movement_mw.apply_movement_fnp_if_applicable(
             state=state,
             decisions=self.decision_controller,
@@ -3335,38 +3364,12 @@ def _invalid_destruction_reaction_status(
     )
     if invalid_status is not None:
         return invalid_status
-    request_payload = request.payload
-    if not isinstance(request_payload, Mapping):
-        raise GameLifecycleError("Destruction reaction request payload must be an object.")
-    destruction_context = request_payload.get("destruction_context")
-    if not isinstance(destruction_context, Mapping):
-        raise GameLifecycleError("Destruction reaction context must be an object.")
-    attack_sequence = _active_attack_sequence_for_state(state)
-    if attack_sequence is None:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Destruction reaction has no active attack sequence.",
-            payload={
-                "invalid_reason": "invalid_destruction_reaction_result",
-                "field": "attack_sequence",
-            },
-        )
-    try:
-        validate_destruction_reaction_context_matches_sequence(
-            attack_sequence=attack_sequence,
-            destruction_context=validate_json_value(destruction_context),
-        )
-    except GameLifecycleError as exc:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Destruction reaction context no longer matches state.",
-            payload={
-                "invalid_reason": "invalid_destruction_reaction_result",
-                "field": "destruction_context",
-                "diagnostic": str(exc),
-            },
-        )
-    return None
+    return invalid_destruction_reaction_context_status(
+        state=state,
+        request=request,
+        result=result,
+        attack_sequence=_active_attack_sequence_for_state(state),
+    )
 
 
 def _active_attack_sequence_for_state(state: GameState) -> AttackSequence | None:

@@ -115,6 +115,9 @@ from warhammer40k_core.rules.selected_target_parser import (
     is_structural_target_keyword,
     selected_target_spec_from_text,
 )
+from warhammer40k_core.rules.selected_to_fight_risk_parser import (
+    compile_selected_to_fight_risk_clauses,
+)
 from warhammer40k_core.rules.triggered_action_parser import (
     compile_triggered_action_clause,
 )
@@ -616,18 +619,23 @@ def parse_rule_ir(
             source_keyword_sequence_parts
         )
     )
-    compiled_clauses = tuple(
-        _compile_clause(
-            source_id=source_id.strip(),
-            clause_index=index,
-            clause_text=clause_text,
-            parsed_text=parsed_text,
-            parser_context=parser_context,
-        )
-        for index, clause_text in enumerate(
-            _split_clause_text(parsed_text.normalized_text), start=1
-        )
+    compiled_clauses = compile_selected_to_fight_risk_clauses(
+        source_id=source_id.strip(),
+        normalized_text=parsed_text.normalized_text,
     )
+    if compiled_clauses is None:
+        compiled_clauses = tuple(
+            _compile_clause(
+                source_id=source_id.strip(),
+                clause_index=index,
+                clause_text=clause_text,
+                parsed_text=parsed_text,
+                parser_context=parser_context,
+            )
+            for index, clause_text in enumerate(
+                _split_clause_text(parsed_text.normalized_text), start=1
+            )
+        )
     return RuleIR(
         rule_id=source_id.strip() if rule_id is None else rule_id,
         source_id=source_id.strip(),

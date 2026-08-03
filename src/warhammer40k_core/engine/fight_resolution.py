@@ -71,7 +71,10 @@ from warhammer40k_core.engine.fight_geometry import (
 from warhammer40k_core.engine.fight_geometry import (
     unit_id_for_fight_model as _unit_id_for_model,
 )
-from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
+from warhammer40k_core.engine.fight_on_death import (
+    fight_on_death_model_ids_for_activation,
+    model_is_present_on_battlefield,
+)
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -1321,7 +1324,7 @@ def available_melee_weapons_payloads(
     state: GameState | None = None,
     source_decision_result_id: str | None = None,
 ) -> tuple[JsonValue, ...]:
-    return tuple(
+    payloads = tuple(
         validate_json_value(
             {
                 "model_instance_id": weapon["model_instance_id"],
@@ -1347,7 +1350,23 @@ def available_melee_weapons_payloads(
             unit=unit,
             army_catalog=army_catalog,
             state=state,
+            source_decision_result_id=source_decision_result_id,
         )
+    )
+    restricted_model_ids = (
+        None
+        if state is None or source_decision_result_id is None
+        else fight_on_death_model_ids_for_activation(
+            state=state,
+            activation_result_id=source_decision_result_id,
+        )
+    )
+    if restricted_model_ids is None:
+        return payloads
+    return tuple(
+        payload
+        for payload in payloads
+        if isinstance(payload, dict) and payload.get("engaged_target_unit_instance_ids")
     )
 
 
@@ -1387,6 +1406,7 @@ def validate_melee_declaration_rules(
         unit=unit,
         army_catalog=army_catalog,
         state=state,
+        source_decision_result_id=request.source_decision_result_id,
     )
     required_primary_model_ids = _required_primary_melee_model_ids(
         scenario=scenario,
@@ -1501,6 +1521,7 @@ def melee_attack_sequence_from_proposal(
         unit=unit,
         army_catalog=army_catalog,
         state=state,
+        source_decision_result_id=proposal.source_decision_result_id,
     )
     runtime_modifiers = _runtime_modifier_registry(runtime_modifier_registry)
     pools: list[RangedAttackPool] = []
@@ -1612,7 +1633,8 @@ def record_one_shot_melee_weapon_uses(
     available = _available_melee_weapons_by_key(
         unit=unit,
         army_catalog=army_catalog,
-        state=None,
+        state=state,
+        source_decision_result_id=proposal.source_decision_result_id,
     )
     records: list[OneShotWeaponUseRecord] = []
     for declaration_index, declaration in enumerate(proposal.declarations, start=1):
@@ -2710,6 +2732,7 @@ def _available_melee_weapons_by_key(
     unit: UnitInstance,
     army_catalog: ArmyCatalog,
     state: GameState | None = None,
+    source_decision_result_id: str | None = None,
 ) -> dict[tuple[str, str, str], WeaponProfile]:
     return {
         (
@@ -2721,6 +2744,7 @@ def _available_melee_weapons_by_key(
             unit=unit,
             army_catalog=army_catalog,
             state=state,
+            source_decision_result_id=source_decision_result_id,
         )
     }
 
@@ -2736,9 +2760,20 @@ def _available_melee_weapons_for_unit(
     unit: UnitInstance,
     army_catalog: ArmyCatalog,
     state: GameState | None = None,
+    source_decision_result_id: str | None = None,
 ) -> tuple[_AvailableMeleeWeapon, ...]:
+    restricted_model_ids = (
+        None
+        if state is None or source_decision_result_id is None
+        else fight_on_death_model_ids_for_activation(
+            state=state,
+            activation_result_id=source_decision_result_id,
+        )
+    )
     weapons: list[_AvailableMeleeWeapon] = []
     for model in unit.own_models:
+        if restricted_model_ids is not None and model.model_instance_id not in restricted_model_ids:
+            continue
         if state is None and not model.is_alive:
             continue
         if state is not None and not model_is_present_on_battlefield(

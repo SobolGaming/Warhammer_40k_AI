@@ -140,6 +140,7 @@ class RuleTargetKind(StrEnum):
 
 class RuleEffectKind(StrEnum):
     ADD_VICTORY_POINTS = "add_victory_points"
+    DESTROY_MODEL = "destroy_model"
     FORCE_DESPERATE_ESCAPE_TESTS = "force_desperate_escape_tests"
     GRANT_ABILITY = "grant_ability"
     GRANT_WEAPON_ABILITY = "grant_weapon_ability"

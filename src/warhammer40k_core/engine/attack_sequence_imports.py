@@ -65,6 +65,10 @@ from warhammer40k_core.engine.core_stratagem_effects import (
     unit_effects_deny_benefit_of_cover,
     unit_effects_grant_benefit_of_cover,
 )
+from warhammer40k_core.engine.critical_wounds import (
+    WoundRollCriticalThresholdContext,
+    generic_rule_critical_wound_threshold,
+)
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_ALLOCATION_ORDER_DECISION_TYPE,
     SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
@@ -427,6 +431,8 @@ __all__ = (
     "WeaponProfile",
     "WeaponProfileError",
     "WoundRollModifierContext",
+    "WoundRollCriticalThresholdContext",
+    "generic_rule_critical_wound_threshold",
     "allocation_context_for_unit",
     "allocation_groups_for_context",
     "anti_keyword_critical_threshold",

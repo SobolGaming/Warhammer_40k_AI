@@ -659,6 +659,19 @@ EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES = (
         ),
     ),
 )
+EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000004089",
+        model_name="Flawless Blades",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:emperors-children:flawless-blades:height",
+        height_document_reference=(
+            "Emperor's Children Faction Pack Flawless Blades assembled miniature imagery; "
+            "Warhammer Event Companion 2026-07-22 p.74 (40mm base)"
+        ),
+    ),
+)
 CHAOS_DEFILER_PDF_CORRECTIONS = (
     DEATH_GUARD_DEFILER_PDF_CORRECTION,
     WORLD_EATERS_DEFILER_PDF_CORRECTION,
@@ -715,5 +728,6 @@ DEFAULT_HEIGHT_OVERRIDES = (
     *CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES,
     *CHAOS_DEFILER_HEIGHT_OVERRIDES,
+    *EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES,
 )

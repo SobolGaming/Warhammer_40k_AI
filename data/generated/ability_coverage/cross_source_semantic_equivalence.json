@@ -7209,7 +7209,7 @@
     }
   ],
   "equivalent_group_count": 332,
-  "exact_text_only_member_count": 3275,
+  "exact_text_only_member_count": 3274,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -57599,12 +57599,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "8774c6283aa17345f6aea399398bd9c7f7cef27a4b8c3ddd48a70b962f82e507",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "d0702ef4121b3a8610b7d962faa4c057ddf7cae3df62c30dd809f283e10121c1",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004089:2",
@@ -57614,16 +57612,19 @@
       "rule_id": "000004089:2",
       "rule_name": "Daemonic Patrons",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:fight-end-failed-activation-model-destruction",
+        "catalog-ir:fight-selected-critical-wound-threshold"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "25c36d8623da44d7c89e5fbaefafbbf8fe6a0cab83bbf45c82841542db449822",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004089:2"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004089:2:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -122140,8 +122141,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "5e71bdf59a0cb728d34541564df7bbebe6ecf708862f3fe1b468381eab9bc88b",
+  "source_payload_checksum_sha256": "240b882834fa059f818b93e5587d8f9c961d8f67ed88bdf32167df97e3ee5031",
   "source_text_unavailable_member_count": 110,
-  "structured_member_count": 709,
+  "structured_member_count": 710,
   "upstream_execution_checksum_sha256": "33f066d0b292580042270148e7e4e190666ecf2720a511d749a0d05d424a9367"
 }

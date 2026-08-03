@@ -30,6 +30,29 @@ def optional_destruction_reaction_trigger_conditions_met(
         raise GameLifecycleError("Destruction reaction condition requires provenance.")
     if type(damage) is not DamageApplication:
         raise GameLifecycleError("Destruction reaction condition requires damage.")
+    return optional_destruction_reaction_trigger_conditions_for_target(
+        state=state,
+        destruction_provenance=destruction_provenance,
+        target_unit_instance_id=damage.target_unit_instance_id,
+        descriptor=descriptor,
+    )
+
+
+def optional_destruction_reaction_trigger_conditions_for_target(
+    *,
+    state: GameState,
+    destruction_provenance: DestructionProvenance,
+    target_unit_instance_id: str,
+    descriptor: dict[str, JsonValue],
+) -> bool:
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Destruction reaction condition requires GameState.")
+    if type(destruction_provenance) is not DestructionProvenance:
+        raise GameLifecycleError("Destruction reaction condition requires provenance.")
+    if type(target_unit_instance_id) is not str or not target_unit_instance_id:
+        raise GameLifecycleError("Destruction reaction target unit ID is invalid.")
     if not optional_destruction_reaction_trigger_battle_round_is_current(
         state=state,
         descriptor=descriptor,
@@ -49,8 +72,7 @@ def optional_destruction_reaction_trigger_conditions_met(
         fight_state = state.fight_phase_state
         if (
             fight_state is not None
-            and damage.target_unit_instance_id
-            in fight_state.fight_order_state.selected_to_fight_unit_ids
+            and target_unit_instance_id in fight_state.fight_order_state.selected_to_fight_unit_ids
         ):
             return False
     return True
