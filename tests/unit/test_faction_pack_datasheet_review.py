@@ -362,6 +362,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("aeldari", "000004196", "Playable"),
         ("death-guard", "000004209", "Partial"),
         ("emperors-children", "000004077", "Playable"),
+        ("emperors-children", "000004089", "Playable"),
         ("emperors-children", "000004208", "Partial"),
         ("thousand-sons", "000001030", "Playable"),
         ("world-eaters", "000004207", "Partial"),
@@ -395,7 +396,10 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
                 for line in support_markdown.splitlines()
                 if line.startswith(f"| {row.datasheet_name} (`{row.datasheet_id}`) |")
             )
-            if row.faction_id == "aeldari" or row.datasheet_id == "000004077":
+            if row.faction_id == "aeldari" or row.datasheet_id in {
+                "000004077",
+                "000004089",
+            }:
                 assert "| All consumed |" in rendered_row
             else:
                 assert "| IR parsed; host needed |" in rendered_row

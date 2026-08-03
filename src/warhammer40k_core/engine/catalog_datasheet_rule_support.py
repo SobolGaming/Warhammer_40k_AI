@@ -60,6 +60,12 @@ CATALOG_IR_PASSIVE_SELF_DEFENSIVE_HIT_MODIFIER_CONSUMER_ID = (
 CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID = (
     "catalog-ir:fight-selected-weapon-ability-choice"
 )
+CATALOG_IR_FIGHT_SELECTED_CRITICAL_WOUND_CONSUMER_ID = (
+    "catalog-ir:fight-selected-critical-wound-threshold"
+)
+CATALOG_IR_FIGHT_END_FAILED_ACTIVATION_MODEL_DESTRUCTION_CONSUMER_ID = (
+    "catalog-ir:fight-end-failed-activation-model-destruction"
+)
 CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID = "catalog-ir:weapon-keyword-grant"
 CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:wound-roll-modifier"
 CATALOG_IR_LEADING_UNIT_HIT_ROLL_MODIFIER_CONSUMER_ID = "catalog-ir:hit-roll-modifier"
@@ -236,6 +242,10 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
             )
             token = ability.value.lower().replace("_", "-").replace(" ", "-")
             consumer_ids.add(f"catalog-ir:weapon-keyword-grant:{token}")
+    if clause_is_fight_selected_critical_wound_threshold(clause):
+        consumer_ids.add(CATALOG_IR_FIGHT_SELECTED_CRITICAL_WOUND_CONSUMER_ID)
+    if clause_is_fight_end_failed_activation_model_destruction(clause):
+        consumer_ids.add(CATALOG_IR_FIGHT_END_FAILED_ACTIVATION_MODEL_DESTRUCTION_CONSUMER_ID)
     if clause_is_charge_end_leading_unit_weapon_ability_grant(clause):
         consumer_ids.add(CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID)
         for effect in clause.effects:
@@ -274,6 +284,8 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_STEALTH_AURA_CONSUMER_ID,
                 CATALOG_IR_GRANTED_STEALTH_CONSUMER_ID,
                 CATALOG_IR_FIGHT_SELECTED_WEAPON_ABILITY_CHOICE_CONSUMER_ID,
+                CATALOG_IR_FIGHT_SELECTED_CRITICAL_WOUND_CONSUMER_ID,
+                CATALOG_IR_FIGHT_END_FAILED_ACTIVATION_MODEL_DESTRUCTION_CONSUMER_ID,
                 CATALOG_IR_WEAPON_KEYWORD_GRANT_CONSUMER_ID,
                 CATALOG_IR_LEADING_UNIT_WOUND_ROLL_MODIFIER_CONSUMER_ID,
                 CATALOG_IR_LEADING_UNIT_HIT_ROLL_MODIFIER_CONSUMER_ID,
@@ -505,6 +517,85 @@ def clause_is_fight_selected_weapon_ability_choice(clause: RuleClause) -> bool:
         except WeaponProfileError:
             return False
     return len(groups) == 1 and len(option_ids) == len(clause.effects)
+
+
+def clause_is_fight_selected_critical_wound_threshold(clause: RuleClause) -> bool:
+    if (
+        not clause.is_supported
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.UNIT_SELECTED
+        or parameter_payload(clause.trigger.parameters)
+        != {
+            "optional": True,
+            "phase": "fight",
+            "timing_window": "selected_to_fight",
+        }
+        or clause.conditions
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_UNIT
+        or clause.target.parameters
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT
+        or parameter_payload(clause.duration.parameters) != {"boundary": "end", "endpoint": "phase"}
+        or len(clause.effects) != 1
+    ):
+        return False
+    effect = clause.effects[0]
+    if effect.kind is not RuleEffectKind.SET_CONTEXTUAL_STATUS:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    threshold = parameters.get("critical_threshold")
+    return (
+        set(parameters)
+        == {
+            "attack_role",
+            "critical_threshold",
+            "roll_type",
+            "status",
+        }
+        and parameters.get("attack_role") == "attacker"
+        and type(threshold) is int
+        and 2 <= threshold <= 6
+        and parameters.get("roll_type") == "wound"
+        and parameters.get("status") == "critical_wound_threshold"
+    )
+
+
+def clause_is_fight_end_failed_activation_model_destruction(clause: RuleClause) -> bool:
+    if (
+        not clause.is_supported
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.TIMING_WINDOW
+        or parameter_payload(clause.trigger.parameters) != {"edge": "end", "phase": "fight"}
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_UNIT
+        or clause.target.parameters
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.IMMEDIATE
+        or clause.duration.parameters
+        or len(clause.effects) != 1
+    ):
+        return False
+    constraints = {
+        parameter_payload(condition.parameters).get("constraint")
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+    }
+    if (
+        constraints
+        != {
+            "source_effect_activated_this_phase",
+            "no_enemy_model_destroyed_by_this_unit_attacks_this_phase",
+        }
+        or len(clause.conditions) != 2
+    ):
+        return False
+    effect = clause.effects[0]
+    return effect.kind is RuleEffectKind.DESTROY_MODEL and parameter_payload(effect.parameters) == {
+        "destroy_count": 1,
+        "selection_policy": "controlling_player",
+        "target_scope": "one_model_in_this_unit",
+    }
 
 
 def clause_is_leading_unit_wound_roll_modifier(clause: RuleClause) -> bool:

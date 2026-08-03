@@ -3254,6 +3254,49 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000004089:daemonic-patrons",
+    "ability_name": "Daemonic Patrons",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004089/datasheet/000004089:daemonic-patrons/none",
+    "datasheet_id": "000004089",
+    "datasheet_name": "Flawless Blades",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:fight-end-failed-activation-model-destruction",
+      "catalog-ir:fight-selected-critical-wound-threshold"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.destroy_model.this_unit",
+      "datasheet.rule_ir.set_contextual_status.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009994",
+    "ability_name": "Thrill Seekers",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004089/faction/000009994/none",
+    "datasheet_id": "000004089",
+    "datasheet_name": "Flawless Blades",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.thrill_seekers"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008346",
     "ability_name": "Leader",
     "catalog_id": "chaos-daemons-bridge-catalog",

@@ -1256,6 +1256,40 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000004089:daemonic-patrons",
+        "ability_name": "Daemonic Patrons",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004089/datasheet/000004089:daemonic-patrons/none",
+        "datasheet_id": "000004089",
+        "datasheet_name": "Flawless Blades",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Daemonic Patrons"
+    ],
+    "category_id": "datasheet.rule_ir.destroy_model.this_unit",
+    "category_name": "Datasheet Rule Ir Destroy Model This Unit",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004089/datasheet/000004089:daemonic-patrons/none"
+    ],
+    "datasheet_names": [
+      "Flawless Blades"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:fight-end-failed-activation-model-destruction",
+      "catalog-ir:fight-selected-critical-wound-threshold"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
         "ability_id": "000001114:bane-of-cowards",
         "ability_name": "Bane of Cowards",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001114/datasheet/000001114:bane-of-cowards/none",
@@ -3060,6 +3094,14 @@
         "source_kind": "datasheet"
       },
       {
+        "ability_id": "000004089:daemonic-patrons",
+        "ability_name": "Daemonic Patrons",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004089/datasheet/000004089:daemonic-patrons/none",
+        "datasheet_id": "000004089",
+        "datasheet_name": "Flawless Blades",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000000595:mandiblasters",
         "ability_name": "Mandiblasters",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000595/datasheet/000000595:mandiblasters/none",
@@ -3069,26 +3111,31 @@
       }
     ],
     "ability_names": [
+      "Daemonic Patrons",
       "Mandiblasters",
       "Shadow Form"
     ],
     "category_id": "datasheet.rule_ir.set_contextual_status.this_unit",
     "category_name": "Datasheet Rule Ir Set Contextual Status This Unit",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-form/none",
+      "chaos-daemons-bridge-catalog/000004089/datasheet/000004089:daemonic-patrons/none",
       "chaos-daemons-bridge-catalog/000000595/datasheet/000000595:mandiblasters/none"
     ],
     "datasheet_names": [
       "Be'lakor",
+      "Flawless Blades",
       "Striking Scorpions"
     ],
     "runtime_consumer_ids": [
+      "catalog-ir:fight-end-failed-activation-model-destruction",
+      "catalog-ir:fight-selected-critical-wound-threshold",
       "catalog-ir:minimum-unmodified-hit-success",
       "catalog-ir:shadow-form-choice"
     ],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -3367,6 +3414,14 @@
       {
         "ability_id": "000009994",
         "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004089/faction/000009994/none",
+        "datasheet_id": "000004089",
+        "datasheet_name": "Flawless Blades",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004077/faction/000009994/none",
         "datasheet_id": "000004077",
         "datasheet_name": "Fulgrim",
@@ -3378,13 +3433,15 @@
     ],
     "category_id": "faction.army_rule.thrill_seekers",
     "category_name": "Emperor's Children Army Rule",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none",
+      "chaos-daemons-bridge-catalog/000004089/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004077/faction/000009994/none"
     ],
     "datasheet_names": [
       "Emperor's Children",
+      "Flawless Blades",
       "Fulgrim"
     ],
     "runtime_consumer_ids": [
@@ -3394,7 +3451,7 @@
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
     ],
     "source_kind_counts": {
-      "faction": 2
+      "faction": 3
     },
     "support_stages": [
       "engine_consumed"

@@ -278,8 +278,10 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:feel-no-pain-roll` | No current generated rows |
 | `catalog-ir:feel-no-pain-source` | Collar of Khorne |
 | `catalog-ir:fight-activation-movement-distance` | No current generated rows |
+| `catalog-ir:fight-end-failed-activation-model-destruction` | Daemonic Patrons |
 | `catalog-ir:fight-end-triggered-movement` | Raid and Run |
 | `catalog-ir:fight-on-death-source` | Malevolent Souls |
+| `catalog-ir:fight-selected-critical-wound-threshold` | Daemonic Patrons |
 | `catalog-ir:fight-selected-weapon-ability-choice` | Harbinger of Death |
 | `catalog-ir:first-death-return` | Unquenchable Resolve |
 | `catalog-ir:first-death-return-phase-end` | No current generated rows |

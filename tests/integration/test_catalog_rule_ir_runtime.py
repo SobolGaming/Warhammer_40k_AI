@@ -36,12 +36,19 @@ from warhammer40k_core.core.datasheet import (
     DatasheetMusteringOptionEffectKind,
 )
 from warhammer40k_core.core.detachment import DetachmentDefinition
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    FightPhaseStepKind,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
+    WeaponProfile,
 )
 from warhammer40k_core.engine import army_mustering
 from warhammer40k_core.engine.abilities import (
+    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+    AbilityCatalogIndex,
     AbilityCatalogRecord,
     AbilityDefinition,
     AbilitySourceKind,
@@ -58,6 +65,14 @@ from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_once_per_battle_runtime import CatalogOncePerBattleRuntime
+from warhammer40k_core.engine.catalog_selected_to_fight_risk_runtime import (
+    CatalogSelectedToFightRiskRuntime,
+)
+from warhammer40k_core.engine.critical_wounds import (
+    WoundRollCriticalThresholdContext,
+    generic_rule_critical_wound_threshold,
+)
+from warhammer40k_core.engine.damage_allocation import model_by_id
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -67,6 +82,11 @@ from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEvent,
     RuntimeContentEventHandlerRegistry,
     RuntimeContentEventIndex,
+)
+from warhammer40k_core.engine.fight_order import FightPhaseState
+from warhammer40k_core.engine.fight_phase_end_hooks import (
+    FightPhaseEndRequestContext,
+    FightPhaseEndResultContext,
 )
 from warhammer40k_core.engine.fight_phase_start_hooks import (
     FightPhaseStartHookRegistry,
@@ -80,6 +100,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrantRegistry,
     fight_unit_selected_grant_options,
 )
+from warhammer40k_core.engine.fights_first import FightsFirstRegistry
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -112,6 +133,8 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.source_data import RuleSourceText
 
 
 def test_phase17k_player_ability_index_uses_mustering_added_wargear() -> None:
@@ -1048,3 +1071,327 @@ def test_phase17k_daemonic_lord_and_stealth_aura_use_group_aware_generic_queries
     assert source.own_models[0].is_alive
     assert hit_registry.hit_roll_modifier(support_hit_context) == 0
     assert restriction_registry.restrictions_for(restriction_context) == ()
+
+
+def test_daemonic_patrons_grant_critical_wounds_and_destroy_a_model_after_no_kill() -> None:
+    state, runtime, source, enemy, profile = _daemonic_patrons_runtime_fixture()
+    grant_registry = FightUnitSelectedGrantRegistry.from_bindings(
+        runtime.fight_unit_selected_grant_bindings()
+    )
+    grants = grant_registry.grants_for(
+        FightUnitSelectedContext(
+            state=state,
+            player_id="player-source",
+            battle_round=1,
+            unit_instance_id=source.unit_instance_id,
+            fight_type="normal",
+            ordering_band="remaining_combats",
+            request_id="daemonic-patrons-activation-request",
+            result_id="daemonic-patrons-activation-result",
+        )
+    )
+    assert len(grants) == 1
+    assert grants[0].label == "Daemonic Patrons"
+    assert grants[0].decline_allowed is True
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="daemonic-patrons-effect",
+            source_rule_id=grants[0].source_id,
+            owner_player_id="player-source",
+            target_unit_instance_ids=(source.unit_instance_id,),
+            started_battle_round=1,
+            started_phase=BattlePhaseKind.FIGHT,
+            expiration=EffectExpiration.end_phase(
+                battle_round=1,
+                phase=BattlePhaseKind.FIGHT,
+                player_id="player-source",
+            ),
+            effect_payload=grants[0].unit_effect_payload,
+        )
+    )
+    assert (
+        generic_rule_critical_wound_threshold(
+            WoundRollCriticalThresholdContext(
+                state=state,
+                source_phase=BattlePhase.FIGHT,
+                attacking_unit_instance_id=source.unit_instance_id,
+                attacker_model_instance_id=source.own_models[0].model_instance_id,
+                target_unit_instance_id=enemy.unit_instance_id,
+                weapon_profile=profile,
+                current_critical_threshold=6,
+            )
+        )
+        == 3
+    )
+
+    decisions = DecisionController()
+    request = runtime.next_fight_phase_end_request(
+        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    assert request.actor_id == "player-source"
+    assert len(request.options) == 1
+    assert type(request).from_payload(request.to_payload()) == request
+    result = DecisionResult.for_request(
+        result_id="daemonic-patrons-destroy-result",
+        request=request,
+        selected_option_id=request.options[0].option_id,
+    )
+    assert type(result).from_payload(result.to_payload()) == result
+    drifted_payload = cast(dict[str, JsonValue], result.payload).copy()
+    drifted_payload["rule_ir_hash"] = "0" * 64
+    invalid = runtime.apply_fight_phase_end_result(
+        FightPhaseEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=replace(result, payload=validate_json_value(drifted_payload)),
+        )
+    )
+    assert type(invalid) is not bool
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert model_by_id(
+        state=state,
+        model_instance_id=source.own_models[0].model_instance_id,
+    ).is_alive
+
+    decisions.request_decision(request)
+    record = decisions.submit_result(result)
+    assert (
+        runtime.apply_fight_phase_end_result(
+            FightPhaseEndResultContext(
+                state=state,
+                decisions=decisions,
+                request=record.request,
+                result=record.result,
+            )
+        )
+        is True
+    )
+    assert not model_by_id(
+        state=state,
+        model_instance_id=source.own_models[0].model_instance_id,
+    ).is_alive
+    assert state.battlefield_state is not None
+    assert source.own_models[0].model_instance_id not in state.battlefield_state.placed_model_ids()
+    assert any(record.event_type == "model_destroyed" for record in decisions.event_log.records)
+    assert "object at 0x" not in json.dumps(
+        {"state": state.to_payload(), "decisions": decisions.to_payload()},
+        sort_keys=True,
+    )
+
+
+def test_daemonic_patrons_counts_only_enemy_models_destroyed_by_that_units_attacks() -> None:
+    state, runtime, source, enemy, _profile = _daemonic_patrons_runtime_fixture()
+    decisions = DecisionController()
+    _record_daemonic_patrons_effect(state=state, runtime=runtime, source=source)
+    base_payload = {
+        "game_id": state.game_id,
+        "battle_round": 1,
+        "phase": BattlePhase.FIGHT.value,
+        "destroying_player_id": "player-source",
+        "attacking_model_instance_id": source.own_models[0].model_instance_id,
+    }
+    decisions.event_log.append(
+        "model_destroyed",
+        validate_json_value(
+            {
+                **base_payload,
+                "target_unit_instance_id": source.unit_instance_id,
+                "model_instance_id": source.own_models[0].model_instance_id,
+            }
+        ),
+    )
+    assert (
+        runtime.next_fight_phase_end_request(
+            FightPhaseEndRequestContext(state=state, decisions=decisions)
+        )
+        is not None
+    )
+    decisions.event_log.append(
+        "model_destroyed",
+        validate_json_value(
+            {
+                **base_payload,
+                "target_unit_instance_id": enemy.unit_instance_id,
+                "model_instance_id": enemy.own_models[0].model_instance_id,
+            }
+        ),
+    )
+    assert (
+        runtime.next_fight_phase_end_request(
+            FightPhaseEndRequestContext(state=state, decisions=decisions)
+        )
+        is None
+    )
+
+
+def _daemonic_patrons_runtime_fixture() -> tuple[
+    GameState,
+    CatalogSelectedToFightRiskRuntime,
+    UnitInstance,
+    UnitInstance,
+    WeaponProfile,
+]:
+    package = undivided_daemon_package()
+    source = daemon_prince_unit(
+        package=package,
+        datasheet_id="000001149",
+        allegiance="SLAANESH",
+        unit_selection_id="daemonic-patrons-source",
+        army_id="army-source",
+    )
+    enemy = daemon_prince_unit(
+        package=package,
+        datasheet_id="000001149",
+        allegiance="KHORNE",
+        unit_selection_id="daemonic-patrons-enemy",
+        army_id="army-enemy",
+    )
+    source_army = flesh_hounds_army(
+        package=package,
+        unit=source,
+        player_id="player-source",
+        army_id="army-source",
+    )
+    enemy_army = flesh_hounds_army(
+        package=package,
+        unit=enemy,
+        player_id="player-enemy",
+        army_id="army-enemy",
+    )
+    battlefield = BattlefieldRuntimeState(
+        battlefield_id="daemonic-patrons-battlefield",
+        battlefield_width_inches=60.0,
+        battlefield_depth_inches=44.0,
+        placed_armies=(
+            PlacedArmy(
+                army_id=source_army.army_id,
+                player_id=source_army.player_id,
+                unit_placements=(single_model_unit_placement(source_army, source, x=12.0),),
+            ),
+            PlacedArmy(
+                army_id=enemy_army.army_id,
+                player_id=enemy_army.player_id,
+                unit_placements=(single_model_unit_placement(enemy_army, enemy, x=14.0),),
+            ),
+        ),
+    )
+    state = battle_state_with_armies(
+        armies=(source_army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.FIGHT,
+    )
+    policy = state.runtime_ruleset_descriptor().fight_policy
+    state.fight_phase_state = FightPhaseState.start(
+        battle_round=1,
+        active_player_id=source_army.player_id,
+        policy=policy,
+        engaged_at_fight_step_start_unit_ids=(),
+        fights_first_registry=FightsFirstRegistry(),
+    ).with_current_step(current_step=FightPhaseStepKind.END, policy=policy)
+    records = _daemonic_patrons_records(source=source)
+    runtime = CatalogSelectedToFightRiskRuntime(
+        {
+            source_army.player_id: AbilityCatalogIndex.from_records(records),
+            enemy_army.player_id: AbilityCatalogIndex.from_records(()),
+        },
+        (source_army, enemy_army),
+    )
+    profile = datasheet_weapon_profile(
+        package.army_catalog,
+        datasheet_id=source.datasheet_id,
+        profile_name="Hellforged weapons - strike",
+    )
+    return state, runtime, source, enemy, profile
+
+
+def _record_daemonic_patrons_effect(
+    *,
+    state: GameState,
+    runtime: CatalogSelectedToFightRiskRuntime,
+    source: UnitInstance,
+) -> None:
+    grants = FightUnitSelectedGrantRegistry.from_bindings(
+        runtime.fight_unit_selected_grant_bindings()
+    ).grants_for(
+        FightUnitSelectedContext(
+            state=state,
+            player_id="player-source",
+            battle_round=1,
+            unit_instance_id=source.unit_instance_id,
+            fight_type="normal",
+            ordering_band="remaining_combats",
+            request_id="daemonic-patrons-kill-activation-request",
+            result_id="daemonic-patrons-kill-activation-result",
+        )
+    )
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="daemonic-patrons-kill-effect",
+            source_rule_id=grants[0].source_id,
+            owner_player_id="player-source",
+            target_unit_instance_ids=(source.unit_instance_id,),
+            started_battle_round=1,
+            started_phase=BattlePhaseKind.FIGHT,
+            expiration=EffectExpiration.end_phase(
+                battle_round=1,
+                phase=BattlePhaseKind.FIGHT,
+                player_id="player-source",
+            ),
+            effect_payload=grants[0].unit_effect_payload,
+        )
+    )
+
+
+def _daemonic_patrons_records(*, source: UnitInstance) -> tuple[AbilityCatalogRecord, ...]:
+    source_text = RuleSourceText.from_raw(
+        source_id="test:emperors-children:daemonic-patrons",
+        raw_text=(
+            "Each time this unit is selected to fight, it can call upon daemonic patrons. "
+            "If it does, until the end of the phase, each time a model in this unit makes "
+            "an attack, an unmodified Wound roll of 3+ scores a Critical Wound. At the end "
+            "of the Fight phase, if this unit called upon daemonic patrons this phase and "
+            "no enemy models were destroyed by attacks made by models in this unit this "
+            "phase, one model in this unit is destroyed."
+        ),
+    )
+    rule_ir = compile_rule_source_text(
+        source_text,
+        source_keyword_sequence_parts=("FLAWLESS BLADES",),
+    ).rule_ir
+    records: list[AbilityCatalogRecord] = []
+    for index, clause in enumerate(rule_ir.clauses, start=1):
+        trigger_kind = (
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT
+            if index == 1
+            else TimingTriggerKind.END_PHASE
+        )
+        records.append(
+            AbilityCatalogRecord(
+                record_id=f"record:daemonic-patrons:{index}",
+                definition=AbilityDefinition(
+                    ability_id=f"ability:daemonic-patrons:{index}",
+                    name="Daemonic Patrons",
+                    source_id=source_text.source_id,
+                    when_descriptor="Selected to fight or end of Fight phase.",
+                    effect_descriptor="Critical Wounds with a failed-activation consequence.",
+                    restrictions_descriptor="Source-backed Daemonic Patrons RuleIR.",
+                    timing=AbilityTimingDescriptor(
+                        trigger_kind=trigger_kind,
+                        phase=BattlePhaseKind.FIGHT,
+                    ),
+                    handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+                    replay_payload=validate_json_value(
+                        {
+                            "rule_ir": rule_ir.to_payload(),
+                            "runtime_clause_id": clause.clause_id,
+                        }
+                    ),
+                ),
+                source_kind=AbilitySourceKind.DATASHEET,
+                datasheet_id=source.datasheet_id,
+            )
+        )
+    return tuple(records)

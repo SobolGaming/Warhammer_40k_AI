@@ -39,6 +39,10 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+from warhammer40k_core.engine.catalog_datasheet_rule_support import (
+    CATALOG_IR_FIGHT_END_FAILED_ACTIVATION_MODEL_DESTRUCTION_CONSUMER_ID,
+    CATALOG_IR_FIGHT_SELECTED_CRITICAL_WOUND_CONSUMER_ID,
+)
 from warhammer40k_core.engine.catalog_poisoned_status_runtime import (
     CATALOG_POISONED_COMMAND_RESOLVED_EVENT,
     catalog_poisoned_command_start_bindings,
@@ -118,6 +122,7 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.replay import ReplayArtifact, ReplayArtifactPayload, ReplayRunner
+from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     RuntimeModifierRegistry,
@@ -260,6 +265,59 @@ def test_emperors_children_overlay_feeds_active_bridge_rows() -> None:
         _ability_fields(abilities, datasheet_id="000004077", name="Serpentine")["description"]
         == ec_overlay.SERPENTINE_DESCRIPTION
     )
+
+
+def test_flawless_blades_catalog_is_complete_and_daemonic_patrons_is_consumed() -> None:
+    package = _catalog_package()
+    datasheet = package.army_catalog.datasheet_by_id("000004089")
+    profile = datasheet.model_profiles[0]
+    characteristics = {value.characteristic: value.final for value in profile.characteristics}
+    assert (
+        characteristics[Characteristic.MOVEMENT],
+        characteristics[Characteristic.TOUGHNESS],
+        characteristics[Characteristic.SAVE],
+        characteristics[Characteristic.WOUNDS],
+        characteristics[Characteristic.LEADERSHIP],
+        characteristics[Characteristic.OBJECTIVE_CONTROL],
+        characteristics[Characteristic.INVULNERABLE_SAVE],
+    ) == (8, 5, 3, 3, 6, 1, 5)
+    assert (datasheet.composition[0].min_models, datasheet.composition[0].max_models) == (3, 6)
+    unit = _instantiate_unit(
+        factory=UnitFactory(
+            catalog=package.army_catalog, model_geometries=package.model_geometries
+        ),
+        army_id="army-flawless-blades",
+        datasheet_id=datasheet.datasheet_id,
+        selection_id="flawless-blades",
+        model_count=3,
+    )
+    assert len(unit.own_models) == 3
+    assert profile.base_size.diameter_mm == 40.0
+    geometry = next(
+        record
+        for record in package.model_geometries
+        if record.model_profile_id == profile.model_profile_id
+    )
+    assert geometry.height.height_inches == 2.0
+    blissblade = _weapon_profile("000004089", "Blissblade")
+    assert (blissblade.attack_profile.fixed_attacks, blissblade.strength.final) == (4, 6)
+    records = tuple(
+        record
+        for record in catalog_ability_records_from_catalog(package.army_catalog)
+        if record.datasheet_id == datasheet.datasheet_id
+        and record.definition.name == "Daemonic Patrons"
+    )
+    assert len(records) == 2
+    rule_irs = tuple(
+        rule_ir_from_execution_payload(record.definition.replay_payload) for record in records
+    )
+    assert rule_irs[0] == rule_irs[1]
+    assert len(rule_irs[0].clauses) == 2
+    assert all(clause.is_supported for clause in rule_irs[0].clauses)
+    assert set(catalog_rule_ir_consumers_for_rule(rule_irs[0])) == {
+        CATALOG_IR_FIGHT_SELECTED_CRITICAL_WOUND_CONSUMER_ID,
+        CATALOG_IR_FIGHT_END_FAILED_ACTIVATION_MODEL_DESTRUCTION_CONSUMER_ID,
+    }
 
 
 def test_fulgrim_generated_rule_ir_and_catalog_are_complete_and_source_bound() -> None:
@@ -1167,6 +1225,7 @@ def _instantiate_unit(
     army_id: str,
     datasheet_id: str,
     selection_id: str,
+    model_count: int = 1,
 ) -> UnitInstance:
     datasheet = factory.catalog.datasheet_by_id(datasheet_id)
     model_profile = datasheet.model_profiles[0]
@@ -1176,7 +1235,9 @@ def _instantiate_unit(
         selection=UnitMusterSelection(
             unit_selection_id=selection_id,
             datasheet_id=datasheet_id,
-            model_profile_selections=(ModelProfileSelection(model_profile.model_profile_id, 1),),
+            model_profile_selections=(
+                ModelProfileSelection(model_profile.model_profile_id, model_count),
+            ),
         ),
     )
 

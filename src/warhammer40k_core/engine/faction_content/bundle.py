@@ -52,6 +52,9 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_post_shoot_hit_target_status_hook_bindings,
     catalog_weapon_profile_modifier_bindings,
 )
+from warhammer40k_core.engine.catalog_selected_to_fight_risk_runtime import (
+    CatalogSelectedToFightRiskRuntime,
+)
 from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationHookBinding,
     ChargeDeclarationHookRegistry,
@@ -1367,6 +1370,10 @@ class RuntimeContentBundle:
         )
         catalog_cp = CatalogCommandPointRuntime(ability_indexes_by_player_id, validated_armies)
         catalog_rules = CatalogDatasheetRuleRuntime(ability_indexes_by_player_id, validated_armies)
+        catalog_selected_fight_risk = CatalogSelectedToFightRiskRuntime(
+            ability_indexes_by_player_id,
+            validated_armies,
+        )
         event_handler_registry = RuntimeContentEventHandlerRegistry.from_bindings(
             (
                 *catalog_cp.event_handler_bindings(),
@@ -1738,6 +1745,7 @@ class RuntimeContentBundle:
                     execution_records=records,
                 ),
                 *catalog_rules.fight_unit_selected_grant_bindings(),
+                *catalog_selected_fight_risk.fight_unit_selected_grant_bindings(),
                 *_contribution_values(
                     validated_contributions,
                     lambda contribution: contribution.fight_unit_selected_grant_hook_bindings,

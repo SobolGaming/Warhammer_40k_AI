@@ -2423,6 +2423,27 @@ def remove_destroyed_model_from_battlefield(
     _remove_destroyed_model(state=state, model_instance_id=model_instance_id)
 
 
+def destroy_model_by_rule(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> ModelInstance:
+    """Destroy one model directly, without routing the destruction through damage."""
+    model = model_by_id(state=state, model_instance_id=model_instance_id)
+    if not model.is_alive:
+        raise GameLifecycleError("A rule cannot destroy a model that is already destroyed.")
+    _replace_model_wounds(
+        state=state,
+        model_instance_id=model_instance_id,
+        wounds_remaining=0,
+    )
+    remove_destroyed_model_from_battlefield(
+        state=state,
+        model_instance_id=model_instance_id,
+    )
+    return model
+
+
 def apply_mortal_wounds_to_unit(
     *,
     state: GameState,

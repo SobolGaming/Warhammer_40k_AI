@@ -28,6 +28,7 @@ if TYPE_CHECKING:
 __all__ = (
     "_benefit_of_cover_ballistic_skill_penalty",
     "_cover_result_with_effect_source",
+    "_critical_wound_threshold",
     "_destroyed_model_placement_payload",
     "_destroyed_model_removal_record",
     "_devastating_wounds_resolution_for_attack",
@@ -190,9 +191,9 @@ def _roll_wound(
     manager: DiceRollManager,
     pool: RangedAttackPool,
     toughness: int,
-    target_keywords: tuple[str, ...],
     attacker_player_id: str,
     attack_context_id: str,
+    critical_threshold: int,
     wound_modifier: int = 0,
 ) -> WoundRoll:
     strength = pool.weapon_profile.strength.final
@@ -208,13 +209,7 @@ def _roll_wound(
     unmodified = roll_state.current_total
     capped_modifier = _cap_roll_modifier(wound_modifier)
     final_roll = unmodified + capped_modifier
-    critical_threshold = anti_keyword_critical_threshold(
-        profile=pool.weapon_profile,
-        target_keywords=target_keywords,
-        selected_ability_id=_selected_anti_keyword_ability_id(pool),
-    )
-    if critical_threshold is None:
-        critical_threshold = 6
+    critical_threshold = _validate_d6_target("critical_threshold", critical_threshold)
     critical = unmodified >= critical_threshold
     return WoundRoll(
         strength=strength,
@@ -262,6 +257,34 @@ def _wound_roll_modifier(
     return modifier
 
 
+def _critical_wound_threshold(
+    *,
+    state: GameState,
+    pool: RangedAttackPool,
+    source_phase: BattlePhase,
+    target_keywords: tuple[str, ...],
+) -> int:
+    threshold = anti_keyword_critical_threshold(
+        profile=pool.weapon_profile,
+        target_keywords=target_keywords,
+        selected_ability_id=_selected_anti_keyword_ability_id(pool),
+    )
+    return generic_rule_critical_wound_threshold(
+        WoundRollCriticalThresholdContext(
+            state=state,
+            source_phase=source_phase,
+            attacking_unit_instance_id=_unit_instance_id_for_model(
+                state=state,
+                model_instance_id=pool.attacker_model_instance_id,
+            ),
+            attacker_model_instance_id=pool.attacker_model_instance_id,
+            target_unit_instance_id=pool.target_unit_instance_id,
+            weapon_profile=pool.weapon_profile,
+            current_critical_threshold=6 if threshold is None else threshold,
+        )
+    )
+
+
 def _reroll_wound_for_twin_linked_if_needed(
     *,
     manager: DiceRollManager,
@@ -269,7 +292,6 @@ def _reroll_wound_for_twin_linked_if_needed(
     pool: RangedAttackPool,
     initial_wound_roll: WoundRoll,
     toughness: int,
-    target_keywords: tuple[str, ...],
     attacker_player_id: str,
     attack_context_id: str,
 ) -> WoundRoll:
@@ -316,13 +338,7 @@ def _reroll_wound_for_twin_linked_if_needed(
     unmodified = updated_state.current_total
     capped_modifier = _cap_roll_modifier(initial_wound_roll.modifier)
     final_roll = unmodified + capped_modifier
-    critical_threshold = anti_keyword_critical_threshold(
-        profile=pool.weapon_profile,
-        target_keywords=target_keywords,
-        selected_ability_id=_selected_anti_keyword_ability_id(pool),
-    )
-    if critical_threshold is None:
-        critical_threshold = 6
+    critical_threshold = initial_wound_roll.critical_threshold
     critical = unmodified >= critical_threshold
     wound_roll = WoundRoll(
         strength=pool.weapon_profile.strength.final,

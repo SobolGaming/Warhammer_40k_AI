@@ -9,6 +9,10 @@ from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+from warhammer40k_core.engine.critical_wounds import (
+    WoundRollCriticalThresholdContext,
+    generic_rule_critical_wound_threshold,
+)
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     EffectExpiration,
@@ -168,6 +172,56 @@ def test_ws14_generic_selected_target_wound_and_damage_hooks_use_explicit_attack
             )
         )
         == 2
+    )
+
+
+def test_ws14_generic_contextual_status_lowers_critical_wound_threshold() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    profile = _weapon_profile(catalog, attacker.own_models[0].wargear_ids[0])
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:critical-wound-threshold",
+            owner_player_id="player-a",
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            target_kind="this_unit",
+            effect_kind="set_contextual_status",
+            parameters={
+                "attack_role": "attacker",
+                "critical_threshold": 3,
+                "roll_type": "wound",
+                "status": "critical_wound_threshold",
+            },
+        )
+    )
+    context = WoundRollCriticalThresholdContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        target_unit_instance_id=defender.unit_instance_id,
+        weapon_profile=profile,
+        current_critical_threshold=6,
+    )
+    assert generic_rule_critical_wound_threshold(context) == 3
+    assert (
+        generic_rule_critical_wound_threshold(replace(context, current_critical_threshold=2)) == 2
+    )
+    assert (
+        generic_rule_critical_wound_threshold(
+            replace(
+                context,
+                attacking_unit_instance_id=defender.unit_instance_id,
+                attacker_model_instance_id=defender.own_models[0].model_instance_id,
+                target_unit_instance_id=attacker.unit_instance_id,
+            )
+        )
+        == 6
     )
 
 
