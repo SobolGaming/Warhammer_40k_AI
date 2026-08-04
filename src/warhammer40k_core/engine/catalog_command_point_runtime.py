@@ -7,7 +7,12 @@ from types import MappingProxyType
 from typing import cast
 
 from warhammer40k_core.core.attributes import Characteristic
-from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollSpec,
+    ModifiedRollResult,
+    UnmodifiedRollResult,
+)
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -34,6 +39,10 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_record_current_wargear_bearer_model_ids,
     catalog_rule_record_source_matches_unit,
+)
+from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
+    LEADERSHIP_TEST_ROLL_TYPE,
+    selected_target_test_roll_modifiers,
 )
 from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
 from warhammer40k_core.engine.decision import DiceRollManager
@@ -930,8 +939,10 @@ def _resolve_phase_command_point_gain(
 ) -> JsonValue:
     gate = _phase_gain_dice_gate(source.clause)
     roll_payload: JsonValue = None
+    leadership_modified_roll_payload: JsonValue = None
     leadership_target: int | None = None
     success_threshold: int | None = None
+    rules_unit_id: str | None = None
     test_kind = "automatic"
     passed = True
     if gate is not None:
@@ -979,7 +990,21 @@ def _resolve_phase_command_point_gain(
             )
         )
         roll_payload = cast(JsonValue, roll.to_payload())
-        passed = roll.current_total >= success_threshold
+        if test_kind == "leadership":
+            if rules_unit_id is None:
+                raise GameLifecycleError("Leadership test requires a rules-unit identity.")
+            modified_roll = ModifiedRollResult.from_unmodified(
+                UnmodifiedRollResult.from_state(roll),
+                modifiers=selected_target_test_roll_modifiers(
+                    state=context.state,
+                    unit_instance_id=rules_unit_id,
+                    roll_type=LEADERSHIP_TEST_ROLL_TYPE,
+                ),
+            )
+            leadership_modified_roll_payload = cast(JsonValue, modified_roll.to_payload())
+            passed = modified_roll.final_value >= success_threshold
+        else:
+            passed = roll.current_total >= success_threshold
     gain_payload: JsonValue = None
     if passed:
         gain = context.state.gain_command_points(
@@ -1012,6 +1037,7 @@ def _resolve_phase_command_point_gain(
             "roll": roll_payload,
             "leadership_target": leadership_target,
             "leadership_roll": roll_payload if test_kind == "leadership" else None,
+            "leadership_modified_roll": leadership_modified_roll_payload,
             "passed": passed,
             "command_point_result": gain_payload,
         }

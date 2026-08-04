@@ -55,6 +55,9 @@ from warhammer40k_core.engine.catalog_contextual_status_consumption import (
     hook_ids_for_effect,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import catalog_rule_clauses_from_record
+from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
+    CATALOG_SELECTED_TARGET_TEST_MODIFIER_HOOK_ID,
+)
 from warhammer40k_core.engine.catalog_shadow_form_runtime import (
     CATALOG_SHADOW_FORM_SELECTED_EVENT,
     CATALOG_SHADOW_FORM_SELECTION_EFFECT_KIND,
@@ -442,6 +445,7 @@ def test_catalog_battle_shock_runtime_detects_forced_test_effects() -> None:
     )
 
     assert [binding.hook_id for binding in bindings] == [
+        CATALOG_SELECTED_TARGET_TEST_MODIFIER_HOOK_ID,
         CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,
         CATALOG_IR_BATTLE_SHOCK_FAILED_HEAL_CONSUMER_ID,
     ]

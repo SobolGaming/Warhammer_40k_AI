@@ -8,6 +8,7 @@ from warhammer40k_core.rules.rule_ir import (
     RuleConditionKind,
     RuleEffectKind,
     RuleEffectSpec,
+    RuleIRError,
     RuleParameterValue,
     RuleTargetKind,
     RuleTargetSpec,
@@ -26,8 +27,30 @@ _SELECTED_TARGET_ATTACK_RE = re.compile(
     re.IGNORECASE,
 )
 _SELECTED_UNIT_BATTLE_SHOCK_TEST_RE = re.compile(
-    r"\b(?P<target>that\s+unit|selected\s+unit|target\s+unit)\s+must\s+take\s+"
+    r"\b(?P<target>it|that\s+unit|selected\s+unit|target\s+unit)"
+    r"\s+must\s+take\s+"
     r"a\s+Battle-shock\s+test\b",
+    re.IGNORECASE,
+)
+_POST_SHOOT_ROLL_POOL_MORTAL_WOUNDS_RE = re.compile(
+    r"\broll\s+(?P<roll_quantity>one|two|three|four|five|six|\d+)\s+"
+    r"(?P<roll_expression>(?:\d+)?D\d+(?:[+-]\d+)?)\s*:\s*"
+    r"for\s+each\s+(?P<success_threshold>[2-6])\+,\s+"
+    r"(?P<target>that\s+enemy\s+unit|that\s+unit|selected\s+unit|target\s+unit)\s+"
+    r"suffers\s+(?P<mortal_wounds>D6|D3|\d+)\s+mortal\s+wounds?\b",
+    re.IGNORECASE,
+)
+_CONDITIONAL_MORTAL_WOUND_BATTLE_SHOCK_RE = re.compile(
+    r"\bif\s+(?:an?\s+)?enemy\s+unit\s+suffers\s+one\s+or\s+more\s+mortal\s+wounds\s+"
+    r"as\s+a\s+result\s+of\s+this\s+ability,\s+it\s+must\s+take\s+a\s+"
+    r"Battle-shock\s+test\b",
+    re.IGNORECASE,
+)
+_SELECTED_UNIT_TEST_MODIFIER_RE = re.compile(
+    r"\beach\s+time\s+a\s+(?P<test_types>Battle-shock\s+or\s+Leadership)\s+test\s+"
+    r"is\s+taken\s+for\s+(?:that\s+enemy\s+unit|that\s+unit|selected\s+unit|"
+    r"target\s+unit),\s+(?P<verb>add|subtract)\s+(?P<value>\d+)\s+"
+    r"(?:to|from)\s+that\s+test\b",
     re.IGNORECASE,
 )
 _SHADOW_OF_CHAOS_AREA_RE = re.compile(
@@ -109,6 +132,97 @@ def parse_selected_target_attack_conditions(
             )
         )
     return tuple(conditions)
+
+
+def parse_conditional_mortal_wound_battle_shock_conditions(
+    *,
+    text: str,
+    source_span: TextSpan,
+) -> tuple[RuleCondition, ...]:
+    return tuple(
+        RuleCondition(
+            kind=RuleConditionKind.TARGET_CONSTRAINT,
+            source_span=_span_from_match(source_span, match),
+            parameters=parameters_from_pairs(
+                (
+                    ("relationship", "prior_effect_inflicted_mortal_wounds"),
+                    ("minimum_mortal_wounds", 1),
+                    ("source_scope", "this_ability"),
+                )
+            ),
+        )
+        for match in _CONDITIONAL_MORTAL_WOUND_BATTLE_SHOCK_RE.finditer(text)
+    )
+
+
+def parse_post_shoot_roll_pool_mortal_wound_effects(
+    *,
+    text: str,
+    source_span: TextSpan,
+) -> tuple[RuleEffectSpec, ...]:
+    return tuple(
+        RuleEffectSpec(
+            kind=RuleEffectKind.INFLICT_MORTAL_WOUNDS,
+            source_span=_span_from_match(source_span, match),
+            parameters=parameters_from_pairs(
+                (
+                    ("damage_kind", "mortal_wounds"),
+                    ("mortal_wounds_expression", match.group("mortal_wounds").upper()),
+                    ("roll_count", _number_value(match.group("roll_quantity"))),
+                    ("roll_expression", match.group("roll_expression").upper()),
+                    ("success_threshold", int(match.group("success_threshold"))),
+                    ("target_scope", "selected_unit"),
+                )
+            ),
+        )
+        for match in _POST_SHOOT_ROLL_POOL_MORTAL_WOUNDS_RE.finditer(text)
+    )
+
+
+def parse_selected_unit_test_modifier_effects(
+    *,
+    text: str,
+    source_span: TextSpan,
+) -> tuple[RuleEffectSpec, ...]:
+    effects: list[RuleEffectSpec] = []
+    for match in _SELECTED_UNIT_TEST_MODIFIER_RE.finditer(text):
+        delta = int(match.group("value"))
+        if match.group("verb").lower() == "subtract":
+            delta = -delta
+        for roll_type in ("battle_shock", "leadership"):
+            effects.append(
+                RuleEffectSpec(
+                    kind=RuleEffectKind.MODIFY_DICE_ROLL,
+                    source_span=_span_from_match(source_span, match),
+                    parameters=parameters_from_pairs(
+                        (
+                            ("delta", delta),
+                            ("roll_type", roll_type),
+                            ("target_scope", "selected_unit"),
+                        )
+                    ),
+                )
+            )
+    return tuple(effects)
+
+
+def selected_unit_followup_target(
+    *,
+    text: str,
+    source_span: TextSpan,
+) -> RuleTargetSpec | None:
+    matches = (
+        *_POST_SHOOT_ROLL_POOL_MORTAL_WOUNDS_RE.finditer(text),
+        *_CONDITIONAL_MORTAL_WOUND_BATTLE_SHOCK_RE.finditer(text),
+        *_SELECTED_UNIT_TEST_MODIFIER_RE.finditer(text),
+    )
+    if not matches:
+        return None
+    match = min(matches, key=lambda value: value.start())
+    return RuleTargetSpec(
+        kind=RuleTargetKind.SELECTED_UNIT,
+        source_span=_span_from_match(source_span, match),
+    )
 
 
 def selected_target_attack_match_ranges(text: str) -> tuple[tuple[int, int], ...]:
@@ -330,3 +444,20 @@ def _lower_group(match: re.Match[str], group_name: str) -> str:
 
 def _subject_token(value: str) -> str:
     return value.lower().replace(" ", "_").replace("-", "_")
+
+
+def _number_value(value: str) -> int:
+    number_words = {
+        "one": 1,
+        "two": 2,
+        "three": 3,
+        "four": 4,
+        "five": 5,
+        "six": 6,
+    }
+    normalized = value.lower()
+    if normalized in number_words:
+        return number_words[normalized]
+    if normalized.isdecimal():
+        return int(normalized)
+    raise RuleIRError(f"Unsupported roll quantity in rule language: {value}.")

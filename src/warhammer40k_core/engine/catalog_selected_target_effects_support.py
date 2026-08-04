@@ -63,6 +63,7 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
+    current_rules_unit_views_for_identity,
     rules_unit_view_by_id,
     rules_unit_views_from_armies,
 )
@@ -84,6 +85,7 @@ from warhammer40k_core.rules.rule_ir import (
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.rule_duration_execution import RuleDurationExecutionContext
 
 
 def post_fight_selected_target_effect_clauses_after(
@@ -431,13 +433,20 @@ def canonical_rules_unit_ids(
     state: GameState,
     unit_instance_ids: tuple[str, ...],
 ) -> frozenset[str]:
+    if state.battlefield_state is None:
+        raise GameLifecycleError(
+            "Catalog selected-target canonical identity requires battlefield_state."
+        )
     canonical_ids: set[str] = set()
     for unit_instance_id in unit_instance_ids:
-        canonical_ids.add(
-            rules_unit_view_by_id(
-                state=state,
-                unit_instance_id=unit_instance_id,
-            ).unit_instance_id
+        rules_units = current_rules_unit_views_for_identity(
+            state=state,
+            unit_instance_id=unit_instance_id,
+        )
+        canonical_ids.update(
+            rules_unit.unit_instance_id
+            for rules_unit in rules_units
+            if rules_unit_has_placed_alive_model(state=state, rules_unit=rules_unit)
         )
     return frozenset(canonical_ids)
 
@@ -543,6 +552,32 @@ def selected_target_status_gate_allows(
             raise GameLifecycleError("Catalog selected-target status is unsupported.")
         return selected_target_unit_instance_id in state.battle_shocked_unit_ids
     return True
+
+
+def selection_subject(clause: RuleClause) -> str | None:
+    if clause.trigger is None:
+        return None
+    subject = parameter_payload(clause.trigger.parameters).get("subject")
+    return subject if type(subject) is str else None
+
+
+def clause_requires_prior_mortal_wounds(clause: RuleClause) -> bool:
+    return any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters).get("relationship")
+        == "prior_effect_inflicted_mortal_wounds"
+        for condition in clause.conditions
+    )
+
+
+def recorded_effects_include_inflicted_mortal_wounds(
+    effects: list[dict[str, JsonValue]],
+) -> bool:
+    for effect in effects:
+        mortal_wounds = effect.get("mortal_wounds")
+        if type(mortal_wounds) is int and mortal_wounds > 0:
+            return True
+    return False
 
 
 def effect_with_selected_target(
@@ -1152,6 +1187,7 @@ def selected_target_effect_expiration(
     state: GameState,
     phase: BattlePhase,
     clause: RuleClause,
+    context: RuleDurationExecutionContext,
 ) -> EffectExpiration:
     duration = clause.duration
     if duration is None:
@@ -1166,6 +1202,15 @@ def selected_target_effect_expiration(
         raise GameLifecycleError("Catalog selected-target effect duration is unsupported.")
     duration_parameters = parameter_payload(duration.parameters)
     endpoint = duration_parameters.get("endpoint")
+    if duration_parameters.get("relative") == "next":
+        from warhammer40k_core.engine.rule_duration_execution import expiration_for_duration
+
+        expiration = expiration_for_duration(duration=duration, context=context)
+        if expiration is None:
+            raise GameLifecycleError(
+                "Catalog selected-target relative duration requires an expiration."
+            )
+        return expiration
     if (
         endpoint == "turn"
         and duration_parameters.get("boundary") == "start"

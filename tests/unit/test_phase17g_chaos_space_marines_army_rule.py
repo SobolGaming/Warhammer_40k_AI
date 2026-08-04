@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import replace
 from typing import cast
 
@@ -52,7 +53,11 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.effects import (
+    GENERIC_RULE_EFFECT_KIND,
+    EffectExpiration,
+    PersistingEffect,
+)
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule,
@@ -97,6 +102,8 @@ from warhammer40k_core.engine.shooting_unit_selected_hooks import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
+from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleEffectSpec, RuleParameter
 
 
 def test_faction_aliases_include_common_faction_keyword_references() -> None:
@@ -663,6 +670,41 @@ def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds() -> None:
         phase=BattlePhase.SHOOTING,
         pact=army_rule.DarkPactKind.LETHAL_HITS,
     )
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="dark-pact-selected-target-leadership-modifier",
+            source_rule_id="test:selected-target-leadership-modifier",
+            owner_player_id="player-b",
+            target_unit_instance_ids=(unit.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.SHOOTING,
+            expiration=EffectExpiration.end_phase(
+                battle_round=state.battle_round,
+                phase=BattlePhaseKind.SHOOTING,
+                player_id="player-a",
+            ),
+            effect_payload=cast(
+                JsonValue,
+                {
+                    "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                    "catalog_selected_target": {},
+                    "effect": RuleEffectSpec(
+                        kind=RuleEffectKind.MODIFY_DICE_ROLL,
+                        source_span=TextSpan(
+                            text="Subtract 1 from Leadership tests.",
+                            start=0,
+                            end=33,
+                        ),
+                        parameters=(
+                            RuleParameter(key="delta", value=-1),
+                            RuleParameter(key="roll_type", value="leadership"),
+                            RuleParameter(key="target_scope", value="selected_unit"),
+                        ),
+                    ).to_payload(),
+                },
+            ),
+        )
+    )
     decisions = DecisionController()
     attack_sequence = AttackSequence(
         sequence_id="dark-pact-sequence",
@@ -730,6 +772,24 @@ def test_dark_pacts_failed_leadership_test_applies_d3_mortal_wounds() -> None:
 
     payload = _last_event_payload(decisions, "chaos_space_marines_dark_pact_resolved")
     assert payload["passed"] is False
+    leadership_roll = cast(dict[str, JsonValue], payload["leadership_roll"])
+    assert set(leadership_roll) == {
+        "original_result",
+        "current_values",
+        "current_total",
+        "rerolls",
+        "result_override",
+    }
+    assert leadership_roll["current_values"] == [1, 1]
+    assert leadership_roll["current_total"] == 2
+    leadership_modified_roll = cast(dict[str, JsonValue], payload["leadership_modified_roll"])
+    assert cast(dict[str, JsonValue], leadership_modified_roll["unmodified"])["value"] == 2
+    assert leadership_modified_roll["final_value"] == 1
+    assert [
+        modifier["source_id"]
+        for modifier in cast(list[dict[str, JsonValue]], leadership_modified_roll["modifiers"])
+    ] == ["test:selected-target-leadership-modifier"]
+    assert json.loads(json.dumps(payload, sort_keys=True)) == payload
     assert cast(dict[str, JsonValue], payload["d3_result"])["value"] == 3
     application = cast(dict[str, JsonValue], payload["mortal_wound_application"])
     assert application["mortal_wounds"] == 3

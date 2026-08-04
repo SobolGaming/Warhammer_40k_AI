@@ -1,5 +1,5 @@
 {
-  "cross_faction_group_count": 162,
+  "cross_faction_group_count": 163,
   "equivalence_groups": [
     {
       "content_kind": "datasheet_ability",
@@ -2323,25 +2323,6 @@
       "runtime_consumer_ids": [
         "catalog-ir:hit-roll-reroll"
       ],
-      "support_transfer": "none"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "4d9db1e9548e4b4729f33fb235e7b4f0473640bc3e02696334554344eabbcfa3",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "emperors-children"
-      ],
-      "group_id": "semantic-equivalence:4d9db1e9548e4b4729f33fb235e7b4f0473640bc3e02696334554344eabbcfa3",
-      "member_ids": [
-        "datasheet-ability:000004088:2",
-        "datasheet-ability:000004099:2"
-      ],
-      "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
       "support_transfer": "none"
     },
     {
@@ -5849,6 +5830,27 @@
     },
     {
       "content_kind": "datasheet_ability",
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "d6129879df5589e21bbdab650f082979e4ccd77c7dd1e8b8807723c4399b0dbd",
+      "execution_statuses": [
+        "engine_consumed"
+      ],
+      "faction_ids": [
+        "emperors-children"
+      ],
+      "group_id": "semantic-equivalence:d6129879df5589e21bbdab650f082979e4ccd77c7dd1e8b8807723c4399b0dbd",
+      "member_ids": [
+        "datasheet-ability:000004088:2",
+        "datasheet-ability:000004099:2"
+      ],
+      "rules_surface": "datasheet",
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
+      "support_transfer": "content_neutral_generic_ir"
+    },
+    {
+      "content_kind": "datasheet_ability",
       "equivalence_basis": "exact_normalized_text",
       "equivalence_hash": "d68b65136c33b0e4f28c7b309b534f197cbce4c0e4f459d32a33a309dbbfe224",
       "execution_statuses": [
@@ -6568,6 +6570,30 @@
     {
       "content_kind": "datasheet_ability",
       "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "edf235efabd8754c606ca14e0aa9267cb1aa0e834f7768bb85e33ef17e4d00b8",
+      "execution_statuses": [
+        "engine_consumed"
+      ],
+      "faction_ids": [
+        "chaos-daemons",
+        "chaos-space-marines"
+      ],
+      "group_id": "semantic-equivalence:edf235efabd8754c606ca14e0aa9267cb1aa0e834f7768bb85e33ef17e4d00b8",
+      "member_ids": [
+        "datasheet-ability:000001462:5",
+        "datasheet-ability:000003712:4",
+        "datasheet-ability:000003844:4",
+        "datasheet-ability:000004045:4"
+      ],
+      "rules_surface": "datasheet",
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
+      "support_transfer": "content_neutral_generic_ir"
+    },
+    {
+      "content_kind": "datasheet_ability",
+      "equivalence_basis": "structured_rule_ir",
       "equivalence_hash": "f018b1f0e90c63a27a4b84b038c10fc95610775f9b330af387906ccd3d569736",
       "execution_statuses": [
         "generic_ir_executable"
@@ -7186,30 +7212,10 @@
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [],
       "support_transfer": "none"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "ffed40479b536b616016046c6dc8492d4aa08a69daaf03382e0bf450fdd50356",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "chaos-space-marines"
-      ],
-      "group_id": "semantic-equivalence:ffed40479b536b616016046c6dc8492d4aa08a69daaf03382e0bf450fdd50356",
-      "member_ids": [
-        "datasheet-ability:000003712:4",
-        "datasheet-ability:000003844:4",
-        "datasheet-ability:000004045:4"
-      ],
-      "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
-      "support_transfer": "none"
     }
   ],
   "equivalent_group_count": 332,
-  "exact_text_only_member_count": 3274,
+  "exact_text_only_member_count": 3267,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -32546,12 +32552,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "c0ce167a2cef0ae40e6a2d51e392579314ffe7ef9a698fbf25d4a879edeff98d",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "edf235efabd8754c606ca14e0aa9267cb1aa0e834f7768bb85e33ef17e4d00b8",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "datasheet-ability:000001462:5",
@@ -32561,16 +32565,18 @@
       "rule_id": "000001462:5",
       "rule_name": "Storm of Mutating Sorcery (Psychic)",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "3999dae461ca6539090f2cf682a3257b9e72b9cd2247893c950c69b3f3f2db6a",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001462:5"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001462:5:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -49846,12 +49852,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "ffed40479b536b616016046c6dc8492d4aa08a69daaf03382e0bf450fdd50356",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "edf235efabd8754c606ca14e0aa9267cb1aa0e834f7768bb85e33ef17e4d00b8",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-space-marines",
       "faction_name": "Chaos Space Marines",
       "member_id": "datasheet-ability:000003712:4",
@@ -49861,16 +49865,18 @@
       "rule_id": "000003712:4",
       "rule_name": "Cursed Flames",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "3999dae461ca6539090f2cf682a3257b9e72b9cd2247893c950c69b3f3f2db6a",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003712:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003712:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -51258,12 +51264,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "ffed40479b536b616016046c6dc8492d4aa08a69daaf03382e0bf450fdd50356",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "edf235efabd8754c606ca14e0aa9267cb1aa0e834f7768bb85e33ef17e4d00b8",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-space-marines",
       "faction_name": "Chaos Space Marines",
       "member_id": "datasheet-ability:000003844:4",
@@ -51273,16 +51277,18 @@
       "rule_id": "000003844:4",
       "rule_name": "Cursed Flames",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "3999dae461ca6539090f2cf682a3257b9e72b9cd2247893c950c69b3f3f2db6a",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003844:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000003844:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -55911,12 +55917,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "ffed40479b536b616016046c6dc8492d4aa08a69daaf03382e0bf450fdd50356",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "edf235efabd8754c606ca14e0aa9267cb1aa0e834f7768bb85e33ef17e4d00b8",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-space-marines",
       "faction_name": "Chaos Space Marines",
       "member_id": "datasheet-ability:000004045:4",
@@ -55926,16 +55930,18 @@
       "rule_id": "000004045:4",
       "rule_name": "Cursed Flames",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "3999dae461ca6539090f2cf682a3257b9e72b9cd2247893c950c69b3f3f2db6a",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004045:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004045:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -57347,12 +57353,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "944a3392dee4e433ea79cf12af49e7a2a60a2f51f42147311baae3cd5e220ce7",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "2317d0d69b03985c337d1587648597d7de1a56785e9dd8fa654a7a4ab3454257",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004084:4",
@@ -57362,16 +57366,18 @@
       "rule_id": "000004084:4",
       "rule_name": "Doom Siren",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "d6fc693d4ff6adaecfbf9e2e49ba23e9ec83aa185f11a6d2d6feef4a4b9c6f24",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004084:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004084:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -57571,12 +57577,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "4d9db1e9548e4b4729f33fb235e7b4f0473640bc3e02696334554344eabbcfa3",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "d6129879df5589e21bbdab650f082979e4ccd77c7dd1e8b8807723c4399b0dbd",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004088:2",
@@ -57586,16 +57590,18 @@
       "rule_id": "000004088:2",
       "rule_name": "Terrifying Crescendo",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "85a6eb0be835ecb8b2633b42284f46134a378f15f9ee2fa2e42287b6ae178f30",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004088:2"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004088:2:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -58077,12 +58083,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "4d9db1e9548e4b4729f33fb235e7b4f0473640bc3e02696334554344eabbcfa3",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "d6129879df5589e21bbdab650f082979e4ccd77c7dd1e8b8807723c4399b0dbd",
+      "execution_status": "engine_consumed",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "datasheet-ability:000004099:2",
@@ -58092,16 +58096,18 @@
       "rule_id": "000004099:2",
       "rule_name": "Terrifying Crescendo",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:post-shoot-hit-target-effect"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "85a6eb0be835ecb8b2633b42284f46134a378f15f9ee2fa2e42287b6ae178f30",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004099:2"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004099:2:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -122141,8 +122147,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "a66c0791c984725e9a19708cb795af5474ba2cd490a3176d57602c9754ac1ee8",
+  "source_payload_checksum_sha256": "1f4c68634f8bb779eadf674e86238e44c700cde620f15dd1bb764c93f059f0e4",
   "source_text_unavailable_member_count": 110,
-  "structured_member_count": 710,
+  "structured_member_count": 717,
   "upstream_execution_checksum_sha256": "33f066d0b292580042270148e7e4e190666ecf2720a511d749a0d05d424a9367"
 }

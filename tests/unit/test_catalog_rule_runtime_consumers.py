@@ -169,6 +169,9 @@ from warhammer40k_core.engine.catalog_selected_target_pair_support import (
     fight_start_selected_target_selection_is_supported,
     selected_target_persisting_effect_clause_is_supported,
 )
+from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
+    CATALOG_SELECTED_TARGET_TEST_MODIFIER_HOOK_ID,
+)
 from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_runtime import (
     catalog_unit_move_completed_battle_shock_hook_bindings,
 )
@@ -701,6 +704,7 @@ def test_catalog_battle_shock_reroll_runtime_uses_fortification_aura() -> None:
         armies=(army, enemy_army),
     )
     assert tuple(binding.hook_id for binding in bindings) == (
+        CATALOG_SELECTED_TARGET_TEST_MODIFIER_HOOK_ID,
         CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID,
     )
     assert BattleShockHookRegistry.from_bindings(bindings).reroll_permission_for(context) == (
@@ -1752,7 +1756,7 @@ def test_catalog_fight_start_rejects_malformed_selection_shapes() -> None:
             is None
         ), shape_name
 
-    with pytest.raises(GameLifecycleError, match="selection condition is unsupported"):
+    assert (
         eligible_selection_target_unit_ids(
             state=state,
             source_player_id=source_army.player_id,
@@ -1761,6 +1765,8 @@ def test_catalog_fight_start_rejects_malformed_selection_shapes() -> None:
             selection_clause=invalid_shapes[1][1],
             explicit_target_unit_ids=None,
         )
+        == ()
+    )
 
 
 def test_catalog_post_shoot_rejects_unsupported_selection_clause() -> None:

@@ -25,6 +25,7 @@ from warhammer40k_core.engine.stratagems_generic_rule_ir_runtime import (
     resolve_generic_rule_ir_mortal_wounds,
     resolve_generic_rule_ir_restore_lost_wounds,
     resolve_generic_rule_ir_return_destroyed_target,
+    resolve_generic_rule_ir_selected_battle_shock,
 )
 
 # fmt: off
@@ -43,14 +44,6 @@ __all__ = (
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
-
-def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(f"{field_name} must be a tuple.")
-    return tuple(
-        _validate_identifier(field_name, value) for value in cast(tuple[object, ...], values)
-    )
 
 
 def _require_target_unit_id(binding: StratagemTargetBinding) -> str:
@@ -339,7 +332,7 @@ def _record_generic_rule_ir_stratagem_runtime_effects(
                     )
                     is None
                 ):
-                    _resolve_generic_forced_battle_shock_test(
+                    resolve_generic_rule_ir_selected_battle_shock(
                         state=state,
                         decisions=decisions,
                         context=context,
@@ -710,96 +703,6 @@ def _record_generic_benefit_of_cover_denial_effect(
             use_record=use_record,
             effect=effect,
         ),
-    )
-
-
-def _resolve_generic_forced_battle_shock_test(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    context: StratagemEligibilityContext,
-    use_record: StratagemUseRecord,
-    effect_payload: dict[str, JsonValue],
-) -> None:
-    from warhammer40k_core.core.attributes import Characteristic
-    from warhammer40k_core.core.modifiers import RollModifier
-    from warhammer40k_core.engine.battle_shock import (
-        BattleShockResult,
-        BattleShockTestReason,
-        BattleShockTestRequest,
-    )
-    from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
-
-    target_unit_id = _effect_selection_unit_id(
-        use_record,
-        expected_selection_kind=_required_rule_effect_string_parameter(
-            effect_payload,
-            "effect_selection_kind",
-        ),
-    )
-    target_owner = unit_owner_player_id(state=state, unit_instance_id=target_unit_id)
-    target_unit = _unit_by_id(state=state, unit_instance_id=target_unit_id)
-    current_model_ids = _current_battlefield_model_ids(state=state, unit=target_unit)
-    starting_strength = _starting_strength_record(state=state, unit_instance_id=target_unit_id)
-    below_half_context = BelowHalfStrengthContext.from_unit(
-        player_id=target_owner,
-        unit=target_unit,
-        starting_strength=starting_strength,
-        current_model_ids=current_model_ids,
-    )
-    request = BattleShockTestRequest.for_unit(
-        request_id=f"{use_record.use_id}:battle-shock:{target_unit_id}",
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        player_id=target_owner,
-        unit_instance_id=target_unit_id,
-        reason=BattleShockTestReason.FORCED_BY_STRATAGEM,
-        leadership_target=_best_current_model_characteristic(
-            target_unit,
-            current_model_ids=current_model_ids,
-            characteristic=Characteristic.LEADERSHIP,
-        ),
-        below_half_strength_context=below_half_context,
-    )
-    decisions.event_log.append(
-        "battle_shock_test_requested",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": use_record.phase.value,
-            "battle_shock_test_request": validate_json_value(request.to_payload()),
-            "source_stratagem_use": use_record.to_payload(),
-            "generic_rule_effect": validate_json_value(effect_payload),
-        },
-    )
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    roll_state = manager.roll(request.spec)
-    modifiers = _generic_battle_shock_modifiers(
-        context=context,
-        use_record=use_record,
-        effect_payload=effect_payload,
-        target_unit_id=target_unit_id,
-    )
-    result = BattleShockResult.from_roll_state(
-        result_id=f"{request.request_id}:result",
-        request=request,
-        roll_state=roll_state,
-        modifiers=modifiers,
-    )
-    state.record_battle_shock_result(result)
-    decisions.event_log.append(
-        "battle_shock_test_resolved",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": use_record.phase.value,
-            "battle_shock_result": validate_json_value(result.to_payload()),
-            "auto_passed": False,
-            "source_stratagem_use": use_record.to_payload(),
-            "generic_rule_effect": validate_json_value(effect_payload),
-        },
     )
 
 
@@ -1330,95 +1233,6 @@ def _generic_runtime_effect_event_payload(
         "stratagem_use": validate_json_value(use_record.to_payload()),
         "persisting_effect": validate_json_value(effect.to_payload()),
     }
-
-
-def _generic_battle_shock_modifiers(
-    *,
-    context: StratagemEligibilityContext,
-    use_record: StratagemUseRecord,
-    effect_payload: dict[str, JsonValue],
-    target_unit_id: str,
-) -> tuple[RollModifier, ...]:
-    from warhammer40k_core.core.modifiers import RollModifier
-
-    modifier = _optional_rule_effect_int_parameter(effect_payload, "modifier_if_destroyed_target")
-    if modifier is None:
-        return ()
-    if target_unit_id not in destroyed_target_unit_ids_from_context(context):
-        return ()
-    source_suffix = _optional_rule_effect_string_parameter(effect_payload, "modifier_source_suffix")
-    if source_suffix is None:
-        source_suffix = "battle-shock-modifier"
-    return (
-        RollModifier(
-            modifier_id=f"{use_record.use_id}:{source_suffix}",
-            source_id=_rule_effect_source_id(effect_payload),
-            operand=modifier,
-        ),
-    )
-
-
-def _current_battlefield_model_ids(
-    *,
-    state: GameState,
-    unit: UnitInstance,
-) -> tuple[str, ...]:
-    from warhammer40k_core.engine.battlefield_state import PlacementError
-
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Generic forced Battle-shock requires battlefield state.")
-    try:
-        placement = battlefield_state.unit_placement_by_id(unit.unit_instance_id)
-    except PlacementError as exc:
-        raise GameLifecycleError("Generic forced Battle-shock target unit is not placed.") from exc
-    unit_model_by_id = {model.model_instance_id: model for model in unit.own_models}
-    current_ids: list[str] = []
-    for model_placement in placement.model_placements:
-        model = unit_model_by_id.get(model_placement.model_instance_id)
-        if model is None:
-            raise GameLifecycleError("Battlefield placement contains unknown model.")
-        if model.is_alive:
-            current_ids.append(model.model_instance_id)
-    if not current_ids:
-        raise GameLifecycleError("Generic forced Battle-shock target unit has no current models.")
-    return tuple(sorted(current_ids))
-
-
-def _starting_strength_record(*, state: GameState, unit_instance_id: str) -> StartingStrengthRecord:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for record in state.starting_strength_records:
-        if record.unit_instance_id == requested_unit_id:
-            return record
-    raise GameLifecycleError("Generic forced Battle-shock target is missing starting strength.")
-
-
-def _best_current_model_characteristic(
-    unit: UnitInstance,
-    *,
-    current_model_ids: tuple[str, ...],
-    characteristic: Characteristic,
-) -> int:
-    model_ids = set(_validate_identifier_tuple("current_model_ids", current_model_ids))
-    values = tuple(
-        _model_characteristic(model, characteristic=characteristic)
-        for model in unit.own_models
-        if model.model_instance_id in model_ids
-    )
-    if not values:
-        raise GameLifecycleError("Generic forced Battle-shock found no current characteristic.")
-    return min(values)
-
-
-def _model_characteristic(model: object, *, characteristic: Characteristic) -> int:
-    from warhammer40k_core.engine.unit_factory import ModelInstance
-
-    if not isinstance(model, ModelInstance):
-        raise GameLifecycleError("Generic characteristic lookup requires a ModelInstance.")
-    for candidate in model.characteristics:
-        if candidate.characteristic is characteristic:
-            return candidate.final
-    raise GameLifecycleError("Generic forced Battle-shock target model is missing characteristic.")
 
 
 def _required_rule_effect_string_parameter(

@@ -8,7 +8,7 @@ from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battle_shock import (
     BattleShockTestReason,
     BattleShockTestRequest,
-    battle_shock_leadership_target_for_unit,
+    battle_shock_leadership_target_for_rules_unit,
 )
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockDiceExpressionContext,
@@ -35,13 +35,16 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.rules_units import (
+    current_placed_alive_rules_unit_view_for_identity,
+    current_rules_unit_views_for_identity,
+)
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.abilities import AbilityCatalogIndex
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
-    from warhammer40k_core.engine.unit_factory import UnitInstance
 
 
 def payload_optional_string(payload: Mapping[str, object], *, key: str) -> str | None:
@@ -71,22 +74,71 @@ def resolve_selected_target_battle_shock_effect(
 ) -> BattleShockResolutionResult:
     if len(target_unit_ids) != 1:
         raise GameLifecycleError("Catalog selected-target Battle-shock requires one target.")
-    target_unit_id = target_unit_ids[0]
-    target_unit, target_player_id = _unit_and_player_id_by_id(
+    selected_target_unit_id = target_unit_ids[0]
+    identity_views = current_rules_unit_views_for_identity(
         state=state,
-        unit_instance_id=target_unit_id,
+        unit_instance_id=selected_target_unit_id,
     )
-    current_model_ids = catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+    target_player_ids = {view.owner_player_id for view in identity_views}
+    if len(target_player_ids) != 1:
+        raise GameLifecycleError("Catalog selected-target Battle-shock owner identity drifted.")
+    target_player_id = next(iter(target_player_ids))
+    target_rules_unit = current_placed_alive_rules_unit_view_for_identity(
         state=state,
-        unit=target_unit,
+        unit_instance_id=selected_target_unit_id,
+    )
+    target_unit_id = (
+        selected_target_unit_id if target_rules_unit is None else target_rules_unit.unit_instance_id
+    )
+    base_payload = _selected_target_battle_shock_base_payload(
+        state=state,
+        result=result,
+        payload=payload,
+        record=record,
+        effect_payload=effect_payload,
+        target_unit_id=target_unit_id,
+        target_player_id=target_player_id,
+        recorded_effects_before_battle_shock=recorded_effects_before_battle_shock,
+        remaining_effect_records_after_battle_shock=remaining_effect_records_after_battle_shock,
+        remaining_effect_start_index=remaining_effect_start_index,
+    )
+    if target_rules_unit is None:
+        skipped_payload = cast(
+            dict[str, JsonValue],
+            validate_json_value(
+                {
+                    **base_payload,
+                    "battle_shock_result": None,
+                    "skip_reason": "no_surviving_target_models",
+                    "state_update": "not_required",
+                    "target_identity_resolution": "no_surviving_rules_unit",
+                }
+            ),
+        )
+        decisions.event_log.append(
+            "catalog_selected_target_battle_shock_skipped",
+            skipped_payload,
+        )
+        return BattleShockResolutionResult(
+            resolved_payload=skipped_payload,
+            pending_status=None,
+        )
+    current_model_ids = tuple(
+        sorted(
+            model_id
+            for component in target_rules_unit.components
+            for model_id in catalog_rule_current_placed_alive_model_instance_ids_for_unit(
+                state=state,
+                unit=component.unit,
+            )
+        )
     )
     if not current_model_ids:
-        raise GameLifecycleError("Catalog selected-target Battle-shock target is not placed.")
+        raise GameLifecycleError("Catalog selected-target survivor resolution drifted.")
     active_player_id = _active_player_id(state)
     phase_start_battle_shocked_unit_ids = tuple(state.battle_shocked_unit_ids)
-    below_half_context = BelowHalfStrengthContext.from_unit(
-        player_id=target_player_id,
-        unit=target_unit,
+    below_half_context = BelowHalfStrengthContext.from_rules_unit(
+        rules_unit=target_rules_unit,
         starting_strength=state.starting_strength_record_for_unit(target_unit_id),
         current_model_ids=current_model_ids,
     )
@@ -112,8 +164,8 @@ def resolve_selected_target_battle_shock_effect(
         player_id=target_player_id,
         unit_instance_id=target_unit_id,
         reason=BattleShockTestReason.FORCED_BY_ARMY_RULE,
-        leadership_target=battle_shock_leadership_target_for_unit(
-            target_unit,
+        leadership_target=battle_shock_leadership_target_for_rules_unit(
+            target_rules_unit,
             current_model_ids=current_model_ids,
             ability_index=_ability_index_for_player(
                 ability_indexes_by_player_id,
@@ -124,18 +176,6 @@ def resolve_selected_target_battle_shock_effect(
         ),
         below_half_strength_context=below_half_context,
         dice_expression=dice_expression,
-    )
-    base_payload = _selected_target_battle_shock_base_payload(
-        state=state,
-        result=result,
-        payload=payload,
-        record=record,
-        effect_payload=effect_payload,
-        target_unit_id=target_unit_id,
-        target_player_id=target_player_id,
-        recorded_effects_before_battle_shock=recorded_effects_before_battle_shock,
-        remaining_effect_records_after_battle_shock=remaining_effect_records_after_battle_shock,
-        remaining_effect_start_index=remaining_effect_start_index,
     )
     decisions.event_log.append(
         "battle_shock_test_requested",
@@ -205,6 +245,12 @@ def _selected_target_battle_shock_base_payload(
                     key="selected_target_unit_instance_id",
                 ),
                 "target_unit_instance_id": target_unit_id,
+                "target_identity_resolution": (
+                    "unchanged"
+                    if target_unit_id
+                    == _payload_string(record, key="selected_target_unit_instance_id")
+                    else "attached_unit_split_survivor"
+                ),
                 "target_player_id": target_player_id,
                 "effect_payload": validate_json_value(effect_payload),
                 "selected_target_decision_result": validate_json_value(result.to_payload()),
@@ -221,19 +267,6 @@ def _selected_target_battle_shock_base_payload(
             }
         ),
     )
-
-
-def _unit_and_player_id_by_id(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-) -> tuple[UnitInstance, str]:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return unit, army.player_id
-    raise GameLifecycleError("Catalog selected-target Battle-shock target unit is unknown.")
 
 
 def _ability_index_for_player(

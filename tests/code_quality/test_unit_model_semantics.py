@@ -14,6 +14,18 @@ MOVEMENT_PHASE_FILES = (
 PATHING = ROOT / "src" / "warhammer40k_core" / "geometry" / "pathing.py"
 DEADLY_DEMISE = ROOT / "src" / "warhammer40k_core" / "engine" / "deadly_demise.py"
 RULE_MODEL_DESTRUCTION = ROOT / "src" / "warhammer40k_core" / "engine" / "rule_model_destruction.py"
+ATTACHED_UNIT_RECONCILIATION = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "attached_unit_reconciliation.py"
+)
+CATALOG_SELECTED_TARGET_MORTAL_WOUNDS = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "catalog_selected_target_mortal_wounds.py"
+)
+CATALOG_SELECTED_TARGET_EVENT = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "catalog_selected_target_event.py"
+)
+CATALOG_SELECTED_TARGET_EFFECTS_SUPPORT = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "catalog_selected_target_effects_support.py"
+)
 UNIT_MODULES = (
     CORE / "unit.py",
     CORE / "attached_unit.py",
@@ -168,6 +180,52 @@ def test_rule_deadly_demise_resolution_uses_context_destruction_provenance() -> 
     }
 
     assert "destruction_provenance_from_rule_context" in call_names
+
+
+def test_model_loss_hosts_share_attached_unit_reconciliation() -> None:
+    for path, function_names in (
+        (RULE_MODEL_DESTRUCTION, ("finalize_rule_model_destruction",)),
+        (CATALOG_SELECTED_TARGET_EVENT, ("append_selected_target_event",)),
+    ):
+        for function_name in function_names:
+            function = _function_node(path=path, function_name=function_name)
+            call_names = {
+                node.func.id
+                for node in ast.walk(function)
+                if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+            }
+            assert "split_attached_rules_unit_if_required" in call_names
+
+    mortal_wound_source = CATALOG_SELECTED_TARGET_MORTAL_WOUNDS.read_text(encoding="utf-8")
+    assert "split_attached_rules_unit_if_required" not in mortal_wound_source
+
+    for path in sorted((ROOT / "src" / "warhammer40k_core" / "engine").rglob("*.py")):
+        if path in {
+            ATTACHED_UNIT_RECONCILIATION,
+            ROOT / "src" / "warhammer40k_core" / "engine" / "game_state.py",
+        }:
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        assert not any(
+            isinstance(node, ast.Attribute)
+            and node.attr == "recover_starting_strength_after_attached_unit_split"
+            for node in ast.walk(tree)
+        ), f"{path.relative_to(ROOT)} bypasses shared Attached Unit reconciliation."
+
+
+def test_selected_target_canonical_identity_expands_all_current_survivors() -> None:
+    function = _function_node(
+        path=CATALOG_SELECTED_TARGET_EFFECTS_SUPPORT,
+        function_name="canonical_rules_unit_ids",
+    )
+    call_names = {
+        node.func.id
+        for node in ast.walk(function)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+
+    assert "current_rules_unit_views_for_identity" in call_names
+    assert "current_placed_alive_rules_unit_view_for_identity" not in call_names
 
 
 def _function_node(*, path: Path, function_name: str) -> ast.FunctionDef:

@@ -19,6 +19,10 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacementError,
     geometry_model_for_placement,
 )
+from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
+    BATTLE_SHOCK_TEST_ROLL_TYPE,
+    selected_target_test_roll_modifiers,
+)
 from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -39,6 +43,9 @@ from warhammer40k_core.engine.stratagems_generic_rule_ir_context import (
 from warhammer40k_core.engine.stratagems_model import (
     StratagemEligibilityContext,
     StratagemUseRecord,
+)
+from warhammer40k_core.engine.stratagems_targeting import (
+    destroyed_target_unit_ids_from_context,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
@@ -163,6 +170,30 @@ def resolve_generic_rule_ir_context_battle_shock(
         use_record=use_record,
         effect_payload=effect_payload,
         target_unit_id=target_unit_id,
+    )
+
+
+def resolve_generic_rule_ir_selected_battle_shock(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    context: StratagemEligibilityContext,
+    use_record: StratagemUseRecord,
+    effect_payload: dict[str, JsonValue],
+) -> None:
+    _resolve_battle_shock_test(
+        state=state,
+        decisions=decisions,
+        context=context,
+        use_record=use_record,
+        effect_payload=effect_payload,
+        target_unit_id=effect_selection_unit_id(
+            use_record,
+            expected_selection_kind=_required_rule_effect_string_parameter(
+                effect_payload,
+                "effect_selection_kind",
+            ),
+        ),
     )
 
 
@@ -626,7 +657,19 @@ def _resolve_battle_shock_test(
         result_id=f"{request.request_id}:result",
         request=request,
         roll_state=roll_state,
-        modifiers=(),
+        modifiers=(
+            *_generic_battle_shock_modifiers(
+                context=context,
+                use_record=use_record,
+                effect_payload=effect_payload,
+                target_unit_id=target_unit_id,
+            ),
+            *selected_target_test_roll_modifiers(
+                state=state,
+                unit_instance_id=target_unit_id,
+                roll_type=BATTLE_SHOCK_TEST_ROLL_TYPE,
+            ),
+        ),
     )
     state.record_battle_shock_result(result)
     decisions.event_log.append(
@@ -641,6 +684,32 @@ def _resolve_battle_shock_test(
             "source_stratagem_use": use_record.to_payload(),
             "generic_rule_effect": validate_json_value(effect_payload),
         },
+    )
+
+
+def _generic_battle_shock_modifiers(
+    *,
+    context: StratagemEligibilityContext,
+    use_record: StratagemUseRecord,
+    effect_payload: dict[str, JsonValue],
+    target_unit_id: str,
+) -> tuple[RollModifier, ...]:
+    modifier = _optional_rule_effect_int_parameter(
+        effect_payload,
+        "modifier_if_destroyed_target",
+    )
+    if modifier is None or target_unit_id not in destroyed_target_unit_ids_from_context(context):
+        return ()
+    source_suffix = _optional_rule_effect_string_parameter(
+        effect_payload,
+        "modifier_source_suffix",
+    )
+    return (
+        RollModifier(
+            modifier_id=f"{use_record.use_id}:{source_suffix or 'battle-shock-modifier'}",
+            source_id=_rule_effect_source_id(effect_payload),
+            operand=modifier,
+        ),
     )
 
 

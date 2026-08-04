@@ -11,6 +11,7 @@ from warhammer40k_core.engine.army_mustering import (
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, SetupStep
+from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_initializations_for_army,
 )
@@ -78,10 +79,49 @@ def _armies_match_muster_with_runtime_attached_unit_splits(
         normalized_state_army = replace(
             state_army,
             attached_units=expected_army.attached_units,
+            units=_units_with_expected_muster_wounds(
+                state_army=state_army,
+                expected_army=expected_army,
+            ),
         )
         if normalized_state_army != expected_army:
             return False
     return True
+
+
+def _units_with_expected_muster_wounds(
+    *,
+    state_army: ArmyDefinition,
+    expected_army: ArmyDefinition,
+) -> tuple[UnitInstance, ...]:
+    expected_units_by_id = {unit.unit_instance_id: unit for unit in expected_army.units}
+    if {unit.unit_instance_id for unit in state_army.units} != set(expected_units_by_id):
+        return state_army.units
+    normalized_units: list[UnitInstance] = []
+    for state_unit in state_army.units:
+        expected_unit = expected_units_by_id[state_unit.unit_instance_id]
+        expected_models_by_id = {
+            model.model_instance_id: model for model in expected_unit.own_models
+        }
+        if {model.model_instance_id for model in state_unit.own_models} != set(
+            expected_models_by_id
+        ):
+            return state_army.units
+        normalized_units.append(
+            replace(
+                state_unit,
+                own_models=tuple(
+                    replace(
+                        model,
+                        wounds_remaining=expected_models_by_id[
+                            model.model_instance_id
+                        ].wounds_remaining,
+                    )
+                    for model in state_unit.own_models
+                ),
+            )
+        )
+    return tuple(normalized_units)
 
 
 def _validate_unit_resource_initialization_consistency(

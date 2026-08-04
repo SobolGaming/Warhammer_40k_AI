@@ -235,7 +235,14 @@ def clause_is_post_shoot_hit_target_selection(clause: RuleClause) -> bool:
         and parameters.get("owner") == "active_player"
         and parameters.get("phase") == BattlePhase.SHOOTING.value
         and parameters.get("edge") == "after"
-        and set(target_parameters) == {"allegiance", "target_relationship"}
+        and not set(target_parameters)
+        - {
+            "allegiance",
+            "required_keyword",
+            "required_keyword_sequence",
+            "target_relationship",
+        }
+        and {"allegiance", "target_relationship"}.issubset(target_parameters)
         and target_parameters.get("allegiance") == "enemy"
         and target_parameters.get("target_relationship") == "hit_by_those_attacks"
     )
@@ -293,7 +300,11 @@ def _post_shoot_trigger_parameters_are_supported(
 ) -> bool:
     parameter_keys = frozenset(parameters)
     if parameter_keys == _POST_SHOOT_TRIGGER_KEYS:
-        return parameters.get("subject") in {"this_model", "this_unit"}
+        return parameters.get("subject") in {
+            "this_model",
+            "this_models_unit",
+            "this_unit",
+        }
     return (
         parameter_keys == _POST_SHOOT_FILTERED_TRIGGER_KEYS
         and parameters.get("subject") == "this_model"

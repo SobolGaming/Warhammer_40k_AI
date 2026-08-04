@@ -5,7 +5,12 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import cast
 
-from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollSpec,
+    ModifiedRollResult,
+    UnmodifiedRollResult,
+)
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -28,6 +33,10 @@ from warhammer40k_core.engine.catalog_selectable_ability_mode_support import (
     SelectableAbilityModeOptionDescriptor,
     clause_is_command_phase_ability_mode_choice,
     selectable_ability_mode_option_descriptor,
+)
+from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
+    LEADERSHIP_TEST_ROLL_TYPE,
+    selected_target_test_roll_modifiers,
 )
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
@@ -467,7 +476,15 @@ def resolve_catalog_fall_back_leadership_denial(
                 actor_id=target.owner_player_id,
             )
         )
-        passed = roll.current_total >= target_leadership
+        modified_roll = ModifiedRollResult.from_unmodified(
+            UnmodifiedRollResult.from_state(roll),
+            modifiers=selected_target_test_roll_modifiers(
+                state=state,
+                unit_instance_id=target.unit_instance_id,
+                roll_type=LEADERSHIP_TEST_ROLL_TYPE,
+            ),
+        )
+        passed = modified_roll.final_value >= target_leadership
         decisions.event_log.append(
             CATALOG_FALL_BACK_LEADERSHIP_TEST_EVENT,
             validate_json_value(
@@ -483,6 +500,7 @@ def resolve_catalog_fall_back_leadership_denial(
                     "source_model_instance_id": source_model_id,
                     "leadership_target": target_leadership,
                     "roll": roll.to_payload(),
+                    "modified_roll": modified_roll.to_payload(),
                     "passed": passed,
                     "fall_back_denied": not passed,
                 }

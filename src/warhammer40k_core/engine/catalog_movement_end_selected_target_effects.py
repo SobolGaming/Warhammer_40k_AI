@@ -18,7 +18,6 @@ from warhammer40k_core.engine.catalog_selected_target_decisions import (
     selected_target_request,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects import (
-    append_selected_target_event,
     options_for_targets,
     record_selected_target_effects_from_payload,
 )
@@ -36,6 +35,7 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     validate_ability_indexes,
     validate_armies,
 )
+from warhammer40k_core.engine.catalog_selected_target_event import append_selected_target_event
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult

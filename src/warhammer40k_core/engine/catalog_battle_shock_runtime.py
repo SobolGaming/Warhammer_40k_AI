@@ -12,6 +12,7 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
+from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -23,6 +24,7 @@ from warhammer40k_core.engine.battle_shock import BATTLE_SHOCK_ROLL_TYPE
 from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockForcedTestContext,
     BattleShockHookBinding,
+    BattleShockModifierContext,
     BattleShockOutcomeContext,
     BattleShockRerollPermissionContext,
 )
@@ -39,6 +41,11 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_current_placed_alive_model_instance_ids_for_unit,
     catalog_rule_ir_consumers_for_clause,
     catalog_rule_record_source_matches_unit,
+)
+from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
+    BATTLE_SHOCK_TEST_ROLL_TYPE,
+    CATALOG_SELECTED_TARGET_TEST_MODIFIER_HOOK_ID,
+    selected_target_test_roll_modifiers,
 )
 from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
 from warhammer40k_core.engine.event_log import validate_json_value
@@ -66,7 +73,13 @@ def catalog_battle_shock_hook_bindings(
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
 ) -> tuple[BattleShockHookBinding, ...]:
-    bindings: list[BattleShockHookBinding] = []
+    bindings: list[BattleShockHookBinding] = [
+        BattleShockHookBinding(
+            hook_id=CATALOG_SELECTED_TARGET_TEST_MODIFIER_HOOK_ID,
+            source_id=CATALOG_SELECTED_TARGET_TEST_MODIFIER_HOOK_ID,
+            modifier_handler=catalog_selected_target_battle_shock_modifiers,
+        )
+    ]
     if _has_catalog_battle_shock_records(
         ability_indexes_by_player_id=ability_indexes_by_player_id,
         consumer_ids=(CATALOG_IR_BATTLE_SHOCK_FORCED_TEST_CONSUMER_ID,),
@@ -105,6 +118,18 @@ def catalog_battle_shock_hook_bindings(
             )
         )
     return tuple(bindings)
+
+
+def catalog_selected_target_battle_shock_modifiers(
+    context: BattleShockModifierContext,
+) -> tuple[RollModifier, ...]:
+    if type(context) is not BattleShockModifierContext:
+        raise GameLifecycleError("Catalog selected-target Battle-shock modifiers require context.")
+    return selected_target_test_roll_modifiers(
+        state=context.state,
+        unit_instance_id=context.request.unit_instance_id,
+        roll_type=BATTLE_SHOCK_TEST_ROLL_TYPE,
+    )
 
 
 @dataclass(frozen=True, slots=True)

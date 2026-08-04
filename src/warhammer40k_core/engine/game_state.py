@@ -30,6 +30,10 @@ from warhammer40k_core.engine.battle_shock import (
     BattleShockedUnitState,
     BattleShockResult,
 )
+from warhammer40k_core.engine.battle_shock_state import (
+    record_battle_shock_result,
+    transfer_battle_shock_after_attached_unit_split,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRuntimeState,
     BattlefieldRuntimeStatePayload,
@@ -1380,6 +1384,7 @@ class GameState:
         self.battle_shocked_unit_states = _validate_battle_shocked_unit_states(
             self.battle_shocked_unit_states,
             army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
             battle_shocked_unit_ids=tuple(self.battle_shocked_unit_ids),
             player_ids=self.player_ids,
         )
@@ -3407,6 +3412,11 @@ class GameState:
             attached_unit_instance_id=requested_attached_unit_id,
             surviving_unit_instance_ids=surviving_ids,
         )
+        transfer_battle_shock_after_attached_unit_split(
+            state=self,
+            attached_unit_instance_id=requested_attached_unit_id,
+            surviving_unit_instance_ids=surviving_ids,
+        )
         _action_history.interrupt_and_emit_attached_unit_split(
             self, event_log, requested_attached_unit_id, surviving_ids
         )
@@ -3441,7 +3451,10 @@ class GameState:
 
     def clear_battle_shock_for_player(self, player_id: str) -> tuple[str, ...]:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
-        unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
+        unit_owner_by_id = _known_rules_unit_owner_ids(
+            army_definitions=self.army_definitions,
+            starting_strength_records=self.starting_strength_records,
+        )
         cleared_ids = tuple(
             unit_id
             for unit_id in self.battle_shocked_unit_ids
@@ -3461,29 +3474,12 @@ class GameState:
         return tuple(sorted(cleared_ids))
 
     def record_battle_shock_result(self, result: BattleShockResult) -> None:
-        if type(result) is not BattleShockResult:
-            raise GameLifecycleError("GameState battle_shock_result must be a BattleShockResult.")
-        if result.request.game_id != self.game_id:
-            raise GameLifecycleError("BattleShockResult game_id drift.")
-        if result.request.battle_round != self.battle_round:
-            raise GameLifecycleError("BattleShockResult battle_round drift.")
-        if result.request.player_id not in self.player_ids:
-            raise GameLifecycleError("BattleShockResult player_id is not in this game.")
-        unit_owner_by_id = _unit_owner_by_id(self.army_definitions)
-        owner = unit_owner_by_id.get(result.request.unit_instance_id)
-        if owner is None:
-            raise GameLifecycleError("BattleShockResult unit is unknown.")
-        if owner != result.request.player_id:
-            raise GameLifecycleError("BattleShockResult unit owner drift.")
-        unit = self._unit_by_id(result.request.unit_instance_id)
-        if not result.passed:
-            if result.request.unit_instance_id in self.battle_shocked_unit_ids:
-                raise GameLifecycleError("Battle-shocked unit is already marked.")
-            shocked_state = BattleShockedUnitState.from_result(result=result, unit=unit)
-            self.battle_shocked_unit_ids.append(result.request.unit_instance_id)
-            self.battle_shocked_unit_ids.sort()
-            self.battle_shocked_unit_states.append(shocked_state)
-            self.battle_shocked_unit_states.sort(key=lambda state: state.unit_instance_id)
+        record_battle_shock_result(state=self, result=result)
+
+    def replace_battle_shock_state(
+        self, state: tuple[list[str], list[BattleShockedUnitState]]
+    ) -> None:
+        self.battle_shocked_unit_ids, self.battle_shocked_unit_states = state
 
     def record_battlefield_state(self, battlefield_state: BattlefieldRuntimeState) -> None:
         if type(battlefield_state) is not BattlefieldRuntimeState:
@@ -6460,12 +6456,16 @@ def _validate_battle_shocked_unit_states(
     values: object,
     *,
     army_definitions: list[ArmyDefinition],
+    starting_strength_records: list[StartingStrengthRecord],
     battle_shocked_unit_ids: tuple[str, ...],
     player_ids: tuple[str, ...],
 ) -> list[BattleShockedUnitState]:
     if not isinstance(values, list):
         raise GameLifecycleError("GameState battle_shocked_unit_states must be a list.")
-    unit_owner_by_id = _unit_owner_by_id(army_definitions)
+    unit_owner_by_id = _known_rules_unit_owner_ids(
+        army_definitions=army_definitions,
+        starting_strength_records=starting_strength_records,
+    )
     shocked_ids = set(battle_shocked_unit_ids)
     validated: list[BattleShockedUnitState] = []
     seen: set[str] = set()

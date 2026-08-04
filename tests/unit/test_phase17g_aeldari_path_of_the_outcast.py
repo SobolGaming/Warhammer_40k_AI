@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from collections.abc import Callable
 from dataclasses import replace
 from typing import cast
@@ -28,7 +29,11 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.effects import (
+    GENERIC_RULE_EFFECT_KIND,
+    EffectExpiration,
+    PersistingEffect,
+)
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectBinding,
     EnhancementEffectContext,
@@ -36,6 +41,7 @@ from warhammer40k_core.engine.enhancement_effects import (
     EnhancementPersistingEffectGrant,
     apply_enhancement_effects,
 )
+from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.activation import (
     RuntimeContentActivation,
     RuntimeEnhancementAssignment,
@@ -96,6 +102,8 @@ from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleEffectSpec, RuleParameter
 
 _RANGERS_UNIT_ID = "army-a:rangers"
 _SHROUD_RUNNERS_UNIT_ID = "army-a:shroud-runners"
@@ -779,10 +787,66 @@ def test_eldritch_suppression_forces_battle_shock_with_destroyed_model_modifier(
     replay_payload = _json_object(result.replay_payload)
     assert replay_payload["enemy_unit_instance_id"] == _ENEMY_UNIT_ID
     assert replay_payload["destroyed_model_modifier_applied"] is True
+    assert replay_payload["selected_target_modifier_ids"] == []
+    assert replay_payload["selected_target_modifier_source_ids"] == []
     assert any(
         record.event_type == "battle_shock_test_resolved"
         for record in context.decisions.event_log.records
     )
+
+
+def test_eldritch_suppression_reports_selected_target_modifier_separately() -> None:
+    state, _army, _rangers, _shroud_runners, _enemy = _path_state()
+    effect = PersistingEffect(
+        effect_id="eldritch-selected-target-modifier",
+        source_rule_id="test:eldritch:selected-target-modifier",
+        owner_player_id="player-a",
+        target_unit_instance_ids=(_ENEMY_UNIT_ID,),
+        started_battle_round=state.battle_round,
+        started_phase=BattlePhase.SHOOTING,
+        expiration=EffectExpiration.end_phase(
+            battle_round=state.battle_round,
+            phase=BattlePhase.SHOOTING,
+            player_id="player-a",
+        ),
+        effect_payload=cast(
+            JsonValue,
+            {
+                "effect_kind": GENERIC_RULE_EFFECT_KIND,
+                "catalog_selected_target": {},
+                "effect": RuleEffectSpec(
+                    kind=RuleEffectKind.MODIFY_DICE_ROLL,
+                    source_span=TextSpan(
+                        text="Subtract 1 from Battle-shock tests.",
+                        start=0,
+                        end=35,
+                    ),
+                    parameters=(
+                        RuleParameter(key="delta", value=-1),
+                        RuleParameter(key="roll_type", value="battle_shock"),
+                        RuleParameter(key="target_scope", value="selected_unit"),
+                    ),
+                ).to_payload(),
+            },
+        ),
+    )
+    state.record_persisting_effect(effect)
+    context = _stratagem_handler_context(
+        state=state,
+        stratagem_id=stratagems.ELDRITCH_SUPPRESSION_STRATAGEM_ID,
+        handler_id=stratagems.ELDRITCH_SUPPRESSION_HANDLER_ID,
+        use_id="use:eldritch:selected-target-only",
+        destroyed_hit_enemy=False,
+    )
+
+    result = stratagems.apply_eldritch_suppression(context)
+
+    assert result.status is StratagemHandlerExecutionStatus.APPLIED
+    replay_payload = _json_object(result.replay_payload)
+    assert replay_payload["destroyed_model_modifier_applied"] is False
+    assert replay_payload["selected_target_modifier_ids"] == [f"{effect.effect_id}:battle_shock"]
+    assert replay_payload["selected_target_modifier_source_ids"] == [effect.source_rule_id]
+    assert json.loads(json.dumps(result.to_payload(), sort_keys=True)) == result.to_payload()
 
 
 def test_apply_enhancement_effects_records_persisting_grant_once() -> None:

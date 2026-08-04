@@ -314,7 +314,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:passive-hit-reroll` | Reavers of the Void |
 | `catalog-ir:poisoned-command-mortal-wounds` | Daemonic Poisons |
 | `catalog-ir:post-fight-hit-target-effect` | Daemonic Poisons |
-| `catalog-ir:post-shoot-hit-target-effect` | Crystalline Targeting<br>Daemonic Poisons<br>Fury of the Void (Psychic)<br>Harassment Fire<br>Monofilament Web |
+| `catalog-ir:post-shoot-hit-target-effect` | Crystalline Targeting<br>Daemonic Poisons<br>Doom Siren<br>Fury of the Void (Psychic)<br>Harassment Fire<br>Monofilament Web<br>Terrifying Crescendo |
 | `catalog-ir:post-shoot-hit-target-status` | Barrage of Filth<br>Target Acquisition |
 | `catalog-ir:prebattle-redeploy-permission` | Prince of Corsairs |
 | `catalog-ir:range-characteristic-modifier` | No current generated rows |
@@ -340,7 +340,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:tracked-target-selection` | Piratical Raiders |
 | `catalog-ir:unit-move-completed-battle-shock` | No current generated rows |
 | `catalog-ir:unit-move-completed-mortal-wounds` | Brass Stampede<br>Grenade Pack Flyover |
-| `catalog-ir:weapon-keyword-grant` | Bladestorm<br>Faolchú<br>Harbinger of Death<br>Piratical Hero<br>Piratical Raiders |
+| `catalog-ir:weapon-keyword-grant` | Bladestorm<br>Faolchú<br>Harbinger of Death<br>Obsessive Annunciation<br>Piratical Hero<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:assault` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:blast` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:c'tan-power` | No current generated rows |
@@ -361,7 +361,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-keyword-grant:precision` | Harbinger of Death<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:psychic` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:rapid-fire` | No current generated rows |
-| `catalog-ir:weapon-keyword-grant:sustained-hits` | Bladestorm<br>Harbinger of Death<br>Piratical Hero |
+| `catalog-ir:weapon-keyword-grant:sustained-hits` | Bladestorm<br>Harbinger of Death<br>Obsessive Annunciation<br>Piratical Hero |
 | `catalog-ir:weapon-keyword-grant:torrent` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:twin-linked` | No current generated rows |
 | `catalog-ir:weapon-skill-characteristic-modifier` | Psychic Guidance |

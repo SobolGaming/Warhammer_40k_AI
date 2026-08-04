@@ -25,6 +25,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_leadership_characteristic_for_unit,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     UnitCharacteristicModifierContext,
@@ -399,6 +400,42 @@ class BattleShockedUnitState:
             expires_at_battle_round=result.request.battle_round + 1,
         )
 
+    @classmethod
+    def from_rules_unit(
+        cls,
+        *,
+        result: BattleShockResult,
+        rules_unit: RulesUnitView,
+    ) -> Self:
+        if type(result) is not BattleShockResult:
+            raise GameLifecycleError("BattleShockedUnitState requires a BattleShockResult.")
+        if result.passed:
+            raise GameLifecycleError("Passed Battle-shock results do not create shocked state.")
+        if type(rules_unit) is not RulesUnitView:
+            raise GameLifecycleError("BattleShockedUnitState requires a RulesUnitView.")
+        requested_unit_id = result.request.unit_instance_id
+        if requested_unit_id == rules_unit.unit_instance_id:
+            models = rules_unit.own_models
+        elif requested_unit_id in rules_unit.component_unit_instance_ids:
+            models = next(
+                component.unit.own_models
+                for component in rules_unit.components
+                if component.unit.unit_instance_id == requested_unit_id
+            )
+        else:
+            raise GameLifecycleError("BattleShockedUnitState rules-unit drift.")
+        if rules_unit.owner_player_id != result.request.player_id:
+            raise GameLifecycleError("BattleShockedUnitState rules-unit owner drift.")
+        return cls(
+            player_id=result.request.player_id,
+            unit_instance_id=requested_unit_id,
+            model_instance_ids=tuple(model.model_instance_id for model in models),
+            source_result_id=result.result_id,
+            battle_round_started=result.request.battle_round,
+            expires_at_player_command_phase_start=result.request.player_id,
+            expires_at_battle_round=result.request.battle_round + 1,
+        )
+
     def to_payload(self) -> BattleShockedUnitStatePayload:
         return {
             "player_id": self.player_id,
@@ -676,6 +713,47 @@ def battle_shock_leadership_target_for_unit(
     )
 
 
+def battle_shock_leadership_target_for_rules_unit(
+    rules_unit: RulesUnitView,
+    *,
+    current_model_ids: tuple[str, ...],
+    ability_index: AbilityCatalogIndex,
+    state: GameState | None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+) -> int:
+    if type(rules_unit) is not RulesUnitView:
+        raise GameLifecycleError("Leadership lookup requires a RulesUnitView.")
+    if type(ability_index) is not AbilityCatalogIndex:
+        raise GameLifecycleError("Leadership lookup requires an AbilityCatalogIndex.")
+    model_ids = set(_validate_identifier_tuple("current_model_ids", current_model_ids))
+    if not model_ids:
+        raise GameLifecycleError("Battle-shock Leadership lookup requires current models.")
+    rules_unit_model_ids = {model.model_instance_id for model in rules_unit.own_models}
+    if not model_ids <= rules_unit_model_ids:
+        raise GameLifecycleError("Battle-shock Leadership model is not in the rules unit.")
+    leadership_values = tuple(
+        _base_leadership(
+            component.unit,
+            current_model_ids=tuple(
+                model.model_instance_id
+                for model in component.unit.own_models
+                if model.model_instance_id in model_ids
+            ),
+            ability_index=ability_index,
+        )
+        for component in rules_unit.components
+        if any(model.model_instance_id in model_ids for model in component.unit.own_models)
+    )
+    if not leadership_values:
+        raise GameLifecycleError("Battle-shock Leadership lookup found no component models.")
+    return _modified_leadership_target(
+        state=state,
+        runtime_modifier_registry=runtime_modifier_registry,
+        unit_instance_id=rules_unit.unit_instance_id,
+        base_leadership=min(leadership_values),
+    )
+
+
 def stratagem_target_permission_status_from_token(
     token: object,
 ) -> StratagemTargetPermissionStatus:
@@ -741,19 +819,33 @@ def _best_leadership(
     model_ids = set(_validate_identifier_tuple("current_model_ids", current_model_ids))
     if not model_ids:
         raise GameLifecycleError("Battle-shock Leadership lookup requires current models.")
+    base_leadership = _base_leadership(
+        unit,
+        current_model_ids=current_model_ids,
+        ability_index=ability_index,
+    )
+    return _modified_leadership_target(
+        state=state,
+        runtime_modifier_registry=runtime_modifier_registry,
+        unit_instance_id=unit.unit_instance_id,
+        base_leadership=base_leadership,
+    )
+
+
+def _base_leadership(
+    unit: UnitInstance,
+    *,
+    current_model_ids: tuple[str, ...],
+    ability_index: AbilityCatalogIndex,
+) -> int:
     catalog_value = catalog_leadership_characteristic_for_unit(
         ability_index=ability_index,
         unit=unit,
         current_model_instance_ids=current_model_ids,
     )
     if catalog_value is not None:
-        base_leadership = catalog_value
-        return _modified_leadership_target(
-            state=state,
-            runtime_modifier_registry=runtime_modifier_registry,
-            unit_instance_id=unit.unit_instance_id,
-            base_leadership=base_leadership,
-        )
+        return catalog_value
+    model_ids = set(current_model_ids)
     leadership_values = tuple(
         _model_leadership(model)
         for model in unit.own_models
@@ -761,13 +853,7 @@ def _best_leadership(
     )
     if not leadership_values:
         raise GameLifecycleError("Battle-shock Leadership lookup found no models.")
-    base_leadership = min(leadership_values)
-    return _modified_leadership_target(
-        state=state,
-        runtime_modifier_registry=runtime_modifier_registry,
-        unit_instance_id=unit.unit_instance_id,
-        base_leadership=base_leadership,
-    )
+    return min(leadership_values)
 
 
 def _modified_leadership_target(
