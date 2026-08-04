@@ -82,8 +82,14 @@ from warhammer40k_core.engine.catalog_selectable_ability_mode_runtime import (
 from warhammer40k_core.engine.catalog_selectable_ability_mode_support import (
     CATALOG_IR_COMMAND_PHASE_ABILITY_MODE_CONSUMER_ID,
 )
+from warhammer40k_core.engine.catalog_selected_target_decisions import (
+    post_shoot_group_participant_id,
+    post_shoot_group_participant_payload,
+    post_shoot_group_stable_identity_payload,
+)
 from warhammer40k_core.engine.catalog_selected_target_effects import (
     CatalogSelectedTargetEffectRuntime,
+    _post_shoot_hit_target_effect_groups,  # pyright: ignore[reportPrivateUsage]
     apply_catalog_post_shoot_hit_target_effect_result,
 )
 from warhammer40k_core.engine.catalog_selected_target_mortal_wounds import (
@@ -134,7 +140,11 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionMode,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
-from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
+from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
+    DetachmentSelection,
+    UnitMusterSelection,
+)
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
@@ -428,7 +438,7 @@ def test_lord_kakophonist_and_noise_marines_post_shoot_rules_use_chosen_order(
     armies, state, indexes, source_noise_marines, target, attached_id = (
         _kakophonist_runtime_fixture()
     )
-    state.game_id = "kakophonist-order-0"
+    state.game_id = "kakophonist-order-1"
     decisions = DecisionController()
     runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
     battle_shock_hooks = BattleShockHookRegistry.from_bindings(
@@ -533,6 +543,472 @@ def test_lord_kakophonist_and_noise_marines_post_shoot_rules_use_chosen_order(
         SequencingDecision.from_payload(cast(Any, sequencing_payload)).to_payload()
         == sequencing_payload
     )
+
+
+def test_post_shoot_order_survives_one_of_multiple_hit_targets_being_destroyed() -> None:
+    (
+        _config,
+        armies,
+        state,
+        indexes,
+        source_noise_marines,
+        target_a,
+        target_b,
+        source_attached_id,
+    ) = _configured_kakophonist_multi_target_fixture()
+    _leave_one_wound_on_unit(state=state, unit=target_a)
+    decisions = DecisionController()
+    runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
+    battle_shock_hooks = BattleShockHookRegistry.from_bindings(
+        catalog_battle_shock_hook_bindings(
+            ability_indexes_by_player_id=indexes,
+            armies=armies,
+        )
+    )
+    context = _kakophonist_post_shoot_context(
+        state=state,
+        decisions=decisions,
+        source_noise_marines=source_noise_marines,
+        source_rules_unit_id=source_attached_id,
+        targets=((target_a, None), (target_b, None)),
+        sequence_suffix="mutable-target-set",
+    )
+
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    sequencing_request = decisions.queue.peek_next()
+    sequencing_decision = _submit_post_shoot_sequencing_order(
+        decisions=decisions,
+        request=sequencing_request,
+        ability_order=("Doom Siren", "Terrifying Crescendo"),
+        result_id="mutable-target-set-sequencing-result",
+    )
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    doom_request = decisions.queue.peek_next()
+    doom_status = _submit_catalog_post_shoot_target(
+        state=state,
+        decisions=decisions,
+        request=doom_request,
+        target_unit_instance_id=target_a.unit_instance_id,
+        result_id="mutable-target-set-doom-siren-result",
+        battle_shock_hooks=battle_shock_hooks,
+        indexes=indexes,
+    )
+    assert doom_status is None
+    assert all(
+        not model.is_alive
+        for model in _unit_from_state(state, target_a.unit_instance_id).own_models
+    )
+
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    crescendo_request = decisions.queue.peek_next()
+    crescendo_payload = cast(dict[str, Any], crescendo_request.payload)
+    assert crescendo_payload["ability_name"] == "Terrifying Crescendo"
+    assert crescendo_payload["available_target_unit_instance_ids"] == [target_b.unit_instance_id]
+    roundtripped_request = DecisionRequest.from_payload(
+        json.loads(json.dumps(crescendo_request.to_payload(), sort_keys=True))
+    )
+    assert roundtripped_request == crescendo_request
+    assert (
+        SequencingDecision.from_payload(
+            json.loads(json.dumps(sequencing_decision.to_payload(), sort_keys=True))
+        )
+        == sequencing_decision
+    )
+    assert (
+        GameState.from_payload(
+            cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
+        ).to_payload()
+        == state.to_payload()
+    )
+    assert (
+        DecisionController.from_payload(
+            cast(
+                DecisionControllerPayload,
+                json.loads(json.dumps(decisions.to_payload(), sort_keys=True)),
+            )
+        ).to_payload()
+        == decisions.to_payload()
+    )
+
+
+def test_post_shoot_pending_decision_after_target_set_change_replays() -> None:
+    (
+        config,
+        armies,
+        state,
+        indexes,
+        source_noise_marines,
+        target_a,
+        target_b,
+        source_attached_id,
+    ) = _configured_kakophonist_multi_target_fixture()
+    decisions = DecisionController()
+    runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
+    battle_shock_hooks = BattleShockHookRegistry.from_bindings(
+        catalog_battle_shock_hook_bindings(
+            ability_indexes_by_player_id=indexes,
+            armies=armies,
+        )
+    )
+    context = _kakophonist_post_shoot_context(
+        state=state,
+        decisions=decisions,
+        source_noise_marines=source_noise_marines,
+        source_rules_unit_id=source_attached_id,
+        targets=((target_a, None), (target_b, None)),
+        sequence_suffix="target-set-replay",
+    )
+
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    _submit_post_shoot_sequencing_order(
+        decisions=decisions,
+        request=decisions.queue.peek_next(),
+        ability_order=("Terrifying Crescendo", "Doom Siren"),
+        result_id="target-set-replay-sequencing-result",
+    )
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    assert (
+        _submit_catalog_post_shoot_target(
+            state=state,
+            decisions=decisions,
+            request=decisions.queue.peek_next(),
+            target_unit_instance_id=target_a.unit_instance_id,
+            result_id="target-set-replay-crescendo-result",
+            battle_shock_hooks=battle_shock_hooks,
+            indexes=indexes,
+        )
+        is None
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.replace_battlefield_state(battlefield.with_removed_models(target_a.own_model_ids()))
+
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    doom_request = decisions.queue.peek_next()
+    doom_payload = cast(dict[str, Any], doom_request.payload)
+    assert doom_payload["ability_name"] == "Doom Siren"
+    assert doom_payload["available_target_unit_instance_ids"] == [target_b.unit_instance_id]
+    pending_lifecycle_payload = cast(
+        GameLifecyclePayload,
+        {
+            "config": config.to_payload(),
+            "parameterized_movement_proposals": True,
+            "state": state.to_payload(),
+            "decisions": decisions.to_payload(),
+            "reaction_queue": ReactionQueue().to_payload(),
+        },
+    )
+    lifecycle = GameLifecycle.from_payload(pending_lifecycle_payload)
+    pending_lifecycle_payload = lifecycle.to_payload()
+    assert GameLifecycle.from_payload(pending_lifecycle_payload).to_payload() == (
+        pending_lifecycle_payload
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    submitted = session.submit_option(
+        request_id=doom_request.request_id,
+        option_id=doom_request.options[0].option_id,
+        result_id="target-set-replay-doom-result",
+    )
+    assert submitted.status_kind not in {
+        LifecycleStatusKind.INVALID,
+        LifecycleStatusKind.UNSUPPORTED,
+    }
+    replay_payload = cast(
+        ReplayArtifactPayload,
+        json.loads(
+            json.dumps(
+                ReplayArtifact.capture(
+                    artifact_id="post-shoot-target-set-change",
+                    initial_lifecycle_payload=pending_lifecycle_payload,
+                    final_lifecycle=session.lifecycle,
+                ).to_payload(),
+                sort_keys=True,
+            )
+        ),
+    )
+    replay_result = ReplayRunner.from_payload(replay_payload).run()
+    assert replay_result.reproduced_exactly, replay_result.to_payload()
+
+
+def test_post_shoot_order_survives_target_set_change_after_feel_no_pain() -> None:
+    (
+        _config,
+        armies,
+        state,
+        indexes,
+        source_noise_marines,
+        target_a,
+        target_b,
+        source_attached_id,
+    ) = _configured_kakophonist_multi_target_fixture()
+    state.game_id = "kakophonist-runtime-test"
+    survivor_id = _leave_one_wound_on_unit(state=state, unit=target_a)
+    source_a = FeelNoPainSource(source_id="mutable-target-fnp-a", threshold=5)
+    source_b = FeelNoPainSource(source_id="mutable-target-fnp-b", threshold=6)
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=survivor_id,
+        sources=(source_a, source_b),
+    )
+    decisions = DecisionController()
+    runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
+    battle_shock_hooks = BattleShockHookRegistry.from_bindings(
+        catalog_battle_shock_hook_bindings(
+            ability_indexes_by_player_id=indexes,
+            armies=armies,
+        )
+    )
+    context = _kakophonist_post_shoot_context(
+        state=state,
+        decisions=decisions,
+        source_noise_marines=source_noise_marines,
+        source_rules_unit_id=source_attached_id,
+        targets=((target_a, None), (target_b, None)),
+        sequence_suffix="mutable-target-set-fnp",
+    )
+
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    _submit_post_shoot_sequencing_order(
+        decisions=decisions,
+        request=decisions.queue.peek_next(),
+        ability_order=("Doom Siren", "Terrifying Crescendo"),
+        result_id="mutable-target-set-fnp-sequencing-result",
+    )
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    status = _submit_catalog_post_shoot_target(
+        state=state,
+        decisions=decisions,
+        request=decisions.queue.peek_next(),
+        target_unit_instance_id=target_a.unit_instance_id,
+        result_id="mutable-target-set-fnp-doom-siren-result",
+        battle_shock_hooks=battle_shock_hooks,
+        indexes=indexes,
+    )
+    assert status is not None
+    continuation_registry = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+        catalog_selected_target_mortal_wound_feel_no_pain_bindings(
+            ability_indexes_by_player_id=indexes,
+        )
+    )
+    while status is not None:
+        fnp_request = cast(DecisionRequest, status.decision_request)
+        source_context = mortal_wound_feel_no_pain_source_context(fnp_request)
+        fnp_result = DecisionResult.for_request(
+            result_id=f"mutable-target-set-fnp-{fnp_request.request_id}",
+            request=fnp_request,
+            selected_option_id=source_a.source_id,
+        )
+        decisions.submit_result(fnp_result)
+        status = continuation_registry.apply_decision(
+            MortalWoundFeelNoPainContinuationContext(
+                state=state,
+                decisions=decisions,
+                request=fnp_request,
+                result=fnp_result,
+                source_context=source_context,
+                dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+                battle_shock_hooks=battle_shock_hooks,
+                ability_indexes_by_player_id=indexes,
+            )
+        )
+    assert all(
+        not model.is_alive
+        for model in _unit_from_state(state, target_a.unit_instance_id).own_models
+    )
+
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    crescendo_request = decisions.queue.peek_next()
+    crescendo_payload = cast(dict[str, Any], crescendo_request.payload)
+    assert crescendo_payload["ability_name"] == "Terrifying Crescendo"
+    assert crescendo_payload["available_target_unit_instance_ids"] == [target_b.unit_instance_id]
+    assert (
+        DecisionController.from_payload(
+            cast(
+                DecisionControllerPayload,
+                json.loads(json.dumps(decisions.to_payload(), sort_keys=True)),
+            )
+        ).to_payload()
+        == decisions.to_payload()
+    )
+
+
+def test_post_shoot_order_survives_attached_target_splitting_after_first_effect() -> None:
+    (
+        _config,
+        armies,
+        state,
+        indexes,
+        source_noise_marines,
+        target_noise_marines,
+        target_lord,
+        source_attached_id,
+        target_attached_id,
+    ) = _configured_kakophonist_attached_target_fixture()
+    _leave_one_wound_on_unit(state=state, unit=target_noise_marines)
+    decisions = DecisionController()
+    runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
+    battle_shock_hooks = BattleShockHookRegistry.from_bindings(
+        catalog_battle_shock_hook_bindings(
+            ability_indexes_by_player_id=indexes,
+            armies=armies,
+        )
+    )
+    context = _kakophonist_post_shoot_context(
+        state=state,
+        decisions=decisions,
+        source_noise_marines=source_noise_marines,
+        source_rules_unit_id=source_attached_id,
+        targets=((target_noise_marines, target_attached_id),),
+        sequence_suffix="attached-target-splits",
+    )
+
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    _submit_post_shoot_sequencing_order(
+        decisions=decisions,
+        request=decisions.queue.peek_next(),
+        ability_order=("Doom Siren", "Terrifying Crescendo"),
+        result_id="attached-target-splits-sequencing-result",
+    )
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    assert (
+        _submit_catalog_post_shoot_target(
+            state=state,
+            decisions=decisions,
+            request=decisions.queue.peek_next(),
+            target_unit_instance_id=target_attached_id,
+            result_id="attached-target-splits-doom-siren-result",
+            battle_shock_hooks=battle_shock_hooks,
+            indexes=indexes,
+        )
+        is None
+    )
+    assert all(
+        not model.is_alive
+        for model in _unit_from_state(state, target_noise_marines.unit_instance_id).own_models
+    )
+    assert any(
+        model.is_alive for model in _unit_from_state(state, target_lord.unit_instance_id).own_models
+    )
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-b",
+        attached_unit_instance_id=target_attached_id,
+        surviving_unit_instance_ids=(target_lord.unit_instance_id,),
+        event_log=decisions.event_log,
+    )
+
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    crescendo_request = decisions.queue.peek_next()
+    crescendo_payload = cast(dict[str, Any], crescendo_request.payload)
+    assert crescendo_payload["ability_name"] == "Terrifying Crescendo"
+    assert crescendo_payload["available_target_unit_instance_ids"] == [target_lord.unit_instance_id]
+    assert target_attached_id not in crescendo_payload["available_target_unit_instance_ids"]
+    assert (
+        GameState.from_payload(
+            cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
+        ).to_payload()
+        == state.to_payload()
+    )
+    assert (
+        DecisionController.from_payload(
+            cast(
+                DecisionControllerPayload,
+                json.loads(json.dumps(decisions.to_payload(), sort_keys=True)),
+            )
+        ).to_payload()
+        == decisions.to_payload()
+    )
+
+
+def test_post_shoot_participant_identity_ignores_ability_display_name() -> None:
+    (
+        _config,
+        armies,
+        state,
+        indexes,
+        source_noise_marines,
+        target_a,
+        target_b,
+        source_attached_id,
+    ) = _configured_kakophonist_multi_target_fixture()
+    decisions = DecisionController()
+    runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
+    context = _kakophonist_post_shoot_context(
+        state=state,
+        decisions=decisions,
+        source_noise_marines=source_noise_marines,
+        source_rules_unit_id=source_attached_id,
+        targets=((target_a, None), (target_b, None)),
+        sequence_suffix="localized-display-name",
+    )
+
+    assert runtime.post_shoot_hit_target_request(context) is not None
+    sequencing_request = decisions.queue.peek_next()
+    request_participants = cast(
+        list[dict[str, Any]],
+        cast(dict[str, Any], sequencing_request.payload)["participants"],
+    )
+    original_participant_id_by_record = {
+        cast(str, cast(dict[str, Any], participant["payload"])["catalog_record_id"]): cast(
+            str, participant["participant_id"]
+        )
+        for participant in request_participants
+    }
+    _submit_post_shoot_sequencing_order(
+        decisions=decisions,
+        request=sequencing_request,
+        ability_order=("Doom Siren", "Terrifying Crescendo"),
+        result_id="localized-display-name-sequencing-result",
+    )
+    renamed_records = tuple(
+        replace(
+            record,
+            definition=replace(record.definition, name="Sirène du destin localisée"),
+        )
+        if record.definition.name == "Doom Siren"
+        else record
+        for record in indexes["player-a"].all_records()
+    )
+    renamed_indexes = {
+        **indexes,
+        "player-a": AbilityCatalogIndex.from_records(renamed_records),
+    }
+    renamed_groups = _post_shoot_hit_target_effect_groups(
+        ability_indexes_by_player_id=renamed_indexes,
+        armies=armies,
+        context=context,
+    )
+    renamed_doom_group = next(
+        group
+        for group in renamed_groups
+        if group.record.definition.name == "Sirène du destin localisée"
+    )
+    stable_identity = post_shoot_group_stable_identity_payload(renamed_doom_group)
+    assert set(stable_identity) == {
+        "attack_sequence_completed_event_id",
+        "attack_sequence_id",
+        "catalog_record_id",
+        "source_rule_id",
+        "source_unit_instance_id",
+        "source_model_instance_id",
+        "selection_clause_id",
+        "effect_clause_ids",
+    }
+    participant_payload = post_shoot_group_participant_payload(renamed_doom_group)
+    assert participant_payload["ability_name"] == "Sirène du destin localisée"
+    assert participant_payload["target_option_ids"] == [
+        option.option_id for option in renamed_doom_group.options
+    ]
+    assert (
+        post_shoot_group_participant_id(renamed_doom_group)
+        == (original_participant_id_by_record[renamed_doom_group.record.record_id])
+    )
+
+    renamed_runtime = CatalogSelectedTargetEffectRuntime(renamed_indexes, armies)
+    assert renamed_runtime.post_shoot_hit_target_request(context) is not None
+    selected_request = decisions.queue.peek_next()
+    selected_payload = cast(dict[str, Any], selected_request.payload)
+    assert selected_payload["ability_name"] == "Sirène du destin localisée"
+    assert selected_payload["catalog_record_id"] == renamed_doom_group.record.record_id
 
 
 @pytest.mark.parametrize("lethal_continuation", [False, True])
@@ -861,6 +1337,7 @@ def test_lord_kakophonist_doom_siren_resolves_stale_attached_target_to_survivor(
         source_attached_id,
         target_attached_id,
     ) = _kakophonist_attached_target_runtime_fixture()
+    state.game_id = "kakophonist-split-target-0"
     decisions = DecisionController()
     for model in target_noise_marines.own_models:
         destroy_model_by_rule(state=state, model_instance_id=model.model_instance_id)
@@ -2072,6 +2549,315 @@ def _kakophonist_attached_target_runtime_fixture() -> tuple[
         target_lord,
         source_attached_id,
         target_attached_id,
+    )
+
+
+def _configured_kakophonist_multi_target_fixture() -> tuple[
+    GameConfig,
+    tuple[ArmyDefinition, ...],
+    GameState,
+    dict[str, AbilityCatalogIndex],
+    UnitInstance,
+    UnitInstance,
+    UnitInstance,
+    str,
+]:
+    config, armies, state, indexes = _configured_kakophonist_fixture(
+        attached_target=False,
+    )
+    source_noise_marines = _unit_from_state(state, "army-a:source-noise-marines")
+    target_a = _unit_from_state(state, "army-b:target-noise-marines-a")
+    target_b = _unit_from_state(state, "army-b:target-noise-marines-b")
+    return (
+        config,
+        armies,
+        state,
+        indexes,
+        source_noise_marines,
+        target_a,
+        target_b,
+        armies[0].attached_units[0].attached_unit_instance_id,
+    )
+
+
+def _configured_kakophonist_attached_target_fixture() -> tuple[
+    GameConfig,
+    tuple[ArmyDefinition, ...],
+    GameState,
+    dict[str, AbilityCatalogIndex],
+    UnitInstance,
+    UnitInstance,
+    UnitInstance,
+    str,
+    str,
+]:
+    config, armies, state, indexes = _configured_kakophonist_fixture(
+        attached_target=True,
+    )
+    source_noise_marines = _unit_from_state(state, "army-a:source-noise-marines")
+    target_noise_marines = _unit_from_state(state, "army-b:target-noise-marines")
+    target_lord = _unit_from_state(state, "army-b:target-lord-kakophonist")
+    return (
+        config,
+        armies,
+        state,
+        indexes,
+        source_noise_marines,
+        target_noise_marines,
+        target_lord,
+        armies[0].attached_units[0].attached_unit_instance_id,
+        armies[1].attached_units[0].attached_unit_instance_id,
+    )
+
+
+def _configured_kakophonist_fixture(
+    *,
+    attached_target: bool,
+) -> tuple[
+    GameConfig,
+    tuple[ArmyDefinition, ...],
+    GameState,
+    dict[str, AbilityCatalogIndex],
+]:
+    package = _catalog_package()
+    catalog = replace(
+        package.army_catalog,
+        detachments=(
+            DetachmentDefinition(
+                detachment_id="kakophonist-sequencing-test",
+                name="Kakophonist sequencing test",
+                faction_id="EC",
+                detachment_point_cost=1,
+                unit_datasheet_ids=("000004084", "000004088"),
+                force_disposition_ids=("purge-the-foe",),
+                source_ids=("test:kakophonist-sequencing:detachment",),
+            ),
+        ),
+    )
+    source_selections = (
+        _minimum_unit_muster_selection(
+            catalog=catalog,
+            datasheet_id="000004084",
+            unit_selection_id="source-lord-kakophonist",
+        ),
+        _minimum_unit_muster_selection(
+            catalog=catalog,
+            datasheet_id="000004088",
+            unit_selection_id="source-noise-marines",
+        ),
+    )
+    target_selections = (
+        (
+            _minimum_unit_muster_selection(
+                catalog=catalog,
+                datasheet_id="000004084",
+                unit_selection_id="target-lord-kakophonist",
+            ),
+            _minimum_unit_muster_selection(
+                catalog=catalog,
+                datasheet_id="000004088",
+                unit_selection_id="target-noise-marines",
+            ),
+        )
+        if attached_target
+        else (
+            _minimum_unit_muster_selection(
+                catalog=catalog,
+                datasheet_id="000004088",
+                unit_selection_id="target-noise-marines-a",
+            ),
+            _minimum_unit_muster_selection(
+                catalog=catalog,
+                datasheet_id="000004088",
+                unit_selection_id="target-noise-marines-b",
+            ),
+        )
+    )
+    muster_requests = (
+        ArmyMusterRequest(
+            army_id="army-a",
+            player_id="player-a",
+            catalog_id=catalog.catalog_id,
+            source_package_id=catalog.source_package_id,
+            ruleset_id=catalog.ruleset_id,
+            detachment_selection=DetachmentSelection(
+                faction_id="EC",
+                detachment_ids=("kakophonist-sequencing-test",),
+            ),
+            force_disposition_id="purge-the-foe",
+            unit_selections=source_selections,
+            attachment_declarations=(
+                AttachmentDeclaration(
+                    source_unit_selection_id="source-lord-kakophonist",
+                    bodyguard_unit_selection_id="source-noise-marines",
+                ),
+            ),
+        ),
+        ArmyMusterRequest(
+            army_id="army-b",
+            player_id="player-b",
+            catalog_id=catalog.catalog_id,
+            source_package_id=catalog.source_package_id,
+            ruleset_id=catalog.ruleset_id,
+            detachment_selection=DetachmentSelection(
+                faction_id="EC",
+                detachment_ids=("kakophonist-sequencing-test",),
+            ),
+            force_disposition_id="purge-the-foe",
+            unit_selections=target_selections,
+            attachment_declarations=(
+                (
+                    AttachmentDeclaration(
+                        source_unit_selection_id="target-lord-kakophonist",
+                        bodyguard_unit_selection_id="target-noise-marines",
+                    ),
+                )
+                if attached_target
+                else ()
+            ),
+        ),
+    )
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    config = GameConfig(
+        game_id=(
+            "kakophonist-attached-target-sequencing"
+            if attached_target
+            else "kakophonist-multi-target-sequencing"
+        ),
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=descriptor,
+        army_catalog=catalog,
+        army_muster_requests=muster_requests,
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down"),
+        mission_setup=_mission_setup(),
+    )
+    armies = tuple(muster_army(catalog=catalog, request=request) for request in muster_requests)
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    state.record_battlefield_state(
+        create_deterministic_battlefield_scenario(
+            battlefield_id=f"{config.game_id}-battlefield",
+            armies=armies,
+        ).battlefield_state
+    )
+    state.stage = GameLifecycleStage.BATTLE
+    state.setup_step_index = None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    state.battle_round = 1
+    state.active_player_id = "player-a"
+    for player_id in state.player_ids:
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player_id=player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("assassination", "bring_it_down"),
+            )
+        )
+    records = catalog_ability_records_from_catalog(catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in armies
+    }
+    return config, armies, state, indexes
+
+
+def _minimum_unit_muster_selection(
+    *,
+    catalog: Any,
+    datasheet_id: str,
+    unit_selection_id: str,
+) -> UnitMusterSelection:
+    datasheet = catalog.datasheet_by_id(datasheet_id)
+    return UnitMusterSelection(
+        unit_selection_id=unit_selection_id,
+        datasheet_id=datasheet_id,
+        model_profile_selections=tuple(
+            ModelProfileSelection(entry.model_profile_id, entry.min_models)
+            for entry in datasheet.composition
+        ),
+    )
+
+
+def _kakophonist_post_shoot_context(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    source_noise_marines: UnitInstance,
+    source_rules_unit_id: str,
+    targets: tuple[tuple[UnitInstance, str | None], ...],
+    sequence_suffix: str,
+) -> AttackSequenceCompletedContext:
+    sequence = AttackSequence(
+        sequence_id=f"kakophonist-noise-marines-{sequence_suffix}",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=source_rules_unit_id,
+        source_phase=BattlePhase.SHOOTING,
+        attack_pools=tuple(
+            _attack_pool(
+                source_noise_marines,
+                target,
+                _weapon_profile("000004088", "Sonic blaster"),
+                target_unit_instance_id=target_rules_unit_id,
+            )
+            for target, target_rules_unit_id in targets
+        ),
+    )
+    for pool_index in range(len(sequence.attack_pools)):
+        decisions.event_log.append(
+            "attack_sequence_step",
+            {
+                "sequence_id": sequence.sequence_id,
+                "step": AttackSequenceStep.HIT.value,
+                "pool_index": pool_index,
+                "payload": {"successful": True},
+            },
+        )
+    return AttackSequenceCompletedContext(
+        state=state,
+        decisions=decisions,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        source_phase=BattlePhase.SHOOTING,
+        attack_sequence=sequence,
+        attack_sequence_completed_event_id=f"kakophonist-completed-{sequence_suffix}",
+    )
+
+
+def _submit_catalog_post_shoot_target(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    target_unit_instance_id: str,
+    result_id: str,
+    battle_shock_hooks: BattleShockHookRegistry,
+    indexes: dict[str, AbilityCatalogIndex],
+) -> LifecycleStatus | None:
+    option = next(
+        option
+        for option in request.options
+        if cast(
+            dict[str, Any],
+            cast(dict[str, Any], option.payload)["selected_catalog_target_effect"],
+        )["target_unit_instance_id"]
+        == target_unit_instance_id
+    )
+    result = DecisionResult.for_request(
+        result_id=result_id,
+        request=request,
+        selected_option_id=option.option_id,
+    )
+    decisions.submit_result(result)
+    return apply_catalog_post_shoot_hit_target_effect_result(
+        state=state,
+        decisions=decisions,
+        result=result,
+        battle_shock_hooks=battle_shock_hooks,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        ability_indexes_by_player_id=indexes,
     )
 
 

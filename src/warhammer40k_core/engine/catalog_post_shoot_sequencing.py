@@ -12,8 +12,8 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.catalog_selected_target_decisions import (
     SelectedTargetGroup,
-    post_shoot_group_identity_payload,
     post_shoot_group_participant_id,
+    post_shoot_group_participant_payload,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import validate_json_value
@@ -54,11 +54,6 @@ def resolve_post_shoot_group_order(
     context: AttackSequenceCompletedContext,
     groups: tuple[SelectedTargetGroup, ...],
 ) -> PostShootSequencingResolution:
-    if len(groups) < 2:
-        return PostShootSequencingResolution(
-            ordered_groups=groups,
-            pending_status=None,
-        )
     conflict = _post_shoot_sequencing_conflict(context=context)
     matching_decisions: list[SequencingDecision] = []
     for event in context.decisions.event_log.records:
@@ -73,6 +68,11 @@ def resolve_post_shoot_group_order(
             SequencingDecision.from_payload(cast(SequencingDecisionPayload, payload))
         )
     if not matching_decisions:
+        if len(groups) < 2:
+            return PostShootSequencingResolution(
+                ordered_groups=groups,
+                pending_status=None,
+            )
         return PostShootSequencingResolution(
             ordered_groups=None,
             pending_status=_request_post_shoot_sequencing(
@@ -89,12 +89,13 @@ def resolve_post_shoot_group_order(
     groups_by_participant_id = {post_shoot_group_participant_id(group): group for group in groups}
     if len(groups_by_participant_id) != len(groups):
         raise GameLifecycleError("Catalog post-shoot sequencing participants are duplicated.")
-    if set(decision.ordered_participant_ids) != set(groups_by_participant_id):
+    if not set(groups_by_participant_id).issubset(decision.ordered_participant_ids):
         raise GameLifecycleError("Catalog post-shoot sequencing participants drifted.")
     return PostShootSequencingResolution(
         ordered_groups=tuple(
             groups_by_participant_id[participant_id]
             for participant_id in decision.ordered_participant_ids
+            if participant_id in groups_by_participant_id
         ),
         pending_status=None,
     )
@@ -156,7 +157,7 @@ def _post_shoot_sequencing_request(
             participant_id=post_shoot_group_participant_id(group),
             player_id=group.player_id,
             source_rule_id=group.record.definition.source_id,
-            payload=post_shoot_group_identity_payload(group),
+            payload=post_shoot_group_participant_payload(group),
         )
         for group in groups
     )

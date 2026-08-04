@@ -456,27 +456,27 @@ class CatalogSelectedTargetEffectRuntime:
             armies=self.armies,
             context=context,
         )
-        if not groups:
+        resolved = _resolved_post_shoot_target_effect_group_keys(
+            context.decisions,
+            event_type=CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
+        )
+        unresolved = tuple(
+            group for group in groups if _post_shoot_group_key(group) not in resolved
+        )
+        if not unresolved:
             return None
         sequencing = _resolve_post_shoot_group_order(
             context=context,
-            groups=groups,
+            groups=unresolved,
         )
         if sequencing.pending_status is not None:
             return sequencing.pending_status
         ordered_groups = sequencing.ordered_groups
         if ordered_groups is None:
             raise GameLifecycleError("Catalog post-shoot sequencing resolution is incomplete.")
-        resolved = _resolved_post_shoot_target_effect_group_keys(
-            context.decisions,
-            event_type=CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
-        )
-        unresolved = tuple(
-            group for group in ordered_groups if _post_shoot_group_key(group) not in resolved
-        )
-        if not unresolved:
+        if not ordered_groups:
             return None
-        group = unresolved[0]
+        group = ordered_groups[0]
         request = _selected_target_request(
             state=context.state,
             group=group,
