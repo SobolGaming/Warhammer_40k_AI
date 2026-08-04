@@ -6,8 +6,9 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind
-from warhammer40k_core.engine.effects import PersistingEffect
+from warhammer40k_core.engine.effects import EffectExpirationKind, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_payload_grants_ability,
@@ -21,6 +22,9 @@ if TYPE_CHECKING:
 
 
 CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID = "catalog-ir:conditional-leading-bodyguard-ability-grant"
+CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID = (
+    "catalog-ir:conditional-not-leading-self-ability-grant"
+)
 CONDITIONAL_LEADING_ROLL_REROLL_DESCRIPTOR_ID = "catalog-ir:conditional-leading-roll-reroll"
 FACTION_RESOURCE_REFUND_ROLL_DESCRIPTOR_ID = "catalog-ir:faction-resource-refund-roll"
 CONDITIONAL_LEADING_WEAPON_RANGE_DESCRIPTOR_ID = (
@@ -184,6 +188,47 @@ def conditional_leader_grant_effect_applies(
         and any(model.is_alive for model in component.unit.own_models)
         and required_bodyguard_keyword in component.unit.keywords
         for component in view.components
+    )
+
+
+def conditional_not_leading_source_applies(
+    *,
+    state: GameState,
+    source_unit_instance_id: str,
+) -> bool:
+    _require_game_state(state)
+    if type(source_unit_instance_id) is not str or not source_unit_instance_id.strip():
+        raise GameLifecycleError("Conditional not-leading source unit ID must be a string.")
+    view = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_instance_id)
+    source_components = tuple(
+        component
+        for component in view.components
+        if component.unit.unit_instance_id == source_unit_instance_id
+        and any(model.is_alive for model in component.unit.own_models)
+    )
+    if len(source_components) != 1:
+        return False
+    return not any(
+        component.role == "bodyguard" and any(model.is_alive for model in component.unit.own_models)
+        for component in view.components
+    )
+
+
+def conditional_not_leading_grant_effect_applies(*, effect: PersistingEffect) -> bool:
+    if type(effect) is not PersistingEffect:
+        raise GameLifecycleError("Conditional not-leading ability query requires typed inputs.")
+    payload = effect.effect_payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Conditional not-leading ability payload must be an object.")
+    snapshot = payload.get("condition_snapshot")
+    return (
+        payload.get("descriptor_id") == CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID
+        and isinstance(snapshot, dict)
+        and snapshot.get("not_leading") is True
+        and type(snapshot.get("event_id")) is str
+        and effect.started_phase is BattlePhaseKind.FIGHT
+        and effect.expiration.expiration_kind is EffectExpirationKind.END_PHASE
+        and effect.expiration.phase is BattlePhaseKind.FIGHT
     )
 
 

@@ -188,6 +188,7 @@ _EC_DATASHEET_IDS = (
     "000004080",
     "000004081",
     "000004082",
+    "000004083",
     "000004089",
     "000004090",
     "000004092",
@@ -195,6 +196,7 @@ _EC_DATASHEET_IDS = (
 )
 _BRIDGE_SUPPORTED_EC_DATASHEET_IDS = (
     "000004077",
+    "000004083",
     "000004089",
     "000004090",
     "000004092",
@@ -370,7 +372,6 @@ def test_fulgrim_generated_rule_ir_and_catalog_are_complete_and_source_bound() -
         "SUPREME COMMANDER",
         "Thrill Seekers",
     }
-
     expected_consumers = {
         f"{_FULGRIM_ID}:4": {
             CATALOG_IR_POISONED_COMMAND_MORTAL_WOUNDS_CONSUMER_ID,
@@ -1462,6 +1463,7 @@ def _keyword_set(value: str) -> set[str]:
 def _ec_height_overrides() -> tuple[ModelHeightOverride, ...]:
     return (
         _height_override("000004077", "Fulgrim - EPIC HERO", 5.5),
+        _height_override("000004083", "Lucius the Eternal - EPIC HERO", 2.25),
         _height_override("000004079", "Obsessionist", 1.75),
         _height_override("000004079", "Tormentors", 1.75),
         _height_override("000004080", "Obsessionist", 1.75),

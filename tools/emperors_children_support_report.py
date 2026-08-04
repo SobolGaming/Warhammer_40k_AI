@@ -138,16 +138,20 @@ _DATASHEET_REVIEW_ROWS = (
         group=_EMPERORS_CHILDREN_GROUP,
         datasheet="Lucius the Eternal",
         datasheet_id="000004083",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All consumed",
         supported_semantics=(
-            "Feel No Pain 5+, Leader, Lone Operative, and the Thrill Seekers army-rule handler "
-            "are implemented paths."
+            "Feel No Pain 5+, Leader, Lone Operative, A Challenge Worthy of Skill Hit and "
+            "Wound re-rolls against CHARACTER, MONSTER, or WALKER targets, Duellist's Hubris "
+            "Fights First while not leading a unit, and the Thrill Seekers army-rule handler "
+            "are implemented source-backed generic or faction paths."
         ),
-        semantics_needed=(
-            "A Challenge Worthy of Skill keyword-targeted Hit and Wound re-rolls and Duellist's "
-            "Hubris conditional Fights First while not leading a unit."
+        semantics_needed="None in the exact source ability rows.",
+        catalog_blockers=(
+            "No known Lucius blocker; catalog, model geometry, wargear, weapon-keyword, "
+            "datasheet-ability, and Thrill Seekers runtime-consumption evidence are Full. "
+            "The generated overall row remains Playable while faction-wide detachment "
+            "interaction coverage is partial."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_EMPERORS_CHILDREN_GROUP,
@@ -837,7 +841,9 @@ def emperors_children_datasheet_support_markdown(
         raise ValueError(
             "Emperor's Children datasheet semantic review must cover every manifest row exactly."
         )
-    if generated_support_datasheet_ids != frozenset({"000004077", "000004089", "000004208"}):
+    if generated_support_datasheet_ids != frozenset(
+        {"000004077", "000004083", "000004089", "000004208"}
+    ):
         raise ValueError(
             "Emperor's Children generated support-row inventory changed; review the custom "
             "datasheet evidence before regenerating documentation."

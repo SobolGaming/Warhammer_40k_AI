@@ -296,6 +296,8 @@ def test_phase17k_bridge_normalizes_core_keyword_ability_timing_and_parameters()
     assert fields_by_name["Firing Deck 2"]["parameter_tokens"] == "2"
     assert fields_by_name["Deadly Demise D3"]["timing_tags"] == "after_destroyed,deadly_demise"
     assert fields_by_name["Deadly Demise D3"]["parameter_tokens"] == "D3"
+    assert fields_by_name['Lone Operative 15"']["timing_tags"] == "target_selection,lone_operative"
+    assert fields_by_name['Lone Operative 15"']["parameter_tokens"] == "15"
 
 
 def test_phase17k_bridge_normalizes_conditioned_wargear_weapon_keywords() -> None:

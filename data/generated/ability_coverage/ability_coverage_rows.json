@@ -3254,6 +3254,125 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000008338",
+    "ability_name": "Feel No Pain",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/core/000008338/none",
+    "datasheet_id": "000004083",
+    "datasheet_name": "Lucius the Eternal",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:lost-wound:feel-no-pain-source",
+      "descriptor:lost-wound:feel-no-pain-resolution"
+    ],
+    "semantic_categories": [
+      "core.feel_no_pain"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008346",
+    "ability_name": "Leader",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/core/000008346/none",
+    "datasheet_id": "000004083",
+    "datasheet_name": "Lucius the Eternal",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:army-mustering:leader-attachment"
+    ],
+    "semantic_categories": [
+      "core.leader"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008336",
+    "ability_name": "Lone Operative",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/core/000008336/none",
+    "datasheet_id": "000004083",
+    "datasheet_name": "Lucius the Eternal",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:shooting-target:lone-operative"
+    ],
+    "semantic_categories": [
+      "core.lone_operative"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004083:a-challenge-worthy-of-skill",
+    "ability_name": "A Challenge Worthy of Skill",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/datasheet/000004083:a-challenge-worthy-of-skill/none",
+    "datasheet_id": "000004083",
+    "datasheet_name": "Lucius the Eternal",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:hit-roll-reroll",
+      "catalog-ir:wound-roll-reroll"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.reroll_permission.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004083:duellists-hubris",
+    "ability_name": "Duellist's Hubris",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/datasheet/000004083:duellists-hubris/none",
+    "datasheet_id": "000004083",
+    "datasheet_name": "Lucius the Eternal",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:conditional-not-leading-ability:fights-first"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009994",
+    "ability_name": "Thrill Seekers",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004083/faction/000009994/none",
+    "datasheet_id": "000004083",
+    "datasheet_name": "Lucius the Eternal",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.thrill_seekers"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000004089:daemonic-patrons",
     "ability_name": "Daemonic Patrons",
     "catalog_id": "chaos-daemons-bridge-catalog",

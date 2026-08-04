@@ -362,6 +362,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("aeldari", "000004196", "Playable"),
         ("death-guard", "000004209", "Partial"),
         ("emperors-children", "000004077", "Playable"),
+        ("emperors-children", "000004083", "Playable"),
         ("emperors-children", "000004089", "Playable"),
         ("emperors-children", "000004208", "Partial"),
         ("thousand-sons", "000001030", "Playable"),
@@ -398,6 +399,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
             )
             if row.faction_id == "aeldari" or row.datasheet_id in {
                 "000004077",
+                "000004083",
                 "000004089",
             }:
                 assert "| All consumed |" in rendered_row

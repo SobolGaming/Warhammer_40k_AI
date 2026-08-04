@@ -175,15 +175,16 @@ _RETURN_ON_DEATH_SET_UP_RE = re.compile(
     r"(?P<full_health>at\s+full\s+health))\b",
     re.IGNORECASE,
 )
+_KEYWORD_ANY_UNIT_LIST_PATTERN = r"Character(?:(?:\s*,\s*|\s+or\s+)(?:Monster|Vehicle|Walker))*"
 _THIS_MODEL_ATTACK_KEYWORD_TARGET_RE = re.compile(
     r"\beach\s+time\s+this\s+model\s+makes\s+(?:a|an)\s+"
     r"(?:(?P<attack_kind>melee|ranged)\s+)?attack\s+that\s+targets\s+"
-    r"(?:a|an)\s+(?P<keyword>Character(?:\s+or\s+Monster)?)\s+unit\b",
+    rf"(?:a|an)\s+(?P<keyword>{_KEYWORD_ANY_UNIT_LIST_PATTERN})\s+unit\b",
     re.IGNORECASE,
 )
 _THIS_MODEL_DESTROYS_ENEMY_KEYWORD_UNIT_RE = re.compile(
     r"\beach\s+time\s+this\s+model\s+destroys\s+an\s+enemy\s+"
-    r"(?P<keyword>Character(?:\s+or\s+Monster)?)\s+unit\b",
+    rf"(?P<keyword>{_KEYWORD_ANY_UNIT_LIST_PATTERN})\s+unit\b",
     re.IGNORECASE,
 )
 _TRACKED_TARGET_ROLE_PATTERN = "prey|quarry"

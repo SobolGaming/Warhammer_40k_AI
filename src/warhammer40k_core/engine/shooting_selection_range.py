@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
@@ -10,6 +12,8 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_from_armies
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.geometry.volume import Model
+
+_RANGE_EPSILON = 1e-9
 
 
 def target_within_shooting_selection_range(
@@ -34,8 +38,10 @@ def target_within_shooting_selection_range(
     if not isinstance(max_range_inches, int | float) or type(max_range_inches) is bool:
         raise GameLifecycleError("Shooting selection range query requires numeric max range.")
     resolved_max_range = float(max_range_inches)
-    if resolved_max_range <= 0.0:
-        raise GameLifecycleError("Shooting selection range query requires positive max range.")
+    if not math.isfinite(resolved_max_range) or resolved_max_range <= 0.0:
+        raise GameLifecycleError(
+            "Shooting selection range query requires positive finite max range."
+        )
     target_rules_unit = rules_unit_view_from_armies(
         armies=scenario.armies,
         unit_instance_id=target_unit_id,
@@ -46,7 +52,7 @@ def target_within_shooting_selection_range(
             first_unit_id=attacking_unit_id,
             second_rules_unit=target_rules_unit,
         )
-        return target_distance <= resolved_max_range
+        return target_distance <= resolved_max_range + _RANGE_EPSILON
     attacker_placement = unit_placement_or_none(scenario, attacking_unit_id)
     if attacker_placement is None:
         raise GameLifecycleError("Shooting selection range query attacking unit is not placed.")
@@ -155,7 +161,7 @@ def target_in_range_model_ids(
     ids: set[str] = set()
     for attacker_model in attacker_models:
         for target_model in target_models:
-            if attacker_model.range_to(target_model) <= float(range_inches):
+            if attacker_model.range_to(target_model) <= float(range_inches) + _RANGE_EPSILON:
                 ids.add(target_model.model_id)
     return tuple(sorted(ids))
 

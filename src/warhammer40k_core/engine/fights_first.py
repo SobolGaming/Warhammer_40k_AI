@@ -6,7 +6,9 @@ from typing import TYPE_CHECKING, Self, TypedDict, cast
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.catalog_conditional_leader_queries import (
     CONDITIONAL_LEADER_ABILITY_DESCRIPTOR_ID,
+    CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID,
     conditional_leader_grant_effect_applies,
+    conditional_not_leading_grant_effect_applies,
 )
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_payload_grants_ability,
@@ -112,6 +114,16 @@ class FightsFirstRegistry:
                         effect=effect,
                         rules_unit_instance_id=rules_unit.unit_instance_id,
                     )
+                ):
+                    effect_kind = FIGHTS_FIRST_EFFECT_KIND
+                if (
+                    effect_payload.get("descriptor_id")
+                    == CONDITIONAL_NOT_LEADING_ABILITY_DESCRIPTOR_ID
+                    and generic_rule_effect_payload_grants_ability(
+                        effect_payload,
+                        ability="fights_first",
+                    )
+                    and conditional_not_leading_grant_effect_applies(effect=effect)
                 ):
                     effect_kind = FIGHTS_FIRST_EFFECT_KIND
                 if effect_kind not in {
