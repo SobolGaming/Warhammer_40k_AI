@@ -72,6 +72,15 @@ def clause_is_supported_phase_end_leadership_command_point_gain(
     return len(dice_gates) == 1 and _is_supported_leadership_gate(dice_gates[0])
 
 
+def clause_requires_source_unit_enemy_destruction(clause: RuleClause) -> bool:
+    _validate_clause(clause)
+    return _has_target_constraint(
+        clause,
+        relationship="source_unit_destroyed_enemy_unit_this_phase",
+        gate_subject="source_unit",
+    )
+
+
 def clause_is_supported_phase_command_point_gain(clause: RuleClause) -> bool:
     _validate_clause(clause)
     if not clause.is_supported or not _has_source_player_target(clause):
@@ -102,10 +111,13 @@ def clause_is_supported_phase_command_point_gain(clause: RuleClause) -> bool:
     )
     if len(target_constraints) > 1:
         return False
-    if target_constraints and not _has_target_constraint(
-        clause,
-        relationship="source_model_on_battlefield",
-        gate_subject="source_model",
+    if target_constraints and not (
+        _has_target_constraint(
+            clause,
+            relationship="source_model_on_battlefield",
+            gate_subject="source_model",
+        )
+        or clause_requires_source_unit_enemy_destruction(clause)
     ):
         return False
     dice_gates = _dice_roll_gates(clause)
@@ -127,13 +139,14 @@ def _is_supported_phase_gain_gate(condition: RuleCondition) -> bool:
 
 
 def _is_supported_leadership_gate(condition: RuleCondition) -> bool:
-    return parameter_payload(condition.parameters) == {
+    parameters = parameter_payload(condition.parameters)
+    return parameters.get("test_target") in {"this_model", "this_unit"} and parameters == {
         "comparison": "greater_or_equal",
         "roll_count": 2,
         "roll_expression": "2D6",
         "roll_type": "leadership",
         "success_threshold_source": "target_leadership",
-        "test_target": "this_model",
+        "test_target": parameters["test_target"],
     }
 
 

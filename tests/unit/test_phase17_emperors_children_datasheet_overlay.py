@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import replace
 from functools import lru_cache
 from pathlib import Path
@@ -15,6 +16,12 @@ from tools.generate_emperors_children_fulgrim_rule_ir import (
 )
 from tools.generate_emperors_children_fulgrim_rule_ir import (
     generated_artifact_payload as generated_fulgrim_rule_ir_artifact_payload,
+)
+from tools.generate_emperors_children_infractors_tormentors_rule_ir import (
+    OUTPUT_PATH as INFRACTORS_TORMENTORS_RULE_IR_OUTPUT_PATH,
+)
+from tools.generate_emperors_children_infractors_tormentors_rule_ir import (
+    generated_artifact_payload as generated_infractors_tormentors_rule_ir_artifact_payload,
 )
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -53,6 +60,14 @@ from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
 from warhammer40k_core.engine.catalog_battle_shock_runtime import (
     catalog_battle_shock_hook_bindings,
 )
+from warhammer40k_core.engine.catalog_command_point_runtime import (
+    CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT,
+    CatalogCommandPointRuntime,
+)
+from warhammer40k_core.engine.catalog_command_point_support import (
+    CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID,
+)
+from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_FIGHT_END_FAILED_ACTIVATION_MODEL_DESTRUCTION_CONSUMER_ID,
     CATALOG_IR_FIGHT_SELECTED_CRITICAL_WOUND_CONSUMER_ID,
@@ -108,6 +123,9 @@ from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
     LEADERSHIP_TEST_ROLL_TYPE,
     selected_target_test_roll_modifiers,
 )
+from warhammer40k_core.engine.catalog_sticky_objective_support import (
+    CATALOG_IR_COMMAND_END_STICKY_OBJECTIVE_CONSUMER_ID,
+)
 from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartEffectContext,
     CommandPhaseStartHookRegistry,
@@ -134,6 +152,14 @@ from warhammer40k_core.engine.effects import (
     PersistingEffect,
 )
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.faction_content.catalog_runtime_hooks import (
+    phase_end_objective_control_hook_bindings,
+)
+from warhammer40k_core.engine.faction_content.events import (
+    RuntimeContentEvent,
+    RuntimeContentEventHandlerRegistry,
+    RuntimeContentEventIndex,
+)
 from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
 )
@@ -164,6 +190,11 @@ from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
 )
+from warhammer40k_core.engine.objective_control import (
+    ObjectiveControlContext,
+    ObjectiveControlTiming,
+    resolve_objective_control,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleStage,
@@ -176,6 +207,7 @@ from warhammer40k_core.engine.replay import ReplayArtifact, ReplayArtifactPayloa
 from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
+    AttackRerollPermissionContext,
     HitRollModifierContext,
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
@@ -186,10 +218,21 @@ from warhammer40k_core.engine.sequencing import (
     apply_sequencing_decision_from_request,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
+from warhammer40k_core.engine.source_backed_rerolls import (
+    SourceBackedRerollPermissionContext,
+)
+from warhammer40k_core.engine.sticky_objective_control import (
+    PhaseEndObjectiveControlContext,
+    PhaseEndObjectiveControlHookRegistry,
+    StickyObjectiveControlState,
+    apply_sticky_objective_control,
+    sticky_objective_control_state_is_expired,
+)
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     STRATAGEM_DECISION_TYPE,
 )
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 from warhammer40k_core.engine.wargear_selections import (
@@ -211,6 +254,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     emperors_children_fulgrim_2026_07 as fulgrim_source_package,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    emperors_children_infractors_tormentors_2026_08 as infractors_tormentors_source_package,
 )
 from warhammer40k_core.rules.wahapedia_bridge import (
     ModelHeightOverride,
@@ -260,6 +306,8 @@ _EC_DATASHEET_IDS = (
 )
 _BRIDGE_SUPPORTED_EC_DATASHEET_IDS = (
     "000004077",
+    "000004079",
+    "000004080",
     "000004083",
     "000004084",
     "000004088",
@@ -863,7 +911,7 @@ def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
         threshold=5,
     )
     if use_feel_no_pain:
-        state.game_id = "kakophonist-runtime-test"
+        state.game_id = "kakophonist-attached-target-fnp-destruction"
         state.record_model_feel_no_pain_sources(
             model_instance_id=survivor_id,
             sources=(
@@ -1021,7 +1069,7 @@ def test_doom_siren_splits_bodyguard_from_surviving_leader_and_support_after_cha
         source_attached_id,
         target_attached_id,
     ) = _configured_kakophonist_leader_support_target_fixture()
-    state.game_id = "kakophonist-runtime-test"
+    state.game_id = "kakophonist-leader-support-split-fnp-destruction"
     final_bodyguard_model_id = _leave_one_wound_on_unit(state=state, unit=target_bodyguard)
     survivor_ids = tuple(sorted((target_leader.unit_instance_id, target_support.unit_instance_id)))
     _record_attached_split_authoritative_state(
@@ -1555,6 +1603,8 @@ def test_lord_kakophonist_doom_siren_resumes_after_feel_no_pain_choice(
     armies, state, indexes, source_noise_marines, target, attached_id = (
         _kakophonist_runtime_fixture()
     )
+    if lethal_continuation:
+        state.game_id = "kakophonist-doom-siren-lethal-fnp-continuation"
     source_a = FeelNoPainSource(source_id="doom-siren-fnp-a", threshold=5)
     source_b = FeelNoPainSource(source_id="doom-siren-fnp-b", threshold=6)
     feel_no_pain_model_id = (
@@ -2133,6 +2183,267 @@ def test_fulgrim_generated_rule_ir_and_catalog_are_complete_and_source_bound() -
         assert set(catalog_rule_ir_consumers_for_rule(_fulgrim_rule_ir(source_row_id))) == (
             consumer_ids
         )
+
+
+def test_infractors_tormentors_generated_rule_ir_and_catalog_are_complete() -> None:
+    committed = cast(
+        dict[str, Any],
+        json.loads(INFRACTORS_TORMENTORS_RULE_IR_OUTPUT_PATH.read_text(encoding="utf-8")),
+    )
+    assert committed == generated_infractors_tormentors_rule_ir_artifact_payload()
+    assert infractors_tormentors_source_package.supported_datasheet_source_row_ids() == (
+        "000004079:3",
+        "000004079:4",
+        "000004080:3",
+        "000004080:4",
+    )
+    assert committed["package_hash"] == infractors_tormentors_source_package.PACKAGE_HASH
+    assert committed["official_document_pages"] == [9]
+
+    committed["package_hash"] = "0" * 64
+    with pytest.raises(
+        infractors_tormentors_source_package.InfractorsTormentorsRuleIrArtifactError,
+        match="hash is stale",
+    ):
+        infractors_tormentors_source_package.validate_generated_artifact_bytes(
+            json.dumps(committed).encode()
+        )
+
+    package = _catalog_package()
+    expected_consumers = {
+        ("000004079", "Objective Defiled"): {CATALOG_IR_COMMAND_END_STICKY_OBJECTIVE_CONSUMER_ID},
+        ("000004079", "Icon of Excess"): {CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID},
+        ("000004080", "Excessive Assault"): {"catalog-ir:wound-roll-reroll"},
+        ("000004080", "Icon of Excess"): {CATALOG_IR_COMMAND_POINT_GAIN_CONSUMER_ID},
+    }
+    records_by_identity: dict[tuple[str, str], list[Any]] = {}
+    for record in catalog_ability_records_from_catalog(package.army_catalog):
+        if record.datasheet_id is None:
+            continue
+        identity = (record.datasheet_id, record.definition.name)
+        if identity in expected_consumers:
+            records_by_identity.setdefault(identity, []).append(record)
+    assert records_by_identity.keys() == expected_consumers.keys()
+    assert len(records_by_identity[("000004079", "Icon of Excess")]) == 2
+    assert len(records_by_identity[("000004080", "Icon of Excess")]) == 2
+    for identity, records in records_by_identity.items():
+        for record in records:
+            rule_ir = rule_ir_from_execution_payload(record.definition.replay_payload)
+            assert rule_ir.is_supported
+            assert not rule_ir.diagnostics
+            assert set(catalog_rule_ir_consumers_for_rule(rule_ir)) == expected_consumers[identity]
+
+    for datasheet_id in ("000004079", "000004080"):
+        datasheet = package.army_catalog.datasheet_by_id(datasheet_id)
+        assert {(entry.min_models, entry.max_models) for entry in datasheet.composition} == {
+            (1, 1),
+            (4, 9),
+        }
+        for profile in datasheet.model_profiles:
+            characteristics = {
+                value.characteristic: value.final for value in profile.characteristics
+            }
+            assert (
+                characteristics[Characteristic.MOVEMENT],
+                characteristics[Characteristic.TOUGHNESS],
+                characteristics[Characteristic.SAVE],
+                characteristics[Characteristic.WOUNDS],
+                characteristics[Characteristic.LEADERSHIP],
+                characteristics[Characteristic.OBJECTIVE_CONTROL],
+            ) == (7, 4, 3, 2, 6, 2)
+            assert profile.base_size.diameter_mm is not None
+            assert math.isclose(profile.base_size.diameter_mm, 32.0)
+            geometry = next(
+                record
+                for record in package.model_geometries
+                if record.model_profile_id == profile.model_profile_id
+            )
+            assert geometry.height.height_inches == 1.75
+        icon_option = next(
+            option for option in datasheet.wargear_options if "icon-of-excess" in option.option_id
+        )
+        assert icon_option.max_selections == 1
+        assert icon_option.allowed_wargear_ids == (f"{datasheet_id}:icon-of-excess",)
+        power_sword = _weapon_profile(datasheet_id, "Power sword")
+        assert power_sword.strength.final == 5
+
+
+def test_infractors_excessive_assault_grants_only_melee_wound_rerolls() -> None:
+    armies, state, indexes, infractors, target = _battleline_runtime_fixture(
+        source_datasheet_id="000004080",
+        phase=BattlePhase.FIGHT,
+        with_icon=False,
+        game_id="infractors-excessive-assault",
+    )
+    runtime = CatalogDatasheetRuleRuntime(indexes, armies)
+
+    def permission_for(phase: BattlePhase) -> SourceBackedRerollPermissionContext | None:
+        context = AttackRerollPermissionContext(
+            state=state,
+            player_id="player-a",
+            attacking_unit_instance_id=infractors.unit_instance_id,
+            attacker_model_instance_id=infractors.own_models[0].model_instance_id,
+            target_unit_instance_id=target.unit_instance_id,
+            source_phase=phase,
+            roll_type="attack_sequence.wound",
+            timing_window="attack_sequence.wound",
+        )
+        return next(
+            (
+                resolved
+                for binding in runtime.attack_reroll_permission_bindings()
+                if (resolved := binding.handler(context)) is not None
+            ),
+            None,
+        )
+
+    permission = permission_for(BattlePhase.FIGHT)
+    assert permission is not None
+    assert permission.source_payload["conditional_wound_reroll"] == {
+        "reroll_unmodified_values": [1],
+        "full_reroll_if_target_within_objective_range": True,
+    }
+    assert permission_for(BattlePhase.SHOOTING) is None
+
+
+def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership() -> None:
+    armies, state, indexes, tormentors, target = _battleline_runtime_fixture(
+        source_datasheet_id="000004079",
+        phase=BattlePhase.SHOOTING,
+        with_icon=True,
+        game_id="icon-of-excess-pass-1",
+    )
+    decisions = DecisionController()
+    runtime = CatalogCommandPointRuntime(indexes, armies)
+    event_index = RuntimeContentEventIndex.from_subscriptions(
+        runtime.event_subscriptions(),
+        handler_registry=RuntimeContentEventHandlerRegistry.from_bindings(
+            runtime.event_handler_bindings()
+        ),
+    )
+
+    def dispatch(event_id: str) -> tuple[Any, ...]:
+        return event_index.dispatch(
+            RuntimeContentEvent(
+                event_id=event_id,
+                game_id=state.game_id,
+                player_id="player-a",
+                battle_round=state.battle_round,
+                trigger_kind=TimingTriggerKind.END_PHASE,
+                phase=BattlePhaseKind.SHOOTING,
+                active_player_id="player-a",
+            ),
+            state=state,
+            decisions=decisions,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=_catalog_package().army_catalog,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+
+    assert len(dispatch("runtime-event:icon-of-excess:no-destruction")) == 1
+    assert not any(
+        record.event_type == CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT
+        for record in decisions.event_log.records
+    )
+    assert state.command_point_total("player-a") == 0
+
+    for model in target.own_models:
+        destroy_model_by_rule(state=state, model_instance_id=model.model_instance_id)
+        decisions.event_log.append(
+            "model_destroyed",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": "player-a",
+                "phase": BattlePhase.SHOOTING.value,
+                "destroying_player_id": "player-a",
+                "attacking_unit_instance_id": tormentors.unit_instance_id,
+                "target_unit_instance_id": target.unit_instance_id,
+                "model_instance_id": model.model_instance_id,
+            },
+        )
+    results = dispatch("runtime-event:icon-of-excess:shooting-end")
+
+    assert len(results) == 1
+    leadership_event = next(
+        record
+        for record in decisions.event_log.records
+        if record.event_type == CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT
+    )
+    payload = cast(dict[str, JsonValue], leadership_event.payload)
+    assert payload["source_unit_instance_id"] == tormentors.unit_instance_id
+    assert payload["leadership_target"] == 6
+    assert payload["passed"] is True
+    assert state.command_point_total("player-a") == 1
+
+
+def test_tormentors_objective_defiled_persists_and_expires_on_higher_control() -> None:
+    armies, state, indexes, tormentors, target = _battleline_runtime_fixture(
+        source_datasheet_id="000004079",
+        phase=BattlePhase.COMMAND,
+        with_icon=False,
+        game_id="tormentors-objective-defiled",
+    )
+    marker = state.mission_setup.objective_markers[0] if state.mission_setup else None
+    assert marker is not None
+    _move_unit(state, tormentors.unit_instance_id, x=marker.x_inches, y=marker.y_inches)
+    _move_unit(state, target.unit_instance_id, x=marker.x_inches + 20.0, y=marker.y_inches)
+    bindings = phase_end_objective_control_hook_bindings(
+        ability_indexes_by_player_id=indexes,
+        armies=armies,
+    )
+    assert any(
+        binding.hook_id.startswith(CATALOG_IR_COMMAND_END_STICKY_OBJECTIVE_CONSUMER_ID)
+        for binding in bindings
+    )
+    states = PhaseEndObjectiveControlHookRegistry.from_bindings(bindings).states_for(
+        PhaseEndObjectiveControlContext(
+            state=state,
+            event_log=DecisionController().event_log,
+            completed_phase=BattlePhase.COMMAND,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+    )
+    sticky = next(state for state in states if state.objective_id == marker.objective_marker_id)
+    assert StickyObjectiveControlState.from_payload(sticky.to_payload()) == sticky
+    state.record_sticky_objective_control_state(sticky)
+
+    _move_unit(state, tormentors.unit_instance_id, x=marker.x_inches + 20.0, y=marker.y_inches)
+    empty_record = resolve_objective_control(
+        ObjectiveControlContext.from_game_state(
+            state,
+            timing=ObjectiveControlTiming.PHASE_END,
+            phase=BattlePhase.COMMAND,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+    )
+    retained = apply_sticky_objective_control(record=empty_record, states=(sticky,))
+    retained_result = retained.result_by_objective_id(marker.objective_marker_id)
+    assert retained_result.controlled_by_player_id == "player-a"
+    assert retained_result.retained_control_source_id == sticky.source_rule_id
+
+    _move_unit(state, target.unit_instance_id, x=marker.x_inches, y=marker.y_inches)
+    enemy_record = resolve_objective_control(
+        ObjectiveControlContext.from_game_state(
+            state,
+            timing=ObjectiveControlTiming.PHASE_END,
+            phase=BattlePhase.COMMAND,
+            ruleset_descriptor=state.runtime_ruleset_descriptor(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+    )
+    assert sticky_objective_control_state_is_expired(
+        state=sticky,
+        record=enemy_record,
+        player_ids=state.player_ids,
+    )
+    assert (
+        apply_sticky_objective_control(record=enemy_record, states=(sticky,))
+        .result_by_objective_id(marker.objective_marker_id)
+        .controlled_by_player_id
+        == "player-b"
+    )
 
 
 @pytest.mark.parametrize("movement_mode", ["normal", "advance", "fall_back"])
@@ -3860,6 +4171,103 @@ def _fulgrim_runtime_fixture(
         for army in armies
     }
     return armies, state, indexes, fulgrim, enemy
+
+
+def _battleline_runtime_fixture(
+    *,
+    source_datasheet_id: str,
+    phase: BattlePhase,
+    with_icon: bool,
+    game_id: str,
+) -> tuple[
+    tuple[ArmyDefinition, ...],
+    GameState,
+    dict[str, AbilityCatalogIndex],
+    UnitInstance,
+    UnitInstance,
+]:
+    package = _catalog_package()
+    catalog = package.army_catalog
+    factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
+    source = _instantiate_battleline_unit(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id=source_datasheet_id,
+        selection_id=f"source-{source_datasheet_id}",
+        with_icon=with_icon,
+    )
+    target_datasheet_id = "000004080" if source_datasheet_id == "000004079" else "000004079"
+    target = _instantiate_battleline_unit(
+        factory=factory,
+        army_id="army-b",
+        datasheet_id=target_datasheet_id,
+        selection_id=f"target-{target_datasheet_id}",
+        with_icon=False,
+    )
+    armies = (
+        _army(
+            catalog=catalog,
+            army_id="army-a",
+            player_id="player-a",
+            faction_id="emperors-children",
+            units=(source,),
+        ),
+        _army(
+            catalog=catalog,
+            army_id="army-b",
+            player_id="player-b",
+            faction_id="emperors-children",
+            units=(target,),
+        ),
+    )
+    state = _battle_state(
+        armies=armies,
+        phase=phase,
+        active_player_id="player-a",
+        game_id=game_id,
+    )
+    records = catalog_ability_records_from_catalog(catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in armies
+    }
+    return armies, state, indexes, source, target
+
+
+def _instantiate_battleline_unit(
+    *,
+    factory: UnitFactory,
+    army_id: str,
+    datasheet_id: str,
+    selection_id: str,
+    with_icon: bool,
+) -> UnitInstance:
+    datasheet = factory.catalog.datasheet_by_id(datasheet_id)
+    wargear_selections: tuple[WargearSelection, ...] = ()
+    if with_icon:
+        icon_option = next(
+            option for option in datasheet.wargear_options if "icon-of-excess" in option.option_id
+        )
+        wargear_selections = (
+            WargearSelection(
+                option_id=icon_option.option_id,
+                model_profile_id=icon_option.model_profile_id,
+                wargear_ids=icon_option.allowed_wargear_ids,
+            ),
+        )
+    return factory.instantiate_unit(
+        army_id=army_id,
+        datasheet=datasheet,
+        selection=UnitMusterSelection(
+            unit_selection_id=selection_id,
+            datasheet_id=datasheet_id,
+            model_profile_selections=tuple(
+                ModelProfileSelection(entry.model_profile_id, entry.min_models)
+                for entry in datasheet.composition
+            ),
+            wargear_selections=wargear_selections,
+        ),
+    )
 
 
 def _instantiate_unit(

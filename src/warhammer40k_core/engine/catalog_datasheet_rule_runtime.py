@@ -131,7 +131,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrant,
     FightUnitSelectedGrantBinding,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
     generic_rule_effect_payload,
@@ -758,8 +758,12 @@ class CatalogDatasheetRuleRuntime:
         ) -> SourceBackedRerollPermissionContext | None:
             if (
                 context.player_id != source.player_id
-                or context.roll_type != "attack_sequence.hit"
-                or context.timing_window != "attack_sequence.hit"
+                or context.roll_type != f"attack_sequence.{descriptor.roll_type}"
+                or context.timing_window != f"attack_sequence.{descriptor.roll_type}"
+                or (
+                    descriptor.attack_kind == "melee"
+                    and context.source_phase is not BattlePhase.FIGHT
+                )
                 or not _source_applies_to_rules_unit(
                     source=source,
                     context_unit_id=context.attacking_unit_instance_id,
@@ -779,7 +783,7 @@ class CatalogDatasheetRuleRuntime:
                     "catalog_record_id": source.record.record_id,
                     "source_rule_id": source.rule_ir.source_id,
                     "source_unit_instance_id": source.unit.unit_instance_id,
-                    "conditional_hit_reroll": {
+                    f"conditional_{descriptor.roll_type}_reroll": {
                         "reroll_unmodified_values": [descriptor.reroll_unmodified_value],
                         "full_reroll_if_target_within_objective_range": (
                             descriptor.full_reroll_if_target_within_objective_range

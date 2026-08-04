@@ -44,6 +44,9 @@ from warhammer40k_core.engine.catalog_shadow_form_runtime import (
 from warhammer40k_core.engine.catalog_start_battle_keyword_choice import (
     catalog_start_battle_keyword_choice_bindings,
 )
+from warhammer40k_core.engine.catalog_sticky_objective_runtime import (
+    catalog_sticky_objective_hook_bindings,
+)
 from warhammer40k_core.engine.catalog_tracked_target_runtime import (
     catalog_tracked_target_battle_round_start_hook_bindings,
     catalog_tracked_target_start_battle_hook_bindings,
@@ -151,9 +154,15 @@ def phase_end_objective_control_hook_bindings(
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
 ) -> tuple[PhaseEndObjectiveControlHookBinding, ...]:
-    return catalog_return_on_death_phase_end_hook_bindings(
-        ability_indexes_by_player_id=ability_indexes_by_player_id,
-        armies=armies,
+    return (
+        *catalog_return_on_death_phase_end_hook_bindings(
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            armies=armies,
+        ),
+        *catalog_sticky_objective_hook_bindings(
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            armies=armies,
+        ),
     )
 
 

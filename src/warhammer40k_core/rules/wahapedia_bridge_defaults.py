@@ -672,6 +672,25 @@ EMPERORS_CHILDREN_LUCIUS_HEIGHT_OVERRIDES = (
         ),
     ),
 )
+EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_HEIGHT_OVERRIDES = tuple(
+    ModelHeightOverride(
+        datasheet_id=datasheet_id,
+        model_name=model_name,
+        height=1.75,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id=f"geometry-review:emperors-children:{source_key}:height",
+        height_document_reference=(
+            f"Emperor's Children {model_name} assembled miniature imagery; "
+            "Warhammer Event Companion 2026-07-22 p.74 (32mm base)"
+        ),
+    )
+    for datasheet_id, model_name, source_key in (
+        ("000004079", "Obsessionist", "tormentors-obsessionist"),
+        ("000004079", "Tormentors", "tormentors"),
+        ("000004080", "Obsessionist", "infractors-obsessionist"),
+        ("000004080", "Infractors", "infractors"),
+    )
+)
 EMPERORS_CHILDREN_LORD_KAKOPHONIST_NOISE_MARINES_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000004084",
@@ -778,6 +797,7 @@ DEFAULT_HEIGHT_OVERRIDES = (
     *CHAOS_DEFILER_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES,
+    *EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_LUCIUS_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_LORD_KAKOPHONIST_NOISE_MARINES_HEIGHT_OVERRIDES,
 )

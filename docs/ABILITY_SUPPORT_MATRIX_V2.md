@@ -253,8 +253,9 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:can-fallback-and-shoot` | No current generated rows |
 | `catalog-ir:charge-roll-modifier` | Instrument of Chaos |
 | `catalog-ir:charge-roll-reroll` | No current generated rows |
+| `catalog-ir:command-end-sticky-objective-control` | Objective Defiled |
 | `catalog-ir:command-phase-ability-mode` | Beguiling Form<br>Daemon Primarch of Slaanesh<br>Daemonic Speed<br>Enthralling Hypnosis (Aura) |
-| `catalog-ir:command-point-gain` | Diviner of Futures |
+| `catalog-ir:command-point-gain` | Diviner of Futures<br>Icon of Excess |
 | `catalog-ir:command-restoration` | Tears of Isha (Psychic) |
 | `catalog-ir:conditional-ability:lone-operative` | Daemonic Lord<br>Spiritseer |
 | `catalog-ir:conditional-leading-ability:fights-first` | ASPECT TRAINING |
@@ -367,7 +368,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-skill-characteristic-modifier` | Psychic Guidance |
 | `catalog-ir:weapon-skill-characteristic-query` | No current generated rows |
 | `catalog-ir:wound-roll-modifier` | Wave Serpent Shield |
-| `catalog-ir:wound-roll-reroll` | A Challenge Worthy of Skill<br>Assured Destruction<br>Fated Hero<br>Storm of Silence |
+| `catalog-ir:wound-roll-reroll` | A Challenge Worthy of Skill<br>Assured Destruction<br>Excessive Assault<br>Fated Hero<br>Storm of Silence |
 | `catalog-ir:wounds-characteristic-modifier` | No current generated rows |
 | `catalog-ir:wounds-characteristic-query` | No current generated rows |
 | `core:command-reroll` | Command Re-roll |

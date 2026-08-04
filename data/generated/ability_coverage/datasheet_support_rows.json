@@ -1593,6 +1593,42 @@
   },
   {
     "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004080/core/000008344/none",
+      "chaos-daemons-bridge-catalog/000004080/datasheet/000004080:excessive-assault/none",
+      "chaos-daemons-bridge-catalog/000004080/faction/000009994/none",
+      "chaos-daemons-bridge-catalog/000004080/wargear/000004080:icon-of-excess/000004080:icon-of-excess"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Full",
+    "datasheet_id": "000004080",
+    "datasheet_name": "Infractors",
+    "detachment_ids": [
+      "carnival-of-excess",
+      "coterie-of-the-conceited",
+      "court-of-the-phoenician",
+      "elegant-brutes",
+      "frenzied-host",
+      "mercurial-host",
+      "peerless-bladesmen",
+      "rapid-evisceration",
+      "slaaneshs-chosen",
+      "spectacle-of-slaughter"
+    ],
+    "faction_id": "emperors-children",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "Faction army rule consumed; detachment support 2/10. Supported detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
+    "overall": "Playable",
+    "supported_detachment_ids": [
+      "court-of-the-phoenician",
+      "spectacle-of-slaughter"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:command-point-gain`, `catalog-ir:wound-roll-reroll`, `descriptor:prebattle:scouts`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004084/core/000008346/none",
       "chaos-daemons-bridge-catalog/000004084/datasheet/000004084:doom-siren/none",
       "chaos-daemons-bridge-catalog/000004084/datasheet/000004084:obsessive-annunciation/none",
@@ -1696,6 +1732,42 @@
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:post-shoot-hit-target-effect`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004079/core/000008345/none",
+      "chaos-daemons-bridge-catalog/000004079/datasheet/000004079:objective-defiled/none",
+      "chaos-daemons-bridge-catalog/000004079/faction/000009994/none",
+      "chaos-daemons-bridge-catalog/000004079/wargear/000004079:icon-of-excess/000004079:icon-of-excess"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Full",
+    "datasheet_id": "000004079",
+    "datasheet_name": "Tormentors",
+    "detachment_ids": [
+      "carnival-of-excess",
+      "coterie-of-the-conceited",
+      "court-of-the-phoenician",
+      "elegant-brutes",
+      "frenzied-host",
+      "mercurial-host",
+      "peerless-bladesmen",
+      "rapid-evisceration",
+      "slaaneshs-chosen",
+      "spectacle-of-slaughter"
+    ],
+    "faction_id": "emperors-children",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "Faction army rule consumed; detachment support 2/10. Supported detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
+    "overall": "Playable",
+    "supported_detachment_ids": [
+      "court-of-the-phoenician",
+      "spectacle-of-slaughter"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:command-end-sticky-objective-control`, `catalog-ir:command-point-gain`, `descriptor:prebattle:infiltrators`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },

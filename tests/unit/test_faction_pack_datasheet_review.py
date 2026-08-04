@@ -362,6 +362,8 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("aeldari", "000004196", "Playable"),
         ("death-guard", "000004209", "Partial"),
         ("emperors-children", "000004077", "Playable"),
+        ("emperors-children", "000004079", "Playable"),
+        ("emperors-children", "000004080", "Playable"),
         ("emperors-children", "000004083", "Playable"),
         ("emperors-children", "000004084", "Playable"),
         ("emperors-children", "000004088", "Playable"),
@@ -401,6 +403,8 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
             )
             if row.faction_id == "aeldari" or row.datasheet_id in {
                 "000004077",
+                "000004079",
+                "000004080",
                 "000004083",
                 "000004084",
                 "000004088",

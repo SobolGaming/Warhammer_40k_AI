@@ -32,6 +32,15 @@ from warhammer40k_core.engine.catalog_datasheet_rule_extensions import (
     extended_datasheet_descriptor_for_clause,
     movement_target_pair_descriptor_for_clause,
 )
+from warhammer40k_core.engine.catalog_sticky_objective_support import (
+    CATALOG_IR_COMMAND_END_STICKY_OBJECTIVE_CONSUMER_ID,
+)
+from warhammer40k_core.engine.catalog_sticky_objective_support import (
+    clause_has_invalid_exact_shape as sticky_objective_clause_has_invalid_exact_shape,
+)
+from warhammer40k_core.engine.catalog_sticky_objective_support import (
+    consumer_ids_for_clause as sticky_objective_consumer_ids_for_clause,
+)
 from warhammer40k_core.engine.catalog_tracked_target_selection_descriptors import (
     clause_has_invalid_exact_tracked_target_selection_shape,
 )
@@ -159,6 +168,7 @@ def clause_has_invalid_exact_datasheet_runtime_shape(clause: RuleClause) -> bool
         )
         or clause_has_invalid_exact_tracked_target_weapon_grant_shape(clause)
         or clause_has_invalid_exact_tracked_target_selection_shape(clause)
+        or sticky_objective_clause_has_invalid_exact_shape(clause)
     )
 
 
@@ -166,6 +176,7 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Datasheet RuleIR support requires RuleClause.")
     consumer_ids: set[str] = set()
+    consumer_ids.update(sticky_objective_consumer_ids_for_clause(clause))
     if clause_is_mustering_selection(clause):
         consumer_ids.add(CATALOG_IR_MUSTERING_SELECTION_CONSUMER_ID)
     if clause_is_conditional_lone_operative(clause):
@@ -185,8 +196,13 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
         consumer_ids.add(CATALOG_IR_INVULNERABLE_SAVE_CHARACTERISTIC_QUERY_CONSUMER_ID)
     if allocated_attack_damage_modifier_descriptor_for_clause(clause) is not None:
         consumer_ids.add(CATALOG_IR_ALLOCATED_ATTACK_DAMAGE_MODIFIER_CONSUMER_ID)
-    if clause_is_passive_hit_reroll(clause):
-        consumer_ids.add(CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID)
+    passive_attack_reroll = passive_hit_reroll_descriptor_for_clause(clause)
+    if passive_attack_reroll is not None:
+        consumer_ids.add(
+            CATALOG_IR_PASSIVE_HIT_REROLL_CONSUMER_ID
+            if passive_attack_reroll.roll_type == "hit"
+            else CATALOG_IR_WOUND_ROLL_REROLL_CONSUMER_ID
+        )
     conditional_attack_rerolls = conditional_attack_reroll_descriptor_for_clause(clause)
     if conditional_attack_rerolls is not None:
         consumer_by_roll_type = {
@@ -323,6 +339,7 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_MOVEMENT_TARGET_PAIR_CONSUMER_ID,
                 CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID,
                 CATALOG_IR_CONDITIONAL_NOT_LEADING_FIGHTS_FIRST_CONSUMER_ID,
+                CATALOG_IR_COMMAND_END_STICKY_OBJECTIVE_CONSUMER_ID,
                 *CATALOG_IR_CONDITIONAL_LEADER_ABILITY_CONSUMER_IDS.values(),
             }
         )
