@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
@@ -296,7 +298,9 @@ def selected_target_option_selection_payload(
     }
 
 
-def post_shoot_group_key(group: SelectedTargetGroup) -> tuple[str, str, str, str, str]:
+def post_shoot_group_key(
+    group: SelectedTargetGroup,
+) -> tuple[str, str, str, str, str, str]:
     if group.attack_sequence is None or group.attack_sequence_completed_event_id is None:
         raise GameLifecycleError("Catalog post-shoot group missing attack sequence.")
     return (
@@ -304,7 +308,42 @@ def post_shoot_group_key(group: SelectedTargetGroup) -> tuple[str, str, str, str
         group.attack_sequence.sequence_id,
         group.record.record_id,
         group.unit.unit_instance_id,
+        "" if group.source_model_instance_id is None else group.source_model_instance_id,
         group.selection_clause.clause_id,
+    )
+
+
+def post_shoot_group_participant_id(group: SelectedTargetGroup) -> str:
+    identity_payload = post_shoot_group_identity_payload(group)
+    encoded = json.dumps(identity_payload, sort_keys=True, separators=(",", ":")).encode()
+    return f"catalog-post-shoot-group:{hashlib.sha256(encoded).hexdigest()}"
+
+
+def post_shoot_group_identity_payload(
+    group: SelectedTargetGroup,
+) -> dict[str, JsonValue]:
+    if group.attack_sequence is None or group.attack_sequence_completed_event_id is None:
+        raise GameLifecycleError("Catalog post-shoot group missing attack sequence.")
+    return cast(
+        dict[str, JsonValue],
+        validate_json_value(
+            {
+                "attack_sequence_completed_event_id": (group.attack_sequence_completed_event_id),
+                "attack_sequence_id": group.attack_sequence.sequence_id,
+                "catalog_record_id": group.record.record_id,
+                "ability_id": group.record.definition.ability_id,
+                "ability_name": group.record.definition.name,
+                "source_rule_id": group.record.definition.source_id,
+                "source_unit_instance_id": group.unit.unit_instance_id,
+                "source_model_instance_id": group.source_model_instance_id,
+                "selection_clause_id": group.selection_clause.clause_id,
+                "effect_clause_ids": [clause.clause_id for clause in group.effect_clauses],
+                "target_option_ids": [option.option_id for option in group.options],
+                "phase": group.phase.value,
+                "hook_id": group.hook_id,
+                "submission_kind": group.submission_kind,
+            }
+        ),
     )
 
 
@@ -312,9 +351,9 @@ def resolved_post_shoot_target_effect_group_keys(
     decisions: DecisionController,
     *,
     event_type: str,
-) -> frozenset[tuple[str, str, str, str, str]]:
+) -> frozenset[tuple[str, str, str, str, str, str]]:
     requested_event_type = _validate_identifier("event_type", event_type)
-    keys: set[tuple[str, str, str, str, str]] = set()
+    keys: set[tuple[str, str, str, str, str, str]] = set()
     for event in decisions.event_log.records:
         if event.event_type != requested_event_type:
             continue
@@ -328,6 +367,11 @@ def resolved_post_shoot_target_effect_group_keys(
                 payload_string(payload_value, key="attack_sequence_id"),
                 payload_string(payload_value, key="catalog_record_id"),
                 payload_string(payload_value, key="source_unit_instance_id"),
+                (
+                    ""
+                    if payload_value.get("source_model_instance_id") is None
+                    else payload_string(payload_value, key="source_model_instance_id")
+                ),
                 payload_string(payload_value, key="selection_clause_id"),
             )
         )

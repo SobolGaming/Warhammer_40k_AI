@@ -30,7 +30,10 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHookBinding,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    current_placed_alive_rules_unit_view_for_identity,
+    current_rules_unit_views_for_identity,
+)
 
 CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_SOURCE_KIND = "catalog_selected_target_mortal_wounds"
 CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_ROLLED_EVENT = "catalog_selected_target_mortal_wounds_rolled"
@@ -90,8 +93,20 @@ def resolve_selected_target_mortal_wound_effect(
     if len(target_unit_ids) != 1:
         raise GameLifecycleError("Selected-target mortal wounds require one target unit.")
     parameters = _mortal_wound_parameters(effect_payload)
-    target_unit_id = target_unit_ids[0]
-    target = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
+    selected_target_unit_id = target_unit_ids[0]
+    identity_views = current_rules_unit_views_for_identity(
+        state=state,
+        unit_instance_id=selected_target_unit_id,
+    )
+    target_owner_ids = {view.owner_player_id for view in identity_views}
+    if len(target_owner_ids) != 1:
+        raise GameLifecycleError("Selected-target mortal wound owner identity drifted.")
+    target_player_id = next(iter(target_owner_ids))
+    target = current_placed_alive_rules_unit_view_for_identity(
+        state=state,
+        unit_instance_id=selected_target_unit_id,
+    )
+    target_unit_id = selected_target_unit_id if target is None else target.unit_instance_id
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     roll_state = manager.roll(
         DiceRollSpec(
@@ -118,8 +133,9 @@ def resolve_selected_target_mortal_wound_effect(
                 "active_player_id": state.active_player_id,
                 "source_kind": CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_SOURCE_KIND,
                 "source_rule_id": _required_string(record, "source_rule_id"),
+                "selected_target_unit_instance_id": selected_target_unit_id,
                 "target_unit_instance_id": target_unit_id,
-                "target_player_id": target.owner_player_id,
+                "target_player_id": target_player_id,
                 "mortal_wounds": mortal_wounds,
                 "roll_state": roll_state.to_payload(),
                 "selected_target_decision_result": result.to_payload(),
@@ -151,7 +167,7 @@ def resolve_selected_target_mortal_wound_effect(
         source_rule_id=_required_string(record, "source_rule_id"),
         source_context=source_context,
         target_unit_instance_id=target_unit_id,
-        defender_player_id=target.owner_player_id,
+        defender_player_id=target_player_id,
         mortal_wounds=mortal_wounds,
         spill_over=True,
     )

@@ -37,8 +37,8 @@ from warhammer40k_core.engine.mortal_wound_context import (
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
+    current_placed_alive_rules_unit_view_for_identity,
     rules_unit_owner_player_id,
-    rules_unit_view_by_id,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
@@ -2199,11 +2199,11 @@ def continue_mortal_wound_application(
         raise GameLifecycleError("remove_destroyed_models must be a bool.")
     current = progress
     while current.remaining_mortal_wounds > 0:
-        rules_unit = rules_unit_view_by_id(
+        rules_unit = current_placed_alive_rules_unit_view_for_identity(
             state=state,
             unit_instance_id=current.target_unit_instance_id,
         )
-        if not alive_placed_models_for_rules_unit(state=state, rules_unit=rules_unit):
+        if rules_unit is None:
             completed = current.with_remaining_lost()
             return MortalWoundRoutingResult(
                 progress=completed,
@@ -2216,7 +2216,7 @@ def continue_mortal_wound_application(
         )
         allocation_context = allocation_context_for_unit(
             state=state,
-            target_unit_instance_id=current.target_unit_instance_id,
+            target_unit_instance_id=rules_unit.unit_instance_id,
             already_allocated_model_ids=(),
             attacker_constraint=(
                 AttackAllocationConstraint(
@@ -2466,12 +2466,18 @@ def apply_mortal_wounds_to_unit(
     ignored_mortal_wounds = 0
     remaining_lost = 0
     target_unit_id = target_unit_instance_id
-    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
     while remaining > 0:
-        if not alive_placed_models_for_rules_unit(state=state, rules_unit=rules_unit):
+        rules_unit = current_placed_alive_rules_unit_view_for_identity(
+            state=state,
+            unit_instance_id=target_unit_id,
+        )
+        if rules_unit is None:
             remaining_lost = remaining
             break
-        context = allocation_context_for_unit(state=state, target_unit_instance_id=target_unit_id)
+        context = allocation_context_for_unit(
+            state=state,
+            target_unit_instance_id=rules_unit.unit_instance_id,
+        )
         legal_model_ids = context.legal_model_ids()
         if not legal_model_ids:
             remaining_lost = remaining

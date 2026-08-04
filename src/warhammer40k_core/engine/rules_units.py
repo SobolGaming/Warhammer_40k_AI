@@ -227,6 +227,77 @@ def rules_unit_views_from_armies(
     return tuple(sorted(views, key=lambda view: view.unit_instance_id))
 
 
+def current_rules_unit_views_for_identity(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> tuple[RulesUnitView, ...]:
+    """Resolve a current rules-unit identity, including a historical attached-unit ID."""
+    requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    current_views = rules_unit_views_from_armies(armies=tuple(state.army_definitions))
+    direct_matches = tuple(
+        view
+        for view in current_views
+        if requested_id == view.unit_instance_id or requested_id in view.component_unit_instance_ids
+    )
+    if direct_matches:
+        if len(direct_matches) != 1:
+            raise GameLifecycleError("Current rules-unit identity is ambiguous.")
+        return direct_matches
+
+    historical_matches = tuple(
+        record
+        for record in state.starting_attached_unit_records
+        if requested_id == record.attached_unit_instance_id
+        or requested_id in record.component_unit_instance_ids
+    )
+    if not historical_matches:
+        raise GameLifecycleError("Rules unit_instance_id is unknown.")
+    if len(historical_matches) != 1:
+        raise GameLifecycleError("Historical attached rules-unit identity is ambiguous.")
+    historical = historical_matches[0]
+    component_ids = set(historical.component_unit_instance_ids)
+    descendants = tuple(
+        view
+        for view in current_views
+        if view.owner_player_id == historical.player_id
+        and component_ids.intersection(view.component_unit_instance_ids)
+    )
+    if not descendants:
+        raise GameLifecycleError("Historical attached rules-unit has no current descendants.")
+    return tuple(sorted(descendants, key=lambda view: view.unit_instance_id))
+
+
+def current_placed_alive_rules_unit_view_for_identity(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> RulesUnitView | None:
+    """Return the one current placed survivor represented by a rules-unit identity."""
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Rules-unit survivor resolution requires battlefield_state.")
+    placed_model_ids = set(battlefield.placed_model_ids())
+    surviving_views = tuple(
+        view
+        for view in current_rules_unit_views_for_identity(
+            state=state,
+            unit_instance_id=unit_instance_id,
+        )
+        if any(
+            model.is_alive and model.model_instance_id in placed_model_ids
+            for model in view.own_models
+        )
+    )
+    if not surviving_views:
+        return None
+    if len(surviving_views) != 1:
+        raise GameLifecycleError(
+            "Historical rules-unit identity resolves to multiple placed survivors."
+        )
+    return surviving_views[0]
+
+
 def rules_unit_id_for_unit_id(
     *,
     armies: tuple[ArmyDefinition, ...],

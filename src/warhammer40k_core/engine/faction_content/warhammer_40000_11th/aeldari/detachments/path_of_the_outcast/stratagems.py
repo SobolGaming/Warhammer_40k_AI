@@ -140,14 +140,16 @@ def apply_eldritch_suppression(
     )
     manager = DiceRollManager(context.state.game_id, event_log=context.decisions.event_log)
     roll_state = manager.roll(request.spec)
-    modifiers = (
-        *_eldritch_suppression_modifiers(context=context, enemy_unit_id=enemy_unit_id),
-        *selected_target_test_roll_modifiers(
-            state=context.state,
-            unit_instance_id=enemy_unit_id,
-            roll_type=BATTLE_SHOCK_TEST_ROLL_TYPE,
-        ),
+    destroyed_model_modifiers = _eldritch_suppression_modifiers(
+        context=context,
+        enemy_unit_id=enemy_unit_id,
     )
+    selected_target_modifiers = selected_target_test_roll_modifiers(
+        state=context.state,
+        unit_instance_id=enemy_unit_id,
+        roll_type=BATTLE_SHOCK_TEST_ROLL_TYPE,
+    )
+    modifiers = (*destroyed_model_modifiers, *selected_target_modifiers)
     result = BattleShockResult.from_roll_state(
         result_id=f"{request.request_id}:result",
         request=request,
@@ -171,7 +173,15 @@ def apply_eldritch_suppression(
         "effect_kind": "eldritch_suppression",
         "enemy_unit_instance_id": enemy_unit_id,
         "battle_shock_result_id": result.result_id,
-        "destroyed_model_modifier_applied": bool(modifiers),
+        "destroyed_model_modifier_applied": bool(destroyed_model_modifiers),
+        "selected_target_modifier_ids": [
+            modifier.modifier_id for modifier in selected_target_modifiers
+        ],
+        "selected_target_modifier_source_ids": [
+            modifier.source_id
+            for modifier in selected_target_modifiers
+            if modifier.source_id is not None
+        ],
     }
     return StratagemHandlerExecutionResult.applied(
         handler_id=ELDRITCH_SUPPRESSION_HANDLER_ID,

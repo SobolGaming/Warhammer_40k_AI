@@ -63,6 +63,7 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
+    current_placed_alive_rules_unit_view_for_identity,
     rules_unit_view_by_id,
     rules_unit_views_from_armies,
 )
@@ -434,12 +435,12 @@ def canonical_rules_unit_ids(
 ) -> frozenset[str]:
     canonical_ids: set[str] = set()
     for unit_instance_id in unit_instance_ids:
-        canonical_ids.add(
-            rules_unit_view_by_id(
-                state=state,
-                unit_instance_id=unit_instance_id,
-            ).unit_instance_id
+        rules_unit = current_placed_alive_rules_unit_view_for_identity(
+            state=state,
+            unit_instance_id=unit_instance_id,
         )
+        if rules_unit is not None:
+            canonical_ids.add(rules_unit.unit_instance_id)
     return frozenset(canonical_ids)
 
 

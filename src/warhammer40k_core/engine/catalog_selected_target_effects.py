@@ -23,6 +23,9 @@ from warhammer40k_core.engine.battle_shock_resolution import (
 from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import (
     post_fight_hit_target_request,
 )
+from warhammer40k_core.engine.catalog_post_shoot_sequencing import (
+    resolve_post_shoot_group_order as _resolve_post_shoot_group_order,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
@@ -239,7 +242,6 @@ CATALOG_SELECTED_TARGET_BATTLE_SHOCK_SOURCE_KIND = "catalog_selected_target_effe
 
 _FIGHT_START_SUBMISSION_KIND = "catalog_selected_target_fight_start_effect"
 _SHOOTING_START_SUBMISSION_KIND = "catalog_selected_target_shooting_start_effect"
-
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
@@ -456,12 +458,21 @@ class CatalogSelectedTargetEffectRuntime:
         )
         if not groups:
             return None
+        sequencing = _resolve_post_shoot_group_order(
+            context=context,
+            groups=groups,
+        )
+        if sequencing.pending_status is not None:
+            return sequencing.pending_status
+        ordered_groups = sequencing.ordered_groups
+        if ordered_groups is None:
+            raise GameLifecycleError("Catalog post-shoot sequencing resolution is incomplete.")
         resolved = _resolved_post_shoot_target_effect_group_keys(
             context.decisions,
             event_type=CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
         )
         unresolved = tuple(
-            group for group in groups if _post_shoot_group_key(group) not in resolved
+            group for group in ordered_groups if _post_shoot_group_key(group) not in resolved
         )
         if not unresolved:
             return None
