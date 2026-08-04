@@ -25,6 +25,11 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_ir_consumers_for_rule,
 )
 from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
+    CATALOG_IR_MOVEMENT_END_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+    CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
+    CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+    CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+    CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
     contextual_consumers_for_clause,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -57,6 +62,17 @@ class AbilityOverallSupport(StrEnum):
     PARTIAL = "Partial"
     PARSED = "Parsed"
     UNSUPPORTED = "Unsupported"
+
+
+_CONTEXTUAL_CLAUSE_WIDE_CONSUMER_IDS = frozenset(
+    {
+        CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+        CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+        CATALOG_IR_POST_FIGHT_HIT_TARGET_EFFECT_CONSUMER_ID,
+        CATALOG_IR_SHOOTING_START_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+        CATALOG_IR_MOVEMENT_END_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+    }
+)
 
 
 class AbilityCoverageRowPayload(TypedDict):
@@ -924,7 +940,12 @@ def _effect_runtime_consumer_ids(
     if len(clause.effects) == 1:
         return (tuple(sorted(runtime_consumer_ids)),)
     consumers = frozenset(runtime_consumer_ids)
-    clause_wide_consumers = consumers.intersection(catalog_rule_ir_clause_wide_consumer_ids(clause))
+    clause_wide_consumers = consumers.intersection(
+        {
+            *catalog_rule_ir_clause_wide_consumer_ids(clause),
+            *_CONTEXTUAL_CLAUSE_WIDE_CONSUMER_IDS,
+        }
+    )
     return tuple(
         tuple(
             sorted(

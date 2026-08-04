@@ -238,9 +238,11 @@ _ENEMY_UNIT_FALLS_BACK_NEAR_ABILITY_RE = re.compile(
 _POST_SHOOT_HIT_TARGET_SELECTION_RE = re.compile(
     r"\b(?:(?:(?:in|during)\s+your\s+Shooting\s+phase,\s*)?"
     r"(?:(?:after|each\s+time)\s+)?"
-    r"(?P<subject>this\s+model|this\s+unit|the\s+bearer|bearer)\s+has\s+shot,\s+"
+    r"(?P<subject>this\s+model's\s+unit|this\s+model|this\s+unit|the\s+bearer|bearer)"
+    r"\s+has\s+shot,\s+"
     r")?"
-    r"select\s+one\s+enemy\s+unit\s+(?:that\s+was\s+)?hit\s+by\s+one\s+or\s+more\s+of\s+"
+    r"select\s+one\s+enemy\s+(?:(?P<keyword>[A-Z][A-Z0-9_'-]*)\s+)?unit\s+"
+    r"(?:that\s+was\s+)?hit\s+by\s+one\s+or\s+more\s+of\s+"
     r"those\s+attacks\b",
     re.IGNORECASE,
 )
@@ -710,6 +712,32 @@ def _semicolon_inside_ability_choice_list(
 
 
 def _split_repeated_trigger_anchors(clause_text: _ClauseText) -> tuple[_ClauseText, ...]:
+    post_shoot_match = _POST_SHOOT_HIT_TARGET_SELECTION_RE.search(clause_text.text)
+    if post_shoot_match is not None:
+        followup_match = re.match(
+            r"\s+and\s+(?=roll\b)",
+            clause_text.text[post_shoot_match.end() :],
+            flags=re.IGNORECASE,
+        )
+        if followup_match is not None:
+            split_start = post_shoot_match.end()
+            followup_start = split_start + followup_match.end()
+            return (
+                _ClauseText(
+                    span=TextSpan(
+                        text=clause_text.text[:split_start],
+                        start=clause_text.start,
+                        end=clause_text.start + split_start,
+                    )
+                ),
+                _ClauseText(
+                    span=TextSpan(
+                        text=clause_text.text[followup_start:],
+                        start=clause_text.start + followup_start,
+                        end=clause_text.span.end,
+                    )
+                ),
+            )
     anchors = tuple(_CLAUSE_TRIGGER_ANCHOR_RE.finditer(clause_text.text))
     if len(anchors) < 2:
         allocated_attack_offsets = allocated_attack_clause_split_offsets(clause_text.text)
@@ -797,6 +825,10 @@ def _compile_clause(
                 text=clause_text.text,
                 source_span=clause_text.span,
             ),
+            *_selected_target_extensions.parse_conditional_mortal_wound_battle_shock_conditions(
+                text=clause_text.text,
+                source_span=clause_text.span,
+            ),
             *parse_this_model_attack_target_conditions(clause_text.span),
             *_parse_return_on_death_conditions(clause_text),
             *parse_frequency_conditions(clause_text.span),
@@ -840,6 +872,14 @@ def _compile_clause(
             *_parse_placement_effects(clause_text),
             *_parse_restore_lost_wounds_effects(clause_text),
             *_parse_mortal_wound_effects(clause_text),
+            *_selected_target_extensions.parse_post_shoot_roll_pool_mortal_wound_effects(
+                text=clause_text.text,
+                source_span=clause_text.span,
+            ),
+            *_selected_target_extensions.parse_selected_unit_test_modifier_effects(
+                text=clause_text.text,
+                source_span=clause_text.span,
+            ),
             *_parse_desperate_escape_effects(clause_text),
             *_parse_battle_shock_test_effects(clause_text),
             *_parse_fight_movement_distance_effects(clause_text),
@@ -1527,6 +1567,12 @@ def _parse_target(
     )
     if selected_target_spec is not None:
         return selected_target_spec
+    selected_unit_followup_target = _selected_target_extensions.selected_unit_followup_target(
+        text=clause_text.text,
+        source_span=clause_text.span,
+    )
+    if selected_unit_followup_target is not None:
+        return selected_unit_followup_target
     tracked_selection_match = _TRACKED_TARGET_SELECTION_RE.search(clause_text.text)
     if tracked_selection_match is not None:
         allegiance = _lower_group(tracked_selection_match, "allegiance")
@@ -1540,12 +1586,22 @@ def _parse_target(
         )
     hit_target_match = _POST_SHOOT_HIT_TARGET_SELECTION_RE.search(clause_text.text)
     if hit_target_match is not None:
+        target_pairs: list[tuple[str, RuleParameterValue]] = [
+            ("allegiance", "enemy"),
+            ("target_relationship", "hit_by_those_attacks"),
+        ]
+        keyword_text = hit_target_match.group("keyword")
+        if keyword_text is not None:
+            target_pairs.extend(
+                _keyword_sequence_parameter_pairs(
+                    keyword_text,
+                    source_keyword_sequence_parts=parser_context.source_keyword_sequence_parts,
+                )
+            )
         return RuleTargetSpec(
             kind=RuleTargetKind.ENEMY_UNIT,
             source_span=_span_from_match(clause_text, hit_target_match),
-            parameters=parameters_from_pairs(
-                (("allegiance", "enemy"), ("target_relationship", "hit_by_those_attacks"))
-            ),
+            parameters=parameters_from_pairs(tuple(target_pairs)),
         )
     match = _TARGET_RE.search(clause_text.text)
     if match is not None:

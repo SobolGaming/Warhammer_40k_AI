@@ -111,6 +111,16 @@ _IMMEDIATE_BATTLE_SHOCK_PARAMETER_KEYS = frozenset(
         "target_scope",
     }
 )
+_IMMEDIATE_MORTAL_WOUND_PARAMETER_KEYS = frozenset(
+    {
+        "damage_kind",
+        "mortal_wounds_expression",
+        "roll_count",
+        "roll_expression",
+        "success_threshold",
+        "target_scope",
+    }
+)
 _FIGHT_START_TRIGGER_PARAMETER_KEYS = frozenset({"edge", "owner", "phase"})
 _FIGHT_START_TARGET_PARAMETER_KEYS = frozenset({"allegiance"})
 _SHOOTING_START_TARGET_PARAMETER_KEYS = frozenset({"allegiance", "required_keyword_sequence"})
@@ -193,7 +203,8 @@ def fight_start_selected_target_selection_is_supported(clause: RuleClause) -> bo
         and _fight_start_selection_trigger_is_supported(clause)
         and _fight_start_selection_target_is_supported(clause.target)
         and all(
-            condition.kind is not RuleConditionKind.FREQUENCY_LIMIT
+            condition.kind
+            not in {RuleConditionKind.FREQUENCY_LIMIT, RuleConditionKind.KEYWORD_GATE}
             and selected_target_selection_condition_is_supported(condition)
             for condition in clause.conditions
         )
@@ -208,6 +219,10 @@ def selected_target_selection_condition_is_supported(condition: RuleCondition) -
             "Selected-target selection condition support requires RuleCondition."
         )
     parameters = parameter_payload(condition.parameters)
+    if condition.kind is RuleConditionKind.KEYWORD_GATE:
+        return frozenset(parameters) == frozenset({"required_keyword"}) and _non_empty_string(
+            parameters.get("required_keyword")
+        )
     if condition.kind is RuleConditionKind.DISTANCE_PREDICATE:
         return _selection_distance_condition_is_supported(parameters)
     if condition.kind is RuleConditionKind.VISIBILITY_PREDICATE:
@@ -383,16 +398,48 @@ def clause_has_immediate_selected_target_effect(clause: RuleClause) -> bool:
     return (
         clause.is_supported
         and clause.trigger is None
-        and not clause.conditions
+        and all(
+            _immediate_effect_condition_is_supported(condition) for condition in clause.conditions
+        )
         and clause.duration is None
         and clause.target is not None
         and clause.target.kind in {RuleTargetKind.SELECTED_UNIT, RuleTargetKind.SELECTED_TARGET}
         and not clause.target.parameters
         and bool(clause.effects)
-        and all(
-            effect_is_immediate_selected_target_battle_shock(effect) for effect in clause.effects
-        )
+        and all(_effect_is_immediate_selected_target(effect) for effect in clause.effects)
     )
+
+
+def _effect_is_immediate_selected_target(effect: RuleEffectSpec) -> bool:
+    return effect_is_immediate_selected_target_battle_shock(
+        effect
+    ) or effect_is_immediate_selected_target_mortal_wounds(effect)
+
+
+def effect_is_immediate_selected_target_mortal_wounds(effect: RuleEffectSpec) -> bool:
+    if type(effect) is not RuleEffectSpec:
+        raise GameLifecycleError("Selected-target effect support requires RuleEffectSpec.")
+    if effect.kind is not RuleEffectKind.INFLICT_MORTAL_WOUNDS:
+        return False
+    parameters = parameter_payload(effect.parameters)
+    return (
+        frozenset(parameters) == _IMMEDIATE_MORTAL_WOUND_PARAMETER_KEYS
+        and parameters.get("damage_kind") == "mortal_wounds"
+        and parameters.get("mortal_wounds_expression") == "1"
+        and parameters.get("roll_count") == 3
+        and parameters.get("roll_expression") == "D6"
+        and parameters.get("success_threshold") == 4
+        and parameters.get("target_scope") == "selected_unit"
+    )
+
+
+def _immediate_effect_condition_is_supported(condition: RuleCondition) -> bool:
+    parameters = parameter_payload(condition.parameters)
+    return condition.kind is RuleConditionKind.TARGET_CONSTRAINT and parameters == {
+        "minimum_mortal_wounds": 1,
+        "relationship": "prior_effect_inflicted_mortal_wounds",
+        "source_scope": "this_ability",
+    }
 
 
 def effect_is_immediate_selected_target_battle_shock(effect: RuleEffectSpec) -> bool:
@@ -435,7 +482,7 @@ def selected_target_selection_clause_binds_source_model(clause: RuleClause) -> b
     if clause.trigger is not None:
         trigger_parameters = parameter_payload(clause.trigger.parameters)
         if (
-            trigger_parameters.get("subject") == "this_model"
+            trigger_parameters.get("subject") in {"this_model", "this_models_unit"}
             or trigger_parameters.get("attacker_model_reference") == "this_model"
         ):
             return True
@@ -640,6 +687,14 @@ def _effect_duration_is_supported(duration: RuleDuration | None) -> bool:
             and parameters.get("owner") == "source_player"
             and parameters.get("phase") == BattlePhase.COMMAND.value
         )
+    if frozenset(parameters) == frozenset({"boundary", "endpoint", "owner", "phase", "relative"}):
+        return (
+            parameters.get("boundary") == "start"
+            and parameters.get("endpoint") == "phase"
+            and parameters.get("owner") in {"self", "opponent"}
+            and parameters.get("phase") in {phase.value for phase in BattlePhase}
+            and parameters.get("relative") == "next"
+        )
     return (
         frozenset(parameters) == frozenset({"battle_round_offset", "boundary", "endpoint", "owner"})
         and parameters.get("battle_round_offset") == 1
@@ -757,6 +812,12 @@ def _selected_target_unit_modifier_is_supported(
             and type(parameters.get("delta")) is int
         )
     if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
+        if frozenset(parameters) == frozenset({"delta", "roll_type", "target_scope"}):
+            return (
+                parameters.get("roll_type") in {"battle_shock", "leadership"}
+                and parameters.get("target_scope") == "selected_unit"
+                and type(parameters.get("delta")) is int
+            )
         return (
             frozenset(parameters) == frozenset({"delta", "roll_type"})
             and parameters.get("roll_type") == "charge"

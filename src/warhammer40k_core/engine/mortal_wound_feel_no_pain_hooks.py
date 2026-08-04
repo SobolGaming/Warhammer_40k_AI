@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -15,6 +15,8 @@ from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.abilities import AbilityCatalogIndex
+    from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
     from warhammer40k_core.engine.game_state import GameState
 
 
@@ -33,6 +35,8 @@ class MortalWoundFeelNoPainContinuationContext:
     source_context: JsonValue
     dice_manager: DiceRollManager
     runtime_modifier_registry: RuntimeModifierRegistry
+    battle_shock_hooks: BattleShockHookRegistry | None = None
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex] | None = None
 
     def __post_init__(self) -> None:
         from warhammer40k_core.engine.game_state import GameState
@@ -56,6 +60,18 @@ class MortalWoundFeelNoPainContinuationContext:
             raise GameLifecycleError(
                 "Mortal wound FNP continuation requires runtime modifier registry."
             )
+        if self.battle_shock_hooks is not None:
+            from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+
+            if type(self.battle_shock_hooks) is not BattleShockHookRegistry:
+                raise GameLifecycleError(
+                    "Mortal wound FNP continuation battle_shock_hooks are invalid."
+                )
+        object.__setattr__(
+            self,
+            "ability_indexes_by_player_id",
+            _validate_ability_indexes(self.ability_indexes_by_player_id),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -119,6 +135,26 @@ class MortalWoundFeelNoPainContinuationHookRegistry:
                 )
             return status
         raise GameLifecycleError("Mortal wound FNP continuation source kind is not registered.")
+
+
+def _validate_ability_indexes(
+    value: object,
+) -> Mapping[str, AbilityCatalogIndex] | None:
+    if value is None:
+        return None
+    if not isinstance(value, Mapping):
+        raise GameLifecycleError("Mortal wound FNP continuation ability indexes must be a mapping.")
+    from warhammer40k_core.engine.abilities import AbilityCatalogIndex
+
+    untyped_indexes = cast(Mapping[object, object], value)
+    for player_id, index in untyped_indexes.items():
+        _validate_identifier("ability_indexes_by_player_id key", player_id)
+        if type(index) is not AbilityCatalogIndex:
+            raise GameLifecycleError(
+                "Mortal wound FNP continuation ability indexes must contain "
+                "AbilityCatalogIndex values."
+            )
+    return cast(Mapping[str, AbilityCatalogIndex], value)
 
 
 def _validate_hook_bindings(

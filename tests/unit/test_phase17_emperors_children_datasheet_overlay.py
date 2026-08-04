@@ -21,8 +21,8 @@ from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-from warhammer40k_core.core.weapon_profiles import WeaponProfile
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
@@ -39,6 +39,9 @@ from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+from warhammer40k_core.engine.catalog_battle_shock_runtime import (
+    catalog_battle_shock_hook_bindings,
+)
 from warhammer40k_core.engine.catalog_datasheet_rule_support import (
     CATALOG_IR_FIGHT_END_FAILED_ACTIVATION_MODEL_DESTRUCTION_CONSUMER_ID,
     CATALOG_IR_FIGHT_SELECTED_CRITICAL_WOUND_CONSUMER_ID,
@@ -58,6 +61,7 @@ from warhammer40k_core.engine.catalog_post_fight_selected_target_runtime import 
 from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_MOVEMENT_TRANSIT_PERMISSION_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+    CatalogWeaponKeywordGrantRuntime,
     catalog_movement_transit_permissions_for_model,
     catalog_rule_ir_consumers_for_rule,
 )
@@ -77,11 +81,26 @@ from warhammer40k_core.engine.catalog_selected_target_effects import (
     CatalogSelectedTargetEffectRuntime,
     apply_catalog_post_shoot_hit_target_effect_result,
 )
+from warhammer40k_core.engine.catalog_selected_target_mortal_wounds import (
+    CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_RESOLVED_EVENT,
+    CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_ROLLED_EVENT,
+    catalog_selected_target_mortal_wound_feel_no_pain_bindings,
+)
+from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
+    BATTLE_SHOCK_TEST_ROLL_TYPE,
+    LEADERSHIP_TEST_ROLL_TYPE,
+    selected_target_test_roll_modifiers,
+)
 from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartEffectContext,
     CommandPhaseStartHookRegistry,
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
+)
+from warhammer40k_core.engine.damage_allocation import (
+    FeelNoPainSource,
+    is_mortal_wound_feel_no_pain_request,
+    mortal_wound_feel_no_pain_source_context,
 )
 from warhammer40k_core.engine.decision_controller import (
     DecisionController,
@@ -109,6 +128,10 @@ from warhammer40k_core.engine.game_state import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
+    MortalWoundFeelNoPainContinuationContext,
+    MortalWoundFeelNoPainContinuationHookRegistry,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -126,6 +149,7 @@ from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_paylo
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierContext,
     RuntimeModifierRegistry,
+    WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.stratagems import (
@@ -133,7 +157,10 @@ from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
 )
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
-from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
+from warhammer40k_core.engine.wargear_selections import (
+    ModelProfileSelection,
+    WargearSelection,
+)
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
@@ -189,6 +216,8 @@ _EC_DATASHEET_IDS = (
     "000004081",
     "000004082",
     "000004083",
+    "000004084",
+    "000004088",
     "000004089",
     "000004090",
     "000004092",
@@ -197,6 +226,8 @@ _EC_DATASHEET_IDS = (
 _BRIDGE_SUPPORTED_EC_DATASHEET_IDS = (
     "000004077",
     "000004083",
+    "000004084",
+    "000004088",
     "000004089",
     "000004090",
     "000004092",
@@ -320,6 +351,362 @@ def test_flawless_blades_catalog_is_complete_and_daemonic_patrons_is_consumed() 
         CATALOG_IR_FIGHT_SELECTED_CRITICAL_WOUND_CONSUMER_ID,
         CATALOG_IR_FIGHT_END_FAILED_ACTIVATION_MODEL_DESTRUCTION_CONSUMER_ID,
     }
+
+
+def test_lord_kakophonist_and_noise_marines_catalog_rule_ir_is_complete() -> None:
+    package = _catalog_package()
+    expected_geometry = {
+        "000004084": {"Lord Kakophonist": 2.5},
+        "000004088": {"Disharmonist": 2.0, "Noise Marines": 2.0},
+    }
+    expected_ability_consumers = {
+        ("000004084", "Obsessive Annunciation"): {
+            "catalog-ir:weapon-keyword-grant",
+            "catalog-ir:weapon-keyword-grant:sustained-hits",
+        },
+        ("000004084", "Doom Siren"): {
+            CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+        },
+        ("000004088", "Terrifying Crescendo"): {
+            CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+        },
+    }
+
+    for datasheet_id, expected_profiles in expected_geometry.items():
+        datasheet = package.army_catalog.datasheet_by_id(datasheet_id)
+        assert {profile.name for profile in datasheet.model_profiles} == expected_profiles.keys()
+        for profile in datasheet.model_profiles:
+            assert profile.base_size.diameter_mm == 40.0
+            geometry = next(
+                record
+                for record in package.model_geometries
+                if record.model_profile_id == profile.model_profile_id
+            )
+            assert geometry.height.height_inches == expected_profiles[profile.name]
+
+    records_by_ability = {
+        (record.datasheet_id, record.definition.name): record
+        for record in catalog_ability_records_from_catalog(package.army_catalog)
+        if (record.datasheet_id, record.definition.name) in expected_ability_consumers
+    }
+    assert records_by_ability.keys() == expected_ability_consumers.keys()
+    for identity, expected_consumers in expected_ability_consumers.items():
+        rule_ir = rule_ir_from_execution_payload(
+            records_by_ability[identity].definition.replay_payload
+        )
+        assert rule_ir.is_supported
+        assert not rule_ir.diagnostics
+        assert set(catalog_rule_ir_consumers_for_rule(rule_ir)) == expected_consumers
+
+
+def test_lord_kakophonist_and_noise_marines_post_shoot_rules_execute_and_stack() -> None:
+    armies, state, indexes, source_noise_marines, target, attached_id = (
+        _kakophonist_runtime_fixture()
+    )
+    decisions = DecisionController()
+    runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
+    battle_shock_hooks = BattleShockHookRegistry.from_bindings(
+        catalog_battle_shock_hook_bindings(
+            ability_indexes_by_player_id=indexes,
+            armies=armies,
+        )
+    )
+    sonic_blaster = _weapon_profile("000004088", "Sonic blaster")
+    modified_sonic_blaster = CatalogWeaponKeywordGrantRuntime(
+        indexes,
+        armies,
+    ).weapon_profile_modifier(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.SHOOTING,
+            attacking_unit_instance_id=attached_id,
+            attacker_model_instance_id=(source_noise_marines.own_models[0].model_instance_id),
+            target_unit_instance_id=target.unit_instance_id,
+            weapon_profile=sonic_blaster,
+        )
+    )
+    assert WeaponKeyword.SUSTAINED_HITS in modified_sonic_blaster.keywords
+    assert "sustained-hits:1" in {
+        ability.ability_id for ability in modified_sonic_blaster.abilities
+    }
+
+    first_names = _resolve_kakophonist_post_shoot_effects(
+        runtime=runtime,
+        state=state,
+        decisions=decisions,
+        indexes=indexes,
+        source_noise_marines=source_noise_marines,
+        source_rules_unit_id=attached_id,
+        target=target,
+        sequence_suffix="first",
+        battle_shock_hooks=battle_shock_hooks,
+    )
+    assert set(first_names) == {"Doom Siren", "Terrifying Crescendo"}
+    mortal_event = next(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_ROLLED_EVENT
+    )
+    mortal_payload = cast(dict[str, Any], mortal_event.payload)
+    assert cast(int, mortal_payload["mortal_wounds"]) > 0
+    assert any(
+        event.event_type == "catalog_selected_target_battle_shock_resolved"
+        for event in decisions.event_log.records
+    )
+
+    for roll_type in (BATTLE_SHOCK_TEST_ROLL_TYPE, LEADERSHIP_TEST_ROLL_TYPE):
+        modifiers = selected_target_test_roll_modifiers(
+            state=state,
+            unit_instance_id=target.unit_instance_id,
+            roll_type=roll_type,
+        )
+        assert [modifier.operand for modifier in modifiers] == [-1]
+    assert len(state.persisting_effects_for_unit(target.unit_instance_id)) == 2
+    assert all(
+        effect.expiration.expiration_kind.value == "start_phase"
+        and effect.expiration.battle_round == 2
+        and effect.expiration.phase is BattlePhaseKind.SHOOTING
+        and effect.expiration.player_id == "player-a"
+        for effect in state.persisting_effects_for_unit(target.unit_instance_id)
+    )
+
+    state = GameState.from_payload(
+        cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
+    )
+    second_names = _resolve_kakophonist_post_shoot_effects(
+        runtime=runtime,
+        state=state,
+        decisions=decisions,
+        indexes=indexes,
+        source_noise_marines=source_noise_marines,
+        source_rules_unit_id=attached_id,
+        target=target,
+        sequence_suffix="second",
+        battle_shock_hooks=battle_shock_hooks,
+    )
+    assert set(second_names) == {"Doom Siren", "Terrifying Crescendo"}
+    battle_shock_payloads = [
+        cast(dict[str, Any], event.payload)
+        for event in decisions.event_log.records
+        if event.event_type == "catalog_selected_target_battle_shock_resolved"
+    ]
+    assert any(
+        [
+            modifier["operand"]
+            for modifier in cast(
+                list[dict[str, Any]],
+                cast(dict[str, Any], payload["battle_shock_result"])["modified_roll"]["modifiers"],
+            )
+        ]
+        == [-1]
+        for payload in battle_shock_payloads
+    )
+    for roll_type in (BATTLE_SHOCK_TEST_ROLL_TYPE, LEADERSHIP_TEST_ROLL_TYPE):
+        modifiers = selected_target_test_roll_modifiers(
+            state=state,
+            unit_instance_id=target.unit_instance_id,
+            roll_type=roll_type,
+        )
+        assert [modifier.operand for modifier in modifiers] == [-1, -1]
+        assert len({modifier.modifier_id for modifier in modifiers}) == 2
+
+
+def test_lord_kakophonist_doom_siren_resumes_after_feel_no_pain_choice() -> None:
+    armies, state, indexes, source_noise_marines, target, attached_id = (
+        _kakophonist_runtime_fixture()
+    )
+    source_a = FeelNoPainSource(source_id="doom-siren-fnp-a", threshold=5)
+    source_b = FeelNoPainSource(source_id="doom-siren-fnp-b", threshold=6)
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=target.own_models[0].model_instance_id,
+        sources=(source_a, source_b),
+    )
+    decisions = DecisionController()
+    runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
+    battle_shock_hooks = BattleShockHookRegistry.from_bindings(
+        catalog_battle_shock_hook_bindings(
+            ability_indexes_by_player_id=indexes,
+            armies=armies,
+        )
+    )
+    sequence = AttackSequence(
+        sequence_id="kakophonist-doom-siren-fnp",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attached_id,
+        source_phase=BattlePhase.SHOOTING,
+        attack_pools=(
+            _attack_pool(
+                source_noise_marines,
+                target,
+                _weapon_profile("000004088", "Sonic blaster"),
+            ),
+        ),
+    )
+    decisions.event_log.append(
+        "attack_sequence_step",
+        {
+            "sequence_id": sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 0,
+            "payload": {"successful": True},
+        },
+    )
+    context = AttackSequenceCompletedContext(
+        state=state,
+        decisions=decisions,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        source_phase=BattlePhase.SHOOTING,
+        attack_sequence=sequence,
+        attack_sequence_completed_event_id="kakophonist-doom-siren-fnp-completed",
+    )
+
+    status: LifecycleStatus | None = None
+    while runtime.post_shoot_hit_target_request(context) is not None:
+        request = decisions.queue.peek_next()
+        request_payload = cast(dict[str, Any], request.payload)
+        result = DecisionResult.for_request(
+            result_id=f"doom-siren-fnp-{request_payload['ability_name']}",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+        decisions.submit_result(result)
+        status = apply_catalog_post_shoot_hit_target_effect_result(
+            state=state,
+            decisions=decisions,
+            result=result,
+            battle_shock_hooks=battle_shock_hooks,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            ability_indexes_by_player_id=indexes,
+        )
+        if status is not None:
+            break
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    continuation_registry = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(
+        catalog_selected_target_mortal_wound_feel_no_pain_bindings(
+            ability_indexes_by_player_id=indexes,
+        )
+    )
+    while status is not None:
+        fnp_request = cast(DecisionRequest, status.decision_request)
+        assert is_mortal_wound_feel_no_pain_request(fnp_request)
+        source_context = mortal_wound_feel_no_pain_source_context(fnp_request)
+        fnp_result = DecisionResult.for_request(
+            result_id=f"doom-siren-fnp-result-{fnp_request.request_id}",
+            request=fnp_request,
+            selected_option_id=source_a.source_id,
+        )
+        decisions.submit_result(fnp_result)
+        status = continuation_registry.apply_decision(
+            MortalWoundFeelNoPainContinuationContext(
+                state=state,
+                decisions=decisions,
+                request=fnp_request,
+                result=fnp_result,
+                source_context=source_context,
+                dice_manager=DiceRollManager(
+                    state.game_id,
+                    event_log=decisions.event_log,
+                ),
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+                battle_shock_hooks=battle_shock_hooks,
+                ability_indexes_by_player_id=indexes,
+            )
+        )
+
+    assert any(
+        event.event_type == CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_RESOLVED_EVENT
+        for event in decisions.event_log.records
+    )
+    assert any(
+        event.event_type == "catalog_selected_target_battle_shock_resolved"
+        for event in decisions.event_log.records
+    )
+
+
+def test_lord_kakophonist_and_noise_marines_alternative_loadouts_instantiate() -> None:
+    package = _catalog_package()
+    factory = UnitFactory(
+        catalog=package.army_catalog,
+        model_geometries=package.model_geometries,
+    )
+    lord_datasheet = package.army_catalog.datasheet_by_id("000004084")
+    lord_option = next(
+        option
+        for option in lord_datasheet.wargear_options
+        if "screamer-pistol-close-combat-weapon" in option.option_id
+    )
+    lord = factory.instantiate_unit(
+        army_id="army-loadout",
+        datasheet=lord_datasheet,
+        selection=UnitMusterSelection(
+            unit_selection_id="lord-kakophonist-alternative",
+            datasheet_id=lord_datasheet.datasheet_id,
+            model_profile_selections=(
+                ModelProfileSelection(lord_datasheet.model_profiles[0].model_profile_id, 1),
+            ),
+            wargear_selections=(
+                WargearSelection(
+                    option_id=lord_option.option_id,
+                    model_profile_id=lord_option.model_profile_id,
+                    wargear_ids=lord_option.allowed_wargear_ids,
+                ),
+            ),
+        ),
+    )
+    assert {
+        "000004084:screamer-pistol",
+        "000004084:close-combat-weapon",
+    }.issubset(lord.own_models[0].wargear_ids)
+    assert "000004084:power-sword" not in lord.own_models[0].wargear_ids
+
+    noise_datasheet = package.army_catalog.datasheet_by_id("000004088")
+    disharmonist_option = next(
+        option
+        for option in noise_datasheet.wargear_options
+        if "screamer-pistol-power-sword" in option.option_id
+    )
+    blastmaster_option = next(
+        option
+        for option in noise_datasheet.wargear_options
+        if "sonic-blaster-blastmaster" in option.option_id
+    )
+    noise_marines = factory.instantiate_unit(
+        army_id="army-loadout",
+        datasheet=noise_datasheet,
+        selection=UnitMusterSelection(
+            unit_selection_id="noise-marines-alternative",
+            datasheet_id=noise_datasheet.datasheet_id,
+            model_profile_selections=tuple(
+                ModelProfileSelection(entry.model_profile_id, entry.min_models)
+                for entry in noise_datasheet.composition
+            ),
+            wargear_selections=(
+                WargearSelection(
+                    option_id=disharmonist_option.option_id,
+                    model_profile_id=disharmonist_option.model_profile_id,
+                    wargear_ids=disharmonist_option.allowed_wargear_ids,
+                ),
+                WargearSelection(
+                    option_id=blastmaster_option.option_id,
+                    model_profile_id=blastmaster_option.model_profile_id,
+                    wargear_ids=blastmaster_option.allowed_wargear_ids,
+                    selection_count=2,
+                ),
+            ),
+        ),
+    )
+    disharmonist = next(model for model in noise_marines.own_models if model.name == "Disharmonist")
+    assert {
+        "000004088:screamer-pistol",
+        "000004088:power-sword",
+    }.issubset(disharmonist.wargear_ids)
+    assert "000004088:sonic-blaster" not in disharmonist.wargear_ids
+    assert (
+        sum("000004088:blastmaster" in model.wargear_ids for model in noise_marines.own_models) == 2
+    )
 
 
 def test_fulgrim_generated_rule_ir_and_catalog_are_complete_and_source_bound() -> None:
@@ -1163,6 +1550,146 @@ def _catalog_package() -> CanonicalCatalogPackage:
     return _ability_support_catalog_package()
 
 
+def _kakophonist_runtime_fixture() -> tuple[
+    tuple[ArmyDefinition, ...],
+    GameState,
+    dict[str, AbilityCatalogIndex],
+    UnitInstance,
+    UnitInstance,
+    str,
+]:
+    package = _catalog_package()
+    catalog = package.army_catalog
+    factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
+    lord = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id="000004084",
+        selection_id="lord-kakophonist",
+    )
+    source_noise_marines = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-a",
+        datasheet_id="000004088",
+        selection_id="source-noise-marines",
+    )
+    target = _instantiate_minimum_composition_unit(
+        factory=factory,
+        army_id="army-b",
+        datasheet_id="000004088",
+        selection_id="target-noise-marines",
+    )
+    attached_id = "attached-unit:army-a:kakophonist-noise-marines"
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=source_noise_marines.unit_instance_id,
+        leader_unit_instance_ids=(lord.unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((source_noise_marines.unit_instance_id, lord.unit_instance_id))
+        ),
+        source_id="test:lord-kakophonist-noise-marines:formation",
+        attachment_source_ids=("test:lord-kakophonist-noise-marines:leader-eligibility",),
+    )
+    armies = (
+        _army(
+            catalog=catalog,
+            army_id="army-a",
+            player_id="player-a",
+            faction_id="emperors-children",
+            units=(lord, source_noise_marines),
+            attached_units=(formation,),
+        ),
+        _army(
+            catalog=catalog,
+            army_id="army-b",
+            player_id="player-b",
+            faction_id="emperors-children",
+            units=(target,),
+        ),
+    )
+    state = _battle_state(
+        armies=armies,
+        phase=BattlePhase.SHOOTING,
+        active_player_id="player-a",
+        game_id="kakophonist-runtime-test",
+    )
+    records = catalog_ability_records_from_catalog(catalog)
+    indexes = {
+        army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
+        for army in armies
+    }
+    return armies, state, indexes, source_noise_marines, target, attached_id
+
+
+def _resolve_kakophonist_post_shoot_effects(
+    *,
+    runtime: CatalogSelectedTargetEffectRuntime,
+    state: GameState,
+    decisions: DecisionController,
+    indexes: dict[str, AbilityCatalogIndex],
+    source_noise_marines: UnitInstance,
+    source_rules_unit_id: str,
+    target: UnitInstance,
+    sequence_suffix: str,
+    battle_shock_hooks: BattleShockHookRegistry,
+) -> tuple[str, ...]:
+    sequence = AttackSequence(
+        sequence_id=f"kakophonist-noise-marines-{sequence_suffix}",
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=source_rules_unit_id,
+        source_phase=BattlePhase.SHOOTING,
+        attack_pools=(
+            _attack_pool(
+                source_noise_marines,
+                target,
+                _weapon_profile("000004088", "Sonic blaster"),
+            ),
+        ),
+    )
+    decisions.event_log.append(
+        "attack_sequence_step",
+        {
+            "sequence_id": sequence.sequence_id,
+            "step": AttackSequenceStep.HIT.value,
+            "pool_index": 0,
+            "payload": {"successful": True},
+        },
+    )
+    context = AttackSequenceCompletedContext(
+        state=state,
+        decisions=decisions,
+        dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        source_phase=BattlePhase.SHOOTING,
+        attack_sequence=sequence,
+        attack_sequence_completed_event_id=f"kakophonist-completed-{sequence_suffix}",
+    )
+    resolved_names: list[str] = []
+    while runtime.post_shoot_hit_target_request(context) is not None:
+        request = decisions.queue.peek_next()
+        request_payload = cast(dict[str, Any], request.payload)
+        ability_name = cast(str, request_payload["ability_name"])
+        result = DecisionResult.for_request(
+            result_id=(
+                f"kakophonist-{sequence_suffix}-{ability_name.casefold().replace(' ', '-')}-result"
+            ),
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+        decisions.submit_result(result)
+        pending_status = apply_catalog_post_shoot_hit_target_effect_result(
+            state=state,
+            decisions=decisions,
+            result=result,
+            battle_shock_hooks=battle_shock_hooks,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            ability_indexes_by_player_id=indexes,
+        )
+        assert pending_status is None
+        resolved_names.append(ability_name)
+    return tuple(resolved_names)
+
+
 def _fulgrim_runtime_fixture(
     *,
     phase: BattlePhase,
@@ -1238,6 +1765,28 @@ def _instantiate_unit(
             datasheet_id=datasheet_id,
             model_profile_selections=(
                 ModelProfileSelection(model_profile.model_profile_id, model_count),
+            ),
+        ),
+    )
+
+
+def _instantiate_minimum_composition_unit(
+    *,
+    factory: UnitFactory,
+    army_id: str,
+    datasheet_id: str,
+    selection_id: str,
+) -> UnitInstance:
+    datasheet = factory.catalog.datasheet_by_id(datasheet_id)
+    return factory.instantiate_unit(
+        army_id=army_id,
+        datasheet=datasheet,
+        selection=UnitMusterSelection(
+            unit_selection_id=selection_id,
+            datasheet_id=datasheet_id,
+            model_profile_selections=tuple(
+                ModelProfileSelection(entry.model_profile_id, entry.min_models)
+                for entry in datasheet.composition
             ),
         ),
     )
@@ -1464,6 +2013,9 @@ def _ec_height_overrides() -> tuple[ModelHeightOverride, ...]:
     return (
         _height_override("000004077", "Fulgrim - EPIC HERO", 5.5),
         _height_override("000004083", "Lucius the Eternal - EPIC HERO", 2.25),
+        _height_override("000004084", "Lord Kakophonist", 2.5),
+        _height_override("000004088", "Disharmonist", 2.0),
+        _height_override("000004088", "Noise Marines", 2.0),
         _height_override("000004079", "Obsessionist", 1.75),
         _height_override("000004079", "Tormentors", 1.75),
         _height_override("000004080", "Obsessionist", 1.75),

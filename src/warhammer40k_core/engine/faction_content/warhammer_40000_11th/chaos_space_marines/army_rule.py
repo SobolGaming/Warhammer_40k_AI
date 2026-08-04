@@ -5,7 +5,12 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, TypedDict, cast
 
 from warhammer40k_core.core.attributes import Characteristic
-from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollSpec,
+    ModifiedRollResult,
+    UnmodifiedRollResult,
+)
 from warhammer40k_core.core.faction_aliases import (
     CHAOS_SPACE_MARINES_FACTION_ID,
     faction_reference_matches,
@@ -21,6 +26,10 @@ from warhammer40k_core.core.weapon_profiles import (
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
     AttackSequenceCompletedHookBinding,
+)
+from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
+    LEADERSHIP_TEST_ROLL_TYPE,
+    selected_target_test_roll_modifiers,
 )
 from warhammer40k_core.engine.damage_allocation import (
     SELECT_FEEL_NO_PAIN_DECISION_TYPE,
@@ -416,7 +425,15 @@ def resolve_dark_pact_attack_sequence_completion(
             actor_id=rules_unit.unit_instance_id,
         )
     )
-    passed = leadership_roll.current_total >= leadership_target
+    modified_leadership_roll = ModifiedRollResult.from_unmodified(
+        UnmodifiedRollResult.from_state(leadership_roll),
+        modifiers=selected_target_test_roll_modifiers(
+            state=context.state,
+            unit_instance_id=rules_unit.unit_instance_id,
+            roll_type=LEADERSHIP_TEST_ROLL_TYPE,
+        ),
+    )
+    passed = modified_leadership_roll.final_value >= leadership_target
     if passed:
         context.decisions.event_log.append(
             "chaos_space_marines_dark_pact_resolved",
@@ -426,7 +443,7 @@ def resolve_dark_pact_attack_sequence_completion(
                 effect=effect,
                 selected_pact=selected_pact,
                 leadership_target=leadership_target,
-                leadership_roll=validate_json_value(leadership_roll.to_payload()),
+                leadership_roll=validate_json_value(modified_leadership_roll.to_payload()),
                 passed=True,
                 d3_result=None,
                 mortal_wound_application=None,
@@ -445,7 +462,7 @@ def resolve_dark_pact_attack_sequence_completion(
         effect=effect,
         selected_pact=selected_pact,
         leadership_target=leadership_target,
-        leadership_roll=validate_json_value(leadership_roll.to_payload()),
+        leadership_roll=validate_json_value(modified_leadership_roll.to_payload()),
         passed=False,
         d3_result=validate_json_value(d3_result.to_payload()),
         mortal_wound_application=None,

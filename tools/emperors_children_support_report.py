@@ -157,15 +157,19 @@ _DATASHEET_REVIEW_ROWS = (
         group=_EMPERORS_CHILDREN_GROUP,
         datasheet="Lord Kakophonist",
         datasheet_id="000004084",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All consumed",
         supported_semantics=(
-            "Leader, the Obsessive Annunciation ranged Sustained Hits 1 grant, and the Thrill "
-            "Seekers army-rule handler are implemented paths."
+            "Leader, the Obsessive Annunciation ranged Sustained Hits 1 grant, Doom Siren's "
+            "post-shoot Infantry selection, three-D6 mortal-wound pool, conditional "
+            "Battle-shock test, Feel No Pain continuation, and the Thrill Seekers army-rule "
+            "handler are implemented paths."
         ),
-        semantics_needed=(
-            "Doom Siren post-shoot mortal wounds followed by a conditional Battle-shock test."
+        semantics_needed="None in the exact source ability rows.",
+        catalog_blockers=(
+            "No known Lord Kakophonist blocker; catalog, model geometry, wargear, "
+            "weapon-keyword, datasheet-ability, and Thrill Seekers runtime-consumption "
+            "evidence are Full."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_EMPERORS_CHILDREN_GROUP,
@@ -185,13 +189,18 @@ _DATASHEET_REVIEW_ROWS = (
         group=_EMPERORS_CHILDREN_GROUP,
         datasheet="Noise Marines",
         datasheet_id="000004088",
-        ir_coverage="Bridge/catalog blocked",
-        supported_semantics="The Thrill Seekers army-rule handler is implemented.",
-        semantics_needed=(
-            "Terrifying Crescendo must persist and stack its Battle-shock and Leadership test "
-            "penalty, including the Faction Pack FAQ clarification."
+        ir_coverage="All consumed",
+        supported_semantics=(
+            "Terrifying Crescendo persists separate Battle-shock and Leadership test penalties "
+            "until the source player's next Shooting phase, and repeated applications to the "
+            "same enemy unit stack as clarified by the Faction Pack FAQ. The Thrill Seekers "
+            "army-rule handler is also implemented."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
+        semantics_needed="None in the exact source ability rows.",
+        catalog_blockers=(
+            "No known Noise Marines blocker; catalog, model geometry, wargear, "
+            "datasheet-ability, and Thrill Seekers runtime-consumption evidence are Full."
+        ),
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_EMPERORS_CHILDREN_GROUP,
@@ -842,7 +851,14 @@ def emperors_children_datasheet_support_markdown(
             "Emperor's Children datasheet semantic review must cover every manifest row exactly."
         )
     if generated_support_datasheet_ids != frozenset(
-        {"000004077", "000004083", "000004089", "000004208"}
+        {
+            "000004077",
+            "000004083",
+            "000004084",
+            "000004088",
+            "000004089",
+            "000004208",
+        }
     ):
         raise ValueError(
             "Emperor's Children generated support-row inventory changed; review the custom "

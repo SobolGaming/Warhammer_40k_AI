@@ -1820,9 +1820,8 @@ class GameLifecycle:
                     if handled_status is not None:
                         return handled_status
             return advanced_status
-        runtime_mortal_wound_registry = (
-            self._require_runtime_content_bundle().mortal_wound_feel_no_pain_hook_registry
-        )
+        runtime_bundle = self._require_runtime_content_bundle()
+        runtime_mortal_wound_registry = runtime_bundle.mortal_wound_feel_no_pain_hook_registry
         if runtime_mortal_wound_registry.handles_source_context(source_context):
             resolves_reaction_frame = self._result_resolves_active_reaction_frame(result)
             runtime_status = runtime_mortal_wound_registry.apply_decision(
@@ -1836,9 +1835,9 @@ class GameLifecycle:
                         state.game_id,
                         event_log=self.decision_controller.event_log,
                     ),
-                    runtime_modifier_registry=(
-                        self._require_runtime_content_bundle().runtime_modifier_registry
-                    ),
+                    runtime_modifier_registry=runtime_bundle.runtime_modifier_registry,
+                    battle_shock_hooks=runtime_bundle.battle_shock_hook_registry,
+                    ability_indexes_by_player_id=runtime_bundle.ability_indexes_by_player_id,
                 )
             )
             if runtime_status is not None:

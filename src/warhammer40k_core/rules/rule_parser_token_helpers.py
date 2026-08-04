@@ -49,6 +49,8 @@ def subject_token(value: str) -> str:
 
 def post_shoot_subject_token(value: str) -> str:
     token = subject_token(value.removeprefix("the "))
+    if token == "this_model's_unit":
+        return "this_models_unit"
     if token in {"bearer", "this_model", "this_unit"}:
         return token
     raise RuleIRError(f"Unsupported post-shoot subject in rule language: {value}.")

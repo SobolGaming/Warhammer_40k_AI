@@ -7,6 +7,9 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionEffectKind,
 )
 from warhammer40k_core.rules.wahapedia_loadout_bridge import LoadoutAssignments
+from warhammer40k_core.rules.wahapedia_paired_replacement_option_bridge import (
+    append_paired_replacement_option_rows,
+)
 from warhammer40k_core.rules.wahapedia_replacement_option_bridge import replacement_choices
 from warhammer40k_core.rules.wahapedia_schema import NormalizedSourceRow
 from warhammer40k_core.rules.wahapedia_wargear_option_bridge_support import (
@@ -64,11 +67,6 @@ ANY_NUMBER_PAIRED_REPLACEMENT_RE = re.compile(
     r"^Any number of (?P<model>.+?)(?: in this unit)? can each have their "
     r"(?P<replaced_first>.+?) and (?P<replaced_second>.+?) replaced with 1 "
     r"(?P<replacement>.+?)\.$",
-    re.IGNORECASE,
-)
-ALL_MODELS_PAIRED_REPLACEMENT_RE = re.compile(
-    r"^All of the models in this unit can each have their (?P<replaced>.+?) replaced with "
-    r"1 (?P<replacement_first>.+?) and 1 (?P<replacement_second>.+?)\.$",
     re.IGNORECASE,
 )
 SCALED_ALTERNATIVE_REPLACEMENT_RE = re.compile(
@@ -203,6 +201,17 @@ def append_unit_wargear_option_rows(
             error_type=error_type,
         )
         return True
+    if append_paired_replacement_option_rows(
+        row=row,
+        datasheet_id=datasheet_id,
+        model_profile_by_name=model_profile_by_name,
+        minimum_unit_models=minimum_unit_models,
+        maximum_unit_models=maximum_unit_models,
+        wargear_ids_by_name=wargear_ids_by_name,
+        bridged_rows=bridged_rows,
+        error_type=error_type,
+    ):
+        return True
     named_replacement = NAMED_REPLACEMENT_CHOICES_RE.fullmatch(description)
     if named_replacement is not None:
         _append_named_replacement(
@@ -306,20 +315,6 @@ def append_unit_wargear_option_rows(
             max_models_by_profile_id=max_models_by_profile_id,
             wargear_ids_by_name=wargear_ids_by_name,
             match=any_number_single,
-            bridged_rows=bridged_rows,
-            error_type=error_type,
-        )
-        return True
-    all_models_paired = ALL_MODELS_PAIRED_REPLACEMENT_RE.fullmatch(description)
-    if all_models_paired is not None:
-        _append_all_models_paired_replacement(
-            row=row,
-            datasheet_id=datasheet_id,
-            model_profile_by_name=model_profile_by_name,
-            minimum_unit_models=minimum_unit_models,
-            maximum_unit_models=maximum_unit_models,
-            wargear_ids_by_name=wargear_ids_by_name,
-            match=all_models_paired,
             bridged_rows=bridged_rows,
             error_type=error_type,
         )
@@ -1157,72 +1152,6 @@ def _any_number_model_profile_id(
     if len(profile_ids) != 1:
         raise error_type("Generic any-number wargear option requires one model profile.")
     return profile_ids[0]
-
-
-def _append_all_models_paired_replacement(
-    *,
-    row: NormalizedSourceRow,
-    datasheet_id: str,
-    model_profile_by_name: dict[str, str],
-    minimum_unit_models: int,
-    maximum_unit_models: int,
-    wargear_ids_by_name: dict[str, str],
-    match: re.Match[str],
-    bridged_rows: dict[str, list[dict[str, str]]],
-    error_type: type[ValueError],
-) -> None:
-    if minimum_unit_models != maximum_unit_models:
-        raise error_type("All-model paired replacement requires a fixed unit size.")
-    model_profile_ids = tuple(sorted(set(model_profile_by_name.values())))
-    if len(model_profile_ids) != 1:
-        raise error_type("All-model paired replacement requires one model profile.")
-    replaced_id = _required_wargear_id(
-        wargear_ids_by_name,
-        match.group("replaced"),
-        error_type=error_type,
-    )
-    replacement_ids = tuple(
-        _required_wargear_id(
-            wargear_ids_by_name,
-            match.group(group),
-            error_type=error_type,
-        )
-        for group in ("replacement_first", "replacement_second")
-    )
-    source_line = _required_field(row, "line", error_type=error_type)
-    common = _option_common(
-        row=row,
-        datasheet_id=datasheet_id,
-        option_id=(
-            f"{datasheet_id}:{_name_key(match.group('replacement_first'))}-"
-            f"{_name_key(match.group('replacement_second'))}:option-{source_line}"
-        ),
-        model_profile_id=model_profile_ids[0],
-        allowed_wargear_ids=replacement_ids,
-        max_selections=2,
-    )
-    bridged_rows["Datasheets_options"].extend(
-        (
-            {
-                **common,
-                "line": f"{source_line}.1",
-                "effect_kind": WargearOptionEffectKind.REPLACE_WARGEAR.value,
-                "effect_wargear_id": replacement_ids[0],
-                "effect_replaced_wargear_id": replaced_id,
-                "effect_model_count": str(maximum_unit_models),
-                "effect_wargear_count": "1",
-            },
-            {
-                **common,
-                "line": f"{source_line}.2",
-                "effect_kind": WargearOptionEffectKind.ADD_WARGEAR.value,
-                "effect_wargear_id": replacement_ids[1],
-                "effect_replaced_wargear_id": "",
-                "effect_model_count": str(maximum_unit_models),
-                "effect_wargear_count": "1",
-            },
-        )
-    )
 
 
 def _append_any_number_paired_replacement(

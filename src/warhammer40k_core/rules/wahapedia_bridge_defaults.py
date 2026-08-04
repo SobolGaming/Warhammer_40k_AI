@@ -672,6 +672,41 @@ EMPERORS_CHILDREN_LUCIUS_HEIGHT_OVERRIDES = (
         ),
     ),
 )
+EMPERORS_CHILDREN_LORD_KAKOPHONIST_NOISE_MARINES_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000004084",
+        model_name="Lord Kakophonist",
+        height=2.5,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:emperors-children:lord-kakophonist:height",
+        height_document_reference=(
+            "Lord Kakophonist assembled miniature imagery; "
+            "Warhammer Event Companion 2026-07-22 p.74 (40mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000004088",
+        model_name="Disharmonist",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:emperors-children:disharmonist:height",
+        height_document_reference=(
+            "Noise Marines Disharmonist assembled miniature imagery; "
+            "Warhammer Event Companion 2026-07-22 p.74 (40mm base)"
+        ),
+    ),
+    ModelHeightOverride(
+        datasheet_id="000004088",
+        model_name="Noise Marines",
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:emperors-children:noise-marines:height",
+        height_document_reference=(
+            "Noise Marines assembled miniature imagery; "
+            "Warhammer Event Companion 2026-07-22 p.74 (40mm base)"
+        ),
+    ),
+)
 EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000004089",
@@ -744,4 +779,5 @@ DEFAULT_HEIGHT_OVERRIDES = (
     *EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_LUCIUS_HEIGHT_OVERRIDES,
+    *EMPERORS_CHILDREN_LORD_KAKOPHONIST_NOISE_MARINES_HEIGHT_OVERRIDES,
 )

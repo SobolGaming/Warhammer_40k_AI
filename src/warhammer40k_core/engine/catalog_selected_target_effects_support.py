@@ -84,6 +84,7 @@ from warhammer40k_core.rules.rule_ir import (
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.rule_duration_execution import RuleDurationExecutionContext
 
 
 def post_fight_selected_target_effect_clauses_after(
@@ -543,6 +544,32 @@ def selected_target_status_gate_allows(
             raise GameLifecycleError("Catalog selected-target status is unsupported.")
         return selected_target_unit_instance_id in state.battle_shocked_unit_ids
     return True
+
+
+def selection_subject(clause: RuleClause) -> str | None:
+    if clause.trigger is None:
+        return None
+    subject = parameter_payload(clause.trigger.parameters).get("subject")
+    return subject if type(subject) is str else None
+
+
+def clause_requires_prior_mortal_wounds(clause: RuleClause) -> bool:
+    return any(
+        condition.kind is RuleConditionKind.TARGET_CONSTRAINT
+        and parameter_payload(condition.parameters).get("relationship")
+        == "prior_effect_inflicted_mortal_wounds"
+        for condition in clause.conditions
+    )
+
+
+def recorded_effects_include_inflicted_mortal_wounds(
+    effects: list[dict[str, JsonValue]],
+) -> bool:
+    for effect in effects:
+        mortal_wounds = effect.get("mortal_wounds")
+        if type(mortal_wounds) is int and mortal_wounds > 0:
+            return True
+    return False
 
 
 def effect_with_selected_target(
@@ -1152,6 +1179,7 @@ def selected_target_effect_expiration(
     state: GameState,
     phase: BattlePhase,
     clause: RuleClause,
+    context: RuleDurationExecutionContext,
 ) -> EffectExpiration:
     duration = clause.duration
     if duration is None:
@@ -1166,6 +1194,15 @@ def selected_target_effect_expiration(
         raise GameLifecycleError("Catalog selected-target effect duration is unsupported.")
     duration_parameters = parameter_payload(duration.parameters)
     endpoint = duration_parameters.get("endpoint")
+    if duration_parameters.get("relative") == "next":
+        from warhammer40k_core.engine.rule_duration_execution import expiration_for_duration
+
+        expiration = expiration_for_duration(duration=duration, context=context)
+        if expiration is None:
+            raise GameLifecycleError(
+                "Catalog selected-target relative duration requires an expiration."
+            )
+        return expiration
     if (
         endpoint == "turn"
         and duration_parameters.get("boundary") == "start"
