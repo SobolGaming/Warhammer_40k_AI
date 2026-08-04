@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.attached_unit_reconciliation import (
+    split_attached_rules_unit_if_required,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldTransitionBatch,
@@ -66,7 +69,6 @@ from warhammer40k_core.engine.rule_deadly_demise_continuation import (
     destroyed_damage_applications,
     destruction_provenance_from_rule_context,
 )
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -374,9 +376,9 @@ def finalize_rule_model_destruction(
         raise GameLifecycleError("Rule destruction completion kind is unsupported.")
     elif source_effect_ids:
         raise GameLifecycleError("Collateral rule destruction cannot consume source liabilities.")
-    _split_attached_rules_unit_if_required(
+    split_attached_rules_unit_if_required(
         state=state,
-        decisions=decisions,
+        event_log=decisions.event_log,
         rules_unit_instance_id=rules_unit_id,
     )
     if completion_kind == RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND:
@@ -914,49 +916,6 @@ def _consume_source_liabilities(
             state.record_persisting_effect(
                 replace(effect, target_unit_instance_ids=remaining_targets)
             )
-
-
-def _split_attached_rules_unit_if_required(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    rules_unit_instance_id: str,
-) -> None:
-    rules_unit = rules_unit_view_by_id(
-        state=state,
-        unit_instance_id=rules_unit_instance_id,
-    )
-    if not rules_unit.is_attached_rules_unit:
-        return
-    bodyguard_alive = any(
-        model.is_alive
-        for component in rules_unit.components
-        if component.role == "bodyguard"
-        for model in component.unit.own_models
-    )
-    leader_or_support_alive = any(
-        model.is_alive
-        for component in rules_unit.components
-        if component.role in {"leader", "support"}
-        for model in component.unit.own_models
-    )
-    if bodyguard_alive == leader_or_support_alive:
-        return
-    surviving_unit_ids = tuple(
-        sorted(
-            component.unit.unit_instance_id
-            for component in rules_unit.components
-            if any(model.is_alive for model in component.unit.own_models)
-        )
-    )
-    if not surviving_unit_ids:
-        raise GameLifecycleError("Attached-unit split requires surviving component units.")
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id=rules_unit.owner_player_id,
-        attached_unit_instance_id=rules_unit.unit_instance_id,
-        surviving_unit_instance_ids=surviving_unit_ids,
-        event_log=decisions.event_log,
-    )
 
 
 def is_rule_model_destruction_reaction_request(request: DecisionRequest) -> bool:

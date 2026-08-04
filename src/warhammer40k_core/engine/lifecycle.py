@@ -806,10 +806,13 @@ class GameLifecycle:
             if invalid_status is not None:
                 return invalid_status
         record = self.decision_controller.submit_result(result)
-        return self._decision_dispatch_registry.handler_for(record.request.decision_type).applier(
+        status = self._decision_dispatch_registry.handler_for(record.request.decision_type).applier(
             record,
             result,
         )
+        if self._runtime_content_bundle is not None:
+            self._refresh_runtime_content_bundle_if_armies_mustered()
+        return status
 
     def to_payload(self) -> GameLifecyclePayload:
         state = self._require_state()
