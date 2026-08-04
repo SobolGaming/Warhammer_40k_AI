@@ -161,8 +161,10 @@ def apply_catalog_post_fight_hit_target_effect_result(
     result: DecisionResult,
 ) -> LifecycleStatus | None:
     from warhammer40k_core.engine.catalog_selected_target_effects import (
-        append_selected_target_event,
         record_selected_target_effects_from_payload,
+    )
+    from warhammer40k_core.engine.catalog_selected_target_event import (
+        append_selected_target_event,
     )
 
     if type(decisions) is not DecisionController:

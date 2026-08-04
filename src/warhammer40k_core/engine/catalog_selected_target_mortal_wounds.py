@@ -9,9 +9,6 @@ from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
     AbilityCatalogIndex,
 )
-from warhammer40k_core.engine.attached_unit_reconciliation import (
-    split_attached_rules_unit_if_required,
-)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_clauses_from_record,
 )
@@ -209,11 +206,6 @@ def resolve_selected_target_mortal_wound_effect(
         CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_RESOLVED_EVENT,
         validate_json_value(resolved_payload),
     )
-    split_attached_rules_unit_if_required(
-        state=state,
-        event_log=decisions.event_log,
-        rules_unit_instance_id=target_unit_id,
-    )
     return SelectedTargetMortalWoundResolution(
         resolved_payload=resolved_payload,
         pending_status=None,
@@ -266,14 +258,6 @@ def apply_catalog_selected_target_mortal_wound_feel_no_pain_decision(
             {**resolved_payload, "feel_no_pain_result_id": context.result.result_id}
         ),
     )
-    split_attached_rules_unit_if_required(
-        state=context.state,
-        event_log=context.decisions.event_log,
-        rules_unit_instance_id=_required_string(
-            source_context,
-            "target_unit_instance_id",
-        ),
-    )
     return _continue_selected_target_effects(
         context=context,
         source_context=source_context,
@@ -293,9 +277,11 @@ def _continue_selected_target_effects(
         )
     from warhammer40k_core.engine.catalog_selected_target_effects import (
         CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SELECTED_EVENT,
-        append_selected_target_event,
         continue_selected_target_effect_records,
         selected_target_json_object_tuple,
+    )
+    from warhammer40k_core.engine.catalog_selected_target_event import (
+        append_selected_target_event,
     )
     from warhammer40k_core.engine.decision_result import DecisionResultPayload
 

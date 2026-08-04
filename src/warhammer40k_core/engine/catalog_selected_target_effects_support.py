@@ -63,7 +63,7 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
-    current_placed_alive_rules_unit_view_for_identity,
+    current_rules_unit_views_for_identity,
     rules_unit_view_by_id,
     rules_unit_views_from_armies,
 )
@@ -433,14 +433,21 @@ def canonical_rules_unit_ids(
     state: GameState,
     unit_instance_ids: tuple[str, ...],
 ) -> frozenset[str]:
+    if state.battlefield_state is None:
+        raise GameLifecycleError(
+            "Catalog selected-target canonical identity requires battlefield_state."
+        )
     canonical_ids: set[str] = set()
     for unit_instance_id in unit_instance_ids:
-        rules_unit = current_placed_alive_rules_unit_view_for_identity(
+        rules_units = current_rules_unit_views_for_identity(
             state=state,
             unit_instance_id=unit_instance_id,
         )
-        if rules_unit is not None:
-            canonical_ids.add(rules_unit.unit_instance_id)
+        canonical_ids.update(
+            rules_unit.unit_instance_id
+            for rules_unit in rules_units
+            if rules_unit_has_placed_alive_model(state=state, rules_unit=rules_unit)
+        )
     return frozenset(canonical_ids)
 
 
