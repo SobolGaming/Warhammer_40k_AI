@@ -834,7 +834,7 @@ def _target_candidate(
             message="Lone Operative target is outside the allowed targeting distance.",
             visibility_cache_key=visibility_cache_key,
             target_visible_model_ids=evidence.visible_and_in_range_target_model_ids,
-            target_in_range_model_ids=evidence.visible_and_in_range_target_model_ids,
+            target_in_range_model_ids=target_in_range_model_ids,
             line_of_sight_witness=witness,
             observer_model_id=witness.observer_model_id,
             targeting_rule_ids=(LONE_OPERATIVE_RULE_ID,),

@@ -4,6 +4,13 @@ import math
 from dataclasses import dataclass
 
 from warhammer40k_core.core.datasheet import CatalogAbilitySupport, DatasheetAbilityDescriptor
+from warhammer40k_core.engine.core_catalog_ability_ids import (
+    CORE_FIGHTS_FIRST_CATALOG_ABILITY_ID,
+    CORE_INFILTRATORS_CATALOG_ABILITY_ID,
+    CORE_LEADER_CATALOG_ABILITY_ID,
+    CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID,
+    CORE_SCOUTS_CATALOG_ABILITY_ID,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import UnitInstance
 
@@ -57,15 +64,21 @@ CORE_LONE_OPERATIVE_KEYWORD_SOURCE_ID = "core-rules:lone-operative:keyword"
 
 
 DEEP_STRIKE_ABILITY_IDS = frozenset({"000008343", "core-deep-strike", "deep-strike"})
-INFILTRATORS_ABILITY_IDS = frozenset({"core-infiltrators", "infiltrators"})
-LEADER_ABILITY_IDS = frozenset({"core-leader", "leader"})
+INFILTRATORS_ABILITY_IDS = frozenset(
+    {CORE_INFILTRATORS_CATALOG_ABILITY_ID, "core-infiltrators", "infiltrators"}
+)
+LEADER_ABILITY_IDS = frozenset({CORE_LEADER_CATALOG_ABILITY_ID, "core-leader", "leader"})
 SUPPORT_ABILITY_IDS = frozenset({"core-support", "support"})
-SCOUTS_ABILITY_IDS = frozenset({"core-scouts", "scouts"})
+SCOUTS_ABILITY_IDS = frozenset({CORE_SCOUTS_CATALOG_ABILITY_ID, "core-scouts", "scouts"})
 FIRING_DECK_ABILITY_IDS = frozenset({"core-firing-deck", "firing-deck"})
 DEADLY_DEMISE_ABILITY_IDS = frozenset({"core-deadly-demise", "deadly-demise"})
 FEEL_NO_PAIN_ABILITY_IDS = frozenset({"core-feel-no-pain", "feel-no-pain"})
-FIGHTS_FIRST_ABILITY_IDS = frozenset({"core-fights-first", "fights-first"})
-LONE_OPERATIVE_ABILITY_IDS = frozenset({"core-lone-operative", "lone-operative"})
+FIGHTS_FIRST_ABILITY_IDS = frozenset(
+    {CORE_FIGHTS_FIRST_CATALOG_ABILITY_ID, "core-fights-first", "fights-first"}
+)
+LONE_OPERATIVE_ABILITY_IDS = frozenset(
+    {CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID, "core-lone-operative", "lone-operative"}
+)
 STEALTH_ABILITY_IDS = frozenset({"core-stealth", "stealth"})
 
 _DEEP_STRIKE_SPEC = CoreKeywordAbilitySpec(
@@ -116,7 +129,7 @@ _FIGHTS_FIRST_SPEC = CoreKeywordAbilitySpec(
 _LONE_OPERATIVE_SPEC = CoreKeywordAbilitySpec(
     keyword="LONE_OPERATIVE",
     ability_ids=LONE_OPERATIVE_ABILITY_IDS,
-    name_words=("LONE", "OPERATIVE"),
+    name_words=(),
 )
 _STEALTH_SPEC = CoreKeywordAbilitySpec(
     keyword="STEALTH",
@@ -348,7 +361,10 @@ def _descriptor_matches_spec(
         raise GameLifecycleError("Core keyword ability lookup requires an ability spec.")
     if descriptor.ability_id in spec.ability_ids:
         return True
-    return _ability_name_matches_family(name=descriptor.name, family_words=spec.name_words)
+    return bool(spec.name_words) and _ability_name_matches_family(
+        name=descriptor.name,
+        family_words=spec.name_words,
+    )
 
 
 def _ability_name_matches_family(

@@ -53,6 +53,9 @@ from warhammer40k_core.engine.catalog_datasheet_rule_support import (
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_rule_ir_consumers_for_rule,
 )
+from warhammer40k_core.engine.core_catalog_ability_ids import (
+    CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID,
+)
 from warhammer40k_core.engine.core_descriptor_consumption import (
     CORE_LONE_OPERATIVE_SHOOTING_TARGET_CONSUMER_ID,
 )
@@ -162,14 +165,21 @@ def test_lucius_generated_rule_ir_and_catalog_are_complete_and_source_bound() ->
         "Lone Operative",
         "Thrill Seekers",
     }
+    lone_operative_descriptor = next(
+        ability
+        for ability in datasheet.abilities
+        if ability.ability_id == CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID
+    )
+    assert lone_operative_descriptor.name == "Lone Operative"
     lone_operative_coverage = next(
         row
         for row in ability_coverage_rows_from_catalog(
             package.army_catalog,
             datasheet_ids=(_LUCIUS_ID,),
         )
-        if row.ability_name == "Lone Operative"
+        if row.ability_id == CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID
     )
+    assert lone_operative_coverage.ability_name == "Lone Operative"
     assert lone_operative_coverage.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
     assert lone_operative_coverage.runtime_consumer_ids == (
         CORE_LONE_OPERATIVE_SHOOTING_TARGET_CONSUMER_ID,
@@ -213,9 +223,24 @@ def test_lone_operative_profile_defaults_retains_source_and_validates_ranges() -
     assert default_profile.source_id == next(
         ability.source_id
         for ability in lucius.datasheet_abilities
-        if ability.name == "Lone Operative"
+        if ability.ability_id == CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID
     )
     assert default_profile.range_inches == 12.0
+
+    renamed = _replace_lone_operative_descriptor(
+        lucius,
+        ability_id=CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID,
+        name="Unrelated localized display label",
+    )
+    renamed_profile = lone_operative_profile_for_unit(renamed)
+    assert renamed_profile == default_profile
+
+    name_only = _replace_lone_operative_descriptor(
+        lucius,
+        ability_id="test:unrelated-ability-id",
+        name="Lone Operative",
+    )
+    assert lone_operative_profile_for_unit(name_only) is None
 
     parameterized = _unit_with_lone_operative_range(lucius, range_inches=15.0)
     parameterized_profile = lone_operative_profile_for_unit(parameterized)
@@ -272,6 +297,9 @@ def test_lucius_lone_operative_uses_twelve_inch_boundary_for_direct_and_indirect
         assert candidate.shooting_types == (shooting_type,)
     else:
         assert candidate.violation_code is ShootingTargetViolationCode.LONE_OPERATIVE
+        if indirect:
+            assert candidate.target_visible_model_ids == ()
+            assert candidate.target_in_range_model_ids == (lucius.own_models[0].model_instance_id,)
 
 
 def test_attached_rules_unit_all_lone_operative_uses_largest_component_range() -> None:
@@ -725,7 +753,7 @@ def _unit_with_lone_operative_tokens(
     abilities: list[DatasheetAbilityDescriptor] = []
     replaced_lone_operative = False
     for ability in unit.datasheet_abilities:
-        if ability.name != "Lone Operative":
+        if ability.ability_id != CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID:
             abilities.append(ability)
             continue
         replaced_lone_operative = True
@@ -739,7 +767,7 @@ def _unit_with_lone_operative_tokens(
     if not replaced_lone_operative:
         abilities.append(
             DatasheetAbilityDescriptor(
-                ability_id="core-lone-operative",
+                ability_id=CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID,
                 name="Lone Operative",
                 source_id=source_id,
                 support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
@@ -749,6 +777,27 @@ def _unit_with_lone_operative_tokens(
                 parameter_tokens=parameter_tokens,
             )
         )
+    return replace(
+        unit,
+        datasheet_abilities=tuple(sorted(abilities, key=lambda ability: ability.ability_id)),
+    )
+
+
+def _replace_lone_operative_descriptor(
+    unit: UnitInstance,
+    *,
+    ability_id: str,
+    name: str,
+) -> UnitInstance:
+    found = False
+    abilities: list[DatasheetAbilityDescriptor] = []
+    for ability in unit.datasheet_abilities:
+        if ability.ability_id != CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID:
+            abilities.append(ability)
+            continue
+        found = True
+        abilities.append(replace(ability, ability_id=ability_id, name=name))
+    assert found
     return replace(
         unit,
         datasheet_abilities=tuple(sorted(abilities, key=lambda ability: ability.ability_id)),

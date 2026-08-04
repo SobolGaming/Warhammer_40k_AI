@@ -3,6 +3,21 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
+from warhammer40k_core.engine.core_catalog_ability_ids import (
+    CORE_FIGHTS_FIRST_CATALOG_ABILITY_ID,
+    CORE_INFILTRATORS_CATALOG_ABILITY_ID,
+    CORE_LEADER_CATALOG_ABILITY_ID,
+    CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID,
+    CORE_SCOUTS_CATALOG_ABILITY_ID,
+)
+from warhammer40k_core.engine.unit_abilities import (
+    FIGHTS_FIRST_ABILITY_IDS,
+    INFILTRATORS_ABILITY_IDS,
+    LEADER_ABILITY_IDS,
+    LONE_OPERATIVE_ABILITY_IDS,
+    SCOUTS_ABILITY_IDS,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 ENGINE_ROOT = ROOT / "src" / "warhammer40k_core" / "engine"
 CATALOG_DATASHEET_RUNTIME = ENGINE_ROOT / "catalog_datasheet_rule_runtime.py"
@@ -63,6 +78,21 @@ def test_engine_runtime_does_not_compare_ability_display_names() -> None:
     assert not violations, (
         "Engine runtime must not gate behavior on DatasheetAbilityDescriptor.name:\n"
         + "\n".join(violations)
+    )
+
+
+def test_engine_consumed_core_catalog_ids_are_bound_to_runtime_specs() -> None:
+    consumed_id_runtime_specs = (
+        (CORE_FIGHTS_FIRST_CATALOG_ABILITY_ID, FIGHTS_FIRST_ABILITY_IDS),
+        (CORE_INFILTRATORS_CATALOG_ABILITY_ID, INFILTRATORS_ABILITY_IDS),
+        (CORE_LEADER_CATALOG_ABILITY_ID, LEADER_ABILITY_IDS),
+        (CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID, LONE_OPERATIVE_ABILITY_IDS),
+        (CORE_SCOUTS_CATALOG_ABILITY_ID, SCOUTS_ABILITY_IDS),
+    )
+
+    assert all(
+        catalog_ability_id in runtime_ability_ids
+        for catalog_ability_id, runtime_ability_ids in consumed_id_runtime_specs
     )
 
 

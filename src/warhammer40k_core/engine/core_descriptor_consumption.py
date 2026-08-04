@@ -4,12 +4,14 @@ from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
 from warhammer40k_core.engine.catalog_descriptor_consumption import (
     CatalogDescriptorConsumptionRecord,
 )
+from warhammer40k_core.engine.core_catalog_ability_ids import (
+    CORE_FIGHTS_FIRST_CATALOG_ABILITY_ID,
+    CORE_INFILTRATORS_CATALOG_ABILITY_ID,
+    CORE_LEADER_CATALOG_ABILITY_ID,
+    CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID,
+    CORE_SCOUTS_CATALOG_ABILITY_ID,
+)
 
-CORE_LEADER_CATALOG_ABILITY_ID = "000008346"
-CORE_FIGHTS_FIRST_CATALOG_ABILITY_ID = "000008340"
-CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID = "000008336"
-CORE_INFILTRATORS_CATALOG_ABILITY_ID = "000008345"
-CORE_SCOUTS_CATALOG_ABILITY_ID = "000008344"
 CORE_FIGHTS_FIRST_CONSUMER_ID = "descriptor:fight-order:fights-first"
 CORE_LEADER_ATTACHMENT_CONSUMER_ID = "descriptor:army-mustering:leader-attachment"
 CORE_LONE_OPERATIVE_SHOOTING_TARGET_CONSUMER_ID = "descriptor:shooting-target:lone-operative"

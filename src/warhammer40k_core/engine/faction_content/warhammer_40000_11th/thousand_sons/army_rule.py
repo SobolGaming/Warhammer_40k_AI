@@ -54,7 +54,10 @@ from warhammer40k_core.engine.faction_content.common import (
     payload_string_tuple as _payload_string_tuple,
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
-from warhammer40k_core.engine.lone_operative import lone_operative_profile_for_rules_unit
+from warhammer40k_core.engine.lone_operative import (
+    lone_operative_profile_for_rules_unit,
+    lone_operative_target_allowed,
+)
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookBinding,
@@ -1548,19 +1551,12 @@ def _doombolt_lone_operative_excluded(
     lone_operative_profile = lone_operative_profile_for_rules_unit(target_rules_unit)
     if lone_operative_profile is None:
         return False
-    scenario = _battlefield_scenario(state)
-    observer_model = _geometry_model_for_manifesting_model(
-        scenario=scenario,
-        component_unit_id=manifesting_model.component_unit.unit_instance_id,
-        model_instance_id=manifesting_model.model.model_instance_id,
-    )
-    target_models = _alive_geometry_models_for_rules_unit(
-        scenario=scenario,
-        rules_unit=target_rules_unit,
-    )
-    return not any(
-        observer_model.range_to(target_model) <= lone_operative_profile.range_inches
-        for target_model in target_models
+    return not lone_operative_target_allowed(
+        scenario=_battlefield_scenario(state),
+        attacker_unit=manifesting_model.component_unit,
+        attacker_model_instance_id=manifesting_model.model.model_instance_id,
+        target_rules_unit=target_rules_unit,
+        profile=lone_operative_profile,
     )
 
 

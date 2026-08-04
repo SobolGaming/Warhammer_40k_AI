@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+import math
 from collections.abc import Callable
 from dataclasses import replace
 from typing import cast
 
+import pytest
 from tests.movement_submission_helpers import straight_line_witness_for_unit
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -26,6 +28,11 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
+from warhammer40k_core.engine.core_catalog_ability_ids import (
+    CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -56,7 +63,12 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalPayload,
     MovementProposalRequest,
 )
-from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.runtime_modifiers import WeaponProfileModifierContext
@@ -64,10 +76,14 @@ from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.shooting_phase_start_hooks import (
     SELECT_FACTION_RULE_SHOOTING_PHASE_START_OPTION_DECISION_TYPE,
 )
+from warhammer40k_core.engine.shooting_selection_range import (
+    geometry_models_for_unit_placement,
+)
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_context_for_unit,
 )
 from warhammer40k_core.engine.triggered_movement import TRIGGERED_MOVEMENT_PROPOSAL_ACTION
+from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -336,6 +352,139 @@ def test_doombolt_excludes_lone_operatives_beyond_twelve_and_applies_wounds() ->
     assert after < before
 
 
+@pytest.mark.parametrize(
+    ("edge_distance", "target_allowed"),
+    [(11.9, True), (12.0, True), (12.1, False)],
+)
+def test_doombolt_uses_shared_lone_operative_boundary(
+    edge_distance: float,
+    target_allowed: bool,
+) -> None:
+    lifecycle = _battle_ready_lifecycle(
+        game_id=f"phase17g-thousand-sons-doombolt-boundary-{edge_distance:g}"
+    )
+    state = _require_state(lifecycle)
+    _clear_standalone_lone_operative_line(state)
+    _move_unit_to_closest_edge_distance(
+        state,
+        attacker_unit_instance_id=MANIFESTER_ID,
+        target_unit_instance_id=ENEMY_LONE_OPERATIVE_ID,
+        edge_distance=edge_distance,
+    )
+
+    option = _ritual_option_or_none(
+        _next_cabal_request(lifecycle),
+        ritual_id=army_rule.CabalRitualId.DOOMBOLT.value,
+        target_rules_unit_id=ENEMY_LONE_OPERATIVE_ID,
+        channel_the_warp=False,
+    )
+
+    assert (option is not None) is target_allowed
+
+
+@pytest.mark.parametrize(
+    ("edge_distance", "target_allowed"),
+    [(15.0, True), (15.1, False)],
+)
+def test_doombolt_uses_parameterized_lone_operative_range(
+    edge_distance: float,
+    target_allowed: bool,
+) -> None:
+    lifecycle = _battle_ready_lifecycle(
+        game_id=f"phase17g-thousand-sons-doombolt-range-15-{edge_distance:g}"
+    )
+    state = _require_state(lifecycle)
+    target = _unit_by_id(state, unit_instance_id=ENEMY_LONE_OPERATIVE_ID)
+    _replace_unit_in_state(
+        state,
+        _unit_with_lone_operative_range(target, range_inches=15.0),
+    )
+    _clear_standalone_lone_operative_line(state)
+    _move_unit_to_closest_edge_distance(
+        state,
+        attacker_unit_instance_id=MANIFESTER_ID,
+        target_unit_instance_id=ENEMY_LONE_OPERATIVE_ID,
+        edge_distance=edge_distance,
+    )
+
+    option = _ritual_option_or_none(
+        _next_cabal_request(lifecycle),
+        ritual_id=army_rule.CabalRitualId.DOOMBOLT.value,
+        target_rules_unit_id=ENEMY_LONE_OPERATIVE_ID,
+        channel_the_warp=False,
+    )
+
+    assert (option is not None) is target_allowed
+
+
+def test_doombolt_attached_target_requires_every_component_to_have_lone_operative() -> None:
+    lifecycle = _battle_ready_lifecycle(game_id="phase17g-thousand-sons-doombolt-attached-missing")
+    state = _require_state(lifecycle)
+    attached_unit_id = _attach_enemy_target_components(state)
+    _move_unit_to_closest_edge_distance(
+        state,
+        attacker_unit_instance_id=MANIFESTER_ID,
+        target_unit_instance_id=ENEMY_OTHER_ID,
+        edge_distance=13.0,
+    )
+    _place_unit(state, unit_instance_id=ENEMY_LONE_OPERATIVE_ID, x=31.0, y=25.0)
+
+    option = _ritual_option_or_none(
+        _next_cabal_request(lifecycle),
+        ritual_id=army_rule.CabalRitualId.DOOMBOLT.value,
+        target_rules_unit_id=attached_unit_id,
+        channel_the_warp=False,
+    )
+
+    assert option is not None
+
+
+def test_doombolt_attached_target_uses_greatest_lone_operative_range() -> None:
+    lifecycle = _battle_ready_lifecycle(game_id="phase17g-thousand-sons-doombolt-attached-greatest")
+    state = _require_state(lifecycle)
+    longer_range_component = _unit_by_id(state, unit_instance_id=ENEMY_OTHER_ID)
+    _replace_unit_in_state(
+        state,
+        _unit_with_lone_operative_range(longer_range_component, range_inches=15.0),
+    )
+    attached_unit_id = _attach_enemy_target_components(state)
+    _move_unit_to_closest_edge_distance(
+        state,
+        attacker_unit_instance_id=MANIFESTER_ID,
+        target_unit_instance_id=ENEMY_OTHER_ID,
+        edge_distance=13.0,
+    )
+    _place_unit(state, unit_instance_id=ENEMY_LONE_OPERATIVE_ID, x=31.0, y=25.0)
+
+    option = _ritual_option_or_none(
+        _next_cabal_request(lifecycle),
+        ritual_id=army_rule.CabalRitualId.DOOMBOLT.value,
+        target_rules_unit_id=attached_unit_id,
+        channel_the_warp=False,
+    )
+
+    assert option is not None
+
+
+def test_doombolt_attached_target_rejects_inconsistent_component_placement() -> None:
+    lifecycle = _battle_ready_lifecycle(
+        game_id="phase17g-thousand-sons-doombolt-attached-placement"
+    )
+    state = _require_state(lifecycle)
+    second_component = _unit_by_id(state, unit_instance_id=ENEMY_OTHER_ID)
+    _replace_unit_in_state(
+        state,
+        _unit_with_lone_operative_range(second_component, range_inches=15.0),
+    )
+    _attach_enemy_target_components(state)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.without_unit_placement(ENEMY_LONE_OPERATIVE_ID)
+
+    with pytest.raises(GameLifecycleError, match="battlefield scenario is invalid"):
+        _next_cabal_request(lifecycle)
+
+
 def _battle_ready_lifecycle(*, game_id: str) -> GameLifecycle:
     config = _thousand_sons_config(game_id=game_id)
     lifecycle = GameLifecycle()
@@ -515,7 +664,7 @@ def _cabal_ability() -> DatasheetAbilityDescriptor:
 
 def _lone_operative_ability() -> DatasheetAbilityDescriptor:
     return DatasheetAbilityDescriptor(
-        ability_id="core-lone-operative",
+        ability_id=CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID,
         name="Lone Operative",
         source_id="core-rules:lone-operative",
         support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
@@ -562,6 +711,159 @@ def _place_unit(
         )
     )
     state.battlefield_state = battlefield.with_unit_placement(updated)
+
+
+def _move_unit_to_closest_edge_distance(
+    state: GameState,
+    *,
+    attacker_unit_instance_id: str,
+    target_unit_instance_id: str,
+    edge_distance: float,
+) -> None:
+    if not math.isfinite(edge_distance) or edge_distance <= 0.0:
+        raise AssertionError("edge_distance must be positive and finite")
+    _place_unit(state, unit_instance_id=target_unit_instance_id, x=34.0, y=10.0)
+    scenario = _scenario(state)
+    attacker_models = geometry_models_for_unit_placement(
+        scenario=scenario,
+        unit_placement=scenario.battlefield_state.unit_placement_by_id(attacker_unit_instance_id),
+    )
+    target_placement = scenario.battlefield_state.unit_placement_by_id(target_unit_instance_id)
+    target_models = geometry_models_for_unit_placement(
+        scenario=scenario,
+        unit_placement=target_placement,
+    )
+    current_distance = min(
+        attacker_model.range_to(target_model)
+        for attacker_model in attacker_models
+        for target_model in target_models
+    )
+    distance_delta = edge_distance - current_distance
+    updated_placement = target_placement.with_model_placements(
+        tuple(
+            placement.with_pose(
+                Pose.at(
+                    placement.pose.position.x + distance_delta,
+                    placement.pose.position.y,
+                    placement.pose.position.z,
+                )
+            )
+            for placement in target_placement.model_placements
+        )
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    state.battlefield_state = battlefield.with_unit_placement(updated_placement)
+
+    moved_scenario = _scenario(state)
+    moved_attacker_models = geometry_models_for_unit_placement(
+        scenario=moved_scenario,
+        unit_placement=moved_scenario.battlefield_state.unit_placement_by_id(
+            attacker_unit_instance_id
+        ),
+    )
+    moved_target_models = geometry_models_for_unit_placement(
+        scenario=moved_scenario,
+        unit_placement=moved_scenario.battlefield_state.unit_placement_by_id(
+            target_unit_instance_id
+        ),
+    )
+    moved_distance = min(
+        attacker_model.range_to(target_model)
+        for attacker_model in moved_attacker_models
+        for target_model in moved_target_models
+    )
+    assert math.isclose(moved_distance, edge_distance, abs_tol=1e-9)
+
+
+def _clear_standalone_lone_operative_line(state: GameState) -> None:
+    _place_unit(state, unit_instance_id=ENEMY_UNIT_ID, x=5.0, y=40.0)
+    _place_unit(state, unit_instance_id=ENEMY_OTHER_ID, x=20.0, y=40.0)
+
+
+def _scenario(state: GameState) -> BattlefieldScenario:
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    return BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=battlefield,
+    )
+
+
+def _unit_by_id(state: GameState, *, unit_instance_id: str) -> UnitInstance:
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id == unit_instance_id:
+                return unit
+    raise AssertionError(f"unknown unit_instance_id {unit_instance_id}")
+
+
+def _unit_with_lone_operative_range(
+    unit: UnitInstance,
+    *,
+    range_inches: float,
+) -> UnitInstance:
+    range_token = f"{range_inches:g}"
+    found = False
+    abilities: list[DatasheetAbilityDescriptor] = []
+    for ability in unit.datasheet_abilities:
+        if ability.ability_id != CORE_LONE_OPERATIVE_CATALOG_ABILITY_ID:
+            abilities.append(ability)
+            continue
+        found = True
+        abilities.append(
+            replace(
+                ability,
+                source_id=f"test:thousand-sons:lone-operative:{range_token}",
+                parameter_tokens=(range_token,),
+            )
+        )
+    if not found:
+        abilities.append(
+            replace(
+                _lone_operative_ability(),
+                source_id=f"test:thousand-sons:lone-operative:{range_token}",
+                parameter_tokens=(range_token,),
+            )
+        )
+    return replace(
+        unit,
+        datasheet_abilities=tuple(sorted(abilities, key=lambda ability: ability.ability_id)),
+    )
+
+
+def _replace_unit_in_state(state: GameState, replacement: UnitInstance) -> None:
+    found = False
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        units = tuple(
+            replacement if unit.unit_instance_id == replacement.unit_instance_id else unit
+            for unit in army.units
+        )
+        found = found or units != army.units
+        updated_armies.append(replace(army, units=units))
+    assert found
+    state.replace_army_definitions(updated_armies)
+
+
+def _attach_enemy_target_components(state: GameState) -> str:
+    attached_unit_id = "attached-unit:army-beta:doombolt-target"
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_unit_id,
+        bodyguard_unit_instance_id=ENEMY_OTHER_ID,
+        leader_unit_instance_ids=(ENEMY_LONE_OPERATIVE_ID,),
+        component_unit_instance_ids=tuple(sorted((ENEMY_OTHER_ID, ENEMY_LONE_OPERATIVE_ID))),
+        source_id="test:thousand-sons:doombolt-attachment",
+        attachment_source_ids=("test:thousand-sons:doombolt-attachment:eligibility",),
+    )
+    updated_armies = [
+        replace(army, attached_units=(*army.attached_units, formation))
+        if army.player_id == "player-b"
+        else army
+        for army in state.army_definitions
+    ]
+    state.replace_army_definitions(updated_armies)
+    return attached_unit_id
 
 
 def _fixed_secondary_choice(*, player_id: str) -> SecondaryMissionChoice:
