@@ -7,12 +7,14 @@ from functools import lru_cache
 from typing import Any, cast
 
 import pytest
+from tools.canonical_json_hash import canonical_json_sha256
 from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 from tools.generate_emperors_children_lucius_rule_ir import (
     OUTPUT_PATH as LUCIUS_RULE_IR_OUTPUT_PATH,
 )
+from tools.generate_emperors_children_lucius_rule_ir import REVIEW_MANIFEST_PATH
 from tools.generate_emperors_children_lucius_rule_ir import (
     generated_artifact_payload as generated_lucius_rule_ir_artifact_payload,
 )
@@ -126,6 +128,7 @@ def test_lucius_generated_rule_ir_and_catalog_are_complete_and_source_bound() ->
     assert committed["official_document_pages"] == []
     assert committed["review_row_id"] == f"source:{_LUCIUS_ID}"
     assert committed["review_treatment"] == "unchanged_predecessor"
+    assert committed["review_manifest_sha256"] == canonical_json_sha256(REVIEW_MANIFEST_PATH)
 
     committed["package_hash"] = "0" * 64
     with pytest.raises(lucius_source_package.LuciusRuleIrArtifactError, match="hash is stale"):

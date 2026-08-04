@@ -3,6 +3,12 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING or __package__:
+    from tools.canonical_json_hash import canonical_json_sha256
+else:
+    from canonical_json_hash import canonical_json_sha256
 
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_ir import (
@@ -98,7 +104,7 @@ def generated_artifact_payload() -> dict[str, object]:
         "official_document_sha256": hashlib.sha256(OFFICIAL_PDF_PATH.read_bytes()).hexdigest(),
         "official_document_pages": [],
         "review_manifest_filename": REVIEW_MANIFEST_PATH.name,
-        "review_manifest_sha256": hashlib.sha256(REVIEW_MANIFEST_PATH.read_bytes()).hexdigest(),
+        "review_manifest_sha256": canonical_json_sha256(REVIEW_MANIFEST_PATH),
         "review_row_id": review_row["review_row_id"],
         "review_treatment": review_row["treatment"],
         "overlay_package_hash": source_overlay.overlay_pack().package_hash(),
