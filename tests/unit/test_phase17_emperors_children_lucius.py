@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import replace
 from functools import lru_cache
 from typing import Any, cast
@@ -17,7 +18,17 @@ from tools.generate_emperors_children_lucius_rule_ir import (
 )
 
 from warhammer40k_core.core.attributes import Characteristic
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+)
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    RulesetDescriptor,
+    TerrainFeatureKind,
+)
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.weapon_profiles import AbilityKind, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.ability_catalog import (
@@ -56,20 +67,33 @@ from warhammer40k_core.engine.faction_content.events import (
 from warhammer40k_core.engine.fights_first import FightsFirstRegistry
 from warhammer40k_core.engine.game_state import GameState, GameStatePayload
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage
+from warhammer40k_core.engine.lone_operative import lone_operative_profile_for_rules_unit
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     AttackRerollPermissionContext,
     RuntimeModifierRegistry,
 )
+from warhammer40k_core.engine.shooting_selection_range import (
+    geometry_models_for_unit_placement,
+)
 from warhammer40k_core.engine.shooting_targets import (
+    ShootingTargetCandidate,
     ShootingTargetViolationCode,
     shooting_target_candidates_for_unit,
 )
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.unit_abilities import lone_operative_profile_for_unit
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
 from warhammer40k_core.engine.wargear_selections import ModelProfileSelection
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import (
+    TerrainFeatureDefinition,
+    TerrainFloorDefinition,
+    TerrainWallDefinition,
+)
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.rule_ir import RuleIR
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -182,6 +206,114 @@ def test_lucius_generated_rule_ir_and_catalog_are_complete_and_source_bound() ->
     )
 
 
+def test_lone_operative_profile_defaults_retains_source_and_validates_ranges() -> None:
+    _, _, _, lucius, _, _ = _lucius_runtime_fixture(attached=False)
+    default_profile = lone_operative_profile_for_unit(lucius)
+    assert default_profile is not None
+    assert default_profile.source_id == next(
+        ability.source_id
+        for ability in lucius.datasheet_abilities
+        if ability.name == "Lone Operative"
+    )
+    assert default_profile.range_inches == 12.0
+
+    parameterized = _unit_with_lone_operative_range(lucius, range_inches=15.0)
+    parameterized_profile = lone_operative_profile_for_unit(parameterized)
+    assert parameterized_profile is not None
+    assert parameterized_profile.source_id == "test:lucius:lone-operative:15"
+    assert parameterized_profile.range_inches == 15.0
+
+    for invalid_tokens in (("0",), ("nan",), ("twelve",), ("12", "15")):
+        invalid = _unit_with_lone_operative_tokens(lucius, parameter_tokens=invalid_tokens)
+        with pytest.raises(GameLifecycleError, match="Lone Operative"):
+            lone_operative_profile_for_unit(invalid)
+
+
+@pytest.mark.parametrize(
+    ("weapon_name", "indirect", "shooting_type"),
+    [
+        ("Shuriken cannon", False, ShootingType.NORMAL),
+        ("Doomweaver", True, ShootingType.INDIRECT),
+    ],
+)
+@pytest.mark.parametrize(
+    ("edge_distance", "is_legal"),
+    [(11.9, True), (12.0, True), (12.1, False)],
+)
+def test_lucius_lone_operative_uses_twelve_inch_boundary_for_direct_and_indirect_fire(
+    weapon_name: str,
+    indirect: bool,
+    shooting_type: ShootingType,
+    edge_distance: float,
+    is_legal: bool,
+) -> None:
+    _, state, _, lucius, targets, _ = _lucius_runtime_fixture(attached=False)
+    shooter = targets["other"]
+    _move_unit(state, shooter.unit_instance_id, x=5.0, y=5.0)
+    _move_unit_to_edge_distance(
+        state,
+        attacker=shooter,
+        target=lucius,
+        edge_distance=edge_distance,
+    )
+    scenario = _scenario(state)
+    terrain_features = (_blocking_wall_between(scenario, shooter, lucius),) if indirect else ()
+    candidate = shooting_target_candidates_for_unit(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        attacker_unit=shooter,
+        weapon_profile=_weapon_profile(_NIGHT_SPINNER_ID, weapon_name),
+        target_unit_ids=(lucius.unit_instance_id,),
+        terrain_features=terrain_features,
+    )[0]
+
+    if is_legal:
+        assert candidate.is_legal
+        assert candidate.shooting_types == (shooting_type,)
+    else:
+        assert candidate.violation_code is ShootingTargetViolationCode.LONE_OPERATIVE
+
+
+def test_attached_rules_unit_all_lone_operative_uses_largest_component_range() -> None:
+    _, state, _, lucius, targets, bodyguard = _lucius_runtime_fixture(attached=True)
+    assert bodyguard is not None
+    bodyguard = _unit_with_lone_operative_range(bodyguard, range_inches=15.0)
+    _replace_unit_in_state(state, bodyguard)
+    formation = state.army_definitions[0].attached_units[0]
+    profile = lone_operative_profile_for_rules_unit(
+        rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=formation.attached_unit_instance_id,
+        )
+    )
+    assert profile is not None
+    assert profile.source_id == "test:lucius:lone-operative:15"
+    assert profile.range_inches == 15.0
+
+    shooter = targets["other"]
+    _move_unit(state, shooter.unit_instance_id, x=5.0, y=5.0)
+    _move_unit_to_edge_distance(state, attacker=shooter, target=lucius, edge_distance=13.0)
+    _place_unit_behind_target(state, unit=bodyguard, target=lucius)
+    within_larger_range = _shooting_candidate(
+        state=state,
+        attacker=shooter,
+        target_unit_id=formation.attached_unit_instance_id,
+        weapon_name="Shuriken cannon",
+    )
+    assert within_larger_range.is_legal
+    assert within_larger_range.shooting_types == (ShootingType.NORMAL,)
+
+    _move_unit_to_edge_distance(state, attacker=shooter, target=lucius, edge_distance=15.1)
+    _place_unit_behind_target(state, unit=bodyguard, target=lucius)
+    outside_larger_range = _shooting_candidate(
+        state=state,
+        attacker=shooter,
+        target_unit_id=formation.attached_unit_instance_id,
+        weapon_name="Shuriken cannon",
+    )
+    assert outside_larger_range.violation_code is ShootingTargetViolationCode.LONE_OPERATIVE
+
+
 @pytest.mark.parametrize("roll_type", ["attack_sequence.hit", "attack_sequence.wound"])
 def test_lucius_challenge_rerolls_apply_to_each_qualifying_target_keyword(
     roll_type: str,
@@ -292,6 +424,7 @@ def test_lucius_rules_are_model_scoped_and_hubris_snapshots_not_leading() -> Non
         target_unit_ids=(formation.attached_unit_instance_id,),
     )[0]
     assert attached_target.is_legal
+    assert attached_target.shooting_types == (ShootingType.NORMAL,)
     attached_result = _dispatch_lucius_fight_phase_start(runtime=runtime, state=state)
     assert cast(dict[str, Any], attached_result.replay_payload) == {
         "granted": False,
@@ -568,6 +701,219 @@ def _battle_state(*, armies: tuple[ArmyDefinition, ...], game_id: str) -> GameSt
         armies=armies,
     ).battlefield_state
     return state
+
+
+def _unit_with_lone_operative_range(
+    unit: UnitInstance,
+    *,
+    range_inches: float,
+) -> UnitInstance:
+    token = f"{range_inches:g}"
+    return _unit_with_lone_operative_tokens(
+        unit,
+        parameter_tokens=(token,),
+        source_id=f"test:lucius:lone-operative:{token}",
+    )
+
+
+def _unit_with_lone_operative_tokens(
+    unit: UnitInstance,
+    *,
+    parameter_tokens: tuple[str, ...],
+    source_id: str = "test:lucius:lone-operative:invalid",
+) -> UnitInstance:
+    abilities: list[DatasheetAbilityDescriptor] = []
+    replaced_lone_operative = False
+    for ability in unit.datasheet_abilities:
+        if ability.name != "Lone Operative":
+            abilities.append(ability)
+            continue
+        replaced_lone_operative = True
+        abilities.append(
+            replace(
+                ability,
+                source_id=source_id,
+                parameter_tokens=parameter_tokens,
+            )
+        )
+    if not replaced_lone_operative:
+        abilities.append(
+            DatasheetAbilityDescriptor(
+                ability_id="core-lone-operative",
+                name="Lone Operative",
+                source_id=source_id,
+                support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+                source_kind=CatalogAbilitySourceKind.CORE,
+                effect_description="CORE Lone Operative test descriptor.",
+                timing_tags=("target_selection", "lone_operative"),
+                parameter_tokens=parameter_tokens,
+            )
+        )
+    return replace(
+        unit,
+        datasheet_abilities=tuple(sorted(abilities, key=lambda ability: ability.ability_id)),
+    )
+
+
+def _replace_unit_in_state(state: GameState, replacement: UnitInstance) -> None:
+    found = False
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        units = tuple(
+            replacement if unit.unit_instance_id == replacement.unit_instance_id else unit
+            for unit in army.units
+        )
+        found = found or units != army.units
+        updated_armies.append(replace(army, units=units))
+    assert found
+    state.replace_army_definitions(updated_armies)
+
+
+def _scenario(state: GameState) -> BattlefieldScenario:
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    return BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=battlefield,
+    )
+
+
+def _move_unit_to_edge_distance(
+    state: GameState,
+    *,
+    attacker: UnitInstance,
+    target: UnitInstance,
+    edge_distance: float,
+) -> None:
+    _move_unit(state, target.unit_instance_id, x=25.0, y=5.0)
+    scenario = _scenario(state)
+    attacker_models = geometry_models_for_unit_placement(
+        scenario=scenario,
+        unit_placement=scenario.battlefield_state.unit_placement_by_id(attacker.unit_instance_id),
+    )
+    target_models = geometry_models_for_unit_placement(
+        scenario=scenario,
+        unit_placement=scenario.battlefield_state.unit_placement_by_id(target.unit_instance_id),
+    )
+    assert len(attacker_models) == len(target_models) == 1
+    current_distance = attacker_models[0].range_to(target_models[0])
+    target_pose = (
+        scenario.battlefield_state.unit_placement_by_id(target.unit_instance_id)
+        .model_placements[0]
+        .pose
+    )
+    _move_unit(
+        state,
+        target.unit_instance_id,
+        x=target_pose.position.x + edge_distance - current_distance,
+        y=target_pose.position.y,
+    )
+    moved_scenario = _scenario(state)
+    moved_attacker = geometry_models_for_unit_placement(
+        scenario=moved_scenario,
+        unit_placement=moved_scenario.battlefield_state.unit_placement_by_id(
+            attacker.unit_instance_id
+        ),
+    )[0]
+    moved_target = geometry_models_for_unit_placement(
+        scenario=moved_scenario,
+        unit_placement=moved_scenario.battlefield_state.unit_placement_by_id(
+            target.unit_instance_id
+        ),
+    )[0]
+    assert math.isclose(moved_attacker.range_to(moved_target), edge_distance, abs_tol=1e-9)
+
+
+def _place_unit_behind_target(
+    state: GameState,
+    *,
+    unit: UnitInstance,
+    target: UnitInstance,
+) -> None:
+    target_pose = (
+        _scenario(state)
+        .battlefield_state.unit_placement_by_id(target.unit_instance_id)
+        .model_placements[0]
+        .pose
+    )
+    _move_unit(
+        state,
+        unit.unit_instance_id,
+        x=target_pose.position.x + 6.0,
+        y=target_pose.position.y,
+    )
+
+
+def _blocking_wall_between(
+    scenario: BattlefieldScenario,
+    attacker: UnitInstance,
+    target: UnitInstance,
+) -> TerrainFeatureDefinition:
+    attacker_pose = (
+        scenario.battlefield_state.unit_placement_by_id(attacker.unit_instance_id)
+        .model_placements[0]
+        .pose
+    )
+    target_pose = (
+        scenario.battlefield_state.unit_placement_by_id(target.unit_instance_id)
+        .model_placements[0]
+        .pose
+    )
+    center_x = (attacker_pose.position.x + target_pose.position.x) / 2.0
+    center_y = (attacker_pose.position.y + target_pose.position.y) / 2.0
+    return TerrainFeatureDefinition(
+        feature_id="test:lucius:lone-operative:blocking-wall",
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_center_x_inches=center_x,
+        footprint_center_y_inches=center_y,
+        footprint_width_inches=0.5,
+        footprint_depth_inches=6.0,
+        display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=center_x,
+            center_y_inches=center_y,
+            width_inches=0.5,
+            depth_inches=6.0,
+            display_template_id=None,
+        ),
+        walls=(
+            TerrainWallDefinition(
+                wall_id="blocking-wall",
+                center_x_inches=center_x,
+                center_y_inches=center_y,
+                bottom_z_inches=0.0,
+                width_inches=0.2,
+                depth_inches=6.0,
+                height_inches=10.0,
+            ),
+        ),
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="ground-floor",
+                center_x_inches=center_x,
+                center_y_inches=center_y,
+                bottom_z_inches=0.0,
+                width_inches=0.5,
+                depth_inches=6.0,
+                thickness_inches=0.1,
+            ),
+        ),
+    )
+
+
+def _shooting_candidate(
+    *,
+    state: GameState,
+    attacker: UnitInstance,
+    target_unit_id: str,
+    weapon_name: str,
+) -> ShootingTargetCandidate:
+    return shooting_target_candidates_for_unit(
+        scenario=_scenario(state),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        attacker_unit=attacker,
+        weapon_profile=_weapon_profile(_NIGHT_SPINNER_ID, weapon_name),
+        target_unit_ids=(target_unit_id,),
+    )[0]
 
 
 def _set_model_wounds(

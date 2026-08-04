@@ -2157,6 +2157,8 @@ def _ability_timing_tags(name: str) -> str:
         return "shooting"
     if key.startswith("deadly-demise"):
         return "after_destroyed,deadly_demise"
+    if key.startswith("lone-operative"):
+        return "target_selection,lone_operative"
     return ""
 
 
@@ -2165,7 +2167,7 @@ def _ability_parameter_tokens(*, name: str, parameter: str) -> str:
     if stripped_parameter:
         return stripped_parameter
     key = _core_ability_name_key(name)
-    match = re.fullmatch(r"(scouts|firing-deck|deadly-demise)-(.+)", key)
+    match = re.fullmatch(r"(scouts|firing-deck|deadly-demise|lone-operative)-(.+)", key)
     if match is None:
         return ""
     return _ability_parameter_token(match.group(2))

@@ -23,6 +23,10 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     SpatialIndexState,
 )
+from warhammer40k_core.engine.lone_operative import (
+    lone_operative_profile_for_rules_unit,
+    lone_operative_target_allowed,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
@@ -41,16 +45,13 @@ from warhammer40k_core.engine.shooting_selection_range import (
     target_in_range_model_ids as _target_in_range_model_ids,
 )
 from warhammer40k_core.engine.shooting_selection_range import (
-    target_within_shooting_selection_range,
-)
-from warhammer40k_core.engine.shooting_selection_range import (
     unit_placement_or_none as _unit_placement_or_none,
 )
 from warhammer40k_core.engine.shooting_selection_range import (
     unit_placements_for_rules_unit_or_none as _unit_placements_for_rules_unit_or_none,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType, validate_shooting_type_tuple
-from warhammer40k_core.engine.unit_abilities import unit_has_lone_operative, unit_has_stealth
+from warhammer40k_core.engine.unit_abilities import unit_has_stealth
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
     HUNTER_RULE_ID,
@@ -815,12 +816,14 @@ def _target_candidate(
             observer_model_id=witness.observer_model_id,
         )
 
-    if _rules_unit_has_lone_operative(target_rules_unit) and not (
-        _lone_operative_target_allowed(
+    lone_operative_profile = lone_operative_profile_for_rules_unit(target_rules_unit)
+    if lone_operative_profile is not None and not (
+        lone_operative_target_allowed(
             scenario=scenario,
             attacker_unit=attacker_unit,
             attacker_model_instance_id=attacker_model_instance_id,
             target_rules_unit=target_rules_unit,
+            profile=lone_operative_profile,
         )
     ):
         return _invalid_candidate(
@@ -1502,37 +1505,6 @@ def _shooting_types_for_target_candidate(
     ):
         return (ShootingType.CLOSE_QUARTERS,)
     return (ShootingType.NORMAL,)
-
-
-def _lone_operative_target_allowed(
-    *,
-    scenario: BattlefieldScenario,
-    attacker_unit: UnitInstance,
-    attacker_model_instance_id: str | None,
-    target_rules_unit: RulesUnitView,
-) -> bool:
-    return target_within_shooting_selection_range(
-        scenario=scenario,
-        attacking_unit_instance_id=attacker_unit.unit_instance_id,
-        attacker_model_instance_id=attacker_model_instance_id,
-        target_unit_instance_id=target_rules_unit.unit_instance_id,
-        max_range_inches=12.0,
-    )
-
-
-def _rules_unit_has_lone_operative(rules_unit: RulesUnitView) -> bool:
-    if type(rules_unit) is not RulesUnitView:
-        raise GameLifecycleError("Lone Operative target lookup requires a rules unit.")
-    if any(
-        component.role == "bodyguard" and any(model.is_alive for model in component.unit.own_models)
-        for component in rules_unit.components
-    ):
-        return False
-    return any(
-        any(model.is_alive for model in component.unit.own_models)
-        and unit_has_lone_operative(component.unit)
-        for component in rules_unit.components
-    )
 
 
 def _rules_unit_has_stealth(rules_unit: RulesUnitView) -> bool:

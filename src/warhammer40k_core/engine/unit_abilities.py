@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 from warhammer40k_core.core.datasheet import CatalogAbilitySupport, DatasheetAbilityDescriptor
@@ -24,6 +25,35 @@ class DeadlyDemiseAbilityProfile:
 class FeelNoPainAbilityProfile:
     source_id: str
     threshold: int
+
+
+@dataclass(frozen=True, slots=True)
+class LoneOperativeAbilityProfile:
+    source_id: str
+    range_inches: float
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_id",
+            _normalize_source_identifier(
+                self.source_id,
+                field_name="Lone Operative profile source_id",
+            ),
+        )
+        if (
+            type(self.range_inches) not in {int, float}
+            or not math.isfinite(float(self.range_inches))
+            or float(self.range_inches) <= 0.0
+        ):
+            raise GameLifecycleError(
+                "Lone Operative profile range_inches must be a positive finite number."
+            )
+        object.__setattr__(self, "range_inches", float(self.range_inches))
+
+
+DEFAULT_LONE_OPERATIVE_RANGE_INCHES = 12.0
+CORE_LONE_OPERATIVE_KEYWORD_SOURCE_ID = "core-rules:lone-operative:keyword"
 
 
 DEEP_STRIKE_ABILITY_IDS = frozenset({"000008343", "core-deep-strike", "deep-strike"})
@@ -148,7 +178,7 @@ def unit_has_fights_first(unit: UnitInstance) -> bool:
 
 
 def unit_has_lone_operative(unit: UnitInstance) -> bool:
-    return _unit_has_core_keyword_ability(unit=unit, spec=_LONE_OPERATIVE_SPEC)
+    return lone_operative_profile_for_unit(unit) is not None
 
 
 def unit_has_stealth(unit: UnitInstance) -> bool:
@@ -220,6 +250,39 @@ def feel_no_pain_profile_for_unit(unit: UnitInstance) -> FeelNoPainAbilityProfil
         source_id=descriptor.source_id,
         threshold=_d6_target_token(token=token, field_name="Feel No Pain descriptor threshold"),
     )
+
+
+def lone_operative_profile_for_unit(unit: UnitInstance) -> LoneOperativeAbilityProfile | None:
+    descriptors = _ability_descriptors_for_unit(unit=unit, spec=_LONE_OPERATIVE_SPEC)
+    if not descriptors:
+        if not unit_has_keyword(unit, _LONE_OPERATIVE_SPEC.keyword):
+            return None
+        return LoneOperativeAbilityProfile(
+            source_id=CORE_LONE_OPERATIVE_KEYWORD_SOURCE_ID,
+            range_inches=DEFAULT_LONE_OPERATIVE_RANGE_INCHES,
+        )
+    profiles: list[LoneOperativeAbilityProfile] = []
+    for descriptor in descriptors:
+        _require_descriptor_only(descriptor=descriptor, ability_name="Lone Operative")
+        if len(descriptor.parameter_tokens) > 1:
+            raise GameLifecycleError(
+                "Lone Operative descriptor accepts at most one range value token."
+            )
+        range_inches = (
+            DEFAULT_LONE_OPERATIVE_RANGE_INCHES
+            if not descriptor.parameter_tokens
+            else _positive_float_token(
+                token=_normalize_parameter_token(descriptor.parameter_tokens[0]),
+                field_name="Lone Operative descriptor range_inches",
+            )
+        )
+        profiles.append(
+            LoneOperativeAbilityProfile(
+                source_id=descriptor.source_id,
+                range_inches=range_inches,
+            )
+        )
+    return max(profiles, key=lambda profile: (profile.range_inches, profile.source_id))
 
 
 def fights_first_source_id_for_unit(unit: UnitInstance, *, fallback_source_id: str) -> str | None:
@@ -333,8 +396,8 @@ def _positive_float_token(*, token: str, field_name: str) -> float:
         value = float(token)
     except ValueError as exc:
         raise GameLifecycleError(f"{field_name} token must be numeric.") from exc
-    if value <= 0.0:
-        raise GameLifecycleError(f"{field_name} must be positive.")
+    if not math.isfinite(value) or value <= 0.0:
+        raise GameLifecycleError(f"{field_name} must be positive and finite.")
     return value
 
 

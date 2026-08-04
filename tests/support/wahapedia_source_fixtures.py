@@ -302,6 +302,7 @@ def keyword_ability_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                     'core-scouts,,"Scouts 6""",Scouts text.',
                     "core-firing-deck,,Firing Deck 2,Firing Deck text.",
                     "core-deadly-demise,,Deadly Demise D3,Deadly Demise text.",
+                    'core-lone-operative,,"Lone Operative 15""",Lone Operative text.',
                 )
             ),
         ),
@@ -322,6 +323,7 @@ def keyword_ability_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
                     "test-keyword-unit,6,Core,core-scouts,,,",
                     "test-keyword-unit,7,Core,core-firing-deck,,,",
                     "test-keyword-unit,8,Core,core-deadly-demise,,,",
+                    "test-keyword-unit,9,Core,core-lone-operative,,,",
                 )
             ),
         ),

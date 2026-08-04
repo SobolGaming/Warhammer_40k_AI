@@ -54,6 +54,7 @@ from warhammer40k_core.engine.faction_content.common import (
     payload_string_tuple as _payload_string_tuple,
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
+from warhammer40k_core.engine.lone_operative import lone_operative_profile_for_rules_unit
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookBinding,
@@ -99,7 +100,6 @@ from warhammer40k_core.engine.triggered_movement import (
     TriggeredMovementDescriptor,
     TriggeredMovementKind,
 )
-from warhammer40k_core.engine.unit_abilities import unit_has_lone_operative
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_proximity import unit_within_enemy_engagement_range
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
@@ -132,7 +132,6 @@ CABAL_TWIST_EFFECT_KIND = "thousand_sons_twist_of_fate"
 CABAL_TEMPORAL_CHARGE_FORBIDDEN_EFFECT_KIND = "thousand_sons_temporal_surge_charge_forbidden"
 CABAL_HIT_REROLL_EFFECT_KIND = "thousand_sons_destinys_ruin_hit_reroll"
 RITUAL_RANGE_INCHES = 24.0
-DOOMBOLT_LONE_OPERATIVE_RANGE_INCHES = 12.0
 
 
 class CabalRitualId(StrEnum):
@@ -1546,11 +1545,8 @@ def _doombolt_lone_operative_excluded(
     manifesting_model: CabalManifestingModel,
     target_rules_unit: RulesUnitView,
 ) -> bool:
-    if target_rules_unit.is_attached_rules_unit:
-        return False
-    if not any(
-        unit_has_lone_operative(component.unit) for component in target_rules_unit.components
-    ):
+    lone_operative_profile = lone_operative_profile_for_rules_unit(target_rules_unit)
+    if lone_operative_profile is None:
         return False
     scenario = _battlefield_scenario(state)
     observer_model = _geometry_model_for_manifesting_model(
@@ -1563,7 +1559,7 @@ def _doombolt_lone_operative_excluded(
         rules_unit=target_rules_unit,
     )
     return not any(
-        observer_model.range_to(target_model) <= DOOMBOLT_LONE_OPERATIVE_RANGE_INCHES
+        observer_model.range_to(target_model) <= lone_operative_profile.range_inches
         for target_model in target_models
     )
 
