@@ -1,5 +1,5 @@
 {
-  "contract_version": "3.1.0",
+  "contract_version": "3.2.0",
   "example_schema_by_path": {
     "examples/decisions/families/select_movement_action.json": "decision-family-live.schema.json",
     "examples/decisions/families/select_movement_unit.json": "decision-family-live.schema.json",
@@ -89,8 +89,8 @@
     "examples/support-profile.json": "support-profile.schema.json"
   },
   "file_sha256": {
-    "README.md": "a1926db15989adc25c338a3c3fd1bfb7dd8e44bbf2f6b781d50f57caeb4b88bb",
-    "compatibility-policy.md": "c7dac42f42860477970a64352895e9a27a3089fc552b5c4d51665207a55354e7",
+    "README.md": "e7581a823391442836207561ac372dcdc6d1476aff53e82e96569e803e828165",
+    "compatibility-policy.md": "ca4a3dfb3661583aa994f8fee7b76c1726bd3feca4f3bc4060a4be41de968b75",
     "compatibility/1.0.0-shape.json": "a2fb7d57f0677dbc1583f4ec5c3bc0b32b3c9db80594cefb55bb90fe3c949d96",
     "compatibility/2.0.0-shape.json": "b90126ab0a3c3fec2c310d2fbd7d2069262ec6be469edc97d280ab39b8879bb6",
     "compatibility/3.0.0-shape.json": "44a543e76c505d1cdf9daf9c6340380bbbe65f2d2c6d9e44709fd2105708b9b6",
@@ -172,10 +172,10 @@
     "examples/replay-metadata.json": "16002de52f04aa2ddd13113041b91930ea6412f4e0255705455ce30dcdbc66f8",
     "examples/sessions/create-session.json": "f25f2677d2a7a395e7061e0ec8b036100fa8253141e3a37b5be77a01380cb1b3",
     "examples/sessions/session-command-envelope.json": "8733d0a6172294e105336b03ea1c978d95bf7b7907398230b774b1601f2e6b93",
-    "examples/sessions/session-command-outcome.json": "555f68aba56d362dbd5fc5f5b9d792aabe5bd4a3189aad370b7dda3e031b9f82",
-    "examples/sessions/session-command-started.json": "84037f36e66b5151b6015da975311319f4019ea42f32b1c7bb7a83014fb88854",
+    "examples/sessions/session-command-outcome.json": "6008c19d2c701fb1c26c10857bda7ecb32dd235c1b1f744b067f83d7d68c6259",
+    "examples/sessions/session-command-started.json": "ff95bf4b76fce2b495e10bb61b36a481301f831e4cca6bc9b53f2ab6df4ac124",
     "examples/sessions/session-create.json": "20d578cafdc78ff21851bd84cdf0390b6ff66aff38409133a998dd5e44b5b243",
-    "examples/sessions/session-metadata-created.json": "64e19974c1b0248882653eead82404fd19bc34b955152ec7aee494985cfead71",
+    "examples/sessions/session-metadata-created.json": "f957b968b1cc4ec043a162cde201c0670fd85553adc0ccd24b896947f0877e61",
     "examples/statuses/advanced.json": "5db7d8f35a681ae9760e96e84f18b778854894f5365ad3aaaf47be5297c3fec2",
     "examples/statuses/invalid.json": "e47473e490d865d271f7bfeb411e50072d457ba3cb13fce6d8533a7aed0eb304",
     "examples/statuses/terminal.json": "d8a4cad732fc2ef74f4a10c804c172f19d4a42f0ef64f2f1a18e43eb924c61df",
@@ -183,7 +183,7 @@
     "examples/statuses/waiting-for-decision.json": "5deb38f0b26c9c00633feaeaf5d697844d1aa51221d30adfdda0983383caff52",
     "examples/support-profile.json": "30cb23fe9f4c5bf2d4667e070c5b43ce6c5c5c7d8ed6ba1826155c57970f80fe",
     "migrations/2-to-3.md": "aebede356be2f7401209220c591212aa5676c47aefec59aba51e96cdf359d8ba",
-    "openapi.yaml": "460a2b0e276e832e7e9d2871c435e6374dd1bddd8b60575d9ab0134a78dda0b4",
+    "openapi.yaml": "b57e4166f342631840db769eb15e7273eb8672d1d3bd8c423899698218b2143b",
     "redaction-policy.md": "4fd9ab48e180216b6c3b1b2d441b1b6a688aac119adeb2a9537f7a9e200e2e4b",
     "schemas/annotated-decision-request.schema.json": "f1f2e87c72ccd2a44a4d3c523abf613418bfc41b830e04e5ebfe7c0a157f6d18",
     "schemas/create-session.schema.json": "ebc46ea4fc65ccacc58ae316dee0e56c5bbbfeb442fe523ec4ff66219341d244",
