@@ -2108,7 +2108,8 @@ gate emits the parameterized decision type
 `submit_catalog_model_materialization_placement` with one fixed
 `submit_parameterized_payload` option. The request is actor-scoped to the owning
 player and includes `proposal_kind: "model_materialization_placement"`,
-`placement_kind: "split_unit"`, attack-sequence and roll-event IDs, catalog
+`placement_kind: "split_unit"`, the immutable Shooting or Fight `source_phase`,
+attack-sequence and roll-event IDs, catalog
 record/clause/source-rule identity, the physical owning unit and army IDs, the
 materialization descriptor ID, and the complete engine-instantiated model
 payloads and model IDs.
@@ -2124,18 +2125,25 @@ coherency before atomically adding the models and placements. Adapters must not
 construct model profiles, derive loadouts, add models, remove destroyed models,
 replace a datasheet, or mutate battlefield state locally.
 
+The engine rejects source-phase drift before queue pop. Accepted placement
+records, transition evidence, materialization events, and per-model battlefield
+placement events retain the request's immutable `source_phase` so Shooting and
+Fight replays cannot collapse to phase-free evidence.
+
 Each accepted model placement emits its own
 `model_placed_on_battlefield` runtime-content timing event for every player so
 owner and opponent reactive abilities use the shared event dispatcher. After
-materialization reactions resolve, source-backed `REPLACE_UNIT_DATASHEET`
-RuleIR may hand the physical owning component to another datasheet. This keeps
+materialization reactions resolve, or after any other authoritative model
+destruction changes the component's composition, source-backed
+`REPLACE_UNIT_DATASHEET` RuleIR may hand the physical owning component to another
+datasheet. This keeps
 the existing Attached Unit formation and canonical rules-unit identity,
 removes only the source-backed destroyed model profiles, remaps retained
 materialized models through descriptor-indexed catalog variants, and preserves
-the original Starting Strength record. Attached-unit reconciliation runs only
-after the completion hook and any materialization decisions finish, so a
-bodyguard component retained by newly materialized models is not split away
-prematurely.
+the original Starting Strength record. Empty components are never replaced.
+Attached-unit reconciliation observes the composition-driven handoff before it
+splits a surviving component away, while a fully destroyed component with no
+successfully materialized model follows the ordinary destruction path.
 
 Malformed, stale, wrong-actor, wrong-kind, wrong-unit, wrong-model-set,
 template-drifted, descriptor-drifted, exception-bearing, transport-bearing,

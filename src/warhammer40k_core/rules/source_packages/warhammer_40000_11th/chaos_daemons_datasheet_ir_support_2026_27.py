@@ -976,9 +976,7 @@ def _horrors_datasheet_handoff_rule_ir(
                 trigger=_trigger(
                     text=_HORRORS_DATASHEET_HANDOFF_TEXT,
                     kind=RuleTriggerKind.MODEL_DESTROYED,
-                    parameters=(
-                        _parameter("timing_window", "after_attacking_unit_finished_attacks"),
-                    ),
+                    parameters=(_parameter("timing_window", "after_model_state_changed"),),
                 ),
                 conditions=(
                     _condition(

@@ -303,10 +303,12 @@ CHAOS_DAEMONS_SPLIT_SUPPORTED_SEMANTICS = (
     "handoff are consumed through catalog RuleIR. Attack destruction and Hazardous "
     "failures trigger the after-attacks D6 gate; non-attack damage does not. Successful "
     "rolls add engine-instantiated Blue or Brimstone models through validated battlefield "
-    "placement, dispatch per-model battlefield-placement reactions, preserve Attached Unit "
-    "identity and the original Starting Strength, and permit Split growth above Starting "
-    "Strength. After handoff, returned models cannot become Pink Horrors or exceed that "
-    "original Starting Strength"
+    "placement with immutable Shooting/Fight phase evidence and dispatch per-model "
+    "battlefield-placement reactions. The composition-driven handoff also runs after "
+    "non-attack destruction, never creates an empty unit, preserves Attached Unit identity "
+    "and the original Starting Strength, and permits Split growth above Starting Strength. "
+    "After handoff, returned models cannot become Pink Horrors or exceed that original "
+    "Starting Strength"
 )
 BELAKOR_DATASHEET_IDS = ("000001148",)
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")

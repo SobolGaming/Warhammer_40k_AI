@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import cast
 
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -20,6 +21,7 @@ CATALOG_IR_MODEL_MATERIALIZATION_CONSUMER_ID = "catalog-ir:model-materialization
 
 @dataclass(frozen=True, slots=True)
 class MaterializeModelsDescriptor:
+    destruction_source_kinds: tuple[DestructionSourceKind, ...]
     destroyed_model_profile_ids: tuple[str, ...]
     result_model_profile_id: str
     result_model_name: str
@@ -95,6 +97,10 @@ def materialize_models_descriptor_for_clause(
     if parameters.get("placement_trigger_kind") != "model_placed_on_battlefield":
         raise GameLifecycleError("Model materialization placement trigger is unsupported.")
     return MaterializeModelsDescriptor(
+        destruction_source_kinds=_destruction_source_kinds(
+            trigger_parameters,
+            "destruction_source_kinds",
+        ),
         destroyed_model_profile_ids=_required_string_tuple(
             parameters, "destroyed_model_profile_ids"
         ),
@@ -130,7 +136,7 @@ def unit_datasheet_replacement_descriptor_for_clause(
         clause.trigger is None
         or clause.trigger.kind is not RuleTriggerKind.MODEL_DESTROYED
         or parameter_payload(clause.trigger.parameters)
-        != {"timing_window": "after_attacking_unit_finished_attacks"}
+        != {"timing_window": "after_model_state_changed"}
         or clause.target is None
         or clause.target.kind is not RuleTargetKind.THIS_UNIT
         or clause.duration is None
@@ -226,6 +232,27 @@ def _required_positive_int(parameters: Mapping[str, object], key: str) -> int:
     if value < 1:
         raise GameLifecycleError(f"Model materialization {key} must be positive.")
     return value
+
+
+def _destruction_source_kinds(
+    parameters: Mapping[str, object],
+    key: str,
+) -> tuple[DestructionSourceKind, ...]:
+    values = _required_string_tuple(parameters, key)
+    resolved: list[DestructionSourceKind] = []
+    for value in values:
+        try:
+            source_kind = DestructionSourceKind(value)
+        except ValueError as exc:
+            raise GameLifecycleError(
+                "Model materialization destruction source kind is unsupported."
+            ) from exc
+        if source_kind in resolved:
+            raise GameLifecycleError(
+                "Model materialization destruction source kinds must be unique."
+            )
+        resolved.append(source_kind)
+    return tuple(resolved)
 
 
 __all__ = (

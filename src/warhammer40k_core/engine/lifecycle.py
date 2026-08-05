@@ -16,6 +16,7 @@ from warhammer40k_core.engine import charge_declaration_hooks as _cd
 from warhammer40k_core.engine import command_phase_start_hooks as _cs
 from warhammer40k_core.engine import fight_activation_abilities as _fa
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
+from warhammer40k_core.engine import lifecycle_state_queries as _lsq
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
@@ -42,6 +43,9 @@ from warhammer40k_core.engine.catalog_command_restoration_runtime import (
     invalid_catalog_command_restoration_status,
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
+from warhammer40k_core.engine.catalog_model_materialization_runtime import (
+    CatalogModelMaterializationRuntime,
+)
 from warhammer40k_core.engine.catalog_movement_end_selected_target_effects import (
     SELECT_CATALOG_MOVEMENT_END_TARGET_EFFECT_DECISION_TYPE,
     invalid_catalog_movement_end_target_effect_status,
@@ -174,12 +178,6 @@ from warhammer40k_core.engine.lifecycle_setup_reactive import (
     apply_setup_reactive_lifecycle_decision_if_applicable,
     invalid_setup_reactive_lifecycle_status,
     is_setup_reactive_lifecycle_request,
-)
-from warhammer40k_core.engine.lifecycle_state_queries import (
-    embarked_unit_ids_for_player as _embarked_unit_ids_for_player,
-)
-from warhammer40k_core.engine.lifecycle_state_queries import (
-    unarrived_reserve_unit_ids_for_player as _unarrived_reserve_unit_ids_for_player,
 )
 from warhammer40k_core.engine.lifecycle_state_validation import (
     validate_disembarked_unit_state_consistency,
@@ -760,6 +758,8 @@ class GameLifecycle:
             decisions=self.decision_controller,
         )
         if out_of_phase_status is not None:
+            if self._reconcile_catalog_model_state_changes():
+                self._refresh_runtime_content_bundle_if_armies_mustered()
             return out_of_phase_status
         if state.stage is GameLifecycleStage.COMPLETE:
             return LifecycleStatus.terminal(
@@ -776,11 +776,14 @@ class GameLifecycle:
             )
             self._refresh_runtime_content_bundle_if_armies_mustered()
             return status
-        return self._require_battle_round_flow().advance(
+        status = self._require_battle_round_flow().advance(
             state=state,
             decisions=self.decision_controller,
             reaction_queue=self.reaction_queue,
         )
+        if self._reconcile_catalog_model_state_changes():
+            self._refresh_runtime_content_bundle_if_armies_mustered()
+        return status
 
     def submit_decision(self, result: DecisionResult) -> LifecycleStatus:
         state = self._require_state()
@@ -823,6 +826,7 @@ class GameLifecycle:
             record,
             result,
         )
+        self._reconcile_catalog_model_state_changes()
         if self._runtime_content_bundle is not None:
             self._refresh_runtime_content_bundle_if_armies_mustered()
         return status
@@ -2757,6 +2761,23 @@ class GameLifecycle:
             validate_json_value(summary),
         )
 
+    def _reconcile_catalog_model_state_changes(self) -> bool:
+        if self._config is None or self._runtime_content_bundle is None:
+            return False
+        state = self._require_state()
+        if not state.army_definitions:
+            return False
+        return CatalogModelMaterializationRuntime(
+            ability_indexes_by_player_id=(
+                self._runtime_content_bundle.ability_indexes_by_player_id
+            ),
+            armies=tuple(state.army_definitions),
+            army_catalog=self._config.army_catalog,
+        ).reconcile_non_attack_model_destruction_events(
+            state=state,
+            decisions=self.decision_controller,
+        )
+
     def _request_stratagem_cost_choice_if_available(
         self,
         *,
@@ -3276,7 +3297,7 @@ def _invalid_damage_allocation_model_status(
     attack_context = request_payload.get("attack_context")
     if not isinstance(attack_context, Mapping):
         raise GameLifecycleError("Damage allocation model attack context must be an object.")
-    attack_sequence = _active_attack_sequence_for_state(state)
+    attack_sequence = _lsq.active_attack_sequence_for_state(state)
     if attack_sequence is None or attack_sequence.pending_grouped_damage is None:
         return LifecycleStatus.invalid(
             stage=state.stage,
@@ -3374,21 +3395,8 @@ def _invalid_destruction_reaction_status(
         state=state,
         request=request,
         result=result,
-        attack_sequence=_active_attack_sequence_for_state(state),
+        attack_sequence=_lsq.active_attack_sequence_for_state(state),
     )
-
-
-def _active_attack_sequence_for_state(state: GameState) -> AttackSequence | None:
-    out_of_phase_state = state.out_of_phase_shooting_state
-    if out_of_phase_state is not None and out_of_phase_state.attack_sequence is not None:
-        return out_of_phase_state.attack_sequence
-    fight_state = state.fight_phase_state
-    if fight_state is not None and fight_state.attack_sequence is not None:
-        return fight_state.attack_sequence
-    shooting_state = state.shooting_phase_state
-    if shooting_state is not None and shooting_state.attack_sequence is not None:
-        return shooting_state.attack_sequence
-    return None
 
 
 def _validate_payload_consistency(*, state: GameState, config: GameConfig | None) -> None:
@@ -3617,15 +3625,15 @@ def _validate_movement_phase_state_consistency(*, state: GameState) -> None:
         active_player_unit_ids = {
             placement.unit_instance_id for placement in placed_army.unit_placements
         }
-    active_player_embarked_unit_ids = _embarked_unit_ids_for_player(
+    active_player_embarked_unit_ids = _lsq.embarked_unit_ids_for_player(
         state=state,
         player_id=state.active_player_id,
     )
-    active_player_reserve_unit_ids = _unarrived_reserve_unit_ids_for_player(
+    active_player_reserve_unit_ids = _lsq.unarrived_reserve_unit_ids_for_player(
         state=state,
         player_id=state.active_player_id,
     )
-    fully_removed_active_player_unit_ids = _fully_removed_unit_ids_for_player(
+    fully_removed_active_player_unit_ids = _lsq.fully_removed_unit_ids_for_player(
         state=state,
         player_id=state.active_player_id,
     )
@@ -3670,7 +3678,7 @@ def _validate_shooting_phase_state_consistency(*, state: GameState) -> None:
         rules_unit.unit_instance_id: rules_unit.owner_player_id
         for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
     }
-    active_player_embarked_unit_ids = _embarked_unit_ids_for_player(
+    active_player_embarked_unit_ids = _lsq.embarked_unit_ids_for_player(
         state=state,
         player_id=state.active_player_id,
     )
@@ -3824,11 +3832,11 @@ def _validate_advanced_unit_state_consistency(*, state: GameState) -> None:
     active_player_unit_ids = {
         placement.unit_instance_id for placement in placed_army.unit_placements
     }
-    active_player_embarked_unit_ids = _embarked_unit_ids_for_player(
+    active_player_embarked_unit_ids = _lsq.embarked_unit_ids_for_player(
         state=state,
         player_id=state.active_player_id,
     )
-    fully_removed_active_player_unit_ids = _fully_removed_unit_ids_for_player(
+    fully_removed_active_player_unit_ids = _lsq.fully_removed_unit_ids_for_player(
         state=state,
         player_id=state.active_player_id,
     )
@@ -3866,11 +3874,11 @@ def _validate_fell_back_unit_state_consistency(*, state: GameState) -> None:
     active_player_unit_ids = {
         placement.unit_instance_id for placement in placed_army.unit_placements
     }
-    active_player_embarked_unit_ids = _embarked_unit_ids_for_player(
+    active_player_embarked_unit_ids = _lsq.embarked_unit_ids_for_player(
         state=state,
         player_id=state.active_player_id,
     )
-    fully_removed_active_player_unit_ids = _fully_removed_unit_ids_for_player(
+    fully_removed_active_player_unit_ids = _lsq.fully_removed_unit_ids_for_player(
         state=state,
         player_id=state.active_player_id,
     )
@@ -3903,18 +3911,3 @@ def _validate_normal_move_state_consistency(*, state: GameState) -> None:
             raise GameLifecycleError("normal_move_states unit is unknown.")
         if owner != normal_move_state.player_id:
             raise GameLifecycleError("normal_move_states player_id does not match unit owner.")
-
-
-def _fully_removed_unit_ids_for_player(*, state: GameState, player_id: str) -> set[str]:
-    if state.battlefield_state is None:
-        raise GameLifecycleError("removed unit accounting requires battlefield_state.")
-    removed_model_ids = set(state.battlefield_state.removed_model_ids)
-    fully_removed_unit_ids: set[str] = set()
-    for army_definition in state.army_definitions:
-        if army_definition.player_id != player_id:
-            continue
-        for unit in army_definition.units:
-            unit_model_ids = {model.model_instance_id for model in unit.own_models}
-            if unit_model_ids and unit_model_ids <= removed_model_ids:
-                fully_removed_unit_ids.add(unit.unit_instance_id)
-    return fully_removed_unit_ids
