@@ -15,6 +15,7 @@ from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, Objective
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     ModelDisplacementKind,
@@ -74,6 +75,7 @@ from warhammer40k_core.engine.phases.charge import (
     ChargeMoveResolution,
     ChargePhaseState,
     ChargingUnitSelection,
+    legal_charge_target_unit_instance_ids,
     resolve_charge_move,
 )
 from warhammer40k_core.engine.phases.movement import (
@@ -101,6 +103,8 @@ from warhammer40k_core.geometry.pathing import (
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model, ModelVolume
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+
+_ATTACHED_CHARGE_TARGET_ID = "attached-unit:army-beta:marked-charge-target"
 
 
 def test_charging_unit_selection_rolls_immediately_and_uses_lifecycle_records() -> None:
@@ -1335,6 +1339,137 @@ def test_selected_target_charge_reroll_rejects_target_drift_before_queue_pop() -
     assert len(lifecycle.decision_controller.records) == 1
 
 
+def test_selected_attached_target_with_alive_unplaced_successor_blocks_charge_after_restore() -> (
+    None
+):
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_ids=("marked-bodyguard", "marked-leader", "enemy-alternate"),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(20.0, 20.0),
+            model_count=5,
+        ),
+        enemy_origins={
+            "marked-bodyguard": Pose.at(20.0, 20.0),
+            "marked-leader": Pose.at(20.0, 24.0),
+            "enemy-alternate": Pose.at(22.0, 28.0),
+        },
+        enemy_attached_unit_ids=("marked-bodyguard", "marked-leader"),
+        selected_attached_target_effect_id=("phase15a-selected-attached-target-unplaced-successor"),
+        game_id="phase15a-selected-attached-target-unplaced-successor",
+    )
+    state = _state(lifecycle)
+    source = units["intercessor-1"]
+    bodyguard = units["marked-bodyguard"]
+    leader = units["marked-leader"]
+    alternate = units["enemy-alternate"]
+    _unplace_alive_successor(
+        lifecycle,
+        successor=leader,
+    )
+    successor_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    constraint = selected_target_charge_constraint_for_unit(
+        state=state,
+        unit_instance_id=source.unit_instance_id,
+    )
+
+    assert constraint is not None
+    assert constraint.required_target_unit_instance_ids == successor_ids
+    assert constraint.unavailable_target_identity_ids == (_ATTACHED_CHARGE_TARGET_ID,)
+    assert constraint.destroyed_target_identity_ids == ()
+    assert constraint.target_lineages[0].surviving_unit_instance_ids == successor_ids
+    assert constraint.target_lineages[0].placed_surviving_unit_instance_ids == (
+        bodyguard.unit_instance_id,
+    )
+    legal_target_ids = legal_charge_target_unit_instance_ids(
+        state=state,
+        unit_instance_id=source.unit_instance_id,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+    )
+    assert {bodyguard.unit_instance_id, alternate.unit_instance_id}.issubset(legal_target_ids)
+    assert leader.unit_instance_id not in legal_target_ids
+    assert not constraint.is_satisfied_by((bodyguard.unit_instance_id, alternate.unit_instance_id))
+
+    restored = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+        )
+    )
+    restored_constraint = selected_target_charge_constraint_for_unit(
+        state=_state(restored),
+        unit_instance_id=source.unit_instance_id,
+    )
+    assert restored_constraint is not None
+    assert restored_constraint.to_payload() == constraint.to_payload()
+
+    for candidate in (lifecycle, restored):
+        candidate.advance_until_decision_or_terminal()
+        assert _state(candidate).current_battle_phase is not BattlePhase.CHARGE
+        assert _event_payloads(candidate, "charging_unit_selected") == ()
+        assert _event_payloads(candidate, "charge_roll_resolved") == ()
+
+
+def test_pending_selected_attached_target_reroll_rejects_alive_unplaced_successor_drift() -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_ids=("marked-bodyguard", "marked-leader", "enemy-alternate"),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(20.0, 20.0),
+            model_count=5,
+        ),
+        enemy_origins={
+            "marked-bodyguard": Pose.at(20.0, 20.0),
+            "marked-leader": Pose.at(20.0, 24.0),
+            "enemy-alternate": Pose.at(22.0, 28.0),
+        },
+        enemy_attached_unit_ids=("marked-bodyguard", "marked-leader"),
+        selected_attached_target_effect_id=("phase15a-selected-attached-target-stale-reroll"),
+        game_id="phase15a-selected-attached-target-stale-reroll",
+    )
+    source = units["intercessor-1"]
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    reroll_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=selection_request,
+            option_id=source.unit_instance_id,
+            result_id="phase15a-selected-attached-target-stale-reroll-select",
+        )
+    )
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+    restored = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+        )
+    )
+
+    status_payloads: list[object] = []
+    for candidate in (lifecycle, restored):
+        _unplace_alive_successor(
+            candidate,
+            successor=units["marked-leader"],
+        )
+        pending_request = _decision_request(candidate.advance_until_decision_or_terminal())
+        status = _submit_option(
+            candidate,
+            request=pending_request,
+            option_id="decline",
+            result_id="phase15a-selected-attached-target-stale-reroll-decline",
+        )
+
+        assert status.status_kind is LifecycleStatusKind.INVALID
+        assert cast(dict[str, object], status.payload)["field"] == (
+            "selected_target_charge_constraint"
+        )
+        assert candidate.decision_controller.queue.pending_requests == (pending_request,)
+        assert len(candidate.decision_controller.records) == 1
+        status_payloads.append(status.payload)
+
+    assert status_payloads[0] == status_payloads[1]
+
+
 def test_repeated_selected_target_charge_effects_coalesce_one_reroll_and_require_all_targets() -> (
     None
 ):
@@ -1885,6 +2020,8 @@ def _charge_lifecycle(
     alpha_origins: dict[str, Pose] | None = None,
     enemy_unit_ids: tuple[str, ...] = ("enemy",),
     enemy_origins: dict[str, Pose] | None = None,
+    enemy_attached_unit_ids: tuple[str, str] | None = None,
+    selected_attached_target_effect_id: str | None = None,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     config = _config(
         game_id=game_id,
@@ -1892,6 +2029,20 @@ def _charge_lifecycle(
         enemy_unit_ids=enemy_unit_ids,
     )
     armies = _mustered_armies(config)
+    if enemy_attached_unit_ids is not None:
+        bodyguard_id, leader_id = (f"army-beta:{unit_id}" for unit_id in enemy_attached_unit_ids)
+        formation = AttachedUnitFormation(
+            attached_unit_instance_id=_ATTACHED_CHARGE_TARGET_ID,
+            bodyguard_unit_instance_id=bodyguard_id,
+            leader_unit_instance_ids=(leader_id,),
+            component_unit_instance_ids=tuple(sorted((bodyguard_id, leader_id))),
+            source_id="test:phase15a:selected-attached-target",
+            attachment_source_ids=("test:phase15a:selected-attached-target:eligibility",),
+        )
+        armies = tuple(
+            replace(army, attached_units=(formation,)) if army.player_id == "player-b" else army
+            for army in armies
+        )
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase15a-battlefield",
         armies=armies,
@@ -1942,13 +2093,38 @@ def _charge_lifecycle(
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.CHARGE)
     state.battle_round = 1
     state.active_player_id = "player-a"
+    decision_controller = GameLifecycle().decision_controller
+    if enemy_attached_unit_ids is not None:
+        if selected_attached_target_effect_id is None:
+            raise AssertionError("Attached Charge target fixture requires a selected effect ID.")
+        source = units[alpha_unit_ids[0]]
+        state.record_persisting_effect(
+            selected_target_charge_persisting_effect(
+                state=state,
+                effect_id=selected_attached_target_effect_id,
+                owner_player_id="player-a",
+                source_rules_unit_instance_id=source.unit_instance_id,
+                source_component_unit_instance_id=source.unit_instance_id,
+                selected_target_unit_instance_id=_ATTACHED_CHARGE_TARGET_ID,
+            )
+        )
+        state.recover_starting_strength_after_attached_unit_split(
+            player_id="player-b",
+            attached_unit_instance_id=_ATTACHED_CHARGE_TARGET_ID,
+            surviving_unit_instance_ids=tuple(
+                sorted(f"army-beta:{unit_id}" for unit_id in enemy_attached_unit_ids)
+            ),
+            event_log=decision_controller.event_log,
+        )
+    elif selected_attached_target_effect_id is not None:
+        raise AssertionError("Selected Attached Unit target fixture requires a formation.")
     payload = cast(
         GameLifecyclePayload,
         {
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": GameLifecycle().decision_controller.to_payload(),
+            "decisions": decision_controller.to_payload(),
             "reaction_queue": {"frames": []},
         },
     )
@@ -2282,6 +2458,26 @@ def _destroy_unit_models_for_test(state: GameState, *, unit_instance_id: str) ->
     if not found:
         raise AssertionError("Destroyed selected-target fixture unit was not found.")
     state.replace_army_definitions(updated_armies)
+
+
+def _unplace_alive_successor(
+    lifecycle: GameLifecycle,
+    *,
+    successor: UnitInstance,
+) -> None:
+    state = _state(lifecycle)
+    if state.battlefield_state is None:
+        raise AssertionError("Selected Attached Unit target fixture requires battlefield state.")
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        successor.unit_instance_id
+    )
+    state.record_reserve_state(
+        ReserveState.declared_before_battle(
+            player_id="player-b",
+            unit_instance_id=successor.unit_instance_id,
+            reserve_kind=ReserveKind.RESERVES,
+        )
+    )
 
 
 def _resolved_charge_move_for_tests(

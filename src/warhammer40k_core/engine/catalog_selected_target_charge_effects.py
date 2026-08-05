@@ -116,11 +116,7 @@ def selected_target_charge_constraint_for_unit(
         reroll_allowed=True,
         required_target_unit_instance_ids=tuple(
             sorted(
-                {
-                    unit_id
-                    for lineage in lineages
-                    for unit_id in lineage.placed_surviving_unit_instance_ids
-                }
+                {unit_id for lineage in lineages for unit_id in lineage.surviving_unit_instance_ids}
             )
         ),
         source_effect_ids=tuple(
@@ -132,7 +128,8 @@ def selected_target_charge_constraint_for_unit(
         unavailable_target_identity_ids=tuple(
             lineage.historical_unit_instance_id
             for lineage in lineages
-            if not lineage.placed_surviving_unit_instance_ids
+            if lineage.is_destroyed
+            or lineage.placed_surviving_unit_instance_ids != lineage.surviving_unit_instance_ids
         ),
         destroyed_target_identity_ids=tuple(
             lineage.historical_unit_instance_id for lineage in lineages if lineage.is_destroyed
