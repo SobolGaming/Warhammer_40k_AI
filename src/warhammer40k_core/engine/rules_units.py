@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
@@ -155,6 +156,67 @@ class RulesUnitView:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class RulesUnitIdentityReconciliation:
+    historical_unit_instance_id: str
+    current_unit_instance_ids: tuple[str, ...]
+    surviving_unit_instance_ids: tuple[str, ...]
+    placed_surviving_unit_instance_ids: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        historical_id = _validate_identifier(
+            "historical_unit_instance_id",
+            self.historical_unit_instance_id,
+        )
+        current_ids = _validated_sorted_identity_ids(
+            "current_unit_instance_ids",
+            self.current_unit_instance_ids,
+        )
+        surviving_ids = _validated_sorted_identity_ids(
+            "surviving_unit_instance_ids",
+            self.surviving_unit_instance_ids,
+        )
+        placed_ids = _validated_sorted_identity_ids(
+            "placed_surviving_unit_instance_ids",
+            self.placed_surviving_unit_instance_ids,
+        )
+        if not current_ids:
+            raise GameLifecycleError("Rules-unit reconciliation requires current identities.")
+        if not set(surviving_ids).issubset(current_ids):
+            raise GameLifecycleError("Rules-unit surviving identities must be current.")
+        if not set(placed_ids).issubset(surviving_ids):
+            raise GameLifecycleError("Rules-unit placed identities must be surviving.")
+        object.__setattr__(self, "historical_unit_instance_id", historical_id)
+        object.__setattr__(self, "current_unit_instance_ids", current_ids)
+        object.__setattr__(self, "surviving_unit_instance_ids", surviving_ids)
+        object.__setattr__(self, "placed_surviving_unit_instance_ids", placed_ids)
+
+    @property
+    def is_split(self) -> bool:
+        return self.current_unit_instance_ids != (self.historical_unit_instance_id,)
+
+    @property
+    def is_destroyed(self) -> bool:
+        return not self.surviving_unit_instance_ids
+
+    def to_payload(self) -> dict[str, JsonValue]:
+        return cast(
+            dict[str, JsonValue],
+            validate_json_value(
+                {
+                    "historical_unit_instance_id": self.historical_unit_instance_id,
+                    "current_unit_instance_ids": list(self.current_unit_instance_ids),
+                    "surviving_unit_instance_ids": list(self.surviving_unit_instance_ids),
+                    "placed_surviving_unit_instance_ids": list(
+                        self.placed_surviving_unit_instance_ids
+                    ),
+                    "is_split": self.is_split,
+                    "is_destroyed": self.is_destroyed,
+                }
+            ),
+        )
+
+
 def rules_unit_display_name(rules_unit: RulesUnitView) -> str:
     if type(rules_unit) is not RulesUnitView:
         raise GameLifecycleError("Rules-unit display name requires RulesUnitView.")
@@ -266,6 +328,40 @@ def current_rules_unit_views_for_identity(
     if not descendants:
         raise GameLifecycleError("Historical attached rules-unit has no current descendants.")
     return tuple(sorted(descendants, key=lambda view: view.unit_instance_id))
+
+
+def reconcile_rules_unit_identity(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> RulesUnitIdentityReconciliation:
+    """Resolve historical identity into deterministic current, living, and placed successors."""
+    requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    current_views = current_rules_unit_views_for_identity(
+        state=state,
+        unit_instance_id=requested_id,
+    )
+    battlefield = state.battlefield_state
+    placed_model_ids: frozenset[str] = (
+        frozenset() if battlefield is None else frozenset(battlefield.placed_model_ids())
+    )
+    surviving_views = tuple(
+        view for view in current_views if any(model.is_alive for model in view.own_models)
+    )
+    placed_views = tuple(
+        view
+        for view in surviving_views
+        if any(
+            model.is_alive and model.model_instance_id in placed_model_ids
+            for model in view.own_models
+        )
+    )
+    return RulesUnitIdentityReconciliation(
+        historical_unit_instance_id=requested_id,
+        current_unit_instance_ids=tuple(view.unit_instance_id for view in current_views),
+        surviving_unit_instance_ids=tuple(view.unit_instance_id for view in surviving_views),
+        placed_surviving_unit_instance_ids=tuple(view.unit_instance_id for view in placed_views),
+    )
 
 
 def current_placed_alive_rules_unit_view_for_identity(
@@ -442,6 +538,20 @@ def _attached_rules_unit_view(
         components=tuple(components),
         attached_unit=attached_unit,
     )
+
+
+def _validated_sorted_identity_ids(
+    field_name: str,
+    values: tuple[str, ...],
+) -> tuple[str, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(f"{field_name} must be a tuple.")
+    validated = tuple(_validate_identifier(field_name, value) for value in values)
+    if len(set(validated)) != len(validated):
+        raise GameLifecycleError(f"{field_name} must not contain duplicates.")
+    if validated != tuple(sorted(validated)):
+        raise GameLifecycleError(f"{field_name} must be sorted.")
+    return validated
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

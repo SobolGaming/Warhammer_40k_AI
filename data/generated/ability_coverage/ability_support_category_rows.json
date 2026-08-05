@@ -2879,6 +2879,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000004081:lethal-obsession",
+        "ability_name": "Lethal Obsession",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004081/datasheet/000004081:lethal-obsession/none",
+        "datasheet_id": "000004081",
+        "datasheet_name": "Chaos Terminators",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000002531:reavers-of-the-void",
         "ability_name": "Reavers of the Void",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000002531/datasheet/000002531:reavers-of-the-void/none",
@@ -2906,17 +2914,20 @@
     "ability_names": [
       "Assured Destruction",
       "Excessive Assault",
+      "Lethal Obsession",
       "Reavers of the Void"
     ],
     "category_id": "datasheet.rule_ir.reroll_permission.this_unit",
     "category_name": "Datasheet Rule Ir Reroll Permission This Unit",
-    "coverage_row_count": 3,
+    "coverage_row_count": 4,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004081/datasheet/000004081:lethal-obsession/none",
       "chaos-daemons-bridge-catalog/000002531/datasheet/000002531:reavers-of-the-void/none",
       "chaos-daemons-bridge-catalog/000000596/datasheet/000000596:assured-destruction/none",
       "chaos-daemons-bridge-catalog/000004080/datasheet/000004080:excessive-assault/none"
     ],
     "datasheet_names": [
+      "Chaos Terminators",
       "Corsair Voidreavers",
       "Fire Dragons",
       "Infractors"
@@ -2925,10 +2936,11 @@
       "catalog-ir:damage-roll-reroll",
       "catalog-ir:hit-roll-reroll",
       "catalog-ir:passive-hit-reroll",
+      "catalog-ir:post-shoot-hit-target-effect",
       "catalog-ir:wound-roll-reroll"
     ],
     "source_kind_counts": {
-      "datasheet": 3
+      "datasheet": 4
     },
     "support_stages": [
       "engine_consumed"
@@ -3461,6 +3473,14 @@
       {
         "ability_id": "000008343",
         "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004081/core/000008343/none",
+        "datasheet_id": "000004081",
+        "datasheet_name": "Chaos Terminators",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004196/core/000008343/none",
         "datasheet_id": "000004196",
         "datasheet_name": "Corsair Skyreavers",
@@ -3536,12 +3556,13 @@
     ],
     "category_id": "core.reserve.deep_strike",
     "category_name": "Deep Strike Reserve Arrival",
-    "coverage_row_count": 13,
+    "coverage_row_count": 14,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000002759/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001148/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001115/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001114/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000004081/core/000008343/none",
       "chaos-daemons-bridge-catalog/000004196/core/000008343/none",
       "chaos-daemons-bridge-catalog/000002758/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001149/core/000008343/none",
@@ -3557,6 +3578,7 @@
       "Be'lakor",
       "Bloodcrushers",
       "Bloodletters",
+      "Chaos Terminators",
       "Corsair Skyreavers",
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
@@ -3572,7 +3594,7 @@
       "descriptor:reserve-declaration:deep-strike"
     ],
     "source_kind_counts": {
-      "core": 13
+      "core": 14
     },
     "support_stages": [
       "engine_consumed"
@@ -3648,6 +3670,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004081/faction/000009994/none",
+        "datasheet_id": "000004081",
+        "datasheet_name": "Chaos Terminators",
+        "source_kind": "faction"
+      },
+      {
         "ability_id": "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers",
         "ability_name": "Thrill Seekers",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none",
@@ -3717,8 +3747,9 @@
     ],
     "category_id": "faction.army_rule.thrill_seekers",
     "category_name": "Emperor's Children Army Rule",
-    "coverage_row_count": 8,
+    "coverage_row_count": 9,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004081/faction/000009994/none",
       "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none",
       "chaos-daemons-bridge-catalog/000004089/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004077/faction/000009994/none",
@@ -3729,6 +3760,7 @@
       "chaos-daemons-bridge-catalog/000004079/faction/000009994/none"
     ],
     "datasheet_names": [
+      "Chaos Terminators",
       "Emperor's Children",
       "Flawless Blades",
       "Fulgrim",
@@ -3745,7 +3777,7 @@
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
     ],
     "source_kind_counts": {
-      "faction": 8
+      "faction": 9
     },
     "support_stages": [
       "engine_consumed"

@@ -11,6 +11,9 @@ from warhammer40k_core.engine.catalog_conditional_leader_queries import (
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_charge_roll_reroll_permission_for_unit,
 )
+from warhammer40k_core.engine.catalog_selected_target_charge_effects import (
+    catalog_selected_target_charge_reroll_permission_for_unit,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_for_unit,
@@ -40,6 +43,11 @@ def charge_reroll_permission_for_unit(
                     unit=unit,
                 ),
                 player_id=player_id,
+            ),
+            catalog_selected_target_charge_reroll_permission_for_unit(
+                state=state,
+                player_id=player_id,
+                unit_instance_id=unit_instance_id,
             ),
             source_backed_reroll_permission_for_unit(
                 state=state,

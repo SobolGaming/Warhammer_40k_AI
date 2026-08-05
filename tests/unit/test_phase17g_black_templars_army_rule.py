@@ -29,6 +29,11 @@ from warhammer40k_core.engine.battle_round_hooks import (
 )
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.charge_declaration_hooks import ChargeDeclarationContext
+from warhammer40k_core.engine.charge_required_targets import (
+    CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
+    charge_target_constraints_satisfied,
+    required_charge_target_unit_instance_ids,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -60,7 +65,6 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.charge import (
     CHARGE_MOVE_ACTION,
-    CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
     ChargeMoveProposal,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
@@ -283,6 +287,16 @@ def test_abhor_charge_grant_records_reroll_and_restricts_targets_to_psykers() ->
     )
 
     assert permission is not None
+    assert required_charge_target_unit_instance_ids(
+        state=state,
+        unit_instance_id=BLACK_TEMPLARS_UNIT_ID,
+        reachable_target_unit_instance_ids=(),
+    ) == (ENEMY_PSYKER_UNIT_ID,)
+    assert not charge_target_constraints_satisfied(
+        state=state,
+        unit_instance_id=BLACK_TEMPLARS_UNIT_ID,
+        candidate_target_unit_instance_ids=(),
+    )
     assert permission.source_payload["effect_kind"] == army_rule.ABHOR_CHARGE_EFFECT_KIND
     assert psyker_restriction is None
     assert non_psyker_restriction is not None

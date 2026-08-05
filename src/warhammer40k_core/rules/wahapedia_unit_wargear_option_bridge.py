@@ -9,6 +9,9 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.rules.wahapedia_counted_wargear_option_bridge import (
     append_counted_wargear_option_rows,
 )
+from warhammer40k_core.rules.wahapedia_generic_model_wargear_option_bridge import (
+    append_generic_model_replacement_rows,
+)
 from warhammer40k_core.rules.wahapedia_loadout_bridge import LoadoutAssignments
 from warhammer40k_core.rules.wahapedia_paired_replacement_option_bridge import (
     append_paired_replacement_option_rows,
@@ -35,7 +38,7 @@ from warhammer40k_core.rules.wahapedia_wargear_option_bridge_support import (
 )
 
 NAMED_REPLACEMENT_CHOICES_RE = re.compile(
-    r"^The (?P<model>.+?)(?: model)?'s (?P<replaced>.+?) can be replaced with "
+    r"^(?:The |1 )(?P<model>.+?)(?: model)?'s (?P<replaced>.+?) can be replaced with "
     r"(?:one|1) of the following:\n"
     r"(?P<choices>(?:- 1 .+?(?:\n|$))+)$",
     re.IGNORECASE,
@@ -208,6 +211,18 @@ def append_unit_wargear_option_rows(
         row=row,
         datasheet_id=datasheet_id,
         model_profile_by_name=model_profile_by_name,
+        minimum_unit_models=minimum_unit_models,
+        maximum_unit_models=maximum_unit_models,
+        wargear_ids_by_name=wargear_ids_by_name,
+        bridged_rows=bridged_rows,
+        error_type=error_type,
+    ):
+        return True
+    if append_generic_model_replacement_rows(
+        row=row,
+        datasheet_id=datasheet_id,
+        model_profile_ids=tuple(sorted(set(model_profile_by_name.values()))),
+        max_models_by_profile_id=max_models_by_profile_id,
         minimum_unit_models=minimum_unit_models,
         maximum_unit_models=maximum_unit_models,
         wargear_ids_by_name=wargear_ids_by_name,
@@ -1052,7 +1067,7 @@ def _append_any_number_replacement_choices(
     bridged_rows: dict[str, list[dict[str, str]]],
     error_type: type[ValueError],
 ) -> None:
-    model_profile_id = _any_number_model_profile_id(
+    model_profile_ids = _any_number_model_profile_ids(
         model_profile_by_name,
         match.group("model"),
         error_type=error_type,
@@ -1065,34 +1080,41 @@ def _append_any_number_replacement_choices(
     choices = replacement_choices(match.group("choices"), error_type=error_type)
     source_line = _required_field(row, "line", error_type=error_type)
     selection_group_id = f"{datasheet_id}:any-number-replacement-option-{source_line}"
-    for choice_index, choice in enumerate(choices, start=1):
-        choice_id = _required_wargear_id(
-            wargear_ids_by_name,
-            choice.name,
-            error_type=error_type,
-        )
-        bridged_rows["Datasheets_options"].append(
-            {
-                **_option_common(
-                    row=row,
-                    datasheet_id=datasheet_id,
-                    option_id=(
-                        f"{datasheet_id}:{_name_key(match.group('replaced'))}-"
-                        f"{_name_key(choice.name)}:option-{source_line}"
+    for profile_index, model_profile_id in enumerate(model_profile_ids, start=1):
+        profile_suffix = _any_number_profile_suffix(model_profile_ids, model_profile_id)
+        for choice_index, choice in enumerate(choices, start=1):
+            choice_id = _required_wargear_id(
+                wargear_ids_by_name,
+                choice.name,
+                error_type=error_type,
+            )
+            line = (
+                f"{source_line}.{choice_index}"
+                if len(model_profile_ids) == 1
+                else f"{source_line}.{profile_index}.{choice_index}"
+            )
+            bridged_rows["Datasheets_options"].append(
+                {
+                    **_option_common(
+                        row=row,
+                        datasheet_id=datasheet_id,
+                        option_id=(
+                            f"{datasheet_id}:{_name_key(match.group('replaced'))}-"
+                            f"{_name_key(choice.name)}{profile_suffix}:option-{source_line}"
+                        ),
+                        model_profile_id=model_profile_id,
+                        allowed_wargear_ids=(choice_id,),
+                        max_selections=max_models_by_profile_id[model_profile_id],
                     ),
-                    model_profile_id=model_profile_id,
-                    allowed_wargear_ids=(choice_id,),
-                    max_selections=max_models_by_profile_id[model_profile_id],
-                ),
-                "line": f"{source_line}.{choice_index}",
-                **_any_number_selection_limit_fields(selection_group_id),
-                "effect_kind": WargearOptionEffectKind.REPLACE_WARGEAR.value,
-                "effect_wargear_id": choice_id,
-                "effect_replaced_wargear_id": replaced_id,
-                "effect_model_count": "1",
-                "effect_wargear_count": "1",
-            }
-        )
+                    "line": line,
+                    **_any_number_selection_limit_fields(selection_group_id),
+                    "effect_kind": WargearOptionEffectKind.REPLACE_WARGEAR.value,
+                    "effect_wargear_id": choice_id,
+                    "effect_replaced_wargear_id": replaced_id,
+                    "effect_model_count": "1",
+                    "effect_wargear_count": "1",
+                }
+            )
 
 
 def _append_any_number_single_replacement(
@@ -1106,7 +1128,7 @@ def _append_any_number_single_replacement(
     bridged_rows: dict[str, list[dict[str, str]]],
     error_type: type[ValueError],
 ) -> None:
-    model_profile_id = _any_number_model_profile_id(
+    model_profile_ids = _any_number_model_profile_ids(
         model_profile_by_name,
         match.group("model"),
         error_type=error_type,
@@ -1123,46 +1145,62 @@ def _append_any_number_single_replacement(
     )
     source_line = _required_field(row, "line", error_type=error_type)
     selection_group_id = f"{datasheet_id}:any-number-replacement-option-{source_line}"
-    bridged_rows["Datasheets_options"].append(
-        {
-            **_option_common(
-                row=row,
-                datasheet_id=datasheet_id,
-                option_id=(
-                    f"{datasheet_id}:{_name_key(match.group('replaced'))}-"
-                    f"{_name_key(match.group('replacement'))}:option-{source_line}"
+    for profile_index, model_profile_id in enumerate(model_profile_ids, start=1):
+        profile_suffix = _any_number_profile_suffix(model_profile_ids, model_profile_id)
+        bridged_rows["Datasheets_options"].append(
+            {
+                **_option_common(
+                    row=row,
+                    datasheet_id=datasheet_id,
+                    option_id=(
+                        f"{datasheet_id}:{_name_key(match.group('replaced'))}-"
+                        f"{_name_key(match.group('replacement'))}{profile_suffix}:"
+                        f"option-{source_line}"
+                    ),
+                    model_profile_id=model_profile_id,
+                    allowed_wargear_ids=(replacement_id,),
+                    max_selections=max_models_by_profile_id[model_profile_id],
                 ),
-                model_profile_id=model_profile_id,
-                allowed_wargear_ids=(replacement_id,),
-                max_selections=max_models_by_profile_id[model_profile_id],
-            ),
-            "line": source_line,
-            **_any_number_selection_limit_fields(selection_group_id),
-            "effect_kind": WargearOptionEffectKind.REPLACE_WARGEAR.value,
-            "effect_wargear_id": replacement_id,
-            "effect_replaced_wargear_id": replaced_id,
-            "effect_model_count": "1",
-            "effect_wargear_count": "1",
-        }
-    )
+                "line": (
+                    source_line if len(model_profile_ids) == 1 else f"{source_line}.{profile_index}"
+                ),
+                **_any_number_selection_limit_fields(selection_group_id),
+                "effect_kind": WargearOptionEffectKind.REPLACE_WARGEAR.value,
+                "effect_wargear_id": replacement_id,
+                "effect_replaced_wargear_id": replaced_id,
+                "effect_model_count": "1",
+                "effect_wargear_count": "1",
+            }
+        )
 
 
-def _any_number_model_profile_id(
+def _any_number_model_profile_ids(
     model_profile_by_name: dict[str, str],
     model_name: str,
     *,
     error_type: type[ValueError],
-) -> str:
+) -> tuple[str, ...]:
     if _name_key(model_name) not in {"model", "models"}:
-        return _required_model_profile_id(
-            model_profile_by_name,
-            model_name,
-            error_type=error_type,
+        return (
+            _required_model_profile_id(
+                model_profile_by_name,
+                model_name,
+                error_type=error_type,
+            ),
         )
     profile_ids = tuple(sorted(set(model_profile_by_name.values())))
-    if len(profile_ids) != 1:
-        raise error_type("Generic any-number wargear option requires one model profile.")
-    return profile_ids[0]
+    if not profile_ids:
+        raise error_type("Generic any-number wargear option requires model profiles.")
+    return profile_ids
+
+
+def _any_number_profile_suffix(
+    model_profile_ids: tuple[str, ...],
+    model_profile_id: str,
+) -> str:
+    if len(model_profile_ids) == 1:
+        return ""
+    return f"-{_name_key(model_profile_id.rsplit(':', maxsplit=1)[-1])}"
 
 
 def _append_any_number_paired_replacement(

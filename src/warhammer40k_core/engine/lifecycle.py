@@ -59,6 +59,9 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
     SELECT_CATALOG_SETUP_REACTIVE_SHOOT_CHARGE_DECISION_TYPE,
 )
+from warhammer40k_core.engine.charge_selected_target_validation import (
+    invalid_charge_roll_reroll_context_status,
+)
 from warhammer40k_core.engine.cult_ambush import (
     SELECT_CULT_AMBUSH_RESURGENCE_DECISION_TYPE,
     SUBMIT_CULT_AMBUSH_MARKER_PLACEMENT_DECISION_TYPE,
@@ -193,7 +196,6 @@ from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
-    ProposalKind,
 )
 from warhammer40k_core.engine.opportunity_windows import (
     OPPORTUNITY_REQUEST_FAMILY,
@@ -208,6 +210,12 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
     PhaseHandler,
+)
+from warhammer40k_core.engine.phase_proposal_routing import (
+    is_charge_move_proposal_request as _is_charge_move_proposal_request,
+)
+from warhammer40k_core.engine.phase_proposal_routing import (
+    is_fight_movement_proposal_request as _is_fight_movement_proposal_request,
 )
 from warhammer40k_core.engine.phases.charge import (
     SELECT_CHARGING_UNIT_DECISION_TYPE,
@@ -1187,6 +1195,16 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         state = self._require_state()
+        selected_target_reroll_status = invalid_charge_roll_reroll_context_status(
+            state=state,
+            request=request,
+            ruleset_descriptor=self._require_config().ruleset_descriptor,
+            charge_target_restriction_hooks=(
+                self._require_runtime_content_bundle().charge_target_restriction_hook_registry
+            ),
+        )
+        if selected_target_reroll_status is not None:
+            return selected_target_reroll_status
         if request.decision_type == SELECT_MOVEMENT_ACTION_DECISION_TYPE:
             return self._movement_phase_handler.invalid_movement_action_selection_status(
                 state=state, request=request, result=result
@@ -1906,6 +1924,10 @@ class GameLifecycle:
                 request=request,
                 result=result,
                 charge_declaration_hooks=self._charge_phase_handler.charge_declaration_hooks,
+                ruleset_descriptor=self._require_config().ruleset_descriptor,
+                charge_target_restriction_hooks=(
+                    self._require_runtime_content_bundle().charge_target_restriction_hook_registry
+                ),
             )
             if invalid_status is not None:
                 return invalid_status
@@ -3170,30 +3192,6 @@ def _proposal_context_string(
     if type(value) is not str or not value:
         raise GameLifecycleError(f"Proposal request context missing string key: {key}.")
     return value
-
-
-def _is_charge_move_proposal_request(request: DecisionRequest) -> bool:
-    if type(request) is not DecisionRequest:
-        raise GameLifecycleError("Charge proposal routing requires a DecisionRequest.")
-    if request.decision_type != MOVEMENT_PROPOSAL_DECISION_TYPE:
-        return False
-    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
-    return (
-        proposal_request.phase == BattlePhase.CHARGE.value
-        or proposal_request.proposal_kind is ProposalKind.CHARGE_MOVE
-    )
-
-
-def _is_fight_movement_proposal_request(request: DecisionRequest) -> bool:
-    if type(request) is not DecisionRequest:
-        raise GameLifecycleError("Fight proposal routing requires a DecisionRequest.")
-    if request.decision_type != MOVEMENT_PROPOSAL_DECISION_TYPE:
-        return False
-    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
-    return proposal_request.phase == BattlePhase.FIGHT.value or proposal_request.proposal_kind in {
-        ProposalKind.PILE_IN,
-        ProposalKind.CONSOLIDATE,
-    }
 
 
 def _is_opportunity_window_request(request: DecisionRequest) -> bool:

@@ -131,16 +131,24 @@ _DATASHEET_REVIEW_ROWS = (
         group=_EMPERORS_CHILDREN_GROUP,
         datasheet="Chaos Terminators",
         datasheet_id="000004081",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All consumed",
         supported_semantics=(
-            "Deep Strike and the Thrill Seekers army-rule handler are implemented paths; the "
-            "source overlay applies the updated Lethal Obsession text."
+            "Deep Strike, the Thrill Seekers army-rule handler, and Lethal Obsession are "
+            "implemented source-backed paths. Lethal Obsession uses the generic post-shoot "
+            "selected-target decision, persists through the turn, blocks the Charge declaration "
+            "if every current successor of the marked enemy is not a legal target, coalesces "
+            "repeated uses into one Charge-roll re-roll while preserving all source effects, "
+            "and requires a PathWitness ending the Charge Move engaged with every current marked "
+            "successor. Historical source and target identities reconcile deterministically "
+            "across Attached Unit splits and replay round-trips."
         ),
-        semantics_needed=(
-            "Lethal Obsession must persist the sole shooting target and condition the later "
-            "Charge-roll re-roll on declaring against that target."
+        semantics_needed="None in the exact source ability rows.",
+        catalog_blockers=(
+            "No known Chaos Terminators blocker; catalog, model geometry, wargear, "
+            "weapon-keyword, datasheet-ability, and Thrill Seekers runtime-consumption "
+            "evidence are Full. The generated overall row remains Playable while "
+            "faction-wide detachment interaction coverage is partial."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_EMPERORS_CHILDREN_GROUP,
@@ -863,6 +871,7 @@ def emperors_children_datasheet_support_markdown(
             "000004077",
             "000004079",
             "000004080",
+            "000004081",
             "000004083",
             "000004084",
             "000004088",

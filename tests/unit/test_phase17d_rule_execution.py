@@ -67,6 +67,9 @@ from warhammer40k_core.engine.catalog_setup_reactive_shoot_charge import (
     invalid_catalog_setup_reactive_shoot_charge_status,
     request_catalog_setup_reactive_shoot_charge_if_available,
 )
+from warhammer40k_core.engine.charge_required_targets import (
+    CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
+)
 from warhammer40k_core.engine.command_point_rule_execution import (
     CommandPointRuleMutationResult,
     apply_command_point_rule_mutation,
@@ -114,7 +117,6 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.charge import (
-    CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
     FIGHTS_FIRST_CHARGE_EFFECT_KIND,
     ChargeMoveProposal,
 )

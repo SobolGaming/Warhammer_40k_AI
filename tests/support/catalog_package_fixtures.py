@@ -6,6 +6,7 @@ from tests.support.wahapedia_bridge_fixtures import (
     flesh_hounds_bridge_artifacts,
     model_reroll_bridge_artifacts,
     named_weapon_choice_bridge_artifacts,
+    post_shoot_charge_target_effect_bridge_artifacts,
     post_shoot_cover_denial_bridge_artifacts,
     post_shoot_selected_target_effect_bridge_artifacts,
     split_fall_back_bridge_artifacts,
@@ -117,6 +118,14 @@ def post_shoot_selected_target_effect_package() -> CanonicalCatalogPackage:
         package_id=catalog_package_id(),
         catalog_version=catalog_version(),
         source_artifacts=post_shoot_selected_target_effect_bridge_artifacts(),
+    )
+
+
+def post_shoot_charge_target_effect_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=catalog_package_id(),
+        catalog_version=catalog_version(),
+        source_artifacts=post_shoot_charge_target_effect_bridge_artifacts(),
     )
 
 

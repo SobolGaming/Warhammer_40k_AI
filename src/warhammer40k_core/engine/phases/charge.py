@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 from warhammer40k_core.core.dice import (
     DiceRollState,
     DiceRollStatePayload,
-    RerollPermission,
 )
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -37,9 +36,11 @@ from warhammer40k_core.engine.catalog_conditional_leader_queries import (
 from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_charge_roll_modifiers_for_unit,
 )
+from warhammer40k_core.engine.catalog_selected_target_charge_effects import (
+    selected_target_charge_constraint_for_unit,
+)
 from warhammer40k_core.engine.charge_declaration import (
     CHARGE_MOVE_PENDING_STATUS,
-    CHARGE_ROLL_COMMAND_REROLL_FORBIDDEN_RULE_ID,
     ChargeDistanceState,
     ChargeDistanceStatePayload,
     ChargeEligibilityContext,
@@ -58,11 +59,23 @@ from warhammer40k_core.engine.charge_declaration_hooks import (
     ChargeDeclarationHookRegistry,
 )
 from warhammer40k_core.engine.charge_effects import charge_after_advance_allowed_by_effects
+from warhammer40k_core.engine.charge_required_targets import (
+    CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
+)
+from warhammer40k_core.engine.charge_required_targets import (
+    charge_target_constraints_satisfied as _charge_target_constraints_satisfied,
+)
+from warhammer40k_core.engine.charge_required_targets import (
+    required_charge_target_unit_instance_ids as _required_charge_target_unit_instance_ids,
+)
 from warhammer40k_core.engine.charge_roll_permissions import (
     charge_reroll_permission_for_unit as _charge_reroll_permission_for_unit,
 )
 from warhammer40k_core.engine.charge_roll_permissions import (
     current_model_instance_ids_for_charge_unit as _current_model_instance_ids_for_charge_unit,
+)
+from warhammer40k_core.engine.charge_roll_reroll_requests import (
+    build_charge_roll_reroll_request,
 )
 from warhammer40k_core.engine.charge_rule_effects import (
     charge_path_context_with_rule_effect_permissions,
@@ -140,7 +153,6 @@ COMPLETE_CHARGE_PHASE_OPTION_ID = "complete_charge_phase"
 CHARGE_MOVE_ACTION = "charge_move"
 FIGHTS_FIRST_CHARGE_EFFECT_KIND = "charge_grants_fights_first"
 CHARGE_AFTER_FALL_BACK_EFFECT_KIND = "charge_after_fall_back_allowed"
-CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY = "charge_move_required_target_unit_instance_ids"
 _COMPLETE_CHARGE_PHASE_STATUS = "charge_phase_complete"
 _CHARGE_MOVE_PROPOSAL_REQUIRED_STATUS = "charge_move_proposal_required"
 _CHARGE_MOVE_INVALID_STATUS = "charge_move_invalid"
@@ -399,12 +411,12 @@ class ChargeMoveProposal:
                 proposal_request_id=request.request_id,
                 proposal_kind=request.proposal_kind,
             )
-        if required_target_ids and selected_target_ids.isdisjoint(required_target_ids):
+        if not required_target_ids.issubset(selected_target_ids):
             return ProposalValidationResult.invalid(
                 proposal_request_id=request.request_id,
                 proposal_kind=request.proposal_kind,
                 violation_code="charge_required_target_not_selected",
-                message="Charge Move selected targets did not include a required reachable target.",
+                message="Charge Move selected targets did not include every required target.",
                 field="charge_target_unit_instance_ids",
             )
         if self.witness is None:
@@ -1274,6 +1286,8 @@ def invalid_charge_declaration_grant_status(
     request: DecisionRequest,
     result: DecisionResult,
     charge_declaration_hooks: ChargeDeclarationHookRegistry,
+    ruleset_descriptor: RulesetDescriptor,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry,
 ) -> LifecycleStatus | None:
     if request.decision_type != SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE:
         raise GameLifecycleError(
@@ -1301,6 +1315,23 @@ def invalid_charge_declaration_grant_status(
             },
         )
     selection = charge_state.active_selection
+    ineligibility_reason = _charge_unit_ineligibility_reason(
+        state=state,
+        unit_instance_id=selection.unit_instance_id,
+        ruleset_descriptor=ruleset_descriptor,
+        charge_state=charge_state,
+        ignore_already_selected=True,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
+    )
+    if ineligibility_reason is not None:
+        return LifecycleStatus.invalid(
+            stage=state.stage,
+            message="Charge declaration grant source is no longer eligible to declare.",
+            payload={
+                "invalid_reason": "invalid_charge_declaration_grant_result",
+                "field": "eligibility_context",
+            },
+        )
     payload = _decision_payload_object(result.payload)
     if _payload_string(payload, key="unit_instance_id") != selection.unit_instance_id:
         return LifecycleStatus.invalid(
@@ -1796,8 +1827,11 @@ def _resolve_charge_roll(
         source_decision_result_id=selection.result_id,
         roll_modifiers=roll_modifiers,
     )
-    roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
-        roll_request.spec
+    legal_target_ids = legal_charge_target_unit_instance_ids(
+        state=state,
+        unit_instance_id=selection.unit_instance_id,
+        ruleset_descriptor=ruleset_descriptor,
+        charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
     reroll_permission = _charge_reroll_permission_for_unit(
         state=state,
@@ -1805,13 +1839,30 @@ def _resolve_charge_roll(
         unit_instance_id=selection.unit_instance_id,
         ability_index=ability_index,
     )
+    selected_target_constraint = selected_target_charge_constraint_for_unit(
+        state=state,
+        unit_instance_id=selection.unit_instance_id,
+    )
+    if not _charge_target_constraints_satisfied(
+        state=state,
+        unit_instance_id=selection.unit_instance_id,
+        candidate_target_unit_instance_ids=legal_target_ids,
+    ):
+        raise GameLifecycleError(
+            "Required Charge target constraint became unavailable after declaration."
+        )
+    roll_state = DiceRollManager(state.game_id, event_log=decisions.event_log).roll(
+        roll_request.spec
+    )
     if reroll_permission is not None:
-        reroll_request = _charge_roll_reroll_request(
+        reroll_request = build_charge_roll_reroll_request(
             state=state,
             decisions=decisions,
             roll_request=roll_request,
             roll_state=roll_state,
             permission=reroll_permission,
+            selected_target_constraint=selected_target_constraint,
+            legal_target_unit_instance_ids=legal_target_ids,
         )
         decisions.request_decision(reroll_request)
         return LifecycleStatus.waiting_for_decision(
@@ -1853,6 +1904,12 @@ def _resolve_charge_roll_state(
         ruleset_descriptor=ruleset_descriptor,
         charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
+    if not _charge_target_constraints_satisfied(
+        state=state,
+        unit_instance_id=selection.unit_instance_id,
+        candidate_target_unit_instance_ids=tuple(reachable_distances),
+    ):
+        reachable_distances = {}
     roll_result = ChargeRollResult.from_roll_state(
         request=roll_request,
         roll_state=roll_state,
@@ -1881,34 +1938,6 @@ def _resolve_charge_roll_state(
         decisions=decisions,
         charge_state=charge_state,
         roll_result=roll_result,
-    )
-
-
-def _charge_roll_reroll_request(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    roll_request: ChargeRollRequest,
-    roll_state: DiceRollState,
-    permission: RerollPermission,
-) -> DecisionRequest:
-    manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
-    return manager.build_reroll_request(
-        roll_state,
-        request_id=state.next_decision_request_id(),
-        actor_id=roll_request.player_id,
-        permission=permission,
-        ignored_reroll_forbidden_rule_ids=(CHARGE_ROLL_COMMAND_REROLL_FORBIDDEN_RULE_ID,),
-        extra_payload={
-            "charge_context": {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": BattlePhase.CHARGE.value,
-                "unit_instance_id": roll_request.unit_instance_id,
-                "charge_roll_request": validate_json_value(roll_request.to_payload()),
-                "charge_roll_state": validate_json_value(roll_state.to_payload()),
-            }
-        },
     )
 
 
@@ -2503,13 +2532,19 @@ def _charge_unit_ineligibility_reason(
         ruleset_descriptor=ruleset_descriptor,
     ):
         return "charge_unit_engaged"
-    candidates = _charge_target_candidates(
+    legal_target_ids = legal_charge_target_unit_instance_ids(
         state=state,
         unit_instance_id=requested_unit_id,
         ruleset_descriptor=ruleset_descriptor,
         charge_target_restriction_hooks=charge_target_restriction_hooks,
     )
-    if not any(candidate.is_legal for candidate in candidates):
+    if not _charge_target_constraints_satisfied(
+        state=state,
+        unit_instance_id=requested_unit_id,
+        candidate_target_unit_instance_ids=legal_target_ids,
+    ):
+        return "charge_unit_required_target_unavailable"
+    if not legal_target_ids:
         return "charge_unit_no_legal_targets"
     return None
 
@@ -2544,52 +2579,6 @@ def _charge_after_fall_back_allowed_by_effects(
         if payload.get("effect_kind") == CHARGE_AFTER_FALL_BACK_EFFECT_KIND:
             return True
     return False
-
-
-def _required_charge_target_unit_instance_ids(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-    reachable_target_unit_instance_ids: tuple[str, ...],
-) -> tuple[str, ...]:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    reachable_ids = set(
-        _validate_identifier_tuple(
-            "reachable_target_unit_instance_ids",
-            reachable_target_unit_instance_ids,
-        )
-    )
-    if not reachable_ids:
-        return ()
-    required_ids: set[str] = set()
-    for effect in state.persisting_effects_for_unit(requested_unit_id):
-        payload = effect.effect_payload
-        if not isinstance(payload, dict):
-            continue
-        for candidate_payload in _charge_target_requirement_payloads(payload):
-            required_ids.update(
-                required_id
-                for required_id in _payload_identifier_list(
-                    candidate_payload,
-                    key=CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
-                )
-                if required_id in reachable_ids
-            )
-    return tuple(sorted(required_ids))
-
-
-def _charge_target_requirement_payloads(
-    effect_payload: Mapping[str, object],
-) -> tuple[Mapping[str, object], ...]:
-    payloads: list[Mapping[str, object]] = []
-    if CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY in effect_payload:
-        payloads.append(effect_payload)
-    raw_source_payload = effect_payload.get("source_payload")
-    if isinstance(raw_source_payload, dict) and (
-        CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY in raw_source_payload
-    ):
-        payloads.append(cast(Mapping[str, object], raw_source_payload))
-    return tuple(payloads)
 
 
 def _charge_target_restriction(
@@ -2653,6 +2642,25 @@ def _charge_target_candidates(
             )
         )
     return tuple(sorted(candidates, key=lambda candidate: candidate.target_unit_instance_id))
+
+
+def legal_charge_target_unit_instance_ids(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    ruleset_descriptor: RulesetDescriptor,
+    charge_target_restriction_hooks: ChargeTargetRestrictionHookRegistry | None = None,
+) -> tuple[str, ...]:
+    return tuple(
+        candidate.target_unit_instance_id
+        for candidate in _charge_target_candidates(
+            state=state,
+            unit_instance_id=unit_instance_id,
+            ruleset_descriptor=ruleset_descriptor,
+            charge_target_restriction_hooks=charge_target_restriction_hooks,
+        )
+        if candidate.is_legal
+    )
 
 
 def _reachable_charge_target_distances(

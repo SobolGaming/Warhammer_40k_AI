@@ -3412,6 +3412,67 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004081/core/000008343/none",
+    "datasheet_id": "000004081",
+    "datasheet_name": "Chaos Terminators",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004081:lethal-obsession",
+    "ability_name": "Lethal Obsession",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004081/datasheet/000004081:lethal-obsession/none",
+    "datasheet_id": "000004081",
+    "datasheet_name": "Chaos Terminators",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:post-shoot-hit-target-effect"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.reroll_permission.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009994",
+    "ability_name": "Thrill Seekers",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004081/faction/000009994/none",
+    "datasheet_id": "000004081",
+    "datasheet_name": "Chaos Terminators",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.thrill_seekers"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008338",
     "ability_name": "Feel No Pain",
     "catalog_id": "chaos-daemons-bridge-catalog",

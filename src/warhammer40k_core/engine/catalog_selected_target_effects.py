@@ -132,6 +132,9 @@ from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     post_shoot_target_once_per_turn as _post_shoot_target_once_per_turn,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
+    post_shoot_target_selection_is_optional as _post_shoot_target_selection_is_optional,
+)
+from warhammer40k_core.engine.catalog_selected_target_effects_support import (
     record_has_supported_post_shoot_selected_target_effect as _record_has_supported_post_shoot,
 )
 from warhammer40k_core.engine.catalog_selected_target_effects_support import (
@@ -1049,6 +1052,7 @@ def _post_shoot_groups_for_record(
                         submission_kind=(
                             SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_SUBMISSION_KIND
                         ),
+                        optional=_post_shoot_target_selection_is_optional(selection_clause),
                         attack_sequence=attack_sequence,
                         attack_sequence_completed_event_id=(attack_sequence_completed_event_id),
                     )

@@ -691,6 +691,23 @@ EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_HEIGHT_OVERRIDES = tuple(
         ("000004080", "Infractors", "infractors"),
     )
 )
+EMPERORS_CHILDREN_CHAOS_TERMINATORS_HEIGHT_OVERRIDES = tuple(
+    ModelHeightOverride(
+        datasheet_id="000004081",
+        model_name=model_name,
+        height=2.0,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id=f"geometry-review:emperors-children:{source_key}:height",
+        height_document_reference=(
+            f"Emperor's Children {model_name} assembled miniature imagery; "
+            "Warhammer Event Companion 2026-07-22 p.74 (40mm base)"
+        ),
+    )
+    for model_name, source_key in (
+        ("Terminator Champion", "terminator-champion"),
+        ("Chaos Terminators", "chaos-terminators"),
+    )
+)
 EMPERORS_CHILDREN_LORD_KAKOPHONIST_NOISE_MARINES_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000004084",
@@ -795,6 +812,7 @@ DEFAULT_HEIGHT_OVERRIDES = (
     *CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES,
     *CHAOS_DEFILER_HEIGHT_OVERRIDES,
+    *EMPERORS_CHILDREN_CHAOS_TERMINATORS_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FULGRIM_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_HEIGHT_OVERRIDES,

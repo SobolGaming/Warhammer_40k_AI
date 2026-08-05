@@ -364,6 +364,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("emperors-children", "000004077", "Playable"),
         ("emperors-children", "000004079", "Playable"),
         ("emperors-children", "000004080", "Playable"),
+        ("emperors-children", "000004081", "Playable"),
         ("emperors-children", "000004083", "Playable"),
         ("emperors-children", "000004084", "Playable"),
         ("emperors-children", "000004088", "Playable"),
@@ -405,6 +406,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
                 "000004077",
                 "000004079",
                 "000004080",
+                "000004081",
                 "000004083",
                 "000004084",
                 "000004088",
@@ -431,6 +433,34 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
                     f"| {row.datasheet_name} (`{row.datasheet_id}`) | "
                     f"{coverage_row.ability_name} (`{coverage_row.ability_id}`) |"
                 ) in markdown
+
+    chaos_terminators_support = next(
+        row for row in non_daemons_rows if row.datasheet_id == "000004081"
+    )
+    assert (
+        chaos_terminators_support.catalog_status,
+        chaos_terminators_support.model_geometry_status,
+        chaos_terminators_support.wargear_status,
+        chaos_terminators_support.weapon_keyword_status,
+        chaos_terminators_support.datasheet_ability_status,
+    ) == ("Full", "Full", "Full", "Full", "Full")
+    assert chaos_terminators_support.faction_interaction_status == "Partial"
+    chaos_terminator_abilities = {
+        ability_rows_by_id[row_id].ability_name: ability_rows_by_id[row_id]
+        for row_id in chaos_terminators_support.ability_coverage_row_ids
+    }
+    assert set(chaos_terminator_abilities) == {
+        "Deep Strike",
+        "Lethal Obsession",
+        "Thrill Seekers",
+    }
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in chaos_terminator_abilities.values()
+    )
+    assert chaos_terminator_abilities["Lethal Obsession"].runtime_consumer_ids == (
+        CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+    )
 
     kharseth_support = next(row for row in non_daemons_rows if row.datasheet_id == "000004194")
     assert (
