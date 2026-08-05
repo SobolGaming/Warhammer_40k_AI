@@ -135,9 +135,12 @@ _DATASHEET_REVIEW_ROWS = (
         supported_semantics=(
             "Deep Strike, the Thrill Seekers army-rule handler, and Lethal Obsession are "
             "implemented source-backed paths. Lethal Obsession uses the generic post-shoot "
-            "selected-target decision, persists through the turn, grants the Charge-roll "
-            "re-roll only when the marked enemy is a legal charge target, and requires a "
-            "PathWitness ending the Charge Move engaged with that enemy."
+            "selected-target decision, persists through the turn, blocks the Charge declaration "
+            "if every current successor of the marked enemy is not a legal target, coalesces "
+            "repeated uses into one Charge-roll re-roll while preserving all source effects, "
+            "and requires a PathWitness ending the Charge Move engaged with every current marked "
+            "successor. Historical source and target identities reconcile deterministically "
+            "across Attached Unit splits and replay round-trips."
         ),
         semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(

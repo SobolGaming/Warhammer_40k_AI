@@ -414,7 +414,6 @@ def test_lithe_agility_charge_grant_spends_pain_token_and_unlocks_charge_reroll(
         player_id="player-a",
         unit_instance_id=unit.unit_instance_id,
         ability_index=AbilityCatalogIndex.from_records(()),
-        eligible_target_unit_instance_ids=(),
     )
 
     assert pain_tokens_available(state, player_id="player-a") == 0

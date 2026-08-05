@@ -7,6 +7,9 @@ from typing import cast
 import pytest
 from tests.setup_completion_helpers import enter_battle_for_fixture
 from tests.support.catalog_package_fixtures import undivided_daemon_package
+from tests.support.selected_target_charge_fixtures import (
+    selected_target_charge_persisting_effect,
+)
 from tests.support.selected_to_fight_risk_fixtures import (
     attached_selected_to_fight_risk_fixture,
 )
@@ -18,6 +21,9 @@ from warhammer40k_core.core.weapon_profiles import RangeProfileKind
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatus
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.catalog_selected_target_charge_effects import (
+    selected_target_charge_constraint_for_unit,
+)
 from warhammer40k_core.engine.damage_allocation import (
     DECLINE_DESTRUCTION_REACTION_OPTION_ID,
     DECLINE_FEEL_NO_PAIN_OPTION_ID,
@@ -51,7 +57,7 @@ from warhammer40k_core.engine.fight_phase_end_hooks import (
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
 )
-from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -675,6 +681,222 @@ def test_selected_to_fight_risk_split_creates_one_liability_per_survivor() -> No
     second_unit = cast(str, cast(dict[str, JsonValue], second.payload)["rules_unit_instance_id"])
     assert {first_unit, second_unit} == {bodyguard.unit_instance_id, leader.unit_instance_id}
     assert len(state.persisting_effects) == 2
+
+
+@pytest.mark.parametrize("destroyed_component", ["bodyguard", "leader"])
+def test_selected_target_charge_effect_source_identity_survives_attached_split(
+    destroyed_component: str,
+) -> None:
+    state, runtime, decisions, bodyguard, leader, enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture(pre_split=False)
+    )
+    state.record_persisting_effect(
+        selected_target_charge_persisting_effect(
+            state=state,
+            effect_id=f"selected-target-charge-source-split:{destroyed_component}",
+            owner_player_id="player-source",
+            source_rules_unit_instance_id=attached_id,
+            source_component_unit_instance_id=bodyguard.unit_instance_id,
+            selected_target_unit_instance_id=enemy.unit_instance_id,
+        )
+    )
+    destroyed_unit = bodyguard if destroyed_component == "bodyguard" else leader
+    survivor = leader if destroyed_component == "bodyguard" else bodyguard
+    request = runtime.next_fight_phase_end_request(
+        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    option = next(
+        item
+        for item in request.options
+        if cast(dict[str, JsonValue], item.payload)["selected_model_instance_id"]
+        == destroyed_unit.own_models[0].model_instance_id
+    )
+    decisions.request_decision(request)
+    record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id=f"selected-target-charge-source-split:{destroyed_component}",
+            request=request,
+            selected_option_id=option.option_id,
+        )
+    )
+    assert (
+        runtime.apply_fight_phase_end_result(
+            FightPhaseEndResultContext(
+                state=state,
+                decisions=decisions,
+                request=record.request,
+                result=record.result,
+            )
+        )
+        is True
+    )
+
+    constraint = selected_target_charge_constraint_for_unit(
+        state=state,
+        unit_instance_id=survivor.unit_instance_id,
+    )
+
+    assert constraint is not None
+    assert constraint.required_target_unit_instance_ids == (enemy.unit_instance_id,)
+    assert constraint.source_effect_ids == (
+        f"selected-target-charge-source-split:{destroyed_component}",
+    )
+    assert constraint.source_lineages[0].historical_unit_instance_id == attached_id
+    assert constraint.source_lineages[0].surviving_unit_instance_ids == (survivor.unit_instance_id,)
+
+
+@pytest.mark.parametrize("destroyed_component", ["bodyguard", "leader"])
+def test_selected_target_charge_effect_target_identity_expands_surviving_attached_successor(
+    destroyed_component: str,
+) -> None:
+    state, runtime, decisions, bodyguard, leader, enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture(pre_split=False)
+    )
+    state.record_persisting_effect(
+        selected_target_charge_persisting_effect(
+            state=state,
+            effect_id=f"selected-target-charge-target-split:{destroyed_component}",
+            owner_player_id="player-enemy",
+            source_rules_unit_instance_id=enemy.unit_instance_id,
+            source_component_unit_instance_id=enemy.unit_instance_id,
+            selected_target_unit_instance_id=attached_id,
+        )
+    )
+    destroyed_unit = bodyguard if destroyed_component == "bodyguard" else leader
+    survivor = leader if destroyed_component == "bodyguard" else bodyguard
+    request = runtime.next_fight_phase_end_request(
+        FightPhaseEndRequestContext(state=state, decisions=decisions)
+    )
+    assert request is not None
+    option = next(
+        item
+        for item in request.options
+        if cast(dict[str, JsonValue], item.payload)["selected_model_instance_id"]
+        == destroyed_unit.own_models[0].model_instance_id
+    )
+    decisions.request_decision(request)
+    record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id=f"selected-target-charge-target-split:{destroyed_component}",
+            request=request,
+            selected_option_id=option.option_id,
+        )
+    )
+    assert (
+        runtime.apply_fight_phase_end_result(
+            FightPhaseEndResultContext(
+                state=state,
+                decisions=decisions,
+                request=record.request,
+                result=record.result,
+            )
+        )
+        is True
+    )
+
+    constraint = selected_target_charge_constraint_for_unit(
+        state=state,
+        unit_instance_id=enemy.unit_instance_id,
+    )
+
+    assert constraint is not None
+    assert constraint.required_target_unit_instance_ids == (survivor.unit_instance_id,)
+    assert constraint.selected_target_identity_ids == (attached_id,)
+    assert constraint.target_lineages[0].is_split is True
+    assert constraint.target_lineages[0].is_destroyed is False
+
+
+def test_selected_target_charge_effect_round_trip_preserves_source_split_lineage_and_expiry() -> (
+    None
+):
+    state, _runtime, _decisions, bodyguard, leader, enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture(pre_split=False)
+    )
+    state.persisting_effects.clear()
+    state.record_persisting_effect(
+        selected_target_charge_persisting_effect(
+            state=state,
+            effect_id="selected-target-charge-source-round-trip",
+            owner_player_id="player-source",
+            source_rules_unit_instance_id=attached_id,
+            source_component_unit_instance_id=leader.unit_instance_id,
+            selected_target_unit_instance_id=enemy.unit_instance_id,
+        )
+    )
+    restored = GameState.from_payload(
+        cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
+    )
+    restored.recover_starting_strength_after_attached_unit_split(
+        player_id="player-source",
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=(bodyguard.unit_instance_id, leader.unit_instance_id),
+        event_log=EventLog(),
+    )
+    expected_payload: dict[str, JsonValue] | None = None
+    for source_id in sorted((bodyguard.unit_instance_id, leader.unit_instance_id)):
+        constraint = selected_target_charge_constraint_for_unit(
+            state=restored,
+            unit_instance_id=source_id,
+        )
+        assert constraint is not None
+        assert constraint.required_target_unit_instance_ids == (enemy.unit_instance_id,)
+        if expected_payload is None:
+            expected_payload = constraint.to_payload()
+        else:
+            assert constraint.to_payload() == expected_payload
+    round_tripped = GameState.from_payload(restored.to_payload())
+    round_tripped_constraint = selected_target_charge_constraint_for_unit(
+        state=round_tripped,
+        unit_instance_id=bodyguard.unit_instance_id,
+    )
+    assert round_tripped_constraint is not None
+    assert round_tripped_constraint.to_payload() == expected_payload
+
+    expired = round_tripped.expire_persisting_effects_at_boundary(
+        EffectExpirationBoundary.turn_end(battle_round=1, player_id="player-source")
+    )
+
+    assert tuple(effect.effect_id for effect in expired) == (
+        "selected-target-charge-source-round-trip",
+    )
+    assert (
+        selected_target_charge_constraint_for_unit(
+            state=round_tripped,
+            unit_instance_id=bodyguard.unit_instance_id,
+        )
+        is None
+    )
+
+
+def test_selected_target_charge_effect_expands_all_current_attached_target_successors() -> None:
+    state, _runtime, _decisions, bodyguard, leader, enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture()
+    )
+    state.persisting_effects.clear()
+    state.record_persisting_effect(
+        selected_target_charge_persisting_effect(
+            state=state,
+            effect_id="selected-target-charge-target-successors",
+            owner_player_id="player-enemy",
+            source_rules_unit_instance_id=enemy.unit_instance_id,
+            source_component_unit_instance_id=enemy.unit_instance_id,
+            selected_target_unit_instance_id=attached_id,
+        )
+    )
+
+    constraint = selected_target_charge_constraint_for_unit(
+        state=GameState.from_payload(state.to_payload()),
+        unit_instance_id=enemy.unit_instance_id,
+    )
+
+    assert constraint is not None
+    assert constraint.required_target_unit_instance_ids == tuple(
+        sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+    )
+    assert constraint.target_lineages[0].current_unit_instance_ids == tuple(
+        sorted((bodyguard.unit_instance_id, leader.unit_instance_id))
+    )
 
 
 @pytest.mark.parametrize("destroyed_component", ["bodyguard", "leader"])

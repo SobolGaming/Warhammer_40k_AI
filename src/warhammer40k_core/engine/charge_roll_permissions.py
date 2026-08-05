@@ -30,7 +30,6 @@ def charge_reroll_permission_for_unit(
     player_id: str,
     unit_instance_id: str,
     ability_index: AbilityCatalogIndex,
-    eligible_target_unit_instance_ids: tuple[str, ...],
 ) -> RerollPermission | None:
     unit = _unit_by_id(state=state, unit_instance_id=unit_instance_id)
     permissions = tuple(
@@ -49,7 +48,6 @@ def charge_reroll_permission_for_unit(
                 state=state,
                 player_id=player_id,
                 unit_instance_id=unit_instance_id,
-                eligible_target_unit_instance_ids=eligible_target_unit_instance_ids,
             ),
             source_backed_reroll_permission_for_unit(
                 state=state,

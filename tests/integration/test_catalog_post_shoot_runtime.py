@@ -838,22 +838,11 @@ def test_chaos_terminator_lethal_obsession_marks_required_charge_target() -> Non
         "selected_target_unit_instance_id": target_unit.unit_instance_id,
         "target_reference": "selected_unit",
     }
-    assert (
-        charge_reroll_permission_for_unit(
-            state=state,
-            player_id=army.player_id,
-            unit_instance_id=unit.unit_instance_id,
-            ability_index=player_index,
-            eligible_target_unit_instance_ids=(),
-        )
-        is None
-    )
     permission = charge_reroll_permission_for_unit(
         state=state,
         player_id=army.player_id,
         unit_instance_id=unit.unit_instance_id,
         ability_index=player_index,
-        eligible_target_unit_instance_ids=(target_unit.unit_instance_id,),
     )
     assert permission is not None
     assert permission.eligible_roll_type == "charge_roll"
@@ -861,6 +850,11 @@ def test_chaos_terminator_lethal_obsession_marks_required_charge_target() -> Non
         state=state,
         unit_instance_id=unit.unit_instance_id,
         reachable_target_unit_instance_ids=(target_unit.unit_instance_id,),
+    ) == (target_unit.unit_instance_id,)
+    assert required_charge_target_unit_instance_ids(
+        state=state,
+        unit_instance_id=unit.unit_instance_id,
+        reachable_target_unit_instance_ids=(),
     ) == (target_unit.unit_instance_id,)
 
 

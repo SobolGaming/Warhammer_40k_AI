@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.catalog_selected_target_charge_effects import (
     catalog_selected_target_required_charge_target_unit_instance_ids,
+    selected_target_charge_constraint_for_unit,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 
@@ -16,6 +17,33 @@ if TYPE_CHECKING:
 CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY = "charge_move_required_target_unit_instance_ids"
 
 
+def charge_target_constraints_satisfied(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    candidate_target_unit_instance_ids: tuple[str, ...],
+) -> bool:
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    candidate_ids = _validate_identifier_tuple(
+        "candidate_target_unit_instance_ids",
+        candidate_target_unit_instance_ids,
+    )
+    selected_target_constraint = selected_target_charge_constraint_for_unit(
+        state=state,
+        unit_instance_id=requested_unit_id,
+    )
+    if selected_target_constraint is not None and not selected_target_constraint.is_satisfied_by(
+        candidate_ids
+    ):
+        return False
+    required_ids = required_charge_target_unit_instance_ids(
+        state=state,
+        unit_instance_id=requested_unit_id,
+        reachable_target_unit_instance_ids=candidate_ids,
+    )
+    return set(required_ids).issubset(candidate_ids)
+
+
 def required_charge_target_unit_instance_ids(
     *,
     state: GameState,
@@ -23,19 +51,14 @@ def required_charge_target_unit_instance_ids(
     reachable_target_unit_instance_ids: tuple[str, ...],
 ) -> tuple[str, ...]:
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    reachable_ids = set(
-        _validate_identifier_tuple(
-            "reachable_target_unit_instance_ids",
-            reachable_target_unit_instance_ids,
-        )
+    _validate_identifier_tuple(
+        "reachable_target_unit_instance_ids",
+        reachable_target_unit_instance_ids,
     )
-    if not reachable_ids:
-        return ()
     required_ids = set(
         catalog_selected_target_required_charge_target_unit_instance_ids(
             state=state,
             unit_instance_id=requested_unit_id,
-            eligible_target_unit_instance_ids=tuple(sorted(reachable_ids)),
         )
     )
     for effect in state.persisting_effects_for_unit(requested_unit_id):
@@ -44,12 +67,10 @@ def required_charge_target_unit_instance_ids(
             continue
         for candidate_payload in _charge_target_requirement_payloads(payload):
             required_ids.update(
-                required_id
-                for required_id in _payload_identifier_list(
+                _payload_identifier_list(
                     candidate_payload,
                     key=CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
                 )
-                if required_id in reachable_ids
             )
     return tuple(sorted(required_ids))
 

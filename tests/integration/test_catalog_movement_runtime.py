@@ -406,7 +406,6 @@ def test_phase17k_leading_model_reroll_text_uses_generic_advance_charge_rerolls(
         player_id=army.player_id,
         unit_instance_id=unit.unit_instance_id,
         ability_index=player_index,
-        eligible_target_unit_instance_ids=(),
     )
     keyword_permission = _advance_reroll_permission_for_unit(
         state=state,
