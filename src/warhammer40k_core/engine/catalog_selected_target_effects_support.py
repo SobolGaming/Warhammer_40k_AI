@@ -42,6 +42,9 @@ from warhammer40k_core.engine.catalog_rule_selected_target_classification import
 from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
     post_shoot_target_once_per_turn as post_shoot_target_once_per_turn,
 )
+from warhammer40k_core.engine.catalog_rule_selected_target_classification import (
+    post_shoot_target_selection_is_optional as post_shoot_target_selection_is_optional,
+)
 from warhammer40k_core.engine.catalog_selected_target_pair_support import (
     clause_is_fight_start_selected_target_selection,
     clause_is_movement_end_selected_target_selection,
@@ -103,6 +106,7 @@ __all__ = (
     "post_shoot_selected_target_effect_clauses_after",
     "post_shoot_selected_target_pair_is_supported",
     "post_shoot_selection_clause_binds_source_model",
+    "post_shoot_target_selection_is_optional",
     "selected_target_effect_attack_role",
     "selected_target_effect_clause_is_supported",
     "selected_target_effect_weapon_scope",

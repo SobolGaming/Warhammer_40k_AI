@@ -612,7 +612,42 @@ def post_shoot_cover_denial_bridge_artifacts() -> tuple[WahapediaJsonArtifact, .
 
 def post_shoot_selected_target_effect_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     return build_wahapedia_canonical_bridge_artifacts(
-        source_artifacts=_post_shoot_selected_target_effect_source_artifacts(),
+        source_artifacts=_post_shoot_selected_target_effect_source_artifacts(
+            ability_name="Warpflame Locus",
+            description=(
+                "In your Shooting phase, after this model has shot, select one enemy unit "
+                "hit by one or more of those attacks. Until the end of the phase, each time "
+                "this model makes an attack that targets that unit, add 1 to the Damage "
+                "characteristic of that attack."
+            ),
+        ),
+        bridge_package_id=bridge_package_id(),
+        datasheet_ids=("test-lord-of-change",),
+        height_overrides=(
+            ModelHeightOverride(
+                datasheet_id="test-lord-of-change",
+                model_name="Lord of Change",
+                height=5.5,
+                height_units=GeometrySourceUnits.INCHES,
+                height_source_id="geometry-review:test:lord-of-change:height",
+                height_document_reference="Test Lord of Change Datasheet",
+            ),
+        ),
+    )
+
+
+def post_shoot_charge_target_effect_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=_post_shoot_selected_target_effect_source_artifacts(
+            ability_name="Lethal Obsession",
+            description=(
+                "In your Shooting phase, after this unit has shot, you can use this ability. "
+                "If you do, select one enemy unit hit by those ranged attacks. Until the end "
+                "of the turn, when this unit declares a charge:\n"
+                "- This unit can re-roll that charge roll.\n"
+                "- This unit must end that charge move engaged with that enemy unit."
+            ),
+        ),
         bridge_package_id=bridge_package_id(),
         datasheet_ids=("test-lord-of-change",),
         height_overrides=(
@@ -983,7 +1018,11 @@ def _post_shoot_cover_denial_source_artifacts() -> tuple[WahapediaJsonArtifact, 
     )
 
 
-def _post_shoot_selected_target_effect_source_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+def _post_shoot_selected_target_effect_source_artifacts(
+    *,
+    ability_name: str,
+    description: str,
+) -> tuple[WahapediaJsonArtifact, ...]:
     return (
         artifact_from_csv(
             "Abilities",
@@ -1013,11 +1052,8 @@ def _post_shoot_selected_target_effect_source_artifacts() -> tuple[WahapediaJson
                         "Test Daemons Rule,Test rule text.,"
                     ),
                     (
-                        "test-lord-of-change,2,Datasheet,,Warpflame Locus,"
-                        '"In your Shooting phase, after this model has shot, select one '
-                        "enemy unit hit by one or more of those attacks. Until the end "
-                        "of the phase, each time this model makes an attack that targets "
-                        'that unit, add 1 to the Damage characteristic of that attack.",'
+                        "test-lord-of-change,2,Datasheet,,"
+                        f'{csv_field(ability_name)},"{csv_field(description)}",'
                     ),
                 )
             ),

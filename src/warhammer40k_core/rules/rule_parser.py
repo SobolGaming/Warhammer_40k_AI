@@ -115,8 +115,8 @@ from warhammer40k_core.rules.selected_target_parser import (
     is_structural_target_keyword,
     selected_target_spec_from_text,
 )
-from warhammer40k_core.rules.selected_to_fight_risk_parser import (
-    compile_selected_to_fight_risk_clauses,
+from warhammer40k_core.rules.specialized_rule_parser import (
+    compile_specialized_rule_clauses,
 )
 from warhammer40k_core.rules.triggered_action_parser import (
     compile_triggered_action_clause,
@@ -622,7 +622,7 @@ def parse_rule_ir(
             source_keyword_sequence_parts
         )
     )
-    compiled_clauses = compile_selected_to_fight_risk_clauses(
+    compiled_clauses = compile_specialized_rule_clauses(
         source_id=source_id.strip(),
         normalized_text=parsed_text.normalized_text,
     )

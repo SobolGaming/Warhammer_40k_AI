@@ -50,6 +50,7 @@ _POST_SHOOT_FILTERED_TRIGGER_KEYS = _POST_SHOOT_TRIGGER_KEYS | {
     "attacker_model_reference",
     "weapon_names",
 }
+_POST_SHOOT_OPTIONAL_TRIGGER_KEYS = _POST_SHOOT_TRIGGER_KEYS | {"optional"}
 _POST_FIGHT_FILTERED_TRIGGER_KEYS = frozenset(
     {
         "attacker_model_reference",
@@ -295,11 +296,23 @@ def post_shoot_target_once_per_turn(clause: RuleClause) -> bool:
     )
 
 
+def post_shoot_target_selection_is_optional(clause: RuleClause) -> bool:
+    if type(clause) is not RuleClause:
+        raise GameLifecycleError("Catalog post-shoot optional query requires RuleClause.")
+    if not clause_is_post_shoot_hit_target_selection(clause):
+        raise GameLifecycleError("Catalog post-shoot optional query requires a selection clause.")
+    if clause.trigger is None:
+        raise GameLifecycleError("Catalog post-shoot selection clause requires a trigger.")
+    return parameter_payload(clause.trigger.parameters).get("optional") is True
+
+
 def _post_shoot_trigger_parameters_are_supported(
     parameters: dict[str, RuleParameterValue],
 ) -> bool:
     parameter_keys = frozenset(parameters)
-    if parameter_keys == _POST_SHOOT_TRIGGER_KEYS:
+    if parameter_keys in {_POST_SHOOT_TRIGGER_KEYS, _POST_SHOOT_OPTIONAL_TRIGGER_KEYS}:
+        if "optional" in parameters and parameters.get("optional") is not True:
+            return False
         return parameters.get("subject") in {
             "this_model",
             "this_models_unit",

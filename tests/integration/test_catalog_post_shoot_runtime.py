@@ -8,6 +8,7 @@ from typing import cast
 from tests.support.catalog_package_fixtures import (
     flesh_hounds_army,
     named_weapon_choice_unit,
+    post_shoot_charge_target_effect_package,
     post_shoot_cover_denial_package,
     post_shoot_selected_target_effect_package,
 )
@@ -74,6 +75,10 @@ from warhammer40k_core.engine.catalog_selected_target_effects import (
     apply_catalog_post_shoot_hit_target_effect_result,
     invalid_catalog_post_shoot_hit_target_effect_status,
 )
+from warhammer40k_core.engine.charge_required_targets import (
+    required_charge_target_unit_instance_ids,
+)
+from warhammer40k_core.engine.charge_roll_permissions import charge_reroll_permission_for_unit
 from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -694,6 +699,169 @@ def test_phase17k_post_shoot_selected_target_effect_records_generic_rule_effect(
     malformed_payload = cast(dict[str, JsonValue], malformed_status.payload)
     assert malformed_payload["field"] == "selected_option_id"
     assert "object at 0x" not in json.dumps(decisions.to_payload(), sort_keys=True)
+
+
+def test_chaos_terminator_lethal_obsession_marks_required_charge_target() -> None:
+    package = post_shoot_charge_target_effect_package()
+    unit = named_weapon_choice_unit(package=package)
+    target_unit = named_weapon_choice_unit(
+        package=package,
+        army_id="army-opponent",
+        unit_selection_id="enemy-lord-of-change-1",
+    )
+    army = flesh_hounds_army(package=package, unit=unit)
+    enemy_army = flesh_hounds_army(
+        package=package,
+        unit=target_unit,
+        army_id="army-opponent",
+        player_id="player-opponent",
+    )
+    player_index = player_ability_index(package=package, army=army)
+    enemy_index = player_ability_index(package=package, army=enemy_army)
+    record = next(
+        record
+        for record in player_index.all_records()
+        if record.definition.name == "Lethal Obsession"
+    )
+    replay_payload = cast(dict[str, JsonValue], record.definition.replay_payload)
+    rule_ir = RuleIR.from_payload(cast(RuleIRPayload, replay_payload["rule_ir"]))
+    battlefield = flesh_hounds_battlefield_state(
+        army=army,
+        unit=unit,
+        enemy_army=enemy_army,
+        enemy_unit=target_unit,
+        enemy_x=9.0,
+    )
+    state = battle_state_with_armies(
+        armies=(army, enemy_army),
+        battlefield=battlefield,
+        active_player_id=army.player_id,
+        phase=BattlePhase.SHOOTING,
+    )
+    decisions = DecisionController()
+    attack_sequence = completed_post_shoot_attack_sequence(
+        package=package,
+        attacker=unit,
+        target=target_unit,
+    )
+    emit_successful_hit(decisions=decisions, attack_sequence=attack_sequence, successful=True)
+    completed_event = decisions.event_log.append(
+        "attack_sequence_completed",
+        {
+            "sequence_id": attack_sequence.sequence_id,
+            "attacker_player_id": army.player_id,
+            "attacking_unit_instance_id": unit.unit_instance_id,
+        },
+    )
+    status = CatalogSelectedTargetEffectRuntime(
+        ability_indexes_by_player_id={
+            army.player_id: player_index,
+            enemy_army.player_id: enemy_index,
+        },
+        armies=(army, enemy_army),
+    ).post_shoot_hit_target_request(
+        AttackSequenceCompletedContext(
+            state=state,
+            decisions=decisions,
+            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            source_phase=BattlePhase.SHOOTING,
+            attack_sequence=attack_sequence,
+            attack_sequence_completed_event_id=completed_event.event_id,
+        )
+    )
+
+    assert len(rule_ir.clauses) == 2
+    assert all(clause.is_supported for clause in rule_ir.clauses)
+    assert catalog_rule_ir_consumers_for_rule(rule_ir) == (
+        CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+    )
+    assert status is not None
+    request = decisions.queue.peek_next()
+    assert request is not None
+    assert request.decision_type == SELECT_CATALOG_POST_SHOOT_HIT_TARGET_EFFECT_DECISION_TYPE
+    assert type(request).from_payload(request.to_payload()).to_payload() == request.to_payload()
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["optional"] is True
+    assert len(request.options) == 2
+    decline_option = next(
+        option
+        for option in request.options
+        if cast(dict[str, JsonValue], option.payload)["use_ability"] is False
+    )
+    assert cast(dict[str, JsonValue], decline_option.payload)["generic_rule_effect_records"] == []
+    use_option = next(option for option in request.options if option is not decline_option)
+    result = DecisionResult.for_request(
+        result_id="lethal-obsession-target-selected",
+        request=request,
+        selected_option_id=use_option.option_id,
+    )
+    assert (
+        invalid_catalog_post_shoot_hit_target_effect_status(
+            state=state,
+            request=request,
+            result=result,
+        )
+        is None
+    )
+    decisions.submit_result(result)
+    assert (
+        apply_catalog_post_shoot_hit_target_effect_result(
+            state=state,
+            decisions=decisions,
+            result=result,
+            battle_shock_hooks=BattleShockHookRegistry.empty(),
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            ability_indexes_by_player_id={
+                army.player_id: player_index,
+                enemy_army.player_id: enemy_index,
+            },
+        )
+        is None
+    )
+
+    effects = state.persisting_effects_for_unit(unit.unit_instance_id)
+    assert len(effects) == 1
+    assert effects[0].expiration == EffectExpiration.end_turn(
+        battle_round=state.battle_round,
+        player_id=army.player_id,
+    )
+    effect_payload = cast(dict[str, JsonValue], effects[0].effect_payload)
+    effect_spec = cast(dict[str, JsonValue], effect_payload["effect"])
+    parameters = {
+        cast(str, parameter["key"]): parameter["value"]
+        for parameter in cast(list[dict[str, JsonValue]], effect_spec["parameters"])
+    }
+    assert parameters == {
+        "must_end_charge_move_engaged_with_selected_unit": True,
+        "roll_type": "charge",
+        "selected_target_unit_instance_id": target_unit.unit_instance_id,
+        "target_reference": "selected_unit",
+    }
+    assert (
+        charge_reroll_permission_for_unit(
+            state=state,
+            player_id=army.player_id,
+            unit_instance_id=unit.unit_instance_id,
+            ability_index=player_index,
+            eligible_target_unit_instance_ids=(),
+        )
+        is None
+    )
+    permission = charge_reroll_permission_for_unit(
+        state=state,
+        player_id=army.player_id,
+        unit_instance_id=unit.unit_instance_id,
+        ability_index=player_index,
+        eligible_target_unit_instance_ids=(target_unit.unit_instance_id,),
+    )
+    assert permission is not None
+    assert permission.eligible_roll_type == "charge_roll"
+    assert required_charge_target_unit_instance_ids(
+        state=state,
+        unit_instance_id=unit.unit_instance_id,
+        reachable_target_unit_instance_ids=(target_unit.unit_instance_id,),
+    ) == (target_unit.unit_instance_id,)
 
 
 def test_phase17k_datasheet_post_shoot_cover_denial_suppresses_save_cover() -> None:

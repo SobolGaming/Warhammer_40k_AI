@@ -387,9 +387,11 @@ def selected_target_effect_uses_unit_context(
         raise GameLifecycleError("Selected-target unit-context resolution requires RuleIR values.")
     if effect not in clause.effects:
         raise GameLifecycleError("Selected-target unit-context effect is not owned by the clause.")
-    return _selected_target_unit_modifier_is_supported(
-        effect, clause=clause
-    ) or _selected_target_poison_status_is_supported(effect, clause=clause)
+    return (
+        _selected_target_unit_modifier_is_supported(effect, clause=clause)
+        or _selected_target_poison_status_is_supported(effect, clause=clause)
+        or _selected_target_charge_reroll_is_supported(effect, clause=clause)
+    )
 
 
 def clause_has_immediate_selected_target_effect(clause: RuleClause) -> bool:
@@ -749,6 +751,8 @@ def _selected_target_effect_is_supported(
     parameters = parameter_payload(effect.parameters)
     if _selected_target_unit_modifier_is_supported(effect, clause=clause):
         return True
+    if _selected_target_charge_reroll_is_supported(effect, clause=clause):
+        return True
     if effect.kind is RuleEffectKind.MODIFY_CHARACTERISTIC:
         effect_is_supported = _characteristic_modifier_is_supported(parameters)
     elif effect.kind is RuleEffectKind.MODIFY_DICE_ROLL:
@@ -789,6 +793,35 @@ def _selected_target_poison_status_is_supported(
         }
         and clause.duration is not None
         and clause.duration.kind is RuleDurationKind.PERMANENT
+    )
+
+
+def _selected_target_charge_reroll_is_supported(
+    effect: RuleEffectSpec,
+    *,
+    clause: RuleClause,
+) -> bool:
+    duration = clause.duration
+    return (
+        clause.trigger is None
+        and not clause.conditions
+        and clause.target is not None
+        and clause.target.kind is RuleTargetKind.THIS_UNIT
+        and not clause.target.parameters
+        and effect.kind is RuleEffectKind.REROLL_PERMISSION
+        and parameter_payload(effect.parameters)
+        == {
+            "must_end_charge_move_engaged_with_selected_unit": True,
+            "roll_type": "charge",
+            "target_reference": "selected_unit",
+        }
+        and duration is not None
+        and duration.kind is RuleDurationKind.UNTIL_TIMING_ENDPOINT
+        and parameter_payload(duration.parameters)
+        == {
+            "boundary": "end",
+            "endpoint": "turn",
+        }
     )
 
 

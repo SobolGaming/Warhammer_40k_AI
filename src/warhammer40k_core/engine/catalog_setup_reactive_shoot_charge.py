@@ -27,6 +27,9 @@ from warhammer40k_core.engine.charge_declaration import (
     ChargeRollResult,
     phase15a_charge_roll_payload,
 )
+from warhammer40k_core.engine.charge_required_targets import (
+    CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     DecisionError,
@@ -49,7 +52,6 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.charge import (
     CHARGE_MOVE_ACTION,
-    CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
     FIGHTS_FIRST_CHARGE_EFFECT_KIND,
 )
 from warhammer40k_core.engine.phases.shooting import (
