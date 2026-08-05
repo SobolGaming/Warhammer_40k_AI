@@ -32,6 +32,12 @@ from warhammer40k_core.engine.catalog_datasheet_rule_extensions import (
     extended_datasheet_descriptor_for_clause,
     movement_target_pair_descriptor_for_clause,
 )
+from warhammer40k_core.engine.catalog_model_materialization_support import (
+    CATALOG_IR_MODEL_MATERIALIZATION_CONSUMER_ID,
+)
+from warhammer40k_core.engine.catalog_model_materialization_support import (
+    consumer_ids_for_effect_kind as model_materialization_consumer_ids_for_effect_kind,
+)
 from warhammer40k_core.engine.catalog_sticky_objective_support import (
     CATALOG_IR_COMMAND_END_STICKY_OBJECTIVE_CONSUMER_ID,
 )
@@ -140,6 +146,8 @@ def consumer_ids_for_effect(effect: RuleEffectSpec) -> tuple[str, ...]:
     if type(effect) is not RuleEffectSpec:
         raise GameLifecycleError("Datasheet RuleIR support requires RuleEffectSpec.")
     parameters = parameter_payload(effect.parameters)
+    if consumer_ids := model_materialization_consumer_ids_for_effect_kind(effect.kind):
+        return consumer_ids
     if effect.kind is RuleEffectKind.REROLL_PERMISSION and parameters == {
         "roll_type": "agile_manoeuvre_roll",
         "selection": "whole_roll",
@@ -176,6 +184,8 @@ def consumer_ids_for_clause(clause: RuleClause) -> tuple[str, ...]:
     if type(clause) is not RuleClause:
         raise GameLifecycleError("Datasheet RuleIR support requires RuleClause.")
     consumer_ids: set[str] = set()
+    for effect in clause.effects:
+        consumer_ids.update(consumer_ids_for_effect(effect))
     consumer_ids.update(sticky_objective_consumer_ids_for_clause(clause))
     if clause_is_mustering_selection(clause):
         consumer_ids.add(CATALOG_IR_MUSTERING_SELECTION_CONSUMER_ID)
@@ -340,6 +350,7 @@ def registered_consumer_ids() -> tuple[str, ...]:
                 CATALOG_IR_COMMAND_RESTORATION_CONSUMER_ID,
                 CATALOG_IR_CONDITIONAL_NOT_LEADING_FIGHTS_FIRST_CONSUMER_ID,
                 CATALOG_IR_COMMAND_END_STICKY_OBJECTIVE_CONSUMER_ID,
+                CATALOG_IR_MODEL_MATERIALIZATION_CONSUMER_ID,
                 *CATALOG_IR_CONDITIONAL_LEADER_ABILITY_CONSUMER_IDS.values(),
             }
         )

@@ -27,7 +27,7 @@ from warhammer40k_core.engine.semantic_equivalence import (
     semantic_member_without_source_text,
 )
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
-from warhammer40k_core.rules.rule_ir import RuleIR
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14,
@@ -48,6 +48,7 @@ from warhammer40k_core.rules.wahapedia_schema import (
     WahapediaJsonArtifact,
     WahapediaJsonArtifactPayload,
 )
+from warhammer40k_core.rules.wahapedia_static_rule_ir import payload_by_source_row_id
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE_JSON_DIR = (
@@ -461,6 +462,7 @@ def _datasheet_ability_members(
         rule_ir, normalized_text = _compile_source_text(
             member_id=f"datasheet-ability:{row.source_row_id}",
             source_text=source_text,
+            source_row_id=row.source_row_id,
         )
         clause_rows = ability_clause_coverage_rows_for_rule_ir(
             source_ability_id=row.stable_source_id(),
@@ -692,17 +694,36 @@ def _compile_source_text(
     *,
     member_id: str,
     source_text: _SourceRuleText,
+    source_row_id: str | None = None,
 ) -> tuple[RuleIR, str]:
     source = RuleSourceText.from_raw(
         source_id=f"cross-source-semantic-audit:{member_id}",
         raw_text=source_text.raw_text,
     )
-    rule_ir = compile_rule_source_text(
-        source,
-        source_keyword_sequence_parts=(
-            datasheet_keyword_lexicon_2026_06_14.canonical_datasheet_keyword_sequence_parts()
-        ),
-    ).rule_ir
+    static_payload = None if source_row_id is None else payload_by_source_row_id(source_row_id)
+    static_rule_ir = None if static_payload is None else RuleIR.from_payload(static_payload)
+    supports_materialization = static_rule_ir is not None and any(
+        effect.kind
+        in {
+            RuleEffectKind.MATERIALIZE_MODELS,
+            RuleEffectKind.REPLACE_UNIT_DATASHEET,
+        }
+        for clause in static_rule_ir.clauses
+        for effect in clause.effects
+    )
+    if (
+        static_rule_ir is None
+        or static_rule_ir.normalized_text != source.normalized_text
+        or not supports_materialization
+    ):
+        rule_ir = compile_rule_source_text(
+            source,
+            source_keyword_sequence_parts=(
+                datasheet_keyword_lexicon_2026_06_14.canonical_datasheet_keyword_sequence_parts()
+            ),
+        ).rule_ir
+    else:
+        rule_ir = static_rule_ir
     return rule_ir, source.normalized_text
 
 

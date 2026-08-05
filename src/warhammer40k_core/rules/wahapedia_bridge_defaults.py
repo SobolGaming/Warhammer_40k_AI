@@ -796,6 +796,60 @@ CHAOS_DEFILER_HEIGHT_OVERRIDES = (
         height_document_reference="Emperor's Children Faction Pack p.7-8",
     ),
 )
+HORRORS_HEIGHT_OVERRIDES = tuple(
+    ModelHeightOverride(
+        datasheet_id=datasheet_id,
+        model_name=model_name,
+        height=height,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id=f"geometry-review:horrors:{datasheet_id}:{profile_kind}:height",
+        height_document_reference=document_reference,
+    )
+    for datasheet_id, model_name, profile_kind, height, document_reference in (
+        (
+            "000002583",
+            "Blue Horrors",
+            "blue",
+            1.0,
+            "Chaos Daemons Faction Pack p.52-53",
+        ),
+        (
+            "000002584",
+            "Pink Horrors",
+            "pink",
+            1.25,
+            "Chaos Daemons Faction Pack p.54-55",
+        ),
+        (
+            "000002584",
+            "BLUE HORROR/BRIMSTONE HORROR",
+            "blue-brimstone",
+            1.0,
+            "Chaos Daemons Faction Pack p.54-55",
+        ),
+        (
+            "000004127",
+            "Pink Horrors",
+            "pink",
+            1.25,
+            "Thousand Sons Faction Pack Pink Horrors datasheet",
+        ),
+        (
+            "000004127",
+            "BLUE HORROR/BRIMSTONE HORROR",
+            "blue-brimstone",
+            1.0,
+            "Thousand Sons Faction Pack Pink Horrors datasheet",
+        ),
+        (
+            "000004128",
+            "Blue Horrors",
+            "blue",
+            1.0,
+            "Thousand Sons Faction Pack Blue Horrors datasheet",
+        ),
+    )
+)
 
 DEFAULT_PDF_CORRECTIONS = (
     CHAOS_DAEMONS_BLOODCRUSHERS_PDF_CORRECTION,
@@ -805,6 +859,7 @@ DEFAULT_PDF_CORRECTIONS = (
     *CHAOS_DEFILER_PDF_CORRECTIONS,
 )
 DEFAULT_HEIGHT_OVERRIDES = (
+    *HORRORS_HEIGHT_OVERRIDES,
     *AELDARI_CORSAIR_SKYREAVERS_HEIGHT_OVERRIDES,
     *AELDARI_CORSAIR_VOID_UNITS_HEIGHT_OVERRIDES,
     *AELDARI_KHARSETH_HEIGHT_OVERRIDES,

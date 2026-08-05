@@ -643,6 +643,8 @@ def _parameterized_decision_type(payload_kind: str) -> str:
         return "submit_redeploy_placement"
     if payload_kind == "healing_revival_placement":
         return "submit_healing_revival_placement"
+    if payload_kind == "model_materialization_placement":
+        return "submit_catalog_model_materialization_placement"
     if payload_kind == "scout_move":
         return "submit_scout_move"
     if payload_kind == "scout_reserve_setup":

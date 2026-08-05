@@ -285,6 +285,10 @@ _PARAMETERIZED_INTERACTION_SPECS = MappingProxyType(
             InteractionKind.MODEL_POSE_PLACEMENT,
             ("model",),
         ),
+        "submit_catalog_model_materialization_placement": InteractionSpec(
+            InteractionKind.MULTI_MODEL_PLACEMENT,
+            ("unit", "model"),
+        ),
         "submit_melee_declaration": InteractionSpec(
             InteractionKind.WEAPON_ALLOCATION_MATRIX,
             ("attacking_model", "target_unit"),
@@ -336,6 +340,7 @@ _PROPOSAL_SCHEMA_DEFINITION_BY_KIND = MappingProxyType(
         "fall_back": "movement",
         "healing_revival_placement": "generic_placement",
         "melee_declaration": "melee_declaration",
+        "model_materialization_placement": "generic_placement",
         "normal_move": "movement",
         "pile_in": "fight_movement",
         "redeploy_placement": "prebattle_placement",

@@ -50,6 +50,7 @@ def bridge_columns_for_table(
             "min_models",
             "max_models",
             "allows_zero_models",
+            "materialization_only",
             "base_size",
             "base_size_source_id",
             "base_size_document_reference",

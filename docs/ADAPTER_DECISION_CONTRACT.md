@@ -203,6 +203,9 @@ The shared contract uses these objects and payloads:
   unit resource after all reroll opportunities and before the Hit or Wound
   result is emitted.
 - `PlacementProposalPayload`: parameterized placement answer, including either one attempted physical `UnitPlacement` or one grouped `RulesUnitPlacement` for an attached rules unit.
+- `CatalogModelMaterializationPlacement`: parameterized placement answer for an
+  engine-instantiated set of models being added to an existing physical owning
+  unit by source-backed RuleIR.
 - `CultAmbushMarker`: replay-safe Genestealer Cults marker state used by the Cult Ambush marker placement and ingress contracts.
 - `DeploymentPlacementRequest`: Deploy Armies parameterized request context containing source mission setup, owning deployment zone IDs, selected rules-unit/component/model IDs, ruleset hash, and setup-step context.
 - `DeploymentPlacementProposal`: Deploy Armies placement answer containing the complete selected rules-unit model placement set, placement kind `deployment`, proposal request ID, ruleset hash, and replay-safe source context.
@@ -2097,6 +2100,58 @@ invalid non-option selection, model-scope and unit-scope reroll gates, destroyed
 target expiry, deterministic reselection, replay payload round-trip, and catalog
 consumer/hook IDs.
 
+## Catalog Model Materialization Decisions
+
+Source-backed `MATERIALIZE_MODELS` RuleIR resolves model-destruction timing and
+the engine-owned dice gate before exposing physical placement. A successful
+gate emits the parameterized decision type
+`submit_catalog_model_materialization_placement` with one fixed
+`submit_parameterized_payload` option. The request is actor-scoped to the owning
+player and includes `proposal_kind: "model_materialization_placement"`,
+`placement_kind: "split_unit"`, attack-sequence and roll-event IDs, catalog
+record/clause/source-rule identity, the physical owning unit and army IDs, the
+materialization descriptor ID, and the complete engine-instantiated model
+payloads and model IDs.
+
+Adapters answer with `PlacementProposalPayload`. The payload must preserve the
+pending request ID, proposal kind, source physical unit ID, and `split_unit`
+placement kind, and must supply exactly one `attempted_placement` containing the
+engine-emitted model IDs. Materialization is explicit set-up placement, not
+movement, so it requires validated model endpoints rather than `PathWitness`.
+The engine validates template identity, catalog profile and wargear identity,
+battlefield bounds, terrain endpoints, overlap, and final complete-rules-unit
+coherency before atomically adding the models and placements. Adapters must not
+construct model profiles, derive loadouts, add models, remove destroyed models,
+replace a datasheet, or mutate battlefield state locally.
+
+Each accepted model placement emits its own
+`model_placed_on_battlefield` runtime-content timing event for every player so
+owner and opponent reactive abilities use the shared event dispatcher. After
+materialization reactions resolve, source-backed `REPLACE_UNIT_DATASHEET`
+RuleIR may hand the physical owning component to another datasheet. This keeps
+the existing Attached Unit formation and canonical rules-unit identity,
+removes only the source-backed destroyed model profiles, remaps retained
+materialized models through descriptor-indexed catalog variants, and preserves
+the original Starting Strength record. Attached-unit reconciliation runs only
+after the completion hook and any materialization decisions finish, so a
+bodyguard component retained by newly materialized models is not split away
+prematurely.
+
+Malformed, stale, wrong-actor, wrong-kind, wrong-unit, wrong-model-set,
+template-drifted, descriptor-drifted, exception-bearing, transport-bearing,
+out-of-bounds, terrain-invalid, overlapping, or incoherent submissions reject
+before queue pop, `DecisionRecord` creation, or mutation. The current
+materialization requests, placements, transition records, and datasheet
+handoffs are public battlefield information. Future hidden materialization must
+add viewer-scoped request, record, projection, diagnostic, and event-delta
+redaction before becoming adapter-visible.
+
+Required model-materialization tests cover both source packages sharing the
+same semantics, attack and Hazardous destruction gates, non-attack exclusion,
+valid and stale placement, exact catalog profile/base/loadout identity,
+Attached Unit handoff, Starting Strength preservation, deterministic JSON-safe
+request/state round trips, and per-model placement reaction dispatch.
+
 ## Catalog First-Death Return Decisions
 
 Catalog first-death return RuleIR is captured from `model_destroyed` events using
@@ -2160,6 +2215,8 @@ The contract currently covers these proposal families:
 - Scout Move and Dedicated Transport Scout Move;
 - Charge Move, including charge-target selection, no-move choice, and PathWitness movement evidence;
 - Pile In and Consolidate movement, including no-move choices, fight movement target or objective context, and PathWitness movement evidence;
+- catalog model materialization placement after a successful source-backed
+  destruction trigger and dice gate;
 - first-death return placement after a successful phase-end return roll;
 - ranged shooting declaration, when target/weapon/profile binding is not safely enumerable;
 - melee declaration, including one primary melee weapon per fighting model, optional `[EXTRA ATTACKS]` weapons, model-engaged target binding, and split melee attack counts;

@@ -57,8 +57,9 @@ def test_chaos_daemons_report_preserves_faction_sections_and_attachment_evidence
         assert rule_name in markdown
     assert "No Prey Can Evade Advance/Charge rerolls" in markdown
     assert "No Prey Too Great" not in markdown
-    assert "only attack destruction (including Hazardous failures) can trigger Split" in markdown
-    assert "non-attack damage cannot" in markdown
+    assert "Source-backed, faction-agnostic Split materialization" in markdown
+    assert "Attack destruction and Hazardous failures trigger" in markdown
+    assert "PDF- and FAQ-backed Split composition normalization still needs review" not in markdown
 
     leader_evidence_ids = leader_attachment_consumer_evidence_datasheet_ids()
     assert leader_evidence_ids >= _CHAOS_DAEMONS_LEADER_DATASHEET_IDS

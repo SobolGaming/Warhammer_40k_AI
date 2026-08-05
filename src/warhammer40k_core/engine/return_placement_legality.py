@@ -41,6 +41,27 @@ def validate_returned_model_endpoints(
         armies=tuple(state.army_definitions),
         battlefield_state=state.battlefield_state,
     )
+    validate_model_placement_endpoints(
+        scenario=scenario,
+        ruleset_descriptor=ruleset_descriptor,
+        placements=placements,
+        placement_label=placement_label,
+    )
+
+
+def validate_model_placement_endpoints(
+    *,
+    scenario: BattlefieldScenario,
+    ruleset_descriptor: RulesetDescriptor,
+    placements: tuple[ModelPlacement, ...],
+    placement_label: str,
+) -> None:
+    if type(scenario) is not BattlefieldScenario:
+        raise GameLifecycleError("Model placement validation requires BattlefieldScenario.")
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("Model placement validation requires ruleset.")
+    if not placements:
+        raise GameLifecycleError("Model placement validation requires placements.")
     returning_ids = {placement.model_instance_id for placement in placements}
     if len(returning_ids) != len(placements):
         raise GameLifecycleError("Returned-model placements must be unique.")
@@ -57,8 +78,8 @@ def validate_returned_model_endpoints(
     for model in returned_models:
         if not model_is_within_battlefield_footprint(
             model,
-            battlefield_width_inches=state.battlefield_state.battlefield_width_inches,
-            battlefield_depth_inches=state.battlefield_state.battlefield_depth_inches,
+            battlefield_width_inches=scenario.battlefield_state.battlefield_width_inches,
+            battlefield_depth_inches=scenario.battlefield_state.battlefield_depth_inches,
         ):
             raise GameLifecycleError(f"{placement_label} crosses the battlefield edge.")
         for blocker in blockers:
@@ -66,9 +87,9 @@ def validate_returned_model_endpoints(
                 raise GameLifecycleError(f"{placement_label} overlaps another model.")
         terrain_violation = terrain_endpoint_placement_violation(
             model=model,
-            unit=_unit_for_model(state=state, model_instance_id=model.model_id),
+            unit=_unit_for_model(scenario=scenario, model_instance_id=model.model_id),
             ruleset_descriptor=ruleset_descriptor,
-            terrain_features=state.battlefield_state.terrain_features,
+            terrain_features=scenario.battlefield_state.terrain_features,
             violation_code="return_terrain_endpoint_illegal",
             placement_label=placement_label,
         )
@@ -86,12 +107,12 @@ def _models_overlap(first: Model, second: Model) -> bool:
     )
 
 
-def _unit_for_model(*, state: GameState, model_instance_id: str) -> UnitInstance:
-    for army in state.army_definitions:
+def _unit_for_model(*, scenario: BattlefieldScenario, model_instance_id: str) -> UnitInstance:
+    for army in scenario.armies:
         for unit in army.units:
             if any(model.model_instance_id == model_instance_id for model in unit.own_models):
                 return unit
     raise GameLifecycleError("Returned-model placement references an unknown model.")
 
 
-__all__ = ("validate_returned_model_endpoints",)
+__all__ = ("validate_model_placement_endpoints", "validate_returned_model_endpoints")

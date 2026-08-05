@@ -269,6 +269,7 @@
             "deep_strike_placement",
             "disembark_placement",
             "healing_revival_placement",
+            "model_materialization_placement",
             "reinforcement_placement",
             "strategic_reserves_placement"
           ],

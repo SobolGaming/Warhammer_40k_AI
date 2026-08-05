@@ -1,5 +1,5 @@
 {
-  "cross_faction_group_count": 163,
+  "cross_faction_group_count": 161,
   "equivalence_groups": [
     {
       "content_kind": "datasheet_ability",
@@ -3287,26 +3287,6 @@
         "datasheet-ability:000002570:2",
         "datasheet-ability:000004064:2",
         "datasheet-ability:000004080:3"
-      ],
-      "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
-      "support_transfer": "none"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "7780b3553c2902a630ac86ad2389fa9c5d02a3075ac045f454776edbac200ceb",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "chaos-daemons",
-        "thousand-sons"
-      ],
-      "group_id": "semantic-equivalence:7780b3553c2902a630ac86ad2389fa9c5d02a3075ac045f454776edbac200ceb",
-      "member_ids": [
-        "datasheet-ability:000002583:4",
-        "datasheet-ability:000004128:4"
       ],
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [],
@@ -7174,26 +7154,6 @@
     {
       "content_kind": "datasheet_ability",
       "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "feb57689895ac8825d3471f5e2aa71c498a729be79ea8724b36020db805bf6fd",
-      "execution_statuses": [
-        "blocked_structured_semantics"
-      ],
-      "faction_ids": [
-        "chaos-daemons",
-        "thousand-sons"
-      ],
-      "group_id": "semantic-equivalence:feb57689895ac8825d3471f5e2aa71c498a729be79ea8724b36020db805bf6fd",
-      "member_ids": [
-        "datasheet-ability:000002584:5",
-        "datasheet-ability:000004127:3"
-      ],
-      "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
-      "support_transfer": "none"
-    },
-    {
-      "content_kind": "datasheet_ability",
-      "equivalence_basis": "exact_normalized_text",
       "equivalence_hash": "ff2e467649c35d51eede80e4ed77c0df20832fc8dc797162b7ade22d3d2b19c1",
       "execution_statuses": [
         "blocked_structured_semantics"
@@ -7214,8 +7174,8 @@
       "support_transfer": "none"
     }
   ],
-  "equivalent_group_count": 332,
-  "exact_text_only_member_count": 3267,
+  "equivalent_group_count": 330,
+  "exact_text_only_member_count": 3263,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -42056,12 +42016,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "7780b3553c2902a630ac86ad2389fa9c5d02a3075ac045f454776edbac200ceb",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "c93fadf935a64f78e41f06d763613e3d9fbc44a489b17fb7062558ef95aed3ca",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "datasheet-ability:000002583:4",
@@ -42071,16 +42029,18 @@
       "rule_id": "000002583:4",
       "rule_name": "Split",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:model-materialization"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "087ebe0ad6edf04eda93befbdba4062abb694dcc03965e3b4101cddf2ad8b049",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002583:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002583:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -42196,12 +42156,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "feb57689895ac8825d3471f5e2aa71c498a729be79ea8724b36020db805bf6fd",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "4060700a0522158be50baa99336eb7ba58743a3a06931610b400b18eccab610b",
+      "execution_status": "engine_consumed",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "datasheet-ability:000002584:5",
@@ -42211,16 +42169,18 @@
       "rule_id": "000002584:5",
       "rule_name": "Split",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:model-materialization"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "fa6efb173e44293adbcc4acc20cc451858b6efaaf3dc6df8e9622ea91ee395e5",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002584:5"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000002584:5:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -59397,12 +59357,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "feb57689895ac8825d3471f5e2aa71c498a729be79ea8724b36020db805bf6fd",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "c5ce544aa84e3c4c9010e1f01c69243314da22fd24af9ebfc5eaf2cd836de28f",
+      "execution_status": "engine_consumed",
       "faction_id": "thousand-sons",
       "faction_name": "Thousand Sons",
       "member_id": "datasheet-ability:000004127:3",
@@ -59412,16 +59370,18 @@
       "rule_id": "000004127:3",
       "rule_name": "Split",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:model-materialization"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "fad8d6401c95d0eb59fc593d26e4affb4b3cb86123b823b0181c3f56cdc52772",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004127:3"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004127:3:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -59481,12 +59441,10 @@
     },
     {
       "content_kind": "datasheet_ability",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "7780b3553c2902a630ac86ad2389fa9c5d02a3075ac045f454776edbac200ceb",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "ef4c15f1d2ae80be07726d6258b281a6ffdd3e431613b62b5bd1be8c76597f9d",
+      "execution_status": "engine_consumed",
       "faction_id": "thousand-sons",
       "faction_name": "Thousand Sons",
       "member_id": "datasheet-ability:000004128:4",
@@ -59496,16 +59454,18 @@
       "rule_id": "000004128:4",
       "rule_name": "Split",
       "rules_surface": "datasheet",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:model-materialization"
+      ],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": null,
+      "semantic_hash": "13ae6f4bb9dd4bfa193074798ef532e19c23fea834ef60676410db70846147c4",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004128:4"
       ],
       "source_text_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000004128:4:description"
       ],
-      "support_transfer": "none"
+      "support_transfer": "content_neutral_generic_ir"
     },
     {
       "content_kind": "datasheet_ability",
@@ -122147,8 +122107,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "1f4c68634f8bb779eadf674e86238e44c700cde620f15dd1bb764c93f059f0e4",
+  "source_payload_checksum_sha256": "6d915d27155568e1ac08f6ec6c64ec4504d98e0af0ef298d833d832a73144272",
   "source_text_unavailable_member_count": 110,
-  "structured_member_count": 717,
+  "structured_member_count": 721,
   "upstream_execution_checksum_sha256": "33f066d0b292580042270148e7e4e190666ecf2720a511d749a0d05d424a9367"
 }

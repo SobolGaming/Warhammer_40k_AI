@@ -7,6 +7,7 @@ from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.engine import battle_formation_hooks as _bf
 from warhammer40k_core.engine import battle_round_hooks as _br
+from warhammer40k_core.engine import catalog_model_materialization_decision_dispatch as _cmmd
 from warhammer40k_core.engine import catalog_start_battle_keyword_choice as _sbkc
 from warhammer40k_core.engine import (
     catalog_unit_move_completed_mortal_wounds_runtime as _catalog_move_mw,
@@ -534,6 +535,7 @@ _PARAMETERIZED_DISPATCH_DECISION_TYPES = frozenset(
         PLACEMENT_PROPOSAL_DECISION_TYPE,
         SUBMIT_REDEPLOY_PLACEMENT_DECISION_TYPE,
         SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+        *_cmmd.PARAMETERIZED_DECISION_TYPES,
         *PARAMETERIZED_HEALING_DECISION_TYPES,
         SUBMIT_SCOUT_MOVE_DECISION_TYPE,
         SUBMIT_SCOUT_RESERVE_SETUP_DECISION_TYPE,
@@ -1057,6 +1059,7 @@ class GameLifecycle:
                     pre_validator=self._pre_validate_cult_ambush_marker_placement_decision,
                     applier=self._apply_cult_ambush_marker_placement_decision,
                 ),
+                *_cmmd.decision_dispatch_handlers(self),
                 *(
                     DecisionDispatchHandler(
                         decision_type=decision_type,

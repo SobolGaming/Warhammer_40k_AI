@@ -15,6 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import attached_unit_reconciliation as _aur
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
@@ -661,6 +662,7 @@ def _advance_fight_attack_sequence(
     )
     if completion_hook_status is not None:
         return completion_hook_status
+    _aur.reconcile_after_attack_sequence(state, decisions.event_log, fight_state.attack_sequence)
     decisions.event_log.append(
         "melee_attack_sequence_completed",
         validate_json_value(

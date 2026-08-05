@@ -298,13 +298,15 @@ CHAOS_DAEMONS_UNSUPPORTED_DETACHMENT_RULE_NAMES = (
     "Melancholic Miasma",
     "Seductive Gambit",
 )
-CHAOS_DAEMONS_SPLIT_UNSUPPORTED_SEMANTICS = (
-    "Split model-addition and Pink-to-Blue datasheet-handoff semantics, including the "
-    "FAQ constraints that only attack destruction (including Hazardous failures) can "
-    "trigger Split, non-attack damage cannot, Split can grow the unit above its starting "
-    "strength, the original Pink Horrors starting-strength baseline is retained after "
-    "handoff, returned models cannot be Pink Horrors after handoff, and returned models "
-    "cannot exceed that original starting strength"
+CHAOS_DAEMONS_SPLIT_SUPPORTED_SEMANTICS = (
+    "Source-backed, faction-agnostic Split materialization and Pink-to-Blue datasheet "
+    "handoff are consumed through catalog RuleIR. Attack destruction and Hazardous "
+    "failures trigger the after-attacks D6 gate; non-attack damage does not. Successful "
+    "rolls add engine-instantiated Blue or Brimstone models through validated battlefield "
+    "placement, dispatch per-model battlefield-placement reactions, preserve Attached Unit "
+    "identity and the original Starting Strength, and permit Split growth above Starting "
+    "Strength. After handoff, returned models cannot become Pink Horrors or exceed that "
+    "original Starting Strength"
 )
 BELAKOR_DATASHEET_IDS = ("000001148",)
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
@@ -4070,15 +4072,11 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             ir_coverage="Unsupported IR",
             supported_semantics=(
                 "Deep Strike, Infiltrators, The Shadow of Chaos, and Sullen Malevolence "
-                "Leadership modifier semantics are structured paths."
+                "Leadership modifier semantics are structured paths. "
+                f"{CHAOS_DAEMONS_SPLIT_SUPPORTED_SEMANTICS}."
             ),
-            semantics_needed=(
-                f"{CHAOS_DAEMONS_SPLIT_UNSUPPORTED_SEMANTICS}; Exploding Horrors "
-                "self-destruction and mortal-wound routing."
-            ),
-            catalog_blockers=(
-                "PDF- and FAQ-backed Split composition normalization still needs review."
-            ),
+            semantics_needed=("Exploding Horrors self-destruction and mortal-wound routing."),
+            catalog_blockers="No known Split catalog blockers.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Burning Chariot",
@@ -4186,15 +4184,14 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
             datasheet="Pink Horrors",
             datasheet_id="000002584",
             source_basis="PDF pages 54-55; supersedes Wahapedia.",
-            ir_coverage="Unsupported IR",
+            ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, The Shadow of Chaos, Daemonic Icon Leadership, and "
-                "Instrument of Chaos charge modifier semantics are structured paths."
+                "Instrument of Chaos charge modifier semantics are structured paths. "
+                f"{CHAOS_DAEMONS_SPLIT_SUPPORTED_SEMANTICS}."
             ),
-            semantics_needed=(f"{CHAOS_DAEMONS_SPLIT_UNSUPPORTED_SEMANTICS}."),
-            catalog_blockers=(
-                "PDF- and FAQ-backed Split composition normalization still needs review."
-            ),
+            semantics_needed="None.",
+            catalog_blockers="No known Split catalog blockers.",
         ),
         DatasheetGroupReviewRow(
             datasheet="Screamers",

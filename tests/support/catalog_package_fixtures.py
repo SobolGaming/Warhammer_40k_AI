@@ -4,6 +4,7 @@ from tests.support.wahapedia_bridge_fixtures import (
     advance_charge_bridge_artifacts,
     bloodcrushers_bridge_artifacts,
     flesh_hounds_bridge_artifacts,
+    horrors_bridge_artifacts,
     model_reroll_bridge_artifacts,
     named_weapon_choice_bridge_artifacts,
     post_shoot_charge_target_effect_bridge_artifacts,
@@ -54,6 +55,14 @@ def flesh_hounds_package() -> CanonicalCatalogPackage:
         package_id=catalog_package_id(),
         catalog_version=catalog_version(),
         source_artifacts=flesh_hounds_bridge_artifacts(),
+    )
+
+
+def horrors_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=catalog_package_id(),
+        catalog_version=catalog_version(),
+        source_artifacts=horrors_bridge_artifacts(),
     )
 
 
