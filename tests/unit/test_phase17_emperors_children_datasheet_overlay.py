@@ -26,11 +26,17 @@ from tools.generate_emperors_children_infractors_tormentors_rule_ir import (
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attachment_eligibility import (
+    AttachmentEligibility,
+    AttachmentRole,
+    AttachmentTargetEligibility,
+)
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
-from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
+from warhammer40k_core.core.weapon_profiles import AttackProfile, WeaponKeyword, WeaponProfile
+from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.ability_catalog import (
     build_player_ability_index,
@@ -132,7 +138,9 @@ from warhammer40k_core.engine.command_phase_start_hooks import (
     CommandPhaseStartRequestContext,
     CommandPhaseStartResultContext,
 )
+from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.damage_allocation import (
+    SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE,
     DamageKind,
     FeelNoPainSource,
     apply_damage_to_model,
@@ -146,7 +154,11 @@ from warhammer40k_core.engine.decision_controller import (
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult, DecisionResultPayload
-from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
+from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.effects import (
     EffectExpiration,
     PersistingEffect,
@@ -201,6 +213,12 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.phases.shooting import (
+    COMPLETE_SHOOTING_PHASE_OPTION_ID,
+    SELECT_SHOOTING_TYPE_DECISION_TYPE,
+    SELECT_SHOOTING_UNIT_DECISION_TYPE,
+    SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.replay import ReplayArtifact, ReplayArtifactPayload, ReplayRunner
@@ -239,7 +257,11 @@ from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
     WargearSelection,
 )
-from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
+from warhammer40k_core.engine.weapon_declaration import (
+    RangedAttackPool,
+    ShootingDeclarationProposal,
+    WeaponDeclaration,
+)
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import DataPackageId
@@ -2306,6 +2328,122 @@ def test_infractors_excessive_assault_grants_only_melee_wound_rerolls() -> None:
     assert permission_for(BattlePhase.SHOOTING) is None
 
 
+@pytest.mark.parametrize(
+    ("within_objective_range", "game_id", "expected_wound_value"),
+    [
+        (True, "infractors-excessive-assault-lifecycle", 4),
+        (False, "excessive-outside-0", 1),
+    ],
+)
+def test_infractors_excessive_assault_uses_fight_lifecycle_decision_and_replays(
+    within_objective_range: bool,
+    game_id: str,
+    expected_wound_value: int,
+) -> None:
+    session, infractors, target = _battleline_lifecycle_session(
+        source_datasheet_id="000004080",
+        phase=BattlePhase.FIGHT,
+        with_icon=False,
+        game_id=game_id,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    marker = state.mission_setup.objective_markers[0] if state.mission_setup else None
+    assert marker is not None
+    if within_objective_range:
+        _move_unit(state, target.unit_instance_id, x=marker.x_inches, y=marker.y_inches)
+        _move_unit(
+            state,
+            infractors.unit_instance_id,
+            x=marker.x_inches - 2.0,
+            y=marker.y_inches,
+        )
+    else:
+        _move_unit(state, target.unit_instance_id, x=12.0, y=10.0)
+        _move_unit(state, infractors.unit_instance_id, x=10.0, y=10.0)
+    status = session.advance_until_decision_or_terminal()
+    status = _advance_battleline_fight_to_source_reroll(
+        session=session,
+        source=infractors,
+        status=status,
+    )
+    request = _decision_request(status)
+    payload = cast(dict[str, JsonValue], request.payload)
+
+    assert request.decision_type == DICE_REROLL_DECISION_TYPE
+    assert payload["current_values"] == [expected_wound_value]
+    assert (expected_wound_value != 1) is within_objective_range
+    assert cast(dict[str, JsonValue], payload["attack_context"])["unit_instance_id"] == (
+        infractors.unit_instance_id
+    )
+    source_payload = cast(
+        dict[str, JsonValue],
+        cast(dict[str, JsonValue], payload["attack_context"])["source_payload"],
+    )
+    assert source_payload["conditional_wound_reroll"] == {
+        "reroll_unmodified_values": [1],
+        "full_reroll_if_target_within_objective_range": True,
+    }
+    initial_lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+    reroll_option = next(option for option in request.options if option.option_id != "decline")
+    submitted = session.submit_option(
+        request_id=request.request_id,
+        option_id=reroll_option.option_id,
+        result_id="infractors-excessive-assault-reroll",
+    )
+    assert submitted.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert session.lifecycle.decision_controller.records[-1].request.decision_type == (
+        DICE_REROLL_DECISION_TYPE
+    )
+    replay_payload = cast(
+        ReplayArtifactPayload,
+        json.loads(
+            json.dumps(
+                ReplayArtifact.capture(
+                    artifact_id=game_id,
+                    initial_lifecycle_payload=initial_lifecycle_payload,
+                    final_lifecycle=session.lifecycle,
+                ).to_payload(),
+                sort_keys=True,
+            )
+        ),
+    )
+    replay_result = ReplayRunner.from_payload(replay_payload).run()
+    assert replay_result.reproduced_exactly, replay_result.to_payload()
+
+
+def test_infractors_excessive_assault_does_not_enter_ranged_reroll_path() -> None:
+    session, infractors, target = _battleline_lifecycle_session(
+        source_datasheet_id="000004080",
+        phase=BattlePhase.SHOOTING,
+        with_icon=False,
+        game_id="infractors-excessive-assault-ranged-lifecycle",
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    _move_unit(state, infractors.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(state, target.unit_instance_id, x=18.0, y=10.0)
+
+    status = _advance_battleline_shooting_to_damage_allocation_request(
+        session=session,
+        source=infractors,
+        target=target,
+        status=session.advance_until_decision_or_terminal(),
+        weapon_name="Bolt pistol",
+    )
+
+    assert _decision_request(status).decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
+    assert not any(
+        record.request.decision_type == DICE_REROLL_DECISION_TYPE
+        and isinstance(record.request.payload, dict)
+        and record.request.payload.get("source_rule_id") is not None
+        for record in session.lifecycle.decision_controller.records
+    )
+
+
 def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership() -> None:
     armies, state, indexes, tormentors, target = _battleline_runtime_fixture(
         source_datasheet_id="000004079",
@@ -2356,8 +2494,13 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
                 "battle_round": state.battle_round,
                 "active_player_id": "player-a",
                 "phase": BattlePhase.SHOOTING.value,
-                "destroying_player_id": "player-a",
-                "attacking_unit_instance_id": tormentors.unit_instance_id,
+                **ModelDestructionAttribution.for_attack(
+                    destroying_player_id="player-a",
+                    attacking_unit_instance_id=tormentors.unit_instance_id,
+                    attacking_model_instance_id=(tormentors.own_models[0].model_instance_id),
+                    weapon_profile=_weapon_profile("000004079", "Bolt pistol"),
+                    attack_context_id="attack-context:icon-of-excess",
+                ).to_payload(),
                 "target_unit_instance_id": target.unit_instance_id,
                 "model_instance_id": model.model_instance_id,
             },
@@ -2375,6 +2518,486 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
     assert payload["leadership_target"] == 6
     assert payload["passed"] is True
     assert state.command_point_total("player-a") == 1
+
+
+@pytest.mark.parametrize(
+    (
+        "game_id",
+        "prefill_non_command_cap",
+        "expected_passed",
+        "expected_gain_status",
+    ),
+    [
+        ("icon-lifecycle-outcome-0", False, True, "applied"),
+        ("icon-lifecycle-outcome-5", False, False, None),
+        ("icon-cap-outcome-0", True, True, "capped"),
+    ],
+)
+def test_icon_of_excess_uses_shooting_lifecycle_destruction_and_replays(
+    game_id: str,
+    prefill_non_command_cap: bool,
+    expected_passed: bool,
+    expected_gain_status: str | None,
+) -> None:
+    session, tormentors, target = _battleline_lifecycle_session(
+        source_datasheet_id="000004079",
+        phase=BattlePhase.SHOOTING,
+        with_icon=True,
+        game_id=game_id,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    if prefill_non_command_cap:
+        state.gain_command_points(
+            player_id="player-a",
+            amount=1,
+            source_id="test:icon-of-excess:prior-non-command-gain",
+            source_kind=CommandPointSourceKind.OTHER,
+        )
+    _move_unit(state, tormentors.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(state, target.unit_instance_id, x=18.0, y=10.0)
+    status = _advance_battleline_shooting_to_damage_allocation_request(
+        session=session,
+        source=tormentors,
+        target=target,
+        status=session.advance_until_decision_or_terminal(),
+    )
+    request = _decision_request(status)
+    assert request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE
+    initial_lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    submitted = session.submit_option(
+        request_id=request.request_id,
+        option_id=request.options[0].option_id,
+        result_id="icon-of-excess-damage-allocation",
+    )
+    assert submitted.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert state.current_battle_phase is not BattlePhase.SHOOTING
+    destroyed_payloads = tuple(
+        cast(dict[str, JsonValue], record.payload)
+        for record in session.lifecycle.decision_controller.event_log.records
+        if record.event_type == "model_destroyed"
+    )
+    assert len(destroyed_payloads) == len(target.own_models)
+    for destroyed_payload in destroyed_payloads:
+        attribution = ModelDestructionAttribution.from_model_destroyed_payload(destroyed_payload)
+        assert attribution.source_rules_unit_instance_id == tormentors.unit_instance_id
+        assert attribution.attacking_unit_instance_id == tormentors.unit_instance_id
+        assert attribution.attacking_model_instance_id is not None
+        assert (
+            attribution.destruction_provenance.destruction_source_kind
+            is DestructionSourceKind.ATTACK
+        )
+    leadership_events = tuple(
+        cast(dict[str, JsonValue], record.payload)
+        for record in session.lifecycle.decision_controller.event_log.records
+        if record.event_type == CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT
+    )
+    assert len(leadership_events) == 1
+    assert leadership_events[0]["source_unit_instance_id"] == tormentors.unit_instance_id
+    assert leadership_events[0]["leadership_target"] == 6
+    assert leadership_events[0]["passed"] is expected_passed
+    command_point_result_value = leadership_events[0]["command_point_result"]
+    if expected_gain_status is None:
+        assert command_point_result_value is None
+    else:
+        command_point_result = cast(dict[str, JsonValue], command_point_result_value)
+        assert command_point_result["status"] == expected_gain_status
+        assert command_point_result["applied_amount"] == int(expected_gain_status == "applied")
+    replay_payload = cast(
+        ReplayArtifactPayload,
+        json.loads(
+            json.dumps(
+                ReplayArtifact.capture(
+                    artifact_id=game_id,
+                    initial_lifecycle_payload=initial_lifecycle_payload,
+                    final_lifecycle=session.lifecycle,
+                ).to_payload(),
+                sort_keys=True,
+            )
+        ),
+    )
+    replay_result = ReplayRunner.from_payload(replay_payload).run()
+    assert replay_result.reproduced_exactly, replay_result.to_payload()
+
+
+def test_icon_of_excess_uses_fight_lifecycle_destruction_and_replays() -> None:
+    game_id = "icon-of-excess-fight-lifecycle"
+    session, tormentors, target = _battleline_lifecycle_session(
+        source_datasheet_id="000004079",
+        phase=BattlePhase.FIGHT,
+        with_icon=True,
+        game_id=game_id,
+        single_source_model=True,
+        single_target_model=True,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    _move_unit(state, tormentors.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(state, target.unit_instance_id, x=12.0, y=10.0)
+    status = _advance_battleline_fight_through_phase(
+        session=session,
+        source=tormentors,
+        status=session.advance_until_decision_or_terminal(),
+        stop_at_movement_proposal_kind="consolidate",
+    )
+    pending_consolidation = MovementProposalRequest.from_decision_request_payload(
+        _decision_request(status).payload
+    )
+    assert pending_consolidation.proposal_kind.value == "consolidate"
+    initial_lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    status = _advance_battleline_fight_through_phase(
+        session=session,
+        source=tormentors,
+        status=status,
+    )
+
+    assert state.current_battle_phase is not BattlePhase.FIGHT
+    destroyed_payloads = tuple(
+        cast(dict[str, JsonValue], record.payload)
+        for record in session.lifecycle.decision_controller.event_log.records
+        if record.event_type == "model_destroyed"
+    )
+    assert destroyed_payloads
+    for destroyed_payload in destroyed_payloads:
+        attribution = ModelDestructionAttribution.from_model_destroyed_payload(destroyed_payload)
+        assert (
+            attribution.destruction_provenance.destruction_source_kind
+            is DestructionSourceKind.ATTACK
+        )
+        assert attribution.source_rules_unit_instance_id == tormentors.unit_instance_id
+    leadership_events = tuple(
+        record
+        for record in session.lifecycle.decision_controller.event_log.records
+        if record.event_type == CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT
+    )
+    assert len(leadership_events) == 1
+    replay_payload = cast(
+        ReplayArtifactPayload,
+        json.loads(
+            json.dumps(
+                ReplayArtifact.capture(
+                    artifact_id=game_id,
+                    initial_lifecycle_payload=initial_lifecycle_payload,
+                    final_lifecycle=session.lifecycle,
+                ).to_payload(),
+                sort_keys=True,
+            )
+        ),
+    )
+    replay_result = ReplayRunner.from_payload(replay_payload).run()
+    assert replay_result.reproduced_exactly, replay_result.to_payload()
+
+
+def test_icon_of_excess_uses_attached_rules_unit_identity_and_leadership() -> None:
+    game_id = "icon-of-excess-attached-lifecycle"
+    session, tormentors, target = _battleline_lifecycle_session(
+        source_datasheet_id="000004079",
+        phase=BattlePhase.SHOOTING,
+        with_icon=True,
+        game_id=game_id,
+        attached_source=True,
+        extra_target=True,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    attached_view = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=tormentors.unit_instance_id,
+    )
+    assert attached_view.is_attached_rules_unit
+    leader = next(
+        component.unit for component in attached_view.components if component.role == "leader"
+    )
+    extra_target = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-b"
+        for unit in army.units
+        if unit.unit_instance_id == "army-b:extra-target-battleline"
+    )
+    _move_unit(state, tormentors.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(state, leader.unit_instance_id, x=9.0, y=10.0)
+    _move_unit(state, target.unit_instance_id, x=18.0, y=10.0)
+    _move_unit(state, extra_target.unit_instance_id, x=20.0, y=10.0)
+    status = _advance_battleline_shooting_to_damage_allocation_request(
+        session=session,
+        source=tormentors,
+        target=target,
+        status=session.advance_until_decision_or_terminal(),
+    )
+    request = _decision_request(status)
+    initial_lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    session.submit_option(
+        request_id=request.request_id,
+        option_id=request.options[0].option_id,
+        result_id="icon-of-excess-attached-allocation",
+    )
+
+    destroyed_payloads = tuple(
+        cast(dict[str, JsonValue], record.payload)
+        for record in session.lifecycle.decision_controller.event_log.records
+        if record.event_type == "model_destroyed"
+    )
+    assert destroyed_payloads
+    for payload in destroyed_payloads:
+        attribution = ModelDestructionAttribution.from_model_destroyed_payload(payload)
+        assert attribution.source_rules_unit_instance_id == attached_view.unit_instance_id
+    leadership_payload = next(
+        cast(dict[str, JsonValue], record.payload)
+        for record in session.lifecycle.decision_controller.event_log.records
+        if record.event_type == CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT
+    )
+    assert leadership_payload["source_unit_instance_id"] == tormentors.unit_instance_id
+    assert leadership_payload["leadership_target"] == 5
+    replay_payload = cast(
+        ReplayArtifactPayload,
+        json.loads(
+            json.dumps(
+                ReplayArtifact.capture(
+                    artifact_id=game_id,
+                    initial_lifecycle_payload=initial_lifecycle_payload,
+                    final_lifecycle=session.lifecycle,
+                ).to_payload(),
+                sort_keys=True,
+            )
+        ),
+    )
+    replay_result = ReplayRunner.from_payload(replay_payload).run()
+    assert replay_result.reproduced_exactly, replay_result.to_payload()
+
+
+def test_icon_of_excess_ignores_rule_destruction_through_phase_end_lifecycle() -> None:
+    game_id = "icon-of-excess-rule-destruction-lifecycle"
+    session, _tormentors, target = _battleline_lifecycle_session(
+        source_datasheet_id="000004079",
+        phase=BattlePhase.SHOOTING,
+        with_icon=True,
+        game_id=game_id,
+        extra_target=True,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    decisions = session.lifecycle.decision_controller
+    for index, model in enumerate(target.own_models):
+        liability_effect_id = f"test:icon-of-excess:unattributed-effect:{index}"
+        state.record_persisting_effect(
+            PersistingEffect(
+                effect_id=liability_effect_id,
+                source_rule_id="test:icon-of-excess:unattributed-ability",
+                owner_player_id="player-a",
+                target_unit_instance_ids=(target.unit_instance_id,),
+                started_battle_round=state.battle_round,
+                started_phase=BattlePhase.SHOOTING,
+                expiration=EffectExpiration.end_phase(
+                    battle_round=state.battle_round,
+                    phase=BattlePhase.SHOOTING,
+                    player_id="player-a",
+                ),
+                effect_payload={"effect_kind": "test_rule_destruction_liability"},
+            )
+        )
+        destruction = rule_model_destruction.destroy_model_with_rule_reactions(
+            state=state,
+            decisions=decisions,
+            model_instance_id=model.model_instance_id,
+            rules_unit_instance_id=target.unit_instance_id,
+            destroying_player_id="player-a",
+            source_rule_id="test:icon-of-excess:unattributed-ability",
+            source_effect_ids=(liability_effect_id,),
+            source_phase=BattlePhase.SHOOTING,
+            source_step="shooting_test_ability",
+            source_result_id=f"test:icon-of-excess:unattributed-result:{index}",
+            completion_event_type="test_icon_unattributed_destruction_completed",
+            completion_event_payload={"destroyed_model_instance_id": model.model_instance_id},
+        )
+        assert destruction.status is None
+    destroyed_payloads = tuple(
+        cast(dict[str, JsonValue], record.payload)
+        for record in decisions.event_log.records
+        if record.event_type == "model_destroyed"
+    )
+    assert len(destroyed_payloads) == len(target.own_models)
+    for payload in destroyed_payloads:
+        attribution = ModelDestructionAttribution.from_model_destroyed_payload(payload)
+        assert attribution.source_rules_unit_instance_id is None
+        assert attribution.attacking_unit_instance_id is None
+        assert attribution.attacking_model_instance_id is None
+        assert (
+            attribution.destruction_provenance.destruction_source_kind
+            is DestructionSourceKind.ABILITY
+        )
+    status = session.advance_until_decision_or_terminal()
+
+    assert status.status_kind in {
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+        LifecycleStatusKind.TERMINAL,
+    }
+    assert not any(
+        record.event_type == CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT
+        for record in decisions.event_log.records
+    )
+
+
+def test_icon_of_excess_matches_historical_attached_attack_identity_after_split() -> None:
+    session, tormentors, target = _battleline_lifecycle_session(
+        source_datasheet_id="000004079",
+        phase=BattlePhase.SHOOTING,
+        with_icon=True,
+        game_id="icon-of-excess-attached-split",
+        attached_source=True,
+        extra_target=True,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    decisions = session.lifecycle.decision_controller
+    attached_view = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=tormentors.unit_instance_id,
+    )
+    leader = next(
+        component.unit for component in attached_view.components if component.role == "leader"
+    )
+    extra_target = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-b"
+        for unit in army.units
+        if unit.unit_instance_id == "army-b:extra-target-battleline"
+    )
+    _move_unit(state, tormentors.unit_instance_id, x=10.0, y=10.0)
+    _move_unit(state, extra_target.unit_instance_id, x=20.0, y=10.0)
+    for index, model in enumerate(target.own_models):
+        destroy_model_by_rule(state=state, model_instance_id=model.model_instance_id)
+        decisions.event_log.append(
+            "model_destroyed",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": "player-a",
+                "phase": BattlePhase.SHOOTING.value,
+                **ModelDestructionAttribution.for_attack(
+                    destroying_player_id="player-a",
+                    attacking_unit_instance_id=attached_view.unit_instance_id,
+                    attacking_model_instance_id=(tormentors.own_models[0].model_instance_id),
+                    weapon_profile=_weapon_profile("000004079", "Boltgun"),
+                    attack_context_id=f"attack-context:icon-attached-split:{index}",
+                ).to_payload(),
+                "target_unit_instance_id": target.unit_instance_id,
+                "model_instance_id": model.model_instance_id,
+            },
+        )
+    for model in leader.own_models:
+        destroy_model_by_rule(state=state, model_instance_id=model.model_instance_id)
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id=attached_view.unit_instance_id,
+        surviving_unit_instance_ids=(tormentors.unit_instance_id,),
+        event_log=decisions.event_log,
+    )
+    assert (
+        rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=tormentors.unit_instance_id,
+        ).unit_instance_id
+        == tormentors.unit_instance_id
+    )
+
+    _advance_battleline_without_actions_to_phase(
+        session=session,
+        status=session.advance_until_decision_or_terminal(),
+        target_phase=BattlePhase.CHARGE,
+    )
+
+    leadership_payload = next(
+        cast(dict[str, JsonValue], record.payload)
+        for record in decisions.event_log.records
+        if record.event_type == CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT
+    )
+    assert leadership_payload["source_unit_instance_id"] == tormentors.unit_instance_id
+    assert leadership_payload["leadership_target"] == 6
+
+
+@pytest.mark.parametrize(
+    ("source_rules_unit_instance_id", "expected_leadership_tests"),
+    [(None, 0), ("source", 1)],
+)
+def test_icon_of_excess_uses_typed_non_attack_source_attribution(
+    source_rules_unit_instance_id: str | None,
+    expected_leadership_tests: int,
+) -> None:
+    armies, state, indexes, tormentors, target = _battleline_runtime_fixture(
+        source_datasheet_id="000004079",
+        phase=BattlePhase.SHOOTING,
+        with_icon=True,
+        game_id=f"icon-of-excess-non-attack-{expected_leadership_tests}",
+    )
+    decisions = DecisionController()
+    runtime = CatalogCommandPointRuntime(indexes, armies)
+    event_index = RuntimeContentEventIndex.from_subscriptions(
+        runtime.event_subscriptions(),
+        handler_registry=RuntimeContentEventHandlerRegistry.from_bindings(
+            runtime.event_handler_bindings()
+        ),
+    )
+    attributed_source_id = (
+        tormentors.unit_instance_id if source_rules_unit_instance_id == "source" else None
+    )
+    for model in target.own_models:
+        destroy_model_by_rule(state=state, model_instance_id=model.model_instance_id)
+        decisions.event_log.append(
+            "model_destroyed",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": "player-a",
+                "phase": BattlePhase.SHOOTING.value,
+                **ModelDestructionAttribution.for_non_attack(
+                    destroying_player_id="player-a",
+                    source_kind=DestructionSourceKind.DEADLY_DEMISE,
+                    source_rules_unit_instance_id=attributed_source_id,
+                ).to_payload(),
+                "target_unit_instance_id": target.unit_instance_id,
+                "model_instance_id": model.model_instance_id,
+            },
+        )
+
+    results = event_index.dispatch(
+        RuntimeContentEvent(
+            event_id=f"runtime-event:icon-of-excess:non-attack:{expected_leadership_tests}",
+            game_id=state.game_id,
+            player_id="player-a",
+            battle_round=state.battle_round,
+            trigger_kind=TimingTriggerKind.END_PHASE,
+            phase=BattlePhaseKind.SHOOTING,
+            active_player_id="player-a",
+        ),
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=_catalog_package().army_catalog,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+
+    assert len(results) == 1
+    assert (
+        sum(
+            record.event_type == CATALOG_IR_COMMAND_POINT_LEADERSHIP_TEST_EVENT
+            for record in decisions.event_log.records
+        )
+        == expected_leadership_tests
+    )
 
 
 def test_tormentors_objective_defiled_persists_and_expires_on_higher_control() -> None:
@@ -2443,6 +3066,177 @@ def test_tormentors_objective_defiled_persists_and_expires_on_higher_control() -
         .result_by_objective_id(marker.objective_marker_id)
         .controlled_by_player_id
         == "player-b"
+    )
+
+
+def test_tormentors_objective_defiled_records_through_lifecycle_and_replays() -> None:
+    session, tormentors, target = _battleline_lifecycle_session(
+        source_datasheet_id="000004079",
+        phase=BattlePhase.COMMAND,
+        with_icon=False,
+        game_id="tormentors-objective-defiled-lifecycle",
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    marker = state.mission_setup.objective_markers[0] if state.mission_setup else None
+    assert marker is not None
+    _move_unit(state, tormentors.unit_instance_id, x=marker.x_inches, y=marker.y_inches)
+    _move_unit(state, target.unit_instance_id, x=marker.x_inches + 20.0, y=marker.y_inches)
+
+    status = session.advance_until_decision_or_terminal()
+    for index in range(32):
+        if state.current_battle_phase is BattlePhase.MOVEMENT:
+            break
+        request = _decision_request(status)
+        option_id = (
+            DECLINE_STRATAGEM_WINDOW_OPTION_ID
+            if request.decision_type == STRATAGEM_DECISION_TYPE
+            else request.options[0].option_id
+        )
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=option_id,
+            result_id=f"objective-defiled-lifecycle-{index:03d}",
+        )
+    else:
+        raise AssertionError("Command phase did not advance to Movement.")
+
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    sticky = next(
+        sticky_state
+        for sticky_state in state.sticky_objective_control_states
+        if sticky_state.objective_id == marker.objective_marker_id
+    )
+    assert sticky.player_id == "player-a"
+    recorded_events = tuple(
+        record
+        for record in session.lifecycle.decision_controller.event_log.records
+        if record.event_type == "sticky_objective_control_state_recorded"
+    )
+    assert len(recorded_events) == 1
+    assert (
+        cast(dict[str, JsonValue], recorded_events[0].payload)["sticky_objective_control_state"]
+        == sticky.to_payload()
+    )
+    _move_unit(
+        state,
+        tormentors.unit_instance_id,
+        x=marker.x_inches + 20.0,
+        y=marker.y_inches,
+    )
+    status = _advance_battleline_without_actions_to_phase(
+        session=session,
+        status=status,
+        target_phase=BattlePhase.SHOOTING,
+    )
+    movement_record = next(
+        record
+        for record in state.objective_control_records
+        if record.phase == BattlePhase.MOVEMENT.value
+        and record.timing is ObjectiveControlTiming.PHASE_END
+    )
+    retained = movement_record.result_by_objective_id(marker.objective_marker_id)
+    assert retained.controlled_by_player_id == "player-a"
+    assert retained.retained_control_source_id == sticky.source_rule_id
+    assert sticky in state.sticky_objective_control_states
+
+    _move_unit(state, target.unit_instance_id, x=marker.x_inches, y=marker.y_inches)
+    initial_lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
+    )
+    status = _advance_battleline_without_actions_to_phase(
+        session=session,
+        status=status,
+        target_phase=BattlePhase.CHARGE,
+    )
+    assert status.status_kind in {
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+        LifecycleStatusKind.TERMINAL,
+    }
+    assert all(
+        stored.objective_id != marker.objective_marker_id
+        for stored in state.sticky_objective_control_states
+    )
+    shooting_record = next(
+        record
+        for record in state.objective_control_records
+        if record.phase == BattlePhase.SHOOTING.value
+        and record.timing is ObjectiveControlTiming.PHASE_END
+    )
+    assert (
+        shooting_record.result_by_objective_id(marker.objective_marker_id).controlled_by_player_id
+        == "player-b"
+    )
+    replay_payload = cast(
+        ReplayArtifactPayload,
+        json.loads(
+            json.dumps(
+                ReplayArtifact.capture(
+                    artifact_id="tormentors-objective-defiled-lifecycle",
+                    initial_lifecycle_payload=initial_lifecycle_payload,
+                    final_lifecycle=session.lifecycle,
+                ).to_payload(),
+                sort_keys=True,
+            )
+        ),
+    )
+    replay_result = ReplayRunner.from_payload(replay_payload).run()
+    assert replay_result.reproduced_exactly, replay_result.to_payload()
+
+
+def test_tormentors_objective_defiled_uses_attached_unit_objective_contribution() -> None:
+    session, tormentors, target = _battleline_lifecycle_session(
+        source_datasheet_id="000004079",
+        phase=BattlePhase.COMMAND,
+        with_icon=False,
+        game_id="tormentors-objective-defiled-attached",
+        attached_source=True,
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    marker = state.mission_setup.objective_markers[0] if state.mission_setup else None
+    assert marker is not None
+    attached_view = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=tormentors.unit_instance_id,
+    )
+    leader = next(
+        component.unit for component in attached_view.components if component.role == "leader"
+    )
+    _move_unit(
+        state,
+        tormentors.unit_instance_id,
+        x=marker.x_inches + 20.0,
+        y=marker.y_inches,
+    )
+    _move_unit(state, leader.unit_instance_id, x=marker.x_inches, y=marker.y_inches)
+    _move_unit(
+        state,
+        target.unit_instance_id,
+        x=marker.x_inches - 20.0,
+        y=marker.y_inches,
+    )
+
+    status = session.advance_until_decision_or_terminal()
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    sticky = next(
+        stored
+        for stored in state.sticky_objective_control_states
+        if stored.objective_id == marker.objective_marker_id
+    )
+    assert sticky.player_id == "player-a"
+    command_record = next(
+        record
+        for record in state.objective_control_records
+        if record.phase == BattlePhase.COMMAND.value
+        and record.timing is ObjectiveControlTiming.PHASE_END
+    )
+    assert (
+        command_record.result_by_objective_id(marker.objective_marker_id).controlled_by_player_id
+        == "player-a"
     )
 
 
@@ -4232,6 +5026,641 @@ def _battleline_runtime_fixture(
         for army in armies
     }
     return armies, state, indexes, source, target
+
+
+def _battleline_lifecycle_session(
+    *,
+    source_datasheet_id: str,
+    phase: BattlePhase,
+    with_icon: bool,
+    game_id: str,
+    single_source_model: bool = False,
+    single_target_model: bool = False,
+    extra_target: bool = False,
+    attached_source: bool = False,
+) -> tuple[LocalGameSession, UnitInstance, UnitInstance]:
+    package = _catalog_package()
+    base_catalog = package.army_catalog
+    target_datasheet_id = "000004080" if source_datasheet_id == "000004079" else "000004079"
+    target_datasheet = base_catalog.datasheet_by_id(target_datasheet_id)
+    single_wound_target_profiles = tuple(
+        replace(
+            target_profile,
+            characteristics=tuple(
+                replace(
+                    characteristic,
+                    raw=(6 if characteristic.characteristic is Characteristic.SAVE else 1),
+                    base=(6 if characteristic.characteristic is Characteristic.SAVE else 1),
+                    final=(6 if characteristic.characteristic is Characteristic.SAVE else 1),
+                )
+                if characteristic.characteristic
+                in {
+                    Characteristic.TOUGHNESS,
+                    Characteristic.SAVE,
+                    Characteristic.WOUNDS,
+                }
+                else characteristic
+                for characteristic in target_profile.characteristics
+            ),
+        )
+        for target_profile in target_datasheet.model_profiles
+    )
+    target_composition = (
+        (replace(target_datasheet.composition[0], min_models=1, max_models=1),)
+        if single_target_model
+        else tuple(
+            replace(composition, min_models=1, max_models=1)
+            for composition in target_datasheet.composition
+        )
+    )
+    target_datasheet = replace(
+        target_datasheet,
+        model_profiles=single_wound_target_profiles,
+        composition=target_composition,
+        max_unit_models=len(target_composition),
+    )
+    catalog = replace(
+        base_catalog,
+        datasheets=tuple(
+            target_datasheet if datasheet.datasheet_id == target_datasheet_id else datasheet
+            for datasheet in base_catalog.datasheets
+        ),
+        detachments=(
+            DetachmentDefinition(
+                detachment_id="battleline-lifecycle-test",
+                name="Battleline lifecycle test",
+                faction_id="EC",
+                detachment_point_cost=1,
+                unit_datasheet_ids=(
+                    "000004079",
+                    "000004080",
+                    *(("000004083",) if attached_source else ()),
+                ),
+                force_disposition_ids=("purge-the-foe",),
+                source_ids=("test:emperors-children:battleline-lifecycle",),
+            ),
+        ),
+    )
+    if single_source_model:
+        source_datasheet = catalog.datasheet_by_id(source_datasheet_id)
+        icon_model_profile_id = next(
+            option.model_profile_id
+            for option in source_datasheet.wargear_options
+            if "icon-of-excess" in option.option_id
+        )
+        source_composition = next(
+            composition
+            for composition in source_datasheet.composition
+            if composition.model_profile_id == icon_model_profile_id
+        )
+        source_datasheet = replace(
+            source_datasheet,
+            composition=(replace(source_composition, min_models=1, max_models=1),),
+            max_unit_models=1,
+        )
+        catalog = replace(
+            catalog,
+            datasheets=tuple(
+                source_datasheet if datasheet.datasheet_id == source_datasheet_id else datasheet
+                for datasheet in catalog.datasheets
+            ),
+        )
+    if attached_source:
+        leader_datasheet = catalog.datasheet_by_id("000004083")
+        leader_datasheet = replace(
+            leader_datasheet,
+            model_profiles=tuple(
+                replace(
+                    profile,
+                    characteristics=tuple(
+                        replace(characteristic, raw=5, base=5, final=5)
+                        if characteristic.characteristic is Characteristic.LEADERSHIP
+                        else characteristic
+                        for characteristic in profile.characteristics
+                    ),
+                )
+                for profile in leader_datasheet.model_profiles
+            ),
+            attachment_eligibilities=(
+                AttachmentEligibility(
+                    role=AttachmentRole.LEADER,
+                    targets=(
+                        AttachmentTargetEligibility(
+                            bodyguard_datasheet_id=source_datasheet_id,
+                            source_ids=("test:emperors-children:battleline-attached-source",),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        catalog = replace(
+            catalog,
+            datasheets=tuple(
+                leader_datasheet
+                if datasheet.datasheet_id == leader_datasheet.datasheet_id
+                else datasheet
+                for datasheet in catalog.datasheets
+            ),
+        )
+    if source_datasheet_id == "000004079":
+        boltgun = next(
+            wargear for wargear in catalog.wargear if wargear.wargear_id == "000004079:boltgun"
+        )
+        boltgun_profile = boltgun.weapon_profiles[0]
+        deterministic_lifecycle_profile = replace(
+            boltgun_profile,
+            attack_profile=AttackProfile.fixed(12),
+            skill=replace(boltgun_profile.skill, raw=2, base=2, final=2),
+            strength=replace(boltgun_profile.strength, raw=12, base=12, final=12),
+            armor_penetration=replace(
+                boltgun_profile.armor_penetration,
+                raw=-6,
+                base=-6,
+                final=-6,
+            ),
+        )
+        catalog = replace(
+            catalog,
+            wargear=tuple(
+                replace(boltgun, weapon_profiles=(deterministic_lifecycle_profile,))
+                if wargear.wargear_id == boltgun.wargear_id
+                else wargear
+                for wargear in catalog.wargear
+            ),
+        )
+    source_selection = _minimum_unit_muster_selection(
+        catalog=catalog,
+        datasheet_id=source_datasheet_id,
+        unit_selection_id="source-battleline",
+    )
+    if with_icon:
+        source_datasheet = catalog.datasheet_by_id(source_datasheet_id)
+        icon_option = next(
+            option
+            for option in source_datasheet.wargear_options
+            if "icon-of-excess" in option.option_id
+        )
+        source_selection = replace(
+            source_selection,
+            wargear_selections=(
+                WargearSelection(
+                    option_id=icon_option.option_id,
+                    model_profile_id=icon_option.model_profile_id,
+                    wargear_ids=icon_option.allowed_wargear_ids,
+                ),
+            ),
+        )
+    muster_requests = (
+        ArmyMusterRequest(
+            army_id="army-a",
+            player_id="player-a",
+            catalog_id=catalog.catalog_id,
+            source_package_id=catalog.source_package_id,
+            ruleset_id=catalog.ruleset_id,
+            detachment_selection=DetachmentSelection(
+                faction_id="EC",
+                detachment_ids=("battleline-lifecycle-test",),
+            ),
+            force_disposition_id="purge-the-foe",
+            unit_selections=(
+                source_selection,
+                *(
+                    (
+                        _minimum_unit_muster_selection(
+                            catalog=catalog,
+                            datasheet_id="000004083",
+                            unit_selection_id="source-attached-leader",
+                        ),
+                    )
+                    if attached_source
+                    else ()
+                ),
+            ),
+            attachment_declarations=(
+                (
+                    AttachmentDeclaration(
+                        source_unit_selection_id="source-attached-leader",
+                        bodyguard_unit_selection_id="source-battleline",
+                    ),
+                )
+                if attached_source
+                else ()
+            ),
+        ),
+        ArmyMusterRequest(
+            army_id="army-b",
+            player_id="player-b",
+            catalog_id=catalog.catalog_id,
+            source_package_id=catalog.source_package_id,
+            ruleset_id=catalog.ruleset_id,
+            detachment_selection=DetachmentSelection(
+                faction_id="EC",
+                detachment_ids=("battleline-lifecycle-test",),
+            ),
+            force_disposition_id="purge-the-foe",
+            unit_selections=(
+                _minimum_unit_muster_selection(
+                    catalog=catalog,
+                    datasheet_id=target_datasheet_id,
+                    unit_selection_id="target-battleline",
+                ),
+                *(
+                    (
+                        _minimum_unit_muster_selection(
+                            catalog=catalog,
+                            datasheet_id=target_datasheet_id,
+                            unit_selection_id="extra-target-battleline",
+                        ),
+                    )
+                    if extra_target
+                    else ()
+                ),
+            ),
+        ),
+    )
+    descriptor = RulesetDescriptor.warhammer_40000_eleventh()
+    config = GameConfig(
+        game_id=game_id,
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=descriptor,
+        army_catalog=catalog,
+        army_muster_requests=muster_requests,
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down"),
+        mission_setup=_mission_setup(),
+    )
+    armies = tuple(muster_army(catalog=catalog, request=request) for request in muster_requests)
+    source = next(
+        unit for unit in armies[0].units if unit.unit_instance_id == "army-a:source-battleline"
+    )
+    target = next(
+        unit for unit in armies[1].units if unit.unit_instance_id == "army-b:target-battleline"
+    )
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    state.record_battlefield_state(
+        create_deterministic_battlefield_scenario(
+            battlefield_id=f"{game_id}-battlefield",
+            armies=armies,
+        ).battlefield_state
+    )
+    state.stage = GameLifecycleStage.BATTLE
+    state.setup_step_index = None
+    state.battle_phase_index = state.battle_phase_sequence.index(phase)
+    state.battle_round = 1
+    state.active_player_id = "player-a"
+    for player_id in state.player_ids:
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player_id=player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("assassination", "bring_it_down"),
+            )
+        )
+    lifecycle = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            {
+                "config": config.to_payload(),
+                "parameterized_movement_proposals": True,
+                "state": state.to_payload(),
+                "decisions": DecisionController().to_payload(),
+                "reaction_queue": ReactionQueue().to_payload(),
+            },
+        )
+    )
+    return LocalGameSession(lifecycle=lifecycle), source, target
+
+
+def _advance_battleline_fight_to_source_reroll(
+    *,
+    session: LocalGameSession,
+    source: UnitInstance,
+    status: LifecycleStatus,
+) -> LifecycleStatus:
+    for index in range(128):
+        request = _decision_request(status)
+        if (
+            request.decision_type == DICE_REROLL_DECISION_TYPE
+            and isinstance(request.payload, dict)
+            and "source_rule_id" in request.payload
+        ):
+            return status
+        result_id = f"battleline-fight-auto-{index:03d}"
+        if request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
+            movement_request = MovementProposalRequest.from_decision_request_payload(
+                request.payload
+            )
+            context = cast(dict[str, JsonValue], movement_request.context)
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=result_id,
+                payload=cast(
+                    JsonValue,
+                    {
+                        "proposal_request_id": movement_request.request_id,
+                        "proposal_kind": movement_request.proposal_kind.value,
+                        "unit_instance_id": movement_request.unit_instance_id,
+                        "movement_phase_action": movement_request.movement_phase_action,
+                        "movement_mode": context["movement_mode"],
+                    },
+                ),
+            )
+            continue
+        if request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE:
+            option_id = next(
+                option.option_id
+                for option in request.options
+                if source.unit_instance_id in option.option_id
+            )
+            status = session.submit_option(
+                request_id=request.request_id,
+                option_id=option_id,
+                result_id=result_id,
+            )
+            continue
+        if request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
+            status = _submit_battleline_melee_declaration(
+                session=session,
+                request=request,
+                result_id=result_id,
+            )
+            continue
+        if request.decision_type == STRATAGEM_DECISION_TYPE:
+            option_id = DECLINE_STRATAGEM_WINDOW_OPTION_ID
+        elif request.decision_type == DICE_REROLL_DECISION_TYPE:
+            option_id = "decline"
+        else:
+            if request.is_parameterized_submission_request():
+                raise AssertionError(
+                    f"Unexpected parameterized Fight decision {request.decision_type}."
+                )
+            option_id = request.options[0].option_id
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=option_id,
+            result_id=result_id,
+        )
+    raise AssertionError("Fight lifecycle did not reach the source-backed wound reroll.")
+
+
+def _submit_battleline_melee_declaration(
+    *,
+    session: LocalGameSession,
+    request: DecisionRequest,
+    result_id: str,
+    single_declaration: bool = False,
+) -> LifecycleStatus:
+    melee_request = MeleeDeclarationProposalRequest.from_decision_request(request)
+    declarations: list[dict[str, JsonValue]] = []
+    for raw_weapon in melee_request.available_weapons:
+        weapon = cast(dict[str, JsonValue], raw_weapon)
+        engaged_target_ids = cast(
+            list[str],
+            weapon["engaged_target_unit_instance_ids"],
+        )
+        if not engaged_target_ids:
+            continue
+        declarations.append(
+            {
+                "attacker_model_instance_id": weapon["model_instance_id"],
+                "wargear_id": weapon["wargear_id"],
+                "weapon_profile_id": weapon["weapon_profile_id"],
+                "target_allocations": [{"target_unit_instance_id": engaged_target_ids[0]}],
+            }
+        )
+    assert declarations
+    submitted_declarations = declarations[:1] if single_declaration else declarations
+    return session.submit_parameterized_payload(
+        request_id=request.request_id,
+        result_id=result_id,
+        payload=cast(
+            JsonValue,
+            {
+                "proposal_request_id": melee_request.request_id,
+                "proposal_kind": melee_request.proposal_kind,
+                "player_id": melee_request.actor_id,
+                "battle_round": melee_request.battle_round,
+                "unit_instance_id": melee_request.unit_instance_id,
+                "source_decision_request_id": melee_request.source_decision_request_id,
+                "source_decision_result_id": melee_request.source_decision_result_id,
+                "declarations": submitted_declarations,
+            },
+        ),
+    )
+
+
+def _advance_battleline_fight_through_phase(
+    *,
+    session: LocalGameSession,
+    source: UnitInstance,
+    status: LifecycleStatus,
+    stop_at_movement_proposal_kind: str | None = None,
+) -> LifecycleStatus:
+    state = session.lifecycle.state
+    assert state is not None
+    source_rules_unit_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=source.unit_instance_id,
+    ).unit_instance_id
+    for index in range(256):
+        if state.current_battle_phase is not BattlePhase.FIGHT:
+            return status
+        request = _decision_request(status)
+        result_id = f"battleline-fight-complete-{index:03d}"
+        if request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE:
+            option_id = next(
+                (
+                    option.option_id
+                    for option in request.options
+                    if source_rules_unit_id in option.option_id
+                ),
+                request.options[0].option_id,
+            )
+        elif request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
+            movement_request = MovementProposalRequest.from_decision_request_payload(
+                request.payload
+            )
+            if movement_request.proposal_kind.value == stop_at_movement_proposal_kind:
+                return status
+            context = cast(dict[str, JsonValue], movement_request.context)
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=result_id,
+                payload=cast(
+                    JsonValue,
+                    {
+                        "proposal_request_id": movement_request.request_id,
+                        "proposal_kind": movement_request.proposal_kind.value,
+                        "unit_instance_id": movement_request.unit_instance_id,
+                        "movement_phase_action": movement_request.movement_phase_action,
+                        "movement_mode": context["movement_mode"],
+                    },
+                ),
+            )
+            continue
+        elif request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
+            status = _submit_battleline_melee_declaration(
+                session=session,
+                request=request,
+                result_id=result_id,
+                single_declaration=True,
+            )
+            continue
+        elif request.decision_type == STRATAGEM_DECISION_TYPE:
+            option_id = DECLINE_STRATAGEM_WINDOW_OPTION_ID
+        elif request.decision_type == DICE_REROLL_DECISION_TYPE:
+            option_id = "decline"
+        else:
+            if request.is_parameterized_submission_request():
+                raise AssertionError(
+                    f"Unexpected parameterized Fight decision {request.decision_type}."
+                )
+            option_id = request.options[0].option_id
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=option_id,
+            result_id=result_id,
+        )
+    raise AssertionError("Fight lifecycle did not complete.")
+
+
+def _advance_battleline_without_actions_to_phase(
+    *,
+    session: LocalGameSession,
+    status: LifecycleStatus,
+    target_phase: BattlePhase,
+) -> LifecycleStatus:
+    state = session.lifecycle.state
+    assert state is not None
+    for index in range(128):
+        if status.status_kind is LifecycleStatusKind.TERMINAL:
+            return status
+        if state.current_battle_phase is target_phase:
+            return status
+        request = _decision_request(status)
+        result_id = f"battleline-no-actions-{index:03d}"
+        option_ids = {option.option_id for option in request.options}
+        if request.decision_type == STRATAGEM_DECISION_TYPE:
+            option_id = DECLINE_STRATAGEM_WINDOW_OPTION_ID
+        elif request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE:
+            option_id = COMPLETE_SHOOTING_PHASE_OPTION_ID
+        elif request.decision_type == "select_movement_action":
+            option_id = "remain_stationary"
+        elif request.decision_type == DICE_REROLL_DECISION_TYPE:
+            option_id = "decline"
+        else:
+            if request.is_parameterized_submission_request():
+                raise AssertionError(
+                    f"Unexpected parameterized phase decision {request.decision_type}."
+                )
+            option_id = request.options[0].option_id
+        assert option_id in option_ids
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=option_id,
+            result_id=result_id,
+        )
+    raise AssertionError(f"Lifecycle did not advance to {target_phase.value}.")
+
+
+def _advance_battleline_shooting_to_damage_allocation_request(
+    *,
+    session: LocalGameSession,
+    source: UnitInstance,
+    target: UnitInstance,
+    status: LifecycleStatus,
+    weapon_name: str = "Boltgun",
+) -> LifecycleStatus:
+    source_selected = False
+    state = session.lifecycle.state
+    assert state is not None
+    source_rules_unit_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=source.unit_instance_id,
+    ).unit_instance_id
+    for index in range(128):
+        request = _decision_request(status)
+        if request.decision_type == SELECT_DAMAGE_ALLOCATION_MODEL_DECISION_TYPE:
+            return status
+        result_id = f"battleline-shooting-auto-{index:03d}"
+        if request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE:
+            option_ids = {option.option_id for option in request.options}
+            if source_selected:
+                assert option_ids == {COMPLETE_SHOOTING_PHASE_OPTION_ID}
+                return status
+            assert source_rules_unit_id in option_ids
+            source_selected = True
+            option_id = source_rules_unit_id
+        elif request.decision_type == SELECT_SHOOTING_TYPE_DECISION_TYPE:
+            option_id = ShootingType.NORMAL.value
+        elif request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE:
+            payload = cast(dict[str, JsonValue], request.payload)
+            proposal_request = cast(
+                dict[str, JsonValue],
+                payload["proposal_request"],
+            )
+            available_weapons = cast(
+                list[dict[str, JsonValue]],
+                proposal_request["available_weapons"],
+            )
+            declarations = tuple(
+                WeaponDeclaration(
+                    attacker_model_instance_id=cast(str, weapon["model_instance_id"]),
+                    wargear_id=cast(str, weapon["wargear_id"]),
+                    weapon_profile_id=cast(str, weapon["weapon_profile_id"]),
+                    target_unit_instance_id=target.unit_instance_id,
+                    shooting_type=ShootingType.NORMAL,
+                )
+                for weapon in available_weapons
+                if cast(dict[str, JsonValue], weapon["weapon_profile"])["name"] == weapon_name
+            )[:1]
+            assert declarations
+            proposal = ShootingDeclarationProposal(
+                proposal_request_id=cast(str, proposal_request["request_id"]),
+                proposal_kind=cast(str, proposal_request["proposal_kind"]),
+                player_id=cast(str, proposal_request["active_player_id"]),
+                battle_round=cast(int, proposal_request["battle_round"]),
+                unit_instance_id=cast(str, proposal_request["unit_instance_id"]),
+                source_decision_request_id=cast(
+                    str,
+                    proposal_request["source_decision_request_id"],
+                ),
+                source_decision_result_id=cast(
+                    str,
+                    proposal_request["source_decision_result_id"],
+                ),
+                declarations=declarations,
+                firing_deck_selection=None,
+                visibility_cache_key=cast(
+                    str,
+                    proposal_request["visibility_cache_key"],
+                ),
+            )
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=result_id,
+                payload=cast(JsonValue, proposal.to_payload()),
+            )
+            continue
+        elif request.decision_type == STRATAGEM_DECISION_TYPE:
+            option_id = DECLINE_STRATAGEM_WINDOW_OPTION_ID
+        elif request.decision_type == DICE_REROLL_DECISION_TYPE:
+            option_id = "decline"
+        else:
+            if request.is_parameterized_submission_request():
+                raise AssertionError(
+                    f"Unexpected parameterized Shooting decision {request.decision_type}."
+                )
+            option_id = request.options[0].option_id
+        status = session.submit_option(
+            request_id=request.request_id,
+            option_id=option_id,
+            result_id=result_id,
+        )
+    raise AssertionError("Shooting lifecycle did not reach damage allocation.")
 
 
 def _instantiate_battleline_unit(

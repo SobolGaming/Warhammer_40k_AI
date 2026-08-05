@@ -83,6 +83,7 @@ from warhammer40k_core.engine.damage_allocation import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
@@ -1209,7 +1210,7 @@ def test_daemonic_patrons_grant_critical_wounds_and_destroy_a_model_after_no_kil
 
 
 def test_daemonic_patrons_counts_only_enemy_models_destroyed_by_that_units_attacks() -> None:
-    state, runtime, source, enemy, _profile = _daemonic_patrons_runtime_fixture()
+    state, runtime, source, enemy, profile = _daemonic_patrons_runtime_fixture()
     decisions = DecisionController()
     _record_daemonic_patrons_effect(state=state, runtime=runtime, source=source)
     base_payload = {
@@ -1217,9 +1218,13 @@ def test_daemonic_patrons_counts_only_enemy_models_destroyed_by_that_units_attac
         "battle_round": 1,
         "active_player_id": "player-source",
         "phase": BattlePhase.FIGHT.value,
-        "destroying_player_id": "player-source",
-        "attacking_unit_instance_id": source.unit_instance_id,
-        "attacking_model_instance_id": source.own_models[0].model_instance_id,
+        **ModelDestructionAttribution.for_attack(
+            destroying_player_id="player-source",
+            attacking_unit_instance_id=source.unit_instance_id,
+            attacking_model_instance_id=source.own_models[0].model_instance_id,
+            weapon_profile=profile,
+            attack_context_id="daemonic-patrons:test-attack",
+        ).to_payload(),
     }
     decisions.event_log.append(
         "model_destroyed",

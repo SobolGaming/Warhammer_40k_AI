@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.attack_sequence_damage_helpers import (
+    emit_deferred_mortal_wounds_applied as _emit_deferred_mortal_wounds_applied,
+)
 from warhammer40k_core.engine.attack_sequence_imports import *
 from warhammer40k_core.engine.attack_sequence_post_roll import (
     defer_grouped_devastating_wounds as _defer_grouped_devastating_wounds,
@@ -736,29 +739,6 @@ def _apply_deferred_mortal_wounds(
     return attack_sequence.without_deferred_mortal_wounds(), None
 
 
-def _emit_deferred_mortal_wounds_applied(
-    *,
-    decisions: DecisionController,
-    attack_sequence: AttackSequence,
-    target_unit_id: str,
-    attack_context_ids: tuple[str, ...],
-    mortal_wounds: int,
-    application: MortalWoundApplication,
-) -> None:
-    decisions.event_log.append(
-        "devastating_wounds_mortal_wounds_applied",
-        {
-            "sequence_id": attack_sequence.sequence_id,
-            "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
-            "target_unit_instance_id": target_unit_id,
-            "attack_context_ids": list(attack_context_ids),
-            "mortal_wounds": mortal_wounds,
-            "mortal_wound_application": application.to_payload(),
-            "source_rule_id": DEVASTATING_WOUNDS_RULE_ID,
-        },
-    )
-
-
 def _apply_deferred_mortal_wound_feel_no_pain_decision(
     *,
     state: GameState,
@@ -1045,6 +1025,13 @@ def _continue_deadly_demise_after_mortal_wound_feel_no_pain(
         saving_throw_payload=validate_json_value(source_context["saving_throw"]),
         feel_no_pain=feel_no_pain,
         destroyed_model_placement=destroyed_model_placement,
+        destruction_attribution=ModelDestructionAttribution.for_attack(
+            destroying_player_id=attack_sequence.attacker_player_id,
+            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attacking_model_instance_id=(attack_sequence.current_pool().attacker_model_instance_id),
+            weapon_profile=attack_sequence.current_pool().weapon_profile,
+            attack_context_id=attack_context["attack_context_id"],
+        ),
     )
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,

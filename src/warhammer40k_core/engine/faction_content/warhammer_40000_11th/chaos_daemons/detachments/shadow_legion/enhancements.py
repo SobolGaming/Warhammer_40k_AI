@@ -24,6 +24,7 @@ from warhammer40k_core.engine.damage_allocation import (
     unit_owner_player_id,
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.enhancement_effects import (
     EnhancementDatasheetAbilityGrant,
@@ -433,8 +434,11 @@ def record_fade_to_darkness_destroyed_enemy_unit(context: UnitDestroyedContext) 
         raise GameLifecycleError("Fade to Darkness requires a unit-destroyed context.")
     if context.completed_phase is not BattlePhase.FIGHT:
         return
-    attacking_unit_value = context.model_destroyed_payload.get("attacking_unit_instance_id")
-    if type(attacking_unit_value) is not str or not attacking_unit_value.strip():
+    attribution = ModelDestructionAttribution.from_model_destroyed_payload(
+        context.model_destroyed_payload
+    )
+    attacking_unit_value = attribution.source_rules_unit_instance_id
+    if attacking_unit_value is None:
         return
     attacking_unit_id = _validate_identifier("attacking_unit_instance_id", attacking_unit_value)
     for army in _shadow_legion_armies(context.state):

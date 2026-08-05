@@ -33,6 +33,14 @@ class DestructionProvenancePayload(TypedDict):
     attack_context_id: str | None
 
 
+class ModelDestructionAttributionPayload(TypedDict):
+    destroying_player_id: str
+    source_rules_unit_instance_id: str | None
+    attacking_unit_instance_id: str | None
+    attacking_model_instance_id: str | None
+    destruction_provenance: DestructionProvenancePayload
+
+
 @dataclass(frozen=True, slots=True)
 class DestructionProvenance:
     destruction_source_kind: DestructionSourceKind
@@ -163,6 +171,135 @@ class DestructionProvenance:
         )
 
 
+@dataclass(frozen=True, slots=True)
+class ModelDestructionAttribution:
+    destroying_player_id: str
+    source_rules_unit_instance_id: str | None
+    attacking_unit_instance_id: str | None
+    attacking_model_instance_id: str | None
+    destruction_provenance: DestructionProvenance
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "destroying_player_id",
+            _validate_identifier("destroying_player_id", self.destroying_player_id),
+        )
+        for field_name in (
+            "source_rules_unit_instance_id",
+            "attacking_unit_instance_id",
+            "attacking_model_instance_id",
+        ):
+            object.__setattr__(
+                self,
+                field_name,
+                _validate_optional_identifier(field_name, getattr(self, field_name)),
+            )
+        if type(self.destruction_provenance) is not DestructionProvenance:
+            raise GameLifecycleError("Model destruction attribution requires typed provenance.")
+        if self.destruction_provenance.destruction_source_kind is DestructionSourceKind.ATTACK:
+            if (
+                self.attacking_unit_instance_id is None
+                or self.attacking_model_instance_id is None
+                or self.source_rules_unit_instance_id != self.attacking_unit_instance_id
+            ):
+                raise GameLifecycleError(
+                    "Attack destruction attribution requires matching attack identities."
+                )
+            return
+        if (
+            self.attacking_unit_instance_id is not None
+            or self.attacking_model_instance_id is not None
+        ):
+            raise GameLifecycleError(
+                "Non-attack destruction attribution cannot carry attack identities."
+            )
+
+    @classmethod
+    def for_attack(
+        cls,
+        *,
+        destroying_player_id: str,
+        attacking_unit_instance_id: str,
+        attacking_model_instance_id: str,
+        weapon_profile: WeaponProfile,
+        attack_context_id: str,
+    ) -> Self:
+        return cls(
+            destroying_player_id=destroying_player_id,
+            source_rules_unit_instance_id=attacking_unit_instance_id,
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            attacking_model_instance_id=attacking_model_instance_id,
+            destruction_provenance=DestructionProvenance.for_attack(
+                weapon_profile=weapon_profile,
+                attack_context_id=attack_context_id,
+            ),
+        )
+
+    @classmethod
+    def for_non_attack(
+        cls,
+        *,
+        destroying_player_id: str,
+        source_kind: DestructionSourceKind,
+        source_rules_unit_instance_id: str | None,
+    ) -> Self:
+        return cls(
+            destroying_player_id=destroying_player_id,
+            source_rules_unit_instance_id=source_rules_unit_instance_id,
+            attacking_unit_instance_id=None,
+            attacking_model_instance_id=None,
+            destruction_provenance=DestructionProvenance.for_non_attack(source_kind),
+        )
+
+    def to_payload(self) -> ModelDestructionAttributionPayload:
+        return {
+            "destroying_player_id": self.destroying_player_id,
+            "source_rules_unit_instance_id": self.source_rules_unit_instance_id,
+            "attacking_unit_instance_id": self.attacking_unit_instance_id,
+            "attacking_model_instance_id": self.attacking_model_instance_id,
+            "destruction_provenance": self.destruction_provenance.to_payload(),
+        }
+
+    @classmethod
+    def from_model_destroyed_payload(cls, payload: object) -> Self:
+        if not isinstance(payload, dict):
+            raise GameLifecycleError("model_destroyed attribution payload must be an object.")
+        raw = cast(dict[str, object], payload)
+        required_fields = (
+            "destroying_player_id",
+            "source_rules_unit_instance_id",
+            "attacking_unit_instance_id",
+            "attacking_model_instance_id",
+            "destruction_provenance",
+        )
+        missing_fields = tuple(field for field in required_fields if field not in raw)
+        if missing_fields:
+            raise GameLifecycleError(
+                "model_destroyed attribution payload is missing required fields."
+            )
+        return cls(
+            destroying_player_id=_validate_identifier(
+                "destroying_player_id", raw.get("destroying_player_id")
+            ),
+            source_rules_unit_instance_id=_validate_optional_identifier(
+                "source_rules_unit_instance_id",
+                raw.get("source_rules_unit_instance_id"),
+            ),
+            attacking_unit_instance_id=_validate_optional_identifier(
+                "attacking_unit_instance_id",
+                raw.get("attacking_unit_instance_id"),
+            ),
+            attacking_model_instance_id=_validate_optional_identifier(
+                "attacking_model_instance_id",
+                raw.get("attacking_model_instance_id"),
+            ),
+            destruction_provenance=DestructionProvenance.from_payload(
+                raw.get("destruction_provenance")
+            ),
+        )
+
+
 def _destruction_source_kind(value: object) -> DestructionSourceKind:
     if isinstance(value, DestructionSourceKind):
         return value
@@ -183,6 +320,12 @@ def _destruction_attack_kind(value: object) -> DestructionAttackKind:
         return DestructionAttackKind(value)
     except ValueError as exc:
         raise GameLifecycleError("Destruction provenance attack kind is unsupported.") from exc
+
+
+def _validate_optional_identifier(field_name: str, value: object) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

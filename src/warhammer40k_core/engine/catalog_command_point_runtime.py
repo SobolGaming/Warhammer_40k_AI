@@ -51,6 +51,10 @@ from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
 from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventContext,
@@ -237,10 +241,16 @@ class CatalogCommandPointRuntime:
     def resolve_unit_destroyed(self, context: UnitDestroyedContext) -> None:
         if type(context) is not UnitDestroyedContext:
             raise GameLifecycleError("Catalog CP unit-destroyed runtime requires context.")
-        attacking_model_id = _payload_identifier(
-            context.model_destroyed_payload,
-            key="attacking_model_instance_id",
+        attribution = ModelDestructionAttribution.from_model_destroyed_payload(
+            context.model_destroyed_payload
         )
+        if attribution.destruction_provenance.destruction_source_kind is not (
+            DestructionSourceKind.ATTACK
+        ):
+            return
+        attacking_model_id = attribution.attacking_model_instance_id
+        if attacking_model_id is None:
+            raise GameLifecycleError("Attack destruction attribution requires an attacking model.")
         attacking_component_unit_id = context.state.unit_instance_id_for_model(attacking_model_id)
         army = _army_for_player(self.armies, player_id=context.destroying_player_id)
         unit = _unit_in_army(army, unit_instance_id=attacking_component_unit_id)
@@ -959,17 +969,27 @@ def _source_unit_destroyed_enemy_unit_this_phase(
         armies=armies,
         unit_instance_id=unit.unit_instance_id,
     )
-    source_view = rules_unit_view_by_id(
-        state=context.state,
-        unit_instance_id=source_rules_unit_id,
+    matching_source_views = tuple(
+        view
+        for view in current_rules_unit_views_for_identity(
+            state=context.state,
+            unit_instance_id=source_rules_unit_id,
+        )
+        if unit.unit_instance_id in view.component_unit_instance_ids
     )
+    if len(matching_source_views) != 1:
+        raise GameLifecycleError(
+            "Catalog CP destruction source must resolve to one current rules unit."
+        )
+    source_view = matching_source_views[0]
     source_component_ids = set(source_view.component_unit_instance_ids)
     for _event_id, payload in unit_destruction_completion_events_for_phase(
         state=context.state,
         event_log=context.decisions.event_log,
         completed_phase=BattlePhase(context.event.phase.value),
     ):
-        if _payload_identifier(payload, key="destroying_player_id") != source.owner_player_id:
+        attribution = ModelDestructionAttribution.from_model_destroyed_payload(payload)
+        if attribution.destroying_player_id != source.owner_player_id:
             continue
         target_unit_id = _payload_identifier(payload, key="target_unit_instance_id")
         if (
@@ -980,15 +1000,17 @@ def _source_unit_destroyed_enemy_unit_this_phase(
             == source.owner_player_id
         ):
             continue
-        attacking_unit_id = _payload_identifier(payload, key="attacking_unit_instance_id")
-        attacking_views = current_rules_unit_views_for_identity(
+        source_identity_id = attribution.source_rules_unit_instance_id
+        if source_identity_id is None:
+            continue
+        attributed_views = current_rules_unit_views_for_identity(
             state=context.state,
-            unit_instance_id=attacking_unit_id,
+            unit_instance_id=source_identity_id,
         )
         if any(
             view.unit_instance_id == source_view.unit_instance_id
             or bool(source_component_ids.intersection(view.component_unit_instance_ids))
-            for view in attacking_views
+            for view in attributed_views
         ):
             return True
     return False

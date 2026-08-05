@@ -328,6 +328,19 @@ def _apply_damage_after_feel_no_pain(
         saving_throw_payload=saving_throw_payload,
         feel_no_pain=resolution,
         destroyed_model_placement=destroyed_model_placement,
+        destruction_attribution=(
+            None
+            if damage is None or not damage.destroyed
+            else ModelDestructionAttribution.for_attack(
+                destroying_player_id=attack_sequence.attacker_player_id,
+                attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+                attacking_model_instance_id=(
+                    attack_sequence.current_pool().attacker_model_instance_id
+                ),
+                weapon_profile=attack_sequence.current_pool().weapon_profile,
+                attack_context_id=attack_context["attack_context_id"],
+            )
+        ),
     )
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,
@@ -923,6 +936,16 @@ def _resolve_deadly_demise_secondary_destroyed_models(
             saving_throw_payload=None,
             feel_no_pain=secondary_feel_no_pain,
             destroyed_model_placement=destroyed_model_placement,
+            destruction_attribution=ModelDestructionAttribution.for_non_attack(
+                destroying_player_id=destroyed_model_controller_player_id,
+                source_kind=DestructionSourceKind.DEADLY_DEMISE,
+                source_rules_unit_instance_id=rules_unit_view_by_id(
+                    state=state,
+                    unit_instance_id=state.unit_instance_id_for_model(
+                        source_damage.model_instance_id
+                    ),
+                ).unit_instance_id,
+            ),
         )
         reaction_status = _destruction_reaction_status_if_needed(
             state=state,
@@ -1098,6 +1121,13 @@ def _continue_deadly_demise_after_secondary_destruction_reaction(
         saving_throw_payload=validate_json_value(source_context["saving_throw"]),
         feel_no_pain=feel_no_pain,
         destroyed_model_placement=destroyed_model_placement,
+        destruction_attribution=ModelDestructionAttribution.for_attack(
+            destroying_player_id=attack_sequence.attacker_player_id,
+            attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            attacking_model_instance_id=(attack_sequence.current_pool().attacker_model_instance_id),
+            weapon_profile=attack_sequence.current_pool().weapon_profile,
+            attack_context_id=attack_context["attack_context_id"],
+        ),
     )
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,

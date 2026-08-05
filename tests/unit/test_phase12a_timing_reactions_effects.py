@@ -14,6 +14,7 @@ from tests.support.selected_to_fight_risk_fixtures import (
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceRollResult, RollOffRequest
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import RangeProfileKind
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatus
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
@@ -29,6 +30,10 @@ from warhammer40k_core.engine.deadly_demise import deadly_demise_target_unit_ids
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import (
     EffectError,
@@ -1377,6 +1382,33 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
         if event.event_type == "model_destroyed"
     )
     assert destroyed_ids[-2:] == (bodyguard_model_id, root_model_id)
+    destroyed_payloads = {
+        cast(dict[str, JsonValue], event.payload)["model_instance_id"]: cast(
+            dict[str, JsonValue], event.payload
+        )
+        for event in round_tripped_decisions.event_log.records
+        if event.event_type == "model_destroyed"
+    }
+    collateral_attribution = ModelDestructionAttribution.from_model_destroyed_payload(
+        destroyed_payloads[bodyguard_model_id]
+    )
+    root_attribution = ModelDestructionAttribution.from_model_destroyed_payload(
+        destroyed_payloads[root_model_id]
+    )
+    assert (
+        collateral_attribution.destruction_provenance.destruction_source_kind
+        is DestructionSourceKind.DEADLY_DEMISE
+    )
+    assert collateral_attribution.source_rules_unit_instance_id == enemy.unit_instance_id
+    assert collateral_attribution.attacking_unit_instance_id is None
+    assert collateral_attribution.attacking_model_instance_id is None
+    assert (
+        root_attribution.destruction_provenance.destruction_source_kind
+        is DestructionSourceKind.ABILITY
+    )
+    assert root_attribution.source_rules_unit_instance_id is None
+    assert root_attribution.attacking_unit_instance_id is None
+    assert root_attribution.attacking_model_instance_id is None
 
 
 @pytest.mark.parametrize(
@@ -1393,6 +1425,12 @@ def test_selected_to_fight_risk_split_preserves_exact_attack_lineage(
     attacking_unit_id = (
         attached_id if attacking_unit_kind == "attached" else bodyguard.unit_instance_id
     )
+    melee_profile = next(
+        profile
+        for wargear in undivided_daemon_package().army_catalog.wargear
+        for profile in wargear.weapon_profiles
+        if profile.range_profile.kind is RangeProfileKind.MELEE
+    )
     decisions.event_log.append(
         "model_destroyed",
         {
@@ -1400,9 +1438,13 @@ def test_selected_to_fight_risk_split_preserves_exact_attack_lineage(
             "battle_round": state.battle_round,
             "active_player_id": state.active_player_id,
             "phase": BattlePhase.FIGHT.value,
-            "destroying_player_id": "player-source",
-            "attacking_unit_instance_id": attacking_unit_id,
-            "attacking_model_instance_id": bodyguard.own_models[0].model_instance_id,
+            **ModelDestructionAttribution.for_attack(
+                destroying_player_id="player-source",
+                attacking_unit_instance_id=attacking_unit_id,
+                attacking_model_instance_id=bodyguard.own_models[0].model_instance_id,
+                weapon_profile=melee_profile,
+                attack_context_id="attack-context:selected-to-fight-lineage",
+            ).to_payload(),
             "target_unit_instance_id": enemy.unit_instance_id,
             "model_instance_id": enemy.own_models[0].model_instance_id,
         },

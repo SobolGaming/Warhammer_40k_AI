@@ -131,6 +131,7 @@ from warhammer40k_core.engine.destruction_provenance import (
     DestructionProvenance,
     DestructionProvenancePayload,
     DestructionSourceKind,
+    ModelDestructionAttribution,
 )
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollManager
 from warhammer40k_core.engine.event_log import (
@@ -331,6 +332,7 @@ __all__ = (
     "DestructionProvenance",
     "DestructionProvenancePayload",
     "DestructionSourceKind",
+    "ModelDestructionAttribution",
     "DisembarkModeKind",
     "DisembarkSelection",
     "DistanceMeasurementContext",

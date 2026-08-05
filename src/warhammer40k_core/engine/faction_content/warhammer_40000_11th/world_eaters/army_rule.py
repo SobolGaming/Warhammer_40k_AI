@@ -27,6 +27,7 @@ from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionSource,
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
@@ -615,9 +616,12 @@ def bloodshed_points_available(
     points = 0
     for completion in completion_events:
         payload = completion.payload
-        if _payload_string(payload, key="destroying_player_id") != requested_player_id:
+        attribution = ModelDestructionAttribution.from_model_destroyed_payload(payload)
+        if attribution.destroying_player_id != requested_player_id:
             continue
-        attacking_unit_id = _payload_string(payload, key="attacking_unit_instance_id")
+        attacking_unit_id = attribution.source_rules_unit_instance_id
+        if attacking_unit_id is None:
+            continue
         target_unit_id = _payload_string(payload, key="target_unit_instance_id")
         if _unit_owner_player_id(state, unit_instance_id=target_unit_id) == requested_player_id:
             continue

@@ -62,6 +62,7 @@ from warhammer40k_core.engine.damage_allocation import SELECT_DESTRUCTION_REACTI
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
@@ -1621,6 +1622,7 @@ def _append_model_destroyed_event(
     phase = state.current_battle_phase
     if phase is None:
         raise AssertionError("test state requires battle phase")
+    attacking_unit = _unit_by_id(state, attacking_unit_id)
     decisions.event_log.append(
         "model_destroyed",
         {
@@ -1628,8 +1630,13 @@ def _append_model_destroyed_event(
             "battle_round": state.battle_round,
             "active_player_id": state.active_player_id,
             "phase": phase.value,
-            "destroying_player_id": destroying_player_id,
-            "attacking_unit_instance_id": attacking_unit_id,
+            **ModelDestructionAttribution.for_attack(
+                destroying_player_id=destroying_player_id,
+                attacking_unit_instance_id=attacking_unit_id,
+                attacking_model_instance_id=(attacking_unit.own_models[0].model_instance_id),
+                weapon_profile=_melee_profile(),
+                attack_context_id=f"attack-context:{event_suffix}",
+            ).to_payload(),
             "target_unit_instance_id": target_unit_id,
             "model_instance_id": model_instance_id,
             "damage_kind": "normal",

@@ -218,6 +218,10 @@ from warhammer40k_core.engine.damage_allocation_targets import (
 )
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
@@ -13293,11 +13297,22 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
     }
     assert len(secondary_destroyed_payloads) == 1
     secondary_destroyed = secondary_destroyed_payloads[0]
+    secondary_attribution = ModelDestructionAttribution.from_model_destroyed_payload(
+        secondary_destroyed
+    )
     removal_record = cast(dict[str, object], secondary_destroyed["removal_record"])
     transition_batch = cast(dict[str, object], secondary_destroyed["transition_batch"])
     assert removal_record["model_instance_id"] == attacker_model.model_instance_id
     assert removal_record["removal_kind"] == "destroyed"
     assert cast(list[object], transition_batch["removals"]) == [removal_record]
+    assert (
+        secondary_attribution.destruction_provenance.destruction_source_kind
+        is DestructionSourceKind.DEADLY_DEMISE
+    )
+    assert secondary_attribution.destroying_player_id == "player-b"
+    assert secondary_attribution.source_rules_unit_instance_id == defender.unit_instance_id
+    assert secondary_attribution.attacking_unit_instance_id is None
+    assert secondary_attribution.attacking_model_instance_id is None
     assert attacker_model.model_instance_id not in updated_battlefield.placed_model_ids()
     assert defender_model.model_instance_id in updated_battlefield.placed_model_ids()
 

@@ -20,6 +20,7 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.enhancement_effects import EnhancementEffectContext
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -944,7 +945,10 @@ def _blood_tainted_states_for_army(
     states: list[StickyObjectiveControlState] = []
     seen_state_keys: set[tuple[str, str, str]] = set()
     for event_id, payload in _unit_destruction_completion_events_for_phase(context):
-        attacking_unit_id = _payload_string(payload, "attacking_unit_instance_id")
+        attribution = ModelDestructionAttribution.from_model_destroyed_payload(payload)
+        attacking_unit_id = attribution.source_rules_unit_instance_id
+        if attacking_unit_id is None:
+            continue
         if not _unit_id_is_in_army(army, unit_instance_id=attacking_unit_id):
             continue
         matching_effects = generic_rule_ability_effects_for_unit(

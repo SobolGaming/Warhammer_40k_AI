@@ -76,6 +76,10 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
@@ -3616,18 +3620,30 @@ def _record_fade_to_darkness_destroyed_enemy(
     attacker: UnitInstance | None,
     target: UnitInstance,
 ) -> None:
+    attribution = (
+        ModelDestructionAttribution.for_non_attack(
+            destroying_player_id="player-a",
+            source_kind=DestructionSourceKind.ABILITY,
+            source_rules_unit_instance_id=None,
+        )
+        if attacker is None
+        else ModelDestructionAttribution.for_attack(
+            destroying_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attacking_model_instance_id=attacker.own_models[0].model_instance_id,
+            weapon_profile=_weapon_profile(melee=True),
+            attack_context_id="attack-context:fade-to-darkness",
+        )
+    )
     payload: dict[str, JsonValue] = {
         "game_id": state.game_id,
         "battle_round": state.battle_round,
         "active_player_id": state.active_player_id,
         "phase": BattlePhase.FIGHT.value,
-        "destroying_player_id": "player-a",
+        **cast(dict[str, JsonValue], attribution.to_payload()),
         "target_unit_instance_id": target.unit_instance_id,
         "model_instance_id": target.own_models[0].model_instance_id,
     }
-    if attacker is not None:
-        payload["attacking_unit_instance_id"] = attacker.unit_instance_id
-        payload["attacker_model_instance_id"] = attacker.own_models[0].model_instance_id
     event = decisions.event_log.append(
         "model_destroyed",
         payload,
