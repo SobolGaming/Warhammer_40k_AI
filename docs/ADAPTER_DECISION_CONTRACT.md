@@ -2108,7 +2108,8 @@ gate emits the parameterized decision type
 `submit_catalog_model_materialization_placement` with one fixed
 `submit_parameterized_payload` option. The request is actor-scoped to the owning
 player and includes `proposal_kind: "model_materialization_placement"`,
-`placement_kind: "split_unit"`, the immutable Shooting or Fight `source_phase`,
+`placement_kind: "split_unit"`, the immutable Shooting or Fight `action_phase`,
+the current `parent_battle_phase` (also retained as placement `source_phase`),
 attack-sequence and roll-event IDs, catalog
 record/clause/source-rule identity, the physical owning unit and army IDs, the
 materialization descriptor ID, and the complete engine-instantiated model
@@ -2119,16 +2120,21 @@ pending request ID, proposal kind, source physical unit ID, and `split_unit`
 placement kind, and must supply exactly one `attempted_placement` containing the
 engine-emitted model IDs. Materialization is explicit set-up placement, not
 movement, so it requires validated model endpoints rather than `PathWitness`.
-The engine validates template identity, catalog profile and wargear identity,
+At submission the engine re-resolves the current catalog record, clause, source
+rule, and materialization descriptor; validates the referenced completion and
+successful roll events; deterministically regenerates the exact models; and
+then validates template identity, catalog profile and wargear identity,
 battlefield bounds, terrain endpoints, overlap, and final complete-rules-unit
 coherency before atomically adding the models and placements. Adapters must not
 construct model profiles, derive loadouts, add models, remove destroyed models,
 replace a datasheet, or mutate battlefield state locally.
 
-The engine rejects source-phase drift before queue pop. Accepted placement
-records, transition evidence, materialization events, and per-model battlefield
-placement events retain the request's immutable `source_phase` so Shooting and
-Fight replays cannot collapse to phase-free evidence.
+The engine rejects action-phase, parent-phase, source, roll, result-count, or
+model-template drift before queue pop. Accepted placement records use the
+parent battle phase as `source_phase`; transition evidence, materialization
+events, and per-model battlefield-placement events retain both `action_phase`
+and `parent_battle_phase`, so out-of-phase shooting replays preserve both the
+shooting action and the Movement or Charge phase in which it occurred.
 
 Each accepted model placement emits its own
 `model_placed_on_battlefield` runtime-content timing event for every player so
@@ -2140,7 +2146,9 @@ datasheet. This keeps
 the existing Attached Unit formation and canonical rules-unit identity,
 removes only the source-backed destroyed model profiles, remaps retained
 materialized models through descriptor-indexed catalog variants, and preserves
-the original Starting Strength record. Empty components are never replaced.
+the original Starting Strength record. Empty components are never replaced,
+and non-attack composition handoff waits for the destruction-finalized event so
+an optional Shoot on Death or Fight on Death window cannot lose its source model.
 Attached-unit reconciliation observes the composition-driven handoff before it
 splits a surviving component away, while a fully destroyed component with no
 successfully materialized model follows the ordinary destruction path.
@@ -2157,7 +2165,9 @@ redaction before becoming adapter-visible.
 Required model-materialization tests cover both source packages sharing the
 same semantics, attack and Hazardous destruction gates, non-attack exclusion,
 valid and stale placement, exact catalog profile/base/loadout identity,
-Attached Unit handoff, Starting Strength preservation, deterministic JSON-safe
+real Shooting/Fight Attached Unit handoff, out-of-phase action/parent phase
+evidence, destruction-reaction finalization, authoritative restored-request
+tamper rejection, Starting Strength preservation, deterministic JSON-safe
 request/state round trips, and per-model placement reaction dispatch.
 
 ## Catalog First-Death Return Decisions

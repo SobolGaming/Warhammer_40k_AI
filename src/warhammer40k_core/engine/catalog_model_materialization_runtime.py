@@ -6,7 +6,13 @@ from types import MappingProxyType
 from typing import cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
-from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
+from warhammer40k_core.core.dice import (
+    DiceExpression,
+    DiceRollSpec,
+    DiceRollSpecError,
+    DiceRollState,
+    DiceRollStatePayload,
+)
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -69,6 +75,9 @@ from warhammer40k_core.engine.return_placement_legality import (
     validate_model_placement_endpoints,
 )
 from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
+from warhammer40k_core.engine.rule_model_destruction import (
+    RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
+)
 from warhammer40k_core.engine.rules_units import (
     rules_unit_view_by_id,
     rules_unit_view_from_armies,
@@ -79,7 +88,6 @@ from warhammer40k_core.engine.unit_coherency import (
 )
 from warhammer40k_core.engine.unit_factory import (
     ModelInstance,
-    ModelInstancePayload,
     UnitFactory,
     UnitFactoryError,
     UnitInstance,
@@ -119,7 +127,8 @@ class ValidatedCatalogModelMaterialization:
     source_unit_instance_id: str
     source_rule_id: str
     attack_sequence_id: str
-    source_phase: BattlePhase
+    action_phase: BattlePhase
+    parent_battle_phase: BattlePhase
     placements: tuple[ModelPlacement, ...]
     models: tuple[ModelInstance, ...]
     hypothetical_armies: tuple[ArmyDefinition, ...]
@@ -199,6 +208,12 @@ class CatalogModelMaterializationRuntime:
     ) -> LifecycleStatus | None:
         if type(context) is not AttackSequenceCompletedContext:
             raise GameLifecycleError("Catalog materialization requires completion context.")
+        action_phase = context.source_phase
+        if context.attack_sequence.source_phase is not action_phase:
+            raise GameLifecycleError("Materialization attack action phase drift.")
+        parent_battle_phase = context.state.current_battle_phase
+        if parent_battle_phase is None:
+            raise GameLifecycleError("Materialization requires a current parent battle phase.")
         sources = self.sources(armies=tuple(context.state.army_definitions))
         for source in sources:
             descriptor = source.materialization
@@ -248,7 +263,9 @@ class CatalogModelMaterializationRuntime:
                             {
                                 "game_id": context.state.game_id,
                                 "battle_round": context.state.battle_round,
-                                "phase": context.source_phase.value,
+                                "phase": parent_battle_phase.value,
+                                "action_phase": action_phase.value,
+                                "parent_battle_phase": parent_battle_phase.value,
                                 "attack_sequence_id": context.attack_sequence.sequence_id,
                                 "attack_sequence_completed_event_id": (
                                     context.attack_sequence_completed_event_id
@@ -282,7 +299,8 @@ class CatalogModelMaterializationRuntime:
                     source=source,
                     descriptor=descriptor,
                     attack_sequence_id=context.attack_sequence.sequence_id,
-                    source_phase=context.source_phase,
+                    action_phase=action_phase,
+                    parent_battle_phase=parent_battle_phase,
                     roll_event_id=roll_event.event_id,
                     army_catalog=self.army_catalog,
                 )
@@ -291,7 +309,9 @@ class CatalogModelMaterializationRuntime:
                     decision_request=request,
                     payload={
                         "game_id": context.state.game_id,
-                        "phase": context.source_phase.value,
+                        "phase": parent_battle_phase.value,
+                        "action_phase": action_phase.value,
+                        "parent_battle_phase": parent_battle_phase.value,
                         "pending_request_id": request.request_id,
                         "phase_body_status": "catalog_model_materialization_pending",
                     },
@@ -303,7 +323,8 @@ class CatalogModelMaterializationRuntime:
             sources=sources,
             affected_unit_instance_ids=_model_state_changed_unit_ids_for_sequence(context),
             attack_sequence_id=context.attack_sequence.sequence_id,
-            source_phase=context.source_phase,
+            action_phase=action_phase,
+            parent_battle_phase=parent_battle_phase,
             source_step="after_attacking_unit_finished_attacks",
             source_event_id=context.attack_sequence_completed_event_id,
         )
@@ -329,6 +350,11 @@ class CatalogModelMaterializationRuntime:
             if record.event_type != "model_destroyed":
                 continue
             payload = _event_payload(record.payload, "model destroyed")
+            if not _rule_model_destruction_is_finalized(
+                decisions=decisions,
+                model_destroyed_event_id=record.event_id,
+            ):
+                continue
             attribution = ModelDestructionAttribution.from_model_destroyed_payload(payload)
             sequence_id = payload.get("sequence_id")
             if sequence_id is not None:
@@ -363,10 +389,13 @@ class CatalogModelMaterializationRuntime:
                     army_catalog=self.army_catalog,
                     sources=sources,
                     affected_unit_instance_ids=(
-                        _payload_string(payload, "target_unit_instance_id"),
+                        state.unit_instance_id_for_model(
+                            _payload_string(payload, "model_instance_id")
+                        ),
                     ),
                     attack_sequence_id=None,
-                    source_phase=source_phase,
+                    action_phase=source_phase,
+                    parent_battle_phase=source_phase,
                     source_step=removal.source_step,
                     source_event_id=record.event_id,
                 )
@@ -380,6 +409,8 @@ def invalid_catalog_model_materialization_placement_status(
     state: GameState,
     request: DecisionRequest,
     result: DecisionResult,
+    decisions: DecisionController,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
 ) -> LifecycleStatus | None:
@@ -388,6 +419,8 @@ def invalid_catalog_model_materialization_placement_status(
             state=state,
             request=request,
             result=result,
+            decisions=decisions,
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
             ruleset_descriptor=ruleset_descriptor,
             army_catalog=army_catalog,
         )
@@ -398,6 +431,7 @@ def invalid_catalog_model_materialization_placement_status(
         PlacementError,
         UnitCoherencyError,
         UnitFactoryError,
+        DiceRollSpecError,
         KeyError,
         TypeError,
     ) as exc:
@@ -420,6 +454,7 @@ def apply_recorded_catalog_model_materialization_placement(
     decisions: DecisionController,
     request: DecisionRequest,
     result: DecisionResult,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
 ) -> tuple[ModelPlacementRecord, ...]:
@@ -428,6 +463,8 @@ def apply_recorded_catalog_model_materialization_placement(
         state=state,
         request=request,
         result=result,
+        decisions=decisions,
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
         ruleset_descriptor=ruleset_descriptor,
         army_catalog=army_catalog,
     )
@@ -440,7 +477,9 @@ def apply_recorded_catalog_model_materialization_placement(
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
                 "attack_sequence_id": validated.attack_sequence_id,
-                "source_phase": validated.source_phase.value,
+                "source_phase": validated.parent_battle_phase.value,
+                "action_phase": validated.action_phase.value,
+                "parent_battle_phase": validated.parent_battle_phase.value,
                 "source_rule_id": validated.source_rule_id,
                 "source_unit_instance_id": validated.source_unit_instance_id,
                 "request_id": request.request_id,
@@ -457,7 +496,9 @@ def apply_recorded_catalog_model_materialization_placement(
             {
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
-                "source_phase": validated.source_phase.value,
+                "source_phase": validated.parent_battle_phase.value,
+                "action_phase": validated.action_phase.value,
+                "parent_battle_phase": validated.parent_battle_phase.value,
                 "placement_kind": BattlefieldPlacementKind.SPLIT_UNIT.value,
                 "placement_trigger_kind": "model_placed_on_battlefield",
                 "source_rule_id": validated.source_rule_id,
@@ -479,7 +520,8 @@ def _materialization_request(
     source: CatalogMaterializationSource,
     descriptor: MaterializeModelsDescriptor,
     attack_sequence_id: str,
-    source_phase: BattlePhase,
+    action_phase: BattlePhase,
+    parent_battle_phase: BattlePhase,
     roll_event_id: str,
     army_catalog: ArmyCatalog,
 ) -> DecisionRequest:
@@ -487,19 +529,12 @@ def _materialization_request(
         armies=tuple(state.army_definitions),
         unit_instance_id=source.source_unit_instance_id,
     )
-    models = tuple(
-        UnitFactory(army_catalog).instantiate_materialized_model(
-            datasheet_id=source_unit.datasheet_id,
-            model_profile_id=descriptor.result_model_profile_id,
-            model_instance_id=(
-                f"{source.source_unit_instance_id}:materialized:{roll_event_id}:{index:02d}"
-            ),
-            model_name=descriptor.result_model_name,
-            wargear_ids=descriptor.result_wargear_ids,
-            source_id=source.source_rule_id,
-            materialization_descriptor_id=descriptor.result_materialization_descriptor_id,
-        )
-        for index in range(1, descriptor.result_count + 1)
+    models = _authoritative_materialized_models(
+        source_unit=source_unit,
+        source=source,
+        descriptor=descriptor,
+        roll_event_id=roll_event_id,
+        army_catalog=army_catalog,
     )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
@@ -511,7 +546,9 @@ def _materialization_request(
                 "proposal_kind": ProposalKind.MODEL_MATERIALIZATION.value,
                 "placement_kind": BattlefieldPlacementKind.SPLIT_UNIT.value,
                 "attack_sequence_id": attack_sequence_id,
-                "source_phase": source_phase.value,
+                "source_phase": parent_battle_phase.value,
+                "action_phase": action_phase.value,
+                "parent_battle_phase": parent_battle_phase.value,
                 "roll_event_id": roll_event_id,
                 "catalog_record_id": source.record.record_id,
                 "clause_id": source.clause.clause_id,
@@ -535,6 +572,8 @@ def _validated_materialization_submission(
     state: GameState,
     request: DecisionRequest,
     result: DecisionResult,
+    decisions: DecisionController,
+    ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     ruleset_descriptor: RulesetDescriptor,
     army_catalog: ArmyCatalog,
 ) -> ValidatedCatalogModelMaterialization:
@@ -547,13 +586,36 @@ def _validated_materialization_submission(
         raise GameLifecycleError("Model materialization proposal kind drift.")
     if submission.placement_kind is not BattlefieldPlacementKind.SPLIT_UNIT:
         raise GameLifecycleError("Model materialization placement kind drift.")
-    source_unit_id = _payload_string(payload, "source_unit_instance_id")
+    if request.decision_type != SUBMIT_CATALOG_MODEL_MATERIALIZATION_PLACEMENT_DECISION_TYPE:
+        raise GameLifecycleError("Model materialization decision type drift.")
+    if payload.get("submission_kind") != request.decision_type:
+        raise GameLifecycleError("Model materialization submission kind drift.")
+    if payload.get("proposal_kind") != ProposalKind.MODEL_MATERIALIZATION.value:
+        raise GameLifecycleError("Model materialization request proposal kind drift.")
+    if payload.get("placement_kind") != BattlefieldPlacementKind.SPLIT_UNIT.value:
+        raise GameLifecycleError("Model materialization request placement kind drift.")
+    runtime = CatalogModelMaterializationRuntime(
+        ability_indexes_by_player_id=ability_indexes_by_player_id,
+        armies=tuple(state.army_definitions),
+        army_catalog=army_catalog,
+    )
+    source = _authoritative_materialization_source(runtime=runtime, payload=payload)
+    descriptor = source.materialization
+    if descriptor is None:
+        raise GameLifecycleError("Model materialization descriptor is unavailable.")
+    source_unit_id = source.source_unit_instance_id
     if submission.unit_instance_id != source_unit_id:
         raise GameLifecycleError("Model materialization unit drift.")
     unit_placement = submission.require_unit_placement()
     source_unit, army = _unit_and_army_for_id(
         armies=tuple(state.army_definitions), unit_instance_id=source_unit_id
     )
+    if _payload_string(payload, "army_id") != army.army_id:
+        raise GameLifecycleError("Model materialization request army drift.")
+    if _payload_string(payload, "player_id") != army.player_id:
+        raise GameLifecycleError("Model materialization request player drift.")
+    if request.actor_id != army.player_id:
+        raise GameLifecycleError("Model materialization request actor drift.")
     if result.actor_id != army.player_id:
         raise GameLifecycleError("Model materialization actor drift.")
     if unit_placement.army_id != army.army_id or unit_placement.player_id != army.player_id:
@@ -568,45 +630,45 @@ def _validated_materialization_submission(
         or submission.transport_movement_status is not None
     ):
         raise GameLifecycleError("Model materialization does not accept transport context.")
-    models_payload = payload.get("models")
-    if not isinstance(models_payload, list):
-        raise GameLifecycleError("Model materialization request models must be a list.")
-    models_list: list[ModelInstance] = []
-    for item in models_payload:
-        if not isinstance(item, dict):
-            raise GameLifecycleError("Model materialization model payload is malformed.")
-        models_list.append(ModelInstance.from_payload(cast(ModelInstancePayload, item)))
-    models = tuple(models_list)
+    action_phase = _battle_phase(_payload_string(payload, "action_phase"))
+    parent_battle_phase = _battle_phase(_payload_string(payload, "parent_battle_phase"))
+    if _battle_phase(_payload_string(payload, "source_phase")) is not parent_battle_phase:
+        raise GameLifecycleError("Model materialization source phase drift.")
+    if action_phase not in {BattlePhase.SHOOTING, BattlePhase.FIGHT}:
+        raise GameLifecycleError("Model materialization action phase is unsupported.")
+    if state.current_battle_phase is not parent_battle_phase:
+        raise GameLifecycleError("Model materialization parent battle phase drift.")
+    roll_event_id = _payload_string(payload, "roll_event_id")
+    attack_sequence_id = _payload_string(payload, "attack_sequence_id")
+    _validate_authoritative_materialization_roll(
+        state=state,
+        decisions=decisions,
+        source=source,
+        descriptor=descriptor,
+        action_phase=action_phase,
+        parent_battle_phase=parent_battle_phase,
+        attack_sequence_id=attack_sequence_id,
+        roll_event_id=roll_event_id,
+    )
+    models = _authoritative_materialized_models(
+        source_unit=source_unit,
+        source=source,
+        descriptor=descriptor,
+        roll_event_id=roll_event_id,
+        army_catalog=army_catalog,
+    )
+    expected_models_payload = [model.to_payload() for model in models]
+    if payload.get("models") != expected_models_payload:
+        raise GameLifecycleError("Model materialization request models drifted.")
+    if payload.get("model_instance_ids") != [model.model_instance_id for model in models]:
+        raise GameLifecycleError("Model materialization request model identities drifted.")
     expected_model_ids = tuple(sorted(model.model_instance_id for model in models))
     submitted_model_ids = tuple(
         sorted(placement.model_instance_id for placement in unit_placement.model_placements)
     )
     if submitted_model_ids != expected_model_ids:
         raise GameLifecycleError("Model materialization model set drift.")
-    source_rule_id = _payload_string(payload, "source_rule_id")
-    materialization_descriptor_id = _payload_string(
-        payload,
-        "materialization_descriptor_id",
-    )
-    source_phase = _battle_phase(_payload_string(payload, "source_phase"))
-    if source_phase not in {BattlePhase.SHOOTING, BattlePhase.FIGHT}:
-        raise GameLifecycleError("Model materialization source phase is unsupported.")
-    if state.current_battle_phase is not source_phase:
-        raise GameLifecycleError("Model materialization source phase drift.")
-    for model in models:
-        if materialization_descriptor_id not in model.source_ids:
-            raise GameLifecycleError("Materialized model descriptor identity drift.")
-        expected = UnitFactory(army_catalog).instantiate_materialized_model(
-            datasheet_id=source_unit.datasheet_id,
-            model_profile_id=model.model_profile_id,
-            model_instance_id=model.model_instance_id,
-            model_name=model.name,
-            wargear_ids=model.wargear_ids,
-            source_id=source_rule_id,
-            materialization_descriptor_id=materialization_descriptor_id,
-        )
-        if expected.to_payload() != model.to_payload():
-            raise GameLifecycleError("Materialized model template drift.")
+    source_rule_id = source.source_rule_id
     hypothetical_unit = replace(
         source_unit,
         own_models=tuple(
@@ -653,10 +715,10 @@ def _validated_materialization_submission(
                 model_instance_id=placement.model_instance_id,
                 placement_kind=BattlefieldPlacementKind.SPLIT_UNIT,
                 pose=placement.pose,
-                source_phase=source_phase.value,
+                source_phase=parent_battle_phase.value,
                 source_step="after_attacking_unit_finished_attacks",
                 source_rule_id=source_rule_id,
-                source_event_id=_payload_string(payload, "roll_event_id"),
+                source_event_id=roll_event_id,
             )
             for placement in unit_placement.model_placements
         )
@@ -664,14 +726,144 @@ def _validated_materialization_submission(
     return ValidatedCatalogModelMaterialization(
         source_unit_instance_id=source_unit_id,
         source_rule_id=source_rule_id,
-        attack_sequence_id=_payload_string(payload, "attack_sequence_id"),
-        source_phase=source_phase,
+        attack_sequence_id=attack_sequence_id,
+        action_phase=action_phase,
+        parent_battle_phase=parent_battle_phase,
         placements=unit_placement.model_placements,
         models=models,
         hypothetical_armies=hypothetical_armies,
         hypothetical_battlefield=hypothetical_battlefield,
         transition_batch=transition,
     )
+
+
+def _authoritative_materialization_source(
+    *,
+    runtime: CatalogModelMaterializationRuntime,
+    payload: dict[str, JsonValue],
+) -> CatalogMaterializationSource:
+    source_unit_instance_id = _payload_string(payload, "source_unit_instance_id")
+    player_id = _payload_string(payload, "player_id")
+    catalog_record_id = _payload_string(payload, "catalog_record_id")
+    clause_id = _payload_string(payload, "clause_id")
+    source_rule_id = _payload_string(payload, "source_rule_id")
+    materialization_descriptor_id = _payload_string(payload, "materialization_descriptor_id")
+    matches = tuple(
+        source
+        for source in runtime.sources(armies=tuple(runtime.armies))
+        if source.player_id == player_id
+        and source.source_unit_instance_id == source_unit_instance_id
+        and source.record.record_id == catalog_record_id
+        and source.clause.clause_id == clause_id
+        and source.source_rule_id == source_rule_id
+        and source.materialization is not None
+        and source.materialization.result_materialization_descriptor_id
+        == materialization_descriptor_id
+    )
+    if len(matches) != 1:
+        raise GameLifecycleError(
+            "Model materialization request does not resolve to one current catalog source."
+        )
+    return matches[0]
+
+
+def _authoritative_materialized_models(
+    *,
+    source_unit: UnitInstance,
+    source: CatalogMaterializationSource,
+    descriptor: MaterializeModelsDescriptor,
+    roll_event_id: str,
+    army_catalog: ArmyCatalog,
+) -> tuple[ModelInstance, ...]:
+    return tuple(
+        UnitFactory(army_catalog).instantiate_materialized_model(
+            datasheet_id=source_unit.datasheet_id,
+            model_profile_id=descriptor.result_model_profile_id,
+            model_instance_id=(
+                f"{source.source_unit_instance_id}:materialized:{roll_event_id}:{index:02d}"
+            ),
+            model_name=descriptor.result_model_name,
+            wargear_ids=descriptor.result_wargear_ids,
+            source_id=source.source_rule_id,
+            materialization_descriptor_id=descriptor.result_materialization_descriptor_id,
+        )
+        for index in range(1, descriptor.result_count + 1)
+    )
+
+
+def _validate_authoritative_materialization_roll(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    source: CatalogMaterializationSource,
+    descriptor: MaterializeModelsDescriptor,
+    action_phase: BattlePhase,
+    parent_battle_phase: BattlePhase,
+    attack_sequence_id: str,
+    roll_event_id: str,
+) -> None:
+    matches = tuple(
+        record for record in decisions.event_log.records if record.event_id == roll_event_id
+    )
+    if len(matches) != 1 or matches[0].event_type != CATALOG_MODEL_MATERIALIZATION_ROLL_EVENT:
+        raise GameLifecycleError("Model materialization roll event identity drift.")
+    payload = _event_payload(matches[0].payload, "materialization roll")
+    exact_fields: tuple[tuple[str, JsonValue], ...] = (
+        ("game_id", state.game_id),
+        ("battle_round", state.battle_round),
+        ("phase", parent_battle_phase.value),
+        ("action_phase", action_phase.value),
+        ("parent_battle_phase", parent_battle_phase.value),
+        ("attack_sequence_id", attack_sequence_id),
+        ("catalog_record_id", source.record.record_id),
+        ("clause_id", source.clause.clause_id),
+        ("source_rule_id", source.source_rule_id),
+        ("source_unit_instance_id", source.source_unit_instance_id),
+        ("success_threshold", descriptor.success_threshold),
+        ("result_count", descriptor.result_count),
+        ("successful", True),
+    )
+    if any(payload.get(key) != expected for key, expected in exact_fields):
+        raise GameLifecycleError("Model materialization roll context drift.")
+    completion_event_id = _payload_string(payload, "attack_sequence_completed_event_id")
+    completion_matches = tuple(
+        record for record in decisions.event_log.records if record.event_id == completion_event_id
+    )
+    if len(completion_matches) != 1 or completion_matches[0].event_type != (
+        "attack_sequence_completed"
+    ):
+        raise GameLifecycleError("Model materialization completion event identity drift.")
+    completion_payload = _event_payload(completion_matches[0].payload, "attack sequence completed")
+    if completion_payload.get("sequence_id") != attack_sequence_id:
+        raise GameLifecycleError("Model materialization completion sequence drift.")
+    destroyed_model_instance_id = _payload_string(payload, "destroyed_model_instance_id")
+    if destroyed_model_instance_id not in _destroyed_model_ids_for_sequence_events(
+        decisions=decisions,
+        attack_sequence_id=attack_sequence_id,
+        descriptor=descriptor,
+    ):
+        raise GameLifecycleError("Model materialization destruction evidence drift.")
+    if not _destroyed_model_matches_source(
+        state=state,
+        source=source,
+        descriptor=descriptor,
+        model_instance_id=destroyed_model_instance_id,
+    ):
+        raise GameLifecycleError("Model materialization destroyed model source drift.")
+    roll_payload = payload.get("roll")
+    if not isinstance(roll_payload, dict):
+        raise GameLifecycleError("Model materialization roll payload is malformed.")
+    roll = DiceRollState.from_payload(cast(DiceRollStatePayload, roll_payload))
+    expected_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=f"Model materialization for {destroyed_model_instance_id}",
+        roll_type="catalog.model_materialization.trigger",
+        actor_id=source.player_id,
+    )
+    if roll.original_result.spec != expected_spec:
+        raise GameLifecycleError("Model materialization roll specification drift.")
+    if roll.current_total < descriptor.success_threshold:
+        raise GameLifecycleError("Model materialization successful roll result drift.")
 
 
 def _apply_available_datasheet_replacements(
@@ -682,7 +874,8 @@ def _apply_available_datasheet_replacements(
     sources: tuple[CatalogMaterializationSource, ...],
     affected_unit_instance_ids: tuple[str, ...],
     attack_sequence_id: str | None,
-    source_phase: BattlePhase,
+    action_phase: BattlePhase,
+    parent_battle_phase: BattlePhase,
     source_step: str,
     source_event_id: str,
 ) -> bool:
@@ -714,7 +907,8 @@ def _apply_available_datasheet_replacements(
                 source=source,
                 descriptor=descriptor,
                 attack_sequence_id=attack_sequence_id,
-                source_phase=source_phase,
+                action_phase=action_phase,
+                parent_battle_phase=parent_battle_phase,
                 source_step=source_step,
                 source_event_id=source_event_id,
             )
@@ -731,7 +925,8 @@ def _replace_unit_datasheet(
     source: CatalogMaterializationSource,
     descriptor: UnitDatasheetReplacementDescriptor,
     attack_sequence_id: str | None,
-    source_phase: BattlePhase,
+    action_phase: BattlePhase,
+    parent_battle_phase: BattlePhase,
     source_step: str,
     source_event_id: str,
 ) -> bool:
@@ -801,7 +996,9 @@ def _replace_unit_datasheet(
                 "game_id": state.game_id,
                 "battle_round": state.battle_round,
                 "attack_sequence_id": attack_sequence_id,
-                "source_phase": source_phase.value,
+                "source_phase": parent_battle_phase.value,
+                "action_phase": action_phase.value,
+                "parent_battle_phase": parent_battle_phase.value,
                 "source_step": source_step,
                 "source_event_id": source_event_id,
                 "catalog_record_id": source.record.record_id,
@@ -824,13 +1021,26 @@ def _destroyed_model_ids_for_sequence(
     *,
     descriptor: MaterializeModelsDescriptor,
 ) -> tuple[str, ...]:
+    return _destroyed_model_ids_for_sequence_events(
+        decisions=context.decisions,
+        attack_sequence_id=context.attack_sequence.sequence_id,
+        descriptor=descriptor,
+    )
+
+
+def _destroyed_model_ids_for_sequence_events(
+    *,
+    decisions: DecisionController,
+    attack_sequence_id: str,
+    descriptor: MaterializeModelsDescriptor,
+) -> tuple[str, ...]:
     destroyed_ids: set[str] = set()
-    for record in context.decisions.event_log.records:
+    for record in decisions.event_log.records:
         if record.event_type not in {"model_destroyed", "hazardous_mortal_wounds_applied"}:
             continue
         payload = _event_payload(record.payload, record.event_type)
         if record.event_type == "model_destroyed":
-            if payload.get("sequence_id") != context.attack_sequence.sequence_id:
+            if payload.get("sequence_id") != attack_sequence_id:
                 continue
             attribution = ModelDestructionAttribution.from_model_destroyed_payload(payload)
             source_kind = attribution.destruction_provenance.destruction_source_kind
@@ -845,7 +1055,7 @@ def _destroyed_model_ids_for_sequence(
             continue
         if (
             DestructionSourceKind.HAZARDOUS not in descriptor.destruction_source_kinds
-            or payload.get("sequence_id") != context.attack_sequence.sequence_id
+            or payload.get("sequence_id") != attack_sequence_id
         ):
             continue
         application = payload.get("mortal_wound_application")
@@ -872,7 +1082,8 @@ def _model_state_changed_unit_ids_for_sequence(
             if payload.get("sequence_id") != context.attack_sequence.sequence_id:
                 continue
             ModelDestructionAttribution.from_model_destroyed_payload(payload)
-            unit_ids.add(_payload_string(payload, "target_unit_instance_id"))
+            model_id = _payload_string(payload, "model_instance_id")
+            unit_ids.add(context.state.unit_instance_id_for_model(model_id))
             continue
         if record.event_type != "hazardous_mortal_wounds_applied":
             continue
@@ -893,6 +1104,23 @@ def _model_state_changed_unit_ids_for_sequence(
             model_id = _payload_string(damage, "model_instance_id")
             unit_ids.add(context.state.unit_instance_id_for_model(model_id))
     return tuple(sorted(unit_ids))
+
+
+def _rule_model_destruction_is_finalized(
+    *,
+    decisions: DecisionController,
+    model_destroyed_event_id: str,
+) -> bool:
+    matches: list[EventRecord] = []
+    for record in decisions.event_log.records:
+        if record.event_type != RULE_MODEL_DESTRUCTION_FINALIZED_EVENT:
+            continue
+        payload = _event_payload(record.payload, "rule model destruction finalized")
+        if _payload_string(payload, "model_destroyed_event_id") == model_destroyed_event_id:
+            matches.append(record)
+    if len(matches) > 1:
+        raise GameLifecycleError("Rule model destruction finalization evidence is duplicated.")
+    return bool(matches)
 
 
 def _destroyed_model_matches_source(

@@ -265,6 +265,7 @@ def _apply_out_of_phase_shooting_declaration_decision(
         attacker_player_id=out_of_phase_state.player_id,
         attacking_unit_instance_id=proposal.unit_instance_id,
         attack_pools=attack_pools,
+        source_phase=BattlePhase.SHOOTING,
     )
     state.replace_out_of_phase_shooting_state(
         out_of_phase_state.with_declaration(

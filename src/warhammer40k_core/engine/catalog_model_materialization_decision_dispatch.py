@@ -50,10 +50,13 @@ def decision_dispatch_handlers(
         result: DecisionResult,
     ) -> LifecycleStatus | None:
         config = host._require_config()
+        bundle = _require_runtime_content_bundle(host)
         return invalid_catalog_model_materialization_placement_status(
             state=host._require_state(),
             request=request,
             result=result,
+            decisions=host.decision_controller,
+            ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
             ruleset_descriptor=config.ruleset_descriptor,
             army_catalog=config.army_catalog,
         )
@@ -61,11 +64,13 @@ def decision_dispatch_handlers(
     def applier(record: DecisionRecord, result: DecisionResult) -> LifecycleStatus:
         state = host._require_state()
         config = host._require_config()
+        bundle = _require_runtime_content_bundle(host)
         placements = apply_recorded_catalog_model_materialization_placement(
             state=state,
             decisions=host.decision_controller,
             request=record.request,
             result=result,
+            ability_indexes_by_player_id=bundle.ability_indexes_by_player_id,
             ruleset_descriptor=config.ruleset_descriptor,
             army_catalog=config.army_catalog,
         )
@@ -76,6 +81,8 @@ def decision_dispatch_handlers(
             runtime_content_bundle=host._runtime_content_bundle,
             source_unit_instance_id=_source_unit_instance_id(record.request),
             request_id=record.request.request_id,
+            action_phase=_request_phase(record.request, "action_phase"),
+            parent_battle_phase=_request_phase(record.request, "parent_battle_phase"),
             placements=placements,
             runtime_modifier_registry=host._shooting_phase_handler.runtime_modifier_registry,
         )
@@ -98,6 +105,8 @@ def _dispatch_model_placed_events(
     runtime_content_bundle: RuntimeContentBundle | None,
     source_unit_instance_id: str,
     request_id: str,
+    action_phase: str,
+    parent_battle_phase: str,
     placements: tuple[ModelPlacementRecord, ...],
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
@@ -123,6 +132,9 @@ def _dispatch_model_placed_events(
                 event_payload=validate_json_value(
                     {
                         "placement_kind": "split_unit",
+                        "source_phase": parent_battle_phase,
+                        "action_phase": action_phase,
+                        "parent_battle_phase": parent_battle_phase,
                         "model_instance_id": placement.model_instance_id,
                         "model_placement_record": placement.to_payload(),
                         "request_id": request_id,
@@ -158,6 +170,25 @@ def _source_unit_instance_id(request: DecisionRequest) -> str:
     if type(value) is not str or not value:
         raise GameLifecycleError("Materialization request source unit is invalid.")
     return value
+
+
+def _request_phase(request: DecisionRequest, key: str) -> str:
+    payload = request.payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Materialization request payload is invalid.")
+    value = payload.get(key)
+    if type(value) is not str or not value:
+        raise GameLifecycleError(f"Materialization request {key} is invalid.")
+    return value
+
+
+def _require_runtime_content_bundle(
+    host: MaterializationDecisionLifecycleHost,
+) -> RuntimeContentBundle:
+    bundle = host._runtime_content_bundle
+    if bundle is None:
+        raise GameLifecycleError("Materialization decision requires runtime content.")
+    return bundle
 
 
 __all__ = (

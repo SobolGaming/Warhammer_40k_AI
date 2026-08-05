@@ -1,6 +1,7 @@
 # pyright: reportPrivateUsage=false
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass, replace
 from typing import Any, cast
 
@@ -12,16 +13,23 @@ from tests.support.catalog_runtime_fixtures import (
 )
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import DamageProfile, WeaponKeyword
 from warhammer40k_core.engine import lifecycle as lifecycle_module
+from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.attached_unit_reconciliation import (
     reconcile_after_attack_sequence,
 )
-from warhammer40k_core.engine.attack_sequence import AttackSequence
+from warhammer40k_core.engine.attack_sequence import (
+    AttackSequence,
+    attack_sequence_wound_roll_spec,
+    resolve_attack_sequence_until_blocked,
+)
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
     AttackSequenceCompletedContext,
 )
@@ -46,6 +54,11 @@ from warhammer40k_core.engine.catalog_model_materialization_runtime import (
     apply_recorded_catalog_model_materialization_placement,
     invalid_catalog_model_materialization_placement_status,
 )
+from warhammer40k_core.engine.damage_allocation import (
+    DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+    DestructionReactionKind,
+    DestructionReactionSource,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_provenance import (
@@ -53,6 +66,7 @@ from warhammer40k_core.engine.destruction_provenance import (
     ModelDestructionAttribution,
 )
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import (
@@ -70,9 +84,18 @@ from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import DetachmentSelection, UnitMusterSelection
 from warhammer40k_core.engine.movement_proposals import PlacementProposalPayload, ProposalKind
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatusKind
+from warhammer40k_core.engine.phases.movement import MovementPhaseHandler
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseHandler
+from warhammer40k_core.engine.rule_model_destruction import (
+    RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
+)
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.saves import (
+    mandatory_save_option,
+    save_options_for_model,
+    saving_throw_roll_spec,
+)
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitFactory, UnitInstance
@@ -160,6 +183,8 @@ def test_split_materializes_models_then_hands_off_attached_unit_datasheet(
         state=scenario.state,
         request=request,
         result=stale_result,
+        decisions=scenario.decisions,
+        ability_indexes_by_player_id=scenario.runtime.ability_indexes_by_player_id,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         army_catalog=scenario.package.army_catalog,
     )
@@ -177,6 +202,8 @@ def test_split_materializes_models_then_hands_off_attached_unit_datasheet(
             state=scenario.state,
             request=request,
             result=result,
+            decisions=scenario.decisions,
+            ability_indexes_by_player_id=scenario.runtime.ability_indexes_by_player_id,
             ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
             army_catalog=scenario.package.army_catalog,
         )
@@ -188,6 +215,7 @@ def test_split_materializes_models_then_hands_off_attached_unit_datasheet(
         decisions=scenario.decisions,
         request=request,
         result=result,
+        ability_indexes_by_player_id=scenario.runtime.ability_indexes_by_player_id,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         army_catalog=scenario.package.army_catalog,
     )
@@ -305,6 +333,151 @@ def test_split_complete_standalone_wipe_skips_empty_datasheet_handoff() -> None:
     )
 
 
+@pytest.mark.parametrize("source_phase", [BattlePhase.SHOOTING, BattlePhase.FIGHT])
+def test_real_attack_pipeline_hands_off_attached_horror_component(
+    source_phase: BattlePhase,
+) -> None:
+    scenario = _split_scenario(
+        pink_datasheet_id="000002584",
+        blue_datasheet_id="000002583",
+        destruction_kind="attack",
+        source_phase=source_phase,
+        models_start_destroyed=False,
+        emit_destruction_events=False,
+    )
+    pink_model = scenario.bodyguard.own_models[0]
+    valid_save_model = replace(
+        pink_model,
+        characteristics=tuple(
+            CharacteristicValue.from_raw(Characteristic.SAVE, 6)
+            if value.characteristic is Characteristic.SAVE
+            else value
+            for value in pink_model.characteristics
+        ),
+    )
+    bodyguard = replace(scenario.bodyguard, own_models=(valid_save_model,))
+    source_army = replace(
+        scenario.source_army,
+        units=tuple(
+            bodyguard if unit.unit_instance_id == bodyguard.unit_instance_id else unit
+            for unit in scenario.source_army.units
+        ),
+    )
+    scenario.state.replace_army_definitions([source_army, scenario.enemy_army])
+    base_pool = scenario.attack_sequence.attack_pools[0]
+    lethal_profile = replace(
+        base_pool.weapon_profile,
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
+        armor_penetration=CharacteristicValue.from_raw(Characteristic.ARMOR_PENETRATION, 0),
+        damage_profile=DamageProfile.fixed(1),
+        keywords=(WeaponKeyword.TORRENT,),
+        abilities=(),
+    )
+    lethal_pool = replace(base_pool, weapon_profile=lethal_profile)
+    attack_sequence = AttackSequence.start(
+        sequence_id=f"real-pipeline:{source_phase.value}:horror-split",
+        attacker_player_id=scenario.enemy_army.player_id,
+        attacking_unit_instance_id=scenario.attack_sequence.attacking_unit_instance_id,
+        attack_pools=(lethal_pool,),
+        source_phase=source_phase,
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=lethal_pool.weapon_profile_id,
+        attack_context_id=attack_sequence.attack_context_id(),
+        attacker_player_id=scenario.enemy_army.player_id,
+    )
+    save_option = mandatory_save_option(
+        save_options_for_model(
+            model=valid_save_model,
+            armor_penetration=0,
+        )
+    )
+    assert save_option is not None
+    save_spec = saving_throw_roll_spec(
+        save_kind=save_option.save_kind,
+        player_id=scenario.source_army.player_id,
+        allocated_model_id=valid_save_model.model_instance_id,
+        attack_context_id=attack_sequence.attack_context_id(),
+    )
+    manager = DiceRollManager(
+        scenario.state.game_id,
+        event_log=scenario.decisions.event_log,
+        injected_results=(
+            DiceRollResult.from_values(
+                roll_id=f"roll:real-pipeline:{source_phase.value}:wound",
+                spec=wound_spec,
+                values=(6,),
+                source="fixed",
+            ),
+            DiceRollResult.from_values(
+                roll_id=f"roll:real-pipeline:{source_phase.value}:save",
+                spec=save_spec,
+                values=(1,),
+                source="fixed",
+            ),
+        ),
+    )
+
+    remaining, _allocated_ids, blocked = resolve_attack_sequence_until_blocked(
+        state=scenario.state,
+        decisions=scenario.decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        attack_sequence=attack_sequence,
+        already_allocated_model_ids=(),
+        dice_manager=manager,
+    )
+
+    assert remaining is None
+    assert blocked is None
+    destroyed_event = next(
+        record
+        for record in scenario.decisions.event_log.records
+        if record.event_type == "model_destroyed"
+    )
+    destroyed_payload = cast(dict[str, JsonValue], destroyed_event.payload)
+    assert destroyed_payload["target_unit_instance_id"] == scenario.attached_unit_instance_id
+    completed_event = next(
+        record
+        for record in reversed(scenario.decisions.event_log.records)
+        if record.event_type == "attack_sequence_completed"
+        and cast(dict[str, JsonValue], record.payload).get("sequence_id")
+        == attack_sequence.sequence_id
+    )
+    completed_sequence = replace(attack_sequence, used_pool_indices=(0,), pool_index=1)
+    context = replace(
+        scenario.context,
+        attack_sequence=completed_sequence,
+        attack_sequence_completed_event_id=completed_event.event_id,
+        source_phase=source_phase,
+    )
+    assert scenario.runtime.resolve_completed_attack_sequence(context) is not None
+    request = scenario.decisions.queue.peek_next()
+    result = _parameterized_result(
+        request=request,
+        payload=_placement_payload(
+            request=request,
+            army=scenario.source_army,
+            unit=scenario.bodyguard,
+        ),
+        result_id=f"result:real-pipeline:{source_phase.value}",
+    )
+    scenario.decisions.submit_result(result)
+    apply_recorded_catalog_model_materialization_placement(
+        state=scenario.state,
+        decisions=scenario.decisions,
+        request=request,
+        result=result,
+        ability_indexes_by_player_id=scenario.runtime.ability_indexes_by_player_id,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=scenario.package.army_catalog,
+    )
+
+    assert scenario.runtime.resolve_completed_attack_sequence(context) is None
+    assert _unit_by_id(scenario.state, scenario.bodyguard.unit_instance_id).datasheet_id == (
+        "000002583"
+    )
+
+
 def test_split_failed_attached_wipe_skips_handoff_then_reconciles_attachment() -> None:
     scenario = _split_scenario(
         pink_datasheet_id="000002584",
@@ -385,6 +558,7 @@ def test_split_mixed_rolls_materialize_only_successes_before_handoff() -> None:
         decisions=scenario.decisions,
         request=request,
         result=result,
+        ability_indexes_by_player_id=scenario.runtime.ability_indexes_by_player_id,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
         army_catalog=scenario.package.army_catalog,
     )
@@ -545,6 +719,133 @@ def test_non_attack_destruction_reconciles_horror_datasheet_from_composition(
     )
 
 
+@pytest.mark.parametrize("select_reaction", [False, True])
+def test_non_attack_handoff_waits_for_optional_destruction_reaction_finalization(
+    select_reaction: bool,
+) -> None:
+    scenario = _split_scenario(
+        pink_datasheet_id="000002584",
+        blue_datasheet_id="000002583",
+        destruction_kind=DestructionSourceKind.ABILITY.value,
+        retained_horror_kinds=("blue",),
+        models_start_destroyed=False,
+        emit_destruction_events=False,
+    )
+    pink_model_id = scenario.bodyguard.own_models[0].model_instance_id
+    liability = PersistingEffect(
+        effect_id="test:horrors:pending-reaction:liability",
+        source_rule_id="test:horrors:pending-reaction:rule",
+        owner_player_id=scenario.enemy_army.player_id,
+        target_unit_instance_ids=(scenario.attached_unit_instance_id,),
+        started_battle_round=scenario.state.battle_round,
+        started_phase=BattlePhase.SHOOTING,
+        expiration=EffectExpiration.end_phase(
+            battle_round=scenario.state.battle_round,
+            phase=BattlePhase.SHOOTING,
+            player_id=scenario.enemy_army.player_id,
+        ),
+        effect_payload={"effect_kind": "test_rule_destruction_liability"},
+    )
+    scenario.state.record_persisting_effect(liability)
+    reaction = DestructionReactionSource(
+        source_id="test:horrors:pending-reaction:shoot-on-death",
+        reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
+        source_rule_id="test:horrors:pending-reaction:source-rule",
+    )
+    scenario.state.record_model_destruction_reaction_sources(
+        model_instance_id=pink_model_id,
+        sources=(reaction,),
+    )
+
+    destruction = rule_model_destruction.destroy_model_with_rule_reactions(
+        state=scenario.state,
+        decisions=scenario.decisions,
+        model_instance_id=pink_model_id,
+        rules_unit_instance_id=scenario.attached_unit_instance_id,
+        destroying_player_id=scenario.enemy_army.player_id,
+        source_rule_id="test:horrors:pending-reaction:destruction",
+        source_effect_ids=(liability.effect_id,),
+        source_phase=BattlePhase.SHOOTING,
+        source_step="ability_resolution",
+        source_result_id="test:horrors:pending-reaction:source-result",
+        completion_event_type="test_horror_rule_destruction_completed",
+        completion_event_payload={"model_instance_id": pink_model_id},
+    )
+
+    assert destruction.status is not None
+    assert destruction.status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert (
+        scenario.runtime.reconcile_non_attack_model_destruction_events(
+            state=scenario.state,
+            decisions=scenario.decisions,
+        )
+        is False
+    )
+    pending_unit = _unit_by_id(scenario.state, scenario.bodyguard.unit_instance_id)
+    assert pending_unit.datasheet_id == "000002584"
+    assert pink_model_id in pending_unit.own_model_ids()
+    restored_state = GameState.from_payload(scenario.state.to_payload())
+    restored_decisions = DecisionController.from_payload(scenario.decisions.to_payload())
+    assert (
+        scenario.runtime.reconcile_non_attack_model_destruction_events(
+            state=restored_state,
+            decisions=restored_decisions,
+        )
+        is False
+    )
+    request = restored_decisions.queue.peek_next()
+    selected_option_id = (
+        reaction.source_id if select_reaction else DECLINE_DESTRUCTION_REACTION_OPTION_ID
+    )
+    result = DecisionResult.for_request(
+        result_id=f"result:horrors:pending-reaction:{select_reaction}",
+        request=request,
+        selected_option_id=selected_option_id,
+    )
+    restored_decisions.submit_result(result)
+    assert (
+        rule_model_destruction.apply_rule_model_destruction_reaction_decision(
+            state=restored_state,
+            decisions=restored_decisions,
+            result=result,
+        )
+        is None
+    )
+
+    assert (
+        scenario.runtime.reconcile_non_attack_model_destruction_events(
+            state=restored_state,
+            decisions=restored_decisions,
+        )
+        is True
+    )
+    updated = _unit_by_id(restored_state, scenario.bodyguard.unit_instance_id)
+    assert updated.datasheet_id == "000002583"
+    assert len(updated.own_models) == 1
+    assert updated.own_models[0].is_alive
+    assert (
+        scenario.runtime.reconcile_non_attack_model_destruction_events(
+            state=restored_state,
+            decisions=restored_decisions,
+        )
+        is False
+    )
+    assert (
+        sum(
+            record.event_type == RULE_MODEL_DESTRUCTION_FINALIZED_EVENT
+            for record in restored_decisions.event_log.records
+        )
+        == 1
+    )
+    assert (
+        sum(
+            record.event_type == CATALOG_UNIT_DATASHEET_REPLACED_EVENT
+            for record in restored_decisions.event_log.records
+        )
+        == 1
+    )
+
+
 def test_split_triggers_for_hazardous_but_not_non_attack_destruction() -> None:
     hazardous = _split_scenario(
         pink_datasheet_id="000002584",
@@ -568,11 +869,15 @@ def test_split_triggers_for_hazardous_but_not_non_attack_destruction() -> None:
     )
 
 
-def test_adapter_submission_dispatches_model_placed_runtime_events() -> None:
+@pytest.mark.parametrize("parent_battle_phase", [BattlePhase.SHOOTING, BattlePhase.MOVEMENT])
+def test_adapter_submission_dispatches_model_placed_runtime_events(
+    parent_battle_phase: BattlePhase,
+) -> None:
     scenario = _split_scenario(
         pink_datasheet_id="000002584",
         blue_datasheet_id="000002583",
         destruction_kind="attack",
+        parent_battle_phase=parent_battle_phase,
     )
     status = scenario.runtime.resolve_completed_attack_sequence(scenario.context)
     assert status is not None
@@ -592,7 +897,12 @@ def test_adapter_submission_dispatches_model_placed_runtime_events() -> None:
         ruleset_descriptor=config.ruleset_descriptor,
         army_catalog=config.army_catalog,
     )
+    lifecycle._movement_phase_handler = MovementPhaseHandler(
+        ruleset_descriptor=config.ruleset_descriptor,
+        army_catalog=config.army_catalog,
+    )
     seen_model_ids: list[str] = []
+    seen_phase_evidence: list[tuple[str, str, str]] = []
     subscription = RuntimeContentEventSubscription(
         subscription_id="test:model-placed:subscription",
         source_rule_id="test:model-placed:rule",
@@ -604,6 +914,13 @@ def test_adapter_submission_dispatches_model_placed_runtime_events() -> None:
     def record_placement(context: RuntimeContentEventContext) -> RuntimeContentEventResult:
         event_payload = cast(dict[str, JsonValue], context.event.event_payload)
         seen_model_ids.append(cast(str, event_payload["model_instance_id"]))
+        seen_phase_evidence.append(
+            (
+                cast(str, event_payload["source_phase"]),
+                cast(str, event_payload["action_phase"]),
+                cast(str, event_payload["parent_battle_phase"]),
+            )
+        )
         lifecycle._runtime_content_activation_input_hash = (
             lifecycle_module._runtime_content_activation_input_hash(
                 config=config,
@@ -635,6 +952,7 @@ def test_adapter_submission_dispatches_model_placed_runtime_events() -> None:
                 ),
             ),
         ),
+        base_ability_records=catalog_ability_records_from_catalog(config.army_catalog),
     )
     lifecycle._runtime_content_bundle = bundle
     lifecycle._runtime_content_activation_input_hash = (
@@ -662,6 +980,13 @@ def test_adapter_submission_dispatches_model_placed_runtime_events() -> None:
     assert tuple(sorted(seen_model_ids)) == tuple(
         sorted(cast(list[str], cast(dict[str, JsonValue], request.payload)["model_instance_ids"]))
     )
+    assert set(seen_phase_evidence) == {
+        (
+            parent_battle_phase.value,
+            BattlePhase.SHOOTING.value,
+            parent_battle_phase.value,
+        )
+    }
     resolved_events = tuple(
         record
         for record in lifecycle.decision_controller.event_log.records
@@ -673,6 +998,141 @@ def test_adapter_submission_dispatches_model_placed_runtime_events() -> None:
         == TimingTriggerKind.MODEL_PLACED_ON_BATTLEFIELD.value
         for record in resolved_events
     )
+
+
+@pytest.mark.parametrize(
+    ("parent_battle_phase", "out_of_phase_path"),
+    [
+        (BattlePhase.MOVEMENT, "fire_overwatch"),
+        (BattlePhase.CHARGE, "source_backed_out_of_phase_shooting"),
+    ],
+)
+def test_out_of_phase_split_restores_and_preserves_action_and_parent_phase_evidence(
+    parent_battle_phase: BattlePhase,
+    out_of_phase_path: str,
+) -> None:
+    scenario = _split_scenario(
+        pink_datasheet_id="000002584",
+        blue_datasheet_id="000002583",
+        destruction_kind="attack",
+        source_phase=BattlePhase.SHOOTING,
+        parent_battle_phase=parent_battle_phase,
+    )
+
+    status = scenario.runtime.resolve_completed_attack_sequence(scenario.context)
+
+    assert status is not None
+    request = scenario.decisions.queue.peek_next()
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    assert request_payload["action_phase"] == BattlePhase.SHOOTING.value
+    assert request_payload["parent_battle_phase"] == parent_battle_phase.value
+    assert request_payload["source_phase"] == parent_battle_phase.value
+    restored_state = GameState.from_payload(scenario.state.to_payload())
+    restored_decisions = DecisionController.from_payload(scenario.decisions.to_payload())
+    restored_request = restored_decisions.queue.peek_next()
+    result = _parameterized_result(
+        request=restored_request,
+        payload=_placement_payload(
+            request=restored_request,
+            army=scenario.source_army,
+            unit=scenario.bodyguard,
+        ),
+        result_id=f"result:split:{out_of_phase_path}",
+    )
+    assert (
+        invalid_catalog_model_materialization_placement_status(
+            state=restored_state,
+            request=restored_request,
+            result=result,
+            decisions=restored_decisions,
+            ability_indexes_by_player_id=scenario.runtime.ability_indexes_by_player_id,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+            army_catalog=scenario.package.army_catalog,
+        )
+        is None
+    )
+    restored_decisions.submit_result(result)
+    placements = apply_recorded_catalog_model_materialization_placement(
+        state=restored_state,
+        decisions=restored_decisions,
+        request=restored_request,
+        result=result,
+        ability_indexes_by_player_id=scenario.runtime.ability_indexes_by_player_id,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=scenario.package.army_catalog,
+    )
+
+    assert {placement.source_phase for placement in placements} == {parent_battle_phase.value}
+    for event_type in (CATALOG_MODELS_MATERIALIZED_EVENT, "battlefield_models_placed"):
+        event = next(
+            record
+            for record in restored_decisions.event_log.records
+            if record.event_type == event_type
+        )
+        event_payload = cast(dict[str, JsonValue], event.payload)
+        assert event_payload["action_phase"] == BattlePhase.SHOOTING.value
+        assert event_payload["parent_battle_phase"] == parent_battle_phase.value
+        assert event_payload["source_phase"] == parent_battle_phase.value
+    replayed = DecisionController.from_payload(restored_decisions.to_payload())
+    assert replayed.to_payload() == restored_decisions.to_payload()
+
+
+@pytest.mark.parametrize(
+    "tamper_kind",
+    [
+        "source_rule",
+        "clause",
+        "descriptor",
+        "roll",
+        "result_count",
+        "model_profile",
+        "wargear",
+        "model_ids",
+    ],
+)
+def test_restored_split_request_revalidates_authoritative_catalog_and_roll_evidence(
+    tamper_kind: str,
+) -> None:
+    scenario = _split_scenario(
+        pink_datasheet_id="000002584",
+        blue_datasheet_id="000002583",
+        destruction_kind="attack",
+    )
+    assert scenario.runtime.resolve_completed_attack_sequence(scenario.context) is not None
+    lifecycle_payload = copy.deepcopy(
+        GameLifecycle(
+            state=scenario.state,
+            decision_controller=scenario.decisions,
+        ).to_payload()
+    )
+    _tamper_materialization_lifecycle_payload(lifecycle_payload, tamper_kind=tamper_kind)
+    restored = GameLifecycle.from_payload(lifecycle_payload)
+    restored_state = restored.state
+    assert restored_state is not None
+    request = restored.decision_controller.queue.peek_next()
+    result = _parameterized_result(
+        request=request,
+        payload=_placement_payload(
+            request=request,
+            army=scenario.source_army,
+            unit=scenario.bodyguard,
+        ),
+        result_id=f"result:split:tampered:{tamper_kind}",
+    )
+
+    invalid = invalid_catalog_model_materialization_placement_status(
+        state=restored_state,
+        request=request,
+        result=result,
+        decisions=restored.decision_controller,
+        ability_indexes_by_player_id=scenario.runtime.ability_indexes_by_player_id,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=scenario.package.army_catalog,
+    )
+
+    assert invalid is not None
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert restored.decision_controller.queue.peek_next() == request
 
 
 def test_horror_catalog_keeps_materialized_profiles_out_of_mustering() -> None:
@@ -717,12 +1177,15 @@ def _split_scenario(
     blue_datasheet_id: str,
     destruction_kind: str,
     source_phase: BattlePhase = BattlePhase.SHOOTING,
+    parent_battle_phase: BattlePhase | None = None,
     attached: bool = True,
     pink_model_count: int = 1,
     roll_values: tuple[int, ...] = (6,),
     retained_horror_kinds: tuple[str, ...] = (),
     event_sequence_matches: bool = False,
     non_attack_source_step: str = "ability_resolution",
+    models_start_destroyed: bool = True,
+    emit_destruction_events: bool = True,
 ) -> _SplitScenario:
     package = horrors_package()
     bodyguard = _model_count_unit(
@@ -733,7 +1196,10 @@ def _split_scenario(
         model_profile_id=f"{pink_datasheet_id}:pink-horrors",
         model_count=pink_model_count,
     )
-    destroyed_models = tuple(replace(model, wounds_remaining=0) for model in bodyguard.own_models)
+    destroyed_models = tuple(
+        replace(model, wounds_remaining=0) if models_start_destroyed else model
+        for model in bodyguard.own_models
+    )
     retained_models = tuple(
         _retained_horror_model(
             package=package,
@@ -814,7 +1280,9 @@ def _split_scenario(
                 unit_placements=(_unit_placement(enemy_army, attacker, Pose.at(30.0, 10.0)),),
             ),
         ),
-        removed_model_ids=tuple(model.model_instance_id for model in destroyed_models),
+        removed_model_ids=tuple(
+            model.model_instance_id for model in destroyed_models if not model.is_alive
+        ),
     )
     attack_sequence = _attack_sequence(
         package=package,
@@ -830,14 +1298,17 @@ def _split_scenario(
         ),
         source_phase=source_phase,
     )
+    resolved_parent_battle_phase = (
+        source_phase if parent_battle_phase is None else parent_battle_phase
+    )
     state = battle_state_with_armies(
         armies=(source_army, enemy_army),
         battlefield=battlefield,
         active_player_id=attack_sequence.attacker_player_id,
-        phase=source_phase,
+        phase=resolved_parent_battle_phase,
     )
     decisions = DecisionController()
-    if destruction_kind == "hazardous":
+    if destruction_kind == "hazardous" and emit_destruction_events:
         decisions.event_log.append(
             "hazardous_mortal_wounds_applied",
             {
@@ -853,7 +1324,7 @@ def _split_scenario(
                 },
             },
         )
-    else:
+    elif emit_destruction_events:
         for model in destroyed_models:
             source_kind = DestructionSourceKind(destruction_kind)
             attribution = (
@@ -883,7 +1354,7 @@ def _split_scenario(
                 source_rule_id="test:horrors:destruction",
                 source_event_id=f"test:horrors:destruction:{model.model_instance_id}",
             )
-            decisions.event_log.append(
+            destroyed_event = decisions.event_log.append(
                 "model_destroyed",
                 validate_json_value(
                     {
@@ -894,12 +1365,24 @@ def _split_scenario(
                             if source_kind is DestructionSourceKind.ATTACK or event_sequence_matches
                             else None
                         ),
-                        "target_unit_instance_id": bodyguard.unit_instance_id,
+                        "target_unit_instance_id": (
+                            attached_unit_id
+                            if source_kind is DestructionSourceKind.ATTACK and attached
+                            else bodyguard.unit_instance_id
+                        ),
                         "model_instance_id": model.model_instance_id,
                         "removal_record": removal_record.to_payload(),
                     }
                 ),
             )
+            if source_kind is not DestructionSourceKind.ATTACK:
+                decisions.event_log.append(
+                    RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
+                    {
+                        "model_destroyed_event_id": destroyed_event.event_id,
+                        "model_instance_id": model.model_instance_id,
+                    },
+                )
     completed_event = decisions.event_log.append(
         "attack_sequence_completed",
         {
@@ -1191,6 +1674,54 @@ def _parameterized_result(*, request: Any, payload: JsonValue, result_id: str) -
         selected_option_id=request.options[0].option_id,
         payload=payload,
     )
+
+
+def _tamper_materialization_lifecycle_payload(
+    lifecycle_payload: Any,
+    *,
+    tamper_kind: str,
+) -> None:
+    decisions_payload = cast(dict[str, Any], lifecycle_payload["decisions"])
+    queue_payload = cast(dict[str, Any], decisions_payload["queue"])
+    request_payload = cast(
+        dict[str, Any],
+        cast(list[dict[str, Any]], queue_payload["pending_requests"])[0]["payload"],
+    )
+    if tamper_kind == "source_rule":
+        request_payload["source_rule_id"] = "tampered:source-rule"
+        return
+    if tamper_kind == "clause":
+        request_payload["clause_id"] = "tampered:clause"
+        return
+    if tamper_kind == "descriptor":
+        request_payload["materialization_descriptor_id"] = "tampered:descriptor"
+        return
+    if tamper_kind == "model_profile":
+        cast(list[dict[str, Any]], request_payload["models"])[0]["model_profile_id"] = (
+            "tampered:model-profile"
+        )
+        return
+    if tamper_kind == "wargear":
+        model = cast(list[dict[str, Any]], request_payload["models"])[0]
+        cast(list[str], model["wargear_ids"])[0] = "tampered:wargear"
+        return
+    if tamper_kind == "model_ids":
+        model_ids = cast(list[str], request_payload["model_instance_ids"])
+        model_ids[0] = f"{model_ids[0]}:tampered"
+        return
+    event_payloads = cast(list[dict[str, Any]], decisions_payload["event_log"])
+    roll_payload = next(
+        cast(dict[str, Any], event["payload"])
+        for event in event_payloads
+        if event["event_type"] == CATALOG_MODEL_MATERIALIZATION_ROLL_EVENT
+    )
+    if tamper_kind == "roll":
+        cast(dict[str, Any], roll_payload["roll"])["current_total"] = 1
+        return
+    if tamper_kind == "result_count":
+        roll_payload["result_count"] = 3
+        return
+    raise AssertionError(f"Unsupported tamper kind: {tamper_kind}")
 
 
 def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
