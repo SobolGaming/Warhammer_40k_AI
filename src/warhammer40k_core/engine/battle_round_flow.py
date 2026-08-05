@@ -62,11 +62,11 @@ from warhammer40k_core.engine.turn_end_hooks import (
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedContext,
     UnitDestroyedHookRegistry,
+    unit_destruction_completion_events_for_phase,
 )
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.reaction_queue import ReactionQueue
-    from warhammer40k_core.engine.unit_factory import ModelInstance
 
 
 _LIFECYCLE_TIMING_RULE_ID = "core-rules-lifecycle-timing"
@@ -730,9 +730,9 @@ def _apply_phase_end_unit_destroyed_hooks(
     completed_phase = state.current_battle_phase
     if completed_phase is None:
         raise GameLifecycleError("Unit-destroyed hooks require a current phase.")
-    for event_id, payload in _unit_destruction_completion_events_for_phase(
+    for event_id, payload in unit_destruction_completion_events_for_phase(
         state=state,
-        decisions=decisions,
+        event_log=decisions.event_log,
         completed_phase=completed_phase,
     ):
         destroying_player_id = _payload_string(payload, key="destroying_player_id")
@@ -754,62 +754,12 @@ def _apply_phase_end_unit_destroyed_hooks(
         )
 
 
-def _unit_destruction_completion_events_for_phase(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    completed_phase: BattlePhase,
-) -> tuple[tuple[str, dict[str, JsonValue]], ...]:
-    if state.battlefield_state is None:
-        return ()
-    events_by_unit: dict[str, list[tuple[int, str, dict[str, JsonValue]]]] = {}
-    for event_order, record in enumerate(decisions.event_log.records):
-        if record.event_type != "model_destroyed":
-            continue
-        payload = record.payload
-        if not isinstance(payload, dict):
-            raise GameLifecycleError("model_destroyed event payload must be an object.")
-        event_payload = validate_json_value(payload)
-        if not isinstance(event_payload, dict):
-            raise GameLifecycleError("model_destroyed event payload must be an object.")
-        if event_payload.get("game_id") != state.game_id:
-            continue
-        if event_payload.get("battle_round") != state.battle_round:
-            continue
-        if event_payload.get("active_player_id") != state.active_player_id:
-            continue
-        if event_payload.get("phase") != completed_phase.value:
-            continue
-        target_unit_id = _payload_string(event_payload, key="target_unit_instance_id")
-        events_by_unit.setdefault(target_unit_id, []).append(
-            (event_order, record.event_id, dict(event_payload))
-        )
-    completions: list[tuple[int, str, dict[str, JsonValue]]] = []
-    for target_unit_id, events in events_by_unit.items():
-        models = _models_for_unit(state=state, unit_instance_id=target_unit_id)
-        if not models:
-            continue
-        if any(model.is_alive for model in models):
-            continue
-        completions.append(sorted(events, key=lambda item: item[0])[-1])
-    return tuple((event_id, payload) for _order, event_id, payload in sorted(completions))
-
-
 def _player_id_for_unit(*, state: GameState, unit_instance_id: str) -> str:
     requested_unit = _validate_identifier("unit_instance_id", unit_instance_id)
     for army in state.army_definitions:
         if any(unit.unit_instance_id == requested_unit for unit in army.units):
             return army.player_id
     raise GameLifecycleError("Unit owner lookup failed for unit-destroyed hook.")
-
-
-def _models_for_unit(*, state: GameState, unit_instance_id: str) -> tuple[ModelInstance, ...]:
-    requested_unit = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit:
-                return unit.own_models
-    raise GameLifecycleError("Model lookup failed for unit-destroyed hook.")
 
 
 def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:

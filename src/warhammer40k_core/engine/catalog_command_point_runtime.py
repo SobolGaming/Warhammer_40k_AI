@@ -21,6 +21,9 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.battle_shock import (
+    battle_shock_leadership_target_for_rules_unit,
+)
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     geometry_model_for_placement,
@@ -32,6 +35,7 @@ from warhammer40k_core.engine.catalog_command_point_support import (
     clause_is_supported_phase_command_point_gain,
     clause_is_supported_phase_end_leadership_command_point_gain,
     clause_is_supported_stratagem_cost_modifier,
+    clause_requires_source_unit_enemy_destruction,
     command_point_effect_parameters,
 )
 from warhammer40k_core.engine.catalog_rule_consumption import (
@@ -47,6 +51,10 @@ from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
 from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventContext,
@@ -55,8 +63,9 @@ from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEventSubscription,
     RuntimeEventHandler,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
+    current_rules_unit_views_for_identity,
     rules_unit_id_for_unit_id,
     rules_unit_owner_player_id,
     rules_unit_view_by_id,
@@ -78,6 +87,7 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedContext,
     UnitDestroyedHookBinding,
+    unit_destruction_completion_events_for_phase,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.rules.rule_ir import (
@@ -231,10 +241,16 @@ class CatalogCommandPointRuntime:
     def resolve_unit_destroyed(self, context: UnitDestroyedContext) -> None:
         if type(context) is not UnitDestroyedContext:
             raise GameLifecycleError("Catalog CP unit-destroyed runtime requires context.")
-        attacking_model_id = _payload_identifier(
-            context.model_destroyed_payload,
-            key="attacking_model_instance_id",
+        attribution = ModelDestructionAttribution.from_model_destroyed_payload(
+            context.model_destroyed_payload
         )
+        if attribution.destruction_provenance.destruction_source_kind is not (
+            DestructionSourceKind.ATTACK
+        ):
+            return
+        attacking_model_id = attribution.attacking_model_instance_id
+        if attacking_model_id is None:
+            raise GameLifecycleError("Attack destruction attribution requires an attacking model.")
         attacking_component_unit_id = context.state.unit_instance_id_for_model(attacking_model_id)
         army = _army_for_player(self.armies, player_id=context.destroying_player_id)
         unit = _unit_in_army(army, unit_instance_id=attacking_component_unit_id)
@@ -463,11 +479,21 @@ class CatalogCommandPointRuntime:
                     current_model_instance_ids=current_model_ids,
                 )
                 for model_id in source_model_ids:
+                    if clause_requires_source_unit_enemy_destruction(
+                        source.clause
+                    ) and not _source_unit_destroyed_enemy_unit_this_phase(
+                        context=context,
+                        armies=self.armies,
+                        source=source,
+                        unit=unit,
+                    ):
+                        continue
                     resolution = _resolve_phase_command_point_gain(
                         context=context,
                         source=source,
                         unit=unit,
                         source_model_instance_id=model_id,
+                        ability_index=self.ability_indexes_by_player_id[source.owner_player_id],
                     )
                     resolutions.append(resolution)
             return RuntimeContentEventResult.applied(
@@ -930,12 +956,73 @@ def _source_model_is_within_target_range(
     return False
 
 
+def _source_unit_destroyed_enemy_unit_this_phase(
+    *,
+    context: RuntimeContentEventContext,
+    armies: tuple[ArmyDefinition, ...],
+    source: _PhaseGainSource,
+    unit: UnitInstance,
+) -> bool:
+    if context.event.phase is None:
+        raise GameLifecycleError("Catalog CP destruction gate requires a battle phase.")
+    source_rules_unit_id = rules_unit_id_for_unit_id(
+        armies=armies,
+        unit_instance_id=unit.unit_instance_id,
+    )
+    matching_source_views = tuple(
+        view
+        for view in current_rules_unit_views_for_identity(
+            state=context.state,
+            unit_instance_id=source_rules_unit_id,
+        )
+        if unit.unit_instance_id in view.component_unit_instance_ids
+    )
+    if len(matching_source_views) != 1:
+        raise GameLifecycleError(
+            "Catalog CP destruction source must resolve to one current rules unit."
+        )
+    source_view = matching_source_views[0]
+    source_component_ids = set(source_view.component_unit_instance_ids)
+    for _event_id, payload in unit_destruction_completion_events_for_phase(
+        state=context.state,
+        event_log=context.decisions.event_log,
+        completed_phase=BattlePhase(context.event.phase.value),
+    ):
+        attribution = ModelDestructionAttribution.from_model_destroyed_payload(payload)
+        if attribution.destroying_player_id != source.owner_player_id:
+            continue
+        target_unit_id = _payload_identifier(payload, key="target_unit_instance_id")
+        if (
+            rules_unit_owner_player_id(
+                state=context.state,
+                unit_instance_id=target_unit_id,
+            )
+            == source.owner_player_id
+        ):
+            continue
+        source_identity_id = attribution.source_rules_unit_instance_id
+        if source_identity_id is None:
+            continue
+        attributed_views = current_rules_unit_views_for_identity(
+            state=context.state,
+            unit_instance_id=source_identity_id,
+        )
+        if any(
+            view.unit_instance_id == source_view.unit_instance_id
+            or bool(source_component_ids.intersection(view.component_unit_instance_ids))
+            for view in attributed_views
+        ):
+            return True
+    return False
+
+
 def _resolve_phase_command_point_gain(
     *,
     context: RuntimeContentEventContext,
     source: _PhaseGainSource,
     unit: UnitInstance,
     source_model_instance_id: str,
+    ability_index: AbilityCatalogIndex,
 ) -> JsonValue:
     gate = _phase_gain_dice_gate(source.clause)
     roll_payload: JsonValue = None
@@ -950,21 +1037,36 @@ def _resolve_phase_command_point_gain(
         roll_count = _mapping_positive_int(gate_parameters, key="roll_count")
         if gate_parameters.get("roll_type") == "leadership":
             test_kind = "leadership"
-            model = _model_in_unit(unit, model_instance_id=source_model_instance_id)
-            base_leadership = _model_leadership(model)
             rules_unit_id = rules_unit_id_for_unit_id(
                 armies=tuple(context.state.army_definitions),
                 unit_instance_id=unit.unit_instance_id,
             )
-            leadership_target = context.runtime_modifier_registry.modified_unit_characteristic(
-                UnitCharacteristicModifierContext(
+            if gate_parameters.get("test_target") == "this_unit":
+                rules_unit = rules_unit_view_by_id(
                     state=context.state,
                     unit_instance_id=rules_unit_id,
-                    characteristic=Characteristic.LEADERSHIP,
-                    base_value=base_leadership,
-                    current_value=base_leadership,
                 )
-            )
+                leadership_target = battle_shock_leadership_target_for_rules_unit(
+                    rules_unit,
+                    current_model_ids=tuple(
+                        model.model_instance_id for model in rules_unit.alive_models()
+                    ),
+                    ability_index=ability_index,
+                    state=context.state,
+                    runtime_modifier_registry=context.runtime_modifier_registry,
+                )
+            else:
+                model = _model_in_unit(unit, model_instance_id=source_model_instance_id)
+                base_leadership = _model_leadership(model)
+                leadership_target = context.runtime_modifier_registry.modified_unit_characteristic(
+                    UnitCharacteristicModifierContext(
+                        state=context.state,
+                        unit_instance_id=rules_unit_id,
+                        characteristic=Characteristic.LEADERSHIP,
+                        base_value=base_leadership,
+                        current_value=base_leadership,
+                    )
+                )
             success_threshold = leadership_target
             roll_type = "catalog_ir.command_point_leadership_test"
             reason = f"Command-point Leadership test for {source_model_instance_id}"

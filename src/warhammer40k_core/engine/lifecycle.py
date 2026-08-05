@@ -275,7 +275,10 @@ from warhammer40k_core.engine.return_on_death import (
     apply_return_on_death_placement_decision,
     invalid_return_on_death_placement_status,
 )
-from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_view_from_armies,
+    rules_unit_views_from_armies,
+)
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
     apply_sequencing_decision_from_request,
@@ -3663,9 +3666,8 @@ def _validate_shooting_phase_state_consistency(*, state: GameState) -> None:
     if state.battlefield_state is None:
         raise GameLifecycleError("shooting_phase_state requires battlefield_state.")
     unit_owner_by_id = {
-        unit.unit_instance_id: army.player_id
-        for army in state.army_definitions
-        for unit in army.units
+        rules_unit.unit_instance_id: rules_unit.owner_player_id
+        for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
     }
     active_player_embarked_unit_ids = _embarked_unit_ids_for_player(
         state=state,
@@ -3713,9 +3715,8 @@ def _validate_charge_phase_state_consistency(*, state: GameState) -> None:
     if state.battlefield_state is None:
         raise GameLifecycleError("charge_phase_state requires battlefield_state.")
     unit_owner_by_id = {
-        unit.unit_instance_id: army.player_id
-        for army in state.army_definitions
-        for unit in army.units
+        rules_unit.unit_instance_id: rules_unit.owner_player_id
+        for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
     }
     active_player_unit_ids = {
         unit_id
@@ -3770,9 +3771,8 @@ def _validate_fight_phase_state_consistency(*, state: GameState) -> None:
     if fight_order_state.next_player_id not in state.player_ids:
         raise GameLifecycleError("fight_phase_state next player is not in this game.")
     unit_owner_by_id = {
-        unit.unit_instance_id: army.player_id
-        for army in state.army_definitions
-        for unit in army.units
+        rules_unit.unit_instance_id: rules_unit.owner_player_id
+        for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
     }
     known_unit_ids = set(unit_owner_by_id)
     for unit_id in (

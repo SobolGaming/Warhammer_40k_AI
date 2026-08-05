@@ -25,7 +25,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     catalog_leadership_characteristic_for_unit,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_units import RulesUnitView
+from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_from_armies
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     UnitCharacteristicModifierContext,
@@ -584,37 +584,36 @@ def collect_battle_shock_test_requests(
     )
 
     requests: list[BattleShockTestRequest] = []
-    for unit in army.units:
-        current_model_ids = _current_battlefield_model_ids(
-            unit=unit,
+    for rules_unit in rules_unit_views_from_armies(armies=(army,)):
+        current_model_ids = _current_battlefield_model_ids_for_rules_unit(
+            rules_unit=rules_unit,
             battlefield_state=battlefield_state,
         )
         if not current_model_ids:
             continue
-        record = records.get(unit.unit_instance_id)
+        record = records.get(rules_unit.unit_instance_id)
         if record is None:
             raise GameLifecycleError("Battle-shock request missing StartingStrengthRecord.")
-        context = BelowHalfStrengthContext.from_unit(
-            player_id=requested_player_id,
-            unit=unit,
+        context = BelowHalfStrengthContext.from_rules_unit(
+            rules_unit=rules_unit,
             starting_strength=record,
             current_model_ids=current_model_ids,
         )
         forced_test_added = False
-        if unit.unit_instance_id in forced_ids and context.is_below_starting_strength:
+        if rules_unit.unit_instance_id in forced_ids and context.is_below_starting_strength:
             requests.append(
-                _battle_shock_request_for_context(
+                _battle_shock_request_for_rules_unit_context(
                     game_id=requested_game_id,
                     battle_round=requested_round,
                     player_id=requested_player_id,
-                    unit=unit,
+                    rules_unit=rules_unit,
                     context=context,
                     current_model_ids=current_model_ids,
                     reason=BattleShockTestReason.BELOW_STARTING_STRENGTH_FORCED,
                     ability_index=catalog_ability_index,
                     state=state,
                     runtime_modifier_registry=runtime_modifiers,
-                    dice_expression=dice_expressions_by_unit.get(unit.unit_instance_id),
+                    dice_expression=dice_expressions_by_unit.get(rules_unit.unit_instance_id),
                 )
             )
             forced_test_added = True
@@ -622,18 +621,18 @@ def collect_battle_shock_test_requests(
             allow_duplicate_below_half_tests or not forced_test_added
         ):
             requests.append(
-                _battle_shock_request_for_context(
+                _battle_shock_request_for_rules_unit_context(
                     game_id=requested_game_id,
                     battle_round=requested_round,
                     player_id=requested_player_id,
-                    unit=unit,
+                    rules_unit=rules_unit,
                     context=context,
                     current_model_ids=current_model_ids,
                     reason=BattleShockTestReason.BELOW_HALF_STRENGTH,
                     ability_index=catalog_ability_index,
                     state=state,
                     runtime_modifier_registry=runtime_modifiers,
-                    dice_expression=dice_expressions_by_unit.get(unit.unit_instance_id),
+                    dice_expression=dice_expressions_by_unit.get(rules_unit.unit_instance_id),
                 )
             )
     return tuple(
@@ -769,12 +768,12 @@ def stratagem_target_permission_status_from_token(
         ) from exc
 
 
-def _battle_shock_request_for_context(
+def _battle_shock_request_for_rules_unit_context(
     *,
     game_id: str,
     battle_round: int,
     player_id: str,
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
     context: BelowHalfStrengthContext,
     current_model_ids: tuple[str, ...],
     reason: BattleShockTestReason,
@@ -785,15 +784,16 @@ def _battle_shock_request_for_context(
 ) -> BattleShockTestRequest:
     return BattleShockTestRequest.for_unit(
         request_id=(
-            f"battle-shock:{battle_round:02d}:{player_id}:{unit.unit_instance_id}:{reason.value}"
+            f"battle-shock:{battle_round:02d}:{player_id}:"
+            f"{rules_unit.unit_instance_id}:{reason.value}"
         ),
         game_id=game_id,
         battle_round=battle_round,
         player_id=player_id,
-        unit_instance_id=unit.unit_instance_id,
+        unit_instance_id=rules_unit.unit_instance_id,
         reason=reason,
-        leadership_target=_best_leadership(
-            unit,
+        leadership_target=battle_shock_leadership_target_for_rules_unit(
+            rules_unit,
             current_model_ids=current_model_ids,
             ability_index=ability_index,
             state=state,
@@ -939,22 +939,23 @@ def _model_leadership(model: ModelInstance) -> int:
     raise GameLifecycleError("ModelInstance is missing Leadership.")
 
 
-def _current_battlefield_model_ids(
+def _current_battlefield_model_ids_for_rules_unit(
     *,
-    unit: UnitInstance,
+    rules_unit: RulesUnitView,
     battlefield_state: BattlefieldRuntimeState,
 ) -> tuple[str, ...]:
-    placement = battlefield_state.unit_placement_or_none(unit.unit_instance_id)
-    if placement is None:
-        return ()
-    unit_model_by_id = {model.model_instance_id: model for model in unit.own_models}
+    rules_unit_model_by_id = {model.model_instance_id: model for model in rules_unit.own_models}
     current_ids: list[str] = []
-    for model_placement in placement.model_placements:
-        model = unit_model_by_id.get(model_placement.model_instance_id)
-        if model is None:
-            raise GameLifecycleError("Battlefield unit placement contains unknown model.")
-        if model.is_alive:
-            current_ids.append(model.model_instance_id)
+    for component in rules_unit.components:
+        placement = battlefield_state.unit_placement_or_none(component.unit.unit_instance_id)
+        if placement is None:
+            continue
+        for model_placement in placement.model_placements:
+            model = rules_unit_model_by_id.get(model_placement.model_instance_id)
+            if model is None:
+                raise GameLifecycleError("Battlefield unit placement contains unknown model.")
+            if model.is_alive:
+                current_ids.append(model.model_instance_id)
     return tuple(sorted(current_ids))
 
 

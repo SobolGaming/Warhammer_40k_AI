@@ -6,6 +6,9 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionConditionKind,
     WargearOptionEffectKind,
 )
+from warhammer40k_core.rules.wahapedia_counted_wargear_option_bridge import (
+    append_counted_wargear_option_rows,
+)
 from warhammer40k_core.rules.wahapedia_loadout_bridge import LoadoutAssignments
 from warhammer40k_core.rules.wahapedia_paired_replacement_option_bridge import (
     append_paired_replacement_option_rows,
@@ -368,7 +371,15 @@ def append_unit_wargear_option_rows(
             error_type=error_type,
         )
         return True
-    return False
+    return append_counted_wargear_option_rows(
+        row=row,
+        datasheet_id=datasheet_id,
+        model_profile_by_name=model_profile_by_name,
+        maximum_unit_models=maximum_unit_models,
+        wargear_ids_by_name=wargear_ids_by_name,
+        bridged_rows=bridged_rows,
+        error_type=error_type,
+    )
 
 
 def _append_unit_resource_option(

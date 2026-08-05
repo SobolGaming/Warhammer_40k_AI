@@ -396,9 +396,17 @@ def _emit_damage_event(
     saving_throw_payload: JsonValue | None = None,
     feel_no_pain: FeelNoPainResolution | None = None,
     destroyed_model_placement: JsonValue | None = None,
+    destruction_attribution: ModelDestructionAttribution | None = None,
 ) -> DestroyedModelEmission | None:
     if saving_throw is not None and saving_throw_payload is not None:
         raise GameLifecycleError("Damage event saving throw payload is ambiguous.")
+    if damage is None or not damage.destroyed:
+        if destruction_attribution is not None:
+            raise GameLifecycleError(
+                "Non-destroying damage cannot carry model destruction attribution."
+            )
+    elif destruction_attribution is None:
+        raise GameLifecycleError("Destroyed-model emission requires typed attribution.")
     resolved_saving_throw: JsonValue
     if saving_throw_payload is not None:
         resolved_saving_throw = saving_throw_payload
@@ -426,42 +434,42 @@ def _emit_damage_event(
             payload=payload,
         ),
     )
-    if damage is not None and damage.destroyed:
-        removal_record = _destroyed_model_removal_record(
-            model_instance_id=damage.model_instance_id,
-            source_phase=attack_sequence.source_phase.value,
-            source_event_id=damage_event.event_id,
-        )
-        transition_batch = BattlefieldTransitionBatch(removals=(removal_record,))
-        destroyed_event = decisions.event_log.append(
-            "model_destroyed",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "phase": attack_sequence.source_phase.value,
-                "destroying_player_id": attack_sequence.attacker_player_id,
-                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
-                "attacking_model_instance_id": attack_sequence.current_pool().attacker_model_instance_id,
-                "sequence_id": attack_sequence.sequence_id,
-                "attack_context_id": attack_sequence.attack_context_id(),
-                "target_unit_instance_id": damage.target_unit_instance_id,
-                "model_instance_id": damage.model_instance_id,
-                "damage_kind": damage.damage_kind.value,
-                "damage_event_id": damage_event.event_id,
-                "removal_record": removal_record.to_payload(),
-                "transition_batch": transition_batch.to_payload(),
-                "destroyed_model_placement": validate_json_value(destroyed_model_placement),
-                "destroyed_model_rules_triggered": True,
-            },
-        )
-        return DestroyedModelEmission(
-            damage_event_id=damage_event.event_id,
-            model_destroyed_event_id=destroyed_event.event_id,
-            removal_record=removal_record,
-            transition_batch=transition_batch,
-        )
-    return None
+    if damage is None or not damage.destroyed:
+        return None
+    if destruction_attribution is None:
+        raise GameLifecycleError("Destroyed-model attribution changed during emission.")
+    removal_record = _destroyed_model_removal_record(
+        model_instance_id=damage.model_instance_id,
+        source_phase=attack_sequence.source_phase.value,
+        source_event_id=damage_event.event_id,
+    )
+    transition_batch = BattlefieldTransitionBatch(removals=(removal_record,))
+    destroyed_event = decisions.event_log.append(
+        "model_destroyed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": attack_sequence.source_phase.value,
+            **destruction_attribution.to_payload(),
+            "sequence_id": attack_sequence.sequence_id,
+            "attack_context_id": attack_sequence.attack_context_id(),
+            "target_unit_instance_id": damage.target_unit_instance_id,
+            "model_instance_id": damage.model_instance_id,
+            "damage_kind": damage.damage_kind.value,
+            "damage_event_id": damage_event.event_id,
+            "removal_record": removal_record.to_payload(),
+            "transition_batch": transition_batch.to_payload(),
+            "destroyed_model_placement": validate_json_value(destroyed_model_placement),
+            "destroyed_model_rules_triggered": True,
+        },
+    )
+    return DestroyedModelEmission(
+        damage_event_id=damage_event.event_id,
+        model_destroyed_event_id=destroyed_event.event_id,
+        removal_record=removal_record,
+        transition_batch=transition_batch,
+    )
 
 
 def _destroyed_model_removal_record(

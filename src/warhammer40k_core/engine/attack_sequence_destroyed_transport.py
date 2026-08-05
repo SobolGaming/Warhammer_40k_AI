@@ -378,6 +378,15 @@ def _continue_pending_destroyed_transport_disembark(
         saving_throw_payload=pending.saving_throw_payload,
         feel_no_pain=pending.feel_no_pain,
         destroyed_model_placement=destroyed_model_placement,
+        destruction_attribution=ModelDestructionAttribution.for_attack(
+            destroying_player_id=sequence_without_pending.attacker_player_id,
+            attacking_unit_instance_id=sequence_without_pending.attacking_unit_instance_id,
+            attacking_model_instance_id=(
+                sequence_without_pending.current_pool().attacker_model_instance_id
+            ),
+            weapon_profile=sequence_without_pending.current_pool().weapon_profile,
+            attack_context_id=pending.attack_context["attack_context_id"],
+        ),
     )
     reaction_status = _destruction_reaction_status_if_needed(
         state=state,

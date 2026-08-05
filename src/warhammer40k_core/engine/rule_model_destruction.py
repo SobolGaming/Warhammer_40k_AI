@@ -44,6 +44,7 @@ from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_provenance import (
     DestructionProvenance,
+    ModelDestructionAttribution,
 )
 from warhammer40k_core.engine.destruction_reaction_conditions import (
     optional_destruction_reaction_trigger_conditions_for_target,
@@ -180,6 +181,7 @@ def destroy_model_with_rule_reactions(
                 "target_unit_instance_id": physical_unit_id,
                 "model_instance_id": requested_model_id,
                 "destroying_player_id": requested_destroying_player_id,
+                "source_rules_unit_instance_id": None,
                 "destroyed_model_controller_player_id": controller_player_id,
                 "destroyed_model_placement": placement_payload,
                 "completion_event_type": requested_completion_event_type,
@@ -591,6 +593,16 @@ def _remove_rule_destroyed_model_and_continue(
     transition_batch = BattlefieldTransitionBatch(removals=(removal_record,))
     damage = damage_application_from_rule_context(root_context)
     provenance = destruction_provenance_from_rule_context(root_context)
+    attribution = ModelDestructionAttribution(
+        destroying_player_id=_payload_string(root_context, "destroying_player_id"),
+        source_rules_unit_instance_id=_optional_payload_string(
+            root_context,
+            "source_rules_unit_instance_id",
+        ),
+        attacking_unit_instance_id=None,
+        attacking_model_instance_id=None,
+        destruction_provenance=provenance,
+    )
     destroyed_event = decisions.event_log.append(
         "model_destroyed",
         validate_json_value(
@@ -599,7 +611,7 @@ def _remove_rule_destroyed_model_and_continue(
                 "battle_round": state.battle_round,
                 "active_player_id": _payload_string(root_context, "active_player_id"),
                 "phase": _payload_string(root_context, "phase"),
-                "destroying_player_id": _payload_string(root_context, "destroying_player_id"),
+                **attribution.to_payload(),
                 "target_unit_instance_id": physical_unit_id,
                 "rules_unit_instance_id": rules_unit_id,
                 "model_instance_id": model_id,
@@ -609,7 +621,6 @@ def _remove_rule_destroyed_model_and_continue(
                 "source_effect_ids": list(
                     _payload_identifier_list(root_context, "source_effect_ids")
                 ),
-                "destruction_provenance": provenance.to_payload(),
                 "removal_record": removal_record.to_payload(),
                 "transition_batch": transition_batch.to_payload(),
                 "destroyed_model_placement": root_context.get("destroyed_model_placement"),
@@ -1295,6 +1306,13 @@ def _payload_string(payload: dict[str, JsonValue], key: str) -> str:
     if type(value) is not str or not value:
         raise GameLifecycleError(f"Rule destruction {key} must be a string.")
     return value
+
+
+def _optional_payload_string(payload: dict[str, JsonValue], key: str) -> str | None:
+    value = payload.get(key)
+    if value is None:
+        return None
+    return _validate_identifier(key, value)
 
 
 def _payload_d6_target(payload: dict[str, JsonValue], key: str) -> int:

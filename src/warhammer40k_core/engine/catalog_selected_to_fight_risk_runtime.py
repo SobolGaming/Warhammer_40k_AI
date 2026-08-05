@@ -29,6 +29,10 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 )
 from warhammer40k_core.engine.damage_allocation import model_owner_player_id
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     EffectExpirationKind,
@@ -542,8 +546,13 @@ def _enemy_model_was_destroyed_by_unit_attacks(
             or payload.get("destroying_player_id") != owner_player_id
         ):
             continue
-        attacking_unit_id = payload.get("attacking_unit_instance_id")
-        attacking_model_id = payload.get("attacking_model_instance_id")
+        attribution = ModelDestructionAttribution.from_model_destroyed_payload(payload)
+        if attribution.destruction_provenance.destruction_source_kind is not (
+            DestructionSourceKind.ATTACK
+        ):
+            continue
+        attacking_unit_id = attribution.attacking_unit_instance_id
+        attacking_model_id = attribution.attacking_model_instance_id
         target_unit_id = payload.get("target_unit_instance_id")
         destroyed_model_id = payload.get("model_instance_id")
         if type(attacking_unit_id) is not str or type(attacking_model_id) is not str:

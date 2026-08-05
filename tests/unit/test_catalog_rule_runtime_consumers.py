@@ -181,6 +181,10 @@ from warhammer40k_core.engine.catalog_unit_move_completed_battle_shock_support i
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -4674,6 +4678,36 @@ def test_catalog_command_point_destroyed_character_gain_is_scoped_and_idempotent
     )
     decisions = DecisionController()
     attacker_model_id = source_unit.own_models[0].model_instance_id
+    non_attack_event = decisions.event_log.append(
+        "model_destroyed",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "active_player_id": state.active_player_id,
+            "phase": BattlePhase.SHOOTING.value,
+            **ModelDestructionAttribution.for_non_attack(
+                destroying_player_id=source_army.player_id,
+                source_kind=DestructionSourceKind.DEADLY_DEMISE,
+                source_rules_unit_instance_id=None,
+            ).to_payload(),
+            "target_unit_instance_id": character_target.unit_instance_id,
+            "model_instance_id": character_target.own_models[0].model_instance_id,
+        },
+    )
+    runtime.resolve_unit_destroyed(
+        UnitDestroyedContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.SHOOTING,
+            model_destroyed_event_id=non_attack_event.event_id,
+            model_destroyed_payload=cast(dict[str, JsonValue], non_attack_event.payload),
+            destroying_player_id=source_army.player_id,
+            destroyed_unit_instance_id=character_target.unit_instance_id,
+            destroyed_player_id=target_army.player_id,
+        )
+    )
+    assert state.command_point_total(source_army.player_id) == 0
+
     destroyed_event = decisions.event_log.append(
         "model_destroyed",
         {
@@ -4681,8 +4715,13 @@ def test_catalog_command_point_destroyed_character_gain_is_scoped_and_idempotent
             "battle_round": state.battle_round,
             "active_player_id": state.active_player_id,
             "phase": BattlePhase.SHOOTING.value,
-            "destroying_player_id": source_army.player_id,
-            "attacking_model_instance_id": attacker_model_id,
+            **ModelDestructionAttribution.for_attack(
+                destroying_player_id=source_army.player_id,
+                attacking_unit_instance_id=source_unit.unit_instance_id,
+                attacking_model_instance_id=attacker_model_id,
+                weapon_profile=_first_catalog_weapon_profile(),
+                attack_context_id="attack-context:destroyed-character-runtime",
+            ).to_payload(),
             "target_unit_instance_id": character_target.unit_instance_id,
             "model_instance_id": character_target.own_models[0].model_instance_id,
         },

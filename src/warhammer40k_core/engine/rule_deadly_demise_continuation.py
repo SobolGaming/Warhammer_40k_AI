@@ -158,6 +158,10 @@ def build_rule_deadly_demise_secondary_root_context(
                     parent_root_context,
                     "destroyed_model_controller_player_id",
                 ),
+                "source_rules_unit_instance_id": _payload_string(
+                    parent_root_context,
+                    "rules_unit_instance_id",
+                ),
                 "destroyed_model_controller_player_id": model_owner_player_id(
                     state=state,
                     model_instance_id=model_id,

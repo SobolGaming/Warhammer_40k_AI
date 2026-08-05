@@ -756,6 +756,14 @@
         "datasheet_id": "000000595",
         "datasheet_name": "Striking Scorpions",
         "source_kind": "core"
+      },
+      {
+        "ability_id": "000008345",
+        "ability_name": "Infiltrators",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004079/core/000008345/none",
+        "datasheet_id": "000004079",
+        "datasheet_name": "Tormentors",
+        "source_kind": "core"
       }
     ],
     "ability_names": [
@@ -763,20 +771,22 @@
     ],
     "category_id": "core.infiltrators",
     "category_name": "Core Infiltrators",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000000592/core/000008345/none",
-      "chaos-daemons-bridge-catalog/000000595/core/000008345/none"
+      "chaos-daemons-bridge-catalog/000000595/core/000008345/none",
+      "chaos-daemons-bridge-catalog/000004079/core/000008345/none"
     ],
     "datasheet_names": [
       "Rangers",
-      "Striking Scorpions"
+      "Striking Scorpions",
+      "Tormentors"
     ],
     "runtime_consumer_ids": [
       "descriptor:prebattle:infiltrators"
     ],
     "source_kind_counts": {
-      "core": 2
+      "core": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -2883,22 +2893,33 @@
         "datasheet_id": "000000596",
         "datasheet_name": "Fire Dragons",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000004080:excessive-assault",
+        "ability_name": "Excessive Assault",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004080/datasheet/000004080:excessive-assault/none",
+        "datasheet_id": "000004080",
+        "datasheet_name": "Infractors",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
       "Assured Destruction",
+      "Excessive Assault",
       "Reavers of the Void"
     ],
     "category_id": "datasheet.rule_ir.reroll_permission.this_unit",
     "category_name": "Datasheet Rule Ir Reroll Permission This Unit",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000002531/datasheet/000002531:reavers-of-the-void/none",
-      "chaos-daemons-bridge-catalog/000000596/datasheet/000000596:assured-destruction/none"
+      "chaos-daemons-bridge-catalog/000000596/datasheet/000000596:assured-destruction/none",
+      "chaos-daemons-bridge-catalog/000004080/datasheet/000004080:excessive-assault/none"
     ],
     "datasheet_names": [
       "Corsair Voidreavers",
-      "Fire Dragons"
+      "Fire Dragons",
+      "Infractors"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:damage-roll-reroll",
@@ -2907,7 +2928,7 @@
       "catalog-ir:wound-roll-reroll"
     ],
     "source_kind_counts": {
-      "datasheet": 2
+      "datasheet": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -3319,34 +3340,46 @@
         "datasheet_id": "000000595",
         "datasheet_name": "Striking Scorpions",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000004079:objective-defiled",
+        "ability_name": "Objective Defiled",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004079/datasheet/000004079:objective-defiled/none",
+        "datasheet_id": "000004079",
+        "datasheet_name": "Tormentors",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
       "Daemonic Patrons",
       "Mandiblasters",
+      "Objective Defiled",
       "Shadow Form"
     ],
     "category_id": "datasheet.rule_ir.set_contextual_status.this_unit",
     "category_name": "Datasheet Rule Ir Set Contextual Status This Unit",
-    "coverage_row_count": 3,
+    "coverage_row_count": 4,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/datasheet/000001148:shadow-form/none",
       "chaos-daemons-bridge-catalog/000004089/datasheet/000004089:daemonic-patrons/none",
-      "chaos-daemons-bridge-catalog/000000595/datasheet/000000595:mandiblasters/none"
+      "chaos-daemons-bridge-catalog/000000595/datasheet/000000595:mandiblasters/none",
+      "chaos-daemons-bridge-catalog/000004079/datasheet/000004079:objective-defiled/none"
     ],
     "datasheet_names": [
       "Be'lakor",
       "Flawless Blades",
-      "Striking Scorpions"
+      "Striking Scorpions",
+      "Tormentors"
     ],
     "runtime_consumer_ids": [
+      "catalog-ir:command-end-sticky-objective-control",
       "catalog-ir:fight-end-failed-activation-model-destruction",
       "catalog-ir:fight-selected-critical-wound-threshold",
       "catalog-ir:minimum-unmodified-hit-success",
       "catalog-ir:shadow-form-choice"
     ],
     "source_kind_counts": {
-      "datasheet": 3
+      "datasheet": 4
     },
     "support_stages": [
       "engine_consumed"
@@ -3641,6 +3674,14 @@
       {
         "ability_id": "000009994",
         "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004080/faction/000009994/none",
+        "datasheet_id": "000004080",
+        "datasheet_name": "Infractors",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004084/faction/000009994/none",
         "datasheet_id": "000004084",
         "datasheet_name": "Lord Kakophonist",
@@ -3661,6 +3702,14 @@
         "datasheet_id": "000004088",
         "datasheet_name": "Noise Marines",
         "source_kind": "faction"
+      },
+      {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004079/faction/000009994/none",
+        "datasheet_id": "000004079",
+        "datasheet_name": "Tormentors",
+        "source_kind": "faction"
       }
     ],
     "ability_names": [
@@ -3668,22 +3717,26 @@
     ],
     "category_id": "faction.army_rule.thrill_seekers",
     "category_name": "Emperor's Children Army Rule",
-    "coverage_row_count": 6,
+    "coverage_row_count": 8,
     "coverage_row_ids": [
       "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none",
       "chaos-daemons-bridge-catalog/000004089/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004077/faction/000009994/none",
+      "chaos-daemons-bridge-catalog/000004080/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004084/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004083/faction/000009994/none",
-      "chaos-daemons-bridge-catalog/000004088/faction/000009994/none"
+      "chaos-daemons-bridge-catalog/000004088/faction/000009994/none",
+      "chaos-daemons-bridge-catalog/000004079/faction/000009994/none"
     ],
     "datasheet_names": [
       "Emperor's Children",
       "Flawless Blades",
       "Fulgrim",
+      "Infractors",
       "Lord Kakophonist",
       "Lucius the Eternal",
-      "Noise Marines"
+      "Noise Marines",
+      "Tormentors"
     ],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
@@ -3692,7 +3745,7 @@
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
     ],
     "source_kind_counts": {
-      "faction": 6
+      "faction": 8
     },
     "support_stages": [
       "engine_consumed"
@@ -4429,6 +4482,14 @@
       {
         "ability_id": "000008344",
         "ability_name": "Scouts",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004080/core/000008344/none",
+        "datasheet_id": "000004080",
+        "datasheet_name": "Infractors",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008344",
+        "ability_name": "Scouts",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004194/core/000008344/none",
         "datasheet_id": "000004194",
         "datasheet_name": "Kharseth",
@@ -4480,11 +4541,12 @@
     ],
     "category_id": "core.scouts",
     "category_name": "Scouts",
-    "coverage_row_count": 9,
+    "coverage_row_count": 10,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004196/core/000008344/none",
       "chaos-daemons-bridge-catalog/000002531/core/000008344/none",
       "chaos-daemons-bridge-catalog/000002532/core/000008344/none",
+      "chaos-daemons-bridge-catalog/000004080/core/000008344/none",
       "chaos-daemons-bridge-catalog/000004194/core/000008344/none",
       "chaos-daemons-bridge-catalog/000004193/core/000008344/none",
       "chaos-daemons-bridge-catalog/000002533/core/000008344/none",
@@ -4496,6 +4558,7 @@
       "Corsair Skyreavers",
       "Corsair Voidreavers",
       "Corsair Voidscarred",
+      "Infractors",
       "Kharseth",
       "Prince Yriel",
       "Shroud Runners",
@@ -4507,7 +4570,7 @@
       "descriptor:prebattle:scouts"
     ],
     "source_kind_counts": {
-      "core": 9
+      "core": 10
     },
     "support_stages": [
       "engine_consumed"
@@ -4817,6 +4880,49 @@
     ],
     "source_kind_counts": {
       "wargear": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000004080:icon-of-excess",
+        "ability_name": "Icon of Excess",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004080/wargear/000004080:icon-of-excess/000004080:icon-of-excess",
+        "datasheet_id": "000004080",
+        "datasheet_name": "Infractors",
+        "source_kind": "wargear"
+      },
+      {
+        "ability_id": "000004079:icon-of-excess",
+        "ability_name": "Icon of Excess",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004079/wargear/000004079:icon-of-excess/000004079:icon-of-excess",
+        "datasheet_id": "000004079",
+        "datasheet_name": "Tormentors",
+        "source_kind": "wargear"
+      }
+    ],
+    "ability_names": [
+      "Icon of Excess"
+    ],
+    "category_id": "wargear.rule_ir.modify_command_points.unscoped",
+    "category_name": "Wargear Rule Ir Modify Command Points Unscoped",
+    "coverage_row_count": 2,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004080/wargear/000004080:icon-of-excess/000004080:icon-of-excess",
+      "chaos-daemons-bridge-catalog/000004079/wargear/000004079:icon-of-excess/000004079:icon-of-excess"
+    ],
+    "datasheet_names": [
+      "Infractors",
+      "Tormentors"
+    ],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-point-gain"
+    ],
+    "source_kind_counts": {
+      "wargear": 2
     },
     "support_stages": [
       "engine_consumed"

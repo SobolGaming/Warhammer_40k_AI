@@ -3254,6 +3254,164 @@
     "support_stage": "engine_consumed"
   },
   {
+    "ability_id": "000008345",
+    "ability_name": "Infiltrators",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004079/core/000008345/none",
+    "datasheet_id": "000004079",
+    "datasheet_name": "Tormentors",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:infiltrators"
+    ],
+    "semantic_categories": [
+      "core.infiltrators"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004079:objective-defiled",
+    "ability_name": "Objective Defiled",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004079/datasheet/000004079:objective-defiled/none",
+    "datasheet_id": "000004079",
+    "datasheet_name": "Tormentors",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-end-sticky-objective-control"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.set_contextual_status.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009994",
+    "ability_name": "Thrill Seekers",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004079/faction/000009994/none",
+    "datasheet_id": "000004079",
+    "datasheet_name": "Tormentors",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.thrill_seekers"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004079:icon-of-excess",
+    "ability_name": "Icon of Excess",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004079/wargear/000004079:icon-of-excess/000004079:icon-of-excess",
+    "datasheet_id": "000004079",
+    "datasheet_name": "Tormentors",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-point-gain"
+    ],
+    "semantic_categories": [
+      "wargear.rule_ir.modify_command_points.unscoped"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000004079:icon-of-excess",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008344",
+    "ability_name": "Scouts",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004080/core/000008344/none",
+    "datasheet_id": "000004080",
+    "datasheet_name": "Infractors",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:prebattle:scouts"
+    ],
+    "semantic_categories": [
+      "core.scouts"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004080:excessive-assault",
+    "ability_name": "Excessive Assault",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004080/datasheet/000004080:excessive-assault/none",
+    "datasheet_id": "000004080",
+    "datasheet_name": "Infractors",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:wound-roll-reroll"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.reroll_permission.this_unit"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000009994",
+    "ability_name": "Thrill Seekers",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004080/faction/000009994/none",
+    "datasheet_id": "000004080",
+    "datasheet_name": "Infractors",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.thrill_seekers"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000004080:icon-of-excess",
+    "ability_name": "Icon of Excess",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000004080/wargear/000004080:icon-of-excess/000004080:icon-of-excess",
+    "datasheet_id": "000004080",
+    "datasheet_name": "Infractors",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:command-point-gain"
+    ],
+    "semantic_categories": [
+      "wargear.rule_ir.modify_command_points.unscoped"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000004080:icon-of-excess",
+    "support_stage": "engine_consumed"
+  },
+  {
     "ability_id": "000008338",
     "ability_name": "Feel No Pain",
     "catalog_id": "chaos-daemons-bridge-catalog",

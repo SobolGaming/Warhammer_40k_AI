@@ -43,6 +43,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     emperors_children_fulgrim_2026_07 as fulgrim_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    emperors_children_infractors_tormentors_2026_08 as infractors_tormentors_source,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     emperors_children_lucius_2026_07 as lucius_source,
 )
 
@@ -80,6 +83,7 @@ def datasheet_rule_ir_payload_by_source_row_id(source_row_id: str) -> RuleIRPayl
                 source_row_id
             ),
             fulgrim_source.datasheet_rule_ir_payload_by_source_row_id(source_row_id),
+            infractors_tormentors_source.datasheet_rule_ir_payload_by_source_row_id(source_row_id),
             lucius_source.datasheet_rule_ir_payload_by_source_row_id(source_row_id),
         )
         if payload is not None

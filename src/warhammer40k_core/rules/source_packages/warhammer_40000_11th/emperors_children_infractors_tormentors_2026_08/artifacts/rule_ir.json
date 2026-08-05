@@ -1,0 +1,742 @@
+{
+  "artifact_schema": "core-v2-emperors-children-infractors-tormentors-rule-ir-v1",
+  "datasheets": {
+    "000004079": "Tormentors",
+    "000004080": "Infractors"
+  },
+  "official_document_filename": "eng_22-07_warhammer_40,000_faction_pack_emperor_s_children-srspmclqtm-i8ey7hgk2s.pdf",
+  "official_document_pages": [
+    9
+  ],
+  "official_document_sha256": "1808fabb911f7a3e917ae5f2f12a6a7436ed97e1e5382238566dfd5e4540aa3c",
+  "overlay_package_hash": "b56dd1dc6370054e563f6fc1ad108761886ddf8fa3f25e480aaa0e15ef83d628",
+  "package_hash": "c96da974ea82d1687dc960f74edaa6259049f6fc259acd097b6eb58aa9033c78",
+  "records": {
+    "000004079:3": {
+      "ability_name": "Objective Defiled",
+      "normalized_text_sha256": "39388fff1412b450acbc8496290358669a2198a41ca9cf399f48a9a1a0b39def",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:emperors-children:battleline:datasheet:000004079:3:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "source_unit"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "source_unit_within_controlled_objective"
+                  }
+                ],
+                "source_span": {
+                  "end": 97,
+                  "start": 34,
+                  "text": "if this unit is within range of an objective marker you control"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "set_contextual_status",
+                "parameters": [
+                  {
+                    "key": "objective_scope",
+                    "value": "controlled_objective_within_source_unit_range"
+                  },
+                  {
+                    "key": "retention_end_condition",
+                    "value": "opponent_level_of_control_greater_than_source_player"
+                  },
+                  {
+                    "key": "status",
+                    "value": "sticky_objective_control"
+                  }
+                ],
+                "source_span": {
+                  "end": 147,
+                  "start": 99,
+                  "text": "that objective marker remains under your control"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 258,
+              "start": 0,
+              "text": "At the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent's Level of Control over that objective marker is greater than yours at the end of a phase."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 46,
+                "start": 37,
+                "text": "this unit"
+              }
+            },
+            "template_id": "phase17n:command-end-sticky-objective-control",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "end"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "command"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                }
+              ],
+              "source_span": {
+                "end": 32,
+                "start": 0,
+                "text": "At the end of your Command phase"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "0cf6502fe3a7e3b845b0090879ff32232c9000e0bf9b158e23b9f28c745e3f15",
+        "normalized_text": "At the end of your Command phase, if this unit is within range of an objective marker you control, that objective marker remains under your control until your opponent's Level of Control over that objective marker is greater than yours at the end of a phase.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:emperors-children:battleline:datasheet:000004079:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08:datasheet:000004079:3"
+      }
+    },
+    "000004079:4": {
+      "ability_name": "Icon of Excess",
+      "normalized_text_sha256": "55e822c45196f1a2cb7d3950d1771c90e6d1410b69fa4aba0872b43ab3729923",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:emperors-children:battleline:datasheet:000004079:4:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "source_unit"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "source_unit_destroyed_enemy_unit_this_phase"
+                  }
+                ],
+                "source_span": {
+                  "end": 119,
+                  "start": 54,
+                  "text": "if the bearer's unit destroyed one or more enemy units that phase"
+                }
+              },
+              {
+                "kind": "dice_roll_gate",
+                "parameters": [
+                  {
+                    "key": "comparison",
+                    "value": "greater_or_equal"
+                  },
+                  {
+                    "key": "roll_count",
+                    "value": 2
+                  },
+                  {
+                    "key": "roll_expression",
+                    "value": "2D6"
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "leadership"
+                  },
+                  {
+                    "key": "success_threshold_source",
+                    "value": "target_leadership"
+                  },
+                  {
+                    "key": "test_target",
+                    "value": "this_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 162,
+                  "start": 121,
+                  "text": "the bearer's unit takes a Leadership test"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "modify_command_points",
+                "parameters": [
+                  {
+                    "key": "affected_player",
+                    "value": "source_player"
+                  },
+                  {
+                    "key": "delta",
+                    "value": 1
+                  },
+                  {
+                    "key": "operation",
+                    "value": "gain"
+                  }
+                ],
+                "source_span": {
+                  "end": 200,
+                  "start": 192,
+                  "text": "gain 1CP"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 201,
+              "start": 0,
+              "text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP."
+            },
+            "target": {
+              "kind": "player",
+              "parameters": [
+                {
+                  "key": "relationship",
+                  "value": "source_player"
+                }
+              ],
+              "source_span": {
+                "end": 200,
+                "start": 188,
+                "text": "you gain 1CP"
+              }
+            },
+            "template_id": "phase17n:phase-end-destruction-leadership-command-point-gain",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "end"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "shooting"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                }
+              ],
+              "source_span": {
+                "end": 52,
+                "start": 0,
+                "text": "At the end of your Shooting phase or the Fight phase"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17n:emperors-children:battleline:datasheet:000004079:4:clause:002",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "source_unit"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "source_unit_destroyed_enemy_unit_this_phase"
+                  }
+                ],
+                "source_span": {
+                  "end": 119,
+                  "start": 54,
+                  "text": "if the bearer's unit destroyed one or more enemy units that phase"
+                }
+              },
+              {
+                "kind": "dice_roll_gate",
+                "parameters": [
+                  {
+                    "key": "comparison",
+                    "value": "greater_or_equal"
+                  },
+                  {
+                    "key": "roll_count",
+                    "value": 2
+                  },
+                  {
+                    "key": "roll_expression",
+                    "value": "2D6"
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "leadership"
+                  },
+                  {
+                    "key": "success_threshold_source",
+                    "value": "target_leadership"
+                  },
+                  {
+                    "key": "test_target",
+                    "value": "this_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 162,
+                  "start": 121,
+                  "text": "the bearer's unit takes a Leadership test"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "modify_command_points",
+                "parameters": [
+                  {
+                    "key": "affected_player",
+                    "value": "source_player"
+                  },
+                  {
+                    "key": "delta",
+                    "value": 1
+                  },
+                  {
+                    "key": "operation",
+                    "value": "gain"
+                  }
+                ],
+                "source_span": {
+                  "end": 200,
+                  "start": 192,
+                  "text": "gain 1CP"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 201,
+              "start": 0,
+              "text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP."
+            },
+            "target": {
+              "kind": "player",
+              "parameters": [
+                {
+                  "key": "relationship",
+                  "value": "source_player"
+                }
+              ],
+              "source_span": {
+                "end": 200,
+                "start": 188,
+                "text": "you gain 1CP"
+              }
+            },
+            "template_id": "phase17n:phase-end-destruction-leadership-command-point-gain",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "end"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "fight"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                }
+              ],
+              "source_span": {
+                "end": 52,
+                "start": 0,
+                "text": "At the end of your Shooting phase or the Fight phase"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "c0353aae99491963228d2feb844cdecf080074eab588b8a1fbf565edbab07653",
+        "normalized_text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:emperors-children:battleline:datasheet:000004079:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08:datasheet:000004079:4"
+      }
+    },
+    "000004080:3": {
+      "ability_name": "Excessive Assault",
+      "normalized_text_sha256": "fd3b20edc41911d2b5121ab8b3c9b03122d36bea66a976a737ba8aaf44d1071b",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:emperors-children:battleline:datasheet:000004080:3:clause:001",
+            "conditions": [],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "reroll_permission",
+                "parameters": [
+                  {
+                    "key": "attack_kind",
+                    "value": "melee"
+                  },
+                  {
+                    "key": "full_reroll_if_target_within_objective_range",
+                    "value": true
+                  },
+                  {
+                    "key": "reroll_unmodified_value",
+                    "value": 1
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "wound"
+                  }
+                ],
+                "source_span": {
+                  "end": 99,
+                  "start": 74,
+                  "text": "re-roll a Wound roll of 1"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 199,
+              "start": 0,
+              "text": "Each time a model in this unit targets an enemy unit with a melee attack, re-roll a Wound roll of 1. If that enemy unit is within range of an objective marker, you can re-roll the Wound roll instead."
+            },
+            "target": {
+              "kind": "this_unit",
+              "parameters": [],
+              "source_span": {
+                "end": 30,
+                "start": 21,
+                "text": "this unit"
+              }
+            },
+            "template_id": "phase17n:conditional-objective-wound-reroll",
+            "trigger": null,
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "033ad9d00c59237d4028f6387c66a432b1daaaad6e6e3aa436800543839fcb5c",
+        "normalized_text": "Each time a model in this unit targets an enemy unit with a melee attack, re-roll a Wound roll of 1. If that enemy unit is within range of an objective marker, you can re-roll the Wound roll instead.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:emperors-children:battleline:datasheet:000004080:3",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08:datasheet:000004080:3"
+      }
+    },
+    "000004080:4": {
+      "ability_name": "Icon of Excess",
+      "normalized_text_sha256": "55e822c45196f1a2cb7d3950d1771c90e6d1410b69fa4aba0872b43ab3729923",
+      "rule_ir": {
+        "clauses": [
+          {
+            "clause_id": "phase17n:emperors-children:battleline:datasheet:000004080:4:clause:001",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "source_unit"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "source_unit_destroyed_enemy_unit_this_phase"
+                  }
+                ],
+                "source_span": {
+                  "end": 119,
+                  "start": 54,
+                  "text": "if the bearer's unit destroyed one or more enemy units that phase"
+                }
+              },
+              {
+                "kind": "dice_roll_gate",
+                "parameters": [
+                  {
+                    "key": "comparison",
+                    "value": "greater_or_equal"
+                  },
+                  {
+                    "key": "roll_count",
+                    "value": 2
+                  },
+                  {
+                    "key": "roll_expression",
+                    "value": "2D6"
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "leadership"
+                  },
+                  {
+                    "key": "success_threshold_source",
+                    "value": "target_leadership"
+                  },
+                  {
+                    "key": "test_target",
+                    "value": "this_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 162,
+                  "start": 121,
+                  "text": "the bearer's unit takes a Leadership test"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "modify_command_points",
+                "parameters": [
+                  {
+                    "key": "affected_player",
+                    "value": "source_player"
+                  },
+                  {
+                    "key": "delta",
+                    "value": 1
+                  },
+                  {
+                    "key": "operation",
+                    "value": "gain"
+                  }
+                ],
+                "source_span": {
+                  "end": 200,
+                  "start": 192,
+                  "text": "gain 1CP"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 201,
+              "start": 0,
+              "text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP."
+            },
+            "target": {
+              "kind": "player",
+              "parameters": [
+                {
+                  "key": "relationship",
+                  "value": "source_player"
+                }
+              ],
+              "source_span": {
+                "end": 200,
+                "start": 188,
+                "text": "you gain 1CP"
+              }
+            },
+            "template_id": "phase17n:phase-end-destruction-leadership-command-point-gain",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "end"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "shooting"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                }
+              ],
+              "source_span": {
+                "end": 52,
+                "start": 0,
+                "text": "At the end of your Shooting phase or the Fight phase"
+              }
+            },
+            "unsupported_reason": null
+          },
+          {
+            "clause_id": "phase17n:emperors-children:battleline:datasheet:000004080:4:clause:002",
+            "conditions": [
+              {
+                "kind": "target_constraint",
+                "parameters": [
+                  {
+                    "key": "gate_subject",
+                    "value": "source_unit"
+                  },
+                  {
+                    "key": "relationship",
+                    "value": "source_unit_destroyed_enemy_unit_this_phase"
+                  }
+                ],
+                "source_span": {
+                  "end": 119,
+                  "start": 54,
+                  "text": "if the bearer's unit destroyed one or more enemy units that phase"
+                }
+              },
+              {
+                "kind": "dice_roll_gate",
+                "parameters": [
+                  {
+                    "key": "comparison",
+                    "value": "greater_or_equal"
+                  },
+                  {
+                    "key": "roll_count",
+                    "value": 2
+                  },
+                  {
+                    "key": "roll_expression",
+                    "value": "2D6"
+                  },
+                  {
+                    "key": "roll_type",
+                    "value": "leadership"
+                  },
+                  {
+                    "key": "success_threshold_source",
+                    "value": "target_leadership"
+                  },
+                  {
+                    "key": "test_target",
+                    "value": "this_unit"
+                  }
+                ],
+                "source_span": {
+                  "end": 162,
+                  "start": 121,
+                  "text": "the bearer's unit takes a Leadership test"
+                }
+              }
+            ],
+            "diagnostics": [],
+            "duration": null,
+            "effects": [
+              {
+                "kind": "modify_command_points",
+                "parameters": [
+                  {
+                    "key": "affected_player",
+                    "value": "source_player"
+                  },
+                  {
+                    "key": "delta",
+                    "value": 1
+                  },
+                  {
+                    "key": "operation",
+                    "value": "gain"
+                  }
+                ],
+                "source_span": {
+                  "end": 200,
+                  "start": 192,
+                  "text": "gain 1CP"
+                }
+              }
+            ],
+            "source_span": {
+              "end": 201,
+              "start": 0,
+              "text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP."
+            },
+            "target": {
+              "kind": "player",
+              "parameters": [
+                {
+                  "key": "relationship",
+                  "value": "source_player"
+                }
+              ],
+              "source_span": {
+                "end": 200,
+                "start": 188,
+                "text": "you gain 1CP"
+              }
+            },
+            "template_id": "phase17n:phase-end-destruction-leadership-command-point-gain",
+            "trigger": {
+              "kind": "timing_window",
+              "parameters": [
+                {
+                  "key": "edge",
+                  "value": "end"
+                },
+                {
+                  "key": "owner",
+                  "value": "active_player"
+                },
+                {
+                  "key": "phase",
+                  "value": "fight"
+                },
+                {
+                  "key": "subject",
+                  "value": "this_unit"
+                }
+              ],
+              "source_span": {
+                "end": 52,
+                "start": 0,
+                "text": "At the end of your Shooting phase or the Fight phase"
+              }
+            },
+            "unsupported_reason": null
+          }
+        ],
+        "diagnostics": [],
+        "ir_hash": "65227dbab2d999a1ad7c4b7b2b2bb4eedfa3a52d8f45f3a3cb891995fd7b5ef5",
+        "normalized_text": "At the end of your Shooting phase or the Fight phase, if the bearer's unit destroyed one or more enemy units that phase, the bearer's unit takes a Leadership test. If that test is passed, you gain 1CP.",
+        "parser_version": "manual-source-backed-rule-ir:v1",
+        "rule_id": "phase17n:emperors-children:battleline:datasheet:000004080:4",
+        "schema_version": "phase17c-rule-ir-v1",
+        "source_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08:datasheet:000004080:4"
+      }
+    }
+  },
+  "source_artifact_hash": "2cf705d43ab06ba0345438d9104a8cf4dc6eff2d8c13e19f230ec8aa6169b693",
+  "source_package_id": "gw-11e-emperors-children-infractors-tormentors-datasheets-2026-08",
+  "source_snapshot_filename": "Datasheets_abilities.json",
+  "source_snapshot_sha256": "45e1eb1fb71438d1e2a9d4d916184083a3e5f397b1e3a2d1c1ff1eb77ddd4a01"
+}

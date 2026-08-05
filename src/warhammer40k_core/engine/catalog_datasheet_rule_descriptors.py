@@ -19,6 +19,7 @@ ALLOCATED_ATTACK_DAMAGE_MODIFIER_TEMPLATE_ID = (
 )
 CHARACTERISTIC_SET_TEMPLATE_ID = "phase17c:characteristic-set"
 CONDITIONAL_OBJECTIVE_HIT_REROLL_TEMPLATE_ID = "phase17c:conditional-objective-hit-reroll"
+CONDITIONAL_OBJECTIVE_WOUND_REROLL_TEMPLATE_ID = "phase17n:conditional-objective-wound-reroll"
 PASSIVE_MODEL_CHARACTERISTIC_SET_TEMPLATE_ID = "phase17c:passive-model-characteristic-set"
 FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_TEMPLATE_ID = "phase17c:first-failed-save-damage-replacement"
 CONDITIONAL_MODEL_FIGHT_ON_DEATH_TEMPLATE_ID = "phase17c:conditional-model-fight-on-death"
@@ -44,6 +45,7 @@ EXACT_DATASHEET_RUNTIME_TEMPLATE_IDS = frozenset(
     {
         ALLOCATED_ATTACK_DAMAGE_MODIFIER_TEMPLATE_ID,
         CONDITIONAL_OBJECTIVE_HIT_REROLL_TEMPLATE_ID,
+        CONDITIONAL_OBJECTIVE_WOUND_REROLL_TEMPLATE_ID,
         PASSIVE_MODEL_CHARACTERISTIC_SET_TEMPLATE_ID,
         FIRST_FAILED_SAVE_DAMAGE_REPLACEMENT_TEMPLATE_ID,
         CONDITIONAL_MODEL_FIGHT_ON_DEATH_TEMPLATE_ID,
@@ -72,6 +74,8 @@ class CatalogAllocatedAttackDamageModifierDescriptor:
 
 @dataclass(frozen=True, slots=True)
 class CatalogPassiveHitRerollDescriptor:
+    attack_kind: str | None
+    roll_type: str
     reroll_unmodified_value: int
     full_reroll_if_target_within_objective_range: bool
 
@@ -178,7 +182,10 @@ def exact_datasheet_runtime_descriptor_for_clause(
     allocated_damage = allocated_attack_damage_modifier_descriptor_for_clause(clause)
     if allocated_damage is not None:
         return allocated_damage
-    if clause.template_id == CONDITIONAL_OBJECTIVE_HIT_REROLL_TEMPLATE_ID:
+    if clause.template_id in {
+        CONDITIONAL_OBJECTIVE_HIT_REROLL_TEMPLATE_ID,
+        CONDITIONAL_OBJECTIVE_WOUND_REROLL_TEMPLATE_ID,
+    }:
         return passive_hit_reroll_descriptor_for_clause(clause)
     if clause.template_id == PASSIVE_MODEL_CHARACTERISTIC_SET_TEMPLATE_ID:
         return invulnerable_save_descriptor_for_clause(clause)
@@ -918,7 +925,11 @@ def passive_hit_reroll_descriptor_for_clause(
 ) -> CatalogPassiveHitRerollDescriptor | None:
     if (
         not clause.is_supported
-        or clause.template_id != CONDITIONAL_OBJECTIVE_HIT_REROLL_TEMPLATE_ID
+        or clause.template_id
+        not in {
+            CONDITIONAL_OBJECTIVE_HIT_REROLL_TEMPLATE_ID,
+            CONDITIONAL_OBJECTIVE_WOUND_REROLL_TEMPLATE_ID,
+        }
         or clause.trigger is not None
         or clause.target is None
         or clause.target.kind is not RuleTargetKind.THIS_UNIT
@@ -932,21 +943,38 @@ def passive_hit_reroll_descriptor_for_clause(
     parameters = parameter_payload(effect.parameters)
     reroll_value = parameters.get("reroll_unmodified_value")
     objective_upgrade = parameters.get("full_reroll_if_target_within_objective_range")
+    expected_keys = {
+        "full_reroll_if_target_within_objective_range",
+        "reroll_unmodified_value",
+        "roll_type",
+    }
+    attack_kind = parameters.get("attack_kind")
+    if clause.template_id == CONDITIONAL_OBJECTIVE_WOUND_REROLL_TEMPLATE_ID:
+        expected_keys.add("attack_kind")
     if (
         effect.kind is not RuleEffectKind.REROLL_PERMISSION
-        or set(parameters)
-        != {
-            "full_reroll_if_target_within_objective_range",
-            "reroll_unmodified_value",
-            "roll_type",
-        }
-        or parameters.get("roll_type") != "hit"
+        or set(parameters) != expected_keys
+        or parameters.get("roll_type") not in {"hit", "wound"}
+        or (
+            clause.template_id == CONDITIONAL_OBJECTIVE_HIT_REROLL_TEMPLATE_ID
+            and parameters.get("roll_type") != "hit"
+        )
+        or (
+            clause.template_id == CONDITIONAL_OBJECTIVE_WOUND_REROLL_TEMPLATE_ID
+            and parameters.get("roll_type") != "wound"
+        )
+        or (
+            clause.template_id == CONDITIONAL_OBJECTIVE_WOUND_REROLL_TEMPLATE_ID
+            and attack_kind != "melee"
+        )
         or type(reroll_value) is not int
         or not 1 <= reroll_value <= 6
         or type(objective_upgrade) is not bool
     ):
         return None
     return CatalogPassiveHitRerollDescriptor(
+        attack_kind=None if attack_kind is None else str(attack_kind),
+        roll_type=str(parameters["roll_type"]),
         reroll_unmodified_value=reroll_value,
         full_reroll_if_target_within_objective_range=objective_upgrade,
     )

@@ -93,31 +93,39 @@ _DATASHEET_REVIEW_ROWS = (
         group=_EMPERORS_CHILDREN_GROUP,
         datasheet="Tormentors",
         datasheet_id="000004079",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All consumed",
         supported_semantics=(
-            "Infiltrators and the Thrill Seekers army-rule handler are implemented paths; the "
+            "Infiltrators, Objective Defiled Command-phase sticky-objective control, Icon of "
+            "Excess enemy-destruction gating plus unit Leadership test and Command point gain, "
+            "and the Thrill Seekers army-rule handler are implemented source-backed paths; the "
             "source overlay applies the updated power sword Strength."
         ),
-        semantics_needed=(
-            "Objective Defiled sticky-objective control and Icon of Excess end-of-phase "
-            "Leadership test and Command point reward."
+        semantics_needed="None in the exact source ability rows.",
+        catalog_blockers=(
+            "No known Tormentors blocker; catalog, model geometry, wargear, weapon-keyword, "
+            "datasheet-ability, and Thrill Seekers runtime-consumption evidence are Full. "
+            "The generated overall row remains Playable while faction-wide detachment "
+            "interaction coverage is partial."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_EMPERORS_CHILDREN_GROUP,
         datasheet="Infractors",
         datasheet_id="000004080",
-        ir_coverage="Bridge/catalog blocked",
+        ir_coverage="All consumed",
         supported_semantics=(
-            'Scouts 6" and the Thrill Seekers army-rule handler are implemented paths; '
-            "the source overlay applies the updated power sword Strength."
+            'Scouts 6", Excessive Assault melee Wound re-rolls with the objective-range '
+            "upgrade, Icon of Excess enemy-destruction gating plus unit Leadership test and "
+            "Command point gain, and the Thrill Seekers army-rule handler are implemented "
+            "source-backed paths; the source overlay applies the updated power sword Strength."
         ),
-        semantics_needed=(
-            "Excessive Assault conditional Wound re-rolls and Icon of Excess end-of-phase "
-            "Leadership test and Command point reward."
+        semantics_needed="None in the exact source ability rows.",
+        catalog_blockers=(
+            "No known Infractors blocker; catalog, model geometry, wargear, weapon-keyword, "
+            "datasheet-ability, and Thrill Seekers runtime-consumption evidence are Full. "
+            "The generated overall row remains Playable while faction-wide detachment "
+            "interaction coverage is partial."
         ),
-        catalog_blockers=_NO_GENERATED_SUPPORT_ROW,
     ),
     EmperorsChildrenDatasheetReviewRow(
         group=_EMPERORS_CHILDREN_GROUP,
@@ -853,6 +861,8 @@ def emperors_children_datasheet_support_markdown(
     if generated_support_datasheet_ids != frozenset(
         {
             "000004077",
+            "000004079",
+            "000004080",
             "000004083",
             "000004084",
             "000004088",

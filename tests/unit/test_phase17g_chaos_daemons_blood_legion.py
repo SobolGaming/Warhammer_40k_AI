@@ -32,6 +32,10 @@ from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlace
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle
@@ -779,8 +783,11 @@ def _destroy_enemy_unit_for_blood_tainted(
                 "battle_round": state.battle_round,
                 "active_player_id": state.active_player_id,
                 "phase": phase.value,
-                "destroying_player_id": "player-a",
-                "attacking_unit_instance_id": _BLOOD_UNIT_ID,
+                **ModelDestructionAttribution.for_non_attack(
+                    destroying_player_id="player-a",
+                    source_kind=DestructionSourceKind.ABILITY,
+                    source_rules_unit_instance_id=_BLOOD_UNIT_ID,
+                ).to_payload(),
                 "target_unit_instance_id": _ENEMY_UNIT_ID,
                 "model_instance_id": model_id,
                 "damage_kind": "normal",
@@ -817,8 +824,11 @@ def _destroy_enemy_unit_with_split_attackers_for_blood_tainted(
                 "battle_round": state.battle_round,
                 "active_player_id": state.active_player_id,
                 "phase": phase.value,
-                "destroying_player_id": "player-a",
-                "attacking_unit_instance_id": attacker_id,
+                **ModelDestructionAttribution.for_non_attack(
+                    destroying_player_id="player-a",
+                    source_kind=DestructionSourceKind.ABILITY,
+                    source_rules_unit_instance_id=attacker_id,
+                ).to_payload(),
                 "target_unit_instance_id": _ENEMY_UNIT_ID,
                 "model_instance_id": model_id,
                 "damage_kind": "normal",
