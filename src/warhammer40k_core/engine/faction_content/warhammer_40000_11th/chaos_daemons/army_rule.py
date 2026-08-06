@@ -26,6 +26,7 @@ from warhammer40k_core.engine.battlefield_state import (
     geometry_model_for_placement,
 )
 from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
 from warhammer40k_core.engine.faction_content.common import canonical_keyword as _canonical_keyword
@@ -34,6 +35,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.healing import HealingEffect, resolve_healing_until_blocked
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
@@ -498,8 +502,27 @@ def _resolve_daemonic_terror(
             },
         )
         return
+    source_context = validate_json_value(
+        {
+            "battle_shock_result": result.to_payload(),
+            "d3_result": d3_result.to_payload(),
+            "target_unit_instance_id": target_unit.unit_instance_id,
+        }
+    )
     application = apply_mortal_wounds_to_unit(
         state=context.state,
+        decisions=context.decisions,
+        application_id=f"{result.result_id}:daemonic-terror:{target_unit.unit_instance_id}",
+        source_rule_id=source_rule_id,
+        source_context=source_context,
+        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            state=context.state,
+            destroying_player_id=daemon_army.player_id,
+            source_rules_unit_instance_id=None,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=context.phase,
+            source_step="daemonic_terror_mortal_wounds",
+        ),
         target_unit_instance_id=target_unit.unit_instance_id,
         mortal_wounds=d3_result.value,
         spill_over=True,

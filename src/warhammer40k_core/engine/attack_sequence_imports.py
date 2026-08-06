@@ -148,6 +148,10 @@ from warhammer40k_core.engine.hazard import (
     hazard_roll_failed,
     hazard_roll_spec,
 )
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+    record_finalized_mortal_wound_model_destructions,
+)
 from warhammer40k_core.engine.movement_proposals import (
     PLACEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -367,6 +371,8 @@ __all__ = (
     "ModifierStackPayload",
     "MortalWoundApplication",
     "MortalWoundApplicationProgress",
+    "MortalWoundDestructionEvidence",
+    "record_finalized_mortal_wound_model_destructions",
     "MortalWoundRoutingResult",
     "MovementProposalRequest",
     "NotRequired",

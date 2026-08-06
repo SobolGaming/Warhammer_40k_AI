@@ -2136,6 +2136,20 @@ events, and per-model battlefield-placement events retain both `action_phase`
 and `parent_battle_phase`, so out-of-phase shooting replays preserve both the
 shooting action and the Movement or Charge phase in which it occurred.
 
+Fight, normal Shooting, and out-of-phase Shooting retain the completed attack
+sequence while any materialization decision is pending. After each accepted
+placement, the owning phase reruns all completion hooks from that retained
+sequence, performs Attached Unit reconciliation only after the hooks drain,
+then clears the retained sequence and completes exactly one Fight activation or
+out-of-phase Shooting action.
+
+`submit_catalog_model_materialization_placement` is a supported nested reaction
+decision. When its source attack belongs to Fire Overwatch or a Fight interrupt,
+prevalidation requires the request to own the active reaction frame. Accepted
+placement continues that frame to any subsequent completion-hook decision, or
+resolves it only after the out-of-phase action or interrupted activation is
+complete; restored lifecycles preserve the same frame/request binding.
+
 Each accepted model placement emits its own
 `model_placed_on_battlefield` runtime-content timing event for every player so
 owner and opponent reactive abilities use the shared event dispatcher. After
@@ -2149,6 +2163,13 @@ materialized models through descriptor-indexed catalog variants, and preserves
 the original Starting Strength record. Empty components are never replaced,
 and non-attack composition handoff waits for the destruction-finalized event so
 an optional Shoot on Death or Fight on Death window cannot lose its source model.
+Shared mortal-wound routing records a typed, replay-safe composition transition
+ledger only after the application has finished, including direct mortal wounds,
+Feel No Pain continuations, and Deadly Demise collateral. The ledger carries
+source attribution, physical and rules-unit identities, destroyed model IDs,
+and battlefield removal evidence, allowing composition handoff to observe
+generic selected-target and other mortal-wound consumers without synthesizing
+destruction events.
 Attached-unit reconciliation observes the composition-driven handoff before it
 splits a surviving component away, while a fully destroyed component with no
 successfully materialized model follows the ordinary destruction path.
@@ -2166,9 +2187,12 @@ Required model-materialization tests cover both source packages sharing the
 same semantics, attack and Hazardous destruction gates, non-attack exclusion,
 valid and stale placement, exact catalog profile/base/loadout identity,
 real Shooting/Fight Attached Unit handoff, out-of-phase action/parent phase
-evidence, destruction-reaction finalization, authoritative restored-request
-tamper rejection, Starting Strength preservation, deterministic JSON-safe
-request/state round trips, and per-model placement reaction dispatch.
+evidence, restored Overwatch and Fight-interrupt reaction-frame continuation,
+selected-target mortal wounds with and without a Feel No Pain continuation,
+Deadly Demise collateral finalization, destruction-reaction finalization,
+authoritative restored-request tamper rejection, Starting Strength preservation,
+deterministic JSON-safe request/state round trips, and per-model placement
+reaction dispatch.
 
 ## Catalog First-Death Return Decisions
 

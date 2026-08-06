@@ -274,6 +274,7 @@ def apply_rule_model_destruction_mortal_wound_decision(
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=state,
+        decisions=decisions,
         request=request,
         result=result,
         next_request_id=state.next_decision_request_id(),
@@ -539,9 +540,11 @@ def _route_rule_deadly_demise_targets(
             defender_player_id=unit_owner_player_id(state=state, unit_instance_id=target_unit_id),
             mortal_wounds=mortal_wounds,
             spill_over=True,
+            destruction_evidence=None,
         )
         routed = continue_mortal_wound_application(
             state=state,
+            decisions=decisions,
             request_id=state.next_decision_request_id(),
             progress=progress,
             dice_manager=manager,

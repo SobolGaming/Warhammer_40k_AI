@@ -44,6 +44,7 @@ from warhammer40k_core.engine.catalog_command_restoration_runtime import (
 )
 from warhammer40k_core.engine.catalog_datasheet_rule_runtime import CatalogDatasheetRuleRuntime
 from warhammer40k_core.engine.catalog_model_materialization_runtime import (
+    SUBMIT_CATALOG_MODEL_MATERIALIZATION_PLACEMENT_DECISION_TYPE,
     CatalogModelMaterializationRuntime,
 )
 from warhammer40k_core.engine.catalog_movement_end_selected_target_effects import (
@@ -500,6 +501,7 @@ _REACTION_FRAME_DECISION_TYPES = frozenset(
         SELECT_FEEL_NO_PAIN_DECISION_TYPE,
         SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
         DICE_RESULT_OVERRIDE_DECISION_TYPE,
+        SUBMIT_CATALOG_MODEL_MATERIALIZATION_PLACEMENT_DECISION_TYPE,
         *HEALING_DECISION_TYPES,
     )
 )

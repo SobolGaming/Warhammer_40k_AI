@@ -11,6 +11,9 @@ if TYPE_CHECKING:
         DamageApplicationPayload,
         FeelNoPainResolutionPayload,
     )
+    from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+        MortalWoundDestructionEvidencePayload,
+    )
 
 MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND = "mortal_wound"
 
@@ -31,6 +34,7 @@ class MortalWoundFeelNoPainContextPayload(TypedDict):
     ignored_mortal_wounds: int
     remaining_mortal_wounds_lost: int
     priority_model_ids: list[str]
+    destruction_evidence: MortalWoundDestructionEvidencePayload | None
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
@@ -46,6 +50,11 @@ def parse_mortal_wound_feel_no_pain_context(
     applications = _list(payload, "applications")
     resolutions = _list(payload, "feel_no_pain_resolutions")
     priority_model_ids = tuple(_string_list(payload, "priority_model_ids"))
+    raw_destruction_evidence = payload.get("destruction_evidence")
+    if raw_destruction_evidence is not None and not isinstance(raw_destruction_evidence, dict):
+        raise GameLifecycleError(
+            "Mortal wound context destruction_evidence must be an object or null."
+        )
     return {
         "context_kind": MORTAL_WOUND_FEEL_NO_PAIN_CONTEXT_KIND,
         "application_id": _string(payload, "application_id"),
@@ -62,6 +71,10 @@ def parse_mortal_wound_feel_no_pain_context(
         "ignored_mortal_wounds": _int(payload, "ignored_mortal_wounds"),
         "remaining_mortal_wounds_lost": _int(payload, "remaining_mortal_wounds_lost"),
         "priority_model_ids": list(_validate_identifiers(priority_model_ids)),
+        "destruction_evidence": cast(
+            "MortalWoundDestructionEvidencePayload | None",
+            raw_destruction_evidence,
+        ),
     }
 
 

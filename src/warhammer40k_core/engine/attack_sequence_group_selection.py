@@ -703,10 +703,19 @@ def _apply_deferred_mortal_wounds(
             ),
             mortal_wounds=deferred.mortal_wounds,
             spill_over=False,
+            destruction_evidence=MortalWoundDestructionEvidence.for_state(
+                state=state,
+                destroying_player_id=attack_sequence.attacker_player_id,
+                source_rules_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+                destruction_source_kind=DestructionSourceKind.ATTACK,
+                action_phase=attack_sequence.source_phase,
+                source_step="devastating_wounds",
+            ),
             priority_model_ids=deferred.priority_model_ids,
         )
         routed = continue_mortal_wound_application(
             state=state,
+            decisions=decisions,
             request_id=state.next_decision_request_id(),
             progress=progress,
             dice_manager=manager,
@@ -763,6 +772,7 @@ def _apply_deferred_mortal_wound_feel_no_pain_decision(
     )
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=state,
+        decisions=decisions,
         request=request,
         result=result,
         next_request_id=state.next_decision_request_id(),

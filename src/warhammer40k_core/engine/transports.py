@@ -2311,12 +2311,11 @@ def apply_transport_hazard_mortal_wounds(
     disembark: CombatDisembark | DestroyedTransportDisembark,
     dice_manager: DiceRollManager,
 ) -> TransportHazardMortalWounds:
-    from warhammer40k_core.engine.damage_allocation import (
-        MortalWoundApplicationProgress,
-        continue_mortal_wound_application,
-        unit_owner_player_id,
-    )
+    from warhammer40k_core.engine.damage_allocation import continue_mortal_wound_application
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.mortal_wound_application_progress import (
+        start_hazardous_mortal_wound_application,
+    )
 
     if type(state) is not GameState:
         raise GameLifecycleError("Transport hazard mortal wounds require GameState.")
@@ -2354,7 +2353,8 @@ def apply_transport_hazard_mortal_wounds(
         _emit_transport_hazard_mortal_wounds_resolved(decisions=decisions, result=resolved)
         return resolved
 
-    progress = MortalWoundApplicationProgress.start(
+    progress = start_hazardous_mortal_wound_application(
+        state=state,
         application_id=(
             f"{disembark.unit_instance_id}:{disembark_mode_for_hazard(disembark).value}:"
             f"transport-hazard-mortal-wounds:r{disembark.battle_round}"
@@ -2365,15 +2365,13 @@ def apply_transport_hazard_mortal_wounds(
             mortal_wounds=mortal_wounds,
         ),
         target_unit_instance_id=disembark.unit_instance_id,
-        defender_player_id=unit_owner_player_id(
-            state=state,
-            unit_instance_id=disembark.unit_instance_id,
-        ),
+        destroying_player_id=disembark.player_id,
         mortal_wounds=mortal_wounds,
-        spill_over=True,
+        source_step="transport_hazard_mortal_wounds",
     )
     routed = continue_mortal_wound_application(
         state=state,
+        decisions=decisions,
         request_id=state.next_decision_request_id(),
         progress=progress,
         dice_manager=dice_manager,
@@ -2427,6 +2425,7 @@ def apply_transport_hazard_mortal_wound_feel_no_pain_decision(
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=state,
+        decisions=decisions,
         request=request,
         result=result,
         next_request_id=state.next_decision_request_id(),

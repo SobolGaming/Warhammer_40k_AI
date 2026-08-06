@@ -240,6 +240,10 @@ from warhammer40k_core.engine.game_state import (
     GameStatePayload,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.movement_proposals import (
     PLACEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -347,6 +351,21 @@ from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
 )
+
+
+def _test_mortal_wound_destruction_evidence(
+    state: GameState,
+) -> MortalWoundDestructionEvidence:
+    phase = state.current_battle_phase
+    assert phase is not None
+    return MortalWoundDestructionEvidence.for_state(
+        state=state,
+        destroying_player_id="player-a",
+        source_rules_unit_instance_id=None,
+        destruction_source_kind=DestructionSourceKind.ABILITY,
+        action_phase=phase,
+        source_step="test_mortal_wounds",
+    )
 
 
 def test_cached_shooting_lifecycle_templates_are_mutation_isolated() -> None:
@@ -10501,6 +10520,11 @@ def test_phase13c_damage_mortal_wounds_and_feel_no_pain_hosts_round_trip() -> No
 
     mortal_application = apply_mortal_wounds_to_unit(
         state=state,
+        decisions=lifecycle.decision_controller,
+        application_id="phase13c-mortal-application",
+        source_rule_id="phase13c:test-mortal-wounds",
+        source_context={"source_kind": "phase13c_test"},
+        destruction_evidence=_test_mortal_wound_destruction_evidence(state),
         target_unit_instance_id=defender.unit_instance_id,
         mortal_wounds=3,
         spill_over=True,
@@ -10514,6 +10538,11 @@ def test_phase13c_damage_mortal_wounds_and_feel_no_pain_hosts_round_trip() -> No
     no_spill_defender = no_spill_units["enemy"]
     no_spill_application = apply_mortal_wounds_to_unit(
         state=no_spill_state,
+        decisions=no_spill_lifecycle.decision_controller,
+        application_id="phase13c-no-spill-mortal-application",
+        source_rule_id="phase13c:test-mortal-wounds",
+        source_context={"source_kind": "phase13c_no_spill_test"},
+        destruction_evidence=_test_mortal_wound_destruction_evidence(no_spill_state),
         target_unit_instance_id=no_spill_defender.unit_instance_id,
         mortal_wounds=3,
         spill_over=False,
@@ -10525,6 +10554,11 @@ def test_phase13c_damage_mortal_wounds_and_feel_no_pain_hosts_round_trip() -> No
     overkill_defender = overkill_units["enemy"]
     overkill_application = apply_mortal_wounds_to_unit(
         state=overkill_state,
+        decisions=overkill_lifecycle.decision_controller,
+        application_id="phase13c-overkill-mortal-application",
+        source_rule_id="phase13c:test-mortal-wounds",
+        source_context={"source_kind": "phase13c_overkill_test"},
+        destruction_evidence=_test_mortal_wound_destruction_evidence(overkill_state),
         target_unit_instance_id=overkill_defender.unit_instance_id,
         mortal_wounds=99,
         spill_over=True,
@@ -13315,6 +13349,7 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
     assert secondary_attribution.attacking_model_instance_id is None
     assert attacker_model.model_instance_id not in updated_battlefield.placed_model_ids()
     assert defender_model.model_instance_id in updated_battlefield.placed_model_ids()
+    assert _event_payloads(lifecycle, MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT) == ()
 
     shooting_state = state.shooting_phase_state
     assert shooting_state is not None
@@ -13345,6 +13380,10 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
         if cast(dict[str, object], payload["selected_source"])["source_id"]
         == deadly_demise_source.source_id
     )
+    finalized_payloads = _event_payloads(
+        lifecycle,
+        MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
+    )
 
     _assert_waiting_for_movement_unit(final_status)
     assert defender_model.model_instance_id not in final_battlefield.placed_model_ids()
@@ -13356,6 +13395,14 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
     assert len(primary_reaction_payloads) == 1
     assert secondary_reaction_payloads[0]["execution_status"] == "recorded_for_action_host"
     assert primary_reaction_payloads[0]["execution_status"] == "resolved"
+    assert len(finalized_payloads) == 1
+    finalized_evidence = cast(dict[str, object], finalized_payloads[0]["destruction_evidence"])
+    assert (
+        finalized_evidence["destruction_source_kind"] == DestructionSourceKind.DEADLY_DEMISE.value
+    )
+    assert finalized_payloads[0]["destroyed_model_instance_ids"] == [
+        attacker_model.model_instance_id
+    ]
 
 
 def test_phase13e_deadly_demise_secondary_deadly_demise_chains_before_removal() -> None:
@@ -13835,6 +13882,11 @@ def test_phase13c_mortal_wounds_use_forced_feel_no_pain_per_wound() -> None:
 
     application = apply_mortal_wounds_to_unit(
         state=state,
+        decisions=lifecycle.decision_controller,
+        application_id="phase13c-forced-fnp-mortal-application",
+        source_rule_id="phase13c:test-mortal-wounds",
+        source_context={"source_kind": "phase13c_forced_fnp_test"},
+        destruction_evidence=_test_mortal_wound_destruction_evidence(state),
         target_unit_instance_id=defender.unit_instance_id,
         mortal_wounds=1,
         dice_manager=DiceRollManager(
@@ -13881,6 +13933,11 @@ def test_phase13c_mortal_wounds_use_psychic_attack_source_with_mortal_wound_scop
 
     application = apply_mortal_wounds_to_unit(
         state=state,
+        decisions=lifecycle.decision_controller,
+        application_id="phase13c-psychic-fnp-mortal-application",
+        source_rule_id="phase13c:test-mortal-wounds",
+        source_context={"source_kind": "phase13c_psychic_fnp_test"},
+        destruction_evidence=_test_mortal_wound_destruction_evidence(state),
         target_unit_instance_id=defender.unit_instance_id,
         mortal_wounds=1,
         dice_manager=DiceRollManager(
@@ -13919,6 +13976,11 @@ def test_phase13c_mortal_wounds_ignore_psychic_attack_source_without_mortal_woun
 
     application = apply_mortal_wounds_to_unit(
         state=state,
+        decisions=lifecycle.decision_controller,
+        application_id="phase13c-psychic-scope-mortal-application",
+        source_rule_id="phase13c:test-mortal-wounds",
+        source_context={"source_kind": "phase13c_psychic_scope_test"},
+        destruction_evidence=_test_mortal_wound_destruction_evidence(state),
         target_unit_instance_id=defender.unit_instance_id,
         mortal_wounds=1,
     )
@@ -14008,6 +14070,11 @@ def test_phase13d_direct_mortal_wound_helper_rejects_choice_routing_contexts() -
     with pytest.raises(GameLifecycleError, match="spill_over must be a bool"):
         apply_mortal_wounds_to_unit(
             state=state,
+            decisions=lifecycle.decision_controller,
+            application_id="phase13d-invalid-direct-mortal",
+            source_rule_id="phase13d:test-mortal-wounds",
+            source_context={"source_kind": "phase13d_invalid_direct_test"},
+            destruction_evidence=_test_mortal_wound_destruction_evidence(state),
             target_unit_instance_id=defender.unit_instance_id,
             mortal_wounds=1,
             spill_over=cast(bool, "yes"),
@@ -14021,6 +14088,11 @@ def test_phase13d_direct_mortal_wound_helper_rejects_choice_routing_contexts() -
     with pytest.raises(GameLifecycleError, match="requires dice manager and defender"):
         apply_mortal_wounds_to_unit(
             state=state,
+            decisions=lifecycle.decision_controller,
+            application_id="phase13d-missing-dice-direct-mortal",
+            source_rule_id="phase13d:test-mortal-wounds",
+            source_context={"source_kind": "phase13d_missing_dice_test"},
+            destruction_evidence=_test_mortal_wound_destruction_evidence(state),
             target_unit_instance_id=defender.unit_instance_id,
             mortal_wounds=1,
         )
@@ -14033,6 +14105,11 @@ def test_phase13d_direct_mortal_wound_helper_rejects_choice_routing_contexts() -
     with pytest.raises(GameLifecycleError, match="choices require lifecycle routing"):
         apply_mortal_wounds_to_unit(
             state=state,
+            decisions=lifecycle.decision_controller,
+            application_id="phase13d-choice-direct-mortal",
+            source_rule_id="phase13d:test-mortal-wounds",
+            source_context={"source_kind": "phase13d_choice_test"},
+            destruction_evidence=_test_mortal_wound_destruction_evidence(state),
             target_unit_instance_id=defender.unit_instance_id,
             mortal_wounds=1,
         )
@@ -14045,6 +14122,11 @@ def test_phase13d_direct_mortal_wound_helper_rejects_choice_routing_contexts() -
     with pytest.raises(GameLifecycleError, match="choices require lifecycle routing"):
         apply_mortal_wounds_to_unit(
             state=state,
+            decisions=lifecycle.decision_controller,
+            application_id="phase13d-decline-direct-mortal",
+            source_rule_id="phase13d:test-mortal-wounds",
+            source_context={"source_kind": "phase13d_decline_test"},
+            destruction_evidence=_test_mortal_wound_destruction_evidence(state),
             target_unit_instance_id=defender.unit_instance_id,
             mortal_wounds=1,
         )
@@ -14069,10 +14151,12 @@ def test_phase13d_mortal_wound_lifecycle_progress_round_trip() -> None:
         defender_player_id="player-b",
         mortal_wounds=1,
         spill_over=True,
+        destruction_evidence=_test_mortal_wound_destruction_evidence(state),
     )
 
     routing = continue_mortal_wound_application(
         state=state,
+        decisions=lifecycle.decision_controller,
         request_id="phase13d-mortal-progress-fnp",
         progress=progress,
     )
@@ -14100,6 +14184,7 @@ def test_phase13d_mortal_wound_lifecycle_progress_round_trip() -> None:
     )
     completed = resolve_mortal_wound_feel_no_pain_decision(
         state=state,
+        decisions=lifecycle.decision_controller,
         request=request,
         result=DecisionResult.for_request(
             result_id="phase13d-mortal-progress-source-a",
@@ -14189,6 +14274,7 @@ def test_phase13d_mortal_wound_lifecycle_value_objects_fail_fast() -> None:
             mortal_wounds=1,
             remaining_mortal_wounds=2,
             spill_over=True,
+            destruction_evidence=None,
         )
     with pytest.raises(GameLifecycleError, match="spill_over must be a bool"):
         MortalWoundApplicationProgress(
@@ -14200,6 +14286,7 @@ def test_phase13d_mortal_wound_lifecycle_value_objects_fail_fast() -> None:
             mortal_wounds=1,
             remaining_mortal_wounds=1,
             spill_over=cast(bool, "yes"),
+            destruction_evidence=None,
         )
     with pytest.raises(GameLifecycleError, match="wound accounting drift"):
         MortalWoundApplicationProgress(
@@ -14211,6 +14298,7 @@ def test_phase13d_mortal_wound_lifecycle_value_objects_fail_fast() -> None:
             mortal_wounds=1,
             remaining_mortal_wounds=1,
             spill_over=True,
+            destruction_evidence=None,
             ignored_mortal_wounds=1,
         )
     with pytest.raises(GameLifecycleError, match="must be at least 1"):
@@ -14222,6 +14310,7 @@ def test_phase13d_mortal_wound_lifecycle_value_objects_fail_fast() -> None:
             defender_player_id="player-b",
             mortal_wounds=0,
             spill_over=True,
+            destruction_evidence=None,
         )
     with pytest.raises(GameLifecycleError, match="must not be negative"):
         MortalWoundApplicationProgress(
@@ -14233,6 +14322,7 @@ def test_phase13d_mortal_wound_lifecycle_value_objects_fail_fast() -> None:
             mortal_wounds=1,
             remaining_mortal_wounds=1,
             spill_over=True,
+            destruction_evidence=None,
             ignored_mortal_wounds=-1,
         )
     with pytest.raises(GameLifecycleError, match="context must be an object"):
@@ -14248,6 +14338,7 @@ def test_phase13d_mortal_wound_lifecycle_value_objects_fail_fast() -> None:
         defender_player_id="player-b",
         mortal_wounds=1,
         spill_over=True,
+        destruction_evidence=None,
     )
     context_payload = cast(
         dict[str, JsonValue],
@@ -14359,6 +14450,7 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
         defender_player_id="player-b",
         mortal_wounds=1,
         spill_over=True,
+        destruction_evidence=_test_mortal_wound_destruction_evidence(state),
     )
     battlefield = state.battlefield_state
     assert battlefield is not None
@@ -14367,6 +14459,7 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
     )
     no_models_routing = continue_mortal_wound_application(
         state=state,
+        decisions=lifecycle.decision_controller,
         request_id="phase13d-no-model-request",
         progress=no_models_progress,
     )
@@ -14393,16 +14486,19 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
         defender_player_id="player-b",
         mortal_wounds=1,
         spill_over=True,
+        destruction_evidence=_test_mortal_wound_destruction_evidence(routed_state),
     )
     with pytest.raises(GameLifecycleError, match="requires dice manager"):
         continue_mortal_wound_application(
             state=routed_state,
+            decisions=routed_lifecycle.decision_controller,
             request_id="phase13d-single-source-request",
             progress=single_source_progress,
         )
     with pytest.raises(GameLifecycleError, match="remove_destroyed_models must be a bool"):
         continue_mortal_wound_application(
             state=routed_state,
+            decisions=routed_lifecycle.decision_controller,
             request_id="phase13d-invalid-removal-flag",
             progress=single_source_progress,
             remove_destroyed_models=cast(bool, "yes"),
@@ -14415,6 +14511,7 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
     )
     choice_routing = continue_mortal_wound_application(
         state=routed_state,
+        decisions=routed_lifecycle.decision_controller,
         request_id="phase13d-source-choice-request",
         progress=single_source_progress,
     )
@@ -14423,6 +14520,7 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
     with pytest.raises(GameLifecycleError, match="remove_destroyed_models must be a bool"):
         resolve_mortal_wound_feel_no_pain_decision(
             state=routed_state,
+            decisions=routed_lifecycle.decision_controller,
             request=request,
             result=DecisionResult.for_request(
                 result_id="phase13d-source-choice-invalid-removal-flag",
@@ -14435,6 +14533,7 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
     with pytest.raises(GameLifecycleError, match="decision requires dice manager"):
         resolve_mortal_wound_feel_no_pain_decision(
             state=routed_state,
+            decisions=routed_lifecycle.decision_controller,
             request=request,
             result=DecisionResult.for_request(
                 result_id="phase13d-source-choice-no-dice",
@@ -14457,6 +14556,7 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
     with pytest.raises(GameLifecycleError, match="not in the request"):
         resolve_mortal_wound_feel_no_pain_decision(
             state=routed_state,
+            decisions=routed_lifecycle.decision_controller,
             request=inconsistent_request,
             result=DecisionResult.for_request(
                 result_id="phase13d-source-choice-bad-payload",
@@ -14477,6 +14577,7 @@ def test_phase13d_mortal_wound_routing_rejects_invalid_lifecycle_edges() -> None
     with pytest.raises(GameLifecycleError, match="sources must be a list"):
         resolve_mortal_wound_feel_no_pain_decision(
             state=routed_state,
+            decisions=routed_lifecycle.decision_controller,
             request=broken_request,
             result=DecisionResult.for_request(
                 result_id="phase13d-source-choice-bad-sources",

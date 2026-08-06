@@ -62,6 +62,10 @@ def _complete_out_of_phase_shooting(
         raise GameLifecycleError("Out-of-phase shooting completion requires state.")
     if completed_state.attack_sequence is not None:
         raise GameLifecycleError("Out-of-phase shooting completion requires no sequence.")
+    if completed_state.pending_completed_attack_sequence is not None:
+        raise GameLifecycleError(
+            "Out-of-phase shooting completion requires no pending completed sequence."
+        )
     removed_grant_effects = (
         state.remove_persisting_effects_by_id(completed_state.grant_effect_ids)
         if completed_state.grant_effect_ids

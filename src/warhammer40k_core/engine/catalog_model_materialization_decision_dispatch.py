@@ -20,8 +20,9 @@ from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.events import RuntimeContentEvent
 from warhammer40k_core.engine.game_state import GameConfig, GameState
-from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseHandler
+from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 
@@ -32,12 +33,22 @@ PARAMETERIZED_DECISION_TYPES = frozenset(
 
 class MaterializationDecisionLifecycleHost(Protocol):
     decision_controller: DecisionController
+    reaction_queue: ReactionQueue
     _runtime_content_bundle: RuntimeContentBundle | None
     _shooting_phase_handler: ShootingPhaseHandler
 
     def _require_state(self) -> GameState: ...
 
     def _require_config(self) -> GameConfig: ...
+
+    def _result_resolves_active_reaction_frame(self, result: DecisionResult) -> bool: ...
+
+    def _continue_or_resolve_fight_reaction(
+        self,
+        *,
+        result: DecisionResult,
+        status: LifecycleStatus,
+    ) -> None: ...
 
     def advance_until_decision_or_terminal(self) -> LifecycleStatus: ...
 
@@ -51,6 +62,8 @@ def decision_dispatch_handlers(
     ) -> LifecycleStatus | None:
         config = host._require_config()
         bundle = _require_runtime_content_bundle(host)
+        if host._result_resolves_active_reaction_frame(result):
+            host.reaction_queue.validate_result(result)
         return invalid_catalog_model_materialization_placement_status(
             state=host._require_state(),
             request=request,
@@ -65,6 +78,8 @@ def decision_dispatch_handlers(
         state = host._require_state()
         config = host._require_config()
         bundle = _require_runtime_content_bundle(host)
+        resolves_reaction_frame = host._result_resolves_active_reaction_frame(result)
+        action_phase = _request_phase_kind(record.request, "action_phase")
         placements = apply_recorded_catalog_model_materialization_placement(
             state=state,
             decisions=host.decision_controller,
@@ -86,7 +101,15 @@ def decision_dispatch_handlers(
             placements=placements,
             runtime_modifier_registry=host._shooting_phase_handler.runtime_modifier_registry,
         )
-        return host.advance_until_decision_or_terminal()
+        advanced_status = host.advance_until_decision_or_terminal()
+        if resolves_reaction_frame:
+            _continue_or_resolve_materialization_reaction(
+                host=host,
+                result=result,
+                status=advanced_status,
+                action_phase=action_phase,
+            )
+        return advanced_status
 
     return (
         DecisionDispatchHandler(
@@ -95,6 +118,38 @@ def decision_dispatch_handlers(
             applier=applier,
         ),
     )
+
+
+def _continue_or_resolve_materialization_reaction(
+    *,
+    host: MaterializationDecisionLifecycleHost,
+    result: DecisionResult,
+    status: LifecycleStatus,
+    action_phase: BattlePhase,
+) -> None:
+    if type(result) is not DecisionResult:
+        raise GameLifecycleError("Catalog materialization reaction requires DecisionResult.")
+    if type(status) is not LifecycleStatus:
+        raise GameLifecycleError("Catalog materialization reaction requires LifecycleStatus.")
+    if type(action_phase) is not BattlePhase:
+        raise GameLifecycleError("Catalog materialization reaction requires BattlePhase.")
+    if action_phase is BattlePhase.FIGHT:
+        host._continue_or_resolve_fight_reaction(result=result, status=status)
+        return
+    if action_phase is not BattlePhase.SHOOTING:
+        raise GameLifecycleError("Catalog materialization reaction action phase drift.")
+    if host._require_state().out_of_phase_shooting_state is not None:
+        if status.decision_request is None:
+            raise GameLifecycleError(
+                "Out-of-phase materialization continuation requires a pending decision."
+            )
+        host.reaction_queue.continue_reaction(
+            result=result,
+            next_request_id=status.decision_request.request_id,
+            decisions=host.decision_controller,
+        )
+        return
+    host.reaction_queue.resolve_reaction(result=result, decisions=host.decision_controller)
 
 
 def _dispatch_model_placed_events(
@@ -180,6 +235,14 @@ def _request_phase(request: DecisionRequest, key: str) -> str:
     if type(value) is not str or not value:
         raise GameLifecycleError(f"Materialization request {key} is invalid.")
     return value
+
+
+def _request_phase_kind(request: DecisionRequest, key: str) -> BattlePhase:
+    value = _request_phase(request, key)
+    try:
+        return BattlePhase(value)
+    except ValueError as exc:
+        raise GameLifecycleError(f"Materialization request {key} is unsupported.") from exc
 
 
 def _require_runtime_content_bundle(

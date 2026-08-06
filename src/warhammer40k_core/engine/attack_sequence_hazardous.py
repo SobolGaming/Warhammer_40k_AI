@@ -98,9 +98,18 @@ def _resolve_hazardous_tests(
         ),
         mortal_wounds=mortal_wounds,
         spill_over=True,
+        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            state=state,
+            destroying_player_id=attack_sequence.attacker_player_id,
+            source_rules_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            destruction_source_kind=DestructionSourceKind.HAZARDOUS,
+            action_phase=attack_sequence.source_phase,
+            source_step="hazardous_test",
+        ),
     )
     routed = continue_mortal_wound_application(
         state=state,
+        decisions=decisions,
         request_id=state.next_decision_request_id(),
         progress=progress,
         dice_manager=manager,

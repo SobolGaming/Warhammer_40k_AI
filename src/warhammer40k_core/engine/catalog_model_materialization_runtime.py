@@ -60,6 +60,11 @@ from warhammer40k_core.engine.destruction_provenance import (
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
+    MortalWoundDestructionEvidence,
+    MortalWoundDestructionEvidencePayload,
+)
 from warhammer40k_core.engine.movement_proposals import (
     PlacementProposalPayload,
     PlacementProposalPayloadPayload,
@@ -347,6 +352,39 @@ class CatalogModelMaterializationRuntime:
             return False
         replaced = False
         for record in decisions.event_log.records:
+            if record.event_type == MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT:
+                payload = _event_payload(record.payload, "mortal wound destructions finalized")
+                raw_evidence = payload.get("destruction_evidence")
+                if not isinstance(raw_evidence, dict):
+                    raise GameLifecycleError("Mortal wound composition evidence is malformed.")
+                evidence = MortalWoundDestructionEvidence.from_payload(
+                    cast(MortalWoundDestructionEvidencePayload, raw_evidence)
+                )
+                if evidence.destruction_source_kind in {
+                    DestructionSourceKind.ATTACK,
+                    DestructionSourceKind.HAZARDOUS,
+                }:
+                    continue
+                affected_unit_ids = _payload_string_tuple(
+                    payload,
+                    "physical_unit_instance_ids",
+                )
+                replaced = (
+                    _apply_available_datasheet_replacements(
+                        state=state,
+                        decisions=decisions,
+                        army_catalog=self.army_catalog,
+                        sources=sources,
+                        affected_unit_instance_ids=affected_unit_ids,
+                        attack_sequence_id=None,
+                        action_phase=evidence.action_phase,
+                        parent_battle_phase=evidence.parent_battle_phase,
+                        source_step=evidence.source_step,
+                        source_event_id=record.event_id,
+                    )
+                    or replaced
+                )
+                continue
             if record.event_type != "model_destroyed":
                 continue
             payload = _event_payload(record.payload, "model destroyed")
@@ -1036,7 +1074,28 @@ def _destroyed_model_ids_for_sequence_events(
 ) -> tuple[str, ...]:
     destroyed_ids: set[str] = set()
     for record in decisions.event_log.records:
-        if record.event_type not in {"model_destroyed", "hazardous_mortal_wounds_applied"}:
+        if record.event_type not in {
+            "model_destroyed",
+            "hazardous_mortal_wounds_applied",
+            MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
+        }:
+            continue
+        if record.event_type == MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT:
+            payload = _event_payload(record.payload, record.event_type)
+            raw_evidence = payload.get("destruction_evidence")
+            if not isinstance(raw_evidence, dict):
+                raise GameLifecycleError("Mortal wound Split evidence is malformed.")
+            evidence = MortalWoundDestructionEvidence.from_payload(
+                cast(MortalWoundDestructionEvidencePayload, raw_evidence)
+            )
+            source_context = payload.get("source_context")
+            if not isinstance(source_context, dict):
+                raise GameLifecycleError("Mortal wound Split source context is malformed.")
+            if source_context.get("sequence_id") != attack_sequence_id:
+                continue
+            if evidence.destruction_source_kind not in descriptor.destruction_source_kinds:
+                continue
+            destroyed_ids.update(_payload_string_tuple(payload, "destroyed_model_instance_ids"))
             continue
         payload = _event_payload(record.payload, record.event_type)
         if record.event_type == "model_destroyed":
@@ -1077,6 +1136,15 @@ def _model_state_changed_unit_ids_for_sequence(
 ) -> tuple[str, ...]:
     unit_ids: set[str] = set()
     for record in context.decisions.event_log.records:
+        if record.event_type == MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT:
+            payload = _event_payload(record.payload, "mortal wound destructions finalized")
+            source_context = payload.get("source_context")
+            if not isinstance(source_context, dict):
+                raise GameLifecycleError("Mortal wound composition context is malformed.")
+            if source_context.get("sequence_id") != context.attack_sequence.sequence_id:
+                continue
+            unit_ids.update(_payload_string_tuple(payload, "physical_unit_instance_ids"))
+            continue
         if record.event_type == "model_destroyed":
             payload = _event_payload(record.payload, "model destroyed")
             if payload.get("sequence_id") != context.attack_sequence.sequence_id:
@@ -1309,6 +1377,19 @@ def _payload_string(payload: Mapping[str, object], key: str) -> str:
     if type(value) is not str or not value:
         raise GameLifecycleError(f"Model materialization {key} must be a string.")
     return value
+
+
+def _payload_string_tuple(payload: Mapping[str, object], key: str) -> tuple[str, ...]:
+    value = payload.get(key)
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"Model materialization {key} must be a list of strings.")
+    items = cast(list[object], value)
+    if any(type(item) is not str or not item for item in items):
+        raise GameLifecycleError(f"Model materialization {key} must be a list of strings.")
+    resolved = cast(list[str], items)
+    if len(set(resolved)) != len(resolved):
+        raise GameLifecycleError(f"Model materialization {key} contains duplicates.")
+    return tuple(sorted(resolved))
 
 
 def _battle_phase(value: object) -> BattlePhase:

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_damage_helpers import (
     no_save_damage_order_roll_spec as _no_save_damage_order_roll_spec,
+    record_deadly_demise_secondary_destruction_finalization as _record_deadly_demise_secondary_destruction_finalization,
 )
 from warhammer40k_core.engine.attack_sequence_imports import *
 from warhammer40k_core.engine.destruction_reaction_conditions import (
@@ -821,9 +822,11 @@ def _route_deadly_demise_mortal_wounds(
             ),
             mortal_wounds=mortal_wounds,
             spill_over=True,
+            destruction_evidence=None,
         )
         routed = continue_mortal_wound_application(
             state=state,
+            decisions=decisions,
             request_id=state.next_decision_request_id(),
             progress=progress,
             dice_manager=manager,
@@ -947,6 +950,10 @@ def _resolve_deadly_demise_secondary_destroyed_models(
                 ).unit_instance_id,
             ),
         )
+        if destroyed_emission is None:
+            raise GameLifecycleError(
+                "Deadly Demise secondary destruction did not emit destruction evidence."
+            )
         reaction_status = _destruction_reaction_status_if_needed(
             state=state,
             decisions=decisions,
@@ -962,6 +969,10 @@ def _resolve_deadly_demise_secondary_destroyed_models(
             continuation=_deadly_demise_secondary_continuation_payload(
                 attack_context=attack_context,
                 source_damage=source_damage,
+                resolved_secondary_damage_application=secondary_damage,
+                resolved_secondary_model_destroyed_event_id=(
+                    destroyed_emission.model_destroyed_event_id
+                ),
                 saving_throw_payload=saving_throw_payload,
                 feel_no_pain=feel_no_pain,
                 source=source,
@@ -978,6 +989,17 @@ def _resolve_deadly_demise_secondary_destroyed_models(
         )
         if reaction_status is not None:
             return reaction_status
+        _record_deadly_demise_secondary_destruction_finalization(
+            state=state,
+            decisions=decisions,
+            attack_sequence=attack_sequence,
+            attack_context=attack_context,
+            source_damage=source_damage,
+            source=source,
+            secondary_damage=secondary_damage,
+            model_destroyed_event_id=destroyed_emission.model_destroyed_event_id,
+            destroying_player_id=destroyed_model_controller_player_id,
+        )
     return None
 
 
@@ -995,6 +1017,12 @@ def _continue_deadly_demise_after_secondary_destruction_reaction(
     attack_context = _deadly_demise_attack_context_from_source_context(source_context)
     damage = DamageApplication.from_payload(
         cast(DamageApplicationPayload, source_context["damage_application"])
+    )
+    resolved_secondary_damage = DamageApplication.from_payload(
+        cast(
+            DamageApplicationPayload,
+            source_context["resolved_secondary_damage_application"],
+        )
     )
     feel_no_pain = FeelNoPainResolution.from_payload(
         cast(FeelNoPainResolutionPayload, source_context["feel_no_pain"])
@@ -1031,6 +1059,20 @@ def _continue_deadly_demise_after_secondary_destruction_reaction(
     pending_secondary_damage = tuple(
         DamageApplication.from_payload(cast(DamageApplicationPayload, payload))
         for payload in pending_secondary_payloads
+    )
+    _record_deadly_demise_secondary_destruction_finalization(
+        state=state,
+        decisions=decisions,
+        attack_sequence=attack_sequence,
+        attack_context=attack_context,
+        source_damage=damage,
+        source=source,
+        secondary_damage=resolved_secondary_damage,
+        model_destroyed_event_id=_payload_string(
+            source_context,
+            key="resolved_secondary_model_destroyed_event_id",
+        ),
+        destroying_player_id=destroyed_model_controller_player_id,
     )
     status = _resolve_deadly_demise_secondary_destroyed_models(
         state=state,
@@ -1159,6 +1201,8 @@ def _deadly_demise_secondary_continuation_payload(
     *,
     attack_context: AttackResolutionContextPayload,
     source_damage: DamageApplication,
+    resolved_secondary_damage_application: DamageApplication,
+    resolved_secondary_model_destroyed_event_id: str,
     saving_throw_payload: JsonValue,
     feel_no_pain: FeelNoPainResolution,
     source: DestructionReactionSource,
@@ -1176,6 +1220,13 @@ def _deadly_demise_secondary_continuation_payload(
             "continuation_kind": "secondary_destroyed_model_reaction",
             "attack_context": attack_context,
             "damage_application": source_damage.to_payload(),
+            "resolved_secondary_damage_application": (
+                resolved_secondary_damage_application.to_payload()
+            ),
+            "resolved_secondary_model_destroyed_event_id": _validate_identifier(
+                "resolved_secondary_model_destroyed_event_id",
+                resolved_secondary_model_destroyed_event_id,
+            ),
             "saving_throw": validate_json_value(saving_throw_payload),
             "feel_no_pain": feel_no_pain.to_payload(),
             "source": source.to_payload(),

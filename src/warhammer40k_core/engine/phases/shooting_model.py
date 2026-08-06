@@ -108,6 +108,7 @@ class OutOfPhaseShootingStatePayload(TypedDict):
     target_unit_ids: list[str] | None
     grant_effect_ids: list[str]
     attack_pools: list[RangedAttackPoolPayload]
+    pending_completed_attack_sequence: NotRequired[AttackSequencePayload]
     attack_sequence: AttackSequencePayload | None
     allocated_model_ids: list[str]
 
@@ -731,6 +732,7 @@ class OutOfPhaseShootingState:
     target_unit_ids: tuple[str, ...] | None = None
     grant_effect_ids: tuple[str, ...] = ()
     attack_pools: tuple[RangedAttackPool, ...] = ()
+    pending_completed_attack_sequence: AttackSequence | None = None
     attack_sequence: AttackSequence | None = None
     allocated_model_ids: tuple[str, ...] = ()
 
@@ -794,6 +796,18 @@ class OutOfPhaseShootingState:
             ),
         )
         object.__setattr__(self, "attack_pools", _validate_attack_pools(self.attack_pools))
+        if self.pending_completed_attack_sequence is not None:
+            if type(self.pending_completed_attack_sequence) is not AttackSequence:
+                raise GameLifecycleError(
+                    "OutOfPhaseShootingState pending completed sequence must be an AttackSequence."
+                )
+            if self.pending_completed_attack_sequence.attack_pools != self.attack_pools:
+                raise GameLifecycleError("Out-of-phase completed attack sequence pool drift.")
+            if (
+                self.pending_completed_attack_sequence.attacking_unit_instance_id
+                != self.selected_unit_instance_id
+            ):
+                raise GameLifecycleError("Out-of-phase completed attack sequence unit drift.")
         if self.attack_sequence is not None:
             if type(self.attack_sequence) is not AttackSequence:
                 raise GameLifecycleError(
@@ -803,6 +817,10 @@ class OutOfPhaseShootingState:
                 raise GameLifecycleError("Out-of-phase attack_sequence pool drift.")
             if self.attack_sequence.attacking_unit_instance_id != self.selected_unit_instance_id:
                 raise GameLifecycleError("Out-of-phase attack_sequence unit drift.")
+        if self.attack_sequence is not None and self.pending_completed_attack_sequence is not None:
+            raise GameLifecycleError(
+                "Out-of-phase shooting cannot retain active and completed sequences together."
+            )
         object.__setattr__(
             self,
             "allocated_model_ids",
@@ -830,6 +848,7 @@ class OutOfPhaseShootingState:
             target_unit_ids=self.target_unit_ids,
             grant_effect_ids=self.grant_effect_ids,
             attack_pools=attack_pools,
+            pending_completed_attack_sequence=None,
             attack_sequence=attack_sequence,
             allocated_model_ids=self.allocated_model_ids,
         )
@@ -847,6 +866,7 @@ class OutOfPhaseShootingState:
             target_unit_ids=self.target_unit_ids,
             grant_effect_ids=grant_effect_ids,
             attack_pools=self.attack_pools,
+            pending_completed_attack_sequence=self.pending_completed_attack_sequence,
             attack_sequence=self.attack_sequence,
             allocated_model_ids=self.allocated_model_ids,
         )
@@ -869,12 +889,38 @@ class OutOfPhaseShootingState:
             target_unit_ids=self.target_unit_ids,
             grant_effect_ids=self.grant_effect_ids,
             attack_pools=self.attack_pools,
+            pending_completed_attack_sequence=self.pending_completed_attack_sequence,
             attack_sequence=attack_sequence,
             allocated_model_ids=allocated_model_ids,
         )
 
+    def with_pending_completed_attack_sequence(
+        self,
+        attack_sequence: AttackSequence | None,
+    ) -> Self:
+        if attack_sequence is not None and type(attack_sequence) is not AttackSequence:
+            raise GameLifecycleError(
+                "Out-of-phase completed attack sequence update requires sequence."
+            )
+        return type(self)(
+            battle_round=self.battle_round,
+            player_id=self.player_id,
+            parent_phase=self.parent_phase,
+            source_rule_id=self.source_rule_id,
+            source_decision_request_id=self.source_decision_request_id,
+            source_decision_result_id=self.source_decision_result_id,
+            source_context=self.source_context,
+            selected_unit_instance_id=self.selected_unit_instance_id,
+            target_unit_ids=self.target_unit_ids,
+            grant_effect_ids=self.grant_effect_ids,
+            attack_pools=self.attack_pools,
+            pending_completed_attack_sequence=attack_sequence,
+            attack_sequence=self.attack_sequence,
+            allocated_model_ids=self.allocated_model_ids,
+        )
+
     def to_payload(self) -> OutOfPhaseShootingStatePayload:
-        return {
+        payload: OutOfPhaseShootingStatePayload = {
             "battle_round": self.battle_round,
             "player_id": self.player_id,
             "parent_phase": self.parent_phase.value,
@@ -891,6 +937,11 @@ class OutOfPhaseShootingState:
             ),
             "allocated_model_ids": list(self.allocated_model_ids),
         }
+        if self.pending_completed_attack_sequence is not None:
+            payload["pending_completed_attack_sequence"] = (
+                self.pending_completed_attack_sequence.to_payload()
+            )
+        return payload
 
     @classmethod
     def from_payload(cls, payload: OutOfPhaseShootingStatePayload) -> Self:
@@ -908,6 +959,11 @@ class OutOfPhaseShootingState:
             grant_effect_ids=tuple(payload["grant_effect_ids"]),
             attack_pools=tuple(
                 RangedAttackPool.from_payload(pool) for pool in payload["attack_pools"]
+            ),
+            pending_completed_attack_sequence=(
+                None
+                if (completed_payload := payload.get("pending_completed_attack_sequence")) is None
+                else AttackSequence.from_payload(completed_payload)
             ),
             attack_sequence=(
                 None

@@ -79,6 +79,7 @@ from warhammer40k_core.engine.decision_request import (
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_order import (
@@ -86,6 +87,9 @@ from warhammer40k_core.engine.fight_order import (
     FightActivationSelection,
     eligible_fight_contexts_for_player,
     legal_fight_types_for_context,
+)
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
 )
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
@@ -193,6 +197,7 @@ __all__ = (
     "DecisionOption",
     "DecisionRequest",
     "DecisionResult",
+    "DestructionSourceKind",
     "DiceExpression",
     "DiceRollManager",
     "DiceRollSpec",
@@ -216,6 +221,7 @@ __all__ = (
     "Model",
     "MortalWoundApplication",
     "MortalWoundApplicationProgress",
+    "MortalWoundDestructionEvidence",
     "MovementMode",
     "MovementProposalRequest",
     "NotRequired",

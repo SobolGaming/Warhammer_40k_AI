@@ -184,9 +184,18 @@ def _apply_explosives_handler(
             ),
             mortal_wounds=mortal_wounds,
             spill_over=True,
+            destruction_evidence=MortalWoundDestructionEvidence.for_state(
+                state=state,
+                destroying_player_id=use_record.player_id,
+                source_rules_unit_instance_id=_require_target_unit_id(target_binding),
+                destruction_source_kind=DestructionSourceKind.ABILITY,
+                action_phase=use_record.phase,
+                source_step="explosives_mortal_wounds",
+            ),
         )
         routed = continue_mortal_wound_application(
             state=state,
+            decisions=decisions,
             request_id=state.next_decision_request_id(),
             progress=progress,
             dice_manager=manager,
@@ -225,6 +234,7 @@ def apply_explosives_mortal_wound_feel_no_pain_decision(
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=state,
+        decisions=decisions,
         request=request,
         result=result,
         next_request_id=state.next_decision_request_id(),
@@ -633,9 +643,18 @@ def _apply_stratagem_mortal_wounds(
         ),
         mortal_wounds=mortal_wounds,
         spill_over=True,
+        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            state=state,
+            destroying_player_id=use_record.player_id,
+            source_rules_unit_instance_id=None,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=use_record.phase,
+            source_step="stratagem_mortal_wounds",
+        ),
     )
     routed = continue_mortal_wound_application(
         state=state,
+        decisions=decisions,
         request_id=state.next_decision_request_id(),
         progress=progress,
         dice_manager=manager,

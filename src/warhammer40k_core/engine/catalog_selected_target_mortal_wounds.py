@@ -23,8 +23,12 @@ from warhammer40k_core.engine.damage_allocation import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookBinding,
@@ -107,6 +111,9 @@ def resolve_selected_target_mortal_wound_effect(
         unit_instance_id=selected_target_unit_id,
     )
     target_unit_id = selected_target_unit_id if target is None else target.unit_instance_id
+    actor_id = result.actor_id
+    if actor_id is None:
+        raise GameLifecycleError("Selected-target mortal wounds require an acting player.")
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     roll_state = manager.roll(
         DiceRollSpec(
@@ -118,7 +125,7 @@ def resolve_selected_target_mortal_wound_effect(
                 f"Selected-target mortal wounds from {_required_string(record, 'source_rule_id')}"
             ),
             roll_type="catalog.selected_target.mortal_wounds",
-            actor_id=result.actor_id,
+            actor_id=actor_id,
         )
     )
     threshold = _required_int(parameters, "success_threshold")
@@ -170,9 +177,18 @@ def resolve_selected_target_mortal_wound_effect(
         defender_player_id=target_player_id,
         mortal_wounds=mortal_wounds,
         spill_over=True,
+        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            state=state,
+            destroying_player_id=actor_id,
+            source_rules_unit_instance_id=None,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=BattlePhase.SHOOTING,
+            source_step="selected_target_mortal_wounds",
+        ),
     )
     routed = continue_mortal_wound_application(
         state=state,
+        decisions=decisions,
         request_id=state.next_decision_request_id(),
         progress=progress,
         dice_manager=manager,
@@ -224,6 +240,7 @@ def apply_catalog_selected_target_mortal_wound_feel_no_pain_decision(
         raise GameLifecycleError("Selected-target mortal wound source kind drifted.")
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=context.state,
+        decisions=context.decisions,
         request=context.request,
         result=context.result,
         next_request_id=context.state.next_decision_request_id(),

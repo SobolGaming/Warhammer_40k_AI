@@ -21,9 +21,13 @@ from warhammer40k_core.engine.damage_allocation import (
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -650,6 +654,7 @@ def apply_unit_move_completed_mortal_wound_feel_no_pain_decision(
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=state,
+        decisions=decisions,
         request=request,
         result=result,
         next_request_id=state.next_decision_request_id(),
@@ -803,9 +808,18 @@ def _resolve_mortal_wound_effect(
         defender_player_id=effect.target_player_id,
         mortal_wounds=mortal_wounds,
         spill_over=True,
+        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            state=state,
+            destroying_player_id=effect.rolling_player_id,
+            source_rules_unit_instance_id=None,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=completed_phase,
+            source_step="unit_move_completed_mortal_wounds",
+        ),
     )
     routed = continue_mortal_wound_application(
         state=state,
+        decisions=decisions,
         request_id=state.next_decision_request_id(),
         progress=progress,
         dice_manager=manager,

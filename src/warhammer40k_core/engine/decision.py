@@ -64,8 +64,10 @@ _RNG_HISTORY_NEUTRAL_EVENT_TYPES = frozenset(
         "battle_started",
         "timing_window_opened",
         "timing_window_resolved",
+        "mortal_wound_model_destructions_finalized",
     }
 )
+_RNG_HISTORY_NEUTRAL_PAYLOAD_KEYS = frozenset(("destruction_evidence",))
 
 _EVENT_ID_PREFIX = "event-"
 
@@ -87,13 +89,29 @@ def _new_random_move_characteristic_rolls() -> dict[
 
 def _rng_history_token(event: EventRecord, *, neutral_event_count: int) -> str:
     if neutral_event_count == 0:
-        return event.history_token()
+        return _rng_payload_history_token(cast(JsonValue, event.to_payload()))
     history_sequence_number = _event_sequence_number(event.event_id) - neutral_event_count
     if history_sequence_number <= 0:
         raise DecisionError("RNG history-neutral event count exceeds event sequence.")
     payload = event.to_payload()
     payload["event_id"] = f"{_EVENT_ID_PREFIX}{history_sequence_number:06d}"
-    return canonical_json(payload)
+    return _rng_payload_history_token(cast(JsonValue, payload))
+
+
+def _rng_payload_history_token(payload: JsonValue) -> str:
+    return canonical_json(_without_rng_history_neutral_metadata(payload))
+
+
+def _without_rng_history_neutral_metadata(value: JsonValue) -> JsonValue:
+    if isinstance(value, dict):
+        return {
+            key: _without_rng_history_neutral_metadata(item)
+            for key, item in value.items()
+            if key not in _RNG_HISTORY_NEUTRAL_PAYLOAD_KEYS
+        }
+    if isinstance(value, list):
+        return [_without_rng_history_neutral_metadata(item) for item in value]
+    return value
 
 
 def _event_sequence_number(event_id: str) -> int:
@@ -334,7 +352,7 @@ class DiceRollManager:
             result=result,
         )
         self._decision_records.append(record)
-        self.rng.append_history(record.history_token())
+        self.rng.append_history(_rng_payload_history_token(cast(JsonValue, record.to_payload())))
         event = self.event_log.append("decision_recorded", record.to_payload())
         self._append_event_history(event)
         return record
@@ -354,7 +372,7 @@ class DiceRollManager:
             permission=permission,
         )
         event = self.event_log.append("decision_requested", request.to_payload())
-        self.rng.append_history(request.history_token())
+        self.rng.append_history(_rng_payload_history_token(cast(JsonValue, request.to_payload())))
         self._append_event_history(event)
         return request
 
@@ -559,7 +577,9 @@ class DiceRollManager:
             if event.event_type == "decision_requested":
                 request = DecisionRequest.from_payload(cast(DecisionRequestPayload, event.payload))
                 self._decision_request_counter += 1
-                self.rng.append_history(request.history_token())
+                self.rng.append_history(
+                    _rng_payload_history_token(cast(JsonValue, request.to_payload()))
+                )
                 self.rng.append_history(event_history_token)
                 continue
 
@@ -569,7 +589,9 @@ class DiceRollManager:
                 if record.record_id != expected_record_id:
                     raise DecisionError("Decision records must be sequential.")
                 self._decision_records.append(record)
-                self.rng.append_history(record.history_token())
+                self.rng.append_history(
+                    _rng_payload_history_token(cast(JsonValue, record.to_payload()))
+                )
                 self.rng.append_history(event_history_token)
                 continue
 

@@ -340,6 +340,12 @@ class ShootingPhaseHandler:
         out_of_phase_state = state.out_of_phase_shooting_state
         if out_of_phase_state is None:
             return None
+        if out_of_phase_state.pending_completed_attack_sequence is not None:
+            return self._resolve_completed_out_of_phase_shooting_continuation(
+                state=state,
+                decisions=decisions,
+                completed_sequence=out_of_phase_state.pending_completed_attack_sequence,
+            )
         if out_of_phase_state.attack_sequence is None:
             if out_of_phase_state.attack_pools:
                 return _complete_out_of_phase_shooting(
@@ -367,22 +373,54 @@ class ShootingPhaseHandler:
             return status
         if completed_state.attack_sequence is not None:
             raise GameLifecycleError("Out-of-phase shooting completion state drift.")
+        completed_state = completed_state.with_pending_completed_attack_sequence(
+            completed_candidate
+        )
+        state.replace_out_of_phase_shooting_state(completed_state)
+        return self._resolve_completed_out_of_phase_shooting_continuation(
+            state=state,
+            decisions=decisions,
+            completed_sequence=completed_candidate,
+        )
+
+    def _resolve_completed_out_of_phase_shooting_continuation(
+        self,
+        *,
+        state: GameState,
+        decisions: DecisionController,
+        completed_sequence: AttackSequence,
+    ) -> LifecycleStatus | None:
+        if type(completed_sequence) is not AttackSequence:
+            raise GameLifecycleError(
+                "Out-of-phase shooting completion continuation requires AttackSequence."
+            )
+        out_of_phase_state = state.out_of_phase_shooting_state
+        if out_of_phase_state is None:
+            raise GameLifecycleError("Out-of-phase shooting completion requires state.")
+        if out_of_phase_state.pending_completed_attack_sequence != completed_sequence:
+            raise GameLifecycleError("Out-of-phase completed attack sequence continuation drift.")
         completion_hook_status = self.attack_sequence_completed_hooks.resolve_completed_sequence(
             AttackSequenceCompletedContext(
                 state=state,
                 decisions=decisions,
                 dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
                 runtime_modifier_registry=self.runtime_modifier_registry,
-                source_phase=completed_candidate.source_phase,
-                attack_sequence=completed_candidate,
+                source_phase=completed_sequence.source_phase,
+                attack_sequence=completed_sequence,
                 attack_sequence_completed_event_id=attack_sequence_completed_event_id(
                     decisions=decisions,
-                    attack_sequence=completed_candidate,
+                    attack_sequence=completed_sequence,
                 ),
             )
         )
         if completion_hook_status is not None:
             return completion_hook_status
+        _aur.reconcile_after_attack_sequence(state, decisions.event_log, completed_sequence)
+        out_of_phase_state = state.out_of_phase_shooting_state
+        if out_of_phase_state is None:
+            raise GameLifecycleError("Out-of-phase shooting state disappeared during completion.")
+        completed_state = out_of_phase_state.with_pending_completed_attack_sequence(None)
+        state.replace_out_of_phase_shooting_state(completed_state)
         return _complete_out_of_phase_shooting(
             state=state,
             decisions=decisions,

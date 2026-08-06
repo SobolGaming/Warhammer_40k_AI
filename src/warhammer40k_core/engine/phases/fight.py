@@ -15,7 +15,6 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine import attached_unit_reconciliation as _aur
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
@@ -36,16 +35,13 @@ from warhammer40k_core.engine.attack_sequence import (
     build_select_resolve_target_unit_request,
     gathered_attack_groups_for_target,
     is_destroyed_transport_disembark_proposal_request,
-    resolve_attack_sequence_until_blocked,
     selected_attack_weapon_group_from_result,
     selected_resolve_target_from_result,
     unresolved_target_unit_ids,
     validate_psychic_attack_modifier_ignore_decision,
 )
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
-    AttackSequenceCompletedContext,
     AttackSequenceCompletedHookRegistry,
-    attack_sequence_completed_event_id,
 )
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, PlacementError
@@ -87,6 +83,10 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     build_fight_activation_ability_request,
     fight_activation_ability_use_from_result,
     is_fight_activation_ability_decline_payload,
+)
+from warhammer40k_core.engine.fight_attack_completion import (
+    advance_fight_attack_sequence_until_completion,
+    continue_completed_fight_attack_sequence,
 )
 from warhammer40k_core.engine.fight_eligibility_queries import (
     unit_was_eligible_to_fight_this_phase,
@@ -534,6 +534,15 @@ def _advance_fight_phase_body(
     policy: FightPolicyDescriptor,
 ) -> LifecycleStatus | None:
     fight_state = _require_fight_state(state)
+    if fight_state.pending_completed_attack_sequence is not None:
+        return _resolve_completed_fight_attack_sequence_continuation(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            policy=policy,
+            completed_sequence=fight_state.pending_completed_attack_sequence,
+        )
     if fight_state.attack_sequence is not None:
         return _advance_fight_attack_sequence(
             handler=handler,
@@ -624,64 +633,52 @@ def _advance_fight_attack_sequence(
     reaction_queue: ReactionQueue | None,
     policy: FightPolicyDescriptor,
 ) -> LifecycleStatus | None:
-    fight_state = _require_fight_state(state)
-    if fight_state.attack_sequence is None:
-        raise GameLifecycleError("Fight attack sequence advance requires attack_sequence.")
-    attack_sequence, allocated_model_ids, status = resolve_attack_sequence_until_blocked(
+    continuation = advance_fight_attack_sequence_until_completion(
         state=state,
         decisions=decisions,
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
-        attack_sequence=fight_state.attack_sequence,
-        already_allocated_model_ids=fight_state.allocated_model_ids_this_phase,
         stratagem_index=handler.stratagem_index,
+        hooks=handler.attack_sequence_completed_hooks,
         runtime_modifier_registry=handler.runtime_modifier_registry,
     )
-    updated_state = fight_state.with_attack_sequence_update(
-        attack_sequence=attack_sequence,
-        allocated_model_ids_this_phase=allocated_model_ids,
-    )
-    state.replace_fight_phase_state(updated_state)
-    if status is not None:
-        return status
-    activation = updated_state.active_activation
-    if activation is None:
-        raise GameLifecycleError("Completed melee attack sequence has no active activation.")
-    completion_hook_status = handler.attack_sequence_completed_hooks.resolve_completed_sequence(
-        AttackSequenceCompletedContext(
-            state=state,
-            decisions=decisions,
-            dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
-            runtime_modifier_registry=handler.runtime_modifier_registry,
-            source_phase=BattlePhase.FIGHT,
-            attack_sequence=fight_state.attack_sequence,
-            attack_sequence_completed_event_id=attack_sequence_completed_event_id(
-                decisions=decisions,
-                attack_sequence=fight_state.attack_sequence,
-            ),
-        )
-    )
-    if completion_hook_status is not None:
-        return completion_hook_status
-    _aur.reconcile_after_attack_sequence(state, decisions.event_log, fight_state.attack_sequence)
-    decisions.event_log.append(
-        "melee_attack_sequence_completed",
-        validate_json_value(
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "phase": BattlePhase.FIGHT.value,
-                "phase_body_status": "melee_attack_sequence_completed",
-                "activation_selection": activation.to_payload(),
-            }
-        ),
-    )
+    if isinstance(continuation, LifecycleStatus):
+        return continuation
     return _complete_active_fight_activation(
         handler=handler,
         state=state,
         decisions=decisions,
         reaction_queue=reaction_queue,
         policy=policy,
-        activation=activation,
+        activation=continuation,
+        unit_attacked=True,
+    )
+
+
+def _resolve_completed_fight_attack_sequence_continuation(
+    *,
+    handler: FightPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    reaction_queue: ReactionQueue | None,
+    policy: FightPolicyDescriptor,
+    completed_sequence: AttackSequence,
+) -> LifecycleStatus | None:
+    continuation = continue_completed_fight_attack_sequence(
+        state=state,
+        decisions=decisions,
+        hooks=handler.attack_sequence_completed_hooks,
+        runtime_modifier_registry=handler.runtime_modifier_registry,
+        completed_sequence=completed_sequence,
+    )
+    if isinstance(continuation, LifecycleStatus):
+        return continuation
+    return _complete_active_fight_activation(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        reaction_queue=reaction_queue,
+        policy=policy,
+        activation=continuation,
         unit_attacked=True,
     )
 
