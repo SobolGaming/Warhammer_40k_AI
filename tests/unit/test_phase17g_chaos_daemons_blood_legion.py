@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from collections.abc import Callable
 from dataclasses import replace
 from typing import cast
@@ -21,11 +22,23 @@ from tests.phase11c_command_phase_helpers import (
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attachment_eligibility import (
+    AttachmentEligibility,
+    AttachmentRole,
+    AttachmentTargetEligibility,
+)
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
-from warhammer40k_core.core.detachment import DetachmentDefinition
+from warhammer40k_core.core.detachment import DetachmentDefinition, EnhancementDefinition
 from warhammer40k_core.core.faction import FactionDefinition
+from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    ArmyMusterRequest,
+    EnhancementAssignment,
+    muster_army,
+    validate_roster_legality,
+)
 from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
@@ -40,6 +53,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.blood_legion import (  # noqa: E501
+    enhancements,
     rule,
 )
 from warhammer40k_core.engine.game_state import (
@@ -50,6 +64,7 @@ from warhammer40k_core.engine.game_state import (
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
 )
@@ -77,6 +92,7 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.runtime_modifiers import ChargeRollModifierContext
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
 )
@@ -86,14 +102,20 @@ from warhammer40k_core.engine.wargear_selections import (
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, parameter_payload
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
+    faction_rule_ir_promotion_2026_07,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
     Phase17ECoverageKind,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
     Phase17FExecutionRecord,
+    Phase17FExecutionStatus,
 )
 
 _BLOOD_LEGION_DATASHEET_ID = "phase17g-blood-legion-khorne-daemon"
@@ -102,6 +124,7 @@ _BLOOD_UNIT_ID = "army-alpha:blood-daemon-unit"
 _OTHER_FRIENDLY_UNIT_ID = "army-alpha:non-khorne-daemon-unit"
 _ENEMY_UNIT_ID = "army-beta:enemy-unit"
 _OTHER_DAEMON_DETACHMENT_ID = "warptide"
+_BRAZENMAW_ATTACHED_UNIT_ID = "attached-unit:army-alpha:non-khorne-daemon-unit"
 
 
 def test_blood_legion_runtime_hooks_materialize_only_for_selected_detachment() -> None:
@@ -124,6 +147,128 @@ def test_blood_legion_runtime_hooks_materialize_only_for_selected_detachment() -
 
     assert rule.MURDERCALL_HOOK_ID not in other_summary["movement_end_surge_hook_ids"]
     assert rule.BLOOD_TAINTED_HOOK_ID not in other_summary["phase_end_objective_control_hook_ids"]
+
+
+def test_brazenmaw_is_exact_source_backed_executable_generic_rule_ir() -> None:
+    rule_ir = faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id(
+        enhancements.BRAZENMAW_DESCRIPTOR_ID
+    )
+    record = _brazenmaw_execution_record()
+
+    assert rule_ir.is_supported
+    assert rule_ir.source_id == (
+        f"{blood_legion_ir.SOURCE_PACKAGE_ID}:{blood_legion_ir.BRAZENMAW_DESCRIPTOR_ID}:source-text"
+    )
+    assert rule_ir.normalized_text == (
+        "Legiones Daemonica Khorne model only. Add 2 to Charge rolls made for the bearer's unit."
+    )
+    assert not rule_ir.diagnostics
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.execution_id == enhancements.BRAZENMAW_SOURCE_RULE_ID
+    assert record.rule_ir_hash == rule_ir.ir_hash()
+    modifier_effect = next(
+        effect
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.MODIFY_DICE_ROLL
+    )
+    assert parameter_payload(modifier_effect.parameters) == {
+        "delta": 2,
+        "roll_type": "charge",
+    }
+
+
+def test_brazenmaw_assignment_applies_charge_modifier_and_replays() -> None:
+    config = _blood_legion_config(
+        game_id="phase17g-brazenmaw-game",
+        include_other_friendly_unit=True,
+        brazenmaw_target_unit_selection_id="blood-daemon-unit",
+    )
+    lifecycle = _blood_legion_enhancement_lifecycle(config)
+    state = _started_state(lifecycle)
+    bundle = _runtime_content_bundle(lifecycle)
+
+    assert enhancements.BRAZENMAW_SOURCE_RULE_ID in bundle.activation.selected_execution_record_ids
+    source_rule_id = (
+        f"{blood_legion_ir.SOURCE_PACKAGE_ID}:{blood_legion_ir.BRAZENMAW_DESCRIPTOR_ID}:source-text"
+    )
+    persisting_effect = next(
+        effect
+        for effect in state.persisting_effects_for_unit(_BLOOD_UNIT_ID)
+        if effect.source_rule_id == source_rule_id
+    )
+    (modifier,) = _charge_roll_modifiers(
+        bundle,
+        state=state,
+        unit_instance_id=_BLOOD_UNIT_ID,
+    )
+    assert type(modifier) is RollModifier
+    assert modifier.modifier_id == persisting_effect.effect_id
+    assert modifier.operand == 2
+    assert modifier.source_id is not None
+    assert modifier.source_id.startswith(f"{source_rule_id}:")
+    assert modifier.source_id.endswith(":modify_dice_roll")
+    assert not _charge_roll_modifiers(
+        bundle,
+        state=state,
+        unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
+    )
+    event_payload = _event_payload(lifecycle.decision_controller, "enhancement_effects_applied")
+    assert "object at 0x" not in json.dumps(event_payload, sort_keys=True)
+
+    payload = lifecycle.to_payload()
+    rebuilt = GameLifecycle.from_payload(payload)
+
+    assert rebuilt.to_payload() == payload
+    assert _charge_roll_operands(
+        _runtime_content_bundle(rebuilt),
+        state=_started_state(rebuilt),
+        unit_instance_id=_BLOOD_UNIT_ID,
+    ) == (2,)
+
+
+def test_brazenmaw_follows_bearer_into_attached_rules_unit_without_duplication() -> None:
+    config = _blood_legion_config(
+        game_id="phase17g-brazenmaw-attached-game",
+        brazenmaw_target_unit_selection_id="blood-daemon-unit",
+        attach_brazenmaw_bearer=True,
+    )
+    lifecycle = _blood_legion_enhancement_lifecycle(config)
+    state = _started_state(lifecycle)
+    bundle = _runtime_content_bundle(lifecycle)
+
+    assert _charge_roll_operands(
+        bundle,
+        state=state,
+        unit_instance_id=_BRAZENMAW_ATTACHED_UNIT_ID,
+    ) == (2,)
+    assert _charge_roll_operands(
+        bundle,
+        state=state,
+        unit_instance_id=_BLOOD_UNIT_ID,
+    ) == (2,)
+    assert _charge_roll_operands(
+        bundle,
+        state=state,
+        unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
+    ) == (2,)
+
+
+def test_brazenmaw_eligibility_rejects_non_khorne_bearer() -> None:
+    config = _blood_legion_config(
+        game_id="phase17g-brazenmaw-invalid-bearer",
+        include_other_friendly_unit=True,
+        brazenmaw_target_unit_selection_id="non-khorne-daemon-unit",
+    )
+
+    report = validate_roster_legality(
+        catalog=config.army_catalog,
+        request=config.army_muster_requests[0],
+    )
+
+    assert "enhancement_target_keyword_required" in {
+        violation.violation_code for violation in report.violations
+    }
 
 
 def test_murdercall_triggers_after_enemy_move_and_resolves_surge_proposal() -> None:
@@ -338,12 +483,25 @@ def _blood_legion_rule_execution_record() -> Phase17FExecutionRecord:
     return records[0]
 
 
+def _brazenmaw_execution_record() -> Phase17FExecutionRecord:
+    records = tuple(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.coverage_descriptor_id == enhancements.BRAZENMAW_DESCRIPTOR_ID
+    )
+    if len(records) != 1:
+        raise AssertionError("expected one Brazenmaw execution record")
+    return records[0]
+
+
 def _blood_legion_config(
     *,
     game_id: str = "phase17g-blood-legion-game",
     daemon_detachment_id: str = rule.BLOOD_LEGION_DETACHMENT_ID,
     turn_order: tuple[str, str] = ("player-a", "player-b"),
     include_other_friendly_unit: bool = False,
+    brazenmaw_target_unit_selection_id: str | None = None,
+    attach_brazenmaw_bearer: bool = False,
 ) -> GameConfig:
     catalog = _blood_legion_catalog()
     return GameConfig(
@@ -368,8 +526,10 @@ def _blood_legion_config(
                         _BLOOD_LEGION_NON_KHORNE_DATASHEET_ID,
                     ),
                 )
-                if include_other_friendly_unit
+                if include_other_friendly_unit or attach_brazenmaw_bearer
                 else (),
+                brazenmaw_target_unit_selection_id=brazenmaw_target_unit_selection_id,
+                attach_brazenmaw_bearer=attach_brazenmaw_bearer,
             ),
             _army_muster_request(
                 catalog=catalog,
@@ -421,6 +581,7 @@ def _blood_legion_catalog() -> ArmyCatalog:
                     _BLOOD_LEGION_NON_KHORNE_DATASHEET_ID,
                 ),
                 force_disposition_ids=("phase17g-force",),
+                enhancement_ids=(blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID,),
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:blood-legion",
                 ),
@@ -437,6 +598,17 @@ def _blood_legion_catalog() -> ArmyCatalog:
                 ),
             ),
         ),
+        enhancements=(
+            *base_catalog.enhancements,
+            EnhancementDefinition(
+                enhancement_id=blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID,
+                name="Brazenmaw",
+                source_id=blood_legion_ir.BRAZENMAW_DESCRIPTOR_ID,
+                points=15,
+                target_required_keywords=(blood_legion_ir.KHORNE_KEYWORD,),
+                target_required_faction_keywords=(blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,),
+            ),
+        ),
     )
 
 
@@ -446,10 +618,20 @@ def _blood_legion_datasheet(base_datasheet: DatasheetDefinition) -> DatasheetDef
         datasheet_id=_BLOOD_LEGION_DATASHEET_ID,
         name="Blood Legion Khorne Daemon",
         keywords=DatasheetKeywordSet(
-            keywords=("Infantry", "Khorne"),
+            keywords=("Character", "Infantry", "Khorne"),
             faction_keywords=("Legiones Daemonica",),
         ),
-        attachment_eligibilities=(),
+        attachment_eligibilities=(
+            AttachmentEligibility(
+                role=AttachmentRole.LEADER,
+                targets=(
+                    AttachmentTargetEligibility(
+                        bodyguard_datasheet_id=_BLOOD_LEGION_NON_KHORNE_DATASHEET_ID,
+                        source_ids=("phase17g:test:blood-legion:leader-eligibility",),
+                    ),
+                ),
+            ),
+        ),
         source_ids=("phase17g:test:chaos-daemons:blood-legion-khorne-daemon",),
     )
 
@@ -462,7 +644,7 @@ def _blood_legion_non_khorne_datasheet(
         datasheet_id=_BLOOD_LEGION_NON_KHORNE_DATASHEET_ID,
         name="Blood Legion Non-Khorne Daemon",
         keywords=DatasheetKeywordSet(
-            keywords=("Infantry", "Tzeentch"),
+            keywords=("Character", "Infantry", "Tzeentch"),
             faction_keywords=("Legiones Daemonica",),
         ),
         attachment_eligibilities=(),
@@ -480,6 +662,8 @@ def _army_muster_request(
     unit_selection_id: str,
     datasheet_id: str,
     extra_unit_selections: tuple[tuple[str, str], ...] = (),
+    brazenmaw_target_unit_selection_id: str | None = None,
+    attach_brazenmaw_bearer: bool = False,
 ) -> ArmyMusterRequest:
     unit_selections = [
         _unit_muster_selection(
@@ -503,11 +687,40 @@ def _army_muster_request(
         detachment_selection=DetachmentSelection(
             faction_id=faction_id,
             detachment_ids=(detachment_id,),
+            enhancement_ids=(
+                (blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID,)
+                if brazenmaw_target_unit_selection_id is not None
+                else ()
+            ),
         ),
         force_disposition_id=(
             "purge-the-foe" if faction_id == "core-marine-force" else "phase17g-force"
         ),
         unit_selections=tuple(unit_selections),
+        attachment_declarations=(
+            (
+                AttachmentDeclaration(
+                    source_unit_selection_id="blood-daemon-unit",
+                    bodyguard_unit_selection_id="non-khorne-daemon-unit",
+                ),
+            )
+            if attach_brazenmaw_bearer
+            else ()
+        ),
+        enhancement_assignments=(
+            (
+                EnhancementAssignment(
+                    enhancement_id=blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID,
+                    target_unit_selection_id=brazenmaw_target_unit_selection_id,
+                    source_id=(
+                        "phase17g:test:blood-legion:brazenmaw-assignment:"
+                        f"{brazenmaw_target_unit_selection_id}"
+                    ),
+                ),
+            )
+            if brazenmaw_target_unit_selection_id is not None
+            else ()
+        ),
     )
 
 
@@ -568,6 +781,51 @@ def _battle_ready_state(
         raise AssertionError("Blood Legion test fixture should not require battle formation input")
     complete_setup_through_gate(state=state, config=config)
     return state
+
+
+def _blood_legion_enhancement_lifecycle(config: GameConfig) -> GameLifecycle:
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    _battle_ready_state(lifecycle=lifecycle, config=config)
+    return GameLifecycle.from_payload(lifecycle.to_payload())
+
+
+def _started_state(lifecycle: GameLifecycle) -> GameState:
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("lifecycle must be started")
+    return state
+
+
+def _charge_roll_modifiers(
+    bundle: RuntimeContentBundle,
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> tuple[RollModifier, ...]:
+    return bundle.runtime_modifier_registry.charge_roll_modifiers(
+        ChargeRollModifierContext(
+            state=state,
+            unit_instance_id=unit_instance_id,
+            current_roll_modifiers=(),
+        )
+    )
+
+
+def _charge_roll_operands(
+    bundle: RuntimeContentBundle,
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> tuple[int, ...]:
+    return tuple(
+        modifier.operand
+        for modifier in _charge_roll_modifiers(
+            bundle,
+            state=state,
+            unit_instance_id=unit_instance_id,
+        )
+    )
 
 
 def _mustered_armies(config: GameConfig) -> tuple[ArmyDefinition, ...]:
