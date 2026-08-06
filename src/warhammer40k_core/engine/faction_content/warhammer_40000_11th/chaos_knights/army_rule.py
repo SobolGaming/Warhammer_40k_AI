@@ -25,6 +25,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
@@ -38,6 +39,9 @@ from warhammer40k_core.engine.faction_content.common import (
     payload_object as _payload_object,
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
 from warhammer40k_core.engine.runtime_modifiers import (
     HitRollModifierBinding,
@@ -608,8 +612,27 @@ def _apply_delirium_mortal_wounds(
             ),
         )
         return
+    source_context = validate_json_value(
+        {
+            "battle_shock_result": context.result.to_payload(),
+            "d3_result": d3_result.to_payload(),
+            "target_unit_instance_id": target_unit.unit_instance_id,
+        }
+    )
     application = apply_mortal_wounds_to_unit(
         state=context.state,
+        decisions=context.decisions,
+        application_id=(f"{context.result.result_id}:delirium:{target_unit.unit_instance_id}"),
+        source_rule_id=SOURCE_RULE_ID,
+        source_context=source_context,
+        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            state=context.state,
+            destroying_player_id=chaos_knights_player_id,
+            source_rules_unit_instance_id=None,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=context.phase,
+            source_step="delirium_mortal_wounds",
+        ),
         target_unit_instance_id=target_unit.unit_instance_id,
         mortal_wounds=d3_result.value,
         spill_over=True,

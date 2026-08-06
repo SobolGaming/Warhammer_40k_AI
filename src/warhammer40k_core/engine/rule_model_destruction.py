@@ -76,6 +76,7 @@ if TYPE_CHECKING:
 
 
 RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND = "rule_model_destruction_deadly_demise"
+RULE_MODEL_DESTRUCTION_FINALIZED_EVENT = "rule_model_destruction_finalized"
 
 
 @dataclass(frozen=True, slots=True)
@@ -273,6 +274,7 @@ def apply_rule_model_destruction_mortal_wound_decision(
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=state,
+        decisions=decisions,
         request=request,
         result=result,
         next_request_id=state.next_decision_request_id(),
@@ -391,6 +393,30 @@ def finalize_rule_model_destruction(
         decisions.event_log.append(
             _payload_string(context, "completion_event_type"),
             validate_json_value(completion_payload),
+        )
+    model_destroyed_event_id = _payload_string(context, "model_destroyed_event_id")
+    if not any(
+        record.event_type == RULE_MODEL_DESTRUCTION_FINALIZED_EVENT
+        and isinstance(record.payload, dict)
+        and record.payload.get("model_destroyed_event_id") == model_destroyed_event_id
+        for record in decisions.event_log.records
+    ):
+        decisions.event_log.append(
+            RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
+            validate_json_value(
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "phase": _payload_string(context, "phase"),
+                    "model_destroyed_event_id": model_destroyed_event_id,
+                    "model_instance_id": _payload_string(context, "model_instance_id"),
+                    "physical_unit_instance_id": _payload_string(
+                        context, "target_unit_instance_id"
+                    ),
+                    "rules_unit_instance_id": rules_unit_id,
+                    "completion_kind": completion_kind,
+                }
+            ),
         )
     continuation = context.get("completion_continuation")
     if continuation is None or not resume_completion_continuation:
@@ -514,9 +540,11 @@ def _route_rule_deadly_demise_targets(
             defender_player_id=unit_owner_player_id(state=state, unit_instance_id=target_unit_id),
             mortal_wounds=mortal_wounds,
             spill_over=True,
+            destruction_evidence=None,
         )
         routed = continue_mortal_wound_application(
             state=state,
+            decisions=decisions,
             request_id=state.next_decision_request_id(),
             progress=progress,
             dice_manager=manager,

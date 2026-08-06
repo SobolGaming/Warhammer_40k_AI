@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
@@ -14,6 +15,9 @@ from warhammer40k_core.engine.catalog_battle_shock_runtime import (
 )
 from warhammer40k_core.engine.catalog_fight_end_triggered_movement_runtime import (
     catalog_fight_end_triggered_movement_hook_bindings,
+)
+from warhammer40k_core.engine.catalog_model_materialization_runtime import (
+    CatalogModelMaterializationRuntime,
 )
 from warhammer40k_core.engine.catalog_movement_end_reactive_normal_move_runtime import (
     catalog_movement_end_reactive_normal_move_hook_bindings,
@@ -264,10 +268,18 @@ def attack_sequence_completed_hook_bindings(
     *,
     ability_indexes_by_player_id: Mapping[str, AbilityCatalogIndex],
     armies: tuple[ArmyDefinition, ...],
+    army_catalog: ArmyCatalog,
 ) -> tuple[AttackSequenceCompletedHookBinding, ...]:
-    return catalog_selected_target_attack_sequence_completed_hook_bindings(
-        ability_indexes_by_player_id=ability_indexes_by_player_id,
-        armies=armies,
+    return (
+        *catalog_selected_target_attack_sequence_completed_hook_bindings(
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            armies=armies,
+        ),
+        *CatalogModelMaterializationRuntime(
+            ability_indexes_by_player_id=ability_indexes_by_player_id,
+            armies=armies,
+            army_catalog=army_catalog,
+        ).bindings(),
     )
 
 

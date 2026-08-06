@@ -28,6 +28,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponKeyword,
     WeaponProfile,
 )
+from warhammer40k_core.engine import attached_unit_reconciliation as _aur
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
 from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
@@ -245,6 +246,7 @@ if TYPE_CHECKING:
     )
 
 __all__ = (
+    "_aur",
     "ASSAULT_RULE_ID",
     "ATTACK_ALLOCATION_DECISION_TYPES",
     "ATTACK_RESOLUTION_SELECTION_DECISION_TYPES",

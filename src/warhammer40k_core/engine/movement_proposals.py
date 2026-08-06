@@ -58,6 +58,7 @@ class ProposalKind(StrEnum):
     DISEMBARK = "disembark_placement"
     CULT_AMBUSH = "cult_ambush_placement"
     HEALING_REVIVAL = "healing_revival_placement"
+    MODEL_MATERIALIZATION = "model_materialization_placement"
 
 
 class ProposalViolationPayload(TypedDict):

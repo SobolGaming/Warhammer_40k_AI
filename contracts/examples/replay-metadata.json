@@ -4371,8 +4371,10 @@
       "attack_sequence_completed_hook_ids": [],
       "battle_formation_hook_ids": [],
       "battle_round_start_hook_ids": [],
-      "battle_shock_hook_ids": [],
-      "bundle_summary_hash": "ee09ebbad95e8aebd0d7f08c591d48a7e08bff51f1230389792a0ca5be220163",
+      "battle_shock_hook_ids": [
+        "catalog-ir:selected-target-test-roll-modifier"
+      ],
+      "bundle_summary_hash": "bc16a735df47c4cadecc9fedadee4c091a99eb6a0e3e0e2cb86243487d66e93e",
       "charge_declaration_hook_ids": [],
       "charge_roll_modifier_ids": [],
       "charge_target_restriction_hook_ids": [],

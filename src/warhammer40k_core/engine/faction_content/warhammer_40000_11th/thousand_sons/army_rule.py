@@ -35,6 +35,7 @@ from warhammer40k_core.engine.damage_allocation import (
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
@@ -57,6 +58,9 @@ from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.lone_operative import (
     lone_operative_profile_for_rules_unit,
     lone_operative_target_allowed,
+)
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
@@ -347,6 +351,7 @@ def apply_cabal_mortal_wound_feel_no_pain_decision(
         raise GameLifecycleError("Cabal of Sorcerers FNP continuation requires context.")
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=context.state,
+        decisions=context.decisions,
         request=context.request,
         result=context.result,
         next_request_id=context.state.next_decision_request_id(),
@@ -450,9 +455,20 @@ def _resolve_cabal_ritual_attempt(
             defender_player_id=player_id,
             mortal_wounds=d3_result.value,
             spill_over=True,
+            destruction_evidence=MortalWoundDestructionEvidence.for_state(
+                state=context.state,
+                destroying_player_id=player_id,
+                source_rules_unit_instance_id=(
+                    option.manifesting_model.rules_unit.unit_instance_id
+                ),
+                destruction_source_kind=DestructionSourceKind.ABILITY,
+                action_phase=BattlePhase.SHOOTING,
+                source_step="psychic_test_perils",
+            ),
         )
         routed = continue_mortal_wound_application(
             state=context.state,
+            decisions=context.decisions,
             request_id=context.state.next_decision_request_id(),
             progress=progress,
             dice_manager=dice_manager,
@@ -805,9 +821,18 @@ def _resolve_doombolt(
         defender_player_id=_payload_string(resolution_payload, key="target_owner_player_id"),
         mortal_wounds=mortal_wounds,
         spill_over=True,
+        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            state=state,
+            destroying_player_id=_payload_string(resolution_payload, key="player_id"),
+            source_rules_unit_instance_id=None,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=BattlePhase.SHOOTING,
+            source_step="doombolt_mortal_wounds",
+        ),
     )
     routed = continue_mortal_wound_application(
         state=state,
+        decisions=decisions,
         request_id=state.next_decision_request_id(),
         progress=progress,
         dice_manager=dice_manager,

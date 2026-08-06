@@ -33,6 +33,13 @@ BELAKOR_SHADOW_LORD_ROW_ID = "000001148:10"
 DAEMON_PRINCE_ROW_IDS = tuple(f"000001149:{line}" for line in range(4, 12))
 WINGED_DAEMON_PRINCE_ROW_IDS = tuple(f"000002758:{line}" for line in range(4, 11))
 SOUL_GRINDER_ALLEGIANCE_ROW_ID = "000001151:5"
+HORROR_SPLIT_ROW_IDS = (
+    "000002583:4",
+    "000002584:5",
+    "000004127:3",
+    "000004128:4",
+)
+HORROR_DATASHEET_HANDOFF_ROW_IDS = ("000002584:6", "000004127:6")
 
 BELAKOR_DARK_MASTER_SOURCE_ID = f"{SOURCE_PACKAGE_ID}:datasheet:{BELAKOR_DARK_MASTER_ROW_ID}"
 BELAKOR_SHADOW_FORM_SOURCE_ID = f"{SOURCE_PACKAGE_ID}:datasheet:{BELAKOR_SHADOW_FORM_ROW_ID}"
@@ -75,6 +82,23 @@ _PALL_OF_DESPAIR_TEXT = (
 _SHADOW_LORD_TEXT = (
     'While a friendly Legiones Daemonica or Shadow Legion unit is within 6" of this model, each '
     "time a model in that unit makes an attack, re-roll a Hit roll of 1."
+)
+_BLUE_HORRORS_SPLIT_TEXT = (
+    "Each time a BLUE HORROR model in this unit is destroyed, after the attacking unit has "
+    "finished making its attacks, if this unit is not destroyed, roll one D6 for that model. "
+    "On a 4+, add one BRIMSTONE HORROR model to this unit."
+)
+_PINK_HORRORS_SPLIT_TEXT = (
+    "Each time a PINK HORROR or BLUE HORROR model in this unit is destroyed, after the "
+    "attacking unit has finished making its attacks, if this unit is not destroyed, roll "
+    "one D6 for that model. On a 4+, if it was a PINK HORROR, add two BLUE HORROR models "
+    "to this unit, and if it was a BLUE HORROR, add one BRIMSTONE HORROR model to this unit."
+)
+_HORRORS_DATASHEET_HANDOFF_TEXT = (
+    "If, at any point, this unit contains no PINK HORROR models, use the BLUE HORRORS "
+    "datasheet for this unit.\nDesigner's Note: While this unit contains one or more PINK "
+    "HORROR models, the Sullen Malevolence and Exploding Horrors abilities from the BLUE "
+    "HORRORS datasheet do not apply to this unit."
 )
 
 _RULE_TEXT_BY_SOURCE_ROW_ID = {
@@ -791,6 +815,231 @@ def _daemon_prince_characteristic_payloads() -> dict[str, RuleIRPayload]:
     return rows
 
 
+def _horror_split_clause(
+    *,
+    clause_id: str,
+    text: str,
+    destroyed_model_profile_id: str,
+    result_model_profile_id: str,
+    result_model_name: str,
+    result_wargear_ids: tuple[str, ...],
+    result_count: int,
+    result_materialization_descriptor_id: str,
+    result_base_size_datasheet_id: str,
+    required_materialization_descriptor_id: str | None = None,
+    excluded_materialization_descriptor_ids: tuple[str, ...] = (),
+) -> RuleClause:
+    effect_parameters = [
+        _parameter("destroyed_model_profile_ids", (destroyed_model_profile_id,)),
+        _parameter("result_model_profile_id", result_model_profile_id),
+        _parameter("result_model_name", result_model_name),
+        _parameter("result_wargear_ids", result_wargear_ids),
+        _parameter("result_count", result_count),
+        _parameter(
+            "result_materialization_descriptor_id",
+            result_materialization_descriptor_id,
+        ),
+        _parameter("result_base_size_datasheet_id", result_base_size_datasheet_id),
+        _parameter("placement_trigger_kind", "model_placed_on_battlefield"),
+    ]
+    if required_materialization_descriptor_id is not None:
+        effect_parameters.append(
+            _parameter(
+                "required_materialization_descriptor_id",
+                required_materialization_descriptor_id,
+            )
+        )
+    if excluded_materialization_descriptor_ids:
+        effect_parameters.append(
+            _parameter(
+                "excluded_materialization_descriptor_ids",
+                excluded_materialization_descriptor_ids,
+            )
+        )
+    return _clause(
+        clause_id=clause_id,
+        text=text,
+        trigger=_trigger(
+            text=text,
+            kind=RuleTriggerKind.MODEL_DESTROYED,
+            parameters=(
+                _parameter("timing_window", "after_attacking_unit_finished_attacks"),
+                _parameter("destruction_source_kinds", ("attack", "hazardous")),
+            ),
+        ),
+        conditions=(
+            _condition(
+                text=text,
+                kind=RuleConditionKind.TARGET_CONSTRAINT,
+                parameters=(_parameter("source_rules_unit_not_destroyed", True),),
+            ),
+            _condition(
+                text=text,
+                kind=RuleConditionKind.DICE_ROLL_GATE,
+                parameters=(
+                    _parameter("roll_expression", "D6"),
+                    _parameter("success_threshold", 4),
+                ),
+            ),
+        ),
+        target=_this_unit_target(text),
+        effects=(
+            _effect(
+                text=text,
+                kind=RuleEffectKind.MATERIALIZE_MODELS,
+                parameters=tuple(effect_parameters),
+            ),
+        ),
+        duration=_duration(text, RuleDurationKind.IMMEDIATE),
+    )
+
+
+def _pink_horrors_split_rule_ir(
+    *, datasheet_id: str, blue_datasheet_id: str, source_row_id: str
+) -> RuleIR:
+    blue_profile_id = f"{datasheet_id}:blue-horror-brimstone-horror"
+    return _rule_ir(
+        source_row_id=source_row_id,
+        normalized_text=_PINK_HORRORS_SPLIT_TEXT,
+        clauses=(
+            _horror_split_clause(
+                clause_id=f"{datasheet_id}-split-blue-into-brimstone",
+                text=_PINK_HORRORS_SPLIT_TEXT,
+                destroyed_model_profile_id=blue_profile_id,
+                result_model_profile_id=blue_profile_id,
+                result_model_name="Brimstone Horror",
+                result_wargear_ids=(
+                    f"{datasheet_id}:coruscating-yellow-flames",
+                    f"{datasheet_id}:yellow-claws",
+                ),
+                result_count=1,
+                result_materialization_descriptor_id=("horror-materialization:brimstone-horror"),
+                result_base_size_datasheet_id=blue_datasheet_id,
+                required_materialization_descriptor_id=("horror-materialization:blue-horror"),
+            ),
+            _horror_split_clause(
+                clause_id=f"{datasheet_id}-split-pink-into-blue",
+                text=_PINK_HORRORS_SPLIT_TEXT,
+                destroyed_model_profile_id=f"{datasheet_id}:pink-horrors",
+                result_model_profile_id=blue_profile_id,
+                result_model_name="Blue Horror",
+                result_wargear_ids=(
+                    f"{datasheet_id}:coruscating-blue-flames",
+                    f"{datasheet_id}:blue-claws",
+                ),
+                result_count=2,
+                result_materialization_descriptor_id="horror-materialization:blue-horror",
+                result_base_size_datasheet_id=blue_datasheet_id,
+            ),
+        ),
+    )
+
+
+def _blue_horrors_split_rule_ir(*, datasheet_id: str, source_row_id: str) -> RuleIR:
+    profile_id = f"{datasheet_id}:blue-horrors"
+    return _rule_ir(
+        source_row_id=source_row_id,
+        normalized_text=_BLUE_HORRORS_SPLIT_TEXT,
+        clauses=(
+            _horror_split_clause(
+                clause_id=f"{datasheet_id}-split-blue-into-brimstone",
+                text=_BLUE_HORRORS_SPLIT_TEXT,
+                destroyed_model_profile_id=profile_id,
+                result_model_profile_id=profile_id,
+                result_model_name="Brimstone Horror",
+                result_wargear_ids=(
+                    f"{datasheet_id}:coruscating-yellow-flames",
+                    f"{datasheet_id}:yellow-claws",
+                ),
+                result_count=1,
+                result_materialization_descriptor_id=("horror-materialization:brimstone-horror"),
+                result_base_size_datasheet_id=datasheet_id,
+                excluded_materialization_descriptor_ids=(
+                    "horror-materialization:brimstone-horror",
+                ),
+            ),
+        ),
+    )
+
+
+def _horrors_datasheet_handoff_rule_ir(
+    *, pink_datasheet_id: str, blue_datasheet_id: str, source_row_id: str
+) -> RuleIR:
+    target_profile_id = f"{blue_datasheet_id}:blue-horrors"
+    return _rule_ir(
+        source_row_id=source_row_id,
+        normalized_text=_HORRORS_DATASHEET_HANDOFF_TEXT,
+        clauses=(
+            _clause(
+                clause_id=f"{pink_datasheet_id}-handoff-to-{blue_datasheet_id}",
+                text=_HORRORS_DATASHEET_HANDOFF_TEXT,
+                trigger=_trigger(
+                    text=_HORRORS_DATASHEET_HANDOFF_TEXT,
+                    kind=RuleTriggerKind.MODEL_DESTROYED,
+                    parameters=(_parameter("timing_window", "after_model_state_changed"),),
+                ),
+                conditions=(
+                    _condition(
+                        text=_HORRORS_DATASHEET_HANDOFF_TEXT,
+                        kind=RuleConditionKind.TARGET_CONSTRAINT,
+                        parameters=(
+                            _parameter(
+                                "required_absent_model_profile_ids",
+                                (f"{pink_datasheet_id}:pink-horrors",),
+                            ),
+                        ),
+                    ),
+                ),
+                target=_this_unit_target(_HORRORS_DATASHEET_HANDOFF_TEXT),
+                effects=(
+                    _effect(
+                        text=_HORRORS_DATASHEET_HANDOFF_TEXT,
+                        kind=RuleEffectKind.REPLACE_UNIT_DATASHEET,
+                        parameters=(
+                            _parameter("replacement_datasheet_id", blue_datasheet_id),
+                            _parameter("replacement_model_profile_id", target_profile_id),
+                            _parameter(
+                                "replacement_model_variant_count",
+                                2,
+                            ),
+                            _parameter(
+                                "replacement_model_variant_1_materialization_descriptor_id",
+                                "horror-materialization:blue-horror",
+                            ),
+                            _parameter(
+                                "replacement_model_variant_1_wargear_ids",
+                                (
+                                    f"{blue_datasheet_id}:coruscating-blue-flames",
+                                    f"{blue_datasheet_id}:blue-claws",
+                                ),
+                            ),
+                            _parameter(
+                                "replacement_model_variant_2_materialization_descriptor_id",
+                                "horror-materialization:brimstone-horror",
+                            ),
+                            _parameter(
+                                "replacement_model_variant_2_wargear_ids",
+                                (
+                                    f"{blue_datasheet_id}:coruscating-yellow-flames",
+                                    f"{blue_datasheet_id}:yellow-claws",
+                                ),
+                            ),
+                            _parameter(
+                                "pruned_model_profile_ids",
+                                (f"{pink_datasheet_id}:pink-horrors",),
+                            ),
+                        ),
+                    ),
+                ),
+                duration=_duration(
+                    _HORRORS_DATASHEET_HANDOFF_TEXT,
+                    RuleDurationKind.PERMANENT,
+                ),
+            ),
+        ),
+    )
+
+
 _RULE_IR_PAYLOADS_BY_SOURCE_ROW_ID = MappingProxyType(
     {
         BELAKOR_DARK_MASTER_ROW_ID: _payload(_dark_master_rule_ir()),
@@ -807,6 +1056,40 @@ _RULE_IR_PAYLOADS_BY_SOURCE_ROW_ID = MappingProxyType(
         "000002758:6": _payload(_daemonic_allegiance_rule_ir("000002758:6")),
         SOUL_GRINDER_ALLEGIANCE_ROW_ID: _payload(
             _daemonic_allegiance_rule_ir(SOUL_GRINDER_ALLEGIANCE_ROW_ID)
+        ),
+        "000002583:4": _payload(
+            _blue_horrors_split_rule_ir(datasheet_id="000002583", source_row_id="000002583:4")
+        ),
+        "000002584:5": _payload(
+            _pink_horrors_split_rule_ir(
+                datasheet_id="000002584",
+                blue_datasheet_id="000002583",
+                source_row_id="000002584:5",
+            )
+        ),
+        "000002584:6": _payload(
+            _horrors_datasheet_handoff_rule_ir(
+                pink_datasheet_id="000002584",
+                blue_datasheet_id="000002583",
+                source_row_id="000002584:6",
+            )
+        ),
+        "000004127:3": _payload(
+            _pink_horrors_split_rule_ir(
+                datasheet_id="000004127",
+                blue_datasheet_id="000004128",
+                source_row_id="000004127:3",
+            )
+        ),
+        "000004127:6": _payload(
+            _horrors_datasheet_handoff_rule_ir(
+                pink_datasheet_id="000004127",
+                blue_datasheet_id="000004128",
+                source_row_id="000004127:6",
+            )
+        ),
+        "000004128:4": _payload(
+            _blue_horrors_split_rule_ir(datasheet_id="000004128", source_row_id="000004128:4")
         ),
         **_daemon_prince_characteristic_payloads(),
     }

@@ -26,9 +26,13 @@ from warhammer40k_core.engine.catalog_selected_target_test_modifiers import (
 from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveOrigin
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.stratagems_generic_metadata import (
@@ -477,8 +481,28 @@ def _resolve_generic_roll_pool_mortal_wounds(
     mortal_wounds = sum(wounds_per_success for roll in rolls if roll.current_total >= threshold)
     application_payload: JsonValue = None
     if mortal_wounds:
+        source_rule_id = _rule_effect_source_id(effect_payload)
+        source_context = validate_json_value(
+            {
+                "stratagem_use": use_record.to_payload(),
+                "generic_rule_effect": effect_payload,
+                "target_unit_instance_id": target_unit_id,
+            }
+        )
         application = apply_mortal_wounds_to_unit(
             state=state,
+            decisions=decisions,
+            application_id=f"{use_record.use_id}:mortal-wounds:{target_unit_id}",
+            source_rule_id=source_rule_id,
+            source_context=source_context,
+            destruction_evidence=MortalWoundDestructionEvidence.for_state(
+                state=state,
+                destroying_player_id=use_record.player_id,
+                source_rules_unit_instance_id=None,
+                destruction_source_kind=DestructionSourceKind.ABILITY,
+                action_phase=BattlePhase(use_record.phase.value),
+                source_step="generic_stratagem_mortal_wounds",
+            ),
             target_unit_instance_id=target_unit_id,
             mortal_wounds=mortal_wounds,
             spill_over=_required_rule_effect_bool_parameter(effect_payload, "spill_over"),
@@ -548,8 +572,28 @@ def _resolve_generic_roll_per_context_target_mortal_wounds(
         )
         application_payload: JsonValue = None
         if mortal_wounds:
+            source_rule_id = _rule_effect_source_id(effect_payload)
+            source_context = validate_json_value(
+                {
+                    "stratagem_use": use_record.to_payload(),
+                    "generic_rule_effect": effect_payload,
+                    "target_unit_instance_id": target_unit_id,
+                }
+            )
             application = apply_mortal_wounds_to_unit(
                 state=state,
+                decisions=decisions,
+                application_id=f"{use_record.use_id}:mortal-wounds:{target_unit_id}",
+                source_rule_id=source_rule_id,
+                source_context=source_context,
+                destruction_evidence=MortalWoundDestructionEvidence.for_state(
+                    state=state,
+                    destroying_player_id=use_record.player_id,
+                    source_rules_unit_instance_id=None,
+                    destruction_source_kind=DestructionSourceKind.ABILITY,
+                    action_phase=BattlePhase(use_record.phase.value),
+                    source_step="generic_stratagem_mortal_wounds",
+                ),
                 target_unit_instance_id=target_unit_id,
                 mortal_wounds=mortal_wounds,
                 spill_over=_required_rule_effect_bool_parameter(effect_payload, "spill_over"),

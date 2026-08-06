@@ -17,6 +17,7 @@ from warhammer40k_core.core.datasheet import (
     DamagedEffectDefinitionPayload,
     DatasheetAbilityDescriptor,
     DatasheetAbilityDescriptorPayload,
+    DatasheetCatalogError,
     DatasheetDefinition,
     DatasheetMusteringOption,
     DatasheetMusteringOptionEffect,
@@ -499,6 +500,61 @@ class UnitFactory:
                 for option in selected_mustering_options
             ),
             starting_resources=starting_resources,
+        )
+
+    def instantiate_materialized_model(
+        self,
+        *,
+        datasheet_id: str,
+        model_profile_id: str,
+        model_instance_id: str,
+        model_name: str,
+        wargear_ids: tuple[str, ...],
+        source_id: str,
+        materialization_descriptor_id: str,
+    ) -> ModelInstance:
+        try:
+            datasheet = self.catalog.datasheet_by_id(datasheet_id)
+            profile = datasheet.model_profile_by_id(model_profile_id)
+        except (ArmyCatalogError, DatasheetCatalogError) as exc:
+            raise UnitFactoryError("Materialized model profile is not in the catalog.") from exc
+        validated_wargear_ids = _validate_ordered_identifier_tuple(
+            "materialized model wargear_ids",
+            wargear_ids,
+            min_length=0,
+        )
+        catalog_wargear_ids = {wargear.wargear_id for wargear in self.catalog.wargear}
+        if any(wargear_id not in catalog_wargear_ids for wargear_id in validated_wargear_ids):
+            raise UnitFactoryError("Materialized model wargear is not in the catalog.")
+        source_ids = tuple(
+            sorted(
+                {
+                    *_merge_source_ids(datasheet.source_ids, profile.source_ids),
+                    _validate_identifier("materialized model source_id", source_id),
+                    _validate_identifier(
+                        "materialization_descriptor_id",
+                        materialization_descriptor_id,
+                    ),
+                }
+            )
+        )
+        starting_wounds = profile.characteristic(Characteristic.WOUNDS).final
+        return ModelInstance(
+            model_instance_id=model_instance_id,
+            datasheet_id=datasheet.datasheet_id,
+            model_profile_id=profile.model_profile_id,
+            name=model_name,
+            characteristics=profile.characteristics,
+            base_size=profile.base_size,
+            geometry=_model_geometry_for_profile(
+                datasheet=datasheet,
+                profile=profile,
+                geometry_record=self._catalog_model_geometry(profile.model_profile_id),
+            ),
+            starting_wounds=starting_wounds,
+            wounds_remaining=starting_wounds,
+            wargear_ids=validated_wargear_ids,
+            source_ids=source_ids,
         )
 
     def _catalog_datasheet(self, datasheet: DatasheetDefinition) -> DatasheetDefinition:

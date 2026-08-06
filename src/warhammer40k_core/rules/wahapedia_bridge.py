@@ -31,6 +31,7 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.rules import wahapedia_base_size_bridge as _base_size_bridge
 from warhammer40k_core.rules import wahapedia_bridge_columns as _bridge_columns
+from warhammer40k_core.rules import wahapedia_materialization_bridge as _materialization_bridge
 from warhammer40k_core.rules import wahapedia_model_profile_mapping as _model_profiles
 from warhammer40k_core.rules.attachment_wargear_requirements import (
     AttachmentWargearRequirement,
@@ -202,6 +203,8 @@ class _CompositionEntry:
     min_models: int
     max_models: int
     source_rows: tuple[NormalizedSourceRow, ...]
+    base_size_datasheet_id: str | None = None
+    materialization_only: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -243,6 +246,9 @@ def _bridge_datasheet(
     if not model_source_rows:
         raise WahapediaBridgeError("Datasheet has no Wahapedia model stat rows.")
     composition_entries = _composition_entries(context=context, datasheet_id=datasheet_id)
+    composition_entries = _with_materialization_only_profiles(
+        context, datasheet_id, composition_entries, model_source_rows
+    )
     model_source_rows_by_profile_id = _model_profiles.model_source_rows_by_profile_id(
         composition_profiles=composition_entries,
         model_source_rows=model_source_rows,
@@ -254,7 +260,12 @@ def _bridge_datasheet(
         error_type=WahapediaBridgeError,
     )
     loadout_assignments = parse_loadout_assignments(
-        loadout=_normalized_or_field(datasheet_row, "loadout"),
+        loadout=_materialization_bridge.mustering_loadout(
+            rows_by_table=context.rows_by_table,
+            datasheet_id=datasheet_id,
+            loadout=_normalized_or_field(datasheet_row, "loadout"),
+            error_type=WahapediaBridgeError,
+        ),
         model_profile_by_name=_model_profiles_by_name(composition_entries),
         all_model_profile_ids=tuple(entry.model_profile_id for entry in composition_entries),
         error_type=WahapediaBridgeError,
@@ -322,9 +333,14 @@ def _bridge_datasheet(
             datasheet_id=datasheet_id,
             model_name=entry.model_name,
         )
+        base_size_datasheet_row = datasheet_row
+        if entry.base_size_datasheet_id is not None:
+            base_size_datasheet_row = _required_row_by_id(
+                context.rows_by_table, "Datasheets", entry.base_size_datasheet_id
+            )
         base_size = base_size_evidence(
             faction_name=_required_field(faction_row, "name"),
-            datasheet_name=_required_field(datasheet_row, "name"),
+            datasheet_name=_required_field(base_size_datasheet_row, "name"),
             model_name=entry.model_name,
             model_source_row=model_source_row,
             event_companion_base_sizes=context.event_companion_base_sizes_by_key,
@@ -353,6 +369,7 @@ def _bridge_datasheet(
                 "min_models": str(entry.min_models),
                 "max_models": str(entry.max_models),
                 "allows_zero_models": "true" if entry.min_models == 0 else "",
+                "materialization_only": "true" if entry.materialization_only else "",
                 "base_size": base_size.base_size_text,
                 "base_size_source_id": base_size.source_id,
                 "base_size_document_reference": base_size.document_reference,
@@ -462,6 +479,38 @@ def _composition_entries(
             source_rows=tuple(accumulator.source_rows),
         )
         for accumulator in accumulators.values()
+    )
+
+
+def _with_materialization_only_profiles(
+    context: _BridgeContext,
+    datasheet_id: str,
+    entries: tuple[_CompositionEntry, ...],
+    model_source_rows: tuple[NormalizedSourceRow, ...],
+) -> tuple[_CompositionEntry, ...]:
+    supplemental = _materialization_bridge.materialization_only_profile_specs(
+        rows_by_table=context.rows_by_table,
+        datasheet_id=datasheet_id,
+        existing_profile_ids=frozenset(entry.model_profile_id for entry in entries),
+        model_source_rows=model_source_rows,
+        profile_id_for_model_name=lambda name: f"{datasheet_id}:{_slug(name)}",
+        error_type=WahapediaBridgeError,
+    )
+    return (
+        *entries,
+        *(
+            _CompositionEntry(
+                line=spec.line,
+                model_name=spec.model_name,
+                model_profile_id=spec.model_profile_id,
+                min_models=0,
+                max_models=1,
+                source_rows=spec.source_rows,
+                base_size_datasheet_id=spec.base_size_datasheet_id,
+                materialization_only=True,
+            )
+            for spec in supplemental
+        ),
     )
 
 

@@ -5182,6 +5182,120 @@
       "submission_variant_id": "melee_declaration"
     },
     {
+      "case_id": "parameterized:model_materialization_placement",
+      "proposal_payload": {
+        "attempted_placement": {
+          "army_id": "army-alpha",
+          "model_placements": [
+            {
+              "army_id": "army-alpha",
+              "model_instance_id": "army-alpha:horrors-1:materialized:model-1",
+              "player_id": "player-a",
+              "pose": {
+                "facing": {
+                  "degrees": 0.0
+                },
+                "position": {
+                  "x": 12.0,
+                  "y": 18.0,
+                  "z": 0.0
+                }
+              },
+              "unit_instance_id": "army-alpha:horrors-1"
+            },
+            {
+              "army_id": "army-alpha",
+              "model_instance_id": "army-alpha:horrors-1:materialized:model-2",
+              "player_id": "player-a",
+              "pose": {
+                "facing": {
+                  "degrees": 0.0
+                },
+                "position": {
+                  "x": 13.0,
+                  "y": 18.0,
+                  "z": 0.0
+                }
+              },
+              "unit_instance_id": "army-alpha:horrors-1"
+            }
+          ],
+          "player_id": "player-a",
+          "unit_instance_id": "army-alpha:horrors-1"
+        },
+        "placement_kind": "split_unit",
+        "proposal_kind": "model_materialization_placement",
+        "proposal_request_id": "contract-model-materialization-request-000001",
+        "unit_instance_id": "army-alpha:horrors-1"
+      },
+      "request": {
+        "actor_id": "player-a",
+        "decision_type": "submit_catalog_model_materialization_placement",
+        "interaction": {
+          "constraints": {
+            "candidate_option_ids": [
+              "submit_parameterized_payload"
+            ],
+            "entity_kinds": [
+              "unit",
+              "model"
+            ],
+            "exact_model_count": null,
+            "maximum_distance_in": null,
+            "maximum_selections": null,
+            "may_enter_engagement_range": null,
+            "minimum_enemy_distance_in": null,
+            "minimum_selections": null,
+            "must_preserve_coherency": true,
+            "placement_kinds": [],
+            "proposal_schema_ref": "proposal-payload.schema.json#/$defs/generic_placement",
+            "submission_schema_ref": "parameterized-submission.schema.json"
+          },
+          "display_hints": {
+            "confirm_label": "Submit Placement",
+            "decline_label": null
+          },
+          "interaction_kind": "multi_model_placement",
+          "proposal_kind": "model_materialization_placement",
+          "required_inputs": [
+            "model_poses"
+          ],
+          "schema_version": "interaction-descriptor-v2-variants",
+          "selected_entity_ids": [],
+          "submission_kind": "parameterized",
+          "submission_variants": [
+            {
+              "display_label": "Submit Placement",
+              "interaction_kind": "multi_model_placement",
+              "proposal_schema_ref": "proposal-payload.schema.json#/$defs/generic_placement",
+              "required_inputs": [
+                "model_poses"
+              ],
+              "variant_id": "model_materialization_placement"
+            }
+          ]
+        },
+        "is_parameterized": true,
+        "options": [
+          {
+            "label": "Submit Parameterized Payload",
+            "option_id": "submit_parameterized_payload",
+            "payload": {
+              "submission_kind": "parameterized"
+            }
+          }
+        ],
+        "payload": {
+          "proposal_request": {
+            "proposal_kind": "model_materialization_placement"
+          }
+        },
+        "request_id": "interaction-conformance:model_materialization_placement",
+        "schema_version": "annotated-decision-request-v1"
+      },
+      "submission_variant_id": "model_materialization_placement"
+    },
+    {
       "case_id": "parameterized:normal_move",
       "proposal_payload": {
         "movement_mode": "normal",

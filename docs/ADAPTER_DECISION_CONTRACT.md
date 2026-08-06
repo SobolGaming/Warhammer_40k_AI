@@ -203,6 +203,9 @@ The shared contract uses these objects and payloads:
   unit resource after all reroll opportunities and before the Hit or Wound
   result is emitted.
 - `PlacementProposalPayload`: parameterized placement answer, including either one attempted physical `UnitPlacement` or one grouped `RulesUnitPlacement` for an attached rules unit.
+- `CatalogModelMaterializationPlacement`: parameterized placement answer for an
+  engine-instantiated set of models being added to an existing physical owning
+  unit by source-backed RuleIR.
 - `CultAmbushMarker`: replay-safe Genestealer Cults marker state used by the Cult Ambush marker placement and ingress contracts.
 - `DeploymentPlacementRequest`: Deploy Armies parameterized request context containing source mission setup, owning deployment zone IDs, selected rules-unit/component/model IDs, ruleset hash, and setup-step context.
 - `DeploymentPlacementProposal`: Deploy Armies placement answer containing the complete selected rules-unit model placement set, placement kind `deployment`, proposal request ID, ruleset hash, and replay-safe source context.
@@ -2097,6 +2100,100 @@ invalid non-option selection, model-scope and unit-scope reroll gates, destroyed
 target expiry, deterministic reselection, replay payload round-trip, and catalog
 consumer/hook IDs.
 
+## Catalog Model Materialization Decisions
+
+Source-backed `MATERIALIZE_MODELS` RuleIR resolves model-destruction timing and
+the engine-owned dice gate before exposing physical placement. A successful
+gate emits the parameterized decision type
+`submit_catalog_model_materialization_placement` with one fixed
+`submit_parameterized_payload` option. The request is actor-scoped to the owning
+player and includes `proposal_kind: "model_materialization_placement"`,
+`placement_kind: "split_unit"`, the immutable Shooting or Fight `action_phase`,
+the current `parent_battle_phase` (also retained as placement `source_phase`),
+attack-sequence and roll-event IDs, catalog
+record/clause/source-rule identity, the physical owning unit and army IDs, the
+materialization descriptor ID, and the complete engine-instantiated model
+payloads and model IDs.
+
+Adapters answer with `PlacementProposalPayload`. The payload must preserve the
+pending request ID, proposal kind, source physical unit ID, and `split_unit`
+placement kind, and must supply exactly one `attempted_placement` containing the
+engine-emitted model IDs. Materialization is explicit set-up placement, not
+movement, so it requires validated model endpoints rather than `PathWitness`.
+At submission the engine re-resolves the current catalog record, clause, source
+rule, and materialization descriptor; validates the referenced completion and
+successful roll events; deterministically regenerates the exact models; and
+then validates template identity, catalog profile and wargear identity,
+battlefield bounds, terrain endpoints, overlap, and final complete-rules-unit
+coherency before atomically adding the models and placements. Adapters must not
+construct model profiles, derive loadouts, add models, remove destroyed models,
+replace a datasheet, or mutate battlefield state locally.
+
+The engine rejects action-phase, parent-phase, source, roll, result-count, or
+model-template drift before queue pop. Accepted placement records use the
+parent battle phase as `source_phase`; transition evidence, materialization
+events, and per-model battlefield-placement events retain both `action_phase`
+and `parent_battle_phase`, so out-of-phase shooting replays preserve both the
+shooting action and the Movement or Charge phase in which it occurred.
+
+Fight, normal Shooting, and out-of-phase Shooting retain the completed attack
+sequence while any materialization decision is pending. After each accepted
+placement, the owning phase reruns all completion hooks from that retained
+sequence, performs Attached Unit reconciliation only after the hooks drain,
+then clears the retained sequence and completes exactly one Fight activation or
+out-of-phase Shooting action.
+
+`submit_catalog_model_materialization_placement` is a supported nested reaction
+decision. When its source attack belongs to Fire Overwatch or a Fight interrupt,
+prevalidation requires the request to own the active reaction frame. Accepted
+placement continues that frame to any subsequent completion-hook decision, or
+resolves it only after the out-of-phase action or interrupted activation is
+complete; restored lifecycles preserve the same frame/request binding.
+
+Each accepted model placement emits its own
+`model_placed_on_battlefield` runtime-content timing event for every player so
+owner and opponent reactive abilities use the shared event dispatcher. After
+materialization reactions resolve, or after any other authoritative model
+destruction changes the component's composition, source-backed
+`REPLACE_UNIT_DATASHEET` RuleIR may hand the physical owning component to another
+datasheet. This keeps
+the existing Attached Unit formation and canonical rules-unit identity,
+removes only the source-backed destroyed model profiles, remaps retained
+materialized models through descriptor-indexed catalog variants, and preserves
+the original Starting Strength record. Empty components are never replaced,
+and non-attack composition handoff waits for the destruction-finalized event so
+an optional Shoot on Death or Fight on Death window cannot lose its source model.
+Shared mortal-wound routing records a typed, replay-safe composition transition
+ledger only after the application has finished, including direct mortal wounds,
+Feel No Pain continuations, and Deadly Demise collateral. The ledger carries
+source attribution, physical and rules-unit identities, destroyed model IDs,
+and battlefield removal evidence, allowing composition handoff to observe
+generic selected-target and other mortal-wound consumers without synthesizing
+destruction events.
+Attached-unit reconciliation observes the composition-driven handoff before it
+splits a surviving component away, while a fully destroyed component with no
+successfully materialized model follows the ordinary destruction path.
+
+Malformed, stale, wrong-actor, wrong-kind, wrong-unit, wrong-model-set,
+template-drifted, descriptor-drifted, exception-bearing, transport-bearing,
+out-of-bounds, terrain-invalid, overlapping, or incoherent submissions reject
+before queue pop, `DecisionRecord` creation, or mutation. The current
+materialization requests, placements, transition records, and datasheet
+handoffs are public battlefield information. Future hidden materialization must
+add viewer-scoped request, record, projection, diagnostic, and event-delta
+redaction before becoming adapter-visible.
+
+Required model-materialization tests cover both source packages sharing the
+same semantics, attack and Hazardous destruction gates, non-attack exclusion,
+valid and stale placement, exact catalog profile/base/loadout identity,
+real Shooting/Fight Attached Unit handoff, out-of-phase action/parent phase
+evidence, restored Overwatch and Fight-interrupt reaction-frame continuation,
+selected-target mortal wounds with and without a Feel No Pain continuation,
+Deadly Demise collateral finalization, destruction-reaction finalization,
+authoritative restored-request tamper rejection, Starting Strength preservation,
+deterministic JSON-safe request/state round trips, and per-model placement
+reaction dispatch.
+
 ## Catalog First-Death Return Decisions
 
 Catalog first-death return RuleIR is captured from `model_destroyed` events using
@@ -2160,6 +2257,8 @@ The contract currently covers these proposal families:
 - Scout Move and Dedicated Transport Scout Move;
 - Charge Move, including charge-target selection, no-move choice, and PathWitness movement evidence;
 - Pile In and Consolidate movement, including no-move choices, fight movement target or objective context, and PathWitness movement evidence;
+- catalog model materialization placement after a successful source-backed
+  destruction trigger and dice gate;
 - first-death return placement after a successful phase-end return roll;
 - ranged shooting declaration, when target/weapon/profile binding is not safely enumerable;
 - melee declaration, including one primary melee weapon per fighting model, optional `[EXTRA ATTACKS]` weapons, model-engaged target binding, and split melee attack counts;

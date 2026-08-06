@@ -454,6 +454,13 @@
       "submission_kind": "finite"
     },
     {
+      "decision_type": "submit_catalog_model_materialization_placement",
+      "interaction_kinds": [
+        "multi_model_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
       "decision_type": "submit_cult_ambush_marker_placement",
       "interaction_kinds": [
         "battlefield_point_placement",

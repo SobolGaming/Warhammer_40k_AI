@@ -75,6 +75,7 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfileError,
 )
 from warhammer40k_core.rules import catalog_generation_composition
+from warhammer40k_core.rules import catalog_materialization_generation as _cmg
 from warhammer40k_core.rules.catalog_generation_errors import CatalogGenerationError
 from warhammer40k_core.rules.catalog_generation_fields import (
     optional_field as _optional_field,
@@ -292,7 +293,8 @@ def _datasheet_from_row(
         _model_profile_from_row(row=model_row, geometry_by_profile_id=geometry_by_profile_id)
         for model_row in model_rows
     )
-    composition = tuple(_composition_from_model_row(model_row) for model_row in model_rows)
+    mustering_model_rows = _cmg.mustering_rows(model_rows, CatalogGenerationError)
+    composition = tuple(map(_composition_from_model_row, mustering_model_rows))
     return DatasheetDefinition(
         datasheet_id=row.source_row_id,
         name=_required_field(row=row, column_name="name"),

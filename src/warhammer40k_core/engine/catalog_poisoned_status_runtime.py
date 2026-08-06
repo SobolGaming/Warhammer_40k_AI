@@ -25,9 +25,13 @@ from warhammer40k_core.engine.damage_allocation import (
     continue_mortal_wound_application,
     resolve_mortal_wound_feel_no_pain_decision,
 )
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import GENERIC_RULE_EFFECT_KIND, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
     MortalWoundFeelNoPainContinuationHookBinding,
@@ -104,6 +108,7 @@ def apply_catalog_poisoned_mortal_wound_feel_no_pain_decision(
         raise GameLifecycleError("Catalog poisoned Feel No Pain source kind drifted.")
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=context.state,
+        decisions=context.decisions,
         request=context.request,
         result=context.result,
         next_request_id=context.state.next_decision_request_id(),
@@ -196,9 +201,18 @@ def _resolve_poisoned_target(
         defender_player_id=target.owner_player_id,
         mortal_wounds=d3_result.value,
         spill_over=True,
+        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            state=state,
+            destroying_player_id=context.active_player_id,
+            source_rules_unit_instance_id=None,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=BattlePhase.COMMAND,
+            source_step="poisoned_command_mortal_wounds",
+        ),
     )
     routed = continue_mortal_wound_application(
         state=state,
+        decisions=context.decisions,
         request_id=state.next_decision_request_id(),
         progress=progress,
         dice_manager=manager,

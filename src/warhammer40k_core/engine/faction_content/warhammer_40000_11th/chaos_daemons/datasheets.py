@@ -28,6 +28,7 @@ from warhammer40k_core.engine.damage_allocation import (
     unit_owner_player_id,
 )
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
@@ -48,6 +49,9 @@ from warhammer40k_core.engine.fight_phase_end_hooks import (
     FightPhaseEndHookBinding,
     FightPhaseEndRequestContext,
     FightPhaseEndResultContext,
+)
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
@@ -647,9 +651,18 @@ def apply_relentless_carnage_fight_phase_end_result(
         ),
         mortal_wounds=mortal_wounds,
         spill_over=True,
+        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            state=context.state,
+            destroying_player_id=player_id,
+            source_rules_unit_instance_id=source_rules_unit_id,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=BattlePhase.FIGHT,
+            source_step="relentless_carnage_mortal_wounds",
+        ),
     )
     routed = continue_mortal_wound_application(
         state=context.state,
+        decisions=context.decisions,
         request_id=context.state.next_decision_request_id(),
         progress=progress,
         dice_manager=dice_manager,
@@ -672,6 +685,7 @@ def apply_relentless_carnage_mortal_wound_feel_no_pain_decision(
         raise GameLifecycleError("Relentless Carnage FNP continuation requires context.")
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=context.state,
+        decisions=context.decisions,
         request=context.request,
         result=context.result,
         next_request_id=context.state.next_decision_request_id(),

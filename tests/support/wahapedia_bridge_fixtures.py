@@ -30,6 +30,14 @@ def bloodcrushers_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     )
 
 
+def horrors_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
+    return build_wahapedia_canonical_bridge_artifacts(
+        source_artifacts=wahapedia_source_artifacts(),
+        bridge_package_id=bridge_package_id(),
+        datasheet_ids=("000002583", "000002584", "000004127", "000004128"),
+    )
+
+
 def weirdboy_bridge_artifacts() -> tuple[WahapediaJsonArtifact, ...]:
     return build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=wahapedia_source_artifacts(),

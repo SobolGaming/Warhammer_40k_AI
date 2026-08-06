@@ -170,6 +170,51 @@ def test_reconstructed_decision_record_history_affects_next_dice_roll() -> None:
     assert reconstructed_next.to_payload() == original_next.to_payload()
 
 
+def test_destruction_evidence_metadata_is_rng_history_neutral() -> None:
+    base_request = _select_unit_request("decision-request-evidence")
+    enriched_request = replace(
+        base_request,
+        payload={
+            **cast(dict[str, JsonValue], base_request.payload),
+            "destruction_evidence": {
+                "source_step": "selected_target_mortal_wounds",
+                "action_phase": "shooting",
+            },
+        },
+    )
+    base_result = DecisionResult.for_request(
+        result_id="decision-result-evidence",
+        request=base_request,
+        selected_option_id="unit-a",
+    )
+    enriched_result = DecisionResult.for_request(
+        result_id="decision-result-evidence",
+        request=enriched_request,
+        selected_option_id="unit-a",
+    )
+    base_manager = DiceRollManager("seed")
+    enriched_manager = DiceRollManager("seed")
+    base_manager.record_decision(request=base_request, result=base_result)
+    enriched_manager.record_decision(request=enriched_request, result=enriched_result)
+    spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=100_000),
+        reason="Roll after replay evidence metadata",
+        roll_type="battle_shock_roll",
+    )
+
+    assert base_manager.roll(spec).current_values == enriched_manager.roll(spec).current_values
+
+    restored_base = DiceRollManager(
+        "seed",
+        event_log=EventLog.from_payload(base_manager.event_log.to_payload()[:-1]),
+    )
+    restored_enriched = DiceRollManager(
+        "seed",
+        event_log=EventLog.from_payload(enriched_manager.event_log.to_payload()[:-1]),
+    )
+    assert restored_base.roll(spec).current_values == restored_enriched.roll(spec).current_values
+
+
 def test_reconstructed_decision_records_advance_record_id_counter() -> None:
     first_request = _select_unit_request("decision-request-1")
     original = DiceRollManager("seed")

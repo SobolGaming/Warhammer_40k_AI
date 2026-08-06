@@ -610,6 +610,16 @@
     },
     {
       "coverage_status": "envelope_only",
+      "decision_type": "submit_catalog_model_materialization_placement",
+      "example_path": null,
+      "interaction_kinds": [
+        "multi_model_placement"
+      ],
+      "registry_scope": "registered",
+      "submission_kind": "parameterized"
+    },
+    {
+      "coverage_status": "envelope_only",
       "decision_type": "submit_cult_ambush_marker_placement",
       "example_path": null,
       "interaction_kinds": [
@@ -741,9 +751,9 @@
     }
   ],
   "interaction_kind_count": 13,
-  "known_external_token_count": 74,
+  "known_external_token_count": 75,
   "live_scenario_count": 4,
-  "registered_decision_type_count": 72,
+  "registered_decision_type_count": 73,
   "schema_version": "decision-family-coverage-v2-interactions",
   "standard_interaction_kinds": [
     "battlefield_point_placement",

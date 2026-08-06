@@ -23,6 +23,7 @@ from warhammer40k_core.engine.damage_allocation_targets import (
 from warhammer40k_core.engine.damage_allocation_targets import (
     damage_kind_from_token as damage_kind_from_token,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DiceRollManager
@@ -33,6 +34,13 @@ from warhammer40k_core.engine.mortal_wound_context import (
 )
 from warhammer40k_core.engine.mortal_wound_context import (
     parse_mortal_wound_feel_no_pain_context as _mortal_wound_context_from_payload,
+)
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+    evidence_from_json,
+    evidence_to_json,
+    record_finalized_mortal_wound_progress_destructions,
+    validate_mortal_wound_destruction_evidence_mode,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import (
@@ -1105,6 +1113,7 @@ class MortalWoundApplicationProgress:
     mortal_wounds: int
     remaining_mortal_wounds: int
     spill_over: bool
+    destruction_evidence: MortalWoundDestructionEvidence | None
     applications: tuple[DamageApplication, ...] = ()
     feel_no_pain_resolutions: tuple[FeelNoPainResolution, ...] = ()
     ignored_mortal_wounds: int = 0
@@ -1165,6 +1174,12 @@ class MortalWoundApplicationProgress:
             raise GameLifecycleError("MortalWoundApplicationProgress remaining wound drift.")
         if type(self.spill_over) is not bool:
             raise GameLifecycleError("MortalWoundApplicationProgress spill_over must be a bool.")
+        if self.destruction_evidence is not None and type(self.destruction_evidence) is not (
+            MortalWoundDestructionEvidence
+        ):
+            raise GameLifecycleError(
+                "MortalWoundApplicationProgress destruction_evidence is invalid."
+            )
         object.__setattr__(self, "applications", _validate_damage_applications(self.applications))
         object.__setattr__(
             self,
@@ -1215,6 +1230,7 @@ class MortalWoundApplicationProgress:
         defender_player_id: str,
         mortal_wounds: int,
         spill_over: bool,
+        destruction_evidence: MortalWoundDestructionEvidence | None,
         priority_model_ids: tuple[str, ...] = (),
     ) -> Self:
         wounds = _validate_positive_int("mortal_wounds", mortal_wounds)
@@ -1227,6 +1243,7 @@ class MortalWoundApplicationProgress:
             mortal_wounds=wounds,
             remaining_mortal_wounds=wounds,
             spill_over=spill_over,
+            destruction_evidence=destruction_evidence,
             priority_model_ids=priority_model_ids,
         )
 
@@ -1242,6 +1259,9 @@ class MortalWoundApplicationProgress:
             mortal_wounds=context["mortal_wounds"],
             remaining_mortal_wounds=context["remaining_mortal_wounds"],
             spill_over=context["spill_over"],
+            destruction_evidence=evidence_from_json(
+                cast(JsonValue, context["destruction_evidence"])
+            ),
             applications=tuple(
                 DamageApplication.from_payload(application)
                 for application in context["applications"]
@@ -1274,6 +1294,7 @@ class MortalWoundApplicationProgress:
             "mortal_wounds": self.mortal_wounds,
             "remaining_mortal_wounds": self.remaining_mortal_wounds,
             "spill_over": self.spill_over,
+            "destruction_evidence": evidence_to_json(self.destruction_evidence),
             "applications": [application.to_payload() for application in self.applications],
             "feel_no_pain_resolutions": [
                 resolution.to_payload() for resolution in self.feel_no_pain_resolutions
@@ -1286,22 +1307,12 @@ class MortalWoundApplicationProgress:
     def with_remaining_lost(self) -> Self:
         if self.remaining_mortal_wounds == 0:
             return self
-        return type(self)(
-            application_id=self.application_id,
-            source_rule_id=self.source_rule_id,
-            source_context=self.source_context,
-            target_unit_instance_id=self.target_unit_instance_id,
-            defender_player_id=self.defender_player_id,
-            mortal_wounds=self.mortal_wounds,
+        return replace(
+            self,
             remaining_mortal_wounds=0,
-            spill_over=self.spill_over,
-            applications=self.applications,
-            feel_no_pain_resolutions=self.feel_no_pain_resolutions,
-            ignored_mortal_wounds=self.ignored_mortal_wounds,
             remaining_mortal_wounds_lost=(
                 self.remaining_mortal_wounds_lost + self.remaining_mortal_wounds
             ),
-            priority_model_ids=self.priority_model_ids,
         )
 
     def after_wound_resolution(
@@ -1337,24 +1348,17 @@ class MortalWoundApplicationProgress:
                 remaining_lost += self.remaining_mortal_wounds - 1
         else:
             ignored += 1
-        return type(self)(
-            application_id=self.application_id,
-            source_rule_id=self.source_rule_id,
-            source_context=self.source_context,
-            target_unit_instance_id=self.target_unit_instance_id,
-            defender_player_id=self.defender_player_id,
-            mortal_wounds=self.mortal_wounds,
+        return replace(
+            self,
             remaining_mortal_wounds=(
                 0
                 if remaining_lost != self.remaining_mortal_wounds_lost
                 else self.remaining_mortal_wounds - 1
             ),
-            spill_over=self.spill_over,
             applications=tuple(applications),
             feel_no_pain_resolutions=(*self.feel_no_pain_resolutions, resolution),
             ignored_mortal_wounds=ignored,
             remaining_mortal_wounds_lost=remaining_lost,
-            priority_model_ids=self.priority_model_ids,
         )
 
     def to_application(self) -> MortalWoundApplication:
@@ -2190,6 +2194,7 @@ def mortal_wound_feel_no_pain_source_context(request: DecisionRequest) -> JsonVa
 def continue_mortal_wound_application(
     *,
     state: GameState,
+    decisions: DecisionController,
     request_id: str,
     progress: MortalWoundApplicationProgress,
     dice_manager: DiceRollManager | None = None,
@@ -2197,6 +2202,10 @@ def continue_mortal_wound_application(
 ) -> MortalWoundRoutingResult:
     if type(remove_destroyed_models) is not bool:
         raise GameLifecycleError("remove_destroyed_models must be a bool.")
+    validate_mortal_wound_destruction_evidence_mode(
+        progress=progress,
+        remove_destroyed_models=remove_destroyed_models,
+    )
     current = progress
     while current.remaining_mortal_wounds > 0:
         rules_unit = current_placed_alive_rules_unit_view_for_identity(
@@ -2205,6 +2214,12 @@ def continue_mortal_wound_application(
         )
         if rules_unit is None:
             completed = current.with_remaining_lost()
+            record_finalized_mortal_wound_progress_destructions(
+                state=state,
+                decisions=decisions,
+                progress=completed,
+                remove_destroyed_models=remove_destroyed_models,
+            )
             return MortalWoundRoutingResult(
                 progress=completed,
                 application=completed.to_application(),
@@ -2231,6 +2246,12 @@ def continue_mortal_wound_application(
         legal_model_ids = allocation_context.legal_model_ids()
         if not legal_model_ids:
             completed = current.with_remaining_lost()
+            record_finalized_mortal_wound_progress_destructions(
+                state=state,
+                decisions=decisions,
+                progress=completed,
+                remove_destroyed_models=remove_destroyed_models,
+            )
             return MortalWoundRoutingResult(
                 progress=completed,
                 application=completed.to_application(),
@@ -2271,12 +2292,19 @@ def continue_mortal_wound_application(
             resolution=resolution,
             remove_destroyed_model=remove_destroyed_models,
         )
+    record_finalized_mortal_wound_progress_destructions(
+        state=state,
+        decisions=decisions,
+        progress=current,
+        remove_destroyed_models=remove_destroyed_models,
+    )
     return MortalWoundRoutingResult(progress=current, application=current.to_application())
 
 
 def resolve_mortal_wound_feel_no_pain_decision(
     *,
     state: GameState,
+    decisions: DecisionController,
     request: DecisionRequest,
     result: DecisionResult,
     next_request_id: str,
@@ -2315,6 +2343,7 @@ def resolve_mortal_wound_feel_no_pain_decision(
     )
     return continue_mortal_wound_application(
         state=state,
+        decisions=decisions,
         request_id=next_request_id,
         progress=updated,
         dice_manager=dice_manager,
@@ -2452,84 +2481,33 @@ def destroy_model_by_rule(
 def apply_mortal_wounds_to_unit(
     *,
     state: GameState,
+    decisions: DecisionController,
+    application_id: str,
+    source_rule_id: str,
+    source_context: JsonValue,
+    destruction_evidence: MortalWoundDestructionEvidence,
     target_unit_instance_id: str,
     mortal_wounds: int,
     spill_over: bool = True,
     dice_manager: DiceRollManager | None = None,
     defender_player_id: str | None = None,
 ) -> MortalWoundApplication:
-    remaining = _validate_positive_int("mortal_wounds", mortal_wounds)
-    if type(spill_over) is not bool:
-        raise GameLifecycleError("spill_over must be a bool.")
-    applications: list[DamageApplication] = []
-    feel_no_pain_resolutions: list[FeelNoPainResolution] = []
-    ignored_mortal_wounds = 0
-    remaining_lost = 0
-    target_unit_id = target_unit_instance_id
-    while remaining > 0:
-        rules_unit = current_placed_alive_rules_unit_view_for_identity(
-            state=state,
-            unit_instance_id=target_unit_id,
-        )
-        if rules_unit is None:
-            remaining_lost = remaining
-            break
-        context = allocation_context_for_unit(
-            state=state,
-            target_unit_instance_id=rules_unit.unit_instance_id,
-        )
-        legal_model_ids = context.legal_model_ids()
-        if not legal_model_ids:
-            remaining_lost = remaining
-            break
-        model_id = legal_model_ids[0]
-        sources = _state_feel_no_pain_sources(state=state, model_instance_id=model_id)
-        decline_allowed = _state_feel_no_pain_decline_allowed(
-            state=state,
-            model_instance_id=model_id,
-        )
-        if len(sources) > 0:
-            if len(sources) > 1 or decline_allowed:
-                raise GameLifecycleError(
-                    "Mortal wound Feel No Pain choices require lifecycle routing."
-                )
-            source = sources[0]
-            if dice_manager is None or defender_player_id is None:
-                raise GameLifecycleError(
-                    "Mortal wound Feel No Pain resolution requires dice manager and defender."
-                )
-            resolution = resolve_feel_no_pain_rolls(
-                manager=dice_manager,
-                source=source,
-                player_id=defender_player_id,
-                model_instance_id=model_id,
-                requested_wounds=1,
-            )
-            feel_no_pain_resolutions.append(resolution)
-            if resolution.ignored_wounds == 1:
-                ignored_mortal_wounds += 1
-                remaining -= 1
-                continue
-        application = apply_damage_to_model(
-            state=state,
-            target_unit_instance_id=target_unit_instance_id,
-            model_instance_id=model_id,
-            damage=1,
-            damage_kind=DamageKind.MORTAL,
-        )
-        applications.append(application)
-        remaining -= 1
-        if application.destroyed and not spill_over:
-            remaining_lost = remaining
-            remaining = 0
-    return MortalWoundApplication(
+    from warhammer40k_core.engine.direct_mortal_wound_application import (
+        apply_direct_mortal_wounds_to_unit,
+    )
+
+    return apply_direct_mortal_wounds_to_unit(
+        state=state,
+        decisions=decisions,
+        application_id=application_id,
+        source_rule_id=source_rule_id,
+        source_context=source_context,
+        destruction_evidence=destruction_evidence,
         target_unit_instance_id=target_unit_instance_id,
         mortal_wounds=mortal_wounds,
         spill_over=spill_over,
-        applications=tuple(applications),
-        feel_no_pain_resolutions=tuple(feel_no_pain_resolutions),
-        ignored_mortal_wounds=ignored_mortal_wounds,
-        remaining_mortal_wounds_lost=remaining_lost,
+        dice_manager=dice_manager,
+        defender_player_id=defender_player_id,
     )
 
 

@@ -1694,6 +1694,7 @@ class RuntimeContentBundle:
                 *catalog_runtime_hooks.attack_sequence_completed_hook_bindings(
                     ability_indexes_by_player_id=ability_indexes_by_player_id,
                     armies=validated_armies,
+                    army_catalog=catalog,
                 ),
                 *_contribution_values(
                     validated_contributions,

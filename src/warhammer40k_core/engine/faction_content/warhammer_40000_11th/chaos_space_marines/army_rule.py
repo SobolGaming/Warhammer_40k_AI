@@ -40,6 +40,7 @@ from warhammer40k_core.engine.damage_allocation import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
@@ -47,6 +48,9 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
     FightUnitSelectedGrantBinding,
+)
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
 )
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
@@ -484,9 +488,18 @@ def resolve_dark_pact_attack_sequence_completion(
         defender_player_id=rules_unit.owner_player_id,
         mortal_wounds=d3_result.value,
         spill_over=True,
+        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            state=context.state,
+            destroying_player_id=rules_unit.owner_player_id,
+            source_rules_unit_instance_id=rules_unit.unit_instance_id,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=context.source_phase,
+            source_step="dark_pacts_mortal_wounds",
+        ),
     )
     routed = continue_mortal_wound_application(
         state=context.state,
+        decisions=context.decisions,
         dice_manager=context.dice_manager,
         request_id=context.state.next_decision_request_id(),
         progress=progress,
@@ -509,6 +522,7 @@ def apply_dark_pact_mortal_wound_feel_no_pain_decision(
         raise GameLifecycleError("Dark Pacts FNP continuation requires context.")
     routed = resolve_mortal_wound_feel_no_pain_decision(
         state=context.state,
+        decisions=context.decisions,
         request=context.request,
         result=context.result,
         next_request_id=context.state.next_decision_request_id(),

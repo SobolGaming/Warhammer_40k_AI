@@ -40,6 +40,7 @@ from warhammer40k_core.engine.damage_allocation import MortalWoundApplicationPro
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     datasheets,
@@ -64,6 +65,9 @@ from warhammer40k_core.engine.fight_phase_start_hooks import (
     SELECT_FACTION_RULE_FIGHT_PHASE_START_OPTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationContext,
 )
@@ -955,6 +959,14 @@ def test_relentless_carnage_mortal_wound_routing_records_pending_fnp() -> None:
         defender_player_id="player-b",
         mortal_wounds=1,
         spill_over=True,
+        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            state=state,
+            destroying_player_id="player-a",
+            source_rules_unit_instance_id=None,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=BattlePhase.FIGHT,
+            source_step="relentless_carnage",
+        ),
     )
     routed_request = _generic_fight_end_request(state)
 
@@ -992,6 +1004,14 @@ def test_datasheet_private_helpers_fail_fast_on_invalid_inputs() -> None:
         defender_player_id="player-b",
         mortal_wounds=1,
         spill_over=True,
+        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            state=state,
+            destroying_player_id="player-a",
+            source_rules_unit_instance_id=None,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=BattlePhase.FIGHT,
+            source_step="relentless_carnage",
+        ),
     )
 
     with pytest.raises(GameLifecycleError, match="requires GameState"):

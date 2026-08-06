@@ -23,6 +23,7 @@ from warhammer40k_core.engine.battlefield_state import PlacementError, geometry_
 from warhammer40k_core.engine.core_stratagem_effects import SMOKESCREEN_EFFECT_KIND
 from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
 from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -33,6 +34,9 @@ from warhammer40k_core.engine.faction_content.common import (
 from warhammer40k_core.engine.faction_content.stratagem_handlers import (
     StratagemHandlerContext,
     StratagemHandlerExecutionResult,
+)
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
 )
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
@@ -909,8 +913,30 @@ def _apply_lethal_ruse_mortal_wounds(context: StratagemHandlerContext) -> JsonVa
     )
     application_payload: JsonValue = None
     if applied_mortal_wounds:
+        source_context = validate_json_value(
+            {
+                "stratagem_use": context.use_record.to_payload(),
+                "source_unit_instance_id": unit.unit_instance_id,
+                "target_unit_instance_id": enemy_unit_id,
+            }
+        )
         application = apply_mortal_wounds_to_unit(
             state=context.state,
+            decisions=context.decisions,
+            application_id=f"{context.use_record.use_id}:mortal-wounds:{enemy_unit_id}",
+            source_rule_id=LETHAL_RUSE_RECORD_ID,
+            source_context=source_context,
+            destruction_evidence=MortalWoundDestructionEvidence.for_state(
+                state=context.state,
+                destroying_player_id=context.use_record.player_id,
+                source_rules_unit_instance_id=rules_unit_view_by_id(
+                    state=context.state,
+                    unit_instance_id=unit.unit_instance_id,
+                ).unit_instance_id,
+                destruction_source_kind=DestructionSourceKind.ABILITY,
+                action_phase=BattlePhase(context.use_record.phase.value),
+                source_step="lethal_ruse_mortal_wounds",
+            ),
             target_unit_instance_id=enemy_unit_id,
             mortal_wounds=applied_mortal_wounds,
             spill_over=True,

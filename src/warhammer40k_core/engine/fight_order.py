@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Self, TypedDict, cast
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
@@ -133,6 +133,7 @@ class FightPhaseStatePayload(TypedDict):
     consolidate_state: FightMovementStepStatePayload | None
     fight_order_state: FightOrderStatePayload
     active_activation: FightActivationSelectionPayload | None
+    pending_completed_attack_sequence: NotRequired[AttackSequencePayload]
     attack_sequence: AttackSequencePayload | None
     allocated_model_ids_this_phase: list[str]
     overrun_pile_in_completed_activation_result_ids: list[str]
@@ -892,6 +893,7 @@ class FightPhaseState:
     pile_in_state: FightMovementStepState | None = None
     consolidate_state: FightMovementStepState | None = None
     active_activation: FightActivationSelection | None = None
+    pending_completed_attack_sequence: AttackSequence | None = None
     attack_sequence: AttackSequence | None = None
     allocated_model_ids_this_phase: tuple[str, ...] = ()
     overrun_pile_in_completed_activation_result_ids: tuple[str, ...] = ()
@@ -934,8 +936,19 @@ class FightPhaseState:
             raise GameLifecycleError(
                 "FightPhaseState active_activation must be FightActivationSelection."
             )
+        if (
+            self.pending_completed_attack_sequence is not None
+            and type(self.pending_completed_attack_sequence) is not AttackSequence
+        ):
+            raise GameLifecycleError(
+                "FightPhaseState pending_completed_attack_sequence must be AttackSequence."
+            )
         if self.attack_sequence is not None and type(self.attack_sequence) is not AttackSequence:
             raise GameLifecycleError("FightPhaseState attack_sequence must be AttackSequence.")
+        if self.attack_sequence is not None and self.pending_completed_attack_sequence is not None:
+            raise GameLifecycleError(
+                "FightPhaseState cannot retain active and completed attack sequences together."
+            )
         object.__setattr__(
             self,
             "allocated_model_ids_this_phase",
@@ -1066,6 +1079,7 @@ class FightPhaseState:
             consolidate_state=self.consolidate_state,
             fight_order_state=self.fight_order_state,
             active_activation=self.active_activation,
+            pending_completed_attack_sequence=self.pending_completed_attack_sequence,
             attack_sequence=self.attack_sequence,
             allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
             overrun_pile_in_completed_activation_result_ids=(
@@ -1111,6 +1125,16 @@ class FightPhaseState:
             allocated_model_ids_this_phase=allocated_model_ids_this_phase,
         )
 
+    def with_pending_completed_attack_sequence(
+        self,
+        attack_sequence: AttackSequence | None,
+    ) -> Self:
+        if attack_sequence is not None and type(attack_sequence) is not AttackSequence:
+            raise GameLifecycleError(
+                "FightPhaseState completed attack sequence update requires sequence."
+            )
+        return self._replace(pending_completed_attack_sequence=attack_sequence)
+
     def with_overrun_pile_in_completed(self, *, activation_result_id: str) -> Self:
         result_id = _validate_identifier("activation_result_id", activation_result_id)
         if result_id in self.overrun_pile_in_completed_activation_result_ids:
@@ -1138,6 +1162,7 @@ class FightPhaseState:
             consolidate_state=self.consolidate_state,
             fight_order_state=self.fight_order_state,
             active_activation=None,
+            pending_completed_attack_sequence=None,
             attack_sequence=None,
             allocated_model_ids_this_phase=self.allocated_model_ids_this_phase,
             overrun_pile_in_completed_activation_result_ids=(
@@ -1158,6 +1183,7 @@ class FightPhaseState:
         pile_in_state: FightMovementStepState | None | object = _UNSET,
         consolidate_state: FightMovementStepState | None | object = _UNSET,
         active_activation: FightActivationSelection | None | object = _UNSET,
+        pending_completed_attack_sequence: AttackSequence | None | object = _UNSET,
         attack_sequence: AttackSequence | None | object = _UNSET,
         allocated_model_ids_this_phase: tuple[str, ...] | None = None,
         overrun_pile_in_completed_activation_result_ids: tuple[str, ...] | None = None,
@@ -1168,6 +1194,11 @@ class FightPhaseState:
         )
         next_active_activation = (
             self.active_activation if active_activation is _UNSET else active_activation
+        )
+        next_pending_completed_attack_sequence = (
+            self.pending_completed_attack_sequence
+            if pending_completed_attack_sequence is _UNSET
+            else pending_completed_attack_sequence
         )
         next_attack_sequence = (
             self.attack_sequence if attack_sequence is _UNSET else attack_sequence
@@ -1183,6 +1214,10 @@ class FightPhaseState:
                 self.fight_order_state if fight_order_state is None else fight_order_state
             ),
             active_activation=cast(FightActivationSelection | None, next_active_activation),
+            pending_completed_attack_sequence=cast(
+                AttackSequence | None,
+                next_pending_completed_attack_sequence,
+            ),
             attack_sequence=cast(AttackSequence | None, next_attack_sequence),
             allocated_model_ids_this_phase=(
                 self.allocated_model_ids_this_phase
@@ -1198,7 +1233,7 @@ class FightPhaseState:
         )
 
     def to_payload(self) -> FightPhaseStatePayload:
-        return {
+        payload: FightPhaseStatePayload = {
             "battle_round": self.battle_round,
             "active_player_id": self.active_player_id,
             "current_step": self.current_step.value,
@@ -1222,6 +1257,11 @@ class FightPhaseState:
             ),
             "phase_complete": self.phase_complete,
         }
+        if self.pending_completed_attack_sequence is not None:
+            payload["pending_completed_attack_sequence"] = (
+                self.pending_completed_attack_sequence.to_payload()
+            )
+        return payload
 
     @classmethod
     def from_payload(cls, payload: FightPhaseStatePayload) -> Self:
@@ -1245,6 +1285,11 @@ class FightPhaseState:
                 None
                 if payload["active_activation"] is None
                 else FightActivationSelection.from_payload(payload["active_activation"])
+            ),
+            pending_completed_attack_sequence=(
+                None
+                if (completed_payload := payload.get("pending_completed_attack_sequence")) is None
+                else AttackSequence.from_payload(completed_payload)
             ),
             attack_sequence=(
                 None
