@@ -46,6 +46,11 @@ Phase 18J adds the optional `battlefield_view` game-view member with its own
 `battlefield-view-v1` family version. It separates viewer-scoped authoritative
 geometry and its hash from interaction overlays and non-authoritative render
 hints under the normative `coordinate-system.md` world frame.
+`examples/battlefield/geometry-conformance.json` is the canonical standalone
+`battlefield-view-v1` fixture for every declared geometry union surface and is
+validated by both Python and the generated TypeScript client. Movement and
+shared placement proposal requests use a separate opaque engine-owned
+`spatial_context_hash`; the viewer-scoped authoritative hash is informational.
 Its parameterized command member references the same canonical 20-kind proposal
 union plus both typed Cult Ambush alternatives and the return-on-death payload
 family as the standalone submission schema; it is not an unrestricted JSON

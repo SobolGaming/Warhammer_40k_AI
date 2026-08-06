@@ -103,6 +103,7 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
+from warhammer40k_core.geometry.model_geometry import GeometrySourceKind
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
@@ -301,6 +302,58 @@ def test_stale_proposal_submission_is_rejected() -> None:
     assert cast(list[dict[str, object]], validation["violations"])[0]["violation_code"] == (
         "stale_proposal_request"
     )
+    assert len(session.lifecycle.decision_controller.records) == before_record_count
+    assert session.lifecycle.decision_controller.queue.pending_requests == (proposal_request,)
+
+
+def test_source_geometry_drift_rejects_pending_movement_before_queue_pop() -> None:
+    session, action_request = _local_session_at_first_movement_action()
+    proposal_request = _decision_request(
+        session.submit_option(
+            request_id=action_request.request_id,
+            option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+            result_id="phase18j-source-drift-normal-action",
+        )
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(proposal_request.payload)
+    state = _session_state(session)
+    before = _unit_placement(state, proposal.unit_instance_id)
+    before_battlefield = state.battlefield_state
+    before_record_count = len(session.lifecycle.decision_controller.records)
+    assert proposal.spatial_context_hash == state.physical_proposal_context_hash()
+
+    _drift_first_model_geometry_source(state, source_id="phase18j-movement-source-drift")
+
+    assert proposal.spatial_context_hash != state.physical_proposal_context_hash()
+    status = session.submit_parameterized_payload(
+        request_id=proposal_request.request_id,
+        payload=_json(
+            MovementProposalPayload(
+                proposal_request_id=proposal.request_id,
+                proposal_kind=ProposalKind.NORMAL_MOVE,
+                unit_instance_id=proposal.unit_instance_id,
+                movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE.value,
+                movement_mode=MovementMode.NORMAL.value,
+                witness=_shift_witness(before, dx=3.0),
+            ).to_payload()
+        ),
+        result_id="phase18j-source-drift-normal-proposal",
+    )
+    violation = cast(
+        list[dict[str, object]],
+        _proposal_validation(status)["violations"],
+    )[0]
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert violation == {
+        "violation_code": "spatial_context_drift",
+        "message": (
+            "Authoritative battlefield geometry or source context changed after the "
+            "proposal request was issued."
+        ),
+        "field": "spatial_context_hash",
+    }
+    assert state.battlefield_state is before_battlefield
     assert len(session.lifecycle.decision_controller.records) == before_record_count
     assert session.lifecycle.decision_controller.queue.pending_requests == (proposal_request,)
 
@@ -1001,6 +1054,56 @@ def test_placement_proposal_drift_rejections_keep_pending_request_and_records_cl
         assert violation_text in json.dumps(violation, sort_keys=True)
         assert len(decisions.records) == before_record_count
         assert decisions.queue.pending_requests == (placement_request,)
+
+
+def test_source_geometry_drift_rejects_pending_shared_placement_before_queue_pop() -> None:
+    state, reserve_state, reserve_unit = _battle_state_with_reserve()
+    handler, decisions, selection_request = _enter_reinforcements_choice(state=state)
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=selection_request,
+            option_id=reserve_state.unit_instance_id,
+            result_id="phase18j-select-source-drift-reserve",
+        )
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
+    before_battlefield = state.battlefield_state
+    before_record_count = len(decisions.records)
+    assert proposal.spatial_context_hash == state.physical_proposal_context_hash()
+
+    _drift_first_model_geometry_source(state, source_id="phase18j-placement-source-drift")
+
+    status = _submit_parameterized_handler_payload(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        payload=_json(
+            PlacementProposalPayload(
+                proposal_request_id=proposal.request_id,
+                proposal_kind=proposal.proposal_kind,
+                unit_instance_id=reserve_state.unit_instance_id,
+                placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+                attempted_placement=_reserve_placement(reserve_unit=reserve_unit),
+            ).to_payload()
+        ),
+        result_id="phase18j-submit-source-drift-reserve",
+    )
+    assert status is not None
+    violation = cast(
+        list[dict[str, object]],
+        _proposal_validation(status)["violations"],
+    )[0]
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert violation["violation_code"] == "spatial_context_drift"
+    assert violation["field"] == "spatial_context_hash"
+    assert state.battlefield_state is before_battlefield
+    assert len(decisions.records) == before_record_count
+    assert decisions.queue.pending_requests == (placement_request,)
 
 
 def test_valid_disembark_placement_proposal_updates_cargo_and_battlefield() -> None:
@@ -1845,6 +1948,24 @@ def _battle_state_with_reserve() -> tuple[GameState, ReserveState, UnitInstance]
     return state, reserve_state, reserve_unit
 
 
+def _drift_first_model_geometry_source(state: GameState, *, source_id: str) -> None:
+    army = state.army_definitions[0]
+    unit = army.units[0]
+    model = unit.own_models[0]
+    drifted_model = replace(
+        model,
+        geometry=replace(
+            model.geometry,
+            geometry_source_kind=GeometrySourceKind.MANUAL_OVERRIDE,
+            geometry_source_id=source_id,
+        ),
+    )
+    state.army_definitions[0] = replace(
+        army,
+        units=(replace(unit, own_models=(drifted_model, *unit.own_models[1:])), *army.units[1:]),
+    )
+
+
 def _enter_reinforcements_choice(
     *,
     state: GameState,
@@ -1922,6 +2043,13 @@ def _battle_state_with_embarked_passenger() -> tuple[GameState, UnitInstance, Un
         active_player_id="player-a",
         army_definitions=list(armies),
         battlefield_state=battlefield,
+        mission_setup=MissionSetup.from_mission_pack(
+            mission_pack=chapter_approved_2026_27_mission_pack(),
+            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+            attacker_player_id="player-a",
+            defender_player_id="player-b",
+        ),
         movement_phase_state=MovementPhaseState(
             battle_round=1,
             active_player_id="player-a",

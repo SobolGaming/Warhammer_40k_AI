@@ -24,6 +24,7 @@ from referencing.jsonschema import (
     SchemaResource,
 )
 from scripts.export_ui_contract_fixtures import (
+    BATTLEFIELD_EXAMPLE_DIR,
     DECISION_EXAMPLE_DIR,
     MODEL_ALPHA_1,
     PLAYER_A,
@@ -41,11 +42,11 @@ from warhammer40k_core.adapters.battlefield_projection import (
     BATTLEFIELD_COORDINATE_SPEC_VERSION,
     BATTLEFIELD_VIEW_SCHEMA_VERSION,
     BattlefieldViewPayload,
-    _authoritative_geometry_hash,
     _model_geometry,
     _model_state,
     _polygon_shape,
     _terrain_feature_entity,
+    authoritative_geometry_hash,
 )
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.projection import (
@@ -127,6 +128,7 @@ PROPOSAL_EXAMPLE_FILES = (
     "shooting_target_selection.json",
 )
 DECISION_FAMILY_COVERAGE_PATH = Path("contracts/examples/decisions/family-coverage.json")
+BATTLEFIELD_GEOMETRY_CONFORMANCE_PATH = BATTLEFIELD_EXAMPLE_DIR / "geometry-conformance.json"
 
 
 class _PayloadValidator(Protocol):
@@ -153,6 +155,7 @@ class _ContractSnapshotVerifier(Protocol):
 def test_ui_contract_artifacts_are_json_safe_and_scrubbed() -> None:
     paths = (
         *SCHEMA_FILES,
+        BATTLEFIELD_GEOMETRY_CONFORMANCE_PATH,
         *(_fixture_path(name) for name in FIXTURE_FILES),
         *(PROPOSAL_EXAMPLE_DIR / name for name in PROPOSAL_EXAMPLE_FILES),
         DECISION_EXAMPLE_DIR / "opportunity_window.json",
@@ -182,6 +185,10 @@ def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
     )
     for fixture_name in GAME_VIEW_FIXTURE_FILES:
         game_view_validator.validate(_fixture(fixture_name))
+
+    _schema_validator("battlefield-view.schema.json", registry=registry).validate(
+        _read_json(REPO_ROOT / BATTLEFIELD_GEOMETRY_CONFORMANCE_PATH)
+    )
 
     _schema_validator("decision-request-view.schema.json", registry=registry).validate(
         _fixture("pending_movement_request.json")
@@ -480,6 +487,88 @@ def test_phase18j_geometry_maps_round_oval_hull_support_and_terrain() -> None:
     ]
 
 
+def test_phase18j_published_geometry_conformance_fixture_covers_declared_union() -> None:
+    battlefield = cast(
+        BattlefieldViewPayload,
+        _read_json(REPO_ROOT / BATTLEFIELD_GEOMETRY_CONFORMANCE_PATH),
+    )
+    models = tuple(battlefield["authoritative"]["models_by_id"].values())
+    measurement_kinds = {
+        shape["kind"] for model in models for shape in model["geometry"]["measurement_shapes"]
+    }
+    support_kinds = {model["geometry"]["support_shape"]["kind"] for model in models}
+    measurement_bases = {model["geometry"]["measurement_basis"] for model in models}
+
+    assert measurement_kinds == {"circle", "ellipse", "rectangle"}
+    assert support_kinds == {"circle", "ellipse"}
+    assert measurement_bases == {"base", "hull"}
+    assert all(model["pose"] is not None for model in models)
+    assert all(
+        model["pose"] is not None and model["pose"]["facing_degrees"] != 0.0 for model in models
+    )
+
+    terrain = battlefield["authoritative"]["terrain_features_by_id"]["geometry-conformance-terrain"]
+    assert terrain["footprint"]["kind"] == "rectangle"
+    assert {volume["volume_kind"] for volume in terrain["volumes"]} == {"wall", "floor"}
+    assert (
+        battlefield["authoritative"]["terrain_areas_by_id"]["geometry-conformance-area"][
+            "footprint"
+        ]["kind"]
+        == "polygon"
+    )
+    assert battlefield["authoritative"]["objectives_by_id"]
+
+    zone_shape = battlefield["authoritative"]["deployment_zones_by_id"][
+        "geometry-conformance-zone"
+    ]["shape"]
+    assert len(zone_shape["circle_cutouts"]) == 1
+    assert len(zone_shape["polygon_cutouts"]) == 1
+    assert zone_shape["circle_cutouts"][0]["kind"] == "circle"
+    assert zone_shape["polygon_cutouts"][0]["kind"] == "polygon"
+    assert battlefield["interaction"]["measurement_overlays"]
+    path = battlefield["interaction"]["path_overlays"][0]
+    assert len(path["segments"]) == 2
+    assert {segment["segment_kind"] for segment in path["segments"]} == {"line"}
+    assert (
+        battlefield["render"]["hit_regions_by_entity_id"]["geometry-conformance-terrain"]["shape"][
+            "kind"
+        ]
+        == "polygon"
+    )
+
+
+def test_phase18j_shape_schema_rejects_missing_centers_and_unanchored_polygon_rotation() -> None:
+    validator = _schema_validator(
+        "battlefield-view.schema.json",
+        registry=_schema_registry(),
+    )
+    battlefield = cast(
+        BattlefieldViewPayload,
+        _read_json(REPO_ROOT / BATTLEFIELD_GEOMETRY_CONFORMANCE_PATH),
+    )
+    missing_center = cast(
+        BattlefieldViewPayload,
+        json.loads(json.dumps(battlefield, sort_keys=True)),
+    )
+    circle = missing_center["authoritative"]["models_by_id"]["geometry-conformance-circle-model"][
+        "geometry"
+    ]["measurement_shapes"][0]
+    circle["center"] = None
+    with pytest.raises(ValidationError):
+        validator.validate(missing_center)
+
+    unanchored_rotation = cast(
+        BattlefieldViewPayload,
+        json.loads(json.dumps(battlefield, sort_keys=True)),
+    )
+    polygon = unanchored_rotation["render"]["hit_regions_by_entity_id"][
+        "geometry-conformance-terrain"
+    ]["shape"]
+    polygon["rotation_degrees"] = 15.0
+    with pytest.raises(ValidationError):
+        validator.validate(unanchored_rotation)
+
+
 def test_phase18j_model_state_projection_is_explicit_and_fail_closed() -> None:
     session, _status = build_local_session_at_movement_request(game_id="phase18j-model-states")
     state = session.lifecycle.state
@@ -591,7 +680,7 @@ def test_phase18j_interaction_and_render_geometry_do_not_change_authoritative_ha
         "asset_id": "changed-asset",
     }
     assert (
-        _authoritative_geometry_hash(
+        authoritative_geometry_hash(
             bounds=non_authoritative_change["bounds"],
             authoritative=non_authoritative_change["authoritative"],
         )
@@ -610,7 +699,7 @@ def test_phase18j_interaction_and_render_geometry_do_not_change_authoritative_ha
     assert first_model["pose"] is not None
     first_model["pose"]["position"]["x_inches"] += 0.25
     assert (
-        _authoritative_geometry_hash(
+        authoritative_geometry_hash(
             bounds=authoritative_change["bounds"],
             authoritative=authoritative_change["authoritative"],
         )
@@ -647,6 +736,50 @@ def test_phase18j_interaction_and_render_geometry_do_not_change_authoritative_ha
     assert drifted_battlefield is not None
     assert drifted_battlefield["authoritative_geometry_hash"] != original_hash
     assert drifted_view["projection_state_hash"] != view["projection_state_hash"]
+
+
+def test_phase18j_physical_proposal_context_excludes_render_geometry() -> None:
+    session, _status = build_local_session_at_movement_request(
+        game_id="phase18j-physical-context-render-boundary"
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    assert state.mission_setup is not None
+    feature = _phase18j_terrain_feature()
+    state.battlefield_state = replace(state.battlefield_state, terrain_features=(feature,))
+    state.mission_setup = replace(state.mission_setup, terrain_features=(feature,))
+    authoritative_context_hash = state.physical_proposal_context_hash()
+
+    render_changed = replace(
+        feature,
+        display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=10.0,
+            center_y_inches=12.0,
+            width_inches=6.0,
+            depth_inches=4.0,
+            display_template_id="phase18j-render-only-context-change",
+        ),
+    )
+    state.battlefield_state = replace(
+        state.battlefield_state,
+        terrain_features=(render_changed,),
+    )
+    state.mission_setup = replace(state.mission_setup, terrain_features=(render_changed,))
+
+    assert state.physical_proposal_context_hash() == authoritative_context_hash
+
+    rules_changed = replace(
+        render_changed,
+        walls=(replace(render_changed.walls[0], height_inches=4.0),),
+    )
+    state.battlefield_state = replace(
+        state.battlefield_state,
+        terrain_features=(rules_changed,),
+    )
+    state.mission_setup = replace(state.mission_setup, terrain_features=(rules_changed,))
+
+    assert state.physical_proposal_context_hash() != authoritative_context_hash
 
 
 def _phase18j_terrain_feature() -> TerrainFeatureDefinition:

@@ -7,6 +7,15 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import cast
 
+from warhammer40k_core.adapters.battlefield_projection import (
+    BATTLEFIELD_COORDINATE_SPACE,
+    BATTLEFIELD_COORDINATE_SPEC_VERSION,
+    BATTLEFIELD_VIEW_SCHEMA_VERSION,
+    BattlefieldAuthoritativeEntitiesPayload,
+    BattlefieldBoundsPayload,
+    BattlefieldViewPayload,
+    authoritative_geometry_hash,
+)
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.adapters.projection import GameViewPayload
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -83,6 +92,7 @@ from warhammer40k_core.rules.mission_pack_import import (
 )
 
 UI_FIXTURE_DIR = Path("contracts/examples/projections")
+BATTLEFIELD_EXAMPLE_DIR = Path("contracts/examples/battlefield")
 DECISION_EXAMPLE_DIR = Path("contracts/examples/decisions")
 PROPOSAL_EXAMPLE_DIR = DECISION_EXAMPLE_DIR / "proposals"
 
@@ -100,6 +110,7 @@ MODEL_BETA_1 = "army-beta:intercessor-unit-2:core-intercessor-like:001"
 @dataclass(frozen=True, slots=True)
 class UiContractBundle:
     fixtures: dict[str, JsonValue]
+    battlefield_examples: dict[str, JsonValue]
     proposal_payload_examples: dict[str, JsonValue]
 
 
@@ -129,6 +140,10 @@ def export_ui_contract_files(*, output_root: Path) -> tuple[Path, ...]:
             DECISION_EXAMPLE_DIR if name == "pending_movement_request.json" else UI_FIXTURE_DIR
         )
         path = output_root / fixture_directory / name
+        _write_json(path, payload)
+        written.append(path)
+    for name, payload in sorted(bundle.battlefield_examples.items()):
+        path = output_root / BATTLEFIELD_EXAMPLE_DIR / name
         _write_json(path, payload)
         written.append(path)
     for name, payload in sorted(bundle.proposal_payload_examples.items()):
@@ -191,8 +206,361 @@ def build_ui_contract_bundle() -> UiContractBundle:
     }
     return UiContractBundle(
         fixtures=fixtures,
+        battlefield_examples={
+            "geometry-conformance.json": validate_json_value(
+                cast(JsonValue, _battlefield_geometry_conformance_example())
+            )
+        },
         proposal_payload_examples=_proposal_payload_examples(),
     )
+
+
+def _battlefield_geometry_conformance_example() -> BattlefieldViewPayload:
+    bounds = cast(
+        BattlefieldBoundsPayload,
+        validate_json_value(
+            {
+                "min_x_inches": 0.0,
+                "min_y_inches": 0.0,
+                "min_z_inches": 0.0,
+                "max_x_inches": 60.0,
+                "max_y_inches": 44.0,
+            }
+        ),
+    )
+    circle_model_id = "geometry-conformance-circle-model"
+    oval_model_id = "geometry-conformance-oval-model"
+    hull_model_id = "geometry-conformance-hull-model"
+    region_shape = {
+        "polygons": [
+            [
+                _conformance_point(0.0, 0.0),
+                _conformance_point(20.0, 0.0),
+                _conformance_point(20.0, 12.0),
+                _conformance_point(0.0, 12.0),
+            ]
+        ],
+        "circle_cutouts": [
+            _conformance_shape(
+                kind="circle",
+                center=_conformance_point(5.0, 5.0),
+                radius=1.5,
+            )
+        ],
+        "polygon_cutouts": [
+            _conformance_shape(
+                kind="polygon",
+                vertices=[
+                    _conformance_point(10.0, 2.0),
+                    _conformance_point(13.0, 2.0),
+                    _conformance_point(11.5, 4.0),
+                ],
+            )
+        ],
+    }
+    authoritative = cast(
+        BattlefieldAuthoritativeEntitiesPayload,
+        validate_json_value(
+            {
+                "models_by_id": {
+                    circle_model_id: _conformance_model(
+                        model_id=circle_model_id,
+                        unit_id="geometry-conformance-circle-unit",
+                        pose=_conformance_pose(8.0, 8.0, facing=30.0),
+                        measurement_basis="base",
+                        measurement_shapes=[
+                            _conformance_shape(
+                                kind="circle",
+                                center=_conformance_point(0.0, 0.0),
+                                radius=0.63,
+                            )
+                        ],
+                        support_shape=_conformance_shape(
+                            kind="circle",
+                            center=_conformance_point(0.0, 0.0),
+                            radius=0.63,
+                        ),
+                        geometry_source_id="geometry-conformance-circle-source",
+                    ),
+                    oval_model_id: _conformance_model(
+                        model_id=oval_model_id,
+                        unit_id="geometry-conformance-oval-unit",
+                        pose=_conformance_pose(18.0, 10.0, facing=45.0),
+                        measurement_basis="base",
+                        measurement_shapes=[
+                            _conformance_shape(
+                                kind="ellipse",
+                                center=_conformance_point(0.25, 0.0),
+                                length=2.95,
+                                width=1.65,
+                                rotation=15.0,
+                            )
+                        ],
+                        support_shape=_conformance_shape(
+                            kind="ellipse",
+                            center=_conformance_point(0.0, 0.0),
+                            length=2.95,
+                            width=1.65,
+                        ),
+                        geometry_source_id="geometry-conformance-oval-source",
+                    ),
+                    hull_model_id: _conformance_model(
+                        model_id=hull_model_id,
+                        unit_id="geometry-conformance-hull-unit",
+                        pose=_conformance_pose(32.0, 18.0, z=0.5, facing=135.0),
+                        measurement_basis="hull",
+                        measurement_shapes=[
+                            _conformance_shape(
+                                kind="rectangle",
+                                center=_conformance_point(0.0, 0.0),
+                                length=5.0,
+                                width=2.5,
+                                rotation=10.0,
+                            )
+                        ],
+                        support_shape=_conformance_shape(
+                            kind="circle",
+                            center=_conformance_point(0.0, 0.0),
+                            radius=1.25,
+                        ),
+                        geometry_source_id="geometry-conformance-hull-source",
+                    ),
+                },
+                "terrain_features_by_id": {
+                    "geometry-conformance-terrain": {
+                        "entity_kind": "terrain_feature",
+                        "terrain_feature_id": "geometry-conformance-terrain",
+                        "terrain_feature_kind": "ruins",
+                        "footprint": _conformance_shape(
+                            kind="rectangle",
+                            center=_conformance_point(42.0, 25.0),
+                            length=8.0,
+                            width=6.0,
+                            rotation=25.0,
+                        ),
+                        "volumes": [
+                            {
+                                "volume_id": "geometry-conformance-wall",
+                                "volume_kind": "wall",
+                                "bottom_center": _conformance_position(42.0, 27.0, 0.0),
+                                "width_inches": 6.0,
+                                "depth_inches": 0.25,
+                                "height_inches": 4.0,
+                                "rotation_degrees": 25.0,
+                            },
+                            {
+                                "volume_id": "geometry-conformance-floor",
+                                "volume_kind": "floor",
+                                "bottom_center": _conformance_position(42.0, 25.0, 2.0),
+                                "width_inches": 6.0,
+                                "depth_inches": 4.0,
+                                "height_inches": 0.25,
+                                "rotation_degrees": 25.0,
+                            },
+                        ],
+                        "source_id": "geometry-conformance-terrain-source",
+                    }
+                },
+                "terrain_areas_by_id": {
+                    "geometry-conformance-area": {
+                        "entity_kind": "terrain_area",
+                        "terrain_area_id": "geometry-conformance-area",
+                        "classification": "crater",
+                        "footprint": _conformance_shape(
+                            kind="polygon",
+                            vertices=[
+                                _conformance_point(22.0, 30.0),
+                                _conformance_point(28.0, 30.0),
+                                _conformance_point(27.0, 35.0),
+                                _conformance_point(23.0, 35.0),
+                            ],
+                        ),
+                        "source_id": "geometry-conformance-area-source",
+                    }
+                },
+                "objectives_by_id": {
+                    "geometry-conformance-objective": {
+                        "entity_kind": "objective",
+                        "objective_id": "geometry-conformance-objective",
+                        "objective_role": "primary",
+                        "position": _conformance_position(30.0, 22.0, 0.0),
+                        "marker_diameter_inches": 1.574803149606299,
+                        "measurement_anchor": "marker_edge",
+                        "source_id": "geometry-conformance-objective-source",
+                    }
+                },
+                "deployment_zones_by_id": {
+                    "geometry-conformance-zone": {
+                        "entity_kind": "deployment_zone",
+                        "deployment_zone_id": "geometry-conformance-zone",
+                        "owner_player_id": PLAYER_A,
+                        "shape": region_shape,
+                    }
+                },
+                "battlefield_regions_by_id": {
+                    "geometry-conformance-region": {
+                        "entity_kind": "battlefield_region",
+                        "region_id": "geometry-conformance-region",
+                        "region_kind": "mission_area",
+                        "owner_role": None,
+                        "shape": region_shape,
+                        "source_id": "geometry-conformance-region-source",
+                    }
+                },
+            }
+        ),
+    )
+    return cast(
+        BattlefieldViewPayload,
+        validate_json_value(
+            {
+                "schema_version": BATTLEFIELD_VIEW_SCHEMA_VERSION,
+                "coordinate_spec_version": BATTLEFIELD_COORDINATE_SPEC_VERSION,
+                "coordinate_space": BATTLEFIELD_COORDINATE_SPACE,
+                "battlefield_id": "geometry-conformance-battlefield",
+                "bounds": bounds,
+                "authoritative_geometry_hash": authoritative_geometry_hash(
+                    bounds=bounds,
+                    authoritative=authoritative,
+                ),
+                "authoritative": authoritative,
+                "interaction": {
+                    "request_id": "geometry-conformance-request",
+                    "selected_or_acting_entity_ids": [circle_model_id],
+                    "legal_candidate_refs": [
+                        {
+                            "reference_kind": "decision_option",
+                            "reference_id": "geometry-conformance-option",
+                        }
+                    ],
+                    "measurement_overlays": [
+                        {
+                            "overlay_id": "geometry-conformance-measurement",
+                            "start": _conformance_position(8.0, 8.0, 0.0),
+                            "end": _conformance_position(18.0, 10.0, 0.0),
+                            "distance_inches": 10.198039027185569,
+                        }
+                    ],
+                    "path_overlays": [
+                        {
+                            "overlay_id": "geometry-conformance-path",
+                            "model_instance_id": circle_model_id,
+                            "segments": [
+                                {
+                                    "segment_kind": "line",
+                                    "start": _conformance_pose(8.0, 8.0, facing=30.0),
+                                    "end": _conformance_pose(12.0, 9.0, facing=75.0),
+                                },
+                                {
+                                    "segment_kind": "line",
+                                    "start": _conformance_pose(12.0, 9.0, facing=75.0),
+                                    "end": _conformance_pose(15.0, 12.0, facing=120.0),
+                                },
+                            ],
+                        }
+                    ],
+                },
+                "render": {
+                    "hit_regions_by_entity_id": {
+                        "geometry-conformance-terrain": {
+                            "entity_id": "geometry-conformance-terrain",
+                            "shape": _conformance_shape(
+                                kind="polygon",
+                                vertices=[
+                                    _conformance_point(38.0, 22.0),
+                                    _conformance_point(46.0, 22.0),
+                                    _conformance_point(46.0, 28.0),
+                                    _conformance_point(38.0, 28.0),
+                                ],
+                            ),
+                        }
+                    },
+                    "hints_by_entity_id": {
+                        "geometry-conformance-terrain": {
+                            "entity_id": "geometry-conformance-terrain",
+                            "asset_id": "geometry-conformance-terrain-asset",
+                        }
+                    },
+                },
+            }
+        ),
+    )
+
+
+def _conformance_model(
+    *,
+    model_id: str,
+    unit_id: str,
+    pose: JsonValue,
+    measurement_basis: str,
+    measurement_shapes: list[JsonValue],
+    support_shape: JsonValue,
+    geometry_source_id: str,
+) -> JsonValue:
+    return {
+        "entity_kind": "model",
+        "model_instance_id": model_id,
+        "unit_instance_id": unit_id,
+        "owner_player_id": PLAYER_A,
+        "state": "placed",
+        "pose": pose,
+        "geometry": {
+            "measurement_basis": measurement_basis,
+            "measurement_shapes": measurement_shapes,
+            "support_shape": support_shape,
+            "height_inches": 2.0,
+            "geometry_source_kind": "manual_override",
+            "geometry_source_id": geometry_source_id,
+            "height_source_kind": "manual_override",
+            "height_source_id": f"{geometry_source_id}-height",
+        },
+        "state_context": {
+            "transport_unit_instance_id": None,
+            "reserve_kind": None,
+        },
+    }
+
+
+def _conformance_shape(
+    *,
+    kind: str,
+    center: JsonValue = None,
+    radius: float | None = None,
+    length: float | None = None,
+    width: float | None = None,
+    rotation: float = 0.0,
+    vertices: list[JsonValue] | None = None,
+) -> JsonValue:
+    return {
+        "kind": kind,
+        "center": center,
+        "rotation_degrees": rotation,
+        "radius_inches": radius,
+        "length_inches": length,
+        "width_inches": width,
+        "vertices": [] if vertices is None else vertices,
+    }
+
+
+def _conformance_point(x: float, y: float) -> JsonValue:
+    return {"x_inches": x, "y_inches": y}
+
+
+def _conformance_position(x: float, y: float, z: float) -> JsonValue:
+    return {"x_inches": x, "y_inches": y, "z_inches": z}
+
+
+def _conformance_pose(
+    x: float,
+    y: float,
+    *,
+    z: float = 0.0,
+    facing: float,
+) -> JsonValue:
+    return {
+        "position": _conformance_position(x, y, z),
+        "facing_degrees": facing,
+    }
 
 
 def build_local_session_at_movement_request(

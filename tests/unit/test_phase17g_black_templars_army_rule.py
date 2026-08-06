@@ -318,6 +318,7 @@ def test_charge_move_rejects_no_move_when_required_psyker_target_is_reachable() 
         proposal_kind=ProposalKind.CHARGE_MOVE,
         source_decision_request_id="phase17g-black-templars-charge-selection-request",
         source_decision_result_id="phase17g-black-templars-charge-selection-result",
+        spatial_context_hash="0" * 64,
         movement_phase_action=CHARGE_MOVE_ACTION,
         context={
             "movement_mode": MovementMode.CHARGE.value,

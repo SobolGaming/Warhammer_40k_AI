@@ -28,9 +28,21 @@ values and do not round or snap authoritative geometry.
 
 Angles are degrees in the half-open interval `[0, 360)`. Zero degrees points
 along positive `x`; positive rotation is counter-clockwise toward positive `y`
-when viewed from above. Model shape centers are local offsets from the model
-pose and rotate with the pose. Terrain volume `bottom_center` positions and
-polygon vertices are absolute world coordinates.
+when viewed from above. Circle, ellipse, and rectangle shapes always have a
+point-valued `center`; `null` is invalid for those kinds. For ellipses and
+rectangles, `length_inches` is the full extent along the shape's local `x`
+axis and `width_inches` is the full extent along its local `y` axis.
+
+Model shape centers are local offsets from the model pose and rotate with the
+model pose. Their world-axis rotation is
+`(pose.facing_degrees + shape.rotation_degrees) mod 360`: the center offset is
+rotated by model facing, then the shape rotates about that translated center.
+For non-model shapes, `rotation_degrees` is an absolute world rotation about
+the emitted center. Terrain volume `bottom_center` positions are absolute
+world coordinates and their `rotation_degrees` is likewise an absolute world
+rotation. Polygon vertices are already absolute world coordinates, have no
+separate pivot or local frame, and therefore require
+`rotation_degrees = 0` and `center = null`.
 
 ## Polygon representation and tolerance
 
@@ -118,9 +130,14 @@ replace a required path with its final pose.
 
 `authoritative_geometry_hash` covers the coordinate-spec version, battlefield
 bounds, and complete viewer-visible authoritative entity payload. The outer
-projection hash also covers interaction and render data. A stale proposal is
-still rejected by its engine-owned request, ruleset, spatial, and source
-context; neither hash is permission to mutate state.
+projection hash also covers interaction and render data. Movement and shared
+placement proposal requests carry an opaque engine-owned
+`spatial_context_hash` over authoritative placements, terrain, mission
+geometry, model physical state, dimensions, and geometry provenance. The
+engine recomputes and validates that token before queue pop; source identity
+drift is stale even when dimensions are unchanged. The viewer-scoped
+`authoritative_geometry_hash` is informational and is never validation
+authority. Neither hash is permission for a client to mutate state.
 
 Clients may transform world coordinates into camera/screen coordinates for
 display, but submissions and cached authoritative entities remain in the world

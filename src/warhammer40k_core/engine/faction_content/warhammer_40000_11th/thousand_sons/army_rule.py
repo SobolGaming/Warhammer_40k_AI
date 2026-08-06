@@ -912,6 +912,7 @@ def _resolve_temporal_surge(
         proposal_kind=ProposalKind.SURGE_MOVE,
         source_decision_request_id=_payload_string(resolution_payload, key="request_id"),
         source_decision_result_id=_payload_string(resolution_payload, key="result_id"),
+        spatial_context_hash=state.physical_proposal_context_hash(),
         movement_phase_action=TRIGGERED_MOVEMENT_PROPOSAL_ACTION,
         context={
             "context_kind": TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND,

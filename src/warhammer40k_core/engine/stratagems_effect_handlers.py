@@ -582,6 +582,7 @@ def _apply_heroic_intervention_handler(
         proposal_kind=ProposalKind.CHARGE_MOVE,
         source_decision_request_id=result.request_id,
         source_decision_result_id=result.result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         movement_phase_action=CHARGE_MOVE_ACTION,
         context=cast(
             dict[str, JsonValue],

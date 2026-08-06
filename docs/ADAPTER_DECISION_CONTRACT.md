@@ -2287,6 +2287,7 @@ Example proposal request:
       "proposal_kind": "normal_move",
       "source_decision_request_id": "decision-request-000004",
       "source_decision_result_id": "phase11d-golden-normal-action",
+      "spatial_context_hash": "03f3bc126357a70d9743ca6770ffae79e65b0845e9d6269e7d93d3f0f5883beb",
       "movement_phase_action": "normal_move",
       "placement_kinds": [],
       "context": {
@@ -2599,6 +2600,8 @@ Finite requests use the existing selected-option equality rule: `DecisionResult.
 
 Parameterized proposal requests use a different validation rule. The pending request still contains the fixed `submit_parameterized_payload` option, and the submitted `DecisionResult.selected_option_id` must be `submit_parameterized_payload`. For parameterized requests, `DecisionResult.payload` is the adapter's movement or placement proposal. It is validated against the embedded `ProposalRequestPayload`; it is not required to equal the fixed option payload `{"submission_kind": "parameterized"}`.
 
+Every `submit_movement_proposal` and shared `submit_placement_proposal` request carries a required opaque `spatial_context_hash`. The engine computes the token from authoritative battlefield bounds and placements, terrain, mission geometry, model physical state, measurement/support dimensions, and geometry/height provenance. Adapters preserve the token only as request context; they do not compute, compare, or submit it as validation authority. Immediately before queue pop, the engine recomputes the token from current authoritative state. Any mismatch returns typed `spatial_context_drift`, leaves the pending request queued, creates no `DecisionRecord`, and mutates no battlefield state. A retry issued after a rule-invalid recorded attempt receives a fresh engine-owned token.
+
 Before the queue is popped or a `DecisionRecord` is created, Phase 11D must validate:
 
 - request ID drift;
@@ -2607,6 +2610,7 @@ Before the queue is popped or a `DecisionRecord` is created, Phase 11D must vali
 - proposal kind drift;
 - unit drift;
 - movement mode and Fall Back mode drift;
+- authoritative spatial, geometry-provenance, and source-context drift;
 - required proposal context drift;
 - JSON shape and required-field validity.
 

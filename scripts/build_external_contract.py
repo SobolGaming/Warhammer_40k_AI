@@ -84,6 +84,7 @@ CONTRACT_ROOT = ROOT / "contracts"
 SCHEMA_DIR = CONTRACT_ROOT / "schemas"
 EXAMPLE_DIR = CONTRACT_ROOT / "examples"
 PROJECTION_EXAMPLE_DIR = EXAMPLE_DIR / "projections"
+BATTLEFIELD_EXAMPLE_DIR = EXAMPLE_DIR / "battlefield"
 DECISION_EXAMPLE_DIR = EXAMPLE_DIR / "decisions"
 PROPOSAL_EXAMPLE_DIR = DECISION_EXAMPLE_DIR / "proposals"
 PARAMETERIZED_EXAMPLE_DIR = DECISION_EXAMPLE_DIR / "parameterized"
@@ -1012,6 +1013,8 @@ def _contract_manifest() -> JsonValue:
 
 def _example_schema_bindings() -> dict[str, JsonValue]:
     bindings: dict[str, JsonValue] = {}
+    for path in sorted(BATTLEFIELD_EXAMPLE_DIR.glob("*.json")):
+        bindings[path.relative_to(CONTRACT_ROOT).as_posix()] = "battlefield-view.schema.json"
     for path in sorted(PROJECTION_EXAMPLE_DIR.glob("*.json")):
         schema = (
             "rules-catalog.schema.json"

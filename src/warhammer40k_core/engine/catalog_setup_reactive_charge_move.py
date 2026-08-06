@@ -403,6 +403,7 @@ def _request_setup_reactive_charge_move_proposal_retry(
         proposal_kind=ProposalKind.CHARGE_MOVE,
         source_decision_request_id=proposal_request.source_decision_request_id,
         source_decision_result_id=proposal_request.source_decision_result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         movement_phase_action=CHARGE_MOVE_ACTION,
         context=dict(proposal_request.context or {}),
     )

@@ -223,6 +223,7 @@ def _request_rapid_ingress_placement_retry(
         proposal_kind=proposal_request.proposal_kind,
         source_decision_request_id=proposal_request.source_decision_request_id,
         source_decision_result_id=proposal_request.source_decision_result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         placement_kinds=proposal_request.placement_kinds,
         context=dict(proposal_request.context or {}),
     )

@@ -1064,6 +1064,7 @@ def _request_fight_movement(
         source_decision_result_id=(
             f"fight-step:{state.battle_round}:{movement_state.step.value}:result"
         ),
+        spatial_context_hash=state.physical_proposal_context_hash(),
         context=context,
     )
     decisions.request_decision(request)
@@ -1127,6 +1128,7 @@ def _request_overrun_pile_in(
         proposal_kind=ProposalKind.PILE_IN,
         source_decision_request_id=activation.request_id,
         source_decision_result_id=activation.result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         context=context,
     )
     decisions.request_decision(request)
@@ -1177,6 +1179,7 @@ def _request_fight_movement_proposal_retry(
         proposal_kind=proposal_request.proposal_kind,
         source_decision_request_id=proposal_request.source_decision_request_id,
         source_decision_result_id=proposal_request.source_decision_result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         movement_phase_action=proposal_request.movement_phase_action,
         context=context,
     )

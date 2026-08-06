@@ -5776,12 +5776,17 @@ Completion gate:
 published in Contract 3.3. It defines one right-handed inches-based world frame,
 stable external entities for the required battlefield concepts, explicit model
 physical states, typed model/support/terrain/zone/path geometry, and a hash over
-viewer-visible authoritative geometry. JSON Schema, generated TypeScript,
-round-trip fixtures, hash-boundary regressions, source-geometry drift checks,
-and hidden-presence tests enforce the three-class boundary. Engine proposal,
-revision, source-package, and replay checks remain the sole stale-submission and
-mutation authority; clients cannot turn interaction or render geometry into an
-accepted move.
+viewer-visible authoritative geometry. The canonical geometry-conformance
+fixture crosses circle, oval, rectangle/hull, support, terrain-volume,
+objective, region-cutout, facing, measurement-overlay, and path-segment values
+through JSON Schema and generated TypeScript. Movement and shared placement
+requests separately snapshot an opaque engine-owned `spatial_context_hash`;
+actual stale submissions after same-dimension geometry-source drift reject
+before queue pop. The viewer-scoped authoritative hash remains informational.
+Round-trip fixtures, hash-boundary regressions, hidden-presence tests, engine
+proposal context, revision, source-package, and replay checks enforce the
+three-class boundary; clients cannot turn interaction or render geometry into
+an accepted move.
 
 ## Phase 18K: interface intent and opportunity UX
 

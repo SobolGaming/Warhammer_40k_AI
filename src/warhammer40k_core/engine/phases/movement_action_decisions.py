@@ -1035,6 +1035,7 @@ def _request_movement_proposal(
         proposal_kind=proposal_kind,
         source_decision_request_id=result.request_id,
         source_decision_result_id=result.result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         movement_phase_action=action.value,
         context=request_context,
     )
@@ -1167,6 +1168,7 @@ def _request_movement_proposal_retry(
         proposal_kind=proposal_request.proposal_kind,
         source_decision_request_id=proposal_request.source_decision_request_id,
         source_decision_result_id=proposal_request.source_decision_result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         movement_phase_action=proposal_request.movement_phase_action,
         context=dict(proposal_request.context or {}),
     )

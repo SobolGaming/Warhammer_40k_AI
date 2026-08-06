@@ -15,6 +15,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import game_state_queries as _queries
 from warhammer40k_core.engine import mission_action_history as _action_history
+from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine import reserve_arrival_requirements as _arrival
 from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.aircraft import HoverModeState
@@ -1562,16 +1563,14 @@ class GameState:
         return self.active_player_id
 
     def effective_opposing_player_ids(self) -> tuple[str, ...]:
-        effective_active_player_id = self.effective_active_player_id()
-        if effective_active_player_id is None:
-            return ()
-        return tuple(
-            player_id for player_id in self.player_ids if player_id != effective_active_player_id
-        )
+        return _queries.effective_opposing_player_ids(self)
 
     def next_decision_request_id(self) -> str:
         self.decision_request_count += 1
         return f"decision-request-{self.decision_request_count:06d}"
+
+    def physical_proposal_context_hash(self) -> str:
+        return _physical_context.physical_proposal_context_hash_for_state(self)
 
     def record_model_feel_no_pain_sources(
         self,

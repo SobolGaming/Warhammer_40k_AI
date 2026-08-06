@@ -18,6 +18,7 @@ from warhammer40k_core.engine import fight_activation_abilities as _fa
 from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
 from warhammer40k_core.engine import lifecycle_state_queries as _lsq
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
+from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_muster_consistency import validate_mustered_army_consistency
@@ -196,6 +197,7 @@ from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
+    required_movement_proposal_context_string,
 )
 from warhammer40k_core.engine.opportunity_windows import (
     OPPORTUNITY_REQUEST_FAMILY,
@@ -1281,6 +1283,14 @@ class GameLifecycle:
             )
         elif request.decision_type in _MOVEMENT_PROPOSAL_DECISION_TYPES:
             result.validate_for_request(request)
+            spatial_status = _physical_context.invalid_physical_proposal_spatial_context_status(
+                state=state,
+                decisions=self.decision_controller,
+                request=request,
+                result=result,
+            )
+            if spatial_status is not None:
+                return spatial_status
             if is_heroic_intervention_charge_move_request(request):
                 malformed_status = invalid_heroic_intervention_charge_move_status(
                     state=state,
@@ -3168,7 +3178,9 @@ def _destroyed_transport_attack_sequence_for_request(
     request: DecisionRequest,
 ) -> AttackSequence:
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
-    sequence_id = _proposal_context_string(proposal_request, key="attack_sequence_id")
+    sequence_id = required_movement_proposal_context_string(
+        proposal_request, key="attack_sequence_id"
+    )
     fight_state = state.fight_phase_state
     if (
         fight_state is not None
@@ -3199,25 +3211,15 @@ def _destroyed_transport_request_is_fight_owned(
     request: DecisionRequest,
 ) -> bool:
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
-    sequence_id = _proposal_context_string(proposal_request, key="attack_sequence_id")
+    sequence_id = required_movement_proposal_context_string(
+        proposal_request, key="attack_sequence_id"
+    )
     fight_state = state.fight_phase_state
     return (
         fight_state is not None
         and fight_state.attack_sequence is not None
         and fight_state.attack_sequence.sequence_id == sequence_id
     )
-
-
-def _proposal_context_string(
-    proposal_request: MovementProposalRequest,
-    *,
-    key: str,
-) -> str:
-    context = proposal_request.context or {}
-    value = context.get(key)
-    if type(value) is not str or not value:
-        raise GameLifecycleError(f"Proposal request context missing string key: {key}.")
-    return value
 
 
 def _is_opportunity_window_request(request: DecisionRequest) -> bool:

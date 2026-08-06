@@ -383,6 +383,7 @@ def _request_disembark_placement(
         proposal_kind=ProposalKind.DISEMBARK,
         source_decision_request_id=result.request_id,
         source_decision_result_id=result.result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         placement_kinds=(BattlefieldPlacementKind.DISEMBARK,),
         context={
             "transport_unit_instance_id": selection.transport_unit_instance_id,

@@ -844,7 +844,10 @@ def test_live_reinforcements_without_mission_setup_fails_fast() -> None:
         state=state,
         battle_round=3,
     )
-    placement_request = _decision_request(
+
+    with pytest.raises(
+        GameLifecycleError, match="Physical proposal context requires mission setup"
+    ):
         _submit_handler_decision(
             handler=handler,
             state=state,
@@ -852,24 +855,6 @@ def test_live_reinforcements_without_mission_setup_fails_fast() -> None:
             request=selection_request,
             option_id=reserve_state.unit_instance_id,
             result_id="phase11a-select-missing-setup",
-        )
-    )
-    reserve_unit = _reserve_unit(state=state, reserve_state=reserve_state)
-    placement = _single_model_reserve_placement(
-        reserve_unit=reserve_unit,
-        pose=_south_edge_touching_pose(reserve_unit=reserve_unit, x=6.0),
-    )
-
-    with pytest.raises(GameLifecycleError, match="Live Reinforcements requires MissionSetup"):
-        _submit_reserve_placement_payload(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            request=placement_request,
-            reserve_unit=reserve_unit,
-            placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
-            attempted_placement=placement,
-            result_id="phase11a-place-missing-setup",
         )
 
 
@@ -930,16 +915,6 @@ def test_live_reinforcements_use_manifested_battlefield_terrain_for_endpoint_val
         state=state,
         battle_round=3,
     )
-    placement_request = _decision_request(
-        _submit_handler_decision(
-            handler=handler,
-            state=state,
-            decisions=decisions,
-            request=selection_request,
-            option_id=reserve_state.unit_instance_id,
-            result_id="phase11a-select-terrain",
-        )
-    )
     reserve_unit = _reserve_unit(state=state, reserve_state=reserve_state)
     placement = _single_model_reserve_placement(
         reserve_unit=reserve_unit,
@@ -956,6 +931,16 @@ def test_live_reinforcements_use_manifested_battlefield_terrain_for_endpoint_val
                     y=pose["y"],
                 ),
             ),
+        )
+    )
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=selection_request,
+            option_id=reserve_state.unit_instance_id,
+            result_id="phase11a-select-terrain",
         )
     )
 

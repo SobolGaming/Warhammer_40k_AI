@@ -1428,6 +1428,7 @@ def _apply_triggered_movement_unit_selection_decision(  # pyright: ignore[report
         proposal_kind=ProposalKind.SURGE_MOVE,
         source_decision_request_id=result.request_id,
         source_decision_result_id=result.result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         movement_phase_action=TRIGGERED_MOVEMENT_PROPOSAL_ACTION,
         context={
             "context_kind": TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND,
@@ -1573,6 +1574,7 @@ def apply_triggered_movement_distance_reroll_decision(
         proposal_kind=ProposalKind.SURGE_MOVE,
         source_decision_request_id=selection_request_id,
         source_decision_result_id=selection_result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         movement_phase_action=TRIGGERED_MOVEMENT_PROPOSAL_ACTION,
         context={
             "context_kind": TRIGGERED_MOVEMENT_PROPOSAL_CONTEXT_KIND,
@@ -1664,6 +1666,7 @@ def _triggered_movement_proposal_retry_request(  # pyright: ignore[reportUnusedF
         proposal_kind=proposal_request.proposal_kind,
         source_decision_request_id=proposal_request.source_decision_request_id,
         source_decision_result_id=rejected_result.result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         movement_phase_action=proposal_request.movement_phase_action,
         context=proposal_request.context,
     ).to_decision_request()

@@ -683,6 +683,9 @@
           },
           "then": {
             "properties": {
+              "center": {
+                "$ref": "#/$defs/point"
+              },
               "length_inches": {
                 "type": "null"
               },
@@ -712,6 +715,9 @@
           },
           "then": {
             "properties": {
+              "center": {
+                "$ref": "#/$defs/point"
+              },
               "length_inches": {
                 "exclusiveMinimum": 0,
                 "type": "number"
@@ -747,6 +753,9 @@
               },
               "radius_inches": {
                 "type": "null"
+              },
+              "rotation_degrees": {
+                "const": 0
               },
               "vertices": {
                 "$ref": "#/$defs/polygon"

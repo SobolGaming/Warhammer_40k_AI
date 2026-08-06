@@ -304,7 +304,7 @@ def project_battlefield_view(
         "coordinate_space": BATTLEFIELD_COORDINATE_SPACE,
         "battlefield_id": battlefield.battlefield_id,
         "bounds": bounds,
-        "authoritative_geometry_hash": _authoritative_geometry_hash(
+        "authoritative_geometry_hash": authoritative_geometry_hash(
             bounds=bounds,
             authoritative=authoritative,
         ),
@@ -576,11 +576,11 @@ def _region_shape(shape: DeploymentZoneShape) -> BattlefieldRegionShapePayload:
 def _circle_shape(
     radius: float,
     *,
-    center: tuple[float, float] | None = None,
+    center: tuple[float, float],
 ) -> BattlefieldShapePayload:
     return {
         "kind": "circle",
-        "center": None if center is None else _point(*center),
+        "center": _point(*center),
         "rotation_degrees": 0.0,
         "radius_inches": radius,
         "length_inches": None,
@@ -593,11 +593,11 @@ def _ellipse_shape(
     *,
     length: float,
     width: float,
-    center: tuple[float, float] | None = None,
+    center: tuple[float, float],
 ) -> BattlefieldShapePayload:
     return {
         "kind": "ellipse",
-        "center": None if center is None else _point(*center),
+        "center": _point(*center),
         "rotation_degrees": 0.0,
         "radius_inches": None,
         "length_inches": length,
@@ -610,12 +610,12 @@ def _rectangle_shape(
     *,
     length: float,
     width: float,
-    center: tuple[float, float] | None = None,
+    center: tuple[float, float],
     rotation_degrees: float = 0.0,
 ) -> BattlefieldShapePayload:
     return {
         "kind": "rectangle",
-        "center": None if center is None else _point(*center),
+        "center": _point(*center),
         "rotation_degrees": rotation_degrees % 360.0,
         "radius_inches": None,
         "length_inches": length,
@@ -671,7 +671,7 @@ def _pose(pose: Pose) -> BattlefieldPosePayload:
     }
 
 
-def _authoritative_geometry_hash(
+def authoritative_geometry_hash(
     *,
     bounds: BattlefieldBoundsPayload,
     authoritative: BattlefieldAuthoritativeEntitiesPayload,

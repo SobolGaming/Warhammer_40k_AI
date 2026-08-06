@@ -737,6 +737,7 @@ def _request_generic_rule_ir_strategic_reserves_placement(
         proposal_kind=ProposalKind.STRATEGIC_RESERVES,
         source_decision_request_id=use_record.request_id,
         source_decision_result_id=use_record.result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         placement_kinds=(BattlefieldPlacementKind.STRATEGIC_RESERVES,),
         context=cast(
             dict[str, JsonValue],
