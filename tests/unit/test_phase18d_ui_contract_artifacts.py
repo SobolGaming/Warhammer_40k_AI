@@ -36,6 +36,17 @@ from scripts.export_ui_contract_fixtures import (
     export_ui_contract_files,
 )
 
+from warhammer40k_core.adapters.battlefield_projection import (
+    BATTLEFIELD_COORDINATE_SPACE,
+    BATTLEFIELD_COORDINATE_SPEC_VERSION,
+    BATTLEFIELD_VIEW_SCHEMA_VERSION,
+    BattlefieldViewPayload,
+    _authoritative_geometry_hash,
+    _model_geometry,
+    _model_state,
+    _polygon_shape,
+    _terrain_feature_entity,
+)
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.projection import (
     GameViewPayload,
@@ -43,13 +54,29 @@ from warhammer40k_core.adapters.projection import (
     project_rules_catalog_view,
 )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.detachment import StratagemDefinition
+from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.interaction_metadata import (
     InteractionKind,
     registered_interaction_decision_types,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.reserves import ReserveStatus
+from warhammer40k_core.geometry.model_geometry import (
+    BaseFootprintKind,
+    FootprintPart,
+    GeometrySourceKind,
+    HeightSourceKind,
+    ModelGeometry,
+)
+from warhammer40k_core.geometry.terrain import (
+    TerrainFeatureDefinition,
+    TerrainFloorDefinition,
+    TerrainWallDefinition,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MEMORY_REPR_PATTERN = re.compile(r"<[^>\n]+ object at 0x[0-9a-fA-F]+>")
@@ -63,6 +90,7 @@ FORBIDDEN_UI_STATE_KEYS = frozenset(
     }
 )
 SCHEMA_FILES = (
+    Path("contracts/schemas/battlefield-view.schema.json"),
     Path("contracts/schemas/decision-family-coverage.schema.json"),
     Path("contracts/schemas/decision-family-live.schema.json"),
     Path("contracts/schemas/decision-request-view.schema.json"),
@@ -315,6 +343,353 @@ def test_ui_contract_fixtures_expose_stable_joinable_viewer_payloads() -> None:
                 assert model_display["unit_instance_id"] == unit_id
 
 
+def test_phase18j_battlefield_projection_is_typed_joinable_and_viewer_scoped() -> None:
+    registry = _schema_registry()
+    battlefield_validator = _schema_validator(
+        "battlefield-view.schema.json",
+        registry=registry,
+    )
+    owner_view = cast(GameViewPayload, _fixture("post_deployment_view.json"))
+    battlefield = owner_view["battlefield_view"]
+    assert battlefield is not None
+
+    battlefield_validator.validate(battlefield)
+    assert battlefield["schema_version"] == BATTLEFIELD_VIEW_SCHEMA_VERSION
+    assert battlefield["coordinate_spec_version"] == BATTLEFIELD_COORDINATE_SPEC_VERSION
+    assert battlefield["coordinate_space"] == BATTLEFIELD_COORDINATE_SPACE
+    assert battlefield["bounds"] == {
+        "min_x_inches": 0.0,
+        "min_y_inches": 0.0,
+        "min_z_inches": 0.0,
+        "max_x_inches": 60.0,
+        "max_y_inches": 44.0,
+    }
+    authoritative = battlefield["authoritative"]
+    assert set(authoritative["models_by_id"]) == set(owner_view["model_display_by_id"])
+    assert len(authoritative["objectives_by_id"]) == 5
+    assert len(authoritative["deployment_zones_by_id"]) == 2
+    assert all(
+        "marker_diameter_inches" in objective and "marker_diameter_mm" not in objective
+        for objective in authoritative["objectives_by_id"].values()
+    )
+    for zone in authoritative["deployment_zones_by_id"].values():
+        for polygon in zone["shape"]["polygons"]:
+            twice_area = sum(
+                point["x_inches"] * polygon[(index + 1) % len(polygon)]["y_inches"]
+                - polygon[(index + 1) % len(polygon)]["x_inches"] * point["y_inches"]
+                for index, point in enumerate(polygon)
+            )
+            assert twice_area > 0.0
+    assert all(
+        model["pose"] is not None and 0.0 <= model["pose"]["facing_degrees"] < 360.0
+        for model in authoritative["models_by_id"].values()
+    )
+    pending = owner_view["pending_decision"]
+    assert pending is not None
+    legal_candidate_refs = battlefield["interaction"]["legal_candidate_refs"]
+    assert [candidate["reference_id"] for candidate in legal_candidate_refs] == [
+        option["option_id"] for option in pending["options"]
+    ]
+
+    hidden_view = cast(GameViewPayload, _fixture("initial_setup_view_player2.json"))
+    hidden_battlefield = hidden_view["battlefield_view"]
+    assert hidden_battlefield is not None
+    assert set(hidden_battlefield["authoritative"]["models_by_id"]) == set(
+        hidden_view["model_display_by_id"]
+    )
+    assert MODEL_ALPHA_1 not in hidden_battlefield["authoritative"]["models_by_id"]
+    assert hidden_battlefield["interaction"]["legal_candidate_refs"] == []
+
+
+def test_phase18j_geometry_maps_round_oval_hull_support_and_terrain() -> None:
+    session, _status = build_local_session_at_movement_request(game_id="phase18j-geometry-kinds")
+    state = session.lifecycle.state
+    assert state is not None
+    model = state.army_definitions[0].units[0].own_models[0]
+
+    round_geometry = _model_geometry(model)
+    assert round_geometry["measurement_basis"] == "base"
+    assert round_geometry["measurement_shapes"][0]["kind"] == "circle"
+    round_support = round_geometry["support_shape"]
+    assert round_support is not None
+    assert round_support["kind"] == "circle"
+
+    oval_base = BaseSizeDefinition.oval(length_mm=75.0, width_mm=42.0)
+    oval_model = replace(
+        model,
+        base_size=oval_base,
+        geometry=ModelGeometry.from_base_size(
+            oval_base,
+            geometry_source_id="phase18j-oval-profile",
+        ),
+    )
+    oval_geometry = _model_geometry(oval_model)
+    assert oval_geometry["measurement_shapes"][0]["kind"] == "ellipse"
+    oval_support = oval_geometry["support_shape"]
+    assert oval_support is not None
+    assert oval_support["kind"] == "ellipse"
+
+    hull_geometry = ModelGeometry(
+        footprint_kind=BaseFootprintKind.HULL,
+        parts=(
+            FootprintPart(
+                part_id="accepted-hull",
+                footprint_kind=BaseFootprintKind.HULL,
+                radius_x_inches=2.5,
+                radius_y_inches=1.25,
+            ),
+        ),
+        height_inches=3.0,
+        geometry_source_kind=GeometrySourceKind.MANUAL_OVERRIDE,
+        geometry_source_id="phase18j-accepted-hull",
+        height_source_kind=HeightSourceKind.MANUAL_OVERRIDE,
+        height_source_id="phase18j-accepted-height",
+    )
+    hull_model = replace(model, geometry=hull_geometry)
+    hull_payload = _model_geometry(hull_model)
+    assert hull_payload["measurement_basis"] == "hull"
+    assert hull_payload["measurement_shapes"][0]["kind"] == "rectangle"
+    hull_support = hull_payload["support_shape"]
+    assert hull_support is not None
+    assert hull_support["kind"] == "circle"
+
+    terrain_source = _phase18j_terrain_feature()
+    terrain = _terrain_feature_entity(terrain_source)
+    assert terrain["footprint"]["kind"] == "rectangle"
+    assert {volume["volume_kind"] for volume in terrain["volumes"]} == {"wall", "floor"}
+    assert {volume["bottom_center"]["z_inches"] for volume in terrain["volumes"]} == {0.0}
+    assert "display_geometry" not in terrain
+    render_only_change = replace(
+        terrain_source,
+        display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=10.0,
+            center_y_inches=12.0,
+            width_inches=6.0,
+            depth_inches=4.0,
+            display_template_id="phase18j-other-render-asset",
+        ),
+    )
+    assert _terrain_feature_entity(render_only_change) == terrain
+
+    polygon = _polygon_shape(((0.0, 0.0), (0.0, 1.0), (1.0, 0.0)))
+    assert polygon["kind"] == "polygon"
+    assert polygon["vertices"] == [
+        {"x_inches": 1.0, "y_inches": 0.0},
+        {"x_inches": 0.0, "y_inches": 1.0},
+        {"x_inches": 0.0, "y_inches": 0.0},
+    ]
+
+
+def test_phase18j_model_state_projection_is_explicit_and_fail_closed() -> None:
+    session, _status = build_local_session_at_movement_request(game_id="phase18j-model-states")
+    state = session.lifecycle.state
+    assert state is not None
+    model = state.army_definitions[0].units[0].own_models[0]
+
+    assert (
+        _model_state(
+            model=model,
+            placement_exists=True,
+            removed=False,
+            transport_unit_id=None,
+            reserve_status=None,
+        )
+        == "placed"
+    )
+    assert (
+        _model_state(
+            model=replace(model, wounds_remaining=0),
+            placement_exists=True,
+            removed=False,
+            transport_unit_id=None,
+            reserve_status=None,
+        )
+        == "destroyed"
+    )
+    assert (
+        _model_state(
+            model=model,
+            placement_exists=False,
+            removed=False,
+            transport_unit_id="transport-unit",
+            reserve_status=None,
+        )
+        == "embarked"
+    )
+    assert (
+        _model_state(
+            model=model,
+            placement_exists=False,
+            removed=False,
+            transport_unit_id=None,
+            reserve_status=ReserveStatus.IN_RESERVES,
+        )
+        == "reserves"
+    )
+    assert (
+        _model_state(
+            model=model,
+            placement_exists=False,
+            removed=True,
+            transport_unit_id=None,
+            reserve_status=None,
+        )
+        == "removed"
+    )
+    assert (
+        _model_state(
+            model=model,
+            placement_exists=False,
+            removed=False,
+            transport_unit_id=None,
+            reserve_status=None,
+        )
+        == "undeployed"
+    )
+
+
+def test_phase18j_interaction_and_render_geometry_do_not_change_authoritative_hash() -> None:
+    session, _status = build_local_session_at_movement_request(game_id="phase18j-hash-boundary")
+    view = session.view(viewer_player_id=PLAYER_A)
+    battlefield = view["battlefield_view"]
+    assert battlefield is not None
+    original_hash = battlefield["authoritative_geometry_hash"]
+
+    non_authoritative_change = cast(
+        BattlefieldViewPayload,
+        json.loads(json.dumps(battlefield, sort_keys=True)),
+    )
+    non_authoritative_change["interaction"]["measurement_overlays"] = [
+        {
+            "overlay_id": "phase18j-measurement",
+            "start": {"x_inches": 3.0, "y_inches": 4.0, "z_inches": 0.0},
+            "end": {"x_inches": 6.0, "y_inches": 8.0, "z_inches": 0.0},
+            "distance_inches": 5.0,
+        }
+    ]
+    non_authoritative_change["interaction"]["path_overlays"] = [
+        {
+            "overlay_id": "phase18j-path",
+            "model_instance_id": MODEL_ALPHA_1,
+            "segments": [
+                {
+                    "segment_kind": "line",
+                    "start": {
+                        "position": {"x_inches": 3.0, "y_inches": 4.0, "z_inches": 0.0},
+                        "facing_degrees": 0.0,
+                    },
+                    "end": {
+                        "position": {"x_inches": 6.0, "y_inches": 4.0, "z_inches": 0.0},
+                        "facing_degrees": 90.0,
+                    },
+                }
+            ],
+        }
+    ]
+    non_authoritative_change["render"]["hints_by_entity_id"]["phase18j-render-only"] = {
+        "entity_id": "phase18j-render-only",
+        "asset_id": "changed-asset",
+    }
+    assert (
+        _authoritative_geometry_hash(
+            bounds=non_authoritative_change["bounds"],
+            authoritative=non_authoritative_change["authoritative"],
+        )
+        == original_hash
+    )
+    _schema_validator(
+        "battlefield-view.schema.json",
+        registry=_schema_registry(),
+    ).validate(non_authoritative_change)
+
+    authoritative_change = cast(
+        BattlefieldViewPayload,
+        json.loads(json.dumps(battlefield, sort_keys=True)),
+    )
+    first_model = next(iter(authoritative_change["authoritative"]["models_by_id"].values()))
+    assert first_model["pose"] is not None
+    first_model["pose"]["position"]["x_inches"] += 0.25
+    assert (
+        _authoritative_geometry_hash(
+            bounds=authoritative_change["bounds"],
+            authoritative=authoritative_change["authoritative"],
+        )
+        != original_hash
+    )
+    refreshed = session.view(viewer_player_id=PLAYER_A)
+    assert refreshed["battlefield_view"] == battlefield
+
+    state = session.lifecycle.state
+    assert state is not None
+    army = state.army_definitions[0]
+    unit = army.units[0]
+    model = unit.own_models[0]
+    drifted_model = replace(
+        model,
+        geometry=replace(
+            model.geometry,
+            geometry_source_kind=GeometrySourceKind.MANUAL_OVERRIDE,
+            geometry_source_id="phase18j-source-identity-drift",
+        ),
+    )
+    state.army_definitions = [
+        replace(
+            army,
+            units=(
+                replace(unit, own_models=(drifted_model, *unit.own_models[1:])),
+                *army.units[1:],
+            ),
+        ),
+        *state.army_definitions[1:],
+    ]
+    drifted_view = session.view(viewer_player_id=PLAYER_A)
+    drifted_battlefield = drifted_view["battlefield_view"]
+    assert drifted_battlefield is not None
+    assert drifted_battlefield["authoritative_geometry_hash"] != original_hash
+    assert drifted_view["projection_state_hash"] != view["projection_state_hash"]
+
+
+def _phase18j_terrain_feature() -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id="phase18j-ruin",
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_center_x_inches=10.0,
+        footprint_center_y_inches=12.0,
+        footprint_width_inches=6.0,
+        footprint_depth_inches=4.0,
+        display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=10.0,
+            center_y_inches=12.0,
+            width_inches=6.0,
+            depth_inches=4.0,
+            display_template_id="phase18j-ruin-asset",
+        ),
+        walls=(
+            TerrainWallDefinition(
+                wall_id="phase18j-wall",
+                center_x_inches=10.0,
+                center_y_inches=13.5,
+                bottom_z_inches=0.0,
+                width_inches=5.0,
+                depth_inches=0.25,
+                height_inches=3.0,
+            ),
+        ),
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="phase18j-floor",
+                center_x_inches=10.0,
+                center_y_inches=12.0,
+                bottom_z_inches=0.0,
+                width_inches=6.0,
+                depth_inches=4.0,
+                thickness_inches=0.1,
+            ),
+        ),
+        source_id="phase18j-ruin-source",
+    )
+
+
 def test_rules_catalog_card_maps_are_joinable_by_static_ids() -> None:
     session, _status = build_local_session_at_movement_request(game_id="ui-contract-card-map-joins")
     catalog_view = session.rules_catalog_view()
@@ -545,7 +920,7 @@ def test_contract_manifest_hashes_baseline_with_canonical_line_endings() -> None
     ).hexdigest()
 
     assert len(baseline_schema_names) == 15
-    assert len(canonical_schema_names) == 24
+    assert len(canonical_schema_names) == 25
     assert baseline_schema_names < canonical_schema_names
     assert hashes["compatibility/1.0.0-shape.json"] == canonical_hash
 

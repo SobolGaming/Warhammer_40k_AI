@@ -2651,6 +2651,44 @@ Important behavior:
 
 The submission contract is shared. The information available to a producer is not always identical.
 
+Phase 18J publishes `GameViewPayload.battlefield_view` as the canonical visual
+play-surface contract. The optional member preserves Contract 3.x compatibility
+for older clients; current engine projections emit `battlefield-view-v1` when
+both battlefield and mission state exist and emit `null` before that boundary.
+Its normative world frame is defined in `contracts/coordinate-system.md`:
+inches, lower-left origin, positive X/Y on the board plane, positive Z above
+the board, and counter-clockwise degrees from positive X.
+
+The payload has three closed sections:
+
+- `authoritative` contains viewer-visible model measurement geometry, poses,
+  explicit physical states, terrain rules geometry, objectives, deployment
+  zones, and battlefield regions. Its coordinate-versioned content and bounds
+  produce `authoritative_geometry_hash`.
+- `interaction` contains the current request ID, engine-authored
+  selected-or-acting entity IDs, finite decision-option references, measurements, and
+  typed line-segment path overlays. These values assist input construction but
+  do not grant legality.
+- `render` contains hit regions and asset hints only. Clients must not derive
+  movement, range, visibility, collision, coherency, placement, or objective
+  control from this section.
+
+Model measurement shapes use local coordinates relative to their emitted pose;
+terrain, objective, zone, and region geometry uses absolute world coordinates.
+Accepted hull measurement geometry and physical support-base geometry remain
+separate. Movement and placement still submit the typed proposal and required
+`PathWitness` through `GameLifecycle.submit_decision(...)`; endpoint or overlay
+geometry never bypasses engine validation.
+
+Battlefield model inclusion consumes the same centralized viewer-scoped model
+visibility map as the datacard projection. Hidden enemy models are omitted,
+not represented by placeholder entities or counts. Battlefield legal-candidate
+references are derived only from visible engine-emitted entity-selection option
+IDs; unrelated finite choices never become battlefield candidates. The projection hash
+covers the complete viewer-visible `battlefield_view`, while
+`authoritative_geometry_hash` deliberately excludes interaction and render
+changes.
+
 Mission setup terrain projections expose typed geometry for both current
 validated layout areas and future terrain features. Chapter Approved 2026-27
 layout geometry imported from Event Companion is represented as

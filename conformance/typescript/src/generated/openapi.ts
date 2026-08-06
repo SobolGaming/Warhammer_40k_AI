@@ -609,6 +609,205 @@ export interface components {
         "game-view--json_value.schema": null | boolean | number | string | components["schemas"]["game-view--json_value.schema"][] | {
             [key: string]: components["schemas"]["game-view--json_value.schema"];
         };
+        "battlefield-view--point.schema": {
+            x_inches: number;
+            y_inches: number;
+        };
+        "battlefield-view--polygon.schema": components["schemas"]["battlefield-view--point.schema"][];
+        "battlefield-view--shape.schema": {
+            center: components["schemas"]["battlefield-view--point.schema"] | null;
+            /** @enum {string} */
+            kind: "circle" | "ellipse" | "rectangle" | "polygon";
+            length_inches: number | null;
+            radius_inches: number | null;
+            rotation_degrees: number;
+            vertices: components["schemas"]["battlefield-view--point.schema"][];
+            width_inches: number | null;
+        } & (unknown & unknown & unknown);
+        "battlefield-view--region_shape.schema": {
+            circle_cutouts: components["schemas"]["battlefield-view--shape.schema"][];
+            polygon_cutouts: components["schemas"]["battlefield-view--shape.schema"][];
+            polygons: components["schemas"]["battlefield-view--polygon.schema"][];
+        };
+        "battlefield-view--battlefield_region.schema": {
+            /** @constant */
+            entity_kind: "battlefield_region";
+            owner_role: string | null;
+            region_id: string;
+            region_kind: string;
+            shape: components["schemas"]["battlefield-view--region_shape.schema"];
+            source_id: string;
+        };
+        "battlefield-view--deployment_zone.schema": {
+            deployment_zone_id: string;
+            /** @constant */
+            entity_kind: "deployment_zone";
+            owner_player_id: string;
+            shape: components["schemas"]["battlefield-view--region_shape.schema"];
+        };
+        "battlefield-view--model_geometry.schema": {
+            height_inches: number;
+            geometry_source_id: string | null;
+            geometry_source_kind: string;
+            height_source_id: string | null;
+            height_source_kind: string;
+            /** @enum {string} */
+            measurement_basis: "base" | "hull";
+            measurement_shapes: components["schemas"]["battlefield-view--shape.schema"][];
+            support_shape: components["schemas"]["battlefield-view--shape.schema"];
+        };
+        "battlefield-view--position.schema": {
+            x_inches: number;
+            y_inches: number;
+            z_inches: number;
+        };
+        "battlefield-view--pose.schema": {
+            facing_degrees: number;
+            position: components["schemas"]["battlefield-view--position.schema"];
+        };
+        "battlefield-view--model_state_context.schema": {
+            reserve_kind: string | null;
+            transport_unit_instance_id: string | null;
+        };
+        "battlefield-view--model.schema": {
+            /** @constant */
+            entity_kind: "model";
+            geometry: components["schemas"]["battlefield-view--model_geometry.schema"];
+            model_instance_id: string;
+            owner_player_id: string;
+            pose: components["schemas"]["battlefield-view--pose.schema"] | null;
+            /** @enum {string} */
+            state: "placed" | "destroyed" | "embarked" | "reserves" | "removed" | "undeployed";
+            state_context: components["schemas"]["battlefield-view--model_state_context.schema"];
+            unit_instance_id: string;
+        };
+        "battlefield-view--objective.schema": {
+            /** @constant */
+            entity_kind: "objective";
+            marker_diameter_inches: number;
+            measurement_anchor: string;
+            objective_id: string;
+            objective_role: string;
+            position: components["schemas"]["battlefield-view--position.schema"];
+            source_id: string;
+        };
+        "battlefield-view--terrain_area.schema": {
+            classification: string;
+            /** @constant */
+            entity_kind: "terrain_area";
+            footprint: components["schemas"]["battlefield-view--shape.schema"];
+            source_id: string;
+            terrain_area_id: string;
+        };
+        "battlefield-view--volume.schema": {
+            bottom_center: components["schemas"]["battlefield-view--position.schema"];
+            depth_inches: number;
+            height_inches: number;
+            rotation_degrees: number;
+            volume_id: string;
+            /** @enum {string} */
+            volume_kind: "wall" | "floor";
+            width_inches: number;
+        };
+        "battlefield-view--terrain_feature.schema": {
+            /** @constant */
+            entity_kind: "terrain_feature";
+            footprint: components["schemas"]["battlefield-view--shape.schema"];
+            source_id: string | null;
+            terrain_feature_id: string;
+            terrain_feature_kind: string;
+            volumes: components["schemas"]["battlefield-view--volume.schema"][];
+        };
+        "battlefield-view--authoritative.schema": {
+            battlefield_regions_by_id: {
+                [key: string]: components["schemas"]["battlefield-view--battlefield_region.schema"];
+            };
+            deployment_zones_by_id: {
+                [key: string]: components["schemas"]["battlefield-view--deployment_zone.schema"];
+            };
+            models_by_id: {
+                [key: string]: components["schemas"]["battlefield-view--model.schema"];
+            };
+            objectives_by_id: {
+                [key: string]: components["schemas"]["battlefield-view--objective.schema"];
+            };
+            terrain_areas_by_id: {
+                [key: string]: components["schemas"]["battlefield-view--terrain_area.schema"];
+            };
+            terrain_features_by_id: {
+                [key: string]: components["schemas"]["battlefield-view--terrain_feature.schema"];
+            };
+        };
+        "battlefield-view--bounds.schema": {
+            max_x_inches: number;
+            max_y_inches: number;
+            /** @constant */
+            min_x_inches: 0;
+            /** @constant */
+            min_y_inches: 0;
+            /** @constant */
+            min_z_inches: 0;
+        };
+        "battlefield-view--candidate_reference.schema": {
+            reference_id: string;
+            /** @constant */
+            reference_kind: "decision_option";
+        };
+        "battlefield-view--measurement_overlay.schema": {
+            distance_inches: number;
+            end: components["schemas"]["battlefield-view--position.schema"];
+            overlay_id: string;
+            start: components["schemas"]["battlefield-view--position.schema"];
+        };
+        "battlefield-view--path_segment.schema": {
+            end: components["schemas"]["battlefield-view--pose.schema"];
+            /** @constant */
+            segment_kind: "line";
+            start: components["schemas"]["battlefield-view--pose.schema"];
+        };
+        "battlefield-view--path_overlay.schema": {
+            model_instance_id: string;
+            overlay_id: string;
+            segments: components["schemas"]["battlefield-view--path_segment.schema"][];
+        };
+        "battlefield-view--interaction.schema": {
+            legal_candidate_refs: components["schemas"]["battlefield-view--candidate_reference.schema"][];
+            measurement_overlays: components["schemas"]["battlefield-view--measurement_overlay.schema"][];
+            path_overlays: components["schemas"]["battlefield-view--path_overlay.schema"][];
+            request_id: string | null;
+            selected_or_acting_entity_ids: string[];
+        };
+        "battlefield-view--render_hint.schema": {
+            asset_id: string | null;
+            entity_id: string;
+        };
+        "battlefield-view--hit_region.schema": {
+            entity_id: string;
+            shape: components["schemas"]["battlefield-view--shape.schema"];
+        };
+        "battlefield-view--render.schema": {
+            hints_by_entity_id: {
+                [key: string]: components["schemas"]["battlefield-view--render_hint.schema"];
+            };
+            hit_regions_by_entity_id: {
+                [key: string]: components["schemas"]["battlefield-view--hit_region.schema"];
+            };
+        };
+        /** CORE V2 BattlefieldViewPayload */
+        "battlefield-view.schema": {
+            authoritative: components["schemas"]["battlefield-view--authoritative.schema"];
+            authoritative_geometry_hash: string;
+            battlefield_id: string;
+            bounds: components["schemas"]["battlefield-view--bounds.schema"];
+            /** @constant */
+            coordinate_space: "battlefield_inches_right_handed_z_up";
+            /** @constant */
+            coordinate_spec_version: "battlefield-coordinate-v1";
+            interaction: components["schemas"]["battlefield-view--interaction.schema"];
+            render: components["schemas"]["battlefield-view--render.schema"];
+            /** @constant */
+            schema_version: "battlefield-view-v1";
+        };
         "game-view--redaction.schema": {
             hidden: boolean;
             reason: string | null;
@@ -748,6 +947,7 @@ export interface components {
             active_player_id: string | null;
             battle_round: number;
             battlefield_state: components["schemas"]["game-view--json_value.schema"];
+            battlefield_view?: components["schemas"]["battlefield-view.schema"] | null;
             current_battle_phase: string | null;
             current_setup_step: string | null;
             game_id: string;

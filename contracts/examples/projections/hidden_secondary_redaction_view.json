@@ -9,6 +9,395 @@
     "removed_model_ids": [],
     "terrain_features": []
   },
+  "battlefield_view": {
+    "authoritative": {
+      "battlefield_regions_by_id": {},
+      "deployment_zones_by_id": {
+        "take-and-hold-vs-purge-the-foe-layout-3-attacker": {
+          "deployment_zone_id": "take-and-hold-vs-purge-the-foe-layout-3-attacker",
+          "entity_kind": "deployment_zone",
+          "owner_player_id": "player-a",
+          "shape": {
+            "circle_cutouts": [],
+            "polygon_cutouts": [],
+            "polygons": [
+              [
+                {
+                  "x_inches": 0.0,
+                  "y_inches": 0.0
+                },
+                {
+                  "x_inches": 18.0,
+                  "y_inches": 0.0
+                },
+                {
+                  "x_inches": 18.0,
+                  "y_inches": 44.0
+                },
+                {
+                  "x_inches": 0.0,
+                  "y_inches": 44.0
+                }
+              ]
+            ]
+          }
+        },
+        "take-and-hold-vs-purge-the-foe-layout-3-defender": {
+          "deployment_zone_id": "take-and-hold-vs-purge-the-foe-layout-3-defender",
+          "entity_kind": "deployment_zone",
+          "owner_player_id": "player-b",
+          "shape": {
+            "circle_cutouts": [],
+            "polygon_cutouts": [],
+            "polygons": [
+              [
+                {
+                  "x_inches": 42.0,
+                  "y_inches": 0.0
+                },
+                {
+                  "x_inches": 60.0,
+                  "y_inches": 0.0
+                },
+                {
+                  "x_inches": 60.0,
+                  "y_inches": 44.0
+                },
+                {
+                  "x_inches": 42.0,
+                  "y_inches": 44.0
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "models_by_id": {
+        "army-beta:intercessor-unit-2:core-intercessor-like:001": {
+          "entity_kind": "model",
+          "geometry": {
+            "geometry_source_id": "core-intercessor-like",
+            "geometry_source_kind": "catalog_base_size",
+            "height_inches": 1.7637795275590549,
+            "height_source_id": "keyword:infantry_or_character",
+            "height_source_kind": "keyword_heuristic",
+            "measurement_basis": "base",
+            "measurement_shapes": [
+              {
+                "center": {
+                  "x_inches": 0.0,
+                  "y_inches": 0.0
+                },
+                "kind": "circle",
+                "length_inches": null,
+                "radius_inches": 0.6299212598425197,
+                "rotation_degrees": 0.0,
+                "vertices": [],
+                "width_inches": null
+              }
+            ],
+            "support_shape": {
+              "center": {
+                "x_inches": 0.0,
+                "y_inches": 0.0
+              },
+              "kind": "circle",
+              "length_inches": null,
+              "radius_inches": 0.6299212598425197,
+              "rotation_degrees": 0.0,
+              "vertices": [],
+              "width_inches": null
+            }
+          },
+          "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:001",
+          "owner_player_id": "player-b",
+          "pose": null,
+          "state": "undeployed",
+          "state_context": {
+            "reserve_kind": null,
+            "transport_unit_instance_id": null
+          },
+          "unit_instance_id": "army-beta:intercessor-unit-2"
+        },
+        "army-beta:intercessor-unit-2:core-intercessor-like:002": {
+          "entity_kind": "model",
+          "geometry": {
+            "geometry_source_id": "core-intercessor-like",
+            "geometry_source_kind": "catalog_base_size",
+            "height_inches": 1.7637795275590549,
+            "height_source_id": "keyword:infantry_or_character",
+            "height_source_kind": "keyword_heuristic",
+            "measurement_basis": "base",
+            "measurement_shapes": [
+              {
+                "center": {
+                  "x_inches": 0.0,
+                  "y_inches": 0.0
+                },
+                "kind": "circle",
+                "length_inches": null,
+                "radius_inches": 0.6299212598425197,
+                "rotation_degrees": 0.0,
+                "vertices": [],
+                "width_inches": null
+              }
+            ],
+            "support_shape": {
+              "center": {
+                "x_inches": 0.0,
+                "y_inches": 0.0
+              },
+              "kind": "circle",
+              "length_inches": null,
+              "radius_inches": 0.6299212598425197,
+              "rotation_degrees": 0.0,
+              "vertices": [],
+              "width_inches": null
+            }
+          },
+          "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:002",
+          "owner_player_id": "player-b",
+          "pose": null,
+          "state": "undeployed",
+          "state_context": {
+            "reserve_kind": null,
+            "transport_unit_instance_id": null
+          },
+          "unit_instance_id": "army-beta:intercessor-unit-2"
+        },
+        "army-beta:intercessor-unit-2:core-intercessor-like:003": {
+          "entity_kind": "model",
+          "geometry": {
+            "geometry_source_id": "core-intercessor-like",
+            "geometry_source_kind": "catalog_base_size",
+            "height_inches": 1.7637795275590549,
+            "height_source_id": "keyword:infantry_or_character",
+            "height_source_kind": "keyword_heuristic",
+            "measurement_basis": "base",
+            "measurement_shapes": [
+              {
+                "center": {
+                  "x_inches": 0.0,
+                  "y_inches": 0.0
+                },
+                "kind": "circle",
+                "length_inches": null,
+                "radius_inches": 0.6299212598425197,
+                "rotation_degrees": 0.0,
+                "vertices": [],
+                "width_inches": null
+              }
+            ],
+            "support_shape": {
+              "center": {
+                "x_inches": 0.0,
+                "y_inches": 0.0
+              },
+              "kind": "circle",
+              "length_inches": null,
+              "radius_inches": 0.6299212598425197,
+              "rotation_degrees": 0.0,
+              "vertices": [],
+              "width_inches": null
+            }
+          },
+          "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:003",
+          "owner_player_id": "player-b",
+          "pose": null,
+          "state": "undeployed",
+          "state_context": {
+            "reserve_kind": null,
+            "transport_unit_instance_id": null
+          },
+          "unit_instance_id": "army-beta:intercessor-unit-2"
+        },
+        "army-beta:intercessor-unit-2:core-intercessor-like:004": {
+          "entity_kind": "model",
+          "geometry": {
+            "geometry_source_id": "core-intercessor-like",
+            "geometry_source_kind": "catalog_base_size",
+            "height_inches": 1.7637795275590549,
+            "height_source_id": "keyword:infantry_or_character",
+            "height_source_kind": "keyword_heuristic",
+            "measurement_basis": "base",
+            "measurement_shapes": [
+              {
+                "center": {
+                  "x_inches": 0.0,
+                  "y_inches": 0.0
+                },
+                "kind": "circle",
+                "length_inches": null,
+                "radius_inches": 0.6299212598425197,
+                "rotation_degrees": 0.0,
+                "vertices": [],
+                "width_inches": null
+              }
+            ],
+            "support_shape": {
+              "center": {
+                "x_inches": 0.0,
+                "y_inches": 0.0
+              },
+              "kind": "circle",
+              "length_inches": null,
+              "radius_inches": 0.6299212598425197,
+              "rotation_degrees": 0.0,
+              "vertices": [],
+              "width_inches": null
+            }
+          },
+          "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:004",
+          "owner_player_id": "player-b",
+          "pose": null,
+          "state": "undeployed",
+          "state_context": {
+            "reserve_kind": null,
+            "transport_unit_instance_id": null
+          },
+          "unit_instance_id": "army-beta:intercessor-unit-2"
+        },
+        "army-beta:intercessor-unit-2:core-intercessor-like:005": {
+          "entity_kind": "model",
+          "geometry": {
+            "geometry_source_id": "core-intercessor-like",
+            "geometry_source_kind": "catalog_base_size",
+            "height_inches": 1.7637795275590549,
+            "height_source_id": "keyword:infantry_or_character",
+            "height_source_kind": "keyword_heuristic",
+            "measurement_basis": "base",
+            "measurement_shapes": [
+              {
+                "center": {
+                  "x_inches": 0.0,
+                  "y_inches": 0.0
+                },
+                "kind": "circle",
+                "length_inches": null,
+                "radius_inches": 0.6299212598425197,
+                "rotation_degrees": 0.0,
+                "vertices": [],
+                "width_inches": null
+              }
+            ],
+            "support_shape": {
+              "center": {
+                "x_inches": 0.0,
+                "y_inches": 0.0
+              },
+              "kind": "circle",
+              "length_inches": null,
+              "radius_inches": 0.6299212598425197,
+              "rotation_degrees": 0.0,
+              "vertices": [],
+              "width_inches": null
+            }
+          },
+          "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:005",
+          "owner_player_id": "player-b",
+          "pose": null,
+          "state": "undeployed",
+          "state_context": {
+            "reserve_kind": null,
+            "transport_unit_instance_id": null
+          },
+          "unit_instance_id": "army-beta:intercessor-unit-2"
+        }
+      },
+      "objectives_by_id": {
+        "take-and-hold-vs-purge-the-foe-layout-3-center-central": {
+          "entity_kind": "objective",
+          "marker_diameter_inches": 1.5748031496062993,
+          "measurement_anchor": "center",
+          "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-center-central",
+          "objective_role": "central",
+          "position": {
+            "x_inches": 30.0,
+            "y_inches": 22.0,
+            "z_inches": 0.0
+          },
+          "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-center-central"
+        },
+        "take-and-hold-vs-purge-the-foe-layout-3-left-home": {
+          "entity_kind": "objective",
+          "marker_diameter_inches": 1.5748031496062993,
+          "measurement_anchor": "center",
+          "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-left-home",
+          "objective_role": "home",
+          "position": {
+            "x_inches": 9.5,
+            "y_inches": 10.5,
+            "z_inches": 0.0
+          },
+          "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-left-home"
+        },
+        "take-and-hold-vs-purge-the-foe-layout-3-lower-central": {
+          "entity_kind": "objective",
+          "marker_diameter_inches": 1.5748031496062993,
+          "measurement_anchor": "center",
+          "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-lower-central",
+          "objective_role": "central",
+          "position": {
+            "x_inches": 28.5,
+            "y_inches": 35.5,
+            "z_inches": 0.0
+          },
+          "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-lower-central"
+        },
+        "take-and-hold-vs-purge-the-foe-layout-3-right-home": {
+          "entity_kind": "objective",
+          "marker_diameter_inches": 1.5748031496062993,
+          "measurement_anchor": "center",
+          "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-right-home",
+          "objective_role": "home",
+          "position": {
+            "x_inches": 52.5,
+            "y_inches": 34.5,
+            "z_inches": 0.0
+          },
+          "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-right-home"
+        },
+        "take-and-hold-vs-purge-the-foe-layout-3-upper-central": {
+          "entity_kind": "objective",
+          "marker_diameter_inches": 1.5748031496062993,
+          "measurement_anchor": "center",
+          "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-upper-central",
+          "objective_role": "central",
+          "position": {
+            "x_inches": 28.5,
+            "y_inches": 8.5,
+            "z_inches": 0.0
+          },
+          "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-upper-central"
+        }
+      },
+      "terrain_areas_by_id": {},
+      "terrain_features_by_id": {}
+    },
+    "authoritative_geometry_hash": "8759ec3ee2a846c4cd55100fb4fc9160be7abda978fb4395b06fc26e04218f18",
+    "battlefield_id": "ui-contract-hidden-redaction:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
+    "bounds": {
+      "max_x_inches": 60.0,
+      "max_y_inches": 44.0,
+      "min_x_inches": 0.0,
+      "min_y_inches": 0.0,
+      "min_z_inches": 0.0
+    },
+    "coordinate_space": "battlefield_inches_right_handed_z_up",
+    "coordinate_spec_version": "battlefield-coordinate-v1",
+    "interaction": {
+      "legal_candidate_refs": [],
+      "measurement_overlays": [],
+      "path_overlays": [],
+      "request_id": "decision-request-000002",
+      "selected_or_acting_entity_ids": []
+    },
+    "render": {
+      "hints_by_entity_id": {},
+      "hit_regions_by_entity_id": {}
+    },
+    "schema_version": "battlefield-view-v1"
+  },
   "current_battle_phase": null,
   "current_setup_step": "select_secondary_missions",
   "game_id": "ui-contract-hidden-redaction",
@@ -1531,7 +1920,7 @@
     "player-b"
   ],
   "projection_schema": "game-view-v6-interaction",
-  "projection_state_hash": "e1c562966927d02ea61985a92175dfd81a5c23c474a36f6acc62d66ef1ca031c",
+  "projection_state_hash": "67ee16121b6c7285707dbd16780c30e31ca5c0bec80fa7f2bb8bc221c6dd41f1",
   "public_command_point_ledgers": [
     {
       "command_points": 0,

@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SCHEMA_NAMES = frozenset(
     {
         "annotated-decision-request.schema.json",
+        "battlefield-view.schema.json",
         "create-session.schema.json",
         "decision-family-coverage.schema.json",
         "decision-family-live.schema.json",
@@ -61,6 +62,7 @@ from warhammer40k_core.engine.event_log import validate_json_value
 
 expected_schema_names = {
     "annotated-decision-request.schema.json",
+    "battlefield-view.schema.json",
     "create-session.schema.json",
     "decision-family-coverage.schema.json",
     "decision-family-live.schema.json",

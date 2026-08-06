@@ -2092,6 +2092,7 @@ def _schema_validator(schema_name: str) -> _PayloadValidator:
 
 def _schema_payloads() -> dict[str, Schema]:
     names = (
+        "battlefield-view.schema.json",
         "decision-request-view.schema.json",
         "event-delta.schema.json",
         "game-view.schema.json",

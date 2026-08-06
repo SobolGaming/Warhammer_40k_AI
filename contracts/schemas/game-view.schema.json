@@ -16,6 +16,16 @@
     "battlefield_state": {
       "$ref": "#/$defs/json_value"
     },
+    "battlefield_view": {
+      "oneOf": [
+        {
+          "$ref": "https://warhammer40k-core.local/contracts/v3/battlefield-view.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "current_battle_phase": {
       "type": [
         "string",
