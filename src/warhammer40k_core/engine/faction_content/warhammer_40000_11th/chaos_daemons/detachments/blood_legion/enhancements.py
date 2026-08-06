@@ -3,17 +3,16 @@
 from __future__ import annotations
 
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentContribution
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
+)
 
-# Generated scaffold placeholder. Remove this marker when implementing semantics.
-
-CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:enhancements:scaffold"
+CONTRIBUTION_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:enhancements"
+BRAZENMAW_ENHANCEMENT_ID = blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID
+BRAZENMAW_DESCRIPTOR_ID = blood_legion_ir.BRAZENMAW_DESCRIPTOR_ID
+BRAZENMAW_SOURCE_RULE_ID = blood_legion_ir.BRAZENMAW_SOURCE_RULE_ID
 
 
 def runtime_contribution() -> RuntimeContentContribution:
-    """Runtime load scaffold only.
-
-    Semantic execution must be supplied by source-backed RuleIR,
-    named handlers, event subscriptions, ability records, or Stratagem
-    handler bindings in implementation PRs.
-    """
+    """Expose the module while generic RuleIR owns Brazenmaw execution."""
     return RuntimeContentContribution(contribution_id=CONTRIBUTION_ID)

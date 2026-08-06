@@ -38,6 +38,7 @@ from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
     rule_ir_weapon_selector_applies,
 )
 from warhammer40k_core.engine.rule_target_resolution import unit_has_required_keywords
+from warhammer40k_core.engine.rules_unit_effects import rules_unit_persisting_effects
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     DamageRollModifierContext,
@@ -610,9 +611,11 @@ def _matching_generic_unit_effects(
 
     if type(state) is not GameState:
         raise GameLifecycleError("Generic RuleIR unit hooks require GameState.")
-    unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     matches_by_effect_slot: dict[str, _GenericAttackEffect] = {}
-    for persisting_effect in state.persisting_effects_for_unit(unit_id):
+    for effect_unit_id, persisting_effect in rules_unit_persisting_effects(
+        state,
+        _validate_identifier("unit_instance_id", unit_instance_id),
+    ):
         generic_effect = _generic_attack_effect_or_none(
             persisting_effect=persisting_effect,
             role="attacker",
@@ -620,7 +623,7 @@ def _matching_generic_unit_effects(
         )
         if generic_effect is None:
             continue
-        if not _generic_unit_effect_applies(effect=generic_effect, unit_instance_id=unit_id):
+        if not _generic_unit_effect_applies(effect=generic_effect, unit_instance_id=effect_unit_id):
             continue
         effect_slot = f"{_modifier_source_id(generic_effect)}:{generic_effect.effect_index}"
         existing = matches_by_effect_slot.get(effect_slot)

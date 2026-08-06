@@ -7,6 +7,7 @@ from typing import cast
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleClausePayload,
+    RuleConditionPayload,
     RuleDurationPayload,
     RuleEffectSpecPayload,
     RuleIR,
@@ -14,7 +15,11 @@ from warhammer40k_core.rules.rule_ir import (
     RuleParameterPayload,
     RuleTargetSpecPayload,
 )
-from warhammer40k_core.rules.rule_templates import GRANT_ABILITY_TEMPLATE_ID
+from warhammer40k_core.rules.rule_templates import (
+    DICE_ROLL_MODIFIER_TEMPLATE_ID,
+    GRANT_ABILITY_TEMPLATE_ID,
+    KEYWORD_GATE_TEMPLATE_ID,
+)
 
 SOURCE_PACKAGE_ID = "gw-11e-phase17e-faction-coverage-2026-27"
 
@@ -22,6 +27,13 @@ BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID = "phase17e:chaos-daemons:blood-legio
 BLOOD_LEGION_SOURCE_RULE_ID = "phase17f:phase17e:chaos-daemons:blood-legion:rule"
 BLOOD_LEGION_DETACHMENT_ID = "blood-legion"
 CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
+BRAZENMAW_ENHANCEMENT_ID = "000009815004"
+BRAZENMAW_SOURCE_ROW_ID = (
+    f"enhancement:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:"
+    f"{BRAZENMAW_ENHANCEMENT_ID}"
+)
+BRAZENMAW_DESCRIPTOR_ID = f"phase17e:{BRAZENMAW_SOURCE_ROW_ID}"
+BRAZENMAW_SOURCE_RULE_ID = f"phase17f:{BRAZENMAW_DESCRIPTOR_ID}"
 MURDERCALL_HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall"
 BLOOD_TAINTED_HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted"
 LEGIONES_DAEMONICA_KEYWORD = "LEGIONES DAEMONICA"
@@ -91,6 +103,58 @@ def _detachment_rule_payload() -> RuleIRPayload:
     )
 
 
+def _brazenmaw_payload() -> RuleIRPayload:
+    normalized_text = (
+        "Legiones Daemonica Khorne model only. Add 2 to Charge rolls made for the bearer's unit."
+    )
+    eligibility_text = "Legiones Daemonica Khorne model only"
+    charge_text = "Add 2 to Charge rolls made for the bearer's unit."
+    return _coverage_payload(
+        BRAZENMAW_SOURCE_ROW_ID,
+        normalized_text,
+        (
+            _keyword_gate_clause(
+                clause_id=_coverage_clause_id(BRAZENMAW_SOURCE_ROW_ID, "gate:001"),
+                normalized_text=normalized_text,
+                source_text=eligibility_text,
+                conditions=(
+                    _keyword_condition(
+                        normalized_text=normalized_text,
+                        source_text="Legiones Daemonica",
+                        parameter_key="required_keyword_sequence",
+                        parameter_value=(LEGIONES_DAEMONICA_KEYWORD,),
+                    ),
+                    _keyword_condition(
+                        normalized_text=normalized_text,
+                        source_text="Khorne",
+                        parameter_key="required_keyword",
+                        parameter_value=KHORNE_KEYWORD,
+                    ),
+                ),
+            ),
+            _effect_clause(
+                clause_id=_coverage_clause_id(BRAZENMAW_SOURCE_ROW_ID, "effect:001"),
+                template_id=DICE_ROLL_MODIFIER_TEMPLATE_ID,
+                normalized_text=normalized_text,
+                source_text=charge_text,
+                target=_target("this_unit", normalized_text, "the bearer's unit"),
+                effects=(
+                    _effect(
+                        "modify_dice_roll",
+                        normalized_text,
+                        "Add 2 to Charge rolls",
+                        (
+                            _parameter("delta", 2),
+                            _parameter("roll_type", "charge"),
+                        ),
+                    ),
+                ),
+                duration=None,
+            ),
+        ),
+    )
+
+
 def _coverage_payload(
     source_row_id: str,
     normalized_text: str,
@@ -122,6 +186,47 @@ def _payload(
         clauses=tuple(RuleClause.from_payload(clause) for clause in clauses),
         diagnostics=(),
     ).to_payload()
+
+
+def _keyword_gate_clause(
+    *,
+    clause_id: str,
+    normalized_text: str,
+    source_text: str,
+    conditions: tuple[RuleConditionPayload, ...],
+) -> RuleClausePayload:
+    return cast(
+        RuleClausePayload,
+        {
+            "clause_id": clause_id,
+            "template_id": KEYWORD_GATE_TEMPLATE_ID,
+            "source_span": _span(normalized_text, source_text),
+            "trigger": None,
+            "conditions": list(conditions),
+            "target": None,
+            "effects": [],
+            "duration": None,
+            "unsupported_reason": None,
+            "diagnostics": [],
+        },
+    )
+
+
+def _keyword_condition(
+    *,
+    normalized_text: str,
+    source_text: str,
+    parameter_key: str,
+    parameter_value: object,
+) -> RuleConditionPayload:
+    return cast(
+        RuleConditionPayload,
+        {
+            "kind": "keyword_gate",
+            "source_span": _span(normalized_text, source_text),
+            "parameters": [_parameter(parameter_key, parameter_value)],
+        },
+    )
 
 
 def _ability_clause(
@@ -245,6 +350,7 @@ def _coverage_payloads() -> Mapping[str, RuleIRPayload]:
     return MappingProxyType(
         {
             BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID: _detachment_rule_payload(),
+            BRAZENMAW_DESCRIPTOR_ID: _brazenmaw_payload(),
         }
     )
 

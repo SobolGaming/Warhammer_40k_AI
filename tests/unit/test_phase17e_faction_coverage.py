@@ -208,6 +208,7 @@ GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         "enhancement:adeptus-custodes:talons-of-the-emperor:000008921004",
         "enhancement:adeptus-custodes:talons-of-the-emperor:000008921005",
+        "enhancement:chaos-daemons:blood-legion:000009815004",
         "enhancement:chaos-space-marines:fellhammer-siege-host:000008976004",
         "enhancement:genestealer-cults:host-of-ascension:000009067005",
         "enhancement:leagues-of-votann:persecution-prospect:000010439002",
