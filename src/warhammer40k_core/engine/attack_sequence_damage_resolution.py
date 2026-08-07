@@ -697,6 +697,7 @@ def _resolve_deadly_demise_before_removal(
     pending_sources: tuple[DestructionReactionSource, ...],
 ) -> LifecycleStatus | None:
     descriptor, trigger_roll_payload, triggered = resolve_deadly_demise_trigger(
+        state=state,
         manager=manager,
         source=source,
         player_id=destroyed_model_controller_player_id,

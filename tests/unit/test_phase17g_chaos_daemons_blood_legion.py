@@ -5,6 +5,7 @@ from collections.abc import Callable
 from dataclasses import replace
 from typing import cast
 
+import pytest
 from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_action_and_movement_proposal,
@@ -27,8 +28,15 @@ from warhammer40k_core.core.attachment_eligibility import (
     AttachmentRole,
     AttachmentTargetEligibility,
 )
-from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+    DatasheetDefinition,
+    DatasheetKeywordSet,
+)
 from warhammer40k_core.core.detachment import DetachmentDefinition, EnhancementDefinition
+from warhammer40k_core.core.dice import DiceRollResult
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
@@ -40,9 +48,23 @@ from warhammer40k_core.engine.army_mustering import (
     muster_army,
     validate_roster_legality,
 )
+from warhammer40k_core.engine.attack_sequence_model import deadly_demise_trigger_roll_spec
 from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
+from warhammer40k_core.engine.damage_allocation import (
+    DestructionReactionKind,
+    DestructionReactionSource,
+)
+from warhammer40k_core.engine.deadly_demise import (
+    deadly_demise_mortal_wounds_for_target,
+    effective_deadly_demise_descriptor,
+    resolve_deadly_demise_trigger,
+)
+from warhammer40k_core.engine.deadly_demise_modifiers import (
+    DEADLY_DEMISE_MODIFIER_CONDITION_EFFECT_KIND,
+    deadly_demise_modifier_for_model,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
@@ -50,6 +72,7 @@ from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
     ModelDestructionAttribution,
 )
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle
@@ -83,6 +106,7 @@ from warhammer40k_core.engine.objective_control import (
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
+    GameLifecycleError,
     LifecycleStatus,
     LifecycleStatusKind,
     PlaceholderPhaseHandler,
@@ -277,6 +301,314 @@ def test_brazenmaw_eligibility_rejects_non_khorne_bearer() -> None:
     assert "enhancement_target_keyword_required" in {
         violation.violation_code for violation in report.violations
     }
+
+
+def test_gateway_unto_damnation_is_exact_source_backed_executable_generic_rule_ir() -> None:
+    rule_ir = faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id(
+        enhancements.GATEWAY_UNTO_DAMNATION_DESCRIPTOR_ID
+    )
+    record = _gateway_unto_damnation_execution_record()
+
+    assert rule_ir.is_supported
+    assert rule_ir.source_id == (
+        f"{blood_legion_ir.SOURCE_PACKAGE_ID}:"
+        f"{blood_legion_ir.GATEWAY_UNTO_DAMNATION_DESCRIPTOR_ID}:source-text"
+    )
+    assert rule_ir.normalized_text == (
+        "Legiones Daemonica Khorne Monster model only. The bearer's Deadly Demise ability "
+        "inflicts mortal wounds on a D6 roll of 2+ instead of on a 6. In addition, if the "
+        "bearer has destroyed one or more enemy units this battle, the bearer has the Deadly "
+        "Demise D3+3 ability, instead of any other Deadly Demise ability on its datasheet."
+    )
+    assert not rule_ir.diagnostics
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.execution_id == enhancements.GATEWAY_UNTO_DAMNATION_SOURCE_RULE_ID
+    assert record.rule_ir_hash == rule_ir.ir_hash()
+    modifier_clause = next(
+        clause
+        for clause in rule_ir.clauses
+        if any(effect.kind is RuleEffectKind.GRANT_ABILITY for effect in clause.effects)
+    )
+    assert modifier_clause.target is not None
+    assert modifier_clause.target.kind.value == "this_model"
+    assert len(modifier_clause.conditions) == 1
+    assert parameter_payload(modifier_clause.conditions[0].parameters) == {
+        "relationship": "this_model_destroyed_unit",
+        "target_allegiance": "enemy",
+        "time_scope": "this_battle",
+    }
+    (modifier_effect,) = modifier_clause.effects
+    assert parameter_payload(modifier_effect.parameters) == {
+        "ability": blood_legion_ir.DEADLY_DEMISE_MODIFIER_ABILITY,
+        "trigger_roll_threshold": 2,
+        "conditional_mortal_wounds_kind": "d3",
+        "conditional_mortal_wounds_modifier": 3,
+        "condition": blood_legion_ir.DEADLY_DEMISE_DESTROYED_ENEMY_UNIT_CONDITION,
+        "replaces_existing_deadly_demise": True,
+    }
+
+
+def test_gateway_unto_damnation_rejects_non_monster_bearer() -> None:
+    config = _blood_legion_config(
+        game_id="phase17g-gateway-invalid-bearer",
+        gateway_target_unit_selection_id="blood-daemon-unit",
+    )
+
+    report = validate_roster_legality(
+        catalog=config.army_catalog,
+        request=config.army_muster_requests[0],
+    )
+
+    assert "enhancement_target_keyword_required" in {
+        violation.violation_code for violation in report.violations
+    }
+
+
+def test_gateway_unto_damnation_modifies_only_bearer_and_persists_destroyed_unit_history() -> None:
+    config = _blood_legion_config(
+        game_id="phase17g-gateway-runtime",
+        include_slaughterthirst_targets=True,
+        gateway_target_unit_selection_id="khorne-monster-unit",
+    )
+    lifecycle = _blood_legion_enhancement_lifecycle(config)
+    state = _started_state(lifecycle)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    bundle = _runtime_content_bundle(lifecycle)
+    monster = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    bearer_model_id = monster.own_models[0].model_instance_id
+    other_model_id = monster.own_models[1].model_instance_id
+    bearer_source = _single_deadly_demise_source(
+        state=state,
+        model_instance_id=bearer_model_id,
+    )
+    other_source = _single_deadly_demise_source(
+        state=state,
+        model_instance_id=other_model_id,
+    )
+    decisions = lifecycle.decision_controller
+
+    before_kill = effective_deadly_demise_descriptor(
+        state=state,
+        event_log=decisions.event_log,
+        source=bearer_source,
+        model_instance_id=bearer_model_id,
+    )
+    other_model_descriptor = effective_deadly_demise_descriptor(
+        state=state,
+        event_log=decisions.event_log,
+        source=other_source,
+        model_instance_id=other_model_id,
+    )
+
+    assert before_kill["trigger_roll_threshold"] == 2
+    assert before_kill["mortal_wounds"] == {"kind": "d3"}
+    assert other_model_descriptor == {
+        "trigger_roll_threshold": 6,
+        "range_inches": 6.0,
+        "mortal_wounds": {"kind": "d3"},
+    }
+
+    _destroy_enemy_unit_for_gateway(
+        state=state,
+        decisions=decisions,
+        attacking_unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+        attacking_model_instance_id=bearer_model_id,
+        weapon_profile=_weapon_profile_for_unit(
+            config=config,
+            state=state,
+            unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+        ),
+    )
+    upgraded_same_phase = effective_deadly_demise_descriptor(
+        state=state,
+        event_log=decisions.event_log,
+        source=bearer_source,
+        model_instance_id=bearer_model_id,
+    )
+    trigger_spec = deadly_demise_trigger_roll_spec(
+        source=bearer_source,
+        player_id="player-a",
+        model_instance_id=bearer_model_id,
+    )
+    trigger_descriptor, _roll_payload, triggered = resolve_deadly_demise_trigger(
+        state=state,
+        manager=DiceRollManager(
+            "phase17g-gateway-trigger",
+            event_log=decisions.event_log,
+            injected_results=(
+                DiceRollResult.from_values(
+                    roll_id="phase17g-gateway-trigger-roll",
+                    spec=trigger_spec,
+                    values=(2,),
+                    source="fixed",
+                ),
+            ),
+        ),
+        source=bearer_source,
+        player_id="player-a",
+        model_instance_id=bearer_model_id,
+    )
+
+    assert upgraded_same_phase["mortal_wounds"] == {"kind": "d3", "modifier": 3}
+    assert trigger_descriptor == upgraded_same_phase
+    assert triggered
+
+    flow = BattleRoundFlow(
+        phase_handlers={
+            BattlePhase.SHOOTING: PlaceholderPhaseHandler(BattlePhase.SHOOTING),
+        },
+        unit_destroyed_hooks=bundle.unit_destroyed_hook_registry,
+    )
+    flow.advance(state=state, decisions=decisions)
+    condition_effects = tuple(
+        effect
+        for effect in state.persisting_effects
+        if isinstance(effect.effect_payload, dict)
+        and effect.effect_payload.get("effect_kind") == DEADLY_DEMISE_MODIFIER_CONDITION_EFFECT_KIND
+    )
+
+    assert len(condition_effects) == 1
+    condition_payload = cast(dict[str, JsonValue], condition_effects[0].effect_payload)
+    assert condition_payload["source_model_instance_id"] == bearer_model_id
+    assert "object at 0x" not in json.dumps(
+        _event_payload(decisions, "deadly_demise_modifier_condition_achieved"),
+        sort_keys=True,
+    )
+
+    payload = lifecycle.to_payload()
+    rebuilt = GameLifecycle.from_payload(payload)
+    rebuilt_state = _started_state(rebuilt)
+    rebuilt_source = _single_deadly_demise_source(
+        state=rebuilt_state,
+        model_instance_id=bearer_model_id,
+    )
+    rebuilt_descriptor = effective_deadly_demise_descriptor(
+        state=rebuilt_state,
+        event_log=rebuilt.decision_controller.event_log,
+        source=rebuilt_source,
+        model_instance_id=bearer_model_id,
+    )
+    damage_spec = DiceRollManager.d3_source_spec(
+        reason=(
+            f"Deadly Demise mortal wounds for {rebuilt_source.source_id} into {_BLOOD_UNIT_ID}"
+        ),
+        roll_type="destruction_reaction.deadly_demise.mortal_wounds",
+        actor_id="player-a",
+    )
+    mortal_wounds, _damage_roll = deadly_demise_mortal_wounds_for_target(
+        manager=DiceRollManager(
+            "phase17g-gateway-damage",
+            event_log=rebuilt.decision_controller.event_log,
+            injected_results=(
+                DiceRollResult.from_values(
+                    roll_id="phase17g-gateway-damage-roll",
+                    spec=damage_spec,
+                    values=(1,),
+                    source="fixed",
+                ),
+            ),
+        ),
+        source=rebuilt_source,
+        descriptor=rebuilt_descriptor,
+        player_id="player-a",
+        target_unit_instance_id=_BLOOD_UNIT_ID,
+    )
+
+    assert rebuilt.to_payload()["state"] == rebuilt_state.to_payload()
+    assert rebuilt_descriptor["mortal_wounds"] == {"kind": "d3", "modifier": 3}
+    assert mortal_wounds == 4
+
+
+@pytest.mark.parametrize("attribution_kind", ["other_model_attack", "unit_ability"])
+def test_gateway_unto_damnation_multi_model_attribution_fails_closed(
+    attribution_kind: str,
+) -> None:
+    config = _blood_legion_config(
+        game_id=f"phase17g-gateway-attribution-{attribution_kind}",
+        include_slaughterthirst_targets=True,
+        gateway_target_unit_selection_id="khorne-monster-unit",
+    )
+    lifecycle = _blood_legion_enhancement_lifecycle(config)
+    state = _started_state(lifecycle)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    monster = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    bearer_model_id = monster.own_models[0].model_instance_id
+    other_model_id = monster.own_models[1].model_instance_id
+    source = _single_deadly_demise_source(
+        state=state,
+        model_instance_id=bearer_model_id,
+    )
+    if attribution_kind == "other_model_attack":
+        _destroy_enemy_unit_for_gateway(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            attacking_unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+            attacking_model_instance_id=other_model_id,
+            weapon_profile=_weapon_profile_for_unit(
+                config=config,
+                state=state,
+                unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+            ),
+        )
+    else:
+        _destroy_enemy_unit_for_gateway(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            attacking_unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+            attacking_model_instance_id=None,
+            weapon_profile=None,
+        )
+
+    descriptor = effective_deadly_demise_descriptor(
+        state=state,
+        event_log=lifecycle.decision_controller.event_log,
+        source=source,
+        model_instance_id=bearer_model_id,
+    )
+
+    assert descriptor["trigger_roll_threshold"] == 2
+    assert descriptor["mortal_wounds"] == {"kind": "d3"}
+
+
+def test_gateway_unto_damnation_source_identity_drift_fails_closed() -> None:
+    config = _blood_legion_config(
+        game_id="phase17g-gateway-source-drift",
+        include_slaughterthirst_targets=True,
+        gateway_target_unit_selection_id="khorne-monster-unit",
+    )
+    lifecycle = _blood_legion_enhancement_lifecycle(config)
+    state = _started_state(lifecycle)
+    monster = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    bearer_model_id = monster.own_models[0].model_instance_id
+    modifier = deadly_demise_modifier_for_model(
+        state=state,
+        model_instance_id=bearer_model_id,
+    )
+    assert modifier is not None
+    effect_index = next(
+        index
+        for index, effect in enumerate(state.persisting_effects)
+        if effect.effect_id == modifier.effect_id
+    )
+    state.persisting_effects[effect_index] = replace(
+        state.persisting_effects[effect_index],
+        source_rule_id="phase17g:gateway:drifted-source-rule",
+    )
+
+    with pytest.raises(GameLifecycleError, match="source rule identity drift"):
+        deadly_demise_modifier_for_model(
+            state=state,
+            model_instance_id=bearer_model_id,
+        )
 
 
 def test_slaughterthirst_is_exact_source_backed_executable_generic_rule_ir() -> None:
@@ -726,6 +1058,17 @@ def _brazenmaw_execution_record() -> Phase17FExecutionRecord:
     return records[0]
 
 
+def _gateway_unto_damnation_execution_record() -> Phase17FExecutionRecord:
+    records = tuple(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.coverage_descriptor_id == enhancements.GATEWAY_UNTO_DAMNATION_DESCRIPTOR_ID
+    )
+    if len(records) != 1:
+        raise AssertionError("expected one Gateway Unto Damnation execution record")
+    return records[0]
+
+
 def _slaughterthirst_execution_record() -> Phase17FExecutionRecord:
     records = tuple(
         record
@@ -746,6 +1089,7 @@ def _blood_legion_config(
     include_slaughterthirst_targets: bool = False,
     brazenmaw_target_unit_selection_id: str | None = None,
     slaughterthirst_target_unit_selection_id: str | None = None,
+    gateway_target_unit_selection_id: str | None = None,
     attach_brazenmaw_bearer: bool = False,
 ) -> GameConfig:
     catalog = _blood_legion_catalog()
@@ -772,6 +1116,7 @@ def _blood_legion_config(
                 ),
                 brazenmaw_target_unit_selection_id=brazenmaw_target_unit_selection_id,
                 slaughterthirst_target_unit_selection_id=(slaughterthirst_target_unit_selection_id),
+                gateway_target_unit_selection_id=gateway_target_unit_selection_id,
                 attach_brazenmaw_bearer=attach_brazenmaw_bearer,
             ),
             _army_muster_request(
@@ -853,6 +1198,7 @@ def _blood_legion_catalog() -> ArmyCatalog:
                 force_disposition_ids=("phase17g-force",),
                 enhancement_ids=(
                     blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID,
+                    blood_legion_ir.GATEWAY_UNTO_DAMNATION_ENHANCEMENT_ID,
                     blood_legion_ir.SLAUGHTERTHIRST_ENHANCEMENT_ID,
                 ),
                 source_ids=(
@@ -879,6 +1225,17 @@ def _blood_legion_catalog() -> ArmyCatalog:
                 source_id=blood_legion_ir.BRAZENMAW_DESCRIPTOR_ID,
                 points=15,
                 target_required_keywords=(blood_legion_ir.KHORNE_KEYWORD,),
+                target_required_faction_keywords=(blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,),
+            ),
+            EnhancementDefinition(
+                enhancement_id=blood_legion_ir.GATEWAY_UNTO_DAMNATION_ENHANCEMENT_ID,
+                name="Gateway Unto Damnation",
+                source_id=blood_legion_ir.GATEWAY_UNTO_DAMNATION_DESCRIPTOR_ID,
+                points=10,
+                target_required_keywords=(
+                    blood_legion_ir.KHORNE_KEYWORD,
+                    blood_legion_ir.MONSTER_KEYWORD,
+                ),
                 target_required_faction_keywords=(blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,),
             ),
             EnhancementDefinition(
@@ -945,6 +1302,19 @@ def _blood_legion_khorne_monster_datasheet(
             faction_keywords=("Legiones Daemonica",),
         ),
         attachment_eligibilities=(),
+        abilities=(
+            *base_datasheet.abilities,
+            DatasheetAbilityDescriptor(
+                ability_id="phase17g-blood-legion-deadly-demise-d3",
+                name="Deadly Demise D3",
+                source_id="phase17g:test:chaos-daemons:blood-legion:deadly-demise-d3",
+                support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+                source_kind=CatalogAbilitySourceKind.CORE,
+                effect_description="Deadly Demise D3 descriptor.",
+                timing_tags=("after_destroyed", "deadly_demise"),
+                parameter_tokens=("D3",),
+            ),
+        ),
         source_ids=("phase17g:test:chaos-daemons:blood-legion-khorne-monster",),
     )
 
@@ -961,6 +1331,7 @@ def _army_muster_request(
     extra_unit_selections: tuple[tuple[str, str], ...] = (),
     brazenmaw_target_unit_selection_id: str | None = None,
     slaughterthirst_target_unit_selection_id: str | None = None,
+    gateway_target_unit_selection_id: str | None = None,
     attach_brazenmaw_bearer: bool = False,
 ) -> ArmyMusterRequest:
     unit_selections = [
@@ -999,6 +1370,18 @@ def _army_muster_request(
                 source_id=(
                     "phase17g:test:blood-legion:slaughterthirst-assignment:"
                     f"{slaughterthirst_target_unit_selection_id}"
+                ),
+            )
+        )
+    if gateway_target_unit_selection_id is not None:
+        enhancement_ids.append(blood_legion_ir.GATEWAY_UNTO_DAMNATION_ENHANCEMENT_ID)
+        enhancement_assignments.append(
+            EnhancementAssignment(
+                enhancement_id=blood_legion_ir.GATEWAY_UNTO_DAMNATION_ENHANCEMENT_ID,
+                target_unit_selection_id=gateway_target_unit_selection_id,
+                source_id=(
+                    "phase17g:test:blood-legion:gateway-unto-damnation-assignment:"
+                    f"{gateway_target_unit_selection_id}"
                 ),
             )
         )
@@ -1413,6 +1796,96 @@ def _destroy_enemy_unit_for_blood_tainted(
                 "destroyed_model_rules_triggered": True,
             },
         )
+
+
+def _destroy_enemy_unit_for_gateway(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    attacking_unit_instance_id: str,
+    attacking_model_instance_id: str | None,
+    weapon_profile: WeaponProfile | None,
+) -> None:
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    phase = state.current_battle_phase
+    if phase is None:
+        raise AssertionError("test state requires current battle phase")
+    enemy_unit = _physical_unit_by_id(state=state, unit_instance_id=_ENEMY_UNIT_ID)
+    destroyed_model_ids = tuple(model.model_instance_id for model in enemy_unit.own_models)
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models(destroyed_model_ids)
+    )
+    state.replace_army_definitions(
+        [
+            replace(
+                army,
+                units=tuple(
+                    replace(
+                        unit,
+                        own_models=tuple(
+                            replace(model, wounds_remaining=0) for model in unit.own_models
+                        ),
+                    )
+                    if unit.unit_instance_id == _ENEMY_UNIT_ID
+                    else unit
+                    for unit in army.units
+                ),
+            )
+            for army in state.army_definitions
+        ]
+    )
+    if attacking_model_instance_id is None:
+        if weapon_profile is not None:
+            raise AssertionError("non-attack attribution cannot carry a weapon profile")
+        attribution = ModelDestructionAttribution.for_non_attack(
+            destroying_player_id="player-a",
+            source_kind=DestructionSourceKind.ABILITY,
+            source_rules_unit_instance_id=attacking_unit_instance_id,
+        )
+    else:
+        if weapon_profile is None:
+            raise AssertionError("attack attribution requires a weapon profile")
+        attribution = ModelDestructionAttribution.for_attack(
+            destroying_player_id="player-a",
+            attacking_unit_instance_id=attacking_unit_instance_id,
+            attacking_model_instance_id=attacking_model_instance_id,
+            weapon_profile=weapon_profile,
+            attack_context_id="phase17g-gateway-destroyed-unit",
+        )
+    for index, model_id in enumerate(destroyed_model_ids, start=1):
+        decisions.event_log.append(
+            "model_destroyed",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": phase.value,
+                **attribution.to_payload(),
+                "target_unit_instance_id": _ENEMY_UNIT_ID,
+                "model_instance_id": model_id,
+                "damage_kind": "normal",
+                "damage_event_id": f"phase17g-gateway-damage-{index:02d}",
+                "destroyed_model_rules_triggered": True,
+            },
+        )
+
+
+def _single_deadly_demise_source(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> DestructionReactionSource:
+    sources = tuple(
+        source
+        for source in state.destruction_reaction_sources_for_model(
+            model_instance_id=model_instance_id
+        )
+        if source.reaction_kind is DestructionReactionKind.DEADLY_DEMISE
+    )
+    if len(sources) != 1:
+        raise AssertionError("expected one Deadly Demise source")
+    return sources[0]
 
 
 def _destroy_enemy_unit_with_split_attackers_for_blood_tainted(

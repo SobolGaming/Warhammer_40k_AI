@@ -141,6 +141,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
 )
 from warhammer40k_core.engine.generic_enhancement_effects import (
     generic_enhancement_aura_weapon_profile_modifier_bindings,
+    generic_enhancement_deadly_demise_unit_destroyed_hook_bindings,
     generic_enhancement_effect_bindings,
 )
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent
@@ -1510,6 +1511,10 @@ class RuntimeContentBundle:
                     armies=validated_armies,
                 ),
                 *generic_rule_lifecycle_hooks.unit_destroyed_hook_bindings(
+                    activation=activation,
+                    execution_records=records,
+                ),
+                *generic_enhancement_deadly_demise_unit_destroyed_hook_bindings(
                     activation=activation,
                     execution_records=records,
                 ),

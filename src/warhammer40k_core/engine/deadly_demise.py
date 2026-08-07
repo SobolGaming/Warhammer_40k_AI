@@ -13,8 +13,12 @@ from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionSource,
     model_by_id,
 )
+from warhammer40k_core.engine.deadly_demise_modifiers import (
+    deadly_demise_modifier_condition_is_met,
+    deadly_demise_modifier_for_model,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_from_armies
 from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
@@ -26,14 +30,20 @@ if TYPE_CHECKING:
 
 def resolve_deadly_demise_trigger(
     *,
+    state: GameState,
     manager: DiceRollManager,
     source: DestructionReactionSource,
     player_id: str,
     model_instance_id: str,
 ) -> tuple[dict[str, JsonValue], JsonValue, bool]:
-    descriptor = deadly_demise_descriptor(source)
     requested_player_id = _validate_identifier("player_id", player_id)
     requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
+    descriptor = effective_deadly_demise_descriptor(
+        state=state,
+        event_log=manager.event_log,
+        source=source,
+        model_instance_id=requested_model_id,
+    )
     roll = manager.roll(
         deadly_demise_trigger_roll_spec(
             source=source,
@@ -60,12 +70,17 @@ def deadly_demise_mortal_wounds_for_target(
     if kind == "fixed":
         return _payload_positive_int(wound_descriptor, key="value"), None
     if kind == "d3":
+        modifier = (
+            _payload_non_negative_int(wound_descriptor, key="modifier")
+            if "modifier" in wound_descriptor
+            else 0
+        )
         result = manager.roll_d3(
             reason=f"Deadly Demise mortal wounds for {source.source_id} into {requested_target_id}",
             roll_type="destruction_reaction.deadly_demise.mortal_wounds",
             actor_id=requested_player_id,
         )
-        return result.value, validate_json_value(result.to_payload())
+        return result.value + modifier, validate_json_value(result.to_payload())
     if kind == "d6":
         roll = manager.roll(
             deadly_demise_mortal_wounds_roll_spec(
@@ -127,13 +142,62 @@ def deadly_demise_descriptor(
     mortal_wounds = _payload_object(payload.get("mortal_wounds"), "mortal_wounds")
     kind = _payload_string(mortal_wounds, key="kind")
     if kind == "fixed":
+        if "modifier" in mortal_wounds:
+            raise GameLifecycleError("Fixed Deadly Demise mortal wounds cannot include a modifier.")
         _payload_positive_int(mortal_wounds, key="value")
-    elif kind not in {"d3", "d6"}:
+    elif kind == "d3":
+        if "modifier" in mortal_wounds:
+            _payload_non_negative_int(mortal_wounds, key="modifier")
+    elif kind == "d6":
+        if "modifier" in mortal_wounds:
+            raise GameLifecycleError("D6 Deadly Demise mortal wounds cannot include a modifier.")
+    else:
         raise GameLifecycleError("Unsupported Deadly Demise mortal-wound descriptor.")
     return {
         "trigger_roll_threshold": trigger_threshold,
         "range_inches": range_inches,
         "mortal_wounds": validate_json_value(mortal_wounds),
+    }
+
+
+def effective_deadly_demise_descriptor(
+    *,
+    state: GameState,
+    event_log: EventLog,
+    source: DestructionReactionSource,
+    model_instance_id: str,
+) -> dict[str, JsonValue]:
+    descriptor = deadly_demise_descriptor(source)
+    requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
+    modifier = deadly_demise_modifier_for_model(
+        state=state,
+        model_instance_id=requested_model_id,
+    )
+    if modifier is None:
+        return descriptor
+    condition_met = deadly_demise_modifier_condition_is_met(
+        state=state,
+        event_log=event_log,
+        modifier=modifier,
+    )
+    mortal_wounds: dict[str, JsonValue]
+    if condition_met:
+        mortal_wounds = {
+            "kind": modifier.conditional_mortal_wounds_kind,
+            "modifier": modifier.conditional_mortal_wounds_modifier,
+        }
+    else:
+        mortal_wounds = _payload_object(descriptor.get("mortal_wounds"), "mortal_wounds")
+    return {
+        "trigger_roll_threshold": modifier.trigger_roll_threshold,
+        "range_inches": descriptor["range_inches"],
+        "mortal_wounds": validate_json_value(mortal_wounds),
+        "runtime_modifier": {
+            "effect_id": modifier.effect_id,
+            "source_rule_id": modifier.source_rule_id,
+            "source_model_instance_id": modifier.source_model_instance_id,
+            "condition_met": condition_met,
+        },
     }
 
 
@@ -182,6 +246,13 @@ def _payload_positive_int(payload: dict[str, JsonValue], *, key: str) -> int:
     value = payload.get(key)
     if type(value) is not int or value < 1:
         raise GameLifecycleError(f"Deadly Demise {key} must be a positive integer.")
+    return value
+
+
+def _payload_non_negative_int(payload: dict[str, JsonValue], *, key: str) -> int:
+    value = payload.get(key)
+    if type(value) is not int or value < 0:
+        raise GameLifecycleError(f"Deadly Demise {key} must be a non-negative integer.")
     return value
 
 

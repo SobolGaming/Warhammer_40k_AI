@@ -444,6 +444,7 @@ def _continue_rule_deadly_demise_sources(
         if source.optional or source.reaction_kind is not DestructionReactionKind.DEADLY_DEMISE:
             raise GameLifecycleError("Rule destruction Deadly Demise source routing drift.")
         descriptor, trigger_roll_payload, triggered = resolve_deadly_demise_trigger(
+            state=state,
             manager=manager,
             source=source,
             player_id=controller_player_id,

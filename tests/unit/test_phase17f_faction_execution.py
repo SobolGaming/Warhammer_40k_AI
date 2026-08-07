@@ -93,6 +93,11 @@ GENERIC_BATTLEFIELD_CONTEXT_EXECUTION_IDS = frozenset(
         "phase17f:phase17e:enhancement:chaos-daemons:blood-legion:000009815002",
     }
 )
+GENERIC_SOURCE_MODEL_CONTEXT_EXECUTION_IDS = frozenset(
+    {
+        "phase17f:phase17e:enhancement:chaos-daemons:blood-legion:000009815005",
+    }
+)
 LEAPING_SHADOWS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:leaping_shadows:scouts_9",
@@ -890,11 +895,12 @@ def test_phase17f_registry_dispatches_every_record_without_missing_handlers() ->
                 FactionRuleExecutionStatus.INVALID,
             }
             if result.status is FactionRuleExecutionStatus.INVALID:
-                expected_reason = (
-                    "missing_input:battlefield_state"
-                    if record.execution_id in GENERIC_BATTLEFIELD_CONTEXT_EXECUTION_IDS
-                    else "missing_input:game_state"
-                )
+                if record.execution_id in GENERIC_BATTLEFIELD_CONTEXT_EXECUTION_IDS:
+                    expected_reason = "missing_input:battlefield_state"
+                elif record.execution_id in GENERIC_SOURCE_MODEL_CONTEXT_EXECUTION_IDS:
+                    expected_reason = "missing_input:source_model_instance_id"
+                else:
+                    expected_reason = "missing_input:game_state"
                 assert result.reason == expected_reason
             else:
                 assert result.reason is None
