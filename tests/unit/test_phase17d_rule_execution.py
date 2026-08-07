@@ -160,6 +160,8 @@ from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27
 from warhammer40k_core.rules.rule_compiler import CompiledRuleSource, compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
+    RuleCondition,
+    RuleConditionKind,
     RuleEffectKind,
     RuleEffectSpec,
     RuleIR,
@@ -2813,7 +2815,7 @@ def test_phase17d_friendly_aura_evaluation_ignores_enemy_units_in_range() -> Non
     friendly_unit_id = "army-alpha:intercessor-unit-3"
     enemy_unit_id = "army-beta:intercessor-unit-2"
     compiled = _compiled(
-        "Aura: while a friendly unit is within 6 inches, subtract 1 from wound rolls."
+        'Aura: while a friendly unit is within 6" of this unit, subtract 1 from wound rolls.'
     )
 
     state.battlefield_state = _with_unit_pose(
@@ -2843,7 +2845,7 @@ def test_phase17d_enemy_aura_evaluation_ignores_friendly_units_in_range() -> Non
     friendly_unit_id = "army-alpha:intercessor-unit-3"
     enemy_unit_id = "army-beta:intercessor-unit-2"
     compiled = _compiled(
-        "Aura: while an enemy unit is within 6 inches, subtract 1 from wound rolls."
+        'Aura: while an enemy unit is within 6" of this unit, subtract 1 from wound rolls.'
     )
 
     state.battlefield_state = _with_unit_pose(
@@ -2872,7 +2874,9 @@ def test_phase17d_any_aura_evaluation_affects_all_allegiances_in_range() -> None
     source_unit_id = "army-alpha:intercessor-unit-1"
     friendly_unit_id = "army-alpha:intercessor-unit-3"
     enemy_unit_id = "army-beta:intercessor-unit-2"
-    compiled = _compiled("Aura: while a unit is within 6 inches, subtract 1 from wound rolls.")
+    compiled = _compiled(
+        'Aura: while a unit is within 6" of this unit, subtract 1 from wound rolls.'
+    )
 
     state.battlefield_state = _with_unit_pose(
         state.battlefield_state,
@@ -2938,7 +2942,13 @@ def test_phase17d_aura_keyword_gates_match_target_faction_keywords() -> None:
     )
     result = execute_rule_ir(
         rule_ir=compiled.rule_ir,
-        context=_execution_context(state=state, source_unit_instance_id=source_unit_id),
+        context=_execution_context(
+            state=state,
+            source_unit_instance_id=source_unit_id,
+            source_model_instance_id=_unit_by_id(state, source_unit_id)
+            .own_models[0]
+            .model_instance_id,
+        ),
         registry=default_rule_execution_registry(),
     )
 
@@ -2987,7 +2997,13 @@ def test_phase17d_shadow_of_chaos_aura_status_targets_matching_daemons() -> None
     )
     result = execute_rule_ir(
         rule_ir=compiled.rule_ir,
-        context=_execution_context(state=state, source_unit_instance_id=source_unit_id),
+        context=_execution_context(
+            state=state,
+            source_unit_instance_id=source_unit_id,
+            source_model_instance_id=_unit_by_id(state, source_unit_id)
+            .own_models[0]
+            .model_instance_id,
+        ),
         registry=default_rule_execution_registry(),
     )
     effect = _json_object(result.effect_payloads[0]["effect"])
@@ -3042,13 +3058,156 @@ def test_phase17d_enemy_aura_keyword_gate_applies_only_to_matching_enemy_units()
     )
     result = execute_rule_ir(
         rule_ir=compiled.rule_ir,
-        context=_execution_context(state=state, source_unit_instance_id=source_unit_id),
+        context=_execution_context(
+            state=state,
+            source_unit_instance_id=source_unit_id,
+            source_model_instance_id=_unit_by_id(state, source_unit_id)
+            .own_models[0]
+            .model_instance_id,
+        ),
         registry=default_rule_execution_registry(),
     )
 
     assert result.status is RuleExecutionStatus.APPLIED
     assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [target_unit_id]
     assert result.effect_payloads[0]["target_unit_instance_ids"] == [target_unit_id]
+
+
+def test_phase17d_this_model_aura_anchors_only_to_the_selected_source_model() -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-alpha:intercessor-unit-3"
+    source_models = _unit_by_id(state, source_unit_id).own_models
+    state.battlefield_state = _with_unit_model_poses(
+        state.battlefield_state,
+        unit_instance_id=source_unit_id,
+        poses=(
+            Pose.at(0.0, 10.0),
+            Pose.at(20.0, 10.0),
+            Pose.at(30.0, 10.0),
+            Pose.at(32.0, 10.0),
+            Pose.at(34.0, 10.0),
+        ),
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=target_unit_id,
+        pose=Pose.at(20.0, 10.0),
+    )
+    compiled = _compiled(
+        'Aura: while a friendly unit is within 6" of this model, subtract 1 from wound rolls.'
+    )
+
+    distant_anchor = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=state,
+            source_unit_instance_id=source_unit_id,
+            source_model_instance_id=source_models[0].model_instance_id,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+    nearby_anchor = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=state,
+            source_unit_instance_id=source_unit_id,
+            source_model_instance_id=source_models[1].model_instance_id,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert distant_anchor.aura_evaluations[0]["affected_unit_instance_ids"] == []
+    assert nearby_anchor.aura_evaluations[0]["affected_unit_instance_ids"] == [target_unit_id]
+
+
+def test_phase17d_this_unit_aura_ignores_incidental_source_model_context() -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-alpha:intercessor-unit-3"
+    source_models = _unit_by_id(state, source_unit_id).own_models
+    state.battlefield_state = _with_unit_model_poses(
+        state.battlefield_state,
+        unit_instance_id=source_unit_id,
+        poses=(
+            Pose.at(0.0, 10.0),
+            Pose.at(20.0, 10.0),
+            Pose.at(30.0, 10.0),
+            Pose.at(32.0, 10.0),
+            Pose.at(34.0, 10.0),
+        ),
+    )
+    state.battlefield_state = _with_unit_pose(
+        state.battlefield_state,
+        unit_instance_id=target_unit_id,
+        pose=Pose.at(20.0, 10.0),
+    )
+    compiled = _compiled(
+        'Aura: while a friendly unit is within 6" of this unit, subtract 1 from wound rolls.'
+    )
+
+    result = execute_rule_ir(
+        rule_ir=compiled.rule_ir,
+        context=_execution_context(
+            state=state,
+            source_unit_instance_id=source_unit_id,
+            source_model_instance_id=source_models[0].model_instance_id,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+
+    assert result.aura_evaluations[0]["affected_unit_instance_ids"] == [target_unit_id]
+
+
+def test_phase17d_this_model_aura_fails_closed_without_source_model() -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    compiled = _compiled(
+        'Aura: while a friendly unit is within 6" of this model, subtract 1 from wound rolls.'
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Aura this_model anchor requires source_model_instance_id",
+    ):
+        execute_rule_ir(
+            rule_ir=compiled.rule_ir,
+            context=_execution_context(
+                state=state,
+                source_unit_instance_id="army-alpha:intercessor-unit-1",
+            ),
+            registry=default_rule_execution_registry(),
+        )
+
+
+@pytest.mark.parametrize(
+    ("object_reference", "error_message"),
+    [
+        (None, "Aura distance predicate requires object_reference"),
+        ("that", "Aura distance predicate object_reference is unsupported"),
+    ],
+)
+def test_phase17d_aura_fails_closed_for_missing_or_unsupported_source_reference(
+    object_reference: str | None,
+    error_message: str,
+) -> None:
+    state = _battle_state_with_extra_friendly_unit()
+    compiled = _compiled(
+        'Aura: while a friendly unit is within 6" of this unit, subtract 1 from wound rolls.'
+    )
+    rule_ir = _rule_ir_with_aura_object_reference(
+        compiled.rule_ir,
+        object_reference=object_reference,
+    )
+
+    with pytest.raises(GameLifecycleError, match=error_message):
+        execute_rule_ir(
+            rule_ir=rule_ir,
+            context=_execution_context(
+                state=state,
+                source_unit_instance_id="army-alpha:intercessor-unit-1",
+            ),
+            registry=default_rule_execution_registry(),
+        )
 
 
 def test_phase17d_unsupported_rule_ir_produces_typed_unsupported_status() -> None:
@@ -3595,6 +3754,34 @@ def _compiled(raw_text: str) -> CompiledRuleSource:
         RuleSourceText.from_raw(source_id=f"phase17d:{raw_text.lower()}", raw_text=raw_text),
         source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
     )
+
+
+def _rule_ir_with_aura_object_reference(
+    rule_ir: RuleIR,
+    *,
+    object_reference: str | None,
+) -> RuleIR:
+    updated_clauses: list[RuleClause] = []
+    updated_distance_condition = False
+    for clause in rule_ir.clauses:
+        updated_conditions: list[RuleCondition] = []
+        for condition in clause.conditions:
+            if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE:
+                updated_conditions.append(condition)
+                continue
+            parameters = tuple(
+                parameter
+                for parameter in condition.parameters
+                if parameter.key != "object_reference"
+            )
+            if object_reference is not None:
+                parameters = (*parameters, RuleParameter("object_reference", object_reference))
+            updated_conditions.append(replace(condition, parameters=parameters))
+            updated_distance_condition = True
+        updated_clauses.append(replace(clause, conditions=tuple(updated_conditions)))
+    if not updated_distance_condition:
+        raise AssertionError("test RuleIR requires a distance predicate")
+    return replace(rule_ir, clauses=tuple(updated_clauses))
 
 
 def _skullmaster_fury_text() -> str:
@@ -4293,6 +4480,27 @@ def _with_unit_pose(
                 )
             )
             for index, model_placement in enumerate(unit_placement.model_placements)
+        ),
+    )
+    return battlefield_state.with_unit_placement(moved)
+
+
+def _with_unit_model_poses(
+    battlefield_state: BattlefieldRuntimeState | None,
+    *,
+    unit_instance_id: str,
+    poses: tuple[Pose, ...],
+) -> BattlefieldRuntimeState:
+    if battlefield_state is None:
+        raise AssertionError("test requires battlefield_state")
+    unit_placement = battlefield_state.unit_placement_by_id(unit_instance_id)
+    if len(poses) != len(unit_placement.model_placements):
+        raise AssertionError("test pose count must match model placement count")
+    moved = replace(
+        unit_placement,
+        model_placements=tuple(
+            model_placement.with_pose(pose)
+            for model_placement, pose in zip(unit_placement.model_placements, poses, strict=True)
         ),
     )
     return battlefield_state.with_unit_placement(moved)

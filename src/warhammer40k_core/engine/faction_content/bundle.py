@@ -139,7 +139,10 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedHookBinding,
     FightUnitSelectedHookRegistry,
 )
-from warhammer40k_core.engine.generic_enhancement_effects import generic_enhancement_effect_bindings
+from warhammer40k_core.engine.generic_enhancement_effects import (
+    generic_enhancement_aura_weapon_profile_modifier_bindings,
+    generic_enhancement_effect_bindings,
+)
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent
 from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHookBinding,
@@ -1862,6 +1865,11 @@ class RuntimeContentBundle:
             + generic_rule_lifecycle_hooks.weapon_profile_modifier_bindings(
                 activation=activation,
                 execution_records=records,
+            )
+            + generic_enhancement_aura_weapon_profile_modifier_bindings(
+                activation=activation,
+                execution_records=records,
+                rule_ir_resolver=rule_ir_resolver,
             )
             + damaged_runtime.weapon_profile_bindings()
             + catalog_weapon_profile_modifier_bindings(

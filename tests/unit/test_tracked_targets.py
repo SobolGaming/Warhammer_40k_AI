@@ -218,7 +218,11 @@ def test_tracked_target_runtime_empty_indexes_have_no_hooks() -> None:
 
 
 def test_catalog_shadow_form_runtime_records_selection_and_event() -> None:
-    state = _battle_state_with_scenario()
+    state = _battle_state_with_scenario(
+        alpha_datasheet_id="core-character-leader",
+        alpha_model_profile_id="core-character-leader",
+        alpha_model_count=1,
+    )
     runtime = CatalogShadowFormRuntime(
         ability_indexes_by_player_id={
             "player-a": AbilityCatalogIndex.from_records(_belakor_shadow_form_records()),
@@ -283,8 +287,30 @@ def test_catalog_shadow_form_runtime_records_selection_and_event() -> None:
     )
 
 
-def test_catalog_shadow_form_selection_rejects_adapter_drift() -> None:
+def test_catalog_shadow_form_rejects_ambiguous_multi_model_source() -> None:
     state = _battle_state_with_scenario()
+    runtime = CatalogShadowFormRuntime(
+        ability_indexes_by_player_id={
+            "player-a": AbilityCatalogIndex.from_records(
+                _belakor_shadow_form_records(datasheet_id="core-intercessor-like-infantry")
+            ),
+            "player-b": AbilityCatalogIndex.from_records(()),
+        },
+        armies=tuple(state.army_definitions),
+    )
+
+    with pytest.raises(GameLifecycleError, match="requires exactly one source model"):
+        runtime.battle_round_start_request(
+            BattleRoundStartRequestContext(state=state, decisions=DecisionController())
+        )
+
+
+def test_catalog_shadow_form_selection_rejects_adapter_drift() -> None:
+    state = _battle_state_with_scenario(
+        alpha_datasheet_id="core-character-leader",
+        alpha_model_profile_id="core-character-leader",
+        alpha_model_count=1,
+    )
     runtime = CatalogShadowFormRuntime(
         ability_indexes_by_player_id={
             "player-a": AbilityCatalogIndex.from_records(_belakor_shadow_form_records()),
@@ -1968,12 +1994,18 @@ def _battle_state_with_scenario(
     *,
     alpha_unit_count: int = 1,
     beta_unit_count: int = 1,
+    alpha_datasheet_id: str = "core-intercessor-like-infantry",
+    alpha_model_profile_id: str = "core-intercessor-like",
+    alpha_model_count: int = 5,
 ) -> GameState:
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="tracked-target-battlefield",
         armies=_mustered_armies(
             alpha_unit_count=alpha_unit_count,
             beta_unit_count=beta_unit_count,
+            alpha_datasheet_id=alpha_datasheet_id,
+            alpha_model_profile_id=alpha_model_profile_id,
+            alpha_model_count=alpha_model_count,
         ),
     )
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
@@ -2003,6 +2035,9 @@ def _mustered_armies(
     *,
     alpha_unit_count: int = 1,
     beta_unit_count: int = 1,
+    alpha_datasheet_id: str = "core-intercessor-like-infantry",
+    alpha_model_profile_id: str = "core-intercessor-like",
+    alpha_model_count: int = 5,
 ) -> tuple[ArmyDefinition, ...]:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return (
@@ -2013,6 +2048,9 @@ def _mustered_armies(
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_count=alpha_unit_count,
+                datasheet_id=alpha_datasheet_id,
+                model_profile_id=alpha_model_profile_id,
+                model_count=alpha_model_count,
             ),
         ),
         muster_army(
@@ -2092,9 +2130,14 @@ def _muster_request(
     player_id: str,
     army_id: str,
     unit_count: int = 1,
+    datasheet_id: str = "core-intercessor-like-infantry",
+    model_profile_id: str = "core-intercessor-like",
+    model_count: int = 5,
 ) -> ArmyMusterRequest:
     if unit_count < 1:
         raise AssertionError("unit_count must be positive")
+    if model_count < 1:
+        raise AssertionError("model_count must be positive")
     return ArmyMusterRequest(
         army_id=army_id,
         player_id=player_id,
@@ -2111,11 +2154,11 @@ def _muster_request(
                 unit_selection_id=(
                     f"{army_id}-unit" if unit_count == 1 else f"{army_id}-unit-{index}"
                 ),
-                datasheet_id="core-intercessor-like-infantry",
+                datasheet_id=datasheet_id,
                 model_profile_selections=(
                     ModelProfileSelection(
-                        model_profile_id="core-intercessor-like",
-                        model_count=5,
+                        model_profile_id=model_profile_id,
+                        model_count=model_count,
                     ),
                 ),
             )
@@ -2172,6 +2215,7 @@ def _belakor_catalog_record(
     row_id: str,
     ability_id: str,
     name: str,
+    datasheet_id: str = "core-intercessor-like-infantry",
 ) -> AbilityCatalogRecord:
     rule_ir = _belakor_rule_ir(row_id)
     return AbilityCatalogRecord(
@@ -2188,31 +2232,38 @@ def _belakor_catalog_record(
             replay_payload=cast(JsonValue, {"rule_ir": rule_ir.to_payload()}),
         ),
         source_kind=AbilitySourceKind.DATASHEET,
-        datasheet_id="core-intercessor-like-infantry",
+        datasheet_id=datasheet_id,
     )
 
 
-def _belakor_shadow_form_records() -> tuple[AbilityCatalogRecord, ...]:
+def _belakor_shadow_form_records(
+    *,
+    datasheet_id: str = "core-character-leader",
+) -> tuple[AbilityCatalogRecord, ...]:
     return (
         _belakor_catalog_record(
             row_id=belakor_ir_source.BELAKOR_SHADOW_FORM_ROW_ID,
             ability_id="ability:shadow-form",
             name="Shadow Form",
+            datasheet_id=datasheet_id,
         ),
         _belakor_catalog_record(
             row_id=belakor_ir_source.BELAKOR_WREATHED_IN_SHADOWS_ROW_ID,
             ability_id="ability:wreathed-in-shadows",
             name="Wreathed in Shadows",
+            datasheet_id=datasheet_id,
         ),
         _belakor_catalog_record(
             row_id=belakor_ir_source.BELAKOR_PALL_OF_DESPAIR_ROW_ID,
             ability_id="ability:pall-of-despair",
             name="Pall of Despair",
+            datasheet_id=datasheet_id,
         ),
         _belakor_catalog_record(
             row_id=belakor_ir_source.BELAKOR_SHADOW_LORD_ROW_ID,
             ability_id="ability:shadow-lord",
             name="Shadow Lord",
+            datasheet_id=datasheet_id,
         ),
     )
 

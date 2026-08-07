@@ -12,6 +12,7 @@ from warhammer40k_core.rules.rule_ir import (
     parameter_payload,
 )
 from warhammer40k_core.rules.rule_templates import (
+    AURA_TEMPLATE_ID,
     CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
     CONTEXTUAL_STATUS_TEMPLATE_ID,
     DESPERATE_ESCAPE_TEMPLATE_ID,
@@ -164,6 +165,11 @@ _SUPPORTED_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         "enhancement:orks:more-dakka:000009991004",
     }
 )
+_SUPPORTED_AURA_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        blood_legion_ir.SLAUGHTERTHIRST_SOURCE_ROW_ID,
+    }
+)
 _SUPPORTED_CONDITIONAL_WEAPON_ABILITY_TEMPLATE_IDS = frozenset(
     {
         KEYWORD_GATE_TEMPLATE_ID,
@@ -192,6 +198,12 @@ _SUPPORTED_MOVEMENT_DISTANCE_TEMPLATE_IDS = frozenset(
     {
         KEYWORD_GATE_TEMPLATE_ID,
         MOVEMENT_DISTANCE_TEMPLATE_ID,
+    }
+)
+_SUPPORTED_AURA_WEAPON_ABILITY_TEMPLATE_IDS = frozenset(
+    {
+        AURA_TEMPLATE_ID,
+        KEYWORD_GATE_TEMPLATE_ID,
     }
 )
 
@@ -394,6 +406,10 @@ def supported_dice_roll_modification_enhancement_source_row_ids() -> tuple[str, 
     return tuple(sorted(_SUPPORTED_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS))
 
 
+def supported_aura_weapon_ability_enhancement_source_row_ids() -> tuple[str, ...]:
+    return tuple(sorted(_SUPPORTED_AURA_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS))
+
+
 def supported_movement_distance_enhancement_source_row_ids() -> tuple[str, ...]:
     return tuple(sorted(_SUPPORTED_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS))
 
@@ -472,6 +488,15 @@ def _validate_supported_enhancement_ir(
             expected_template_ids=_SUPPORTED_DICE_ROLL_MODIFICATION_TEMPLATE_IDS,
             effect_kind=RuleEffectKind.MODIFY_DICE_ROLL,
             effect_family_name="dice roll modifier",
+            expected_effect_count=1,
+        )
+    elif source_row.source_row_id in _SUPPORTED_AURA_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS:
+        _validate_supported_effect_family_ir(
+            rule_ir=rule_ir,
+            source_row=source_row,
+            expected_template_ids=_SUPPORTED_AURA_WEAPON_ABILITY_TEMPLATE_IDS,
+            effect_kind=RuleEffectKind.GRANT_WEAPON_ABILITY,
+            effect_family_name="aura weapon ability",
             expected_effect_count=1,
         )
     elif source_row.source_row_id in _SUPPORTED_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS:
@@ -1300,6 +1325,7 @@ def _supported_enhancement_source_row_ids() -> frozenset[str]:
         | _SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
         | _SUPPORTED_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
         | _SUPPORTED_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
+        | _SUPPORTED_AURA_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
         | _SUPPORTED_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS
         | _SUPPORTED_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS
     )

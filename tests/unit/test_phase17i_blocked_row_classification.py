@@ -27,7 +27,7 @@ def test_phase17i_classification_covers_every_phase17f_structured_blocked_row() 
     )
     rows_by_execution_id = {row.execution_id: row for row in report.classification_rows}
 
-    assert report.structured_blocked_count == 1922
+    assert report.structured_blocked_count == 1921
     assert set(rows_by_execution_id) == {
         record.execution_id for record in structured_blocked_records
     }
@@ -60,7 +60,7 @@ def test_phase17i_source_text_boundaries_are_explicit() -> None:
         is classification_source.Phase17IClassificationSourceKind.PHASE17F_METADATA_ONLY
     )
 
-    assert report.source_text_matched_count == 1823
+    assert report.source_text_matched_count == 1822
     assert report.source_text_missing_count == 99
     assert len(source_text_rows) == report.source_text_matched_count
     assert len(metadata_only_rows) == report.source_text_missing_count
@@ -87,14 +87,14 @@ def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
         summary.family: summary for summary in report.missing_capability_summaries()
     }
 
-    assert summary_by_family["generic_ir_execution_binding"].row_count == 1922
+    assert summary_by_family["generic_ir_execution_binding"].row_count == 1921
     assert summary_by_family["generic_ir_execution_binding"].coverage_kind_counts == {
-        "detachment_enhancement": 657,
+        "detachment_enhancement": 656,
         "detachment_rule": 257,
         "detachment_stratagem": 1003,
         "faction_army_rule": 5,
     }
-    assert summary_by_family["unrepresented_rule_language"].row_count == 1787
+    assert summary_by_family["unrepresented_rule_language"].row_count == 1786
     assert summary_by_family["stratagem_activation_and_targeting"].coverage_kind_counts == {
         "detachment_stratagem": 1003
     }
@@ -102,7 +102,7 @@ def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
         "detachment_stratagem": 1003
     }
     assert summary_by_family["enhancement_assignment_effect"].coverage_kind_counts == {
-        "detachment_enhancement": 657
+        "detachment_enhancement": 656
     }
     assert summary_by_family["stratagem_cost_modifier_runtime"].row_count == 1
     assert summary_by_family["stratagem_cost_modifier_runtime"].coverage_kind_counts == {
@@ -131,7 +131,7 @@ def test_phase17i_existing_template_report_uses_phase17c_template_families() -> 
     assert template_summary_by_family["selected_target_constraint"].row_count == 1102
     assert template_summary_by_family["keyword_gate"].row_count == 715
     assert template_summary_by_family["dice_roll_modification"].row_count == 170
-    assert template_summary_by_family["conditional_weapon_ability_grant"].row_count == 149
+    assert template_summary_by_family["conditional_weapon_ability_grant"].row_count == 148
     assert template_summary_by_family["characteristic_modification"].row_count == 119
     assert template_summary_by_family["grant_ability"].row_count == 88
     for row in report.classification_rows:
