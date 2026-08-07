@@ -18,6 +18,7 @@ from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleCondition,
     RuleConditionKind,
+    RuleParameterValue,
     RuleTargetKind,
     parameter_payload,
 )
@@ -25,6 +26,8 @@ from warhammer40k_core.rules.rule_ir import (
 AURA_ALLEGIANCE_ANY = "any"
 AURA_ALLEGIANCE_ENEMY = "enemy"
 AURA_ALLEGIANCE_FRIENDLY = "friendly"
+AURA_ANCHOR_MODEL = "model"
+AURA_ANCHOR_UNIT = "unit"
 
 
 def aura_affected_unit_ids(
@@ -44,14 +47,16 @@ def aura_affected_unit_ids(
         state=state,
         unit_instance_id=source_unit_instance_id,
     )
+    distance_parameters = _aura_distance_parameters(clause)
     source_geometries = _aura_source_geometries(
         state=state,
         source_rules_unit=source_rules_unit,
         source_model_instance_id=source_model_instance_id,
+        anchor_kind=_aura_anchor_kind(distance_parameters),
     )
     if not source_geometries:
         return ()
-    distance_inches = _aura_distance_inches(clause)
+    distance_inches = _aura_distance_inches(distance_parameters)
     allegiance = _aura_allegiance(clause)
     required_keywords = _required_keywords(clause.conditions)
     excluded_keywords = _excluded_keywords(clause.conditions)
@@ -102,20 +107,28 @@ def _aura_source_geometries(
     state: GameState,
     source_rules_unit: RulesUnitView,
     source_model_instance_id: str | None,
+    anchor_kind: str,
 ) -> tuple[GeometryModel, ...]:
     source_geometries = _placed_alive_rules_unit_geometries(
         state=state,
         rules_unit=source_rules_unit,
     )
-    if source_model_instance_id is None:
+    if anchor_kind == AURA_ANCHOR_UNIT:
         return source_geometries
+    if anchor_kind != AURA_ANCHOR_MODEL:
+        raise GameLifecycleError("Aura anchor kind is unsupported.")
+    if source_model_instance_id is None:
+        raise GameLifecycleError("Aura this_model anchor requires source_model_instance_id.")
     if source_model_instance_id not in {
         model.model_instance_id for model in source_rules_unit.alive_models()
     }:
-        return ()
-    return tuple(
+        raise GameLifecycleError("Aura source model must be alive in the source rules unit.")
+    matching_geometries = tuple(
         geometry for geometry in source_geometries if geometry.model_id == source_model_instance_id
     )
+    if len(matching_geometries) != 1:
+        raise GameLifecycleError("Aura source model must have exactly one battlefield placement.")
+    return matching_geometries
 
 
 def _placed_alive_rules_unit_geometries(
@@ -155,14 +168,40 @@ def _unit_within_aura(
     )
 
 
-def _aura_distance_inches(clause: RuleClause) -> float:
-    for condition in clause.conditions:
-        if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE:
-            continue
-        distance = parameter_payload(condition.parameters).get("distance_inches")
-        if isinstance(distance, int | float) and type(distance) is not bool:
-            return float(distance)
+def _aura_distance_parameters(clause: RuleClause) -> dict[str, RuleParameterValue]:
+    distance_conditions = tuple(
+        condition
+        for condition in clause.conditions
+        if condition.kind is RuleConditionKind.DISTANCE_PREDICATE
+    )
+    if len(distance_conditions) != 1:
+        raise GameLifecycleError("Aura clause requires exactly one distance predicate.")
+    return parameter_payload(distance_conditions[0].parameters)
+
+
+def _aura_distance_inches(parameters: dict[str, RuleParameterValue]) -> float:
+    distance = parameters.get("distance_inches")
+    if isinstance(distance, int | float) and type(distance) is not bool:
+        return float(distance)
     raise GameLifecycleError("Aura clause requires a structured distance predicate.")
+
+
+def _aura_anchor_kind(parameters: dict[str, RuleParameterValue]) -> str:
+    object_reference = parameters.get("object_reference")
+    if type(object_reference) is not str or not object_reference.strip():
+        raise GameLifecycleError("Aura distance predicate requires object_reference.")
+    if object_reference == "this_model":
+        return AURA_ANCHOR_MODEL
+    if object_reference in {"this_unit", "unit"}:
+        return AURA_ANCHOR_UNIT
+    if object_reference == "this":
+        object_kind = parameters.get("object_kind")
+        if object_kind == "model":
+            return AURA_ANCHOR_MODEL
+        if object_kind == "unit":
+            return AURA_ANCHOR_UNIT
+        raise GameLifecycleError("Aura 'this' reference requires model or unit object_kind.")
+    raise GameLifecycleError("Aura distance predicate object_reference is unsupported.")
 
 
 def _aura_allegiance(clause: RuleClause) -> str:

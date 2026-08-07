@@ -145,6 +145,10 @@ def apply_catalog_shadow_form_selection_result(
     )
     if not current_model_ids:
         raise GameLifecycleError("Catalog Shadow Form source unit is not currently placed.")
+    source_model_id = _shadow_form_source_model_instance_id(
+        unit=source_unit,
+        current_model_instance_ids=current_model_ids,
+    )
     shadow_form_record, shadow_form_rule_ir = _shadow_form_record_for_request(
         index=index,
         unit=source_unit,
@@ -188,6 +192,7 @@ def apply_catalog_shadow_form_selection_result(
         active_player_id=context.state.active_player_id,
         timing_window_id="catalog-shadow-form-selection",
         source_unit_instance_id=source_unit_id,
+        source_model_instance_id=source_model_id,
         source_keywords=(*source_unit.keywords, *source_unit.faction_keywords),
         trigger_payload={
             "source": CATALOG_SHADOW_FORM_SUBMISSION_KIND,
@@ -292,6 +297,10 @@ def _shadow_form_selection_request_for_record(
     selectable_source_ids = _shadow_form_selectable_source_ids(record)
     if not selectable_source_ids:
         return None
+    _shadow_form_source_model_instance_id(
+        unit=unit,
+        current_model_instance_ids=current_model_instance_ids,
+    )
     options = _shadow_form_selection_options(
         state_battle_round=context.state.battle_round,
         source_unit=unit,
@@ -498,6 +507,21 @@ def _record_shadow_form_selection_effect(
             }
         ),
     )
+
+
+def _shadow_form_source_model_instance_id(
+    *,
+    unit: UnitInstance,
+    current_model_instance_ids: tuple[str, ...],
+) -> str:
+    if len(unit.own_models) != 1:
+        raise GameLifecycleError("Catalog Shadow Form requires exactly one source model.")
+    source_model = unit.own_models[0]
+    if not source_model.is_alive:
+        raise GameLifecycleError("Catalog Shadow Form source model must be alive.")
+    if current_model_instance_ids != (source_model.model_instance_id,):
+        raise GameLifecycleError("Catalog Shadow Form source model must be currently placed.")
+    return source_model.model_instance_id
 
 
 def _persist_shadow_form_execution_effects(
