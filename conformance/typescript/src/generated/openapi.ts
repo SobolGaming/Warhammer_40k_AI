@@ -288,7 +288,7 @@ export interface components {
             ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v3-contract";
+            schema_version: "session-metadata-v4-contract";
             server_contract_version: string;
             session_id: string;
             session_revision: number;
@@ -586,7 +586,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v3-contract";
+            schema_version: "session-command-outcome-v4-contract";
             session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
