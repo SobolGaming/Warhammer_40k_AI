@@ -886,6 +886,20 @@ _DETACHMENT_RULE_SUPPORT_OVERRIDES: dict[tuple[str, str], SupportSectionRow] = {
     ),
     (
         "emperors-children",
+        "mercurial-host",
+    ): SupportSectionRow(
+        subject="Mercurial Host",
+        engine="Static RuleIR for the Quicksilver Grace army-wide Advance-roll reroll",
+        documentation="Exact source row, execution record, and generated semantic matrix",
+        tests="Movement lifecycle, replay, target-scope, and runtime-boundary tests",
+        overall="Partial",
+        notes=(
+            "Quicksilver Grace is executable through the shared Advance-roll reroll path. "
+            "The detachment's four Enhancements and six Stratagems remain source-only."
+        ),
+    ),
+    (
+        "emperors-children",
         "spectacle-of-slaughter",
     ): SupportSectionRow(
         subject="Spectacle of Slaughter",

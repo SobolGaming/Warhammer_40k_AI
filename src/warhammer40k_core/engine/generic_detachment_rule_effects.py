@@ -33,6 +33,7 @@ from warhammer40k_core.engine.rule_execution import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
+    RuleDurationKind,
     RuleIR,
     RuleParameterValue,
     RuleTargetKind,
@@ -146,13 +147,16 @@ def generic_detachment_rule_battle_formation_hook_bindings(
             raise GameLifecycleError("Generic detachment bindings require execution records.")
         if not _record_is_generic_detachment_rule(record):
             continue
-        if record.coverage_descriptor_id not in _BATTLE_FORMATION_DETACHMENT_RULE_DESCRIPTOR_IDS:
-            continue
         if record.detachment_id not in selected_detachment_ids:
             continue
         rule_ir = faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id(
             record.coverage_descriptor_id
         )
+        if (
+            record.coverage_descriptor_id not in _BATTLE_FORMATION_DETACHMENT_RULE_DESCRIPTOR_IDS
+            and not _rule_ir_has_permanent_keyword_scoped_unit_effects(rule_ir)
+        ):
+            continue
         source = _GenericDetachmentRuleBindingSource(record=record, rule_ir=rule_ir)
         bindings.append(
             BattleFormationHookBinding(
@@ -457,6 +461,25 @@ def _target_unit_ids_from_rule_ir_keyword_requirements(
         if any(_unit_matches_keyword_requirement(unit, requirement) for requirement in requirements)
     }
     return tuple(sorted(target_ids))
+
+
+def _rule_ir_has_permanent_keyword_scoped_unit_effects(rule_ir: RuleIR) -> bool:
+    if type(rule_ir) is not RuleIR:
+        raise GameLifecycleError("Generic detachment binding shape requires RuleIR.")
+    effectful_clauses = tuple(clause for clause in rule_ir.clauses if clause.effects)
+    if not effectful_clauses:
+        return False
+    for clause in effectful_clauses:
+        if clause.target is None or clause.target.kind is not RuleTargetKind.THIS_UNIT:
+            return False
+        if clause.duration is None or clause.duration.kind is not RuleDurationKind.PERMANENT:
+            return False
+        if any(
+            _unit_keyword_requirement_from_parameters(parameter_payload(effect.parameters)) is None
+            for effect in clause.effects
+        ):
+            return False
+    return True
 
 
 def _unit_keyword_requirements_from_rule_ir(

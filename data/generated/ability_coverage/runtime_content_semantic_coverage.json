@@ -1,8 +1,8 @@
 {
   "detachment_status_counts": {
     "implemented": 8,
-    "partial": 17,
-    "placeholder": 241
+    "partial": 18,
+    "placeholder": 240
   },
   "faction_status_counts": {
     "implemented": 0,
@@ -4358,8 +4358,8 @@
     {
       "detachment_status_counts": {
         "implemented": 2,
-        "partial": 0,
-        "placeholder": 8
+        "partial": 1,
+        "placeholder": 7
       },
       "detachments": [
         {
@@ -4506,7 +4506,7 @@
           "detachment_name": "Mercurial Host",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children.detachments.mercurial_host.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:emperors-children:mercurial-host",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009998002",
@@ -7006,6 +7006,6 @@
     }
   ],
   "schema_version": "runtime-content-semantic-coverage-v1",
-  "source_package_hash": "7c6626aa8ace62078f47711ff65ff43c7bc726a483b55e89ca722a51c8cc48dd",
+  "source_package_hash": "e370a2a9ddad269a152875feddb7345b1f12abb3775ef2906b9ea3ca9c492339",
   "source_package_id": "gw-11e-phase17f-faction-execution-2026-07"
 }

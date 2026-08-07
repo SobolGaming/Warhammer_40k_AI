@@ -591,9 +591,6 @@ _DETACHMENT_SEMANTICS_NEEDED_BY_ID = {
         "IR still needed: Battleline Advance/Fall Back selection must grant +1 Strength to the "
         "unit's attacks until turn end, and mustering must enforce the exclusive HOST tag."
     ),
-    "mercurial-host": (
-        "IR still needed: Emperor's Children units require army-wide Advance-roll rerolls."
-    ),
     "peerless-bladesmen": (
         "IR still needed: after charging, a unit selected to fight must choose between Lethal Hits "
         "and Sustained Hits 1 for its melee weapons while resolving those attacks."
