@@ -1108,9 +1108,9 @@ def _destroyed_model_ids_for_sequence_events(
                     destroyed_ids.add(_payload_string(payload, "model_instance_id"))
                 continue
             if source_kind is DestructionSourceKind.HAZARDOUS:
-                raise GameLifecycleError(
-                    "Hazardous Split destruction requires the typed Hazardous event path."
-                )
+                # Canonical model-destroyed records mirror the typed Hazardous aggregate.
+                # The aggregate is the sole Split trigger so each destroyed model is consumed once.
+                continue
             continue
         if (
             DestructionSourceKind.HAZARDOUS not in descriptor.destruction_source_kinds

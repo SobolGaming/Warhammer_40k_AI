@@ -8,7 +8,9 @@ from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldTransitionBatch,
+    ModelPlacement,
     ModelRemovalRecord,
+    PlacementError,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.destruction_provenance import (
@@ -211,6 +213,7 @@ def record_finalized_mortal_wound_model_destructions(
     destroyed_model_instance_ids: tuple[str, ...],
     evidence: MortalWoundDestructionEvidence,
     existing_model_destroyed_event_ids: tuple[str, ...],
+    destroyed_model_placements: tuple[ModelPlacement, ...],
 ) -> None:
     if type(decisions) is not DecisionController:
         raise GameLifecycleError("Mortal wound destruction evidence requires decisions.")
@@ -244,6 +247,12 @@ def record_finalized_mortal_wound_model_destructions(
     if not set(existing_events_by_model) <= set(model_ids):
         raise GameLifecycleError(
             "Existing mortal wound model-destroyed events contain an unrelated model."
+        )
+    placements_by_model = _destroyed_model_placements_by_model(destroyed_model_placements)
+    required_placement_model_ids = set(model_ids) - set(existing_events_by_model)
+    if set(placements_by_model) != required_placement_model_ids:
+        raise GameLifecycleError(
+            "Mortal wound destroyed-model placement evidence does not match new destructions."
         )
     removals: list[ModelRemovalRecord] = []
     physical_unit_ids: set[str] = set()
@@ -279,6 +288,9 @@ def record_finalized_mortal_wound_model_destructions(
             application_payload=validated_application,
             model_instance_id=model_id,
         )
+        destroyed_model_placement = placements_by_model[model_id]
+        if destroyed_model_placement.unit_instance_id != physical_unit_id:
+            raise GameLifecycleError("Mortal wound destroyed-model placement unit drift.")
         transition_batch = BattlefieldTransitionBatch(removals=(removal,))
         destroyed_event = decisions.event_log.append(
             "model_destroyed",
@@ -307,7 +319,7 @@ def record_finalized_mortal_wound_model_destructions(
                     "source_context": validated_source_context,
                     "removal_record": removal.to_payload(),
                     "transition_batch": transition_batch.to_payload(),
-                    "destroyed_model_placement": None,
+                    "destroyed_model_placement": destroyed_model_placement.to_payload(),
                     "damage_application": damage_application,
                     "destroyed_model_rules_triggered": False,
                 }
@@ -387,6 +399,7 @@ def record_finalized_mortal_wound_progress_destructions(
         source_context=progress.source_context,
         application=progress.to_application(),
         evidence=evidence,
+        destroyed_model_placements=progress.destroyed_model_placements,
     )
 
 
@@ -399,6 +412,7 @@ def record_finalized_mortal_wound_application_destructions(
     source_context: JsonValue,
     application: MortalWoundApplication,
     evidence: MortalWoundDestructionEvidence,
+    destroyed_model_placements: tuple[ModelPlacement, ...],
 ) -> None:
     record_finalized_mortal_wound_model_destructions(
         state=state,
@@ -413,7 +427,69 @@ def record_finalized_mortal_wound_application_destructions(
         ),
         evidence=evidence,
         existing_model_destroyed_event_ids=(),
+        destroyed_model_placements=destroyed_model_placements,
     )
+
+
+def pre_removal_model_placement_for_mortal_wound_destruction(
+    *,
+    state: GameState,
+    model_instance_id: str,
+) -> ModelPlacement:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError(
+            "Mortal wound destruction placement evidence requires battlefield state."
+        )
+    try:
+        return battlefield.model_placement_by_id(model_instance_id)
+    except PlacementError as exc:
+        raise GameLifecycleError(
+            "Mortal wound destruction placement evidence requires a placed model."
+        ) from exc
+
+
+def _destroyed_model_placements_by_model(
+    placements: tuple[ModelPlacement, ...],
+) -> dict[str, ModelPlacement]:
+    if type(placements) is not tuple:
+        raise GameLifecycleError("Destroyed-model placements must be a tuple.")
+    placements_by_model: dict[str, ModelPlacement] = {}
+    for placement in placements:
+        if type(placement) is not ModelPlacement:
+            raise GameLifecycleError(
+                "Destroyed-model placements must contain ModelPlacement values."
+            )
+        if placement.model_instance_id in placements_by_model:
+            raise GameLifecycleError("Destroyed-model placements must not duplicate models.")
+        placements_by_model[placement.model_instance_id] = placement
+    return placements_by_model
+
+
+def validate_mortal_wound_destroyed_model_placements(
+    *,
+    placements: object,
+    destroyed_model_instance_ids: tuple[str, ...],
+    has_destruction_evidence: bool,
+) -> tuple[ModelPlacement, ...]:
+    if type(placements) is not tuple:
+        raise GameLifecycleError("Destroyed-model placements must be a tuple.")
+    if type(has_destruction_evidence) is not bool:
+        raise GameLifecycleError("Destruction-evidence presence must be a bool.")
+    placements_by_model = _destroyed_model_placements_by_model(
+        cast(tuple[ModelPlacement, ...], placements)
+    )
+    destroyed_model_ids = set(
+        _validate_identifier_tuple(
+            "destroyed_model_instance_ids",
+            destroyed_model_instance_ids,
+        )
+    )
+    if not has_destruction_evidence and placements_by_model:
+        raise GameLifecycleError("Mortal wound placement evidence requires destruction evidence.")
+    if has_destruction_evidence and set(placements_by_model) != destroyed_model_ids:
+        raise GameLifecycleError("Mortal wound destroyed-model placement drift.")
+    return tuple(placements_by_model.values())
 
 
 def _existing_model_destroyed_events_by_model(
@@ -501,8 +577,10 @@ __all__ = (
     "MortalWoundDestructionEvidencePayload",
     "evidence_from_json",
     "evidence_to_json",
+    "pre_removal_model_placement_for_mortal_wound_destruction",
     "record_finalized_mortal_wound_application_destructions",
     "record_finalized_mortal_wound_model_destructions",
     "record_finalized_mortal_wound_progress_destructions",
+    "validate_mortal_wound_destroyed_model_placements",
     "validate_mortal_wound_destruction_evidence_mode",
 )

@@ -180,6 +180,12 @@ def test_destruction_evidence_metadata_is_rng_history_neutral() -> None:
                 "source_step": "selected_target_mortal_wounds",
                 "action_phase": "shooting",
             },
+            "destroyed_model_placements": [
+                {
+                    "model_instance_id": "model:destroyed",
+                    "pose": {"x": 1.0, "y": 2.0, "z": 0.0, "facing_degrees": 0.0},
+                }
+            ],
         },
     )
     base_result = DecisionResult.for_request(

@@ -104,4 +104,5 @@ def record_deadly_demise_secondary_destruction_finalization(
             source_step="deadly_demise_collateral",
         ),
         existing_model_destroyed_event_ids=(model_destroyed_event_id,),
+        destroyed_model_placements=(),
     )
