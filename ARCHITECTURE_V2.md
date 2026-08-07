@@ -5773,7 +5773,7 @@ Required tests:
 Completion gate:
 
 `battlefield-view-v1` is emitted through the shared viewer projection and
-published in Contract 3.3. It defines one right-handed inches-based world frame,
+published in Contract 4.0. It defines one right-handed inches-based world frame,
 stable external entities for the required battlefield concepts, explicit model
 physical states, typed model/support/terrain/zone/path geometry, and a hash over
 viewer-visible authoritative geometry. The canonical geometry-conformance
