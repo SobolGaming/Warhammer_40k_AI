@@ -246,6 +246,12 @@ def _modifier_from_persisting_effect(
         context_payload,
         key="source_unit_instance_id",
     )
+    source_model_ids = _physical_unit_model_ids(
+        state=state,
+        unit_instance_id=source_unit_id,
+    )
+    if source_model_ids != (source_model_id,):
+        raise GameLifecycleError("Deadly Demise modifier requires an exact single-model bearer.")
     if state.unit_instance_id_for_model(source_model_id) != source_unit_id:
         raise GameLifecycleError("Deadly Demise modifier source model identity drift.")
     if rules_unit_owner_player_id(state=state, unit_instance_id=source_unit_id) != (
@@ -354,11 +360,7 @@ def _destruction_matches_modifier(
         return False
     if attribution.destruction_provenance.destruction_source_kind is (DestructionSourceKind.ATTACK):
         return attribution.attacking_model_instance_id == modifier.source_model_instance_id
-    source_models = _physical_unit_model_ids(
-        state=state,
-        unit_instance_id=modifier.source_unit_instance_id,
-    )
-    return len(source_models) == 1 and source_models[0] == modifier.source_model_instance_id
+    return True
 
 
 def _physical_unit_model_ids(

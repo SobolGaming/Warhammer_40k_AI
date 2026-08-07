@@ -70,6 +70,10 @@ from warhammer40k_core.engine.rule_deadly_demise_continuation import (
     destroyed_damage_applications,
     destruction_provenance_from_rule_context,
 )
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_owner_player_id,
+    rules_unit_view_by_id,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -124,6 +128,7 @@ def destroy_model_with_rule_reactions(
     source_result_id: str,
     completion_event_type: str,
     completion_event_payload: JsonValue,
+    source_rules_unit_instance_id: str | None = None,
 ) -> RuleModelDestructionResult:
     requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
     requested_rules_unit_id = _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
@@ -138,6 +143,11 @@ def destroy_model_with_rule_reactions(
     requested_result_id = _validate_identifier("source_result_id", source_result_id)
     requested_completion_event_type = _validate_identifier(
         "completion_event_type", completion_event_type
+    )
+    requested_source_rules_unit_id = _source_rules_unit_instance_id(
+        state=state,
+        source_rules_unit_instance_id=source_rules_unit_instance_id,
+        destroying_player_id=requested_destroying_player_id,
     )
     validated_completion_payload = validate_json_value(completion_event_payload)
     if not isinstance(validated_completion_payload, dict):
@@ -182,7 +192,7 @@ def destroy_model_with_rule_reactions(
                 "target_unit_instance_id": physical_unit_id,
                 "model_instance_id": requested_model_id,
                 "destroying_player_id": requested_destroying_player_id,
-                "source_rules_unit_instance_id": None,
+                "source_rules_unit_instance_id": requested_source_rules_unit_id,
                 "destroyed_model_controller_player_id": controller_player_id,
                 "destroyed_model_placement": placement_payload,
                 "completion_event_type": requested_completion_event_type,
@@ -1409,6 +1419,32 @@ def _active_player_id(state: GameState) -> str:
     if state.active_player_id is None:
         raise GameLifecycleError("Rule destruction requires active player.")
     return state.active_player_id
+
+
+def _source_rules_unit_instance_id(
+    *,
+    state: GameState,
+    source_rules_unit_instance_id: str | None,
+    destroying_player_id: str,
+) -> str | None:
+    if source_rules_unit_instance_id is None:
+        return None
+    requested_source_id = _validate_identifier(
+        "source_rules_unit_instance_id",
+        source_rules_unit_instance_id,
+    )
+    canonical_source_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=requested_source_id,
+    ).unit_instance_id
+    if rules_unit_owner_player_id(
+        state=state,
+        unit_instance_id=canonical_source_id,
+    ) != _validate_identifier("destroying_player_id", destroying_player_id):
+        raise GameLifecycleError(
+            "Rule destruction source rules unit must belong to the destroying player."
+        )
+    return canonical_source_id
 
 
 def _validate_identifier_tuple(

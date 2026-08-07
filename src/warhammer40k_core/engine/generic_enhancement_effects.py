@@ -232,7 +232,7 @@ def _deadly_demise_unit_destroyed_handler(
 ) -> UnitDestroyedHandler:
     def handler(context: UnitDestroyedContext) -> None:
         bearer = _bearer_unit_for_assignment(state=context.state, assignment=assignment)
-        source_model_id = _source_model_instance_id(bearer)
+        source_model_id = _require_single_model_bearer(bearer)
         modifier = deadly_demise_modifier_for_model(
             state=context.state,
             model_instance_id=source_model_id,
@@ -387,6 +387,8 @@ def _generic_enhancement_effects(
         context=context,
         binding_source=binding_source,
     )
+    if _rule_ir_grants_deadly_demise_modifier(binding_source.rule_ir):
+        _require_single_model_bearer(context.target_unit)
     rule_context = _rule_execution_context(context=context, assignment=assignment)
     result = execute_rule_ir(rule_ir=binding_source.rule_ir, context=rule_context)
     if result.status is not RuleExecutionStatus.APPLIED:
@@ -710,6 +712,16 @@ def _source_model_instance_id(unit: UnitInstance) -> str:
     if not unit.own_models:
         raise GameLifecycleError("Generic enhancement source unit has no models.")
     return sorted(model.model_instance_id for model in unit.own_models)[0]
+
+
+def _require_single_model_bearer(unit: UnitInstance) -> str:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Generic enhancement source unit is invalid.")
+    if len(unit.own_models) != 1:
+        raise GameLifecycleError(
+            "A this_model Deadly Demise modifier requires a single-model bearer unit."
+        )
+    return unit.own_models[0].model_instance_id
 
 
 def _bearer_unit_for_assignment(
