@@ -369,7 +369,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("emperors-children", "000004084", "Playable"),
         ("emperors-children", "000004088", "Playable"),
         ("emperors-children", "000004089", "Playable"),
-        ("emperors-children", "000004208", "Partial"),
+        ("emperors-children", "000004208", "Playable"),
         ("thousand-sons", "000001030", "Playable"),
         ("world-eaters", "000004207", "Partial"),
     }
@@ -411,6 +411,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
                 "000004084",
                 "000004088",
                 "000004089",
+                "000004208",
             }:
                 assert "| All consumed |" in rendered_row
             else:
@@ -460,6 +461,32 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
     )
     assert chaos_terminator_abilities["Lethal Obsession"].runtime_consumer_ids == (
         CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
+    )
+
+    emperors_children_defiler_support = next(
+        row for row in non_daemons_rows if row.datasheet_id == "000004208"
+    )
+    assert (
+        emperors_children_defiler_support.catalog_status,
+        emperors_children_defiler_support.model_geometry_status,
+        emperors_children_defiler_support.wargear_status,
+        emperors_children_defiler_support.weapon_keyword_status,
+        emperors_children_defiler_support.datasheet_ability_status,
+    ) == ("Full", "Full", "Full", "Full", "Full")
+    assert emperors_children_defiler_support.faction_interaction_status == "Partial"
+    defiler_abilities = {
+        ability_rows_by_id[row_id].ability_name: ability_rows_by_id[row_id]
+        for row_id in emperors_children_defiler_support.ability_coverage_row_ids
+    }
+    assert set(defiler_abilities) == {
+        "Deadly Demise",
+        "Revel in Desecration",
+        "Scuttling Walker",
+        "Thrill Seekers",
+    }
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        for row in defiler_abilities.values()
     )
 
     kharseth_support = next(row for row in non_daemons_rows if row.datasheet_id == "000004194")

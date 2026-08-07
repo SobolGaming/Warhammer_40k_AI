@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from tools.generate_ability_support_matrix import ability_support_matrix_rows
 
+from warhammer40k_core.core.datasheet import CatalogAbilitySourceKind
 from warhammer40k_core.engine import cult_ambush as genestealer_cults_cult_ambush
 from warhammer40k_core.engine.ability_coverage import (
     AbilityCoverageRow,
@@ -233,10 +234,7 @@ def test_cross_faction_descriptor_rows_remain_distinct_from_executable_army_rule
     for row in ability_support_matrix_rows():
         rows_by_name.setdefault(row.ability_name, []).append(row)
 
-    for ability_name, datasheet_id in (
-        ("Blessings of Khorne", "000004207"),
-        ("Thrill Seekers", "000004208"),
-    ):
+    for ability_name, datasheet_id in (("Blessings of Khorne", "000004207"),):
         rows = rows_by_name[ability_name]
         assert any(
             row.datasheet_id == datasheet_id
@@ -245,3 +243,39 @@ def test_cross_faction_descriptor_rows_remain_distinct_from_executable_army_rule
             for row in rows
         )
         assert any(row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED for row in rows)
+
+
+def test_emperors_children_defiler_thrill_seekers_retains_exact_runtime_evidence() -> None:
+    rows = ability_support_matrix_rows()
+    defiler_row = next(
+        row
+        for row in rows
+        if row.datasheet_id == "000004208"
+        and row.ability_id == emperors_children_army_rule.THRILL_SEEKERS_SOURCE_ABILITY_ID
+    )
+
+    assert defiler_row.source_kind is CatalogAbilitySourceKind.FACTION
+    assert defiler_row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+    assert defiler_row.semantic_categories == ("faction.army_rule.thrill_seekers",)
+    assert frozenset(defiler_row.runtime_consumer_ids) == frozenset(
+        {
+            emperors_children_army_rule.ADVANCE_ELIGIBILITY_HOOK_ID,
+            emperors_children_army_rule.FALL_BACK_ELIGIBILITY_HOOK_ID,
+            emperors_children_army_rule.SHOOTING_TARGET_RESTRICTION_HOOK_ID,
+            emperors_children_army_rule.CHARGE_TARGET_RESTRICTION_HOOK_ID,
+        }
+    )
+
+    unrelated_defiler_rows = tuple(
+        row
+        for row in rows
+        if row.datasheet_name == "Defiler"
+        and row.source_kind is CatalogAbilitySourceKind.FACTION
+        and row.ability_id != emperors_children_army_rule.THRILL_SEEKERS_SOURCE_ABILITY_ID
+    )
+    assert unrelated_defiler_rows
+    assert all(
+        row.support_stage is AbilityCoverageSupportStage.DESCRIPTOR_ONLY
+        and row.runtime_consumer_ids == ()
+        for row in unrelated_defiler_rows
+    )

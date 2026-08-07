@@ -3678,6 +3678,14 @@
         "source_kind": "faction"
       },
       {
+        "ability_id": "000009994",
+        "ability_name": "Thrill Seekers",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004208/faction/000009994/none",
+        "datasheet_id": "000004208",
+        "datasheet_name": "Defiler",
+        "source_kind": "faction"
+      },
+      {
         "ability_id": "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers",
         "ability_name": "Thrill Seekers",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none",
@@ -3747,9 +3755,10 @@
     ],
     "category_id": "faction.army_rule.thrill_seekers",
     "category_name": "Emperor's Children Army Rule",
-    "coverage_row_count": 9,
+    "coverage_row_count": 10,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004081/faction/000009994/none",
+      "chaos-daemons-bridge-catalog/000004208/faction/000009994/none",
       "runtime-content-warhammer-40000-11th/emperors-children/faction/warhammer_40000_11th:emperors_children:army_rule:thrill_seekers/none",
       "chaos-daemons-bridge-catalog/000004089/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004077/faction/000009994/none",
@@ -3761,6 +3770,7 @@
     ],
     "datasheet_names": [
       "Chaos Terminators",
+      "Defiler",
       "Emperor's Children",
       "Flawless Blades",
       "Fulgrim",
@@ -3777,7 +3787,7 @@
       "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
     ],
     "source_kind_counts": {
-      "faction": 9
+      "faction": 10
     },
     "support_stages": [
       "engine_consumed"
@@ -4735,14 +4745,6 @@
         "source_kind": "faction"
       },
       {
-        "ability_id": "000009994",
-        "ability_name": "Thrill Seekers",
-        "coverage_row_id": "chaos-daemons-bridge-catalog/000004208/faction/000009994/none",
-        "datasheet_id": "000004208",
-        "datasheet_name": "Defiler",
-        "source_kind": "faction"
-      },
-      {
         "ability_id": "000008396",
         "ability_name": "Nurgle's Gift (Aura)",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004209/faction/000008396/none",
@@ -4753,15 +4755,13 @@
     ],
     "ability_names": [
       "Blessings of Khorne",
-      "Nurgle's Gift (Aura)",
-      "Thrill Seekers"
+      "Nurgle's Gift (Aura)"
     ],
     "category_id": "unknown.ability_text",
     "category_name": "Unknown Abilities",
-    "coverage_row_count": 3,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004207/faction/000008428/none",
-      "chaos-daemons-bridge-catalog/000004208/faction/000009994/none",
       "chaos-daemons-bridge-catalog/000004209/faction/000008396/none"
     ],
     "datasheet_names": [
@@ -4769,7 +4769,7 @@
     ],
     "runtime_consumer_ids": [],
     "source_kind_counts": {
-      "faction": 3
+      "faction": 2
     },
     "support_stages": [
       "descriptor_only"

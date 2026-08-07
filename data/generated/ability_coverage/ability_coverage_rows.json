@@ -4266,13 +4266,18 @@
     "datasheet_id": "000004208",
     "datasheet_name": "Defiler",
     "diagnostic_reasons": [],
-    "runtime_consumer_ids": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility",
+      "warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction"
+    ],
     "semantic_categories": [
-      "unknown.ability_text"
+      "faction.army_rule.thrill_seekers"
     ],
     "source_kind": "faction",
     "source_wargear_id": null,
-    "support_stage": "descriptor_only"
+    "support_stage": "engine_consumed"
   },
   {
     "ability_id": "000008339",
