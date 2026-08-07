@@ -94,12 +94,14 @@ def record_deadly_demise_secondary_destruction_finalization(
         target_unit_instance_id=secondary_damage.target_unit_instance_id,
         application_payload=validate_json_value({"applications": [secondary_damage.to_payload()]}),
         destroyed_model_instance_ids=(secondary_damage.model_instance_id,),
-        evidence=MortalWoundDestructionEvidence.for_state(
+        evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
             destroying_player_id=destroying_player_id,
             source_rules_unit_instance_id=source_rules_unit_id,
+            source_model_instance_id=source_damage.model_instance_id,
             destruction_source_kind=DestructionSourceKind.DEADLY_DEMISE,
             action_phase=attack_sequence.source_phase,
             source_step="deadly_demise_collateral",
         ),
+        existing_model_destroyed_event_ids=(model_destroyed_event_id,),
     )

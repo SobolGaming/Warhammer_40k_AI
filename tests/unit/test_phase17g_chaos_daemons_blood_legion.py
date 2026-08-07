@@ -43,7 +43,11 @@ from warhammer40k_core.core.detachment import DetachmentDefinition, EnhancementD
 from warhammer40k_core.core.dice import DiceRollResult
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.modifiers import RollModifier
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    FightPhaseStepKind,
+    MovementMode,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.weapon_profiles import (
     DamageProfile,
     WeaponKeyword,
@@ -94,10 +98,14 @@ from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    datasheets,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.blood_legion import (  # noqa: E501
     enhancements,
     rule,
 )
+from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -130,6 +138,7 @@ from warhammer40k_core.engine.phase import (
     PlaceholderPhaseHandler,
     SetupStep,
 )
+from warhammer40k_core.engine.phases.fight import FightPhaseHandler
 from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_ACTION_DECISION_TYPE,
     MovementPhaseActionKind,
@@ -541,6 +550,134 @@ def test_gateway_unto_damnation_attack_destruction_upgrades_and_persists() -> No
     assert rebuilt.to_payload()["state"] == rebuilt_state.to_payload()
     assert rebuilt_descriptor["mortal_wounds"] == {"kind": "d3", "modifier": 3}
     assert mortal_wounds == 4
+
+
+def test_gateway_unto_damnation_relentless_carnage_destruction_upgrades_and_persists() -> None:
+    config = _blood_legion_config(
+        game_id="phase17g-gateway-relentless-carnage",
+        include_slaughterthirst_targets=True,
+        gateway_target_unit_selection_id="khorne-monster-unit",
+        khorne_monster_model_count=1,
+        enemy_model_count=1,
+    )
+    lifecycle = _blood_legion_enhancement_lifecycle(config)
+    state = _started_state(lifecycle)
+    state.active_player_id = "player-a"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    _place_unit_poses(
+        state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+        poses=(Pose.at(20.0, 20.0),),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=_ENEMY_UNIT_ID,
+        poses=(Pose.at(20.5, 20.0),),
+    )
+    policy = config.ruleset_descriptor.fight_policy
+    state.fight_phase_state = FightPhaseState.start(
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        policy=policy,
+        engaged_at_fight_step_start_unit_ids=(
+            _OTHER_KHORNE_MONSTER_UNIT_ID,
+            _ENEMY_UNIT_ID,
+        ),
+        fights_first_registry=FightsFirstRegistry(),
+    ).with_current_step(current_step=FightPhaseStepKind.END, policy=policy)
+    bundle = _runtime_content_bundle(lifecycle)
+    decisions = lifecycle.decision_controller
+    monster = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    enemy = _physical_unit_by_id(state=state, unit_instance_id=_ENEMY_UNIT_ID)
+    (bearer_model,) = monster.own_models
+    (enemy_model,) = enemy.own_models
+    bearer_source = _single_deadly_demise_source(
+        state=state,
+        model_instance_id=bearer_model.model_instance_id,
+    )
+    handler = FightPhaseHandler(
+        fight_phase_end_hooks=bundle.fight_phase_end_hook_registry,
+    )
+
+    status = handler.begin_phase(state=state, decisions=decisions)
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = status.decision_request
+    assert request is not None
+    target_option = next(
+        option
+        for option in request.options
+        if isinstance(option.payload, dict)
+        and option.payload.get("target_enemy_unit_instance_id") == _ENEMY_UNIT_ID
+    )
+    result = DecisionResult.for_request(
+        result_id="phase17g-gateway-relentless-carnage-selected",
+        request=request,
+        selected_option_id=target_option.option_id,
+    )
+    decisions.submit_result(result)
+
+    assert handler.apply_decision(state=state, decisions=decisions, result=result) is None
+    assert state.battlefield_state is not None
+    assert enemy_model.model_instance_id not in state.battlefield_state.placed_model_ids()
+    destroyed_payload = next(
+        event.payload
+        for event in decisions.event_log.records
+        if event.event_type == "model_destroyed"
+        and isinstance(event.payload, dict)
+        and event.payload.get("model_instance_id") == enemy_model.model_instance_id
+    )
+    attribution = ModelDestructionAttribution.from_model_destroyed_payload(destroyed_payload)
+    assert attribution.source_rules_unit_instance_id == _OTHER_KHORNE_MONSTER_UNIT_ID
+    assert attribution.source_model_instance_id == bearer_model.model_instance_id
+    assert attribution.destruction_provenance.destruction_source_kind is (
+        DestructionSourceKind.ABILITY
+    )
+    assert effective_deadly_demise_descriptor(
+        state=state,
+        event_log=decisions.event_log,
+        source=bearer_source,
+        model_instance_id=bearer_model.model_instance_id,
+    )["mortal_wounds"] == {"kind": "d3", "modifier": 3}
+
+    flow = BattleRoundFlow(
+        phase_handlers={
+            BattlePhase.FIGHT: PlaceholderPhaseHandler(BattlePhase.FIGHT),
+        },
+        unit_destroyed_hooks=bundle.unit_destroyed_hook_registry,
+    )
+    flow.advance(state=state, decisions=decisions)
+    condition_effects = tuple(
+        effect
+        for effect in state.persisting_effects
+        if isinstance(effect.effect_payload, dict)
+        and effect.effect_payload.get("effect_kind") == DEADLY_DEMISE_MODIFIER_CONDITION_EFFECT_KIND
+    )
+
+    assert len(condition_effects) == 1
+    condition_payload = cast(dict[str, JsonValue], condition_effects[0].effect_payload)
+    assert condition_payload["source_model_instance_id"] == bearer_model.model_instance_id
+    assert condition_payload["model_destroyed_event_id"] in {
+        event.event_id
+        for event in decisions.event_log.records
+        if event.event_type == "model_destroyed"
+    }
+    payload = lifecycle.to_payload()
+    rebuilt = GameLifecycle.from_payload(payload)
+    rebuilt_state = _started_state(rebuilt)
+    assert rebuilt.to_payload() == payload
+    assert effective_deadly_demise_descriptor(
+        state=rebuilt_state,
+        event_log=rebuilt.decision_controller.event_log,
+        source=_single_deadly_demise_source(
+            state=rebuilt_state,
+            model_instance_id=bearer_model.model_instance_id,
+        ),
+        model_instance_id=bearer_model.model_instance_id,
+    )["mortal_wounds"] == {"kind": "d3", "modifier": 3}
 
 
 def test_gateway_unto_damnation_rule_destruction_upgrades_and_persists() -> None:
@@ -1494,6 +1631,16 @@ def _blood_legion_khorne_monster_datasheet(
         ),
         abilities=(
             *base_datasheet.abilities,
+            DatasheetAbilityDescriptor(
+                ability_id="phase17g-blood-legion-relentless-carnage",
+                name="Relentless Carnage",
+                source_id=datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+                support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+                source_kind=CatalogAbilitySourceKind.DATASHEET,
+                effect_description="Fight-end Relentless Carnage runtime source.",
+                timing_tags=("fight_phase_end",),
+                parameter_tokens=("D6",),
+            ),
             DatasheetAbilityDescriptor(
                 ability_id="phase17g-blood-legion-deadly-demise-d3",
                 name="Deadly Demise D3",

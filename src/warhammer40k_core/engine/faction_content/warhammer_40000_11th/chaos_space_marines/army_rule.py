@@ -488,10 +488,11 @@ def resolve_dark_pact_attack_sequence_completion(
         defender_player_id=rules_unit.owner_player_id,
         mortal_wounds=d3_result.value,
         spill_over=True,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=context.state,
             destroying_player_id=rules_unit.owner_player_id,
             source_rules_unit_instance_id=rules_unit.unit_instance_id,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=context.source_phase,
             source_step="dark_pacts_mortal_wounds",

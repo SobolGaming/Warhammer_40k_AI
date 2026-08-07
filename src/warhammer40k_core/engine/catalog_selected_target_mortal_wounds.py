@@ -177,10 +177,11 @@ def resolve_selected_target_mortal_wound_effect(
         defender_player_id=target_player_id,
         mortal_wounds=mortal_wounds,
         spill_over=True,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
             destroying_player_id=actor_id,
             source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=BattlePhase.SHOOTING,
             source_step="selected_target_mortal_wounds",

@@ -395,10 +395,11 @@ def apply_malice_made_manifest_fight_phase_start_result(
         ),
         mortal_wounds=mortal_wounds,
         spill_over=True,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=context.state,
             destroying_player_id=player_id,
             source_rules_unit_instance_id=bearer_rules_unit_id,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=BattlePhase.FIGHT,
             source_step="malice_made_manifest_mortal_wounds",

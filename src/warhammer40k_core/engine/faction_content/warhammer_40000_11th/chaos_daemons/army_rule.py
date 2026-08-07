@@ -515,10 +515,11 @@ def _resolve_daemonic_terror(
         application_id=f"{result.result_id}:daemonic-terror:{target_unit.unit_instance_id}",
         source_rule_id=source_rule_id,
         source_context=source_context,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=context.state,
             destroying_player_id=daemon_army.player_id,
             source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=context.phase,
             source_step="daemonic_terror_mortal_wounds",

@@ -1364,6 +1364,99 @@ def test_rule_deadly_demise_collateral_chain_restores_nested_fnp_continuation() 
     assert DecisionController.from_payload(restored_decisions.to_payload()) == restored_decisions
 
 
+def test_rule_destruction_resume_rejects_source_unit_drift_without_source_model() -> None:
+    state, _runtime, decisions, bodyguard, _leader, enemy, _attached_id = (
+        attached_selected_to_fight_risk_fixture(
+            pre_split=False,
+            enemy_x=16.0,
+        )
+    )
+    root_model_id = enemy.own_models[0].model_instance_id
+    target_model_id = bodyguard.own_models[0].model_instance_id
+    liability = _record_rule_destruction_liability(
+        state=state,
+        effect_id="test:rule-destruction:source-unit-drift-liability",
+        target_unit_instance_id=enemy.unit_instance_id,
+        owner_player_id="player-enemy",
+    )
+    state.clear_model_destruction_reaction_sources(model_instance_id=root_model_id)
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=root_model_id,
+        sources=(
+            _deadly_demise_source(
+                source_id="test:rule-destruction:source-unit-drift-deadly-demise",
+                mortal_wounds=1,
+            ),
+        ),
+    )
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=target_model_id,
+        sources=(
+            FeelNoPainSource(
+                source_id="test:rule-destruction:source-unit-drift-fnp",
+                threshold=5,
+            ),
+        ),
+        decline_allowed=True,
+    )
+
+    destruction = rule_model_destruction.destroy_model_with_rule_reactions(
+        state=state,
+        decisions=decisions,
+        model_instance_id=root_model_id,
+        rules_unit_instance_id=enemy.unit_instance_id,
+        destroying_player_id="player-enemy",
+        source_rule_id="test:rule-destruction:source-unit-drift",
+        source_effect_ids=(liability.effect_id,),
+        source_phase=BattlePhase.FIGHT,
+        source_step="fight_phase_end",
+        source_result_id="test:rule-destruction:source-unit-drift-result",
+        completion_event_type="test_rule_destruction_source_unit_drift_completed",
+        completion_event_payload={"root_model_instance_id": root_model_id},
+        source_rules_unit_instance_id=enemy.unit_instance_id,
+        source_model_instance_id=None,
+    )
+
+    assert destruction.status is not None
+    assert destruction.status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    restored_state = GameState.from_payload(state.to_payload())
+    controller_payload = decisions.to_payload()
+    pending_payload = controller_payload["queue"]["pending_requests"][0]["payload"]
+    assert isinstance(pending_payload, dict)
+    lost_wound_context = pending_payload["lost_wound_context"]
+    assert isinstance(lost_wound_context, dict)
+    source_context = lost_wound_context["source_context"]
+    assert isinstance(source_context, dict)
+    root_context = source_context["root_context"]
+    assert isinstance(root_context, dict)
+    assert root_context["source_model_instance_id"] is None
+    root_context["source_rules_unit_instance_id"] = bodyguard.unit_instance_id
+    restored_decisions = DecisionController.from_payload(controller_payload)
+    request = restored_decisions.queue.peek_next()
+    result = DecisionResult.for_request(
+        result_id="test:rule-destruction:source-unit-drift-declined",
+        request=request,
+        selected_option_id=DECLINE_FEEL_NO_PAIN_OPTION_ID,
+    )
+    state_before = restored_state.to_payload()
+    decisions_before = restored_decisions.to_payload()
+
+    invalid = rule_model_destruction.invalid_rule_model_destruction_mortal_wound_status(
+        state=restored_state,
+        request=request,
+        result=result,
+    )
+
+    assert invalid is not None
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    invalid_payload = cast(dict[str, JsonValue], invalid.payload)
+    assert invalid_payload["diagnostic"] == (
+        "Destruction source rules unit must belong to the destroying player."
+    )
+    assert restored_state.to_payload() == state_before
+    assert restored_decisions.to_payload() == decisions_before
+
+
 @pytest.mark.parametrize(
     ("mandatory_kind", "expected_action_host"),
     [

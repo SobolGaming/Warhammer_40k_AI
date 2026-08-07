@@ -377,6 +377,8 @@ def defer_grouped_devastating_wounds(
         )
         deferred = DeferredMortalWounds(
             source_rule_id=DEVASTATING_WOUNDS_RULE_ID,
+            source_model_instance_id=pool.attacker_model_instance_id,
+            source_weapon_profile=pool.weapon_profile,
             target_unit_instance_id=attack_context["target_unit_instance_id"],
             attack_context_id=attack_context["attack_context_id"],
             mortal_wounds=mortal_wounds,

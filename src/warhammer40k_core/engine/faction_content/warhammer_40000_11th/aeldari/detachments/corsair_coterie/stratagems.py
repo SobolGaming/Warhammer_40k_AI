@@ -926,13 +926,14 @@ def _apply_lethal_ruse_mortal_wounds(context: StratagemHandlerContext) -> JsonVa
             application_id=f"{context.use_record.use_id}:mortal-wounds:{enemy_unit_id}",
             source_rule_id=LETHAL_RUSE_RECORD_ID,
             source_context=source_context,
-            destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
                 state=context.state,
                 destroying_player_id=context.use_record.player_id,
                 source_rules_unit_instance_id=rules_unit_view_by_id(
                     state=context.state,
                     unit_instance_id=unit.unit_instance_id,
                 ).unit_instance_id,
+                source_model_instance_id=None,
                 destruction_source_kind=DestructionSourceKind.ABILITY,
                 action_phase=BattlePhase(context.use_record.phase.value),
                 source_step="lethal_ruse_mortal_wounds",

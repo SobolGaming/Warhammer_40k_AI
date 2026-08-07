@@ -703,11 +703,13 @@ def _apply_deferred_mortal_wounds(
             ),
             mortal_wounds=deferred.mortal_wounds,
             spill_over=False,
-            destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            destruction_evidence=MortalWoundDestructionEvidence.for_attack_state(
                 state=state,
                 destroying_player_id=attack_sequence.attacker_player_id,
-                source_rules_unit_instance_id=attack_sequence.attacking_unit_instance_id,
-                destruction_source_kind=DestructionSourceKind.ATTACK,
+                attacking_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+                attacking_model_instance_id=deferred.source_model_instance_id,
+                weapon_profile=deferred.source_weapon_profile,
+                attack_context_id=deferred.attack_context_id,
                 action_phase=attack_sequence.source_phase,
                 source_step="devastating_wounds",
             ),

@@ -251,10 +251,11 @@ def _resolve_effect(
         defender_player_id=rules_unit.owner_player_id,
         mortal_wounds=mortal_wounds,
         spill_over=True,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
             destroying_player_id=effect.owner_player_id,
             source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=BattlePhase.MOVEMENT,
             source_step="movement_phase_end_mortal_wounds",
