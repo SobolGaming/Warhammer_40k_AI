@@ -1969,6 +1969,7 @@ def _split_scenario(
                     destroying_player_id=enemy_army.player_id,
                     source_kind=source_kind,
                     source_rules_unit_instance_id=attacker.unit_instance_id,
+                    source_model_instance_id=None,
                 )
             )
             removal_record = ModelRemovalRecord(

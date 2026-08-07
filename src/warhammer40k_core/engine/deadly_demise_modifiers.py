@@ -4,10 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.destruction_provenance import (
-    DestructionSourceKind,
-    ModelDestructionAttribution,
-)
+from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
@@ -358,9 +355,7 @@ def _destruction_matches_modifier(
     )
     if all(view.unit_instance_id != expected_rules_unit_id for view in attributed_views):
         return False
-    if attribution.destruction_provenance.destruction_source_kind is (DestructionSourceKind.ATTACK):
-        return attribution.attacking_model_instance_id == modifier.source_model_instance_id
-    return True
+    return attribution.source_model_instance_id == modifier.source_model_instance_id
 
 
 def _physical_unit_model_ids(

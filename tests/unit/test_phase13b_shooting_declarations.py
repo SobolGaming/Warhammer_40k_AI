@@ -13345,6 +13345,7 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
     )
     assert secondary_attribution.destroying_player_id == "player-b"
     assert secondary_attribution.source_rules_unit_instance_id == defender.unit_instance_id
+    assert secondary_attribution.source_model_instance_id == defender_model.model_instance_id
     assert secondary_attribution.attacking_unit_instance_id is None
     assert secondary_attribution.attacking_model_instance_id is None
     assert attacker_model.model_instance_id not in updated_battlefield.placed_model_ids()

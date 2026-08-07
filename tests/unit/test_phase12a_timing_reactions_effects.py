@@ -1622,6 +1622,7 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
         is DestructionSourceKind.DEADLY_DEMISE
     )
     assert collateral_attribution.source_rules_unit_instance_id == enemy.unit_instance_id
+    assert collateral_attribution.source_model_instance_id == root_model_id
     assert collateral_attribution.attacking_unit_instance_id is None
     assert collateral_attribution.attacking_model_instance_id is None
     assert (
@@ -1629,6 +1630,7 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
         is DestructionSourceKind.ABILITY
     )
     assert root_attribution.source_rules_unit_instance_id is None
+    assert root_attribution.source_model_instance_id is None
     assert root_attribution.attacking_unit_instance_id is None
     assert root_attribution.attacking_model_instance_id is None
 
