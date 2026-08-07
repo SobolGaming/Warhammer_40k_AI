@@ -1522,7 +1522,7 @@
       "chaos-daemons-bridge-catalog/000004208/faction/000009994/none"
     ],
     "catalog_status": "Full",
-    "datasheet_ability_status": "Partial",
+    "datasheet_ability_status": "Full",
     "datasheet_id": "000004208",
     "datasheet_name": "Defiler",
     "detachment_ids": [
@@ -1540,13 +1540,13 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "`000009994` Thrill Seekers: `descriptor_only` Faction ability row is not fully consumed; detachment support 2/10.",
-    "overall": "Partial",
+    "notes": "Faction army rule consumed; detachment support 2/10. Supported detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
+    "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
       "spectacle-of-slaughter"
     ],
-    "tests_evidence": "Runtime consumers: `catalog-ir:hit-roll-modifier`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:hit-roll-modifier`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },

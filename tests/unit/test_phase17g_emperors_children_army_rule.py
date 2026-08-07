@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import Any, cast
 
 import pytest
+from tests.chaos_defiler_catalog_helpers import defiler_catalog_package
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
@@ -75,6 +76,7 @@ from warhammer40k_core.engine.phases.movement import (
     AdvancedUnitState,
     AdvanceRollRequest,
     AdvanceRollResult,
+    FallBackModeKind,
     FellBackUnitState,
     MovementDiceRecord,
     MovementPhaseActionKind,
@@ -119,6 +121,9 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import (
     chapter_approved_2026_27_mission_pack,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_defiler_datasheet_overlay_2026_06 as defiler_overlay,
+)
 
 EMPERORS_CHILDREN_TEST_DATASHEET_ID = "phase17g-emperors-children-noise-marine"
 EMPERORS_CHILDREN_UNIT_ID = "army-alpha:intercessor-unit-1"
@@ -126,6 +131,8 @@ ENEMY_UNIT_ID = "army-beta:intercessor-unit-3"
 EMPERORS_CHILDREN_LIFECYCLE_UNIT_ID = "army-alpha:noise-marine"
 EMPERORS_CHILDREN_RESTRICTED_TARGET_ID = "army-beta:restricted-target"
 EMPERORS_CHILDREN_LEGAL_TARGET_ID = "army-beta:legal-target"
+EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID = "army-alpha:defiler"
+EMPERORS_CHILDREN_DEFILER_DETACHMENT_ID = "phase17g-defiler-runtime"
 
 
 def test_runtime_bundle_loads_thrill_seekers_opt_in_surfaces() -> None:
@@ -341,6 +348,131 @@ def test_thrill_seekers_shooting_restriction_is_consumed_by_declaration_path() -
     shooting_phase_state = _state(lifecycle).shooting_phase_state
     assert shooting_phase_state is not None
     assert shooting_phase_state.attack_pools == ()
+
+
+def test_catalog_defiler_thrill_seekers_fall_back_and_target_restriction_consumer_paths() -> None:
+    config = _emperors_children_defiler_config()
+    defiler_datasheet = config.army_catalog.datasheet_by_id(
+        defiler_overlay.EMPERORS_CHILDREN_DEFILER_DATASHEET_ID
+    )
+    thrill_seekers = next(
+        ability
+        for ability in defiler_datasheet.abilities
+        if ability.ability_id == army_rule.THRILL_SEEKERS_SOURCE_ABILITY_ID
+    )
+    assert thrill_seekers.source_kind.value == "faction"
+
+    lifecycle, movement_request = _emperors_children_lifecycle_to_movement_unit_selection(
+        enemy_unit_ids=("restricted-target", "legal-target"),
+        pose_factory=_defiler_turn_start_engagement_deployment_pose,
+        config=config,
+    )
+    state = _state(lifecycle)
+    _reseed_turn_start_engagement_snapshot_from_current_positions(state)
+    assert turn_start_enemy_unit_ids_for_friendly_unit(
+        state,
+        player_id="player-a",
+        battle_round=state.battle_round,
+        friendly_unit_instance_id=EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID,
+    ) == (EMPERORS_CHILDREN_RESTRICTED_TARGET_ID,)
+
+    action_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=movement_request,
+            option_id=EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID,
+            result_id="phase17g-ec-defiler-select-movement-unit",
+        )
+    )
+    ordered_retreat_option_id = (
+        f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
+    )
+    assert ordered_retreat_option_id in {option.option_id for option in action_request.options}
+    proposal_request = _decision_request_of_type(
+        lifecycle,
+        status=_submit_result(
+            lifecycle,
+            request=action_request,
+            option_id=ordered_retreat_option_id,
+            result_id="phase17g-ec-defiler-select-fall-back",
+        ),
+        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+        result_id_prefix="phase17g-ec-defiler-pre-fall-back",
+    )
+    fall_back_status = submit_movement_proposal(
+        lifecycle,
+        request=proposal_request,
+        result_id="phase17g-ec-defiler-submit-fall-back",
+        unit_instance_id=EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        movement_mode=MovementMode.FALL_BACK,
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID,
+            dx=-6.0,
+        ),
+    )
+
+    fell_back = state.fell_back_unit_state_for_unit(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID,
+    )
+    assert fell_back is not None
+    assert fell_back.can_shoot is True
+    assert fell_back.can_declare_charge is True
+    fall_back_payload = _last_event_payload(lifecycle, "fall_back_eligibility_hooks_resolved")
+    grants = cast(list[dict[str, object]], fall_back_payload["grants"])
+    assert [grant["hook_id"] for grant in grants] == [army_rule.FALL_BACK_ELIGIBILITY_HOOK_ID]
+
+    shooting_request = _decision_request_of_type(
+        lifecycle,
+        status=fall_back_status,
+        decision_type=SELECT_SHOOTING_UNIT_DECISION_TYPE,
+        result_id_prefix="phase17g-ec-defiler-after-fall-back",
+    )
+    assert EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID in {
+        option.option_id for option in shooting_request.options
+    }
+    shooting_type_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=shooting_request,
+            option_id=EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID,
+            result_id="phase17g-ec-defiler-select-shooter",
+        )
+    )
+    declaration_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=shooting_type_request,
+            option_id=ShootingType.NORMAL.value,
+            result_id="phase17g-ec-defiler-select-normal-shooting",
+        )
+    )
+    assert declaration_request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
+
+    proposal_payload = _shooting_proposal_request_payload(declaration_request)
+    target_candidates = cast(list[dict[str, object]], proposal_payload["target_candidates"])
+    restricted_candidates = tuple(
+        candidate
+        for candidate in target_candidates
+        if candidate["target_unit_instance_id"] == EMPERORS_CHILDREN_RESTRICTED_TARGET_ID
+    )
+    legal_candidates = tuple(
+        candidate
+        for candidate in target_candidates
+        if candidate["target_unit_instance_id"] == EMPERORS_CHILDREN_LEGAL_TARGET_ID
+    )
+    assert restricted_candidates
+    assert all(candidate["is_legal"] is False for candidate in restricted_candidates)
+    assert all(
+        army_rule.SHOOTING_TARGET_RESTRICTION_HOOK_ID
+        in cast(list[str], candidate["targeting_rule_ids"])
+        for candidate in restricted_candidates
+    )
+    assert any(candidate["is_legal"] is True for candidate in legal_candidates)
 
 
 def test_thrill_seekers_grants_shoot_and_charge_after_advance_and_fall_back() -> None:
@@ -719,9 +851,12 @@ def _emperors_children_lifecycle_to_movement_unit_selection(
     *,
     enemy_unit_ids: tuple[str, ...],
     pose_factory: Callable[[int, str, str], Pose],
+    config: GameConfig | None = None,
 ) -> tuple[GameLifecycle, DecisionRequest]:
     lifecycle = GameLifecycle()
-    lifecycle.start(_emperors_children_config(enemy_unit_ids=enemy_unit_ids))
+    lifecycle.start(
+        _emperors_children_config(enemy_unit_ids=enemy_unit_ids) if config is None else config
+    )
 
     first_secondary_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
     assert first_secondary_request.decision_type == SECONDARY_MISSION_DECISION_TYPE
@@ -931,12 +1066,37 @@ def _turn_start_engagement_deployment_pose(
     raise AssertionError(f"Unexpected unit {unit_instance_id}.")
 
 
+def _defiler_turn_start_engagement_deployment_pose(
+    index: int,
+    _player_id: str,
+    model_instance_id: str,
+) -> Pose:
+    unit_instance_id = _unit_instance_id_from_model_instance_id(model_instance_id)
+    if unit_instance_id == EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID:
+        assert index == 0
+        return Pose.at(10.0, 20.0)
+    if unit_instance_id == EMPERORS_CHILDREN_RESTRICTED_TARGET_ID:
+        return _compact_poses(
+            origin=Pose.at(14.5, 20.0, facing_degrees=180.0),
+            model_count=5,
+        )[index]
+    if unit_instance_id == EMPERORS_CHILDREN_LEGAL_TARGET_ID:
+        return _compact_poses(
+            origin=Pose.at(30.0, 20.0, facing_degrees=180.0),
+            model_count=5,
+        )[index]
+    raise AssertionError(f"Unexpected unit {unit_instance_id}.")
+
+
 def _legal_deployment_pose_for_lifecycle_fixture(
     index: int,
     player_id: str,
     model_instance_id: str,
 ) -> Pose:
     unit_instance_id = _unit_instance_id_from_model_instance_id(model_instance_id)
+    if unit_instance_id == EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID:
+        assert index == 0
+        return Pose.at(4.0, 4.0)
     base_y_by_unit_id = {
         EMPERORS_CHILDREN_LIFECYCLE_UNIT_ID: 3.0,
         "army-beta:enemy-unit": 24.0,
@@ -964,6 +1124,8 @@ def _compact_poses(*, origin: Pose, model_count: int) -> tuple[Pose, ...]:
 
 
 def _unit_instance_id_from_model_instance_id(model_instance_id: str) -> str:
+    if model_instance_id.startswith(f"{EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID}:"):
+        return EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID
     return model_instance_id.rsplit(":", 2)[0]
 
 
@@ -1225,6 +1387,67 @@ def _emperors_children_config(
     )
 
 
+def _emperors_children_defiler_config() -> GameConfig:
+    catalog = _emperors_children_defiler_catalog()
+    return GameConfig(
+        game_id="phase17g-emperors-children-defiler-lifecycle-game",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
+            descriptor_version="core-v2-phase17g-emperors-children-defiler-test",
+        ),
+        army_catalog=catalog,
+        army_muster_requests=(
+            ArmyMusterRequest(
+                army_id="army-alpha",
+                player_id="player-a",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id=army_rule.EMPERORS_CHILDREN_FACTION_ID,
+                    detachment_ids=(EMPERORS_CHILDREN_DEFILER_DETACHMENT_ID,),
+                ),
+                force_disposition_id="phase17g-force",
+                unit_selections=(
+                    UnitMusterSelection(
+                        unit_selection_id="defiler",
+                        datasheet_id=defiler_overlay.EMPERORS_CHILDREN_DEFILER_DATASHEET_ID,
+                        model_profile_selections=(
+                            ModelProfileSelection(
+                                model_profile_id=(
+                                    f"{defiler_overlay.EMPERORS_CHILDREN_DEFILER_DATASHEET_ID}:"
+                                    "defiler"
+                                ),
+                                model_count=1,
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            ArmyMusterRequest(
+                army_id="army-beta",
+                player_id="player-b",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id="core-marine-force",
+                    detachment_ids=("core-combined-arms",),
+                ),
+                force_disposition_id="purge-the-foe",
+                unit_selections=(
+                    default_unit_selection("restricted-target"),
+                    default_unit_selection("legal-target"),
+                ),
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down"),
+        mission_setup=_emperors_children_mission_setup(),
+    )
+
+
 def _emperors_children_mission_setup() -> MissionSetup:
     return replace(
         MissionSetup.from_mission_pack(
@@ -1268,6 +1491,44 @@ def _emperors_children_catalog() -> ArmyCatalog:
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:emperors-children:frenzied-host",
                 ),
+            ),
+        ),
+    )
+
+
+def _emperors_children_defiler_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    source_catalog = defiler_catalog_package().army_catalog
+    datasheet_id = defiler_overlay.EMPERORS_CHILDREN_DEFILER_DATASHEET_ID
+    defiler = source_catalog.datasheet_by_id(datasheet_id)
+    defiler_wargear = tuple(
+        wargear
+        for wargear in source_catalog.wargear
+        if wargear.wargear_id.startswith(f"{datasheet_id}:")
+    )
+    return replace(
+        base_catalog,
+        datasheets=(*base_catalog.datasheets, defiler),
+        wargear=(*base_catalog.wargear, *defiler_wargear),
+        factions=(
+            *base_catalog.factions,
+            FactionDefinition(
+                faction_id=army_rule.EMPERORS_CHILDREN_FACTION_ID,
+                name="Emperor's Children",
+                faction_keywords=(army_rule.EMPERORS_CHILDREN_FACTION_KEYWORD,),
+                source_ids=("gw-11e-faction-detachments-2026-27:faction:emperors-children",),
+            ),
+        ),
+        detachments=(
+            *base_catalog.detachments,
+            DetachmentDefinition(
+                detachment_id=EMPERORS_CHILDREN_DEFILER_DETACHMENT_ID,
+                name="Defiler Runtime Test",
+                faction_id=army_rule.EMPERORS_CHILDREN_FACTION_ID,
+                detachment_point_cost=1,
+                unit_datasheet_ids=(datasheet_id,),
+                force_disposition_ids=("phase17g-force",),
+                source_ids=("phase17g:test:emperors-children:defiler-runtime",),
             ),
         ),
     )

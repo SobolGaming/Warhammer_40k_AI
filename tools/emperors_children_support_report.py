@@ -317,18 +317,18 @@ _DATASHEET_REVIEW_ROWS = (
         group=_VEHICLES_GROUP,
         datasheet="Defiler",
         datasheet_id="000004208",
-        ir_coverage="IR parsed; host needed",
+        ir_coverage="All consumed",
         supported_semantics=(
             "Deadly Demise D6, Revel in Desecration hit modifier, Scuttling Walker movement "
-            "transit, and the Thrill Seekers army-rule behavior are implemented."
+            "transit, and the exact Thrill Seekers source ability row are implemented and "
+            "engine-consumed."
         ),
-        semantics_needed=(
-            "Bind the exact Thrill Seekers source ability row to the existing named army-rule "
-            "handler so generated evidence no longer reports it as descriptor-only."
-        ),
+        semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(
-            "No known catalog blocker; catalog, model geometry, wargear, and weapon-keyword "
-            "evidence are Full in the generated DatasheetSupportRow."
+            "No known Defiler blocker; catalog, model geometry, wargear, weapon-keyword, "
+            "datasheet-ability, and Thrill Seekers runtime-consumption evidence are Full. "
+            "The generated overall row remains Playable while faction-wide detachment "
+            "interaction coverage is partial."
         ),
     ),
     EmperorsChildrenDatasheetReviewRow(
