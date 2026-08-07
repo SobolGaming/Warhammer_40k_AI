@@ -353,8 +353,8 @@ reference server currently requires:
 - `event-delta-v1` for the in-process integer-cursor adapter delta only;
 - `event-delta-v2` for authenticated role-bound HTTP event deltas;
 - `session-projection-v2-interaction` for full role-scoped reconnect projections;
-- `session-create-v2`, `session-metadata-v3-contract`,
-  `session-command-result-v3-contract`, and `session-command-outcome-v3-contract` for the
+- `session-create-v2`, `session-metadata-v4-contract`,
+  `session-command-result-v4-contract`, and `session-command-outcome-v4-contract` for the
   authenticated formal session protocol;
 - `replay-artifact-v2-phase18i` for replay artifacts whose required source identity includes
   `ruleset_descriptor_hash` and `rules_overlay_ids`;
@@ -2287,6 +2287,7 @@ Example proposal request:
       "proposal_kind": "normal_move",
       "source_decision_request_id": "decision-request-000004",
       "source_decision_result_id": "phase11d-golden-normal-action",
+      "spatial_context_hash": "03f3bc126357a70d9743ca6770ffae79e65b0845e9d6269e7d93d3f0f5883beb",
       "movement_phase_action": "normal_move",
       "placement_kinds": [],
       "context": {
@@ -2599,6 +2600,8 @@ Finite requests use the existing selected-option equality rule: `DecisionResult.
 
 Parameterized proposal requests use a different validation rule. The pending request still contains the fixed `submit_parameterized_payload` option, and the submitted `DecisionResult.selected_option_id` must be `submit_parameterized_payload`. For parameterized requests, `DecisionResult.payload` is the adapter's movement or placement proposal. It is validated against the embedded `ProposalRequestPayload`; it is not required to equal the fixed option payload `{"submission_kind": "parameterized"}`.
 
+Every `submit_movement_proposal` and shared `submit_placement_proposal` request carries a required opaque `spatial_context_hash`. The engine computes the token from authoritative battlefield bounds and placements, terrain, mission geometry, model physical state, measurement/support dimensions, and geometry/height provenance. Adapters preserve the token only as request context; they do not compute, compare, or submit it as validation authority. Immediately before queue pop, the engine recomputes the token from current authoritative state. Any mismatch returns typed `spatial_context_drift`, leaves the pending request queued, creates no `DecisionRecord`, and mutates no battlefield state. A retry issued after a rule-invalid recorded attempt receives a fresh engine-owned token.
+
 Before the queue is popped or a `DecisionRecord` is created, Phase 11D must validate:
 
 - request ID drift;
@@ -2607,6 +2610,7 @@ Before the queue is popped or a `DecisionRecord` is created, Phase 11D must vali
 - proposal kind drift;
 - unit drift;
 - movement mode and Fall Back mode drift;
+- authoritative spatial, geometry-provenance, and source-context drift;
 - required proposal context drift;
 - JSON shape and required-field validity.
 
@@ -2650,6 +2654,44 @@ Important behavior:
 ## Projection and Visibility
 
 The submission contract is shared. The information available to a producer is not always identical.
+
+Phase 18J publishes `GameViewPayload.battlefield_view` as the canonical visual
+play-surface contract. The member remains optional because projections can
+exist before battlefield and mission state; current engine projections emit `battlefield-view-v1` when
+both battlefield and mission state exist and emit `null` before that boundary.
+Its normative world frame is defined in `contracts/coordinate-system.md`:
+inches, lower-left origin, positive X/Y on the board plane, positive Z above
+the board, and counter-clockwise degrees from positive X.
+
+The payload has three closed sections:
+
+- `authoritative` contains viewer-visible model measurement geometry, poses,
+  explicit physical states, terrain rules geometry, objectives, deployment
+  zones, and battlefield regions. Its coordinate-versioned content and bounds
+  produce `authoritative_geometry_hash`.
+- `interaction` contains the current request ID, engine-authored
+  selected-or-acting entity IDs, finite decision-option references, measurements, and
+  typed line-segment path overlays. These values assist input construction but
+  do not grant legality.
+- `render` contains hit regions and asset hints only. Clients must not derive
+  movement, range, visibility, collision, coherency, placement, or objective
+  control from this section.
+
+Model measurement shapes use local coordinates relative to their emitted pose;
+terrain, objective, zone, and region geometry uses absolute world coordinates.
+Accepted hull measurement geometry and physical support-base geometry remain
+separate. Movement and placement still submit the typed proposal and required
+`PathWitness` through `GameLifecycle.submit_decision(...)`; endpoint or overlay
+geometry never bypasses engine validation.
+
+Battlefield model inclusion consumes the same centralized viewer-scoped model
+visibility map as the datacard projection. Hidden enemy models are omitted,
+not represented by placeholder entities or counts. Battlefield legal-candidate
+references are derived only from visible engine-emitted entity-selection option
+IDs; unrelated finite choices never become battlefield candidates. The projection hash
+covers the complete viewer-visible `battlefield_view`, while
+`authoritative_geometry_hash` deliberately excludes interaction and render
+changes.
 
 Mission setup terrain projections expose typed geometry for both current
 validated layout areas and future terrain features. Chapter Approved 2026-27

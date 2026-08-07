@@ -73,6 +73,7 @@ from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
+from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     PlacementProposalPayload,
@@ -104,6 +105,7 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 
 GSC_PLAYER_ID = "player-gsc"
@@ -1759,21 +1761,19 @@ def test_marker_position_rejects_unknown_enemy_model_reference() -> None:
         ),
         *enemy_placement.model_placements[1:],
     )
-    state.replace_battlefield_state(
-        replace(
-            battlefield_state,
-            placed_armies=(
-                replace(
-                    enemy_army,
-                    unit_placements=(
-                        replace(
-                            enemy_placement,
-                            model_placements=unknown_enemy_models,
-                        ),
+    state.battlefield_state = replace(
+        battlefield_state,
+        placed_armies=(
+            replace(
+                enemy_army,
+                unit_placements=(
+                    replace(
+                        enemy_placement,
+                        model_placements=unknown_enemy_models,
                     ),
                 ),
             ),
-        )
+        ),
     )
 
     with pytest.raises(GameLifecycleError, match="unknown model"):
@@ -2057,6 +2057,7 @@ def _battle_state(
         battle_phase_index=battle_phase_sequence.index(phase),
         battle_round=1,
         active_player_id=active_player_id,
+        mission_setup=_mission_setup(),
     )
     state.record_army_definition(gsc_army)
     state.record_army_definition(enemy_army)
@@ -2087,6 +2088,16 @@ def _battle_state(
         source_id="phase17g-gsc-test-resurgence-grant",
     )
     return state, gsc_unit, enemy_unit
+
+
+def _mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        attacker_player_id=GSC_PLAYER_ID,
+        defender_player_id=ENEMY_PLAYER_ID,
+    )
 
 
 def _state_waiting_for_marker_placement(

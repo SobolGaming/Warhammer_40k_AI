@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
@@ -350,6 +351,14 @@ class MovementPhaseHandler:
             if isinstance(movement_parsed, LifecycleStatus):
                 return movement_parsed
             proposal_request, movement_submission = movement_parsed
+            spatial_status = _physical_context.invalid_physical_proposal_spatial_context_status(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+            )
+            if spatial_status is not None:
+                return spatial_status
             proposal_validation = movement_submission.validation_result_for_request(
                 proposal_request
             )
@@ -396,6 +405,14 @@ class MovementPhaseHandler:
             if isinstance(placement_parsed, LifecycleStatus):
                 return placement_parsed
             proposal_request, placement_submission = placement_parsed
+            spatial_status = _physical_context.invalid_physical_proposal_spatial_context_status(
+                state=state,
+                decisions=decisions,
+                request=request,
+                result=result,
+            )
+            if spatial_status is not None:
+                return spatial_status
             proposal_validation = placement_submission.validation_result_for_request(
                 proposal_request
             )

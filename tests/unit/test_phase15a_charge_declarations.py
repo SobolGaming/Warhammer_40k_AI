@@ -2376,6 +2376,7 @@ def _charge_move_proposal_request_for_value_tests() -> MovementProposalRequest:
         proposal_kind=ProposalKind.CHARGE_MOVE,
         source_decision_request_id="source-request-a",
         source_decision_result_id="source-result-a",
+        spatial_context_hash="0" * 64,
         movement_phase_action="charge_move",
         context={
             "movement_mode": "charge",

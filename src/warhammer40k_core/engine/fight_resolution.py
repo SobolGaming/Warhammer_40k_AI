@@ -917,6 +917,7 @@ def build_fight_movement_request(
     proposal_kind: ProposalKind,
     source_decision_request_id: str,
     source_decision_result_id: str,
+    spatial_context_hash: str,
     context: dict[str, JsonValue],
 ) -> DecisionRequest:
     kind = _fight_movement_proposal_kind(proposal_kind)
@@ -933,6 +934,7 @@ def build_fight_movement_request(
         proposal_kind=kind,
         source_decision_request_id=source_decision_request_id,
         source_decision_result_id=source_decision_result_id,
+        spatial_context_hash=spatial_context_hash,
         movement_phase_action=action,
         context={
             "active_player_id": active_player_id,

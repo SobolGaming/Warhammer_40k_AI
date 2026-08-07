@@ -1755,6 +1755,7 @@ def _destroyed_transport_proposal_request_for_test(
         proposal_kind=ProposalKind.DISEMBARK,
         source_decision_request_id=f"{attack_context_id}:destroyed-transport",
         source_decision_result_id=f"{attack_context_id}:destroyed-transport",
+        spatial_context_hash=state.physical_proposal_context_hash(),
         placement_kinds=(BattlefieldPlacementKind.DISEMBARK,),
         context={
             "destruction_timing": "destroyed_transport",

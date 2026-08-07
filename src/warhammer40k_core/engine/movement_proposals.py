@@ -21,6 +21,9 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.physical_proposal_context import (
+    validate_physical_proposal_context_hash,
+)
 from warhammer40k_core.engine.reserves import (
     LargeModelReservePlacementException,
     LargeModelReservePlacementExceptionPayload,
@@ -86,6 +89,7 @@ class MovementProposalRequestPayload(TypedDict):
     proposal_kind: str
     source_decision_request_id: str
     source_decision_result_id: str
+    spatial_context_hash: str
     movement_phase_action: str | None
     placement_kinds: list[str]
     context: dict[str, JsonValue]
@@ -275,6 +279,7 @@ class MovementProposalRequest:
     proposal_kind: ProposalKind
     source_decision_request_id: str
     source_decision_result_id: str
+    spatial_context_hash: str
     movement_phase_action: str | None = None
     placement_kinds: tuple[BattlefieldPlacementKind, ...] = ()
     context: dict[str, JsonValue] | None = None
@@ -341,6 +346,14 @@ class MovementProposalRequest:
         )
         object.__setattr__(
             self,
+            "spatial_context_hash",
+            validate_physical_proposal_context_hash(
+                "MovementProposalRequest spatial_context_hash",
+                self.spatial_context_hash,
+            ),
+        )
+        object.__setattr__(
+            self,
             "movement_phase_action",
             _validate_optional_identifier(
                 "MovementProposalRequest movement_phase_action",
@@ -390,6 +403,7 @@ class MovementProposalRequest:
             "proposal_kind": self.proposal_kind.value,
             "source_decision_request_id": self.source_decision_request_id,
             "source_decision_result_id": self.source_decision_result_id,
+            "spatial_context_hash": self.spatial_context_hash,
             "movement_phase_action": self.movement_phase_action,
             "placement_kinds": [placement_kind.value for placement_kind in self.placement_kinds],
             "context": dict(self.context or {}),
@@ -408,6 +422,7 @@ class MovementProposalRequest:
             proposal_kind=proposal_kind_from_token(payload["proposal_kind"]),
             source_decision_request_id=payload["source_decision_request_id"],
             source_decision_result_id=payload["source_decision_result_id"],
+            spatial_context_hash=payload["spatial_context_hash"],
             movement_phase_action=payload["movement_phase_action"],
             placement_kinds=tuple(
                 battlefield_placement_kind_from_token(kind) for kind in payload["placement_kinds"]
@@ -424,6 +439,44 @@ class MovementProposalRequest:
         if not isinstance(proposal_payload, dict):
             raise GameLifecycleError("Proposal DecisionRequest payload missing proposal_request.")
         return cls.from_payload(cast(MovementProposalRequestPayload, proposal_payload))
+
+    def spatial_context_validation(
+        self,
+        *,
+        current_spatial_context_hash: str,
+    ) -> ProposalValidationResult:
+        current_hash = validate_physical_proposal_context_hash(
+            "current_spatial_context_hash",
+            current_spatial_context_hash,
+        )
+        if self.spatial_context_hash != current_hash:
+            return ProposalValidationResult.invalid(
+                proposal_request_id=self.request_id,
+                proposal_kind=self.proposal_kind,
+                violation_code="spatial_context_drift",
+                message=(
+                    "Authoritative battlefield geometry or source context changed after "
+                    "the proposal request was issued."
+                ),
+                field="spatial_context_hash",
+                status="stale",
+            )
+        return ProposalValidationResult.valid(
+            proposal_request_id=self.request_id,
+            proposal_kind=self.proposal_kind,
+        )
+
+
+def required_movement_proposal_context_string(
+    proposal_request: MovementProposalRequest,
+    *,
+    key: str,
+) -> str:
+    context = proposal_request.context or {}
+    value = context.get(key)
+    if type(value) is not str or not value:
+        raise GameLifecycleError(f"Proposal request context missing string key: {key}.")
+    return value
 
 
 @dataclass(frozen=True, slots=True)

@@ -2507,6 +2507,7 @@ def _fight_movement_request(
         proposal_kind=proposal_kind,
         source_decision_request_id="phase15d-fight-activation-request",
         source_decision_result_id="phase15d-fight-activation-result",
+        spatial_context_hash="0" * 64,
         context=request_context,
     )
     return MovementProposalRequest.from_decision_request_payload(request.payload)

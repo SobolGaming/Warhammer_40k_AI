@@ -104,6 +104,7 @@ from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
+from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -155,6 +156,7 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.rule_compiler import CompiledRuleSource, compile_rule_source_text
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -1016,6 +1018,7 @@ def test_phase17d_catalog_setup_reactive_charge_move_no_move_records_decline() -
         proposal_kind=ProposalKind.CHARGE_MOVE,
         source_decision_request_id="phase17d-setup-reactive-action-request",
         source_decision_result_id="phase17d-setup-reactive-action-result",
+        spatial_context_hash=state.physical_proposal_context_hash(),
         movement_phase_action="charge_move",
         context={
             "source_kind": CATALOG_SETUP_REACTIVE_SOURCE_KIND,
@@ -1415,6 +1418,7 @@ def _non_reaction_movement_request(*, state: GameState, request_id: str) -> Deci
         proposal_kind=ProposalKind.NORMAL_MOVE,
         source_decision_request_id="phase17d-source-request",
         source_decision_result_id="phase17d-source-result",
+        spatial_context_hash=state.physical_proposal_context_hash(),
         movement_phase_action="normal_move",
         context={"source_kind": "ordinary_movement"},
     ).to_decision_request()
@@ -1432,6 +1436,7 @@ def _non_reaction_placement_request(*, state: GameState, request_id: str) -> Dec
         proposal_kind=ProposalKind.REINFORCEMENT,
         source_decision_request_id="phase17d-source-request",
         source_decision_result_id="phase17d-source-result",
+        spatial_context_hash=state.physical_proposal_context_hash(),
         placement_kinds=(BattlefieldPlacementKind.STRATEGIC_RESERVES,),
         context={"source_kind": "ordinary_reinforcement"},
     ).to_decision_request()
@@ -3984,6 +3989,23 @@ def _battle_state() -> GameState:
         tactical_secondary_draw_count=2,
         command_point_ledgers=initial_command_point_ledgers(("player-a", "player-b")),
         victory_point_ledgers=initial_victory_point_ledgers(("player-a", "player-b")),
+        battlefield_state=BattlefieldRuntimeState(
+            battlefield_id="phase17d-battlefield",
+            battlefield_width_inches=60.0,
+            battlefield_depth_inches=44.0,
+            placed_armies=(),
+        ),
+        mission_setup=_mission_setup(),
+    )
+
+
+def _mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
     )
 
 

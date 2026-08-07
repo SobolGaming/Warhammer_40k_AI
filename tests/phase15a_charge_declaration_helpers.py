@@ -50,9 +50,13 @@ def charge_lifecycle(
         enemy_unit_ids=enemy_unit_ids,
     )
     armies = mustered_armies(config)
+    mission = config.mission_setup
+    assert mission is not None
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase15a-battlefield",
         armies=armies,
+        battlefield_width_inches=mission.battlefield_width_inches,
+        battlefield_depth_inches=mission.battlefield_depth_inches,
     )
     units = {
         unit.unit_instance_id.split(":", maxsplit=1)[1]: unit

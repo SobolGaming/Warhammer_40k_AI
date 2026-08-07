@@ -20,6 +20,15 @@ if TYPE_CHECKING:
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
+def effective_opposing_player_ids(state: GameState) -> tuple[str, ...]:
+    effective_active_player_id = state.effective_active_player_id()
+    if effective_active_player_id is None:
+        return ()
+    return tuple(
+        player_id for player_id in state.player_ids if player_id != effective_active_player_id
+    )
+
+
 def transport_cargo_state_for_embarked_unit(
     *,
     state: GameState,

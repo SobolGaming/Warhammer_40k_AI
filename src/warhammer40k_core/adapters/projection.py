@@ -4,6 +4,10 @@ import hashlib
 from typing import TypedDict, cast
 
 from warhammer40k_core.adapters.access_control import ViewerContext
+from warhammer40k_core.adapters.battlefield_projection import (
+    BattlefieldViewPayload,
+    project_battlefield_view,
+)
 from warhammer40k_core.adapters.external_contract import (
     DECISION_REQUEST_VIEW_SCHEMA_VERSION,
 )
@@ -29,6 +33,7 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.interaction_metadata import (
     InteractionAnnotatedDecisionRequestPayload,
     InteractionDescriptorPayload,
+    InteractionKind,
     interaction_descriptor_for_request,
     nested_interaction_request_payloads,
 )
@@ -298,6 +303,7 @@ class GameViewPayload(TypedDict):
     current_battle_phase: str | None
     player_ids: list[str]
     battlefield_state: JsonValue
+    battlefield_view: BattlefieldViewPayload | None
     mission_setup: JsonValue
     public_secondary_mission_choices: list[JsonValue]
     public_secondary_mission_card_states: list[JsonValue]
@@ -521,6 +527,29 @@ def project_game_view(
         catalog=catalog,
         viewer=context,
     )
+    pending_decision_view = (
+        None if pending_request is None else _decision_request_view(pending_request, viewer=context)
+    )
+    pending_interaction = (
+        None if pending_decision_view is None else pending_decision_view["interaction"]
+    )
+    battlefield_view = project_battlefield_view(
+        state=state,
+        visible_model_ids=frozenset(model_display_by_id),
+        pending_request_id=(
+            None if pending_decision_view is None else pending_decision_view["request_id"]
+        ),
+        selected_entity_ids=(
+            () if pending_interaction is None else tuple(pending_interaction["selected_entity_ids"])
+        ),
+        legal_option_ids=(
+            ()
+            if pending_decision_view is None
+            or pending_interaction is None
+            or pending_interaction["interaction_kind"] != InteractionKind.ENTITY_SELECTION.value
+            else tuple(option["option_id"] for option in pending_decision_view["options"])
+        ),
+    )
     payload: GameViewPayload = {
         "projection_schema": PROJECTION_SCHEMA_VERSION,
         "projection_state_hash": "",
@@ -535,6 +564,7 @@ def project_game_view(
         "current_battle_phase": None if battle_phase is None else battle_phase.value,
         "player_ids": list(state.player_ids),
         "battlefield_state": validate_json_value(battlefield_payload),
+        "battlefield_view": battlefield_view,
         "mission_setup": validate_json_value(mission_payload),
         "public_secondary_mission_choices": [
             validate_json_value(
@@ -574,9 +604,7 @@ def project_game_view(
         ],
         "unit_display_by_id": unit_display_by_id,
         "model_display_by_id": model_display_by_id,
-        "pending_decision": None
-        if pending_request is None
-        else _decision_request_view(pending_request, viewer=context),
+        "pending_decision": pending_decision_view,
         "pending_proposal": None
         if pending_request is None
         else _proposal_view(pending_request, viewer=context),

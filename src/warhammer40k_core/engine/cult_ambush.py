@@ -844,6 +844,7 @@ def apply_cult_ambush_marker_ingress_selection(
         proposal_kind=ProposalKind.CULT_AMBUSH,
         source_decision_request_id=context.result.request_id,
         source_decision_result_id=context.result.result_id,
+        spatial_context_hash=context.state.physical_proposal_context_hash(),
         placement_kinds=(BattlefieldPlacementKind.CULT_AMBUSH,),
         context=cast(
             dict[str, JsonValue],
@@ -1299,6 +1300,7 @@ def _request_cult_ambush_placement_retry(
         proposal_kind=proposal_request.proposal_kind,
         source_decision_request_id=proposal_request.source_decision_request_id,
         source_decision_result_id=proposal_request.source_decision_result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         placement_kinds=proposal_request.placement_kinds,
         context=dict(proposal_request.context or {}),
     )

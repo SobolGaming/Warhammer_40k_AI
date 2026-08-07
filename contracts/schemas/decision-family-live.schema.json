@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v3/decision-family-live.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v4/decision-family-live.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "oneOf": [
     {"$ref": "#/$defs/select_secondary_missions"},
@@ -286,6 +286,7 @@
         "request_id": {"$ref": "#/$defs/identifier"},
         "source_decision_request_id": {"$ref": "#/$defs/identifier"},
         "source_decision_result_id": {"$ref": "#/$defs/identifier"},
+        "spatial_context_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
         "unit_instance_id": {"$ref": "#/$defs/identifier"}
       },
       "required": [
@@ -301,6 +302,7 @@
         "source_decision_result_id",
         "movement_phase_action",
         "placement_kinds",
+        "spatial_context_hash",
         "context"
       ],
       "type": "object"

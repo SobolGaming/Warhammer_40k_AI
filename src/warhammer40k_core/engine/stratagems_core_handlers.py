@@ -580,6 +580,7 @@ def _apply_rapid_ingress_handler(
         proposal_kind=proposal_kind,
         source_decision_request_id=result.request_id,
         source_decision_result_id=result.result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         placement_kinds=placement_kinds,
         context=cast(
             dict[str, JsonValue],
@@ -643,6 +644,7 @@ def _apply_ingress_move_handler(
         proposal_kind=ProposalKind.STRATEGIC_RESERVES,
         source_decision_request_id=result.request_id,
         source_decision_result_id=result.result_id,
+        spatial_context_hash=state.physical_proposal_context_hash(),
         placement_kinds=(BattlefieldPlacementKind.STRATEGIC_RESERVES,),
         context=cast(
             dict[str, JsonValue],

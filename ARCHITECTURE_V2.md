@@ -144,6 +144,11 @@ regressions. **Phase 18G and Phase 18H are complete** for protected opaque
 role-bound cursors, deterministic paged event deltas, explicit full-projection
 resynchronization, server-owned authenticated principal/role bindings, delayed
 spectator snapshots, and shared differential hidden-information redaction.
+**Phase 18I and Phase 18J are complete** for engine-authored neutral interaction
+descriptors and the versioned, viewer-scoped battlefield coordinate contract.
+The battlefield projection separates authoritative model/terrain/objective/zone
+geometry and hashes from advisory interaction overlays and render hints while
+preserving the shared engine decision and redaction paths.
 Persistence and recovery remain Phase 18L work.
 **Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
@@ -398,7 +403,8 @@ Next / planned sequence:
 | 17M | Planned | Source-backed generic semantic completion organized by reusable mechanic family |
 | 17N | Planned | Mission, terrain, deployment, objective, and battlefield package completion |
 | 17O | Planned | Multi-axis engine capability and support manifest |
-| 18J-18L | Planned | Battlefield coordinate contracts, interface intent, and persistence |
+| 18J | Complete | Versioned battlefield coordinate contract with separated authoritative, interaction, and render geometry |
+| 18K-18L | Planned | Interface intent and persistence |
 | 18M-B+ | Planned | Remaining decision-family, race, golden-corpus, persistence-claim, and Phase 20A backend certification coverage |
 | 19A-19F | Planned | Performance, AI orchestration, self-play, training corpus generation, and observability |
 | 20A-20D | Planned | Certified vertical slice, full-game regression, adversarial soak, and release gates |
@@ -5723,6 +5729,8 @@ inventory, and support-profile row exactly.
 
 Priority: P1 and a dependency of the visual play surface.
 
+Status: Complete.
+
 Publish one explicit, versioned coordinate specification covering:
 
 - inches internally and over the wire;
@@ -5761,6 +5769,24 @@ Required tests:
 - source geometry drift changes package/projection hashes and fails stale
   proposals;
 - viewer-scoped battlefield entities do not expose hidden model/unit presence.
+
+Completion gate:
+
+`battlefield-view-v1` is emitted through the shared viewer projection and
+published in Contract 4.0. It defines one right-handed inches-based world frame,
+stable external entities for the required battlefield concepts, explicit model
+physical states, typed model/support/terrain/zone/path geometry, and a hash over
+viewer-visible authoritative geometry. The canonical geometry-conformance
+fixture crosses circle, oval, rectangle/hull, support, terrain-volume,
+objective, region-cutout, facing, measurement-overlay, and path-segment values
+through JSON Schema and generated TypeScript. Movement and shared placement
+requests separately snapshot an opaque engine-owned `spatial_context_hash`;
+actual stale submissions after same-dimension geometry-source drift reject
+before queue pop. The viewer-scoped authoritative hash remains informational.
+Round-trip fixtures, hash-boundary regressions, hidden-presence tests, engine
+proposal context, revision, source-package, and replay checks enforce the
+three-class boundary; clients cannot turn interaction or render geometry into
+an accepted move.
 
 ## Phase 18K: interface intent and opportunity UX
 

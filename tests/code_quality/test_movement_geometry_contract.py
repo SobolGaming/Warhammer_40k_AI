@@ -12,6 +12,7 @@ MOVEMENT_PHASE_FILES = (
 CHARGE_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "charge.py"
 FIGHT_PHASE = ROOT / "src" / "warhammer40k_core" / "engine" / "phases" / "fight.py"
 FIGHT_RESOLUTION = ROOT / "src" / "warhammer40k_core" / "engine" / "fight_resolution.py"
+LIFECYCLE = ROOT / "src" / "warhammer40k_core" / "engine" / "lifecycle.py"
 STRATAGEMS = ROOT / "src" / "warhammer40k_core" / "engine" / "stratagems.py"
 STRATAGEM_FILES = (STRATAGEMS, *sorted(STRATAGEMS.parent.glob("stratagems_*.py")))
 TRIGGERED_MOVEMENT = ROOT / "src" / "warhammer40k_core" / "engine" / "triggered_movement.py"
@@ -37,6 +38,12 @@ RESOLVER_GEOMETRY_READS = (
     (CHARGE_PHASE, "resolve_charge_move"),
     (FIGHT_RESOLUTION, "_validate_fight_paths"),
     (TRIGGERED_MOVEMENT, "resolve_triggered_movement"),
+)
+SPECIALIZED_PHYSICAL_PROPOSAL_VALIDATORS = (
+    "invalid_stratagem_placement_proposal_status",
+    "invalid_cult_ambush_placement_status",
+    "invalid_destroyed_transport_disembark_proposal_status",
+    "invalid_setup_reactive_lifecycle_status",
 )
 
 
@@ -92,6 +99,23 @@ def test_movement_resolvers_read_manifested_battlefield_geometry() -> None:
         "Movement-family resolvers must read geometry from scenario.battlefield_state:\n"
         + "\n".join(violations)
     )
+
+
+def test_spatial_context_validation_precedes_specialized_physical_proposal_routing() -> None:
+    _source_path, function = _function_by_name(
+        LIFECYCLE,
+        "_pre_validate_movement_phase_decision",
+    )
+    call_lines = {
+        _call_name(node): node.lineno for node in ast.walk(function) if isinstance(node, ast.Call)
+    }
+    spatial_validation_line = call_lines["invalid_physical_proposal_spatial_context_status"]
+
+    for validator_name in SPECIALIZED_PHYSICAL_PROPOSAL_VALIDATORS:
+        assert spatial_validation_line < call_lines[validator_name], (
+            "Physical proposal spatial-context validation must run before specialized "
+            f"routing through {validator_name}."
+        )
 
 
 def _function_by_name(path: Path, name: str) -> tuple[Path, ast.FunctionDef]:
