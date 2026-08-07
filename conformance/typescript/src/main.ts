@@ -8,7 +8,11 @@ import { fileURLToPath } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 
 import { ContractHttpClient } from "./client.js";
-import { ContractRegistry, type ReplayMetadata } from "./contract.js";
+import {
+  ContractRegistry,
+  EXTERNAL_CONTRACT_VERSION,
+  type ReplayMetadata,
+} from "./contract.js";
 import {
   type CertifiedScenarioResult,
   type PrincipalTokens,
@@ -77,7 +81,7 @@ async function main(): Promise<void> {
           assertion_count:
             primary.assertion_count + comparison.assertion_count + equivalenceAssertions,
           client_language: "typescript",
-          contract_version: "3.3.0",
+          contract_version: EXTERNAL_CONTRACT_VERSION,
           replay_sha256: primary.replay_sha256,
           scenario_id: primary.scenario_id,
           status: "passed",

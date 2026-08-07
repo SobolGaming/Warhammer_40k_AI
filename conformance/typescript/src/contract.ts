@@ -65,6 +65,8 @@ export type SessionEventQuery = GetSessionEventsOperation["parameters"]["query"]
 
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 
+export const EXTERNAL_CONTRACT_VERSION = "4.0.0";
+
 const REQUIRED_OPERATION_IDS = new Set([
   "createAuthoritativeSession",
   "getSessionMetadata",
@@ -172,8 +174,10 @@ function assertPublishedOpenApi(contractRoot: string): void {
     throw new Error("Conformance requires the published OpenAPI 3.1.0 document.");
   }
   const info = jsonObject(document.info, "OpenAPI info");
-  if (info.version !== "3.3.0") {
-    throw new Error("Conformance requires external contract version 3.3.0.");
+  if (info.version !== EXTERNAL_CONTRACT_VERSION) {
+    throw new Error(
+      `Conformance requires external contract version ${EXTERNAL_CONTRACT_VERSION}.`,
+    );
   }
   const operationIds = new Set<string>();
   for (const pathValue of Object.values(jsonObject(document.paths, "OpenAPI paths"))) {
