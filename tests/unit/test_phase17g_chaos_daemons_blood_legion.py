@@ -32,6 +32,7 @@ from warhammer40k_core.core.detachment import DetachmentDefinition, EnhancementD
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
@@ -92,10 +93,14 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.runtime_modifiers import ChargeRollModifierContext
+from warhammer40k_core.engine.runtime_modifiers import (
+    ChargeRollModifierContext,
+    WeaponProfileModifierContext,
+)
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
 )
+from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -120,8 +125,11 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
 
 _BLOOD_LEGION_DATASHEET_ID = "phase17g-blood-legion-khorne-daemon"
 _BLOOD_LEGION_NON_KHORNE_DATASHEET_ID = "phase17g-blood-legion-non-khorne-daemon"
+_BLOOD_LEGION_KHORNE_MONSTER_DATASHEET_ID = "phase17g-blood-legion-khorne-monster"
 _BLOOD_UNIT_ID = "army-alpha:blood-daemon-unit"
 _OTHER_FRIENDLY_UNIT_ID = "army-alpha:non-khorne-daemon-unit"
+_OTHER_KHORNE_UNIT_ID = "army-alpha:khorne-daemon-unit"
+_OTHER_KHORNE_MONSTER_UNIT_ID = "army-alpha:khorne-monster-unit"
 _ENEMY_UNIT_ID = "army-beta:enemy-unit"
 _OTHER_DAEMON_DETACHMENT_ID = "warptide"
 _BRAZENMAW_ATTACHED_UNIT_ID = "attached-unit:army-alpha:non-khorne-daemon-unit"
@@ -259,6 +267,230 @@ def test_brazenmaw_eligibility_rejects_non_khorne_bearer() -> None:
         game_id="phase17g-brazenmaw-invalid-bearer",
         include_other_friendly_unit=True,
         brazenmaw_target_unit_selection_id="non-khorne-daemon-unit",
+    )
+
+    report = validate_roster_legality(
+        catalog=config.army_catalog,
+        request=config.army_muster_requests[0],
+    )
+
+    assert "enhancement_target_keyword_required" in {
+        violation.violation_code for violation in report.violations
+    }
+
+
+def test_slaughterthirst_is_exact_source_backed_executable_generic_rule_ir() -> None:
+    rule_ir = faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id(
+        enhancements.SLAUGHTERTHIRST_DESCRIPTOR_ID
+    )
+    record = _slaughterthirst_execution_record()
+
+    assert rule_ir.is_supported
+    assert rule_ir.source_id == (
+        f"{blood_legion_ir.SOURCE_PACKAGE_ID}:"
+        f"{blood_legion_ir.SLAUGHTERTHIRST_DESCRIPTOR_ID}:source-text"
+    )
+    assert rule_ir.normalized_text == (
+        "Legiones Daemonica Khorne model only. While a friendly LEGIONES DAEMONICA "
+        'KHORNE unit (excluding Monsters) is within 6" of the bearer, weapons equipped '
+        "by models in that unit have the [LANCE] ability."
+    )
+    assert not rule_ir.diagnostics
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.execution_id == enhancements.SLAUGHTERTHIRST_SOURCE_RULE_ID
+    assert record.rule_ir_hash == rule_ir.ir_hash()
+    aura_clause = next(
+        clause
+        for clause in rule_ir.clauses
+        if any(effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY for effect in clause.effects)
+    )
+    assert aura_clause.target is not None
+    assert parameter_payload(aura_clause.target.parameters) == {
+        "allegiance": "friendly",
+        "include_source_unit": True,
+    }
+    (grant_effect,) = aura_clause.effects
+    assert parameter_payload(grant_effect.parameters) == {
+        "weapon_ability": "Lance",
+        "weapon_scope": "all",
+    }
+
+
+def test_slaughterthirst_dynamically_grants_lance_to_eligible_units_in_range() -> None:
+    config = _blood_legion_config(
+        game_id="phase17g-slaughterthirst-game",
+        include_other_friendly_unit=True,
+        include_slaughterthirst_targets=True,
+        slaughterthirst_target_unit_selection_id="blood-daemon-unit",
+    )
+    lifecycle = _blood_legion_enhancement_lifecycle(config)
+    state = _started_state(lifecycle)
+    bundle = _runtime_content_bundle(lifecycle)
+    _place_unit_poses(
+        state, unit_instance_id=_BLOOD_UNIT_ID, poses=_unit_line_poses(x=10.0, y=10.0)
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=_OTHER_KHORNE_UNIT_ID,
+        poses=_unit_line_poses(x=15.0, y=10.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
+        poses=_unit_line_poses(x=15.0, y=20.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+        poses=_unit_line_poses(x=15.0, y=30.0),
+    )
+    profile = _weapon_profile_for_unit(
+        config=config,
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_UNIT_ID,
+    )
+
+    in_range = _modified_weapon_profile(
+        bundle,
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_UNIT_ID,
+        profile=profile,
+    )
+    bearer_unit = _modified_weapon_profile(
+        bundle,
+        state=state,
+        unit_instance_id=_BLOOD_UNIT_ID,
+        profile=profile,
+    )
+
+    assert WeaponKeyword.LANCE in in_range.keywords
+    assert WeaponKeyword.LANCE in bearer_unit.keywords
+    source_rule_id = (
+        f"{blood_legion_ir.SOURCE_PACKAGE_ID}:"
+        f"{blood_legion_ir.SLAUGHTERTHIRST_DESCRIPTOR_ID}:source-text"
+    )
+    assert any(source_id.startswith(source_rule_id) for source_id in in_range.source_ids)
+    assert (
+        WeaponKeyword.LANCE
+        not in _modified_weapon_profile(
+            bundle,
+            state=state,
+            unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
+            profile=profile,
+        ).keywords
+    )
+    assert (
+        WeaponKeyword.LANCE
+        not in _modified_weapon_profile(
+            bundle,
+            state=state,
+            unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+            profile=profile,
+        ).keywords
+    )
+
+    _place_unit_poses(
+        state,
+        unit_instance_id=_OTHER_KHORNE_UNIT_ID,
+        poses=_unit_line_poses(x=30.0, y=10.0),
+    )
+    assert (
+        WeaponKeyword.LANCE
+        not in _modified_weapon_profile(
+            bundle,
+            state=state,
+            unit_instance_id=_OTHER_KHORNE_UNIT_ID,
+            profile=profile,
+        ).keywords
+    )
+
+    _place_unit_poses(
+        state,
+        unit_instance_id=_OTHER_KHORNE_UNIT_ID,
+        poses=_unit_line_poses(x=15.0, y=10.0),
+    )
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(state.battlefield_state.without_unit_placement(_BLOOD_UNIT_ID))
+    assert (
+        WeaponKeyword.LANCE
+        not in _modified_weapon_profile(
+            bundle,
+            state=state,
+            unit_instance_id=_OTHER_KHORNE_UNIT_ID,
+            profile=profile,
+        ).keywords
+    )
+
+
+def test_slaughterthirst_uses_bearer_model_and_attached_rules_unit_geometry() -> None:
+    config = _blood_legion_config(
+        game_id="phase17g-slaughterthirst-attached-game",
+        include_slaughterthirst_targets=True,
+        slaughterthirst_target_unit_selection_id="blood-daemon-unit",
+        attach_brazenmaw_bearer=True,
+    )
+    lifecycle = _blood_legion_enhancement_lifecycle(config)
+    state = _started_state(lifecycle)
+    bundle = _runtime_content_bundle(lifecycle)
+    _place_unit_poses(
+        state, unit_instance_id=_BLOOD_UNIT_ID, poses=_unit_line_poses(x=10.0, y=10.0)
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
+        poses=_unit_line_poses(x=30.0, y=10.0),
+    )
+    _place_unit_poses(
+        state,
+        unit_instance_id=_OTHER_KHORNE_UNIT_ID,
+        poses=_unit_line_poses(x=35.0, y=10.0),
+    )
+    profile = _weapon_profile_for_unit(
+        config=config,
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_UNIT_ID,
+    )
+
+    assert (
+        WeaponKeyword.LANCE
+        not in _modified_weapon_profile(
+            bundle,
+            state=state,
+            unit_instance_id=_OTHER_KHORNE_UNIT_ID,
+            profile=profile,
+        ).keywords
+    )
+    assert (
+        WeaponKeyword.LANCE
+        in _modified_weapon_profile(
+            bundle,
+            state=state,
+            unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
+            profile=profile,
+        ).keywords
+    )
+
+    _place_unit_poses(
+        state,
+        unit_instance_id=_OTHER_KHORNE_UNIT_ID,
+        poses=_unit_line_poses(x=15.0, y=10.0),
+    )
+    assert (
+        WeaponKeyword.LANCE
+        in _modified_weapon_profile(
+            bundle,
+            state=state,
+            unit_instance_id=_OTHER_KHORNE_UNIT_ID,
+            profile=profile,
+        ).keywords
+    )
+
+
+def test_slaughterthirst_eligibility_rejects_non_khorne_bearer() -> None:
+    config = _blood_legion_config(
+        game_id="phase17g-slaughterthirst-invalid-bearer",
+        include_other_friendly_unit=True,
+        slaughterthirst_target_unit_selection_id="non-khorne-daemon-unit",
     )
 
     report = validate_roster_legality(
@@ -494,13 +726,26 @@ def _brazenmaw_execution_record() -> Phase17FExecutionRecord:
     return records[0]
 
 
+def _slaughterthirst_execution_record() -> Phase17FExecutionRecord:
+    records = tuple(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.coverage_descriptor_id == enhancements.SLAUGHTERTHIRST_DESCRIPTOR_ID
+    )
+    if len(records) != 1:
+        raise AssertionError("expected one Slaughterthirst execution record")
+    return records[0]
+
+
 def _blood_legion_config(
     *,
     game_id: str = "phase17g-blood-legion-game",
     daemon_detachment_id: str = rule.BLOOD_LEGION_DETACHMENT_ID,
     turn_order: tuple[str, str] = ("player-a", "player-b"),
     include_other_friendly_unit: bool = False,
+    include_slaughterthirst_targets: bool = False,
     brazenmaw_target_unit_selection_id: str | None = None,
+    slaughterthirst_target_unit_selection_id: str | None = None,
     attach_brazenmaw_bearer: bool = False,
 ) -> GameConfig:
     catalog = _blood_legion_catalog()
@@ -520,15 +765,13 @@ def _blood_legion_config(
                 detachment_id=daemon_detachment_id,
                 unit_selection_id="blood-daemon-unit",
                 datasheet_id=_BLOOD_LEGION_DATASHEET_ID,
-                extra_unit_selections=(
-                    (
-                        "non-khorne-daemon-unit",
-                        _BLOOD_LEGION_NON_KHORNE_DATASHEET_ID,
-                    ),
-                )
-                if include_other_friendly_unit or attach_brazenmaw_bearer
-                else (),
+                extra_unit_selections=_blood_legion_extra_unit_selections(
+                    include_other_friendly_unit=include_other_friendly_unit,
+                    include_slaughterthirst_targets=include_slaughterthirst_targets,
+                    attach_brazenmaw_bearer=attach_brazenmaw_bearer,
+                ),
                 brazenmaw_target_unit_selection_id=brazenmaw_target_unit_selection_id,
+                slaughterthirst_target_unit_selection_id=(slaughterthirst_target_unit_selection_id),
                 attach_brazenmaw_bearer=attach_brazenmaw_bearer,
             ),
             _army_muster_request(
@@ -548,17 +791,43 @@ def _blood_legion_config(
     )
 
 
+def _blood_legion_extra_unit_selections(
+    *,
+    include_other_friendly_unit: bool,
+    include_slaughterthirst_targets: bool,
+    attach_brazenmaw_bearer: bool,
+) -> tuple[tuple[str, str], ...]:
+    selections: list[tuple[str, str]] = []
+    if include_other_friendly_unit or attach_brazenmaw_bearer:
+        selections.append(
+            (
+                "non-khorne-daemon-unit",
+                _BLOOD_LEGION_NON_KHORNE_DATASHEET_ID,
+            )
+        )
+    if include_slaughterthirst_targets:
+        selections.extend(
+            (
+                ("khorne-daemon-unit", _BLOOD_LEGION_DATASHEET_ID),
+                ("khorne-monster-unit", _BLOOD_LEGION_KHORNE_MONSTER_DATASHEET_ID),
+            )
+        )
+    return tuple(selections)
+
+
 def _blood_legion_catalog() -> ArmyCatalog:
     base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
     base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
     daemon_datasheet = _blood_legion_datasheet(base_datasheet)
     non_khorne_daemon_datasheet = _blood_legion_non_khorne_datasheet(base_datasheet)
+    khorne_monster_datasheet = _blood_legion_khorne_monster_datasheet(base_datasheet)
     return replace(
         base_catalog,
         datasheets=(
             *base_catalog.datasheets,
             daemon_datasheet,
             non_khorne_daemon_datasheet,
+            khorne_monster_datasheet,
         ),
         factions=(
             *base_catalog.factions,
@@ -579,9 +848,13 @@ def _blood_legion_catalog() -> ArmyCatalog:
                 unit_datasheet_ids=(
                     _BLOOD_LEGION_DATASHEET_ID,
                     _BLOOD_LEGION_NON_KHORNE_DATASHEET_ID,
+                    _BLOOD_LEGION_KHORNE_MONSTER_DATASHEET_ID,
                 ),
                 force_disposition_ids=("phase17g-force",),
-                enhancement_ids=(blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID,),
+                enhancement_ids=(
+                    blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID,
+                    blood_legion_ir.SLAUGHTERTHIRST_ENHANCEMENT_ID,
+                ),
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:blood-legion",
                 ),
@@ -605,6 +878,14 @@ def _blood_legion_catalog() -> ArmyCatalog:
                 name="Brazenmaw",
                 source_id=blood_legion_ir.BRAZENMAW_DESCRIPTOR_ID,
                 points=15,
+                target_required_keywords=(blood_legion_ir.KHORNE_KEYWORD,),
+                target_required_faction_keywords=(blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,),
+            ),
+            EnhancementDefinition(
+                enhancement_id=blood_legion_ir.SLAUGHTERTHIRST_ENHANCEMENT_ID,
+                name="Slaughterthirst (Aura)",
+                source_id=blood_legion_ir.SLAUGHTERTHIRST_DESCRIPTOR_ID,
+                points=25,
                 target_required_keywords=(blood_legion_ir.KHORNE_KEYWORD,),
                 target_required_faction_keywords=(blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,),
             ),
@@ -652,6 +933,22 @@ def _blood_legion_non_khorne_datasheet(
     )
 
 
+def _blood_legion_khorne_monster_datasheet(
+    base_datasheet: DatasheetDefinition,
+) -> DatasheetDefinition:
+    return replace(
+        base_datasheet,
+        datasheet_id=_BLOOD_LEGION_KHORNE_MONSTER_DATASHEET_ID,
+        name="Blood Legion Khorne Monster",
+        keywords=DatasheetKeywordSet(
+            keywords=("Character", "Khorne", "Monster"),
+            faction_keywords=("Legiones Daemonica",),
+        ),
+        attachment_eligibilities=(),
+        source_ids=("phase17g:test:chaos-daemons:blood-legion-khorne-monster",),
+    )
+
+
 def _army_muster_request(
     *,
     catalog: ArmyCatalog,
@@ -663,6 +960,7 @@ def _army_muster_request(
     datasheet_id: str,
     extra_unit_selections: tuple[tuple[str, str], ...] = (),
     brazenmaw_target_unit_selection_id: str | None = None,
+    slaughterthirst_target_unit_selection_id: str | None = None,
     attach_brazenmaw_bearer: bool = False,
 ) -> ArmyMusterRequest:
     unit_selections = [
@@ -678,6 +976,32 @@ def _army_muster_request(
         )
         for extra_unit_selection_id, extra_datasheet_id in extra_unit_selections
     )
+    enhancement_ids: list[str] = []
+    enhancement_assignments: list[EnhancementAssignment] = []
+    if brazenmaw_target_unit_selection_id is not None:
+        enhancement_ids.append(blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID)
+        enhancement_assignments.append(
+            EnhancementAssignment(
+                enhancement_id=blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID,
+                target_unit_selection_id=brazenmaw_target_unit_selection_id,
+                source_id=(
+                    "phase17g:test:blood-legion:brazenmaw-assignment:"
+                    f"{brazenmaw_target_unit_selection_id}"
+                ),
+            )
+        )
+    if slaughterthirst_target_unit_selection_id is not None:
+        enhancement_ids.append(blood_legion_ir.SLAUGHTERTHIRST_ENHANCEMENT_ID)
+        enhancement_assignments.append(
+            EnhancementAssignment(
+                enhancement_id=blood_legion_ir.SLAUGHTERTHIRST_ENHANCEMENT_ID,
+                target_unit_selection_id=slaughterthirst_target_unit_selection_id,
+                source_id=(
+                    "phase17g:test:blood-legion:slaughterthirst-assignment:"
+                    f"{slaughterthirst_target_unit_selection_id}"
+                ),
+            )
+        )
     return ArmyMusterRequest(
         army_id=army_id,
         player_id=player_id,
@@ -687,11 +1011,7 @@ def _army_muster_request(
         detachment_selection=DetachmentSelection(
             faction_id=faction_id,
             detachment_ids=(detachment_id,),
-            enhancement_ids=(
-                (blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID,)
-                if brazenmaw_target_unit_selection_id is not None
-                else ()
-            ),
+            enhancement_ids=tuple(enhancement_ids),
         ),
         force_disposition_id=(
             "purge-the-foe" if faction_id == "core-marine-force" else "phase17g-force"
@@ -707,20 +1027,7 @@ def _army_muster_request(
             if attach_brazenmaw_bearer
             else ()
         ),
-        enhancement_assignments=(
-            (
-                EnhancementAssignment(
-                    enhancement_id=blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID,
-                    target_unit_selection_id=brazenmaw_target_unit_selection_id,
-                    source_id=(
-                        "phase17g:test:blood-legion:brazenmaw-assignment:"
-                        f"{brazenmaw_target_unit_selection_id}"
-                    ),
-                ),
-            )
-            if brazenmaw_target_unit_selection_id is not None
-            else ()
-        ),
+        enhancement_assignments=tuple(enhancement_assignments),
     )
 
 
@@ -826,6 +1133,59 @@ def _charge_roll_operands(
             unit_instance_id=unit_instance_id,
         )
     )
+
+
+def _weapon_profile_for_unit(
+    *,
+    config: GameConfig,
+    state: GameState,
+    unit_instance_id: str,
+) -> WeaponProfile:
+    unit = _physical_unit_by_id(state=state, unit_instance_id=unit_instance_id)
+    equipped_wargear_ids = {
+        wargear_id for model in unit.own_models for wargear_id in model.wargear_ids
+    }
+    profiles = tuple(
+        profile
+        for wargear in config.army_catalog.wargear
+        if wargear.wargear_id in equipped_wargear_ids
+        for profile in wargear.weapon_profiles
+    )
+    if not profiles:
+        raise AssertionError("test unit requires an equipped weapon profile")
+    return profiles[0]
+
+
+def _modified_weapon_profile(
+    bundle: RuntimeContentBundle,
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    profile: WeaponProfile,
+) -> WeaponProfile:
+    unit = _physical_unit_by_id(state=state, unit_instance_id=unit_instance_id)
+    return bundle.runtime_modifier_registry.modified_weapon_profile(
+        WeaponProfileModifierContext(
+            state=state,
+            source_phase=BattlePhase.FIGHT,
+            attacking_unit_instance_id=unit_instance_id,
+            attacker_model_instance_id=unit.own_models[0].model_instance_id,
+            target_unit_instance_id=_ENEMY_UNIT_ID,
+            weapon_profile=profile,
+        )
+    )
+
+
+def _physical_unit_by_id(*, state: GameState, unit_instance_id: str) -> UnitInstance:
+    matches = tuple(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == unit_instance_id
+    )
+    if len(matches) != 1:
+        raise AssertionError("expected one physical unit")
+    return matches[0]
 
 
 def _mustered_armies(config: GameConfig) -> tuple[ArmyDefinition, ...]:

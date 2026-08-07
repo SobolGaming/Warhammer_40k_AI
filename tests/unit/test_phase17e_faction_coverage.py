@@ -18,6 +18,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -216,6 +219,11 @@ GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         "enhancement:orks:more-dakka:000009991004",
     }
 )
+GENERIC_AURA_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
+    {
+        blood_legion_ir.SLAUGHTERTHIRST_SOURCE_ROW_ID,
+    }
+)
 GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         *GENERIC_CONDITIONAL_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
@@ -223,6 +231,7 @@ GENERIC_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         *GENERIC_MOVEMENT_DISTANCE_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_CHARACTERISTIC_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS,
+        *GENERIC_AURA_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS,
         *GENERIC_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS,
     }
 )
@@ -1513,6 +1522,10 @@ def test_phase17e_generic_enhancements_are_template_family_bounded() -> None:
     assert (
         set(generic_ir_support_source.supported_dice_roll_modification_enhancement_source_row_ids())
         == GENERIC_DICE_ROLL_MODIFICATION_ENHANCEMENT_SOURCE_ROW_IDS
+    )
+    assert (
+        set(generic_ir_support_source.supported_aura_weapon_ability_enhancement_source_row_ids())
+        == GENERIC_AURA_WEAPON_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS
     )
     assert (
         set(

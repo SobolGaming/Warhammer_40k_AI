@@ -16,6 +16,7 @@ from warhammer40k_core.rules.rule_ir import (
     RuleTargetSpecPayload,
 )
 from warhammer40k_core.rules.rule_templates import (
+    AURA_TEMPLATE_ID,
     DICE_ROLL_MODIFIER_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
     KEYWORD_GATE_TEMPLATE_ID,
@@ -34,10 +35,18 @@ BRAZENMAW_SOURCE_ROW_ID = (
 )
 BRAZENMAW_DESCRIPTOR_ID = f"phase17e:{BRAZENMAW_SOURCE_ROW_ID}"
 BRAZENMAW_SOURCE_RULE_ID = f"phase17f:{BRAZENMAW_DESCRIPTOR_ID}"
+SLAUGHTERTHIRST_ENHANCEMENT_ID = "000009815002"
+SLAUGHTERTHIRST_SOURCE_ROW_ID = (
+    f"enhancement:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:"
+    f"{SLAUGHTERTHIRST_ENHANCEMENT_ID}"
+)
+SLAUGHTERTHIRST_DESCRIPTOR_ID = f"phase17e:{SLAUGHTERTHIRST_SOURCE_ROW_ID}"
+SLAUGHTERTHIRST_SOURCE_RULE_ID = f"phase17f:{SLAUGHTERTHIRST_DESCRIPTOR_ID}"
 MURDERCALL_HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall"
 BLOOD_TAINTED_HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted"
 LEGIONES_DAEMONICA_KEYWORD = "LEGIONES DAEMONICA"
 KHORNE_KEYWORD = "KHORNE"
+MONSTER_KEYWORD = "MONSTER"
 AIRCRAFT_KEYWORD = "AIRCRAFT"
 MURDERCALL_RANGE_INCHES = 8.0
 MURDERCALL_SURGE_ABILITY = "blood_legion_murdercall_surge"
@@ -146,6 +155,107 @@ def _brazenmaw_payload() -> RuleIRPayload:
                         (
                             _parameter("delta", 2),
                             _parameter("roll_type", "charge"),
+                        ),
+                    ),
+                ),
+                duration=None,
+            ),
+        ),
+    )
+
+
+def _slaughterthirst_payload() -> RuleIRPayload:
+    normalized_text = (
+        "Legiones Daemonica Khorne model only. While a friendly LEGIONES DAEMONICA "
+        'KHORNE unit (excluding Monsters) is within 6" of the bearer, weapons equipped '
+        "by models in that unit have the [LANCE] ability."
+    )
+    eligibility_text = "Legiones Daemonica Khorne model only"
+    aura_text = (
+        'While a friendly LEGIONES DAEMONICA KHORNE unit (excluding Monsters) is within 6" '
+        "of the bearer, weapons equipped by models in that unit have the [LANCE] ability."
+    )
+    return _coverage_payload(
+        SLAUGHTERTHIRST_SOURCE_ROW_ID,
+        normalized_text,
+        (
+            _keyword_gate_clause(
+                clause_id=_coverage_clause_id(SLAUGHTERTHIRST_SOURCE_ROW_ID, "gate:001"),
+                normalized_text=normalized_text,
+                source_text=eligibility_text,
+                conditions=(
+                    _keyword_condition(
+                        normalized_text=normalized_text,
+                        source_text="Legiones Daemonica",
+                        parameter_key="required_keyword_sequence",
+                        parameter_value=(LEGIONES_DAEMONICA_KEYWORD,),
+                    ),
+                    _keyword_condition(
+                        normalized_text=normalized_text,
+                        source_text="Khorne",
+                        parameter_key="required_keyword",
+                        parameter_value=KHORNE_KEYWORD,
+                    ),
+                ),
+            ),
+            _effect_clause(
+                clause_id=_coverage_clause_id(SLAUGHTERTHIRST_SOURCE_ROW_ID, "effect:001"),
+                template_id=AURA_TEMPLATE_ID,
+                normalized_text=normalized_text,
+                source_text=aura_text,
+                conditions=(
+                    _condition(
+                        kind="aura",
+                        normalized_text=normalized_text,
+                        source_text=aura_text,
+                    ),
+                    _condition(
+                        kind="distance_predicate",
+                        normalized_text=normalized_text,
+                        source_text='within 6" of the bearer',
+                        parameters=(
+                            _parameter("predicate", "within"),
+                            _parameter("object_kind", "unit"),
+                            _parameter("object_reference", "this_model"),
+                            _parameter("distance_inches", 6),
+                        ),
+                    ),
+                    _condition(
+                        kind="keyword_gate",
+                        normalized_text=normalized_text,
+                        source_text="LEGIONES DAEMONICA",
+                        parameters=(_parameter("required_keyword", LEGIONES_DAEMONICA_KEYWORD),),
+                    ),
+                    _condition(
+                        kind="keyword_gate",
+                        normalized_text=normalized_text,
+                        source_text="KHORNE",
+                        parameters=(_parameter("required_keyword", KHORNE_KEYWORD),),
+                    ),
+                    _condition(
+                        kind="keyword_gate",
+                        normalized_text=normalized_text,
+                        source_text="Monsters",
+                        parameters=(_parameter("excluded_keyword", MONSTER_KEYWORD),),
+                    ),
+                ),
+                target=_target(
+                    "aura_units",
+                    normalized_text,
+                    "friendly LEGIONES DAEMONICA KHORNE unit (excluding Monsters)",
+                    parameters=(
+                        _parameter("allegiance", "friendly"),
+                        _parameter("include_source_unit", True),
+                    ),
+                ),
+                effects=(
+                    _effect(
+                        "grant_weapon_ability",
+                        normalized_text,
+                        "weapons equipped by models in that unit have the [LANCE] ability",
+                        (
+                            _parameter("weapon_ability", "Lance"),
+                            _parameter("weapon_scope", "all"),
                         ),
                     ),
                 ),
@@ -273,6 +383,7 @@ def _effect_clause(
     target: RuleTargetSpecPayload | None,
     effects: tuple[RuleEffectSpecPayload, ...],
     duration: RuleDurationPayload | None,
+    conditions: tuple[RuleConditionPayload, ...] = (),
 ) -> RuleClausePayload:
     return cast(
         RuleClausePayload,
@@ -281,7 +392,7 @@ def _effect_clause(
             "template_id": template_id,
             "source_span": _span(normalized_text, source_text),
             "trigger": None,
-            "conditions": [],
+            "conditions": list(conditions),
             "target": target,
             "effects": list(effects),
             "duration": duration,
@@ -307,17 +418,36 @@ def _effect(
     )
 
 
+def _condition(
+    *,
+    kind: str,
+    normalized_text: str,
+    source_text: str,
+    parameters: tuple[RuleParameterPayload, ...] = (),
+) -> RuleConditionPayload:
+    return cast(
+        RuleConditionPayload,
+        {
+            "kind": kind,
+            "source_span": _span(normalized_text, source_text),
+            "parameters": list(parameters),
+        },
+    )
+
+
 def _target(
     kind: str,
     normalized_text: str,
     source_text: str,
+    *,
+    parameters: tuple[RuleParameterPayload, ...] = (),
 ) -> RuleTargetSpecPayload:
     return cast(
         RuleTargetSpecPayload,
         {
             "kind": kind,
             "source_span": _span(normalized_text, source_text),
-            "parameters": [],
+            "parameters": list(parameters),
         },
     )
 
@@ -351,6 +481,7 @@ def _coverage_payloads() -> Mapping[str, RuleIRPayload]:
         {
             BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID: _detachment_rule_payload(),
             BRAZENMAW_DESCRIPTOR_ID: _brazenmaw_payload(),
+            SLAUGHTERTHIRST_DESCRIPTOR_ID: _slaughterthirst_payload(),
         }
     )
 

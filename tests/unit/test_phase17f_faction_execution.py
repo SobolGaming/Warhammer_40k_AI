@@ -88,6 +88,11 @@ CORSAIR_RUNTIME_CONSUMERS_BY_DESCRIPTOR_ID = {
 GENERIC_SOURCE_UNIT_CONTEXT_EXECUTION_ID = (
     "phase17f:phase17e:enhancement:orks:more-dakka:000009991003"
 )
+GENERIC_BATTLEFIELD_CONTEXT_EXECUTION_IDS = frozenset(
+    {
+        "phase17f:phase17e:enhancement:chaos-daemons:blood-legion:000009815002",
+    }
+)
 LEAPING_SHADOWS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:leaping_shadows:scouts_9",
@@ -885,7 +890,12 @@ def test_phase17f_registry_dispatches_every_record_without_missing_handlers() ->
                 FactionRuleExecutionStatus.INVALID,
             }
             if result.status is FactionRuleExecutionStatus.INVALID:
-                assert result.reason == "missing_input:game_state"
+                expected_reason = (
+                    "missing_input:battlefield_state"
+                    if record.execution_id in GENERIC_BATTLEFIELD_CONTEXT_EXECUTION_IDS
+                    else "missing_input:game_state"
+                )
+                assert result.reason == expected_reason
             else:
                 assert result.reason is None
             replay_payload = result.to_payload()["replay_payload"]

@@ -13,11 +13,6 @@ from warhammer40k_core.core.ruleset_descriptor import (
     battle_phase_kind_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldScenario,
-    UnitPlacement,
-    geometry_model_for_placement,
-)
 from warhammer40k_core.engine.command_point_rule_execution import (
     apply_command_point_rule_mutation,
     command_point_operation_and_delta,
@@ -38,6 +33,7 @@ from warhammer40k_core.engine.event_log import (
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rule_aura_resolution import aura_affected_unit_ids
 from warhammer40k_core.engine.rule_duration_execution import (
     expiration_for_duration,
     rule_duration_unavailable_reason,
@@ -51,14 +47,12 @@ from warhammer40k_core.engine.rule_target_resolution import (
     effect_clause_target_unavailable_reason,
     target_binding_clause_unavailable_reason,
     target_unit_instance_ids_for_clause,
-    unit_has_required_keywords,
 )
 from warhammer40k_core.engine.scoring import (
     VictoryPointAward,
     VictoryPointSourceKind,
     VictoryPointTransactionPayload,
 )
-from warhammer40k_core.geometry.measurement import DistanceMeasurementContext
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleCondition,
@@ -82,9 +76,6 @@ STATE_INPUT_BATTLEFIELD_STATE = "battlefield_state"
 STATE_INPUT_SOURCE_UNIT = "source_unit"
 STATE_INPUT_EVENT_LOG = "event_log"
 TARGET_BINDING_UNIT_IDS = "target_unit_instance_ids"
-AURA_ALLEGIANCE_ANY = "any"
-AURA_ALLEGIANCE_ENEMY = "enemy"
-AURA_ALLEGIANCE_FRIENDLY = "friendly"
 TARGET_CONSTRAINT_THIS_MODEL_LEADING_UNIT = "this_model_leading_unit"
 TARGET_CONSTRAINT_THIS_MODEL_MAKES_ATTACK = "this_model_makes_attack"
 TARGET_CONSTRAINT_THIS_MODEL_DESTROYED_UNIT = "this_model_destroyed_unit"
@@ -1026,7 +1017,15 @@ def _aura_handler(
 ) -> RuleExecutionResult:
     if effect is not None:
         raise GameLifecycleError("Aura handler does not accept a single effect.")
-    affected_unit_ids = _aura_affected_unit_ids(clause=clause, context=context)
+    source_unit_instance_id = context.source_unit_instance_id
+    if source_unit_instance_id is None:
+        raise GameLifecycleError("Aura evaluation requires source_unit_instance_id.")
+    affected_unit_ids = aura_affected_unit_ids(
+        clause=clause,
+        state=_require_state(context),
+        source_unit_instance_id=source_unit_instance_id,
+        source_model_instance_id=context.source_model_instance_id,
+    )
     aura_payload = _json_object(
         {
             "rule_id": rule_ir.rule_id,
@@ -1188,121 +1187,6 @@ def _persisting_effect_or_none(
     )
     context.state.record_persisting_effect(persisting_effect)
     return persisting_effect
-
-
-def _aura_affected_unit_ids(
-    *,
-    clause: RuleClause,
-    context: RuleExecutionContext,
-) -> tuple[str, ...]:
-    state = _require_state(context)
-    if state.battlefield_state is None:
-        raise GameLifecycleError("Aura evaluation requires battlefield_state.")
-    source_unit_id = context.source_unit_instance_id
-    if source_unit_id is None:
-        raise GameLifecycleError("Aura evaluation requires source_unit_instance_id.")
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions),
-        battlefield_state=state.battlefield_state,
-    )
-    source_placement = state.battlefield_state.unit_placement_by_id(source_unit_id)
-    distance_inches = _aura_distance_inches(clause)
-    allegiance = _aura_allegiance(clause)
-    required_keywords = _required_keywords(clause.conditions)
-    affected: list[str] = []
-    for placed_army in state.battlefield_state.placed_armies:
-        for unit_placement in placed_army.unit_placements:
-            if unit_placement.unit_instance_id == source_unit_id:
-                continue
-            if (
-                allegiance == AURA_ALLEGIANCE_FRIENDLY
-                and unit_placement.player_id != source_placement.player_id
-            ):
-                continue
-            if (
-                allegiance == AURA_ALLEGIANCE_ENEMY
-                and unit_placement.player_id == source_placement.player_id
-            ):
-                continue
-            unit = scenario.unit_instance_for_placement(unit_placement)
-            if required_keywords and not unit_has_required_keywords(
-                unit_keywords=unit.keywords,
-                faction_keywords=unit.faction_keywords,
-                required_keywords=required_keywords,
-            ):
-                continue
-            if _unit_within_aura(
-                scenario=scenario,
-                source_placement=source_placement,
-                target_placement=unit_placement,
-                distance_inches=distance_inches,
-            ):
-                affected.append(unit_placement.unit_instance_id)
-    return tuple(sorted(affected))
-
-
-def _unit_within_aura(
-    *,
-    scenario: BattlefieldScenario,
-    source_placement: UnitPlacement,
-    target_placement: UnitPlacement,
-    distance_inches: float,
-) -> bool:
-    for source_model_placement in source_placement.model_placements:
-        source_model = scenario.model_instance_for_placement(source_model_placement)
-        source_geometry = geometry_model_for_placement(
-            model=source_model,
-            placement=source_model_placement,
-        )
-        for target_model_placement in target_placement.model_placements:
-            target_model = scenario.model_instance_for_placement(target_model_placement)
-            target_geometry = geometry_model_for_placement(
-                model=target_model,
-                placement=target_model_placement,
-            )
-            measured = DistanceMeasurementContext.from_models(source_geometry, target_geometry)
-            if measured.closest_distance_inches() <= distance_inches:
-                return True
-    return False
-
-
-def _aura_distance_inches(clause: RuleClause) -> float:
-    for condition in clause.conditions:
-        if condition.kind is not RuleConditionKind.DISTANCE_PREDICATE:
-            continue
-        parameters = parameter_payload(condition.parameters)
-        distance = parameters.get("distance_inches")
-        if isinstance(distance, int | float) and type(distance) is not bool:
-            return float(distance)
-    raise GameLifecycleError("Aura clause requires a structured distance predicate.")
-
-
-def _aura_allegiance(clause: RuleClause) -> str:
-    if clause.target is None or clause.target.kind is not RuleTargetKind.AURA_UNITS:
-        raise GameLifecycleError("Aura clause requires an aura_units target.")
-    parameters = parameter_payload(clause.target.parameters)
-    allegiance = parameters.get("allegiance")
-    if type(allegiance) is not str:
-        raise GameLifecycleError("Aura target requires structured allegiance.")
-    if allegiance not in {
-        AURA_ALLEGIANCE_ANY,
-        AURA_ALLEGIANCE_ENEMY,
-        AURA_ALLEGIANCE_FRIENDLY,
-    }:
-        raise GameLifecycleError("Aura target allegiance is unsupported.")
-    return allegiance
-
-
-def _required_keywords(conditions: tuple[RuleCondition, ...]) -> tuple[str, ...]:
-    keywords: list[str] = []
-    for condition in conditions:
-        if condition.kind is not RuleConditionKind.KEYWORD_GATE:
-            continue
-        parameters = parameter_payload(condition.parameters)
-        keyword = parameters.get("required_keyword")
-        if type(keyword) is str:
-            keywords.append(keyword)
-    return tuple(sorted(keywords))
 
 
 def _status_token(status: str) -> str:

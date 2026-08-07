@@ -10,7 +10,7 @@ Current source package: `gw-11e-chaos-daemons-faction-pack-2026-07`
 
 | Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 9 | 6 | 29 | 46 | 43 |
+| 9 | 6 | 29 | 46 | 44 |
 
 ## July 22, 2026 Source Status
 
@@ -50,7 +50,7 @@ This generated snapshot answers the support question directly. Detachment-rule s
 
 | Detachment | Runtime supported / executable | Still source-only / blocked |
 | --- | --- | --- |
-| Blood Legion | Brazenmaw | Fury's Cage<br>Gateway Unto Damnation<br>Slaughterthirst (Aura) |
+| Blood Legion | Brazenmaw<br>Slaughterthirst (Aura) | Fury's Cage<br>Gateway Unto Damnation |
 | Cavalcade of Chaos | Apocalyptic Steeds (Upgrade)<br>Soul-shattering Charge (Upgrade) | None |
 | Daemonic Incursion | A'rgath, the King of Blades<br>Soulstealer<br>The Endless Gift<br>The Everstave | None |
 | Legion of Excess | None | Avatar of Perfection<br>Dreaming Crown (Aura)<br>False Majesty (Aura)<br>Soul Glutton |
@@ -199,7 +199,7 @@ This section is generated from the repository-wide semantic audit. It is separat
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 203 | 119 | 45 |
+| 203 | 120 | 45 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |
