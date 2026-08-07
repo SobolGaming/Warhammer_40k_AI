@@ -508,6 +508,137 @@ def test_real_attack_pipeline_hands_off_attached_horror_component(
     )
 
 
+def test_real_hazardous_attack_uses_typed_destruction_once_for_horror_split() -> None:
+    scenario = _split_scenario(
+        pink_datasheet_id="000002584",
+        blue_datasheet_id="000002583",
+        destruction_kind="hazardous",
+        models_start_destroyed=False,
+        emit_destruction_events=False,
+    )
+    enemy_model = scenario.enemy_army.units[0].own_models[0]
+    valid_save_model = replace(
+        enemy_model,
+        characteristics=tuple(
+            CharacteristicValue.from_raw(Characteristic.SAVE, 6)
+            if value.characteristic is Characteristic.SAVE
+            else value
+            for value in enemy_model.characteristics
+        ),
+    )
+    enemy_unit = replace(scenario.enemy_army.units[0], own_models=(valid_save_model,))
+    enemy_army = replace(scenario.enemy_army, units=(enemy_unit,))
+    scenario.state.replace_army_definitions([scenario.source_army, enemy_army])
+    base_pool = scenario.attack_sequence.attack_pools[0]
+    hazardous_profile = replace(
+        base_pool.weapon_profile,
+        profile_id="real-hazardous:horror-split",
+        keywords=(WeaponKeyword.TORRENT, WeaponKeyword.HAZARDOUS),
+        abilities=(),
+    )
+    hazardous_pool = replace(
+        base_pool,
+        weapon_profile_id=hazardous_profile.profile_id,
+        weapon_profile=hazardous_profile,
+    )
+    attack_sequence = AttackSequence.start(
+        sequence_id="real-hazardous:horror-split",
+        attacker_player_id=scenario.source_army.player_id,
+        attacking_unit_instance_id=scenario.bodyguard.unit_instance_id,
+        attack_pools=(hazardous_pool,),
+    )
+    wound_spec = attack_sequence_wound_roll_spec(
+        weapon_profile_id=hazardous_profile.profile_id,
+        attack_context_id=attack_sequence.attack_context_id(),
+        attacker_player_id=scenario.source_army.player_id,
+    )
+    hazardous_spec = DiceRollSpec(
+        expression=DiceExpression(quantity=1, sides=6),
+        reason=(f"Hazardous test for {scenario.bodyguard.unit_instance_id} after shooting"),
+        roll_type="hazardous_test",
+        actor_id=scenario.bodyguard.unit_instance_id,
+    )
+
+    remaining, _allocated_ids, blocked = resolve_attack_sequence_until_blocked(
+        state=scenario.state,
+        decisions=scenario.decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        attack_sequence=attack_sequence,
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            scenario.state.game_id,
+            event_log=scenario.decisions.event_log,
+            injected_results=(
+                DiceRollResult.from_values(
+                    roll_id="roll:real-hazardous:horror-split:wound",
+                    spec=wound_spec,
+                    values=(1,),
+                    source="fixed",
+                ),
+                DiceRollResult.from_values(
+                    roll_id="roll:real-hazardous:horror-split:test",
+                    spec=hazardous_spec,
+                    values=(1,),
+                    source="fixed",
+                ),
+            ),
+        ),
+    )
+
+    assert remaining is None
+    assert blocked is None
+    completed_event = next(
+        record
+        for record in reversed(scenario.decisions.event_log.records)
+        if record.event_type == "attack_sequence_completed"
+        and cast(dict[str, JsonValue], record.payload).get("sequence_id")
+        == attack_sequence.sequence_id
+    )
+    completed_sequence = replace(attack_sequence, used_pool_indices=(0,), pool_index=1)
+    context = replace(
+        scenario.context,
+        attack_sequence=completed_sequence,
+        attack_sequence_completed_event_id=completed_event.event_id,
+    )
+
+    status = scenario.runtime.resolve_completed_attack_sequence(context)
+
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert (
+        sum(
+            record.event_type == "hazardous_mortal_wounds_applied"
+            for record in scenario.decisions.event_log.records
+        )
+        == 1
+    )
+    hazardous_destroyed_payloads = tuple(
+        cast(dict[str, JsonValue], record.payload)
+        for record in scenario.decisions.event_log.records
+        if record.event_type == "model_destroyed"
+        and cast(dict[str, JsonValue], record.payload).get("model_instance_id")
+        == scenario.destroyed_model_instance_id
+    )
+    assert len(hazardous_destroyed_payloads) == 1
+    assert isinstance(
+        hazardous_destroyed_payloads[0]["destroyed_model_placement"],
+        dict,
+    )
+    assert (
+        ModelDestructionAttribution.from_model_destroyed_payload(
+            hazardous_destroyed_payloads[0]
+        ).destruction_provenance.destruction_source_kind
+        is DestructionSourceKind.HAZARDOUS
+    )
+    assert (
+        sum(
+            record.event_type == CATALOG_MODEL_MATERIALIZATION_ROLL_EVENT
+            for record in scenario.decisions.event_log.records
+        )
+        == 1
+    )
+
+
 def test_split_failed_attached_wipe_skips_handoff_then_reconciles_attachment() -> None:
     scenario = _split_scenario(
         pink_datasheet_id="000002584",
@@ -1969,6 +2100,7 @@ def _split_scenario(
                     destroying_player_id=enemy_army.player_id,
                     source_kind=source_kind,
                     source_rules_unit_instance_id=attacker.unit_instance_id,
+                    source_model_instance_id=None,
                 )
             )
             removal_record = ModelRemovalRecord(

@@ -67,7 +67,9 @@ _RNG_HISTORY_NEUTRAL_EVENT_TYPES = frozenset(
         "mortal_wound_model_destructions_finalized",
     }
 )
-_RNG_HISTORY_NEUTRAL_PAYLOAD_KEYS = frozenset(("destruction_evidence",))
+_RNG_HISTORY_NEUTRAL_PAYLOAD_KEYS = frozenset(
+    ("destroyed_model_placements", "destruction_evidence")
+)
 
 _EVENT_ID_PREFIX = "event-"
 

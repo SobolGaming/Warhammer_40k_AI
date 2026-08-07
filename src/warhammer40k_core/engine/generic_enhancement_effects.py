@@ -7,6 +7,12 @@ from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import WeaponProfile
+from warhammer40k_core.engine.deadly_demise_modifiers import (
+    DEADLY_DEMISE_DESTROYED_ENEMY_UNIT_CONDITION,
+    DEADLY_DEMISE_MODIFIER_ABILITY,
+    deadly_demise_modifier_for_model,
+    record_deadly_demise_modifier_condition,
+)
 from warhammer40k_core.engine.effects import (
     EffectExpiration,
     generic_rule_persisting_effect,
@@ -36,6 +42,11 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
     WeaponProfileModifierHandler,
+)
+from warhammer40k_core.engine.unit_destroyed_hooks import (
+    UnitDestroyedContext,
+    UnitDestroyedHandler,
+    UnitDestroyedHookBinding,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
@@ -155,6 +166,40 @@ def generic_enhancement_aura_weapon_profile_modifier_bindings(
     return tuple(sorted(bindings, key=lambda binding: binding.modifier_id))
 
 
+def generic_enhancement_deadly_demise_unit_destroyed_hook_bindings(
+    *,
+    activation: RuntimeContentActivation,
+    execution_records: tuple[_Phase17FExecutionRecord, ...],
+    rule_ir_resolver: Callable[[str], RuleIR] = (
+        faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id
+    ),
+) -> tuple[UnitDestroyedHookBinding, ...]:
+    bindings: list[UnitDestroyedHookBinding] = []
+    for source in _generic_enhancement_binding_sources(
+        activation=activation,
+        execution_records=execution_records,
+        rule_ir_resolver=rule_ir_resolver,
+    ):
+        if not _rule_ir_grants_deadly_demise_modifier(source.rule_ir):
+            continue
+        _validate_deadly_demise_modifier_rule_ir(source.rule_ir)
+        for assignment in source.assignments_by_id.values():
+            bindings.append(
+                UnitDestroyedHookBinding(
+                    hook_id=(
+                        f"{source.record.execution_id}:{assignment.assignment_id}:"
+                        "deadly-demise-condition"
+                    ),
+                    source_id=source.rule_ir.source_id,
+                    handler=_deadly_demise_unit_destroyed_handler(
+                        binding_source=source,
+                        assignment=assignment,
+                    ),
+                )
+            )
+    return tuple(sorted(bindings, key=lambda binding: binding.hook_id))
+
+
 def rule_ir_has_dynamic_aura_weapon_grant(rule_ir: RuleIR) -> bool:
     if type(rule_ir) is not RuleIR:
         raise GameLifecycleError("Generic aura weapon lookup requires RuleIR.")
@@ -163,6 +208,46 @@ def rule_ir_has_dynamic_aura_weapon_grant(rule_ir: RuleIR) -> bool:
         and any(effect.kind is RuleEffectKind.GRANT_WEAPON_ABILITY for effect in clause.effects)
         for clause in rule_ir.clauses
     )
+
+
+def _rule_ir_grants_deadly_demise_modifier(rule_ir: RuleIR) -> bool:
+    if type(rule_ir) is not RuleIR:
+        raise GameLifecycleError("Deadly Demise modifier lookup requires RuleIR.")
+    matches = tuple(
+        effect
+        for clause in rule_ir.clauses
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.GRANT_ABILITY
+        and parameter_payload(effect.parameters).get("ability") == DEADLY_DEMISE_MODIFIER_ABILITY
+    )
+    if len(matches) > 1:
+        raise GameLifecycleError("Generic enhancement RuleIR has multiple Deadly Demise modifiers.")
+    return bool(matches)
+
+
+def _deadly_demise_unit_destroyed_handler(
+    *,
+    binding_source: _GenericEnhancementBindingSource,
+    assignment: RuntimeEnhancementAssignment,
+) -> UnitDestroyedHandler:
+    def handler(context: UnitDestroyedContext) -> None:
+        bearer = _bearer_unit_for_assignment(state=context.state, assignment=assignment)
+        source_model_id = _require_single_model_bearer(bearer)
+        modifier = deadly_demise_modifier_for_model(
+            state=context.state,
+            model_instance_id=source_model_id,
+            source_rule_id=binding_source.rule_ir.source_id,
+        )
+        if modifier is None:
+            raise GameLifecycleError(
+                "Deadly Demise modifier enhancement effect is missing at runtime."
+            )
+        record_deadly_demise_modifier_condition(
+            context=context,
+            modifier=modifier,
+        )
+
+    return handler
 
 
 def _generic_enhancement_binding_sources(
@@ -302,6 +387,8 @@ def _generic_enhancement_effects(
         context=context,
         binding_source=binding_source,
     )
+    if _rule_ir_grants_deadly_demise_modifier(binding_source.rule_ir):
+        _require_single_model_bearer(context.target_unit)
     rule_context = _rule_execution_context(context=context, assignment=assignment)
     result = execute_rule_ir(rule_ir=binding_source.rule_ir, context=rule_context)
     if result.status is not RuleExecutionStatus.APPLIED:
@@ -424,6 +511,79 @@ def _validate_dynamic_aura_weapon_grant_rule_ir(rule_ir: RuleIR) -> None:
             grant_count += 1
     if grant_count < 1:
         raise GameLifecycleError("Generic aura weapon RuleIR requires a weapon ability grant.")
+
+
+def _validate_deadly_demise_modifier_rule_ir(rule_ir: RuleIR) -> None:
+    if not rule_ir.is_supported:
+        raise GameLifecycleError("Deadly Demise modifier RuleIR must be supported.")
+    modifier_clauses = tuple(
+        clause
+        for clause in rule_ir.clauses
+        if any(
+            effect.kind is RuleEffectKind.GRANT_ABILITY
+            and parameter_payload(effect.parameters).get("ability")
+            == DEADLY_DEMISE_MODIFIER_ABILITY
+            for effect in clause.effects
+        )
+    )
+    if len(modifier_clauses) != 1:
+        raise GameLifecycleError(
+            "Deadly Demise modifier RuleIR requires exactly one modifier clause."
+        )
+    clause = modifier_clauses[0]
+    if clause.unsupported_reason is not None or clause.diagnostics:
+        raise GameLifecycleError("Deadly Demise modifier RuleIR contains diagnostics.")
+    if clause.target is None or clause.target.kind is not RuleTargetKind.THIS_MODEL:
+        raise GameLifecycleError("Deadly Demise modifier RuleIR requires this_model target.")
+    if clause.trigger is not None or clause.duration is not None:
+        raise GameLifecycleError("Deadly Demise modifier RuleIR must be continuously evaluated.")
+    if len(clause.conditions) != 1:
+        raise GameLifecycleError("Deadly Demise modifier RuleIR requires one target constraint.")
+    condition = clause.conditions[0]
+    if condition.kind is not RuleConditionKind.TARGET_CONSTRAINT:
+        raise GameLifecycleError(
+            "Deadly Demise modifier RuleIR condition must be a target constraint."
+        )
+    if parameter_payload(condition.parameters) != {
+        "relationship": "this_model_destroyed_unit",
+        "target_allegiance": "enemy",
+        "time_scope": "this_battle",
+    }:
+        raise GameLifecycleError("Deadly Demise modifier RuleIR target constraint is unsupported.")
+    modifiers = tuple(
+        effect
+        for effect in clause.effects
+        if effect.kind is RuleEffectKind.GRANT_ABILITY
+        and parameter_payload(effect.parameters).get("ability") == DEADLY_DEMISE_MODIFIER_ABILITY
+    )
+    if len(modifiers) != 1 or len(clause.effects) != 1:
+        raise GameLifecycleError(
+            "Deadly Demise modifier RuleIR must contain only one ability grant."
+        )
+    parameters = parameter_payload(modifiers[0].parameters)
+    if set(parameters) != {
+        "ability",
+        "trigger_roll_threshold",
+        "conditional_mortal_wounds_kind",
+        "conditional_mortal_wounds_modifier",
+        "condition",
+        "replaces_existing_deadly_demise",
+    }:
+        raise GameLifecycleError("Deadly Demise modifier RuleIR parameters are invalid.")
+    trigger_threshold = parameters["trigger_roll_threshold"]
+    if type(trigger_threshold) is not int or not 1 <= trigger_threshold <= 6:
+        raise GameLifecycleError("Deadly Demise modifier RuleIR trigger threshold is unsupported.")
+    if parameters["conditional_mortal_wounds_kind"] != "d3":
+        raise GameLifecycleError("Deadly Demise modifier RuleIR mortal-wound kind is unsupported.")
+    mortal_wounds_modifier = parameters["conditional_mortal_wounds_modifier"]
+    if type(mortal_wounds_modifier) is not int or mortal_wounds_modifier < 0:
+        raise GameLifecycleError(
+            "Deadly Demise modifier RuleIR mortal-wound modifier is unsupported."
+        )
+    if parameters["condition"] != DEADLY_DEMISE_DESTROYED_ENEMY_UNIT_CONDITION:
+        raise GameLifecycleError("Deadly Demise modifier RuleIR condition is unsupported.")
+    if parameters["replaces_existing_deadly_demise"] is not True:
+        raise GameLifecycleError("Deadly Demise modifier RuleIR must replace the existing ability.")
 
 
 def _rule_ir_has_specialized_runtime_hook_family(rule_ir: RuleIR) -> bool:
@@ -552,6 +712,16 @@ def _source_model_instance_id(unit: UnitInstance) -> str:
     if not unit.own_models:
         raise GameLifecycleError("Generic enhancement source unit has no models.")
     return sorted(model.model_instance_id for model in unit.own_models)[0]
+
+
+def _require_single_model_bearer(unit: UnitInstance) -> str:
+    if type(unit) is not UnitInstance:
+        raise GameLifecycleError("Generic enhancement source unit is invalid.")
+    if len(unit.own_models) != 1:
+        raise GameLifecycleError(
+            "A this_model Deadly Demise modifier requires a single-model bearer unit."
+        )
+    return unit.own_models[0].model_instance_id
 
 
 def _bearer_unit_for_assignment(

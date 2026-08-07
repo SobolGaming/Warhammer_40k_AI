@@ -49,6 +49,10 @@ from warhammer40k_core.engine.destruction_provenance import (
 from warhammer40k_core.engine.destruction_reaction_conditions import (
     optional_destruction_reaction_trigger_conditions_for_target,
 )
+from warhammer40k_core.engine.destruction_source_attribution import (
+    resolve_non_attack_destruction_source_identity,
+    validate_non_attack_destruction_source_context,
+)
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.fight_on_death import (
@@ -124,6 +128,8 @@ def destroy_model_with_rule_reactions(
     source_result_id: str,
     completion_event_type: str,
     completion_event_payload: JsonValue,
+    source_rules_unit_instance_id: str | None = None,
+    source_model_instance_id: str | None = None,
 ) -> RuleModelDestructionResult:
     requested_model_id = _validate_identifier("model_instance_id", model_instance_id)
     requested_rules_unit_id = _validate_identifier("rules_unit_instance_id", rules_unit_instance_id)
@@ -138,6 +144,14 @@ def destroy_model_with_rule_reactions(
     requested_result_id = _validate_identifier("source_result_id", source_result_id)
     requested_completion_event_type = _validate_identifier(
         "completion_event_type", completion_event_type
+    )
+    requested_source_rules_unit_id, requested_source_model_id = (
+        resolve_non_attack_destruction_source_identity(
+            state=state,
+            source_rules_unit_instance_id=source_rules_unit_instance_id,
+            source_model_instance_id=source_model_instance_id,
+            destroying_player_id=requested_destroying_player_id,
+        )
     )
     validated_completion_payload = validate_json_value(completion_event_payload)
     if not isinstance(validated_completion_payload, dict):
@@ -182,7 +196,8 @@ def destroy_model_with_rule_reactions(
                 "target_unit_instance_id": physical_unit_id,
                 "model_instance_id": requested_model_id,
                 "destroying_player_id": requested_destroying_player_id,
-                "source_rules_unit_instance_id": None,
+                "source_rules_unit_instance_id": requested_source_rules_unit_id,
+                "source_model_instance_id": requested_source_model_id,
                 "destroyed_model_controller_player_id": controller_player_id,
                 "destroyed_model_placement": placement_payload,
                 "completion_event_type": requested_completion_event_type,
@@ -444,6 +459,7 @@ def _continue_rule_deadly_demise_sources(
         if source.optional or source.reaction_kind is not DestructionReactionKind.DEADLY_DEMISE:
             raise GameLifecycleError("Rule destruction Deadly Demise source routing drift.")
         descriptor, trigger_roll_payload, triggered = resolve_deadly_demise_trigger(
+            state=state,
             manager=manager,
             source=source,
             player_id=controller_player_id,
@@ -626,6 +642,10 @@ def _remove_rule_destroyed_model_and_continue(
         source_rules_unit_instance_id=_optional_payload_string(
             root_context,
             "source_rules_unit_instance_id",
+        ),
+        source_model_instance_id=_optional_payload_string(
+            root_context,
+            "source_model_instance_id",
         ),
         attacking_unit_instance_id=None,
         attacking_model_instance_id=None,
@@ -1279,6 +1299,7 @@ def _validate_rule_context_identity(
         context, "target_unit_instance_id"
     ):
         raise GameLifecycleError("Rule destruction physical unit drift.")
+    validate_non_attack_destruction_source_context(state=state, context=context)
 
 
 def _selected_source(

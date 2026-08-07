@@ -98,10 +98,11 @@ def _resolve_hazardous_tests(
         ),
         mortal_wounds=mortal_wounds,
         spill_over=True,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
             destroying_player_id=attack_sequence.attacker_player_id,
             source_rules_unit_instance_id=attack_sequence.attacking_unit_instance_id,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.HAZARDOUS,
             action_phase=attack_sequence.source_phase,
             source_step="hazardous_test",

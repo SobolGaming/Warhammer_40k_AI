@@ -808,10 +808,11 @@ def _resolve_mortal_wound_effect(
         defender_player_id=effect.target_player_id,
         mortal_wounds=mortal_wounds,
         spill_over=True,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
             destroying_player_id=effect.rolling_player_id,
             source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=completed_phase,
             source_step="unit_move_completed_mortal_wounds",

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from warhammer40k_core.engine.battlefield_state import ModelPlacement
 from warhammer40k_core.engine.damage_allocation import (
     DamageApplication,
     DamageKind,
@@ -20,6 +21,7 @@ from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
+    pre_removal_model_placement_for_mortal_wound_destruction,
     record_finalized_mortal_wound_application_destructions,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -49,6 +51,7 @@ def apply_direct_mortal_wounds_to_unit(
     feel_no_pain_resolutions: list[FeelNoPainResolution] = []
     ignored_mortal_wounds = 0
     remaining_lost = 0
+    destroyed_model_placements: list[ModelPlacement] = []
     while remaining > 0:
         rules_unit = current_placed_alive_rules_unit_view_for_identity(
             state=state,
@@ -91,6 +94,10 @@ def apply_direct_mortal_wounds_to_unit(
                 ignored_mortal_wounds += 1
                 remaining -= 1
                 continue
+        pre_removal_placement = pre_removal_model_placement_for_mortal_wound_destruction(
+            state=state,
+            model_instance_id=model_id,
+        )
         damage_application = apply_damage_to_model(
             state=state,
             target_unit_instance_id=target_unit_instance_id,
@@ -99,6 +106,8 @@ def apply_direct_mortal_wounds_to_unit(
             damage_kind=DamageKind.MORTAL,
         )
         applications.append(damage_application)
+        if damage_application.destroyed:
+            destroyed_model_placements.append(pre_removal_placement)
         remaining -= 1
         if damage_application.destroyed and not spill_over:
             remaining_lost = remaining
@@ -120,6 +129,7 @@ def apply_direct_mortal_wounds_to_unit(
         source_context=source_context,
         application=mortal_wound_application,
         evidence=destruction_evidence,
+        destroyed_model_placements=tuple(destroyed_model_placements),
     )
     return mortal_wound_application
 

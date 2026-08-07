@@ -7,6 +7,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.battlefield_state import ModelPlacementPayload
     from warhammer40k_core.engine.damage_allocation import (
         DamageApplicationPayload,
         FeelNoPainResolutionPayload,
@@ -35,6 +36,7 @@ class MortalWoundFeelNoPainContextPayload(TypedDict):
     remaining_mortal_wounds_lost: int
     priority_model_ids: list[str]
     destruction_evidence: MortalWoundDestructionEvidencePayload | None
+    destroyed_model_placements: list[ModelPlacementPayload]
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
@@ -49,6 +51,11 @@ def parse_mortal_wound_feel_no_pain_context(
         raise GameLifecycleError("Mortal wound Feel No Pain context kind is invalid.")
     applications = _list(payload, "applications")
     resolutions = _list(payload, "feel_no_pain_resolutions")
+    destroyed_model_placements = _list(payload, "destroyed_model_placements")
+    if any(not isinstance(item, dict) for item in destroyed_model_placements):
+        raise GameLifecycleError(
+            "Mortal wound context destroyed_model_placements must contain objects."
+        )
     priority_model_ids = tuple(_string_list(payload, "priority_model_ids"))
     raw_destruction_evidence = payload.get("destruction_evidence")
     if raw_destruction_evidence is not None and not isinstance(raw_destruction_evidence, dict):
@@ -74,6 +81,10 @@ def parse_mortal_wound_feel_no_pain_context(
         "destruction_evidence": cast(
             "MortalWoundDestructionEvidencePayload | None",
             raw_destruction_evidence,
+        ),
+        "destroyed_model_placements": cast(
+            'list["ModelPlacementPayload"]',
+            destroyed_model_placements,
         ),
     }
 

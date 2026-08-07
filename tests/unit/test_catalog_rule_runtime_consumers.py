@@ -4689,6 +4689,7 @@ def test_catalog_command_point_destroyed_character_gain_is_scoped_and_idempotent
                 destroying_player_id=source_army.player_id,
                 source_kind=DestructionSourceKind.DEADLY_DEMISE,
                 source_rules_unit_instance_id=None,
+                source_model_instance_id=None,
             ).to_payload(),
             "target_unit_instance_id": character_target.unit_instance_id,
             "model_instance_id": character_target.own_models[0].model_instance_id,

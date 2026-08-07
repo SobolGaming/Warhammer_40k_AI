@@ -13,7 +13,7 @@ from warhammer40k_core.core.dice import (
     DiceRollStatePayload,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.battlefield_state import PlacementError
+from warhammer40k_core.engine.battlefield_state import ModelPlacement, PlacementError
 from warhammer40k_core.engine.damage_allocation_targets import (
     DamageKind as DamageKind,
 )
@@ -39,7 +39,9 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
     evidence_from_json,
     evidence_to_json,
+    pre_removal_model_placement_for_mortal_wound_destruction,
     record_finalized_mortal_wound_progress_destructions,
+    validate_mortal_wound_destroyed_model_placements,
     validate_mortal_wound_destruction_evidence_mode,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -1119,6 +1121,7 @@ class MortalWoundApplicationProgress:
     ignored_mortal_wounds: int = 0
     remaining_mortal_wounds_lost: int = 0
     priority_model_ids: tuple[str, ...] = ()
+    destroyed_model_placements: tuple[ModelPlacement, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -1210,6 +1213,19 @@ class MortalWoundApplicationProgress:
                 self.priority_model_ids,
             ),
         )
+        object.__setattr__(
+            self,
+            "destroyed_model_placements",
+            validate_mortal_wound_destroyed_model_placements(
+                placements=self.destroyed_model_placements,
+                destroyed_model_instance_ids=tuple(
+                    application.model_instance_id
+                    for application in self.applications
+                    if application.destroyed
+                ),
+                has_destruction_evidence=self.destruction_evidence is not None,
+            ),
+        )
         accounted = (
             sum(application.wounds_lost for application in self.applications)
             + self.ignored_mortal_wounds
@@ -1273,6 +1289,10 @@ class MortalWoundApplicationProgress:
             ignored_mortal_wounds=context["ignored_mortal_wounds"],
             remaining_mortal_wounds_lost=context["remaining_mortal_wounds_lost"],
             priority_model_ids=tuple(context["priority_model_ids"]),
+            destroyed_model_placements=tuple(
+                ModelPlacement.from_payload(placement)
+                for placement in context["destroyed_model_placements"]
+            ),
         )
 
     def to_feel_no_pain_context(
@@ -1302,6 +1322,9 @@ class MortalWoundApplicationProgress:
             "ignored_mortal_wounds": self.ignored_mortal_wounds,
             "remaining_mortal_wounds_lost": self.remaining_mortal_wounds_lost,
             "priority_model_ids": list(self.priority_model_ids),
+            "destroyed_model_placements": [
+                placement.to_payload() for placement in self.destroyed_model_placements
+            ],
         }
 
     def with_remaining_lost(self) -> Self:
@@ -1334,7 +1357,16 @@ class MortalWoundApplicationProgress:
         applications = list(self.applications)
         ignored = self.ignored_mortal_wounds
         remaining_lost = self.remaining_mortal_wounds_lost
+        destroyed_model_placements = list(self.destroyed_model_placements)
         if resolution.remaining_wounds > 0:
+            pre_removal_placement = (
+                pre_removal_model_placement_for_mortal_wound_destruction(
+                    state=state,
+                    model_instance_id=model_instance_id,
+                )
+                if remove_destroyed_model
+                else None
+            )
             application = apply_damage_to_model(
                 state=state,
                 target_unit_instance_id=self.target_unit_instance_id,
@@ -1344,6 +1376,12 @@ class MortalWoundApplicationProgress:
                 remove_destroyed_model=remove_destroyed_model,
             )
             applications.append(application)
+            if application.destroyed and remove_destroyed_model:
+                if pre_removal_placement is None:
+                    raise GameLifecycleError(
+                        "Mortal wound destruction is missing pre-removal placement evidence."
+                    )
+                destroyed_model_placements.append(pre_removal_placement)
             if application.destroyed and not self.spill_over:
                 remaining_lost += self.remaining_mortal_wounds - 1
         else:
@@ -1359,6 +1397,7 @@ class MortalWoundApplicationProgress:
             feel_no_pain_resolutions=(*self.feel_no_pain_resolutions, resolution),
             ignored_mortal_wounds=ignored,
             remaining_mortal_wounds_lost=remaining_lost,
+            destroyed_model_placements=tuple(destroyed_model_placements),
         )
 
     def to_application(self) -> MortalWoundApplication:

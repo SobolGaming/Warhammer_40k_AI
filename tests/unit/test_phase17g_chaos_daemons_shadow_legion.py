@@ -3625,6 +3625,7 @@ def _record_fade_to_darkness_destroyed_enemy(
             destroying_player_id="player-a",
             source_kind=DestructionSourceKind.ABILITY,
             source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
         )
         if attacker is None
         else ModelDestructionAttribution.for_attack(

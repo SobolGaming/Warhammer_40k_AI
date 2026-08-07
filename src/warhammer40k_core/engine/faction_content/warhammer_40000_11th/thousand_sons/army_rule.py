@@ -455,12 +455,13 @@ def _resolve_cabal_ritual_attempt(
             defender_player_id=player_id,
             mortal_wounds=d3_result.value,
             spill_over=True,
-            destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
                 state=context.state,
                 destroying_player_id=player_id,
                 source_rules_unit_instance_id=(
                     option.manifesting_model.rules_unit.unit_instance_id
                 ),
+                source_model_instance_id=option.manifesting_model.model.model_instance_id,
                 destruction_source_kind=DestructionSourceKind.ABILITY,
                 action_phase=BattlePhase.SHOOTING,
                 source_step="psychic_test_perils",
@@ -821,10 +822,11 @@ def _resolve_doombolt(
         defender_player_id=_payload_string(resolution_payload, key="target_owner_player_id"),
         mortal_wounds=mortal_wounds,
         spill_over=True,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
             destroying_player_id=_payload_string(resolution_payload, key="player_id"),
             source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=BattlePhase.SHOOTING,
             source_step="doombolt_mortal_wounds",

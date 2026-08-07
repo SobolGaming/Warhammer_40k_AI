@@ -455,26 +455,10 @@ def test_infected_outbreak_records_sticky_state_when_plaguebearers_control_objec
 
 
 def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wounds() -> None:
-    state = battle_state_with_center_objective_positions(
-        player_a_offsets=((0.0, 0.0),),
-        player_b_offsets=((0.5, 0.0),),
+    state = _relentless_carnage_state(
+        game_id="phase17g-relentless-carnage",
     )
-    state.game_id = "phase17g-relentless-carnage"
-    state.active_player_id = "player-a"
-    _set_current_battle_phase(state, BattlePhase.FIGHT)
-    source_unit_id = "army-alpha:intercessor-unit-1"
     target_unit_id = "army-beta:intercessor-unit-3"
-    _mark_player_as_chaos_daemons(state, player_id="player-a")
-    _replace_unit_keywords_and_abilities(
-        state,
-        unit_instance_id=source_unit_id,
-        keywords=("Character", "Monster", "Khorne"),
-        faction_keywords=("Legiones Daemonica",),
-        datasheet_abilities=(
-            _datasheet_ability(datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID),
-        ),
-    )
-    _set_fight_phase_end_state(state, engaged_unit_ids=(source_unit_id, target_unit_id))
     decisions = DecisionController()
     contribution = datasheets.runtime_contribution()
     handler = FightPhaseHandler(
@@ -541,26 +525,10 @@ def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wound
 
 
 def test_relentless_carnage_fight_end_handler_records_decline_without_damage() -> None:
-    state = battle_state_with_center_objective_positions(
-        player_a_offsets=((0.0, 0.0),),
-        player_b_offsets=((0.5, 0.0),),
+    state = _relentless_carnage_state(
+        game_id="phase17g-relentless-carnage-decline",
     )
-    state.game_id = "phase17g-relentless-carnage-decline"
-    state.active_player_id = "player-a"
-    _set_current_battle_phase(state, BattlePhase.FIGHT)
-    source_unit_id = "army-alpha:intercessor-unit-1"
     target_unit_id = "army-beta:intercessor-unit-3"
-    _mark_player_as_chaos_daemons(state, player_id="player-a")
-    _replace_unit_keywords_and_abilities(
-        state,
-        unit_instance_id=source_unit_id,
-        keywords=("Character", "Monster", "Khorne"),
-        faction_keywords=("Legiones Daemonica",),
-        datasheet_abilities=(
-            _datasheet_ability(datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID),
-        ),
-    )
-    _set_fight_phase_end_state(state, engaged_unit_ids=(source_unit_id, target_unit_id))
     decisions = DecisionController()
     contribution = datasheets.runtime_contribution()
     handler = FightPhaseHandler(
@@ -959,10 +927,11 @@ def test_relentless_carnage_mortal_wound_routing_records_pending_fnp() -> None:
         defender_player_id="player-b",
         mortal_wounds=1,
         spill_over=True,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
             destroying_player_id="player-a",
             source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=BattlePhase.FIGHT,
             source_step="relentless_carnage",
@@ -1004,10 +973,11 @@ def test_datasheet_private_helpers_fail_fast_on_invalid_inputs() -> None:
         defender_player_id="player-b",
         mortal_wounds=1,
         spill_over=True,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
             destroying_player_id="player-a",
             source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=BattlePhase.FIGHT,
             source_step="relentless_carnage",
@@ -1891,6 +1861,36 @@ def _replace_unit_keywords_and_abilities(
     state.army_definitions = updated_armies
 
 
+def _retain_one_alive_model(*, state: GameState, unit_instance_id: str) -> None:
+    unit = unit_by_id(state, unit_instance_id)
+    removed_model_ids = tuple(model.model_instance_id for model in unit.own_models[1:])
+    if not removed_model_ids:
+        return
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        updated_armies.append(
+            replace(
+                army,
+                units=tuple(
+                    replace(
+                        candidate,
+                        own_models=tuple(
+                            model if index == 0 else replace(model, wounds_remaining=0)
+                            for index, model in enumerate(candidate.own_models)
+                        ),
+                    )
+                    if candidate.unit_instance_id == unit_instance_id
+                    else candidate
+                    for candidate in army.units
+                ),
+            )
+        )
+    state.army_definitions = updated_armies
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    state.battlefield_state = state.battlefield_state.with_removed_models(removed_model_ids)
+
+
 def _place_units_near_center(
     state: GameState,
     *,
@@ -1991,6 +1991,7 @@ def _relentless_carnage_state(
             _datasheet_ability(datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID),
         ),
     )
+    _retain_one_alive_model(state=state, unit_instance_id=source_unit_id)
     _set_fight_phase_end_state(state, engaged_unit_ids=(source_unit_id, target_unit_id))
     return state
 

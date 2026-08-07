@@ -42,6 +42,13 @@ SLAUGHTERTHIRST_SOURCE_ROW_ID = (
 )
 SLAUGHTERTHIRST_DESCRIPTOR_ID = f"phase17e:{SLAUGHTERTHIRST_SOURCE_ROW_ID}"
 SLAUGHTERTHIRST_SOURCE_RULE_ID = f"phase17f:{SLAUGHTERTHIRST_DESCRIPTOR_ID}"
+GATEWAY_UNTO_DAMNATION_ENHANCEMENT_ID = "000009815005"
+GATEWAY_UNTO_DAMNATION_SOURCE_ROW_ID = (
+    f"enhancement:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:"
+    f"{GATEWAY_UNTO_DAMNATION_ENHANCEMENT_ID}"
+)
+GATEWAY_UNTO_DAMNATION_DESCRIPTOR_ID = f"phase17e:{GATEWAY_UNTO_DAMNATION_SOURCE_ROW_ID}"
+GATEWAY_UNTO_DAMNATION_SOURCE_RULE_ID = f"phase17f:{GATEWAY_UNTO_DAMNATION_DESCRIPTOR_ID}"
 MURDERCALL_HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:murdercall"
 BLOOD_TAINTED_HOOK_ID = "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:blood_tainted"
 LEGIONES_DAEMONICA_KEYWORD = "LEGIONES DAEMONICA"
@@ -51,6 +58,8 @@ AIRCRAFT_KEYWORD = "AIRCRAFT"
 MURDERCALL_RANGE_INCHES = 8.0
 MURDERCALL_SURGE_ABILITY = "blood_legion_murdercall_surge"
 BLOOD_TAINTED_STICKY_OBJECTIVE_ABILITY = "blood_legion_blood_tainted_sticky_objective"
+DEADLY_DEMISE_MODIFIER_ABILITY = "deadly_demise_modifier"
+DEADLY_DEMISE_DESTROYED_ENEMY_UNIT_CONDITION = "source_model_destroyed_enemy_unit_this_battle"
 
 
 class BloodLegionIrSupportError(ValueError):
@@ -256,6 +265,100 @@ def _slaughterthirst_payload() -> RuleIRPayload:
                         (
                             _parameter("weapon_ability", "Lance"),
                             _parameter("weapon_scope", "all"),
+                        ),
+                    ),
+                ),
+                duration=None,
+            ),
+        ),
+    )
+
+
+def _gateway_unto_damnation_payload() -> RuleIRPayload:
+    normalized_text = (
+        "Legiones Daemonica Khorne Monster model only. The bearer's Deadly Demise ability "
+        "inflicts mortal wounds on a D6 roll of 2+ instead of on a 6. In addition, if the "
+        "bearer has destroyed one or more enemy units this battle, the bearer has the Deadly "
+        "Demise D3+3 ability, instead of any other Deadly Demise ability on its datasheet."
+    )
+    eligibility_text = "Legiones Daemonica Khorne Monster model only"
+    effect_text = (
+        "The bearer's Deadly Demise ability inflicts mortal wounds on a D6 roll of 2+ instead "
+        "of on a 6. In addition, if the bearer has destroyed one or more enemy units this "
+        "battle, the bearer has the Deadly Demise D3+3 ability, instead of any other Deadly "
+        "Demise ability on its datasheet."
+    )
+    return _coverage_payload(
+        GATEWAY_UNTO_DAMNATION_SOURCE_ROW_ID,
+        normalized_text,
+        (
+            _keyword_gate_clause(
+                clause_id=_coverage_clause_id(
+                    GATEWAY_UNTO_DAMNATION_SOURCE_ROW_ID,
+                    "gate:001",
+                ),
+                normalized_text=normalized_text,
+                source_text=eligibility_text,
+                conditions=(
+                    _keyword_condition(
+                        normalized_text=normalized_text,
+                        source_text="Legiones Daemonica",
+                        parameter_key="required_keyword_sequence",
+                        parameter_value=(LEGIONES_DAEMONICA_KEYWORD,),
+                    ),
+                    _keyword_condition(
+                        normalized_text=normalized_text,
+                        source_text="Khorne",
+                        parameter_key="required_keyword",
+                        parameter_value=KHORNE_KEYWORD,
+                    ),
+                    _keyword_condition(
+                        normalized_text=normalized_text,
+                        source_text="Monster",
+                        parameter_key="required_keyword",
+                        parameter_value=MONSTER_KEYWORD,
+                    ),
+                ),
+            ),
+            _effect_clause(
+                clause_id=_coverage_clause_id(
+                    GATEWAY_UNTO_DAMNATION_SOURCE_ROW_ID,
+                    "effect:001",
+                ),
+                template_id=GRANT_ABILITY_TEMPLATE_ID,
+                normalized_text=normalized_text,
+                source_text=effect_text,
+                conditions=(
+                    _condition(
+                        kind="target_constraint",
+                        normalized_text=normalized_text,
+                        source_text="the bearer",
+                        parameters=(
+                            _parameter("relationship", "this_model_destroyed_unit"),
+                            _parameter("target_allegiance", "enemy"),
+                            _parameter("time_scope", "this_battle"),
+                        ),
+                    ),
+                ),
+                target=_target("this_model", normalized_text, "the bearer"),
+                effects=(
+                    _effect(
+                        "grant_ability",
+                        normalized_text,
+                        effect_text,
+                        (
+                            _parameter("ability", DEADLY_DEMISE_MODIFIER_ABILITY),
+                            _parameter("trigger_roll_threshold", 2),
+                            _parameter(
+                                "conditional_mortal_wounds_kind",
+                                "d3",
+                            ),
+                            _parameter("conditional_mortal_wounds_modifier", 3),
+                            _parameter(
+                                "condition",
+                                DEADLY_DEMISE_DESTROYED_ENEMY_UNIT_CONDITION,
+                            ),
+                            _parameter("replaces_existing_deadly_demise", True),
                         ),
                     ),
                 ),
@@ -481,6 +584,7 @@ def _coverage_payloads() -> Mapping[str, RuleIRPayload]:
         {
             BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID: _detachment_rule_payload(),
             BRAZENMAW_DESCRIPTOR_ID: _brazenmaw_payload(),
+            GATEWAY_UNTO_DAMNATION_DESCRIPTOR_ID: _gateway_unto_damnation_payload(),
             SLAUGHTERTHIRST_DESCRIPTOR_ID: _slaughterthirst_payload(),
         }
     )

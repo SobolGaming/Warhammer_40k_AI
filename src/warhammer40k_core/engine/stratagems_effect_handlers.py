@@ -184,10 +184,11 @@ def _apply_explosives_handler(
             ),
             mortal_wounds=mortal_wounds,
             spill_over=True,
-            destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
                 state=state,
                 destroying_player_id=use_record.player_id,
                 source_rules_unit_instance_id=_require_target_unit_id(target_binding),
+                source_model_instance_id=None,
                 destruction_source_kind=DestructionSourceKind.ABILITY,
                 action_phase=use_record.phase,
                 source_step="explosives_mortal_wounds",
@@ -644,10 +645,11 @@ def _apply_stratagem_mortal_wounds(
         ),
         mortal_wounds=mortal_wounds,
         spill_over=True,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
             destroying_player_id=use_record.player_id,
             source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=use_record.phase,
             source_step="stratagem_mortal_wounds",

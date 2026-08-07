@@ -38,10 +38,11 @@ def start_hazardous_mortal_wound_application(
         ),
         mortal_wounds=mortal_wounds,
         spill_over=True,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=state,
             destroying_player_id=destroying_player_id,
             source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.HAZARDOUS,
             action_phase=action_phase,
             source_step=source_step,

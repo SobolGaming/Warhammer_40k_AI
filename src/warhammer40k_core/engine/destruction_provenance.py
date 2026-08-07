@@ -36,6 +36,7 @@ class DestructionProvenancePayload(TypedDict):
 class ModelDestructionAttributionPayload(TypedDict):
     destroying_player_id: str
     source_rules_unit_instance_id: str | None
+    source_model_instance_id: str | None
     attacking_unit_instance_id: str | None
     attacking_model_instance_id: str | None
     destruction_provenance: DestructionProvenancePayload
@@ -175,6 +176,7 @@ class DestructionProvenance:
 class ModelDestructionAttribution:
     destroying_player_id: str
     source_rules_unit_instance_id: str | None
+    source_model_instance_id: str | None
     attacking_unit_instance_id: str | None
     attacking_model_instance_id: str | None
     destruction_provenance: DestructionProvenance
@@ -187,6 +189,7 @@ class ModelDestructionAttribution:
         )
         for field_name in (
             "source_rules_unit_instance_id",
+            "source_model_instance_id",
             "attacking_unit_instance_id",
             "attacking_model_instance_id",
         ):
@@ -202,9 +205,10 @@ class ModelDestructionAttribution:
                 self.attacking_unit_instance_id is None
                 or self.attacking_model_instance_id is None
                 or self.source_rules_unit_instance_id != self.attacking_unit_instance_id
+                or self.source_model_instance_id != self.attacking_model_instance_id
             ):
                 raise GameLifecycleError(
-                    "Attack destruction attribution requires matching attack identities."
+                    "Attack destruction attribution requires matching unit and model identities."
                 )
             return
         if (
@@ -213,6 +217,12 @@ class ModelDestructionAttribution:
         ):
             raise GameLifecycleError(
                 "Non-attack destruction attribution cannot carry attack identities."
+            )
+        if self.source_model_instance_id is not None and (
+            self.source_rules_unit_instance_id is None
+        ):
+            raise GameLifecycleError(
+                "Non-attack source model attribution requires a source rules unit."
             )
 
     @classmethod
@@ -228,6 +238,7 @@ class ModelDestructionAttribution:
         return cls(
             destroying_player_id=destroying_player_id,
             source_rules_unit_instance_id=attacking_unit_instance_id,
+            source_model_instance_id=attacking_model_instance_id,
             attacking_unit_instance_id=attacking_unit_instance_id,
             attacking_model_instance_id=attacking_model_instance_id,
             destruction_provenance=DestructionProvenance.for_attack(
@@ -243,10 +254,12 @@ class ModelDestructionAttribution:
         destroying_player_id: str,
         source_kind: DestructionSourceKind,
         source_rules_unit_instance_id: str | None,
+        source_model_instance_id: str | None,
     ) -> Self:
         return cls(
             destroying_player_id=destroying_player_id,
             source_rules_unit_instance_id=source_rules_unit_instance_id,
+            source_model_instance_id=source_model_instance_id,
             attacking_unit_instance_id=None,
             attacking_model_instance_id=None,
             destruction_provenance=DestructionProvenance.for_non_attack(source_kind),
@@ -256,6 +269,7 @@ class ModelDestructionAttribution:
         return {
             "destroying_player_id": self.destroying_player_id,
             "source_rules_unit_instance_id": self.source_rules_unit_instance_id,
+            "source_model_instance_id": self.source_model_instance_id,
             "attacking_unit_instance_id": self.attacking_unit_instance_id,
             "attacking_model_instance_id": self.attacking_model_instance_id,
             "destruction_provenance": self.destruction_provenance.to_payload(),
@@ -269,6 +283,7 @@ class ModelDestructionAttribution:
         required_fields = (
             "destroying_player_id",
             "source_rules_unit_instance_id",
+            "source_model_instance_id",
             "attacking_unit_instance_id",
             "attacking_model_instance_id",
             "destruction_provenance",
@@ -285,6 +300,10 @@ class ModelDestructionAttribution:
             source_rules_unit_instance_id=_validate_optional_identifier(
                 "source_rules_unit_instance_id",
                 raw.get("source_rules_unit_instance_id"),
+            ),
+            source_model_instance_id=_validate_optional_identifier(
+                "source_model_instance_id",
+                raw.get("source_model_instance_id"),
             ),
             attacking_unit_instance_id=_validate_optional_identifier(
                 "attacking_unit_instance_id",

@@ -625,10 +625,11 @@ def _apply_delirium_mortal_wounds(
         application_id=(f"{context.result.result_id}:delirium:{target_unit.unit_instance_id}"),
         source_rule_id=SOURCE_RULE_ID,
         source_context=source_context,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=context.state,
             destroying_player_id=chaos_knights_player_id,
             source_rules_unit_instance_id=None,
+            source_model_instance_id=None,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=context.phase,
             source_step="delirium_mortal_wounds",

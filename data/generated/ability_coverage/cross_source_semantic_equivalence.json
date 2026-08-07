@@ -7175,7 +7175,7 @@
     }
   ],
   "equivalent_group_count": 330,
-  "exact_text_only_member_count": 3261,
+  "exact_text_only_member_count": 3260,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -73478,12 +73478,10 @@
     },
     {
       "content_kind": "enhancement",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "576b49d7092cdc0c218c58cd9ad431fb1a3c090f7b2a57f3bff4da89499ef7e9",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "d1034038c4942d4e56af661a08799d86148f698769a1d99bba1f78446752647c",
+      "execution_status": "generic_ir_executable",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
       "member_id": "runtime-content:phase17f:phase17e:enhancement:chaos-daemons:blood-legion:000009815005",
@@ -73495,12 +73493,15 @@
       "rules_surface": "enhancement",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "3c40f8b20f5f268aacf351339803f9d01f99a4100f655683b29fbc7c657e48f4",
-      "semantic_hash": null,
+      "semantic_hash": "e3f7bb6ea89dfc880049a02d5148f9804e4f5c55f945dda91443aaf7a0831687",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Enhancements:000009815005"
+        "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:blood-legion",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009815005",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:enhancement:chaos-daemons:blood-legion:000009815005",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:chaos-daemons"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Enhancements:000009815005:description"
+        "gw-11e-phase17e-faction-coverage-2026-27:phase17e:enhancement:chaos-daemons:blood-legion:000009815005:source-text"
       ],
       "support_transfer": "none"
     },
@@ -122109,8 +122110,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "08edcbf7a0c9595b392d9fbe37229d552ba005fa34a018d929593446f2830da5",
+  "source_payload_checksum_sha256": "04a5669eeaa70f47073479f2ad8a10ab29a7398712ea28f603ab64b7361f702d",
   "source_text_unavailable_member_count": 110,
-  "structured_member_count": 723,
-  "upstream_execution_checksum_sha256": "71d22587da68d97266fdd40a99c83a9e59c25424238c698b8b57ee4aac2a2766"
+  "structured_member_count": 724,
+  "upstream_execution_checksum_sha256": "7c6626aa8ace62078f47711ff65ff43c7bc726a483b55e89ca722a51c8cc48dd"
 }

@@ -109,6 +109,7 @@ _SUPPORTED_GRANT_ABILITY_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
         daemonic_incursion_ir.ENDLESS_GIFT_SOURCE_ROW_ID,
         daemonic_incursion_ir.EVERSTAVE_SOURCE_ROW_ID,
         daemonic_incursion_ir.SOULSTEALER_SOURCE_ROW_ID,
+        blood_legion_ir.GATEWAY_UNTO_DAMNATION_SOURCE_ROW_ID,
         warptide_ir.SOUL_HUNGRY_SLAUGHTERERS_SOURCE_ROW_ID,
         "enhancement:emperors-children:court-of-the-phoenician:000010654002",
         "enhancement:emperors-children:court-of-the-phoenician:000010654004",

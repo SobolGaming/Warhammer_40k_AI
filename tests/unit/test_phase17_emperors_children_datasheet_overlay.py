@@ -2529,8 +2529,8 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
     ),
     [
         ("icon-lifecycle-outcome-0", False, True, "applied"),
-        ("icon-lifecycle-outcome-5", False, False, None),
-        ("icon-cap-outcome-0", True, True, "capped"),
+        ("icon-lifecycle-outcome-8", False, False, None),
+        ("icon-cap-outcome-1", True, True, "capped"),
     ],
 )
 def test_icon_of_excess_uses_shooting_lifecycle_destruction_and_replays(
@@ -2967,6 +2967,7 @@ def test_icon_of_excess_uses_typed_non_attack_source_attribution(
                     destroying_player_id="player-a",
                     source_kind=DestructionSourceKind.DEADLY_DEMISE,
                     source_rules_unit_instance_id=attributed_source_id,
+                    source_model_instance_id=None,
                 ).to_payload(),
                 "target_unit_instance_id": target.unit_instance_id,
                 "model_instance_id": model.model_instance_id,

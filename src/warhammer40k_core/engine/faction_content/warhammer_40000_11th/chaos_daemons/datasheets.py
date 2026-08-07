@@ -563,7 +563,7 @@ def apply_relentless_carnage_fight_phase_end_result(
     source_unit_id = _payload_string(result_payload, "source_unit_instance_id")
     source_rules_unit_id = _payload_string(result_payload, "source_rules_unit_instance_id")
     use_ability = _payload_bool(result_payload, "use_ability")
-    _validate_current_relentless_carnage_source(
+    source_model_id = _validate_current_relentless_carnage_source(
         state=context.state,
         player_id=player_id,
         source_unit_instance_id=source_unit_id,
@@ -651,10 +651,11 @@ def apply_relentless_carnage_fight_phase_end_result(
         ),
         mortal_wounds=mortal_wounds,
         spill_over=True,
-        destruction_evidence=MortalWoundDestructionEvidence.for_state(
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
             state=context.state,
             destroying_player_id=player_id,
             source_rules_unit_instance_id=source_rules_unit_id,
+            source_model_instance_id=source_model_id,
             destruction_source_kind=DestructionSourceKind.ABILITY,
             action_phase=BattlePhase.FIGHT,
             source_step="relentless_carnage_mortal_wounds",
@@ -1113,7 +1114,7 @@ def _validate_current_relentless_carnage_source(
     player_id: str,
     source_unit_instance_id: str,
     source_rules_unit_instance_id: str,
-) -> None:
+) -> str:
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
@@ -1129,8 +1130,11 @@ def _validate_current_relentless_carnage_source(
         BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
     ):
         raise GameLifecycleError("Relentless Carnage source ability is missing.")
-    if not source_unit.alive_own_models():
+    alive_source_models = source_unit.alive_own_models()
+    if not alive_source_models:
         raise GameLifecycleError("Relentless Carnage source unit is not alive.")
+    if len(alive_source_models) != 1:
+        raise GameLifecycleError("Relentless Carnage requires one exact source model.")
     source_rules_unit = rules_unit_view_by_id(
         state=state,
         unit_instance_id=source_unit_instance_id,
@@ -1139,6 +1143,7 @@ def _validate_current_relentless_carnage_source(
         raise GameLifecycleError("Relentless Carnage source rules-unit drift.")
     if source_rules_unit.owner_player_id != player_id:
         raise GameLifecycleError("Relentless Carnage source owner drift.")
+    return alive_source_models[0].model_instance_id
 
 
 def _relentless_carnage_target_from_payload(payload: dict[str, JsonValue]) -> str:

@@ -263,6 +263,7 @@ class CatalogSelectedToFightRiskRuntime:
                     "result_id": context.result.result_id,
                 }
             ),
+            source_rules_unit_instance_id=rules_unit_id,
         )
         return True if destruction.status is None else destruction.status
 

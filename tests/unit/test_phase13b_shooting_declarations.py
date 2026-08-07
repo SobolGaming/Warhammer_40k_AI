@@ -358,10 +358,11 @@ def _test_mortal_wound_destruction_evidence(
 ) -> MortalWoundDestructionEvidence:
     phase = state.current_battle_phase
     assert phase is not None
-    return MortalWoundDestructionEvidence.for_state(
+    return MortalWoundDestructionEvidence.for_non_attack_state(
         state=state,
         destroying_player_id="player-a",
         source_rules_unit_instance_id=None,
+        source_model_instance_id=None,
         destruction_source_kind=DestructionSourceKind.ABILITY,
         action_phase=phase,
         source_step="test_mortal_wounds",
@@ -2076,12 +2077,16 @@ def test_phase13d_deferred_devastating_mortal_wound_queue_survives_fnp_pause() -
     )
     deferred_a = DeferredMortalWounds(
         source_rule_id="weapon-ability:devastating-wounds",
+        source_model_instance_id=pool_a.attacker_model_instance_id,
+        source_weapon_profile=pool_a.weapon_profile,
         target_unit_instance_id=target_a.unit_instance_id,
         attack_context_id="phase13d-dev-queue:pool-001:attack-001",
         mortal_wounds=1,
     )
     deferred_b = DeferredMortalWounds(
         source_rule_id="weapon-ability:devastating-wounds",
+        source_model_instance_id=pool_b.attacker_model_instance_id,
+        source_weapon_profile=pool_b.weapon_profile,
         target_unit_instance_id=target_b.unit_instance_id,
         attack_context_id="phase13d-dev-queue:pool-002:attack-001",
         mortal_wounds=1,
@@ -8396,6 +8401,8 @@ def test_phase13c_attack_payloads_hooks_and_fast_dice_groups() -> None:
     assert AttackSequence.from_payload(sequence.to_payload()) == sequence
     deferred = DeferredMortalWounds(
         source_rule_id="devastating_wounds",
+        source_model_instance_id=base_pool.attacker_model_instance_id,
+        source_weapon_profile=base_pool.weapon_profile,
         target_unit_instance_id=defender.unit_instance_id,
         attack_context_id=sequence.attack_context_id(),
         mortal_wounds=2,
@@ -8419,6 +8426,8 @@ def test_phase13c_attack_payloads_hooks_and_fast_dice_groups() -> None:
     with pytest.raises(GameLifecycleError, match="mortal_wounds"):
         DeferredMortalWounds(
             source_rule_id="devastating_wounds",
+            source_model_instance_id=base_pool.attacker_model_instance_id,
+            source_weapon_profile=base_pool.weapon_profile,
             target_unit_instance_id=defender.unit_instance_id,
             attack_context_id=sequence.attack_context_id(),
             mortal_wounds=0,
@@ -13345,6 +13354,7 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
     )
     assert secondary_attribution.destroying_player_id == "player-b"
     assert secondary_attribution.source_rules_unit_instance_id == defender.unit_instance_id
+    assert secondary_attribution.source_model_instance_id == defender_model.model_instance_id
     assert secondary_attribution.attacking_unit_instance_id is None
     assert secondary_attribution.attacking_model_instance_id is None
     assert attacker_model.model_instance_id not in updated_battlefield.placed_model_ids()
@@ -13397,8 +13407,11 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
     assert primary_reaction_payloads[0]["execution_status"] == "resolved"
     assert len(finalized_payloads) == 1
     finalized_evidence = cast(dict[str, object], finalized_payloads[0]["destruction_evidence"])
-    assert (
-        finalized_evidence["destruction_source_kind"] == DestructionSourceKind.DEADLY_DEMISE.value
+    finalized_attribution = ModelDestructionAttribution.from_model_destroyed_payload(
+        cast(dict[str, JsonValue], finalized_evidence["destruction_attribution"])
+    )
+    assert finalized_attribution.destruction_provenance.destruction_source_kind is (
+        DestructionSourceKind.DEADLY_DEMISE
     )
     assert finalized_payloads[0]["destroyed_model_instance_ids"] == [
         attacker_model.model_instance_id

@@ -495,10 +495,11 @@ def _resolve_generic_roll_pool_mortal_wounds(
             application_id=f"{use_record.use_id}:mortal-wounds:{target_unit_id}",
             source_rule_id=source_rule_id,
             source_context=source_context,
-            destruction_evidence=MortalWoundDestructionEvidence.for_state(
+            destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
                 state=state,
                 destroying_player_id=use_record.player_id,
                 source_rules_unit_instance_id=None,
+                source_model_instance_id=None,
                 destruction_source_kind=DestructionSourceKind.ABILITY,
                 action_phase=BattlePhase(use_record.phase.value),
                 source_step="generic_stratagem_mortal_wounds",
@@ -586,10 +587,11 @@ def _resolve_generic_roll_per_context_target_mortal_wounds(
                 application_id=f"{use_record.use_id}:mortal-wounds:{target_unit_id}",
                 source_rule_id=source_rule_id,
                 source_context=source_context,
-                destruction_evidence=MortalWoundDestructionEvidence.for_state(
+                destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
                     state=state,
                     destroying_player_id=use_record.player_id,
                     source_rules_unit_instance_id=None,
+                    source_model_instance_id=None,
                     destruction_source_kind=DestructionSourceKind.ABILITY,
                     action_phase=BattlePhase(use_record.phase.value),
                     source_step="generic_stratagem_mortal_wounds",

@@ -32,14 +32,21 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.direct_mortal_wound_application import (
+    apply_direct_mortal_wounds_to_unit,
+)
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.return_on_death import (
     SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
@@ -963,6 +970,109 @@ def test_first_death_return_phase_end_hook_captures_model_destroyed_once() -> No
     }
 
 
+def test_mortal_wound_destruction_preserves_placement_through_return_on_death() -> None:
+    state = _battle_state_with_scenario()
+    beta = _beta_unit(state)
+    destroyed_model = beta.own_models[0]
+    source_unit = state.army_definitions[0].units[0]
+    assert state.battlefield_state is not None
+    destroyed_placement = state.battlefield_state.model_placement_by_id(
+        destroyed_model.model_instance_id
+    )
+    decisions = DecisionController()
+
+    application = apply_direct_mortal_wounds_to_unit(
+        state=state,
+        decisions=decisions,
+        application_id="application:return-on-death:mortal-wounds",
+        source_rule_id="rule:return-on-death:mortal-wounds",
+        source_context={"source_kind": "return_on_death_regression"},
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+            state=state,
+            destroying_player_id="player-a",
+            source_rules_unit_instance_id=source_unit.unit_instance_id,
+            source_model_instance_id=source_unit.own_models[0].model_instance_id,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=BattlePhase.COMMAND,
+            source_step="return_on_death_regression",
+        ),
+        target_unit_instance_id=beta.unit_instance_id,
+        mortal_wounds=destroyed_model.wounds_remaining,
+        spill_over=False,
+    )
+
+    assert application.applications[-1].destroyed
+    model_destroyed_event = next(
+        record
+        for record in decisions.event_log.records
+        if record.event_type == "model_destroyed"
+        and cast(dict[str, JsonValue], record.payload).get("model_instance_id")
+        == destroyed_model.model_instance_id
+    )
+    model_destroyed_payload = cast(dict[str, JsonValue], model_destroyed_event.payload)
+    assert model_destroyed_payload["destroyed_model_placement"] == (
+        destroyed_placement.to_payload()
+    )
+
+    runtime = CatalogReturnOnDeathRuntime(
+        ability_indexes_by_player_id={
+            "player-b": AbilityCatalogIndex.from_records(
+                (_return_on_death_record(wounds_remaining=1),)
+            )
+        },
+        armies=tuple(state.army_definitions),
+    )
+    current_phase = state.current_battle_phase
+    assert current_phase is BattlePhase.COMMAND
+    runtime.phase_end_handler(
+        PhaseEndObjectiveControlContext(
+            state=state,
+            event_log=decisions.event_log,
+            completed_phase=current_phase,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+    )
+    assert len(state.pending_return_on_death) == 1
+    pending = state.pending_return_on_death[0]
+    request = resolve_pending_return_on_death_phase_end(
+        state=state,
+        decisions=decisions,
+        dice_manager=DiceRollManager(
+            state.game_id,
+            event_log=decisions.event_log,
+            injected_results=(_roll_result(pending=pending, value=6),),
+        ),
+    )
+    assert request is not None
+    placement = UnitPlacement(
+        army_id=destroyed_placement.army_id,
+        player_id=destroyed_placement.player_id,
+        unit_instance_id=destroyed_placement.unit_instance_id,
+        model_placements=(destroyed_placement,),
+    )
+
+    resolved = apply_return_on_death_placement_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        result=_placement_result(request=request, placement=placement),
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+    )
+
+    assert resolved.resolved
+    assert (
+        state.battlefield_state.model_placement_by_id(destroyed_model.model_instance_id)
+        == destroyed_placement
+    )
+    returned_model = next(
+        model
+        for model in _beta_unit(state).own_models
+        if model.model_instance_id == destroyed_model.model_instance_id
+    )
+    assert returned_model.is_alive
+    assert returned_model.wounds_remaining == 1
+
+
 def _placement_result(*, request: DecisionRequest, placement: UnitPlacement) -> DecisionResult:
     return DecisionResult(
         result_id=f"result:{request.request_id}",
@@ -1096,10 +1206,13 @@ def _set_model_wounds(
     state.army_definitions = updated_armies
 
 
-def _return_on_death_record() -> AbilityCatalogRecord:
+def _return_on_death_record(*, wounds_remaining: int = 3) -> AbilityCatalogRecord:
     source = RuleSourceText.from_raw(
         source_id="rule:first-death-return",
-        raw_text=FIRST_DEATH_RETURN_TEXT,
+        raw_text=FIRST_DEATH_RETURN_TEXT.replace(
+            "3 wounds remaining",
+            f"{wounds_remaining} wounds remaining",
+        ),
     )
     rule_ir = compile_rule_source_text(
         source,
