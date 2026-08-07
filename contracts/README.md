@@ -1,6 +1,6 @@
 # CORE V2 external contract
 
-Contract version: `3.3.0`
+Contract version: `4.0.0`
 
 This directory is the canonical, language-neutral Phase 18D contract, Phase
 18E session protocol, Phase 18F optimistic-concurrency command protocol, Phase

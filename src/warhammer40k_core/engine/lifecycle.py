@@ -1234,8 +1234,17 @@ class GameLifecycle:
                 request=request,
                 result=result,
             )
-        if is_stratagem_placement_proposal_request(request):
+        if request.decision_type in _MOVEMENT_PROPOSAL_DECISION_TYPES:
             result.validate_for_request(request)
+            spatial_status = _physical_context.invalid_physical_proposal_spatial_context_status(
+                state=state,
+                decisions=self.decision_controller,
+                request=request,
+                result=result,
+            )
+            if spatial_status is not None:
+                return spatial_status
+        if is_stratagem_placement_proposal_request(request):
             if self._result_resolves_active_reaction_frame(result):
                 self.reaction_queue.validate_result(result)
             invalid_status = invalid_stratagem_placement_proposal_status(
@@ -1254,7 +1263,6 @@ class GameLifecycle:
             if invalid_status is not None:
                 return invalid_status
         elif is_destroyed_transport_disembark_proposal_request(request):
-            result.validate_for_request(request)
             if self._result_resolves_active_reaction_frame(result):
                 self.reaction_queue.validate_result(result)
             attack_sequence = _destroyed_transport_attack_sequence_for_request(
@@ -1282,15 +1290,6 @@ class GameLifecycle:
                 resolves_reaction_frame=self._result_resolves_active_reaction_frame(result),
             )
         elif request.decision_type in _MOVEMENT_PROPOSAL_DECISION_TYPES:
-            result.validate_for_request(request)
-            spatial_status = _physical_context.invalid_physical_proposal_spatial_context_status(
-                state=state,
-                decisions=self.decision_controller,
-                request=request,
-                result=result,
-            )
-            if spatial_status is not None:
-                return spatial_status
             if is_heroic_intervention_charge_move_request(request):
                 malformed_status = invalid_heroic_intervention_charge_move_status(
                     state=state,

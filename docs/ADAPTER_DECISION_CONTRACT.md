@@ -353,8 +353,8 @@ reference server currently requires:
 - `event-delta-v1` for the in-process integer-cursor adapter delta only;
 - `event-delta-v2` for authenticated role-bound HTTP event deltas;
 - `session-projection-v2-interaction` for full role-scoped reconnect projections;
-- `session-create-v2`, `session-metadata-v3-contract`,
-  `session-command-result-v3-contract`, and `session-command-outcome-v3-contract` for the
+- `session-create-v2`, `session-metadata-v4-contract`,
+  `session-command-result-v4-contract`, and `session-command-outcome-v4-contract` for the
   authenticated formal session protocol;
 - `replay-artifact-v2-phase18i` for replay artifacts whose required source identity includes
   `ruleset_descriptor_hash` and `rules_overlay_ids`;
@@ -2656,8 +2656,8 @@ Important behavior:
 The submission contract is shared. The information available to a producer is not always identical.
 
 Phase 18J publishes `GameViewPayload.battlefield_view` as the canonical visual
-play-surface contract. The optional member preserves Contract 3.x compatibility
-for older clients; current engine projections emit `battlefield-view-v1` when
+play-surface contract. The member remains optional because projections can
+exist before battlefield and mission state; current engine projections emit `battlefield-view-v1` when
 both battlefield and mission state exist and emit `null` before that boundary.
 Its normative world frame is defined in `contracts/coordinate-system.md`:
 inches, lower-left origin, positive X/Y on the board plane, positive Z above

@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`3.3.0`, declared in `openapi.yaml`, `manifest.json`, and
+`4.0.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -27,10 +27,11 @@ The pull-request contract audit performs three independent checks:
    contract requires a major increase. This preserves compatible additions
    made anywhere in the current major line.
 2. The proposed contract is compared with the oldest committed baseline for
-   its current major, currently `compatibility/3.0.0-shape.json`. Breaking
-   changes are rejected while the bundle major remains `3`, preserving the
-   original clients for the full supported major. The immutable 1.0.0 and
-   2.0.0 baselines remain committed as historical compatibility anchors.
+   its current major, currently `compatibility/4.0.0-shape.json`. Breaking
+   changes are rejected while the bundle major remains `4`, preserving the
+   original clients for the full supported major. The immutable 1.0.0,
+   2.0.0, and 3.0.0 baselines remain committed as historical compatibility
+   anchors.
 3. Every released baseline present on the base commit must retain the exact
    decoded UTF-8 text after line-ending normalization.
 
@@ -46,21 +47,20 @@ must be reviewed in the same change.
 
 ## Support window
 
-The reference server supports one contract major at a time. Contract 3.x makes
-Phase 18I interaction metadata a required, closed contract: visible pending
-decisions carry variant-aware descriptors, game views carry typed nested
-interaction requests, affected session payload families identify Contract 3,
-and projection hashes cover the complete viewer-visible projection. These are
-intentional old-client breaks and are not presented as Contract 2 additions.
+The reference server supports one contract major at a time. Contract 4 makes
+the engine-owned `spatial_context_hash` mandatory on every published movement
+and placement proposal request. This closes the Contract 3 shape that allowed a
+client to accept a physical proposal request without the opaque context used by
+the engine's pre-mutation drift validation.
 
-Deployers upgrading a hosted 2.x service must retain a separately deployed 2.x
-adapter through at least 2027-01-19 and one released 3.x minor line, whichever
-is later. The retained adapter is a separate deployment pinned to a 2.x build;
-the repository's Contract 3 reference server does not provide content
-negotiation or parallel 2.x endpoints. Contract 3 clients must fetch a full
-projection after authentication and replace any Contract 2 cached projection,
-interaction metadata, and projection hash. Contract 2 cursors remain valid only
-against the retained 2.x deployment. See `migrations/2-to-3.md`.
+Deployers upgrading a hosted 3.x service must retain a separately deployed 3.x
+adapter through at least 2027-02-06 and one released 4.x minor line, whichever
+is later. The retained adapter is a separate deployment pinned to a 3.x build;
+the repository's Contract 4 reference server does not provide content
+negotiation or parallel 3.x endpoints. Contract 4 clients must regenerate from
+the Contract 4 schemas, discard pending Contract 3 physical proposal requests,
+and fetch a fresh projection after authentication. Contract 3 cursors remain
+valid only against the retained 3.x deployment. See `migrations/3-to-4.md`.
 
 Unknown or mismatched request `schema_version` values fail before engine
 mutation with `schema_version_mismatch`. Servers never reinterpret a request

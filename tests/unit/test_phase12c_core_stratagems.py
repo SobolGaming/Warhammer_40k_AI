@@ -4258,6 +4258,65 @@ def test_rapid_ingress_stale_placement_proposal_rejects_before_queue_pop() -> No
     assert state.reserve_state_for_unit(reserve_state.unit_instance_id) == reserve_state
 
 
+def test_rapid_ingress_reserve_state_drift_rejects_before_queue_pop() -> None:
+    lifecycle = _battle_lifecycle()
+    state, reserve_state, reserve_unit, reserve_army, placement_request = (
+        _request_rapid_ingress_placement(lifecycle)
+    )
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        placement_request.payload
+    )
+    placement = _reserve_placement(
+        army=reserve_army,
+        reserve_unit=reserve_unit,
+        poses=tuple(
+            Pose.at(x=12.0 + index * 2.0, y=40.0, z=0.0, facing_degrees=180.0)
+            for index, _model in enumerate(reserve_unit.own_models)
+        ),
+    )
+    before_record_count = len(lifecycle.decision_controller.records)
+    assert proposal_request.spatial_context_hash == state.physical_proposal_context_hash()
+
+    state.replace_reserve_state(
+        reserve_state.mark_arrived(
+            battle_round=state.battle_round,
+            phase=BattlePhase.MOVEMENT,
+            large_model_exception_used=False,
+            post_arrival_restrictions=(),
+        )
+    )
+
+    assert proposal_request.spatial_context_hash != state.physical_proposal_context_hash()
+    status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id="phase12c-rapid-ingress-reserve-state-drift",
+            request_id=placement_request.request_id,
+            decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=placement_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(
+                PlacementProposalPayload(
+                    proposal_request_id=proposal_request.request_id,
+                    proposal_kind=ProposalKind.REINFORCEMENT,
+                    unit_instance_id=reserve_state.unit_instance_id,
+                    placement_kind=BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD,
+                    attempted_placement=placement,
+                ).to_payload()
+            ),
+        )
+    )
+    assert isinstance(status.payload, dict)
+    validation_payload = cast(dict[str, JsonValue], status.payload["proposal_validation"])
+    violations = cast(list[JsonValue], validation_payload["violations"])
+    violation_payload = cast(dict[str, JsonValue], violations[0])
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert violation_payload["violation_code"] == "spatial_context_drift"
+    assert violation_payload["field"] == "spatial_context_hash"
+    assert len(lifecycle.decision_controller.records) == before_record_count
+    assert lifecycle.decision_controller.queue.pending_requests == (placement_request,)
+
+
 def test_rapid_ingress_malformed_placement_payload_rejects_before_queue_pop() -> None:
     lifecycle = _battle_lifecycle()
     state, reserve_state, _reserve_unit, _reserve_army, placement_request = (

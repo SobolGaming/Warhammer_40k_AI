@@ -8,6 +8,11 @@ from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.reserves import ReserveState, ReserveStatePayload
+from warhammer40k_core.engine.transports import (
+    TransportCargoState,
+    TransportCargoStatePayload,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_controller import DecisionController
@@ -33,6 +38,8 @@ class PhysicalProposalContextPayload(TypedDict):
     battlefield_state: JsonValue
     mission_setup: JsonValue
     models: list[PhysicalModelContextPayload]
+    reserve_states: list[ReserveStatePayload]
+    transport_cargo_states: list[TransportCargoStatePayload]
 
 
 def physical_proposal_context_hash(
@@ -40,6 +47,8 @@ def physical_proposal_context_hash(
     armies: tuple[ArmyDefinition, ...],
     battlefield_state: BattlefieldRuntimeState,
     mission_setup: MissionSetup,
+    reserve_states: tuple[ReserveState, ...],
+    transport_cargo_states: tuple[TransportCargoState, ...],
 ) -> str:
     if type(armies) is not tuple or any(type(army) is not ArmyDefinition for army in armies):
         raise GameLifecycleError(
@@ -49,6 +58,18 @@ def physical_proposal_context_hash(
         raise GameLifecycleError("Physical proposal context requires BattlefieldRuntimeState.")
     if type(mission_setup) is not MissionSetup:
         raise GameLifecycleError("Physical proposal context requires MissionSetup.")
+    if type(reserve_states) is not tuple or any(
+        type(reserve_state) is not ReserveState for reserve_state in reserve_states
+    ):
+        raise GameLifecycleError(
+            "Physical proposal context reserve_states must be a ReserveState tuple."
+        )
+    if type(transport_cargo_states) is not tuple or any(
+        type(cargo_state) is not TransportCargoState for cargo_state in transport_cargo_states
+    ):
+        raise GameLifecycleError(
+            "Physical proposal context transport_cargo_states must be a TransportCargoState tuple."
+        )
     models = [
         PhysicalModelContextPayload(
             army_id=army.army_id,
@@ -115,6 +136,20 @@ def physical_proposal_context_hash(
         battlefield_state=validate_json_value(battlefield_payload),
         mission_setup=validate_json_value(mission_payload),
         models=models,
+        reserve_states=[
+            reserve_state.to_payload()
+            for reserve_state in sorted(
+                reserve_states,
+                key=lambda value: (value.player_id, value.unit_instance_id),
+            )
+        ],
+        transport_cargo_states=[
+            cargo_state.to_payload()
+            for cargo_state in sorted(
+                transport_cargo_states,
+                key=lambda value: (value.player_id, value.transport_unit_instance_id),
+            )
+        ],
     )
     json_payload = validate_json_value(payload)
     return hashlib.sha256(canonical_json(json_payload).encode("utf-8")).hexdigest()
@@ -135,6 +170,8 @@ def physical_proposal_context_hash_for_state(state: GameState) -> str:
         armies=tuple(state.army_definitions),
         battlefield_state=state.battlefield_state,
         mission_setup=state.mission_setup,
+        reserve_states=tuple(state.reserve_states),
+        transport_cargo_states=tuple(state.transport_cargo_states),
     )
 
 

@@ -211,14 +211,28 @@ def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
     )
 
 
-def test_session_metadata_contract_version_accepts_compatible_major_three_releases() -> None:
+def test_live_movement_proposal_schema_requires_spatial_context_hash() -> None:
+    registry = _schema_registry()
+    validator = _schema_validator("decision-family-live.schema.json", registry=registry)
+    payload = _read_json(
+        REPO_ROOT / DECISION_EXAMPLE_DIR / "families" / "submit_movement_proposal.json"
+    )
+    without_spatial_context = json.loads(json.dumps(payload))
+    proposal_request = without_spatial_context["payload"]["proposal_request"]
+    proposal_request.pop("spatial_context_hash")
+
+    with pytest.raises(ValidationError):
+        validator.validate(without_spatial_context)
+
+
+def test_session_metadata_contract_version_accepts_compatible_major_four_releases() -> None:
     registry = _schema_registry()
     validator = _schema_validator("session-metadata.schema.json", registry=registry)
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "3.1.0"}
-    incompatible = {**_json_object(metadata), "server_contract_version": "2.1.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "4.1.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "3.3.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):

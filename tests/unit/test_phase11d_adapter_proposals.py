@@ -1106,6 +1106,67 @@ def test_source_geometry_drift_rejects_pending_shared_placement_before_queue_pop
     assert decisions.queue.pending_requests == (placement_request,)
 
 
+def test_transport_cargo_drift_rejects_pending_disembark_before_queue_pop() -> None:
+    state, passenger, transport = _battle_state_with_embarked_passenger()
+    handler = MovementPhaseHandler(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        parameterized_proposals=True,
+    )
+    decisions = DecisionController()
+    disembark_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=disembark_request,
+            option_id=passenger.unit_instance_id,
+            result_id="phase18j-select-cargo-drift-disembark",
+        )
+    )
+    proposal = MovementProposalRequest.from_decision_request_payload(placement_request.payload)
+    cargo = state.transport_cargo_state_for_transport(transport.unit_instance_id)
+    assert cargo is not None
+    before_battlefield = state.battlefield_state
+    before_record_count = len(decisions.records)
+    assert proposal.spatial_context_hash == state.physical_proposal_context_hash()
+
+    state.replace_transport_cargo_state(cargo.with_disembarked_unit(passenger.unit_instance_id))
+
+    assert proposal.spatial_context_hash != state.physical_proposal_context_hash()
+    status = _submit_parameterized_handler_payload(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        payload=_json(
+            PlacementProposalPayload(
+                proposal_request_id=proposal.request_id,
+                proposal_kind=ProposalKind.DISEMBARK,
+                unit_instance_id=passenger.unit_instance_id,
+                placement_kind=BattlefieldPlacementKind.DISEMBARK,
+                attempted_placement=_disembark_placement(passenger),
+                transport_unit_instance_id=transport.unit_instance_id,
+                disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+                transport_movement_status=TransportMovementStatus.NOT_MOVED,
+            ).to_payload()
+        ),
+        result_id="phase18j-submit-cargo-drift-disembark",
+    )
+    assert status is not None
+    violation = cast(
+        list[dict[str, object]],
+        _proposal_validation(status)["violations"],
+    )[0]
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert violation["violation_code"] == "spatial_context_drift"
+    assert violation["field"] == "spatial_context_hash"
+    assert state.battlefield_state is before_battlefield
+    assert len(decisions.records) == before_record_count
+    assert decisions.queue.pending_requests == (placement_request,)
+
+
 def test_valid_disembark_placement_proposal_updates_cargo_and_battlefield() -> None:
     state, passenger, transport = _battle_state_with_embarked_passenger()
     handler = MovementPhaseHandler(
