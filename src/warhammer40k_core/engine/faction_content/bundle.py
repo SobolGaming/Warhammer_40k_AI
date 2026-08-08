@@ -69,6 +69,9 @@ from warhammer40k_core.engine.enhancement_effects import (
     EnhancementEffectRegistry,
 )
 from warhammer40k_core.engine.faction_content import bundle_catalog_indexes as _catalog_indexes
+from warhammer40k_core.engine.faction_content import (
+    bundle_execution_records as _bundle_execution_records,
+)
 from warhammer40k_core.engine.faction_content import bundle_payloads as _bundle_payloads
 from warhammer40k_core.engine.faction_content import bundle_validation as _bundle_validation
 from warhammer40k_core.engine.faction_content import catalog_generic_hooks, catalog_runtime_hooks
@@ -168,6 +171,7 @@ from warhammer40k_core.engine.rule_execution import (
 )
 from warhammer40k_core.engine.runtime_modifiers import (
     AdvanceRollModifierBinding,
+    AttackRerollPermissionBinding,
     ChargeRollModifierBinding,
     HitRollModifierBinding,
     MovementBudgetModifierBinding,
@@ -236,7 +240,7 @@ _validate_identifier = _bundle_validation.validate_identifier
 _validate_identifier_tuple = _bundle_validation.validate_identifier_tuple
 _validate_index_mapping = _bundle_validation.validate_index_mapping
 _validate_runtime_contributions = _bundle_validation.validate_runtime_content_contributions
-_validate_tuple = _bundle_validation.validate_tuple
+_selected_faction_execution_records = _bundle_execution_records.selected_faction_execution_records
 _merge_records = _bundle_validation.merge_records
 _contribution_values = _bundle_validation.contribution_values
 
@@ -263,6 +267,7 @@ class RuntimeContentContribution:
     advance_roll_modifier_bindings: tuple[AdvanceRollModifierBinding, ...] = ()
     charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = ()
     weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = ()
+    attack_reroll_permission_bindings: tuple[AttackRerollPermissionBinding, ...] = ()
     post_roll_weapon_profile_modifier_bindings: tuple[
         PostRollWeaponProfileModifierBinding,
         ...,
@@ -344,6 +349,7 @@ class RuntimeContentContribution:
         advance_roll_modifier_bindings: tuple[AdvanceRollModifierBinding, ...] = (),
         charge_roll_modifier_bindings: tuple[ChargeRollModifierBinding, ...] = (),
         weapon_profile_modifier_bindings: tuple[WeaponProfileModifierBinding, ...] = (),
+        attack_reroll_permission_bindings: tuple[AttackRerollPermissionBinding, ...] = (),
         post_roll_weapon_profile_modifier_bindings: tuple[
             PostRollWeaponProfileModifierBinding,
             ...,
@@ -621,6 +627,11 @@ class RuntimeContentContribution:
                 "weapon_profile_modifier_bindings",
                 weapon_profile_modifier_bindings,
                 WeaponProfileModifierBinding,
+            ),
+            (
+                "attack_reroll_permission_bindings",
+                attack_reroll_permission_bindings,
+                AttackRerollPermissionBinding,
             ),
             (
                 "post_roll_weapon_profile_modifier_bindings",
@@ -1042,6 +1053,14 @@ def combine_runtime_content_contributions(
             _contribution_values(
                 validated_contributions,
                 lambda contribution: contribution.weapon_profile_modifier_bindings,
+            ),
+            lambda binding: binding.modifier_id,
+        ),
+        attack_reroll_permission_bindings=_combine_unique_values(
+            "attack reroll permission binding",
+            _contribution_values(
+                validated_contributions,
+                lambda contribution: contribution.attack_reroll_permission_bindings,
             ),
             lambda binding: binding.modifier_id,
         ),
@@ -1888,7 +1907,13 @@ class RuntimeContentBundle:
                 validated_contributions,
                 lambda contribution: contribution.post_roll_weapon_profile_modifier_bindings,
             ),
-            attack_reroll_permission_bindings=(catalog_rules.attack_reroll_permission_bindings()),
+            attack_reroll_permission_bindings=(
+                catalog_rules.attack_reroll_permission_bindings()
+                + _contribution_values(
+                    validated_contributions,
+                    lambda contribution: contribution.attack_reroll_permission_bindings,
+                )
+            ),
             failed_save_damage_replacement_bindings=(
                 catalog_rules.failed_save_damage_replacement_bindings()
             ),
@@ -1960,27 +1985,3 @@ class RuntimeContentBundle:
 
 def _validate_contributions(contributions: object) -> tuple[RuntimeContentContribution, ...]:
     return _validate_runtime_contributions(contributions, RuntimeContentContribution)
-
-
-def _selected_faction_execution_records(
-    available_records: tuple[_Phase17FExecutionRecord, ...],
-    selected_execution_record_ids: tuple[str, ...],
-) -> tuple[_Phase17FExecutionRecord, ...]:
-    ids = _validate_identifier_tuple("selected_execution_record_ids", selected_execution_record_ids)
-    selected_ids = set(ids)
-    if not selected_ids:
-        return ()
-    records_by_id: dict[str, _Phase17FExecutionRecord] = {}
-    records = _validate_tuple(
-        "faction_execution_records", available_records, _Phase17FExecutionRecord
-    )
-    for record in records:
-        if record.execution_id in records_by_id:
-            raise GameLifecycleError("Runtime content faction execution record IDs must be unique.")
-        records_by_id[record.execution_id] = record
-    missing_ids = tuple(sorted(selected_ids.difference(records_by_id)))
-    if missing_ids:
-        raise GameLifecycleError(
-            f"Runtime content selected unknown faction execution records: {', '.join(missing_ids)}."
-        )
-    return tuple(records_by_id[execution_id] for execution_id in sorted(selected_ids))

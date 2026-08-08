@@ -40,10 +40,12 @@ from ._artifacts import (
 from ._runtime_artifacts import (
     JulyChaosDaemonsRuntimeArtifact,
     JulyChaosDaemonsRuntimeRow,
+    JulyChaosSpaceMarinesDefilerArtifact,
     JulyDaemonicManifestationArtifact,
     JulyExaltedPatronArtifact,
     JulyThousandSonsDefilerArtifact,
     july_chaos_daemons_runtime_from_json_bytes,
+    july_chaos_space_marines_defiler_from_json_bytes,
     july_daemonic_manifestation_from_json_bytes,
     july_exalted_patron_from_json_bytes,
     july_thousand_sons_defiler_from_json_bytes,
@@ -164,6 +166,12 @@ def thousand_sons_defiler() -> JulyThousandSonsDefilerArtifact:
     )
 
 
+def chaos_space_marines_defiler() -> JulyChaosSpaceMarinesDefilerArtifact:
+    return july_chaos_space_marines_defiler_from_json_bytes(
+        _staged_artifact_bytes("gw-11e-july-chaos-space-marines-defiler-2026-07")
+    )
+
+
 def subrules() -> JulySubruleArtifact:
     return july_subrules_from_json_bytes(
         _staged_artifact_bytes("gw-11e-july-faction-pack-subrules-2026-07")
@@ -225,6 +233,7 @@ __all__ = (
     "SOURCE_VERSION",
     "JulyChaosDaemonsRuntimeArtifact",
     "JulyChaosDaemonsRuntimeRow",
+    "JulyChaosSpaceMarinesDefilerArtifact",
     "JulyDaemonicManifestationArtifact",
     "JulyDatasheetArtifact",
     "JulyDatasheetPreviewArtifact",
@@ -244,6 +253,7 @@ __all__ = (
     "audit_manifest_links",
     "audit_runtime_predecessor_references",
     "chaos_daemons_runtime_updates",
+    "chaos_space_marines_defiler",
     "daemonic_manifestation",
     "datasheet_support_preview",
     "datasheets",

@@ -7,6 +7,7 @@ from tests.chaos_defiler_catalog_helpers import (
     instantiate_defiler,
     july_defiler_catalog_package,
     july_defiler_overlay_artifacts,
+    july_thousand_sons_defiler_overlay_artifacts,
 )
 
 from warhammer40k_core.core.attributes import Characteristic
@@ -19,6 +20,9 @@ from warhammer40k_core.engine.wargear_selections import WargearSelection
 from warhammer40k_core.rules.source_overlay import OverlaySourceArtifact, SourceOverlayPack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_defiler_datasheet_overlay_2026_06 as defiler_overlay,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_space_marines_defiler_datasheet_overlay_2026_07 as csm_defiler_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     thousand_sons_defiler_datasheet_overlay_2026_07 as july_defiler_overlay,
@@ -41,6 +45,15 @@ _EXPECTED_BLANK_KEYWORD_SUPERSEDES = {
     "000004209:blank-keyword:global:true:15742": ("chaos-defiler-death-guard-remove-empty-keyword"),
 }
 _EXPECTED_DEFILER_ROWS = {
+    csm_defiler_overlay.CHAOS_SPACE_MARINES_DEFILER_DATASHEET_ID: (
+        "CSM",
+        "HERETIC ASTARTES",
+        "CHAOS",
+        12,
+        "000008359",
+        "Dark Pacts",
+        "Daemonforge",
+    ),
     defiler_overlay.DEATH_GUARD_DEFILER_DATASHEET_ID: (
         "DG",
         "DEATH GUARD",
@@ -141,7 +154,10 @@ def test_july_thousand_sons_defiler_overlay_is_source_id_scoped() -> None:
         )
 
     june_abilities = _artifact_by_table(defiler_overlay_artifacts(), "Datasheets_abilities")
-    july_abilities = _artifact_by_table(july_defiler_overlay_artifacts(), "Datasheets_abilities")
+    july_abilities = _artifact_by_table(
+        july_thousand_sons_defiler_overlay_artifacts(),
+        "Datasheets_abilities",
+    )
     chaos_space_marines_rows = tuple(
         row
         for row in june_abilities.rows
@@ -166,8 +182,28 @@ def test_july_thousand_sons_defiler_overlay_is_source_id_scoped() -> None:
     }
 
 
-def test_chaos_defiler_overlay_builds_catalog_and_runtime_units() -> None:
-    package = defiler_catalog_package()
+def test_july_chaos_space_marines_defiler_overlay_replaces_daemonforge() -> None:
+    datasheet = july_defiler_catalog_package().army_catalog.datasheet_by_id(
+        csm_defiler_overlay.CHAOS_SPACE_MARINES_DEFILER_DATASHEET_ID
+    )
+    daemonforge = next(ability for ability in datasheet.abilities if ability.name == "Daemonforge")
+    artifact = csm_defiler_overlay.overlay_pack()
+
+    assert daemonforge.ability_id == "000000969:daemonforge"
+    assert daemonforge.effect_description == (
+        "Each time this unit makes a Dark Pact, until the end of the phase, each time "
+        "this model makes an attack, re-roll a Wound roll of 1."
+    )
+    assert "once per battle" not in daemonforge.effect_description.lower()
+    assert SourceOverlayPack.from_payload(artifact.to_payload()) == artifact
+    assert (
+        csm_defiler_overlay.source_package_identity_payload()["source_payload_checksum_sha256"]
+        == artifact.package_hash()
+    )
+
+
+def test_current_chaos_defiler_overlays_build_all_catalog_and_runtime_units() -> None:
+    package = july_defiler_catalog_package()
 
     for datasheet_id, expected in _EXPECTED_DEFILER_ROWS.items():
         (

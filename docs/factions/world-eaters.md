@@ -99,7 +99,7 @@ This table reports datasheet-level playability evidence generated from the exact
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Defiler (`000004207`) | `Partial` | Full | Full | Full | Full | Partial | Partial; supported detachments 0/8 (None) | Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:setup-reactive-shoot-charge`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only | `000008428` Blessings of Khorne: `descriptor_only` Faction ability row is not fully consumed; detachment support 0/8. |
+| Defiler (`000004207`) | `Playable` | Full | Full | Full | Full | Full | Partial; supported detachments 0/8 (None) | Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:setup-reactive-shoot-charge`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords`; coverage artifact only | Faction army rule consumed; detachment support 0/8. Supported detachment IDs: None. |
 
 ### Datasheet Ability Details
 
@@ -108,7 +108,7 @@ This table reports datasheet-level playability evidence generated from the exact
 | Defiler (`000004207`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
 | Defiler (`000004207`) | Scuttling Walker (`000004207:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
 | Defiler (`000004207`) | Unleash Wrath (`000004207:unleash-wrath`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.out_of_phase_action.enemy_unit` | `catalog-ir:setup-reactive-shoot-charge` | None |
-| Defiler (`000004207`) | Blessings of Khorne (`000008428`) | `faction` | `descriptor_only` | `unknown.ability_text` | None | None |
+| Defiler (`000004207`) | Blessings of Khorne (`000008428`) | `faction` | `engine_consumed` | `faction.army_rule.blessings_of_khorne` | `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords` | None |
 
 ## Cross-source Semantic Equivalence
 

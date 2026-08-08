@@ -872,6 +872,7 @@ class JulyStagingPackageArtifact(msgspec.Struct, frozen=True):
         expected_staged_artifact_ids = {
             "gw-11e-july-chaos-daemons-daemonic-manifestation-2026-07",
             "gw-11e-july-chaos-daemons-runtime-updates-2026-07",
+            "gw-11e-july-chaos-space-marines-defiler-2026-07",
             "gw-11e-july-emperors-children-exalted-patron-2026-07",
             "gw-11e-july-thousand-sons-defiler-2026-07",
             "gw-11e-july-faction-pack-datasheet-preview-2026-07",

@@ -22,6 +22,7 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     rule_runtime_binding_ids: list[str]
     event_subscriptions: list[dict[str, JsonValue]]
     battle_formation_hook_ids: list[str]
+    start_battle_hook_ids: list[str]
     battle_round_start_hook_ids: list[str]
     turn_end_hook_ids: list[str]
     command_phase_start_hook_ids: list[str]
@@ -56,13 +57,17 @@ class RuntimeContentBundleSummaryPayload(TypedDict):
     unit_characteristic_modifier_ids: list[str]
     hit_roll_modifier_ids: list[str]
     wound_roll_modifier_ids: list[str]
+    damage_roll_modifier_ids: list[str]
+    allocated_attack_damage_modifier_ids: list[str]
     save_option_modifier_ids: list[str]
     movement_budget_modifier_ids: list[str]
     objective_control_modifier_ids: list[str]
     advance_roll_modifier_ids: list[str]
     charge_roll_modifier_ids: list[str]
     weapon_profile_modifier_ids: list[str]
+    attack_reroll_permission_modifier_ids: list[str]
     post_roll_weapon_profile_modifier_ids: list[str]
+    failed_save_damage_replacement_modifier_ids: list[str]
     faction_execution_record_ids: list[str]
     selected_execution_record_ids: list[str]
     bundle_summary_hash: str
@@ -101,6 +106,9 @@ def runtime_content_bundle_summary_payload(
         "event_subscriptions": bundle.event_index.to_summary_payload(),
         "battle_formation_hook_ids": [
             binding.hook_id for binding in bundle.battle_formation_hook_registry.all_bindings()
+        ],
+        "start_battle_hook_ids": [
+            binding.hook_id for binding in bundle.start_battle_hook_registry.all_bindings()
         ],
         "battle_round_start_hook_ids": [
             binding.hook_id for binding in bundle.battle_round_start_hook_registry.all_bindings()
@@ -211,44 +219,64 @@ def runtime_content_bundle_summary_payload(
         ],
         "unit_characteristic_modifier_ids": [
             binding.modifier_id
-            for binding in bundle.runtime_modifier_registry.all_unit_characteristic_bindings()
+            for binding in (bundle.runtime_modifier_registry.unit_characteristic_modifier_bindings)
         ],
         "hit_roll_modifier_ids": [
             binding.modifier_id
-            for binding in bundle.runtime_modifier_registry.all_hit_roll_bindings()
+            for binding in bundle.runtime_modifier_registry.hit_roll_modifier_bindings
         ],
         "wound_roll_modifier_ids": [
             binding.modifier_id
-            for binding in bundle.runtime_modifier_registry.all_wound_roll_bindings()
+            for binding in bundle.runtime_modifier_registry.wound_roll_modifier_bindings
+        ],
+        "damage_roll_modifier_ids": [
+            binding.modifier_id
+            for binding in bundle.runtime_modifier_registry.damage_roll_modifier_bindings
+        ],
+        "allocated_attack_damage_modifier_ids": [
+            binding.modifier_id
+            for binding in (
+                bundle.runtime_modifier_registry.allocated_attack_damage_modifier_bindings
+            )
         ],
         "save_option_modifier_ids": [
             binding.modifier_id
-            for binding in bundle.runtime_modifier_registry.all_save_option_bindings()
+            for binding in bundle.runtime_modifier_registry.save_option_modifier_bindings
         ],
         "movement_budget_modifier_ids": [
             binding.modifier_id
-            for binding in bundle.runtime_modifier_registry.all_movement_budget_bindings()
+            for binding in bundle.runtime_modifier_registry.movement_budget_modifier_bindings
         ],
         "objective_control_modifier_ids": [
             binding.modifier_id
-            for binding in bundle.runtime_modifier_registry.all_objective_control_bindings()
+            for binding in bundle.runtime_modifier_registry.objective_control_modifier_bindings
         ],
         "advance_roll_modifier_ids": [
             binding.modifier_id
-            for binding in bundle.runtime_modifier_registry.all_advance_roll_bindings()
+            for binding in bundle.runtime_modifier_registry.advance_roll_modifier_bindings
         ],
         "charge_roll_modifier_ids": [
             binding.modifier_id
-            for binding in bundle.runtime_modifier_registry.all_charge_roll_bindings()
+            for binding in bundle.runtime_modifier_registry.charge_roll_modifier_bindings
         ],
         "weapon_profile_modifier_ids": [
             binding.modifier_id
-            for binding in bundle.runtime_modifier_registry.all_weapon_profile_bindings()
+            for binding in bundle.runtime_modifier_registry.weapon_profile_modifier_bindings
+        ],
+        "attack_reroll_permission_modifier_ids": [
+            binding.modifier_id
+            for binding in bundle.runtime_modifier_registry.attack_reroll_permission_bindings
         ],
         "post_roll_weapon_profile_modifier_ids": [
             binding.modifier_id
             for binding in (
                 bundle.runtime_modifier_registry.post_roll_weapon_profile_modifier_bindings
+            )
+        ],
+        "failed_save_damage_replacement_modifier_ids": [
+            binding.modifier_id
+            for binding in (
+                bundle.runtime_modifier_registry.failed_save_damage_replacement_bindings
             )
         ],
         "faction_execution_record_ids": [

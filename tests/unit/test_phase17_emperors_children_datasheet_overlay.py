@@ -9,6 +9,7 @@ from typing import Any, cast
 
 import pytest
 from tools.generate_ability_support_matrix import (
+    ABILITY_SUPPORT_DATASHEET_IDS,
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 from tools.generate_emperors_children_fulgrim_rule_ir import (
@@ -4011,7 +4012,13 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
 
 @lru_cache(maxsize=1)
 def _catalog_package() -> CanonicalCatalogPackage:
-    return _ability_support_catalog_package()
+    # Keep an unrelated faction addition from changing these replay fixtures' RNG history.
+    replay_fixture_datasheet_ids = tuple(
+        datasheet_id
+        for datasheet_id in ABILITY_SUPPORT_DATASHEET_IDS
+        if datasheet_id != "000000969"
+    )
+    return _ability_support_catalog_package(datasheet_ids=replay_fixture_datasheet_ids)
 
 
 def _kakophonist_runtime_fixture() -> tuple[

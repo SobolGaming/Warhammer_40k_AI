@@ -1449,13 +1449,53 @@
   },
   {
     "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000969/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000000969/datasheet/000000969:daemonforge/none",
+      "chaos-daemons-bridge-catalog/000000969/datasheet/000000969:scuttling-walker/none",
+      "chaos-daemons-bridge-catalog/000000969/faction/000008359/none"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Full",
+    "datasheet_id": "000000969",
+    "datasheet_name": "Defiler",
+    "detachment_ids": [
+      "cabal-of-chaos",
+      "chaos-cult",
+      "creations-of-bile",
+      "cult-of-the-arkifane",
+      "deceptors",
+      "devotees-of-destruction",
+      "dread-talons",
+      "fellhammer-siege-host",
+      "hurons-marauders",
+      "murdertalon-raiders",
+      "nightmare-hunt",
+      "pactbound-zealots",
+      "renegade-raiders",
+      "renegade-warband",
+      "soulforged-warpack",
+      "veterans-of-the-long-war",
+      "warpstrike-champions"
+    ],
+    "faction_id": "chaos-space-marines",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Full",
+    "notes": "Faction army rule consumed; detachment support 0/17. Supported detachment IDs: None.",
+    "overall": "Playable",
+    "supported_detachment_ids": [],
+    "tests_evidence": "Runtime consumers: `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:defiler-daemonforge:wound-reroll`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:mortal_wound_feel_no_pain`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000004209/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004209/datasheet/000004209:barrage-of-filth/none",
       "chaos-daemons-bridge-catalog/000004209/datasheet/000004209:scuttling-walker/none",
       "chaos-daemons-bridge-catalog/000004209/faction/000008396/none"
     ],
     "catalog_status": "Full",
-    "datasheet_ability_status": "Partial",
+    "datasheet_ability_status": "Full",
     "datasheet_id": "000004209",
     "datasheet_name": "Defiler",
     "detachment_ids": [
@@ -1472,10 +1512,10 @@
     "faction_id": "death-guard",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "`000008396` Nurgle's Gift (Aura): `descriptor_only` Faction ability row is not fully consumed; detachment support 0/9.",
-    "overall": "Partial",
+    "notes": "Faction army rule consumed; detachment support 0/9. Supported detachment IDs: None.",
+    "overall": "Playable",
     "supported_detachment_ids": [],
-    "tests_evidence": "Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:post-shoot-hit-target-status`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:post-shoot-hit-target-status`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:armour-save-option`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:leadership`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:melee-hit-roll`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:movement-budget`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:objective-control`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:toughness`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },
@@ -1854,7 +1894,7 @@
       "chaos-daemons-bridge-catalog/000004207/faction/000008428/none"
     ],
     "catalog_status": "Full",
-    "datasheet_ability_status": "Partial",
+    "datasheet_ability_status": "Full",
     "datasheet_id": "000004207",
     "datasheet_name": "Defiler",
     "detachment_ids": [
@@ -1870,10 +1910,10 @@
     "faction_id": "world-eaters",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "`000008428` Blessings of Khorne: `descriptor_only` Faction ability row is not fully consumed; detachment support 0/8.",
-    "overall": "Partial",
+    "notes": "Faction army rule consumed; detachment support 0/8. Supported detachment IDs: None.",
+    "overall": "Playable",
     "supported_detachment_ids": [],
-    "tests_evidence": "Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:setup-reactive-shoot-charge`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:setup-reactive-shoot-charge`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   }

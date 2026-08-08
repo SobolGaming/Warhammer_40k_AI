@@ -147,24 +147,24 @@ def test_faction_army_rule_categories_are_engine_consumed() -> None:
         for row in ability_coverage_category_rows(ability_support_matrix_rows())
     }
     expected_abilities = {
-        "Chaos Daemons Army Rule": "The Shadow of Chaos",
-        "Chaos Space Marines Army Rule": "Dark Pacts",
-        "Death Guard Army Rule": "Nurgle's Gift",
-        "World Eaters Army Rule": "Blessings of Khorne",
-        "Emperor's Children Army Rule": "Thrill Seekers",
-        "Faction Army Rule Prioritised Efficiency": "Prioritised Efficiency",
-        "Faction Army Rule Cabal Of Sorcerers": "Cabal of Sorcerers",
-        "Faction Army Rule Cult Ambush": "Cult Ambush",
-        "Faction Army Rule Acts Of Faith": "Acts of Faith",
-        "Faction Army Rule Martial Katah": "Martial Ka'tah",
-        "Faction Army Rule Doctrina Imperatives": "Doctrina Imperatives",
-        "Faction Army Rule Shadow In The Warp Synapse": "Shadow in the Warp / Synapse",
-        "Faction Army Rule Code Chivalric": "Code Chivalric",
-        "Faction Army Rule Bondsman": "Bondsman",
+        "Chaos Daemons Army Rule": ("The Shadow of Chaos",),
+        "Chaos Space Marines Army Rule": ("Dark Pacts",),
+        "Death Guard Army Rule": ("Nurgle's Gift", "Nurgle's Gift (Aura)"),
+        "World Eaters Army Rule": ("Blessings of Khorne",),
+        "Emperor's Children Army Rule": ("Thrill Seekers",),
+        "Faction Army Rule Prioritised Efficiency": ("Prioritised Efficiency",),
+        "Faction Army Rule Cabal Of Sorcerers": ("Cabal of Sorcerers",),
+        "Faction Army Rule Cult Ambush": ("Cult Ambush",),
+        "Faction Army Rule Acts Of Faith": ("Acts of Faith",),
+        "Faction Army Rule Martial Katah": ("Martial Ka'tah",),
+        "Faction Army Rule Doctrina Imperatives": ("Doctrina Imperatives",),
+        "Faction Army Rule Shadow In The Warp Synapse": ("Shadow in the Warp / Synapse",),
+        "Faction Army Rule Code Chivalric": ("Code Chivalric",),
+        "Faction Army Rule Bondsman": ("Bondsman",),
     }
 
-    for category_name, ability_name in expected_abilities.items():
+    for category_name, ability_names in expected_abilities.items():
         category = categories[category_name]
-        assert category.ability_names == (ability_name,)
+        assert category.ability_names == ability_names
         assert category.support_stages == (AbilityCoverageSupportStage.ENGINE_CONSUMED,)
         assert category.runtime_consumer_ids

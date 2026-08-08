@@ -55,6 +55,7 @@ if TYPE_CHECKING:
 CONTRIBUTION_ID = "warhammer_40000_11th:death_guard:army_rule:scaffold"
 HOOK_ID = "warhammer_40000_11th:death_guard:army_rule:nurgles_gift"
 SOURCE_RULE_ID = "phase17f:phase17e:death-guard:army-rule"
+NURGLES_GIFT_SOURCE_ABILITY_ID = "000008396"
 DEATH_GUARD_FACTION_ID = "death-guard"
 DEATH_GUARD_FACTION_KEYWORD = "DEATH GUARD"
 NURGLES_GIFT_STATE_KIND = "death_guard_nurgles_gift_plague_selection"

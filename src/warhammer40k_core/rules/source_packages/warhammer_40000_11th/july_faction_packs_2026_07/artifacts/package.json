@@ -46,6 +46,11 @@
       "artifact_sha256": "b2c3e45752b5b82224600823d9c52bf6931c44d5106feee761dda2978a0c9492"
     },
     {
+      "artifact_id": "gw-11e-july-chaos-space-marines-defiler-2026-07",
+      "artifact_path": "artifacts/chaos-space-marines-defiler.json",
+      "artifact_sha256": "404ac5b8ceccc83ede30bf851e613ece1692473a2885d2a246b64fdc22310b26"
+    },
+    {
       "artifact_id": "gw-11e-july-emperors-children-exalted-patron-2026-07",
       "artifact_path": "artifacts/emperors-children-exalted-patron.json",
       "artifact_sha256": "5eb687b60880e4fa7bfca725f99fce858f0be88198063688b8a609dad056a0aa"
