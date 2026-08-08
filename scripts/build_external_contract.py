@@ -24,6 +24,10 @@ from warhammer40k_core.adapters.access_control import (
     DEV_PLAYER_B_TOKEN,
     bearer_authorization,
 )
+from warhammer40k_core.adapters.capability_manifest import (
+    CAPABILITY_MANIFEST_SCHEMA_SHA256,
+    CAPABILITY_MANIFEST_SCHEMA_VERSION,
+)
 from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.external_contract import (
     CREATE_SESSION_SCHEMA_VERSION,
@@ -108,6 +112,7 @@ _SPECIAL_PARAMETERIZED_PAYLOAD_KINDS = frozenset(
 PRIMARY_SCHEMA_NAMES = frozenset(
     {
         "annotated-decision-request.schema.json",
+        "capability-manifest.schema.json",
         "create-session.schema.json",
         "decision-request-view.schema.json",
         "error-envelope.schema.json",
@@ -131,6 +136,10 @@ PRIMARY_SCHEMA_NAMES = frozenset(
     }
 )
 PAYLOAD_SCHEMA_VERSION_BY_NAME = {
+    "capability-manifest.schema.json": (
+        "schema_version",
+        CAPABILITY_MANIFEST_SCHEMA_VERSION,
+    ),
     "create-session.schema.json": ("schema_version", CREATE_SESSION_SCHEMA_VERSION),
     "decision-family-coverage.schema.json": (
         "schema_version",
@@ -328,6 +337,13 @@ def _verify_python_schema_versions(schemas: dict[str, Schema]) -> None:
             raise ExternalContractError(
                 f"{schema_name} {property_name} drifted from Python payload version {expected}."
             )
+    capability_schema_hash = hashlib.sha256(
+        (SCHEMA_DIR / "capability-manifest.schema.json").read_bytes()
+    ).hexdigest()
+    if capability_schema_hash != CAPABILITY_MANIFEST_SCHEMA_SHA256:
+        raise ExternalContractError(
+            "Capability manifest runtime contract-schema hash drifted from the canonical schema."
+        )
 
 
 def _write_server_read_examples(*, server: AdapterGameServer, game_id: str) -> None:
@@ -364,6 +380,21 @@ def _write_server_read_examples(*, server: AdapterGameServer, game_id: str) -> N
             expected_status=200,
         ),
     )
+    for viewer, token in (
+        ("player-a", DEV_PLAYER_A_TOKEN),
+        ("player-b", DEV_PLAYER_B_TOKEN),
+    ):
+        _write_json(
+            EXAMPLE_DIR / f"support-profile-{viewer}-redacted.json",
+            _successful_response(
+                server.handle(
+                    method="GET",
+                    path=f"/games/{game_id}/support-profile",
+                    authorization=bearer_authorization(token),
+                ),
+                expected_status=200,
+            ),
+        )
     _write_json(
         EXAMPLE_DIR / "replay-metadata.json",
         _successful_response(
@@ -1064,6 +1095,8 @@ def _example_schema_bindings() -> dict[str, JsonValue]:
         "session-command-outcome.schema.json"
     )
     bindings["examples/support-profile.json"] = "support-profile.schema.json"
+    bindings["examples/support-profile-player-a-redacted.json"] = "support-profile.schema.json"
+    bindings["examples/support-profile-player-b-redacted.json"] = "support-profile.schema.json"
     bindings["examples/replay-metadata.json"] = "replay-metadata.schema.json"
     return bindings
 

@@ -49,6 +49,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
+    CatalogJsonObject,
     DatasheetAbilityDescriptor,
 )
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
@@ -79,6 +80,13 @@ from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.parsed_tokens import TextSpan
+from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
+    RuleIR,
+    RuleParseDiagnostic,
+    RuleUnsupportedReason,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PLAYER_A = "player-a"
@@ -199,6 +207,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     )
 
     support_profile = _request(server, "GET", f"/games/{game_id}/support-profile")
+    _schema_validator("support-profile.schema.json").validate(support_profile)
     assert support_profile["overall_status"] == "playable"
     assert support_profile["eligible_for_headless_self_play_smoke"] is True
     assert "path_editor" in _field_list(support_profile, "interaction_kinds")
@@ -236,6 +245,64 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
         assert semantic_status in {"placeholder", "partial", "implemented"}
         if semantic_status != "implemented":
             assert _field_string(row, "status") != "full"
+
+    capability_manifest = _field_object(support_profile, "capability_manifest")
+    assert capability_manifest["schema_version"] == "capability-manifest-v1"
+    assert [
+        _field_string(_json_object(result), "dimension")
+        for result in _field_list(capability_manifest, "mode_capabilities")
+    ] == [
+        "LOADABLE",
+        "DISPLAYABLE",
+        "MUSTERABLE",
+        "PHYSICALLY_PLAYABLE",
+        "SEMANTICALLY_EXECUTABLE",
+        "FULL_GAME_SUPPORTED",
+        "NETWORK_SAFE",
+        "REPLAY_VERIFIED",
+    ]
+    claims = _field_object(capability_manifest, "certification_claims")
+    assert claims["phase20a_certified"] is False
+    assert claims["phase20d_release_eligible"] is False
+    assert _field_list(capability_manifest, "unsupported_effects")
+    identities = _field_object(capability_manifest, "identities")
+    assert _field_object(identities, "mission_pack")
+    assert _field_object(identities, "terrain_layout")
+    assert _field_object(identities, "contract_schema")["contract_version"] == "4.1.0"
+
+    player_a_support = _request(
+        server,
+        "GET",
+        f"/games/{game_id}/support-profile",
+        query={"viewer_player_id": PLAYER_A},
+    )
+    _schema_validator("support-profile.schema.json").validate(player_a_support)
+    player_a_manifest = _field_object(player_a_support, "capability_manifest")
+    assert player_a_manifest["viewer_scope"] == PLAYER_A
+    assert {
+        _field_string(_json_object(row), "player_id")
+        for row in _field_list(player_a_support, "mustering_support_rows")
+    } == {PLAYER_A}
+    assert player_a_support["eligible_for_headless_self_play_smoke"] is False
+    for row_name in ("roster_rows", "unit_rows", "rule_rows", "geometry_rows"):
+        assert {
+            _field_string(_json_object(row), "player_id")
+            for row in _field_list(player_a_manifest, row_name)
+        } == {PLAYER_A}
+    assert all(
+        _field_string(_json_object(effect), "player_id") == PLAYER_A
+        for effect in _field_list(player_a_manifest, "unsupported_effects")
+    )
+    assert player_a_manifest["selection_hash"] != capability_manifest["selection_hash"]
+    assert (
+        _request(
+            server,
+            "GET",
+            f"/games/{game_id}/support-profile",
+            query={"viewer_player_id": PLAYER_A},
+        )
+        == player_a_support
+    )
 
 
 def test_phase18e_formal_session_protocol_completes_all_required_operations() -> None:
@@ -849,7 +916,7 @@ def test_phase18e_status_response_redacts_secret_pending_for_non_actor_viewers()
     assert _field_string(no_viewer_status, "actor_id") == PLAYER_A
 
 
-def test_phase18e_support_profile_generic_ir_datasheet_ability_is_playable() -> None:
+def test_phase17o_capability_manifest_does_not_treat_unconsumed_ir_as_executable() -> None:
     server = AdapterGameServer()
     game_id = "phase18e-server-generic-ir-support"
     catalog = _catalog_with_selected_generic_ir_ability()
@@ -865,6 +932,24 @@ def test_phase18e_support_profile_generic_ir_datasheet_ability_is_playable() -> 
     assert _field_string(rows[0], "catalog_support") == CatalogAbilitySupport.GENERIC_RULE_IR.value
     assert _field_string(rows[0], "status") == "playable"
     assert support_profile["overall_status"] == "playable"
+    manifest = _field_object(support_profile, "capability_manifest")
+    rule_rows = [
+        _json_object(row)
+        for row in _field_list(manifest, "rule_rows")
+        if _field_string(_json_object(row), "owner_id") == "phase18e-generic-ir-no-consumer"
+    ]
+    assert len(rule_rows) == 2
+    for rule_row in rule_rows:
+        assert _field_string(rule_row, "load_support") == "generic_rule_ir"
+        assert _field_string(rule_row, "semantic_execution") == "ir_compiled_unsupported"
+        semantic = next(
+            _json_object(result)
+            for result in _field_list(rule_row, "capabilities")
+            if _field_string(_json_object(result), "dimension") == "SEMANTICALLY_EXECUTABLE"
+        )
+        assert semantic["status"] == "unsupported"
+        assert semantic["reason_code"] == "ability_ir_compiled_unsupported"
+    assert len(_field_list(manifest, "unsupported_effects")) >= 2
 
 
 def test_phase18e_server_submission_rejections_are_typed() -> None:
@@ -1996,6 +2081,27 @@ def _contains_key(value: JsonValue, key: str) -> bool:
 
 def _catalog_with_selected_generic_ir_ability() -> ArmyCatalog:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    source_span = TextSpan(text="Unsupported generic test effect.", start=0, end=32)
+    rule_ir = RuleIR(
+        rule_id="phase18e:test:generic-ir-no-consumer",
+        source_id="phase18e:test:generic-ir-no-consumer",
+        normalized_text=source_span.text,
+        parser_version="phase18e-test-parser",
+        clauses=(
+            RuleClause(
+                clause_id="phase18e:test:generic-ir-no-consumer:clause:001",
+                source_span=source_span,
+                unsupported_reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
+                diagnostics=(
+                    RuleParseDiagnostic(
+                        reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
+                        message="No generic runtime consumer exists for this test effect.",
+                        source_span=source_span,
+                    ),
+                ),
+            ),
+        ),
+    )
     added_ability = DatasheetAbilityDescriptor(
         ability_id="phase18e-generic-ir-no-consumer",
         name="Phase 18E Generic IR No Consumer",
@@ -2005,7 +2111,7 @@ def _catalog_with_selected_generic_ir_ability() -> ArmyCatalog:
         effect_description="Structured generic IR without a phase host consumer.",
         timing_tags=("command_phase",),
         parameter_tokens=(),
-        rule_ir_payload={"kind": "phase18e_test_no_consumer"},
+        rule_ir_payload=cast(CatalogJsonObject, rule_ir.to_payload()),
     )
     datasheets = tuple(
         replace(datasheet, abilities=(*datasheet.abilities, added_ability))
@@ -2093,6 +2199,7 @@ def _schema_validator(schema_name: str) -> _PayloadValidator:
 def _schema_payloads() -> dict[str, Schema]:
     names = (
         "battlefield-view.schema.json",
+        "capability-manifest.schema.json",
         "decision-request-view.schema.json",
         "event-delta.schema.json",
         "game-view.schema.json",
@@ -2103,6 +2210,7 @@ def _schema_payloads() -> dict[str, Schema]:
         "session-command-result.schema.json",
         "session-metadata.schema.json",
         "session-projection.schema.json",
+        "support-profile.schema.json",
     )
     return {
         name: cast(Schema, _read_json(REPO_ROOT / "contracts" / "schemas" / name)) for name in names

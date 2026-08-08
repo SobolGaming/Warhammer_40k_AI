@@ -395,16 +395,28 @@ DATASHEET_SUPPORT_CATALOG_ONLY = "Catalog-only"
 DATASHEET_SUPPORT_BLOCKED = "Blocked"
 DATASHEET_SUPPORT_UNKNOWN = "Unknown"
 DATASHEET_SUPPORT_NONE = "None"
-DATASHEET_SUPPORT_OVERALL_VALUES = frozenset(
-    (
-        DATASHEET_SUPPORT_FULL,
-        DATASHEET_SUPPORT_PLAYABLE,
-        DATASHEET_SUPPORT_PARTIAL,
-        DATASHEET_SUPPORT_CATALOG_ONLY,
-        DATASHEET_SUPPORT_BLOCKED,
-        DATASHEET_SUPPORT_UNKNOWN,
-    )
+
+FACTION_SUPPORT_SECTION_TITLES = (
+    "At a glance",
+    "Source",
+    "July 22, 2026 Source Status",
+    "Faction Pack Review",
+    "Semantic Support Snapshot",
+    "Detachment Rule Support",
+    "Datasheet Source Review",
+    "Secondary-reference Audit",
+    "Datasheet component coverage",
+    "Cross-source Semantic Equivalence",
 )
+DATASHEET_SUPPORT_OVERALL_ORDER = (
+    DATASHEET_SUPPORT_FULL,
+    DATASHEET_SUPPORT_PLAYABLE,
+    DATASHEET_SUPPORT_PARTIAL,
+    DATASHEET_SUPPORT_CATALOG_ONLY,
+    DATASHEET_SUPPORT_BLOCKED,
+    DATASHEET_SUPPORT_UNKNOWN,
+)
+DATASHEET_SUPPORT_OVERALL_VALUES = frozenset(DATASHEET_SUPPORT_OVERALL_ORDER)
 DATASHEET_SUPPORT_COMPONENT_VALUES = frozenset(
     (*DATASHEET_SUPPORT_OVERALL_VALUES, DATASHEET_SUPPORT_NONE)
 )
@@ -2212,11 +2224,12 @@ def _faction_interaction_status(
     )
     if not faction_rows and not detachment_support_rows:
         return _component(DATASHEET_SUPPORT_NONE)
-    supported_detachments = tuple(
+    implemented_detachments = tuple(
         row for row in detachment_support_rows if _detachment_rule_is_supported(row)
     )
     detachment_note = (
-        f"detachment support {len(supported_detachments)}/{len(detachment_support_rows)}"
+        "implemented detachment rules "
+        f"{len(implemented_detachments)}/{len(detachment_support_rows)}"
         if detachment_support_rows
         else "no generated detachment support rows"
     )
@@ -2234,13 +2247,13 @@ def _faction_interaction_status(
             DATASHEET_SUPPORT_PARTIAL,
             f"Faction ability row is not fully consumed; {detachment_note}.",
         )
-    if detachment_support_rows and len(supported_detachments) != len(detachment_support_rows):
-        supported_ids = tuple(row.detachment_id for row in supported_detachments)
+    if detachment_support_rows and len(implemented_detachments) != len(detachment_support_rows):
+        implemented_ids = tuple(row.detachment_id for row in implemented_detachments)
         return _component(
             DATASHEET_SUPPORT_PARTIAL,
             (
-                f"Faction army rule consumed; {detachment_note}. Supported detachment IDs: "
-                f"{_inline_code_list(supported_ids)}."
+                f"Faction army rule consumed; {detachment_note}. Implemented detachment IDs: "
+                f"{_inline_code_list(implemented_ids)}."
             ),
         )
     return _component(DATASHEET_SUPPORT_FULL, f"Faction army rule consumed; {detachment_note}.")
@@ -3175,9 +3188,11 @@ def _faction_support_markdown(
     engine_consumed_row_count = _engine_consumed_coverage_row_count(
         (*army_rule_rows, *detachment_rule_rows, *exact_rows)
     )
-    supported_detachment_count = sum(
-        1 for row in detachment_support_rows if _detachment_rule_is_supported(row)
-    )
+    implemented_detachment_count = sum(row.overall == "Full" for row in detachment_support_rows)
+    partial_detachment_count = sum(row.overall == "Partial" for row in detachment_support_rows)
+    source_only_detachment_count = sum(row.overall == "None" for row in detachment_support_rows)
+    executable_enhancement_count = _engine_consumed_coverage_row_count(enhancement_rows)
+    executable_stratagem_count = _engine_consumed_coverage_row_count(stratagem_rows)
     lines = [
         f"# {faction_row.name} Support Matrix",
         "",
@@ -3186,25 +3201,52 @@ def _faction_support_markdown(
             "faction support file."
         ),
         "",
+        "## At a glance",
+        "",
         (
-            "Source PDF: "
+            "This page separates source data from executable rules. An `Implemented` row "
+            "has a runtime consumer and focused evidence for the listed rule. `Partial` means "
+            "only some semantics execute. `Source-only` means the rule is recorded for display "
+            "or audit but is not executable gameplay support."
+        ),
+        "",
+        "| Content | Total source rows | Implemented / executable | Partial | Source-only |",
+        "| --- | ---: | ---: | ---: | ---: |",
+        (
+            f"| Detachment rules | {len(detachment_rule_rows)} | "
+            f"{implemented_detachment_count} | {partial_detachment_count} | "
+            f"{source_only_detachment_count} |"
+        ),
+        (
+            f"| Enhancements | {len(enhancement_rows)} | {executable_enhancement_count} | "
+            f"0 | {len(enhancement_rows) - executable_enhancement_count} |"
+        ),
+        (
+            f"| Stratagems | {len(stratagem_rows)} | {executable_stratagem_count} | "
+            f"0 | {len(stratagem_rows) - executable_stratagem_count} |"
+        ),
+        "",
+        (
+            f"Across army, detachment, Enhancement, and Stratagem records, "
+            f"{engine_consumed_row_count} exact source rows currently have engine consumers."
+        ),
+        "",
+        (
+            "**This is not a full-game support claim.** Roster legality, selected units, model "
+            "geometry, mission scoring, network safety, and replay certification are separate "
+            "Phase 17O capabilities. Query the selected game's `capability_manifest` before "
+            "presenting a roster or matchup as playable or certified."
+        ),
+        "",
+        "## Source",
+        "",
+        (
+            "Official source PDF: "
             f"[{_markdown_text(pdf_record.pdf_filename)}]"
             f"(<../../data/raw/faction_packs/{pdf_record.pdf_filename}>)"
         ),
         "",
-        f"Current source package: `{pdf_record.package_id}`",
-        "",
-        "## Summary",
-        "",
-        (
-            "| Detachments | Supported detachments | Exact Enhancements | "
-            "Exact Stratagems | Engine-supported rows |"
-        ),
-        "| ---: | ---: | ---: | ---: | ---: |",
-        (
-            f"| {len(detachment_rule_rows)} | {supported_detachment_count} | "
-            f"{len(enhancement_rows)} | {len(stratagem_rows)} | {engine_consumed_row_count} |"
-        ),
+        f"Current generated source package: `{pdf_record.package_id}`",
     ]
     lines.extend(_july_source_update_markdown(faction_row.faction_id))
     if faction_row.faction_id == EMPERORS_CHILDREN_FACTION_ID:
@@ -3228,6 +3270,15 @@ def _faction_support_markdown(
                 )
             )
         )
+    else:
+        lines.extend(
+            _generic_faction_pack_review_markdown(
+                faction_id=faction_row.faction_id,
+                pdf_filename=pdf_record.pdf_filename,
+                package_id=pdf_record.package_id,
+            )
+        )
+    if faction_row.faction_id == EMPERORS_CHILDREN_FACTION_ID:
         lines.extend(
             emperors_children_semantic_snapshot_markdown(
                 detachment_rows=tuple(
@@ -3252,9 +3303,9 @@ def _faction_support_markdown(
                 ),
             )
         )
-    if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
+    elif faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
         lines.extend(_chaos_daemons_semantic_snapshot_markdown())
-    if faction_row.faction_id == AELDARI_FACTION_ID:
+    elif faction_row.faction_id == AELDARI_FACTION_ID:
         lines.extend(
             aeldari_semantic_snapshot_markdown(
                 detachment_rows=tuple(
@@ -3279,18 +3330,30 @@ def _faction_support_markdown(
                 ),
             )
         )
-    elif (
-        faction_row.faction_id != EMPERORS_CHILDREN_FACTION_ID
-        and faction_row.faction_id in reviewed_faction_ids()
-    ):
-        lines.extend(faction_pack_datasheet_snapshot_markdown(faction_row.faction_id))
+    else:
+        lines.extend(
+            _generic_semantic_snapshot_markdown(
+                detachment_support_rows=detachment_support_rows,
+                detachment_rule_rows=detachment_rule_rows,
+                enhancement_rows=enhancement_rows,
+                stratagem_rows=stratagem_rows,
+                datasheet_support_rows=datasheet_support_rows,
+            )
+        )
     lines.extend(_faction_detachment_rule_support_markdown(detachment_support_rows))
     if faction_row.faction_id in reviewed_faction_ids():
         lines.extend(("", "## Datasheet Source Review", ""))
         lines.extend(faction_pack_datasheet_review_markdown(faction_row.faction_id))
+    else:
+        lines.extend(
+            _datasheet_source_review_unavailable_markdown(
+                faction_name=faction_row.name,
+                pdf_filename=pdf_record.pdf_filename,
+            )
+        )
     if faction_row.faction_id == AELDARI_FACTION_ID:
         lines.extend(aeldari_thirty_nine_k_pro_audit_markdown())
-    if faction_row.faction_id == EMPERORS_CHILDREN_FACTION_ID:
+    elif faction_row.faction_id == EMPERORS_CHILDREN_FACTION_ID:
         review = faction_pack_datasheet_review(EMPERORS_CHILDREN_FACTION_ID)
         lines.extend(
             emperors_children_secondary_reference_audit_markdown(
@@ -3301,6 +3364,8 @@ def _faction_support_markdown(
                 )
             )
         )
+    else:
+        lines.extend(_secondary_reference_audit_unavailable_markdown())
     lines.extend(
         _faction_datasheet_support_markdown(
             faction_row=faction_row,
@@ -3315,16 +3380,6 @@ def _faction_support_markdown(
             faction_id=faction_row.faction_id,
         )
     )
-    if faction_row.faction_id in (
-        AELDARI_FACTION_ID,
-        CHAOS_DAEMONS_FACTION_ID,
-        EMPERORS_CHILDREN_FACTION_ID,
-    ):
-        lines.append("")
-        return "\n".join(lines)
-    lines.extend(_faction_detachment_rule_coverage_rows_markdown(detachment_rule_rows))
-    lines.extend(_faction_exact_rule_rows_markdown("Enhancements", enhancement_rows))
-    lines.extend(_faction_exact_rule_rows_markdown("Stratagems", stratagem_rows))
     lines.append("")
     return "\n".join(lines)
 
@@ -3377,6 +3432,158 @@ def _july_source_update_markdown(faction_id: str) -> list[str]:
     for item in reviews[0].review_items:
         lines.append(f"| {_markdown_text(item.name)} | `{_markdown_text(item.disposition)}` |")
     return lines
+
+
+def _generic_faction_pack_review_markdown(
+    *,
+    faction_id: str,
+    pdf_filename: str,
+    package_id: str,
+) -> list[str]:
+    lines = [
+        "",
+        "## Faction Pack Review",
+        "",
+        (
+            f"The official `{pdf_filename}` source is recorded in structured package "
+            f"`{package_id}`. This review reports source treatment only; executable semantics "
+            "are reported separately below."
+        ),
+    ]
+    if faction_id in reviewed_faction_ids():
+        lines.extend(faction_pack_datasheet_snapshot_markdown(faction_id))
+        return lines
+    lines.extend(
+        (
+            "",
+            "### Unit Datasheet Source Treatments",
+            "",
+            (
+                "A separate predecessor-versus-Faction-Pack treatment manifest has not been "
+                "published for this faction. Per-datasheet source bases remain explicit in the "
+                "component coverage section; this summary does not claim an exhaustive source "
+                "partition."
+            ),
+        )
+    )
+    return lines
+
+
+def _generic_semantic_snapshot_markdown(
+    *,
+    detachment_support_rows: tuple[DetachmentRuleSupportRow, ...],
+    detachment_rule_rows: tuple[Phase17ECoverageRow, ...],
+    enhancement_rows: tuple[Phase17ECoverageRow, ...],
+    stratagem_rows: tuple[Phase17ECoverageRow, ...],
+    datasheet_support_rows: tuple[DatasheetSupportRow, ...],
+) -> list[str]:
+    implemented_detachments = tuple(
+        row.detachment for row in detachment_support_rows if _detachment_rule_is_supported(row)
+    )
+    incomplete_detachments = tuple(
+        row.detachment for row in detachment_support_rows if not _detachment_rule_is_supported(row)
+    )
+    lines = [
+        "",
+        "## Semantic Support Snapshot",
+        "",
+        (
+            "This generated snapshot separates source presence from executable behavior. "
+            "A rule appears in the executable column only when Phase17F evidence records a "
+            "runtime consumer. Datasheet rows summarize component evidence, not selected-game "
+            "playability or certification."
+        ),
+        "",
+        "### Detachments",
+        "",
+        "| Implemented detachment rules | Still needs semantic support |",
+        "| --- | --- |",
+        (
+            f"| {_markdown_line_list(implemented_detachments)} | "
+            f"{_markdown_line_list(incomplete_detachments)} |"
+        ),
+    ]
+    lines.extend(
+        _chaos_daemons_exact_source_rows_snapshot_markdown(
+            title="Detachment rules",
+            rows=detachment_rule_rows,
+        )
+    )
+    lines.extend(
+        _chaos_daemons_exact_source_rows_snapshot_markdown(
+            title="Enhancements",
+            rows=enhancement_rows,
+        )
+    )
+    lines.extend(
+        _chaos_daemons_exact_source_rows_snapshot_markdown(
+            title="Stratagems",
+            rows=stratagem_rows,
+        )
+    )
+    lines.extend(_generic_datasheet_snapshot_markdown(datasheet_support_rows))
+    return lines
+
+
+def _generic_datasheet_snapshot_markdown(
+    rows: tuple[DatasheetSupportRow, ...],
+) -> list[str]:
+    lines = [
+        "",
+        "### Unit Datasheets",
+        "",
+        (
+            "These are historical component-rollup categories rendered with human-facing "
+            "labels. They do not replace the Phase 17O selected-game capability manifest."
+        ),
+        "",
+        "| Component evidence | Datasheets |",
+        "| --- | --- |",
+    ]
+    for status in DATASHEET_SUPPORT_OVERALL_ORDER:
+        matching_names = tuple(
+            _datasheet_label(row)
+            for row in sorted(rows, key=lambda row: (row.datasheet_name.lower(), row.datasheet_id))
+            if row.overall == status
+        )
+        lines.append(
+            f"| {_markdown_text(_datasheet_rollup_label(status))} | "
+            f"{_markdown_line_list(matching_names)} |"
+        )
+    return lines
+
+
+def _datasheet_source_review_unavailable_markdown(
+    *,
+    faction_name: str,
+    pdf_filename: str,
+) -> list[str]:
+    return [
+        "",
+        "## Datasheet Source Review",
+        "",
+        "### Source scope, provenance, and exclusions",
+        "",
+        (
+            f"{_markdown_text(faction_name)} per-datasheet source bases are recorded directly "
+            f"in the component tables derived from `{pdf_filename}`. A separate exhaustive "
+            "predecessor/overlay partition artifact is not currently published, so this section "
+            "does not claim that independent source-review gate."
+        ),
+    ]
+
+
+def _secondary_reference_audit_unavailable_markdown() -> list[str]:
+    return [
+        "",
+        "## Secondary-reference Audit",
+        "",
+        (
+            "No versioned secondary-provider reconciliation is committed for this faction. "
+            "This absence is explicit and makes no support claim; the hashed official source "
+            "artifacts above remain authoritative."
+        ),
+    ]
 
 
 def _engine_consumed_coverage_row_count(rows: Iterable[Phase17ECoverageRow]) -> int:
@@ -3437,12 +3644,13 @@ def _faction_detachment_rule_support_markdown(
         "## Detachment Rule Support",
         "",
         (
-            "This table reports semantic engine support. `Full` means the current CORE V2 "
-            "scope has gameplay hooks plus focused tests; `None` means only source rows "
-            "and generated scaffold exist."
+            "This table reports rule execution, not whether an entire detachment or army can "
+            "finish a game. `Implemented` means the listed detachment-rule semantics have "
+            "runtime evidence; `Partial` means some semantics remain blocked; `Source-only` "
+            "means no executable detachment-rule semantics are claimed."
         ),
         "",
-        "| Detachment | Overall support | Engine support | Tests | Notes |",
+        "| Detachment | Rule status | Runtime evidence | Focused tests | What remains / notes |",
         "| --- | --- | --- | --- | --- |",
     ]
     for row in rows:
@@ -3451,7 +3659,7 @@ def _faction_detachment_rule_support_markdown(
             + " | ".join(
                 (
                     _markdown_text(row.detachment),
-                    f"`{_markdown_text(row.overall)}`",
+                    f"**{_markdown_text(_detachment_rule_status_label(row))}**",
                     _markdown_text(row.engine),
                     _markdown_text(row.tests),
                     _markdown_text(row.notes),
@@ -3490,7 +3698,7 @@ def _chaos_daemons_detachment_snapshot_markdown() -> list[str]:
         "",
         "### Detachments",
         "",
-        "| Fully supported | Still needs semantic support |",
+        "| Implemented detachment rules | Still needs semantic support |",
         "| --- | --- |",
         f"| {_markdown_line_list(fully_supported)} | {_markdown_line_list(needs_support)} |",
         "",
@@ -3540,9 +3748,12 @@ def _chaos_daemons_exact_source_rows_snapshot_markdown(
         "",
         f"### {title}",
         "",
-        ("| Detachment | Runtime supported / executable | Still source-only / blocked |"),
+        "| Detachment | Runtime executable | Still source-only / blocked |",
         "| --- | --- | --- |",
     ]
+    if not rows:
+        lines.append("| No exact source rows generated | None | None |")
+        return lines
     for detachment_name in sorted({_required_text(row.detachment_name) for row in rows}):
         supported = tuple(
             sorted(
@@ -3583,7 +3794,7 @@ def _chaos_daemons_datasheet_snapshot_markdown() -> list[str]:
         "### Unit Datasheets",
         "",
         (
-            "| Allegiance | Fully supported (`All consumed`) | IR parsed; host needed | "
+            "| Allegiance | All listed clauses consumed | IR parsed; host needed | "
             "Unsupported IR | Bridge/catalog blocked |"
         ),
         "| --- | --- | --- | --- | --- |",
@@ -3631,16 +3842,19 @@ def _faction_datasheet_support_markdown(
     )
     lines = [
         "",
-        "## Datasheet / Unit Support",
+        "## Datasheet component coverage",
         "",
         (
-            "This table reports datasheet-level playability evidence generated from the exact "
-            "source text and structured catalog rows. `Full` (fully complete) requires complete "
+            "This table reports component evidence generated from exact source text and "
+            "structured catalog rows; it does not certify a unit or roster as playable. The "
+            "machine artifact retains the historical `Full` and `Playable` rollup tokens for "
+            "compatibility. On this page, `Component-complete` means complete "
             "catalog/model/wargear/geometry data, every known datasheet and wargear ability to "
             "parse into supported descriptors or RuleIR without diagnostics, and every parsed "
-            "semantic to have an engine runtime consumer. `Playable` means the exact text parses "
-            "into supported structured semantics and core unit operation is available, but one "
-            "or more runtime-consumption, faction, or detachment proofs remain incomplete. "
+            "semantic to have an engine runtime consumer. `Structured; interaction gaps` means "
+            "the exact text parses into supported structured semantics and core unit operation "
+            "is available, but one or more runtime-consumption, faction, or detachment proofs "
+            "remain incomplete. "
             "`Partial` means at least one known ability or interaction is descriptor-only, only "
             "partly parsed, or unsupported. `Catalog-only` means the unit is present but no "
             "semantic ability/runtime support is proven. `Blocked` means a known unsupported "
@@ -3684,7 +3898,7 @@ def _faction_datasheet_support_markdown(
     lines.extend(
         (
             (
-                "| Datasheet | Overall | Catalog | Models / geometry | Wargear | "
+                "| Datasheet | Component rollup | Catalog | Models / geometry | Wargear | "
                 "Weapon keywords | Datasheet abilities | Faction / detachment interactions | "
                 "Tests / evidence | Notes |"
             ),
@@ -3720,7 +3934,7 @@ def _faction_datasheet_support_markdown(
             + " | ".join(
                 (
                     _datasheet_label(row),
-                    f"`{_markdown_text(row.overall)}`",
+                    f"**{_markdown_text(_datasheet_rollup_label(row.overall))}**",
                     _markdown_text(row.catalog_status),
                     _markdown_text(row.model_geometry_status),
                     _markdown_text(row.wargear_status),
@@ -4721,10 +4935,18 @@ def _faction_interaction_cell(row: DatasheetSupportRow) -> str:
     if not row.detachment_ids:
         return row.faction_interaction_status
     return (
-        f"{row.faction_interaction_status}; supported detachments "
+        f"{row.faction_interaction_status}; implemented detachment rules "
         f"{len(row.supported_detachment_ids)}/{len(row.detachment_ids)} "
         f"({_inline_code_list(row.supported_detachment_ids)})"
     )
+
+
+def _datasheet_rollup_label(status: str) -> str:
+    if status == DATASHEET_SUPPORT_FULL:
+        return "Component-complete"
+    if status == DATASHEET_SUPPORT_PLAYABLE:
+        return "Structured; interaction gaps"
+    return status
 
 
 def _faction_detachment_rule_coverage_rows_markdown(
@@ -6113,15 +6335,15 @@ def _faction_index_section_markdown() -> list[str]:
         "",
         (
             "Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split "
-            "into generated per-faction files under `docs/factions/`. The exact rows expose "
-            "their coverage row IDs, source IDs, timing/category metadata, and current "
-            "support status. Supported detachment counts report semantic engine support, "
-            "not just source-row intake."
+            "into generated per-faction files under `docs/factions/`. Counts below separate "
+            "implemented, partial, and source-only detachment rules. They do not claim that a "
+            "whole faction, roster, mission, or full game is supported; selected-game claims "
+            "come from the Phase 17O capability manifest."
         ),
         "",
         (
-            "| Faction | Detachments | Supported detachments | Exact Enhancements | "
-            "Exact Stratagems | Engine-supported rows | File |"
+            "| Faction | Detachments | Implemented | Partial | Source-only | "
+            "Executable exact rules | File |"
         ),
         "| --- | ---: | ---: | ---: | ---: | ---: | --- |",
     ]
@@ -6133,19 +6355,10 @@ def _faction_index_section_markdown() -> list[str]:
             faction_rows,
             Phase17ECoverageKind.DETACHMENT_RULE,
         )
-        enhancement_count = _coverage_kind_count(
-            faction_rows,
-            Phase17ECoverageKind.DETACHMENT_ENHANCEMENT,
-        )
-        stratagem_count = _coverage_kind_count(
-            faction_rows,
-            Phase17ECoverageKind.DETACHMENT_STRATAGEM,
-        )
-        supported_detachment_count = sum(
-            1
-            for row in _detachment_rule_support_rows_for_faction(faction_row.faction_id)
-            if _detachment_rule_is_supported(row)
-        )
+        support_rows = _detachment_rule_support_rows_for_faction(faction_row.faction_id)
+        implemented_detachment_count = sum(row.overall == "Full" for row in support_rows)
+        partial_detachment_count = sum(row.overall == "Partial" for row in support_rows)
+        source_only_detachment_count = sum(row.overall == "None" for row in support_rows)
         engine_consumed_row_count = sum(
             1
             for row in faction_rows
@@ -6158,9 +6371,9 @@ def _faction_index_section_markdown() -> list[str]:
                 (
                     _markdown_text(faction_row.name),
                     str(detachment_count),
-                    str(supported_detachment_count),
-                    str(enhancement_count),
-                    str(stratagem_count),
+                    str(implemented_detachment_count),
+                    str(partial_detachment_count),
+                    str(source_only_detachment_count),
                     str(engine_consumed_row_count),
                     f"[{_markdown_text(faction_row.faction_id)}](factions/{faction_row.faction_id}.md)",
                 )
@@ -6350,7 +6563,17 @@ def _detachment_rule_support_rows_for_faction(
 
 
 def _detachment_rule_is_supported(row: DetachmentRuleSupportRow) -> bool:
-    return row.overall != "None"
+    return row.overall == "Full"
+
+
+def _detachment_rule_status_label(row: DetachmentRuleSupportRow) -> str:
+    if row.overall == "Full":
+        return "Implemented"
+    if row.overall == "Partial":
+        return "Partial"
+    if row.overall == "None":
+        return "Source-only"
+    raise ValueError("Detachment rule support row has an unknown overall status.")
 
 
 def _wargear_keyword_support_rows() -> tuple[SupportSectionRow, ...]:

@@ -1,0 +1,2371 @@
+{
+  "capability_manifest": {
+    "capability_counts": {
+      "DISPLAYABLE": {
+        "not_applicable": 0,
+        "supported": 8,
+        "unsupported": 0
+      },
+      "FULL_GAME_SUPPORTED": {
+        "not_applicable": 0,
+        "supported": 0,
+        "unsupported": 8
+      },
+      "LOADABLE": {
+        "not_applicable": 0,
+        "supported": 5,
+        "unsupported": 3
+      },
+      "MUSTERABLE": {
+        "not_applicable": 6,
+        "supported": 1,
+        "unsupported": 1
+      },
+      "NETWORK_SAFE": {
+        "not_applicable": 0,
+        "supported": 8,
+        "unsupported": 0
+      },
+      "PHYSICALLY_PLAYABLE": {
+        "not_applicable": 4,
+        "supported": 0,
+        "unsupported": 4
+      },
+      "REPLAY_VERIFIED": {
+        "not_applicable": 0,
+        "supported": 0,
+        "unsupported": 8
+      },
+      "SEMANTICALLY_EXECUTABLE": {
+        "not_applicable": 1,
+        "supported": 1,
+        "unsupported": 6
+      }
+    },
+    "certification_claims": {
+      "blocker_reason_codes": [
+        "certified_full_game_evidence_missing",
+        "certified_replay_evidence_missing",
+        "multiple_capability_blockers",
+        "roster_legality_invalid",
+        "runtime_source_only"
+      ],
+      "evidence_refs": [],
+      "phase20a_certified": false,
+      "phase20d_release_eligible": false
+    },
+    "certified_scenario_evidence_refs": [],
+    "decision_family_rows": [
+      {
+        "decision_type": "discard_tactical_secondary_mission",
+        "interaction_kinds": [
+          "confirmation"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "draw_tactical_secondary_missions",
+        "interaction_kinds": [
+          "confirmation"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "replace_tactical_secondary_mission",
+        "interaction_kinds": [
+          "confirmation"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "resolve_fight_interrupt",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "resolve_reaction_window",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "resolve_sequencing_order",
+        "interaction_kinds": [
+          "ordered_sequencing"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "score_tactical_secondary_mission",
+        "interaction_kinds": [
+          "confirmation"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_allocation_order",
+        "interaction_kinds": [
+          "ordered_sequencing"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_attack_weapon_group",
+        "interaction_kinds": [
+          "weapon_allocation_matrix"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_catalog_any_phase_once_per_battle_ability",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_catalog_movement_end_target_effect",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_catalog_movement_target_pair",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_catalog_post_fight_hit_target_effect",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_catalog_post_shoot_hit_target_effect",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_catalog_post_shoot_hit_target_status",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_catalog_setup_reactive_shoot_charge",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_catalog_unit_move_completed_mortal_wounds_target",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_charge_declaration_grant",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_charging_unit",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_cult_ambush_resurgence",
+        "interaction_kinds": [
+          "confirmation"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_damage_allocation_model",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_deployment_unit",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_desperate_escape_model",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_destruction_reaction",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_dice_reroll",
+        "interaction_kinds": [
+          "dice_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_dice_result_override",
+        "interaction_kinds": [
+          "dice_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_disembark_unit",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_embark_transport",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_faction_rule_battle_round_option",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_faction_rule_command_phase_start_option",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_faction_rule_fight_phase_end_option",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_faction_rule_fight_phase_start_option",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_faction_rule_setup_option",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_faction_rule_shooting_phase_start_option",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_faction_rule_turn_end_option",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_feel_no_pain",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_fight_activation",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_fight_activation_ability",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_fight_unit_grant",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_healing_model",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_movement_action",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_movement_action_grant",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_movement_unit",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_post_roll_attack_pool",
+        "interaction_kinds": [
+          "ordered_sequencing"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_prebattle_action",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_precision_allocation",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_psychic_attack_modifier_ignores",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_redeploy_unit",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_reinforcement_unit",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_reserve_declaration",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_resolve_target_unit",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_secondary_missions",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_shooting_type",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_shooting_unit",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_shooting_unit_grant",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_stratagem_cost_modifier_option",
+        "interaction_kinds": [
+          "confirmation"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_tracked_target",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_triggered_movement",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_weapon_ability_instance",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "start_mission_action",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "submit_catalog_model_materialization_placement",
+        "interaction_kinds": [
+          "multi_model_placement"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "submit_cult_ambush_marker_placement",
+        "interaction_kinds": [
+          "battlefield_point_placement",
+          "confirmation"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "submit_deployment_placement",
+        "interaction_kinds": [
+          "multi_model_placement"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "submit_healing_revival_placement",
+        "interaction_kinds": [
+          "model_pose_placement"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "submit_melee_declaration",
+        "interaction_kinds": [
+          "weapon_allocation_matrix"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "submit_movement_proposal",
+        "interaction_kinds": [
+          "path_editor"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "submit_placement_proposal",
+        "interaction_kinds": [
+          "multi_model_placement"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "submit_redeploy_placement",
+        "interaction_kinds": [
+          "multi_model_placement"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "submit_return_on_death_placement",
+        "interaction_kinds": [
+          "model_pose_placement"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "submit_scout_move",
+        "interaction_kinds": [
+          "path_editor"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "submit_scout_reserve_setup",
+        "interaction_kinds": [
+          "multi_model_placement"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "submit_shooting_declaration",
+        "interaction_kinds": [
+          "weapon_allocation_matrix"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "submit_stratagem_target_proposal",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "parameterized"
+      },
+      {
+        "decision_type": "use_stratagem",
+        "interaction_kinds": [
+          "opportunity_window"
+        ],
+        "submission_kind": "finite"
+      }
+    ],
+    "geometry_rows": [
+      {
+        "capabilities": [
+          {
+            "dimension": "LOADABLE",
+            "evidence_refs": [
+              "core-intercessor-like"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "datasheet:core-intercessor-like-infantry:profile"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "DISPLAYABLE",
+            "evidence_refs": [
+              "adapter:model-display:core-intercessor-like"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "datasheet:core-intercessor-like-infantry:profile"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "MUSTERABLE",
+            "evidence_refs": [],
+            "reason_code": "geometry_musterable_not_applicable",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "datasheet:core-intercessor-like-infantry:profile"
+            ],
+            "status": "not_applicable"
+          },
+          {
+            "dimension": "PHYSICALLY_PLAYABLE",
+            "evidence_refs": [
+              "core-intercessor-like",
+              "keyword:infantry_or_character"
+            ],
+            "reason_code": "heuristic_model_height_not_certified",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "datasheet:core-intercessor-like-infantry:profile"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "SEMANTICALLY_EXECUTABLE",
+            "evidence_refs": [],
+            "reason_code": "geometry_semantically_executable_not_applicable",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "datasheet:core-intercessor-like-infantry:profile"
+            ],
+            "status": "not_applicable"
+          },
+          {
+            "dimension": "FULL_GAME_SUPPORTED",
+            "evidence_refs": [],
+            "reason_code": "certified_full_game_evidence_missing",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "datasheet:core-intercessor-like-infantry:profile"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "NETWORK_SAFE",
+            "evidence_refs": [
+              "adapter:redaction:capability_manifest"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "datasheet:core-intercessor-like-infantry:profile"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "REPLAY_VERIFIED",
+            "evidence_refs": [],
+            "reason_code": "certified_replay_evidence_missing",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "datasheet:core-intercessor-like-infantry:profile"
+            ],
+            "status": "unsupported"
+          }
+        ],
+        "display_name": "core-intercessor-like",
+        "load_support": "catalog_base_size",
+        "metadata": {
+          "geometry_source_kind": "catalog_base_size",
+          "height_inches": 1.7637795275590549,
+          "height_source_kind": "keyword_heuristic",
+          "unit_instance_id": "army-beta:scout-redeploy-unit"
+        },
+        "owner_id": "core-intercessor-like",
+        "player_id": "player-b",
+        "row_id": "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
+        "row_kind": "geometry",
+        "semantic_execution": "not_applicable",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:profile"
+        ]
+      }
+    ],
+    "hidden_information_status": {
+      "dimension": "NETWORK_SAFE",
+      "evidence_refs": [
+        "adapter:redaction:public_support_profile_payload",
+        "contract:capability-manifest-v1:viewer-scope"
+      ],
+      "reason_code": null,
+      "source_ids": [
+        "https://warhammer40k-core.local/contracts/v4/capability-manifest.schema.json"
+      ],
+      "status": "supported"
+    },
+    "identities": {
+      "catalog": {
+        "identity_hash": "24846bc075bda480343623eeaeec61238d52bae950b069a3a24336c5aef3955d",
+        "identity_id": "phase9a-canonical"
+      },
+      "contract_schema": {
+        "contract_version": "4.1.0",
+        "identity_hash": "320d31af5048139c3543d094d0e271f29ecd23cc65e634a034bc8e97442ff281",
+        "identity_id": "https://warhammer40k-core.local/contracts/v4/capability-manifest.schema.json"
+      },
+      "engine_build": {
+        "identity_hash": "871c1a1521ff49cb40aed4fbfa43b07bdbd4fdfbb4448093d9794fe1e1d96877",
+        "identity_id": "warhammer40k-core-v2:0.1.0"
+      },
+      "mission_pack": {
+        "identity_hash": "2e42caa511a01b7e5e045d3ac12785eeaac0af59c5f4c10fa9b4d9997d5aaac4",
+        "identity_id": "11e-chapter-approved-2026-27"
+      },
+      "ruleset": {
+        "identity_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
+        "identity_id": "warhammer_40000:11e:core-v2-setup-prebattle-ui-smoke"
+      },
+      "source_packages": [
+        {
+          "identity_hash": "24846bc075bda480343623eeaeec61238d52bae950b069a3a24336c5aef3955d",
+          "identity_id": "data-package:core-v2:phase9a-canonical:0.1.0",
+          "source_kind": "army_catalog"
+        },
+        {
+          "identity_hash": "d20e5338132ccd068cb9691308b1e24f6f70227c3a5a8ae6a9b9e066c13b723c",
+          "identity_id": "gw-11e-chapter-approved-2026-27",
+          "source_kind": "mission_pack"
+        }
+      ],
+      "terrain_layout": {
+        "identity_hash": "07d996a42f8b432f97e80e1e791e4f05b9b33d70fd169184cbb879bb53826cac",
+        "identity_id": "take-and-hold-vs-take-and-hold-layout-3"
+      }
+    },
+    "interaction_kinds": [
+      "battlefield_point_placement",
+      "confirmation",
+      "dice_selection",
+      "entity_selection",
+      "finite_option_list",
+      "model_pose_placement",
+      "multi_model_placement",
+      "opportunity_window",
+      "ordered_sequencing",
+      "path_editor",
+      "quantity_selection",
+      "roster_construction",
+      "weapon_allocation_matrix"
+    ],
+    "manifest_id": "capability-manifest:3cb1677c5359541a7b5e5ce70b9c88803c07488de3ee5184de428b6be66d4d92",
+    "mission_rows": [
+      {
+        "capabilities": [
+          {
+            "dimension": "LOADABLE",
+            "evidence_refs": [
+              "gw-11e-chapter-approved-2026-27"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "gw-11e-chapter-approved-2026-27",
+              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "DISPLAYABLE",
+            "evidence_refs": [
+              "mission-setup:mission-take-and-hold-vs-purge-the-foe-layout-3"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "gw-11e-chapter-approved-2026-27",
+              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "MUSTERABLE",
+            "evidence_refs": [],
+            "reason_code": "mission_musterable_not_applicable",
+            "source_ids": [
+              "gw-11e-chapter-approved-2026-27",
+              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+            ],
+            "status": "not_applicable"
+          },
+          {
+            "dimension": "PHYSICALLY_PLAYABLE",
+            "evidence_refs": [
+              "take-and-hold-vs-take-and-hold-layout-3"
+            ],
+            "reason_code": "battlefield_layout_geometry_incomplete",
+            "source_ids": [
+              "gw-11e-chapter-approved-2026-27",
+              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "SEMANTICALLY_EXECUTABLE",
+            "evidence_refs": [
+              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "gw-11e-chapter-approved-2026-27",
+              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "FULL_GAME_SUPPORTED",
+            "evidence_refs": [],
+            "reason_code": "certified_full_game_evidence_missing",
+            "source_ids": [
+              "gw-11e-chapter-approved-2026-27",
+              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "NETWORK_SAFE",
+            "evidence_refs": [
+              "adapter:redaction:capability_manifest"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "gw-11e-chapter-approved-2026-27",
+              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "REPLAY_VERIFIED",
+            "evidence_refs": [],
+            "reason_code": "certified_replay_evidence_missing",
+            "source_ids": [
+              "gw-11e-chapter-approved-2026-27",
+              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+            ],
+            "status": "unsupported"
+          }
+        ],
+        "display_name": "primary-immovable-object",
+        "load_support": "engine_loaded",
+        "metadata": {
+          "battlefield_layout_id": "take-and-hold-vs-take-and-hold-layout-3",
+          "mission_pack_id": "11e-chapter-approved-2026-27",
+          "primary_mission_id": "primary-immovable-object",
+          "terrain_layout_id": "take-and-hold-vs-take-and-hold-layout-3"
+        },
+        "owner_id": "mission-take-and-hold-vs-purge-the-foe-layout-3",
+        "player_id": null,
+        "row_id": "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+        "row_kind": "mission",
+        "semantic_execution": "executable",
+        "source_ids": [
+          "gw-11e-chapter-approved-2026-27",
+          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+        ]
+      }
+    ],
+    "mode_capabilities": [
+      {
+        "dimension": "LOADABLE",
+        "evidence_refs": [
+          "army:army-beta",
+          "catalog:ability:core-scouts",
+          "catalog:datasheet:core-intercessor-like-infantry",
+          "core-intercessor-like",
+          "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
+          "gw-11e-chapter-approved-2026-27",
+          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "roster:player-b:army-beta",
+          "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
+          "rule:player-b:runtime:detachment:core-combined-arms",
+          "rule:player-b:runtime:faction:core-marine-force",
+          "rule:player-b:scout-redeploy-unit:ability:core-scouts",
+          "unit:player-b:scout-redeploy-unit"
+        ],
+        "reason_code": "runtime_source_only",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6",
+          "datasheet:core-intercessor-like-infantry:profile",
+          "detachment:core-combined-arms",
+          "faction:core-marine-force",
+          "gw-11e-chapter-approved-2026-27",
+          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+        ],
+        "status": "unsupported"
+      },
+      {
+        "dimension": "DISPLAYABLE",
+        "evidence_refs": [
+          "adapter:model-display:core-intercessor-like",
+          "adapter:rules_catalog_view",
+          "adapter:unit-display:army-beta:scout-redeploy-unit",
+          "adapter:unit_display_projection",
+          "catalog:ability:core-scouts:descriptor",
+          "datasheet:core-intercessor-like-infantry",
+          "detachment:core-combined-arms",
+          "faction:core-marine-force",
+          "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
+          "mission-setup:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "roster:player-b:army-beta",
+          "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
+          "rule:player-b:runtime:detachment:core-combined-arms",
+          "rule:player-b:runtime:faction:core-marine-force",
+          "rule:player-b:scout-redeploy-unit:ability:core-scouts",
+          "unit:player-b:scout-redeploy-unit"
+        ],
+        "reason_code": null,
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6",
+          "datasheet:core-intercessor-like-infantry:profile",
+          "detachment:core-combined-arms",
+          "faction:core-marine-force",
+          "gw-11e-chapter-approved-2026-27",
+          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+        ],
+        "status": "supported"
+      },
+      {
+        "dimension": "MUSTERABLE",
+        "evidence_refs": [
+          "roster-legality:army-beta",
+          "roster:player-b:army-beta",
+          "unit:army-beta:scout-redeploy-unit",
+          "unit:player-b:scout-redeploy-unit"
+        ],
+        "reason_code": "roster_legality_invalid",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "detachment:core-combined-arms",
+          "faction:core-marine-force"
+        ],
+        "status": "unsupported"
+      },
+      {
+        "dimension": "PHYSICALLY_PLAYABLE",
+        "evidence_refs": [
+          "core-intercessor-like",
+          "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
+          "keyword:infantry_or_character",
+          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "roster:player-b:army-beta",
+          "take-and-hold-vs-take-and-hold-layout-3",
+          "unit:player-b:scout-redeploy-unit"
+        ],
+        "reason_code": "multiple_capability_blockers",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:profile",
+          "detachment:core-combined-arms",
+          "faction:core-marine-force",
+          "gw-11e-chapter-approved-2026-27",
+          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+        ],
+        "status": "unsupported"
+      },
+      {
+        "dimension": "SEMANTICALLY_EXECUTABLE",
+        "evidence_refs": [
+          "core-combined-arms",
+          "core-intercessor-like-infantry",
+          "core-marine-force",
+          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object",
+          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "phase9a-canonical/core-intercessor-like-infantry/core/core-scouts/none",
+          "roster:player-b:army-beta",
+          "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
+          "rule:player-b:runtime:detachment:core-combined-arms",
+          "rule:player-b:runtime:faction:core-marine-force",
+          "rule:player-b:scout-redeploy-unit:ability:core-scouts",
+          "unit:player-b:scout-redeploy-unit"
+        ],
+        "reason_code": "multiple_capability_blockers",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6",
+          "detachment:core-combined-arms",
+          "faction:core-marine-force",
+          "gw-11e-chapter-approved-2026-27",
+          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+        ],
+        "status": "unsupported"
+      },
+      {
+        "dimension": "FULL_GAME_SUPPORTED",
+        "evidence_refs": [
+          "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
+          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "roster:player-b:army-beta",
+          "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
+          "rule:player-b:runtime:detachment:core-combined-arms",
+          "rule:player-b:runtime:faction:core-marine-force",
+          "rule:player-b:scout-redeploy-unit:ability:core-scouts",
+          "unit:player-b:scout-redeploy-unit"
+        ],
+        "reason_code": "certified_full_game_evidence_missing",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6",
+          "datasheet:core-intercessor-like-infantry:profile",
+          "detachment:core-combined-arms",
+          "faction:core-marine-force",
+          "gw-11e-chapter-approved-2026-27",
+          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+        ],
+        "status": "unsupported"
+      },
+      {
+        "dimension": "NETWORK_SAFE",
+        "evidence_refs": [
+          "adapter:redaction:capability_manifest",
+          "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
+          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "roster:player-b:army-beta",
+          "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
+          "rule:player-b:runtime:detachment:core-combined-arms",
+          "rule:player-b:runtime:faction:core-marine-force",
+          "rule:player-b:scout-redeploy-unit:ability:core-scouts",
+          "unit:player-b:scout-redeploy-unit"
+        ],
+        "reason_code": null,
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6",
+          "datasheet:core-intercessor-like-infantry:profile",
+          "detachment:core-combined-arms",
+          "faction:core-marine-force",
+          "gw-11e-chapter-approved-2026-27",
+          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+        ],
+        "status": "supported"
+      },
+      {
+        "dimension": "REPLAY_VERIFIED",
+        "evidence_refs": [
+          "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
+          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "roster:player-b:army-beta",
+          "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
+          "rule:player-b:runtime:detachment:core-combined-arms",
+          "rule:player-b:runtime:faction:core-marine-force",
+          "rule:player-b:scout-redeploy-unit:ability:core-scouts",
+          "unit:player-b:scout-redeploy-unit"
+        ],
+        "reason_code": "certified_replay_evidence_missing",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6",
+          "datasheet:core-intercessor-like-infantry:profile",
+          "detachment:core-combined-arms",
+          "faction:core-marine-force",
+          "gw-11e-chapter-approved-2026-27",
+          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+        ],
+        "status": "unsupported"
+      }
+    ],
+    "replay_evidence_refs": [],
+    "roster_rows": [
+      {
+        "capabilities": [
+          {
+            "dimension": "LOADABLE",
+            "evidence_refs": [
+              "army:army-beta"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "detachment:core-combined-arms",
+              "faction:core-marine-force"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "DISPLAYABLE",
+            "evidence_refs": [
+              "adapter:rules_catalog_view",
+              "adapter:unit_display_projection"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "detachment:core-combined-arms",
+              "faction:core-marine-force"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "MUSTERABLE",
+            "evidence_refs": [
+              "roster-legality:army-beta"
+            ],
+            "reason_code": "roster_legality_invalid",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "detachment:core-combined-arms",
+              "faction:core-marine-force"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "PHYSICALLY_PLAYABLE",
+            "evidence_refs": [
+              "keyword:infantry_or_character"
+            ],
+            "reason_code": "accepted_model_geometry_missing",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "detachment:core-combined-arms",
+              "faction:core-marine-force"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "SEMANTICALLY_EXECUTABLE",
+            "evidence_refs": [
+              "core-combined-arms",
+              "core-intercessor-like-infantry",
+              "core-marine-force"
+            ],
+            "reason_code": "selected_rule_semantics_incomplete",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "detachment:core-combined-arms",
+              "faction:core-marine-force"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "FULL_GAME_SUPPORTED",
+            "evidence_refs": [],
+            "reason_code": "certified_full_game_evidence_missing",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "detachment:core-combined-arms",
+              "faction:core-marine-force"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "NETWORK_SAFE",
+            "evidence_refs": [
+              "adapter:redaction:capability_manifest"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "detachment:core-combined-arms",
+              "faction:core-marine-force"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "REPLAY_VERIFIED",
+            "evidence_refs": [],
+            "reason_code": "certified_replay_evidence_missing",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry",
+              "detachment:core-combined-arms",
+              "faction:core-marine-force"
+            ],
+            "status": "unsupported"
+          }
+        ],
+        "display_name": "core-marine-force roster",
+        "load_support": "engine_mustered",
+        "metadata": {
+          "detachment_ids": [
+            "core-combined-arms"
+          ],
+          "faction_id": "core-marine-force",
+          "legality_status": "invalid",
+          "unit_count": 1
+        },
+        "owner_id": "army-beta",
+        "player_id": "player-b",
+        "row_id": "roster:player-b:army-beta",
+        "row_kind": "roster",
+        "semantic_execution": "incomplete",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "detachment:core-combined-arms",
+          "faction:core-marine-force"
+        ]
+      }
+    ],
+    "rule_rows": [
+      {
+        "capabilities": [
+          {
+            "dimension": "LOADABLE",
+            "evidence_refs": [],
+            "reason_code": "runtime_source_only",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "DISPLAYABLE",
+            "evidence_refs": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "MUSTERABLE",
+            "evidence_refs": [],
+            "reason_code": "rule_musterable_not_applicable",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "not_applicable"
+          },
+          {
+            "dimension": "PHYSICALLY_PLAYABLE",
+            "evidence_refs": [],
+            "reason_code": "rule_physically_playable_not_applicable",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "not_applicable"
+          },
+          {
+            "dimension": "SEMANTICALLY_EXECUTABLE",
+            "evidence_refs": [],
+            "reason_code": "runtime_semantic_placeholder",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "FULL_GAME_SUPPORTED",
+            "evidence_refs": [],
+            "reason_code": "certified_full_game_evidence_missing",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "NETWORK_SAFE",
+            "evidence_refs": [
+              "adapter:redaction:capability_manifest"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "REPLAY_VERIFIED",
+            "evidence_refs": [],
+            "reason_code": "certified_replay_evidence_missing",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "unsupported"
+          }
+        ],
+        "display_name": "core-intercessor-like-infantry",
+        "load_support": "source_only",
+        "metadata": {
+          "content_family": "datasheet",
+          "execution_record_ids": [],
+          "required_for_matched_play": true,
+          "source_package_hash": null,
+          "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
+        },
+        "owner_id": "core-intercessor-like-infantry",
+        "player_id": "player-b",
+        "row_id": "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
+        "row_kind": "rule",
+        "semantic_execution": "placeholder",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry"
+        ]
+      },
+      {
+        "capabilities": [
+          {
+            "dimension": "LOADABLE",
+            "evidence_refs": [],
+            "reason_code": "runtime_source_only",
+            "source_ids": [
+              "detachment:core-combined-arms"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "DISPLAYABLE",
+            "evidence_refs": [
+              "detachment:core-combined-arms"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "detachment:core-combined-arms"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "MUSTERABLE",
+            "evidence_refs": [],
+            "reason_code": "rule_musterable_not_applicable",
+            "source_ids": [
+              "detachment:core-combined-arms"
+            ],
+            "status": "not_applicable"
+          },
+          {
+            "dimension": "PHYSICALLY_PLAYABLE",
+            "evidence_refs": [],
+            "reason_code": "rule_physically_playable_not_applicable",
+            "source_ids": [
+              "detachment:core-combined-arms"
+            ],
+            "status": "not_applicable"
+          },
+          {
+            "dimension": "SEMANTICALLY_EXECUTABLE",
+            "evidence_refs": [],
+            "reason_code": "runtime_semantic_placeholder",
+            "source_ids": [
+              "detachment:core-combined-arms"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "FULL_GAME_SUPPORTED",
+            "evidence_refs": [],
+            "reason_code": "certified_full_game_evidence_missing",
+            "source_ids": [
+              "detachment:core-combined-arms"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "NETWORK_SAFE",
+            "evidence_refs": [
+              "adapter:redaction:capability_manifest"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "detachment:core-combined-arms"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "REPLAY_VERIFIED",
+            "evidence_refs": [],
+            "reason_code": "certified_replay_evidence_missing",
+            "source_ids": [
+              "detachment:core-combined-arms"
+            ],
+            "status": "unsupported"
+          }
+        ],
+        "display_name": "core-combined-arms",
+        "load_support": "source_only",
+        "metadata": {
+          "content_family": "detachment",
+          "execution_record_ids": [],
+          "required_for_matched_play": true,
+          "source_package_hash": null,
+          "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
+        },
+        "owner_id": "core-combined-arms",
+        "player_id": "player-b",
+        "row_id": "rule:player-b:runtime:detachment:core-combined-arms",
+        "row_kind": "rule",
+        "semantic_execution": "placeholder",
+        "source_ids": [
+          "detachment:core-combined-arms"
+        ]
+      },
+      {
+        "capabilities": [
+          {
+            "dimension": "LOADABLE",
+            "evidence_refs": [],
+            "reason_code": "runtime_source_only",
+            "source_ids": [
+              "faction:core-marine-force"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "DISPLAYABLE",
+            "evidence_refs": [
+              "faction:core-marine-force"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "faction:core-marine-force"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "MUSTERABLE",
+            "evidence_refs": [],
+            "reason_code": "rule_musterable_not_applicable",
+            "source_ids": [
+              "faction:core-marine-force"
+            ],
+            "status": "not_applicable"
+          },
+          {
+            "dimension": "PHYSICALLY_PLAYABLE",
+            "evidence_refs": [],
+            "reason_code": "rule_physically_playable_not_applicable",
+            "source_ids": [
+              "faction:core-marine-force"
+            ],
+            "status": "not_applicable"
+          },
+          {
+            "dimension": "SEMANTICALLY_EXECUTABLE",
+            "evidence_refs": [],
+            "reason_code": "runtime_semantic_placeholder",
+            "source_ids": [
+              "faction:core-marine-force"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "FULL_GAME_SUPPORTED",
+            "evidence_refs": [],
+            "reason_code": "certified_full_game_evidence_missing",
+            "source_ids": [
+              "faction:core-marine-force"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "NETWORK_SAFE",
+            "evidence_refs": [
+              "adapter:redaction:capability_manifest"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "faction:core-marine-force"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "REPLAY_VERIFIED",
+            "evidence_refs": [],
+            "reason_code": "certified_replay_evidence_missing",
+            "source_ids": [
+              "faction:core-marine-force"
+            ],
+            "status": "unsupported"
+          }
+        ],
+        "display_name": "core-marine-force",
+        "load_support": "source_only",
+        "metadata": {
+          "content_family": "faction",
+          "execution_record_ids": [],
+          "required_for_matched_play": true,
+          "source_package_hash": null,
+          "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
+        },
+        "owner_id": "core-marine-force",
+        "player_id": "player-b",
+        "row_id": "rule:player-b:runtime:faction:core-marine-force",
+        "row_kind": "rule",
+        "semantic_execution": "placeholder",
+        "source_ids": [
+          "faction:core-marine-force"
+        ]
+      },
+      {
+        "capabilities": [
+          {
+            "dimension": "LOADABLE",
+            "evidence_refs": [
+              "catalog:ability:core-scouts"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "DISPLAYABLE",
+            "evidence_refs": [
+              "catalog:ability:core-scouts:descriptor"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "MUSTERABLE",
+            "evidence_refs": [],
+            "reason_code": "rule_musterable_not_applicable",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6"
+            ],
+            "status": "not_applicable"
+          },
+          {
+            "dimension": "PHYSICALLY_PLAYABLE",
+            "evidence_refs": [],
+            "reason_code": "rule_physically_playable_not_applicable",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6"
+            ],
+            "status": "not_applicable"
+          },
+          {
+            "dimension": "SEMANTICALLY_EXECUTABLE",
+            "evidence_refs": [],
+            "reason_code": "ability_descriptor_only",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "FULL_GAME_SUPPORTED",
+            "evidence_refs": [],
+            "reason_code": "certified_full_game_evidence_missing",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "NETWORK_SAFE",
+            "evidence_refs": [
+              "adapter:redaction:capability_manifest"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "REPLAY_VERIFIED",
+            "evidence_refs": [],
+            "reason_code": "certified_replay_evidence_missing",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6"
+            ],
+            "status": "unsupported"
+          }
+        ],
+        "display_name": "CORE Scouts 6",
+        "load_support": "descriptor_only",
+        "metadata": {
+          "coverage_row_id": "phase9a-canonical/core-intercessor-like-infantry/core/core-scouts/none",
+          "datasheet_id": "core-intercessor-like-infantry",
+          "diagnostic_reasons": [],
+          "runtime_consumer_ids": [],
+          "semantic_categories": [
+            "unknown.ability_text"
+          ],
+          "unit_selection_id": "scout-redeploy-unit"
+        },
+        "owner_id": "core-scouts",
+        "player_id": "player-b",
+        "row_id": "rule:player-b:scout-redeploy-unit:ability:core-scouts",
+        "row_kind": "rule",
+        "semantic_execution": "descriptor_only",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6"
+        ]
+      }
+    ],
+    "schema_version": "capability-manifest-v1",
+    "selection_hash": "97fd22992919ad846ffebb195e97d72ff997a4bade5385fb710d4637a03db939",
+    "unit_rows": [
+      {
+        "capabilities": [
+          {
+            "dimension": "LOADABLE",
+            "evidence_refs": [
+              "catalog:datasheet:core-intercessor-like-infantry"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "DISPLAYABLE",
+            "evidence_refs": [
+              "adapter:unit-display:army-beta:scout-redeploy-unit"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "MUSTERABLE",
+            "evidence_refs": [
+              "unit:army-beta:scout-redeploy-unit"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "PHYSICALLY_PLAYABLE",
+            "evidence_refs": [
+              "core-intercessor-like"
+            ],
+            "reason_code": "accepted_model_geometry_missing",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "SEMANTICALLY_EXECUTABLE",
+            "evidence_refs": [
+              "phase9a-canonical/core-intercessor-like-infantry/core/core-scouts/none"
+            ],
+            "reason_code": "datasheet_ability_semantics_incomplete",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "FULL_GAME_SUPPORTED",
+            "evidence_refs": [],
+            "reason_code": "certified_full_game_evidence_missing",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "unsupported"
+          },
+          {
+            "dimension": "NETWORK_SAFE",
+            "evidence_refs": [
+              "adapter:redaction:capability_manifest"
+            ],
+            "reason_code": null,
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "supported"
+          },
+          {
+            "dimension": "REPLAY_VERIFIED",
+            "evidence_refs": [],
+            "reason_code": "certified_replay_evidence_missing",
+            "source_ids": [
+              "datasheet:core-intercessor-like-infantry"
+            ],
+            "status": "unsupported"
+          }
+        ],
+        "display_name": "CORE Intercessor-like Infantry",
+        "load_support": "catalog_loaded",
+        "metadata": {
+          "army_id": "army-beta",
+          "datasheet_id": "core-intercessor-like-infantry",
+          "model_profile_ids": [
+            "core-intercessor-like"
+          ],
+          "wargear_ids": [
+            "core-bolt-rifle"
+          ]
+        },
+        "owner_id": "scout-redeploy-unit",
+        "player_id": "player-b",
+        "row_id": "unit:player-b:scout-redeploy-unit",
+        "row_kind": "unit",
+        "semantic_execution": "incomplete",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry"
+        ]
+      }
+    ],
+    "unsupported_effects": [
+      {
+        "effect_id": "unsupported-effect:rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
+        "message": "core-intercessor-like-infantry is not fully executable: runtime_semantic_placeholder.",
+        "player_id": "player-b",
+        "reason_code": "runtime_semantic_placeholder",
+        "rule_row_id": "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry"
+        ]
+      },
+      {
+        "effect_id": "unsupported-effect:rule:player-b:runtime:detachment:core-combined-arms",
+        "message": "core-combined-arms is not fully executable: runtime_semantic_placeholder.",
+        "player_id": "player-b",
+        "reason_code": "runtime_semantic_placeholder",
+        "rule_row_id": "rule:player-b:runtime:detachment:core-combined-arms",
+        "source_ids": [
+          "detachment:core-combined-arms"
+        ]
+      },
+      {
+        "effect_id": "unsupported-effect:rule:player-b:runtime:faction:core-marine-force",
+        "message": "core-marine-force is not fully executable: runtime_semantic_placeholder.",
+        "player_id": "player-b",
+        "reason_code": "runtime_semantic_placeholder",
+        "rule_row_id": "rule:player-b:runtime:faction:core-marine-force",
+        "source_ids": [
+          "faction:core-marine-force"
+        ]
+      },
+      {
+        "effect_id": "unsupported-effect:rule:player-b:scout-redeploy-unit:ability:core-scouts",
+        "message": "CORE Scouts 6 is not fully executable: ability_descriptor_only.",
+        "player_id": "player-b",
+        "reason_code": "ability_descriptor_only",
+        "rule_row_id": "rule:player-b:scout-redeploy-unit:ability:core-scouts",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6"
+        ]
+      }
+    ],
+    "viewer_scope": "player-b"
+  },
+  "catalog_id": "phase9a-canonical",
+  "datasheet_support_rows": [
+    {
+      "ability_id": "core-scouts",
+      "catalog_support": "descriptor_only",
+      "datasheet_id": "core-intercessor-like-infantry",
+      "display_name": "CORE Scouts 6",
+      "parameter_tokens": [
+        "6"
+      ],
+      "row_id": "datasheet:core-intercessor-like-infantry:ability:core-scouts",
+      "source_id": "datasheet:core-intercessor-like-infantry:ability:setup-smoke-scouts-6",
+      "status": "playable",
+      "timing_tags": [
+        "before_battle",
+        "scouts"
+      ]
+    }
+  ],
+  "decision_interaction_support_rows": [
+    {
+      "decision_type": "discard_tactical_secondary_mission",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "draw_tactical_secondary_missions",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "replace_tactical_secondary_mission",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "resolve_fight_interrupt",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "resolve_reaction_window",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "resolve_sequencing_order",
+      "interaction_kinds": [
+        "ordered_sequencing"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "score_tactical_secondary_mission",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_allocation_order",
+      "interaction_kinds": [
+        "ordered_sequencing"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_attack_weapon_group",
+      "interaction_kinds": [
+        "weapon_allocation_matrix"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_any_phase_once_per_battle_ability",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_movement_end_target_effect",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_movement_target_pair",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_post_fight_hit_target_effect",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_post_shoot_hit_target_effect",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_post_shoot_hit_target_status",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_setup_reactive_shoot_charge",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_catalog_unit_move_completed_mortal_wounds_target",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_charge_declaration_grant",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_charging_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_cult_ambush_resurgence",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_damage_allocation_model",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_deployment_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_desperate_escape_model",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_destruction_reaction",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_dice_reroll",
+      "interaction_kinds": [
+        "dice_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_dice_result_override",
+      "interaction_kinds": [
+        "dice_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_disembark_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_embark_transport",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_battle_round_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_command_phase_start_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_fight_phase_end_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_fight_phase_start_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_setup_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_shooting_phase_start_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_faction_rule_turn_end_option",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_feel_no_pain",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_fight_activation",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_fight_activation_ability",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_fight_unit_grant",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_healing_model",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_movement_action",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_movement_action_grant",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_movement_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_post_roll_attack_pool",
+      "interaction_kinds": [
+        "ordered_sequencing"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_prebattle_action",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_precision_allocation",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_psychic_attack_modifier_ignores",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_redeploy_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_reinforcement_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_reserve_declaration",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_resolve_target_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_secondary_missions",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_shooting_type",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_shooting_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_shooting_unit_grant",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_stratagem_cost_modifier_option",
+      "interaction_kinds": [
+        "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_tracked_target",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_triggered_movement",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_weapon_ability_instance",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "start_mission_action",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "submit_catalog_model_materialization_placement",
+      "interaction_kinds": [
+        "multi_model_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_cult_ambush_marker_placement",
+      "interaction_kinds": [
+        "battlefield_point_placement",
+        "confirmation"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_deployment_placement",
+      "interaction_kinds": [
+        "multi_model_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_healing_revival_placement",
+      "interaction_kinds": [
+        "model_pose_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_melee_declaration",
+      "interaction_kinds": [
+        "weapon_allocation_matrix"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_movement_proposal",
+      "interaction_kinds": [
+        "path_editor"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_placement_proposal",
+      "interaction_kinds": [
+        "multi_model_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_redeploy_placement",
+      "interaction_kinds": [
+        "multi_model_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_return_on_death_placement",
+      "interaction_kinds": [
+        "model_pose_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_scout_move",
+      "interaction_kinds": [
+        "path_editor"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_scout_reserve_setup",
+      "interaction_kinds": [
+        "multi_model_placement"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_shooting_declaration",
+      "interaction_kinds": [
+        "weapon_allocation_matrix"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "submit_stratagem_target_proposal",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "parameterized"
+    },
+    {
+      "decision_type": "use_stratagem",
+      "interaction_kinds": [
+        "opportunity_window"
+      ],
+      "submission_kind": "finite"
+    }
+  ],
+  "detachment_faction_support_rows": [
+    {
+      "content_id": "core-combined-arms",
+      "family": "detachment",
+      "owner_detachment_id": "core-combined-arms",
+      "owner_faction_id": "core-marine-force",
+      "required_for_matched_play": true,
+      "row_id": "runtime:detachment:core-combined-arms",
+      "runtime_support": "source_only",
+      "semantic_status": "placeholder",
+      "source_ids": [
+        "detachment:core-combined-arms"
+      ],
+      "status": "playable",
+      "support_reason": null,
+      "unsupported_reason": null
+    },
+    {
+      "content_id": "core-marine-force",
+      "family": "faction",
+      "owner_detachment_id": null,
+      "owner_faction_id": "core-marine-force",
+      "required_for_matched_play": true,
+      "row_id": "runtime:faction:core-marine-force",
+      "runtime_support": "source_only",
+      "semantic_status": "placeholder",
+      "source_ids": [
+        "faction:core-marine-force"
+      ],
+      "status": "playable",
+      "support_reason": null,
+      "unsupported_reason": null
+    }
+  ],
+  "eligible_for_headless_self_play_smoke": false,
+  "game_id": "phase18d-contract-session",
+  "interaction_kinds": [
+    "battlefield_point_placement",
+    "confirmation",
+    "dice_selection",
+    "entity_selection",
+    "finite_option_list",
+    "model_pose_placement",
+    "multi_model_placement",
+    "opportunity_window",
+    "ordered_sequencing",
+    "path_editor",
+    "quantity_selection",
+    "roster_construction",
+    "weapon_allocation_matrix"
+  ],
+  "mustering_support_rows": [
+    {
+      "army_id": "army-beta",
+      "datasheet_ids": [
+        "core-intercessor-like-infantry"
+      ],
+      "detachment_ids": [
+        "core-combined-arms"
+      ],
+      "faction_id": "core-marine-force",
+      "legality_status": "invalid",
+      "player_id": "player-b",
+      "row_id": "mustering:player-b:army-beta",
+      "status": "playable",
+      "violation_count": 2
+    }
+  ],
+  "overall_status": "playable",
+  "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
+  "schema_version": "support-profile-v3-interactions",
+  "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
+  "status_counts": {
+    "full": 0,
+    "playable": 4,
+    "unsupported": 0
+  }
+}

@@ -245,6 +245,12 @@ Current status:
 - Core rules infrastructure through movement, shooting, charge, fight, setup,
   reserves, transports, missions, replay, source ingestion, catalog generation,
   rule IR, generic rule execution, and adapter decision submission is in place.
+- Phase 17O exposes a deterministic `capability-manifest-v1` inside the existing
+  support-profile response. It reports load, display, mustering, physical,
+  semantic, full-game, network, and replay capability independently for the
+  selected rosters, units, rules, mission, and geometry. Player views omit every
+  opponent-owned row, unsupported reason, count, and derived selection hash;
+  current full-game and release claims remain false without certified evidence.
 - `uv run python tools/generate_ability_support_matrix.py` also regenerates the
   typed cross-source semantic-equivalence artifact and report at
   `data/generated/ability_coverage/cross_source_semantic_equivalence.json` and

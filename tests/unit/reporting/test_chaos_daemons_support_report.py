@@ -43,10 +43,11 @@ def test_chaos_daemons_report_preserves_faction_sections_and_attachment_evidence
     for allegiance in ("Khorne", "Tzeentch", "Nurgle", "Slaanesh", "Undivided"):
         assert f"### {allegiance}" in markdown
     assert "## Semantic Support Snapshot" in markdown
-    assert "## Datasheet / Unit Support" in markdown
+    assert "## Datasheet component coverage" in markdown
     assert "Leader row consumer evidence" not in markdown
-    assert "| Detachments | Supported detachments | Exact Enhancements |" in markdown
-    assert "| 9 | 6 | 29 | 46 |" in markdown
+    assert "| Detachment rules | 9 | 6 | 0 | 3 |" in markdown
+    assert "| Enhancements | 29 | 16 | 0 | 13 |" in markdown
+    assert "| Stratagems | 46 | 22 | 0 | 24 |" in markdown
     assert "### Detachment rules" in markdown
     for rule_name in (
         "Beguiling Aura",

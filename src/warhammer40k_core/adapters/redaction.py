@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import TypedDict, cast
 
 from warhammer40k_core.adapters.access_control import ViewerContext
+from warhammer40k_core.adapters.capability_manifest import project_capability_manifest
 from warhammer40k_core.adapters.external_contract import ERROR_ENVELOPE_SCHEMA_VERSION
 from warhammer40k_core.adapters.support_profile import SupportProfilePayload
 from warhammer40k_core.engine.decision_request import DecisionRequest
@@ -46,7 +47,71 @@ def public_support_profile_payload(
         raise GameLifecycleError("Support-profile redaction requires a ViewerContext.")
     if not viewer.policy.may_view_support:
         raise GameLifecycleError("Viewer role cannot receive a support profile.")
-    return validate_json_value(cast(JsonValue, payload))
+    public_payload = dict(payload)
+    capability_manifest = project_capability_manifest(
+        payload["capability_manifest"],
+        viewer_player_id=viewer.viewer_player_id,
+        omniscient=viewer.policy.omniscient,
+    )
+    public_payload["capability_manifest"] = capability_manifest
+    if not viewer.policy.omniscient:
+        visible_datasheet_ids = {
+            _required_metadata_string(row["metadata"], key="datasheet_id")
+            for row in capability_manifest["unit_rows"]
+        }
+        visible_runtime_content_ids = {
+            row["owner_id"]
+            for row in capability_manifest["rule_rows"]
+            if "content_family" in row["metadata"]
+        }
+        mustering_rows = [
+            row
+            for row in payload["mustering_support_rows"]
+            if row["player_id"] == viewer.viewer_player_id
+        ]
+        datasheet_rows = [
+            row
+            for row in payload["datasheet_support_rows"]
+            if row["datasheet_id"] in visible_datasheet_ids
+        ]
+        runtime_rows = [
+            row
+            for row in payload["detachment_faction_support_rows"]
+            if row["content_id"] in visible_runtime_content_ids
+        ]
+        public_payload["mustering_support_rows"] = mustering_rows
+        public_payload["datasheet_support_rows"] = datasheet_rows
+        public_payload["detachment_faction_support_rows"] = runtime_rows
+        visible_statuses = [
+            *(row["status"] for row in mustering_rows),
+            *(row["status"] for row in datasheet_rows),
+            *(row["status"] for row in runtime_rows),
+        ]
+        public_payload["overall_status"] = _public_legacy_support_status(visible_statuses)
+        public_payload["status_counts"] = {
+            "unsupported": visible_statuses.count("unsupported"),
+            "playable": visible_statuses.count("playable"),
+            "full": visible_statuses.count("full"),
+        }
+        public_payload["eligible_for_headless_self_play_smoke"] = False
+    return validate_json_value(cast(JsonValue, public_payload))
+
+
+def _required_metadata_string(payload: Mapping[str, JsonValue], *, key: str) -> str:
+    value = payload[key]
+    if type(value) is not str or not value.strip():
+        raise GameLifecycleError("Capability manifest metadata field must be a string.")
+    return value
+
+
+def _public_legacy_support_status(statuses: Sequence[str]) -> str:
+    if any(status == "unsupported" for status in statuses):
+        return "unsupported"
+    if not statuses or any(status == "playable" for status in statuses):
+        return "playable"
+    if all(status == "full" for status in statuses):
+        return "full"
+    raise GameLifecycleError("Viewer-scoped legacy support status is invalid.")
 
 
 def decision_request_hidden_from_context(

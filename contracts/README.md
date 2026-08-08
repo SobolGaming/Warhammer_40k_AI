@@ -1,10 +1,11 @@
 # CORE V2 external contract
 
-Contract version: `4.0.0`
+Contract version: `4.1.0`
 
-This directory is the canonical, language-neutral Phase 18D contract, Phase
-18E session protocol, Phase 18F optimistic-concurrency command protocol, Phase
-18G reconnect/event contract, Phase 18H authentication/authorization contract,
+This directory is the canonical, language-neutral Phase 17O capability and
+Phase 18D contract, Phase 18E session protocol, Phase 18F
+optimistic-concurrency command protocol, Phase 18G reconnect/event contract,
+Phase 18H authentication/authorization contract,
 Phase 18I interaction contract, and Phase 18J battlefield coordinate/geometry
 contract for the reference adapter server. `schemas/` is the only authoritative JSON Schema
 source. `openapi.yaml` references those files directly; it does not duplicate
@@ -56,6 +57,14 @@ union plus both typed Cult Ambush alternatives and the return-on-death payload
 family as the standalone submission schema; it is not an unrestricted JSON
 value. The generated TypeScript gate constructs and schema-validates all 81
 published interaction cases.
+
+Phase 17O adds `capability-manifest-v1` inside the compatible support-profile
+envelope. It publishes independent evidence-bearing load, display, muster,
+physical, semantic, full-game, network, and replay results for the selected
+configuration. The administrator fixture is unredacted; the two player fixtures
+contain only their own roster-sensitive rows, counts, reasons, and derived
+hashes. Certification booleans remain false until certified scenario and replay
+evidence is present.
 
 ## Layout
 

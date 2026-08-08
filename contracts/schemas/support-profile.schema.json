@@ -3,6 +3,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
+    "capability_manifest": {
+      "$ref": "https://warhammer40k-core.local/contracts/v4/capability-manifest.schema.json"
+    },
     "catalog_id": {"minLength": 1, "type": "string"},
     "datasheet_support_rows": {
       "items": {"$ref": "#/$defs/datasheet_row"},

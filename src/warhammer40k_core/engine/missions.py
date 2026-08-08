@@ -112,13 +112,19 @@ def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionSco
 
 def mission_pack_for_id(mission_pack_id: str) -> MissionPackDefinition:
     requested_pack_id = _validate_identifier("mission_pack_id", mission_pack_id)
-    for mission_pack in _supported_mission_packs():
+    for mission_pack in supported_mission_packs():
         if mission_pack.mission_pack_id == requested_pack_id:
             return mission_pack
     raise GameLifecycleError("Unsupported mission pack.")
 
 
-def _supported_mission_packs() -> tuple[MissionPackDefinition, ...]:
+def supported_mission_packs() -> tuple[MissionPackDefinition, ...]:
+    """Return the explicit mission-pack inventory accepted by the engine.
+
+    Capability inspection uses this presence-query API so an unknown mission pack
+    can be reported as unsupported without using an exception as control flow.
+    """
+
     return (
         chapter_approved_2026_27_mission_pack(),
         warhammer_event_companion_2026_07_mission_pack(),

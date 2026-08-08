@@ -30,6 +30,35 @@ The engine-facing path is shared:
 
 Adapters are producers of answers. The engine remains the owner of validation, mutation, events, and replay records.
 
+## Phase 17O capability manifest
+
+`LocalGameSession.support_profile()` retains its existing 4.x envelope and now
+includes the versioned `capability_manifest` member. Its canonical language-
+neutral schema is `contracts/schemas/capability-manifest.schema.json`. Clients
+may use this manifest to disable or explain UI flows, but it never grants roster
+legality, accepts a proposal, or mutates authoritative state.
+
+Every roster, unit, rule, mission, and geometry row records all eight capability
+dimensions: `LOADABLE`, `DISPLAYABLE`, `MUSTERABLE`, `PHYSICALLY_PLAYABLE`,
+`SEMANTICALLY_EXECUTABLE`, `FULL_GAME_SUPPORTED`, `NETWORK_SAFE`, and
+`REPLAY_VERIFIED`. Load support and semantic execution remain separate fields.
+A descriptor, generic IR payload, source-only module, or heuristic model height
+is therefore visible as evidence without being promoted to executable or
+certified gameplay support. Unsupported rule effects carry stable rule-row and
+source IDs plus a reason code.
+
+The support-profile response is viewer scoped in the shared redaction module.
+Players and coaches receive only their roster, unit, rule, geometry, unsupported-
+effect, count, selection-hash, and certification projection; administrators
+receive the omniscient fixture. Mission, ruleset, catalog, engine, contract, and
+neutral interaction identities remain common. Clients must not infer hidden
+opponent selection from a missing row or compare viewer hashes across scopes.
+
+Phase 20A and Phase 20D claim booleans are mechanically derived from explicit
+capability and certified-scenario/replay evidence. With no such evidence, the
+claims are false even if the legacy support-profile envelope says `playable` or
+the setup smoke is eligible.
+
 ## Phase 18I interaction metadata
 
 Every visible `DecisionRequestViewPayload` emitted by the shared projection path

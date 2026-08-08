@@ -36,6 +36,14 @@ Status payloads may include request/actor details only when the corresponding
 request is visible to that viewer. Catalog projections contain static public
 display data and no live hidden state.
 
+The nested Phase 17O capability manifest is projected by this same redaction
+module. A non-omniscient viewer receives only owned roster, unit, rule,
+geometry, and unsupported-effect rows. Capability counts, mode results,
+selection hashes, manifest IDs, and certification blockers are rebuilt from the
+visible rows; they are not copied from the omniscient payload. The common
+mission/catalog/ruleset/contract identities and neutral interaction inventory
+contain no selected opponent content.
+
 Session metadata is always principal scoped. Viewer-scoped command checkpoints
 and event ranges use only that role's redacted projection and stream; they must
 not become a hash, count, cursor, or next-actor oracle for hidden opponent state.
@@ -58,7 +66,9 @@ A role, player binding, policy, or registry authorization-epoch change changes
 cursor scope and invalidates previously issued cursors. Delayed spectators read a retained historical revision snapshot;
 they do not receive current hidden state with fields merely omitted.
 
-`examples/projections/hidden_secondary_redaction_view.json` and the generated
+`examples/projections/hidden_secondary_redaction_view.json`,
+`examples/support-profile.json`, both
+`examples/support-profile-player-*-redacted.json` files, and the generated
 event/status examples are conformance fixtures. Adding a visibility-sensitive
 payload requires valid owner and opponent examples plus a regression proving
 that counts and metadata do not leak.

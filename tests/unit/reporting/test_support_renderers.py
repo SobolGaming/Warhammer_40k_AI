@@ -68,24 +68,26 @@ def test_faction_support_renderer_preserves_section_order() -> None:
 
     assert aeldari.startswith("# Aeldari Support Matrix\n")
     assert aeldari.index("## Detachment Rule Support") < aeldari.index(
-        "## Datasheet / Unit Support"
+        "## Datasheet component coverage"
     )
     assert (
         aeldari.index("## Semantic Support Snapshot")
         < aeldari.index("## Detachment Rule Support")
         < aeldari.index("## Datasheet Source Review")
-        < aeldari.index("## 39k PRO Secondary Reference Audit")
-        < aeldari.index("## Datasheet / Unit Support")
+        < aeldari.index("## Secondary-reference Audit")
+        < aeldari.index("## Datasheet component coverage")
     )
     assert "Corsair Coterie — Relentless Raiders" in aeldari
     assert "Armoured Warhost — Skilled Crews" in aeldari
     assert "15 detachments, 52 Enhancements, and 78 Stratagems" in aeldari
-    assert "| 15 | 2 | 52 | 78 | 16 |" in aeldari
+    assert "| Detachment rules | 15 | 2 | 0 | 13 |" in aeldari
+    assert "| Enhancements | 52 | 6 | 0 | 46 |" in aeldari
+    assert "| Stratagems | 78 | 9 | 0 | 69 |" in aeldari
     assert "https://39k.pro/faction/-utUCEwvtbI" in aeldari
     assert aeldari.count("https://39k.pro/detachment/") == 15
     assert "Guileful Strategist" not in aeldari
     assert "Harmonisation Matrix" not in aeldari
-    assert "## 11th Edition Faction Pack Review" in emperors_children
+    assert "## Faction Pack Review" in emperors_children
     assert "Elegant Brutes | Yes | Physical PDF page 2" in emperors_children
     assert "Frenzied Host | Yes | Physical PDF page 3" in emperors_children
     assert "Spectacle of Slaughter | Yes | Physical PDF page 4" in emperors_children
@@ -97,15 +99,15 @@ def test_faction_support_renderer_preserves_section_order() -> None:
     assert "are not yet present in the structured Phase17E artifacts" in emperors_children
     assert "## Semantic Support Snapshot" in emperors_children
     assert (
-        emperors_children.index("## 11th Edition Faction Pack Review")
+        emperors_children.index("## Faction Pack Review")
         < emperors_children.index("## Semantic Support Snapshot")
         < emperors_children.index("## Detachment Rule Support")
         < emperors_children.index("## Datasheet Source Review")
-        < emperors_children.index("## 39k PRO Secondary-reference Audit")
-        < emperors_children.index("## Datasheet / Unit Support")
+        < emperors_children.index("## Secondary-reference Audit")
+        < emperors_children.index("## Datasheet component coverage")
         < emperors_children.index("## Cross-source Semantic Equivalence")
     )
-    assert "Court of the Phoenician | `Full`" in emperors_children
+    assert "Court of the Phoenician | **Implemented**" in emperors_children
     assert "| Core | 31 | 31 assignments matched |" in emperors_children
     assert "| Faction | 23 | 23 assignments matched |" in emperors_children
     assert "| Datasheet | 35 | 34 assignments matched;" in emperors_children
@@ -124,7 +126,7 @@ def test_faction_support_renderer_preserves_section_order() -> None:
     assert "http://39k.pro" not in emperors_children
     assert "### Unit Datasheet Source Treatments" not in emperors_children
     assert "### Datasheet Ability Details" not in emperors_children
-    support_markdown = emperors_children.split("## Datasheet / Unit Support", 1)[1]
+    support_markdown = emperors_children.split("## Datasheet component coverage", 1)[1]
     assert "### Emperor's Children" in support_markdown
     assert "### Vehicles and Daemon Engines" in support_markdown
     assert "### Slaanesh Daemons" in support_markdown

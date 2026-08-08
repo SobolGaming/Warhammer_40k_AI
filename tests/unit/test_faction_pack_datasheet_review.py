@@ -278,7 +278,7 @@ def test_emperors_children_semantic_rows_name_every_reviewed_ability() -> None:
     }
 
     support_markdown = faction_support_markdown_files()["emperors-children.md"].split(
-        "## Datasheet / Unit Support", 1
+        "## Datasheet component coverage", 1
     )[1]
     rendered_rows = {
         datasheet_id: next(
@@ -416,10 +416,10 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
     for row in non_daemons_rows:
         markdown = markdown_by_filename[f"{row.faction_id}.md"]
         assert markdown.index("## Datasheet Source Review") < markdown.index(
-            "## Datasheet / Unit Support"
+            "## Datasheet component coverage"
         )
         if row.faction_id in {"aeldari", "emperors-children"}:
-            support_markdown = markdown.split("## Datasheet / Unit Support", 1)[1]
+            support_markdown = markdown.split("## Datasheet component coverage", 1)[1]
             assert f"| {row.datasheet_name} (`{row.datasheet_id}`) |" in support_markdown
             rendered_row = next(
                 line
@@ -441,14 +441,17 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
             else:
                 assert "| IR parsed; host needed |" in rendered_row
         else:
-            assert f"| {row.datasheet_name} (`{row.datasheet_id}`) | `{row.overall}` |" in markdown
+            assert (
+                f"| {row.datasheet_name} (`{row.datasheet_id}`) | "
+                "**Structured; interaction gaps** |"
+            ) in markdown
         if row.faction_id == "aeldari":
             semantic_row = next(
                 semantic_row
                 for semantic_row in aeldari_datasheet_semantic_coverage().rows
                 if semantic_row.datasheet_id == row.datasheet_id
             )
-            support_markdown = markdown.split("## Datasheet / Unit Support", 1)[1]
+            support_markdown = markdown.split("## Datasheet component coverage", 1)[1]
             for ability in semantic_row.abilities:
                 assert support_markdown.count(f"`{ability.ability_id}`") == 1
         elif row.faction_id != "emperors-children":
@@ -522,7 +525,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         kharseth_support.datasheet_ability_status,
     ) == ("Full", "Full", "Full", "Full", "Full")
     assert kharseth_support.faction_interaction_status == "Partial"
-    assert "detachment support 2/15" in kharseth_support.notes
+    assert "implemented detachment rules 2/15" in kharseth_support.notes
     kharseth_ability_rows = {
         ability_rows_by_id[row_id].ability_name: ability_rows_by_id[row_id]
         for row_id in kharseth_support.ability_coverage_row_ids
@@ -851,7 +854,7 @@ def test_aeldari_semantic_descriptions_exactly_partition_every_reviewed_ability(
         for row in prose_rows
     )
     support_markdown = faction_support_markdown_files()["aeldari.md"].split(
-        "## Datasheet / Unit Support", 1
+        "## Datasheet component coverage", 1
     )[1]
     for description in descriptions.rows:
         assert support_markdown.count(f"`{description.ability_id}`") == 1

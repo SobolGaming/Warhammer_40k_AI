@@ -1,0 +1,403 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v4/capability-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "capability-manifest-v1", "type": "string"},
+    "manifest_id": {"minLength": 1, "type": "string"},
+    "viewer_scope": {"minLength": 1, "type": "string"},
+    "selection_hash": {"minLength": 64, "maxLength": 64, "type": "string"},
+    "identities": {"$ref": "#/$defs/identities"},
+    "mode_capabilities": {
+      "$ref": "#/$defs/capability_vector"
+    },
+    "capability_counts": {"$ref": "#/$defs/capability_counts"},
+    "roster_rows": {
+      "items": {"$ref": "#/$defs/roster_row"},
+      "type": "array"
+    },
+    "unit_rows": {"items": {"$ref": "#/$defs/unit_row"}, "type": "array"},
+    "rule_rows": {"items": {"$ref": "#/$defs/rule_row"}, "type": "array"},
+    "mission_rows": {
+      "items": {"$ref": "#/$defs/mission_row"},
+      "type": "array"
+    },
+    "geometry_rows": {
+      "items": {"$ref": "#/$defs/geometry_row"},
+      "type": "array"
+    },
+    "unsupported_effects": {
+      "items": {"$ref": "#/$defs/unsupported_effect"},
+      "type": "array"
+    },
+    "interaction_kinds": {
+      "items": {"minLength": 1, "type": "string"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "decision_family_rows": {
+      "items": {"$ref": "#/$defs/decision_family"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "hidden_information_status": {
+      "allOf": [
+        {"$ref": "#/$defs/capability_result"},
+        {"properties": {"dimension": {"const": "NETWORK_SAFE"}}}
+      ]
+    },
+    "replay_evidence_refs": {
+      "items": {"minLength": 1, "type": "string"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "certified_scenario_evidence_refs": {
+      "items": {"minLength": 1, "type": "string"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "certification_claims": {"$ref": "#/$defs/certification_claims"}
+  },
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "viewer_scope",
+    "selection_hash",
+    "identities",
+    "mode_capabilities",
+    "capability_counts",
+    "roster_rows",
+    "unit_rows",
+    "rule_rows",
+    "mission_rows",
+    "geometry_rows",
+    "unsupported_effects",
+    "interaction_kinds",
+    "decision_family_rows",
+    "hidden_information_status",
+    "replay_evidence_refs",
+    "certified_scenario_evidence_refs",
+    "certification_claims"
+  ],
+  "title": "CORE V2 Phase 17O CapabilityManifestPayload",
+  "type": "object",
+  "$defs": {
+    "capability_dimension": {
+      "enum": [
+        "LOADABLE",
+        "DISPLAYABLE",
+        "MUSTERABLE",
+        "PHYSICALLY_PLAYABLE",
+        "SEMANTICALLY_EXECUTABLE",
+        "FULL_GAME_SUPPORTED",
+        "NETWORK_SAFE",
+        "REPLAY_VERIFIED"
+      ],
+      "type": "string"
+    },
+    "capability_status": {
+      "enum": ["supported", "unsupported", "not_applicable"],
+      "type": "string"
+    },
+    "string_array": {
+      "items": {"minLength": 1, "type": "string"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "capability_result": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {"$ref": "#/$defs/capability_dimension"},
+        "status": {"$ref": "#/$defs/capability_status"},
+        "evidence_refs": {"$ref": "#/$defs/string_array"},
+        "source_ids": {"$ref": "#/$defs/string_array"},
+        "reason_code": {
+          "anyOf": [
+            {"minLength": 1, "type": "string"},
+            {"type": "null"}
+          ]
+        }
+      },
+      "required": ["dimension", "status", "evidence_refs", "source_ids", "reason_code"],
+      "type": "object",
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "supported"}}},
+          "then": {
+            "properties": {
+              "evidence_refs": {"minItems": 1},
+              "reason_code": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"status": {"const": "unsupported"}}},
+          "then": {
+            "properties": {"reason_code": {"minLength": 1, "type": "string"}}
+          }
+        },
+        {
+          "if": {"properties": {"status": {"const": "not_applicable"}}},
+          "then": {
+            "properties": {"reason_code": {"minLength": 1, "type": "string"}}
+          }
+        }
+      ]
+    },
+    "capability_vector": {
+      "items": false,
+      "maxItems": 8,
+      "minItems": 8,
+      "prefixItems": [
+        {
+          "allOf": [
+            {"$ref": "#/$defs/capability_result"},
+            {"properties": {"dimension": {"const": "LOADABLE"}}}
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/capability_result"},
+            {"properties": {"dimension": {"const": "DISPLAYABLE"}}}
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/capability_result"},
+            {"properties": {"dimension": {"const": "MUSTERABLE"}}}
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/capability_result"},
+            {"properties": {"dimension": {"const": "PHYSICALLY_PLAYABLE"}}}
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/capability_result"},
+            {"properties": {"dimension": {"const": "SEMANTICALLY_EXECUTABLE"}}}
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/capability_result"},
+            {"properties": {"dimension": {"const": "FULL_GAME_SUPPORTED"}}}
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/capability_result"},
+            {"properties": {"dimension": {"const": "NETWORK_SAFE"}}}
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/capability_result"},
+            {"properties": {"dimension": {"const": "REPLAY_VERIFIED"}}}
+          ]
+        }
+      ],
+      "type": "array"
+    },
+    "capability_row": {
+      "additionalProperties": false,
+      "properties": {
+        "row_id": {"minLength": 1, "type": "string"},
+        "row_kind": {"enum": ["roster", "unit", "rule", "mission", "geometry"]},
+        "player_id": {"type": ["string", "null"]},
+        "owner_id": {"minLength": 1, "type": "string"},
+        "display_name": {"minLength": 1, "type": "string"},
+        "source_ids": {"$ref": "#/$defs/string_array"},
+        "load_support": {"minLength": 1, "type": "string"},
+        "semantic_execution": {"minLength": 1, "type": "string"},
+        "capabilities": {"$ref": "#/$defs/capability_vector"},
+        "metadata": {"type": "object"}
+      },
+      "required": [
+        "row_id",
+        "row_kind",
+        "player_id",
+        "owner_id",
+        "display_name",
+        "source_ids",
+        "load_support",
+        "semantic_execution",
+        "capabilities",
+        "metadata"
+      ],
+      "type": "object"
+    },
+    "roster_row": {
+      "allOf": [
+        {"$ref": "#/$defs/capability_row"},
+        {"properties": {"row_kind": {"const": "roster"}}}
+      ]
+    },
+    "unit_row": {
+      "allOf": [
+        {"$ref": "#/$defs/capability_row"},
+        {"properties": {"row_kind": {"const": "unit"}}}
+      ]
+    },
+    "rule_row": {
+      "allOf": [
+        {"$ref": "#/$defs/capability_row"},
+        {"properties": {"row_kind": {"const": "rule"}}}
+      ]
+    },
+    "mission_row": {
+      "allOf": [
+        {"$ref": "#/$defs/capability_row"},
+        {"properties": {"row_kind": {"const": "mission"}}}
+      ]
+    },
+    "geometry_row": {
+      "allOf": [
+        {"$ref": "#/$defs/capability_row"},
+        {"properties": {"row_kind": {"const": "geometry"}}}
+      ]
+    },
+    "unsupported_effect": {
+      "additionalProperties": false,
+      "properties": {
+        "effect_id": {"minLength": 1, "type": "string"},
+        "rule_row_id": {"minLength": 1, "type": "string"},
+        "player_id": {"type": ["string", "null"]},
+        "source_ids": {"$ref": "#/$defs/string_array"},
+        "reason_code": {"minLength": 1, "type": "string"},
+        "message": {"minLength": 1, "type": "string"}
+      },
+      "required": [
+        "effect_id",
+        "rule_row_id",
+        "player_id",
+        "source_ids",
+        "reason_code",
+        "message"
+      ],
+      "type": "object"
+    },
+    "identity": {
+      "additionalProperties": false,
+      "properties": {
+        "identity_id": {"minLength": 1, "type": "string"},
+        "identity_hash": {"minLength": 1, "type": "string"}
+      },
+      "required": ["identity_id", "identity_hash"],
+      "type": "object"
+    },
+    "source_package_identity": {
+      "additionalProperties": false,
+      "properties": {
+        "identity_id": {"minLength": 1, "type": "string"},
+        "identity_hash": {"minLength": 1, "type": "string"},
+        "source_kind": {"enum": ["army_catalog", "mission_pack"]}
+      },
+      "required": ["identity_id", "identity_hash", "source_kind"],
+      "type": "object"
+    },
+    "contract_identity": {
+      "additionalProperties": false,
+      "properties": {
+        "identity_id": {"const": "https://warhammer40k-core.local/contracts/v4/capability-manifest.schema.json"},
+        "identity_hash": {"minLength": 64, "maxLength": 64, "type": "string"},
+        "contract_version": {"minLength": 1, "type": "string"}
+      },
+      "required": ["identity_id", "identity_hash", "contract_version"],
+      "type": "object"
+    },
+    "identities": {
+      "additionalProperties": false,
+      "properties": {
+        "ruleset": {"$ref": "#/$defs/identity"},
+        "catalog": {"$ref": "#/$defs/identity"},
+        "source_packages": {
+          "items": {"$ref": "#/$defs/source_package_identity"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "mission_pack": {"anyOf": [{"$ref": "#/$defs/identity"}, {"type": "null"}]},
+        "terrain_layout": {"anyOf": [{"$ref": "#/$defs/identity"}, {"type": "null"}]},
+        "engine_build": {"$ref": "#/$defs/identity"},
+        "contract_schema": {"$ref": "#/$defs/contract_identity"}
+      },
+      "required": [
+        "ruleset",
+        "catalog",
+        "source_packages",
+        "mission_pack",
+        "terrain_layout",
+        "engine_build",
+        "contract_schema"
+      ],
+      "type": "object"
+    },
+    "status_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "supported": {"minimum": 0, "type": "integer"},
+        "unsupported": {"minimum": 0, "type": "integer"},
+        "not_applicable": {"minimum": 0, "type": "integer"}
+      },
+      "required": ["supported", "unsupported", "not_applicable"],
+      "type": "object"
+    },
+    "capability_counts": {
+      "additionalProperties": false,
+      "properties": {
+        "LOADABLE": {"$ref": "#/$defs/status_counts"},
+        "DISPLAYABLE": {"$ref": "#/$defs/status_counts"},
+        "MUSTERABLE": {"$ref": "#/$defs/status_counts"},
+        "PHYSICALLY_PLAYABLE": {"$ref": "#/$defs/status_counts"},
+        "SEMANTICALLY_EXECUTABLE": {"$ref": "#/$defs/status_counts"},
+        "FULL_GAME_SUPPORTED": {"$ref": "#/$defs/status_counts"},
+        "NETWORK_SAFE": {"$ref": "#/$defs/status_counts"},
+        "REPLAY_VERIFIED": {"$ref": "#/$defs/status_counts"}
+      },
+      "required": [
+        "LOADABLE",
+        "DISPLAYABLE",
+        "MUSTERABLE",
+        "PHYSICALLY_PLAYABLE",
+        "SEMANTICALLY_EXECUTABLE",
+        "FULL_GAME_SUPPORTED",
+        "NETWORK_SAFE",
+        "REPLAY_VERIFIED"
+      ],
+      "type": "object"
+    },
+    "decision_family": {
+      "additionalProperties": false,
+      "properties": {
+        "decision_type": {"minLength": 1, "type": "string"},
+        "submission_kind": {"enum": ["finite", "parameterized"]},
+        "interaction_kinds": {
+          "items": {"minLength": 1, "type": "string"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": ["decision_type", "submission_kind", "interaction_kinds"],
+      "type": "object"
+    },
+    "certification_claims": {
+      "additionalProperties": false,
+      "properties": {
+        "phase20a_certified": {"type": "boolean"},
+        "phase20d_release_eligible": {"type": "boolean"},
+        "evidence_refs": {"$ref": "#/$defs/string_array"},
+        "blocker_reason_codes": {"$ref": "#/$defs/string_array"}
+      },
+      "required": [
+        "phase20a_certified",
+        "phase20d_release_eligible",
+        "evidence_refs",
+        "blocker_reason_codes"
+      ],
+      "type": "object"
+    }
+  }
+}

@@ -155,13 +155,13 @@ def aeldari_semantic_snapshot_markdown(
             "The Exact Ability Semantic Coverage table groups the reviewed Aeldari source scope "
             "by tradition. It bridges every effective datasheet and derives each semantic bucket "
             "from exact datasheet and wargear ability text, parser diagnostics, and runtime "
-            "consumers. It does not report catalog or playability support; the separate Datasheet "
-            "/ Unit Support table remains authoritative for those fields."
+            "consumers. It does not report selected-game capability; the datasheet component "
+            "table and Phase 17O manifest remain authoritative for those fields."
         ),
         "",
         "### Detachments",
         "",
-        "| Fully supported | Still needs semantic support |",
+        "| Implemented detachment rules | Still needs semantic support |",
         "| --- | --- |",
         (
             f"| {_markdown_line_list(name for name, supported in detachment_rows if supported)} | "
@@ -187,7 +187,7 @@ def aeldari_thirty_nine_k_pro_audit_markdown() -> list[str]:
     audit = aeldari_thirty_nine_k_pro_audit()
     lines = [
         "",
-        "## 39k PRO Secondary Reference Audit",
+        "## Secondary-reference Audit",
         "",
         (
             f"Audit `{audit.audit_id}` checked the current [{audit.publication_name}]"
