@@ -27,7 +27,7 @@ def test_phase17i_classification_covers_every_phase17f_structured_blocked_row() 
     )
     rows_by_execution_id = {row.execution_id: row for row in report.classification_rows}
 
-    assert report.structured_blocked_count == 1920
+    assert report.structured_blocked_count == 1919
     assert set(rows_by_execution_id) == {
         record.execution_id for record in structured_blocked_records
     }
@@ -60,7 +60,7 @@ def test_phase17i_source_text_boundaries_are_explicit() -> None:
         is classification_source.Phase17IClassificationSourceKind.PHASE17F_METADATA_ONLY
     )
 
-    assert report.source_text_matched_count == 1821
+    assert report.source_text_matched_count == 1820
     assert report.source_text_missing_count == 99
     assert len(source_text_rows) == report.source_text_matched_count
     assert len(metadata_only_rows) == report.source_text_missing_count
@@ -87,14 +87,14 @@ def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
         summary.family: summary for summary in report.missing_capability_summaries()
     }
 
-    assert summary_by_family["generic_ir_execution_binding"].row_count == 1920
+    assert summary_by_family["generic_ir_execution_binding"].row_count == 1919
     assert summary_by_family["generic_ir_execution_binding"].coverage_kind_counts == {
         "detachment_enhancement": 655,
-        "detachment_rule": 257,
+        "detachment_rule": 256,
         "detachment_stratagem": 1003,
         "faction_army_rule": 5,
     }
-    assert summary_by_family["unrepresented_rule_language"].row_count == 1785
+    assert summary_by_family["unrepresented_rule_language"].row_count == 1784
     assert summary_by_family["stratagem_activation_and_targeting"].coverage_kind_counts == {
         "detachment_stratagem": 1003
     }
@@ -109,7 +109,7 @@ def test_phase17i_missing_capability_report_groups_rows_by_family() -> None:
         "detachment_enhancement": 1,
     }
     assert summary_by_family["detachment_rule_state"].coverage_kind_counts == {
-        "detachment_rule": 257
+        "detachment_rule": 256
     }
     assert summary_by_family["army_rule_state"].coverage_kind_counts == {"faction_army_rule": 5}
     assert summary_by_family["source_text_not_available"].coverage_kind_counts == {

@@ -7175,7 +7175,7 @@
     }
   ],
   "equivalent_group_count": 330,
-  "exact_text_only_member_count": 3260,
+  "exact_text_only_member_count": 3259,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -68743,29 +68743,30 @@
     },
     {
       "content_kind": "detachment_rule",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "e1d94d098e7940c951d29c77d18cdeec3f9950154c3cd348f7d2e380f6f5cf5b",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "8d2714bdcd8083800559bb99ab0e038b7f9bc4d21345d2ad9c050285a3ca3787",
+      "execution_status": "generic_ir_executable",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "runtime-content:phase17f:phase17e:emperors-children:mercurial-host:rule",
-      "normalized_text_hash": "0696cf0c3e8b3d8a762b0487c6cbd934a19e0c9b15152bc477c00c5857a4f33c",
+      "normalized_text_hash": "a7e1cc69013eb73522fd942a285059b316aff0ce3357a8c1423e9ba6d9c111d9",
       "owner_id": "mercurial-host",
       "owner_name": "Mercurial Host",
       "rule_id": "phase17e:emperors-children:mercurial-host:rule",
       "rule_name": "Mercurial Host detachment rule",
       "rules_surface": "detachment_rule",
-      "runtime_consumer_ids": [],
+      "runtime_consumer_ids": [
+        "catalog-ir:advance-roll-reroll"
+      ],
       "semantic_context_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-      "semantic_hash": null,
+      "semantic_hash": "e30e9eb9d85c3066f1b42ca49b28686c457a20098dfd3cddbc5669dfb80d55bd",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Detachment_abilities:000009997"
+        "gw-11e-faction-detachments-2026-27:detachment:emperors-children:mercurial-host",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:emperors-children"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Detachment_abilities:000009997:description"
+        "gw-11e-phase17e-faction-coverage-2026-27:phase17e:emperors-children:mercurial-host:rule:source-text"
       ],
       "support_transfer": "none"
     },
@@ -122110,8 +122111,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "04a5669eeaa70f47073479f2ad8a10ab29a7398712ea28f603ab64b7361f702d",
+  "source_payload_checksum_sha256": "414a6ad80befab7fbcd1899b86fa0fe09e1e27ec855683a856940aed7fbb810f",
   "source_text_unavailable_member_count": 110,
-  "structured_member_count": 724,
-  "upstream_execution_checksum_sha256": "7c6626aa8ace62078f47711ff65ff43c7bc726a483b55e89ca722a51c8cc48dd"
+  "structured_member_count": 725,
+  "upstream_execution_checksum_sha256": "e370a2a9ddad269a152875feddb7345b1f12abb3775ef2906b9ea3ca9c492339"
 }

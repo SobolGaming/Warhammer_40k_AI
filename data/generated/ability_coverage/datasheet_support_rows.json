@@ -1504,10 +1504,11 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/10. Supported detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
+      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:post-shoot-hit-target-effect`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1540,10 +1541,11 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/10. Supported detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
+      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:hit-roll-modifier`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1574,10 +1576,11 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/10. Supported detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
+      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:fight-end-failed-activation-model-destruction`, `catalog-ir:fight-selected-critical-wound-threshold`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1616,10 +1619,11 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/10. Supported detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
+      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `army-mustering:supreme-commander`, `catalog-ir:command-phase-ability-mode`, `catalog-ir:movement-transit-permission`, `catalog-ir:poisoned-command-mortal-wounds`, `catalog-ir:post-fight-hit-target-effect`, `catalog-ir:post-shoot-hit-target-effect`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1652,10 +1656,11 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/10. Supported detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
+      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:command-point-gain`, `catalog-ir:wound-roll-reroll`, `descriptor:prebattle:scouts`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1688,10 +1693,11 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/10. Supported detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
+      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:post-shoot-hit-target-effect`, `catalog-ir:weapon-keyword-grant`, `catalog-ir:weapon-keyword-grant:sustained-hits`, `descriptor:army-mustering:leader-attachment`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1726,10 +1732,11 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/10. Supported detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
+      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:conditional-not-leading-ability:fights-first`, `catalog-ir:hit-roll-reroll`, `catalog-ir:wound-roll-reroll`, `descriptor:army-mustering:leader-attachment`, `descriptor:lost-wound:feel-no-pain-resolution`, `descriptor:lost-wound:feel-no-pain-source`, `descriptor:shooting-target:lone-operative`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1760,10 +1767,11 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/10. Supported detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
+      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:post-shoot-hit-target-effect`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1796,10 +1804,11 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/10. Supported detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
+      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:command-end-sticky-objective-control`, `catalog-ir:command-point-gain`, `descriptor:prebattle:infiltrators`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",

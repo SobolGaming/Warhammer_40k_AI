@@ -116,7 +116,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v3`
 - source-payload SHA-256 checksum:
-  `f87fbe8cbe3464a270a7e8b928bae33b249f954abc54dd714b6cfb88eac1eb8a`
+  `4fc3bb60b5fc0730619402adfca3ac0a645101a003e2c1040bcda88c0df6ce28`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -147,7 +147,8 @@ Aeldari Corsair Coterie and Path of the Outcast add nine generic-supported
 Stratagem rows. Chaos Daemons Warptide adds a generic-supported detachment rule,
 two Enhancements, and three Stratagem rows. Chaos Daemons Lords of the Warp adds
 a generic-supported detachment rule, one Enhancement, and four Stratagem rows,
-for a total of 102 generic-supported rows;
+and Emperor's Children Mercurial Host adds a generic-supported Quicksilver Grace
+detachment rule, for a total of 103 generic-supported rows;
 exact rows outside generic IR with existing runtime consumers are marked
 implemented. No aggregate faction-pack Enhancement or Stratagem row is used to
 hide missing detail, and no unapproved unsupported descriptor remains for Phase
@@ -179,13 +180,13 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v3`
 - source-payload SHA-256 checksum:
-  `7c6626aa8ace62078f47711ff65ff43c7bc726a483b55e89ca722a51c8cc48dd`
+  `e370a2a9ddad269a152875feddb7345b1f12abb3775ef2906b9ea3ca9c492339`
 - upstream Phase 17E checksum:
-  `f87fbe8cbe3464a270a7e8b928bae33b249f954abc54dd714b6cfb88eac1eb8a`
+  `4fc3bb60b5fc0730619402adfca3ac0a645101a003e2c1040bcda88c0df6ce28`
 
 The package emits 2073 execution records, one for every Phase 17E coverage row:
-1920 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, 102 rows are executable generic IR
+1919 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, 103 rows are executable generic IR
 rows, and 23 rows are executable named-handler rows because they already have
 runtime consumers.
 The engine dispatcher can route every record and returns typed `unsupported`
@@ -446,15 +447,15 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `3ff86d5cab27c74f588532bcfea312eca37f2102691b3e0a3f88f8f9407f9679`
+  `50aaacb7b8587aa69293f38b67f272f8b050c18e1032c863f8e2c0b23d8e1fcc`
 - upstream Phase 17F checksum:
-  `7c6626aa8ace62078f47711ff65ff43c7bc726a483b55e89ca722a51c8cc48dd`
+  `e370a2a9ddad269a152875feddb7345b1f12abb3775ef2906b9ea3ca9c492339`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
 
-The report emits 1920 classification rows, one for every Phase 17F row blocked
-as `blocked_structured_semantics_required`. It compiles 1821 rows from Wahapedia
+The report emits 1919 classification rows, one for every Phase 17F row blocked
+as `blocked_structured_semantics_required`. It compiles 1820 rows from Wahapedia
 bridge descriptions through Phase 17C and marks 99 rows as
 `source_text_not_available` metadata-only rows. Each row records the existing
 Phase 17C template IDs and template families that can already express clauses,
@@ -488,9 +489,9 @@ WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-named-handler-budget-v1`
 - source-payload SHA-256 checksum:
-  `f18e0a3c035a35ad5531e1b73ee75920343fb9679d6e4f1253d1a5443af0549c`
+  `61ba09e3de572c4a3394575c3ec8bca4b9f469c6355bc18c37980f30a287d85d`
 - upstream Phase 17F checksum:
-  `7c6626aa8ace62078f47711ff65ff43c7bc726a483b55e89ca722a51c8cc48dd`
+  `e370a2a9ddad269a152875feddb7345b1f12abb3775ef2906b9ea3ca9c492339`
 
 The budget report tracks 23 executable named-handler Phase 17F rows and 23
 approved entries. The current approved reason is
@@ -707,8 +708,8 @@ already engine-consumed named handlers.
 | Covered item family | Rows | Execution status | Engine result | Source block |
 |---|---:|---|---|---|
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
-| Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Detachment rules | 2 | `executable_generic_ir` | `applied` | `none` |
+| Detachment rules | 7 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Detachment rules | 3 | `executable_generic_ir` | `applied` | `none` |
 | Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 6 | `executable_generic_ir` | `applied` | `none` |
 | Stratagems | 30 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |

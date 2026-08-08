@@ -37,6 +37,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_generic_ir_support_2026_27 as generic_ir_support_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_mercurial_host_ir_support_2026_27 as mercurial_host_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     july_faction_packs_2026_07,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_coverage_2026_27 import (
@@ -798,6 +801,27 @@ def test_phase17f_court_of_the_phoenician_rows_are_executable_generic_ir() -> No
             )
         )
         assert record.rule_ir_hash == expected_rule_ir_hash
+
+
+def test_phase17f_mercurial_host_rule_is_executable_generic_ir() -> None:
+    descriptor_id = mercurial_host_ir.MERCURIAL_HOST_DETACHMENT_RULE_DESCRIPTOR_ID
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_descriptor_id == descriptor_id
+    )
+    rule_ir = generic_ir_support_source.generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+
+    assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.block_reason is None
+    assert record.handler_id is None
+    assert record.runtime_consumer_ids == ("catalog-ir:advance-roll-reroll",)
+    assert record.rule_ir_hash == rule_ir.ir_hash()
+    assert rule_ir.source_id == mercurial_host_ir.QUICKSILVER_GRACE_SOURCE_RULE_ID
+    assert rule_ir.normalized_text == (
+        "You can re-roll Advance rolls made for Emperor's Children units from your army."
+    )
 
 
 def test_phase17f_cavalcade_of_chaos_rows_are_executable_generic_ir() -> None:

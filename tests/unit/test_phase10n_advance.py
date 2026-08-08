@@ -12,6 +12,8 @@ from tests.deployment_submission_helpers import (
 from tests.movement_submission_helpers import submit_default_movement_proposal_if_pending
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
+from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
@@ -19,6 +21,7 @@ from warhammer40k_core.core.dice import (
     RerollComponentSelectionPolicy,
     RerollPermission,
 )
+from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
@@ -73,6 +76,14 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_mercurial_host_ir_support_2026_27 as mercurial_host_ir,
+)
+
+QUICKSILVER_GRACE_DATASHEET_ID = "phase10n-emperors-children-unit"
+QUICKSILVER_GRACE_ALLIED_DATASHEET_ID = "phase10n-legiones-daemonica-unit"
+QUICKSILVER_GRACE_UNIT_ID = "army-alpha:quicksilver-unit"
+QUICKSILVER_GRACE_ALLIED_UNIT_ID = "army-alpha:allied-unit"
 
 
 def test_advance_roll_and_advanced_state_payloads_round_trip_without_object_reprs() -> None:
@@ -289,6 +300,106 @@ def test_advance_reroll_request_appears_only_with_legal_reroll_source() -> None:
     assert _decision_request(follow_up).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     assert advanced is not None
     assert advanced.movement_dice_record.advance_roll.roll_state.rerolls
+
+
+def test_quicksilver_grace_uses_real_advance_reroll_and_replay_path() -> None:
+    lifecycle, movement_status = _advance_to_movement_unit_selection(
+        _quicksilver_grace_config(detachment_id="mercurial-host")
+    )
+    state = _state(lifecycle)
+    quicksilver_effects = tuple(
+        effect
+        for effect in state.persisting_effects
+        if effect.source_rule_id == mercurial_host_ir.QUICKSILVER_GRACE_SOURCE_RULE_ID
+    )
+
+    assert len(quicksilver_effects) == 1
+    assert quicksilver_effects[0].target_unit_instance_ids == (QUICKSILVER_GRACE_UNIT_ID,)
+
+    action_status = _submit_result(
+        lifecycle,
+        request=_decision_request(movement_status),
+        option_id=QUICKSILVER_GRACE_UNIT_ID,
+        result_id="phase10n-quicksilver-select-unit",
+    )
+    pending_reroll = _submit_result(
+        lifecycle,
+        request=_decision_request(action_status),
+        option_id=MovementPhaseActionKind.ADVANCE.value,
+        result_id="phase10n-quicksilver-select-advance",
+    )
+    reroll_request = _decision_request(pending_reroll)
+
+    assert reroll_request.decision_type == DICE_REROLL_DECISION_TYPE
+
+    reroll_payload = cast(dict[str, object], reroll_request.payload)
+    permission_payload = cast(dict[str, object], reroll_payload["permission"])
+
+    assert tuple(option.option_id for option in reroll_request.options) == ("decline", "reroll:0")
+    assert permission_payload["eligible_roll_type"] == "advance_roll"
+    assert permission_payload["timing_window"] == "after_advance_roll"
+    assert mercurial_host_ir.MERCURIAL_HOST_DETACHMENT_RULE_DESCRIPTOR_ID in cast(
+        str, permission_payload["source_id"]
+    )
+
+    restored = GameLifecycle.from_payload(_payload_copy(lifecycle))
+    restored_status = restored.advance_until_decision_or_terminal()
+    restored_request = _decision_request(restored_status)
+
+    assert restored_request.to_payload() == reroll_request.to_payload()
+
+    _submit_result(
+        restored,
+        request=restored_request,
+        option_id="reroll:0",
+        result_id="phase10n-quicksilver-accept-reroll",
+    )
+    advanced = _state(restored).advanced_unit_state_for_unit(
+        player_id="player-a",
+        battle_round=1,
+        unit_instance_id=QUICKSILVER_GRACE_UNIT_ID,
+    )
+
+    assert advanced is not None
+    assert advanced.movement_dice_record.advance_roll.roll_state.rerolls
+    assert "generic_detachment_rule_effects_applied" in {
+        event.event_type for event in restored.decision_controller.event_log.records
+    }
+
+
+@pytest.mark.parametrize(
+    ("detachment_id", "selected_unit_id"),
+    [
+        ("mercurial-host", QUICKSILVER_GRACE_ALLIED_UNIT_ID),
+        ("frenzied-host", QUICKSILVER_GRACE_UNIT_ID),
+    ],
+)
+def test_quicksilver_grace_fails_closed_outside_faction_and_detachment_scope(
+    detachment_id: str,
+    selected_unit_id: str,
+) -> None:
+    lifecycle, movement_status = _advance_to_movement_unit_selection(
+        _quicksilver_grace_config(detachment_id=detachment_id)
+    )
+    action_status = _submit_result(
+        lifecycle,
+        request=_decision_request(movement_status),
+        option_id=selected_unit_id,
+        result_id=f"phase10n-quicksilver-{detachment_id}-select-unit",
+    )
+    after_advance = _submit_result(
+        lifecycle,
+        request=_decision_request(action_status),
+        option_id=MovementPhaseActionKind.ADVANCE.value,
+        result_id=f"phase10n-quicksilver-{detachment_id}-select-advance",
+    )
+
+    assert _decision_request(after_advance).decision_type != DICE_REROLL_DECISION_TYPE
+    if detachment_id != "mercurial-host":
+        assert all(
+            effect.source_rule_id != mercurial_host_ir.QUICKSILVER_GRACE_SOURCE_RULE_ID
+            for effect in _state(lifecycle).persisting_effects
+        )
 
 
 def test_advance_roll_resolved_event_uses_final_rerolled_value() -> None:
@@ -936,6 +1047,150 @@ def _config() -> GameConfig:
     )
 
 
+def _quicksilver_grace_config(*, detachment_id: str) -> GameConfig:
+    catalog = _quicksilver_grace_catalog()
+    return GameConfig(
+        game_id=f"phase10n-quicksilver-grace-{detachment_id}",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="core-v2-phase10n-quicksilver-grace-test"
+        ),
+        army_catalog=catalog,
+        army_muster_requests=(
+            ArmyMusterRequest(
+                army_id="army-alpha",
+                player_id="player-a",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id="emperors-children",
+                    detachment_ids=(detachment_id,),
+                ),
+                force_disposition_id="phase10n-quicksilver-force",
+                unit_selections=(
+                    UnitMusterSelection(
+                        unit_selection_id="quicksilver-unit",
+                        datasheet_id=QUICKSILVER_GRACE_DATASHEET_ID,
+                        model_profile_selections=(
+                            ModelProfileSelection(
+                                model_profile_id="core-intercessor-like",
+                                model_count=5,
+                            ),
+                        ),
+                    ),
+                    UnitMusterSelection(
+                        unit_selection_id="allied-unit",
+                        datasheet_id=QUICKSILVER_GRACE_ALLIED_DATASHEET_ID,
+                        model_profile_selections=(
+                            ModelProfileSelection(
+                                model_profile_id="core-intercessor-like",
+                                model_count=5,
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selection_ids=("enemy-unit",),
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
+        mission_setup=_mission_setup(),
+    )
+
+
+def _quicksilver_grace_catalog() -> ArmyCatalog:
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
+    detachment_datasheet_ids = (
+        QUICKSILVER_GRACE_DATASHEET_ID,
+        base_datasheet.datasheet_id,
+    )
+    return replace(
+        base_catalog,
+        datasheets=(
+            *base_catalog.datasheets,
+            _quicksilver_grace_datasheet(base_datasheet),
+            _quicksilver_grace_allied_datasheet(base_datasheet),
+        ),
+        factions=(
+            *base_catalog.factions,
+            FactionDefinition(
+                faction_id="emperors-children",
+                name="Emperor's Children",
+                faction_keywords=(
+                    mercurial_host_ir.EMPERORS_CHILDREN_FACTION_KEYWORD,
+                    "HERETIC ASTARTES",
+                ),
+                source_ids=("gw-11e-faction-detachments-2026-27:faction:emperors-children",),
+            ),
+            FactionDefinition(
+                faction_id="phase10n-legiones-daemonica",
+                name="Legiones Daemonica Test Faction",
+                faction_keywords=("LEGIONES DAEMONICA",),
+                source_ids=("phase10n:test:legiones-daemonica-faction",),
+            ),
+        ),
+        detachments=(
+            *base_catalog.detachments,
+            *tuple(
+                DetachmentDefinition(
+                    detachment_id=detachment_id,
+                    name=detachment_name,
+                    faction_id="emperors-children",
+                    detachment_point_cost=1,
+                    unit_datasheet_ids=detachment_datasheet_ids,
+                    force_disposition_ids=("phase10n-quicksilver-force",),
+                    source_ids=(
+                        "gw-11e-faction-detachments-2026-27:detachment:"
+                        f"emperors-children:{detachment_id}",
+                    ),
+                )
+                for detachment_id, detachment_name in (
+                    ("mercurial-host", "Mercurial Host"),
+                    ("frenzied-host", "Frenzied Host"),
+                )
+            ),
+        ),
+    )
+
+
+def _quicksilver_grace_datasheet(base_datasheet: DatasheetDefinition) -> DatasheetDefinition:
+    return replace(
+        base_datasheet,
+        datasheet_id=QUICKSILVER_GRACE_DATASHEET_ID,
+        name="Quicksilver Grace Test Unit",
+        keywords=DatasheetKeywordSet(
+            keywords=("Infantry", "Battleline"),
+            faction_keywords=(mercurial_host_ir.EMPERORS_CHILDREN_FACTION_KEYWORD,),
+        ),
+        attachment_eligibilities=(),
+        source_ids=("phase10n:test:quicksilver-grace-unit",),
+    )
+
+
+def _quicksilver_grace_allied_datasheet(
+    base_datasheet: DatasheetDefinition,
+) -> DatasheetDefinition:
+    return replace(
+        base_datasheet,
+        datasheet_id=QUICKSILVER_GRACE_ALLIED_DATASHEET_ID,
+        name="Daemonic Pact Test Unit",
+        keywords=DatasheetKeywordSet(
+            keywords=("Infantry", "Daemon"),
+            faction_keywords=("LEGIONES DAEMONICA",),
+        ),
+        attachment_eligibilities=(),
+        source_ids=("phase10n:test:quicksilver-grace-allied-unit",),
+    )
+
+
 def _shooting_reachable_deployment_pose(
     index: int,
     player_id: str,
@@ -945,6 +1200,8 @@ def _shooting_reachable_deployment_pose(
     if unit_instance_id in {
         "army-alpha:intercessor-unit-1",
         "army-beta:intercessor-unit-3",
+        QUICKSILVER_GRACE_UNIT_ID,
+        "army-beta:enemy-unit",
     }:
         x = 15.5 if player_id == "player-a" else 43.5
         facing = 0.0 if player_id == "player-a" else 180.0

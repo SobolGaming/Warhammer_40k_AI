@@ -33,9 +33,12 @@ from warhammer40k_core.engine.rule_execution import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.rule_ir import (
+    RuleDurationKind,
+    RuleEffectKind,
     RuleIR,
     RuleParameterValue,
     RuleTargetKind,
+    RuleTriggerKind,
     parameter_payload,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -81,6 +84,19 @@ BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID = (
 )
 BLOOD_LEGION_FACTION_KEYWORD = blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD
 BLOOD_LEGION_KEYWORD = blood_legion_ir.KHORNE_KEYWORD
+_ADVANCE_ROLL_REROLL_CONSUMER_ID = "catalog-ir:advance-roll-reroll"
+_REROLL_PERMISSION_TEMPLATE_ID = "phase17c:reroll-permission"
+_ADVANCE_REROLL_KEYWORD_PARAMETER_KEYS = frozenset(
+    {
+        "excluded_keyword",
+        "excluded_keyword_sequence",
+        "required_faction_keyword",
+        "required_faction_keyword_sequence",
+        "required_keyword",
+        "required_keyword_any",
+        "required_keyword_sequence",
+    }
+)
 
 
 def _registered_battle_formation_descriptor_ids() -> frozenset[str]:
@@ -146,13 +162,16 @@ def generic_detachment_rule_battle_formation_hook_bindings(
             raise GameLifecycleError("Generic detachment bindings require execution records.")
         if not _record_is_generic_detachment_rule(record):
             continue
-        if record.coverage_descriptor_id not in _BATTLE_FORMATION_DETACHMENT_RULE_DESCRIPTOR_IDS:
-            continue
         if record.detachment_id not in selected_detachment_ids:
             continue
         rule_ir = faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id(
             record.coverage_descriptor_id
         )
+        if (
+            record.coverage_descriptor_id not in _BATTLE_FORMATION_DETACHMENT_RULE_DESCRIPTOR_IDS
+            and not _record_has_keyword_scoped_advance_reroll(record=record, rule_ir=rule_ir)
+        ):
+            continue
         source = _GenericDetachmentRuleBindingSource(record=record, rule_ir=rule_ir)
         bindings.append(
             BattleFormationHookBinding(
@@ -457,6 +476,53 @@ def _target_unit_ids_from_rule_ir_keyword_requirements(
         if any(_unit_matches_keyword_requirement(unit, requirement) for requirement in requirements)
     }
     return tuple(sorted(target_ids))
+
+
+def _record_has_keyword_scoped_advance_reroll(
+    *,
+    record: _Phase17FExecutionRecord,
+    rule_ir: RuleIR,
+) -> bool:
+    if type(record) is not _Phase17FExecutionRecord:
+        raise GameLifecycleError("Generic detachment binding shape requires execution record.")
+    if type(rule_ir) is not RuleIR:
+        raise GameLifecycleError("Generic detachment binding shape requires RuleIR.")
+    if _ADVANCE_ROLL_REROLL_CONSUMER_ID not in record.runtime_consumer_ids:
+        return False
+    if not rule_ir.is_supported or len(rule_ir.clauses) != 1:
+        return False
+    clause = rule_ir.clauses[0]
+    if (
+        clause.template_id != _REROLL_PERMISSION_TEMPLATE_ID
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.DICE_ROLL
+        or clause.conditions
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_UNIT
+        or clause.target.parameters
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.PERMANENT
+        or len(clause.effects) != 1
+        or clause.effects[0].kind is not RuleEffectKind.REROLL_PERMISSION
+    ):
+        return False
+    trigger_parameters = parameter_payload(clause.trigger.parameters)
+    if set(trigger_parameters) != {"roll_type"}:
+        return False
+    if trigger_parameters["roll_type"] not in {"advance", "advance_roll"}:
+        return False
+    effect_parameters = parameter_payload(clause.effects[0].parameters)
+    if set(effect_parameters) - {
+        "roll_type",
+        "timing_window",
+        *_ADVANCE_REROLL_KEYWORD_PARAMETER_KEYS,
+    }:
+        return False
+    if effect_parameters.get("roll_type") not in {"advance", "advance_roll"}:
+        return False
+    if effect_parameters.get("timing_window") != "after_advance_roll":
+        return False
+    return _unit_keyword_requirement_from_parameters(effect_parameters) is not None
 
 
 def _unit_keyword_requirements_from_rule_ir(

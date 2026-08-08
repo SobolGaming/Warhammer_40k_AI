@@ -268,6 +268,7 @@ GENERIC_DETACHMENT_RULE_KEYS = frozenset(
         ("chaos-daemons", "lords-of-the-warp"),
         ("chaos-daemons", "warptide"),
         ("emperors-children", "court-of-the-phoenician"),
+        ("emperors-children", "mercurial-host"),
         ("emperors-children", "spectacle-of-slaughter"),
         ("orks", "more-dakka"),
     }
@@ -356,6 +357,7 @@ CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY: dict[tuple[str, str], tu
 GENERIC_DETACHMENT_RULE_RUNTIME_CONSUMERS_BY_KEY = {
     ("chaos-daemons", "blood-legion"): BLOOD_LEGION_RUNTIME_CONSUMERS,
     ("chaos-daemons", "daemonic-incursion"): DAEMONIC_INCURSION_RUNTIME_CONSUMERS,
+    ("emperors-children", "mercurial-host"): ("catalog-ir:advance-roll-reroll",),
 }
 AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:aeldari:army_rule:fade_back",

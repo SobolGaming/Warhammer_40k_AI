@@ -9,6 +9,8 @@ from warhammer40k_core.rules.rule_ir import (
     RuleEffectSpec,
     RuleIR,
     RuleIRPayload,
+    RuleTargetKind,
+    RuleTriggerKind,
     parameter_payload,
 )
 from warhammer40k_core.rules.rule_templates import (
@@ -21,6 +23,7 @@ from warhammer40k_core.rules.rule_templates import (
     KEYWORD_GATE_TEMPLATE_ID,
     MOVEMENT_DISTANCE_TEMPLATE_ID,
     PLACEMENT_TEMPLATE_ID,
+    REROLL_PERMISSION_TEMPLATE_ID,
     WEAPON_ABILITY_GRANT_TEMPLATE_ID,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -47,6 +50,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_lords_of_the_warp_ir_support_2026_27 as lords_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_mercurial_host_ir_support_2026_27 as mercurial_host_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_more_dakka_ir_support_2026_27 as more_dakka_ir,
@@ -260,6 +266,11 @@ def generic_supported_detachment_rule_ir_hash(
     rule_ir_hash = more_dakka_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         return rule_ir_hash
+    rule_ir_hash = mercurial_host_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
+    if rule_ir_hash is not None:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_mercurial_host_detachment_rule_ir(rule_ir)
+        return rule_ir_hash
     rule_ir_hash = spectacle_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         return rule_ir_hash
@@ -349,6 +360,8 @@ def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> Ru
         payload = daemonic_incursion_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = more_dakka_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
+    if payload is None:
+        payload = mercurial_host_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         payload = spectacle_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
@@ -640,6 +653,48 @@ def _validate_cavalcade_of_chaos_detachment_rule_ir(rule_ir: RuleIR) -> None:
     if granted_abilities != frozenset({"can_fall_back_and_shoot", "can_fall_back_and_charge"}):
         raise Phase17FGenericIrSupportError(
             "Cavalcade of Chaos detachment RuleIR has unexpected granted abilities."
+        )
+
+
+def _validate_mercurial_host_detachment_rule_ir(rule_ir: RuleIR) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Mercurial Host detachment requires RuleIR.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Mercurial Host detachment RuleIR must deserialize as supported."
+        )
+    if rule_ir.source_id != mercurial_host_ir.QUICKSILVER_GRACE_SOURCE_RULE_ID:
+        raise Phase17FGenericIrSupportError(
+            "Mercurial Host detachment RuleIR produced an unexpected source ID."
+        )
+    if len(rule_ir.clauses) != 1:
+        raise Phase17FGenericIrSupportError(
+            "Mercurial Host detachment RuleIR must contain one clause."
+        )
+    clause = rule_ir.clauses[0]
+    if (
+        clause.template_id != REROLL_PERMISSION_TEMPLATE_ID
+        or clause.trigger is None
+        or clause.trigger.kind is not RuleTriggerKind.DICE_ROLL
+        or clause.target is None
+        or clause.target.kind is not RuleTargetKind.THIS_UNIT
+        or clause.duration is None
+        or clause.duration.kind is not RuleDurationKind.PERMANENT
+        or len(clause.effects) != 1
+        or clause.effects[0].kind is not RuleEffectKind.REROLL_PERMISSION
+    ):
+        raise Phase17FGenericIrSupportError(
+            "Mercurial Host detachment RuleIR has an unexpected structured shape."
+        )
+    trigger_parameters = parameter_payload(clause.trigger.parameters)
+    effect_parameters = parameter_payload(clause.effects[0].parameters)
+    if trigger_parameters != {"roll_type": "advance"} or effect_parameters != {
+        "required_faction_keyword": mercurial_host_ir.EMPERORS_CHILDREN_FACTION_KEYWORD,
+        "roll_type": "advance_roll",
+        "timing_window": "after_advance_roll",
+    }:
+        raise Phase17FGenericIrSupportError(
+            "Mercurial Host detachment RuleIR has unexpected reroll parameters."
         )
 
 

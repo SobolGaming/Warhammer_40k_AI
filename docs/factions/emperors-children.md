@@ -10,7 +10,7 @@ Current source package: `gw-11e-emperors-children-faction-pack-2026-07`
 
 | Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 10 | 2 | 26 | 39 | 18 |
+| 10 | 3 | 26 | 39 | 19 |
 
 ## July 22, 2026 Source Status
 
@@ -81,7 +81,7 @@ This generated snapshot separates source review from semantic execution. Detachm
 
 | Fully supported | Still needs semantic support |
 | --- | --- |
-| Court of the Phoenician<br>Spectacle of Slaughter | Carnival of Excess<br>Coterie of the Conceited<br>Elegant Brutes<br>Frenzied Host<br>Mercurial Host<br>Peerless Bladesmen<br>Rapid Evisceration<br>Slaanesh's Chosen |
+| Court of the Phoenician<br>Mercurial Host<br>Spectacle of Slaughter | Carnival of Excess<br>Coterie of the Conceited<br>Elegant Brutes<br>Frenzied Host<br>Peerless Bladesmen<br>Rapid Evisceration<br>Slaanesh's Chosen |
 
 ### Enhancements
 
@@ -118,7 +118,7 @@ This table reports semantic engine support. `Full` means the current CORE V2 sco
 | Court of the Phoenician | `Full` | Static RuleIR runtime bundle for two detachment rules, four enhancement bindings, and six Stratagem records | Lifecycle bundle, runtime-modifier, ability-hook, Stratagem lifecycle, replay, and runtime-boundary tests | Covers Sensational Performance target restrictions and melee Strength/AP bonuses, Master of the Pageant CP reduction, all four Enhancements, and all six Stratagems through the shared generic RuleIR runtime. |
 | Elegant Brutes | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: a setup-completion hook that gives the arriving Emperor's Children Terminator unit +1 to Charge rolls until the end of the turn. |
 | Frenzied Host | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: Battleline Advance/Fall Back selection must grant +1 Strength to the unit's attacks until turn end, and mustering must enforce the exclusive HOST tag. |
-| Mercurial Host | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: Emperor's Children units require army-wide Advance-roll rerolls. |
+| Mercurial Host | `Partial` | Static RuleIR for the Quicksilver Grace army-wide Advance-roll reroll | Movement lifecycle, replay, target-scope, and runtime-boundary tests | Quicksilver Grace is executable through the shared Advance-roll reroll path. The detachment's four Enhancements and six Stratagems remain source-only. |
 | Peerless Bladesmen | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: after charging, a unit selected to fight must choose between Lethal Hits and Sustained Hits 1 for its melee weapons while resolving those attacks. |
 | Rapid Evisceration | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: Transport models and models that disembarked this turn must reroll Hit rolls of 1 and Wound rolls of 1, using the Faction Pack's updated Mechanised Murder text. |
 | Slaanesh's Chosen | `None` | Generated scaffold only | Source-row/catalog coverage | IR still needed: Character movement-modifier immunity, deterministic Favoured Champions ownership transfers after destruction, and Favoured Champions Wound-roll rerolls. |
@@ -280,7 +280,7 @@ This section is generated from the repository-wide semantic audit. It is separat
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 119 | 37 | 20 |
+| 119 | 38 | 20 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |

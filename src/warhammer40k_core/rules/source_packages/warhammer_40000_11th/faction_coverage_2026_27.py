@@ -84,6 +84,7 @@ SHADOW_LEGION_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
     "disciples-of-belakor:weapon-profile",
 )
+MERCURIAL_HOST_RUNTIME_CONSUMER_IDS = ("catalog-ir:advance-roll-reroll",)
 CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMER_IDS_BY_DETACHMENT_ID = {
     "blood-legion": BLOOD_LEGION_RUNTIME_CONSUMER_IDS,
     "daemonic-incursion": DAEMONIC_INCURSION_RUNTIME_CONSUMER_IDS,
@@ -990,6 +991,11 @@ def _detachment_rows(
 def _detachment_rule_runtime_consumer_ids(
     detachment_row: faction_detachments_2026_27.SourceDetachmentRow,
 ) -> tuple[str, ...]:
+    if (
+        detachment_row.faction_id == "emperors-children"
+        and detachment_row.detachment_id == "mercurial-host"
+    ):
+        return MERCURIAL_HOST_RUNTIME_CONSUMER_IDS
     if detachment_row.faction_id == "chaos-daemons":
         return CHAOS_DAEMONS_DETACHMENT_RULE_RUNTIME_CONSUMER_IDS_BY_DETACHMENT_ID.get(
             detachment_row.detachment_id,

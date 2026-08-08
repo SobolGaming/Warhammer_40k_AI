@@ -25,7 +25,7 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Family | Placeholder | Partial | Implemented |
 | --- | ---: | ---: | ---: |
 | Faction | 5 | 23 | 0 |
-| Detachment | 241 | 17 | 8 |
+| Detachment | 240 | 18 | 8 |
 
 | Faction | Faction semantic status | Placeholder detachments | Partial detachments | Implemented detachments |
 | --- | --- | ---: | ---: | ---: |
@@ -46,7 +46,7 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Grey Knights | `partial` | 9 | 0 | 0 |
 | Chaos Space Marines | `partial` | 15 | 2 | 0 |
 | World Eaters | `partial` | 8 | 0 | 0 |
-| Emperor's Children | `partial` | 8 | 0 | 2 |
+| Emperor's Children | `partial` | 7 | 1 | 2 |
 | Death Guard | `partial` | 9 | 0 | 0 |
 | Thousand Sons | `partial` | 9 | 0 | 0 |
 | Chaos Knights | `partial` | 8 | 0 | 0 |
@@ -203,7 +203,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Grey Knights | 9 | 0 | 24 | 36 | 1 | [grey-knights](factions/grey-knights.md) |
 | Chaos Space Marines | 17 | 0 | 56 | 84 | 3 | [chaos-space-marines](factions/chaos-space-marines.md) |
 | World Eaters | 8 | 0 | 24 | 36 | 1 | [world-eaters](factions/world-eaters.md) |
-| Emperor's Children | 10 | 2 | 26 | 39 | 18 | [emperors-children](factions/emperors-children.md) |
+| Emperor's Children | 10 | 3 | 26 | 39 | 19 | [emperors-children](factions/emperors-children.md) |
 | Death Guard | 9 | 0 | 20 | 30 | 1 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 26 | 36 | 1 | [chaos-knights](factions/chaos-knights.md) |
