@@ -25,17 +25,17 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Family | Placeholder | Partial | Implemented |
 | --- | ---: | ---: | ---: |
 | Faction | 5 | 23 | 0 |
-| Detachment | 225 | 33 | 8 |
+| Detachment | 212 | 46 | 8 |
 
 | Faction | Faction semantic status | Placeholder detachments | Partial detachments | Implemented detachments |
 | --- | --- | ---: | ---: | ---: |
-| Orks | `partial` | 10 | 1 | 1 |
+| Orks | `partial` | 9 | 2 | 1 |
 | Aeldari | `partial` | 13 | 2 | 0 |
 | Drukhari | `partial` | 9 | 0 | 0 |
-| Tyranids | `partial` | 9 | 1 | 0 |
+| Tyranids | `partial` | 8 | 2 | 0 |
 | Genestealer Cults | `partial` | 7 | 2 | 0 |
 | Necrons | `partial` | 9 | 3 | 0 |
-| Leagues of Votann | `partial` | 9 | 1 | 0 |
+| Leagues of Votann | `partial` | 8 | 2 | 0 |
 | T'au Empire | `partial` | 7 | 0 | 0 |
 | Space Marines | `partial` | 7 | 15 | 0 |
 | Dark Angels | `placeholder` | 8 | 0 | 0 |
@@ -44,19 +44,19 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Black Templars | `partial` | 6 | 0 | 0 |
 | Deathwatch | `placeholder` | 1 | 0 | 0 |
 | Grey Knights | `partial` | 9 | 0 | 0 |
-| Chaos Space Marines | `partial` | 15 | 2 | 0 |
+| Chaos Space Marines | `partial` | 13 | 4 | 0 |
 | World Eaters | `partial` | 8 | 0 | 0 |
-| Emperor's Children | `partial` | 7 | 1 | 2 |
+| Emperor's Children | `partial` | 6 | 2 | 2 |
 | Death Guard | `partial` | 9 | 0 | 0 |
-| Thousand Sons | `partial` | 9 | 0 | 0 |
-| Chaos Knights | `partial` | 8 | 0 | 0 |
+| Thousand Sons | `partial` | 8 | 1 | 0 |
+| Chaos Knights | `partial` | 6 | 2 | 0 |
 | Chaos Daemons | `partial` | 3 | 1 | 5 |
-| Astra Militarum | `partial` | 10 | 1 | 0 |
-| Adepta Sororitas | `partial` | 8 | 0 | 0 |
+| Astra Militarum | `partial` | 9 | 2 | 0 |
+| Adepta Sororitas | `partial` | 7 | 1 | 0 |
 | Adeptus Mechanicus | `partial` | 10 | 0 | 0 |
-| Imperial Knights | `partial` | 7 | 1 | 0 |
+| Imperial Knights | `partial` | 6 | 2 | 0 |
 | Adeptus Custodes | `partial` | 8 | 1 | 0 |
-| Imperial Agents | `placeholder` | 4 | 1 | 0 |
+| Imperial Agents | `placeholder` | 3 | 2 | 0 |
 
 ## Structured Support Sections
 
@@ -186,13 +186,13 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 
 | Faction | Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows | File |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Orks | 12 | 1 | 44 | 66 | 13 | [orks](factions/orks.md) |
+| Orks | 12 | 1 | 44 | 66 | 14 | [orks](factions/orks.md) |
 | Aeldari | 15 | 2 | 52 | 78 | 16 | [aeldari](factions/aeldari.md) |
 | Drukhari | 9 | 0 | 20 | 30 | 1 | [drukhari](factions/drukhari.md) |
-| Tyranids | 10 | 0 | 32 | 48 | 2 | [tyranids](factions/tyranids.md) |
+| Tyranids | 10 | 0 | 32 | 48 | 3 | [tyranids](factions/tyranids.md) |
 | Genestealer Cults | 9 | 0 | 20 | 30 | 3 | [genestealer-cults](factions/genestealer-cults.md) |
 | Necrons | 12 | 0 | 36 | 54 | 4 | [necrons](factions/necrons.md) |
-| Leagues of Votann | 10 | 0 | 28 | 42 | 2 | [leagues-of-votann](factions/leagues-of-votann.md) |
+| Leagues of Votann | 10 | 0 | 28 | 42 | 3 | [leagues-of-votann](factions/leagues-of-votann.md) |
 | T'au Empire | 7 | 0 | 16 | 24 | 1 | [tau-empire](factions/tau-empire.md) |
 | Space Marines | 22 | 0 | 72 | 107 | 17 | [space-marines](factions/space-marines.md) |
 | Dark Angels | 8 | 0 | 0 | 0 | 0 | [dark-angels](factions/dark-angels.md) |
@@ -201,19 +201,19 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Black Templars | 6 | 0 | 0 | 0 | 1 | [black-templars](factions/black-templars.md) |
 | Deathwatch | 1 | 0 | 0 | 0 | 0 | [deathwatch](factions/deathwatch.md) |
 | Grey Knights | 9 | 0 | 24 | 36 | 1 | [grey-knights](factions/grey-knights.md) |
-| Chaos Space Marines | 17 | 0 | 56 | 84 | 3 | [chaos-space-marines](factions/chaos-space-marines.md) |
+| Chaos Space Marines | 17 | 0 | 56 | 84 | 5 | [chaos-space-marines](factions/chaos-space-marines.md) |
 | World Eaters | 8 | 0 | 24 | 36 | 1 | [world-eaters](factions/world-eaters.md) |
-| Emperor's Children | 10 | 3 | 26 | 39 | 19 | [emperors-children](factions/emperors-children.md) |
+| Emperor's Children | 10 | 3 | 26 | 39 | 20 | [emperors-children](factions/emperors-children.md) |
 | Death Guard | 9 | 0 | 20 | 30 | 1 | [death-guard](factions/death-guard.md) |
-| Thousand Sons | 9 | 0 | 24 | 36 | 1 | [thousand-sons](factions/thousand-sons.md) |
-| Chaos Knights | 8 | 0 | 26 | 36 | 1 | [chaos-knights](factions/chaos-knights.md) |
+| Thousand Sons | 9 | 0 | 24 | 36 | 2 | [thousand-sons](factions/thousand-sons.md) |
+| Chaos Knights | 8 | 0 | 26 | 36 | 3 | [chaos-knights](factions/chaos-knights.md) |
 | Chaos Daemons | 9 | 6 | 29 | 46 | 45 | [chaos-daemons](factions/chaos-daemons.md) |
-| Astra Militarum | 11 | 0 | 36 | 54 | 2 | [astra-militarum](factions/astra-militarum.md) |
-| Adepta Sororitas | 8 | 0 | 20 | 30 | 1 | [adepta-sororitas](factions/adepta-sororitas.md) |
+| Astra Militarum | 11 | 0 | 36 | 54 | 3 | [astra-militarum](factions/astra-militarum.md) |
+| Adepta Sororitas | 8 | 0 | 20 | 30 | 2 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 1 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
-| Imperial Knights | 8 | 0 | 24 | 36 | 2 | [imperial-knights](factions/imperial-knights.md) |
+| Imperial Knights | 8 | 0 | 24 | 36 | 3 | [imperial-knights](factions/imperial-knights.md) |
 | Adeptus Custodes | 9 | 0 | 24 | 36 | 3 | [adeptus-custodes](factions/adeptus-custodes.md) |
-| Imperial Agents | 5 | 0 | 20 | 30 | 1 | [imperial-agents](factions/imperial-agents.md) |
+| Imperial Agents | 5 | 0 | 20 | 30 | 2 | [imperial-agents](factions/imperial-agents.md) |
 
 ## Datasheet Abilities
 

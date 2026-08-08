@@ -116,7 +116,7 @@ coverage package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17e-faction-coverage-v3`
 - source-payload SHA-256 checksum:
-  `5795f4e9ef7bbfe4ff5ef6514bc8f3ff18c1c5ab8552c12b6e4ac76e5cc885f8`
+  `8b50dae2504a924628ea70c7a487d7f68bac041b0d65fe0e25d3239d4ce59bee`
 
 The package validates all 28 faction-pack PDF manifest records and emits
 coverage rows for every seeded faction and detachment. Faction army rules and
@@ -148,8 +148,9 @@ Stratagem rows. Chaos Daemons Warptide adds a generic-supported detachment rule,
 two Enhancements, and three Stratagem rows. Chaos Daemons Lords of the Warp adds
 a generic-supported detachment rule, one Enhancement, and four Stratagem rows,
 and Emperor's Children Mercurial Host adds a generic-supported Quicksilver Grace
-detachment rule. The 15 Space Marines and one Imperial Agents Armour of
-Contempt rows add source-backed incoming AP modification, for a total of 119
+detachment rule. All 29 exact incoming-AP modifier Stratagem rows, including
+the 15 Space Marines Armour of Contempt rows and their cross-faction semantic
+equivalents, add source-backed incoming AP modification, for a total of 132
 generic-supported rows;
 exact rows outside generic IR with existing runtime consumers are marked
 implemented. No aggregate faction-pack Enhancement or Stratagem row is used to
@@ -182,13 +183,13 @@ Phase 17E coverage row. The execution package is:
 - source edition: `11th`
 - schema version: `core-v2-phase17f-faction-execution-v3`
 - source-payload SHA-256 checksum:
-  `855ea8d5249cfd6021e04d64903a7c4abb0de6f8225c9a75713929c76cd16aa5`
+  `254db5f9bcae04892ef7bf51fa82f82f1207bc8b0d9b43ad976f902079607780`
 - upstream Phase 17E checksum:
-  `5795f4e9ef7bbfe4ff5ef6514bc8f3ff18c1c5ab8552c12b6e4ac76e5cc885f8`
+  `8b50dae2504a924628ea70c7a487d7f68bac041b0d65fe0e25d3239d4ce59bee`
 
 The package emits 2073 execution records, one for every Phase 17E coverage row:
-1903 rows are blocked as `structured_rule_semantics_required`, 28 rows are
-blocked as `approved_phase17e_source_gap`, 119 rows are executable generic IR
+1890 rows are blocked as `structured_rule_semantics_required`, 28 rows are
+blocked as `approved_phase17e_source_gap`, 132 rows are executable generic IR
 rows, and 23 rows are executable named-handler rows because they already have
 runtime consumers.
 The engine dispatcher can route every record and returns typed `unsupported`
@@ -449,15 +450,15 @@ WS14 step 1 is implemented as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-blocked-row-classification-v1`
 - source-payload SHA-256 checksum:
-  `ac1ce217ad56bd7a5986849c98d338875a49594fab61f1ca41da54088d54fa43`
+  `aa89beac746476da4a67ae905e88211590f81c87b6e2320b467e233771be25b5`
 - upstream Phase 17F checksum:
-  `855ea8d5249cfd6021e04d64903a7c4abb0de6f8225c9a75713929c76cd16aa5`
+  `254db5f9bcae04892ef7bf51fa82f82f1207bc8b0d9b43ad976f902079607780`
 - bridge source version: `10th-edition-2026-06-14`
 - bridge JSON source:
   `data/source_snapshots/wahapedia/10th-edition/2026-06-14/json`
 
-The report emits 1903 classification rows, one for every Phase 17F row blocked
-as `blocked_structured_semantics_required`. It compiles 1804 rows from Wahapedia
+The report emits 1890 classification rows, one for every Phase 17F row blocked
+as `blocked_structured_semantics_required`. It compiles 1791 rows from Wahapedia
 bridge descriptions through Phase 17C and marks 99 rows as
 `source_text_not_available` metadata-only rows. Each row records the existing
 Phase 17C template IDs and template families that can already express clauses,
@@ -491,9 +492,9 @@ WS14 step 3 is enforced as a deterministic Phase 17I source package artifact:
 - source edition: `11th`
 - schema version: `core-v2-phase17i-named-handler-budget-v1`
 - source-payload SHA-256 checksum:
-  `8aa03b1f6840490bd0cb414753f6726a222dc6483ac2621ae57198a1e4e86433`
+  `6c83872c6cdcde4a789fd1dc6613e24e96ea419c2f0e1e6a692c5180e49ba6a5`
 - upstream Phase 17F checksum:
-  `855ea8d5249cfd6021e04d64903a7c4abb0de6f8225c9a75713929c76cd16aa5`
+  `254db5f9bcae04892ef7bf51fa82f82f1207bc8b0d9b43ad976f902079607780`
 
 The budget report tracks 23 executable named-handler Phase 17F rows and 23
 approved entries. The current approved reason is
@@ -543,8 +544,8 @@ already engine-consumed named handlers.
 | Detachment rules | 1 | `executable_generic_ir` | `applied` | `none` |
 | Enhancements | 39 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 5 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 60 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 6 | `executable_generic_ir` | `applied` | `none` |
+| Stratagems | 59 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 7 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Aeldari Execution Status
@@ -577,7 +578,8 @@ already engine-consumed named handlers.
 | Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 31 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 1 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 48 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 47 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 1 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Genestealer Cults Execution Status
@@ -610,7 +612,8 @@ already engine-consumed named handlers.
 | Detachment rules | 10 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 27 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 1 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 42 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 41 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 1 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### T'au Empire Execution Status
@@ -693,7 +696,8 @@ already engine-consumed named handlers.
 | Detachment rules | 17 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 54 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 2 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 84 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 82 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 2 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### World Eaters Execution Status
@@ -715,8 +719,8 @@ already engine-consumed named handlers.
 | Detachment rules | 3 | `executable_generic_ir` | `applied` | `none` |
 | Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 6 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 30 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 9 | `executable_generic_ir` | `applied` | `none` |
+| Stratagems | 29 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 10 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Death Guard Execution Status
@@ -736,7 +740,8 @@ already engine-consumed named handlers.
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 9 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 24 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 35 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 1 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Chaos Knights Execution Status
@@ -746,7 +751,8 @@ already engine-consumed named handlers.
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 26 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 34 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 2 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Chaos Daemons Execution Status
@@ -769,8 +775,8 @@ already engine-consumed named handlers.
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 11 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 53 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 1 | `executable_generic_ir` | `applied` | `none` |
+| Stratagems | 52 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 2 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Adepta Sororitas Execution Status
@@ -780,7 +786,8 @@ already engine-consumed named handlers.
 | Army rule | 1 | `executable_named_handler` | `applied` | `none` |
 | Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 30 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 29 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 1 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ### Adeptus Mechanicus Execution Status
@@ -801,7 +808,8 @@ already engine-consumed named handlers.
 | Detachment rules | 8 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 23 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 1 | `executable_generic_ir` | `applied` | `none` |
-| Stratagems | 36 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 35 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 1 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 Runtime note: Phase 17G also implements Imperial Knights Bondsman as a
@@ -837,8 +845,8 @@ to grant `SUSTAINED HITS 1` or `LETHAL HITS` until the effect expires.
 | Army rule | 1 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Detachment rules | 5 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
 | Enhancements | 20 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 29 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
-| Stratagems | 1 | `executable_generic_ir` | `applied` | `none` |
+| Stratagems | 28 | `blocked_structured_semantics_required` | `unsupported` | `structured_rule_semantics_required` |
+| Stratagems | 2 | `executable_generic_ir` | `applied` | `none` |
 | Datasheet intake | 1 | `blocked_approved_unsupported_source_gap` | `unsupported` | `approved_phase17e_source_gap:datasheet_intake_requires_generated_source_rows` |
 
 ## Queue Source

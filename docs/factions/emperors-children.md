@@ -10,7 +10,7 @@ Current source package: `gw-11e-emperors-children-faction-pack-2026-07`
 
 | Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 10 | 3 | 26 | 39 | 19 |
+| 10 | 3 | 26 | 39 | 20 |
 
 ## July 22, 2026 Source Status
 
@@ -100,7 +100,7 @@ This generated snapshot separates source review from semantic execution. Detachm
 | Detachment | Runtime supported / executable | Still source-only / blocked |
 | --- | --- | --- |
 | Carnival of Excess | None | DARK APPARITIONS<br>ECSTATIC SLAUGHTER<br>SUSTAINED BY AGONY<br>SYCOPHANTIC SURGE<br>UNCANNY REACTIONS<br>VIOLENT CRESCENDO |
-| Coterie of the Conceited | None | ARMOUR OF ABHORRENCE<br>EMBRACE THE PAIN<br>MARTIAL PERFECTION<br>PROTECTION OF THE DARK PRINCE<br>UNBOUND ARROGANCE<br>UNSHAKEABLE OPPONENTS |
+| Coterie of the Conceited | ARMOUR OF ABHORRENCE | EMBRACE THE PAIN<br>MARTIAL PERFECTION<br>PROTECTION OF THE DARK PRINCE<br>UNBOUND ARROGANCE<br>UNSHAKEABLE OPPONENTS |
 | Court of the Phoenician | CATALYTIC STIMULUS<br>CLOSE-QUARTERS EXCRUCIATION<br>CONTEMPTUOUS DISREGARD<br>EUPHORIC INSPIRATION<br>PRIDEFUL SUPERIORITY<br>SINUOUS BREACH | None |
 | Mercurial Host | None | CAPRICIOUS REACTIONS<br>COMBAT STIMMS<br>CRUEL RAIDERS<br>DARK VIGOUR<br>HONOUR THE PRINCE<br>VIOLENT EXCESS |
 | Peerless Bladesmen | None | CRUEL BLADESMAN<br>CUT DOWN THE WEAK<br>DEATH ECSTASY<br>DEFT PARRY<br>INCESSANT VIOLENCE<br>TERRIFYING SPECTACLE |
@@ -280,7 +280,7 @@ This section is generated from the repository-wide semantic audit. It is separat
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 119 | 38 | 20 |
+| 119 | 39 | 20 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |

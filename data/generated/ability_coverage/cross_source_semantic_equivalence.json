@@ -7175,7 +7175,7 @@
     }
   ],
   "equivalent_group_count": 330,
-  "exact_text_only_member_count": 3243,
+  "exact_text_only_member_count": 3230,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -91630,16 +91630,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "6669b69f81db09a507f59bee3a5a12609e1eb8f008b9e02ca6f031d635bc55ea",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "f3489fd1f501992394f790169ef7d1f83e1b0d001044b80feab6a97c63bbf5f0",
+      "execution_status": "generic_ir_executable",
       "faction_id": "adepta-sororitas",
       "faction_name": "Adepta Sororitas",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:adepta-sororitas:bringers-of-flame:000009034002",
-      "normalized_text_hash": "dad7868c59668497ee1e158a7182e2a3d12f8e257e01a511c5b008458fc36ec9",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "bringers-of-flame",
       "owner_name": "Bringers of Flame",
       "rule_id": "000009034002",
@@ -91647,12 +91645,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "3954f292f4ca7831e6a7868b78666c4c128ec0041af2b996fde70e0f94ada2d7",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000009034002"
+        "gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:bringers-of-flame",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000009034002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:adepta-sororitas:bringers-of-flame:000009034002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:adepta-sororitas"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000009034002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:adepta-sororitas:bringers-of-flame:000009034002"
       ],
       "support_transfer": "none"
     },
@@ -97356,16 +97357,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "b90e2245b2391aafeb625b5817935aea50aeed8537be643061374983ca8a5642",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "8dfb1b3290cd9380e37fffefb6567cebdb1d87935d3d7f00d03a65481841bc77",
+      "execution_status": "generic_ir_executable",
       "faction_id": "astra-militarum",
       "faction_name": "Astra Militarum",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:astra-militarum:grizzled-company:000010638007",
-      "normalized_text_hash": "88bdeb27b0b1f35c49f8d32411bd1970a9169009a5dceb15d69535076d406b99",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "grizzled-company",
       "owner_name": "Grizzled Company",
       "rule_id": "000010638007",
@@ -97373,12 +97372,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "15b0e1056cfabd6b6800bf5b86eb3669e9ce7685cc603f0222595062cccff21f",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010638007"
+        "gw-11e-faction-detachments-2026-27:detachment:astra-militarum:grizzled-company",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010638007",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:astra-militarum:grizzled-company:000010638007",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:astra-militarum"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010638007:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:astra-militarum:grizzled-company:000010638007"
       ],
       "support_transfer": "none"
     },
@@ -99643,16 +99645,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "173272906fd0d3c8285bcff84cd5931171eaef73c2aa42a037a1c1bf4ec3eece",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "4ded6b7a8ae7dead6d0d5e3bbcc3d8f59838d131f0b67647c27121338bfbb386",
+      "execution_status": "generic_ir_executable",
       "faction_id": "chaos-knights",
       "faction_name": "Chaos Knights",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:chaos-knights:helhunt-lance:000010752004",
-      "normalized_text_hash": "ce4992dd51dec0e21963fab94f2eff5e90521f57cbc86d6a0b8c29e14a1354c9",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "helhunt-lance",
       "owner_name": "Helhunt Lance",
       "rule_id": "000010752004",
@@ -99660,12 +99660,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "7afbf3e0fb41cc71f7f865807059bc043b553ac3ee9a56c2cea42d46c9f7939d",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010752004"
+        "gw-11e-faction-detachments-2026-27:detachment:chaos-knights:helhunt-lance",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010752004",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-knights:helhunt-lance:000010752004",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:chaos-knights"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010752004:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-knights:helhunt-lance:000010752004"
       ],
       "support_transfer": "none"
     },
@@ -100119,16 +100122,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "dfce2e133a887f1a160a5b0cc29efa82072b7e962d87395e8ced12f90d5e62c2",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "e11f64bc74015a2ccff4921d9e491e473bc2eb0a464a334cbfc83fa90d3a989b",
+      "execution_status": "generic_ir_executable",
       "faction_id": "chaos-knights",
       "faction_name": "Chaos Knights",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:chaos-knights:infernal-lance:000010305003",
-      "normalized_text_hash": "78ac3a15fffa01471b412496cf41a7a4ad1c8e58475db9ea3683ade7f6a6fdb4",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "infernal-lance",
       "owner_name": "Infernal Lance",
       "rule_id": "000010305003",
@@ -100136,12 +100137,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "e5ad7ce608ae1d74a3f20449ab24b23ac8f5368ca4974845d89474ab7a83bec9",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010305003"
+        "gw-11e-faction-detachments-2026-27:detachment:chaos-knights:infernal-lance",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010305003",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-knights:infernal-lance:000010305003",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:chaos-knights"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010305003:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-knights:infernal-lance:000010305003"
       ],
       "support_transfer": "none"
     },
@@ -102107,16 +102111,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "1379e62c01e98b41e8452e48deaaabbc5dc86d09bb3ecd8a702cd583a821847a",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "1c9c30b0369e58b44ac5e4b4a0d92e71784368e8c14a6c90675a48f20e66b31a",
+      "execution_status": "generic_ir_executable",
       "faction_id": "chaos-space-marines",
       "faction_name": "Chaos Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:chaos-space-marines:renegade-raiders:000008969002",
-      "normalized_text_hash": "d378628bc35c3917f6d51b48ffbf53348d03c3608d4a313b16de8c8c8700f963",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "renegade-raiders",
       "owner_name": "Renegade Raiders",
       "rule_id": "000008969002",
@@ -102124,12 +102126,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "e97b8c4b357881b8ecda1910654bec8dfd64b6adb69dff33ead74345647ef492",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008969002"
+        "gw-11e-faction-detachments-2026-27:detachment:chaos-space-marines:renegade-raiders",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008969002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-space-marines:renegade-raiders:000008969002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:chaos-space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008969002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-space-marines:renegade-raiders:000008969002"
       ],
       "support_transfer": "none"
     },
@@ -102639,16 +102644,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "709eb87cd1b8ee5052e607a4852eebdcd56d8340033c00a4028f27ad66cb6306",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "8de38c7702f330bdcbba6036f5b7e2fb75c08e3153db8059ddc26e8f75995046",
+      "execution_status": "generic_ir_executable",
       "faction_id": "chaos-space-marines",
       "faction_name": "Chaos Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:chaos-space-marines:veterans-of-the-long-war:000008961003",
-      "normalized_text_hash": "995dc53512fcee87764f9645cfbc56d83cd789e4b9e62b41eb0870b7a2144968",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "veterans-of-the-long-war",
       "owner_name": "Veterans of the Long War",
       "rule_id": "000008961003",
@@ -102656,12 +102659,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "42da01c8de3b4712ab4972cfd4e6ffc0add772137f00a1ccdb00db5552565d08",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008961003"
+        "gw-11e-faction-detachments-2026-27:detachment:chaos-space-marines:veterans-of-the-long-war",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008961003",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-space-marines:veterans-of-the-long-war:000008961003",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:chaos-space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008961003:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:chaos-space-marines:veterans-of-the-long-war:000008961003"
       ],
       "support_transfer": "none"
     },
@@ -104935,16 +104941,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "fcf0eee6faf792849bf1f1a947a7d0c6cf1d492454bfccc4696a842b3680f6c5",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "656f9b2fe6040a74bbaefa351a64aa2bfd5c8dcdd976cd2c770b60780237b4d8",
+      "execution_status": "generic_ir_executable",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:emperors-children:coterie-of-the-conceited:000010015007",
-      "normalized_text_hash": "66adda809945f62190c896a5e52d95675fb61b0ff59fd338b5d8a9972a872b3b",
+      "normalized_text_hash": "81d94f4ddfc57a7de23e6e07277eb43d83185d46f656597a6dc6792fb2762199",
       "owner_id": "coterie-of-the-conceited",
       "owner_name": "Coterie of the Conceited",
       "rule_id": "000010015007",
@@ -104952,12 +104956,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "1a16341bae544d821422b3bc058eb5612d1a35dbeb0eecc97ed6280333223dcd",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010015007"
+        "gw-11e-faction-detachments-2026-27:detachment:emperors-children:coterie-of-the-conceited",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010015007",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:emperors-children:coterie-of-the-conceited:000010015007",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:emperors-children"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010015007:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:emperors-children:coterie-of-the-conceited:000010015007"
       ],
       "support_transfer": "none"
     },
@@ -108014,16 +108021,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "c4d8a6a1dbe7de9c1508f27b83624846198075f5efdee4552761092e301b13ad",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "481868043f296544dcc7bb33b44a7ea88864befd10b7f7eaea11c0dded2bd95e",
+      "execution_status": "generic_ir_executable",
       "faction_id": "imperial-agents",
       "faction_name": "Imperial Agents",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:imperial-agents:ordo-malleus-daemon-hunters:000009135005",
-      "normalized_text_hash": "6e0aafe23b20866b742baa958b38d2a1afb8c98ab9ec81f5331661676f55ef55",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "ordo-malleus-daemon-hunters",
       "owner_name": "Ordo Malleus, Daemon Hunters",
       "rule_id": "000009135005",
@@ -108031,12 +108036,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "bc8bd4bcf32df1cee742c4599722b662537fea0926deaddbc3a6c501ba637f27",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000009135005"
+        "gw-11e-faction-detachments-2026-27:detachment:imperial-agents:ordo-malleus-daemon-hunters",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000009135005",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:imperial-agents:ordo-malleus-daemon-hunters:000009135005",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:imperial-agents"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000009135005:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:imperial-agents:ordo-malleus-daemon-hunters:000009135005"
       ],
       "support_transfer": "none"
     },
@@ -109219,16 +109227,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "1ae87e8ea31eb9159189c86faf87b93bab994d508e93b39cc050ab38cedf1edd",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "3732147fb4c276674dee8b31e6222a5ab61549992fe1c8d50eddc5eff57c350b",
+      "execution_status": "generic_ir_executable",
       "faction_id": "imperial-knights",
       "faction_name": "Imperial Knights",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:imperial-knights:spearhead-at-arms:000010507006",
-      "normalized_text_hash": "40d410228a10332e94d0f7362b198f315b308096fc115538b93b79df8b76af54",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "spearhead-at-arms",
       "owner_name": "Spearhead-at-arms",
       "rule_id": "000010507006",
@@ -109236,12 +109242,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "062052a94e75e5f2b37beffd8cd97a0f083905e5f4ff9f84b4a6e85796a59750",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010507006"
+        "gw-11e-faction-detachments-2026-27:detachment:imperial-knights:spearhead-at-arms",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010507006",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:imperial-knights:spearhead-at-arms:000010507006",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:imperial-knights"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010507006:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:imperial-knights:spearhead-at-arms:000010507006"
       ],
       "support_transfer": "none"
     },
@@ -110283,16 +110292,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "aa23320a8190fab20f8993c89604a2e12ed55e310b1ee79207044f4bf1cd925a",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "3b961659d7db0601e4c9daa1a74acc1a8b85ffd6bdb843e8c61f5cd7a384045a",
+      "execution_status": "generic_ir_executable",
       "faction_id": "leagues-of-votann",
       "faction_name": "Leagues of Votann",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:leagues-of-votann:needgaard-oathband:000010436002",
-      "normalized_text_hash": "b4a1f5de81f2b49417ebda056d7fe40230ad62eb99be9bcc847eafd4211cc29f",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "needgaard-oathband",
       "owner_name": "Needgaard Oathband",
       "rule_id": "000010436002",
@@ -110300,12 +110307,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "2b1fb0b486047d3d5a4e597259b796ece39cb2f221463bab89f875c949c581a0",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010436002"
+        "gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:needgaard-oathband",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010436002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:leagues-of-votann:needgaard-oathband:000010436002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:leagues-of-votann"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010436002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:leagues-of-votann:needgaard-oathband:000010436002"
       ],
       "support_transfer": "none"
     },
@@ -112439,16 +112449,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "84502a4eb2ad57d74ac7124ae8bbe7ac19d78b3c0712fa669beb993e41baa470",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "2db5d37cfad0c7775e0068c118bc744228fbaca7dea0c4effde4c116f443f1e1",
+      "execution_status": "generic_ir_executable",
       "faction_id": "orks",
       "faction_name": "Orks",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:orks:bully-boyz:000008886007",
-      "normalized_text_hash": "c71c9191e0a3133f9df4a3059822ff7fb452cc2d51477978650d339a8fa79835",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "bully-boyz",
       "owner_name": "Bully Boyz",
       "rule_id": "000008886007",
@@ -112456,12 +112464,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "ac1f8d124181055cd969d3ffe374b0865f545ac96c3615db54609390decc5243",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008886007"
+        "gw-11e-faction-detachments-2026-27:detachment:orks:bully-boyz",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008886007",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:orks:bully-boyz:000008886007",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:orks"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008886007:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:orks:bully-boyz:000008886007"
       ],
       "support_transfer": "none"
     },
@@ -118352,16 +118363,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "828f073a5dfd9d0008d41fd806af1a6801ed373bcff9e9063cf4210d5970ca9a",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "b9fd23079579c9f83d27108529840da2bde042b3e327ffda3a44973e55b9d61b",
+      "execution_status": "generic_ir_executable",
       "faction_id": "thousand-sons",
       "faction_name": "Thousand Sons",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:thousand-sons:warpforged-cabal:000010210002",
-      "normalized_text_hash": "7f2dd6b18bbec1b5f4a248aaa5333fe0833171ffd5506047ee79b3aa6064f803",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "warpforged-cabal",
       "owner_name": "Warpforged Cabal",
       "rule_id": "000010210002",
@@ -118369,12 +118378,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "4199838d5bb903b96b2956aa75435596e6113783602f7837dd549e43fec9a8d6",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010210002"
+        "gw-11e-faction-detachments-2026-27:detachment:thousand-sons:warpforged-cabal",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010210002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:thousand-sons:warpforged-cabal:000010210002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:thousand-sons"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010210002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:thousand-sons:warpforged-cabal:000010210002"
       ],
       "support_transfer": "none"
     },
@@ -119444,16 +119456,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "c1286dc2d8c31cfbe0c575b63c8a16c40b39304467548075f2ee0a7030280ece",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "a96469d8ec78ba91536cf46284ccef780fea5f60c75704a5b90d99312a454444",
+      "execution_status": "generic_ir_executable",
       "faction_id": "tyranids",
       "faction_name": "Tyranids",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:tyranids:synaptic-nexus:000008556005",
-      "normalized_text_hash": "89ddc653ef6f723e21197579b0ff58ef6952c369961a5f78a4704c69e8575fac",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "synaptic-nexus",
       "owner_name": "Synaptic Nexus",
       "rule_id": "000008556005",
@@ -119461,12 +119471,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "f2aa3220c1e7477b3ed72b3b5803a44aa180893c571923323cb06951cbf7d1f1",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008556005"
+        "gw-11e-faction-detachments-2026-27:detachment:tyranids:synaptic-nexus",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008556005",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:tyranids:synaptic-nexus:000008556005",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:tyranids"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008556005:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:tyranids:synaptic-nexus:000008556005"
       ],
       "support_transfer": "none"
     },
@@ -122127,8 +122140,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "ee0a7386edc08aa03549980860b033fa3a1b436850cafbcd01bd946a42f142ac",
+  "source_payload_checksum_sha256": "41fbc5dda7876feb40cd902a54c9c09b346eeafbc54605279d2be0ada421eb5f",
   "source_text_unavailable_member_count": 110,
-  "structured_member_count": 741,
-  "upstream_execution_checksum_sha256": "855ea8d5249cfd6021e04d64903a7c4abb0de6f8225c9a75713929c76cd16aa5"
+  "structured_member_count": 754,
+  "upstream_execution_checksum_sha256": "254db5f9bcae04892ef7bf51fa82f82f1207bc8b0d9b43ad976f902079607780"
 }

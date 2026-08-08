@@ -1385,6 +1385,10 @@ def test_leader_support_split_lifecycle_and_replay_round_trip(
     ) = _configured_kakophonist_leader_support_target_fixture(
         single_wound_bodyguard=True,
     )
+    if use_feel_no_pain:
+        explicit_game_id = "kakophonist-leader-support-replay-explicit-0"
+        config = replace(config, game_id=explicit_game_id)
+        state.game_id = explicit_game_id
     assert len(target_bodyguard.own_models) == 1
     assert target_bodyguard.own_models[0].wounds_remaining == 1
     survivor_ids = tuple(sorted((target_leader.unit_instance_id, target_support.unit_instance_id)))
@@ -1628,6 +1632,8 @@ def test_lord_kakophonist_doom_siren_resumes_after_feel_no_pain_choice(
     )
     if lethal_continuation:
         state.game_id = "kakophonist-doom-siren-lethal-fnp-continuation"
+    else:
+        state.game_id = "kakophonist-doom-siren-explicit-628"
     source_a = FeelNoPainSource(source_id="doom-siren-fnp-a", threshold=5)
     source_b = FeelNoPainSource(source_id="doom-siren-fnp-b", threshold=6)
     feel_no_pain_model_id = (
@@ -1708,6 +1714,17 @@ def test_lord_kakophonist_doom_siren_resumes_after_feel_no_pain_choice(
         if status is not None:
             break
 
+    mortal_roll_payload = cast(
+        dict[str, Any],
+        next(
+            event.payload
+            for event in decisions.event_log.records
+            if event.event_type == CATALOG_SELECTED_TARGET_MORTAL_WOUNDS_ROLLED_EVENT
+        ),
+    )
+    if not lethal_continuation:
+        roll_state_payload = cast(dict[str, Any], mortal_roll_payload["roll_state"])
+        assert roll_state_payload["current_values"] == [6, 5, 2]
     assert status is not None
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     continuation_registry = MortalWoundFeelNoPainContinuationHookRegistry.from_bindings(

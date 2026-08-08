@@ -1447,25 +1447,42 @@ def test_phase17e_hit_target_cover_denial_stratagem_is_generic_supported() -> No
     )
 
 
-def test_phase17e_armour_of_contempt_rows_are_generic_supported() -> None:
+def test_phase17e_exact_incoming_ap_modifier_rows_are_generic_supported() -> None:
     source_row_ids = set(
         generic_ir_support_source.supported_incoming_ap_modifier_stratagem_source_row_ids()
     )
+    source_rows = {row.source_row_id: row for row in faction_subrule_source.stratagem_rows()}
     coverage_rows = {row.descriptor_id: row for row in faction_coverage_source.coverage_rows()}
 
-    assert len(source_row_ids) == 16
+    assert len(source_row_ids) == 29
     assert (
         sum(
             source_row_id.startswith("stratagem:space-marines:") for source_row_id in source_row_ids
         )
         == 15
     )
+    assert {source_rows[source_row_id].name for source_row_id in source_row_ids} == {
+        "ADDITIONAL ARMOUR",
+        "ARMOUR OF ABHORRENCE",
+        "ARMOUR OF CONTEMPT",
+        "BEASTHIDE MANIFESTATION",
+        "CONTEMPTUOUS DISREGARD",
+        "HELLFORGED CONSTRUCTION",
+        "HEX-MARKED ARMOUR",
+        "HULKING BRUTES",
+        "LET DUTY BE YOUR SHIELD",
+        "REINFORCED HIVE NODE",
+        "SHIELD OF AVERSION",
+        "TRUESILVER ARMOUR",
+        "UNFAILINGLY OBDURATE",
+        "VOID HARDENED",
+    }
     for source_row_id in source_row_ids:
         descriptor_id = f"phase17e:{source_row_id}"
         coverage_row = coverage_rows[descriptor_id]
         rule_ir = generic_ir_support_source.generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
 
-        assert coverage_row.rule_name == "ARMOUR OF CONTEMPT"
+        assert coverage_row.rule_name == source_rows[source_row_id].name
         assert coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
         assert coverage_row.rule_ir_hash == rule_ir.ir_hash()
         assert rule_ir.is_supported
