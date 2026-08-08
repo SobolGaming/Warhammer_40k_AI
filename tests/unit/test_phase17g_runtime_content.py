@@ -120,6 +120,8 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.runtime_modifiers import (
+    AttackRerollPermissionBinding,
+    AttackRerollPermissionContext,
     HitRollModifierBinding,
     HitRollModifierContext,
     RuntimeModifierRegistry,
@@ -739,6 +741,17 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
         handler=fall_back_handler,
     )
 
+    def attack_reroll_handler(
+        _context: AttackRerollPermissionContext,
+    ) -> None:
+        return None
+
+    attack_reroll_binding = AttackRerollPermissionBinding(
+        modifier_id="runtime:attack-reroll-permission",
+        source_id="runtime:attack-reroll-source",
+        handler=attack_reroll_handler,
+    )
+
     contribution = RuntimeContentContribution(
         ability_records=(
             _ability_record(
@@ -754,6 +767,7 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
             ),
         ),
         fall_back_hook_bindings=(fall_back_binding,),
+        attack_reroll_permission_bindings=(attack_reroll_binding,),
     )
 
     bundle = RuntimeContentBundle.from_contributions(
@@ -781,6 +795,7 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
     assert summary["save_option_modifier_ids"] == []
     assert summary["movement_budget_modifier_ids"] == []
     assert summary["objective_control_modifier_ids"] == []
+    assert summary["attack_reroll_permission_modifier_ids"] == ["runtime:attack-reroll-permission"]
     assert summary["contribution_ids"] == ["runtime-content:module-default"]
     assert len(summary["bundle_summary_hash"]) == 64
     assert "object at 0x" not in encoded
@@ -789,6 +804,17 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
         binding.binding
         for binding in bundle.hook_bindings_for_event(LifecycleHookEvent.FALL_BACK_ELIGIBILITY)
     ) == (fall_back_binding,)
+
+    bundle_without_attack_reroll = RuntimeContentBundle.from_contributions(
+        activation=activation,
+        armies=(army,),
+        catalog=catalog,
+        contributions=(replace(contribution, attack_reroll_permission_bindings=()),),
+    )
+    summary_without_attack_reroll = bundle_without_attack_reroll.to_summary_payload()
+
+    assert summary_without_attack_reroll["attack_reroll_permission_modifier_ids"] == []
+    assert summary_without_attack_reroll["bundle_summary_hash"] != summary["bundle_summary_hash"]
 
 
 def test_runtime_content_bundle_event_keyed_hooks_match_legacy_registries() -> None:

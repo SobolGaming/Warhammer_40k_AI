@@ -465,6 +465,10 @@ def _shooting_lifecycle(
     embarked_unit_ids: tuple[str, ...] = (),
     enemy_pose: Pose | None = None,
     catalog: ArmyCatalog | None = None,
+    alpha_faction_id: str = "core-marine-force",
+    alpha_detachment_ids: tuple[str, ...] = ("core-combined-arms",),
+    enemy_faction_id: str = "core-marine-force",
+    enemy_detachment_ids: tuple[str, ...] = ("core-combined-arms",),
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     if (
         alpha_datasheets is None
@@ -474,6 +478,10 @@ def _shooting_lifecycle(
         and not embarked_unit_ids
         and enemy_pose is None
         and catalog is None
+        and alpha_faction_id == "core-marine-force"
+        and alpha_detachment_ids == ("core-combined-arms",)
+        and enemy_faction_id == "core-marine-force"
+        and enemy_detachment_ids == ("core-combined-arms",)
     ):
         config, armies, battlefield, cached_units = _cached_default_shooting_lifecycle_template(
             alpha_unit_ids,
@@ -505,6 +513,10 @@ def _shooting_lifecycle(
         embarked_unit_ids=embarked_unit_ids,
         enemy_pose=enemy_pose,
         catalog=catalog,
+        alpha_faction_id=alpha_faction_id,
+        alpha_detachment_ids=alpha_detachment_ids,
+        enemy_faction_id=enemy_faction_id,
+        enemy_detachment_ids=enemy_detachment_ids,
     )
 
 
@@ -574,6 +586,10 @@ def _build_shooting_lifecycle(
     embarked_unit_ids: tuple[str, ...] = (),
     enemy_pose: Pose | None = None,
     catalog: ArmyCatalog | None = None,
+    alpha_faction_id: str = "core-marine-force",
+    alpha_detachment_ids: tuple[str, ...] = ("core-combined-arms",),
+    enemy_faction_id: str = "core-marine-force",
+    enemy_detachment_ids: tuple[str, ...] = ("core-combined-arms",),
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     resolved_enemy_pose = Pose.at(35.0, 35.0) if enemy_pose is None else enemy_pose
     config = _config(
@@ -586,6 +602,10 @@ def _build_shooting_lifecycle(
         enemy_unit_specs=enemy_unit_specs,
         enemy_attachment_declarations=enemy_attachment_declarations,
         catalog=catalog,
+        alpha_faction_id=alpha_faction_id,
+        alpha_detachment_ids=alpha_detachment_ids,
+        enemy_faction_id=enemy_faction_id,
+        enemy_detachment_ids=enemy_detachment_ids,
     )
     armies = _mustered_armies(config)
     mission_setup = config.mission_setup
@@ -947,6 +967,10 @@ def _config(
     enemy_unit_specs: tuple[tuple[str, str, str, int], ...] | None = None,
     enemy_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
     catalog: ArmyCatalog | None = None,
+    alpha_faction_id: str = "core-marine-force",
+    alpha_detachment_ids: tuple[str, ...] = ("core-combined-arms",),
+    enemy_faction_id: str = "core-marine-force",
+    enemy_detachment_ids: tuple[str, ...] = ("core-combined-arms",),
 ) -> GameConfig:
     resolved_catalog = _canonical_catalog() if catalog is None else catalog
     enemy_datasheet_id, enemy_model_profile_id, enemy_model_count = (
@@ -982,6 +1006,8 @@ def _config(
                 army_id="army-alpha",
                 unit_specs=resolved_alpha_unit_specs,
                 attachment_declarations=alpha_attachment_declarations,
+                faction_id=alpha_faction_id,
+                detachment_ids=alpha_detachment_ids,
             ),
             _army_muster_request(
                 catalog=resolved_catalog,
@@ -989,6 +1015,8 @@ def _config(
                 army_id="army-beta",
                 unit_specs=beta_unit_specs,
                 attachment_declarations=enemy_attachment_declarations,
+                faction_id=enemy_faction_id,
+                detachment_ids=enemy_detachment_ids,
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -1055,6 +1083,8 @@ def _army_muster_request(
     army_id: str,
     unit_specs: tuple[tuple[str, str, str, int], ...],
     attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
+    faction_id: str = "core-marine-force",
+    detachment_ids: tuple[str, ...] = ("core-combined-arms",),
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -1063,8 +1093,8 @@ def _army_muster_request(
         source_package_id=catalog.source_package_id,
         ruleset_id=catalog.ruleset_id,
         detachment_selection=DetachmentSelection(
-            faction_id="core-marine-force",
-            detachment_ids=("core-combined-arms",),
+            faction_id=faction_id,
+            detachment_ids=detachment_ids,
         ),
         force_disposition_id="purge-the-foe",
         unit_selections=tuple(
