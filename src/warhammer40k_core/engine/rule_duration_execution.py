@@ -103,6 +103,14 @@ def expiration_for_duration(
             return EffectExpiration.end_battle_round(battle_round=context.battle_round)
         if endpoint == "battle":
             return EffectExpiration.end_of_battle()
+        if endpoint == "attacking_unit_attacks":
+            if context.phase is None:
+                raise GameLifecycleError("Attack-sequence duration requires execution phase.")
+            return EffectExpiration.end_phase(
+                battle_round=context.battle_round,
+                phase=context.phase,
+                player_id=_current_active_player_id(context),
+            )
         raise GameLifecycleError("Unsupported rule duration endpoint.")
     if duration.kind is RuleDurationKind.WHILE_CONDITION_TRUE:
         return None
@@ -126,13 +134,15 @@ def rule_duration_unavailable_reason(
         return None
     parameters = parameter_payload(clause.duration.parameters)
     endpoint = parameters.get("endpoint")
-    if endpoint in {"phase", "turn"} and context.active_player_id is None:
+    if endpoint in {"phase", "turn", "attacking_unit_attacks"} and (
+        context.active_player_id is None
+    ):
         return "missing_active_player"
     if (
         parameters.get("relative") == "next" or parameters.get("owner") is not None
     ) and context.state is None:
         return "missing_input:game_state"
-    if endpoint == "phase" and context.phase is None:
+    if endpoint in {"phase", "attacking_unit_attacks"} and context.phase is None:
         return "missing_phase"
     return None
 

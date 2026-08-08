@@ -7175,7 +7175,7 @@
     }
   ],
   "equivalent_group_count": 330,
-  "exact_text_only_member_count": 3259,
+  "exact_text_only_member_count": 3243,
   "generated_by": "uv run python tools/generate_ability_support_matrix.py",
   "member_count": 4094,
   "members": [
@@ -28561,7 +28561,7 @@
       "content_kind": "datasheet_ability",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "112230567352b0252643e2a74299e105ca4e11b496946b4e80fb77fb2bf805d2",
+      "equivalence_hash": "1b0ff2dbbf5c6c28b612ae850dc144246f41deb41a1e3f2125da905333c95f1d",
       "execution_status": "generic_ir_executable",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
@@ -28574,7 +28574,7 @@
       "rules_surface": "datasheet",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "2d2c50d4ff86cbf8bdbd2d67d7691a03dfb0c774cece201e8deb2c77583312e8",
-      "semantic_hash": "efc0eeb2cf61732268e84fab46291a9170ca7d22013638949166c6d7702eb323",
+      "semantic_hash": "3f907962bf453b4d87ce17450efc9ee8ede49372f0fafb4a3a9d7b415f163e48",
       "source_row_ids": [
         "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Datasheets_abilities:000001111:3"
       ],
@@ -68664,7 +68664,7 @@
       "content_kind": "detachment_rule",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "d7daa2225ddf542b62e028846feb3014798450be08c816219cc2a7b414afc32e",
+      "equivalence_hash": "fee23a8bda626ce5f427707b9886132cfbcfbb36bb05d64fd5fd9df318134900",
       "execution_status": "generic_ir_executable",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
@@ -68677,7 +68677,7 @@
       "rules_surface": "detachment_rule",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-      "semantic_hash": "fa0b419443cbe6e61d063be354359f3df7bd993371bd37adbff62b7c042a8004",
+      "semantic_hash": "d3c6c32f2b0e32413fb9968692c426d60588ba465cc544734c360956f54d32a0",
       "source_row_ids": [
         "gw-11e-faction-detachments-2026-27:detachment:emperors-children:court-of-the-phoenician",
         "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:emperors-children"
@@ -99340,7 +99340,7 @@
       "content_kind": "stratagem",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "8b51252ac1922976602c6a6bce3d37b81a24e2f9b04ef6b3f4ee1a94bb67ecc5",
+      "equivalence_hash": "9900d63db53675c5f42687135ff2ab9e9b2d3c9eb890185f895fe3d0a2888373",
       "execution_status": "generic_ir_executable",
       "faction_id": "chaos-daemons",
       "faction_name": "Chaos Daemons",
@@ -99355,7 +99355,7 @@
         "generic:rule-ir"
       ],
       "semantic_context_hash": "a02e4055ba0b2fd12fec0920383a0cc95718295e1b5ec1d68d9a5cbf82831177",
-      "semantic_hash": "8d3460f7e6bf5273de3a55d0f6942bbe0e457f86651eb21de11e6c764c73d574",
+      "semantic_hash": "624b774c601e4e3020eed53c8f208dd8f66dd5145957d2669bbe7a1c2635fa55",
       "source_row_ids": [
         "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:shadow-legion",
         "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000009979003",
@@ -105058,7 +105058,7 @@
       "content_kind": "stratagem",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "6b08e7a10825da47cf85ac8b58b56727d991fdde4670848f57316bf2b71493d2",
+      "equivalence_hash": "e843b94052f9d74772fbea9354f694d518a0f29af9a7661f2a90c23acf395796",
       "execution_status": "generic_ir_executable",
       "faction_id": "emperors-children",
       "faction_name": "Emperor's Children",
@@ -105073,7 +105073,7 @@
         "generic:rule-ir"
       ],
       "semantic_context_hash": "f00776d7c4c95c3d4849ab6ae5b08486449c05eccfd7993907cef1509c2ca4d9",
-      "semantic_hash": "06d134a01dd121dd7345933d801515bfa2541a4b33e12b87f26eacc5d07ab169",
+      "semantic_hash": "3587a13afcd911d4889cbecd98b4b14bcb930ac2bbc0139f9376db12ddc0ca1c",
       "source_row_ids": [
         "gw-11e-faction-detachments-2026-27:detachment:emperors-children:court-of-the-phoenician",
         "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010655005",
@@ -108098,16 +108098,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "80b764d855fe77eb223b900a3c839781bd6097a31cae3e48d11038276f7f8f40",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "79ebc0a175ca4332b07e08b86977d5ca313a7d93b5dbaaae1655b87453f52d82",
+      "execution_status": "generic_ir_executable",
       "faction_id": "imperial-agents",
       "faction_name": "Imperial Agents",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:imperial-agents:ordo-xenos-alien-hunters:000009127002",
-      "normalized_text_hash": "e45bada18db58ea3943fe3e630a7431820fe291436175214d9b5a035d01cf071",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "ordo-xenos-alien-hunters",
       "owner_name": "Ordo Xenos, Alien Hunters",
       "rule_id": "000009127002",
@@ -108115,12 +108113,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "48aca00d7095f8062d98e138f318431b7211611673f1361c22e654a5f3fc8b8a",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000009127002"
+        "gw-11e-faction-detachments-2026-27:detachment:imperial-agents:ordo-xenos-alien-hunters",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000009127002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:imperial-agents:ordo-xenos-alien-hunters:000009127002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:imperial-agents"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000009127002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:imperial-agents:ordo-xenos-alien-hunters:000009127002"
       ],
       "support_transfer": "none"
     },
@@ -113432,7 +113433,7 @@
       "content_kind": "stratagem",
       "diagnostic_reasons": [],
       "equivalence_basis": "structured_rule_ir",
-      "equivalence_hash": "a5d9697cc5b14b4537ecd5ac0b1efd4445b8918355c5a07e5ff40a6b9a932f56",
+      "equivalence_hash": "c3b026989f1e0402d440a772891292d432b9e922780b28b72890e2d468340654",
       "execution_status": "generic_ir_executable",
       "faction_id": "orks",
       "faction_name": "Orks",
@@ -113447,7 +113448,7 @@
         "generic:rule-ir"
       ],
       "semantic_context_hash": "8713d771f46bac34b70b243d667a80bf3e893a4ec47477846c8214094c215a4a",
-      "semantic_hash": "32f510ac63a1866eb498005908a5b2be67420a5b46fc2fc8dd32b3bfde97085e",
+      "semantic_hash": "856b8ed793a6d17742dffb8262bfb3bff0230fb76051f7f05cc0601070acc2da",
       "source_row_ids": [
         "gw-11e-faction-detachments-2026-27:detachment:orks:more-dakka",
         "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000009992006",
@@ -113996,16 +113997,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "85628e122e9a489db6d94def30faa79dbd437be876b811395fb07db06a533b3d",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "ac54b2f14c2a23d9645f95def478df67f761c36d51ce8ba3dab2fd91d623c7aa",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:1st-company-task-force:000008495002",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "1st-company-task-force",
       "owner_name": "1st Company Task Force",
       "rule_id": "000008495002",
@@ -114013,12 +114012,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "8e123171d23639c5f7888c88e3bc99bc17e9048cf313823c2f2be6f3606f9cbf",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008495002"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:1st-company-task-force",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008495002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:1st-company-task-force:000008495002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008495002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:1st-company-task-force:000008495002"
       ],
       "support_transfer": "none"
     },
@@ -114164,16 +114166,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "ccd126a614053e699d1ea21e092fa89950b7d582129e8038167d531394f9d7b3",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "7b65fe8c07892628f145e0181d75da78035e1fe76c9e02b7bc9f118989f7132e",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:anvil-siege-force:000008475002",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "anvil-siege-force",
       "owner_name": "Anvil Siege Force",
       "rule_id": "000008475002",
@@ -114181,12 +114181,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "883fdd2ade8e9ef4144d6792b4117b6e0f0a959aaaeb562ad136c7ab2a03a080",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008475002"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:anvil-siege-force",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008475002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:anvil-siege-force:000008475002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008475002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:anvil-siege-force:000008475002"
       ],
       "support_transfer": "none"
     },
@@ -114360,16 +114363,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "4a428823765499c3139ab5362dfa25204b80f8ab1819708362658260f4b3f9ea",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "2731cca09b7157f170f97eae26a17be4c2ad274e0130f67d460bfdfb45873429",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:armoured-speartip:000010780003",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "armoured-speartip",
       "owner_name": "Armoured Speartip",
       "rule_id": "000010780003",
@@ -114377,12 +114378,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "52032d9f6b619d9ec651da0336e37adc15ac2d67ba1c2a8d936545db4d7353d6",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010780003"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:armoured-speartip",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010780003",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:armoured-speartip:000010780003",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010780003:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:armoured-speartip:000010780003"
       ],
       "support_transfer": "none"
     },
@@ -114640,16 +114644,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "124b6ab39a48a2f03330011c1cd079c285a7265c1b28f436a1730d4ef06d9e1b",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "8ead2b59ba5482eeb5c6d1a9c95b115b05f2967422b534c6bb65143b24fe1126",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:blade-of-ultramar:000010634002",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "blade-of-ultramar",
       "owner_name": "Blade of Ultramar",
       "rule_id": "000010634002",
@@ -114657,12 +114659,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "5f22bd55662d340d5a1a96a38eeaae06794915e799dddfac19529c17b0eac623",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010634002"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:blade-of-ultramar",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010634002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:blade-of-ultramar:000010634002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010634002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:blade-of-ultramar:000010634002"
       ],
       "support_transfer": "none"
     },
@@ -114864,16 +114869,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "2d599479cef7ec5f0917a16a27b1e5908183d9848ed762a6660a44059fa050c6",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "c04fc9a37dc52b550298f977884e79f1a7fb1de5c623477069ee7b35e210fd17",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:ceramite-sentinels:000010760004",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "ceramite-sentinels",
       "owner_name": "Ceramite Sentinels",
       "rule_id": "000010760004",
@@ -114881,12 +114884,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "ff49aec6bfdf507cbdb164a3d1e46f9049cfaa5a93ed698fe5a3176b5d117fc1",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010760004"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:ceramite-sentinels",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010760004",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:ceramite-sentinels:000010760004",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010760004:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:ceramite-sentinels:000010760004"
       ],
       "support_transfer": "none"
     },
@@ -114976,16 +114982,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "c0736f350a26a23350df791df9ff62ea9d2105255c4c2126432e3bc119cb57a6",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "33c28f5d96d992d950de240a36c053e953972aa9614c4c8a9b28b60759005e89",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:firestorm-assault-force:000008483002",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "firestorm-assault-force",
       "owner_name": "Firestorm Assault Force",
       "rule_id": "000008483002",
@@ -114993,12 +114997,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "ef90c70c2956de310148c2398c1fe5932e4efe6ac3b04df8f62ff4f756783f62",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008483002"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:firestorm-assault-force",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008483002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:firestorm-assault-force:000008483002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008483002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:firestorm-assault-force:000008483002"
       ],
       "support_transfer": "none"
     },
@@ -115144,16 +115151,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "1fb5ea89f0bdb9639c431228265c66407e2e8e4e179615db29b22fb2edfb5c63",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "a427a8727eaca5bb53b90e8b91f6e3cecbbfd147c29b6825568dcdc2a6daa1df",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:gladius-task-force:000008352002",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "gladius-task-force",
       "owner_name": "Gladius Task Force",
       "rule_id": "000008352002",
@@ -115161,12 +115166,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "a3f4af169990b1504d8faa3fabe6167279c64cf88a6f260c82af193be758bcfc",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008352002"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:gladius-task-force",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008352002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:gladius-task-force:000008352002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008352002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:gladius-task-force:000008352002"
       ],
       "support_transfer": "none"
     },
@@ -115312,16 +115320,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "80502d88efc202d22820236046ae22cf34001571cef0983d92f83a9e7441e420",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "197a44ab6876833cec07fac0cd2cdb50d1651bf06c4725a80bb2a13a2c1f22fb",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:hammer-of-avernii:000010624002",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "hammer-of-avernii",
       "owner_name": "Hammer of Avernii",
       "rule_id": "000010624002",
@@ -115329,12 +115335,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "ffbce31e73058a277619c9c45ad65ed261dcc15c30b14fe848ef73b6fb77d353",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010624002"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:hammer-of-avernii",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010624002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:hammer-of-avernii:000010624002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010624002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:hammer-of-avernii:000010624002"
       ],
       "support_transfer": "none"
     },
@@ -115480,16 +115489,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "6ad959ca079e05ffaf172fea019737674c2ed762d28d43c89b7592f88420f24c",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "91d697a06acb476c53c9fb5963c4f94f3abcc848693b6fe471cae16043e3c6ff",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:headhunter-task-force:000010784002",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "headhunter-task-force",
       "owner_name": "Headhunter Task Force",
       "rule_id": "000010784002",
@@ -115497,12 +115504,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "4e9272f93b8ab332ec98c8ead96dc4875ccf11fcedec5e5fef3ce277ceb719a6",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010784002"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:headhunter-task-force",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010784002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:headhunter-task-force:000010784002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010784002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:headhunter-task-force:000010784002"
       ],
       "support_transfer": "none"
     },
@@ -115676,16 +115686,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "1a072f0e914fcb7ba69e6f8139f33ad7aba04ebfdf057f82ac66c1c0bac59cc3",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "45146f2d29e7b7b7594faa8c5608364ffac9c4c10002a1ad8d8a372e1338c34d",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:ironstorm-spearhead:000008479003",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "ironstorm-spearhead",
       "owner_name": "Ironstorm Spearhead",
       "rule_id": "000008479003",
@@ -115693,12 +115701,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "947be819136c687469a6a522c8f6a65d6ab5facf35e23239c40ed8f40fcf2bb6",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008479003"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:ironstorm-spearhead",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008479003",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:ironstorm-spearhead:000008479003",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008479003:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:ironstorm-spearhead:000008479003"
       ],
       "support_transfer": "none"
     },
@@ -115844,16 +115855,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "5321a39dad3cadccf5bb767868e5bbac1150079779db3c1629cc324510c914e4",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "17c4de68bab4a4a32a36d536ac7b92aa7d27d2222d55f0c2fffaf4d7e2b35a23",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:librarius-conclave:000009791003",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "librarius-conclave",
       "owner_name": "Librarius Conclave",
       "rule_id": "000009791003",
@@ -115861,12 +115870,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "d6bed331ce08d2c29ee8a93b39d2cbfdf35e611669ff928e92e1a6507f4c26df",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000009791003"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:librarius-conclave",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000009791003",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:librarius-conclave:000009791003",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000009791003:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:librarius-conclave:000009791003"
       ],
       "support_transfer": "none"
     },
@@ -116320,16 +116332,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "ecd1cf917d439dc6a29ed09bbd3d5e1546b59ad70a3bc546364b6b9a8f581a49",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "b7e738098ce84d829253bd8a9491bedc28a92e9f47df744a1f47382b9cc911e9",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:shadowmark-talon:000010467002",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "shadowmark-talon",
       "owner_name": "Shadowmark Talon",
       "rule_id": "000010467002",
@@ -116337,12 +116347,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "54c8a37bd9fe8d62c93828ae089ad56e12cc723d0820fe5f5fa0810a31228a06",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010467002"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:shadowmark-talon",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010467002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:shadowmark-talon:000010467002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010467002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:shadowmark-talon:000010467002"
       ],
       "support_transfer": "none"
     },
@@ -116488,16 +116501,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "b32895d9e40e2dd5eb52b90ed4838a8d21958388f0ed2d87a1b8aa227eb503dc",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "dc98dbf2883ec5a74af636e3f0a4997a47e0d626d75b33d0638dd0eee4930fba",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:spearpoint-task-force:000010630002",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "spearpoint-task-force",
       "owner_name": "Spearpoint Task Force",
       "rule_id": "000010630002",
@@ -116505,12 +116516,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "aeadd0c932447e98cbeb988915758d32f7af7e3bc323789dc5221b445d79196b",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010630002"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:spearpoint-task-force",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000010630002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:spearpoint-task-force:000010630002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000010630002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:spearpoint-task-force:000010630002"
       ],
       "support_transfer": "none"
     },
@@ -116656,16 +116670,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "f8a509c249ef18a1d0a384ca99f0d47f7b891e2624e8898974e5407755811824",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "66106bb6130621c93a0000a63ca6bb1b2a14071ccd03e4b8282f902e8cb64135",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:stormlance-task-force:000008487002",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "stormlance-task-force",
       "owner_name": "Stormlance Task Force",
       "rule_id": "000008487002",
@@ -116673,12 +116685,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "153772777d18e1459100b2212d5fb2ca66420439486b0af79a7d088006cbb0ff",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008487002"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:stormlance-task-force",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008487002",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:stormlance-task-force:000008487002",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008487002:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:stormlance-task-force:000008487002"
       ],
       "support_transfer": "none"
     },
@@ -116852,16 +116867,14 @@
     },
     {
       "content_kind": "stratagem",
-      "diagnostic_reasons": [
-        "unsupported_language"
-      ],
-      "equivalence_basis": "exact_normalized_text",
-      "equivalence_hash": "31906de860fd057dd77e4bfc57ba9e6c3e7a0d500e48fda2ebd1ba568eaba6cc",
-      "execution_status": "blocked_structured_semantics",
+      "diagnostic_reasons": [],
+      "equivalence_basis": "structured_rule_ir",
+      "equivalence_hash": "962218bb0585726326db86889449568dcb92cfd0c269d0cadca64fac62b4f5b6",
+      "execution_status": "generic_ir_executable",
       "faction_id": "space-marines",
       "faction_name": "Space Marines",
       "member_id": "runtime-content:phase17f:phase17e:stratagem:space-marines:vanguard-spearhead:000008491003",
-      "normalized_text_hash": "39e6f97abaa990daaa4b06fcb9d4f9ea60a889a9c0a3c077e25a710d78f296f5",
+      "normalized_text_hash": "6a07e08c30837a7e0de0fde807fdca40465dac0ae16bccb48c14aaa62a52bd11",
       "owner_id": "vanguard-spearhead",
       "owner_name": "Vanguard Spearhead",
       "rule_id": "000008491003",
@@ -116869,12 +116882,15 @@
       "rules_surface": "stratagem",
       "runtime_consumer_ids": [],
       "semantic_context_hash": "cc754fc014a143fee6fd1851561e0a751b6bb173097edd5f064215f25c007c72",
-      "semantic_hash": null,
+      "semantic_hash": "2ab7f25a11ec797918945831cb5f4fffdccdc16d362413063cdabe89cb0d52b2",
       "source_row_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008491003"
+        "gw-11e-faction-detachments-2026-27:detachment:space-marines:vanguard-spearhead",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008491003",
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:vanguard-spearhead:000008491003",
+        "gw-11e-phase17e-faction-coverage-2026-07:source-pdf:space-marines"
       ],
       "source_text_ids": [
-        "data-package:wahapedia:source-mirror:10th-edition-2026-06-14:Stratagems:000008491003:description"
+        "gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:space-marines:vanguard-spearhead:000008491003"
       ],
       "support_transfer": "none"
     },
@@ -122111,8 +122127,8 @@
     "Source": "be71483d32107f42173bc13bf191f2769a8d17279ebdb2bb24d2fca372a1826c",
     "Stratagems": "b13ffe800908d95adcb221fb28b653ae319b0a84bb88d17b0585bceb3d939958"
   },
-  "source_payload_checksum_sha256": "414a6ad80befab7fbcd1899b86fa0fe09e1e27ec855683a856940aed7fbb810f",
+  "source_payload_checksum_sha256": "ee0a7386edc08aa03549980860b033fa3a1b436850cafbcd01bd946a42f142ac",
   "source_text_unavailable_member_count": 110,
-  "structured_member_count": 725,
-  "upstream_execution_checksum_sha256": "e370a2a9ddad269a152875feddb7345b1f12abb3775ef2906b9ea3ca9c492339"
+  "structured_member_count": 741,
+  "upstream_execution_checksum_sha256": "855ea8d5249cfd6021e04d64903a7c4abb0de6f8225c9a75713929c76cd16aa5"
 }

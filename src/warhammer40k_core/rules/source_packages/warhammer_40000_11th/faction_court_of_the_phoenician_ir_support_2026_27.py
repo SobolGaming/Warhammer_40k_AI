@@ -157,7 +157,7 @@ def _detachment_rule_payload() -> RuleIRPayload:
             ),
             effect_text="Armour Penetration",
             characteristic="armor_penetration",
-            delta=1,
+            delta=-1,
             weapon_scope="melee",
             duration=_end_phase_duration(normalized_text),
             extra_parameters=(
@@ -547,7 +547,7 @@ def _close_quarters_excruciation_payload(*, rule_id: str, source_id: str) -> Rul
             source_text=source_text,
             effect_text="Armour Penetration",
             characteristic="armor_penetration",
-            delta=1,
+            delta=-1,
             weapon_scope="all",
             duration=_end_phase_duration(normalized_text),
             trigger=_dice_roll_trigger(

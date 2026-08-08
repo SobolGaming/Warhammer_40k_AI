@@ -162,6 +162,9 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedHookRegistry,
     fight_unit_selected_grant_options,
 )
+from warhammer40k_core.engine.finite_decision_validation import (
+    invalid_finite_decision_status as _invalid_finite_decision_status,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -184,7 +187,11 @@ from warhammer40k_core.engine.rule_model_destruction_fight_continuation import (
     remove_rule_fight_on_death_models_for_completed_activation,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.selected_target_stratagem_reactions import (
+    request_after_unit_selected_as_target_stratagem_if_available,
+)
 from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_stratagem_index
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.stratagems import (
     CORE_COUNTEROFFENSIVE_HANDLER_ID,
     CORE_EPIC_CHALLENGE_HANDLER_ID,
@@ -241,6 +248,9 @@ class FightPhaseHandler:
     ruleset_descriptor: RulesetDescriptor | None = None
     army_catalog: ArmyCatalog | None = None
     stratagem_index: StratagemCatalogIndex = field(default_factory=eleventh_edition_stratagem_index)
+    stratagem_cost_modifier_registry: StratagemCostModifierRegistry = field(
+        default_factory=StratagemCostModifierRegistry.empty
+    )
     fight_activation_ability_hooks: FightActivationAbilityHookRegistry = field(
         default_factory=FightActivationAbilityHookRegistry.empty
     )
@@ -275,6 +285,10 @@ class FightPhaseHandler:
             raise GameLifecycleError("FightPhaseHandler army_catalog must be an ArmyCatalog.")
         if type(self.stratagem_index) is not StratagemCatalogIndex:
             raise GameLifecycleError("FightPhaseHandler stratagem_index must be an index.")
+        if type(self.stratagem_cost_modifier_registry) is not StratagemCostModifierRegistry:
+            raise GameLifecycleError(
+                "FightPhaseHandler stratagem_cost_modifier_registry must be a registry."
+            )
         if type(self.fight_activation_ability_hooks) is not FightActivationAbilityHookRegistry:
             raise GameLifecycleError(
                 "FightPhaseHandler fight_activation_ability_hooks must be a registry."
@@ -633,6 +647,20 @@ def _advance_fight_attack_sequence(
     reaction_queue: ReactionQueue | None,
     policy: FightPolicyDescriptor,
 ) -> LifecycleStatus | None:
+    fight_state = _require_fight_state(state)
+    attack_sequence = fight_state.attack_sequence
+    if attack_sequence is None:
+        raise GameLifecycleError("Fight attack advance requires attack_sequence.")
+    stratagem_status = request_after_unit_selected_as_target_stratagem_if_available(
+        state=state,
+        decisions=decisions,
+        stratagem_index=handler.stratagem_index,
+        stratagem_cost_modifier_registry=handler.stratagem_cost_modifier_registry,
+        attack_sequence=attack_sequence,
+        phase=BattlePhase.FIGHT,
+    )
+    if stratagem_status is not None:
+        return stratagem_status
     continuation = advance_fight_attack_sequence_until_completion(
         state=state,
         decisions=decisions,
@@ -3942,51 +3970,6 @@ def _decision_payload_object(payload: JsonValue) -> dict[str, JsonValue]:
     if not isinstance(payload, dict):
         raise GameLifecycleError("Fight decision payload must be an object.")
     return payload
-
-
-def _invalid_finite_decision_status(
-    *,
-    state: GameState,
-    request: DecisionRequest,
-    result: DecisionResult,
-    invalid_reason: str,
-) -> LifecycleStatus | None:
-    if result.request_id != request.request_id:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Decision result does not match the pending request.",
-            payload={"invalid_reason": invalid_reason, "field": "request_id"},
-        )
-    if result.decision_type != request.decision_type:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Decision result type does not match the pending request.",
-            payload={"invalid_reason": invalid_reason, "field": "decision_type"},
-        )
-    if result.actor_id != request.actor_id:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Decision result actor does not match the pending request.",
-            payload={"invalid_reason": invalid_reason, "field": "actor_id"},
-        )
-    if result.selected_option_id not in {option.option_id for option in request.options}:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Decision result selected option is not pending.",
-            payload={"invalid_reason": invalid_reason, "field": "selected_option_id"},
-        )
-    selected_payload = next(
-        option.payload
-        for option in request.options
-        if option.option_id == result.selected_option_id
-    )
-    if result.payload != selected_payload:
-        return LifecycleStatus.invalid(
-            stage=state.stage,
-            message="Decision result payload does not match the selected option.",
-            payload={"invalid_reason": invalid_reason, "field": "payload"},
-        )
-    return None
 
 
 def _fight_phase_status_payload(

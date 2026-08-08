@@ -2743,6 +2743,7 @@ class GameLifecycle:
             ruleset_descriptor=self._fight_phase_handler.ruleset_descriptor,
             army_catalog=self._fight_phase_handler.army_catalog,
             stratagem_index=runtime_stratagem_index,
+            stratagem_cost_modifier_registry=bundle.stratagem_cost_modifier_registry,
             fight_activation_ability_hooks=(bundle.fight_activation_ability_hook_registry),
             fight_unit_selected_hooks=bundle.fight_unit_selected_hook_registry,
             fight_unit_selected_grant_hooks=(bundle.fight_unit_selected_grant_hook_registry),

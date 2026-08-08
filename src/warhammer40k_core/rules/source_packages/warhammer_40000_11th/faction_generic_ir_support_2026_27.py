@@ -155,6 +155,26 @@ _SUPPORTED_HIT_TARGET_COVER_DENIAL_STRATAGEM_SOURCE_ROW_IDS = frozenset(
         "stratagem:astra-militarum:steel-hammer:000010788005",
     }
 )
+_SUPPORTED_INCOMING_AP_MODIFIER_STRATAGEM_SOURCE_ROW_IDS = frozenset(
+    {
+        "stratagem:imperial-agents:ordo-xenos-alien-hunters:000009127002",
+        "stratagem:space-marines:1st-company-task-force:000008495002",
+        "stratagem:space-marines:anvil-siege-force:000008475002",
+        "stratagem:space-marines:armoured-speartip:000010780003",
+        "stratagem:space-marines:blade-of-ultramar:000010634002",
+        "stratagem:space-marines:ceramite-sentinels:000010760004",
+        "stratagem:space-marines:firestorm-assault-force:000008483002",
+        "stratagem:space-marines:gladius-task-force:000008352002",
+        "stratagem:space-marines:hammer-of-avernii:000010624002",
+        "stratagem:space-marines:headhunter-task-force:000010784002",
+        "stratagem:space-marines:ironstorm-spearhead:000008479003",
+        "stratagem:space-marines:librarius-conclave:000009791003",
+        "stratagem:space-marines:shadowmark-talon:000010467002",
+        "stratagem:space-marines:spearpoint-task-force:000010630002",
+        "stratagem:space-marines:stormlance-task-force:000008487002",
+        "stratagem:space-marines:vanguard-spearhead:000008491003",
+    }
+)
 _SUPPORTED_COURT_OF_THE_PHOENICIAN_MIXED_ENHANCEMENT_SOURCE_ROW_IDS = frozenset(
     {
         "enhancement:emperors-children:court-of-the-phoenician:000010654003",
@@ -319,6 +339,13 @@ def generic_supported_stratagem_rule_ir_hash(
             source_row=source_row,
         )
         return rule_ir.ir_hash()
+    if source_row.source_row_id in _SUPPORTED_INCOMING_AP_MODIFIER_STRATAGEM_SOURCE_ROW_IDS:
+        rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+        _validate_incoming_ap_modifier_stratagem_rule_ir(
+            rule_ir=rule_ir,
+            source_row=source_row,
+        )
+        return rule_ir.ir_hash()
     rule_ir_hash = shadow_legion_ir.coverage_rule_ir_hash_by_descriptor_id(descriptor_id)
     if rule_ir_hash is not None:
         rule_ir = generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
@@ -379,7 +406,7 @@ def generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id: str) -> Ru
     if payload is None:
         payload = corsair_coterie_ir.coverage_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
-        payload = _hit_target_cover_denial_stratagem_rule_ir_payload_by_descriptor_id(descriptor_id)
+        payload = _stratagem_activation_rule_ir_payload_by_descriptor_id(descriptor_id)
     if payload is None:
         raise Phase17FGenericIrSupportError("Generic IR coverage descriptor is not registered.")
     return RuleIR.from_payload(payload)
@@ -389,19 +416,22 @@ def generic_rule_ir_hash_by_coverage_descriptor_id(coverage_descriptor_id: str) 
     return generic_rule_ir_by_coverage_descriptor_id(coverage_descriptor_id).ir_hash()
 
 
-def _hit_target_cover_denial_stratagem_rule_ir_payload_by_descriptor_id(
+def _stratagem_activation_rule_ir_payload_by_descriptor_id(
     descriptor_id: str,
 ) -> RuleIRPayload | None:
     prefix = "phase17e:"
     if not descriptor_id.startswith(prefix):
         return None
     source_row_id = descriptor_id.removeprefix(prefix)
-    if source_row_id not in _SUPPORTED_HIT_TARGET_COVER_DENIAL_STRATAGEM_SOURCE_ROW_IDS:
+    if source_row_id not in (
+        _SUPPORTED_HIT_TARGET_COVER_DENIAL_STRATAGEM_SOURCE_ROW_IDS
+        | _SUPPORTED_INCOMING_AP_MODIFIER_STRATAGEM_SOURCE_ROW_IDS
+    ):
         return None
     for profile in stratagem_activation.stratagem_activation_profiles():
         if profile.source_row_id == source_row_id:
             return cast(RuleIRPayload, profile.rule_ir_payload())
-    raise Phase17FGenericIrSupportError("Hit-target cover denial Stratagem profile is missing.")
+    raise Phase17FGenericIrSupportError("Generic Stratagem activation profile is missing.")
 
 
 def supported_conditional_weapon_ability_enhancement_source_row_ids() -> tuple[str, ...]:
@@ -442,6 +472,10 @@ def supported_daemonic_incursion_stratagem_source_row_ids() -> tuple[str, ...]:
 
 def supported_hit_target_cover_denial_stratagem_source_row_ids() -> tuple[str, ...]:
     return tuple(sorted(_SUPPORTED_HIT_TARGET_COVER_DENIAL_STRATAGEM_SOURCE_ROW_IDS))
+
+
+def supported_incoming_ap_modifier_stratagem_source_row_ids() -> tuple[str, ...]:
+    return tuple(sorted(_SUPPORTED_INCOMING_AP_MODIFIER_STRATAGEM_SOURCE_ROW_IDS))
 
 
 def supported_shadow_legion_stratagem_source_row_ids() -> tuple[str, ...]:
@@ -1304,6 +1338,73 @@ def _validate_hit_target_cover_denial_effect(effects: tuple[RuleEffectSpec, ...]
     if parameters.get("target_scope") not in {"selected_unit", "models_in_selected_unit"}:
         raise Phase17FGenericIrSupportError(
             "Hit-target cover denial Stratagem has unsupported target scope."
+        )
+
+
+def _validate_incoming_ap_modifier_stratagem_rule_ir(
+    *,
+    rule_ir: RuleIR,
+    source_row: faction_subrules_2026_27.SourceStratagemRow,
+) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise Phase17FGenericIrSupportError("Incoming AP modifier support requires RuleIR.")
+    if type(source_row) is not faction_subrules_2026_27.SourceStratagemRow:
+        raise Phase17FGenericIrSupportError("Incoming AP modifier support requires source row.")
+    if not rule_ir.is_supported:
+        raise Phase17FGenericIrSupportError(
+            "Incoming AP modifier Stratagem RuleIR must deserialize as supported."
+        )
+    if rule_ir.source_id != source_row.source_id:
+        raise Phase17FGenericIrSupportError(
+            "Incoming AP modifier Stratagem produced an unexpected source ID."
+        )
+    if len(rule_ir.clauses) != 2:
+        raise Phase17FGenericIrSupportError(
+            "Incoming AP modifier Stratagem RuleIR must contain two clauses."
+        )
+    target_binding_clause, effect_clause = rule_ir.clauses
+    if (
+        target_binding_clause.template_id != stratagem_activation.RULE_IR_TEMPLATE_ID
+        or target_binding_clause.target is None
+        or target_binding_clause.target.kind is not RuleTargetKind.SELECTED_TARGET
+        or target_binding_clause.effects
+    ):
+        raise Phase17FGenericIrSupportError(
+            "Incoming AP modifier Stratagem requires one selected-target activation binding."
+        )
+    if (
+        effect_clause.template_id != CHARACTERISTIC_MODIFIER_TEMPLATE_ID
+        or effect_clause.unsupported_reason is not None
+        or effect_clause.diagnostics
+        or effect_clause.target is not None
+    ):
+        raise Phase17FGenericIrSupportError(
+            "Incoming AP modifier Stratagem uses an unexpected effect clause shape."
+        )
+    if (
+        effect_clause.duration is None
+        or effect_clause.duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT
+        or parameter_payload(effect_clause.duration.parameters).get("endpoint")
+        != "attacking_unit_attacks"
+    ):
+        raise Phase17FGenericIrSupportError(
+            "Incoming AP modifier Stratagem must expire with the triggering attacks."
+        )
+    if len(effect_clause.effects) != 1:
+        raise Phase17FGenericIrSupportError(
+            "Incoming AP modifier Stratagem must contain one characteristic effect."
+        )
+    effect = effect_clause.effects[0]
+    if effect.kind is not RuleEffectKind.MODIFY_CHARACTERISTIC or parameter_payload(
+        effect.parameters
+    ) != {
+        "attack_role": "target",
+        "attacker_scope": "triggering_attacking_unit",
+        "characteristic": "armor_penetration",
+        "delta": 1,
+    }:
+        raise Phase17FGenericIrSupportError(
+            "Incoming AP modifier Stratagem has unexpected effect semantics."
         )
 
 

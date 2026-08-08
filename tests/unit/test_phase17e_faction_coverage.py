@@ -308,6 +308,7 @@ GENERIC_STRATAGEM_SOURCE_ROW_IDS = frozenset(
     }
     | set(generic_ir_support_source.supported_daemonic_incursion_stratagem_source_row_ids())
     | set(generic_ir_support_source.supported_shadow_legion_stratagem_source_row_ids())
+    | set(generic_ir_support_source.supported_incoming_ap_modifier_stratagem_source_row_ids())
 )
 COURT_OF_THE_PHOENICIAN_GENERIC_DESCRIPTOR_IDS = frozenset(
     {
@@ -1444,6 +1445,30 @@ def test_phase17e_hit_target_cover_denial_stratagem_is_generic_supported() -> No
     assert coverage_row.rule_ir_hash == (
         generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(descriptor_id)
     )
+
+
+def test_phase17e_armour_of_contempt_rows_are_generic_supported() -> None:
+    source_row_ids = set(
+        generic_ir_support_source.supported_incoming_ap_modifier_stratagem_source_row_ids()
+    )
+    coverage_rows = {row.descriptor_id: row for row in faction_coverage_source.coverage_rows()}
+
+    assert len(source_row_ids) == 16
+    assert (
+        sum(
+            source_row_id.startswith("stratagem:space-marines:") for source_row_id in source_row_ids
+        )
+        == 15
+    )
+    for source_row_id in source_row_ids:
+        descriptor_id = f"phase17e:{source_row_id}"
+        coverage_row = coverage_rows[descriptor_id]
+        rule_ir = generic_ir_support_source.generic_rule_ir_by_coverage_descriptor_id(descriptor_id)
+
+        assert coverage_row.rule_name == "ARMOUR OF CONTEMPT"
+        assert coverage_row.status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+        assert coverage_row.rule_ir_hash == rule_ir.ir_hash()
+        assert rule_ir.is_supported
 
 
 def test_phase17e_coverage_report_groups_supported_and_approved_unsupported_rows() -> None:

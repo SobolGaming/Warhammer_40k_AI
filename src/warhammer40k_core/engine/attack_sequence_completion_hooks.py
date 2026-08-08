@@ -9,6 +9,9 @@ from warhammer40k_core.engine.attack_sequence import AttackSequence, AttackSeque
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.generic_rule_attack_completion import (
+    expire_attack_sequence_scoped_generic_effects,
+)
 from warhammer40k_core.engine.lifecycle_hooks import LifecycleHookEvent, validate_hook_bindings
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rule_ir_weapon_modifiers import rule_ir_weapon_selector_applies
@@ -99,6 +102,13 @@ class AttackSequenceCompletedHookRegistry:
     ) -> LifecycleStatus | None:
         if type(context) is not AttackSequenceCompletedContext:
             raise GameLifecycleError("Attack sequence completion hooks require context.")
+        expire_attack_sequence_scoped_generic_effects(
+            state=context.state,
+            decisions=context.decisions,
+            source_phase=context.source_phase,
+            attack_sequence=context.attack_sequence,
+            attack_sequence_completed_event_id=context.attack_sequence_completed_event_id,
+        )
         for binding in self.bindings:
             status = binding.handler(context)
             if status is None:

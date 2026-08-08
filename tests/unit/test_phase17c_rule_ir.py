@@ -147,6 +147,7 @@ from warhammer40k_core.rules.rule_ir import (
 from warhammer40k_core.rules.rule_keyword_sequences import keyword_sequence_tokens
 from warhammer40k_core.rules.rule_templates import (
     ALLOCATED_ATTACK_DAMAGE_MODIFIER_TEMPLATE_ID,
+    CHARACTERISTIC_MODIFIER_TEMPLATE_ID,
     CHARACTERISTIC_SET_TEMPLATE_ID,
 )
 from warhammer40k_core.rules.source_data import RuleSourceText
@@ -330,7 +331,7 @@ def test_phase17c_normalized_source_text_compiles_to_stable_rule_ir() -> None:
         == compiled.to_payload()
     )
     assert compiled.rule_ir.is_supported
-    assert compiled.rule_ir.parser_version == "phase17c-rule-parser-v3"
+    assert compiled.rule_ir.parser_version == "phase17c-rule-parser-v4"
     assert compiled.rule_ir.clauses[0].trigger is not None
     assert compiled.rule_ir.clauses[0].trigger.kind is RuleTriggerKind.TIMING_WINDOW
     assert compiled.rule_ir.clauses[0].target is not None
@@ -3113,6 +3114,30 @@ def test_phase17c_skullmaster_fury_compiles_to_charge_move_weapon_keyword_grant(
     )
 
 
+def test_phase17c_incoming_ap_modifier_compiles_to_attack_scoped_generic_ir() -> None:
+    rule_ir = _compiled(
+        "Until the attacking unit has finished making its attacks, each time an attack "
+        "targets your unit, worsen the Armour Penetration characteristic of that attack by 1."
+    ).rule_ir
+    clause = rule_ir.clauses[0]
+
+    assert rule_ir.is_supported
+    assert RuleIR.from_payload(rule_ir.to_payload()).to_payload() == rule_ir.to_payload()
+    assert clause.template_id == CHARACTERISTIC_MODIFIER_TEMPLATE_ID
+    assert clause.target is None
+    assert clause.duration is not None
+    assert clause.duration.kind is RuleDurationKind.UNTIL_TIMING_ENDPOINT
+    assert parameter_payload(clause.duration.parameters) == {"endpoint": "attacking_unit_attacks"}
+    assert len(clause.effects) == 1
+    assert clause.effects[0].kind is RuleEffectKind.MODIFY_CHARACTERISTIC
+    assert parameter_payload(clause.effects[0].parameters) == {
+        "attack_role": "target",
+        "attacker_scope": "triggering_attacking_unit",
+        "characteristic": "armor_penetration",
+        "delta": 1,
+    }
+
+
 def test_phase17c_lord_of_change_named_weapon_choice_compiles_to_semantic_ir() -> None:
     rule_ir = _compiled(
         "In your Shooting phase, select one of the following abilities: [IGNORES COVER]; "
@@ -3834,7 +3859,7 @@ def test_phase17c_rendmaster_blood_throne_requires_selected_attacker_runtime() -
         {
             "attack_role": "attacker",
             "characteristic": "armor_penetration",
-            "delta": 1,
+            "delta": -1,
         },
         {
             "attack_role": "attacker",
@@ -4209,7 +4234,7 @@ def test_phase17c_compiler_payload_boundary_is_fail_fast() -> None:
     )
     assert identity == {
         "compiler_version": "phase17c-rule-compiler-v2",
-        "parser_version": "phase17c-rule-parser-v3",
+        "parser_version": "phase17c-rule-parser-v4",
         "ir_schema_version": "phase17c-rule-ir-v1",
     }
     assert tuple(

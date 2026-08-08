@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Literal, cast
 
 from warhammer40k_core.core.attributes import (
@@ -27,9 +27,14 @@ from warhammer40k_core.engine.generic_rule_attack_conditions import (
     generic_rule_target_constraint_values,
     generic_rule_target_constraints_apply,
     generic_rule_target_proximity_keyword_gate_applies,
+    generic_rule_triggering_attacker_applies,
 )
 from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_index_from_payload,
+)
+from warhammer40k_core.engine.generic_rule_save_modifiers import (
+    generic_rule_save_option_with_roll_modifier,
+    generic_rule_save_options_with_invulnerable_save,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
@@ -51,7 +56,7 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierContext,
     WoundRollModifierContext,
 )
-from warhammer40k_core.engine.saves import SaveKind, SaveOption
+from warhammer40k_core.engine.saves import SaveOption, save_option_with_armor_penetration_modifier
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
 
 type AttackRole = Literal["attacker", "target"]
@@ -257,7 +262,7 @@ def generic_rule_modified_save_options(
                 continue
         elif effect.source_model_instance_id != context.allocated_model_instance_id:
             continue
-        current = _save_options_with_invulnerable_save(
+        current = generic_rule_save_options_with_invulnerable_save(
             current,
             target_number=_required_int_parameter(effect.parameters, key="value"),
             source_id=_modifier_source_id(effect),
@@ -290,7 +295,31 @@ def generic_rule_modified_save_options(
         delta = _required_int_parameter(effect.parameters, key="delta")
         source_id = _modifier_source_id(effect)
         current = tuple(
-            _save_option_with_roll_modifier(option, delta, source_id) for option in current
+            generic_rule_save_option_with_roll_modifier(option, delta, source_id)
+            for option in current
+        )
+    for effect in _matching_generic_attack_effects(
+        state=context.state,
+        attacking_unit_instance_id=context.attacking_unit_instance_id,
+        attacker_model_instance_id=context.attacker_model_instance_id,
+        target_unit_instance_id=context.target_unit_instance_id,
+        source_phase=context.source_phase,
+        weapon_profile=context.weapon_profile,
+        effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
+        legacy_attacker_role_allowed=lambda _candidate: False,
+        legacy_target_role_allowed=lambda _candidate: False,
+    ):
+        if _characteristic_parameter(effect.parameters) is not Characteristic.ARMOR_PENETRATION:
+            continue
+        delta = _required_int_parameter(effect.parameters, key="delta")
+        source_id = _modifier_source_id(effect)
+        current = tuple(
+            save_option_with_armor_penetration_modifier(
+                option,
+                delta=delta,
+                source_rule_id=source_id,
+            )
+            for option in current
         )
     return current
 
@@ -315,24 +344,6 @@ def _generic_this_model_effect_targets_only_alive_model(
         ).alive_models()
     )
     return alive_ids == (source_model_id,)
-
-
-def _save_options_with_invulnerable_save(
-    options: tuple[SaveOption, ...], *, target_number: int, source_id: str
-) -> tuple[SaveOption, ...]:
-    if target_number < 2 or target_number > 6:
-        raise GameLifecycleError("Generic invulnerable save target must be 2-6.")
-    replacement = SaveOption(
-        save_kind=SaveKind.INVULNERABLE,
-        target_number=target_number,
-        characteristic_target_number=target_number,
-        armor_penetration=0,
-        source_rule_ids=(source_id,),
-    )
-    return (
-        *tuple(option for option in options if option.save_kind is not SaveKind.INVULNERABLE),
-        replacement,
-    )
 
 
 def generic_rule_modified_weapon_profile(context: WeaponProfileModifierContext) -> WeaponProfile:
@@ -863,6 +874,12 @@ def _generic_effect_context_applies(
     attack_strength: int | None,
     target_toughness: int | None,
 ) -> bool:
+    if not generic_rule_triggering_attacker_applies(
+        parameters=effect.parameters,
+        effect_payload=effect.persisting_effect.effect_payload,
+        attacking_unit_instance_id=attacking_unit_instance_id,
+    ):
+        return False
     if not generic_rule_source_model_applies(
         target_kind=effect.target_kind,
         source_model_instance_id=effect.source_model_instance_id,
@@ -1200,26 +1217,6 @@ def _timing_window_for_roll_type(
     if roll_suffix != requested_suffix:
         raise GameLifecycleError("Generic RuleIR reroll roll_type drift.")
     return requested_roll_type
-
-
-def _save_option_with_roll_modifier(
-    option: SaveOption,
-    delta: int,
-    source_id: str,
-) -> SaveOption:
-    if type(option) is not SaveOption:
-        raise GameLifecycleError("Generic save modifier requires SaveOption.")
-    modified_target = max(2, option.target_number - delta)
-    modified_characteristic_target = max(2, option.characteristic_target_number - delta)
-    source_ids = option.source_rule_ids
-    if source_id not in source_ids:
-        source_ids = tuple(sorted((*source_ids, source_id)))
-    return replace(
-        option,
-        target_number=modified_target,
-        characteristic_target_number=modified_characteristic_target,
-        source_rule_ids=source_ids,
-    )
 
 
 def _profile_with_weapon_ability_grant(

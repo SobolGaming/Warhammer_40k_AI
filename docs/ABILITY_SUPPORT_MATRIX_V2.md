@@ -25,7 +25,7 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Family | Placeholder | Partial | Implemented |
 | --- | ---: | ---: | ---: |
 | Faction | 5 | 23 | 0 |
-| Detachment | 240 | 18 | 8 |
+| Detachment | 225 | 33 | 8 |
 
 | Faction | Faction semantic status | Placeholder detachments | Partial detachments | Implemented detachments |
 | --- | --- | ---: | ---: | ---: |
@@ -37,7 +37,7 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Necrons | `partial` | 9 | 3 | 0 |
 | Leagues of Votann | `partial` | 9 | 1 | 0 |
 | T'au Empire | `partial` | 7 | 0 | 0 |
-| Space Marines | `partial` | 21 | 1 | 0 |
+| Space Marines | `partial` | 7 | 15 | 0 |
 | Dark Angels | `placeholder` | 8 | 0 | 0 |
 | Blood Angels | `placeholder` | 8 | 0 | 0 |
 | Space Wolves | `placeholder` | 7 | 0 | 0 |
@@ -56,7 +56,7 @@ Load support and semantic execution support are distinct. A row with `support_st
 | Adeptus Mechanicus | `partial` | 10 | 0 | 0 |
 | Imperial Knights | `partial` | 7 | 1 | 0 |
 | Adeptus Custodes | `partial` | 8 | 1 | 0 |
-| Imperial Agents | `placeholder` | 5 | 0 | 0 |
+| Imperial Agents | `placeholder` | 4 | 1 | 0 |
 
 ## Structured Support Sections
 
@@ -194,7 +194,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Necrons | 12 | 0 | 36 | 54 | 4 | [necrons](factions/necrons.md) |
 | Leagues of Votann | 10 | 0 | 28 | 42 | 2 | [leagues-of-votann](factions/leagues-of-votann.md) |
 | T'au Empire | 7 | 0 | 16 | 24 | 1 | [tau-empire](factions/tau-empire.md) |
-| Space Marines | 22 | 0 | 72 | 107 | 2 | [space-marines](factions/space-marines.md) |
+| Space Marines | 22 | 0 | 72 | 107 | 17 | [space-marines](factions/space-marines.md) |
 | Dark Angels | 8 | 0 | 0 | 0 | 0 | [dark-angels](factions/dark-angels.md) |
 | Blood Angels | 8 | 0 | 0 | 0 | 0 | [blood-angels](factions/blood-angels.md) |
 | Space Wolves | 7 | 0 | 0 | 0 | 0 | [space-wolves](factions/space-wolves.md) |
@@ -213,7 +213,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Adeptus Mechanicus | 10 | 0 | 28 | 42 | 1 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
 | Imperial Knights | 8 | 0 | 24 | 36 | 2 | [imperial-knights](factions/imperial-knights.md) |
 | Adeptus Custodes | 9 | 0 | 24 | 36 | 3 | [adeptus-custodes](factions/adeptus-custodes.md) |
-| Imperial Agents | 5 | 0 | 20 | 30 | 0 | [imperial-agents](factions/imperial-agents.md) |
+| Imperial Agents | 5 | 0 | 20 | 30 | 1 | [imperial-agents](factions/imperial-agents.md) |
 
 ## Datasheet Abilities
 

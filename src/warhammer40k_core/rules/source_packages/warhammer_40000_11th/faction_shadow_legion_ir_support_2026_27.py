@@ -482,7 +482,7 @@ def _channelled_wrath_payload(*, rule_id: str, source_id: str) -> RuleIRPayload:
                         "improve the Armour Penetration characteristic",
                         (
                             _parameter("characteristic", "armor_penetration"),
-                            _parameter("delta", 1),
+                            _parameter("delta", -1),
                             _parameter("weapon_scope", "melee"),
                             _parameter("attack_role", "attacker"),
                             _parameter(

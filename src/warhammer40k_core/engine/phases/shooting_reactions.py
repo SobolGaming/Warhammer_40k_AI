@@ -7,6 +7,9 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.phases.shooting_imports import *
 from warhammer40k_core.engine.phases.shooting_model import *
 from warhammer40k_core.engine.phases.shooting_handler import *
+from warhammer40k_core.engine.selected_target_stratagem_reactions import (
+    request_after_unit_selected_as_target_stratagem_if_available,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -265,91 +268,14 @@ def _request_after_unit_selected_as_target_stratagem_if_available(
     stratagem_cost_modifier_registry: StratagemCostModifierRegistry,
     attack_sequence: AttackSequence,
 ) -> LifecycleStatus | None:
-    from warhammer40k_core.engine.stratagems import (
-        SELECTED_TARGET_UNIT_CONTEXT_KEY,
-        StratagemEligibilityContext,
-        create_stratagem_use_decision_request,
-        stratagem_decline_option,
-        stratagem_use_options_from_index,
-        stratagem_window_declined_for_context,
+    return request_after_unit_selected_as_target_stratagem_if_available(
+        state=state,
+        decisions=decisions,
+        stratagem_index=stratagem_index,
+        stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
+        attack_sequence=attack_sequence,
+        phase=BattlePhase.SHOOTING,
     )
-    from warhammer40k_core.engine.timing_windows import TimingTriggerKind
-
-    if type(attack_sequence) is not AttackSequence:
-        raise GameLifecycleError("Selected-as-target trigger requires an AttackSequence.")
-    target_unit_ids = _target_unit_ids_for_attack_sequence(attack_sequence)
-    if not target_unit_ids:
-        return None
-    attacking_player_id = attack_sequence.attacker_player_id
-    for reacting_player_id in sorted(
-        player_id for player_id in state.player_ids if player_id != attacking_player_id
-    ):
-        context = StratagemEligibilityContext.from_state(
-            state=state,
-            player_id=reacting_player_id,
-            trigger_kind=TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET,
-            timing_window_id=_selected_as_target_timing_window_id(
-                sequence_id=attack_sequence.sequence_id,
-                player_id=reacting_player_id,
-            ),
-            trigger_payload={
-                SELECTED_TARGET_UNIT_CONTEXT_KEY: list(target_unit_ids),
-                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
-                "attacking_player_id": attacking_player_id,
-                "attack_sequence_id": attack_sequence.sequence_id,
-            },
-        )
-        if stratagem_window_declined_for_context(decisions=decisions, context=context):
-            continue
-        if _stratagem_used_for_context(decisions=decisions, context=context):
-            continue
-        options = stratagem_use_options_from_index(
-            state=state,
-            index=stratagem_index,
-            context=context,
-            stratagem_cost_modifier_registry=stratagem_cost_modifier_registry,
-        )
-        if not options:
-            continue
-        request = create_stratagem_use_decision_request(
-            state=state,
-            context=context,
-            options=(*options, stratagem_decline_option()),
-        )
-        decisions.request_decision(request)
-        decisions.event_log.append(
-            "unit_selected_as_target_stratagem_window_opened",
-            validate_json_value(
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "active_player_id": state.active_player_id,
-                    "phase": BattlePhase.SHOOTING.value,
-                    "player_id": reacting_player_id,
-                    "attacking_player_id": attacking_player_id,
-                    "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
-                    "selected_target_unit_instance_ids": list(target_unit_ids),
-                    "attack_sequence_id": attack_sequence.sequence_id,
-                    "stratagem_context": context.to_payload(),
-                    "request_id": request.request_id,
-                    "phase_body_status": "unit_selected_as_target_stratagem_pending",
-                }
-            ),
-        )
-        return LifecycleStatus.waiting_for_decision(
-            stage=state.stage,
-            decision_request=request,
-            payload={
-                "phase": BattlePhase.SHOOTING.value,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "player_id": reacting_player_id,
-                "attacking_unit_instance_id": attack_sequence.attacking_unit_instance_id,
-                "phase_body_status": "unit_selected_as_target_stratagem_pending",
-                "pending_request_id": request.request_id,
-            },
-        )
-    return None
 
 
 def _resolve_completed_shooting_attack_sequence_continuation(

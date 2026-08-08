@@ -309,6 +309,87 @@ def test_ws14_generic_save_and_weapon_profile_hooks_execute_from_persisted_paylo
     assert modified_saves[0].characteristic_target_number == 3
 
 
+def test_ws14_incoming_ap_modifier_is_bounded_and_scoped_to_triggering_attacker() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
+    defender = _unit(catalog=catalog, army_id="army-b", unit_selection_id="defender-unit")
+    state = _state(
+        _army(catalog=catalog, player_id="player-a", army_id="army-a", unit=attacker),
+        _army(catalog=catalog, player_id="player-b", army_id="army-b", unit=defender),
+    )
+    profile = _weapon_profile(catalog, attacker.own_models[0].wargear_ids[0])
+    registry = RuntimeModifierRegistry.empty()
+    state.record_persisting_effect(
+        _generic_effect(
+            effect_id="ws14:incoming-ap",
+            owner_player_id="player-b",
+            target_unit_instance_ids=(defender.unit_instance_id,),
+            target_kind="selected_target",
+            effect_kind="modify_characteristic",
+            parameters={
+                "attack_role": "target",
+                "attacker_scope": "triggering_attacking_unit",
+                "characteristic": "armor_penetration",
+                "delta": 1,
+            },
+            trigger_payload={
+                "attacking_unit_instance_id": attacker.unit_instance_id,
+                "attack_sequence_id": "ws14:incoming-ap:sequence",
+            },
+        )
+    )
+    options = (
+        SaveOption(
+            save_kind=SaveKind.ARMOUR,
+            target_number=6,
+            characteristic_target_number=4,
+            armor_penetration=-2,
+        ),
+        SaveOption(
+            save_kind=SaveKind.INVULNERABLE,
+            target_number=5,
+            characteristic_target_number=5,
+            armor_penetration=-2,
+        ),
+    )
+    context = SaveOptionModifierContext(
+        state=state,
+        source_phase=BattlePhase.SHOOTING,
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        target_unit_instance_id=defender.unit_instance_id,
+        weapon_profile=profile,
+        save_options=options,
+    )
+
+    modified = registry.modified_save_options(context)
+    ap_zero = registry.modified_save_options(
+        replace(
+            context,
+            save_options=(replace(options[0], target_number=4, armor_penetration=0),),
+        )
+    )
+    wrong_attacker = registry.modified_save_options(
+        replace(
+            context,
+            attacking_unit_instance_id=defender.unit_instance_id,
+            attacker_model_instance_id=defender.own_models[0].model_instance_id,
+        )
+    )
+
+    assert tuple(option.armor_penetration for option in modified) == (-1, -1)
+    assert tuple(option.target_number for option in modified) == (5, 5)
+    assert all(
+        any(
+            source_id.startswith("source:ws14:incoming-ap:") for source_id in option.source_rule_ids
+        )
+        for option in modified
+    )
+    assert ap_zero[0].armor_penetration == 0
+    assert ap_zero[0].target_number == 4
+    assert wrong_attacker == options
+
+
 def test_ws14_generic_reroll_permission_uses_source_backed_attack_path() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     attacker = _unit(catalog=catalog, army_id="army-a", unit_selection_id="attacker-unit")
@@ -1217,6 +1298,7 @@ def _generic_effect(
     parameters: dict[str, JsonValue],
     conditions: tuple[dict[str, JsonValue], ...] = (),
     source_model_instance_id: str | None = None,
+    trigger_payload: dict[str, JsonValue] | None = None,
 ) -> PersistingEffect:
     parameter_payloads: list[dict[str, JsonValue]] = [
         {"key": key, "value": value} for key, value in sorted(parameters.items())
@@ -1260,6 +1342,7 @@ def _generic_effect(
                     "player_id": owner_player_id,
                     "phase": BattlePhase.SHOOTING.value,
                     "source_model_instance_id": source_model_instance_id,
+                    "trigger_payload": trigger_payload,
                 },
             }
         ),

@@ -4580,6 +4580,13 @@ target-scoped Hit-roll reroll effects, Codex Space Marines Detachment Wound-roll
 modifier gating, and Space Marine Chapters roster legality diagnostics for Black
 Templars, Space Wolves, and Deathwatch restrictions.
 
+The Space Marines and Imperial Agents Armour of Contempt rows execute through a
+shared incoming-attack characteristic-modifier RuleIR semantic. The semantic
+worsens Armour Penetration by 1, is bounded at AP 0, applies only to attacks from
+the triggering attacking unit, and expires when that attack sequence completes.
+The source-backed selected-as-target Stratagem window is shared by Shooting and
+Fight; runtime behavior does not branch on the Armour of Contempt display name.
+
 Invariants:
 
 - faction army rules execute through structured descriptors, generic IR, or
