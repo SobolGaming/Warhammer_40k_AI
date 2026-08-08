@@ -122,7 +122,7 @@ from warhammer40k_core.rules.triggered_action_parser import (
     compile_triggered_action_clause,
 )
 
-RULE_PARSER_VERSION = "phase17c-rule-parser-v3"
+RULE_PARSER_VERSION = "phase17c-rule-parser-v4"
 
 _PHASES = "command|movement|shooting|charge|fight"
 _ROLL_TYPES = (

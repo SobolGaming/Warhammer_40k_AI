@@ -359,7 +359,7 @@ def test_shadow_legion_channelled_wrath_grants_lance_and_khorne_melee_ap() -> No
     )
 
     assert WeaponKeyword.LANCE in modified.keywords
-    assert modified.armor_penetration.final == profile.armor_penetration.final + 1
+    assert modified.armor_penetration.final == profile.armor_penetration.final - 1
 
 
 def test_shadow_legion_encroaching_darkness_grants_ignores_cover_to_companion() -> None:

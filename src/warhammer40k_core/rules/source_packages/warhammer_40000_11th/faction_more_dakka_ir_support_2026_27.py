@@ -344,7 +344,7 @@ def _speshul_shells_payload(*, rule_id: str, source_id: str) -> RuleIRPayload:
                     "improve the Armour Penetration characteristic",
                     (
                         _parameter("characteristic", "armor_penetration"),
-                        _parameter("delta", 1),
+                        _parameter("delta", -1),
                         _parameter("weapon_scope", "ranged"),
                         _parameter("attack_role", "attacker"),
                         _parameter(

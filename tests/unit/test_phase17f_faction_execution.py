@@ -101,6 +101,12 @@ GENERIC_SOURCE_MODEL_CONTEXT_EXECUTION_IDS = frozenset(
         "phase17f:phase17e:enhancement:chaos-daemons:blood-legion:000009815005",
     }
 )
+GENERIC_SELECTED_TARGET_CONTEXT_EXECUTION_IDS = frozenset(
+    f"phase17f:phase17e:{source_row_id}"
+    for source_row_id in (
+        generic_ir_support_source.supported_incoming_ap_modifier_stratagem_source_row_ids()
+    )
+)
 LEAPING_SHADOWS_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:"
     "enhancement:leaping_shadows:scouts_9",
@@ -923,6 +929,8 @@ def test_phase17f_registry_dispatches_every_record_without_missing_handlers() ->
                     expected_reason = "missing_input:battlefield_state"
                 elif record.execution_id in GENERIC_SOURCE_MODEL_CONTEXT_EXECUTION_IDS:
                     expected_reason = "missing_input:source_model_instance_id"
+                elif record.execution_id in GENERIC_SELECTED_TARGET_CONTEXT_EXECUTION_IDS:
+                    expected_reason = "missing_selected_target_context"
                 else:
                     expected_reason = "missing_input:game_state"
                 assert result.reason == expected_reason

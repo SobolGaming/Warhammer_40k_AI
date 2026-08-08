@@ -4,7 +4,11 @@ from collections.abc import Mapping
 from dataclasses import replace
 from typing import cast
 
-from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.attributes import (
+    Characteristic,
+    CharacteristicBoundPolicy,
+    CharacteristicValue,
+)
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AttackProfile,
@@ -209,7 +213,10 @@ def _required_positive_weapon_ability_value(parameters: Mapping[str, object]) ->
 def _modified_characteristic_value(value: CharacteristicValue, delta: int) -> CharacteristicValue:
     if type(value) is not CharacteristicValue or not value.is_numeric:
         raise GameLifecycleError("RuleIR weapon modifier requires a numeric characteristic.")
-    return CharacteristicValue.from_raw(value.characteristic, value.final + delta)
+    bounded = CharacteristicBoundPolicy.for_characteristic(value.characteristic).apply(
+        value.final + delta
+    )
+    return CharacteristicValue.from_raw(value.characteristic, bounded)
 
 
 def _modified_attack_profile(profile: AttackProfile, delta: int) -> AttackProfile:

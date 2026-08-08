@@ -45,8 +45,16 @@ _INVULNERABLE_SAVE_RE = re.compile(
     re.IGNORECASE,
 )
 _IMPROVE_CHARACTERISTIC_LIST_RE = re.compile(
-    rf"\bimprove\s+(?:the\s+)?(?P<characteristics>(?:{_CHARACTERISTIC_NAMES})"
+    rf"\b(?P<verb>improve|worsen)\s+(?:the\s+)?(?P<characteristics>(?:{_CHARACTERISTIC_NAMES})"
     rf"(?:(?:\s*,\s*|\s+and\s+)(?:{_CHARACTERISTIC_NAMES}))+)\s+characteristics\s+"
+    r"of\s+that\s+attack\s+by\s+(?P<value>\d+)\b",
+    re.IGNORECASE,
+)
+_INCOMING_ATTACK_CHARACTERISTIC_RE = re.compile(
+    rf"\beach\s+time\s+an\s+attack\s+targets\s+"
+    r"(?:a\s+model\s+in\s+)?(?:this|that|your)\s+unit\s*,\s*"
+    rf"(?P<verb>improve|worsen)\s+(?:the\s+)?"
+    rf"(?P<characteristic>{_CHARACTERISTIC_NAMES})\s+characteristic\s+"
     r"of\s+that\s+attack\s+by\s+(?P<value>\d+)\b",
     re.IGNORECASE,
 )
@@ -156,12 +164,43 @@ def parse_characteristic_effects(clause_span: TextSpan) -> tuple[RuleEffectSpec,
                     parameters=parameters_from_pairs(
                         (
                             ("characteristic", characteristic.value),
-                            ("delta", value),
+                            (
+                                "delta",
+                                _directional_characteristic_delta(
+                                    characteristic=characteristic,
+                                    verb=_lower_group(match, "verb"),
+                                    value=value,
+                                ),
+                            ),
                             ("attack_role", "attacker"),
                         )
                     ),
                 )
             )
+    for match in _INCOMING_ATTACK_CHARACTERISTIC_RE.finditer(clause_span.text):
+        characteristic = _characteristic_from_label(match.group("characteristic"))
+        value = int(match.group("value"))
+        effects.append(
+            RuleEffectSpec(
+                kind=_characteristic_effect_kind(characteristic),
+                source_span=_span_from_match(clause_span, match),
+                parameters=parameters_from_pairs(
+                    (
+                        ("characteristic", characteristic.value),
+                        (
+                            "delta",
+                            _directional_characteristic_delta(
+                                characteristic=characteristic,
+                                verb=_lower_group(match, "verb"),
+                                value=value,
+                            ),
+                        ),
+                        ("attack_role", "target"),
+                        ("attacker_scope", "triggering_attacking_unit"),
+                    )
+                ),
+            )
+        )
     for match in _ADDITIONAL_MOVE_RE.finditer(clause_span.text):
         effects.append(
             RuleEffectSpec(
@@ -177,6 +216,25 @@ def _characteristic_effect_kind(characteristic: Characteristic) -> RuleEffectKin
     if characteristic is Characteristic.MOVEMENT:
         return RuleEffectKind.MODIFY_MOVE_DISTANCE
     return RuleEffectKind.MODIFY_CHARACTERISTIC
+
+
+def _directional_characteristic_delta(
+    *, characteristic: Characteristic, verb: str, value: int
+) -> int:
+    if verb not in {"improve", "worsen"}:
+        raise RuleIRError("Directional characteristic modifier has unsupported verb.")
+    if value < 1:
+        raise RuleIRError("Directional characteristic modifier must be positive.")
+    lower_is_better = characteristic in {
+        Characteristic.ARMOR_PENETRATION,
+        Characteristic.BALLISTIC_SKILL,
+        Characteristic.INVULNERABLE_SAVE,
+        Characteristic.LEADERSHIP,
+        Characteristic.SAVE,
+        Characteristic.WEAPON_SKILL,
+    }
+    improves = verb == "improve"
+    return -value if improves == lower_is_better else value
 
 
 def _characteristics_from_list(value: str) -> tuple[Characteristic, ...]:

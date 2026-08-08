@@ -609,6 +609,31 @@ class ReplayRunner:
             self.artifact.decision_records,
             start=1,
         ):
+            expected_record_count = initial_record_count + decision_record_index
+            reproduced_record_diagnostic = _already_reproduced_record_diagnostic(
+                lifecycle=lifecycle,
+                expected_record=expected_record,
+                decision_record_index=decision_record_index,
+                expected_record_count=expected_record_count,
+            )
+            if reproduced_record_diagnostic is not None:
+                return self._drifted_result(
+                    lifecycle=lifecycle,
+                    reproduced_decision_count=decision_record_index - 1,
+                    diagnostics=(reproduced_record_diagnostic,),
+                )
+            if len(lifecycle.decision_controller.records) >= expected_record_count:
+                checkpoint_diagnostic = self._checkpoint_diagnostic(
+                    lifecycle=lifecycle,
+                    decision_record_index=decision_record_index,
+                )
+                if checkpoint_diagnostic is not None:
+                    return self._drifted_result(
+                        lifecycle=lifecycle,
+                        reproduced_decision_count=decision_record_index,
+                        diagnostics=(checkpoint_diagnostic,),
+                    )
+                continue
             request_diagnostic = _request_drift_diagnostic(
                 lifecycle=lifecycle,
                 expected_record=expected_record,
@@ -624,7 +649,7 @@ class ReplayRunner:
                 lifecycle=lifecycle,
                 expected_record=expected_record,
                 decision_record_index=decision_record_index,
-                expected_record_count=initial_record_count + decision_record_index,
+                expected_record_count=expected_record_count,
             )
             if submission_diagnostic is not None:
                 return self._drifted_result(
@@ -643,6 +668,21 @@ class ReplayRunner:
                     diagnostics=(checkpoint_diagnostic,),
                 )
 
+        expected_final_record_count = initial_record_count + len(self.artifact.decision_records)
+        actual_final_record_count = len(lifecycle.decision_controller.records)
+        if actual_final_record_count != expected_final_record_count:
+            diagnostic = ReplayDriftDiagnostic(
+                diagnostic_code=ReplayDiagnosticCode.SUBMISSION_RECORD_DRIFT,
+                message="Replay produced unexpected automatic decision records.",
+                decision_record_index=len(self.artifact.decision_records),
+                expected={"record_count": expected_final_record_count},
+                actual={"record_count": actual_final_record_count},
+            )
+            return self._drifted_result(
+                lifecycle=lifecycle,
+                reproduced_decision_count=len(self.artifact.decision_records),
+                diagnostics=(diagnostic,),
+            )
         expected_tail = [record.to_payload() for record in self.artifact.event_records]
         actual_tail = [
             record.to_payload()
@@ -716,16 +756,16 @@ class ReplayRunner:
                 actual=status_payload(status),
             )
         records = lifecycle.decision_controller.records
-        if len(records) != expected_record_count:
+        if len(records) < expected_record_count:
             return ReplayDriftDiagnostic(
                 diagnostic_code=ReplayDiagnosticCode.SUBMISSION_RECORD_DRIFT,
-                message="Replay decision did not produce the expected record count.",
+                message="Replay decision did not produce its expected record.",
                 decision_record_index=decision_record_index,
                 record_id=expected_record.record_id,
                 expected={"record_count": expected_record_count},
                 actual={"record_count": len(records)},
             )
-        actual_record = records[-1]
+        actual_record = records[expected_record_count - 1]
         if actual_record.to_payload() != expected_record.to_payload():
             return ReplayDriftDiagnostic(
                 diagnostic_code=ReplayDiagnosticCode.SUBMISSION_RECORD_DRIFT,
@@ -919,6 +959,29 @@ def status_payload(status: LifecycleStatus) -> JsonValue:
     )
     payload["payload"] = validate_json_value(status.payload)
     return payload
+
+
+def _already_reproduced_record_diagnostic(
+    *,
+    lifecycle: GameLifecycle,
+    expected_record: DecisionRecord,
+    decision_record_index: int,
+    expected_record_count: int,
+) -> ReplayDriftDiagnostic | None:
+    records = lifecycle.decision_controller.records
+    if len(records) < expected_record_count:
+        return None
+    actual_record = records[expected_record_count - 1]
+    if actual_record.to_payload() == expected_record.to_payload():
+        return None
+    return ReplayDriftDiagnostic(
+        diagnostic_code=ReplayDiagnosticCode.SUBMISSION_RECORD_DRIFT,
+        message="Automatically reproduced replay decision record drifted.",
+        decision_record_index=decision_record_index,
+        record_id=expected_record.record_id,
+        expected=_json_payload(expected_record.to_payload()),
+        actual=_json_payload(actual_record.to_payload()),
+    )
 
 
 def _request_drift_diagnostic(

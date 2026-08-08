@@ -25,6 +25,33 @@ def generic_rule_parameters_from_effect_payload(
     return generic_rule_parameters_from_payload_object(effect_payload, object_label="effect")
 
 
+def generic_rule_triggering_attacker_applies(
+    *,
+    parameters: dict[str, JsonValue],
+    effect_payload: JsonValue,
+    attacking_unit_instance_id: str,
+) -> bool:
+    attacker_scope = parameters.get("attacker_scope")
+    if attacker_scope is None:
+        return True
+    if attacker_scope != "triggering_attacking_unit":
+        raise GameLifecycleError("Generic RuleIR attacker_scope is unsupported.")
+    if not isinstance(effect_payload, dict):
+        raise GameLifecycleError("Generic RuleIR scoped effect payload must be an object.")
+    context_payload = effect_payload.get("context")
+    if not isinstance(context_payload, dict):
+        raise GameLifecycleError("Generic RuleIR scoped effect requires execution context.")
+    trigger_payload = context_payload.get("trigger_payload")
+    if not isinstance(trigger_payload, dict):
+        raise GameLifecycleError("Generic RuleIR scoped effect requires trigger payload.")
+    triggering_attacker_id = trigger_payload.get("attacking_unit_instance_id")
+    if type(triggering_attacker_id) is not str or not triggering_attacker_id.strip():
+        raise GameLifecycleError(
+            "Generic RuleIR scoped effect requires attacking_unit_instance_id."
+        )
+    return triggering_attacker_id == attacking_unit_instance_id
+
+
 def generic_rule_parameters_from_payload_object(
     payload: dict[str, JsonValue],
     *,

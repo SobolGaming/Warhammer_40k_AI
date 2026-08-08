@@ -25,10 +25,22 @@ _UNTIL_RE = re.compile(
     r"(?P<endpoint>phase|turn|battle round|battle)\b",
     re.IGNORECASE,
 )
+_UNTIL_ATTACKING_UNIT_FINISHES_ATTACKS_RE = re.compile(
+    r"\buntil\s+the\s+attacking\s+unit\s+has\s+finished\s+making\s+its\s+attacks\b",
+    re.IGNORECASE,
+)
 _AURA_RE = re.compile(r"(?:\bAura\b|^\s*Aura\s*:)", re.IGNORECASE)
 
 
 def parse_rule_duration(*, text: str, span: TextSpan) -> RuleDuration | None:
+    attack_sequence_match = _UNTIL_ATTACKING_UNIT_FINISHES_ATTACKS_RE.search(text)
+    if attack_sequence_match is not None:
+        return RuleDuration(
+            kind=RuleDurationKind.UNTIL_TIMING_ENDPOINT,
+            source_span=_span_from_match(span=span, match=attack_sequence_match),
+            parameters=parameters_from_pairs((("endpoint", "attacking_unit_attacks"),)),
+        )
+
     next_phase_match = _UNTIL_NEXT_PHASE_RE.search(text)
     if next_phase_match is not None:
         boundary = next_phase_match.group("boundary")

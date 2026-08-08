@@ -446,6 +446,53 @@ def save_options_for_model(
     return tuple(options)
 
 
+def save_option_with_armor_penetration_modifier(
+    option: SaveOption,
+    *,
+    delta: int,
+    source_rule_id: str,
+) -> SaveOption:
+    if type(option) is not SaveOption:
+        raise GameLifecycleError("AP modifier requires a SaveOption.")
+    if type(delta) is not int:
+        raise GameLifecycleError("AP modifier delta must be an integer.")
+    source_id = _validate_identifier("source_rule_id", source_rule_id)
+    armor_penetration = min(0, option.armor_penetration + delta)
+    source_rule_ids = (
+        option.source_rule_ids
+        if source_id in option.source_rule_ids
+        else (*option.source_rule_ids, source_id)
+    )
+    if option.save_kind is SaveKind.INVULNERABLE:
+        return SaveOption(
+            save_kind=option.save_kind,
+            target_number=option.target_number,
+            characteristic_target_number=option.characteristic_target_number,
+            armor_penetration=armor_penetration,
+            cover_applied=False,
+            cover_result=option.cover_result,
+            source_rule_ids=source_rule_ids,
+        )
+    cover_applied = _cover_applies_to_armour_save(
+        armor_save=option.characteristic_target_number,
+        armor_penetration=armor_penetration,
+        cover_result=option.cover_result,
+    )
+    return SaveOption(
+        save_kind=option.save_kind,
+        target_number=_armour_save_target_number(
+            armor_save=option.characteristic_target_number,
+            armor_penetration=armor_penetration,
+            cover_result=option.cover_result,
+        ),
+        characteristic_target_number=option.characteristic_target_number,
+        armor_penetration=armor_penetration,
+        cover_applied=cover_applied,
+        cover_result=option.cover_result,
+        source_rule_ids=source_rule_ids,
+    )
+
+
 def mandatory_save_option(options: tuple[SaveOption, ...]) -> SaveOption | None:
     selectable = _selectable_save_options(options)
     invulnerable_options = tuple(

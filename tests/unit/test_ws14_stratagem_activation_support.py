@@ -6,11 +6,18 @@ from typing import cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.weapon_profiles import WeaponProfile
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.engine.attack_sequence import AttackSequence
+from warhammer40k_core.engine.attack_sequence_completion_hooks import (
+    AttackSequenceCompletedContext,
+    AttackSequenceCompletedHookRegistry,
+)
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.effects import EffectExpirationBoundary
+from warhammer40k_core.engine.dice import DiceRollManager
+from warhammer40k_core.engine.effects import EffectExpirationBoundary, PersistingEffect
 from warhammer40k_core.engine.faction_content.stratagem_activation import (
     source_backed_detachment_stratagem_activation_records,
     source_backed_stratagem_activation_source_package_id,
@@ -21,6 +28,7 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.phase import (
+    BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatusKind,
@@ -32,7 +40,17 @@ from warhammer40k_core.engine.rule_execution import (
     default_rule_execution_registry,
     execute_rule_ir,
 )
+from warhammer40k_core.engine.runtime_modifiers import (
+    RuntimeModifierRegistry,
+    SaveOptionModifierContext,
+)
+from warhammer40k_core.engine.saves import SaveKind, SaveOption
 from warhammer40k_core.engine.selected_target_context import SELECTED_TARGET_UNIT_CONTEXT_KEY
+from warhammer40k_core.engine.selected_target_stratagem_reactions import (
+    request_after_unit_selected_as_target_stratagem_if_available,
+)
+from warhammer40k_core.engine.shooting_types import ShootingType
+from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierRegistry
 from warhammer40k_core.engine.stratagems import (
     HIT_ENEMY_UNIT_CONTEXT_KEY,
     HIT_ENEMY_UNIT_EFFECT_SELECTION_KIND,
@@ -49,6 +67,7 @@ from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
     WargearSelection,
 )
+from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
 from warhammer40k_core.rules.rule_ir import RuleIR, RuleIRPayload, parameter_payload
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_court_of_the_phoenician_ir_support_2026_27 as court_ir,
@@ -131,8 +150,8 @@ def test_ws14_generated_stratagem_rule_ir_freezes_supported_effect_durations() -
         )
     ]
 
-    assert len(effect_profiles) == 176
-    assert len(duration_profiles) == 172
+    assert len(effect_profiles) == 209
+    assert len(duration_profiles) == 201
 
     payload = effect_profiles[0].rule_ir_payload()
     payload["rule_id"] = "tampered"
@@ -415,6 +434,157 @@ def test_ws14_selected_target_activation_rule_ir_executes_from_structured_contex
     assert result.target_bindings[0]["target_unit_instance_ids"] == [target_unit_id]
 
 
+def test_ws14_armour_of_contempt_fight_window_applies_and_expires_with_attack_sequence() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    attacker = _unit(
+        catalog=catalog,
+        army_id="army-alpha",
+        unit_selection_id="armour-of-contempt-attacker",
+    )
+    defender = replace(
+        _unit(
+            catalog=catalog,
+            army_id="army-beta",
+            unit_selection_id="armour-of-contempt-defender",
+        ),
+        faction_keywords=("ADEPTUS ASTARTES",),
+    )
+    state = _state(
+        _army(
+            catalog=catalog,
+            player_id="player-a",
+            army_id="army-alpha",
+            unit=attacker,
+        ),
+        _army(
+            catalog=catalog,
+            player_id="player-b",
+            army_id="army-beta",
+            unit=defender,
+            faction_id="space-marines",
+            detachment_id="gladius-task-force",
+        ),
+        active_player_id="player-a",
+    )
+    _set_battle_phase(state, BattlePhaseKind.FIGHT)
+    state.gain_command_points(
+        player_id="player-b",
+        amount=1,
+        source_id="ws14-armour-of-contempt-cp",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+    profile = _weapon_profile(catalog, attacker.own_models[0].wargear_ids[0])
+    attack_sequence = AttackSequence(
+        sequence_id="ws14-armour-of-contempt-sequence",
+        source_phase=BattlePhase.FIGHT,
+        attacker_player_id="player-a",
+        attacking_unit_instance_id=attacker.unit_instance_id,
+        attack_pools=(
+            RangedAttackPool(
+                attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+                wargear_id=attacker.own_models[0].wargear_ids[0],
+                weapon_profile_id=profile.profile_id,
+                weapon_profile=profile,
+                target_unit_instance_id=defender.unit_instance_id,
+                shooting_type=ShootingType.NORMAL,
+                attacks=1,
+                target_visible_model_ids=(defender.own_models[0].model_instance_id,),
+                target_in_range_model_ids=(defender.own_models[0].model_instance_id,),
+            ),
+        ),
+    )
+    decisions = DecisionController()
+    index = StratagemCatalogIndex.from_records(
+        source_backed_detachment_stratagem_activation_records()
+    )
+
+    status = request_after_unit_selected_as_target_stratagem_if_available(
+        state=state,
+        decisions=decisions,
+        stratagem_index=index,
+        stratagem_cost_modifier_registry=StratagemCostModifierRegistry.empty(),
+        attack_sequence=attack_sequence,
+        phase=BattlePhase.FIGHT,
+    )
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = status.decision_request
+    assert request is not None
+    option = next(
+        option
+        for option in request.options
+        if _option_stratagem_id(option.payload) == "000008352002"
+        and _option_target_unit_id(option.payload) == defender.unit_instance_id
+    )
+    result = DecisionResult.for_request(
+        result_id="ws14-armour-of-contempt-result",
+        request=request,
+        selected_option_id=option.option_id,
+    )
+    decisions.submit_result(result)
+    apply_stratagem_decision(
+        state=state,
+        result=result,
+        decisions=decisions,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=catalog,
+    )
+
+    effects = state.persisting_effects_for_unit(defender.unit_instance_id)
+    assert state.command_point_total("player-b") == 0
+    assert len(effects) == 1
+    assert PersistingEffect.from_payload(effects[0].to_payload()) == effects[0]
+    modified_options = RuntimeModifierRegistry.empty().modified_save_options(
+        SaveOptionModifierContext(
+            state=state,
+            source_phase=BattlePhase.FIGHT,
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+            target_unit_instance_id=defender.unit_instance_id,
+            weapon_profile=profile,
+            save_options=(
+                SaveOption(
+                    save_kind=SaveKind.ARMOUR,
+                    target_number=6,
+                    characteristic_target_number=4,
+                    armor_penetration=-2,
+                ),
+            ),
+        )
+    )
+    assert modified_options[0].armor_penetration == -1
+    assert modified_options[0].target_number == 5
+
+    completed_event = decisions.event_log.append(
+        "attack_sequence_completed",
+        {"sequence_id": attack_sequence.sequence_id},
+    )
+    assert (
+        AttackSequenceCompletedHookRegistry.empty().resolve_completed_sequence(
+            AttackSequenceCompletedContext(
+                state=state,
+                decisions=decisions,
+                dice_manager=DiceRollManager(state.game_id, event_log=decisions.event_log),
+                runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+                source_phase=BattlePhase.FIGHT,
+                attack_sequence=attack_sequence,
+                attack_sequence_completed_event_id=completed_event.event_id,
+            )
+        )
+        is None
+    )
+    assert state.persisting_effects_for_unit(defender.unit_instance_id) == ()
+    expiration_events = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "generic_rule_attack_sequence_effects_expired"
+    )
+    assert len(expiration_events) == 1
+    expiration_payload = cast(Mapping[str, object], expiration_events[0].payload)
+    assert expiration_payload["attack_sequence_id"] == attack_sequence.sequence_id
+
+
 def test_ws14_source_backed_stratagem_effect_duration_persists_and_expires() -> None:
     profile = next(
         profile
@@ -573,6 +743,13 @@ def _set_battle_phase(state: GameState, phase: BattlePhaseKind) -> None:
     state.battle_phase_index = state.battle_phase_sequence.index(phase)
 
 
+def _weapon_profile(catalog: ArmyCatalog, wargear_id: str) -> WeaponProfile:
+    for wargear in catalog.wargear:
+        if wargear.wargear_id == wargear_id:
+            return wargear.weapon_profiles[0]
+    raise AssertionError(f"Unknown wargear id: {wargear_id}")
+
+
 def _payload_mapping(payload: object, label: str) -> Mapping[str, object]:
     if not isinstance(payload, dict):
         raise GameLifecycleError(f"{label} must be an object.")
@@ -581,6 +758,8 @@ def _payload_mapping(payload: object, label: str) -> Mapping[str, object]:
 
 def _option_stratagem_id(payload: object) -> str | None:
     payload_mapping = _payload_mapping(payload, "Stratagem option payload")
+    if payload_mapping.get("catalog_record") is None:
+        return None
     catalog_record = _payload_mapping(
         payload_mapping.get("catalog_record"),
         "Stratagem option catalog_record",

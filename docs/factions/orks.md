@@ -10,7 +10,7 @@ Current source package: `gw-11e-orks-faction-pack-2026-07`
 
 | Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows |
 | ---: | ---: | ---: | ---: | ---: |
-| 12 | 1 | 44 | 66 | 13 |
+| 12 | 1 | 44 | 66 | 14 |
 
 ## July 22, 2026 Source Status
 
@@ -140,7 +140,7 @@ This section is generated from the repository-wide semantic audit. It is separat
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 216 | 34 | 21 |
+| 216 | 35 | 21 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |
@@ -252,7 +252,7 @@ These rows expose the underlying Phase17E source coverage and handler IDs. `gene
 | Bully Boyz | ARMED TO DATEEF | `000008886002` | Either player's turn; Shooting or Fight phase | Bully Boyz - Battle Tactic Stratagem | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:orks:bully-boyz:stratagem:000008886002` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:bully-boyz`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008886002`, `gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:orks:bully-boyz:000008886002`, `gw-11e-phase17e-faction-coverage-2026-07:source-pdf:orks` |
 | Bully Boyz | CRUSHING IMPACT | `000008886005` | Your turn; Charge phase | Bully Boyz - Epic Deed Stratagem | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:orks:bully-boyz:stratagem:000008886005` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:bully-boyz`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008886005`, `gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:orks:bully-boyz:000008886005`, `gw-11e-phase17e-faction-coverage-2026-07:source-pdf:orks` |
 | Bully Boyz | CUT'EM DOWN | `000008886006` | Opponent's turn; Movement phase | Bully Boyz - Battle Tactic Stratagem | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:orks:bully-boyz:stratagem:000008886006` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:bully-boyz`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008886006`, `gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:orks:bully-boyz:000008886006`, `gw-11e-phase17e-faction-coverage-2026-07:source-pdf:orks` |
-| Bully Boyz | HULKING BRUTES | `000008886007` | Opponent's turn; Shooting phase | Bully Boyz - Battle Tactic Stratagem | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:orks:bully-boyz:stratagem:000008886007` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:bully-boyz`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008886007`, `gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:orks:bully-boyz:000008886007`, `gw-11e-phase17e-faction-coverage-2026-07:source-pdf:orks` |
+| Bully Boyz | HULKING BRUTES | `000008886007` | Opponent's turn; Shooting phase | Bully Boyz - Battle Tactic Stratagem | `generic_supported` / `source_only` | `executable_generic_ir` |  | None | `gw-11e-faction-detachments-2026-27:detachment:orks:bully-boyz`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008886007`, `gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:orks:bully-boyz:000008886007`, `gw-11e-phase17e-faction-coverage-2026-07:source-pdf:orks` |
 | Bully Boyz | TOO ARROGANT TO DIE | `000008886003` | Either player's turn; Shooting or Fight phase | Bully Boyz - Strategic Ploy Stratagem | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:orks:bully-boyz:stratagem:000008886003` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:bully-boyz`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008886003`, `gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:orks:bully-boyz:000008886003`, `gw-11e-phase17e-faction-coverage-2026-07:source-pdf:orks` |
 | Da Big Hunt | DAT ONE'S EVEN BIGGA! | `000008869004` | Your turn; Charge phase | Da Big Hunt - Strategic Ploy Stratagem | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:orks:da-big-hunt:stratagem:000008869004` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:da-big-hunt`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008869004`, `gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:orks:da-big-hunt:000008869004`, `gw-11e-phase17e-faction-coverage-2026-07:source-pdf:orks` |
 | Da Big Hunt | DRAG IT DOWN | `000008869002` | Either player's turn; Fight phase | Da Big Hunt - Battle Tactic Stratagem | `named_handler_required` / `source_only` | `blocked_structured_semantics_required` | `phase17e:orks:da-big-hunt:stratagem:000008869002` | None | `gw-11e-faction-detachments-2026-27:detachment:orks:da-big-hunt`, `gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Stratagems:000008869002`, `gw-11e-phase17e-exact-faction-subrules-2026-27:stratagem:orks:da-big-hunt:000008869002`, `gw-11e-phase17e-faction-coverage-2026-07:source-pdf:orks` |

@@ -816,8 +816,8 @@ def _selected_target_context_error(
 ) -> str | None:
     if context.trigger_kind is not TimingTriggerKind.AFTER_UNIT_SELECTED_AS_TARGET:
         return "selected_target_requires_target_selection_trigger"
-    if context.phase is not BattlePhase.SHOOTING:
-        return "selected_target_requires_shooting_phase"
+    if context.phase not in {BattlePhase.SHOOTING, BattlePhase.FIGHT}:
+        return "selected_target_requires_attack_phase"
     selected_unit_ids = _selected_target_unit_ids_or_none(context)
     if selected_unit_ids is None:
         return "missing_selected_target_context"

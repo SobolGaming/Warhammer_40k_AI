@@ -502,7 +502,7 @@ def test_ws14_more_dakka_stratagem_ir_effects_drive_runtime_hooks() -> None:
             attacker_model_id=_first_model_id(shells_state, unit_instance_id="army-alpha:boyz-1"),
         )
     )
-    assert shells_profile.armor_penetration.final == 1
+    assert shells_profile.armor_penetration.final == -1
 
 
 @pytest.mark.integration
@@ -915,7 +915,7 @@ def test_ws14_court_of_the_phoenician_rule_and_enhancements_bind_to_runtime_hook
     )
     assert post_charge_profile.strength.final == sensational_base.strength.final + 1
     assert post_charge_profile.armor_penetration.final == (
-        sensational_base.armor_penetration.final + 1
+        sensational_base.armor_penetration.final - 1
     )
     assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
 
@@ -1168,7 +1168,7 @@ def test_ws14_court_of_the_phoenician_stratagems_execute_through_lifecycle() -> 
         )
     )
     assert close_profile.strength.final == close_base.strength.final + 1
-    assert close_profile.armor_penetration.final == close_base.armor_penetration.final + 1
+    assert close_profile.armor_penetration.final == close_base.armor_penetration.final - 1
     assert GameLifecycle.from_payload(close_lifecycle.to_payload()).to_payload() == (
         close_lifecycle.to_payload()
     )

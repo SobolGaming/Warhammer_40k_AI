@@ -1,8 +1,8 @@
 {
   "detachment_status_counts": {
     "implemented": 8,
-    "partial": 18,
-    "placeholder": 240
+    "partial": 46,
+    "placeholder": 212
   },
   "faction_status_counts": {
     "implemented": 0,
@@ -13,8 +13,8 @@
     {
       "detachment_status_counts": {
         "implemented": 1,
-        "partial": 1,
-        "placeholder": 10
+        "partial": 2,
+        "placeholder": 9
       },
       "detachments": [
         {
@@ -126,7 +126,7 @@
           "detachment_name": "Bully Boyz",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.orks.detachments.bully_boyz.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:orks:bully-boyz",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008885002",
@@ -1094,8 +1094,8 @@
     {
       "detachment_status_counts": {
         "implemented": 0,
-        "partial": 1,
-        "placeholder": 9
+        "partial": 2,
+        "placeholder": 8
       },
       "detachments": [
         {
@@ -1280,7 +1280,7 @@
           "detachment_name": "Synaptic Nexus",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.tyranids.detachments.synaptic_nexus.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:tyranids:synaptic-nexus",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008421002",
@@ -1929,8 +1929,8 @@
     {
       "detachment_status_counts": {
         "implemented": 0,
-        "partial": 1,
-        "placeholder": 9
+        "partial": 2,
+        "placeholder": 8
       },
       "detachments": [
         {
@@ -2126,7 +2126,7 @@
           "detachment_name": "Needgaard Oathband",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.leagues_of_votann.detachments.needgaard_oathband.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:leagues-of-votann:needgaard-oathband",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010435002",
@@ -2372,8 +2372,8 @@
     {
       "detachment_status_counts": {
         "implemented": 0,
-        "partial": 1,
-        "placeholder": 21
+        "partial": 15,
+        "placeholder": 7
       },
       "detachments": [
         {
@@ -2392,7 +2392,7 @@
           "detachment_name": "Librarius Conclave",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.librarius_conclave.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:librarius-conclave",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009785002",
@@ -2434,7 +2434,7 @@
           "detachment_name": "1st Company Task Force",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.content_1st_company_task_force.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:1st-company-task-force",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008494002",
@@ -2465,7 +2465,7 @@
           "detachment_name": "Anvil Siege Force",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.anvil_siege_force.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:anvil-siege-force",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008474002",
@@ -2496,7 +2496,7 @@
           "detachment_name": "Armoured Speartip",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.armoured_speartip.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:armoured-speartip",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010779002",
@@ -2556,7 +2556,7 @@
           "detachment_name": "Blade of Ultramar",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.blade_of_ultramar.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:blade-of-ultramar",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010633002",
@@ -2629,7 +2629,7 @@
           "detachment_name": "Firestorm Assault Force",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.firestorm_assault_force.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:firestorm-assault-force",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008482002",
@@ -2671,7 +2671,7 @@
           "detachment_name": "Gladius Task Force",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.gladius_task_force.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:gladius-task-force",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008353002",
@@ -2702,7 +2702,7 @@
           "detachment_name": "Hammer of Avernii",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.hammer_of_avernii.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:hammer-of-avernii",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010623002",
@@ -2733,7 +2733,7 @@
           "detachment_name": "Headhunter Task Force",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.headhunter_task_force.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:headhunter-task-force",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010783002",
@@ -2764,7 +2764,7 @@
           "detachment_name": "Ironstorm Spearhead",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.ironstorm_spearhead.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:ironstorm-spearhead",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008478002",
@@ -2857,7 +2857,7 @@
           "detachment_name": "Shadowmark Talon",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.shadowmark_talon.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:shadowmark-talon",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010466002",
@@ -2888,7 +2888,7 @@
           "detachment_name": "Spearpoint Task Force",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.spearpoint_task_force.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:spearpoint-task-force",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010629002",
@@ -2919,7 +2919,7 @@
           "detachment_name": "Stormlance Task Force",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.stormlance_task_force.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:stormlance-task-force",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008486002",
@@ -2950,7 +2950,7 @@
           "detachment_name": "Vanguard Spearhead",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.space_marines.detachments.vanguard_spearhead.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:space-marines:vanguard-spearhead",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008490002",
@@ -3647,8 +3647,8 @@
     {
       "detachment_status_counts": {
         "implemented": 0,
-        "partial": 2,
-        "placeholder": 15
+        "partial": 4,
+        "placeholder": 13
       },
       "detachments": [
         {
@@ -3968,7 +3968,7 @@
           "detachment_name": "Renegade Raiders",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines.detachments.renegade_raiders.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:chaos-space-marines:renegade-raiders",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008968002",
@@ -4061,7 +4061,7 @@
           "detachment_name": "Veterans of the Long War",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines.detachments.veterans_of_the_long_war.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:chaos-space-marines:veterans-of-the-long-war",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000008960002",
@@ -4358,8 +4358,8 @@
     {
       "detachment_status_counts": {
         "implemented": 2,
-        "partial": 1,
-        "placeholder": 7
+        "partial": 2,
+        "placeholder": 6
       },
       "detachments": [
         {
@@ -4441,7 +4441,7 @@
           "detachment_name": "Coterie of the Conceited",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children.detachments.coterie_of_the_conceited.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:emperors-children:coterie-of-the-conceited",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010014002",
@@ -4836,8 +4836,8 @@
     {
       "detachment_status_counts": {
         "implemented": 0,
-        "partial": 0,
-        "placeholder": 9
+        "partial": 1,
+        "placeholder": 8
       },
       "detachments": [
         {
@@ -5002,7 +5002,7 @@
           "detachment_name": "Warpforged Cabal",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.thousand_sons.detachments.warpforged_cabal.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:thousand-sons:warpforged-cabal",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010209002",
@@ -5073,8 +5073,8 @@
     {
       "detachment_status_counts": {
         "implemented": 0,
-        "partial": 0,
-        "placeholder": 8
+        "partial": 2,
+        "placeholder": 6
       },
       "detachments": [
         {
@@ -5135,7 +5135,7 @@
           "detachment_name": "Helhunt Lance",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_knights.detachments.helhunt_lance.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:chaos-knights:helhunt-lance",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010751002",
@@ -5197,7 +5197,7 @@
           "detachment_name": "Infernal Lance",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_knights.detachments.infernal_lance.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:chaos-knights:infernal-lance",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010304002",
@@ -5578,8 +5578,8 @@
     {
       "detachment_status_counts": {
         "implemented": 0,
-        "partial": 1,
-        "placeholder": 10
+        "partial": 2,
+        "placeholder": 9
       },
       "detachments": [
         {
@@ -5702,7 +5702,7 @@
           "detachment_name": "Grizzled Company",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.astra_militarum.detachments.grizzled_company.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:astra-militarum:grizzled-company",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010637002",
@@ -5897,8 +5897,8 @@
     {
       "detachment_status_counts": {
         "implemented": 0,
-        "partial": 0,
-        "placeholder": 8
+        "partial": 1,
+        "placeholder": 7
       },
       "detachments": [
         {
@@ -5970,7 +5970,7 @@
           "detachment_name": "Bringers of Flame",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.adepta_sororitas.detachments.bringers_of_flame.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:adepta-sororitas:bringers-of-flame",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009033002",
@@ -6371,8 +6371,8 @@
     {
       "detachment_status_counts": {
         "implemented": 0,
-        "partial": 1,
-        "placeholder": 7
+        "partial": 2,
+        "placeholder": 6
       },
       "detachments": [
         {
@@ -6526,7 +6526,7 @@
           "detachment_name": "Spearhead-at-arms",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.imperial_knights.detachments.spearhead_at_arms.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:imperial-knights:spearhead-at-arms",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000010506002",
@@ -6834,8 +6834,8 @@
     {
       "detachment_status_counts": {
         "implemented": 0,
-        "partial": 0,
-        "placeholder": 5
+        "partial": 2,
+        "placeholder": 3
       },
       "detachments": [
         {
@@ -6905,7 +6905,7 @@
           "detachment_name": "Ordo Malleus, Daemon Hunters",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.imperial_agents.detachments.ordo_malleus_daemon_hunters.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:imperial-agents:ordo-malleus-daemon-hunters",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009134002",
@@ -6936,7 +6936,7 @@
           "detachment_name": "Ordo Xenos, Alien Hunters",
           "execution_record_count": 11,
           "module_path": "warhammer40k_core.engine.faction_content.warhammer_40000_11th.imperial_agents.detachments.ordo_xenos_alien_hunters.manifest",
-          "semantic_status": "placeholder",
+          "semantic_status": "partial",
           "source_ids": [
             "gw-11e-faction-detachments-2026-27:detachment:imperial-agents:ordo-xenos-alien-hunters",
             "gw-11e-phase17e-exact-faction-subrules-2026-27:bridge-source-row:Enhancements:000009126002",
@@ -7006,6 +7006,6 @@
     }
   ],
   "schema_version": "runtime-content-semantic-coverage-v1",
-  "source_package_hash": "e370a2a9ddad269a152875feddb7345b1f12abb3775ef2906b9ea3ca9c492339",
+  "source_package_hash": "254db5f9bcae04892ef7bf51fa82f82f1207bc8b0d9b43ad976f902079607780",
   "source_package_id": "gw-11e-phase17f-faction-execution-2026-07"
 }
