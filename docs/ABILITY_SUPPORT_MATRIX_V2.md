@@ -451,19 +451,20 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:doom:wound-roll` | Harbingers of Dread - Doom |
 | `warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread:leadership` | Harbingers of Dread - Deathly Terror and Despair |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed` | Dark Pacts |
+| `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:defiler-daemonforge:wound-reroll` | Daemonforge |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits` | Dark Pacts |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1` | Dark Pacts |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:mortal_wound_feel_no_pain` | Dark Pacts |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits` | Dark Pacts |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1` | Dark Pacts |
 | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier` | Dark Pacts |
-| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift` | Nurgle's Gift |
-| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:armour-save-option` | Nurgle's Gift |
-| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:leadership` | Nurgle's Gift |
-| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:melee-hit-roll` | Nurgle's Gift |
-| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:movement-budget` | Nurgle's Gift |
-| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:objective-control` | Nurgle's Gift |
-| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:toughness` | Nurgle's Gift |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift` | Nurgle's Gift<br>Nurgle's Gift (Aura) |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:armour-save-option` | Nurgle's Gift<br>Nurgle's Gift (Aura) |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:leadership` | Nurgle's Gift<br>Nurgle's Gift (Aura) |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:melee-hit-roll` | Nurgle's Gift<br>Nurgle's Gift (Aura) |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:movement-budget` | Nurgle's Gift<br>Nurgle's Gift (Aura) |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:objective-control` | Nurgle's Gift<br>Nurgle's Gift (Aura) |
+| `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:toughness` | Nurgle's Gift<br>Nurgle's Gift (Aura) |
 | `warhammer_40000_11th:drukhari:army_rule:power_from_pain` | Power from Pain |
 | `warhammer_40000_11th:drukhari:army_rule:power_from_pain:battle-shock-failed` | Power from Pain |
 | `warhammer_40000_11th:drukhari:army_rule:power_from_pain:command-phase-start` | Power from Pain |

@@ -52,6 +52,7 @@ def test_july_faction_pack_current_source_uses_typed_json_artifacts() -> None:
     assert json_artifacts == (
         "chaos-daemons-daemonic-manifestation.json",
         "chaos-daemons-runtime-updates.json",
+        "chaos-space-marines-defiler.json",
         "current-sources.json",
         "datasheet-support-preview.json",
         "datasheets.json",

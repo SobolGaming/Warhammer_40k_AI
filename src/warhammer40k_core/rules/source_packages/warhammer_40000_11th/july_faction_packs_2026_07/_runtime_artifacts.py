@@ -31,6 +31,7 @@ from ._artifacts import (
 JULY_DAEMONIC_MANIFESTATION_SCHEMA = "core-v2-july-chaos-daemons-daemonic-manifestation-v1"
 JULY_CHAOS_DAEMONS_RUNTIME_SCHEMA = "core-v2-july-chaos-daemons-runtime-updates-v1"
 JULY_EXALTED_PATRON_SCHEMA = "core-v2-july-emperors-children-exalted-patron-v1"
+JULY_CHAOS_SPACE_MARINES_DEFILER_SCHEMA = "core-v2-july-chaos-space-marines-defiler-v1"
 JULY_THOUSAND_SONS_DEFILER_SCHEMA = "core-v2-july-thousand-sons-defiler-v1"
 
 
@@ -329,7 +330,7 @@ def july_chaos_daemons_runtime_from_json_bytes(
     return artifact
 
 
-class JulyThousandSonsDefilerOverlayOperation(msgspec.Struct, frozen=True):
+class JulyDefilerOverlayOperation(msgspec.Struct, frozen=True):
     op_id: str
     order_index: int
     operation_kind: str
@@ -338,6 +339,107 @@ class JulyThousandSonsDefilerOverlayOperation(msgspec.Struct, frozen=True):
     expected_preimage_hash: str
     reason: str
     fields: dict[str, str]
+
+
+class JulyChaosSpaceMarinesDefilerArtifact(msgspec.Struct, frozen=True):
+    artifact_schema: str
+    artifact_id: str
+    source_package_id: str
+    source_date: str
+    source_pdf_package_id: str
+    source_pdf_page: int
+    datasheet_id: str
+    source_rule_row_id: str
+    source_ability_id: str
+    source_rule_name: str
+    load_support_status: str
+    semantic_execution_status: str
+    runtime_consumer_ids: list[str]
+    runtime_provider_id: str
+    provider_activation_status: str
+    operations: list[JulyDefilerOverlayOperation]
+
+    def validate(self) -> None:
+        if (
+            self.artifact_schema != JULY_CHAOS_SPACE_MARINES_DEFILER_SCHEMA
+            or self.artifact_id != "gw-11e-july-chaos-space-marines-defiler-2026-07"
+        ):
+            raise JulyFactionPackStagingError(
+                "July Chaos Space Marines Defiler artifact identity drifted."
+            )
+        if (
+            self.source_package_id != JULY_FACTION_PACK_SOURCE_PACKAGE_ID
+            or self.source_date != JULY_FACTION_PACK_SOURCE_DATE
+            or self.source_pdf_package_id != "gw-11e-chaos-space-marines-faction-pack-2026-07"
+            or self.source_pdf_page != 21
+        ):
+            raise JulyFactionPackStagingError(
+                "July Chaos Space Marines Defiler source identity is invalid."
+            )
+        if (
+            self.datasheet_id != "000000969"
+            or self.source_rule_row_id != "000000969:4"
+            or self.source_ability_id != "000000969:daemonforge"
+            or self.source_rule_name != "Daemonforge"
+        ):
+            raise JulyFactionPackStagingError(
+                "July Chaos Space Marines Defiler source rows drifted."
+            )
+        if (
+            self.load_support_status != "loaded"
+            or self.semantic_execution_status != "executable_generic_runtime"
+            or self.runtime_provider_id
+            != "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts"
+            or self.provider_activation_status != "current_default"
+        ):
+            raise JulyFactionPackStagingError(
+                "July Chaos Space Marines Defiler runtime support is invalid."
+            )
+        _validate_exact_identifier_list(
+            "Chaos Space Marines Defiler runtime consumer IDs",
+            self.runtime_consumer_ids,
+            expected=(
+                "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:"
+                "defiler-daemonforge:wound-reroll",
+            ),
+        )
+        if len(self.operations) != 1:
+            raise JulyFactionPackStagingError(
+                "July Chaos Space Marines Defiler requires one overlay operation."
+            )
+        operation = self.operations[0]
+        if (
+            operation.op_id != "july-chaos-space-marines-defiler-replace-daemonforge"
+            or operation.order_index != 10
+            or operation.operation_kind != "update_row"
+            or operation.source_table != "Datasheets_abilities"
+            or operation.source_row_id != self.source_rule_row_id
+            or operation.expected_preimage_hash
+            != "bd9f7bc7442cdc2a8946faa27e38f791254382c4c6bb3acf46b5f22cf72e1f81"
+            or operation.fields
+            != {
+                "description": (
+                    "Each time this unit makes a Dark Pact, until the end of the phase, "
+                    "each time this model makes an attack, re-roll a Wound roll of 1."
+                )
+            }
+        ):
+            raise JulyFactionPackStagingError(
+                "July Chaos Space Marines Defiler overlay operation drifted."
+            )
+
+
+def july_chaos_space_marines_defiler_from_json_bytes(
+    raw: bytes,
+) -> JulyChaosSpaceMarinesDefilerArtifact:
+    try:
+        artifact = msgspec.json.decode(raw, type=JulyChaosSpaceMarinesDefilerArtifact)
+    except msgspec.DecodeError as exc:
+        raise JulyFactionPackStagingError(
+            "July Chaos Space Marines Defiler artifact is invalid."
+        ) from exc
+    artifact.validate()
+    return artifact
 
 
 class JulyThousandSonsDefilerArtifact(msgspec.Struct, frozen=True):
@@ -362,7 +464,7 @@ class JulyThousandSonsDefilerArtifact(msgspec.Struct, frozen=True):
     runtime_consumer_ids: list[str]
     runtime_provider_id: str
     provider_activation_status: str
-    operations: list[JulyThousandSonsDefilerOverlayOperation]
+    operations: list[JulyDefilerOverlayOperation]
 
     def validate(self) -> None:
         if (

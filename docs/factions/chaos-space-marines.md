@@ -135,7 +135,16 @@ This table reports datasheet-level playability evidence generated from the exact
 
 | Datasheet | Overall | Catalog | Models / geometry | Wargear | Weapon keywords | Datasheet abilities | Faction / detachment interactions | Tests / evidence | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| No generated catalog datasheets for Chaos Space Marines | `Unknown` | Unknown | Unknown | Unknown | None | None | None | coverage artifact only | Generated catalog/support artifacts do not contain datasheet rows for this faction. |
+| Defiler (`000000969`) | `Playable` | Full | Full | Full | Full | Full | Partial; supported detachments 0/17 (None) | Runtime consumers: `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:defiler-daemonforge:wound-reroll`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:mortal_wound_feel_no_pain`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier`; coverage artifact only | Faction army rule consumed; detachment support 0/17. Supported detachment IDs: None. |
+
+### Datasheet Ability Details
+
+| Datasheet | Ability | Source kind | Support stage | Semantic categories | Runtime consumers | Diagnostics |
+| --- | --- | --- | --- | --- | --- | --- |
+| Defiler (`000000969`) | Deadly Demise (`000008339`) | `core` | `engine_consumed` | `core.deadly_demise` | `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:destruction-reaction:deadly-demise-resolution` | None |
+| Defiler (`000000969`) | Daemonforge (`000000969:daemonforge`) | `datasheet` | `engine_consumed` | `datasheet.dark_pact.wound_roll_reroll` | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:defiler-daemonforge:wound-reroll` | None |
+| Defiler (`000000969`) | Scuttling Walker (`000000969:scuttling-walker`) | `datasheet` | `engine_consumed` | `datasheet.rule_ir.movement_transit_permission.this_unit` | `catalog-ir:movement-transit-permission` | None |
+| Defiler (`000000969`) | Dark Pacts (`000008359`) | `faction` | `engine_consumed` | `faction.army_rule.dark_pacts` | `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:mortal_wound_feel_no_pain`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier` | None |
 
 ## Cross-source Semantic Equivalence
 

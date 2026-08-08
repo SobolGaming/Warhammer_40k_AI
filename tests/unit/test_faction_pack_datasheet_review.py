@@ -360,7 +360,8 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("aeldari", "000004194", "Playable"),
         ("aeldari", "000004195", "Playable"),
         ("aeldari", "000004196", "Playable"),
-        ("death-guard", "000004209", "Partial"),
+        ("chaos-space-marines", "000000969", "Playable"),
+        ("death-guard", "000004209", "Playable"),
         ("emperors-children", "000004077", "Playable"),
         ("emperors-children", "000004079", "Playable"),
         ("emperors-children", "000004080", "Playable"),
@@ -371,7 +372,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
         ("emperors-children", "000004089", "Playable"),
         ("emperors-children", "000004208", "Playable"),
         ("thousand-sons", "000001030", "Playable"),
-        ("world-eaters", "000004207", "Partial"),
+        ("world-eaters", "000004207", "Playable"),
     }
     thousand_sons_defiler = next(
         row
@@ -382,6 +383,29 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
     assert thousand_sons_defiler.runtime_consumer_ids == (
         "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:phase-use-exception",
         "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:counteroffensive-discount",
+    )
+    defiler_support_by_id = {
+        row.datasheet_id: row for row in non_daemons_rows if row.datasheet_name == "Defiler"
+    }
+    assert set(defiler_support_by_id) == {
+        "000000969",
+        "000001030",
+        "000004207",
+        "000004208",
+        "000004209",
+    }
+    assert all(row.overall == "Playable" for row in defiler_support_by_id.values())
+    assert all(
+        (
+            row.catalog_status,
+            row.model_geometry_status,
+            row.wargear_status,
+            row.weapon_keyword_status,
+            row.datasheet_ability_status,
+            row.faction_interaction_status,
+        )
+        == ("Full", "Full", "Full", "Full", "Full", "Partial")
+        for row in defiler_support_by_id.values()
     )
     rangers_infiltrators = next(
         row
@@ -531,7 +555,7 @@ def test_non_daemons_semantic_support_rows_remain_in_faction_documents() -> None
     world_eaters_markdown = markdown_by_filename["world-eaters.md"]
     assert "`catalog-ir:movement-transit-permission`" in world_eaters_markdown
     assert "`catalog-ir:setup-reactive-shoot-charge`" in world_eaters_markdown
-    assert "Blessings of Khorne (`000008428`) | `faction` | `descriptor_only`" in (
+    assert "Blessings of Khorne (`000008428`) | `faction` | `engine_consumed`" in (
         world_eaters_markdown
     )
 

@@ -1,0 +1,33 @@
+{
+  "artifact_id": "gw-11e-july-chaos-space-marines-defiler-2026-07",
+  "artifact_schema": "core-v2-july-chaos-space-marines-defiler-v1",
+  "datasheet_id": "000000969",
+  "load_support_status": "loaded",
+  "operations": [
+    {
+      "expected_preimage_hash": "bd9f7bc7442cdc2a8946faa27e38f791254382c4c6bb3acf46b5f22cf72e1f81",
+      "fields": {
+        "description": "Each time this unit makes a Dark Pact, until the end of the phase, each time this model makes an attack, re-roll a Wound roll of 1."
+      },
+      "op_id": "july-chaos-space-marines-defiler-replace-daemonforge",
+      "operation_kind": "update_row",
+      "order_index": 10,
+      "reason": "Apply the July Daemonforge source-backed replacement.",
+      "source_row_id": "000000969:4",
+      "source_table": "Datasheets_abilities"
+    }
+  ],
+  "provider_activation_status": "current_default",
+  "runtime_consumer_ids": [
+    "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:defiler-daemonforge:wound-reroll"
+  ],
+  "runtime_provider_id": "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts",
+  "semantic_execution_status": "executable_generic_runtime",
+  "source_ability_id": "000000969:daemonforge",
+  "source_date": "2026-07-22",
+  "source_package_id": "gw-11e-faction-packs-2026-07",
+  "source_pdf_package_id": "gw-11e-chaos-space-marines-faction-pack-2026-07",
+  "source_pdf_page": 21,
+  "source_rule_name": "Daemonforge",
+  "source_rule_row_id": "000000969:4"
+}

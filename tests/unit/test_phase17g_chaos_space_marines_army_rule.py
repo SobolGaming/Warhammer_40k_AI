@@ -5,6 +5,10 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.chaos_defiler_catalog_helpers import (
+    instantiate_defiler,
+    july_defiler_catalog_package,
+)
 from tests.phase11c_command_phase_helpers import (
     battle_state,
 )
@@ -91,6 +95,7 @@ from warhammer40k_core.engine.phases.shooting import (
     request_out_of_phase_shooting_declaration,
 )
 from warhammer40k_core.engine.runtime_modifiers import (
+    AttackRerollPermissionContext,
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
 )
@@ -266,6 +271,58 @@ def test_dark_pacts_runtime_contribution_registers_engine_hooks() -> None:
         contribution.weapon_profile_modifier_bindings[0].modifier_id
         == army_rule.WEAPON_PROFILE_MODIFIER_ID
     )
+    assert (
+        contribution.attack_reroll_permission_bindings[0].modifier_id
+        == army_rule.DEFILER_DAEMONFORGE_WOUND_REROLL_MODIFIER_ID
+    )
+
+
+def test_defiler_daemonforge_rerolls_wound_rolls_of_one_after_dark_pact() -> None:
+    state = _csm_battle_state()
+    defiler = _replace_first_unit_with_csm_defiler(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _set_current_battle_phase(state, BattlePhase.SHOOTING)
+    contribution = army_rule.runtime_contribution()
+    registry = RuntimeModifierRegistry.from_bindings(
+        attack_reroll_permission_bindings=(contribution.attack_reroll_permission_bindings)
+    )
+    context = AttackRerollPermissionContext(
+        state=state,
+        player_id="player-a",
+        attacking_unit_instance_id=defiler.unit_instance_id,
+        attacker_model_instance_id=defiler.own_models[0].model_instance_id,
+        target_unit_instance_id=target.unit_instance_id,
+        source_phase=BattlePhase.SHOOTING,
+        roll_type="attack_sequence.wound",
+        timing_window="attack_sequence.wound",
+    )
+
+    assert registry.attack_reroll_permission_context(context) is None
+
+    _record_dark_pact_effect(
+        state,
+        unit=defiler,
+        phase=BattlePhase.SHOOTING,
+        pact=army_rule.DarkPactKind.LETHAL_HITS,
+    )
+    permission_context = registry.attack_reroll_permission_context(context)
+
+    assert permission_context is not None
+    assert permission_context.permission.source_id == army_rule.DEFILER_DAEMONFORGE_ABILITY_ID
+    assert permission_context.permission.to_payload() == {
+        "source_id": army_rule.DEFILER_DAEMONFORGE_ABILITY_ID,
+        "timing_window": "attack_sequence.wound",
+        "owning_player_id": "player-a",
+        "eligible_roll_type": "attack_sequence.wound",
+        "component_selection_policy": "whole_roll",
+        "allowed_component_selections": None,
+    }
+    assert permission_context.source_payload == {
+        "conditional_wound_reroll": {"reroll_unmodified_values": [1]},
+        "dark_pacts_source_ability_id": army_rule.DARK_PACTS_SOURCE_ABILITY_ID,
+        "datasheet_id": army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID,
+        "source_ability_id": army_rule.DEFILER_DAEMONFORGE_ABILITY_ID,
+    }
 
 
 def test_mortal_wound_feel_no_pain_continuation_registry_dispatches_by_source_kind() -> None:
@@ -1037,6 +1094,29 @@ def _unit_for_player(state: GameState, *, player_id: str) -> UnitInstance:
     if army is None:
         raise AssertionError(f"Missing army for {player_id}.")
     return army.units[0]
+
+
+def _replace_first_unit_with_csm_defiler(
+    state: GameState,
+    *,
+    player_id: str,
+) -> UnitInstance:
+    army = state.army_definition_for_player(player_id)
+    if army is None:
+        raise AssertionError(f"Missing army for {player_id}.")
+    defiler = instantiate_defiler(
+        package=july_defiler_catalog_package(),
+        datasheet_id=army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID,
+        army_id=army.army_id,
+    )
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        if army.player_id != player_id:
+            updated_armies.append(army)
+            continue
+        updated_armies.append(replace(army, units=(defiler, *army.units[1:])))
+    state.army_definitions = updated_armies
+    return defiler
 
 
 def _set_current_battle_phase(state: GameState, phase: BattlePhase) -> None:

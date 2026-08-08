@@ -189,6 +189,9 @@ from warhammer40k_core.rules.source_overlay import (
     apply_source_release_overlays,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_space_marines_defiler_datasheet_overlay_2026_07 as csm_defiler_overlay,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     emperors_children_datasheet_overlay_2026_06 as emperors_children_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -315,7 +318,7 @@ CHAOS_DAEMONS_SPLIT_SUPPORTED_SEMANTICS = (
 BELAKOR_DATASHEET_IDS = ("000001148",)
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
 UNDIVIDED_DAEMON_DATASHEET_IDS = ("000001149", "000002758", "000001151")
-CHAOS_DEFILER_DATASHEET_IDS = chaos_defiler_overlay.ALIGNED_DEFILER_DATASHEET_IDS
+CHAOS_DEFILER_DATASHEET_IDS = chaos_defiler_overlay.AUDITED_DEFILER_DATASHEET_IDS
 EMPERORS_CHILDREN_FULGRIM_DATASHEET_IDS = ("000004077",)
 EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_DATASHEET_IDS = ("000004079", "000004080")
 EMPERORS_CHILDREN_CHAOS_TERMINATORS_DATASHEET_IDS = ("000004081",)
@@ -1588,7 +1591,16 @@ def mustering_support_rows_payload(
 def _ability_support_catalog_package(
     *,
     source_json_dir: Path = DEFAULT_SOURCE_JSON_DIR,
+    datasheet_ids: tuple[str, ...] = ABILITY_SUPPORT_DATASHEET_IDS,
 ) -> CanonicalCatalogPackage:
+    if type(datasheet_ids) is not tuple or not datasheet_ids:
+        raise ValueError("Ability support catalog datasheet_ids must be a non-empty tuple.")
+    if any(
+        type(datasheet_id) is not str or not datasheet_id.strip() for datasheet_id in datasheet_ids
+    ):
+        raise ValueError("Ability support catalog datasheet_ids must contain non-empty strings.")
+    if len(datasheet_ids) != len(set(datasheet_ids)):
+        raise ValueError("Ability support catalog datasheet_ids must not contain duplicates.")
     source_json_dir = _resolve_repo_path(source_json_dir)
     artifacts = _load_source_artifacts(source_json_dir)
     chaos_overlaid_artifacts = apply_source_release_overlays(
@@ -1596,8 +1608,13 @@ def _ability_support_catalog_package(
         release_manifest=chaos_defiler_overlay.source_release_manifest(),
         overlay_packs=(chaos_defiler_overlay.overlay_pack(),),
     )
-    emperors_children_overlaid_artifacts = apply_source_release_overlays(
+    csm_overlaid_artifacts = apply_source_release_overlays(
         source_artifacts=chaos_overlaid_artifacts,
+        release_manifest=csm_defiler_overlay.source_release_manifest(),
+        overlay_packs=(csm_defiler_overlay.overlay_pack(),),
+    )
+    emperors_children_overlaid_artifacts = apply_source_release_overlays(
+        source_artifacts=csm_overlaid_artifacts,
         release_manifest=emperors_children_overlay.source_release_manifest(),
         overlay_packs=(emperors_children_overlay.overlay_pack(),),
     )
@@ -1651,7 +1668,7 @@ def _ability_support_catalog_package(
     bridge_artifacts = build_wahapedia_canonical_bridge_artifacts(
         source_artifacts=overlaid_artifacts,
         bridge_package_id=_bridge_package_id(),
-        datasheet_ids=ABILITY_SUPPORT_DATASHEET_IDS,
+        datasheet_ids=datasheet_ids,
         height_overrides=(
             AELDARI_ASPECT_WARRIORS_HEIGHT_OVERRIDES
             + AELDARI_AUTARCHS_HEIGHT_OVERRIDES
@@ -1696,20 +1713,37 @@ def _ability_support_matrix_rows_from_package(
         datasheet_ids=ABILITY_SUPPORT_DATASHEET_IDS,
     )
     rows = _promote_july_runtime_backed_datasheet_abilities(rows)
-    rows = _promote_emperors_children_runtime_backed_faction_abilities(rows)
+    rows = _promote_runtime_backed_faction_abilities(rows)
     return (*rows, *_runtime_faction_army_rule_rows())
 
 
-def _promote_emperors_children_runtime_backed_faction_abilities(
+def _promote_runtime_backed_faction_abilities(
     rows: tuple[AbilityCoverageRow, ...],
 ) -> tuple[AbilityCoverageRow, ...]:
-    promoted: list[AbilityCoverageRow] = []
-    for row in rows:
+    def promotion_for_row(
+        row: AbilityCoverageRow,
+    ) -> tuple[str, tuple[str, ...]] | None:
+        if row.source_kind is not CatalogAbilitySourceKind.FACTION:
+            return None
         if (
-            row.source_kind is not CatalogAbilitySourceKind.FACTION
-            or row.ability_id != emperors_children_army_rule.THRILL_SEEKERS_SOURCE_ABILITY_ID
-            or row.datasheet_id
-            not in {
+            row.datasheet_id == csm_defiler_overlay.CHAOS_SPACE_MARINES_DEFILER_DATASHEET_ID
+            and row.ability_id == chaos_space_marines_army_rule.DARK_PACTS_SOURCE_ABILITY_ID
+        ):
+            return "faction.army_rule.dark_pacts", _chaos_space_marines_runtime_consumer_ids()
+        if (
+            row.datasheet_id == "000004209"
+            and row.ability_id == death_guard_army_rule.NURGLES_GIFT_SOURCE_ABILITY_ID
+        ):
+            return "faction.army_rule.nurgles_gift", _death_guard_runtime_consumer_ids()
+        if (
+            row.datasheet_id == "000004207"
+            and row.ability_id == world_eaters_army_rule.BLESSINGS_OF_KHORNE_SOURCE_ABILITY_ID
+        ):
+            return "faction.army_rule.blessings_of_khorne", _world_eaters_runtime_consumer_ids()
+        if (
+            row.ability_id == emperors_children_army_rule.THRILL_SEEKERS_SOURCE_ABILITY_ID
+            and row.datasheet_id
+            in {
                 *EMPERORS_CHILDREN_FULGRIM_DATASHEET_IDS,
                 *EMPERORS_CHILDREN_INFRACTORS_TORMENTORS_DATASHEET_IDS,
                 *EMPERORS_CHILDREN_CHAOS_TERMINATORS_DATASHEET_IDS,
@@ -1720,14 +1754,22 @@ def _promote_emperors_children_runtime_backed_faction_abilities(
                 *EMPERORS_CHILDREN_DEFILER_DATASHEET_IDS,
             }
         ):
+            return "faction.army_rule.thrill_seekers", _emperors_children_runtime_consumer_ids()
+        return None
+
+    promoted: list[AbilityCoverageRow] = []
+    for row in rows:
+        promotion = promotion_for_row(row)
+        if promotion is None:
             promoted.append(row)
             continue
+        semantic_category, runtime_consumer_ids = promotion
         promoted.append(
             replace(
                 row,
                 support_stage=AbilityCoverageSupportStage.ENGINE_CONSUMED,
-                semantic_categories=("faction.army_rule.thrill_seekers",),
-                runtime_consumer_ids=_emperors_children_runtime_consumer_ids(),
+                semantic_categories=(semantic_category,),
+                runtime_consumer_ids=runtime_consumer_ids,
             )
         )
     return tuple(promoted)
@@ -1736,33 +1778,50 @@ def _promote_emperors_children_runtime_backed_faction_abilities(
 def _promote_july_runtime_backed_datasheet_abilities(
     rows: tuple[AbilityCoverageRow, ...],
 ) -> tuple[AbilityCoverageRow, ...]:
-    artifact = july_faction_packs_2026_07.thousand_sons_defiler()
+    thousand_sons_artifact = july_faction_packs_2026_07.thousand_sons_defiler()
+    chaos_space_marines_artifact = july_faction_packs_2026_07.chaos_space_marines_defiler()
     promoted: list[AbilityCoverageRow] = []
-    replacements = 0
+    replacements = {"chaos_space_marines": 0, "thousand_sons": 0}
     for row in rows:
         if (
-            row.datasheet_id != artifact.datasheet_id
-            or row.ability_id != artifact.source_ability_id
+            row.datasheet_id == chaos_space_marines_artifact.datasheet_id
+            and row.ability_id == chaos_space_marines_artifact.source_ability_id
         ):
-            promoted.append(row)
-            continue
-        promoted.append(
-            replace(
-                row,
-                catalog_support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
-                support_stage=AbilityCoverageSupportStage.ENGINE_CONSUMED,
-                semantic_categories=(
-                    "datasheet.counteroffensive.phase_use_exception",
-                    "datasheet.counteroffensive.cost_modifier",
-                ),
-                runtime_consumer_ids=tuple(artifact.runtime_consumer_ids),
-                diagnostic_reasons=(),
+            promoted.append(
+                replace(
+                    row,
+                    catalog_support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+                    support_stage=AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                    semantic_categories=("datasheet.dark_pact.wound_roll_reroll",),
+                    runtime_consumer_ids=tuple(chaos_space_marines_artifact.runtime_consumer_ids),
+                    diagnostic_reasons=(),
+                )
             )
-        )
-        replacements += 1
-    if replacements != 1:
+            replacements["chaos_space_marines"] += 1
+            continue
+        if (
+            row.datasheet_id == thousand_sons_artifact.datasheet_id
+            and row.ability_id == thousand_sons_artifact.source_ability_id
+        ):
+            promoted.append(
+                replace(
+                    row,
+                    catalog_support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+                    support_stage=AbilityCoverageSupportStage.ENGINE_CONSUMED,
+                    semantic_categories=(
+                        "datasheet.counteroffensive.phase_use_exception",
+                        "datasheet.counteroffensive.cost_modifier",
+                    ),
+                    runtime_consumer_ids=tuple(thousand_sons_artifact.runtime_consumer_ids),
+                    diagnostic_reasons=(),
+                )
+            )
+            replacements["thousand_sons"] += 1
+            continue
+        promoted.append(row)
+    if replacements != {"chaos_space_marines": 1, "thousand_sons": 1}:
         raise ValueError(
-            "July Thousand Sons Defiler ability coverage must replace exactly one source row."
+            "July Defiler ability coverage must replace each runtime-backed source row once."
         )
     return tuple(promoted)
 

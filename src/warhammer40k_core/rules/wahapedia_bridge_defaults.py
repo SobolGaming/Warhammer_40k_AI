@@ -630,6 +630,11 @@ AELDARI_CORSAIR_VOID_UNITS_HEIGHT_OVERRIDES = tuple(
     )
 )
 
+CHAOS_SPACE_MARINES_DEFILER_PDF_CORRECTION = PdfDatasheetCorrection(
+    datasheet_id="000000969",
+    source_id="pdf:chaos-space-marines-faction-pack:2026-07-22:p21",
+    source_package_version="2026-07-22",
+)
 DEATH_GUARD_DEFILER_PDF_CORRECTION = PdfDatasheetCorrection(
     datasheet_id="000004209",
     source_id="pdf:death-guard-faction-pack:2026-06-10:p5-p6",
@@ -757,12 +762,21 @@ EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES = (
     ),
 )
 CHAOS_DEFILER_PDF_CORRECTIONS = (
+    CHAOS_SPACE_MARINES_DEFILER_PDF_CORRECTION,
     DEATH_GUARD_DEFILER_PDF_CORRECTION,
     WORLD_EATERS_DEFILER_PDF_CORRECTION,
     THOUSAND_SONS_DEFILER_PDF_CORRECTION,
     EMPERORS_CHILDREN_DEFILER_PDF_CORRECTION,
 )
 CHAOS_DEFILER_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000000969",
+        model_name="Defiler",
+        height=4.5,
+        height_units=GeometrySourceUnits.INCHES,
+        height_source_id="geometry-review:chaos-space-marines:defiler:height",
+        height_document_reference="Chaos Space Marines Faction Pack p.21",
+    ),
     ModelHeightOverride(
         datasheet_id="000004209",
         model_name="Defiler",

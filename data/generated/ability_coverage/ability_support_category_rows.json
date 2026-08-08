@@ -428,6 +428,14 @@
         "datasheet_id": "chaos-space-marines",
         "datasheet_name": "Chaos Space Marines",
         "source_kind": "faction"
+      },
+      {
+        "ability_id": "000008359",
+        "ability_name": "Dark Pacts",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000969/faction/000008359/none",
+        "datasheet_id": "000000969",
+        "datasheet_name": "Defiler",
+        "source_kind": "faction"
       }
     ],
     "ability_names": [
@@ -435,12 +443,14 @@
     ],
     "category_id": "faction.army_rule.dark_pacts",
     "category_name": "Chaos Space Marines Army Rule",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "runtime-content-warhammer-40000-11th/chaos-space-marines/faction/warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts/none"
+      "runtime-content-warhammer-40000-11th/chaos-space-marines/faction/warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts/none",
+      "chaos-daemons-bridge-catalog/000000969/faction/000008359/none"
     ],
     "datasheet_names": [
-      "Chaos Space Marines"
+      "Chaos Space Marines",
+      "Defiler"
     ],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed",
@@ -452,7 +462,7 @@
       "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier"
     ],
     "source_kind_counts": {
-      "faction": 1
+      "faction": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -525,6 +535,14 @@
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001149/core/000008339/none",
         "datasheet_id": "000001149",
         "datasheet_name": "Daemon Prince of Chaos",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000969/core/000008339/none",
+        "datasheet_id": "000000969",
+        "datasheet_name": "Defiler",
         "source_kind": "core"
       },
       {
@@ -621,11 +639,12 @@
     ],
     "category_id": "core.deadly_demise",
     "category_name": "Core Deadly Demise",
-    "coverage_row_count": 14,
+    "coverage_row_count": 15,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
       "chaos-daemons-bridge-catalog/000002758/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001149/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000000969/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001030/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004207/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004208/core/000008339/none",
@@ -656,7 +675,7 @@
       "descriptor:destruction-reaction:deadly-demise-source"
     ],
     "source_kind_counts": {
-      "core": 14
+      "core": 15
     },
     "support_stages": [
       "engine_consumed"
@@ -1042,6 +1061,39 @@
     "runtime_consumer_ids": [
       "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:counteroffensive-discount",
       "warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:phase-use-exception"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000000969:daemonforge",
+        "ability_name": "Daemonforge",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000969/datasheet/000000969:daemonforge/none",
+        "datasheet_id": "000000969",
+        "datasheet_name": "Defiler",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Daemonforge"
+    ],
+    "category_id": "datasheet.dark_pact.wound_roll_reroll",
+    "category_name": "Datasheet Dark Pact Wound Roll Reroll",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000969/datasheet/000000969:daemonforge/none"
+    ],
+    "datasheet_names": [
+      "Defiler"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:defiler-daemonforge:wound-reroll"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -2420,6 +2472,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000000969:scuttling-walker",
+        "ability_name": "Scuttling Walker",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000000969/datasheet/000000969:scuttling-walker/none",
+        "datasheet_id": "000000969",
+        "datasheet_name": "Defiler",
+        "source_kind": "datasheet"
+      },
+      {
         "ability_id": "000001030:scuttling-walker",
         "ability_name": "Scuttling Walker",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:scuttling-walker/none",
@@ -2466,8 +2526,9 @@
     ],
     "category_id": "datasheet.rule_ir.movement_transit_permission.this_unit",
     "category_name": "Datasheet Rule Ir Movement Transit Permission This Unit",
-    "coverage_row_count": 5,
+    "coverage_row_count": 6,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000000969/datasheet/000000969:scuttling-walker/none",
       "chaos-daemons-bridge-catalog/000001030/datasheet/000001030:scuttling-walker/none",
       "chaos-daemons-bridge-catalog/000004207/datasheet/000004207:scuttling-walker/none",
       "chaos-daemons-bridge-catalog/000004208/datasheet/000004208:scuttling-walker/none",
@@ -2482,7 +2543,7 @@
       "catalog-ir:movement-transit-permission"
     ],
     "source_kind_counts": {
-      "datasheet": 5
+      "datasheet": 6
     },
     "support_stages": [
       "engine_consumed"
@@ -3406,19 +3467,30 @@
         "datasheet_id": "death-guard",
         "datasheet_name": "Death Guard",
         "source_kind": "faction"
+      },
+      {
+        "ability_id": "000008396",
+        "ability_name": "Nurgle's Gift (Aura)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004209/faction/000008396/none",
+        "datasheet_id": "000004209",
+        "datasheet_name": "Defiler",
+        "source_kind": "faction"
       }
     ],
     "ability_names": [
-      "Nurgle's Gift"
+      "Nurgle's Gift",
+      "Nurgle's Gift (Aura)"
     ],
     "category_id": "faction.army_rule.nurgles_gift",
     "category_name": "Death Guard Army Rule",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "runtime-content-warhammer-40000-11th/death-guard/faction/warhammer_40000_11th:death_guard:army_rule:nurgles_gift/none"
+      "runtime-content-warhammer-40000-11th/death-guard/faction/warhammer_40000_11th:death_guard:army_rule:nurgles_gift/none",
+      "chaos-daemons-bridge-catalog/000004209/faction/000008396/none"
     ],
     "datasheet_names": [
-      "Death Guard"
+      "Death Guard",
+      "Defiler"
     ],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:death_guard:army_rule:nurgles_gift",
@@ -3430,7 +3502,7 @@
       "warhammer_40000_11th:death_guard:army_rule:nurgles_gift:toughness"
     ],
     "source_kind_counts": {
-      "faction": 1
+      "faction": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -4737,47 +4809,6 @@
   {
     "ability_datasheet_pairs": [
       {
-        "ability_id": "000008428",
-        "ability_name": "Blessings of Khorne",
-        "coverage_row_id": "chaos-daemons-bridge-catalog/000004207/faction/000008428/none",
-        "datasheet_id": "000004207",
-        "datasheet_name": "Defiler",
-        "source_kind": "faction"
-      },
-      {
-        "ability_id": "000008396",
-        "ability_name": "Nurgle's Gift (Aura)",
-        "coverage_row_id": "chaos-daemons-bridge-catalog/000004209/faction/000008396/none",
-        "datasheet_id": "000004209",
-        "datasheet_name": "Defiler",
-        "source_kind": "faction"
-      }
-    ],
-    "ability_names": [
-      "Blessings of Khorne",
-      "Nurgle's Gift (Aura)"
-    ],
-    "category_id": "unknown.ability_text",
-    "category_name": "Unknown Abilities",
-    "coverage_row_count": 2,
-    "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000004207/faction/000008428/none",
-      "chaos-daemons-bridge-catalog/000004209/faction/000008396/none"
-    ],
-    "datasheet_names": [
-      "Defiler"
-    ],
-    "runtime_consumer_ids": [],
-    "source_kind_counts": {
-      "faction": 2
-    },
-    "support_stages": [
-      "descriptor_only"
-    ]
-  },
-  {
-    "ability_datasheet_pairs": [
-      {
         "ability_id": "000002532:channeller-stones",
         "ability_name": "Channeller Stones",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000002532/wargear/000002532:channeller-stones/000002532:channeller-stones",
@@ -5046,6 +5077,14 @@
   {
     "ability_datasheet_pairs": [
       {
+        "ability_id": "000008428",
+        "ability_name": "Blessings of Khorne",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000004207/faction/000008428/none",
+        "datasheet_id": "000004207",
+        "datasheet_name": "Defiler",
+        "source_kind": "faction"
+      },
+      {
         "ability_id": "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne",
         "ability_name": "Blessings of Khorne",
         "coverage_row_id": "runtime-content-warhammer-40000-11th/world-eaters/faction/warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne/none",
@@ -5059,11 +5098,13 @@
     ],
     "category_id": "faction.army_rule.blessings_of_khorne",
     "category_name": "World Eaters Army Rule",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000004207/faction/000008428/none",
       "runtime-content-warhammer-40000-11th/world-eaters/faction/warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne/none"
     ],
     "datasheet_names": [
+      "Defiler",
       "World Eaters"
     ],
     "runtime_consumer_ids": [
@@ -5074,7 +5115,7 @@
       "warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords"
     ],
     "source_kind_counts": {
-      "faction": 1
+      "faction": 2
     },
     "support_stages": [
       "engine_consumed"

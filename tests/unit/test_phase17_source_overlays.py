@@ -30,6 +30,9 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     manifest as chaos_daemons_june_manifest,
 )
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
+    army_rule as chaos_space_marines_army_rule,
+)
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children import (
     july_2026 as emperors_children_july,
 )
@@ -921,6 +924,22 @@ def test_july_thousand_sons_defiler_artifact_and_provider_are_current() -> None:
     assert active_thousand_sons_row.module_path is not None
     assert active_thousand_sons_row.module_path.endswith(".thousand_sons.july_2026")
     assert "july_2026_candidate" not in active_thousand_sons_row.module_path
+
+
+def test_july_chaos_space_marines_defiler_artifact_links_daemonforge_runtime() -> None:
+    artifact = july_faction_packs_2026_07.chaos_space_marines_defiler()
+    contribution = chaos_space_marines_army_rule.runtime_contribution()
+
+    assert artifact.datasheet_id == chaos_space_marines_army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID
+    assert (
+        artifact.source_ability_id == chaos_space_marines_army_rule.DEFILER_DAEMONFORGE_ABILITY_ID
+    )
+    assert artifact.semantic_execution_status == "executable_generic_runtime"
+    assert artifact.provider_activation_status == "current_default"
+    assert contribution.contribution_id == artifact.runtime_provider_id
+    assert tuple(
+        binding.modifier_id for binding in contribution.attack_reroll_permission_bindings
+    ) == tuple(artifact.runtime_consumer_ids)
 
 
 def test_july_kairos_uses_existing_generic_stratagem_cost_semantics() -> None:

@@ -9,6 +9,8 @@ from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
     ModifiedRollResult,
+    RerollComponentSelectionPolicy,
+    RerollPermission,
     UnmodifiedRollResult,
 )
 from warhammer40k_core.core.faction_aliases import (
@@ -64,6 +66,8 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
+    AttackRerollPermissionBinding,
+    AttackRerollPermissionContext,
     UnitCharacteristicModifierContext,
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
@@ -72,6 +76,9 @@ from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     ShootingUnitSelectedContext,
     ShootingUnitSelectedGrant,
     ShootingUnitSelectedGrantBinding,
+)
+from warhammer40k_core.engine.source_backed_rerolls import (
+    SourceBackedRerollPermissionContext,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
@@ -86,7 +93,10 @@ class DarkPactMortalWoundSourceContextPayload(TypedDict):
 
 CONTRIBUTION_ID = "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts"
 SOURCE_RULE_ID = "phase17f:phase17e:chaos-space-marines:army-rule"
+DARK_PACTS_SOURCE_ABILITY_ID = "000008359"
 HOOK_ID = "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts"
+DEFILER_DAEMONFORGE_DATASHEET_ID = "000000969"
+DEFILER_DAEMONFORGE_ABILITY_ID = "000000969:daemonforge"
 DARK_PACT_EFFECT_KIND = "chaos_space_marines_dark_pact"
 DARK_PACT_LEADERSHIP_ROLL_TYPE = "chaos_space_marines.dark_pact_leadership_test"
 DARK_PACT_MORTAL_WOUNDS_ROLL_TYPE = "chaos_space_marines.dark_pact_mortal_wounds"
@@ -106,6 +116,7 @@ FIGHT_SUSTAINED_HITS_HOOK_ID = f"{HOOK_ID}:fight:sustained_hits_1"
 ATTACK_SEQUENCE_COMPLETED_HOOK_ID = f"{HOOK_ID}:attack_sequence_completed"
 MORTAL_WOUND_FEEL_NO_PAIN_HOOK_ID = f"{HOOK_ID}:mortal_wound_feel_no_pain"
 WEAPON_PROFILE_MODIFIER_ID = f"{HOOK_ID}:weapon_profile_modifier"
+DEFILER_DAEMONFORGE_WOUND_REROLL_MODIFIER_ID = f"{HOOK_ID}:defiler-daemonforge:wound-reroll"
 SHADOW_LEGION_ATTACK_SEQUENCE_COMPLETED_HOOK_ID = (
     "warhammer_40000_11th:chaos_daemons:detachment:shadow_legion:rule:"
     "disciples-of-belakor:attack-sequence-completed"
@@ -164,6 +175,13 @@ def runtime_contribution() -> RuntimeContentContribution:
                 modifier_id=WEAPON_PROFILE_MODIFIER_ID,
                 source_id=SOURCE_RULE_ID,
                 handler=dark_pact_weapon_profile_modifier,
+            ),
+        ),
+        attack_reroll_permission_bindings=(
+            AttackRerollPermissionBinding(
+                modifier_id=DEFILER_DAEMONFORGE_WOUND_REROLL_MODIFIER_ID,
+                source_id=DEFILER_DAEMONFORGE_ABILITY_ID,
+                handler=defiler_daemonforge_wound_reroll_permission,
             ),
         ),
     )
@@ -378,6 +396,57 @@ def dark_pact_weapon_profile_modifier(
             source_rule_id=effect.source_rule_id,
         )
     raise GameLifecycleError("Dark Pacts selected pact is unsupported.")
+
+
+def defiler_daemonforge_wound_reroll_permission(
+    context: AttackRerollPermissionContext,
+) -> SourceBackedRerollPermissionContext | None:
+    if type(context) is not AttackRerollPermissionContext:
+        raise GameLifecycleError("Defiler Daemonforge wound reroll requires context.")
+    if context.source_phase not in (BattlePhase.SHOOTING, BattlePhase.FIGHT):
+        return None
+    if (
+        context.roll_type != "attack_sequence.wound"
+        or context.timing_window != "attack_sequence.wound"
+        or context.attacker_model_instance_id is None
+    ):
+        return None
+    rules_unit = rules_unit_view_by_id(
+        state=context.state,
+        unit_instance_id=context.attacking_unit_instance_id,
+    )
+    if rules_unit.owner_player_id != context.player_id:
+        raise GameLifecycleError("Defiler Daemonforge reroll owner drift.")
+    attacking_component = rules_unit.component_unit_for_model(context.attacker_model_instance_id)
+    if attacking_component.datasheet_id != DEFILER_DAEMONFORGE_DATASHEET_ID or all(
+        ability.ability_id != DEFILER_DAEMONFORGE_ABILITY_ID
+        for ability in attacking_component.datasheet_abilities
+    ):
+        return None
+    if (
+        active_dark_pact_for_unit(
+            context.state,
+            unit_instance_id=context.attacking_unit_instance_id,
+            phase=context.source_phase,
+        )
+        is None
+    ):
+        return None
+    return SourceBackedRerollPermissionContext(
+        permission=RerollPermission(
+            source_id=DEFILER_DAEMONFORGE_ABILITY_ID,
+            timing_window=context.timing_window,
+            owning_player_id=context.player_id,
+            eligible_roll_type=context.roll_type,
+            component_selection_policy=RerollComponentSelectionPolicy.WHOLE_ROLL,
+        ),
+        source_payload={
+            "conditional_wound_reroll": {"reroll_unmodified_values": [1]},
+            "dark_pacts_source_ability_id": DARK_PACTS_SOURCE_ABILITY_ID,
+            "datasheet_id": DEFILER_DAEMONFORGE_DATASHEET_ID,
+            "source_ability_id": DEFILER_DAEMONFORGE_ABILITY_ID,
+        },
+    )
 
 
 def resolve_dark_pact_attack_sequence_completion(

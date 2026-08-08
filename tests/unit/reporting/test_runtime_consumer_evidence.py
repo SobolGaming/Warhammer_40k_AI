@@ -229,20 +229,22 @@ def test_cross_faction_army_rule_rows_retain_runtime_consumer_evidence() -> None
         assert frozenset(row.runtime_consumer_ids) == evidence.runtime_consumer_ids
 
 
-def test_cross_faction_descriptor_rows_remain_distinct_from_executable_army_rules() -> None:
+def test_defiler_faction_rows_retain_exact_executable_army_rule_evidence() -> None:
     rows_by_name: dict[str, list[AbilityCoverageRow]] = {}
     for row in ability_support_matrix_rows():
         rows_by_name.setdefault(row.ability_name, []).append(row)
 
-    for ability_name, datasheet_id in (("Blessings of Khorne", "000004207"),):
-        rows = rows_by_name[ability_name]
+    for ability_name, datasheet_id, runtime_consumer_ids in (
+        ("Dark Pacts", "000000969", _ARMY_RULE_EVIDENCE[0].runtime_consumer_ids),
+        ("Nurgle's Gift (Aura)", "000004209", _ARMY_RULE_EVIDENCE[1].runtime_consumer_ids),
+        ("Blessings of Khorne", "000004207", _ARMY_RULE_EVIDENCE[2].runtime_consumer_ids),
+    ):
         assert any(
             row.datasheet_id == datasheet_id
-            and row.support_stage is AbilityCoverageSupportStage.DESCRIPTOR_ONLY
-            and row.runtime_consumer_ids == ()
-            for row in rows
+            and row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+            and frozenset(row.runtime_consumer_ids) == runtime_consumer_ids
+            for row in rows_by_name[ability_name]
         )
-        assert any(row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED for row in rows)
 
 
 def test_emperors_children_defiler_thrill_seekers_retains_exact_runtime_evidence() -> None:
@@ -266,16 +268,16 @@ def test_emperors_children_defiler_thrill_seekers_retains_exact_runtime_evidence
         }
     )
 
-    unrelated_defiler_rows = tuple(
+    other_runtime_backed_defiler_rows = tuple(
         row
         for row in rows
         if row.datasheet_name == "Defiler"
         and row.source_kind is CatalogAbilitySourceKind.FACTION
         and row.ability_id != emperors_children_army_rule.THRILL_SEEKERS_SOURCE_ABILITY_ID
     )
-    assert unrelated_defiler_rows
+    assert other_runtime_backed_defiler_rows
     assert all(
-        row.support_stage is AbilityCoverageSupportStage.DESCRIPTOR_ONLY
-        and row.runtime_consumer_ids == ()
-        for row in unrelated_defiler_rows
+        row.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
+        and row.runtime_consumer_ids
+        for row in other_runtime_backed_defiler_rows
     )

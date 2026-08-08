@@ -19,6 +19,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_defiler_datasheet_overlay_2026_06 as defiler_overlay,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_space_marines_defiler_datasheet_overlay_2026_07 as csm_defiler_overlay,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     thousand_sons_defiler_datasheet_overlay_2026_07 as july_defiler_overlay,
 )
 from warhammer40k_core.rules.wahapedia_bridge import (
@@ -86,7 +89,7 @@ def july_defiler_catalog_package() -> CanonicalCatalogPackage:
             package_name="july-thousand-sons-defiler-11e-bridge-test",
             version="2026-07-22",
         ),
-        datasheet_ids=july_defiler_overlay.ALIGNED_DEFILER_DATASHEET_IDS,
+        datasheet_ids=july_defiler_overlay.AUDITED_DEFILER_DATASHEET_IDS,
         height_overrides=CHAOS_DEFILER_HEIGHT_OVERRIDES,
     )
     return build_canonical_catalog_package(
@@ -104,6 +107,7 @@ def instantiate_defiler(
     *,
     package: CanonicalCatalogPackage,
     datasheet_id: str,
+    army_id: str = "chaos-defiler-test-army",
     wargear_selections: tuple[WargearSelection, ...] = (),
 ) -> UnitInstance:
     datasheet = package.army_catalog.datasheet_by_id(datasheet_id)
@@ -111,7 +115,7 @@ def instantiate_defiler(
         catalog=package.army_catalog,
         model_geometries=package.model_geometries,
     ).instantiate_unit(
-        army_id="chaos-defiler-test-army",
+        army_id=army_id,
         selection=UnitMusterSelection(
             unit_selection_id=f"defiler-{datasheet_id}",
             datasheet_id=datasheet_id,
@@ -138,6 +142,16 @@ def defiler_overlay_artifacts() -> tuple[OverlaySourceArtifact, ...]:
 
 @lru_cache(maxsize=1)
 def july_defiler_overlay_artifacts() -> tuple[OverlaySourceArtifact, ...]:
+    thousand_sons_artifacts = july_thousand_sons_defiler_overlay_artifacts()
+    return apply_source_release_overlays(
+        source_artifacts=thousand_sons_artifacts,
+        release_manifest=csm_defiler_overlay.source_release_manifest(),
+        overlay_packs=(csm_defiler_overlay.overlay_pack(),),
+    )
+
+
+@lru_cache(maxsize=1)
+def july_thousand_sons_defiler_overlay_artifacts() -> tuple[OverlaySourceArtifact, ...]:
     return apply_source_release_overlays(
         source_artifacts=_wahapedia_source_artifacts(),
         release_manifest=july_defiler_overlay.source_release_manifest(),
@@ -164,4 +178,5 @@ __all__ = (
     "instantiate_defiler",
     "july_defiler_catalog_package",
     "july_defiler_overlay_artifacts",
+    "july_thousand_sons_defiler_overlay_artifacts",
 )
