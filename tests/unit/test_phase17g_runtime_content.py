@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import ast
 import json
 import sys
 from collections.abc import Callable, Mapping
-from dataclasses import replace
+from dataclasses import fields, replace
 from importlib import import_module
+from inspect import getsource
+from textwrap import dedent
 from types import ModuleType
 from typing import cast
 
@@ -34,6 +37,9 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
     AbilityTimingDescriptor,
 )
+from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
+    AllocatedAttackDamageModifierBinding,
+)
 from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     EnhancementAssignment,
@@ -55,6 +61,9 @@ from warhammer40k_core.engine.faction_content.bundle import (
     RuntimeContentBundle,
     RuntimeContentContribution,
     combine_runtime_content_contributions,
+)
+from warhammer40k_core.engine.faction_content.bundle_payloads import (
+    runtime_content_bundle_summary_payload,
 )
 from warhammer40k_core.engine.faction_content.events import (
     RuntimeContentEvent,
@@ -122,11 +131,17 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.runtime_modifiers import (
     AttackRerollPermissionBinding,
     AttackRerollPermissionContext,
+    DamageRollModifierBinding,
+    FailedSaveDamageReplacementBinding,
     HitRollModifierBinding,
     HitRollModifierContext,
     RuntimeModifierRegistry,
     WoundRollModifierBinding,
     WoundRollModifierContext,
+)
+from warhammer40k_core.engine.start_battle_hooks import (
+    StartBattleHookBinding,
+    StartBattleHookRegistry,
 )
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_DECISION_TYPE,
@@ -815,6 +830,137 @@ def test_runtime_content_bundle_builds_player_filtered_indexes_and_summary_paylo
 
     assert summary_without_attack_reroll["attack_reroll_permission_modifier_ids"] == []
     assert summary_without_attack_reroll["bundle_summary_hash"] != summary["bundle_summary_hash"]
+
+
+def test_runtime_content_bundle_summary_hash_tracks_every_previously_omitted_registry() -> None:
+    catalog = _catalog_with_runtime_detachment_selection(
+        ArmyCatalog.phase9a_canonical_content_pack()
+    )
+    army = muster_army(catalog=catalog, request=_muster_request(catalog))
+    activation = RuntimeContentActivation.from_armies(armies=(army,), catalog=catalog)
+    bundle = RuntimeContentBundle.from_contributions(
+        activation=activation,
+        armies=(army,),
+        catalog=catalog,
+        contributions=(RuntimeContentContribution(),),
+    )
+    baseline_summary = bundle.to_summary_payload()
+    runtime_modifiers = bundle.runtime_modifier_registry
+    start_battle_binding = StartBattleHookBinding(
+        hook_id="runtime:start-battle-hook",
+        source_id="runtime:start-battle-source",
+        request_handler=lambda _context: None,
+    )
+    damage_roll_binding = DamageRollModifierBinding(
+        modifier_id="runtime:damage-roll-modifier",
+        source_id="runtime:damage-roll-source",
+        handler=lambda _context: 0,
+    )
+    allocated_damage_binding = AllocatedAttackDamageModifierBinding(
+        modifier_id="runtime:allocated-attack-damage-modifier",
+        source_id="runtime:allocated-attack-damage-source",
+        handler=lambda _context: 0,
+    )
+    failed_save_binding = FailedSaveDamageReplacementBinding(
+        modifier_id="runtime:failed-save-damage-replacement",
+        source_id="runtime:failed-save-damage-replacement-source",
+        handler=lambda _context: None,
+    )
+    variants = (
+        (
+            "start_battle_hook_ids",
+            start_battle_binding.hook_id,
+            replace(
+                bundle,
+                start_battle_hook_registry=StartBattleHookRegistry.from_bindings(
+                    (*bundle.start_battle_hook_registry.all_bindings(), start_battle_binding)
+                ),
+            ),
+        ),
+        (
+            "damage_roll_modifier_ids",
+            damage_roll_binding.modifier_id,
+            replace(
+                bundle,
+                runtime_modifier_registry=replace(
+                    runtime_modifiers,
+                    damage_roll_modifier_bindings=(
+                        *runtime_modifiers.damage_roll_modifier_bindings,
+                        damage_roll_binding,
+                    ),
+                ),
+            ),
+        ),
+        (
+            "allocated_attack_damage_modifier_ids",
+            allocated_damage_binding.modifier_id,
+            replace(
+                bundle,
+                runtime_modifier_registry=replace(
+                    runtime_modifiers,
+                    allocated_attack_damage_modifier_bindings=(
+                        *runtime_modifiers.allocated_attack_damage_modifier_bindings,
+                        allocated_damage_binding,
+                    ),
+                ),
+            ),
+        ),
+        (
+            "failed_save_damage_replacement_modifier_ids",
+            failed_save_binding.modifier_id,
+            replace(
+                bundle,
+                runtime_modifier_registry=replace(
+                    runtime_modifiers,
+                    failed_save_damage_replacement_bindings=(
+                        *runtime_modifiers.failed_save_damage_replacement_bindings,
+                        failed_save_binding,
+                    ),
+                ),
+            ),
+        ),
+    )
+
+    for summary_field, binding_id, variant in variants:
+        variant_summary = variant.to_summary_payload()
+        variant_payload = cast(Mapping[str, JsonValue], variant_summary)
+
+        assert binding_id in cast(list[str], variant_payload[summary_field])
+        assert variant_summary["bundle_summary_hash"] != baseline_summary["bundle_summary_hash"]
+
+
+def test_runtime_content_bundle_summary_has_static_registry_family_parity() -> None:
+    source = dedent(getsource(runtime_content_bundle_summary_payload))
+    tree = ast.parse(source)
+    payload_assignments = tuple(
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == "payload" for target in node.targets)
+        and isinstance(node.value, ast.Dict)
+    )
+    assert len(payload_assignments) == 1
+    payload_dict = cast(ast.Dict, payload_assignments[0].value)
+    payload_dependencies = {
+        path
+        for value in payload_dict.values
+        for node in ast.walk(value)
+        if isinstance(node, ast.Attribute)
+        if (path := _attribute_path(node)) is not None
+    }
+    bundle_registry_paths = {
+        f"bundle.{field.name}"
+        for field in fields(RuntimeContentBundle)
+        if field.name.endswith("_registry")
+    }
+    runtime_modifier_binding_paths = {
+        f"bundle.runtime_modifier_registry.{field.name}"
+        for field in fields(RuntimeModifierRegistry)
+        if field.name.endswith("_bindings")
+    }
+
+    assert bundle_registry_paths <= payload_dependencies
+    assert runtime_modifier_binding_paths <= payload_dependencies
 
 
 def test_runtime_content_bundle_event_keyed_hooks_match_legacy_registries() -> None:
@@ -2288,6 +2434,18 @@ def _runtime_content_bundle(lifecycle: GameLifecycle) -> RuntimeContentBundle:
     if type(bundle) is not RuntimeContentBundle:
         raise AssertionError("Runtime content bundle was not rebuilt.")
     return bundle
+
+
+def _attribute_path(node: ast.Attribute) -> str | None:
+    parts = [node.attr]
+    value = node.value
+    while isinstance(value, ast.Attribute):
+        parts.append(value.attr)
+        value = value.value
+    if not isinstance(value, ast.Name):
+        return None
+    parts.append(value.id)
+    return ".".join(reversed(parts))
 
 
 def _catalog_with_hazardous_bolt_rifle(catalog: ArmyCatalog) -> ArmyCatalog:

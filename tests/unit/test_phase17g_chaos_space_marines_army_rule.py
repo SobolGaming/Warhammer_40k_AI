@@ -19,6 +19,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     proposal_from_request,
     shooting_lifecycle,
 )
+from tests.phase15c_fight_order_helpers import fight_lifecycle
 
 from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -80,8 +81,17 @@ from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_marines import (
     army_rule,
 )
-from warhammer40k_core.engine.fight_order import FightActivationSelection
+from warhammer40k_core.engine.fight_order import (
+    FIGHT_ACTIVATION_DECISION_TYPE,
+    FightActivationSelection,
+    fight_activation_option_id,
+)
+from warhammer40k_core.engine.fight_resolution import (
+    SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+    MeleeDeclarationProposalRequest,
+)
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
+    SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
     FightUnitSelectedContext,
     FightUnitSelectedGrantRegistry,
 )
@@ -91,6 +101,10 @@ from warhammer40k_core.engine.mortal_wound_feel_no_pain_hooks import (
     MortalWoundFeelNoPainContinuationHandler,
     MortalWoundFeelNoPainContinuationHookBinding,
     MortalWoundFeelNoPainContinuationHookRegistry,
+)
+from warhammer40k_core.engine.movement_proposals import (
+    MOVEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
 )
 from warhammer40k_core.engine.phase import (
     BattlePhase,
@@ -125,6 +139,7 @@ from warhammer40k_core.engine.shooting_unit_selected_hooks import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import FIRE_OVERWATCH_RULE_ID
 from warhammer40k_core.engine.weapon_declaration import RangedAttackPool
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleEffectSpec, RuleParameter
 
@@ -364,7 +379,18 @@ def test_defiler_daemonforge_runs_through_catalog_lifecycle_and_replay(
     attack_context = cast(dict[str, JsonValue], request_payload["attack_context"])
     wound_roll_state = cast(dict[str, JsonValue], attack_context["wound_roll_state"])
     assert wound_roll_state["current_values"] == [1]
+    assert attack_context["phase"] == BattlePhase.SHOOTING.value
     assert permission_payload["source_id"] == army_rule.DEFILER_DAEMONFORGE_ABILITY_ID
+    state = cast(GameState, session.lifecycle.state)
+    attacker = _unit_for_player(state, player_id="player-a")
+    assert (
+        army_rule.active_dark_pact_for_unit(
+            state,
+            unit_instance_id=attacker.unit_instance_id,
+            phase=BattlePhase.SHOOTING,
+        )
+        is army_rule.DarkPactKind.LETHAL_HITS
+    )
     initial_reroll_lifecycle_payload = copy.deepcopy(session.lifecycle.to_payload())
 
     resolved = session.submit_option(
@@ -378,6 +404,50 @@ def test_defiler_daemonforge_runs_through_catalog_lifecycle_and_replay(
     replay = ReplayRunner.from_payload(
         ReplayArtifact.capture(
             artifact_id=f"replay:phase17g:csm:daemonforge:{reroll_option_id}",
+            initial_lifecycle_payload=initial_reroll_lifecycle_payload,
+            final_lifecycle=session.lifecycle,
+        ).to_payload()
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+def test_defiler_daemonforge_runs_through_catalog_fight_lifecycle_and_replay() -> None:
+    session, status = _daemonforge_fight_status(
+        game_id="daemonforge-fight-seed-5",
+    )
+    request = _decision_request(status.decision_request)
+
+    assert request.decision_type == DICE_REROLL_DECISION_TYPE
+    request_payload = cast(dict[str, JsonValue], request.payload)
+    permission_payload = cast(dict[str, JsonValue], request_payload["permission"])
+    attack_context = cast(dict[str, JsonValue], request_payload["attack_context"])
+    wound_roll_state = cast(dict[str, JsonValue], attack_context["wound_roll_state"])
+    assert wound_roll_state["current_values"] == [1]
+    assert attack_context["phase"] == BattlePhase.FIGHT.value
+    assert permission_payload["source_id"] == army_rule.DEFILER_DAEMONFORGE_ABILITY_ID
+    state = cast(GameState, session.lifecycle.state)
+    attacker = _unit_for_player(state, player_id="player-a")
+    assert (
+        army_rule.active_dark_pact_for_unit(
+            state,
+            unit_instance_id=attacker.unit_instance_id,
+            phase=BattlePhase.FIGHT,
+        )
+        is army_rule.DarkPactKind.LETHAL_HITS
+    )
+    initial_reroll_lifecycle_payload = copy.deepcopy(session.lifecycle.to_payload())
+
+    resolved = session.submit_option(
+        request_id=request.request_id,
+        option_id="decline",
+        result_id="phase17g-csm-daemonforge-fight-decline",
+    )
+
+    assert resolved.status_kind is not LifecycleStatusKind.INVALID
+    assert _event_count(session.lifecycle.decision_controller, "dice_reroll_declined") == 1
+    replay = ReplayRunner.from_payload(
+        ReplayArtifact.capture(
+            artifact_id="replay:phase17g:csm:daemonforge:fight:decline",
             initial_lifecycle_payload=initial_reroll_lifecycle_payload,
             final_lifecycle=session.lifecycle,
         ).to_payload()
@@ -1215,13 +1285,149 @@ def test_dark_pacts_completion_hook_runs_once_through_shooting_phase_handler() -
     assert _event_count(decisions, "chaos_space_marines_dark_pact_resolved") == 1
 
 
+def _daemonforge_fight_status(*, game_id: str) -> tuple[LocalGameSession, LifecycleStatus]:
+    catalog = _daemonforge_catalog()
+    lifecycle, units = fight_lifecycle(
+        alpha_unit_ids=("defiler-attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "defiler-attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id=game_id,
+        alpha_unit_specs={
+            "defiler-attacker": (
+                army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID,
+                f"{army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID}:defiler",
+                1,
+            )
+        },
+        enemy_unit_specs={"enemy": ("000004209", "000004209:defiler", 1)},
+        catalog=catalog,
+        alpha_faction_id=CHAOS_SPACE_MARINES_FACTION_ID,
+        alpha_detachment_ids=("pactbound-zealots",),
+        enemy_faction_id="death-guard",
+        enemy_detachment_ids=("champions-of-contagion",),
+    )
+    bundle = _runtime_content_bundle(lifecycle)
+    assert (
+        army_rule.DEFILER_DAEMONFORGE_WOUND_REROLL_MODIFIER_ID
+        in bundle.to_summary_payload()["attack_reroll_permission_modifier_ids"]
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    status = _drain_daemonforge_fight_movement_requests(
+        session=session,
+        status=session.advance_until_decision_or_terminal(),
+        result_id_prefix=game_id,
+    )
+    activation_request = _decision_request(status.decision_request)
+    assert activation_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+    status = session.submit_option(
+        request_id=activation_request.request_id,
+        option_id=fight_activation_option_id(
+            unit_instance_id=units["defiler-attacker"].unit_instance_id,
+            fight_type=FightTypeKind.NORMAL,
+        ),
+        result_id=f"{game_id}:select-fight-activation",
+    )
+    grant_request = _decision_request(status.decision_request)
+    assert grant_request.decision_type == SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE
+    status = session.submit_option(
+        request_id=grant_request.request_id,
+        option_id=army_rule.FIGHT_LETHAL_HITS_HOOK_ID,
+        result_id=f"{game_id}:dark-pact",
+    )
+    status = _drain_daemonforge_fight_movement_requests(
+        session=session,
+        status=status,
+        result_id_prefix=game_id,
+    )
+    declaration_request = _decision_request(status.decision_request)
+    assert declaration_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    return session, session.submit_parameterized_payload(
+        request_id=declaration_request.request_id,
+        payload=_daemonforge_melee_declaration_payload(
+            request=declaration_request,
+            target_unit_instance_id=units["enemy"].unit_instance_id,
+        ),
+        result_id=f"{game_id}:melee-declaration",
+    )
+
+
+def _drain_daemonforge_fight_movement_requests(
+    *,
+    session: LocalGameSession,
+    status: LifecycleStatus,
+    result_id_prefix: str,
+) -> LifecycleStatus:
+    current = status
+    movement_number = 1
+    while (
+        current.decision_request is not None
+        and current.decision_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    ):
+        request = current.decision_request
+        proposal = MovementProposalRequest.from_decision_request_payload(request.payload)
+        context = cast(dict[str, JsonValue], proposal.context)
+        current = session.submit_parameterized_payload(
+            request_id=request.request_id,
+            payload=cast(
+                JsonValue,
+                {
+                    "proposal_request_id": proposal.request_id,
+                    "proposal_kind": proposal.proposal_kind.value,
+                    "unit_instance_id": proposal.unit_instance_id,
+                    "movement_phase_action": proposal.movement_phase_action,
+                    "movement_mode": context["movement_mode"],
+                },
+            ),
+            result_id=f"{result_id_prefix}:fight-no-move:{movement_number}",
+        )
+        movement_number += 1
+    return current
+
+
+def _daemonforge_melee_declaration_payload(
+    *,
+    request: DecisionRequest,
+    target_unit_instance_id: str,
+) -> JsonValue:
+    proposal = MeleeDeclarationProposalRequest.from_decision_request(request)
+    weapon = next(
+        cast(dict[str, JsonValue], available_weapon)
+        for available_weapon in proposal.available_weapons
+        if cast(dict[str, JsonValue], available_weapon)["weapon_profile_id"]
+        == "000000969:shearing-claws:strike"
+    )
+    return cast(
+        JsonValue,
+        {
+            "proposal_request_id": proposal.request_id,
+            "proposal_kind": proposal.proposal_kind,
+            "player_id": proposal.actor_id,
+            "battle_round": proposal.battle_round,
+            "unit_instance_id": proposal.unit_instance_id,
+            "source_decision_request_id": proposal.source_decision_request_id,
+            "source_decision_result_id": proposal.source_decision_result_id,
+            "declarations": [
+                {
+                    "attacker_model_instance_id": weapon["model_instance_id"],
+                    "wargear_id": weapon["wargear_id"],
+                    "weapon_profile_id": weapon["weapon_profile_id"],
+                    "target_allocations": [{"target_unit_instance_id": target_unit_instance_id}],
+                }
+            ],
+        },
+    )
+
+
 def _daemonforge_shooting_status(
     *,
     game_id: str,
     attacker_datasheet_id: str,
     choose_dark_pact: bool,
 ) -> tuple[LocalGameSession, LifecycleStatus]:
-    catalog = _daemonforge_shooting_catalog()
+    catalog = _daemonforge_catalog()
     attacker_is_csm = attacker_datasheet_id == army_rule.DEFILER_DAEMONFORGE_DATASHEET_ID
     attacker_model_profile_id = f"{attacker_datasheet_id}:defiler"
     target_datasheet_id = "000004209" if attacker_is_csm else "000000969"
@@ -1300,7 +1506,7 @@ def _daemonforge_shooting_status(
 
 
 @lru_cache(maxsize=1)
-def _daemonforge_shooting_catalog() -> ArmyCatalog:
+def _daemonforge_catalog() -> ArmyCatalog:
     source_catalog = july_defiler_catalog_package().army_catalog
     factions = tuple(
         replace(
@@ -1341,6 +1547,7 @@ def _daemonforge_shooting_catalog() -> ArmyCatalog:
                 if profile.profile_id
                 in {
                     "000000969:excruciator-cannon:standard",
+                    "000000969:shearing-claws:strike",
                     "000004209:excruciator-cannon:standard",
                 }
                 else profile
