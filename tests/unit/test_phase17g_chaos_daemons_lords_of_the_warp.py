@@ -11,6 +11,7 @@ from warhammer40k_core.engine import generic_detachment_rule_effects as generic_
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.decision_request import DecisionOption
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.lords_of_the_warp import (  # noqa: E501
     manifest,
     stratagems,
@@ -154,6 +155,28 @@ def test_lords_detachment_rule_ir_modifies_only_non_monster_daemon_characters() 
         rule_ir=rule_ir,
         army=army,
     ) == ("army-alpha:slaanesh-character",)
+
+
+def test_lords_detachment_rule_is_not_automatically_installed_at_battle_formation() -> None:
+    activation = RuntimeContentActivation(
+        selected_faction_ids=(lords_ir.CHAOS_DAEMONS_FACTION_ID,),
+        selected_detachment_ids=(lords_ir.LORDS_OF_THE_WARP_DETACHMENT_ID,),
+        selected_enhancement_ids=(),
+        selected_stratagem_ids=(),
+        selected_datasheet_ids=(),
+        selected_wargear_ids=(),
+        selected_weapon_profile_ids=(),
+        selected_weapon_keywords=(),
+        loaded_unit_instance_ids=(),
+    )
+
+    assert (
+        generic_detachment_effects.generic_detachment_rule_battle_formation_hook_bindings(
+            activation=activation,
+            execution_records=(_lords_execution_record(),),
+        )
+        == ()
+    )
 
 
 def test_lords_runtime_manifest_and_stratagem_records_are_source_backed() -> None:
