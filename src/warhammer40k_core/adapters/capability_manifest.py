@@ -250,6 +250,8 @@ def project_capability_manifest(
         type(viewer_player_id) is not str or not viewer_player_id.strip()
     ):
         raise GameLifecycleError("Capability manifest viewer_player_id must be a string or None.")
+    if omniscient:
+        return payload
     viewer_scope = "omniscient" if omniscient else (viewer_player_id or "public")
 
     def visible(row: CapabilityRowPayload) -> bool:
@@ -268,11 +270,18 @@ def project_capability_manifest(
         if effect["rule_row_id"] in visible_rule_ids
     ]
     mode_capabilities = _mode_capabilities(all_rows)
-    selection_hash = _hash_json(
-        {
-            "viewer_scope": viewer_scope,
-            "row_ids": [row["row_id"] for row in all_rows],
-        }
+    selection_hash = _projected_selection_hash(
+        viewer_scope=viewer_scope,
+        roster_rows=roster_rows,
+        mission_rows=mission_rows,
+    )
+    certification_claims = _project_certification_claims(
+        authoritative_claims=payload["certification_claims"],
+        projected_claims=_certification_claims(
+            mode_capabilities=mode_capabilities,
+            certified_scenario_evidence_refs=tuple(payload["certified_scenario_evidence_refs"]),
+            replay_evidence_refs=tuple(payload["replay_evidence_refs"]),
+        ),
     )
     projected = dict(payload)
     projected.update(
@@ -292,11 +301,7 @@ def project_capability_manifest(
             "mission_rows": mission_rows,
             "geometry_rows": geometry_rows,
             "unsupported_effects": unsupported_effects,
-            "certification_claims": _certification_claims(
-                mode_capabilities=mode_capabilities,
-                certified_scenario_evidence_refs=tuple(payload["certified_scenario_evidence_refs"]),
-                replay_evidence_refs=tuple(payload["replay_evidence_refs"]),
-            ),
+            "certification_claims": certification_claims,
         }
     )
     return cast(
@@ -390,6 +395,7 @@ def _roster_rows(
                     ),
                 },
                 metadata={
+                    "army_muster_request": cast(JsonValue, request.to_payload()),
                     "faction_id": request.detachment_selection.faction_id,
                     "detachment_ids": list(request.detachment_selection.detachment_ids),
                     "unit_count": len(request.unit_selections),
@@ -677,7 +683,7 @@ def _mission_rows(
                             ("adapter:redaction:capability_manifest",),
                         ),
                     },
-                    metadata={"mission_pack_id": None},
+                    metadata={"mission_pack_id": None, "mission_setup_hash": _hash_json(None)},
                 )
             ],
             None,
@@ -766,6 +772,7 @@ def _mission_rows(
             ),
         },
         metadata={
+            "mission_setup_hash": _hash_json(setup.to_payload()),
             "mission_pack_id": setup.mission_pack_id,
             "primary_mission_id": setup.primary_mission_id,
             "battlefield_layout_id": setup.battlefield_layout_id,
@@ -1106,6 +1113,54 @@ def _certification_claims(
         "evidence_refs": sorted({*certified_scenario_evidence_refs, *replay_evidence_refs}),
         "blocker_reason_codes": blockers,
     }
+
+
+def _project_certification_claims(
+    *,
+    authoritative_claims: CertificationClaimsPayload,
+    projected_claims: CertificationClaimsPayload,
+) -> CertificationClaimsPayload:
+    blocker_reason_codes = set(projected_claims["blocker_reason_codes"])
+    if not authoritative_claims["phase20a_certified"] and projected_claims["phase20a_certified"]:
+        blocker_reason_codes.add("authoritative_certification_blockers_redacted")
+    if (
+        not authoritative_claims["phase20d_release_eligible"]
+        and projected_claims["phase20d_release_eligible"]
+    ):
+        blocker_reason_codes.add("authoritative_release_blockers_redacted")
+    return {
+        "phase20a_certified": authoritative_claims["phase20a_certified"],
+        "phase20d_release_eligible": authoritative_claims["phase20d_release_eligible"],
+        "evidence_refs": projected_claims["evidence_refs"],
+        "blocker_reason_codes": sorted(blocker_reason_codes),
+    }
+
+
+def _projected_selection_hash(
+    *,
+    viewer_scope: str,
+    roster_rows: list[CapabilityRowPayload],
+    mission_rows: list[CapabilityRowPayload],
+) -> str:
+    return _hash_json(
+        {
+            "viewer_scope": viewer_scope,
+            "army_muster_requests": [
+                _required_selection_metadata(row, "army_muster_request") for row in roster_rows
+            ],
+            "public_mission_data_hashes": [
+                _required_selection_metadata(row, "mission_setup_hash") for row in mission_rows
+            ],
+        }
+    )
+
+
+def _required_selection_metadata(row: CapabilityRowPayload, key: str) -> JsonValue:
+    if key not in row["metadata"]:
+        raise GameLifecycleError(
+            f"Capability {row['row_kind']} row {row['row_id']} is missing {key} metadata."
+        )
+    return row["metadata"][key]
 
 
 def _capability_counts(

@@ -1084,7 +1084,7 @@
       "roster_construction",
       "weapon_allocation_matrix"
     ],
-    "manifest_id": "capability-manifest:e218b7b0adb3948cdd43f18b5fc7f21431321b05c7f3d70ea40c5845d1294d43",
+    "manifest_id": "capability-manifest:8609aa1fa9f9a6b5d33b67c6ead189e4e25a391a16ffabaacb0abb2819c9962d",
     "mission_rows": [
       {
         "capabilities": [
@@ -1184,6 +1184,7 @@
         "metadata": {
           "battlefield_layout_id": "take-and-hold-vs-take-and-hold-layout-3",
           "mission_pack_id": "11e-chapter-approved-2026-27",
+          "mission_setup_hash": "56f7edcb3dc6ddd09e7819aa7a9b79327700886fb57aa57c7046a363ba4afa36",
           "primary_mission_id": "primary-immovable-object",
           "terrain_layout_id": "take-and-hold-vs-take-and-hold-layout-3"
         },
@@ -1683,6 +1684,73 @@
         "display_name": "core-marine-force roster",
         "load_support": "engine_mustered",
         "metadata": {
+          "army_muster_request": {
+            "army_id": "army-alpha",
+            "attachment_declarations": [],
+            "battle_size": "strike_force",
+            "catalog_id": "phase9a-canonical",
+            "dedicated_transport_manifests": [],
+            "detachment_selection": {
+              "detachment_ids": [
+                "core-combined-arms"
+              ],
+              "enhancement_ids": [],
+              "faction_id": "core-marine-force",
+              "stratagem_ids": []
+            },
+            "enhancement_assignments": [],
+            "enhancement_point_values": [],
+            "force_disposition_id": "purge-the-foe",
+            "player_id": "player-a",
+            "points_source_package_id": null,
+            "roster_legality_required": false,
+            "ruleset_id": {
+              "edition": "11e",
+              "game": "warhammer_40000",
+              "version": "core-v2-phase9a"
+            },
+            "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
+            "unit_points": [],
+            "unit_selections": [
+              {
+                "datasheet_id": "core-intercessor-like-infantry",
+                "model_profile_selections": [
+                  {
+                    "model_count": 5,
+                    "model_profile_id": "core-intercessor-like"
+                  }
+                ],
+                "mustering_option_selections": [],
+                "unit_selection_id": "scout-redeploy-unit",
+                "wargear_selections": []
+              },
+              {
+                "datasheet_id": "core-vehicle-monster",
+                "model_profile_selections": [
+                  {
+                    "model_count": 1,
+                    "model_profile_id": "core-vehicle-monster"
+                  }
+                ],
+                "mustering_option_selections": [],
+                "unit_selection_id": "strategic-reserve-unit",
+                "wargear_selections": []
+              },
+              {
+                "datasheet_id": "core-deep-strike-unit",
+                "model_profile_selections": [
+                  {
+                    "model_count": 3,
+                    "model_profile_id": "core-deep-strike-model"
+                  }
+                ],
+                "mustering_option_selections": [],
+                "unit_selection_id": "deep-strike-unit",
+                "wargear_selections": []
+              }
+            ],
+            "warlord_selection": null
+          },
           "detachment_ids": [
             "core-combined-arms"
           ],
@@ -1812,6 +1880,49 @@
         "display_name": "core-marine-force roster",
         "load_support": "engine_mustered",
         "metadata": {
+          "army_muster_request": {
+            "army_id": "army-beta",
+            "attachment_declarations": [],
+            "battle_size": "strike_force",
+            "catalog_id": "phase9a-canonical",
+            "dedicated_transport_manifests": [],
+            "detachment_selection": {
+              "detachment_ids": [
+                "core-combined-arms"
+              ],
+              "enhancement_ids": [],
+              "faction_id": "core-marine-force",
+              "stratagem_ids": []
+            },
+            "enhancement_assignments": [],
+            "enhancement_point_values": [],
+            "force_disposition_id": "purge-the-foe",
+            "player_id": "player-b",
+            "points_source_package_id": null,
+            "roster_legality_required": false,
+            "ruleset_id": {
+              "edition": "11e",
+              "game": "warhammer_40000",
+              "version": "core-v2-phase9a"
+            },
+            "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
+            "unit_points": [],
+            "unit_selections": [
+              {
+                "datasheet_id": "core-intercessor-like-infantry",
+                "model_profile_selections": [
+                  {
+                    "model_count": 5,
+                    "model_profile_id": "core-intercessor-like"
+                  }
+                ],
+                "mustering_option_selections": [],
+                "unit_selection_id": "scout-redeploy-unit",
+                "wargear_selections": []
+              }
+            ],
+            "warlord_selection": null
+          },
           "detachment_ids": [
             "core-combined-arms"
           ],
@@ -2922,7 +3033,7 @@
       }
     ],
     "schema_version": "capability-manifest-v1",
-    "selection_hash": "3c64064b3e3bc98a3cc889a0957d4b3757c75477720b2b627f7eb9e852e29e07",
+    "selection_hash": "19c00623b5966dc58be67da70f54d71db18ce7186c6f65e3009fb786c0ec2510",
     "unit_rows": [
       {
         "capabilities": [

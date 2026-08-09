@@ -51,13 +51,18 @@ The support-profile response is viewer scoped in the shared redaction module.
 Players and coaches receive only their roster, unit, rule, geometry, unsupported-
 effect, count, selection-hash, and certification projection; administrators
 receive the omniscient fixture. Mission, ruleset, catalog, engine, contract, and
-neutral interaction identities remain common. Clients must not infer hidden
+neutral interaction identities remain common. A viewer selection hash covers
+that viewer's complete canonical muster request plus a digest of the complete
+public mission setup; owned roster or public mission changes therefore change
+the hash, while opponent-only changes do not. Clients must not infer hidden
 opponent selection from a missing row or compare viewer hashes across scopes.
 
 Phase 20A and Phase 20D claim booleans are mechanically derived from explicit
 capability and certified-scenario/replay evidence. With no such evidence, the
 claims are false even if the legacy support-profile envelope says `playable` or
-the setup smoke is eligible.
+the setup smoke is eligible. Viewer projection never promotes either
+authoritative boolean. It recomputes visible blocker detail and uses explicit
+redacted-blocker reason codes when an authoritative blocker is not visible.
 
 ## Phase 18I interaction metadata
 

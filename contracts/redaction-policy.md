@@ -38,9 +38,14 @@ display data and no live hidden state.
 
 The nested Phase 17O capability manifest is projected by this same redaction
 module. A non-omniscient viewer receives only owned roster, unit, rule,
-geometry, and unsupported-effect rows. Capability counts, mode results,
-selection hashes, manifest IDs, and certification blockers are rebuilt from the
-visible rows; they are not copied from the omniscient payload. The common
+geometry, and unsupported-effect rows. Capability counts and mode results are
+rebuilt from visible rows. Selection hashes and manifest IDs cover the viewer's
+complete canonical muster request plus a digest of the complete public mission
+setup, never an opponent's selection. Certification blocker details are rebuilt
+from visible rows, but the authoritative Phase 20A and Phase 20D booleans are
+preserved so redaction cannot strengthen a certification claim. When a hidden
+authoritative blocker would otherwise disappear, the projection emits only a
+generic redacted-blocker reason code. The common
 mission/catalog/ruleset/contract identities and neutral interaction inventory
 contain no selected opponent content.
 

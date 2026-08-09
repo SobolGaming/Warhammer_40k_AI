@@ -754,7 +754,7 @@
       "roster_construction",
       "weapon_allocation_matrix"
     ],
-    "manifest_id": "capability-manifest:3cb1677c5359541a7b5e5ce70b9c88803c07488de3ee5184de428b6be66d4d92",
+    "manifest_id": "capability-manifest:79724682c2ebb6daac07a4d16d7fae2e77844b2a159ffd99cb9af9e33913d852",
     "mission_rows": [
       {
         "capabilities": [
@@ -854,6 +854,7 @@
         "metadata": {
           "battlefield_layout_id": "take-and-hold-vs-take-and-hold-layout-3",
           "mission_pack_id": "11e-chapter-approved-2026-27",
+          "mission_setup_hash": "56f7edcb3dc6ddd09e7819aa7a9b79327700886fb57aa57c7046a363ba4afa36",
           "primary_mission_id": "primary-immovable-object",
           "terrain_layout_id": "take-and-hold-vs-take-and-hold-layout-3"
         },
@@ -1181,6 +1182,49 @@
         "display_name": "core-marine-force roster",
         "load_support": "engine_mustered",
         "metadata": {
+          "army_muster_request": {
+            "army_id": "army-beta",
+            "attachment_declarations": [],
+            "battle_size": "strike_force",
+            "catalog_id": "phase9a-canonical",
+            "dedicated_transport_manifests": [],
+            "detachment_selection": {
+              "detachment_ids": [
+                "core-combined-arms"
+              ],
+              "enhancement_ids": [],
+              "faction_id": "core-marine-force",
+              "stratagem_ids": []
+            },
+            "enhancement_assignments": [],
+            "enhancement_point_values": [],
+            "force_disposition_id": "purge-the-foe",
+            "player_id": "player-b",
+            "points_source_package_id": null,
+            "roster_legality_required": false,
+            "ruleset_id": {
+              "edition": "11e",
+              "game": "warhammer_40000",
+              "version": "core-v2-phase9a"
+            },
+            "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
+            "unit_points": [],
+            "unit_selections": [
+              {
+                "datasheet_id": "core-intercessor-like-infantry",
+                "model_profile_selections": [
+                  {
+                    "model_count": 5,
+                    "model_profile_id": "core-intercessor-like"
+                  }
+                ],
+                "mustering_option_selections": [],
+                "unit_selection_id": "scout-redeploy-unit",
+                "wargear_selections": []
+              }
+            ],
+            "warlord_selection": null
+          },
           "detachment_ids": [
             "core-combined-arms"
           ],
@@ -1596,7 +1640,7 @@
       }
     ],
     "schema_version": "capability-manifest-v1",
-    "selection_hash": "97fd22992919ad846ffebb195e97d72ff997a4bade5385fb710d4637a03db939",
+    "selection_hash": "17689f507d2c5a235786597174a48bf835b2fe59861eedd93f80a226d7a0fc32",
     "unit_rows": [
       {
         "capabilities": [

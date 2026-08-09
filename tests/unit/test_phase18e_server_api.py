@@ -29,6 +29,10 @@ from warhammer40k_core.adapters.access_control import (
     DEV_PLAYER_B_TOKEN,
     bearer_authorization,
 )
+from warhammer40k_core.adapters.capability_manifest import (
+    CapabilityManifestPayload,
+    project_capability_manifest,
+)
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.external_contract import (
     CREATE_SESSION_SCHEMA_VERSION,
@@ -303,6 +307,129 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
         )
         == player_a_support
     )
+
+
+def test_phase17o_player_selection_hash_covers_only_owned_roster_and_public_mission() -> None:
+    def manifests_for_model_counts(
+        *,
+        player_a_model_count: int,
+        player_b_model_count: int,
+        attacker_player_id: str = PLAYER_A,
+    ) -> tuple[dict[str, JsonValue], dict[str, JsonValue]]:
+        server = AdapterGameServer()
+        game_id = "phase17o-viewer-selection-hash"
+        _create_game(
+            server,
+            game_id=game_id,
+            player_a_model_count=player_a_model_count,
+            player_b_model_count=player_b_model_count,
+            attacker_player_id=attacker_player_id,
+        )
+        authoritative = _field_object(
+            _request(server, "GET", f"/games/{game_id}/support-profile"),
+            "capability_manifest",
+        )
+        player_a = _field_object(
+            _request(
+                server,
+                "GET",
+                f"/games/{game_id}/support-profile",
+                query={"viewer_player_id": PLAYER_A},
+            ),
+            "capability_manifest",
+        )
+        return authoritative, player_a
+
+    baseline_authoritative, baseline_player_a = manifests_for_model_counts(
+        player_a_model_count=5,
+        player_b_model_count=5,
+    )
+    owned_change_authoritative, owned_change_player_a = manifests_for_model_counts(
+        player_a_model_count=10,
+        player_b_model_count=5,
+    )
+    opponent_change_authoritative, opponent_change_player_a = manifests_for_model_counts(
+        player_a_model_count=5,
+        player_b_model_count=10,
+    )
+    mission_change_authoritative, mission_change_player_a = manifests_for_model_counts(
+        player_a_model_count=5,
+        player_b_model_count=5,
+        attacker_player_id=PLAYER_B,
+    )
+
+    assert baseline_authoritative["selection_hash"] != owned_change_authoritative["selection_hash"]
+    assert (
+        baseline_authoritative["selection_hash"] != opponent_change_authoritative["selection_hash"]
+    )
+    assert baseline_player_a["selection_hash"] != owned_change_player_a["selection_hash"]
+    assert baseline_player_a["manifest_id"] != owned_change_player_a["manifest_id"]
+    assert baseline_player_a != owned_change_player_a
+    assert baseline_player_a == opponent_change_player_a
+    assert (
+        baseline_authoritative["selection_hash"] != mission_change_authoritative["selection_hash"]
+    )
+    assert baseline_player_a["selection_hash"] != mission_change_player_a["selection_hash"]
+
+
+def test_phase17o_redaction_cannot_promote_authoritative_certification_claims() -> None:
+    server = AdapterGameServer()
+    game_id = "phase17o-certification-redaction"
+    _create_game(server, game_id=game_id)
+    manifest = cast(
+        CapabilityManifestPayload,
+        json.loads(
+            json.dumps(
+                _field_object(
+                    _request(server, "GET", f"/games/{game_id}/support-profile"),
+                    "capability_manifest",
+                )
+            )
+        ),
+    )
+    all_rows = (
+        *manifest["roster_rows"],
+        *manifest["unit_rows"],
+        *manifest["rule_rows"],
+        *manifest["mission_rows"],
+        *manifest["geometry_rows"],
+    )
+    for row in all_rows:
+        for result in row["capabilities"]:
+            result["status"] = "supported"
+            result["evidence_refs"] = ["scenario:phase20a", "replay:phase20d"]
+            result["reason_code"] = None
+    opponent_row = next(row for row in manifest["roster_rows"] if row["player_id"] == PLAYER_B)
+    opponent_semantic_result = next(
+        result
+        for result in opponent_row["capabilities"]
+        if result["dimension"] == "SEMANTICALLY_EXECUTABLE"
+    )
+    opponent_semantic_result["status"] = "unsupported"
+    opponent_semantic_result["reason_code"] = "opponent_semantics_incomplete"
+    manifest["certified_scenario_evidence_refs"] = ["scenario:phase20a"]
+    manifest["replay_evidence_refs"] = ["replay:phase20d"]
+    manifest["certification_claims"] = {
+        "phase20a_certified": False,
+        "phase20d_release_eligible": False,
+        "evidence_refs": ["replay:phase20d", "scenario:phase20a"],
+        "blocker_reason_codes": ["opponent_semantics_incomplete"],
+    }
+
+    projected = project_capability_manifest(
+        manifest,
+        viewer_player_id=PLAYER_A,
+        omniscient=False,
+    )
+    projected_claims = projected["certification_claims"]
+
+    assert projected_claims["phase20a_certified"] is False
+    assert projected_claims["phase20d_release_eligible"] is False
+    assert projected_claims["blocker_reason_codes"] == [
+        "authoritative_certification_blockers_redacted",
+        "authoritative_release_blockers_redacted",
+    ]
+    assert "opponent_semantics_incomplete" not in projected_claims["blocker_reason_codes"]
 
 
 def test_phase18e_formal_session_protocol_completes_all_required_operations() -> None:
@@ -1486,12 +1613,21 @@ def _create_game(
     *,
     game_id: str,
     catalog: ArmyCatalog | None = None,
+    player_a_model_count: int = 5,
+    player_b_model_count: int = 5,
+    attacker_player_id: str = PLAYER_A,
 ) -> None:
     payload = _request(
         server,
         "POST",
         "/games",
-        body=_game_config_body(game_id=game_id, catalog=catalog),
+        body=_game_config_body(
+            game_id=game_id,
+            catalog=catalog,
+            player_a_model_count=player_a_model_count,
+            player_b_model_count=player_b_model_count,
+            attacker_player_id=attacker_player_id,
+        ),
         expected_status=201,
     )
     assert payload["game_id"] == game_id
@@ -1502,11 +1638,23 @@ def _game_config_body(
     *,
     game_id: str,
     catalog: ArmyCatalog | None = None,
+    player_a_model_count: int = 5,
+    player_b_model_count: int = 5,
+    attacker_player_id: str = PLAYER_A,
 ) -> dict[str, JsonValue]:
     return {
         "schema_version": CREATE_SESSION_SCHEMA_VERSION,
         "config": validate_json_value(
-            cast(JsonValue, _config(game_id=game_id, catalog=catalog).to_payload())
+            cast(
+                JsonValue,
+                _config(
+                    game_id=game_id,
+                    catalog=catalog,
+                    player_a_model_count=player_a_model_count,
+                    player_b_model_count=player_b_model_count,
+                    attacker_player_id=attacker_player_id,
+                ).to_payload(),
+            )
         ),
     }
 
@@ -2122,7 +2270,14 @@ def _catalog_with_selected_generic_ir_ability() -> ArmyCatalog:
     return replace(catalog, datasheets=datasheets)
 
 
-def _config(*, game_id: str, catalog: ArmyCatalog | None = None) -> GameConfig:
+def _config(
+    *,
+    game_id: str,
+    catalog: ArmyCatalog | None = None,
+    player_a_model_count: int = 5,
+    player_b_model_count: int = 5,
+    attacker_player_id: str = PLAYER_A,
+) -> GameConfig:
     army_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
         game_id=game_id,
@@ -2137,12 +2292,14 @@ def _config(*, game_id: str, catalog: ArmyCatalog | None = None) -> GameConfig:
                 player_id=PLAYER_A,
                 army_id="army-alpha",
                 unit_selection_id="intercessor-unit-1",
+                model_count=player_a_model_count,
             ),
             _army_muster_request(
                 catalog=army_catalog,
                 player_id=PLAYER_B,
                 army_id="army-beta",
                 unit_selection_id="intercessor-unit-2",
+                model_count=player_b_model_count,
             ),
         ),
         player_ids=(PLAYER_A, PLAYER_B),
@@ -2152,8 +2309,8 @@ def _config(*, game_id: str, catalog: ArmyCatalog | None = None) -> GameConfig:
             mission_pack=chapter_approved_2026_27_mission_pack(),
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
-            attacker_player_id=PLAYER_A,
-            defender_player_id=PLAYER_B,
+            attacker_player_id=attacker_player_id,
+            defender_player_id=(PLAYER_B if attacker_player_id == PLAYER_A else PLAYER_A),
         ),
     )
 
@@ -2164,6 +2321,7 @@ def _army_muster_request(
     player_id: str,
     army_id: str,
     unit_selection_id: str,
+    model_count: int = 5,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -2183,7 +2341,7 @@ def _army_muster_request(
                 model_profile_selections=(
                     ModelProfileSelection(
                         model_profile_id="core-intercessor-like",
-                        model_count=5,
+                        model_count=model_count,
                     ),
                 ),
             ),
