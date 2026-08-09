@@ -805,6 +805,8 @@ export interface components {
             width_inches: number;
         };
         "battlefield-view--terrain_feature.schema": {
+            /** @enum {string} */
+            classification?: "dense" | "light" | "mixed" | "unknown";
             /** @constant */
             entity_kind: "terrain_feature";
             footprint: components["schemas"]["battlefield-view--shape.schema"];
@@ -1020,6 +1022,18 @@ export interface components {
             /** @constant */
             schema_version: "annotated-decision-request-v1";
         };
+        "game-view--primary_unit_terrain_membership.schema": {
+            terrain_feature_ids: string[];
+            unit_instance_id: string;
+        };
+        "game-view--primary_unit_terrain_turn_start_snapshot.schema": {
+            active_player_id: string;
+            battle_round: number;
+            game_id: string;
+            snapshot_id: string;
+            source_id: string;
+            unit_memberships: components["schemas"]["game-view--primary_unit_terrain_membership.schema"][];
+        };
         "game-view--rules_catalog_reference.schema": {
             catalog_id: string;
             /** @constant */
@@ -1060,6 +1074,7 @@ export interface components {
             public_command_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_card_states: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_choices: components["schemas"]["game-view--json_value.schema"][];
+            primary_unit_terrain_turn_start_snapshots?: components["schemas"]["game-view--primary_unit_terrain_turn_start_snapshot.schema"][];
             public_stratagem_use_records: components["schemas"]["game-view--json_value.schema"][];
             public_victory_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             rules_catalog: components["schemas"]["game-view--rules_catalog_reference.schema"];
