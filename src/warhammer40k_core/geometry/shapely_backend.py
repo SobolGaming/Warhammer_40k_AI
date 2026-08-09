@@ -1,10 +1,22 @@
 from __future__ import annotations
 
 import importlib
+import math
 from functools import lru_cache
 from typing import TYPE_CHECKING, Protocol, cast
 
-from warhammer40k_core.geometry.pose import GeometryError, Point3, Pose, validate_point3
+from warhammer40k_core.geometry.polygons import (
+    Point2D,
+    polygon_self_intersects,
+    signed_polygon_area,
+)
+from warhammer40k_core.geometry.pose import (
+    GeometryError,
+    Point3,
+    Pose,
+    validate_finite_number,
+    validate_point3,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.core.deployment_zones import DeploymentZone, DeploymentZoneShape
@@ -155,6 +167,10 @@ def footprint_for_deployment_zone_shape(shape: DeploymentZoneShape) -> _Geometry
     return zone_footprint
 
 
+def footprint_for_polygon(polygon: tuple[Point2D, ...]) -> _Geometry:
+    return _geometry_module().Polygon(_validate_polygon("polygon", polygon))
+
+
 def deployment_zone_shapes_cover_bounds(
     *,
     shapes: tuple[DeploymentZoneShape, ...],
@@ -169,6 +185,19 @@ def deployment_zone_shapes_cover_bounds(
     if min_x >= max_x or min_y >= max_y:
         raise GeometryError("covered bounds must have positive width and depth.")
     return zone_footprint.covers(_box(min_x, min_y, max_x, max_y))
+
+
+def deployment_zone_shapes_cover_polygon(
+    *,
+    shapes: tuple[DeploymentZoneShape, ...],
+    polygon: tuple[Point2D, ...],
+) -> bool:
+    if type(shapes) is not tuple or not shapes:
+        raise GeometryError("deployment-zone shapes must be a non-empty tuple.")
+    zone_footprint = footprint_for_deployment_zone_shape(shapes[0])
+    for shape in shapes[1:]:
+        zone_footprint = zone_footprint.union(footprint_for_deployment_zone_shape(shape))
+    return zone_footprint.covers(footprint_for_polygon(polygon))
 
 
 def base_footprint_within_bounds(
@@ -189,6 +218,22 @@ def base_footprint_intersects_bounds(
     min_x, min_y, max_x, max_y = bounds
     surface = _box(min_x, min_y, max_x, max_y)
     return surface.intersects(footprint_for_base(base, pose))
+
+
+def base_footprint_within_polygon(
+    base: BaseShape,
+    pose: Pose,
+    polygon: tuple[Point2D, ...],
+) -> bool:
+    return footprint_for_polygon(polygon).covers(footprint_for_base(base, pose))
+
+
+def base_footprint_intersects_polygon(
+    base: BaseShape,
+    pose: Pose,
+    polygon: tuple[Point2D, ...],
+) -> bool:
+    return footprint_for_polygon(polygon).intersects(footprint_for_base(base, pose))
 
 
 def base_footprint_intersects_deployment_zone(
@@ -261,6 +306,44 @@ def base_footprint_distance_to_bounds(
     min_x, min_y, max_x, max_y = bounds
     surface = _box(min_x, min_y, max_x, max_y)
     return surface.distance(footprint_for_base(base, pose))
+
+
+def base_footprint_distance_to_polygon(
+    base: BaseShape,
+    pose: Pose,
+    polygon: tuple[Point2D, ...],
+) -> float:
+    return footprint_for_polygon(polygon).distance(footprint_for_base(base, pose))
+
+
+def point_intersects_polygon(
+    x: float,
+    y: float,
+    polygon: tuple[Point2D, ...],
+) -> bool:
+    valid_x = validate_finite_number("point x", x)
+    valid_y = validate_finite_number("point y", y)
+    return _geometry_module().Point(valid_x, valid_y).intersects(footprint_for_polygon(polygon))
+
+
+def segment_intersects_polygon(
+    start: Point3,
+    end: Point3,
+    polygon: tuple[Point2D, ...],
+) -> bool:
+    valid_start = validate_point3("start", start)
+    valid_end = validate_point3("end", end)
+    line = _geometry_module().LineString(
+        ((valid_start.x, valid_start.y), (valid_end.x, valid_end.y))
+    )
+    return line.intersects(footprint_for_polygon(polygon))
+
+
+def polygon_within_polygon(
+    inner: tuple[Point2D, ...],
+    outer: tuple[Point2D, ...],
+) -> bool:
+    return footprint_for_polygon(outer).covers(footprint_for_polygon(inner))
 
 
 def base_footprint_distance(
@@ -457,6 +540,43 @@ def _validate_non_negative_number(field_name: str, value: object) -> float:
     if number < 0.0:
         raise GeometryError(f"{field_name} must be non-negative.")
     return number
+
+
+def _validate_polygon(
+    field_name: str,
+    value: object,
+) -> tuple[Point2D, ...]:
+    if type(value) is not tuple:
+        raise GeometryError(f"{field_name} must be a tuple.")
+    raw_points = cast(tuple[object, ...], value)
+    if len(raw_points) < 3:
+        raise GeometryError(f"{field_name} must contain at least three points.")
+    points: list[Point2D] = []
+    for raw_point in raw_points:
+        if type(raw_point) is not tuple:
+            raise GeometryError(f"{field_name} points must be 2-tuples.")
+        point = cast(tuple[object, ...], raw_point)
+        if len(point) != 2:
+            raise GeometryError(f"{field_name} points must be 2-tuples.")
+        raw_x, raw_y = point
+        if (
+            not isinstance(raw_x, int | float)
+            or type(raw_x) is bool
+            or not isinstance(raw_y, int | float)
+            or type(raw_y) is bool
+        ):
+            raise GeometryError(f"{field_name} coordinates must be numbers.")
+        x = float(raw_x)
+        y = float(raw_y)
+        if not math.isfinite(x) or not math.isfinite(y):
+            raise GeometryError(f"{field_name} coordinates must be finite.")
+        points.append((x, y))
+    polygon = tuple(points)
+    if polygon[0] == polygon[-1]:
+        raise GeometryError(f"{field_name} must be unclosed.")
+    if abs(signed_polygon_area(polygon)) <= _EPSILON or polygon_self_intersects(polygon):
+        raise GeometryError(f"{field_name} must be a simple polygon with positive area.")
+    return polygon
 
 
 def _vertical_gap(

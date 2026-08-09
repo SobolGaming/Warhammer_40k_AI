@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.phases.shooting_declaration_validation import _validate_declaration_submission, _validate_out_of_phase_declaration_submission, _attack_pools_for_proposal, _AttackPoolValidationResult, _attack_pools_or_validation, _validate_duplicate_weapon_ability_selection, _shooting_candidate_with_target_restrictions, _modified_shooting_weapon_profile, _runtime_modifier_registry, _out_of_phase_allowed_target_unit_ids, _out_of_phase_uses_fire_overwatch, _forced_shooting_type_for_out_of_phase, _selected_shooting_type_for_declaration, _shooting_types_for_declaration_candidate, _targeting_rule_ids_with_shooting_type, _validate_model_pistol_exclusivity, _apply_phase13d_weapon_modifiers
     from warhammer40k_core.engine.phases.shooting_targeting import _target_within_half_weapon_range, _snap_shooting_type_allowed_for_unit_target, _declaration_target_within_max_range, _unit_target_within_max_range, _unit_placements_for_rules_unit_or_none, _rules_unit_remained_stationary, _heavy_hit_roll_modifier_applies, _rules_unit_set_up_this_turn, _rules_unit_within_enemy_engagement_range, _target_visible_to_friendly_unit, _declaration_source_unit
     from warhammer40k_core.engine.phases.shooting_firing_deck import _declaration_source_model_id, _validate_firing_deck_selection, _validate_firing_deck_weapon_against_catalog, _available_weapon_by_declaration_key_for_rules_unit, _available_weapon_key, _component_unit_for_available_weapon, _component_unit_for_declaration, _component_unit_by_id, _declaration_available_weapon_key, _available_weapons_for_unit, _available_weapons_for_rules_unit, _available_weapons_for_model, _available_own_weapons_for_model, _available_firing_deck_weapons, _transport_firing_deck_model, _available_weapon_to_payload
-    from warhammer40k_core.engine.phases.shooting_validation import _attack_sequence_for_selection_request, _invalid_if_current_option_payload_drifted, _invalid_finite_decision_status, _proposal_request_from_decision_request, _reject_invalid_declaration, _ensure_shooting_phase_state, _validate_shooting_phase_state, _battlefield_scenario, _terrain_features_for_state, _active_player_id, _active_player_placed_unit_ids, _enemy_placed_unit_ids, _unit_by_id, _model_by_id, _model_has_wargear_id, _wargear_by_id, _weapon_profile_for_wargear, _shooting_unit_options, _shooting_type_options, _shooting_phase_status_payload, _decision_payload_object, _payload_string, _payload_int, _army_catalog_for_handler, _ruleset_descriptor_for_handler, _firing_deck_value_for_unit, _firing_deck_value_for_rules_unit, _unit_has_vehicle_or_monster_keyword, _rules_unit_has_vehicle_or_monster_keyword, _rules_unit_label, _unit_has_keyword, _canonical_keyword, _validate_attack_pools, _validate_identifier, _validate_positive_int, _validate_identifier_tuple
+    from warhammer40k_core.engine.phases.shooting_validation import _attack_sequence_for_selection_request, _invalid_if_current_option_payload_drifted, _invalid_finite_decision_status, _proposal_request_from_decision_request, _reject_invalid_declaration, _ensure_shooting_phase_state, _validate_shooting_phase_state, _battlefield_scenario, _terrain_features_for_state, _terrain_areas_for_state, _active_player_id, _active_player_placed_unit_ids, _enemy_placed_unit_ids, _unit_by_id, _model_by_id, _model_has_wargear_id, _wargear_by_id, _weapon_profile_for_wargear, _shooting_unit_options, _shooting_type_options, _shooting_phase_status_payload, _decision_payload_object, _payload_string, _payload_int, _army_catalog_for_handler, _ruleset_descriptor_for_handler, _firing_deck_value_for_unit, _firing_deck_value_for_rules_unit, _unit_has_vehicle_or_monster_keyword, _rules_unit_has_vehicle_or_monster_keyword, _rules_unit_label, _unit_has_keyword, _canonical_keyword, _validate_attack_pools, _validate_identifier, _validate_positive_int, _validate_identifier_tuple
 # fmt: on
 
 __all__ = (
@@ -127,8 +127,10 @@ def _rules_unit_has_legal_shooting_declaration(
         else _validate_identifier_tuple("shooting declaration target_unit_ids", target_unit_ids)
     )
     terrain_features = _terrain_features_for_state(state)
+    terrain_areas = _terrain_areas_for_state(state)
     hidden_target_unit_ids = _hidden_target_unit_ids(
         state=state,
+        ruleset_descriptor=ruleset_descriptor,
         target_unit_ids=resolved_target_unit_ids,
     )
     target_unit_ids_with_recent_ranged_attacks = _target_unit_ids_with_recent_ranged_attacks(
@@ -160,6 +162,7 @@ def _rules_unit_has_legal_shooting_declaration(
                 weapon=weapon,
                 target_unit_id=target_unit_id,
                 terrain_features=terrain_features,
+                terrain_areas=terrain_areas,
                 hidden_target_unit_ids=hidden_target_unit_ids,
                 target_unit_ids_with_recent_ranged_attacks=(
                     target_unit_ids_with_recent_ranged_attacks
@@ -192,6 +195,7 @@ def _rules_unit_has_legal_shooting_declaration(
 def _hidden_target_unit_ids(
     *,
     state: GameState,
+    ruleset_descriptor: RulesetDescriptor,
     target_unit_ids: tuple[str, ...],
 ) -> tuple[str, ...]:
     return tuple(
@@ -202,6 +206,11 @@ def _hidden_target_unit_ids(
                 target_unit_ids,
             )
             if unit_is_hidden_by_effects(state.persisting_effects_for_unit(target_unit_id))
+            or unit_is_hidden_by_terrain(
+                state=state,
+                ruleset_descriptor=ruleset_descriptor,
+                unit_instance_id=target_unit_id,
+            )
         )
     )
 
@@ -290,8 +299,10 @@ def _unit_has_legal_shooting_declaration(
         else _validate_identifier_tuple("shooting declaration target_unit_ids", target_unit_ids)
     )
     terrain_features = _terrain_features_for_state(state)
+    terrain_areas = _terrain_areas_for_state(state)
     hidden_target_unit_ids = _hidden_target_unit_ids(
         state=state,
+        ruleset_descriptor=ruleset_descriptor,
         target_unit_ids=resolved_target_unit_ids,
     )
     target_unit_ids_with_recent_ranged_attacks = _target_unit_ids_with_recent_ranged_attacks(
@@ -319,6 +330,7 @@ def _unit_has_legal_shooting_declaration(
                 weapon=weapon,
                 target_unit_id=target_unit_id,
                 terrain_features=terrain_features,
+                terrain_areas=terrain_areas,
                 hidden_target_unit_ids=hidden_target_unit_ids,
                 target_unit_ids_with_recent_ranged_attacks=(
                     target_unit_ids_with_recent_ranged_attacks
@@ -366,8 +378,10 @@ def _legal_shooting_types_for_rules_unit(
     )
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
+    terrain_areas = _terrain_areas_for_state(state)
     hidden_target_unit_ids = _hidden_target_unit_ids(
         state=state,
+        ruleset_descriptor=ruleset_descriptor,
         target_unit_ids=resolved_target_unit_ids,
     )
     target_unit_ids_with_recent_ranged_attacks = _target_unit_ids_with_recent_ranged_attacks(
@@ -406,6 +420,7 @@ def _legal_shooting_types_for_rules_unit(
                     weapon=weapon,
                     target_unit_id=target_unit_id,
                     terrain_features=terrain_features,
+                    terrain_areas=terrain_areas,
                     hidden_target_unit_ids=hidden_target_unit_ids,
                     target_unit_ids_with_recent_ranged_attacks=(
                         target_unit_ids_with_recent_ranged_attacks
@@ -454,6 +469,7 @@ def _cached_shooting_target_candidate_for_model(
     weapon: _AvailableWeapon,
     target_unit_id: str,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
+    terrain_areas: tuple[PlacedTerrainArea, ...],
     hidden_target_unit_ids: tuple[str, ...],
     target_unit_ids_with_recent_ranged_attacks: tuple[str, ...],
     target_detection_range_bonus_inches: int,
@@ -479,6 +495,7 @@ def _cached_shooting_target_candidate_for_model(
             weapon_profile=weapon["weapon_profile"],
             target_unit_id=target_unit_id,
             terrain_features=terrain_features,
+            terrain_areas=terrain_areas,
             hidden_target_unit_ids=hidden_target_unit_ids,
             target_unit_ids_with_recent_ranged_attacks=(target_unit_ids_with_recent_ranged_attacks),
             target_detection_range_bonus_inches=target_detection_range_bonus_inches,

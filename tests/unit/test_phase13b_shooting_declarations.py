@@ -7947,6 +7947,12 @@ def test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_rol
         footprint_center_y_inches=35.0,
         footprint_width_inches=12.0,
         footprint_depth_inches=6.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=12.0,
+            center_y_inches=35.0,
+            width_inches=12.0,
+            depth_inches=6.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=12.0,
             center_y_inches=35.0,

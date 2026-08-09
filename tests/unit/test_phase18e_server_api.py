@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import replace
 from datetime import UTC, datetime
@@ -73,6 +74,7 @@ from warhammer40k_core.engine.faction_content.manifest import (
 )
 from warhammer40k_core.engine.faction_content.runtime import (
     build_runtime_content_bundle_for_armies,
+    runtime_content_manifest_for_ruleset,
 )
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.list_validation import (
@@ -96,7 +98,10 @@ from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
+)
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
@@ -106,6 +111,9 @@ from warhammer40k_core.rules.rule_ir import (
     RuleParameter,
     RuleTargetKind,
     RuleTargetSpec,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    event_companion_layouts_2026_06,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -323,6 +331,91 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
         )
         == player_a_support
     )
+
+
+def test_phase17n_exact_event_companion_mission_has_hashed_runtime_evidence() -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    mission_setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id=PLAYER_A,
+        defender_player_id=PLAYER_B,
+    )
+    config = replace(
+        _config(game_id="phase17n-exact-event-companion-capability"),
+        mission_setup=mission_setup,
+        model_geometries=(accepted_model_geometry(),),
+    )
+    armies = tuple(
+        muster_army(
+            catalog=config.army_catalog,
+            request=request,
+            model_geometries=config.model_geometries,
+        )
+        for request in config.army_muster_requests
+    )
+    manifest = build_capability_manifest(
+        config=config,
+        armies=armies,
+        runtime_manifest=runtime_content_manifest_for_ruleset(
+            ruleset_descriptor=config.ruleset_descriptor,
+            config=config,
+        ),
+        runtime_bundle=build_runtime_content_bundle_for_armies(
+            config=config,
+            armies=armies,
+        ),
+    )
+
+    mission_row = next(
+        row
+        for row in manifest["mission_rows"]
+        if row["owner_id"] == "mission-purge-the-foe-vs-purge-the-foe-layout-1"
+    )
+    physical = next(
+        result
+        for result in mission_row["capabilities"]
+        if result["dimension"] == "PHYSICALLY_PLAYABLE"
+    )
+    semantic = next(
+        result
+        for result in mission_row["capabilities"]
+        if result["dimension"] == "SEMANTICALLY_EXECUTABLE"
+    )
+    mission_setup_hash = hashlib.sha256(
+        json.dumps(
+            mission_setup.to_payload(),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+        ).encode("utf-8")
+    ).hexdigest()
+    mission_setup_evidence_id = f"mission-setup-sha256:{mission_setup_hash}"
+    mission_source_package_hash = mission_pack.source_package.source_commit_or_import_hash
+    mission_source_package_evidence_id = (
+        f"mission-source-package-hash:{mission_source_package_hash}"
+    )
+    terrain_source_ids = {
+        feature.source_id
+        for feature in mission_setup.terrain_features
+        if feature.source_id is not None
+    }
+
+    assert physical["status"] == "supported"
+    assert physical["reason_code"] is None
+    assert semantic["status"] == "supported"
+    assert semantic["reason_code"] is None
+    assert mission_setup_evidence_id in physical["evidence_refs"]
+    assert mission_setup_evidence_id in semantic["evidence_refs"]
+    assert mission_source_package_evidence_id in semantic["evidence_refs"]
+    assert terrain_source_ids.issubset(set(physical["evidence_refs"]))
+    assert any(
+        event_companion_layouts_2026_06.EXACT_SLICE_PACKAGE_HASH in evidence_ref
+        for evidence_ref in physical["evidence_refs"]
+    )
+    assert mission_row["metadata"]["mission_setup_hash"] == mission_setup_hash
+    assert mission_row["metadata"]["mission_source_package_hash"] == mission_source_package_hash
 
 
 def test_phase17o_player_selection_hash_covers_only_owned_roster_and_public_mission() -> None:

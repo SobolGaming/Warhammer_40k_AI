@@ -331,6 +331,7 @@ def _battlefield_geometry_conformance_example() -> BattlefieldViewPayload:
                         "entity_kind": "terrain_feature",
                         "terrain_feature_id": "geometry-conformance-terrain",
                         "terrain_feature_kind": "ruins",
+                        "classification": "unknown",
                         "footprint": _conformance_shape(
                             kind="rectangle",
                             center=_conformance_point(42.0, 25.0),

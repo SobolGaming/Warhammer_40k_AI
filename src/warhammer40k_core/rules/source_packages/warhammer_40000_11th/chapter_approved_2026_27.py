@@ -6,7 +6,10 @@ from dataclasses import dataclass
 
 from warhammer40k_core.core.deployment_zones import DeploymentZoneShape
 from warhammer40k_core.core.missions import MissionPackError, MissionSourcePackageDefinition
-from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+
+from .chapter_approved_battlefield_rows_2026_27 import (
+    SourceBattlefieldTerrainFeatureRow as SourceBattlefieldTerrainFeatureRow,
+)
 
 EDITION_ID = "warhammer_40000_11th"
 MISSION_PACK_ID = "11e-chapter-approved-2026-27"
@@ -207,30 +210,6 @@ class SourceBattlefieldDeploymentZoneRow:
             "deployment_zone_id": self.deployment_zone_id,
             "player_role": self.player_role,
             "shape": self.shape.to_payload(),
-        }
-
-
-@dataclass(frozen=True, slots=True)
-class SourceBattlefieldTerrainFeatureRow:
-    feature_id: str
-    feature_kind: str
-    footprint_center_x_inches: float
-    footprint_center_y_inches: float
-    footprint_width_inches: float
-    footprint_depth_inches: float
-    source_note: str
-    display_geometry: TerrainDisplayGeometry
-
-    def to_payload(self) -> dict[str, object]:
-        return {
-            "feature_id": self.feature_id,
-            "feature_kind": self.feature_kind,
-            "footprint_center_x_inches": self.footprint_center_x_inches,
-            "footprint_center_y_inches": self.footprint_center_y_inches,
-            "footprint_width_inches": self.footprint_width_inches,
-            "footprint_depth_inches": self.footprint_depth_inches,
-            "source_note": self.source_note,
-            "display_geometry": self.display_geometry.to_payload(),
         }
 
 
@@ -835,14 +814,14 @@ def battlefield_layout_rows() -> tuple[SourceBattlefieldLayoutRow, ...]:
                 SourceBattlefieldObjectiveRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-left-home",
                     "Left Home Objective",
-                    "home",
+                    "attacker_home",
                     9.5,
                     10.5,
                 ),
                 SourceBattlefieldObjectiveRow(
                     "take-and-hold-vs-purge-the-foe-layout-3-right-home",
                     "Right Home Objective",
-                    "home",
+                    "defender_home",
                     52.5,
                     34.5,
                 ),

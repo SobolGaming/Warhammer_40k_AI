@@ -40,6 +40,9 @@ from warhammer40k_core.engine.interaction_metadata import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    PrimaryUnitTerrainTurnStartSnapshotPayload,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_starting_total,
@@ -307,6 +310,7 @@ class GameViewPayload(TypedDict):
     mission_setup: JsonValue
     public_secondary_mission_choices: list[JsonValue]
     public_secondary_mission_card_states: list[JsonValue]
+    primary_unit_terrain_turn_start_snapshots: list[PrimaryUnitTerrainTurnStartSnapshotPayload]
     public_command_point_ledgers: list[JsonValue]
     public_victory_point_ledgers: list[JsonValue]
     public_stratagem_use_records: list[JsonValue]
@@ -584,6 +588,9 @@ def project_game_view(
                 viewer=context,
                 domain_viewer=domain_viewer,
             )
+        ],
+        "primary_unit_terrain_turn_start_snapshots": [
+            snapshot.to_payload() for snapshot in state.primary_unit_terrain_turn_start_snapshots
         ],
         "public_command_point_ledgers": [
             validate_json_value(ledger.to_payload()) for ledger in state.command_point_ledgers

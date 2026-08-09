@@ -715,7 +715,7 @@
         "identity_id": "warhammer40k-core-v2:0.1.0"
       },
       "mission_pack": {
-        "identity_hash": "2e42caa511a01b7e5e045d3ac12785eeaac0af59c5f4c10fa9b4d9997d5aaac4",
+        "identity_hash": "fd5980e6170ad14fe844a7ec9228edbfe247bc84bca766d5e47934146aa324fd",
         "identity_id": "11e-chapter-approved-2026-27"
       },
       "ruleset": {
@@ -729,13 +729,13 @@
           "source_kind": "army_catalog"
         },
         {
-          "identity_hash": "d20e5338132ccd068cb9691308b1e24f6f70227c3a5a8ae6a9b9e066c13b723c",
+          "identity_hash": "47352dbc7a279cff3c56200f572492a9630edbdc188dc7b957dab382b1bf9c83",
           "identity_id": "gw-11e-chapter-approved-2026-27",
           "source_kind": "mission_pack"
         }
       ],
       "terrain_layout": {
-        "identity_hash": "07d996a42f8b432f97e80e1e791e4f05b9b33d70fd169184cbb879bb53826cac",
+        "identity_hash": "dd7c2cae361baa9b90bfa3e0eca3e303a252bd3fc56ba6e29b83ddf45f75e17e",
         "identity_id": "take-and-hold-vs-take-and-hold-layout-3"
       }
     },
@@ -754,7 +754,7 @@
       "roster_construction",
       "weapon_allocation_matrix"
     ],
-    "manifest_id": "capability-manifest:fbe3316bbd545800015e923196777d19bfc6cffd73ae49ce2afdfc2bd49ee81c",
+    "manifest_id": "capability-manifest:8c96848fc356589bc3e12ce0c6fcdce7c6739e2c49211f09eb4bb3f36816ad7a",
     "mission_rows": [
       {
         "capabilities": [
@@ -795,6 +795,7 @@
           {
             "dimension": "PHYSICALLY_PLAYABLE",
             "evidence_refs": [
+              "mission-setup-sha256:ab2edd2ba1f9e9a8b5372ef4de586d9f604de72544ebb043ac0ed294a0f6cdec",
               "take-and-hold-vs-take-and-hold-layout-3"
             ],
             "reason_code": "battlefield_layout_geometry_incomplete",
@@ -807,7 +808,9 @@
           {
             "dimension": "SEMANTICALLY_EXECUTABLE",
             "evidence_refs": [
-              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object",
+              "mission-setup-sha256:ab2edd2ba1f9e9a8b5372ef4de586d9f604de72544ebb043ac0ed294a0f6cdec",
+              "mission-source-package-hash:47352dbc7a279cff3c56200f572492a9630edbdc188dc7b957dab382b1bf9c83"
             ],
             "reason_code": null,
             "source_ids": [
@@ -854,7 +857,8 @@
         "metadata": {
           "battlefield_layout_id": "take-and-hold-vs-take-and-hold-layout-3",
           "mission_pack_id": "11e-chapter-approved-2026-27",
-          "mission_setup_hash": "56f7edcb3dc6ddd09e7819aa7a9b79327700886fb57aa57c7046a363ba4afa36",
+          "mission_setup_hash": "ab2edd2ba1f9e9a8b5372ef4de586d9f604de72544ebb043ac0ed294a0f6cdec",
+          "mission_source_package_hash": "47352dbc7a279cff3c56200f572492a9630edbdc188dc7b957dab382b1bf9c83",
           "primary_mission_id": "primary-immovable-object",
           "terrain_layout_id": "take-and-hold-vs-take-and-hold-layout-3"
         },
@@ -951,6 +955,7 @@
           "core-intercessor-like",
           "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
           "keyword:infantry_or_character",
+          "mission-setup-sha256:ab2edd2ba1f9e9a8b5372ef4de586d9f604de72544ebb043ac0ed294a0f6cdec",
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-b:army-beta",
           "take-and-hold-vs-take-and-hold-layout-3",
@@ -973,6 +978,8 @@
           "core-combined-arms",
           "core-marine-force",
           "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object",
+          "mission-setup-sha256:ab2edd2ba1f9e9a8b5372ef4de586d9f604de72544ebb043ac0ed294a0f6cdec",
+          "mission-source-package-hash:47352dbc7a279cff3c56200f572492a9630edbdc188dc7b957dab382b1bf9c83",
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "phase9a-canonical/core-intercessor-like-infantry/core/core-scouts/none",
           "roster:player-b:army-beta",
@@ -1538,7 +1545,7 @@
       }
     ],
     "schema_version": "capability-manifest-v1",
-    "selection_hash": "17689f507d2c5a235786597174a48bf835b2fe59861eedd93f80a226d7a0fc32",
+    "selection_hash": "7638d3cb02782343aad05b8a33dfb039e3b00fbbb512aa9ac5ffbf5f8d0303c8",
     "unit_rows": [
       {
         "capabilities": [

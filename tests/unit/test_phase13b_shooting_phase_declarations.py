@@ -55,6 +55,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
+from warhammer40k_core.core.terrain_areas import TerrainAreaClassification
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AttackProfile,
@@ -78,6 +79,7 @@ from warhammer40k_core.engine.game_state import (
     GameStatePayload,
     RangedAttackHistoryRecord,
 )
+from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -90,6 +92,7 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseState,
     ShootingTypeSelection,
     ShootingUnitSelection,
+    _hidden_target_unit_ids,
 )
 from warhammer40k_core.engine.shooting_targets import (
     LONE_OPERATIVE_RULE_ID,
@@ -98,6 +101,7 @@ from warhammer40k_core.engine.shooting_targets import (
     shooting_target_candidate_for_model,
     shooting_target_candidates_for_unit,
     shooting_target_violation_code_from_token,
+    shooting_visibility_cache_key,
 )
 from warhammer40k_core.engine.shooting_types import (
     ShootingType,
@@ -126,6 +130,9 @@ from warhammer40k_core.geometry.terrain import (
 )
 from warhammer40k_core.geometry.visibility import (
     VisibilityBlockerKind,
+)
+from warhammer40k_core.rules.mission_pack_import import (
+    warhammer_event_companion_2026_07_mission_pack,
 )
 
 
@@ -1132,6 +1139,12 @@ def test_target_range_visibility_and_lone_operative_gates_are_explicit() -> None
         footprint_center_y_inches=35.0,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=20.0,
+            center_y_inches=35.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=20.0,
             center_y_inches=35.0,
@@ -1333,6 +1346,135 @@ def test_ranged_attack_history_tracks_current_and_previous_player_turns() -> Non
     restored_state.active_player_id = "player-a"
     assert not restored_state.unit_made_ranged_attacks_current_or_previous_turn(
         unit_instance_id=unit_id
+    )
+
+
+def test_phase17n_terrain_areas_participate_in_shooting_visibility_cache_key() -> None:
+    lifecycle, _ = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    setup = _phase17n_exact_meatgrinder_setup()
+    dense_area = setup.terrain_areas[0]
+    reclassified_area = replace(
+        dense_area,
+        classification=TerrainAreaClassification.LIGHT,
+    )
+
+    without_area = shooting_visibility_cache_key(scenario=scenario)
+    with_dense_area = shooting_visibility_cache_key(
+        scenario=scenario,
+        terrain_areas=(dense_area,),
+    )
+    with_same_area = shooting_visibility_cache_key(
+        scenario=scenario,
+        terrain_areas=(dense_area,),
+    )
+    with_reclassified_area = shooting_visibility_cache_key(
+        scenario=scenario,
+        terrain_areas=(reclassified_area,),
+    )
+
+    assert with_dense_area == with_same_area
+    assert without_area != with_dense_area
+    assert with_dense_area != with_reclassified_area
+
+
+def test_phase17n_automatic_hidden_requires_every_model_inside_exact_terrain_area() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    setup = _phase17n_exact_meatgrinder_setup()
+    state.mission_setup = setup
+    assert state.battlefield_state is not None
+    target = units["enemy"]
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=replace(
+            state.battlefield_state,
+            terrain_features=setup.terrain_features,
+        ),
+    )
+    all_inside = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(Pose.at(x=x, y=53.0) for x in (31.3, 32.6, 33.9, 35.2, 36.3)),
+    )
+    state.battlefield_state = all_inside.battlefield_state
+
+    hidden_ids = _hidden_target_unit_ids(
+        state=state,
+        ruleset_descriptor=_ruleset(),
+        target_unit_ids=(target.unit_instance_id,),
+    )
+    assert hidden_ids == (target.unit_instance_id,)
+
+    all_inside_light = _scenario_with_unit_pose(
+        scenario=all_inside,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(Pose.at(x=x, y=43.0) for x in (34.5, 35.7, 36.9, 38.1, 39.3)),
+    )
+    state.battlefield_state = all_inside_light.battlefield_state
+    assert _hidden_target_unit_ids(
+        state=state,
+        ruleset_descriptor=_ruleset(),
+        target_unit_ids=(target.unit_instance_id,),
+    ) == (target.unit_instance_id,)
+
+    one_outside = _scenario_with_unit_pose(
+        scenario=all_inside,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            Pose.at(x=29.0, y=53.0),
+            *(Pose.at(x=x, y=53.0) for x in (32.6, 33.9, 35.2, 36.3)),
+        ),
+    )
+    state.battlefield_state = one_outside.battlefield_state
+    assert (
+        _hidden_target_unit_ids(
+            state=state,
+            ruleset_descriptor=_ruleset(),
+            target_unit_ids=(target.unit_instance_id,),
+        )
+        == ()
+    )
+
+    state.battlefield_state = all_inside.battlefield_state
+    state.record_ranged_attack_history(
+        RangedAttackHistoryRecord(
+            player_id="player-b",
+            unit_instance_id=target.unit_instance_id,
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            phase=BattlePhase.SHOOTING,
+            request_id="phase17n-hidden-ranged-history-request",
+            result_id="phase17n-hidden-ranged-history-result",
+        )
+    )
+    assert (
+        _hidden_target_unit_ids(
+            state=state,
+            ruleset_descriptor=_ruleset(),
+            target_unit_ids=(target.unit_instance_id,),
+        )
+        == ()
+    )
+
+
+def _phase17n_exact_meatgrinder_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
     )
 
 
@@ -2038,6 +2180,10 @@ def test_unit_level_target_legality_requires_one_model_with_range_and_visibility
         scenario.battlefield_state,
         terrain_features=(blocking_ruin,),
     )
+    state.mission_setup = replace(
+        state.mission_setup,
+        terrain_features=(blocking_ruin,),
+    )
     status = lifecycle.advance_until_decision_or_terminal()
     _assert_waiting_for_movement_unit(status)
     assert state.current_battle_phase is BattlePhase.MOVEMENT
@@ -2168,6 +2314,12 @@ def test_phase13c_allocated_cover_excludes_attacker_and_target_units_as_blockers
         footprint_center_y_inches=10.0,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=80.0,
+            center_y_inches=10.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=80.0,
             center_y_inches=10.0,

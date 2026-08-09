@@ -37,6 +37,9 @@ from warhammer40k_core.engine.shooting_phase_start_hooks import (
     ShootingPhaseStartResultContext,
 )
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
+from warhammer40k_core.engine.shooting_terrain_visibility import (
+    shooting_terrain_areas_for_state,
+)
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
@@ -652,6 +655,7 @@ def _rules_unit_has_visible_target(
             observing_unit=component.unit,
             target_unit_id=target_rules_unit.unit_instance_id,
             terrain_features=terrain_features,
+            terrain_areas=shooting_terrain_areas_for_state(state),
         ):
             return True
     return False

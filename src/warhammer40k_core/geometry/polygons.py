@@ -87,6 +87,19 @@ def polygon_self_intersects(points: tuple[Point2D, ...]) -> bool:
     return False
 
 
+def point_intersects_polygon(point: Point2D, polygon: tuple[Point2D, ...]) -> bool:
+    raw_point_value = cast(object, point)
+    if type(raw_point_value) is not tuple:
+        raise GeometryError("point must be a Point2D tuple.")
+    raw_point_tuple = cast(tuple[object, ...], raw_point_value)
+    if len(raw_point_tuple) != 2:
+        raise GeometryError("point must be a Point2D tuple.")
+    point_x = validate_finite_number("point x", raw_point_tuple[0])
+    point_y = validate_finite_number("point y", raw_point_tuple[1])
+    target = (point_x, point_y)
+    return any(_point_in_triangle(target, triangle) for triangle in triangulate_polygon(polygon))
+
+
 def _find_ear_index(vertices: tuple[Point2D, ...]) -> int | None:
     for index, current_point in enumerate(vertices):
         previous_index = (index - 1) % len(vertices)

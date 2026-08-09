@@ -1,0 +1,2 @@
+# Raw-byte hashes must identify the same committed JSON bytes on every platform.
+*.json text eol=lf

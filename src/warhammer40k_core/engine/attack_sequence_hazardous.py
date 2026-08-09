@@ -323,6 +323,7 @@ def _cover_for_allocated_model(
     except PlacementError as exc:
         raise GameLifecycleError("Allocated-model cover context is invalid.") from exc
     terrain_features = battlefield.terrain_features
+    terrain_areas = shooting_terrain_areas_for_state(state)
     terrain_volumes = tuple(
         volume for feature in terrain_features for volume in feature.terrain_volumes()
     )
@@ -337,10 +338,12 @@ def _cover_for_allocated_model(
         los_cache_key=shooting_visibility_cache_key(
             scenario=scenario,
             terrain_features=terrain_features,
+            terrain_areas=terrain_areas,
         ),
         observer_model=observer_geometry,
         target_models=(target_geometry,),
         terrain_features=terrain_features,
+        terrain_areas=terrain_visibility_areas_from_placements(terrain_areas),
         terrain_volumes=terrain_volumes,
         dynamic_model_blockers=dynamic_blockers,
         observer_keywords=unit_by_id(
@@ -392,6 +395,7 @@ def _fortification_cover_for_allocated_model(
     except PlacementError as exc:
         raise GameLifecycleError("Fortification cover attacker placement is invalid.") from exc
     blocker_records: set[CoverSourceRecord] = set()
+    terrain_areas = shooting_terrain_areas_for_state(state)
     blocker_witness: LineOfSightWitness | None = None
     for attacker_placement in attacking_unit_placement.model_placements:
         attacker_model = model_by_id(
@@ -409,10 +413,12 @@ def _fortification_cover_for_allocated_model(
             los_cache_key=shooting_visibility_cache_key(
                 scenario=scenario,
                 terrain_features=terrain_features,
+                terrain_areas=terrain_areas,
             ),
             observer_model=observer_geometry,
             target_models=(target_geometry,),
             terrain_features=terrain_features,
+            terrain_areas=terrain_visibility_areas_from_placements(terrain_areas),
             terrain_volumes=terrain_volumes,
             dynamic_model_blockers=dynamic_blockers,
             observer_keywords=unit_by_id(

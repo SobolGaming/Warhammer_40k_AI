@@ -63,6 +63,9 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
+from warhammer40k_core.engine.shooting_terrain_visibility import (
+    shooting_terrain_areas_for_state,
+)
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_move_completed_hooks import (
     UnitMoveCompletedContext,
@@ -510,6 +513,7 @@ class CatalogMovementTargetPairRuntime:
                 observer_model_instance_id=source.source_model_instance_id,
                 target_unit_id=view.unit_instance_id,
                 terrain_features=state.battlefield_state.terrain_features,
+                terrain_areas=shooting_terrain_areas_for_state(state),
             ):
                 candidates.append(view)
         return tuple(sorted(candidates, key=lambda view: view.unit_instance_id))

@@ -24,9 +24,9 @@ def terrain_feature_within_player_deployment_zone(
     )
     if not zones:
         raise GameLifecycleError("Deployment-zone terrain target check requires player zone.")
-    return shapely_backend.deployment_zone_shapes_cover_bounds(
+    return shapely_backend.deployment_zone_shapes_cover_polygon(
         shapes=tuple(zone.shape for zone in zones),
-        bounds=feature.bounds(),
+        polygon=feature.rules_footprint_points(),
     )
 
 
@@ -55,9 +55,9 @@ def terrain_feature_within_player_territory(
     if len(territories) != 1:
         raise GameLifecycleError("Territory terrain target check requires one player territory.")
     territory = territories[0]
-    return shapely_backend.deployment_zone_shapes_cover_bounds(
+    return shapely_backend.deployment_zone_shapes_cover_polygon(
         shapes=(territory.shape,),
-        bounds=feature.bounds(),
+        polygon=feature.rules_footprint_points(),
     )
 
 

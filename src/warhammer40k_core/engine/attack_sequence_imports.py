@@ -210,6 +210,10 @@ from warhammer40k_core.engine.shooting_targets import (
     shooting_dynamic_model_blockers,
     shooting_visibility_cache_key,
 )
+from warhammer40k_core.engine.shooting_terrain_visibility import (
+    shooting_terrain_areas_for_state,
+    terrain_visibility_areas_from_placements,
+)
 from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
     select_source_backed_reroll_permission_context,
@@ -486,7 +490,9 @@ __all__ = (
     "saving_throw_roll_spec",
     "sha256",
     "shooting_dynamic_model_blockers",
+    "shooting_terrain_areas_for_state",
     "shooting_visibility_cache_key",
+    "terrain_visibility_areas_from_placements",
     "source_backed_reroll_permission_context_for_unit",
     "source_backed_reroll_permission_contexts_for_unit",
     "select_source_backed_reroll_permission_context",

@@ -71,6 +71,9 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
+from warhammer40k_core.engine.shooting_terrain_visibility import (
+    shooting_terrain_areas_for_state,
+)
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.volume import Model
@@ -398,6 +401,7 @@ def selection_visibility_conditions_apply(
                 target_unit_id=target_rules_unit.unit_instance_id,
                 observer_model_instance_id=observer_model_id,
                 terrain_features=state.battlefield_state.terrain_features,
+                terrain_areas=shooting_terrain_areas_for_state(state),
             )
             for observing_unit in observing_components
         ):

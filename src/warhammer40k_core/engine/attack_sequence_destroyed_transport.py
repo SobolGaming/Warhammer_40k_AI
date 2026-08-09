@@ -5,6 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.attack_sequence_imports import *
+from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+    record_primary_unit_destructions_for_destroyed_models,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -828,6 +831,25 @@ def _apply_valid_destroyed_transport_disembark(
             disembark=disembark,
         )
     )
+    if disembark.destroyed_model_instance_ids:
+        for destruction in record_primary_unit_destructions_for_destroyed_models(
+            state=state,
+            destroyed_model_instance_ids=disembark.destroyed_model_instance_ids,
+            destroying_player_id=None,
+            source_id=f"core-rules:emergency-disembark:{result.result_id}",
+        ):
+            decisions.event_log.append(
+                "primary_unit_destruction_recorded",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": state.active_player_id,
+                    "phase": source_phase.value,
+                    "source_rule_id": "emergency_disembark",
+                    "source_result_id": result.result_id,
+                    "primary_unit_destruction_state": destruction.to_payload(),
+                },
+            )
     state.replace_transport_cargo_state(disembark.placement.updated_cargo_state)
     state.record_disembarked_unit_state(disembark.placement.disembarked_unit_state)
     decisions.event_log.append(

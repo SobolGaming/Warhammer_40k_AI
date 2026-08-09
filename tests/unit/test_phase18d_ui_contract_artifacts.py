@@ -58,6 +58,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.detachment import StratagemDefinition
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
+from warhammer40k_core.core.terrain_areas import TerrainAreaClassification
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.interaction_metadata import (
@@ -476,7 +477,14 @@ def test_phase18j_geometry_maps_round_oval_hull_support_and_terrain() -> None:
 
     terrain_source = _phase18j_terrain_feature()
     terrain = _terrain_feature_entity(terrain_source)
-    assert terrain["footprint"]["kind"] == "rectangle"
+    assert terrain["classification"] == "dense"
+    assert terrain["footprint"]["kind"] == "polygon"
+    assert terrain["footprint"]["vertices"] == [
+        {"x_inches": 7.0, "y_inches": 10.0},
+        {"x_inches": 13.0, "y_inches": 10.0},
+        {"x_inches": 13.0, "y_inches": 14.0},
+        {"x_inches": 7.0, "y_inches": 14.0},
+    ]
     assert {volume["volume_kind"] for volume in terrain["volumes"]} == {"wall", "floor"}
     assert {volume["bottom_center"]["z_inches"] for volume in terrain["volumes"]} == {0.0}
     assert "display_geometry" not in terrain
@@ -522,6 +530,7 @@ def test_phase18j_published_geometry_conformance_fixture_covers_declared_union()
     )
 
     terrain = battlefield["authoritative"]["terrain_features_by_id"]["geometry-conformance-terrain"]
+    assert terrain["classification"] == "unknown"
     assert terrain["footprint"]["kind"] == "rectangle"
     assert {volume["volume_kind"] for volume in terrain["volumes"]} == {"wall", "floor"}
     assert (
@@ -795,15 +804,38 @@ def test_phase18j_physical_proposal_context_excludes_render_geometry() -> None:
 
     assert state.physical_proposal_context_hash() != authoritative_context_hash
 
+    classification_changed = replace(
+        render_changed,
+        classification=TerrainAreaClassification.LIGHT,
+    )
+    state.battlefield_state = replace(
+        state.battlefield_state,
+        terrain_features=(classification_changed,),
+    )
+    state.mission_setup = replace(
+        state.mission_setup,
+        terrain_features=(classification_changed,),
+    )
+
+    assert state.physical_proposal_context_hash() != authoritative_context_hash
+
 
 def _phase18j_terrain_feature() -> TerrainFeatureDefinition:
     return TerrainFeatureDefinition(
         feature_id="phase18j-ruin",
         feature_kind=TerrainFeatureKind.RUINS,
+        classification=TerrainAreaClassification.DENSE,
         footprint_center_x_inches=10.0,
         footprint_center_y_inches=12.0,
         footprint_width_inches=6.0,
         footprint_depth_inches=4.0,
+        rules_footprint_polygon=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=10.0,
+            center_y_inches=12.0,
+            width_inches=6.0,
+            depth_inches=4.0,
+            display_template_id="phase18j-ruin-rules",
+        ).footprint_polygon,
         display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
             center_x_inches=10.0,
             center_y_inches=12.0,

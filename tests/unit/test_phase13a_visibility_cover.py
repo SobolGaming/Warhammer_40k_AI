@@ -10,7 +10,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
-from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry, TerrainDisplayPoint
 from warhammer40k_core.engine.battlefield_state import SpatialIndexState
 from warhammer40k_core.geometry.base import CircularBase
 from warhammer40k_core.geometry.pose import GeometryError, Point3, Pose
@@ -69,6 +69,12 @@ def _visibility_ruin() -> TerrainFeatureDefinition:
         footprint_center_y_inches=0.0,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=0.0,
+            center_y_inches=0.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=0.0,
             center_y_inches=0.0,
@@ -98,6 +104,51 @@ def _visibility_ruin() -> TerrainFeatureDefinition:
             ),
         ),
         source_id="phase13a_visibility_ruin",
+    )
+
+
+def _triangular_visibility_ruin() -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id="triangular-visibility-ruin",
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_center_x_inches=0.0,
+        footprint_center_y_inches=0.0,
+        footprint_width_inches=4.0,
+        footprint_depth_inches=4.0,
+        rules_footprint_polygon=(
+            TerrainDisplayPoint(-2.0, -2.0),
+            TerrainDisplayPoint(2.0, -2.0),
+            TerrainDisplayPoint(-2.0, 2.0),
+        ),
+        display_geometry=_display_geometry(
+            center_x_inches=0.0,
+            center_y_inches=0.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ),
+        walls=(
+            TerrainWallDefinition(
+                wall_id="lower-left-wall",
+                center_x_inches=-1.5,
+                center_y_inches=-1.5,
+                bottom_z_inches=0.0,
+                width_inches=0.25,
+                depth_inches=0.25,
+                height_inches=3.0,
+            ),
+        ),
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="ground-floor",
+                center_x_inches=0.0,
+                center_y_inches=0.0,
+                bottom_z_inches=0.0,
+                width_inches=4.0,
+                depth_inches=4.0,
+                thickness_inches=0.1,
+            ),
+        ),
+        source_id="phase13a_triangular_visibility_ruin",
     )
 
 
@@ -164,6 +215,55 @@ def test_ruins_area_visibility_blocks_los_without_physical_wall_intersection() -
         for record in blockers
     )
     assert not context.benefit_of_cover(witness).has_benefit
+
+
+def test_ruins_visibility_uses_exact_rules_polygon_not_its_bounding_box() -> None:
+    feature = _triangular_visibility_ruin()
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
+        observer_model=_model("observer", 0.0, 3.0, radius=0.25),
+        target_models=(_model("target", 3.0, 0.0, radius=0.25),),
+        terrain_features=(feature,),
+    )
+
+    witness = context.resolve_line_of_sight()
+
+    assert witness.unit_visible
+    assert not any(
+        record.blocker_kind is VisibilityBlockerKind.TERRAIN_FEATURE
+        for record in witness.all_blocker_records()
+    )
+
+
+@pytest.mark.parametrize(
+    ("observer_xy", "target_xy"),
+    [
+        ((-5.0, 0.0), (1.5, 1.5)),
+        ((1.5, 1.5), (-5.0, 0.0)),
+    ],
+)
+def test_ruins_inside_exceptions_use_exact_rules_polygon(
+    observer_xy: tuple[float, float],
+    target_xy: tuple[float, float],
+) -> None:
+    feature = _triangular_visibility_ruin()
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
+        observer_model=_model("observer", *observer_xy, radius=0.25),
+        target_models=(_model("target", *target_xy, radius=0.25),),
+        terrain_features=(feature,),
+    )
+
+    witness = context.resolve_line_of_sight()
+
+    assert not witness.unit_visible
+    assert any(
+        record.blocker_kind is VisibilityBlockerKind.TERRAIN_FEATURE
+        and record.exception_applied is None
+        for record in witness.all_blocker_records()
+    )
 
 
 def test_ruins_wall_floor_context_records_physical_wall_blockers_not_floors() -> None:

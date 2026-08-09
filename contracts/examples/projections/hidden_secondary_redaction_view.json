@@ -323,7 +323,7 @@
           "marker_diameter_inches": 1.5748031496062993,
           "measurement_anchor": "center",
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-left-home",
-          "objective_role": "home",
+          "objective_role": "attacker_home",
           "position": {
             "x_inches": 9.5,
             "y_inches": 10.5,
@@ -349,7 +349,7 @@
           "marker_diameter_inches": 1.5748031496062993,
           "measurement_anchor": "center",
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-right-home",
-          "objective_role": "home",
+          "objective_role": "defender_home",
           "position": {
             "x_inches": 52.5,
             "y_inches": 34.5,
@@ -374,7 +374,7 @@
       "terrain_areas_by_id": {},
       "terrain_features_by_id": {}
     },
-    "authoritative_geometry_hash": "8759ec3ee2a846c4cd55100fb4fc9160be7abda978fb4395b06fc26e04218f18",
+    "authoritative_geometry_hash": "a0c2e9e6e5a2f6e3135d323ab96721d3f5550924e9d786927aa7d1f1786d94cd",
     "battlefield_id": "ui-contract-hidden-redaction:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
     "bounds": {
       "max_x_inches": 60.0,
@@ -494,7 +494,7 @@
         "measurement_anchor": "center",
         "name": "Left Home Objective",
         "objective_marker_id": "take-and-hold-vs-purge-the-foe-layout-3-left-home",
-        "objective_role": "home",
+        "objective_role": "attacker_home",
         "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-left-home",
         "x_inches": 9.5,
         "y_inches": 10.5,
@@ -522,7 +522,7 @@
         "measurement_anchor": "center",
         "name": "Right Home Objective",
         "objective_marker_id": "take-and-hold-vs-purge-the-foe-layout-3-right-home",
-        "objective_role": "home",
+        "objective_role": "defender_home",
         "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-right-home",
         "x_inches": 52.5,
         "y_inches": 34.5,
@@ -1919,8 +1919,9 @@
     "player-a",
     "player-b"
   ],
+  "primary_unit_terrain_turn_start_snapshots": [],
   "projection_schema": "game-view-v6-interaction",
-  "projection_state_hash": "67ee16121b6c7285707dbd16780c30e31ca5c0bec80fa7f2bb8bc221c6dd41f1",
+  "projection_state_hash": "98a2fa673cec86023976be27582378131f78fd85b70f915eddf3b0aab2b9bee2",
   "public_command_point_ledgers": [
     {
       "command_points": 0,

@@ -2195,10 +2195,7 @@ def _visible_enemy_rules_unit_ids_for_source(
         raise GameLifecycleError("Visible enemy rules-unit range must be positive.")
     if state.battlefield_state is None:
         raise GameLifecycleError("Visible enemy rules-unit query requires battlefield state.")
-    source_rules_unit = rules_unit_view_by_id(
-        state=state,
-        unit_instance_id=source_unit_instance_id,
-    )
+    source_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_instance_id)
     source_models = _placed_alive_geometry_models_for_rules_unit(
         state=state,
         rules_unit_instance_id=source_rules_unit.unit_instance_id,
@@ -2230,6 +2227,9 @@ def _visible_enemy_rules_unit_ids_for_source(
                 observing_unit=component.unit,
                 target_unit_id=target_rules_unit.unit_instance_id,
                 terrain_features=state.battlefield_state.terrain_features,
+                terrain_areas=(
+                    () if state.mission_setup is None else state.mission_setup.terrain_areas
+                ),
             )
             for component in source_rules_unit.components
         )

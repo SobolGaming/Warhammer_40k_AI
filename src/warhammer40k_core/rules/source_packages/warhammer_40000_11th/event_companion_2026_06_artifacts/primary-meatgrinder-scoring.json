@@ -1,0 +1,83 @@
+{
+  "artifact_schema": "core-v2-phase17n-event-companion-primary-scoring-v1",
+  "source_package_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
+  "primary_mission_id": "primary-meatgrinder",
+  "mission_name": "Meatgrinder",
+  "scoring_kind": "meatgrinder",
+  "max_vp_per_turn": null,
+  "vp_per_controlled_objective": null,
+  "authoritative_source": {
+    "source_kind": "project_owner_supplied_official_source_transcription",
+    "source_title": "Warhammer 40,000 Chapter Approved 2026-27 Meatgrinder Primary Mission card",
+    "source_scope": "Meatgrinder primary mission scoring clauses",
+    "review_status": "reviewed_and_merged",
+    "review_pull_request": 134,
+    "review_commit": "35b9ddaf5"
+  },
+  "secondary_corroboration": {
+    "provider": "GDMissions",
+    "authority_status": "secondary_corroboration_not_official_gw_source",
+    "transcription_url": "https://gdmissions.app/11th/primary-missions/purge-the-foe/meatgrinder",
+    "card_image_url": "https://gdmissions.app/assets/11th/primary-missions/purge-the-foe/meatgrinder.png",
+    "retrieved_date": "2026-08-09",
+    "card_image_sha256": "d4bcc1dfde2d72fb2fc31b095964d1ea7721dcd082967b0063bcfd77c9965c24"
+  },
+  "layout_source_boundary": {
+    "source_pdf_filename": "eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf",
+    "source_pdf_sha256": "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20",
+    "source_pages": [
+      24,
+      25,
+      26
+    ],
+    "authority_scope": "battlefield_and_layout_facts_only",
+    "contains_meatgrinder_scoring_clauses": false
+  },
+  "scoring_rules": [
+    {
+      "rule_id": "meatgrinder-enemy-destroyed-turn-end",
+      "battle_round_window_text": "ANY BATTLE ROUND",
+      "trigger_text": "End of your turn",
+      "canonical_text": "One or more enemy units were destroyed this turn.",
+      "timing": "turn_end",
+      "source_kind": "primary",
+      "victory_points": 3,
+      "cap": null,
+      "condition": "one_or_more_enemy_units_destroyed_this_turn"
+    },
+    {
+      "rule_id": "meatgrinder-objective-control",
+      "battle_round_window_text": "SECOND BATTLE ROUND ONWARDS",
+      "trigger_text": "End of your Command phase (or the end of your turn in the fifth battle round)",
+      "canonical_text": "You control one or more objectives (excluding your home objective).",
+      "timing": "command_phase_or_round_five_turn_end",
+      "source_kind": "primary",
+      "victory_points": 4,
+      "cap": null,
+      "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+    },
+    {
+      "rule_id": "meatgrinder-more-destroyed-turn-end",
+      "battle_round_window_text": "SECOND BATTLE ROUND ONWARDS",
+      "trigger_text": "End of your turn",
+      "canonical_text": "More enemy units were destroyed this turn than friendly units were destroyed in the previous turn.",
+      "timing": "turn_end_from_battle_round_two",
+      "source_kind": "primary",
+      "victory_points": 5,
+      "cap": null,
+      "condition": "more_enemy_units_destroyed_than_friendly_previous_turn"
+    },
+    {
+      "rule_id": "meatgrinder-opponent-home-turn-end",
+      "battle_round_window_text": "SECOND BATTLE ROUND ONWARDS",
+      "trigger_text": "End of your turn",
+      "canonical_text": "You control your opponent's home objective.",
+      "timing": "turn_end_from_battle_round_two",
+      "source_kind": "primary",
+      "victory_points": 5,
+      "cap": null,
+      "condition": "control_opponent_home_objective"
+    }
+  ],
+  "package_hash": "21b3fabcb585ee33b2295a888963d666a42f85d3f09200e973dd7de8253bd39c"
+}

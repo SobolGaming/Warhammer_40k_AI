@@ -19,6 +19,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     battle_phase_kind_from_token,
 )
+from warhammer40k_core.core.terrain_areas import PlacedTerrainArea
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import (
@@ -166,6 +167,9 @@ from warhammer40k_core.engine.shooting_targets import (
     shooting_visibility_cache_key,
     unit_has_line_of_sight_to_target,
 )
+from warhammer40k_core.engine.shooting_terrain_visibility import (
+    shooting_terrain_areas_for_state,
+)
 from warhammer40k_core.engine.shooting_types import ShootingType, shooting_type_from_token
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     DECLINE_SHOOTING_UNIT_GRANT_OPTION_ID,
@@ -181,6 +185,7 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
     ShootingTargetRestrictionHookRegistry,
 )
+from warhammer40k_core.engine.terrain_hidden import unit_is_hidden_by_terrain
 from warhammer40k_core.engine.transports import (
     FiringDeckWeaponSelection,
     resolve_firing_deck_selection,
@@ -296,6 +301,7 @@ __all__ = (
     "PLACEMENT_PROPOSAL_DECISION_TYPE",
     "PersistingEffect",
     "PlacementError",
+    "PlacedTerrainArea",
     "RangeProfileKind",
     "RangedAttackPool",
     "RangedAttackPoolPayload",
@@ -413,6 +419,7 @@ __all__ = (
     "shooting_declaration_proposal_from_json",
     "shooting_target_candidate_for_model",
     "shooting_target_candidates_for_unit",
+    "shooting_terrain_areas_for_state",
     "shooting_type_from_token",
     "shooting_visibility_cache_key",
     "successful_hit_target_unit_ids_for_sequence",
@@ -420,6 +427,7 @@ __all__ = (
     "unit_firing_deck_value",
     "unit_has_line_of_sight_to_target",
     "unit_is_hidden_by_effects",
+    "unit_is_hidden_by_terrain",
     "unresolved_attacks_for_validation",
     "unresolved_target_unit_ids",
     "validate_json_value",

@@ -12,7 +12,7 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
-    from warhammer40k_core.engine.unit_factory import ModelInstance
+    from warhammer40k_core.engine.unit_factory import UnitInstance
 
 
 type UnitDestroyedHandler = Callable[["UnitDestroyedContext"], None]
@@ -140,21 +140,74 @@ def unit_destruction_completion_events_for_phase(
         events_by_unit.setdefault(target_unit_id, []).append(
             (event_order, record.event_id, dict(event_payload))
         )
-    completions: list[tuple[int, str, dict[str, JsonValue]]] = []
+    completions_by_unit: dict[str, tuple[int, str, dict[str, JsonValue]]] = {}
     for target_unit_id, events in events_by_unit.items():
-        models = _models_for_unit(state=state, unit_instance_id=target_unit_id)
-        if models and not any(model.is_alive for model in models):
-            completions.append(sorted(events, key=lambda item: item[0])[-1])
-    return tuple((event_id, payload) for _order, event_id, payload in sorted(completions))
+        for unit in _component_units_for_target(
+            state=state,
+            target_unit_instance_id=target_unit_id,
+        ):
+            models = tuple(unit.own_models)
+            model_ids = {model.model_instance_id for model in models}
+            component_events = tuple(
+                event
+                for event in events
+                if _payload_identifier(event[2], key="model_instance_id") in model_ids
+            )
+            if not component_events or not models or any(model.is_alive for model in models):
+                continue
+            event_order, event_id, event_payload = sorted(
+                component_events,
+                key=lambda item: item[0],
+            )[-1]
+            completion_payload = dict(event_payload)
+            completion_payload["target_unit_instance_id"] = unit.unit_instance_id
+            existing = completions_by_unit.get(unit.unit_instance_id)
+            if existing is None or event_order > existing[0]:
+                completions_by_unit[unit.unit_instance_id] = (
+                    event_order,
+                    event_id,
+                    completion_payload,
+                )
+    return tuple(
+        (event_id, payload)
+        for _order, event_id, payload in sorted(
+            completions_by_unit.values(),
+            key=lambda item: (item[0], _payload_identifier(item[2], key="target_unit_instance_id")),
+        )
+    )
 
 
-def _models_for_unit(*, state: GameState, unit_instance_id: str) -> tuple[ModelInstance, ...]:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return tuple(unit.own_models)
-    raise GameLifecycleError("Model lookup failed for unit-destruction completion.")
+def _component_units_for_target(
+    *,
+    state: GameState,
+    target_unit_instance_id: str,
+) -> tuple[UnitInstance, ...]:
+    requested_unit_id = _validate_identifier(
+        "target_unit_instance_id",
+        target_unit_instance_id,
+    )
+    physical_units = {
+        unit.unit_instance_id: unit for army in state.army_definitions for unit in army.units
+    }
+    direct = physical_units.get(requested_unit_id)
+    if direct is not None:
+        return (direct,)
+    attached_matches = tuple(
+        record
+        for record in state.starting_attached_unit_records
+        if record.attached_unit_instance_id == requested_unit_id
+    )
+    if len(attached_matches) != 1:
+        raise GameLifecycleError("Model lookup failed for unit-destruction completion.")
+    components: list[UnitInstance] = []
+    for component_id in attached_matches[0].component_unit_instance_ids:
+        component = physical_units.get(component_id)
+        if component is None:
+            raise GameLifecycleError(
+                "Attached-unit destruction completion references an unknown component."
+            )
+        components.append(component)
+    return tuple(sorted(components, key=lambda unit: unit.unit_instance_id))
 
 
 def _payload_identifier(payload: dict[str, JsonValue], *, key: str) -> str:

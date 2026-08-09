@@ -44,6 +44,31 @@ def test_terrain_display_contract_forbids_source_id_string_parsing() -> None:
     )
 
 
+def test_rules_terrain_footprints_are_not_derived_from_display_geometry() -> None:
+    violations: list[str] = []
+    for path in sorted(SRC_ROOT.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            for keyword in node.keywords:
+                if keyword.arg not in {
+                    "rules_footprint_polygon",
+                    "local_rules_footprint_polygon",
+                }:
+                    continue
+                if _references_display_geometry(keyword.value):
+                    violations.append(
+                        f"{path.relative_to(ROOT)}:{keyword.value.lineno} derives "
+                        f"{keyword.arg} from display geometry"
+                    )
+
+    assert not violations, (
+        "Authoritative terrain rules footprints must not be derived from render-only geometry:\n"
+        + "\n".join(violations)
+    )
+
+
 def test_projection_fixtures_with_terrain_features_include_display_geometry() -> None:
     violations: list[str] = []
     for path in sorted(FIXTURE_ROOT.rglob("*.json")):
@@ -80,6 +105,20 @@ def _is_source_id_expression(node: ast.expr) -> bool:
         return node.attr == "source_id"
     if isinstance(node, ast.Subscript):
         return _is_source_id_key(node.slice)
+    return False
+
+
+def _references_display_geometry(node: ast.expr) -> bool:
+    display_geometry_names = {
+        "display_geometry",
+        "local_display_geometry",
+        "TerrainDisplayGeometry",
+    }
+    for child in ast.walk(node):
+        if isinstance(child, ast.Name) and child.id in display_geometry_names:
+            return True
+        if isinstance(child, ast.Attribute) and child.attr in display_geometry_names:
+            return True
     return False
 
 

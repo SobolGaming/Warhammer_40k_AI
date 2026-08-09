@@ -37,6 +37,27 @@ CHAOS_DAEMONS_DATASHEET_RUNTIME = (
     / "chaos_daemons"
     / "datasheets.py"
 )
+GIT_ATTRIBUTES = ROOT / ".gitattributes"
+RAW_BYTE_HASHED_JSON_ARTIFACTS = (
+    RECONCILIATION_ARTIFACT,
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "rules"
+    / "source_packages"
+    / "warhammer_40000_11th"
+    / "event_companion_2026_06_artifacts"
+    / "primary-meatgrinder-scoring.json",
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "rules"
+    / "source_packages"
+    / "warhammer_40000_11th"
+    / "event_companion_layouts_2026_06"
+    / "artifacts"
+    / "purge-the-foe-vs-purge-the-foe-meatgrinder.json",
+)
 
 
 def test_active_code_tests_and_docs_do_not_reference_retired_edition_ids() -> None:
@@ -123,6 +144,21 @@ def test_exact_roster_reconciliation_is_current_only_hash_and_schema_bounded() -
     assert tuple(row.datasheet_id for row in reconciliation.datasheets) == (
         chaos_daemons_roster_2026_07.EXPECTED_DATASHEET_IDS
     )
+
+
+def test_raw_byte_hashed_json_artifacts_have_platform_stable_line_endings() -> None:
+    attributes = tuple(
+        line.strip()
+        for line in GIT_ATTRIBUTES.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    )
+
+    assert "*.json text eol=lf" in attributes
+    assert {
+        path.relative_to(ROOT).as_posix()
+        for path in RAW_BYTE_HASHED_JSON_ARTIFACTS
+        if b"\r\n" in path.read_bytes()
+    } == set()
 
 
 def test_runtime_reconciliation_loader_rejects_raw_hash_drift(

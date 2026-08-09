@@ -191,10 +191,10 @@ def terrain_endpoint_placement_violation(
             if (
                 model.pose.position.z > 0.0
                 and feature_policy.no_overhang_required
-                and shapely_backend.base_footprint_intersects_bounds(
+                and shapely_backend.base_footprint_intersects_polygon(
                     model.base,
                     model.pose,
-                    feature.bounds(),
+                    feature.rules_footprint_points(),
                 )
             ):
                 return TerrainEndpointPlacementViolation(

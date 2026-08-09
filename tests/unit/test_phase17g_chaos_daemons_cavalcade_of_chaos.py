@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import replace
+from math import cos, radians, sin
 from typing import cast
 
 import pytest
@@ -13,11 +14,13 @@ from tests.movement_submission_helpers import (
 from tests.phase10o_fall_back_helpers import (
     advance_to_movement_unit_selection,
     decision_request,
+    fall_back_deployment_pose,
     fall_back_forward_pose,
     fall_back_state,
     fall_back_witness,
     move_first_enemy_model_into_side_engagement,
 )
+from tests.support.catalog_package_fixtures import bloodcrushers_package
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -58,6 +61,7 @@ from warhammer40k_core.engine.battle_shock_hooks import (
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
+    BattlefieldScenario,
     ModelPlacement,
     UnitPlacement,
 )
@@ -141,6 +145,7 @@ from warhammer40k_core.engine.phases.movement import (
     DesperateEscapeRequirementReason,
     FallBackModeKind,
     MovementPhaseActionKind,
+    resolve_normal_move,
 )
 from warhammer40k_core.engine.phases.shooting import (
     COMPLETE_SHOOTING_PHASE_OPTION_ID,
@@ -166,9 +171,18 @@ from warhammer40k_core.engine.stratagems import (
 )
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
+    WargearSelection,
 )
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.geometry.terrain import (
+    TerrainFeatureDefinition,
+    TerrainFeatureKind,
+    TerrainWallDefinition,
+)
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_execution_2026_27,
 )
@@ -182,9 +196,15 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execut
 
 _CAVALCADE_TEST_DATASHEET_ID = "phase17g-cavalcade-mounted-daemon"
 _CAVALCADE_UNIT_ID = "army-alpha:intercessor-unit-1"
+_BLOODCRUSHERS_UNIT_SELECTION_ID = "bloodcrushers-1"
+_BLOODCRUSHERS_UNIT_ID = f"army-alpha:{_BLOODCRUSHERS_UNIT_SELECTION_ID}"
 _CAVALCADE_RESERVE_UNIT_ID = "army-alpha:reserve-unit"
 _ENEMY_UNIT_ID = "army-beta:intercessor-unit-2"
 _OTHER_DAEMON_DETACHMENT_ID = "phase17g-other-daemon-detachment"
+_PHASE17N_EXACT_LAYOUT_ID = "purge-the-foe-vs-purge-the-foe-layout-1"
+_PHASE17N_EXACT_POOL_ENTRY_ID = "mission-purge-the-foe-vs-purge-the-foe-layout-1"
+_PHASE17N_TRAVERSAL_RUIN_ID = f"{_PHASE17N_EXACT_LAYOUT_ID}-terrain-area-07-component-01"
+_WARP_RIDERS_TRAVERSAL_DISTANCE_INCHES = 6.5
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
 )
@@ -288,10 +308,54 @@ def test_cavalcade_unholy_avalanche_grants_fall_back_shoot_and_charge_permission
     }
 
 
-def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> None:
-    config = _cavalcade_config()
-    lifecycle, movement_status = advance_to_movement_unit_selection(config)
+def test_cavalcade_warp_riders_moves_bloodcrushers_through_exact_event_ruin() -> None:
+    config = _bloodcrushers_cavalcade_config_with_traversal_ruins()
+    lifecycle, movement_status = _advance_to_movement_unit_selection_with_reserve(
+        config,
+        pose_factory=_bloodcrushers_deployment_pose,
+    )
     state = fall_back_state(lifecycle)
+    _place_warp_riders_ruins_traversal_positions(state)
+    traversal_dx, traversal_dy = _warp_riders_ruins_traversal_vector(state)
+    traversal_ruin = _warp_riders_traversal_ruin_from_state(state)
+    army = state.army_definition_for_player("player-a")
+    if army is None or state.battlefield_state is None:
+        raise AssertionError("Bloodcrushers traversal test requires a placed player-a army")
+    bloodcrushers = army.unit_by_id(_BLOODCRUSHERS_UNIT_ID)
+    assert bloodcrushers.datasheet_id == "000001115"
+    assert bloodcrushers.name == "Bloodcrushers"
+    assert rule.MOUNTED in bloodcrushers.keywords
+    assert rule.LEGIONES_DAEMONICA in bloodcrushers.faction_keywords
+    blocked_without_mobile = resolve_normal_move(
+        scenario=BattlefieldScenario(
+            armies=tuple(state.army_definitions),
+            battlefield_state=state.battlefield_state,
+        ),
+        ruleset_descriptor=config.ruleset_descriptor,
+        unit_placement=state.battlefield_state.unit_placement_by_id(_BLOODCRUSHERS_UNIT_ID),
+        path_witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=_BLOODCRUSHERS_UNIT_ID,
+            dx=traversal_dx,
+            dy=traversal_dy,
+        ),
+    )
+    assert not blocked_without_mobile.is_valid
+    assert blocked_without_mobile.coherency_result.is_coherent
+    assert all(result.is_valid for result in blocked_without_mobile.path_validation_results)
+    blocked_terrain_violations = tuple(
+        violation
+        for result in blocked_without_mobile.terrain_path_legality_results
+        for violation in result.violations
+    )
+    assert any(
+        violation.violation_code == "terrain_feature_transit_forbidden"
+        and violation.terrain_id is not None
+        and violation.terrain_id.startswith(f"{traversal_ruin.feature_id}:")
+        for violation in blocked_terrain_violations
+    ), tuple(
+        (violation.violation_code, violation.terrain_id) for violation in blocked_terrain_violations
+    )
     _grant_cp(state, player_id="player-a", amount=1)
     bundle = _runtime_content_bundle(lifecycle)
     summary = bundle.to_summary_payload()
@@ -319,7 +383,7 @@ def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> Non
         DecisionResult.for_request(
             result_id="phase17g-warp-riders-select-mounted",
             request=selection_request,
-            selected_option_id=_CAVALCADE_UNIT_ID,
+            selected_option_id=_BLOODCRUSHERS_UNIT_ID,
         )
     )
     stratagem_request = decision_request(stratagem_status)
@@ -343,7 +407,7 @@ def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> Non
 
     persisting_effect = _required_generic_rule_effect_for_unit(
         state,
-        unit_instance_id=_CAVALCADE_UNIT_ID,
+        unit_instance_id=_BLOODCRUSHERS_UNIT_ID,
         source_rule_id=stratagems.WARP_RIDERS_RULE_IR_SOURCE_ID,
     )
     effect_payload = cast(dict[str, JsonValue], persisting_effect.effect_payload)
@@ -351,7 +415,7 @@ def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> Non
     assert effect_payload["effect_kind"] == "generic_rule_execution"
     assert rule_effect["kind"] == "grant_ability"
     assert _rule_effect_parameters(rule_effect)["ability"] == stratagems.MOBILE
-    assert persisting_effect.target_unit_instance_ids == (_CAVALCADE_UNIT_ID,)
+    assert persisting_effect.target_unit_instance_ids == (_BLOODCRUSHERS_UNIT_ID,)
 
     move_status = submit_action_and_movement_proposal(
         lifecycle,
@@ -359,13 +423,14 @@ def test_cavalcade_warp_riders_registers_for_selected_mounted_unit_only() -> Non
         option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
         action_result_id="phase17g-warp-riders-normal-move-action",
         proposal_result_id="phase17g-warp-riders-normal-move-proposal",
-        unit_instance_id=_CAVALCADE_UNIT_ID,
+        unit_instance_id=_BLOODCRUSHERS_UNIT_ID,
         movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
         movement_mode=MovementMode.NORMAL,
         witness=straight_line_witness_for_unit(
             lifecycle,
-            unit_instance_id=_CAVALCADE_UNIT_ID,
-            dx=1.0,
+            unit_instance_id=_BLOODCRUSHERS_UNIT_ID,
+            dx=traversal_dx,
+            dy=traversal_dy,
         ),
     )
 
@@ -1287,6 +1352,8 @@ def _state_at_phase(state: GameState, phase: BattlePhase) -> GameState:
 
 def _advance_to_movement_unit_selection_with_reserve(
     config: GameConfig,
+    *,
+    pose_factory: Callable[[int, str, str], Pose] | None = None,
 ) -> tuple[GameLifecycle, LifecycleStatus]:
     lifecycle = GameLifecycle()
     lifecycle.start(config)
@@ -1330,6 +1397,7 @@ def _advance_to_movement_unit_selection_with_reserve(
         lifecycle,
         status,
         result_id_prefix="phase17g-reserve-deploy",
+        pose_factory=pose_factory,
     )
     assert decision_request(movement_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     return lifecycle, movement_status
@@ -1428,6 +1496,83 @@ def _non_cavalcade_daemon_config() -> GameConfig:
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
         mission_setup=_mission_setup(),
+    )
+
+
+def _bloodcrushers_cavalcade_config_with_traversal_ruins() -> GameConfig:
+    config = _cavalcade_config()
+    source_package = bloodcrushers_package()
+    source_catalog = source_package.army_catalog
+    bloodcrushers_datasheet = source_catalog.datasheet_by_id("000001115")
+    catalog = replace(
+        config.army_catalog,
+        datasheets=(
+            *(
+                datasheet
+                for datasheet in config.army_catalog.datasheets
+                if datasheet.datasheet_id != _CAVALCADE_TEST_DATASHEET_ID
+            ),
+            bloodcrushers_datasheet,
+        ),
+        wargear=(*config.army_catalog.wargear, *source_catalog.wargear),
+        detachments=tuple(
+            replace(detachment, unit_datasheet_ids=(bloodcrushers_datasheet.datasheet_id,))
+            if detachment.detachment_id == rule.CAVALCADE_DETACHMENT_ID
+            else detachment
+            for detachment in config.army_catalog.detachments
+        ),
+    )
+    player_a_request, player_b_request = config.army_muster_requests
+    bloodcrushers_request = replace(
+        player_a_request,
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        unit_selections=(
+            UnitMusterSelection(
+                unit_selection_id=_BLOODCRUSHERS_UNIT_SELECTION_ID,
+                datasheet_id=bloodcrushers_datasheet.datasheet_id,
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="000001115:bloodcrushers",
+                        model_count=5,
+                    ),
+                    ModelProfileSelection(
+                        model_profile_id="000001115:bloodhunter",
+                        model_count=1,
+                    ),
+                ),
+                wargear_selections=(
+                    WargearSelection(
+                        option_id="000001115:daemonic-icon:option-2",
+                        model_profile_id="000001115:bloodcrushers",
+                        wargear_ids=("000001115:daemonic-icon",),
+                    ),
+                    WargearSelection(
+                        option_id="000001115:instrument-of-chaos:option-1",
+                        model_profile_id="000001115:bloodcrushers",
+                        wargear_ids=("000001115:instrument-of-chaos",),
+                    ),
+                ),
+            ),
+        ),
+    )
+    mission_setup = config.mission_setup
+    if mission_setup is None:
+        raise AssertionError("Cavalcade terrain test requires mission_setup")
+    ruins = _exact_phase17n_warp_riders_ruin(
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+    )
+    return replace(
+        config,
+        army_catalog=catalog,
+        army_muster_requests=(bloodcrushers_request, player_b_request),
+        model_geometries=source_package.model_geometries,
+        mission_setup=replace(
+            mission_setup,
+            terrain_features=(ruins,),
+        ),
     )
 
 
@@ -1711,6 +1856,116 @@ def _place_soul_shattering_charge_positions(state: GameState) -> None:
             enemy_placement
         )
     )
+
+
+def _place_warp_riders_ruins_traversal_positions(state: GameState) -> None:
+    ruins = _warp_riders_traversal_ruin_from_state(state)
+    ground_wall = _longest_ground_wall(ruins)
+    wall_rotation_radians = radians(ground_wall.rotation_degrees)
+    tangent_x = cos(wall_rotation_radians)
+    tangent_y = sin(wall_rotation_radians)
+    traversal_dx, traversal_dy = _warp_riders_ruins_traversal_vector(state)
+    normal_x = traversal_dx / _WARP_RIDERS_TRAVERSAL_DISTANCE_INCHES
+    normal_y = traversal_dy / _WARP_RIDERS_TRAVERSAL_DISTANCE_INCHES
+    friendly_placement = _with_model_poses(
+        _unit_placement(state, _BLOODCRUSHERS_UNIT_ID),
+        poses=tuple(
+            Pose.at(
+                ground_wall.center_x_inches
+                + (((index % 3) - 1) * 3.7 * tangent_x)
+                - (traversal_dx / 2.0)
+                + (((index // 3) - 0.5) * 2.2 * normal_x),
+                ground_wall.center_y_inches
+                + (((index % 3) - 1) * 3.7 * tangent_y)
+                - (traversal_dy / 2.0)
+                + (((index // 3) - 0.5) * 2.2 * normal_y),
+                facing_degrees=ground_wall.rotation_degrees,
+            )
+            for index in range(6)
+        ),
+    )
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield_state")
+    state.replace_battlefield_state(state.battlefield_state.with_unit_placement(friendly_placement))
+
+
+def _exact_phase17n_warp_riders_ruin(
+    *,
+    battlefield_width_inches: float,
+    battlefield_depth_inches: float,
+) -> TerrainFeatureDefinition:
+    exact_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id=_PHASE17N_EXACT_POOL_ENTRY_ID,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    matching_ruins = tuple(
+        feature
+        for feature in exact_setup.terrain_features
+        if feature.feature_kind is TerrainFeatureKind.RUINS
+        and feature.feature_id == _PHASE17N_TRAVERSAL_RUIN_ID
+    )
+    if len(matching_ruins) != 1:
+        raise AssertionError("Phase 17N exact layout requires the selected generated ruin")
+    ruins = matching_ruins[0]
+    min_x, min_y, max_x, max_y = ruins.bounds()
+    if (
+        min_x < 0.0
+        or min_y < 0.0
+        or max_x > battlefield_width_inches
+        or max_y > battlefield_depth_inches
+    ):
+        raise AssertionError("Selected Phase 17N ruin must fit the test battlefield")
+    return ruins
+
+
+def _warp_riders_traversal_ruin_from_state(state: GameState) -> TerrainFeatureDefinition:
+    mission_setup = state.mission_setup
+    if mission_setup is None:
+        raise AssertionError("Warp Riders traversal test requires mission setup")
+    ruins = tuple(
+        feature
+        for feature in mission_setup.terrain_features
+        if feature.feature_kind is TerrainFeatureKind.RUINS
+    )
+    if len(ruins) != 1:
+        raise AssertionError("Warp Riders traversal test requires exactly one generated ruin")
+    ruins_feature = ruins[0]
+    if not ruins_feature.feature_id.startswith(_PHASE17N_EXACT_LAYOUT_ID):
+        raise AssertionError("Warp Riders traversal ruin must come from the Phase 17N exact layout")
+    if ruins_feature.source_id is None or ":battlefield-layout:" not in ruins_feature.source_id:
+        raise AssertionError("Warp Riders traversal ruin requires Event Companion provenance")
+    return ruins_feature
+
+
+def _longest_ground_wall(ruins: TerrainFeatureDefinition) -> TerrainWallDefinition:
+    ground_walls = tuple(wall for wall in ruins.walls if wall.bottom_z_inches == 0.0)
+    if not ground_walls:
+        raise AssertionError("Warp Riders traversal ruin requires a ground-floor wall")
+    return max(ground_walls, key=lambda wall: wall.width_inches)
+
+
+def _warp_riders_ruins_traversal_vector(state: GameState) -> tuple[float, float]:
+    ground_wall = _longest_ground_wall(_warp_riders_traversal_ruin_from_state(state))
+    wall_rotation_radians = radians(ground_wall.rotation_degrees)
+    return (
+        -sin(wall_rotation_radians) * _WARP_RIDERS_TRAVERSAL_DISTANCE_INCHES,
+        cos(wall_rotation_radians) * _WARP_RIDERS_TRAVERSAL_DISTANCE_INCHES,
+    )
+
+
+def _bloodcrushers_deployment_pose(
+    index: int,
+    player_id: str,
+    model_instance_id: str,
+) -> Pose:
+    if model_instance_id.startswith(f"{_BLOODCRUSHERS_UNIT_ID}:"):
+        return Pose.at(
+            3.0 + ((index % 2) * 4.0),
+            20.0 + ((index // 2) * 2.2),
+        )
+    return fall_back_deployment_pose(index, player_id, model_instance_id)
 
 
 def _unit_placement(state: GameState, unit_instance_id: str) -> UnitPlacement:

@@ -186,6 +186,7 @@ __all__ = (
     "_target_within_half_weapon_range",
     "_targeting_detection_context_fingerprint",
     "_targeting_rule_ids_with_shooting_type",
+    "_terrain_areas_for_state",
     "_terrain_features_for_state",
     "_transport_firing_deck_model",
     "_unit_advanced_this_turn",

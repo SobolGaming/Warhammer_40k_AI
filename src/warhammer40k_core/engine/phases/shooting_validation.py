@@ -60,6 +60,7 @@ __all__ = (
     "_shooting_phase_status_payload",
     "_shooting_type_options",
     "_shooting_unit_options",
+    "_terrain_areas_for_state",
     "_terrain_features_for_state",
     "_unit_by_id",
     "_unit_has_keyword",
@@ -257,6 +258,10 @@ def _terrain_features_for_state(state: GameState) -> tuple[TerrainFeatureDefinit
     if battlefield_state is None:
         raise GameLifecycleError("Shooting phase requires battlefield_state.")
     return battlefield_state.terrain_features
+
+
+def _terrain_areas_for_state(state: GameState) -> tuple[PlacedTerrainArea, ...]:
+    return shooting_terrain_areas_for_state(state)
 
 
 def _active_player_id(state: GameState) -> str:

@@ -20,7 +20,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
-from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry, TerrainDisplayPoint
 from warhammer40k_core.core.unit import Unit, UnitMember
 from warhammer40k_core.core.unit_group import UnitGroup
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -1110,6 +1110,7 @@ def _ruins_features(count: int) -> tuple[TerrainFeatureDefinition, ...]:
             footprint_center_y_inches=1.0 + (index * 8.0),
             footprint_width_inches=6.0,
             footprint_depth_inches=6.0,
+            rules_footprint_polygon=_profiling_ruins_rules_footprint(index=index),
             display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
                 center_x_inches=3.0,
                 center_y_inches=1.0 + (index * 8.0),
@@ -1141,6 +1142,18 @@ def _ruins_features(count: int) -> tuple[TerrainFeatureDefinition, ...]:
             ),
         )
         for index in range(count)
+    )
+
+
+def _profiling_ruins_rules_footprint(*, index: int) -> tuple[TerrainDisplayPoint, ...]:
+    center_x = 3.0
+    center_y = 1.0 + (index * 8.0)
+    half_size = 3.0
+    return (
+        TerrainDisplayPoint(center_x - half_size, center_y - half_size),
+        TerrainDisplayPoint(center_x + half_size, center_y - half_size),
+        TerrainDisplayPoint(center_x + half_size, center_y + half_size),
+        TerrainDisplayPoint(center_x - half_size, center_y + half_size),
     )
 
 

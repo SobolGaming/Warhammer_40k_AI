@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 
+from warhammer40k_core.adapters.battlefield_projection import project_battlefield_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.missions import (
@@ -70,9 +71,15 @@ from warhammer40k_core.engine.wargear_selections import (
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition, TerrainWallDefinition
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2026_27 as source_data,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    event_companion_layouts_2026_06 as event_layouts,
 )
 
 PHASE16A_BATTLEFIELD_LAYOUT_ID = "take-and-hold-vs-purge-the-foe-layout-3"
@@ -92,9 +99,9 @@ def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> Non
     assert "object at 0x" not in encoded
     assert MissionPackDefinition.from_payload(decoded).to_payload() == payload
     assert mission_pack.sequence.steps[0] == "muster_armies"
-    assert len(mission_pack.deployment_maps) == 7
-    assert len(mission_pack.terrain_layout_templates) == 7
-    assert len(mission_pack.battlefield_layouts) == 6
+    assert len(mission_pack.deployment_maps) == 10
+    assert len(mission_pack.terrain_layout_templates) == 10
+    assert len(mission_pack.battlefield_layouts) == 9
     assert len(mission_pack.terrain_area_footprint_templates) == 5
     assert len(mission_pack.mission_pool_entries) == 1
     assert len(mission_pack.secondary_missions) == 18
@@ -279,6 +286,9 @@ def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
         "disruption-vs-reconnaissance-layout-1",
         "disruption-vs-reconnaissance-layout-2",
         "disruption-vs-reconnaissance-layout-3",
+        "purge-the-foe-vs-purge-the-foe-layout-1",
+        "purge-the-foe-vs-purge-the-foe-layout-2",
+        "purge-the-foe-vs-purge-the-foe-layout-3",
         PHASE16A_BATTLEFIELD_LAYOUT_ID,
         "take-and-hold-vs-take-and-hold-layout-1",
         "take-and-hold-vs-take-and-hold-layout-2",
@@ -645,11 +655,11 @@ def test_phase16a_battlefield_layout_template_matches_source_snapshot() -> None:
         "cutouts": [],
     }
     assert tuple(sorted(objective_kinds.values())) == (
+        "attacker_home",
         "central",
         "central",
         "central",
-        "home",
-        "home",
+        "defender_home",
     )
     assert layout_row.source_status == "layout_identity_coordinate_extraction_pending"
     assert terrain_layout.terrain_features == ()
@@ -784,6 +794,12 @@ def test_mission_setup_from_payload_rejects_out_of_bounds_terrain() -> None:
     setup = replace(setup, terrain_features=(_blocking_terrain_feature(x=30.0, y=22.0),))
     payload = setup.to_payload()
     payload["terrain_features"][0]["footprint_width_inches"] = 1000.0
+    payload["terrain_features"][0]["rules_footprint_polygon"] = [
+        {"x_inches": -470.0, "y_inches": 20.0},
+        {"x_inches": 530.0, "y_inches": 20.0},
+        {"x_inches": 530.0, "y_inches": 24.0},
+        {"x_inches": -470.0, "y_inches": 24.0},
+    ]
 
     with pytest.raises(MissionSetupError, match="terrain feature x is outside"):
         MissionSetup.from_payload(payload)
@@ -800,6 +816,57 @@ def test_game_state_round_trips_populated_mission_setup() -> None:
     state = GameState.from_config(_config(mission_setup=mission_setup))
 
     assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+
+def test_phase17n_exact_terrain_provenance_survives_config_round_trip_and_projection() -> None:
+    mission_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    config = _config(mission_setup=mission_setup)
+    round_tripped = GameConfig.from_payload(config.to_payload())
+
+    assert round_tripped.to_payload() == config.to_payload()
+    assert round_tripped.mission_setup is not None
+    assert all(
+        feature.source_id is not None
+        and event_layouts.EXACT_SLICE_PACKAGE_HASH in feature.source_id
+        for feature in round_tripped.mission_setup.terrain_features
+    )
+
+    state = GameState.from_config(round_tripped)
+    armies = _mustered_armies(round_tripped)
+    for army in armies:
+        state.record_army_definition(army)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase17n-provenance-battlefield",
+        armies=armies,
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+        terrain_features=round_tripped.mission_setup.terrain_features,
+    )
+    state.record_battlefield_state(scenario.battlefield_state)
+    projection = project_battlefield_view(
+        state=state,
+        visible_model_ids=frozenset(),
+        pending_request_id=None,
+        selected_entity_ids=(),
+        legal_option_ids=(),
+    )
+
+    assert projection is not None
+    projected_features = projection["authoritative"]["terrain_features_by_id"].values()
+    assert {feature["classification"] for feature in projected_features} == {
+        "dense",
+        "light",
+    }
+    assert all(
+        feature["source_id"] is not None
+        and event_layouts.EXACT_SLICE_PACKAGE_HASH in feature["source_id"]
+        for feature in projected_features
+    )
 
 
 def test_hidden_secondary_and_challenger_cards_do_not_leak_to_opponent_payload() -> None:
@@ -1207,6 +1274,12 @@ def _blocking_terrain_feature(*, x: float, y: float) -> TerrainFeatureDefinition
         footprint_center_y_inches=y,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=x,
+            center_y_inches=y,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=x,
             center_y_inches=y,

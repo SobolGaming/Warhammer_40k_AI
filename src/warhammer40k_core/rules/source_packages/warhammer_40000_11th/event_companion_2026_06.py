@@ -24,7 +24,6 @@ from warhammer40k_core.core.missions import (
     ObjectiveTerrainAreaDefinition,
     objective_marker_role_from_token,
 )
-from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
 from warhammer40k_core.core.terrain_areas import (
     PlacedTerrainArea,
     SymmetryAxis,
@@ -38,9 +37,8 @@ from warhammer40k_core.core.terrain_areas import (
 from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
 from warhammer40k_core.core.terrain_layouts import (
     TerrainFeatureAreaPlacement,
+    TerrainFeatureLocalTransform,
     TerrainFeaturePreset,
-    TerrainFloorTemplate,
-    TerrainWallTemplate,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2026_27 as chapter_approved,
@@ -50,6 +48,20 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_layouts_2026_06 as event_layouts,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_layout_geometry_2026_06 import (  # noqa: E501
+    deployment_zone_rows_from_specs,
+    event_no_mans_land_shape,
+    event_territory_vertices,
+    terrain_area_classifications_by_suffix,
+    terrain_feature_placements_from_specs,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_primary_scoring_2026_06 import (  # noqa: E501
+    MEATGRINDER_SCORING_PACKAGE_HASH,
+    meatgrinder_primary_scoring_artifact,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_terrain_presets_2026_06 import (  # noqa: E501
+    build_default_ruins_feature_preset,
 )
 
 EDITION_ID = "warhammer_40000_11th"
@@ -64,7 +76,7 @@ IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
-TERRAIN_AREA_FEATURE_KIND = TerrainFeatureKind.RUINS.value
+TERRAIN_AREA_FEATURE_KIND = "terrain_layout_area"
 LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES = 9.0
 LAYOUT_C_ARC_SEGMENTS = 16
 type DeploymentZoneLayoutTemplateId = Literal[
@@ -1112,6 +1124,7 @@ _ENGINE_IMPLEMENTED_PRIMARY_MISSION_IDS = frozenset(
     (
         "primary-death-trap",
         "primary-immovable-object",
+        "primary-meatgrinder",
         "primary-unstoppable-force",
     )
 )
@@ -1155,15 +1168,12 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_condition:each_friendly_unit_extracted_intelligence_this_turn",
         "engine_primary_condition:gather_intel_operation_marker_end_of_battle",
     ),
-    "primary-destroyers-wrath": (
-        "engine_primary_condition:control_more_objectives_than_opponent",
-        "engine_primary_condition:more_enemy_units_destroyed_than_friendly_previous_turn",
-    ),
+    "primary-destroyers-wrath": ("engine_primary_condition:control_more_objectives_than_opponent",),
     "primary-inescapable-dominion": (
         "engine_primary_condition:control_three_or_more_objectives",
         "engine_primary_condition:control_two_or_more_objectives_from_battle_round_two",
         "engine_primary_condition:control_more_objectives_than_opponent",
-        "engine_primary_condition:control_opponent_home_objective",
+        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
     ),
     "primary-locate-and-deny": (
         "engine_primary_start_battle_setup:locate_and_deny_operation_markers",
@@ -1171,10 +1181,6 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_marker_state:operation_marker_terrain_area",
         "engine_primary_condition:enemy_started_turn_on_objective_destroyed",
         "engine_primary_condition:single_friendly_operation_marker_terrain_area_state",
-    ),
-    "primary-meatgrinder": (
-        "engine_primary_condition:more_enemy_units_destroyed_than_friendly_previous_turn",
-        "engine_primary_condition:control_opponent_home_objective",
     ),
     "primary-outmaneuver": (
         "engine_primary_condition:control_enemy_home_objective",
@@ -1185,7 +1191,7 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_start_turn_choice:condemned_enemy_units",
         "engine_primary_condition:condemned_enemy_units_left_battlefield",
         "engine_primary_condition:control_more_objectives_than_opponent",
-        "engine_primary_condition:control_opponent_home_objective",
+        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
     ),
     "primary-purge-and-secure": (
         "engine_primary_condition:enemy_destroyed_by_friendly_unit_on_objective",
@@ -1241,7 +1247,7 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_action:vanguard-operation",
         "engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn",
         "engine_primary_condition:enemy_territory_terrain_area_control",
-        "engine_primary_condition:control_opponent_home_objective",
+        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
     ),
     "primary-vital-link": (
         "engine_primary_action:maintain-control",
@@ -1256,38 +1262,22 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
 def _source_known_event_primary_mission_rows_by_id() -> dict[
     str, chapter_approved.SourcePrimaryMissionRow
 ]:
+    meatgrinder = meatgrinder_primary_scoring_artifact()
     rows = (
         chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-meatgrinder",
-            name="Meatgrinder",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
+            primary_mission_id=meatgrinder.primary_mission_id,
+            name=meatgrinder.mission_name,
+            max_vp_per_turn=meatgrinder.max_vp_per_turn,
+            scoring_kind=meatgrinder.scoring_kind,
+            vp_per_controlled_objective=meatgrinder.vp_per_controlled_objective,
+            scoring_rules=tuple(
                 _event_primary_rule(
-                    "meatgrinder-enemy-destroyed-turn-end",
-                    "turn_end",
-                    3,
-                    "one_or_more_enemy_units_destroyed_this_turn",
-                ),
-                _event_primary_rule(
-                    "meatgrinder-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "meatgrinder-more-destroyed-turn-end",
-                    "turn_end_from_battle_round_two",
-                    5,
-                    "more_enemy_units_destroyed_than_friendly_previous_turn",
-                ),
-                _event_primary_rule(
-                    "meatgrinder-opponent-home-turn-end",
-                    "turn_end_from_battle_round_two",
-                    5,
-                    "control_opponent_home_objective",
-                ),
+                    rule.rule_id,
+                    rule.timing,
+                    rule.victory_points,
+                    rule.condition,
+                )
+                for rule in meatgrinder.scoring_rules
             ),
         ),
         chapter_approved.SourcePrimaryMissionRow(
@@ -2228,9 +2218,12 @@ def terrain_area_footprint_templates() -> tuple[TerrainAreaFootprintTemplate, ..
 
 
 def terrain_feature_presets() -> tuple[TerrainFeaturePreset, ...]:
-    return tuple(
-        _terrain_feature_preset_from_footprint_template(template)
-        for template in terrain_area_footprint_templates()
+    return (
+        *(
+            _terrain_feature_preset_from_footprint_template(template)
+            for template in terrain_area_footprint_templates()
+        ),
+        *event_layouts.EXACT_SLICE_TERRAIN_FEATURE_PRESETS,
     )
 
 
@@ -2342,7 +2335,7 @@ def _battlefield_layout_row(
             battlefield_depth_inches=BATTLEFIELD_DEPTH_INCHES,
             coordinate_origin="bottom_left",
             coordinate_orientation="x_right_along_44_inch_edge_y_up_along_60_inch_edge",
-            source_status="event_companion_layout_geometry_extracted",
+            source_status=_extracted_layout_source_status(layout_id),
             objective_markers=_extracted_objectives(layout_id=layout_id),
             deployment_zones=_extracted_deployment_zones(layout_id=layout_id),
             terrain_features=(),
@@ -2446,6 +2439,9 @@ def _extracted_deployment_zones(
 ) -> tuple[chapter_approved.SourceBattlefieldDeploymentZoneRow, ...]:
     if layout_id not in event_layouts.EXTRACTED_LAYOUT_IDS:
         raise MissionPackError("Unsupported extracted battlefield layout ID.")
+    explicit_specs = _extracted_layout_source(layout_id).deployment_zone_shape_specs
+    if explicit_specs:
+        return deployment_zone_rows_from_specs(layout_id=layout_id, specs=explicit_specs)
     return _deployment_zone_rows_for_layout(
         layout_id=layout_id,
         layout_number=_layout_number_from_layout_id(layout_id),
@@ -2761,6 +2757,33 @@ def _descriptor_terrain(
     layout_id: str,
     layout_number: int,
 ) -> tuple[EventTerrainSourceRecord, ...]:
+    if layout_id in event_layouts.EXACT_SLICE_LAYOUT_IDS:
+        artifact = event_layouts.exact_slice_artifact()
+        exact_layout = {layout.layout_id: layout for layout in artifact.layouts}[layout_id]
+        archetypes = {
+            archetype.archetype_id: archetype for archetype in artifact.feature_archetypes
+        }
+        spans = {
+            archetype.archetype_id: (
+                max(point.x_inches for point in archetype.rules_footprint_polygon)
+                - min(point.x_inches for point in archetype.rules_footprint_polygon),
+                max(point.y_inches for point in archetype.rules_footprint_polygon)
+                - min(point.y_inches for point in archetype.rules_footprint_polygon),
+            )
+            for archetype in artifact.feature_archetypes
+        }
+        return tuple(
+            EventTerrainSourceRecord(
+                feature_id=component.component_id,
+                feature_kind=archetypes[component.archetype_id].feature_kind,
+                density=archetypes[component.archetype_id].classification,
+                x_inches=component.battlefield_center_x_inches,
+                y_inches=component.battlefield_center_y_inches,
+                width_inches=spans[component.archetype_id][0],
+                depth_inches=spans[component.archetype_id][1],
+            )
+            for component in exact_layout.terrain_components
+        )
     if _is_extracted_layout(layout_id):
         templates = {
             template.footprint_template_id: template
@@ -2904,71 +2927,20 @@ def _extracted_regions(*, layout_id: str) -> tuple[BattlefieldRegion, ...]:
 
 
 def _extracted_no_mans_land_shape(layout_id: str) -> DeploymentZoneShape:
-    layout_number = _layout_number_from_layout_id(layout_id)
-    if layout_number == 1:
-        return _shape_from_vertices(
-            (
-                (0.0, 12.0),
-                (22.0, 12.0),
-                (22.0, 20.0),
-                (44.0, 20.0),
-                (44.0, 48.0),
-                (22.0, 48.0),
-                (22.0, 40.0),
-                (0.0, 40.0),
-            )
-        )
-    if layout_number == 2:
-        return DeploymentZoneShape.rectangle(
-            min_x=12.0,
-            min_y=0.0,
-            max_x=32.0,
-            max_y=60.0,
-        )
-    if layout_number == 3:
-        return _shape_from_polygons(
-            (
-                ((0.0, 0.0), (22.0, 0.0), (22.0, 30.0), (0.0, 30.0)),
-                ((22.0, 30.0), (44.0, 30.0), (44.0, 60.0), (22.0, 60.0)),
-                _quarter_circle_sector_vertices(
-                    center_x=22.0,
-                    center_y=30.0,
-                    radius=LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES,
-                    start_degrees=90.0,
-                    end_degrees=180.0,
-                ),
-                _quarter_circle_sector_vertices(
-                    center_x=22.0,
-                    center_y=30.0,
-                    radius=LAYOUT_C_DEPLOYMENT_CUTOUT_RADIUS_INCHES,
-                    start_degrees=-90.0,
-                    end_degrees=0.0,
-                ),
-            )
-        )
-    raise MissionPackError("Unsupported extracted battlefield layout number.")
+    source = _extracted_layout_source(layout_id)
+    return event_no_mans_land_shape(
+        explicit_polygons=source.no_mans_land_shape_polygons,
+        layout_number=_layout_number_from_layout_id(layout_id),
+    )
 
 
 def _extracted_territory_vertices(
     layout_id: str,
 ) -> tuple[tuple[str, tuple[tuple[float, float], ...]], ...]:
-    layout_number = _layout_number_from_layout_id(layout_id)
-    if layout_number == 1:
-        return (
-            ("attacker_territory", ((0.0, 30.0), (44.0, 30.0), (44.0, 60.0), (0.0, 60.0))),
-            ("defender_territory", ((0.0, 0.0), (44.0, 0.0), (44.0, 30.0), (0.0, 30.0))),
-        )
-    if layout_number == 2:
-        return (
-            ("attacker_territory", ((0.0, 0.0), (22.0, 0.0), (22.0, 60.0), (0.0, 60.0))),
-            ("defender_territory", ((22.0, 0.0), (44.0, 0.0), (44.0, 60.0), (22.0, 60.0))),
-        )
-    if layout_number == 3:
-        return (
-            ("attacker_territory", ((0.0, 0.0), (44.0, 60.0), (0.0, 60.0))),
-            ("defender_territory", ((0.0, 0.0), (44.0, 0.0), (44.0, 60.0))),
-        )
-    raise MissionPackError("Unsupported extracted battlefield layout number.")
+    return event_territory_vertices(
+        explicit_specs=_extracted_layout_source(layout_id).territory_shape_specs,
+        layout_number=_layout_number_from_layout_id(layout_id),
+    )
 
 
 def _extracted_terrain_areas(
@@ -2981,6 +2953,7 @@ def _extracted_terrain_areas(
         explicit_specs=layout_source.terrain_area_specs,
         mirrored_pairs=layout_source.terrain_area_mirror_pairs,
         local_transform_specs=layout_source.terrain_area_local_transform_specs,
+        classification_specs=layout_source.terrain_area_classification_specs,
     )
 
 
@@ -2990,11 +2963,23 @@ def _terrain_feature_area_placements(
     terrain_areas: tuple[PlacedTerrainArea, ...],
 ) -> tuple[TerrainFeatureAreaPlacement, ...]:
     layout_source = _extracted_layout_source(layout_id)
+    if layout_source.terrain_feature_placement_specs:
+        return terrain_feature_placements_from_specs(
+            layout_id=layout_id,
+            source_layout_id=layout_source.source_layout_id,
+            source_package_id=SOURCE_PACKAGE_ID,
+            terrain_areas=terrain_areas,
+            specs=layout_source.terrain_feature_placement_specs,
+        )
     return tuple(
         TerrainFeatureAreaPlacement(
             feature_id=area.terrain_area_id,
             terrain_area_id=area.terrain_area_id,
             terrain_feature_preset_id=_terrain_feature_preset_id(area.footprint_template_id),
+            local_offset_x_inches=0.0,
+            local_offset_y_inches=0.0,
+            local_rotation_degrees=0.0,
+            local_transform=TerrainFeatureLocalTransform.IDENTITY,
             source_id=(
                 f"{SOURCE_PACKAGE_ID}:battlefield-layout:{layout_source.source_layout_id}:"
                 f"terrain-feature-placement:"
@@ -3012,6 +2997,7 @@ def _placed_terrain_areas_from_specs(
     explicit_specs: tuple[event_layouts.EventTerrainAreaSpec, ...],
     mirrored_pairs: tuple[event_layouts.EventTerrainAreaMirrorPair, ...],
     local_transform_specs: tuple[event_layouts.EventTerrainAreaLocalTransformSpec, ...],
+    classification_specs: tuple[event_layouts.EventTerrainAreaClassificationSpec, ...],
 ) -> tuple[PlacedTerrainArea, ...]:
     templates = {
         template.footprint_template_id: template for template in terrain_area_footprint_templates()
@@ -3019,6 +3005,11 @@ def _placed_terrain_areas_from_specs(
     local_transforms_by_area_id = _terrain_area_local_transforms_by_area_id(
         explicit_specs=explicit_specs,
         local_transform_specs=local_transform_specs,
+    )
+    classifications_by_area_id = terrain_area_classifications_by_suffix(
+        explicit_specs=explicit_specs,
+        classification_specs=classification_specs,
+        default_for_template=_terrain_area_classification_for_footprint_template,
     )
     explicit_areas = tuple(
         _placed_terrain_area_from_anchor_spec(
@@ -3030,6 +3021,7 @@ def _placed_terrain_areas_from_specs(
             anchor_y_inches=anchor_y,
             rotation_degrees=rotation,
             local_transform=local_transforms_by_area_id[area_id],
+            classification=classifications_by_area_id[area_id],
         )
         for area_id, template_id, anchor_x, anchor_y, rotation in explicit_specs
     )
@@ -3056,51 +3048,9 @@ def _placed_terrain_areas_from_specs(
 def _terrain_feature_preset_from_footprint_template(
     template: TerrainAreaFootprintTemplate,
 ) -> TerrainFeaturePreset:
-    if type(template) is not TerrainAreaFootprintTemplate:
-        raise MissionPackError("Terrain feature preset source must be a footprint template.")
-    width = template.bounding_width_inches
-    depth = template.bounding_depth_inches
-    interior_width = min(0.5, max(0.12, width - 2.0))
-    interior_depth = min(0.5, max(0.12, depth - 2.0))
-    wall_thickness = 0.12
-    return TerrainFeaturePreset(
+    return build_default_ruins_feature_preset(
+        template=template,
         terrain_feature_preset_id=_terrain_feature_preset_id(template.footprint_template_id),
-        feature_kind=TerrainFeatureKind.RUINS,
-        footprint_template_id=template.footprint_template_id,
-        footprint_width_inches=width,
-        footprint_depth_inches=depth,
-        walls=(
-            TerrainWallTemplate(
-                wall_id="center-wall",
-                center_x_inches=0.0,
-                center_y_inches=0.0,
-                bottom_z_inches=0.0,
-                width_inches=interior_width,
-                depth_inches=wall_thickness,
-                height_inches=3.0,
-            ),
-        ),
-        floors=(
-            TerrainFloorTemplate(
-                floor_id="ground-floor",
-                center_x_inches=0.0,
-                center_y_inches=0.0,
-                bottom_z_inches=0.0,
-                width_inches=interior_width,
-                depth_inches=interior_depth,
-                thickness_inches=0.12,
-            ),
-            TerrainFloorTemplate(
-                floor_id="upper-floor",
-                center_x_inches=0.0,
-                center_y_inches=0.0,
-                bottom_z_inches=3.0,
-                width_inches=interior_width,
-                depth_inches=interior_depth,
-                thickness_inches=0.12,
-            ),
-        ),
-        source_id=f"{template.source_id}:terrain-feature-preset:ruins",
     )
 
 
@@ -3137,6 +3087,7 @@ def _placed_terrain_area_from_anchor_spec(
     anchor_y_inches: float,
     rotation_degrees: float,
     local_transform: TerrainAreaLocalTransform,
+    classification: TerrainAreaClassification,
 ) -> PlacedTerrainArea:
     center_x, center_y = _terrain_area_center_from_anchor(
         template,
@@ -3148,9 +3099,7 @@ def _placed_terrain_area_from_anchor_spec(
         terrain_area_id=f"{layout_id}-{area_id}",
         template=template,
         terrain_feature_kind=TERRAIN_AREA_FEATURE_KIND,
-        classification=_terrain_area_classification_for_footprint_template(
-            template.footprint_template_id
-        ),
+        classification=classification,
         center_x_inches=center_x,
         center_y_inches=center_y,
         rotation_degrees=rotation_degrees,
@@ -3285,26 +3234,6 @@ def _rectangle_with_quarter_circle_cutout_vertices(
     raise MissionPackError("Unsupported quarter-circle cutout corner.")
 
 
-def _quarter_circle_sector_vertices(
-    *,
-    center_x: float,
-    center_y: float,
-    radius: float,
-    start_degrees: float,
-    end_degrees: float,
-) -> tuple[tuple[float, float], ...]:
-    return (
-        (center_x, center_y),
-        *_arc_points(
-            center_x=center_x,
-            center_y=center_y,
-            radius=radius,
-            start_degrees=start_degrees,
-            end_degrees=end_degrees,
-        ),
-    )
-
-
 def _arc_points(
     *,
     center_x: float,
@@ -3366,9 +3295,17 @@ def _deployment_zone_layout_edges(template_id: DeploymentZoneLayoutTemplateId) -
 
 
 def _layout_geometry_extraction_status(layout_id: str) -> str:
+    if layout_id in event_layouts.EXACT_SLICE_LAYOUT_IDS:
+        return "source_hashed_exact_layout_geometry"
     if _is_extracted_layout(layout_id):
         return "layout_geometry_extracted"
     return "layout_identity_source_page_bound_coordinates_pending"
+
+
+def _extracted_layout_source_status(layout_id: str) -> str:
+    if layout_id in event_layouts.EXACT_SLICE_LAYOUT_IDS:
+        return "event_companion_source_hashed_exact_slice"
+    return "event_companion_layout_geometry_extracted"
 
 
 def _is_extracted_layout(layout_id: str) -> bool:
@@ -3592,6 +3529,9 @@ def _import_hash() -> str:
         "package_identity": package_identity().to_payload(),
         "mission_sequence": mission_sequence_descriptor().to_payload(),
         "primary_missions": [row.to_payload() for row in primary_mission_rows()],
+        "primary_scoring_artifact_hashes": {
+            "primary-meatgrinder": MEATGRINDER_SCORING_PACKAGE_HASH,
+        },
         "primary_mission_action_sources": [
             row.to_payload() for row in primary_mission_action_source_rows()
         ],

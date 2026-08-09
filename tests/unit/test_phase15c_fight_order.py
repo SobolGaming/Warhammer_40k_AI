@@ -93,6 +93,9 @@ from warhammer40k_core.engine.phases.fight import (
 )
 from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    record_primary_turn_start_evidence,
+)
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     STRATAGEM_DECISION_TYPE,
@@ -2115,6 +2118,7 @@ def _fight_lifecycle(
                 fixed_mission_ids=("assassination", "bring_it_down"),
             )
         )
+    record_primary_turn_start_evidence(state=state)
     for key in fights_first_unit_keys:
         _record_fights_first_effect(
             state=state,

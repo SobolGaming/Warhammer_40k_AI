@@ -23,7 +23,7 @@ from warhammer40k_core.core.missions import (
     objective_marker_role_from_token,
 )
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
-from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry, TerrainDisplayPoint
 from warhammer40k_core.core.terrain_layouts import (
     TerrainFeatureTemplate,
     TerrainFloorTemplate,
@@ -32,6 +32,9 @@ from warhammer40k_core.core.terrain_layouts import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chapter_approved_2026_27 as source_data,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chapter_approved_battlefield_rows_2026_27 as source_battlefield_rows,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_2026_06 as event_source_data,
@@ -387,7 +390,7 @@ def _terrain_layouts_from_typed_battlefield_layouts(
 def _terrain_feature_from_battlefield_layout(
     *,
     layout: source_data.SourceBattlefieldLayoutRow,
-    feature: source_data.SourceBattlefieldTerrainFeatureRow,
+    feature: source_battlefield_rows.SourceBattlefieldTerrainFeatureRow,
     source_id: str,
 ) -> TerrainFeatureTemplate:
     feature_source_id = (
@@ -401,6 +404,7 @@ def _terrain_feature_from_battlefield_layout(
             y=feature.footprint_center_y_inches,
             width=feature.footprint_width_inches,
             depth=feature.footprint_depth_inches,
+            rules_footprint_polygon=feature.rules_footprint_polygon,
             display_geometry=feature.display_geometry,
             source_id=feature_source_id,
         )
@@ -411,6 +415,7 @@ def _terrain_feature_from_battlefield_layout(
         footprint_center_y_inches=feature.footprint_center_y_inches,
         footprint_width_inches=feature.footprint_width_inches,
         footprint_depth_inches=feature.footprint_depth_inches,
+        rules_footprint_polygon=feature.rules_footprint_polygon,
         display_geometry=feature.display_geometry,
         walls=(),
         floors=(),
@@ -425,6 +430,7 @@ def _ruins_feature(
     y: float,
     width: float,
     depth: float,
+    rules_footprint_polygon: tuple[TerrainDisplayPoint, ...],
     display_geometry: TerrainDisplayGeometry,
     source_id: str,
 ) -> TerrainFeatureTemplate:
@@ -438,6 +444,7 @@ def _ruins_feature(
         footprint_center_y_inches=y,
         footprint_width_inches=width,
         footprint_depth_inches=depth,
+        rules_footprint_polygon=rules_footprint_polygon,
         display_geometry=display_geometry,
         walls=(
             TerrainWallTemplate(

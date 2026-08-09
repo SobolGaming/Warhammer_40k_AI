@@ -40,6 +40,9 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseStatePayload,
 )
 from warhammer40k_core.engine.prebattle_records import PreBattleActionRecordPayload
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    PrimaryUnitTerrainTurnStartSnapshotPayload,
+)
 from warhammer40k_core.engine.reserves import (
     ReserveStatePayload,
     ReserveUnitPointValuePayload,
@@ -179,6 +182,7 @@ class GameStatePayload(TypedDict):
     objective_control_records: list[ObjectiveControlRecordPayload]
     sticky_objective_control_states: list[StickyObjectiveControlStatePayload]
     primary_objective_turn_start_states: list[PrimaryObjectiveTurnStartStatePayload]
+    primary_unit_terrain_turn_start_snapshots: list[PrimaryUnitTerrainTurnStartSnapshotPayload]
     primary_terrain_trap_states: list[PrimaryTerrainTrapStatePayload]
     primary_unit_destruction_states: list[PrimaryUnitDestructionStatePayload]
     secondary_unit_destruction_states: list[SecondaryUnitDestructionStatePayload]

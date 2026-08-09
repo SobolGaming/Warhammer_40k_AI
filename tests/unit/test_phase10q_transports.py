@@ -3783,6 +3783,12 @@ def _support_feature(
         footprint_center_y_inches=center_y_inches,
         footprint_width_inches=width_inches,
         footprint_depth_inches=depth_inches,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=center_x_inches,
+            center_y_inches=center_y_inches,
+            width_inches=width_inches,
+            depth_inches=depth_inches,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=center_x_inches,
             center_y_inches=center_y_inches,
@@ -3818,6 +3824,12 @@ def _ruins_floor_feature(
         footprint_center_y_inches=center_y_inches,
         footprint_width_inches=6.0,
         footprint_depth_inches=6.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=center_x_inches,
+            center_y_inches=center_y_inches,
+            width_inches=6.0,
+            depth_inches=6.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=center_x_inches,
             center_y_inches=center_y_inches,

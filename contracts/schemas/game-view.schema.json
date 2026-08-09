@@ -105,6 +105,13 @@
       },
       "type": "array"
     },
+    "primary_unit_terrain_turn_start_snapshots": {
+      "items": {
+        "$ref": "#/$defs/primary_unit_terrain_turn_start_snapshot"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
     "public_stratagem_use_records": {
       "items": {
         "$ref": "#/$defs/json_value"
@@ -340,6 +347,69 @@
         "current_characteristics",
         "visible_modifiers",
         "redaction"
+      ],
+      "type": "object"
+    },
+    "primary_unit_terrain_turn_start_snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "active_player_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "battle_round": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "game_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "snapshot_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "unit_memberships": {
+          "items": {
+            "$ref": "#/$defs/primary_unit_terrain_membership"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "game_id",
+        "active_player_id",
+        "battle_round",
+        "unit_memberships",
+        "source_id"
+      ],
+      "type": "object"
+    },
+    "primary_unit_terrain_membership": {
+      "additionalProperties": false,
+      "properties": {
+        "terrain_feature_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "unit_instance_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "unit_instance_id",
+        "terrain_feature_ids"
       ],
       "type": "object"
     },

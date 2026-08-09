@@ -2181,10 +2181,10 @@ def _model_endpoint_intersects_feature_footprint(
     model: Model,
     feature: TerrainFeatureDefinition,
 ) -> bool:
-    return shapely_backend.base_footprint_intersects_bounds(
+    return shapely_backend.base_footprint_intersects_polygon(
         model.base,
         model.pose,
-        feature.bounds(),
+        feature.rules_footprint_points(),
     )
 
 

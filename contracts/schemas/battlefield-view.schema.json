@@ -863,6 +863,15 @@
     "terrain_feature": {
       "additionalProperties": false,
       "properties": {
+        "classification": {
+          "enum": [
+            "dense",
+            "light",
+            "mixed",
+            "unknown"
+          ],
+          "type": "string"
+        },
         "entity_kind": {
           "const": "terrain_feature",
           "type": "string"

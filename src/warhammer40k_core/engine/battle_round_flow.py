@@ -42,6 +42,9 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
     PhaseHandler,
 )
+from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+    record_primary_unit_destructions_for_destroyed_models,
+)
 from warhammer40k_core.engine.return_on_death import resolve_pending_return_on_death_phase_end
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.sticky_objective_control import (
@@ -70,6 +73,7 @@ if TYPE_CHECKING:
 
 
 _LIFECYCLE_TIMING_RULE_ID = "core-rules-lifecycle-timing"
+_PRIMARY_UNIT_DESTRUCTION_TRACKING_RULE_ID = "core-rules:primary-unit-destruction-tracking"
 _END_WINDOW_RESOLUTION_ORDER = ("non_mission_rules", "mission_rules")
 
 
@@ -725,16 +729,22 @@ def _apply_phase_end_unit_destroyed_hooks(
 ) -> None:
     if type(registry) is not UnitDestroyedHookRegistry:
         raise GameLifecycleError("Unit-destroyed hooks require a registry.")
-    if not registry.all_bindings():
-        return
     completed_phase = state.current_battle_phase
     if completed_phase is None:
         raise GameLifecycleError("Unit-destroyed hooks require a current phase.")
-    for event_id, payload in unit_destruction_completion_events_for_phase(
+    completion_events = unit_destruction_completion_events_for_phase(
         state=state,
         event_log=decisions.event_log,
         completed_phase=completed_phase,
-    ):
+    )
+    _record_phase_end_primary_unit_destructions(
+        state=state,
+        decisions=decisions,
+        completion_events=completion_events,
+    )
+    if not registry.all_bindings():
+        return
+    for event_id, payload in completion_events:
         destroying_player_id = _payload_string(payload, key="destroying_player_id")
         destroyed_unit_id = _payload_string(payload, key="target_unit_instance_id")
         destroyed_player_id = _player_id_for_unit(state=state, unit_instance_id=destroyed_unit_id)
@@ -752,6 +762,36 @@ def _apply_phase_end_unit_destroyed_hooks(
                 destroyed_player_id=destroyed_player_id,
             )
         )
+
+
+def _record_phase_end_primary_unit_destructions(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    completion_events: tuple[tuple[str, dict[str, JsonValue]], ...],
+) -> None:
+    if state.mission_setup is None:
+        return
+    for event_id, payload in completion_events:
+        destructions = record_primary_unit_destructions_for_destroyed_models(
+            state=state,
+            destroyed_model_instance_ids=(_payload_string(payload, key="model_instance_id"),),
+            destroying_player_id=_payload_string(payload, key="destroying_player_id"),
+            source_id=f"{_PRIMARY_UNIT_DESTRUCTION_TRACKING_RULE_ID}:{event_id}",
+        )
+        for destruction in destructions:
+            decisions.event_log.append(
+                "primary_unit_destruction_recorded",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": state.active_player_id,
+                    "phase": destruction.phase,
+                    "source_rule_id": _PRIMARY_UNIT_DESTRUCTION_TRACKING_RULE_ID,
+                    "source_model_destroyed_event_id": event_id,
+                    "primary_unit_destruction_state": destruction.to_payload(),
+                },
+            )
 
 
 def _player_id_for_unit(*, state: GameState, unit_instance_id: str) -> str:

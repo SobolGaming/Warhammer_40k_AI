@@ -50,6 +50,9 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    record_primary_turn_start_evidence,
+)
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
@@ -143,6 +146,7 @@ def fight_lifecycle(
                 fixed_mission_ids=("assassination", "bring_it_down"),
             )
         )
+    record_primary_turn_start_evidence(state=state)
     for key in fights_first_unit_keys:
         record_fights_first_effect(
             state=state,

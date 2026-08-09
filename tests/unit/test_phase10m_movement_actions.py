@@ -3,19 +3,25 @@ from __future__ import annotations
 import json
 import math
 from dataclasses import replace
+from functools import cache
 from typing import cast
 
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
+from tests.support.wahapedia_bridge_fixtures import screamers_bridge_artifacts
+from tests.support.wahapedia_source_fixtures import catalog_package_id, catalog_version
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import BaseSizeDefinition
+from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRuntimeState,
     BattlefieldScenario,
     ModelDisplacementKind,
+    ModelPlacement,
     UnitPlacement,
 )
 from warhammer40k_core.engine.decision_request import (
@@ -41,6 +47,7 @@ from warhammer40k_core.engine.phases.movement import (
     MovementActionAvailabilityContext,
     MovementActionAvailabilityResult,
     MovementPhaseActionKind,
+    NormalMoveResolution,
     resolve_normal_move,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
@@ -62,7 +69,12 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFloorDefinition,
     TerrainWallDefinition,
 )
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
+from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
+)
 
 
 def test_action_options_outside_engagement_are_remain_normal_and_advance() -> None:
@@ -312,10 +324,46 @@ def test_infantry_normal_move_can_end_on_upper_ruins_floor_with_vertical_movemen
     unit_placement = scenario.battlefield_state.unit_placement_by_id(
         "army-alpha:intercessor-unit-1"
     )
-    ruins = _multilevel_ruins_feature(
-        center_x_inches=10.0,
-        center_y_inches=6.0,
-        upper_floor_z_inches=3.0,
+    removed_model_ids = tuple(
+        placement.model_instance_id for placement in unit_placement.model_placements[2:]
+    )
+    battlefield_state = scenario.battlefield_state.with_removed_models(removed_model_ids)
+    unit_placement = battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+
+    exact_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    ruins = next(
+        feature
+        for feature in exact_setup.terrain_features
+        if feature.feature_id
+        == "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-14-component-01"
+    )
+    upper_floor = next(floor for floor in ruins.floors if floor.bottom_z_inches == 3.0)
+    floor_axis_radians = math.radians(upper_floor.rotation_degrees)
+    model_center_offset_inches = 0.7
+    unit_placement = unit_placement.with_model_placements(
+        tuple(
+            placement.with_pose(
+                Pose.at(
+                    upper_floor.center_x_inches
+                    + ((-1.0 if index == 0 else 1.0) * model_center_offset_inches)
+                    * math.cos(floor_axis_radians),
+                    upper_floor.center_y_inches
+                    + ((-1.0 if index == 0 else 1.0) * model_center_offset_inches)
+                    * math.sin(floor_axis_radians),
+                    facing_degrees=placement.pose.facing.degrees,
+                )
+            )
+            for index, placement in enumerate(unit_placement.model_placements)
+        )
+    )
+    scenario = BattlefieldScenario(
+        armies=scenario.armies,
+        battlefield_state=battlefield_state.with_unit_placement(unit_placement),
     )
     scenario = _scenario_with_terrain_features(scenario, (ruins,))
 
@@ -327,6 +375,14 @@ def test_infantry_normal_move_can_end_on_upper_ruins_floor_with_vertical_movemen
     )
 
     assert resolution.is_valid
+    assert resolution.coherency_result.is_coherent
+    assert ruins.source_id is not None
+    assert "purge_the_foe_vs_purge_the_foe_meatgrinder_layout_a" in ruins.source_id
+    assert len(resolution.attempted_placement.model_placements) == 2
+    assert all(
+        placement.pose.position.z == upper_floor.bottom_z_inches
+        for placement in resolution.attempted_placement.model_placements
+    )
     assert all(result.is_valid for result in resolution.path_validation_results)
     assert all(result.is_valid for result in resolution.terrain_path_legality_results)
     for path_result in resolution.path_validation_results:
@@ -343,10 +399,94 @@ def test_infantry_normal_move_can_end_on_upper_ruins_floor_with_vertical_movemen
         upper_floor_segments = tuple(
             segment
             for segment in terrain_result.segments
-            if segment.terrain_id == "phase10m-multilevel-ruins:upper"
+            if segment.terrain_id == f"{ruins.feature_id}:{upper_floor.floor_id}"
         )
         assert len(upper_floor_segments) == 1
         assert upper_floor_segments[0].traversal_mode.value == "freely_traversable"
+
+
+def test_mustered_infantry_normal_move_traverses_exact_event_ruin_wall() -> None:
+    scenario, unit_placement, witness, ruins, wall = _exact_ruin_wall_traversal_scenario(
+        scenario=_infantry_scenario(),
+        unit_instance_id="army-alpha:intercessor-unit-1",
+    )
+    unit = scenario.unit_instance_for_placement(unit_placement)
+
+    resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        path_witness=witness,
+    )
+
+    assert "INFANTRY" in unit.keywords
+    _assert_exact_ruin_wall_traversal(
+        resolution=resolution,
+        ruins=ruins,
+        wall=wall,
+    )
+
+
+def test_mustered_beast_normal_move_traverses_exact_event_ruin_wall() -> None:
+    scenario, unit_placement, witness, ruins, wall = _exact_ruin_wall_traversal_scenario(
+        scenario=_screamers_scenario(),
+        unit_instance_id="army-alpha:screamers-unit-1",
+    )
+    unit = scenario.unit_instance_for_placement(unit_placement)
+
+    resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        path_witness=witness,
+    )
+
+    assert unit.datasheet_id == "000001127"
+    assert unit.name == "Screamers"
+    assert "BEAST" in unit.keywords
+    _assert_exact_ruin_wall_traversal(
+        resolution=resolution,
+        ruins=ruins,
+        wall=wall,
+    )
+
+
+def test_mustered_fly_unit_takes_to_the_skies_over_exact_dense_non_ruin() -> None:
+    scenario, unit_placement, witness, dense_non_ruin, wall = (
+        _exact_dense_non_ruin_air_path_scenario(
+            scenario=_screamers_scenario(),
+            unit_instance_id="army-alpha:screamers-unit-1",
+        )
+    )
+    unit = scenario.unit_instance_for_placement(unit_placement)
+
+    resolution = resolve_normal_move(
+        scenario=scenario,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        unit_placement=unit_placement,
+        movement_mode=MovementMode.FLY_TAKE_TO_SKIES,
+        path_witness=witness,
+    )
+
+    assert unit.datasheet_id == "000001127"
+    assert unit.name == "Screamers"
+    assert "FLY" in unit.keywords
+    assert resolution.is_valid
+    assert resolution.coherency_result.is_coherent
+    assert dense_non_ruin.source_id is not None
+    assert "purge_the_foe_vs_purge_the_foe_meatgrinder_layout_a" in dense_non_ruin.source_id
+    assert all(result.is_valid for result in resolution.path_validation_results)
+    assert all(result.is_valid for result in resolution.terrain_path_legality_results)
+    for terrain_result in resolution.terrain_path_legality_results:
+        air_path_segments = tuple(
+            segment
+            for segment in terrain_result.segments
+            if segment.terrain_id == f"{dense_non_ruin.feature_id}:{wall.wall_id}"
+            and segment.traversal_mode.value == "air_path"
+        )
+        assert air_path_segments
+        assert all(segment.air_path_measurement_pending for segment in air_path_segments)
+        assert sum(segment.vertical_distance_inches for segment in air_path_segments) > 0.0
 
 
 def test_non_round_vehicle_or_monster_normal_move_records_cost_free_rotation() -> None:
@@ -675,6 +815,72 @@ def _single_model_infantry_scenario() -> BattlefieldScenario:
     )
 
 
+@cache
+def _screamers_package() -> CanonicalCatalogPackage:
+    return build_canonical_catalog_package(
+        package_id=catalog_package_id(),
+        catalog_version=catalog_version(),
+        source_artifacts=screamers_bridge_artifacts(),
+    )
+
+
+def _screamers_scenario() -> BattlefieldScenario:
+    package = _screamers_package()
+    detachment_id = "phase17n-screamers-detachment"
+    catalog = replace(
+        package.army_catalog,
+        detachments=(
+            DetachmentDefinition(
+                detachment_id=detachment_id,
+                name="Phase 17N Screamers movement fixture",
+                faction_id="CD",
+                detachment_point_cost=1,
+                unit_datasheet_ids=("000001127",),
+                force_disposition_ids=("purge-the-foe",),
+                source_ids=("test:phase17n:screamers-movement-detachment",),
+            ),
+        ),
+    )
+    armies = tuple(
+        muster_army(
+            catalog=catalog,
+            request=ArmyMusterRequest(
+                army_id=army_id,
+                player_id=player_id,
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id="CD",
+                    detachment_ids=(detachment_id,),
+                ),
+                force_disposition_id="purge-the-foe",
+                unit_selections=(
+                    UnitMusterSelection(
+                        unit_selection_id=unit_selection_id,
+                        datasheet_id="000001127",
+                        model_profile_selections=(
+                            ModelProfileSelection(
+                                model_profile_id="000001127:screamers",
+                                model_count=3,
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            model_geometries=package.model_geometries,
+        )
+        for player_id, army_id, unit_selection_id in (
+            ("player-a", "army-alpha", "screamers-unit-1"),
+            ("player-b", "army-beta", "screamers-unit-2"),
+        )
+    )
+    return create_deterministic_battlefield_scenario(
+        battlefield_id="phase10m-screamers-battlefield",
+        armies=armies,
+    )
+
+
 def _vehicle_scenario() -> BattlefieldScenario:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     armies = tuple(
@@ -712,6 +918,217 @@ def _scenario_with_terrain_features(
             terrain_features=terrain_features,
         ),
     )
+
+
+@cache
+def _exact_phase17n_layout_a_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+
+
+def _exact_ruin_wall_traversal_scenario(
+    *,
+    scenario: BattlefieldScenario,
+    unit_instance_id: str,
+) -> tuple[
+    BattlefieldScenario,
+    UnitPlacement,
+    PathWitness,
+    TerrainFeatureDefinition,
+    TerrainWallDefinition,
+]:
+    setup = _exact_phase17n_layout_a_setup()
+    ruins = next(
+        feature
+        for feature in setup.terrain_features
+        if feature.feature_id
+        == "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-03-component-01"
+    )
+    wall = next(wall for wall in ruins.walls if wall.wall_id == "ground-long-solid-wall")
+    battlefield_state = _battlefield_state_with_only_unit_placed(
+        scenario=scenario,
+        unit_instance_id=unit_instance_id,
+    )
+    unit_placement = battlefield_state.unit_placement_by_id(unit_instance_id)
+    formation_offsets = _ruin_wall_traversal_formation_offsets(len(unit_placement.model_placements))
+    wall_axis_radians = math.radians(wall.rotation_degrees)
+    tangent_x = math.cos(wall_axis_radians)
+    tangent_y = math.sin(wall_axis_radians)
+    normal_x = -math.sin(wall_axis_radians)
+    normal_y = math.cos(wall_axis_radians)
+    crossing_distance_inches = 6.0
+    start_normal_offset_inches = -3.0
+    updated_placements: list[ModelPlacement] = []
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for placement, (tangent_offset, normal_offset) in zip(
+        unit_placement.model_placements,
+        formation_offsets,
+        strict=True,
+    ):
+        start_normal = start_normal_offset_inches + normal_offset
+        start_pose = Pose.at(
+            wall.center_x_inches + (tangent_offset * tangent_x) + (start_normal * normal_x),
+            wall.center_y_inches + (tangent_offset * tangent_y) + (start_normal * normal_y),
+            facing_degrees=wall.rotation_degrees,
+        )
+        end_pose = Pose.at(
+            start_pose.position.x + (crossing_distance_inches * normal_x),
+            start_pose.position.y + (crossing_distance_inches * normal_y),
+            facing_degrees=wall.rotation_degrees,
+        )
+        midpoint = Pose.at(
+            (start_pose.position.x + end_pose.position.x) / 2.0,
+            (start_pose.position.y + end_pose.position.y) / 2.0,
+            facing_degrees=wall.rotation_degrees,
+        )
+        updated_placements.append(placement.with_pose(start_pose))
+        model_paths.append((placement.model_instance_id, (start_pose, midpoint, end_pose)))
+    unit_placement = unit_placement.with_model_placements(tuple(updated_placements))
+    battlefield_state = replace(
+        battlefield_state.with_unit_placement(unit_placement),
+        battlefield_width_inches=setup.battlefield_width_inches,
+        battlefield_depth_inches=setup.battlefield_depth_inches,
+        terrain_features=setup.terrain_features,
+    )
+    return (
+        BattlefieldScenario(armies=scenario.armies, battlefield_state=battlefield_state),
+        unit_placement,
+        PathWitness.for_paths(tuple(model_paths)),
+        ruins,
+        wall,
+    )
+
+
+def _exact_dense_non_ruin_air_path_scenario(
+    *,
+    scenario: BattlefieldScenario,
+    unit_instance_id: str,
+) -> tuple[
+    BattlefieldScenario,
+    UnitPlacement,
+    PathWitness,
+    TerrainFeatureDefinition,
+    TerrainWallDefinition,
+]:
+    setup = _exact_phase17n_layout_a_setup()
+    dense_non_ruin = next(
+        feature
+        for feature in setup.terrain_features
+        if feature.feature_id
+        == "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-05-component-01"
+    )
+    wall = dense_non_ruin.walls[0]
+    battlefield_state = _battlefield_state_with_only_unit_placed(
+        scenario=scenario,
+        unit_instance_id=unit_instance_id,
+    )
+    unit_placement = battlefield_state.unit_placement_by_id(unit_instance_id)
+    tangent_offsets = (-1.4, 0.0, 1.4)
+    if len(unit_placement.model_placements) != len(tangent_offsets):
+        raise AssertionError("Exact dense non-ruin traversal requires three Screamers.")
+    wall_axis_radians = math.radians(wall.rotation_degrees)
+    tangent_x = math.cos(wall_axis_radians)
+    tangent_y = math.sin(wall_axis_radians)
+    normal_x = -math.sin(wall_axis_radians)
+    normal_y = math.cos(wall_axis_radians)
+    updated_placements: list[ModelPlacement] = []
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for placement, tangent_offset in zip(
+        unit_placement.model_placements,
+        tangent_offsets,
+        strict=True,
+    ):
+        start_pose = Pose.at(
+            wall.center_x_inches + (tangent_offset * tangent_x) - (2.0 * normal_x),
+            wall.center_y_inches + (tangent_offset * tangent_y) - (2.0 * normal_y),
+            facing_degrees=wall.rotation_degrees,
+        )
+        apex_pose = Pose.at(
+            wall.center_x_inches + (tangent_offset * tangent_x),
+            wall.center_y_inches + (tangent_offset * tangent_y),
+            wall.height_inches,
+            facing_degrees=wall.rotation_degrees,
+        )
+        end_pose = Pose.at(
+            wall.center_x_inches + (tangent_offset * tangent_x) + (2.0 * normal_x),
+            wall.center_y_inches + (tangent_offset * tangent_y) + (2.0 * normal_y),
+            facing_degrees=wall.rotation_degrees,
+        )
+        updated_placements.append(placement.with_pose(start_pose))
+        model_paths.append((placement.model_instance_id, (start_pose, apex_pose, end_pose)))
+    unit_placement = unit_placement.with_model_placements(tuple(updated_placements))
+    battlefield_state = replace(
+        battlefield_state.with_unit_placement(unit_placement),
+        battlefield_width_inches=setup.battlefield_width_inches,
+        battlefield_depth_inches=setup.battlefield_depth_inches,
+        terrain_features=setup.terrain_features,
+    )
+    return (
+        BattlefieldScenario(armies=scenario.armies, battlefield_state=battlefield_state),
+        unit_placement,
+        PathWitness.for_paths(tuple(model_paths)),
+        dense_non_ruin,
+        wall,
+    )
+
+
+def _battlefield_state_with_only_unit_placed(
+    *,
+    scenario: BattlefieldScenario,
+    unit_instance_id: str,
+) -> BattlefieldRuntimeState:
+    battlefield_state = scenario.battlefield_state
+    other_unit_ids = tuple(
+        unit_placement.unit_instance_id
+        for placed_army in battlefield_state.placed_armies
+        for unit_placement in placed_army.unit_placements
+        if unit_placement.unit_instance_id != unit_instance_id
+    )
+    for other_unit_id in other_unit_ids:
+        battlefield_state = battlefield_state.without_unit_placement(other_unit_id)
+    return battlefield_state
+
+
+def _ruin_wall_traversal_formation_offsets(
+    model_count: int,
+) -> tuple[tuple[float, float], ...]:
+    if model_count == 3:
+        return ((-1.4, 0.0), (0.0, 0.0), (1.4, 0.0))
+    if model_count == 5:
+        return (
+            (-1.4, 0.0),
+            (0.0, 0.0),
+            (1.4, 0.0),
+            (-0.7, -1.4),
+            (0.7, -1.4),
+        )
+    raise AssertionError("Exact ruin traversal requires a three- or five-model unit.")
+
+
+def _assert_exact_ruin_wall_traversal(
+    *,
+    resolution: NormalMoveResolution,
+    ruins: TerrainFeatureDefinition,
+    wall: TerrainWallDefinition,
+) -> None:
+    assert resolution.is_valid
+    assert resolution.coherency_result.is_coherent
+    assert ruins.source_id is not None
+    assert "purge_the_foe_vs_purge_the_foe_meatgrinder_layout_a" in ruins.source_id
+    assert all(result.is_valid for result in resolution.path_validation_results)
+    assert all(result.is_valid for result in resolution.terrain_path_legality_results)
+    for terrain_result in resolution.terrain_path_legality_results:
+        wall_segments = tuple(
+            segment
+            for segment in terrain_result.segments
+            if segment.terrain_id == f"{ruins.feature_id}:{wall.wall_id}"
+        )
+        assert wall_segments
+        assert all(segment.traversal_mode.value == "through_feature" for segment in wall_segments)
 
 
 def _army_muster_request(
@@ -949,6 +1366,12 @@ def _ruins_wall_feature(
         footprint_center_y_inches=center_y_inches,
         footprint_width_inches=8.0,
         footprint_depth_inches=6.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=center_x_inches,
+            center_y_inches=center_y_inches,
+            width_inches=8.0,
+            depth_inches=6.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=center_x_inches,
             center_y_inches=center_y_inches,
@@ -973,59 +1396,6 @@ def _ruins_wall_feature(
                 center_y_inches=center_y_inches,
                 bottom_z_inches=0.0,
                 width_inches=8.0,
-                depth_inches=6.0,
-                thickness_inches=0.12,
-            ),
-        ),
-    )
-
-
-def _multilevel_ruins_feature(
-    *,
-    center_x_inches: float,
-    center_y_inches: float,
-    upper_floor_z_inches: float,
-) -> TerrainFeatureDefinition:
-    return TerrainFeatureDefinition(
-        feature_id="phase10m-multilevel-ruins",
-        feature_kind=TerrainFeatureKind.RUINS,
-        footprint_center_x_inches=center_x_inches,
-        footprint_center_y_inches=center_y_inches,
-        footprint_width_inches=12.0,
-        footprint_depth_inches=6.0,
-        display_geometry=_display_geometry(
-            center_x_inches=center_x_inches,
-            center_y_inches=center_y_inches,
-            width_inches=12.0,
-            depth_inches=6.0,
-        ),
-        walls=(
-            TerrainWallDefinition(
-                wall_id="north-wall",
-                center_x_inches=center_x_inches,
-                center_y_inches=center_y_inches + 2.5,
-                bottom_z_inches=0.0,
-                width_inches=12.0,
-                depth_inches=0.12,
-                height_inches=upper_floor_z_inches,
-            ),
-        ),
-        floors=(
-            TerrainFloorDefinition(
-                floor_id="ground",
-                center_x_inches=center_x_inches,
-                center_y_inches=center_y_inches,
-                bottom_z_inches=0.0,
-                width_inches=12.0,
-                depth_inches=6.0,
-                thickness_inches=0.12,
-            ),
-            TerrainFloorDefinition(
-                floor_id="upper",
-                center_x_inches=center_x_inches,
-                center_y_inches=center_y_inches,
-                bottom_z_inches=upper_floor_z_inches,
-                width_inches=12.0,
                 depth_inches=6.0,
                 thickness_inches=0.12,
             ),

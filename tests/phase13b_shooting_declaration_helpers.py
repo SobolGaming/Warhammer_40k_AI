@@ -128,6 +128,9 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseState,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    record_primary_turn_start_evidence,
+)
 from warhammer40k_core.engine.saves import (
     SaveKind,
     saving_throw_roll_spec,
@@ -692,6 +695,7 @@ def _configure_shooting_battle_state(
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     state.battle_round = 1
     state.active_player_id = "player-a"
+    record_primary_turn_start_evidence(state=state)
     if embarked_unit_ids:
         transport = units["transport-1"]
         state.record_transport_cargo_state(
@@ -2615,6 +2619,12 @@ def _dense_solid_woods() -> TerrainFeatureDefinition:
         footprint_center_y_inches=35.0,
         footprint_width_inches=12.0,
         footprint_depth_inches=6.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=29.5,
+            center_y_inches=35.0,
+            width_inches=12.0,
+            depth_inches=6.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=29.5,
             center_y_inches=35.0,
@@ -2632,6 +2642,12 @@ def _non_solid_hill_with_wall() -> TerrainFeatureDefinition:
         footprint_center_y_inches=35.0,
         footprint_width_inches=12.0,
         footprint_depth_inches=6.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=25.5,
+            center_y_inches=35.0,
+            width_inches=12.0,
+            depth_inches=6.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=25.5,
             center_y_inches=35.0,
@@ -2660,6 +2676,12 @@ def _blocking_ruin() -> TerrainFeatureDefinition:
         footprint_center_y_inches=35.0,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=20.0,
+            center_y_inches=35.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=20.0,
             center_y_inches=35.0,

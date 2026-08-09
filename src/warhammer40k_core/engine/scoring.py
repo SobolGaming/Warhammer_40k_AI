@@ -13,6 +13,17 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlTiming,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_scoring_conditions import (
+    PrimaryUnitDestructionEvidence,
+    cross_turn_destruction_comparison_evidence,
+    opponent_home_control_evidence,
+)
+from warhammer40k_core.engine.primary_scoring_conditions import (
+    home_objective_ids as _home_objective_ids,
+)
+from warhammer40k_core.engine.primary_scoring_conditions import (
+    primary_score_count_evidence as _score_count_evidence,
+)
 from warhammer40k_core.engine.scoring_cap_audit import metadata_with_vp_cap_audit
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 
@@ -185,7 +196,7 @@ class PrimaryTerrainTrapStatePayload(TypedDict):
 class PrimaryUnitDestructionStatePayload(TypedDict):
     destruction_id: str
     game_id: str
-    destroying_player_id: str
+    destroying_player_id: str | None
     destroyed_player_id: str
     active_player_id: str
     battle_round: int
@@ -890,7 +901,7 @@ class PrimaryTerrainTrapState:
 class PrimaryUnitDestructionState:
     destruction_id: str
     game_id: str
-    destroying_player_id: str
+    destroying_player_id: str | None
     destroyed_player_id: str
     active_player_id: str
     battle_round: int
@@ -910,14 +921,15 @@ class PrimaryUnitDestructionState:
             "game_id",
             _validate_identifier("PrimaryUnitDestructionState game_id", self.game_id),
         )
-        object.__setattr__(
-            self,
-            "destroying_player_id",
-            _validate_identifier(
-                "PrimaryUnitDestructionState destroying_player_id",
-                self.destroying_player_id,
-            ),
-        )
+        if self.destroying_player_id is not None:
+            object.__setattr__(
+                self,
+                "destroying_player_id",
+                _validate_identifier(
+                    "PrimaryUnitDestructionState destroying_player_id",
+                    self.destroying_player_id,
+                ),
+            )
         object.__setattr__(
             self,
             "destroyed_player_id",
@@ -926,8 +938,6 @@ class PrimaryUnitDestructionState:
                 self.destroyed_player_id,
             ),
         )
-        if self.destroying_player_id == self.destroyed_player_id:
-            raise GameLifecycleError("Primary unit destruction must target an enemy unit.")
         object.__setattr__(
             self,
             "active_player_id",
@@ -993,7 +1003,10 @@ class PrimaryUnitDestructionState:
             battle_round=payload["battle_round"],
             phase=payload["phase"],
             destroyed_unit_instance_id=payload["destroyed_unit_instance_id"],
-            started_turn_terrain_feature_ids=tuple(payload["started_turn_terrain_feature_ids"]),
+            started_turn_terrain_feature_ids=_identifier_tuple_from_payload_list(
+                "PrimaryUnitDestructionState started_turn_terrain_feature_ids",
+                payload["started_turn_terrain_feature_ids"],
+            ),
             source_id=payload["source_id"],
         )
 
@@ -2203,6 +2216,7 @@ class MissionScoringPolicy:
         *,
         record: ObjectiveControlRecord,
         mission_setup: MissionSetup,
+        turn_order: tuple[str, ...],
         turn_start_states: tuple[PrimaryObjectiveTurnStartState, ...],
         terrain_trap_states: tuple[PrimaryTerrainTrapState, ...],
         unit_destruction_states: tuple[PrimaryUnitDestructionState, ...],
@@ -2213,6 +2227,13 @@ class MissionScoringPolicy:
             raise GameLifecycleError("Primary scoring requires an ObjectiveControlRecord.")
         if type(mission_setup) is not MissionSetup:
             raise GameLifecycleError("Primary scoring requires MissionSetup.")
+        ordered_players = _validate_identifier_tuple_ordered(
+            "Primary scoring turn_order",
+            turn_order,
+            min_length=2,
+        )
+        if record.active_player_id not in ordered_players:
+            raise GameLifecycleError("Primary scoring active player is missing from turn_order.")
         starts = _validate_primary_turn_start_state_tuple(turn_start_states)
         traps = _validate_primary_terrain_trap_state_tuple(terrain_trap_states)
         destructions = _validate_primary_unit_destruction_state_tuple(unit_destruction_states)
@@ -2221,6 +2242,8 @@ class MissionScoringPolicy:
             if scoring_player_ids
             else (record.active_player_id,)
         )
+        if any(player_id not in ordered_players for player_id in player_ids):
+            raise GameLifecycleError("Primary scoring player is missing from turn_order.")
         awards: list[VictoryPointAward] = []
         for rule in self.primary_scoring_rules:
             if not self._primary_rule_applies_at_record(
@@ -2234,6 +2257,7 @@ class MissionScoringPolicy:
                     rule=rule,
                     record=record,
                     mission_setup=mission_setup,
+                    turn_order=ordered_players,
                     player_id=player_id,
                     turn_start_states=starts,
                     terrain_trap_states=traps,
@@ -2261,9 +2285,12 @@ class MissionScoringPolicy:
             )
         if rule.timing == "turn_end":
             return record.timing is ObjectiveControlTiming.TURN_END
+        if rule.timing == "turn_end_from_battle_round_two":
+            return record.battle_round >= 2 and record.timing is ObjectiveControlTiming.TURN_END
         if rule.timing == "command_phase_or_round_five_turn_end":
             return (
-                record.phase == self.primary_scoring_phase
+                record.battle_round < self.game_length_battle_rounds
+                and record.phase == self.primary_scoring_phase
                 and record.timing is self.primary_scoring_timing
             ) or (
                 record.battle_round == self.game_length_battle_rounds
@@ -2277,6 +2304,7 @@ class MissionScoringPolicy:
         rule: PrimaryMissionScoringRule,
         record: ObjectiveControlRecord,
         mission_setup: MissionSetup,
+        turn_order: tuple[str, ...],
         player_id: str,
         turn_start_states: tuple[PrimaryObjectiveTurnStartState, ...],
         terrain_trap_states: tuple[PrimaryTerrainTrapState, ...],
@@ -2287,6 +2315,7 @@ class MissionScoringPolicy:
             rule=rule,
             record=record,
             mission_setup=mission_setup,
+            turn_order=turn_order,
             player_id=player_id,
             turn_start_states=turn_start_states,
             terrain_trap_states=terrain_trap_states,
@@ -2324,6 +2353,7 @@ class MissionScoringPolicy:
         rule: PrimaryMissionScoringRule,
         record: ObjectiveControlRecord,
         mission_setup: MissionSetup,
+        turn_order: tuple[str, ...],
         player_id: str,
         turn_start_states: tuple[PrimaryObjectiveTurnStartState, ...],
         terrain_trap_states: tuple[PrimaryTerrainTrapState, ...],
@@ -2387,8 +2417,9 @@ class MissionScoringPolicy:
             return _score_count_evidence(
                 score_count=1 if matching else 0,
                 destroyed_unit_instance_ids=tuple(
-                    state.destroyed_unit_instance_id for state in matching
+                    sorted({state.destroyed_unit_instance_id for state in matching})
                 ),
+                destruction_ids=tuple(state.destruction_id for state in matching),
             )
         if rule.condition == "each_non_home_objective_controlled_from_battle_round_two":
             if record.battle_round < 2:
@@ -2462,22 +2493,24 @@ class MissionScoringPolicy:
                 for trap in terrain_trap_states
                 if trap.player_id == requested_player
             }
+            enemy_destructions = _enemy_unit_destructions_this_turn(
+                unit_destruction_states,
+                player_id=requested_player,
+                battle_round=record.battle_round,
+                active_player_id=record.active_player_id,
+            )
             matching = tuple(
                 destruction
-                for destruction in _enemy_unit_destructions_this_turn(
-                    unit_destruction_states,
-                    player_id=requested_player,
-                    battle_round=record.battle_round,
-                    active_player_id=record.active_player_id,
-                )
+                for destruction in enemy_destructions
                 if trap_ids.intersection(destruction.started_turn_terrain_feature_ids)
             )
             return _score_count_evidence(
                 score_count=1 if matching else 0,
                 destroyed_unit_instance_ids=tuple(
-                    state.destroyed_unit_instance_id for state in matching
+                    sorted({state.destroyed_unit_instance_id for state in matching})
                 ),
                 trapped_terrain_feature_ids=tuple(sorted(trap_ids)),
+                destruction_ids=tuple(state.destruction_id for state in matching),
             )
         if rule.condition == "control_one_or_more_non_home_objectives_from_battle_round_two":
             if record.battle_round < 2:
@@ -2486,6 +2519,29 @@ class MissionScoringPolicy:
                 score_count=1 if non_home_objective_ids else 0,
                 controlled_objective_ids=non_home_objective_ids,
                 home_objective_ids=home_objective_ids,
+            )
+        if rule.condition == "more_enemy_units_destroyed_than_friendly_previous_turn":
+            return cross_turn_destruction_comparison_evidence(
+                turn_order=turn_order,
+                battle_round=record.battle_round,
+                active_player_id=record.active_player_id,
+                scoring_player_id=requested_player,
+                destruction_evidence=tuple(
+                    PrimaryUnitDestructionEvidence(
+                        destruction_id=state.destruction_id,
+                        battle_round=state.battle_round,
+                        active_player_id=state.active_player_id,
+                        destroyed_player_id=state.destroyed_player_id,
+                        destroyed_unit_instance_id=state.destroyed_unit_instance_id,
+                    )
+                    for state in unit_destruction_states
+                ),
+            )
+        if rule.condition == "control_opponent_home_objective":
+            return opponent_home_control_evidence(
+                mission_setup=mission_setup,
+                player_id=requested_player,
+                controlled_objective_ids=controlled_objective_ids,
             )
         raise GameLifecycleError("Unsupported primary scoring rule condition.")
 
@@ -3568,24 +3624,6 @@ def _controlled_objective_ids(
     )
 
 
-def _home_objective_ids(
-    mission_setup: MissionSetup,
-    *,
-    player_id: str,
-) -> tuple[str, ...]:
-    requested_player = _validate_identifier("player_id", player_id)
-    home_zones = tuple(
-        zone for zone in mission_setup.deployment_zones if zone.player_id == requested_player
-    )
-    return tuple(
-        sorted(
-            marker.objective_marker_id
-            for marker in mission_setup.objective_markers
-            if any(zone.contains_point(marker.x_inches, marker.y_inches) for zone in home_zones)
-        )
-    )
-
-
 def _central_objective_ids(mission_setup: MissionSetup) -> tuple[str, ...]:
     return tuple(
         sorted(
@@ -3634,8 +3672,7 @@ def _enemy_unit_destructions_this_turn(
     return tuple(
         state
         for state in states
-        if state.destroying_player_id == requested_player
-        and state.destroyed_player_id != requested_player
+        if state.destroyed_player_id != requested_player
         and state.active_player_id == requested_active
         and state.battle_round == requested_round
     )
@@ -3745,38 +3782,6 @@ def _starting_strength_for_destroyed_unit(
     if record is None:
         raise GameLifecycleError("Secondary scoring missing StartingStrengthRecord.")
     return record.starting_model_count
-
-
-def _score_count_evidence(
-    *,
-    score_count: int,
-    controlled_objective_ids: tuple[str, ...] = (),
-    home_objective_ids: tuple[str, ...] = (),
-    turn_start_controlled_objective_ids: tuple[str, ...] = (),
-    trapped_terrain_feature_ids: tuple[str, ...] = (),
-    destroyed_unit_instance_ids: tuple[str, ...] = (),
-) -> dict[str, JsonValue]:
-    return {
-        "score_count": _validate_non_negative_int("score_count", score_count),
-        "controlled_objective_ids": list(
-            _validate_identifier_tuple("controlled_objective_ids", controlled_objective_ids)
-        ),
-        "home_objective_ids": list(
-            _validate_identifier_tuple("home_objective_ids", home_objective_ids)
-        ),
-        "turn_start_controlled_objective_ids": list(
-            _validate_identifier_tuple(
-                "turn_start_controlled_objective_ids",
-                turn_start_controlled_objective_ids,
-            )
-        ),
-        "trapped_terrain_feature_ids": list(
-            _validate_identifier_tuple("trapped_terrain_feature_ids", trapped_terrain_feature_ids)
-        ),
-        "destroyed_unit_instance_ids": list(
-            _validate_identifier_tuple("destroyed_unit_instance_ids", destroyed_unit_instance_ids)
-        ),
-    }
 
 
 def _secondary_score_count_evidence(
@@ -4167,6 +4172,17 @@ def _validate_identifier_tuple_ordered(
     if len(identifiers) < min_length:
         raise GameLifecycleError(f"{field_name} must contain at least {min_length} values.")
     return tuple(identifiers)
+
+
+def _identifier_tuple_from_payload_list(
+    field_name: str,
+    value: object,
+) -> tuple[str, ...]:
+    if type(value) is not list:
+        raise GameLifecycleError(f"{field_name} must be a list in serialized payloads.")
+    return tuple(
+        _validate_identifier(f"{field_name} value", item) for item in cast(list[object], value)
+    )
 
 
 def _validate_identifier_tuple(

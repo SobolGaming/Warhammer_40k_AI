@@ -2400,7 +2400,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 23.465948054933786,
@@ -2476,7 +2476,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-south-center",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 38.2,
@@ -2536,7 +2536,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-east-midfield",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 36.7,
@@ -2596,7 +2596,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-north-east",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 7.3,
@@ -2656,7 +2656,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 5.8,
@@ -2716,7 +2716,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 33.25,
@@ -2788,7 +2788,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 10.75,
@@ -2860,7 +2860,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-west",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 13.25,
@@ -2932,7 +2932,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 30.75,
@@ -3004,7 +3004,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-south-east",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 34.2,
@@ -3076,7 +3076,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 9.87114177668623,
@@ -3148,7 +3148,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 34.12885822331377,
@@ -3220,7 +3220,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 9.8,
@@ -3292,7 +3292,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 21.75,
@@ -3344,7 +3344,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 22.25,
@@ -3396,7 +3396,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           }
         ],
         "terrain_features": [],
@@ -7223,7 +7223,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 23.465948054933786,
@@ -7299,7 +7299,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-south-center",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 38.2,
@@ -7359,7 +7359,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-east-midfield",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 36.7,
@@ -7419,7 +7419,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-north-east",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 7.3,
@@ -7479,7 +7479,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 5.8,
@@ -7539,7 +7539,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 33.25,
@@ -7611,7 +7611,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 10.75,
@@ -7683,7 +7683,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-west",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 13.25,
@@ -7755,7 +7755,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 30.75,
@@ -7827,7 +7827,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-south-east",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 34.2,
@@ -7899,7 +7899,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 9.87114177668623,
@@ -7971,7 +7971,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 34.12885822331377,
@@ -8043,7 +8043,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 9.8,
@@ -8115,7 +8115,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 21.75,
@@ -8167,7 +8167,7 @@
             "source_transform": "explicit",
             "symmetry_axis": "none",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           },
           {
             "center_x_inches": 22.25,
@@ -8219,7 +8219,7 @@
             "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
             "symmetry_axis": "point_center",
             "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east",
-            "terrain_feature_kind": "ruins"
+            "terrain_feature_kind": "terrain_layout_area"
           }
         ],
         "terrain_features": [],
@@ -8240,6 +8240,7 @@
       "primary_objective_turn_start_states": [],
       "primary_terrain_trap_states": [],
       "primary_unit_destruction_states": [],
+      "primary_unit_terrain_turn_start_snapshots": [],
       "ranged_attack_history_records": [],
       "reserve_states": [],
       "return_on_death_consumed_keys": [],
@@ -8346,7 +8347,7 @@
   "source_identity": {
     "catalog_hash": "24846bc075bda480343623eeaeec61238d52bae950b069a3a24336c5aef3955d",
     "catalog_id": "phase9a-canonical",
-    "game_config_hash": "e721552060b449d535de901412658681cc35f9d80a2ed2e5637248229d6fcef3",
+    "game_config_hash": "eb364a574392b0d093591ea32bb7a9653cf7a5572021881c73e37036b7508b89",
     "game_id": "phase18d-contract-session",
     "rules_overlay_ids": [],
     "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",

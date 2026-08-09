@@ -1145,7 +1145,9 @@ Required Phase 12 adapter-contract tests:
 
 ## Phase 13 Shooting Decisions
 
-Phase 13A terrain visibility, line of sight, and cover foundation does not create player-facing choices. Its `LineOfSightWitness` and `BenefitOfCoverResult` payloads are engine-owned evidence consumed by later shooting decisions and events. `BenefitOfCoverResult` includes deterministic `source_records` with terrain feature ID, feature kind, LoS policy kind, and cover-source reason (`wholly_within_feature` or `not_fully_visible_because_of_feature`). Dense/Solid terrain is represented by `LineOfSightPolicy.DENSE_COVER`; adapters must consume line-of-sight witnesses and target candidates from the engine rather than locally interpreting terrain openings, Hidden status, or Solid detection penalties. Phase 13C attack allocation must request cover evidence with a single allocated target model in `target_models`; multi-model target contexts are selection/debug evidence only and must not drive final save/AP modifiers.
+Phase 13A terrain visibility, line of sight, and cover foundation does not create player-facing choices. Its `LineOfSightWitness` and `BenefitOfCoverResult` payloads are engine-owned evidence consumed by later shooting decisions and events. `BenefitOfCoverResult` records deterministic feature sources through `source_feature_ids` and feature `source_records`, and terrain-area sources through `source_terrain_area_ids` and typed area records containing the terrain-area ID, classification, LoS policy, and cover-source reason. Feature reasons remain `wholly_within_feature` or `not_fully_visible_because_of_feature`; area reasons are `within_terrain_area` or `not_fully_visible_because_of_terrain_area`.
+
+The engine converts source `PlacedTerrainArea` values into geometry-owned `TerrainVisibilityArea` descriptors. Dense, Light, and Mixed terrain areas use `LineOfSightPolicy.AREA_OBSCURING`; Dense and Mixed areas are Solid, while Light areas are not. Hidden eligibility is engine-derived from canonical unit keywords, every eligible model's terrain-area occupancy, and authoritative current/previous-turn ranged-attack history. Adapters must consume line-of-sight witnesses and target candidates rather than locally interpreting terrain-area polygons, classifications, openings, cover, Hidden status, or Solid detection penalties. Phase 13C attack allocation must request cover evidence with a single allocated target model in `target_models`; multi-model target contexts are selection/debug evidence only and must not drive final save/AP modifiers.
 
 Phase 13B and later shooting slices add player-facing attacker and defender choices. They must not introduce UI, headless, replay, or network-specific mutation paths. Every accepted choice must pass through the same lifecycle submission path and produce deterministic replay-facing records.
 
@@ -2769,8 +2771,19 @@ display geometry payload uses schema `terrain-display-v1`, coordinate space
 `battlefield_inches`, footprint kind `polygon`, optional
 `display_template_id`, and an unclosed `footprint_polygon` list of
 `{x_inches, y_inches}` vertices. Adapters should render from these typed
-payloads. `source_id` remains provenance only; adapters must not parse it to
-recover terrain preset, origin, rotation, or footprint details.
+payloads. Each runtime feature also exposes its source-backed `classification`
+(`dense`, `light`, `mixed`, or `unknown`) independently from
+`terrain_feature_kind`; clients must not infer that classification from wall
+height, color, or feature kind. Exact-layout feature `source_id` values retain
+the source-hashed preset provenance, including the exact artifact package hash,
+through MissionSetup/GameConfig round trips and battlefield projections.
+`source_id` remains provenance only; adapters must not parse it to recover
+terrain preset, origin, rotation, footprint details, or terrain behavior.
+
+`terrain_areas[*].terrain_feature_kind` identifies the semantic kind of the
+layout area and does not claim that every component on a multi-component area
+shares one terrain feature kind. Authoritative per-component kind and
+classification live on `terrain_features[*]`.
 
 Chapter Approved 2026-27 layout source geometry is canonical in `44x60` portrait
 orientation. UI clients that prefer wide battlefield displays may rotate the
@@ -2868,6 +2881,17 @@ Phase 11E adds scoring state to the viewer projection:
 - `public_secondary_mission_card_states`: Fixed and Tactical card state payloads scoped
   through the secondary-mission reveal gate.
 - `public_victory_point_ledgers`: victory point ledgers scoped to the viewer.
+- `primary_unit_terrain_turn_start_snapshots`: deterministic, engine-owned
+  public evidence recording each physical unit's intersection with manifested
+  battlefield terrain at each player-turn boundary.
+
+Turn-start terrain snapshots are viewer-identical because they contain only
+public battlefield-derived membership, not a new position or visibility oracle.
+Each physical unit has one row so Attached Unit components remain distinct;
+units that are not placed on the battlefield, including unrevealed reserve
+positions, record an empty terrain-membership list. Adapters may display this
+evidence for scoring audit but must not recalculate it from current positions or
+use it to infer an unplaced unit's location.
 
 Chapter Approved 2026-27 secondary selection is simultaneous-secret. A player's
 Fixed/Tactical mode and Fixed mission IDs are secret only until every player has

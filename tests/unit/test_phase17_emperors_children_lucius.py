@@ -920,6 +920,13 @@ def _blocking_wall_between(
         footprint_center_y_inches=center_y,
         footprint_width_inches=0.5,
         footprint_depth_inches=6.0,
+        rules_footprint_polygon=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=center_x,
+            center_y_inches=center_y,
+            width_inches=0.5,
+            depth_inches=6.0,
+            display_template_id=None,
+        ).footprint_polygon,
         display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
             center_x_inches=center_x,
             center_y_inches=center_y,

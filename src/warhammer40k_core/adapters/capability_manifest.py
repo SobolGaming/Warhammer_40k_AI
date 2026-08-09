@@ -819,6 +819,25 @@ def _mission_rows(
     physical = setup.battlefield_layout_id is not None and bool(
         setup.deployment_zones and setup.battlefield_regions and setup.terrain_features
     )
+    mission_setup_hash = _hash_json(setup.to_payload())
+    mission_setup_evidence_id = f"mission-setup-sha256:{mission_setup_hash}"
+    terrain_source_evidence_refs = tuple(
+        sorted(
+            feature.source_id for feature in setup.terrain_features if feature.source_id is not None
+        )
+    )
+    mission_source_package_hash = (
+        None if mission_pack is None else mission_pack.source_package.source_commit_or_import_hash
+    )
+    semantic_evidence_refs = (
+        ()
+        if primary is None or mission_source_package_hash is None
+        else (
+            primary.source_id,
+            mission_setup_evidence_id,
+            f"mission-source-package-hash:{mission_source_package_hash}",
+        )
+    )
     row = _row(
         row_id=f"mission:{setup.mission_pack_id}:{setup.mission_pool_entry_id}",
         row_kind="mission",
@@ -842,16 +861,20 @@ def _mission_rows(
             CapabilityDimension.PHYSICALLY_PLAYABLE: (
                 physical,
                 "battlefield_layout_geometry_incomplete",
-                tuple(
-                    item
-                    for item in (setup.battlefield_layout_id, setup.terrain_layout_id)
-                    if item is not None
+                (
+                    mission_setup_evidence_id,
+                    *terrain_source_evidence_refs,
+                    *(
+                        item
+                        for item in (setup.battlefield_layout_id, setup.terrain_layout_id)
+                        if item is not None
+                    ),
                 ),
             ),
             CapabilityDimension.SEMANTICALLY_EXECUTABLE: (
                 executable,
                 semantic_reason,
-                (() if primary is None else (primary.source_id,)),
+                semantic_evidence_refs,
             ),
             CapabilityDimension.NETWORK_SAFE: (
                 True,
@@ -860,7 +883,8 @@ def _mission_rows(
             ),
         },
         metadata={
-            "mission_setup_hash": _hash_json(setup.to_payload()),
+            "mission_setup_hash": mission_setup_hash,
+            "mission_source_package_hash": mission_source_package_hash,
             "mission_pack_id": setup.mission_pack_id,
             "primary_mission_id": setup.primary_mission_id,
             "battlefield_layout_id": setup.battlefield_layout_id,
