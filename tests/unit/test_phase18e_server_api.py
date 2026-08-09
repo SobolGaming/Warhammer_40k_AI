@@ -21,6 +21,7 @@ from referencing.jsonschema import (
     SchemaRegistry,
     SchemaResource,
 )
+from tests.model_geometry_helpers import accepted_model_geometry
 from tests.movement_submission_helpers import straight_line_witness_for_unit
 
 from warhammer40k_core.adapters.access_control import (
@@ -31,6 +32,7 @@ from warhammer40k_core.adapters.access_control import (
 )
 from warhammer40k_core.adapters.capability_manifest import (
     CapabilityManifestPayload,
+    build_capability_manifest,
     project_capability_manifest,
 )
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
@@ -58,10 +60,20 @@ from warhammer40k_core.core.datasheet import (
 )
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
-from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
+from warhammer40k_core.engine.army_mustering import ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.manifest import (
+    RuntimeContentManifest,
+    RuntimeContentManifestRow,
+    RuntimeContentModuleFamily,
+    RuntimeContentSemanticStatus,
+    RuntimeContentSupportStatus,
+)
+from warhammer40k_core.engine.faction_content.runtime import (
+    build_runtime_content_bundle_for_armies,
+)
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -74,6 +86,7 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequestPayload,
 )
 from warhammer40k_core.engine.phase import (
+    GameLifecycleError,
     LifecycleStatus,
     LifecycleStatusKind,
 )
@@ -87,9 +100,12 @@ from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27
 from warhammer40k_core.rules.parsed_tokens import TextSpan
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
+    RuleEffectKind,
+    RuleEffectSpec,
     RuleIR,
-    RuleParseDiagnostic,
-    RuleUnsupportedReason,
+    RuleParameter,
+    RuleTargetKind,
+    RuleTargetSpec,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -272,7 +288,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     identities = _field_object(capability_manifest, "identities")
     assert _field_object(identities, "mission_pack")
     assert _field_object(identities, "terrain_layout")
-    assert _field_object(identities, "contract_schema")["contract_version"] == "4.1.0"
+    assert _field_object(identities, "contract_schema")["contract_version"] == "4.2.0"
 
     player_a_support = _request(
         server,
@@ -908,6 +924,82 @@ def test_phase18e_command_result_schema_requires_accepted_commands_to_be_committ
         validator.validate({**example, "committed": False, "accepted": True})
 
 
+def test_phase18e_create_session_schema_requires_complete_nonempty_model_geometries() -> None:
+    validator = _schema_validator("create-session.schema.json")
+    body = _game_config_body(game_id="phase18e-model-geometry-schema")
+
+    validator.validate(body)
+    config = _field_object(body, "config")
+    geometry = _json_object(
+        validate_json_value(cast(JsonValue, accepted_model_geometry().to_payload()))
+    )
+    config["model_geometries"] = [geometry]
+    validator.validate(body)
+
+    config["model_geometries"] = []
+    with pytest.raises(ValidationError):
+        validator.validate(body)
+
+    incomplete_geometry = dict(geometry)
+    del incomplete_geometry["support_base"]
+    config["model_geometries"] = [incomplete_geometry]
+    with pytest.raises(ValidationError):
+        validator.validate(body)
+
+
+def test_phase18e_server_create_routes_accept_valid_reviewed_model_geometry() -> None:
+    server = AdapterGameServer()
+    body = _game_config_body(game_id="phase18e-valid-model-geometry")
+    config = _field_object(body, "config")
+    config["model_geometries"] = [
+        validate_json_value(cast(JsonValue, accepted_model_geometry().to_payload()))
+    ]
+
+    response = _request_raw(server, "POST", "/games", body=body)
+
+    assert response.status_code == 201
+
+    session_body = _session_create_body(game_id="phase18e-valid-session-model-geometry")
+    _field_object(session_body, "config")["model_geometries"] = [
+        validate_json_value(cast(JsonValue, accepted_model_geometry().to_payload()))
+    ]
+
+    session_response = _request_raw(server, "POST", "/sessions", body=session_body)
+
+    assert session_response.status_code == 201
+
+
+def test_phase18e_server_rejects_structurally_incomplete_model_geometry() -> None:
+    server = AdapterGameServer()
+    body = _game_config_body(game_id="phase18e-incomplete-model-geometry")
+    geometry = _json_object(
+        validate_json_value(cast(JsonValue, accepted_model_geometry().to_payload()))
+    )
+    del geometry["support_base"]
+    _field_object(body, "config")["model_geometries"] = [geometry]
+
+    response = _request_raw(server, "POST", "/games", body=body)
+
+    assert response.status_code == 400
+    assert _error_code(response) == "canonical_schema_invalid"
+
+
+def test_phase18e_server_rejects_semantically_invalid_model_geometry() -> None:
+    server = AdapterGameServer()
+    body = _game_config_body(game_id="phase18e-invalid-model-geometry-evidence")
+    geometry = _json_object(
+        validate_json_value(cast(JsonValue, accepted_model_geometry().to_payload()))
+    )
+    height = _field_object(geometry, "height")
+    height["evidence_id"] = "core-intercessor-like:accepted-footprint"
+    _field_object(body, "config")["model_geometries"] = [geometry]
+
+    response = _request_raw(server, "POST", "/games", body=body)
+
+    assert response.status_code == 409
+    assert _error_code(response) == "session_contract_rejected"
+
+
 def test_phase18e_session_create_validation_fails_before_authoritative_creation() -> None:
     server = AdapterGameServer()
     game_id = "phase18e-session-create-validation"
@@ -1068,15 +1160,92 @@ def test_phase17o_capability_manifest_does_not_treat_unconsumed_ir_as_executable
     assert len(rule_rows) == 2
     for rule_row in rule_rows:
         assert _field_string(rule_row, "load_support") == "generic_rule_ir"
-        assert _field_string(rule_row, "semantic_execution") == "ir_compiled_unsupported"
+        assert _field_string(rule_row, "semantic_execution") == "generic_ir_executable"
         semantic = next(
             _json_object(result)
             for result in _field_list(rule_row, "capabilities")
             if _field_string(_json_object(result), "dimension") == "SEMANTICALLY_EXECUTABLE"
         )
         assert semantic["status"] == "unsupported"
-        assert semantic["reason_code"] == "ability_ir_compiled_unsupported"
+        assert semantic["reason_code"] == "ability_generic_ir_executable"
+        assert semantic["evidence_refs"] == []
     assert len(_field_list(manifest, "unsupported_effects")) >= 2
+    for result in (
+        *(_json_object(value) for value in _field_list(manifest, "mode_capabilities")),
+        *(
+            _json_object(result)
+            for row_key in (
+                "roster_rows",
+                "unit_rows",
+                "rule_rows",
+                "mission_rows",
+                "geometry_rows",
+            )
+            for row in _field_list(manifest, row_key)
+            for result in _field_list(_json_object(row), "capabilities")
+        ),
+    ):
+        if result["status"] == "supported":
+            assert _field_list(result, "evidence_refs")
+
+
+def test_phase17o_capability_manifest_rejects_unregistered_selected_runtime_evidence() -> None:
+    catalog = _catalog_with_selected_engine_consumed_ability()
+    config = _config(game_id="phase17o-selected-runtime-rules", catalog=catalog)
+    armies = tuple(
+        muster_army(catalog=catalog, request=request) for request in config.army_muster_requests
+    )
+    runtime_bundle = build_runtime_content_bundle_for_armies(
+        config=config,
+        armies=armies,
+    )
+    faction_row = RuntimeContentManifestRow(
+        content_id="core-marine-force",
+        family=RuntimeContentModuleFamily.FACTION,
+        source_ids=("phase17o:test:core-marine-force",),
+        owner_faction_id="core-marine-force",
+        owner_detachment_id=None,
+        source_package_id="phase17o-test-runtime",
+        source_package_hash="phase17o-test-runtime-hash",
+        execution_record_ids=(
+            "phase17o:test:core-marine-force:army-rule",
+            "phase17o:test:core-marine-force:datasheet-intake",
+        ),
+        module_path="warhammer40k_core.engine.phase17o_test_faction",
+        support_status=RuntimeContentSupportStatus.SUPPORTED,
+        semantic_status=RuntimeContentSemanticStatus.PARTIAL,
+    )
+    detachment_row = RuntimeContentManifestRow(
+        content_id="core-combined-arms",
+        family=RuntimeContentModuleFamily.DETACHMENT,
+        source_ids=("phase17o:test:core-combined-arms",),
+        owner_faction_id="core-marine-force",
+        owner_detachment_id="core-combined-arms",
+        source_package_id="phase17o-test-runtime",
+        source_package_hash="phase17o-test-runtime-hash",
+        execution_record_ids=("phase17o:test:core-combined-arms:detachment-rule",),
+        module_path="warhammer40k_core.engine.phase17o_test_detachment",
+        support_status=RuntimeContentSupportStatus.SUPPORTED,
+        dependency_ids=("core-bolt-rifle",),
+        semantic_status=RuntimeContentSemanticStatus.IMPLEMENTED,
+    )
+
+    runtime_manifest = RuntimeContentManifest.from_catalog(
+        catalog=catalog,
+        generated_rows=(faction_row, detachment_row),
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="unregistered runtime consumer evidence",
+    ) as exc_info:
+        build_capability_manifest(
+            config=config,
+            armies=armies,
+            runtime_manifest=runtime_manifest,
+            runtime_bundle=runtime_bundle,
+        )
+
+    assert "phase17o:test:core-combined-arms:detachment-rule" in str(exc_info.value)
 
 
 def test_phase18e_server_submission_rejections_are_typed() -> None:
@@ -2229,7 +2398,8 @@ def _contains_key(value: JsonValue, key: str) -> bool:
 
 def _catalog_with_selected_generic_ir_ability() -> ArmyCatalog:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
-    source_span = TextSpan(text="Unsupported generic test effect.", start=0, end=32)
+    source_text = "Modify an unconsumed test faction resource."
+    source_span = TextSpan(text=source_text, start=0, end=len(source_text))
     rule_ir = RuleIR(
         rule_id="phase18e:test:generic-ir-no-consumer",
         source_id="phase18e:test:generic-ir-no-consumer",
@@ -2239,12 +2409,18 @@ def _catalog_with_selected_generic_ir_ability() -> ArmyCatalog:
             RuleClause(
                 clause_id="phase18e:test:generic-ir-no-consumer:clause:001",
                 source_span=source_span,
-                unsupported_reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
-                diagnostics=(
-                    RuleParseDiagnostic(
-                        reason=RuleUnsupportedReason.UNSUPPORTED_LANGUAGE,
-                        message="No generic runtime consumer exists for this test effect.",
+                target=RuleTargetSpec(
+                    kind=RuleTargetKind.THIS_UNIT,
+                    source_span=source_span,
+                ),
+                effects=(
+                    RuleEffectSpec(
+                        kind=RuleEffectKind.MODIFY_FACTION_RESOURCE,
                         source_span=source_span,
+                        parameters=(
+                            RuleParameter(key="resource", value="phase18e_test_resource"),
+                            RuleParameter(key="amount", value=1),
+                        ),
                     ),
                 ),
             ),
@@ -2255,7 +2431,7 @@ def _catalog_with_selected_generic_ir_ability() -> ArmyCatalog:
         name="Phase 18E Generic IR No Consumer",
         source_id="phase18e:test:generic-ir-no-consumer",
         support=CatalogAbilitySupport.GENERIC_RULE_IR,
-        source_kind=CatalogAbilitySourceKind.CORE,
+        source_kind=CatalogAbilitySourceKind.DATASHEET,
         effect_description="Structured generic IR without a phase host consumer.",
         timing_tags=("command_phase",),
         parameter_tokens=(),
@@ -2263,6 +2439,23 @@ def _catalog_with_selected_generic_ir_ability() -> ArmyCatalog:
     )
     datasheets = tuple(
         replace(datasheet, abilities=(*datasheet.abilities, added_ability))
+        if datasheet.datasheet_id == "core-intercessor-like-infantry"
+        else datasheet
+        for datasheet in catalog.datasheets
+    )
+    return replace(catalog, datasheets=datasheets)
+
+
+def _catalog_with_selected_engine_consumed_ability() -> ArmyCatalog:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    deep_strike = next(
+        ability
+        for ability in catalog.datasheet_by_id("core-deep-strike-unit").abilities
+        if ability.ability_id == "core-deep-strike"
+    )
+    deep_strike = replace(deep_strike, support=CatalogAbilitySupport.DESCRIPTOR_ONLY)
+    datasheets = tuple(
+        replace(datasheet, abilities=(*datasheet.abilities, deep_strike))
         if datasheet.datasheet_id == "core-intercessor-like-infantry"
         else datasheet
         for datasheet in catalog.datasheets
@@ -2358,6 +2551,7 @@ def _schema_payloads() -> dict[str, Schema]:
     names = (
         "battlefield-view.schema.json",
         "capability-manifest.schema.json",
+        "create-session.schema.json",
         "decision-request-view.schema.json",
         "event-delta.schema.json",
         "game-view.schema.json",

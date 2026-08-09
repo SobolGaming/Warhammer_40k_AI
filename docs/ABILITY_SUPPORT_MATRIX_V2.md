@@ -309,7 +309,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:movement-end-selected-target-effect` | Doom (Psychic) |
 | `catalog-ir:movement-friendly-enemy-target-pair` | Spirit Mark (Psychic) |
 | `catalog-ir:movement-transit-permission` | Extreme Mobility<br>Scuttling Walker<br>Serpentine |
-| `catalog-ir:named-weapon-ability-choice` | No current generated rows |
+| `catalog-ir:named-weapon-ability-choice` | Master of Magicks (Psychic) |
 | `catalog-ir:objective-control-characteristic-modifier` | No current generated rows |
 | `catalog-ir:objective-control-characteristic-query` | No current generated rows |
 | `catalog-ir:once-per-battle-ability` | Malefic Destruction<br>Unholy Vigour |
@@ -342,7 +342,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:tracked-target-selection` | Piratical Raiders |
 | `catalog-ir:unit-move-completed-battle-shock` | No current generated rows |
 | `catalog-ir:unit-move-completed-mortal-wounds` | Brass Stampede<br>Grenade Pack Flyover |
-| `catalog-ir:weapon-keyword-grant` | Bladestorm<br>Faolchú<br>Harbinger of Death<br>Obsessive Annunciation<br>Piratical Hero<br>Piratical Raiders |
+| `catalog-ir:weapon-keyword-grant` | Bladestorm<br>Faolchú<br>Harbinger of Death<br>Master of Magicks (Psychic)<br>Obsessive Annunciation<br>Piratical Hero<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:assault` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:blast` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:c'tan-power` | No current generated rows |
@@ -353,17 +353,17 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `catalog-ir:weapon-keyword-grant:hazardous` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:heavy` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:hunter` | No current generated rows |
-| `catalog-ir:weapon-keyword-grant:ignores-cover` | Faolchú |
+| `catalog-ir:weapon-keyword-grant:ignores-cover` | Faolchú<br>Master of Magicks (Psychic) |
 | `catalog-ir:weapon-keyword-grant:indirect-fire` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:lance` | No current generated rows |
-| `catalog-ir:weapon-keyword-grant:lethal-hits` | Harbinger of Death<br>Piratical Raiders |
+| `catalog-ir:weapon-keyword-grant:lethal-hits` | Harbinger of Death<br>Master of Magicks (Psychic)<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:melta` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:one-shot` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:pistol` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:precision` | Harbinger of Death<br>Piratical Raiders |
 | `catalog-ir:weapon-keyword-grant:psychic` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:rapid-fire` | No current generated rows |
-| `catalog-ir:weapon-keyword-grant:sustained-hits` | Bladestorm<br>Harbinger of Death<br>Obsessive Annunciation<br>Piratical Hero |
+| `catalog-ir:weapon-keyword-grant:sustained-hits` | Bladestorm<br>Harbinger of Death<br>Master of Magicks (Psychic)<br>Obsessive Annunciation<br>Piratical Hero |
 | `catalog-ir:weapon-keyword-grant:torrent` | No current generated rows |
 | `catalog-ir:weapon-keyword-grant:twin-linked` | No current generated rows |
 | `catalog-ir:weapon-skill-characteristic-modifier` | Psychic Guidance |
@@ -432,8 +432,7 @@ This bottom inventory lists the hook, modifier, effect, handler, and runtime con
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:accept_any_challenge:wound-roll` | Templar Vows |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:suffer_not_the_unclean:fall-back` | Templar Vows |
 | `warhammer_40000_11th:black_templars:army_rule:templar_vows:uphold_the_honour:objective-control` | Templar Vows |
-| `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos` | The Shadow of Chaos |
-| `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026` | July 2026 |
+| `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026` | Greater Daemon of Khorne (Aura)<br>Greater Daemon of Tzeentch (Aura)<br>July 2026<br>The Shadow of Chaos |
 | `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:daemon_lord_of_khorne` | Daemon Lord of Khorne |
 | `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage` | Relentless Carnage |
 | `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage:mortal-wound-fnp` | Relentless Carnage - Mortal Wound Feel No Pain |

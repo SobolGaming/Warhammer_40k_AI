@@ -3,43 +3,43 @@
     "capability_counts": {
       "DISPLAYABLE": {
         "not_applicable": 0,
-        "supported": 8,
+        "supported": 7,
         "unsupported": 0
       },
       "FULL_GAME_SUPPORTED": {
         "not_applicable": 0,
         "supported": 0,
-        "unsupported": 8
+        "unsupported": 7
       },
       "LOADABLE": {
         "not_applicable": 0,
         "supported": 5,
-        "unsupported": 3
+        "unsupported": 2
       },
       "MUSTERABLE": {
-        "not_applicable": 6,
+        "not_applicable": 5,
         "supported": 1,
         "unsupported": 1
       },
       "NETWORK_SAFE": {
         "not_applicable": 0,
-        "supported": 8,
+        "supported": 7,
         "unsupported": 0
       },
       "PHYSICALLY_PLAYABLE": {
-        "not_applicable": 4,
+        "not_applicable": 3,
         "supported": 0,
         "unsupported": 4
       },
       "REPLAY_VERIFIED": {
         "not_applicable": 0,
         "supported": 0,
-        "unsupported": 8
+        "unsupported": 7
       },
       "SEMANTICALLY_EXECUTABLE": {
         "not_applicable": 1,
         "supported": 1,
-        "unsupported": 6
+        "unsupported": 5
       }
     },
     "certification_claims": {
@@ -706,7 +706,7 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "4.1.0",
+        "contract_version": "4.2.0",
         "identity_hash": "320d31af5048139c3543d094d0e271f29ecd23cc65e634a034bc8e97442ff281",
         "identity_id": "https://warhammer40k-core.local/contracts/v4/capability-manifest.schema.json"
       },
@@ -754,7 +754,7 @@
       "roster_construction",
       "weapon_allocation_matrix"
     ],
-    "manifest_id": "capability-manifest:79724682c2ebb6daac07a4d16d7fae2e77844b2a159ffd99cb9af9e33913d852",
+    "manifest_id": "capability-manifest:fbe3316bbd545800015e923196777d19bfc6cffd73ae49ce2afdfc2bd49ee81c",
     "mission_rows": [
       {
         "capabilities": [
@@ -881,7 +881,6 @@
           "gw-11e-chapter-approved-2026-27",
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-b:army-beta",
-          "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
           "rule:player-b:runtime:detachment:core-combined-arms",
           "rule:player-b:runtime:faction:core-marine-force",
           "rule:player-b:scout-redeploy-unit:ability:core-scouts",
@@ -907,14 +906,12 @@
           "adapter:unit-display:army-beta:scout-redeploy-unit",
           "adapter:unit_display_projection",
           "catalog:ability:core-scouts:descriptor",
-          "datasheet:core-intercessor-like-infantry",
           "detachment:core-combined-arms",
           "faction:core-marine-force",
           "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
           "mission-setup:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-b:army-beta",
-          "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
           "rule:player-b:runtime:detachment:core-combined-arms",
           "rule:player-b:runtime:faction:core-marine-force",
           "rule:player-b:scout-redeploy-unit:ability:core-scouts",
@@ -974,13 +971,11 @@
         "dimension": "SEMANTICALLY_EXECUTABLE",
         "evidence_refs": [
           "core-combined-arms",
-          "core-intercessor-like-infantry",
           "core-marine-force",
           "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object",
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "phase9a-canonical/core-intercessor-like-infantry/core/core-scouts/none",
           "roster:player-b:army-beta",
-          "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
           "rule:player-b:runtime:detachment:core-combined-arms",
           "rule:player-b:runtime:faction:core-marine-force",
           "rule:player-b:scout-redeploy-unit:ability:core-scouts",
@@ -1003,7 +998,6 @@
           "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-b:army-beta",
-          "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
           "rule:player-b:runtime:detachment:core-combined-arms",
           "rule:player-b:runtime:faction:core-marine-force",
           "rule:player-b:scout-redeploy-unit:ability:core-scouts",
@@ -1028,7 +1022,6 @@
           "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-b:army-beta",
-          "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
           "rule:player-b:runtime:detachment:core-combined-arms",
           "rule:player-b:runtime:faction:core-marine-force",
           "rule:player-b:scout-redeploy-unit:ability:core-scouts",
@@ -1052,7 +1045,6 @@
           "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-b:army-beta",
-          "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
           "rule:player-b:runtime:detachment:core-combined-arms",
           "rule:player-b:runtime:faction:core-marine-force",
           "rule:player-b:scout-redeploy-unit:ability:core-scouts",
@@ -1132,7 +1124,6 @@
             "dimension": "SEMANTICALLY_EXECUTABLE",
             "evidence_refs": [
               "core-combined-arms",
-              "core-intercessor-like-infantry",
               "core-marine-force"
             ],
             "reason_code": "selected_rule_semantics_incomplete",
@@ -1252,103 +1243,6 @@
             "evidence_refs": [],
             "reason_code": "runtime_source_only",
             "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "unsupported"
-          },
-          {
-            "dimension": "DISPLAYABLE",
-            "evidence_refs": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "reason_code": null,
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "supported"
-          },
-          {
-            "dimension": "MUSTERABLE",
-            "evidence_refs": [],
-            "reason_code": "rule_musterable_not_applicable",
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "not_applicable"
-          },
-          {
-            "dimension": "PHYSICALLY_PLAYABLE",
-            "evidence_refs": [],
-            "reason_code": "rule_physically_playable_not_applicable",
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "not_applicable"
-          },
-          {
-            "dimension": "SEMANTICALLY_EXECUTABLE",
-            "evidence_refs": [],
-            "reason_code": "runtime_semantic_placeholder",
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "unsupported"
-          },
-          {
-            "dimension": "FULL_GAME_SUPPORTED",
-            "evidence_refs": [],
-            "reason_code": "certified_full_game_evidence_missing",
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "unsupported"
-          },
-          {
-            "dimension": "NETWORK_SAFE",
-            "evidence_refs": [
-              "adapter:redaction:capability_manifest"
-            ],
-            "reason_code": null,
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "supported"
-          },
-          {
-            "dimension": "REPLAY_VERIFIED",
-            "evidence_refs": [],
-            "reason_code": "certified_replay_evidence_missing",
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "unsupported"
-          }
-        ],
-        "display_name": "core-intercessor-like-infantry",
-        "load_support": "source_only",
-        "metadata": {
-          "content_family": "datasheet",
-          "execution_record_ids": [],
-          "required_for_matched_play": true,
-          "source_package_hash": null,
-          "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
-        },
-        "owner_id": "core-intercessor-like-infantry",
-        "player_id": "player-b",
-        "row_id": "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
-        "row_kind": "rule",
-        "semantic_execution": "placeholder",
-        "source_ids": [
-          "datasheet:core-intercessor-like-infantry"
-        ]
-      },
-      {
-        "capabilities": [
-          {
-            "dimension": "LOADABLE",
-            "evidence_refs": [],
-            "reason_code": "runtime_source_only",
-            "source_ids": [
               "detachment:core-combined-arms"
             ],
             "status": "unsupported"
@@ -1424,7 +1318,9 @@
         "display_name": "core-combined-arms",
         "load_support": "source_only",
         "metadata": {
+          "aggregate_semantic_execution": "placeholder",
           "content_family": "detachment",
+          "excluded_aggregate_execution_record_ids": [],
           "execution_record_ids": [],
           "required_for_matched_play": true,
           "source_package_hash": null,
@@ -1521,7 +1417,9 @@
         "display_name": "core-marine-force",
         "load_support": "source_only",
         "metadata": {
+          "aggregate_semantic_execution": "placeholder",
           "content_family": "faction",
+          "excluded_aggregate_execution_record_ids": [],
           "execution_record_ids": [],
           "required_for_matched_play": true,
           "source_package_hash": null,
@@ -1752,16 +1650,6 @@
       }
     ],
     "unsupported_effects": [
-      {
-        "effect_id": "unsupported-effect:rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
-        "message": "core-intercessor-like-infantry is not fully executable: runtime_semantic_placeholder.",
-        "player_id": "player-b",
-        "reason_code": "runtime_semantic_placeholder",
-        "rule_row_id": "rule:player-b:runtime:datasheet:core-intercessor-like-infantry",
-        "source_ids": [
-          "datasheet:core-intercessor-like-infantry"
-        ]
-      },
       {
         "effect_id": "unsupported-effect:rule:player-b:runtime:detachment:core-combined-arms",
         "message": "core-combined-arms is not fully executable: runtime_semantic_placeholder.",

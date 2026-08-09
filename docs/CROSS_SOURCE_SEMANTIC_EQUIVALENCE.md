@@ -17,7 +17,7 @@ When RuleIR is incomplete, the audit records exact normalized-text identity only
 | `stratagem` | 1050 | 76 |
 | **Total** | **4094** | **754** |
 
-Equivalent groups: **330**; cross-faction groups: **161**; exact-text-only members: **3230**; source-text-unavailable members: **110**.
+Equivalent groups: **330**; cross-faction groups: **161**; exact-text-only members: **3229**; source-text-unavailable members: **111**.
 
 ## Equivalence Groups
 

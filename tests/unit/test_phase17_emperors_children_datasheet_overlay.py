@@ -9,7 +9,6 @@ from typing import Any, cast
 
 import pytest
 from tools.generate_ability_support_matrix import (
-    ABILITY_SUPPORT_DATASHEET_IDS,
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
 from tools.generate_emperors_children_fulgrim_rule_ir import (
@@ -340,6 +339,57 @@ _BRIDGE_SUPPORTED_EC_DATASHEET_IDS = (
 )
 _FULGRIM_ID = "000004077"
 _NIGHT_SPINNER_ID = "000000611"
+# Replay RNG consumes canonical event history, including selected catalog identities. Keep this
+# fixture closure explicit so unrelated support-matrix additions cannot drift established replays.
+_RUNTIME_FIXTURE_DATASHEET_IDS = (
+    "000000594",
+    "000000595",
+    "000000596",
+    "000000600",
+    "000000601",
+    "000000577",
+    "000002759",
+    "000000572",
+    "000000574",
+    "000000588",
+    "000003909",
+    "000000592",
+    "000002533",
+    "000000598",
+    "000000612",
+    "000000613",
+    "000000568",
+    "000000593",
+    "000000599",
+    "000000602",
+    "000004196",
+    "000002531",
+    "000002532",
+    "000004194",
+    _NIGHT_SPINNER_ID,
+    "000004193",
+    "000000605",
+    "000004195",
+    "000001148",
+    "000001112",
+    "000001114",
+    "000001115",
+    "000001149",
+    "000002758",
+    "000001151",
+    "000001030",
+    "000004207",
+    "000004208",
+    "000004209",
+    _FULGRIM_ID,
+    "000004079",
+    "000004080",
+    "000004081",
+    "000004083",
+    "000004084",
+    "000004088",
+    "000004089",
+)
 
 
 def test_emperors_children_datasheet_overlay_updates_source_rows() -> None:
@@ -4029,13 +4079,7 @@ def _decision_request(status: LifecycleStatus) -> DecisionRequest:
 
 @lru_cache(maxsize=1)
 def _catalog_package() -> CanonicalCatalogPackage:
-    # Keep an unrelated faction addition from changing these replay fixtures' RNG history.
-    replay_fixture_datasheet_ids = tuple(
-        datasheet_id
-        for datasheet_id in ABILITY_SUPPORT_DATASHEET_IDS
-        if datasheet_id != "000000969"
-    )
-    return _ability_support_catalog_package(datasheet_ids=replay_fixture_datasheet_ids)
+    return _ability_support_catalog_package(datasheet_ids=_RUNTIME_FIXTURE_DATASHEET_IDS)
 
 
 def _kakophonist_runtime_fixture() -> tuple[

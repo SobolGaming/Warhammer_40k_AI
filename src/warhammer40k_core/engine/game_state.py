@@ -5,6 +5,7 @@ from enum import StrEnum
 from typing import Self, cast
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     RulesetDescriptor,
@@ -81,6 +82,16 @@ from warhammer40k_core.engine.faction_rule_states import (
     FactionRuleState,
 )
 from warhammer40k_core.engine.fight_order import FightPhaseState
+from warhammer40k_core.engine.game_config_geometry import (
+    game_config_model_geometries_from_payload,
+    validate_optional_game_config_model_geometries,
+)
+from warhammer40k_core.engine.game_config_validation import (
+    validate_army_muster_requests as _validate_army_muster_requests,
+)
+from warhammer40k_core.engine.game_config_validation import (
+    validate_strict_roster_legality_requests as _validate_strict_roster_legality_requests,
+)
 from warhammer40k_core.engine.game_state_payloads import (
     DedicatedTransportSetupConsequencePayload as DedicatedTransportSetupConsequencePayload,
 )
@@ -572,6 +583,7 @@ class GameConfig:
     mission_setup: MissionSetup | None = None
     reserve_unit_points: tuple[ReserveUnitPointValue, ...] = ()
     allow_legacy_non_strict_rosters: bool = False
+    model_geometries: tuple[ModelGeometryCatalogRecord, ...] | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -658,10 +670,19 @@ class GameConfig:
                 army_muster_requests=self.army_muster_requests,
             ),
         )
+        object.__setattr__(
+            self,
+            "model_geometries",
+            validate_optional_game_config_model_geometries(
+                self.model_geometries,
+                catalog=self.army_catalog,
+                army_muster_requests=self.army_muster_requests,
+            ),
+        )
         _validate_lifecycle_sequences(self.ruleset_descriptor)
 
     def to_payload(self) -> GameConfigPayload:
-        return {
+        payload: GameConfigPayload = {
             "game_id": self.game_id,
             "ruleset_descriptor": self.ruleset_descriptor.to_payload(),
             "army_catalog": self.army_catalog.to_payload(),
@@ -677,6 +698,9 @@ class GameConfig:
             ),
             "reserve_unit_points": [entry.to_payload() for entry in self.reserve_unit_points],
         }
+        if self.model_geometries is not None:
+            payload["model_geometries"] = [record.to_payload() for record in self.model_geometries]
+        return payload
 
     @classmethod
     def from_payload(cls, payload: GameConfigPayload) -> Self:
@@ -702,6 +726,11 @@ class GameConfig:
             reserve_unit_points=tuple(
                 ReserveUnitPointValue.from_payload(entry)
                 for entry in payload["reserve_unit_points"]
+            ),
+            model_geometries=(
+                None
+                if "model_geometries" not in payload
+                else game_config_model_geometries_from_payload(payload["model_geometries"])
             ),
         )
 
@@ -5506,52 +5535,6 @@ def _validate_lifecycle_sequences(ruleset_descriptor: RulesetDescriptor) -> None
         raise GameLifecycleError("GameConfig battle_phase_sequence must include FIGHT.")
     if phases[-1] is not BattlePhaseKind.FIGHT:
         raise GameLifecycleError("GameConfig battle_phase_sequence must end with FIGHT.")
-
-
-def _validate_army_muster_requests(
-    values: object,
-    *,
-    player_ids: tuple[str, ...],
-) -> tuple[ArmyMusterRequest, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("GameConfig army_muster_requests must be a tuple.")
-    raw_values = cast(tuple[object, ...], values)
-    if len(raw_values) != len(player_ids):
-        raise GameLifecycleError(
-            "GameConfig army_muster_requests must include every player exactly once."
-        )
-    validated: list[ArmyMusterRequest] = []
-    seen: set[str] = set()
-    for value in raw_values:
-        if type(value) is not ArmyMusterRequest:
-            raise GameLifecycleError(
-                "GameConfig army_muster_requests must contain ArmyMusterRequest values."
-            )
-        if value.player_id not in player_ids:
-            raise GameLifecycleError("ArmyMusterRequest player_id is not in this game.")
-        if value.player_id in seen:
-            raise GameLifecycleError("GameConfig army_muster_requests must be unique by player.")
-        seen.add(value.player_id)
-        validated.append(value)
-    if set(seen) != set(player_ids):
-        raise GameLifecycleError(
-            "GameConfig army_muster_requests must include every player exactly once."
-        )
-    return tuple(sorted(validated, key=lambda request: request.player_id))
-
-
-def _validate_strict_roster_legality_requests(
-    values: tuple[ArmyMusterRequest, ...],
-) -> None:
-    non_strict_player_ids = tuple(
-        request.player_id for request in values if not request.roster_legality_required
-    )
-    if non_strict_player_ids:
-        raise GameLifecycleError(
-            "GameConfig production path requires roster_legality_required for every "
-            "ArmyMusterRequest. Legacy smoke fixtures must set "
-            "allow_legacy_non_strict_rosters explicitly."
-        )
 
 
 def _validate_reserve_unit_points(

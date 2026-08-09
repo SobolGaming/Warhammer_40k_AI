@@ -2764,7 +2764,7 @@ def _with_daemonic_incursion_units(
                 name="Renamed Greater Daemon Anchor",
                 keywords=("Monster", anchor_god_keyword),
                 datasheet_abilities=(
-                    _datasheet_ability(datasheets.BLOODTHIRSTER_GREATER_DAEMON_SOURCE_ID),
+                    _datasheet_ability(datasheets.BLOODTHIRSTER_GREATER_DAEMON_ABILITY_ID),
                 ),
             )
             updated_armies.append(
@@ -2809,12 +2809,11 @@ def _as_daemon_unit(
     )
 
 
-def _datasheet_ability(source_id: str) -> DatasheetAbilityDescriptor:
-    ability_id_suffix = source_id.split("Datasheets_abilities:", maxsplit=1)[1].replace(":", "-")
+def _datasheet_ability(ability_id: str) -> DatasheetAbilityDescriptor:
     return DatasheetAbilityDescriptor(
-        ability_id=f"phase17g-daemonic-incursion:{ability_id_suffix}",
+        ability_id=ability_id,
         name="Source Backed Datasheet Ability",
-        source_id=source_id,
+        source_id=f"data-package:core-v2:phase17g-daemonic-incursion-test:{ability_id}",
         support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
         source_kind=CatalogAbilitySourceKind.DATASHEET,
         effect_description="source-backed datasheet test ability",

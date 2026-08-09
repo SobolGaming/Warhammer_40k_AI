@@ -366,6 +366,54 @@ class FactionRuleExecutionRegistry:
             sorted(self._records_by_execution_id.values(), key=lambda row: row.execution_id)
         )
 
+    def active_execution_record_ids(
+        self,
+        *,
+        active_handler_ids: frozenset[str] = frozenset(),
+    ) -> tuple[str, ...]:
+        """Return executable records backed by a registry executor or typed runtime handler."""
+
+        if type(active_handler_ids) is not frozenset:
+            raise GameLifecycleError("Active faction execution handler IDs must be a frozenset.")
+        validated_active_handler_ids = frozenset(
+            _validate_identifier("active_handler_ids value", handler_id)
+            for handler_id in active_handler_ids
+        )
+
+        active_ids: list[str] = []
+        for record in self.all_records():
+            if record.execution_status in {
+                Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED,
+                Phase17FExecutionStatus.BLOCKED_APPROVED_UNSUPPORTED_SOURCE_GAP,
+            }:
+                continue
+            if record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR:
+                if self._generic_ir_executor is None:
+                    raise GameLifecycleError(
+                        "Executable faction generic-IR evidence requires a registered executor: "
+                        f"{record.execution_id}."
+                    )
+                active_ids.append(record.execution_id)
+                continue
+            if record.execution_status is Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER:
+                if record.handler_id is None:
+                    raise GameLifecycleError(
+                        "Executable faction named-handler evidence lacks a handler ID: "
+                        f"{record.execution_id}."
+                    )
+                if (
+                    record.handler_id not in self._named_handlers
+                    and record.handler_id not in validated_active_handler_ids
+                ):
+                    raise GameLifecycleError(
+                        "Executable faction named-handler evidence requires a registered handler: "
+                        f"{record.execution_id} -> {record.handler_id}."
+                    )
+                active_ids.append(record.execution_id)
+                continue
+            raise GameLifecycleError("Unsupported Phase17F execution status.")
+        return tuple(active_ids)
+
     def record_by_execution_id(self, execution_id: str) -> Phase17FExecutionRecord:
         validated_id = _validate_identifier("execution_id", execution_id)
         record = self._records_by_execution_id.get(validated_id)

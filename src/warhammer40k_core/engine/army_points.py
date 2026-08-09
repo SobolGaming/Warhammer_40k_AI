@@ -609,11 +609,13 @@ def _mfm_enhancement_for_assignment(
         for detachment in selected_detachments
         for mfm_enhancement in detachment.enhancements
     )
-    requested_ids = (assignment.enhancement_id, source_label_slug(enhancement.name))
     matches = tuple(
         mfm_enhancement
         for mfm_enhancement in selected_enhancements
-        if mfm_enhancement.enhancement_id in requested_ids
+        if _mfm_enhancement_matches_catalog_definition(
+            mfm_enhancement=mfm_enhancement,
+            enhancement=enhancement,
+        )
     )
     if len(matches) != 1:
         raise ArmyPointsError("MFM enhancement assignment did not resolve to one enhancement.")
@@ -659,15 +661,29 @@ def _mfm_enhancement_for_catalog_enhancement(
     detachment: MfmDetachmentRecord,
     enhancement: EnhancementDefinition,
 ) -> MfmEnhancementRecord:
-    requested_ids = (enhancement.enhancement_id, source_label_slug(enhancement.name))
     matches = tuple(
         mfm_enhancement
         for mfm_enhancement in detachment.enhancements
-        if mfm_enhancement.enhancement_id in requested_ids
+        if _mfm_enhancement_matches_catalog_definition(
+            mfm_enhancement=mfm_enhancement,
+            enhancement=enhancement,
+        )
     )
     if len(matches) != 1:
         raise ArmyPointsError("MFM enhancement did not resolve to one enhancement.")
     return matches[0]
+
+
+def _mfm_enhancement_matches_catalog_definition(
+    *,
+    mfm_enhancement: MfmEnhancementRecord,
+    enhancement: EnhancementDefinition,
+) -> bool:
+    requested_ids = (enhancement.enhancement_id, source_label_slug(enhancement.name))
+    return (
+        mfm_enhancement.source_id == enhancement.source_id
+        or mfm_enhancement.enhancement_id in requested_ids
+    )
 
 
 def _mfm_faction_for_request(

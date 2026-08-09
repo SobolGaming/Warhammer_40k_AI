@@ -679,6 +679,11 @@ def test_july_runtime_affected_rows_link_to_stable_active_source_ids() -> None:
         stable_reference_ids_by_kind={
             "phase17e_descriptor_id": {
                 row.descriptor_id for row in faction_coverage_2026_27.coverage_rows()
+            }
+            | {
+                july_faction_packs_2026_07.daemonic_manifestation().predecessor_source_rule_id.removeprefix(
+                    "phase17f:"
+                )
             },
             "source_row_id": source_row_ids,
             "datasheet_id": _source_row_ids(source_json / "Datasheets.json"),
@@ -814,6 +819,34 @@ def test_july_daemonic_manifestation_artifact_is_current_and_executable() -> Non
         "select_healing_model",
         "submit_healing_revival_placement",
     ]
+
+    coverage_row = next(
+        row
+        for row in faction_coverage_2026_27.coverage_rows()
+        if row.faction_id == "chaos-daemons"
+        and row.coverage_kind is faction_coverage_2026_27.Phase17ECoverageKind.FACTION_ARMY_RULE
+    )
+    execution_record = next(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.coverage_descriptor_id == coverage_row.descriptor_id
+    )
+    active_runtime_row = next(
+        row
+        for row in generated_manifest.generated_runtime_content_rows()
+        if row.family is RuntimeContentModuleFamily.FACTION and row.content_id == "chaos-daemons"
+    )
+
+    assert coverage_row.descriptor_id == artifact.phase17e_descriptor_id
+    assert coverage_row.rule_name == artifact.rule_name
+    assert coverage_row.runtime_consumer_ids == tuple(artifact.runtime_consumer_ids)
+    assert execution_record.execution_id == artifact.phase17f_execution_id
+    assert execution_record.handler_id == artifact.runtime_consumer_ids[0]
+    assert artifact.phase17f_execution_id in active_runtime_row.execution_record_ids
+    assert artifact.predecessor_source_rule_id not in active_runtime_row.execution_record_ids
+    assert artifact.predecessor_source_rule_id not in {
+        record.execution_id for record in faction_execution_2026_27.execution_records()
+    }
 
 
 def test_july_chaos_daemons_runtime_artifact_is_current_and_contract_stable() -> None:

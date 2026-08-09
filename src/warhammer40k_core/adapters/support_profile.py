@@ -14,7 +14,10 @@ from warhammer40k_core.engine.faction_content.manifest import (
     RuntimeContentSemanticStatus,
     RuntimeContentSupportStatus,
 )
-from warhammer40k_core.engine.faction_content.runtime import runtime_content_manifest_for_ruleset
+from warhammer40k_core.engine.faction_content.runtime import (
+    build_runtime_content_bundle_for_armies,
+    runtime_content_manifest_for_ruleset,
+)
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.interaction_metadata import (
     DecisionInteractionSupportPayload,
@@ -94,12 +97,20 @@ def build_support_profile(*, config: GameConfig) -> SupportProfilePayload:
     if type(config) is not GameConfig:
         raise GameLifecycleError("Support profile requires a GameConfig.")
     armies = tuple(
-        muster_army(catalog=config.army_catalog, request=request)
+        muster_army(
+            catalog=config.army_catalog,
+            request=request,
+            model_geometries=config.model_geometries,
+        )
         for request in config.army_muster_requests
     )
     manifest = runtime_content_manifest_for_ruleset(
         ruleset_descriptor=config.ruleset_descriptor,
         config=config,
+    )
+    runtime_bundle = build_runtime_content_bundle_for_armies(
+        config=config,
+        armies=armies,
     )
     selected_content_ids = _selected_runtime_content_ids(config=config)
     runtime_rows = manifest.reachable_rows_for_content_ids(selected_content_ids)
@@ -143,6 +154,7 @@ def build_support_profile(*, config: GameConfig) -> SupportProfilePayload:
             config=config,
             armies=armies,
             runtime_manifest=manifest,
+            runtime_bundle=runtime_bundle,
         ),
     }
     return cast(SupportProfilePayload, validate_json_value(payload))

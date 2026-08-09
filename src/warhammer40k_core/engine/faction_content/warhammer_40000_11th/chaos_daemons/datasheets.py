@@ -103,50 +103,32 @@ TZEENTCH = _canonical_keyword("Tzeentch")
 NURGLE = _canonical_keyword("Nurgle")
 SLAANESH = _canonical_keyword("Slaanesh")
 
-_DATASHEET_ABILITY_SOURCE_PREFIX = (
-    "data-package:"
-    + "waha"
-    + "pedia:source-mirror:"
-    + "1"
-    + "0"
-    + "th-edition-2026-06-14:Datasheets_abilities:"
-)
-BLOODTHIRSTER_DAEMON_LORD_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000002582:4:description"
-BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID = (
-    f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000002582:5:description"
-)
-BLOODTHIRSTER_GREATER_DAEMON_SOURCE_ID = (
-    f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000002582:6:description"
-)
-SKARBRAND_GREATER_DAEMON_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001105:4:description"
-SKARBRAND_RAGE_EMBODIED_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001105:5:description"
-LORD_OF_CHANGE_DAEMON_LORD_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001120:4:description"
-LORD_OF_CHANGE_GREATER_DAEMON_SOURCE_ID = (
-    f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001120:6:description"
-)
-KAIROS_GREATER_DAEMON_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001117:4:description"
-GREAT_UNCLEAN_ONE_GREATER_DAEMON_SOURCE_ID = (
-    f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001130:5:description"
-)
-PLAGUEBEARERS_INFECTED_OUTBREAK_SOURCE_ID = (
-    f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001132:5:description"
-)
-KEEPER_DAEMON_LORD_SLAANESH_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001137:5:description"
-KEEPER_GREATER_DAEMON_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001137:7:description"
-ROTIGUS_GREATER_DAEMON_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001465:5:description"
-ROTIGUS_DELUGE_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001465:7:description"
-NURGLINGS_MISCHIEF_MAKERS_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001133:4:description"
-POXBRINGER_FECULENT_DESPAIR_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001467:6:description"
-SHALAXI_GREATER_DAEMON_SOURCE_ID = f"{_DATASHEET_ABILITY_SOURCE_PREFIX}000001648:4:description"
-GREATER_DAEMON_SHADOW_AURA_SOURCE_IDS = (
-    BLOODTHIRSTER_GREATER_DAEMON_SOURCE_ID,
-    SKARBRAND_GREATER_DAEMON_SOURCE_ID,
-    LORD_OF_CHANGE_GREATER_DAEMON_SOURCE_ID,
-    KAIROS_GREATER_DAEMON_SOURCE_ID,
-    GREAT_UNCLEAN_ONE_GREATER_DAEMON_SOURCE_ID,
-    ROTIGUS_GREATER_DAEMON_SOURCE_ID,
-    KEEPER_GREATER_DAEMON_SOURCE_ID,
-    SHALAXI_GREATER_DAEMON_SOURCE_ID,
+BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID = "000002582:daemon-lord-of-khorne-aura"
+BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID = "000002582:relentless-carnage"
+BLOODTHIRSTER_GREATER_DAEMON_ABILITY_ID = "000002582:greater-daemon-of-khorne-aura"
+SKARBRAND_GREATER_DAEMON_ABILITY_ID = "000001105:greater-daemon-of-khorne-aura"
+SKARBRAND_RAGE_EMBODIED_ABILITY_ID = "000001105:rage-embodied-aura"
+LORD_OF_CHANGE_DAEMON_LORD_ABILITY_ID = "000001120:daemon-lord-of-tzeentch-aura"
+LORD_OF_CHANGE_GREATER_DAEMON_ABILITY_ID = "000001120:greater-daemon-of-tzeentch-aura"
+KAIROS_GREATER_DAEMON_ABILITY_ID = "000001117:greater-daemon-of-tzeentch-aura"
+GREAT_UNCLEAN_ONE_GREATER_DAEMON_ABILITY_ID = "000001130:greater-daemon-of-nurgle-aura"
+PLAGUEBEARERS_INFECTED_OUTBREAK_ABILITY_ID = "000001132:infected-outbreak"
+KEEPER_DAEMON_LORD_SLAANESH_ABILITY_ID = "000001137:daemon-lord-of-slaanesh-aura"
+KEEPER_GREATER_DAEMON_ABILITY_ID = "000001137:greater-daemon-of-slaanesh-aura"
+ROTIGUS_GREATER_DAEMON_ABILITY_ID = "000001465:greater-daemon-of-nurgle-aura"
+ROTIGUS_DELUGE_ABILITY_ID = "000001465:deluge-of-nurgle-aura"
+NURGLINGS_MISCHIEF_MAKERS_ABILITY_ID = "000001133:mischief-makers"
+POXBRINGER_FECULENT_DESPAIR_ABILITY_ID = "000001467:feculent-despair-aura-psychic"
+SHALAXI_GREATER_DAEMON_ABILITY_ID = "000001648:greater-daemon-of-slaanesh-aura"
+GREATER_DAEMON_SHADOW_AURA_ABILITY_IDS = (
+    BLOODTHIRSTER_GREATER_DAEMON_ABILITY_ID,
+    SKARBRAND_GREATER_DAEMON_ABILITY_ID,
+    LORD_OF_CHANGE_GREATER_DAEMON_ABILITY_ID,
+    KAIROS_GREATER_DAEMON_ABILITY_ID,
+    GREAT_UNCLEAN_ONE_GREATER_DAEMON_ABILITY_ID,
+    ROTIGUS_GREATER_DAEMON_ABILITY_ID,
+    KEEPER_GREATER_DAEMON_ABILITY_ID,
+    SHALAXI_GREATER_DAEMON_ABILITY_ID,
 )
 
 KHORNE_HIT_MODIFIER_ID = (
@@ -197,57 +179,57 @@ def runtime_contribution() -> RuntimeContentContribution:
         hit_roll_modifier_bindings=(
             HitRollModifierBinding(
                 modifier_id=KHORNE_HIT_MODIFIER_ID,
-                source_id=BLOODTHIRSTER_DAEMON_LORD_SOURCE_ID,
+                source_id=BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID,
                 handler=daemon_lord_of_khorne_hit_roll_modifier,
             ),
             HitRollModifierBinding(
                 modifier_id=MISCHIEF_MAKERS_HIT_MODIFIER_ID,
-                source_id=NURGLINGS_MISCHIEF_MAKERS_SOURCE_ID,
+                source_id=NURGLINGS_MISCHIEF_MAKERS_ABILITY_ID,
                 handler=mischief_makers_hit_roll_modifier,
             ),
         ),
         movement_budget_modifier_bindings=(
             MovementBudgetModifierBinding(
                 modifier_id=DELUGE_MOVEMENT_MODIFIER_ID,
-                source_id=ROTIGUS_DELUGE_SOURCE_ID,
+                source_id=ROTIGUS_DELUGE_ABILITY_ID,
                 handler=deluge_movement_budget_modifier,
             ),
         ),
         objective_control_modifier_bindings=(
             ObjectiveControlModifierBinding(
                 modifier_id=DELUGE_OBJECTIVE_CONTROL_MODIFIER_ID,
-                source_id=ROTIGUS_DELUGE_SOURCE_ID,
+                source_id=ROTIGUS_DELUGE_ABILITY_ID,
                 handler=deluge_objective_control_modifier,
             ),
         ),
         weapon_profile_modifier_bindings=(
             WeaponProfileModifierBinding(
                 modifier_id=RAGE_EMBODIED_ATTACKS_MODIFIER_ID,
-                source_id=SKARBRAND_RAGE_EMBODIED_SOURCE_ID,
+                source_id=SKARBRAND_RAGE_EMBODIED_ABILITY_ID,
                 handler=rage_embodied_weapon_profile_modifier,
             ),
             WeaponProfileModifierBinding(
                 modifier_id=SLAANESH_AP_MODIFIER_ID,
-                source_id=KEEPER_DAEMON_LORD_SLAANESH_SOURCE_ID,
+                source_id=KEEPER_DAEMON_LORD_SLAANESH_ABILITY_ID,
                 handler=daemon_lord_of_slaanesh_weapon_profile_modifier,
             ),
             WeaponProfileModifierBinding(
                 modifier_id=TZEENTCH_STRENGTH_MODIFIER_ID,
-                source_id=LORD_OF_CHANGE_DAEMON_LORD_SOURCE_ID,
+                source_id=LORD_OF_CHANGE_DAEMON_LORD_ABILITY_ID,
                 handler=daemon_lord_of_tzeentch_weapon_profile_modifier,
             ),
         ),
         phase_end_objective_control_hook_bindings=(
             PhaseEndObjectiveControlHookBinding(
                 hook_id=INFECTED_OUTBREAK_HOOK_ID,
-                source_id=PLAGUEBEARERS_INFECTED_OUTBREAK_SOURCE_ID,
+                source_id=PLAGUEBEARERS_INFECTED_OUTBREAK_ABILITY_ID,
                 handler=infected_outbreak_sticky_objective_states,
             ),
         ),
         fight_phase_end_hook_bindings=(
             FightPhaseEndHookBinding(
                 hook_id=RELENTLESS_CARNAGE_HOOK_ID,
-                source_id=BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+                source_id=BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
                 request_handler=relentless_carnage_fight_phase_end_request,
                 result_handler=apply_relentless_carnage_fight_phase_end_result,
             ),
@@ -255,7 +237,7 @@ def runtime_contribution() -> RuntimeContentContribution:
         mortal_wound_feel_no_pain_hook_bindings=(
             MortalWoundFeelNoPainContinuationHookBinding(
                 hook_id=RELENTLESS_CARNAGE_FNP_HOOK_ID,
-                source_id=BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+                source_id=BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
                 source_kind=RELENTLESS_CARNAGE_SOURCE_KIND,
                 handler=apply_relentless_carnage_mortal_wound_feel_no_pain_decision,
             ),
@@ -263,7 +245,7 @@ def runtime_contribution() -> RuntimeContentContribution:
         battle_shock_hook_bindings=(
             BattleShockHookBinding(
                 hook_id=FECULENT_DESPAIR_HOOK_ID,
-                source_id=POXBRINGER_FECULENT_DESPAIR_SOURCE_ID,
+                source_id=POXBRINGER_FECULENT_DESPAIR_ABILITY_ID,
                 modifier_handler=feculent_despair_battle_shock_modifiers,
             ),
         ),
@@ -280,7 +262,7 @@ def daemon_lord_of_khorne_hit_roll_modifier(context: HitRollModifierContext) -> 
         if _friendly_keyworded_rules_unit_within_source_aura(
             state=context.state,
             target_unit_instance_id=context.attacking_unit_instance_id,
-            source_ability_id=BLOODTHIRSTER_DAEMON_LORD_SOURCE_ID,
+            ability_id=BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID,
             required_god_keyword=KHORNE,
         )
         else 0
@@ -297,13 +279,13 @@ def daemon_lord_of_tzeentch_weapon_profile_modifier(
     if not _friendly_keyworded_rules_unit_within_source_aura(
         state=context.state,
         target_unit_instance_id=context.attacking_unit_instance_id,
-        source_ability_id=LORD_OF_CHANGE_DAEMON_LORD_SOURCE_ID,
+        ability_id=LORD_OF_CHANGE_DAEMON_LORD_ABILITY_ID,
         required_god_keyword=TZEENTCH,
     ):
         return context.weapon_profile
     return _profile_with_strength_modifier(
         profile=context.weapon_profile,
-        source_id=LORD_OF_CHANGE_DAEMON_LORD_SOURCE_ID,
+        source_id=LORD_OF_CHANGE_DAEMON_LORD_ABILITY_ID,
     )
 
 
@@ -317,13 +299,13 @@ def rage_embodied_weapon_profile_modifier(
     if not _friendly_keyworded_rules_unit_within_source_aura(
         state=context.state,
         target_unit_instance_id=context.attacking_unit_instance_id,
-        source_ability_id=SKARBRAND_RAGE_EMBODIED_SOURCE_ID,
+        ability_id=SKARBRAND_RAGE_EMBODIED_ABILITY_ID,
         required_god_keyword=KHORNE,
     ):
         return context.weapon_profile
     return _profile_with_attack_modifier(
         profile=context.weapon_profile,
-        source_id=SKARBRAND_RAGE_EMBODIED_SOURCE_ID,
+        source_id=SKARBRAND_RAGE_EMBODIED_ABILITY_ID,
     )
 
 
@@ -337,13 +319,13 @@ def daemon_lord_of_slaanesh_weapon_profile_modifier(
     if not _friendly_keyworded_rules_unit_within_source_aura(
         state=context.state,
         target_unit_instance_id=context.attacking_unit_instance_id,
-        source_ability_id=KEEPER_DAEMON_LORD_SLAANESH_SOURCE_ID,
+        ability_id=KEEPER_DAEMON_LORD_SLAANESH_ABILITY_ID,
         required_god_keyword=SLAANESH,
     ):
         return context.weapon_profile
     return _profile_with_ap_modifier(
         profile=context.weapon_profile,
-        source_id=KEEPER_DAEMON_LORD_SLAANESH_SOURCE_ID,
+        source_id=KEEPER_DAEMON_LORD_SLAANESH_ABILITY_ID,
     )
 
 
@@ -353,7 +335,7 @@ def deluge_movement_budget_modifier(context: MovementBudgetModifierContext) -> f
     if not _enemy_rules_unit_within_source_aura(
         state=context.state,
         target_unit_instance_id=context.unit_instance_id,
-        source_ability_id=ROTIGUS_DELUGE_SOURCE_ID,
+        ability_id=ROTIGUS_DELUGE_ABILITY_ID,
     ):
         return context.current_movement_inches
     return max(0.0, context.current_movement_inches - 2.0)
@@ -365,7 +347,7 @@ def deluge_objective_control_modifier(context: ObjectiveControlModifierContext) 
     if not _enemy_rules_unit_within_source_aura(
         state=context.state,
         target_unit_instance_id=context.unit_instance_id,
-        source_ability_id=ROTIGUS_DELUGE_SOURCE_ID,
+        ability_id=ROTIGUS_DELUGE_ABILITY_ID,
     ):
         return context.current_objective_control
     return max(0, context.current_objective_control - 1)
@@ -389,7 +371,7 @@ def mischief_makers_hit_roll_modifier(context: HitRollModifierContext) -> int:
         if _enemy_rules_unit_within_source_engagement_range(
             state=context.state,
             target_unit_instance_id=context.attacking_unit_instance_id,
-            source_ability_id=NURGLINGS_MISCHIEF_MAKERS_SOURCE_ID,
+            ability_id=NURGLINGS_MISCHIEF_MAKERS_ABILITY_ID,
         )
         else 0
     )
@@ -403,14 +385,14 @@ def feculent_despair_battle_shock_modifiers(
     source_player_ids = _enemy_source_aura_player_ids(
         state=context.state,
         target_unit_instance_id=context.request.unit_instance_id,
-        source_ability_id=POXBRINGER_FECULENT_DESPAIR_SOURCE_ID,
+        ability_id=POXBRINGER_FECULENT_DESPAIR_ABILITY_ID,
     )
     return tuple(
         RollModifier(
             modifier_id=(
                 f"{FECULENT_DESPAIR_HOOK_ID}:{context.request.request_id}:{source_player_id}"
             ),
-            source_id=POXBRINGER_FECULENT_DESPAIR_SOURCE_ID,
+            source_id=POXBRINGER_FECULENT_DESPAIR_ABILITY_ID,
             operand=-1,
         )
         for source_player_id in source_player_ids
@@ -439,9 +421,9 @@ def infected_outbreak_sticky_objective_states(
         if army.player_id != active_player_id:
             continue
         for source_unit in army.units:
-            if not _unit_has_datasheet_ability_source(
+            if not _unit_has_datasheet_ability(
                 source_unit,
-                PLAGUEBEARERS_INFECTED_OUTBREAK_SOURCE_ID,
+                PLAGUEBEARERS_INFECTED_OUTBREAK_ABILITY_ID,
             ):
                 continue
             if not source_unit.alive_own_models():
@@ -480,9 +462,9 @@ def relentless_carnage_fight_phase_end_request(
     active_player_id = _active_player_id(context.state)
     for army in _chaos_daemons_armies(context.state):
         for source_unit in army.units:
-            if not _unit_has_datasheet_ability_source(
+            if not _unit_has_datasheet_ability(
                 source_unit,
-                BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+                BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
             ):
                 continue
             if not source_unit.alive_own_models():
@@ -514,7 +496,7 @@ def relentless_carnage_fight_phase_end_request(
                     "active_player_id": active_player_id,
                     "phase": BattlePhase.FIGHT.value,
                     "player_id": army.player_id,
-                    "source_rule_id": BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+                    "source_rule_id": BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
                     "hook_id": RELENTLESS_CARNAGE_HOOK_ID,
                     "source_unit_instance_id": source_unit.unit_instance_id,
                     "source_rules_unit_instance_id": source_rules_unit.unit_instance_id,
@@ -640,7 +622,7 @@ def apply_relentless_carnage_fight_phase_end_result(
             f"round-{context.state.battle_round:02d}:"
             f"{source_rules_unit_id}:{target_enemy_unit_id}:{context.result.result_id}"
         ),
-        source_rule_id=BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+        source_rule_id=BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
         source_context=validate_json_value(
             _relentless_carnage_mortal_wound_source_context(resolution_payload=resolution_payload)
         ),
@@ -706,7 +688,7 @@ def _friendly_keyworded_rules_unit_within_source_aura(
     *,
     state: object,
     target_unit_instance_id: str,
-    source_ability_id: str,
+    ability_id: str,
     required_god_keyword: str,
 ) -> bool:
     from warhammer40k_core.engine.game_state import GameState
@@ -739,7 +721,7 @@ def _friendly_keyworded_rules_unit_within_source_aura(
         if army.player_id != target_rules_unit.owner_player_id:
             continue
         for source_unit in army.units:
-            if not _unit_has_datasheet_ability_source(source_unit, source_ability_id):
+            if not _unit_has_datasheet_ability(source_unit, ability_id):
                 continue
             source_models = _alive_geometry_models_for_unit(
                 state=state,
@@ -759,13 +741,13 @@ def _enemy_rules_unit_within_source_aura(
     *,
     state: object,
     target_unit_instance_id: str,
-    source_ability_id: str,
+    ability_id: str,
 ) -> bool:
     return bool(
         _enemy_source_aura_player_ids(
             state=state,
             target_unit_instance_id=target_unit_instance_id,
-            source_ability_id=source_ability_id,
+            ability_id=ability_id,
         )
     )
 
@@ -774,7 +756,7 @@ def _enemy_source_aura_player_ids(
     *,
     state: object,
     target_unit_instance_id: str,
-    source_ability_id: str,
+    ability_id: str,
 ) -> tuple[str, ...]:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -802,7 +784,7 @@ def _enemy_source_aura_player_ids(
         if army.player_id == target_rules_unit.owner_player_id:
             continue
         for source_unit in army.units:
-            if not _unit_has_datasheet_ability_source(source_unit, source_ability_id):
+            if not _unit_has_datasheet_ability(source_unit, ability_id):
                 continue
             source_models = _alive_geometry_models_for_unit(
                 state=state,
@@ -823,7 +805,7 @@ def _enemy_rules_unit_within_source_engagement_range(
     *,
     state: object,
     target_unit_instance_id: str,
-    source_ability_id: str,
+    ability_id: str,
 ) -> bool:
     from warhammer40k_core.engine.game_state import GameState
 
@@ -852,7 +834,7 @@ def _enemy_rules_unit_within_source_engagement_range(
         if army.player_id == target_rules_unit.owner_player_id:
             continue
         for source_unit in army.units:
-            if not _unit_has_datasheet_ability_source(source_unit, source_ability_id):
+            if not _unit_has_datasheet_ability(source_unit, ability_id):
                 continue
             source_models = _alive_geometry_models_for_unit(
                 state=state,
@@ -889,7 +871,7 @@ def _infected_outbreak_sticky_state(
         game_id=context.state.game_id,
         player_id=player_id,
         objective_id=objective_id,
-        source_rule_id=PLAGUEBEARERS_INFECTED_OUTBREAK_SOURCE_ID,
+        source_rule_id=PLAGUEBEARERS_INFECTED_OUTBREAK_ABILITY_ID,
         source_event_id=source_event_id,
         battle_round=context.state.battle_round,
         phase=context.completed_phase.value,
@@ -899,7 +881,7 @@ def _infected_outbreak_sticky_state(
         replay_payload=validate_json_value(
             {
                 "effect_kind": "chaos_daemons_plaguebearers_infected_outbreak",
-                "source_rule_id": PLAGUEBEARERS_INFECTED_OUTBREAK_SOURCE_ID,
+                "source_rule_id": PLAGUEBEARERS_INFECTED_OUTBREAK_ABILITY_ID,
                 "hook_id": INFECTED_OUTBREAK_HOOK_ID,
                 "player_id": player_id,
                 "objective_id": objective_id,
@@ -931,7 +913,7 @@ def _relentless_carnage_decline_option(
             "active_player_id": active_player_id,
             "phase": BattlePhase.FIGHT.value,
             "player_id": player_id,
-            "source_rule_id": BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+            "source_rule_id": BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
             "hook_id": RELENTLESS_CARNAGE_HOOK_ID,
             "source_unit_instance_id": source_unit_instance_id,
             "source_rules_unit_instance_id": source_rules_unit_instance_id,
@@ -964,7 +946,7 @@ def _relentless_carnage_target_option(
             "active_player_id": active_player_id,
             "phase": BattlePhase.FIGHT.value,
             "player_id": player_id,
-            "source_rule_id": BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+            "source_rule_id": BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
             "hook_id": RELENTLESS_CARNAGE_HOOK_ID,
             "source_unit_instance_id": source_unit_instance_id,
             "source_rules_unit_instance_id": source_rules_unit_instance_id,
@@ -1016,7 +998,7 @@ def _resolve_routed_relentless_carnage_mortal_wounds(
             payload={
                 "phase": BattlePhase.FIGHT.value,
                 "decision_type": SELECT_FEEL_NO_PAIN_DECISION_TYPE,
-                "source_rule_id": BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+                "source_rule_id": BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
                 "source_kind": RELENTLESS_CARNAGE_SOURCE_KIND,
                 "target_unit_instance_id": resolution_payload["target_enemy_unit_instance_id"],
                 "remaining_mortal_wounds": routed_progress.remaining_mortal_wounds,
@@ -1051,7 +1033,7 @@ def _relentless_carnage_base_resolution_payload(
         "active_player_id": _active_player_id(context.state),
         "phase": BattlePhase.FIGHT.value,
         "player_id": player_id,
-        "source_rule_id": BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+        "source_rule_id": BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
         "hook_id": RELENTLESS_CARNAGE_HOOK_ID,
         "source_unit_instance_id": source_unit_instance_id,
         "source_rules_unit_instance_id": source_rules_unit_instance_id,
@@ -1125,9 +1107,9 @@ def _validate_current_relentless_carnage_source(
         context="Relentless Carnage",
     )
     source_unit = _unit_by_id(army.units, unit_instance_id=source_unit_instance_id)
-    if not _unit_has_datasheet_ability_source(
+    if not _unit_has_datasheet_ability(
         source_unit,
-        BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+        BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
     ):
         raise GameLifecycleError("Relentless Carnage source ability is missing.")
     alive_source_models = source_unit.alive_own_models()
@@ -1167,7 +1149,7 @@ def _relentless_carnage_recorded_this_fight_end(
         }:
             continue
         payload = _payload_object(event.payload, field_name="Relentless Carnage event payload")
-        if payload.get("source_rule_id") != BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID:
+        if payload.get("source_rule_id") != BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID:
             continue
         if payload.get("phase") != BattlePhase.FIGHT.value:
             continue
@@ -1424,13 +1406,13 @@ def _rules_unit_has_keywords(
     return all(_canonical_keyword(keyword) in keyword_tokens for keyword in required_keywords)
 
 
-def _unit_has_datasheet_ability_source(unit: UnitInstance, source_id: str) -> bool:
+def _unit_has_datasheet_ability(unit: UnitInstance, ability_id: str) -> bool:
     if type(unit) is not UnitInstance:
         raise GameLifecycleError("Datasheet ability lookup requires UnitInstance.")
-    requested_source_id = _validate_identifier("source_id", source_id)
+    requested_ability_id = _validate_identifier("ability_id", ability_id)
     return any(
         ability.source_kind is CatalogAbilitySourceKind.DATASHEET
-        and ability.source_id == requested_source_id
+        and ability.ability_id == requested_ability_id
         for ability in unit.datasheet_abilities
     )
 

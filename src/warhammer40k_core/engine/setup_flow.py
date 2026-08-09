@@ -623,7 +623,13 @@ class SetupFlow:
             if request.player_id not in missing_player_ids:
                 continue
             try:
-                army_definitions.append(muster_army(catalog=config.army_catalog, request=request))
+                army_definitions.append(
+                    muster_army(
+                        catalog=config.army_catalog,
+                        request=request,
+                        model_geometries=config.model_geometries,
+                    )
+                )
             except ArmyMusteringError as exc:
                 raise GameLifecycleError("MUSTER_ARMIES failed during army mustering.") from exc
         for army_definition in army_definitions:

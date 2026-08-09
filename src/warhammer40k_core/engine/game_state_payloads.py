@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 from warhammer40k_core.core.army_catalog import ArmyCatalogPayload
+from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecordPayload
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptorPayload
 from warhammer40k_core.engine.actions import MissionActionStatePayload
 from warhammer40k_core.engine.aircraft import HoverModeStatePayload
@@ -83,6 +84,7 @@ class GameConfigPayload(TypedDict):
     max_lifecycle_transitions: int
     mission_setup: MissionSetupPayload | None
     reserve_unit_points: list[ReserveUnitPointValuePayload]
+    model_geometries: NotRequired[list[ModelGeometryCatalogRecordPayload]]
 
 
 class SecondaryMissionChoicePayload(TypedDict):

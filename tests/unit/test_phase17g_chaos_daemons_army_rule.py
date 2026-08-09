@@ -255,7 +255,7 @@ def test_daemonic_manifestation_uses_source_backed_greater_daemon_shadow_aura() 
         unit_instance_id=source_unit_id,
         keywords=("Character", "Monster", "Khorne"),
         faction_keywords=("Legiones Daemonica",),
-        datasheet_abilities=(_datasheet_ability(datasheets.SKARBRAND_GREATER_DAEMON_SOURCE_ID),),
+        datasheet_abilities=(_datasheet_ability(datasheets.SKARBRAND_GREATER_DAEMON_ABILITY_ID),),
     )
     _replace_unit_keywords_and_abilities(
         state,
@@ -290,14 +290,14 @@ def test_daemonic_manifestation_uses_source_backed_greater_daemon_shadow_aura() 
 def test_greater_daemon_shadow_aura_host_table_covers_all_datasheet_sources() -> None:
     assert (
         tuple(
-            source_id
-            for source_id, _keyword in army_rule.GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID
+            ability_id
+            for ability_id, _keyword in army_rule.GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_ABILITY_ID
         )
-        == datasheets.GREATER_DAEMON_SHADOW_AURA_SOURCE_IDS
+        == datasheets.GREATER_DAEMON_SHADOW_AURA_ABILITY_IDS
     )
     assert tuple(
         keyword
-        for _source_id, keyword in army_rule.GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID
+        for _ability_id, keyword in army_rule.GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_ABILITY_ID
     ) == (
         "KHORNE",
         "KHORNE",
@@ -881,11 +881,13 @@ def test_default_june_daemonic_manifestation_battleline_branch_remains_unsupport
 
 def test_chaos_daemons_army_rule_hook_uses_phase17f_execution_source_id() -> None:
     record = _chaos_daemons_army_rule_execution_record()
-    contribution = army_rule.runtime_contribution()
+    contribution = army_rule.staged_july_runtime_contribution()
     binding = contribution.battle_shock_hook_bindings[0]
 
-    assert record.execution_id == army_rule.SOURCE_RULE_ID
+    assert record.execution_id == army_rule.JULY_SOURCE_RULE_ID
+    assert record.handler_id == army_rule.JULY_HOOK_ID
     assert binding.source_id == record.execution_id
+    assert binding.hook_id == record.handler_id
 
 
 def test_lifecycle_loads_chaos_daemons_battle_shock_hook_from_runtime_manifest() -> None:
@@ -902,7 +904,8 @@ def test_lifecycle_loads_chaos_daemons_battle_shock_hook_from_runtime_manifest()
     summary = bundle.to_summary_payload()
 
     assert army_rule.JULY_HOOK_ID in summary["battle_shock_hook_ids"]
-    assert army_rule.SOURCE_RULE_ID in summary["selected_execution_record_ids"]
+    assert army_rule.JULY_SOURCE_RULE_ID in summary["selected_execution_record_ids"]
+    assert army_rule.SOURCE_RULE_ID not in summary["selected_execution_record_ids"]
     assert any(
         path.endswith(".chaos_daemons.july_2026") for path in summary["selected_module_paths"]
     )
@@ -973,7 +976,7 @@ def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds()
         keywords=("Character", "Monster", "Khorne"),
         faction_keywords=("Legiones Daemonica",),
         datasheet_abilities=(
-            _datasheet_ability(datasheets.BLOODTHIRSTER_GREATER_DAEMON_SOURCE_ID),
+            _datasheet_ability(datasheets.BLOODTHIRSTER_GREATER_DAEMON_ABILITY_ID),
         ),
     )
     state.active_player_id = "player-b"
@@ -1378,12 +1381,11 @@ def _replace_unit_keywords_and_abilities(
     state.army_definitions = updated_armies
 
 
-def _datasheet_ability(source_id: str) -> DatasheetAbilityDescriptor:
-    ability_id_suffix = source_id.split("Datasheets_abilities:", maxsplit=1)[1].replace(":", "-")
+def _datasheet_ability(ability_id: str) -> DatasheetAbilityDescriptor:
     return DatasheetAbilityDescriptor(
-        ability_id=f"phase17g-chaos-daemons-army-rule:{ability_id_suffix}",
+        ability_id=ability_id,
         name="Source Backed Datasheet Ability",
-        source_id=source_id,
+        source_id=f"data-package:core-v2:phase17g-chaos-army-rule-test:{ability_id}",
         support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
         source_kind=CatalogAbilitySourceKind.DATASHEET,
         effect_description="source-backed datasheet test ability",

@@ -97,9 +97,10 @@ class CanonicalCatalogPackage:
             )
         model_geometries = _validate_model_geometry_tuple(self.model_geometries)
         diagnostics = _validate_diagnostic_tuple(self.diagnostics)
-        _validate_every_model_profile_has_geometry(
+        _validate_model_profile_geometry_coverage(
             catalog=self.army_catalog,
             model_geometries=model_geometries,
+            diagnostics=diagnostics,
         )
         object.__setattr__(self, "model_geometries", model_geometries)
         object.__setattr__(self, "diagnostics", diagnostics)
@@ -159,10 +160,11 @@ class CanonicalCatalogPackage:
         }
 
 
-def _validate_every_model_profile_has_geometry(
+def _validate_model_profile_geometry_coverage(
     *,
     catalog: ArmyCatalog,
     model_geometries: tuple[ModelGeometryCatalogRecord, ...],
+    diagnostics: tuple[ModelGeometryImportDiagnostic, ...],
 ) -> None:
     model_profile_ids = {
         model_profile.model_profile_id
@@ -170,7 +172,18 @@ def _validate_every_model_profile_has_geometry(
         for model_profile in datasheet.model_profiles
     }
     geometry_profile_ids = {record.model_profile_id for record in model_geometries}
-    missing = sorted(model_profile_ids.difference(geometry_profile_ids))
+    diagnostic_profile_ids = {
+        diagnostic.model_profile_id for diagnostic in diagnostics if diagnostic.blocking
+    }
+    overlap = sorted(geometry_profile_ids.intersection(diagnostic_profile_ids))
+    if overlap:
+        raise CanonicalCatalogPackageError(
+            "CanonicalCatalogPackage has both geometry and a blocking diagnostic for: "
+            + ", ".join(overlap)
+        )
+    missing = sorted(
+        model_profile_ids.difference(geometry_profile_ids).difference(diagnostic_profile_ids)
+    )
     if missing:
         raise CanonicalCatalogPackageError(
             "CanonicalCatalogPackage missing model geometry for: " + ", ".join(missing)
@@ -180,6 +193,12 @@ def _validate_every_model_profile_has_geometry(
         raise CanonicalCatalogPackageError(
             "CanonicalCatalogPackage has model geometry for unknown profiles: " + ", ".join(extra)
         )
+    unknown_diagnostics = sorted(diagnostic_profile_ids.difference(model_profile_ids))
+    if unknown_diagnostics:
+        raise CanonicalCatalogPackageError(
+            "CanonicalCatalogPackage has geometry diagnostics for unknown profiles: "
+            + ", ".join(unknown_diagnostics)
+        )
 
 
 def _validate_model_geometry_tuple(
@@ -188,10 +207,6 @@ def _validate_model_geometry_tuple(
     if type(values) is not tuple:
         raise CanonicalCatalogPackageError(
             "CanonicalCatalogPackage model_geometries must be a tuple."
-        )
-    if not values:
-        raise CanonicalCatalogPackageError(
-            "CanonicalCatalogPackage model_geometries must not be empty."
         )
     seen: set[str] = set()
     validated: list[ModelGeometryCatalogRecord] = []

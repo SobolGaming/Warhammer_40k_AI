@@ -126,8 +126,8 @@ ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:unit-characteristic",
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:weapon-profile",
 )
-CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_IDS = (
-    "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",
+CHAOS_DAEMONS_DAEMONIC_MANIFESTATION_RUNTIME_CONSUMER_IDS = (
+    "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026",
 )
 CHAOS_KNIGHTS_HARBINGERS_OF_DREAD_RUNTIME_CONSUMER_IDS = (
     "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread",
@@ -248,7 +248,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "aeldari": "Battle Focus",
     "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",
-    "chaos-daemons": "The Shadow of Chaos",
+    "chaos-daemons": "Daemonic Manifestation",
     "chaos-knights": "Harbingers of Dread",
     "chaos-space-marines": "Dark Pacts",
     "death-guard": "Nurgle's Gift",
@@ -273,7 +273,7 @@ FACTION_ARMY_RULE_RUNTIME_CONSUMER_IDS_BY_FACTION_ID = {
     "aeldari": AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMER_IDS,
     "astra-militarum": ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMER_IDS,
     "black-templars": BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMER_IDS,
-    "chaos-daemons": CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMER_IDS,
+    "chaos-daemons": CHAOS_DAEMONS_DAEMONIC_MANIFESTATION_RUNTIME_CONSUMER_IDS,
     "chaos-knights": CHAOS_KNIGHTS_HARBINGERS_OF_DREAD_RUNTIME_CONSUMER_IDS,
     "chaos-space-marines": CHAOS_SPACE_MARINES_DARK_PACTS_RUNTIME_CONSUMER_IDS,
     "death-guard": DEATH_GUARD_NURGLES_GIFT_RUNTIME_CONSUMER_IDS,
@@ -831,32 +831,72 @@ def _promote_current_successor_rows(
         july_faction_packs_2026_07,
     )
 
-    successor = july_faction_packs_2026_07.exalted_patron().execution_record()
+    exalted_patron_successor = july_faction_packs_2026_07.exalted_patron().execution_record()
+    daemonic_manifestation_successor = july_faction_packs_2026_07.daemonic_manifestation()
     current_runtime_status = faction_subrules_2026_27.SourceSubruleRuntimeStatus.ENGINE_CONSUMED
-    if successor.runtime_support_status != current_runtime_status.value:
+    if exalted_patron_successor.runtime_support_status != current_runtime_status.value:
         raise Phase17EFactionCoverageError("July Exalted Patron successor must be engine-consumed.")
     promoted: list[Phase17ECoverageRow] = []
-    replacements = 0
+    exalted_patron_replacements = 0
+    daemonic_manifestation_replacements = 0
     for row in rows:
-        if row.descriptor_id != successor.coverage_descriptor_id:
-            promoted.append(row)
-            continue
-        promoted.append(
-            replace(
-                row,
-                status=Phase17ECoverageStatus.GENERIC_SUPPORTED,
-                source_ids=successor.source_ids,
-                source_pdf_package_id=successor.source_pdf_package_id,
-                runtime_support_status=current_runtime_status,
-                runtime_consumer_ids=successor.runtime_consumer_ids,
-                handler_id=None,
-                rule_ir_hash=successor.rule_ir_hash,
+        if row.descriptor_id == exalted_patron_successor.coverage_descriptor_id:
+            promoted.append(
+                replace(
+                    row,
+                    status=Phase17ECoverageStatus.GENERIC_SUPPORTED,
+                    source_ids=exalted_patron_successor.source_ids,
+                    source_pdf_package_id=exalted_patron_successor.source_pdf_package_id,
+                    runtime_support_status=current_runtime_status,
+                    runtime_consumer_ids=exalted_patron_successor.runtime_consumer_ids,
+                    handler_id=None,
+                    rule_ir_hash=exalted_patron_successor.rule_ir_hash,
+                )
             )
-        )
-        replacements += 1
-    if replacements != 1:
+            exalted_patron_replacements += 1
+            continue
+
+        if f"phase17f:{row.descriptor_id}" == (
+            daemonic_manifestation_successor.predecessor_source_rule_id
+        ):
+            if (
+                row.coverage_kind is not Phase17ECoverageKind.FACTION_ARMY_RULE
+                or row.faction_id != "chaos-daemons"
+            ):
+                raise Phase17EFactionCoverageError(
+                    "July Daemonic Manifestation predecessor identity drifted."
+                )
+            promoted.append(
+                replace(
+                    row,
+                    descriptor_id=daemonic_manifestation_successor.phase17e_descriptor_id,
+                    status=Phase17ECoverageStatus.IMPLEMENTED,
+                    source_ids=(
+                        daemonic_manifestation_successor.source_row_id,
+                        *row.source_ids,
+                    ),
+                    source_pdf_package_id=(daemonic_manifestation_successor.source_pdf_package_id),
+                    rule_name=daemonic_manifestation_successor.rule_name,
+                    runtime_support_status=current_runtime_status,
+                    runtime_consumer_ids=tuple(
+                        daemonic_manifestation_successor.runtime_consumer_ids
+                    ),
+                    handler_id=daemonic_manifestation_successor.runtime_consumer_ids[0],
+                    rule_ir_hash=None,
+                    unsupported_reason=None,
+                )
+            )
+            daemonic_manifestation_replacements += 1
+            continue
+
+        promoted.append(row)
+    if exalted_patron_replacements != 1:
         raise Phase17EFactionCoverageError(
             "July coverage package requires exactly one Exalted Patron predecessor."
+        )
+    if daemonic_manifestation_replacements != 1:
+        raise Phase17EFactionCoverageError(
+            "July coverage package requires exactly one Daemonic Manifestation predecessor."
         )
     return tuple(promoted)
 

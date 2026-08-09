@@ -6,8 +6,13 @@ from typing import cast
 
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
+from tests.model_geometry_helpers import accepted_model_geometry
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.model_geometry_catalog import (
+    ModelGeometryCatalogRecord,
+    ModelGeometryCatalogRecordPayload,
+)
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     BattlePhaseSequenceDescriptor,
@@ -29,6 +34,7 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
+from warhammer40k_core.engine.game_state_payloads import GameConfigPayload
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -62,6 +68,7 @@ from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
     WargearSelection,
 )
+from warhammer40k_core.geometry.model_geometry import GeometrySourceKind, HeightSourceKind
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
@@ -71,6 +78,7 @@ def _config(
     army_catalog: ArmyCatalog | None = None,
     army_muster_requests: tuple[ArmyMusterRequest, ...] | None = None,
     max_lifecycle_transitions: int = DEFAULT_MAX_LIFECYCLE_TRANSITIONS,
+    model_geometries: tuple[ModelGeometryCatalogRecord, ...] | None = None,
 ) -> GameConfig:
     descriptor = ruleset_descriptor
     if descriptor is None:
@@ -95,6 +103,7 @@ def _config(
         ),
         max_lifecycle_transitions=max_lifecycle_transitions,
         mission_setup=_mission_setup(),
+        model_geometries=model_geometries,
     )
 
 
@@ -449,6 +458,79 @@ def test_lifecycle_muster_armies_consumes_requests_and_records_runtime_armies() 
         for event in lifecycle.decision_controller.event_log.records
         if event.event_type == "army_mustered" and isinstance(event.payload, dict)
     ] == ["player-a", "player-b"]
+
+
+def test_game_config_model_geometries_round_trip_only_when_present() -> None:
+    config_without_reviewed_geometry = _config()
+    payload_without_reviewed_geometry = config_without_reviewed_geometry.to_payload()
+
+    assert "model_geometries" not in payload_without_reviewed_geometry
+    assert GameConfig.from_payload(payload_without_reviewed_geometry).model_geometries is None
+
+    geometry = accepted_model_geometry()
+    config_with_reviewed_geometry = _config(model_geometries=(geometry,))
+    payload_with_reviewed_geometry = config_with_reviewed_geometry.to_payload()
+
+    assert payload_with_reviewed_geometry.get("model_geometries") == [geometry.to_payload()]
+    assert GameConfig.from_payload(payload_with_reviewed_geometry).to_payload() == (
+        payload_with_reviewed_geometry
+    )
+
+
+def test_lifecycle_mustering_uses_game_config_reviewed_model_geometry() -> None:
+    geometry = accepted_model_geometry()
+    lifecycle = _start_lifecycle(_config(model_geometries=(geometry,)))
+
+    status = lifecycle.advance_until_decision_or_terminal()
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert lifecycle.state is not None
+    for army in lifecycle.state.army_definitions:
+        model_geometry = army.units[0].own_models[0].geometry
+        assert model_geometry.geometry_source_kind is GeometrySourceKind.CATALOG_GEOMETRY_RECORD
+        assert model_geometry.height_source_kind is HeightSourceKind.CATALOG_GEOMETRY_RECORD
+        assert model_geometry.height_inches == 1.55
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(payload)
+    assert restored.config.model_geometries == (geometry,)
+    assert restored.to_payload() == lifecycle.to_payload()
+
+
+def test_game_config_rejects_model_geometry_for_unknown_catalog_profile() -> None:
+    with pytest.raises(GameLifecycleError, match="unknown catalog model profile"):
+        _config(model_geometries=(accepted_model_geometry("unknown-model-profile"),))
+
+
+def test_game_config_payload_rejects_structurally_incomplete_model_geometry() -> None:
+    payload = cast(
+        GameConfigPayload,
+        json.loads(
+            json.dumps(
+                _config(model_geometries=(accepted_model_geometry(),)).to_payload(),
+                sort_keys=True,
+            )
+        ),
+    )
+    assert "model_geometries" in payload
+    geometry_payload = cast(
+        dict[str, object],
+        cast(object, payload["model_geometries"][0]),
+    )
+    del geometry_payload["support_base"]
+
+    with pytest.raises(GameLifecycleError, match="model_geometries payload is invalid"):
+        GameConfig.from_payload(payload)
+
+
+def test_game_config_payload_rejects_non_record_model_geometry() -> None:
+    payload = _config().to_payload()
+    payload["model_geometries"] = cast(list[ModelGeometryCatalogRecordPayload], [1])
+
+    with pytest.raises(GameLifecycleError, match="model_geometries payload is invalid"):
+        GameConfig.from_payload(payload)
 
 
 def test_lifecycle_replay_payload_preserves_mustered_army_definitions() -> None:

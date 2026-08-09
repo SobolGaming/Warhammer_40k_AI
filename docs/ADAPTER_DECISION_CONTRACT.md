@@ -142,6 +142,19 @@ decision path. Adapters normalize the external roster once into a versioned
 `ArmyMusterRequest` is the only roster input passed to `GameConfig` and the
 ordinary setup lifecycle.
 
+`GameConfig.model_geometries` is an optional tuple of accepted,
+source-attributed `ModelGeometryCatalogRecord` values. When present, every
+record must reference a model profile in the accompanying `army_catalog`, the
+tuple must cover every model profile selected by the muster requests, and the
+same records flow through setup mustering, support-profile evaluation, runtime
+content activation, and replay serialization. The create-session schema accepts
+the corresponding optional `model_geometries` array. Omission is the explicit
+legal state for a configuration with no reviewed model geometry; models then
+retain their existing heuristic height provenance and must not be reported as
+physically supported merely because mustering succeeded. Adapters must not
+invent measurements, silently replace missing records, or send an empty array
+as a substitute for omission.
+
 Unit-scoped resources obtained through optional wargear are selected through
 the ordinary `UnitMusterSelection.wargear_selections` contract. Adapters submit
 the source-backed wargear option ID, wargear ID, model profile ID, and

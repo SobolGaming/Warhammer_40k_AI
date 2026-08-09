@@ -20,7 +20,6 @@ from warhammer40k_core.core.datasheet import (
     WargearOptionConditionKind,
     WargearOptionEffectKind,
 )
-from warhammer40k_core.core.model_geometry_catalog import GeometryReviewStatus
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
@@ -1950,8 +1949,6 @@ def _required_height_override(
     override = context.height_by_datasheet_and_model.get((datasheet_id, _name_key(model_name)))
     if override is None:
         raise WahapediaBridgeError("Representative model height override is required.")
-    if override.reviewer_status is not GeometryReviewStatus.ACCEPTED:
-        raise WahapediaBridgeError("Representative model height override must be accepted.")
     return override
 
 

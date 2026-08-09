@@ -1711,7 +1711,7 @@
     "datasheet_name": "Flesh Hounds",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
-      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
     ],
     "semantic_categories": [
       "faction.army_rule.shadow_of_chaos"
@@ -1790,7 +1790,7 @@
     "datasheet_name": "Bloodletters",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
-      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
     ],
     "semantic_categories": [
       "faction.army_rule.shadow_of_chaos"
@@ -1886,7 +1886,7 @@
     "datasheet_name": "Bloodcrushers",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
-      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
     ],
     "semantic_categories": [
       "faction.army_rule.shadow_of_chaos"
@@ -1931,6 +1931,226 @@
     ],
     "source_kind": "wargear",
     "source_wargear_id": "000001115:instrument-of-chaos",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001120/core/000008339/none",
+    "datasheet_id": "000001120",
+    "datasheet_name": "Lord of Change",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001120/core/000008343/none",
+    "datasheet_id": "000001120",
+    "datasheet_name": "Lord of Change",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001120:daemon-lord-of-tzeentch-aura",
+    "ability_name": "Daemon Lord of Tzeentch (Aura)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "unsupported",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001120/datasheet/000001120:daemon-lord-of-tzeentch-aura/none",
+    "datasheet_id": "000001120",
+    "datasheet_name": "Lord of Change",
+    "diagnostic_reasons": [
+      "unsupported_language"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:datasheet:lord_of_change:daemon_lord_of_tzeentch"
+    ],
+    "semantic_categories": [
+      "datasheet.aura.ranged_strength_modifier"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001120:greater-daemon-of-tzeentch-aura",
+    "ability_name": "Greater Daemon of Tzeentch (Aura)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001120/datasheet/000001120:greater-daemon-of-tzeentch-aura/none",
+    "datasheet_id": "000001120",
+    "datasheet_name": "Lord of Change",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
+    ],
+    "semantic_categories": [
+      "datasheet.aura.shadow_of_chaos"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001120:master-of-magicks-psychic",
+    "ability_name": "Master of Magicks (Psychic)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001120/datasheet/000001120:master-of-magicks-psychic/none",
+    "datasheet_id": "000001120",
+    "datasheet_name": "Lord of Change",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:named-weapon-ability-choice",
+      "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:ignores-cover",
+      "catalog-ir:weapon-keyword-grant:lethal-hits",
+      "catalog-ir:weapon-keyword-grant:sustained-hits"
+    ],
+    "semantic_categories": [
+      "datasheet.rule_ir.grant_weapon_ability.this_model"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008433",
+    "ability_name": "The Shadow of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001120/faction/000008433/none",
+    "datasheet_id": "000001120",
+    "datasheet_name": "Lord of Change",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.shadow_of_chaos"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001132/core/000008343/none",
+    "datasheet_id": "000001132",
+    "datasheet_name": "Plaguebearers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001132:infected-outbreak",
+    "ability_name": "Infected Outbreak",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "unsupported",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001132/datasheet/000001132:infected-outbreak/none",
+    "datasheet_id": "000001132",
+    "datasheet_name": "Plaguebearers",
+    "diagnostic_reasons": [
+      "unsupported_language"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:datasheet:plaguebearers:infected_outbreak"
+    ],
+    "semantic_categories": [
+      "datasheet.objective_control.sticky"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008433",
+    "ability_name": "The Shadow of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001132/faction/000008433/none",
+    "datasheet_id": "000001132",
+    "datasheet_name": "Plaguebearers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.shadow_of_chaos"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001132:daemonic-icon",
+    "ability_name": "Daemonic Icon",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001132/wargear/000001132:daemonic-icon/000001132:daemonic-icon",
+    "datasheet_id": "000001132",
+    "datasheet_name": "Plaguebearers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:leadership-characteristic-query"
+    ],
+    "semantic_categories": [
+      "wargear.characteristic_set.leadership.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000001132:daemonic-icon",
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000001132:instrument-of-chaos",
+    "ability_name": "Instrument of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000001132/wargear/000001132:instrument-of-chaos/000001132:instrument-of-chaos",
+    "datasheet_id": "000001132",
+    "datasheet_name": "Plaguebearers",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "catalog-ir:charge-roll-modifier"
+    ],
+    "semantic_categories": [
+      "wargear.roll_modifier.charge.this_unit"
+    ],
+    "source_kind": "wargear",
+    "source_wargear_id": "000001132:instrument-of-chaos",
     "support_stage": "engine_consumed"
   },
   {
@@ -2118,7 +2338,7 @@
     "datasheet_name": "Be'lakor",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
-      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
     ],
     "semantic_categories": [
       "faction.army_rule.shadow_of_chaos"
@@ -2329,7 +2549,7 @@
     "datasheet_name": "Daemon Prince of Chaos",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
-      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
     ],
     "semantic_categories": [
       "faction.army_rule.shadow_of_chaos"
@@ -2426,7 +2646,7 @@
     "datasheet_name": "Soul Grinder",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
-      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
     ],
     "semantic_categories": [
       "faction.army_rule.shadow_of_chaos"
@@ -2746,6 +2966,125 @@
     "ability_name": "Deadly Demise",
     "catalog_id": "chaos-daemons-bridge-catalog",
     "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002582/core/000008339/none",
+    "datasheet_id": "000002582",
+    "datasheet_name": "Bloodthirster",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:destruction-reaction:deadly-demise-source",
+      "descriptor:destruction-reaction:deadly-demise-resolution"
+    ],
+    "semantic_categories": [
+      "core.deadly_demise"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008343",
+    "ability_name": "Deep Strike",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002582/core/000008343/none",
+    "datasheet_id": "000002582",
+    "datasheet_name": "Bloodthirster",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "descriptor:movement:deep-strike-placement",
+      "descriptor:reserve-declaration:deep-strike"
+    ],
+    "semantic_categories": [
+      "core.reserve.deep_strike"
+    ],
+    "source_kind": "core",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002582:daemon-lord-of-khorne-aura",
+    "ability_name": "Daemon Lord of Khorne (Aura)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002582/datasheet/000002582:daemon-lord-of-khorne-aura/none",
+    "datasheet_id": "000002582",
+    "datasheet_name": "Bloodthirster",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:daemon_lord_of_khorne"
+    ],
+    "semantic_categories": [
+      "datasheet.aura.melee_hit_roll_modifier"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002582:greater-daemon-of-khorne-aura",
+    "ability_name": "Greater Daemon of Khorne (Aura)",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "generic_rule_ir",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002582/datasheet/000002582:greater-daemon-of-khorne-aura/none",
+    "datasheet_id": "000002582",
+    "datasheet_name": "Bloodthirster",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
+    ],
+    "semantic_categories": [
+      "datasheet.aura.shadow_of_chaos"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000002582:relentless-carnage",
+    "ability_name": "Relentless Carnage",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "unsupported",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002582/datasheet/000002582:relentless-carnage/none",
+    "datasheet_id": "000002582",
+    "datasheet_name": "Bloodthirster",
+    "diagnostic_reasons": [
+      "unsupported_language"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage",
+      "warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage:mortal-wound-fnp"
+    ],
+    "semantic_categories": [
+      "datasheet.fight_phase_end.mortal_wounds"
+    ],
+    "source_kind": "datasheet",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008433",
+    "ability_name": "The Shadow of Chaos",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
+    "coverage_row_id": "chaos-daemons-bridge-catalog/000002582/faction/000008433/none",
+    "datasheet_id": "000002582",
+    "datasheet_name": "Bloodthirster",
+    "diagnostic_reasons": [],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
+    ],
+    "semantic_categories": [
+      "faction.army_rule.shadow_of_chaos"
+    ],
+    "source_kind": "faction",
+    "source_wargear_id": null,
+    "support_stage": "engine_consumed"
+  },
+  {
+    "ability_id": "000008339",
+    "ability_name": "Deadly Demise",
+    "catalog_id": "chaos-daemons-bridge-catalog",
+    "catalog_support": "descriptor_only",
     "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/core/000008339/none",
     "datasheet_id": "000002758",
     "datasheet_name": "Daemon Prince Of Chaos With Wings",
@@ -2928,7 +3267,7 @@
     "datasheet_name": "Daemon Prince Of Chaos With Wings",
     "diagnostic_reasons": [],
     "runtime_consumer_ids": [
-      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
     ],
     "semantic_categories": [
       "faction.army_rule.shadow_of_chaos"

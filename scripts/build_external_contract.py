@@ -337,9 +337,7 @@ def _verify_python_schema_versions(schemas: dict[str, Schema]) -> None:
             raise ExternalContractError(
                 f"{schema_name} {property_name} drifted from Python payload version {expected}."
             )
-    capability_schema_hash = hashlib.sha256(
-        (SCHEMA_DIR / "capability-manifest.schema.json").read_bytes()
-    ).hexdigest()
+    capability_schema_hash = _file_hash(SCHEMA_DIR / "capability-manifest.schema.json")
     if capability_schema_hash != CAPABILITY_MANIFEST_SCHEMA_SHA256:
         raise ExternalContractError(
             "Capability manifest runtime contract-schema hash drifted from the canonical schema."

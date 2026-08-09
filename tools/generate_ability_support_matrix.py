@@ -178,7 +178,7 @@ from warhammer40k_core.engine.semantic_equivalence import CrossSourceSemanticAud
 from warhammer40k_core.engine.stratagem_catalog import (
     eleventh_edition_core_stratagem_catalog_records,
 )
-from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_package
+from warhammer40k_core.rules.catalog_generation import build_canonical_catalog_report
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
 from warhammer40k_core.rules.source_overlay import (
@@ -225,7 +225,11 @@ from warhammer40k_core.rules.wahapedia_bridge_defaults import (
     AELDARI_WAR_WALKERS_WRAITHLORD_HEIGHT_OVERRIDES,
     AELDARI_WAVE_SERPENT_SHINING_SPEARS_ELDRAD_DIRE_AVENGERS_HEIGHT_OVERRIDES,
     AELDARI_YRIEL_VYPERS_STARFANGS_HEIGHT_OVERRIDES,
+    CHAOS_DAEMONS_BELAKOR_HEIGHT_OVERRIDES,
     CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
+    CHAOS_DAEMONS_BLOODTHIRSTER_HEIGHT_OVERRIDES,
+    CHAOS_DAEMONS_LORD_OF_CHANGE_HEIGHT_OVERRIDES,
+    CHAOS_DAEMONS_PLAGUEBEARERS_HEIGHT_OVERRIDES,
     CHAOS_DEFILER_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_CHAOS_TERMINATORS_HEIGHT_OVERRIDES,
     EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES,
@@ -316,6 +320,7 @@ CHAOS_DAEMONS_SPLIT_SUPPORTED_SEMANTICS = (
     "Starting Strength"
 )
 BELAKOR_DATASHEET_IDS = ("000001148",)
+CHAOS_DAEMONS_ROSTER_DATASHEET_IDS = ("000002582", "000001120", "000001132")
 DAEMON_WARGEAR_DATASHEET_IDS = ("000001112", "000001114", "000001115")
 UNDIVIDED_DAEMON_DATASHEET_IDS = ("000001149", "000002758", "000001151")
 CHAOS_DEFILER_DATASHEET_IDS = chaos_defiler_overlay.AUDITED_DEFILER_DATASHEET_IDS
@@ -341,6 +346,7 @@ ABILITY_SUPPORT_DATASHEET_IDS = (
     *AELDARI_NIGHT_SPINNER_DATASHEET_IDS,
     *AELDARI_YRIEL_VYPERS_STARFANGS_DATASHEET_IDS,
     *BELAKOR_DATASHEET_IDS,
+    *CHAOS_DAEMONS_ROSTER_DATASHEET_IDS,
     *DAEMON_WARGEAR_DATASHEET_IDS,
     *UNDIVIDED_DAEMON_DATASHEET_IDS,
     *CHAOS_DEFILER_DATASHEET_IDS,
@@ -351,16 +357,6 @@ ABILITY_SUPPORT_DATASHEET_IDS = (
     *EMPERORS_CHILDREN_LORD_KAKOPHONIST_DATASHEET_IDS,
     *EMPERORS_CHILDREN_NOISE_MARINES_DATASHEET_IDS,
     *EMPERORS_CHILDREN_FLAWLESS_BLADES_DATASHEET_IDS,
-)
-BELAKOR_HEIGHT_OVERRIDES = (
-    ModelHeightOverride(
-        datasheet_id="000001148",
-        model_name="Be'lakor - EPIC HERO",
-        height=170.0,
-        height_units=GeometrySourceUnits.MILLIMETERS,
-        height_source_id="geometry-review:chaos-daemons:belakor:height",
-        height_document_reference="Chaos Daemons Be'lakor product listing",
-    ),
 )
 UNDIVIDED_DAEMON_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
@@ -1694,9 +1690,12 @@ def _ability_support_catalog_package(
             + AELDARI_WAR_WALKERS_WRAITHLORD_HEIGHT_OVERRIDES
             + AELDARI_WAVE_SERPENT_SHINING_SPEARS_ELDRAD_DIRE_AVENGERS_HEIGHT_OVERRIDES
             + AELDARI_YRIEL_VYPERS_STARFANGS_HEIGHT_OVERRIDES
-            + BELAKOR_HEIGHT_OVERRIDES
+            + CHAOS_DAEMONS_BELAKOR_HEIGHT_OVERRIDES
             + UNDIVIDED_DAEMON_HEIGHT_OVERRIDES
             + CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES
+            + CHAOS_DAEMONS_BLOODTHIRSTER_HEIGHT_OVERRIDES
+            + CHAOS_DAEMONS_LORD_OF_CHANGE_HEIGHT_OVERRIDES
+            + CHAOS_DAEMONS_PLAGUEBEARERS_HEIGHT_OVERRIDES
             + BLOODLETTERS_HEIGHT_OVERRIDES
             + FLESH_HOUNDS_HEIGHT_OVERRIDES
             + CHAOS_DEFILER_HEIGHT_OVERRIDES
@@ -1708,11 +1707,16 @@ def _ability_support_catalog_package(
             + EMPERORS_CHILDREN_LORD_KAKOPHONIST_NOISE_MARINES_HEIGHT_OVERRIDES
         ),
     )
-    return build_canonical_catalog_package(
+    report = build_canonical_catalog_report(
         package_id=_catalog_package_id(),
         catalog_version=_catalog_version(),
         source_artifacts=bridge_artifacts,
     )
+    if report.package is None:
+        raise ValueError(
+            "Ability support catalog could not preserve datasheets with geometry diagnostics."
+        )
+    return report.package
 
 
 def _ability_support_matrix_rows_from_package(
@@ -3270,6 +3274,13 @@ def _faction_support_markdown(
                 )
             )
         )
+    elif faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
+        lines.extend(
+            _chaos_daemons_faction_pack_review_markdown(
+                pdf_filename=pdf_record.pdf_filename,
+                package_id=pdf_record.package_id,
+            )
+        )
     else:
         lines.extend(
             _generic_faction_pack_review_markdown(
@@ -3344,6 +3355,12 @@ def _faction_support_markdown(
     if faction_row.faction_id in reviewed_faction_ids():
         lines.extend(("", "## Datasheet Source Review", ""))
         lines.extend(faction_pack_datasheet_review_markdown(faction_row.faction_id))
+    elif faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
+        lines.extend(
+            _chaos_daemons_datasheet_source_review_markdown(
+                pdf_filename=pdf_record.pdf_filename,
+            )
+        )
     else:
         lines.extend(
             _datasheet_source_review_unavailable_markdown(
@@ -3364,6 +3381,8 @@ def _faction_support_markdown(
                 )
             )
         )
+    elif faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
+        lines.extend(_chaos_daemons_secondary_reference_audit_markdown())
     else:
         lines.extend(_secondary_reference_audit_unavailable_markdown())
     lines.extend(
@@ -3469,6 +3488,42 @@ def _generic_faction_pack_review_markdown(
     return lines
 
 
+def _chaos_daemons_faction_pack_review_markdown(
+    *,
+    pdf_filename: str,
+    package_id: str,
+) -> list[str]:
+    return [
+        "",
+        "## Faction Pack Review",
+        "",
+        (
+            f"The official `{pdf_filename}` source is recorded in structured package "
+            f"`{package_id}`. A fail-closed reconciliation artifact covers only the five "
+            "datasheets selected by the checked-in roster: Bloodcrushers, Bloodthirster, "
+            "Lord of Change, Plaguebearers, and Be'lakor. It records the exact official "
+            "pages and reviewed field families, pins every historical generator input by "
+            "hash, and hashes each resulting gameplay payload. The offline migration "
+            "generator validates the historical input package identity; the runtime-safe "
+            "artifact does not carry that retired identity. "
+            "Other rows on this page are documentation review observations, not claims that "
+            "their production catalog rows were generated from this PDF."
+        ),
+        "",
+        "### Unit Datasheet Source Treatments",
+        "",
+        (
+            "The exact-five roster reconciliation is committed at "
+            "`src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+            "chaos_daemons_roster_2026_07/artifacts/official-pdf-reconciliation.json`. "
+            "It is intentionally not an exhaustive faction partition. Datasheets outside "
+            "those five still need a complete input-versus-Faction-Pack treatment "
+            "artifact before their source review can be promoted to the same production "
+            "guarantee."
+        ),
+    ]
+
+
 def _generic_semantic_snapshot_markdown(
     *,
     detachment_support_rows: tuple[DetachmentRuleSupportRow, ...],
@@ -3569,6 +3624,41 @@ def _datasheet_source_review_unavailable_markdown(
             f"in the component tables derived from `{pdf_filename}`. A separate exhaustive "
             "predecessor/overlay partition artifact is not currently published, so this section "
             "does not claim that independent source-review gate."
+        ),
+    ]
+
+
+def _chaos_daemons_datasheet_source_review_markdown(*, pdf_filename: str) -> list[str]:
+    return [
+        "",
+        "## Datasheet Source Review",
+        "",
+        "### Source scope, provenance, and exclusions",
+        "",
+        (
+            "The five roster datasheets have a versioned, typed reconciliation from the "
+            f"recorded generator inputs to `{pdf_filename}`. The runtime artifact pins the "
+            "exact input hashes but carries only current source identity; historical package "
+            "identity validation remains confined to the offline migration generator. The "
+            "rest of the component table records "
+            "human-readable PDF page observations only. Because no exhaustive whole-faction "
+            "input/overlay partition is published, this section makes no whole-faction "
+            "source-review claim."
+        ),
+    ]
+
+
+def _chaos_daemons_secondary_reference_audit_markdown() -> list[str]:
+    return [
+        "",
+        "## Secondary-reference Audit",
+        "",
+        (
+            "The exact-five reconciliation records every consumed input artifact hash, then "
+            "promotes only reviewed current-PDF rows into the runtime catalog. Historical "
+            "input package identity is validated only by the offline generator. This is not "
+            "an independent "
+            "secondary-provider semantic audit and does not cover the rest of the faction."
         ),
     ]
 
@@ -3681,6 +3771,25 @@ def _chaos_daemons_semantic_snapshot_markdown() -> list[str]:
             "support uses the shared Phase17F semantic execution evidence, including explicit "
             "runtime consumers and executable generic IR records. Datasheet support is fully "
             "supported only for source-review rows whose IR coverage is `All consumed`."
+        ),
+        "",
+        (
+            "The checked-in July 2026 matched-play roster "
+            "[`cavalcade-shadow-bloodthirster.json`]"
+            "(../../data/army_lists/cavalcade-shadow-bloodthirster.json) is a 1,980-point "
+            "Strike Force with eight unit selections across Be'lakor, Bloodthirster, Lord of "
+            "Change, Plaguebearers, and Bloodcrushers. Its exact production catalog is "
+            "reconciled field-by-field to the current official PDF for those five datasheets, "
+            "including Be'lakor's `DAMAGED 1-7` threshold and the detachment-only "
+            "`SHADOW LEGION` keyword grant. Official base sizes are retained, but the "
+            "Bloodthirster, Lord of Change, Plaguebearers, and Plagueridden representative "
+            "heights remain `NEEDS_REVIEW`; the catalog emits blocking geometry diagnostics "
+            "and the capability manifest honestly withholds `PHYSICALLY_PLAYABLE`. The July "
+            "MFM mustering data, Cavalcade of Chaos and Shadow Legion runtime bundles, "
+            "selected datasheet abilities, and two Apocalyptic Steeds assignments still "
+            "have active runtime evidence. This selected-component evidence does not claim "
+            "`FULL_GAME_SUPPORTED` or `REPLAY_VERIFIED`; those remain blocked until Phase 20 "
+            "certification evidence exists."
         ),
     ]
     lines.extend(_chaos_daemons_detachment_snapshot_markdown())
@@ -3840,14 +3949,23 @@ def _faction_datasheet_support_markdown(
     sorted_rows = tuple(
         sorted(rows, key=lambda row: (row.datasheet_name.lower(), row.datasheet_id))
     )
+    component_evidence_intro = (
+        "This table reports component evidence generated from exact source text and "
+        "structured catalog rows; it does not certify a unit or roster as playable."
+    )
+    if faction_row.faction_id == CHAOS_DAEMONS_FACTION_ID:
+        component_evidence_intro = (
+            "This table reports component review and runtime-consumer evidence; it does not "
+            "by itself certify a unit or roster as playable. Only the five selected roster "
+            "datasheets have the fail-closed production reconciliation described above."
+        )
     lines = [
         "",
         "## Datasheet component coverage",
         "",
         (
-            "This table reports component evidence generated from exact source text and "
-            "structured catalog rows; it does not certify a unit or roster as playable. The "
-            "machine artifact retains the historical `Full` and `Playable` rollup tokens for "
+            f"{component_evidence_intro} The machine artifact retains the historical `Full` "
+            "and `Playable` rollup tokens for "
             "compatibility. On this page, `Component-complete` means complete "
             "catalog/model/wargear/geometry data, every known datasheet and wargear ability to "
             "parse into supported descriptors or RuleIR without diagnostics, and every parsed "
@@ -4199,14 +4317,20 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
         DatasheetGroupReviewRow(
             datasheet="Bloodcrushers",
             datasheet_id="000001115",
-            source_basis="PDF pages 30-31; supersedes Wahapedia.",
+            source_basis=(
+                "Exact-five reconciliation: official PDF pages 30-31; generator inputs "
+                "pinned by hash."
+            ),
             ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Brass Stampede move-completed mortal wounds, The Shadow of "
                 "Chaos, Daemonic Icon Leadership, and Instrument of Chaos charge modifier."
             ),
             semantics_needed="None.",
-            catalog_blockers="No known datasheet-level blockers.",
+            catalog_blockers=(
+                "Base datasheet excludes the detachment-granted SHADOW LEGION keyword. "
+                "No known datasheet-level blockers."
+            ),
         ),
         DatasheetGroupReviewRow(
             datasheet="Bloodletters",
@@ -4236,7 +4360,10 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
         DatasheetGroupReviewRow(
             datasheet="Bloodthirster",
             datasheet_id="000002582",
-            source_basis="PDF pages 16-17; supersedes Wahapedia.",
+            source_basis=(
+                "Exact-five reconciliation: official PDF pages 16-17; generator inputs "
+                "pinned by hash."
+            ),
             ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Deadly Demise descriptor evidence, The Shadow of Chaos, "
@@ -4244,7 +4371,11 @@ def _chaos_daemons_khorne_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "and Relentless Carnage end-of-Fight mortal wounds are consumed."
             ),
             semantics_needed="None.",
-            catalog_blockers="No known catalog blocker.",
+            catalog_blockers=(
+                "Base datasheet excludes the detachment-granted SHADOW LEGION keyword. "
+                "Official base size is retained, but representative height evidence remains "
+                "NEEDS_REVIEW and blocks physical-play certification."
+            ),
         ),
         DatasheetGroupReviewRow(
             datasheet="Flesh Hounds",
@@ -4463,7 +4594,10 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
         DatasheetGroupReviewRow(
             datasheet="Lord of Change",
             datasheet_id="000001120",
-            source_basis="PDF pages 40-41; supersedes Wahapedia.",
+            source_basis=(
+                "Exact-five reconciliation: official PDF pages 40-41; generator inputs "
+                "pinned by hash."
+            ),
             ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D6, The Shadow of Chaos, Master of Magicks "
@@ -4471,7 +4605,11 @@ def _chaos_daemons_tzeentch_review_rows() -> tuple[DatasheetGroupReviewRow, ...]
                 "aura, and Daemon Lord of Tzeentch ranged Strength aura are consumed."
             ),
             semantics_needed="None.",
-            catalog_blockers="Representative height remains unreviewed outside this report.",
+            catalog_blockers=(
+                "Base datasheet excludes the detachment-granted SHADOW LEGION keyword. "
+                "Official base size is retained, but representative height evidence remains "
+                "NEEDS_REVIEW and blocks physical-play certification."
+            ),
         ),
         DatasheetGroupReviewRow(
             datasheet="Pink Horrors",
@@ -4629,7 +4767,10 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
         DatasheetGroupReviewRow(
             datasheet="Plaguebearers",
             datasheet_id="000001132",
-            source_basis="PDF pages 78-79; supersedes Wahapedia.",
+            source_basis=(
+                "Exact-five reconciliation: official PDF pages 78-79; generator inputs "
+                "pinned by hash."
+            ),
             ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, The Shadow of Chaos, Daemonic Icon Leadership, and "
@@ -4637,7 +4778,12 @@ def _chaos_daemons_nurgle_review_rows() -> tuple[DatasheetGroupReviewRow, ...]:
                 "sticky-objective control are consumed."
             ),
             semantics_needed="None.",
-            catalog_blockers="No known catalog blocker.",
+            catalog_blockers=(
+                "Base datasheet excludes the detachment-granted SHADOW LEGION keyword. "
+                "Official base sizes are retained, but both the regular Plaguebearer and "
+                "Plagueridden representative heights remain NEEDS_REVIEW and block "
+                "physical-play certification."
+            ),
         ),
         DatasheetGroupReviewRow(
             datasheet="Poxbringer",
@@ -4864,7 +5010,10 @@ def _chaos_daemons_undivided_review_rows() -> tuple[DatasheetGroupReviewRow, ...
         DatasheetGroupReviewRow(
             datasheet="Be'lakor",
             datasheet_id="000001148",
-            source_basis="PDF pages 112-113; supersedes Wahapedia.",
+            source_basis=(
+                "Exact-five reconciliation: official PDF pages 112-113; generator inputs "
+                "pinned by hash."
+            ),
             ir_coverage="All consumed",
             supported_semantics=(
                 "Deep Strike, Deadly Demise D6, Stealth, The Shadow of Chaos, The Dark "
@@ -4874,7 +5023,11 @@ def _chaos_daemons_undivided_review_rows() -> tuple[DatasheetGroupReviewRow, ...
                 "Commander mustering are consumed."
             ),
             semantics_needed="None.",
-            catalog_blockers="Representative height remains unreviewed outside this report.",
+            catalog_blockers=(
+                "Official DAMAGED 1-7 is enforced; the base datasheet excludes the "
+                "detachment-granted SHADOW LEGION keyword. Reviewed representative height "
+                "is included in the July roster catalog; no known catalog blocker."
+            ),
         ),
         DatasheetGroupReviewRow(
             datasheet="Daemon Prince of Chaos",

@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecord
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusteringError,
@@ -23,13 +24,21 @@ def validate_mustered_army_consistency(
     state: GameState,
     catalog: ArmyCatalog,
     muster_requests: tuple[ArmyMusterRequest, ...],
+    model_geometries: tuple[ModelGeometryCatalogRecord, ...] | None,
 ) -> None:
     if not state.army_definitions and not _state_requires_mustered_armies(state):
         return
     try:
         expected_armies = tuple(
             sorted(
-                (muster_army(catalog=catalog, request=request) for request in muster_requests),
+                (
+                    muster_army(
+                        catalog=catalog,
+                        request=request,
+                        model_geometries=model_geometries,
+                    )
+                    for request in muster_requests
+                ),
                 key=lambda army: army.player_id,
             )
         )

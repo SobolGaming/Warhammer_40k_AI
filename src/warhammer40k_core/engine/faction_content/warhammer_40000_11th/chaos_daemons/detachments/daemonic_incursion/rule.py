@@ -19,7 +19,7 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
     CHAOS_DAEMONS_FACTION_ID as _CHAOS_DAEMONS_FACTION_ID,
 )
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.army_rule import (
-    GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID,
+    GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_ABILITY_ID,
     ShadowRegion,
     shadow_regions_for_player,
 )
@@ -381,8 +381,8 @@ def _greater_daemon_anchor_keywords(unit: UnitInstance) -> frozenset[str]:
         raise GameLifecycleError("Warp Rifts Greater Daemon anchor lookup requires UnitInstance.")
     keywords: set[str] = set()
     for ability in unit.datasheet_abilities:
-        for source_id, keyword in GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID:
-            if ability.source_id == source_id:
+        for ability_id, keyword in GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_ABILITY_ID:
+            if ability.ability_id == ability_id:
                 keywords.add(keyword)
     return frozenset(keywords)
 

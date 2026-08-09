@@ -123,15 +123,25 @@ def test_phase17b_non_derivable_geometry_rows_block_catalog_emission(
         report.require_success()
 
 
-def test_phase17b_missing_representative_height_blocks_catalog_emission() -> None:
+def test_phase17b_missing_height_preserves_base_catalog_but_blocks_geometry_success() -> None:
     report = build_canonical_catalog_report(
         package_id=_catalog_package_id(),
         catalog_version=_catalog_version(),
         source_artifacts=_source_artifacts(include_height=False),
     )
 
-    assert report.package is None
+    assert report.package is not None
+    assert report.package.model_geometries == ()
+    assert math.isclose(
+        report.package.army_catalog.datasheets[0].model_profiles[0].base_size.diameter_mm or 0.0,
+        32.0,
+    )
+    assert CanonicalCatalogPackage.from_payload(report.package.to_payload()).to_payload() == (
+        report.package.to_payload()
+    )
     assert report.blocking_diagnostics()[0].reason is ModelGeometryDiagnosticReason.MISSING_HEIGHT
+    with pytest.raises(CatalogGenerationError, match="missing_height"):
+        report.require_success()
 
 
 def test_phase17b_flying_base_override_round_trips_support_hull_and_z_offset() -> None:
@@ -363,7 +373,7 @@ def test_phase17b_canonical_package_rejects_geometry_drift_and_duplicate_artifac
         model_profile_id="extra-profile",
     )
 
-    with pytest.raises(ValueError, match="model_geometries must not be empty"):
+    with pytest.raises(ValueError, match="missing model geometry"):
         CanonicalCatalogPackage(
             package_id=package.package_id,
             catalog_version=package.catalog_version,
@@ -489,7 +499,9 @@ def test_phase17b_generation_rejects_invalid_source_fields(
             source_artifacts=_source_artifacts_from_text_overrides(kwargs),
         )
 
-        assert report.package is None
+        assert report.package is not None
+        assert report.package.model_geometries == ()
+        assert report.package.diagnostics == report.diagnostics
         assert (
             report.blocking_diagnostics()[0].reason
             is ModelGeometryDiagnosticReason.UNREVIEWED_EVIDENCE

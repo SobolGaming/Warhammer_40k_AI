@@ -10,13 +10,13 @@
       "shadow-legion"
     ],
     "enhancement_ids": [
-      "apocalyptic-steeds"
+      "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade"
     ],
     "stratagem_ids": []
   },
   "force_disposition_id": "purge-the-foe",
   "battle_size": "strike_force",
-  "declared_total_points": 1995,
+  "declared_total_points": 1980,
   "units": [
     {
       "selection": {
@@ -68,7 +68,7 @@
         ],
         "mustering_option_selections": []
       },
-      "declared_points": 300
+      "declared_points": 320
     },
     {
       "selection": {
@@ -90,7 +90,7 @@
         ],
         "mustering_option_selections": []
       },
-      "declared_points": 300
+      "declared_points": 320
     },
     {
       "selection": {
@@ -158,7 +158,7 @@
         ],
         "mustering_option_selections": []
       },
-      "declared_points": 190
+      "declared_points": 200
     },
     {
       "selection": {
@@ -192,7 +192,7 @@
         ],
         "mustering_option_selections": []
       },
-      "declared_points": 190
+      "declared_points": 200
     },
     {
       "selection": {
@@ -205,7 +205,7 @@
           },
           {
             "model_profile_id": "000001115:bloodcrushers",
-            "model_count": 5
+            "model_count": 2
           }
         ],
         "wargear_selections": [
@@ -226,20 +226,20 @@
         ],
         "mustering_option_selections": []
       },
-      "declared_points": 190
+      "declared_points": 115
     }
   ],
   "attachment_declarations": [],
   "enhancement_assignments": [
     {
-      "enhancement_id": "apocalyptic-steeds",
+      "enhancement_id": "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade",
       "target_unit_selection_id": "bloodcrushers-1",
-      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds"
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds"
     },
     {
-      "enhancement_id": "apocalyptic-steeds",
+      "enhancement_id": "chaos-daemons:cavalcade-of-chaos:apocalyptic-steeds-upgrade",
       "target_unit_selection_id": "bloodcrushers-2",
-      "source_id": "gw-11e-mfm-2026-06:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds"
+      "source_id": "gw-11e-mfm-2026-07:faction:chaos-daemons:detachment:cavalcade-of-chaos:enhancement:apocalyptic-steeds"
     }
   ],
   "warlord_selection": {
@@ -251,7 +251,6 @@
     "source_format": "warhammer-40000-app-text",
     "app_version": "v2.1.0 (3)",
     "data_version": "v895",
-    "game_result": "win",
-    "points_source_package_id": "gw-11e-mfm-2026-06"
+    "points_source_package_id": "gw-11e-mfm-2026-07"
   }
 }

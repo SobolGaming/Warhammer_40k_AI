@@ -3442,6 +3442,7 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
         state=state,
         catalog=config.army_catalog,
         muster_requests=config.army_muster_requests,
+        model_geometries=config.model_geometries,
     )
 
 

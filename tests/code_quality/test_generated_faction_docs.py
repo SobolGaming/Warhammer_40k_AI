@@ -54,6 +54,8 @@ def test_generated_faction_documents_separate_component_evidence_from_game_suppo
     assert "This is not a full-game support claim." in document
     assert "Phase 17O capabilities" in document
     assert "## Datasheet component coverage" in document
+    assert "A `blocked_structured_semantics` label means this audit cannot transfer" in document
+    assert "source-local named runtime consumer can still provide execution evidence" in document
     assert "Supported detachments" not in document
 
 
@@ -65,6 +67,14 @@ def test_generated_faction_documents_share_one_section_structure(filename: str) 
     )
 
     assert section_titles == FACTION_SUPPORT_SECTION_TITLES
+
+
+def test_chaos_daemons_document_scopes_checked_in_roster_evidence() -> None:
+    document = _generated_faction_documents()["chaos-daemons.md"]
+
+    assert "is a 1,980-point Strike Force with eight unit selections" in document
+    assert "Cavalcade of Chaos and Shadow Legion runtime bundles" in document
+    assert "does not claim `FULL_GAME_SUPPORTED` or `REPLAY_VERIFIED`" in document
 
 
 @cache

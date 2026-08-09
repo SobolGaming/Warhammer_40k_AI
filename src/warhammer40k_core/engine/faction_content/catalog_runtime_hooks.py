@@ -79,6 +79,8 @@ from warhammer40k_core.engine.sticky_objective_control import (
 )
 from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedHookBinding
 
+CATALOG_IR_SHOOTING_PHASE_START_HOOK_ID = "catalog-ir:shooting-phase-start"
+
 
 def start_battle_hook_bindings(
     *,
@@ -240,8 +242,8 @@ def shooting_phase_start_hook_bindings(
 
     return (
         ShootingPhaseStartHookBinding(
-            hook_id="catalog-ir:shooting-phase-start",
-            source_id="catalog-ir:shooting-phase-start",
+            hook_id=CATALOG_IR_SHOOTING_PHASE_START_HOOK_ID,
+            source_id=CATALOG_IR_SHOOTING_PHASE_START_HOOK_ID,
             request_handler=request_handler,
             result_handler=result_handler,
         ),

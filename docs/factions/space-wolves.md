@@ -158,7 +158,7 @@ This table reports component evidence generated from exact source text and struc
 
 ## Cross-source Semantic Equivalence
 
-This section is generated from the repository-wide semantic audit. It is separate from catalog load/playability: it reports exact per-rule IR execution evidence and safe equivalence across source owners.
+This section is generated from the repository-wide semantic audit. It audits portable structured RuleIR and exact-text equivalence; it is not a complete view of source-local runtime wiring. A `blocked_structured_semantics` label means this audit cannot transfer that source text through shared RuleIR. A source-local named runtime consumer can still provide execution evidence in the sections above.
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |

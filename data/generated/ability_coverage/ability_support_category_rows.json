@@ -355,6 +355,14 @@
       {
         "ability_id": "000008433",
         "ability_name": "The Shadow of Chaos",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002582/faction/000008433/none",
+        "datasheet_id": "000002582",
+        "datasheet_name": "Bloodthirster",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000008433",
+        "ability_name": "The Shadow of Chaos",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000002758/faction/000008433/none",
         "datasheet_id": "000002758",
         "datasheet_name": "Daemon Prince Of Chaos With Wings",
@@ -379,6 +387,22 @@
       {
         "ability_id": "000008433",
         "ability_name": "The Shadow of Chaos",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001120/faction/000008433/none",
+        "datasheet_id": "000001120",
+        "datasheet_name": "Lord of Change",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000008433",
+        "ability_name": "The Shadow of Chaos",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001132/faction/000008433/none",
+        "datasheet_id": "000001132",
+        "datasheet_name": "Plaguebearers",
+        "source_kind": "faction"
+      },
+      {
+        "ability_id": "000008433",
+        "ability_name": "The Shadow of Chaos",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001151/faction/000008433/none",
         "datasheet_id": "000001151",
         "datasheet_name": "Soul Grinder",
@@ -390,30 +414,36 @@
     ],
     "category_id": "faction.army_rule.shadow_of_chaos",
     "category_name": "Chaos Daemons Army Rule",
-    "coverage_row_count": 7,
+    "coverage_row_count": 10,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/faction/000008433/none",
       "chaos-daemons-bridge-catalog/000001115/faction/000008433/none",
       "chaos-daemons-bridge-catalog/000001114/faction/000008433/none",
+      "chaos-daemons-bridge-catalog/000002582/faction/000008433/none",
       "chaos-daemons-bridge-catalog/000002758/faction/000008433/none",
       "chaos-daemons-bridge-catalog/000001149/faction/000008433/none",
       "chaos-daemons-bridge-catalog/000001112/faction/000008433/none",
+      "chaos-daemons-bridge-catalog/000001120/faction/000008433/none",
+      "chaos-daemons-bridge-catalog/000001132/faction/000008433/none",
       "chaos-daemons-bridge-catalog/000001151/faction/000008433/none"
     ],
     "datasheet_names": [
       "Be'lakor",
       "Bloodcrushers",
       "Bloodletters",
+      "Bloodthirster",
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
       "Flesh Hounds",
+      "Lord of Change",
+      "Plaguebearers",
       "Soul Grinder"
     ],
     "runtime_consumer_ids": [
-      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos"
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
     ],
     "source_kind_counts": {
-      "faction": 7
+      "faction": 10
     },
     "support_stages": [
       "engine_consumed"
@@ -485,6 +515,14 @@
         "datasheet_id": "000001114",
         "datasheet_name": "Bloodletters",
         "source_kind": "wargear"
+      },
+      {
+        "ability_id": "000001132:instrument-of-chaos",
+        "ability_name": "Instrument of Chaos",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001132/wargear/000001132:instrument-of-chaos/000001132:instrument-of-chaos",
+        "datasheet_id": "000001132",
+        "datasheet_name": "Plaguebearers",
+        "source_kind": "wargear"
       }
     ],
     "ability_names": [
@@ -492,20 +530,22 @@
     ],
     "category_id": "wargear.roll_modifier.charge.this_unit",
     "category_name": "Charge Roll Modifier",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001115/wargear/000001115:instrument-of-chaos/000001115:instrument-of-chaos",
-      "chaos-daemons-bridge-catalog/000001114/wargear/000001114:instrument-of-chaos/000001114:instrument-of-chaos"
+      "chaos-daemons-bridge-catalog/000001114/wargear/000001114:instrument-of-chaos/000001114:instrument-of-chaos",
+      "chaos-daemons-bridge-catalog/000001132/wargear/000001132:instrument-of-chaos/000001132:instrument-of-chaos"
     ],
     "datasheet_names": [
       "Bloodcrushers",
-      "Bloodletters"
+      "Bloodletters",
+      "Plaguebearers"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:charge-roll-modifier"
     ],
     "source_kind_counts": {
-      "wargear": 2
+      "wargear": 3
     },
     "support_stages": [
       "engine_consumed"
@@ -519,6 +559,14 @@
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
         "datasheet_id": "000001148",
         "datasheet_name": "Be'lakor",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002582/core/000008339/none",
+        "datasheet_id": "000002582",
+        "datasheet_name": "Bloodthirster",
         "source_kind": "core"
       },
       {
@@ -588,6 +636,14 @@
       {
         "ability_id": "000008339",
         "ability_name": "Deadly Demise",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001120/core/000008339/none",
+        "datasheet_id": "000001120",
+        "datasheet_name": "Lord of Change",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008339",
+        "ability_name": "Deadly Demise",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000000611/core/000008339/none",
         "datasheet_id": "000000611",
         "datasheet_name": "Night Spinner",
@@ -639,9 +695,10 @@
     ],
     "category_id": "core.deadly_demise",
     "category_name": "Core Deadly Demise",
-    "coverage_row_count": 15,
+    "coverage_row_count": 17,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001148/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000002582/core/000008339/none",
       "chaos-daemons-bridge-catalog/000002758/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001149/core/000008339/none",
       "chaos-daemons-bridge-catalog/000000969/core/000008339/none",
@@ -650,6 +707,7 @@
       "chaos-daemons-bridge-catalog/000004208/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004209/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004077/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000001120/core/000008339/none",
       "chaos-daemons-bridge-catalog/000000611/core/000008339/none",
       "chaos-daemons-bridge-catalog/000001151/core/000008339/none",
       "chaos-daemons-bridge-catalog/000004195/core/000008339/none",
@@ -659,10 +717,12 @@
     ],
     "datasheet_names": [
       "Be'lakor",
+      "Bloodthirster",
       "Daemon Prince Of Chaos With Wings",
       "Daemon Prince of Chaos",
       "Defiler",
       "Fulgrim",
+      "Lord of Change",
       "Night Spinner",
       "Soul Grinder",
       "Starfangs",
@@ -675,7 +735,7 @@
       "descriptor:destruction-reaction:deadly-demise-source"
     ],
     "source_kind_counts": {
-      "core": 15
+      "core": 17
     },
     "support_stages": [
       "engine_consumed"
@@ -839,6 +899,116 @@
     ],
     "source_kind_counts": {
       "core": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000002582:daemon-lord-of-khorne-aura",
+        "ability_name": "Daemon Lord of Khorne (Aura)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002582/datasheet/000002582:daemon-lord-of-khorne-aura/none",
+        "datasheet_id": "000002582",
+        "datasheet_name": "Bloodthirster",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Daemon Lord of Khorne (Aura)"
+    ],
+    "category_id": "datasheet.aura.melee_hit_roll_modifier",
+    "category_name": "Datasheet Aura Melee Hit Roll Modifier",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002582/datasheet/000002582:daemon-lord-of-khorne-aura/none"
+    ],
+    "datasheet_names": [
+      "Bloodthirster"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:daemon_lord_of_khorne"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001120:daemon-lord-of-tzeentch-aura",
+        "ability_name": "Daemon Lord of Tzeentch (Aura)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001120/datasheet/000001120:daemon-lord-of-tzeentch-aura/none",
+        "datasheet_id": "000001120",
+        "datasheet_name": "Lord of Change",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Daemon Lord of Tzeentch (Aura)"
+    ],
+    "category_id": "datasheet.aura.ranged_strength_modifier",
+    "category_name": "Datasheet Aura Ranged Strength Modifier",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001120/datasheet/000001120:daemon-lord-of-tzeentch-aura/none"
+    ],
+    "datasheet_names": [
+      "Lord of Change"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:datasheet:lord_of_change:daemon_lord_of_tzeentch"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000002582:greater-daemon-of-khorne-aura",
+        "ability_name": "Greater Daemon of Khorne (Aura)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002582/datasheet/000002582:greater-daemon-of-khorne-aura/none",
+        "datasheet_id": "000002582",
+        "datasheet_name": "Bloodthirster",
+        "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000001120:greater-daemon-of-tzeentch-aura",
+        "ability_name": "Greater Daemon of Tzeentch (Aura)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001120/datasheet/000001120:greater-daemon-of-tzeentch-aura/none",
+        "datasheet_id": "000001120",
+        "datasheet_name": "Lord of Change",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Greater Daemon of Khorne (Aura)",
+      "Greater Daemon of Tzeentch (Aura)"
+    ],
+    "category_id": "datasheet.aura.shadow_of_chaos",
+    "category_name": "Datasheet Aura Shadow Of Chaos",
+    "coverage_row_count": 2,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002582/datasheet/000002582:greater-daemon-of-khorne-aura/none",
+      "chaos-daemons-bridge-catalog/000001120/datasheet/000001120:greater-daemon-of-tzeentch-aura/none"
+    ],
+    "datasheet_names": [
+      "Bloodthirster",
+      "Lord of Change"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026"
+    ],
+    "source_kind_counts": {
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -1094,6 +1264,73 @@
     ],
     "runtime_consumer_ids": [
       "warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:defiler-daemonforge:wound-reroll"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000002582:relentless-carnage",
+        "ability_name": "Relentless Carnage",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002582/datasheet/000002582:relentless-carnage/none",
+        "datasheet_id": "000002582",
+        "datasheet_name": "Bloodthirster",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Relentless Carnage"
+    ],
+    "category_id": "datasheet.fight_phase_end.mortal_wounds",
+    "category_name": "Datasheet Fight Phase End Mortal Wounds",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002582/datasheet/000002582:relentless-carnage/none"
+    ],
+    "datasheet_names": [
+      "Bloodthirster"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage",
+      "warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage:mortal-wound-fnp"
+    ],
+    "source_kind_counts": {
+      "datasheet": 1
+    },
+    "support_stages": [
+      "engine_consumed"
+    ]
+  },
+  {
+    "ability_datasheet_pairs": [
+      {
+        "ability_id": "000001132:infected-outbreak",
+        "ability_name": "Infected Outbreak",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001132/datasheet/000001132:infected-outbreak/none",
+        "datasheet_id": "000001132",
+        "datasheet_name": "Plaguebearers",
+        "source_kind": "datasheet"
+      }
+    ],
+    "ability_names": [
+      "Infected Outbreak"
+    ],
+    "category_id": "datasheet.objective_control.sticky",
+    "category_name": "Datasheet Objective Control Sticky",
+    "coverage_row_count": 1,
+    "coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001132/datasheet/000001132:infected-outbreak/none"
+    ],
+    "datasheet_names": [
+      "Plaguebearers"
+    ],
+    "runtime_consumer_ids": [
+      "warhammer_40000_11th:chaos_daemons:datasheet:plaguebearers:infected_outbreak"
     ],
     "source_kind_counts": {
       "datasheet": 1
@@ -1866,29 +2103,42 @@
         "datasheet_id": "000002758",
         "datasheet_name": "Daemon Prince Of Chaos With Wings",
         "source_kind": "datasheet"
+      },
+      {
+        "ability_id": "000001120:master-of-magicks-psychic",
+        "ability_name": "Master of Magicks (Psychic)",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001120/datasheet/000001120:master-of-magicks-psychic/none",
+        "datasheet_id": "000001120",
+        "datasheet_name": "Lord of Change",
+        "source_kind": "datasheet"
       }
     ],
     "ability_names": [
-      "Harbinger of Death"
+      "Harbinger of Death",
+      "Master of Magicks (Psychic)"
     ],
     "category_id": "datasheet.rule_ir.grant_weapon_ability.this_model",
     "category_name": "Datasheet Rule Ir Grant Weapon Ability This Model",
-    "coverage_row_count": 1,
+    "coverage_row_count": 2,
     "coverage_row_ids": [
-      "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:harbinger-of-death/none"
+      "chaos-daemons-bridge-catalog/000002758/datasheet/000002758:harbinger-of-death/none",
+      "chaos-daemons-bridge-catalog/000001120/datasheet/000001120:master-of-magicks-psychic/none"
     ],
     "datasheet_names": [
-      "Daemon Prince Of Chaos With Wings"
+      "Daemon Prince Of Chaos With Wings",
+      "Lord of Change"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:fight-selected-weapon-ability-choice",
+      "catalog-ir:named-weapon-ability-choice",
       "catalog-ir:weapon-keyword-grant",
+      "catalog-ir:weapon-keyword-grant:ignores-cover",
       "catalog-ir:weapon-keyword-grant:lethal-hits",
       "catalog-ir:weapon-keyword-grant:precision",
       "catalog-ir:weapon-keyword-grant:sustained-hits"
     ],
     "source_kind_counts": {
-      "datasheet": 1
+      "datasheet": 2
     },
     "support_stages": [
       "engine_consumed"
@@ -3545,6 +3795,14 @@
       {
         "ability_id": "000008343",
         "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000002582/core/000008343/none",
+        "datasheet_id": "000002582",
+        "datasheet_name": "Bloodthirster",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000004081/core/000008343/none",
         "datasheet_id": "000004081",
         "datasheet_name": "Chaos Terminators",
@@ -3601,6 +3859,22 @@
       {
         "ability_id": "000008343",
         "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001120/core/000008343/none",
+        "datasheet_id": "000001120",
+        "datasheet_name": "Lord of Change",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001132/core/000008343/none",
+        "datasheet_id": "000001132",
+        "datasheet_name": "Plaguebearers",
+        "source_kind": "core"
+      },
+      {
+        "ability_id": "000008343",
+        "ability_name": "Deep Strike",
         "coverage_row_id": "chaos-daemons-bridge-catalog/000001151/core/000008343/none",
         "datasheet_id": "000001151",
         "datasheet_name": "Soul Grinder",
@@ -3628,12 +3902,13 @@
     ],
     "category_id": "core.reserve.deep_strike",
     "category_name": "Deep Strike Reserve Arrival",
-    "coverage_row_count": 14,
+    "coverage_row_count": 17,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000002759/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001148/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001115/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001114/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000002582/core/000008343/none",
       "chaos-daemons-bridge-catalog/000004081/core/000008343/none",
       "chaos-daemons-bridge-catalog/000004196/core/000008343/none",
       "chaos-daemons-bridge-catalog/000002758/core/000008343/none",
@@ -3641,6 +3916,8 @@
       "chaos-daemons-bridge-catalog/000001112/core/000008343/none",
       "chaos-daemons-bridge-catalog/000004077/core/000008343/none",
       "chaos-daemons-bridge-catalog/000003909/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000001120/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000001132/core/000008343/none",
       "chaos-daemons-bridge-catalog/000001151/core/000008343/none",
       "chaos-daemons-bridge-catalog/000000600/core/000008343/none",
       "chaos-daemons-bridge-catalog/000000601/core/000008343/none"
@@ -3650,6 +3927,7 @@
       "Be'lakor",
       "Bloodcrushers",
       "Bloodletters",
+      "Bloodthirster",
       "Chaos Terminators",
       "Corsair Skyreavers",
       "Daemon Prince Of Chaos With Wings",
@@ -3657,6 +3935,8 @@
       "Flesh Hounds",
       "Fulgrim",
       "Lhykhis",
+      "Lord of Change",
+      "Plaguebearers",
       "Soul Grinder",
       "Swooping Hawks",
       "Warp Spiders"
@@ -3666,7 +3946,7 @@
       "descriptor:reserve-declaration:deep-strike"
     ],
     "source_kind_counts": {
-      "core": 14
+      "core": 17
     },
     "support_stages": [
       "engine_consumed"
@@ -4541,6 +4821,14 @@
         "datasheet_id": "000001114",
         "datasheet_name": "Bloodletters",
         "source_kind": "wargear"
+      },
+      {
+        "ability_id": "000001132:daemonic-icon",
+        "ability_name": "Daemonic Icon",
+        "coverage_row_id": "chaos-daemons-bridge-catalog/000001132/wargear/000001132:daemonic-icon/000001132:daemonic-icon",
+        "datasheet_id": "000001132",
+        "datasheet_name": "Plaguebearers",
+        "source_kind": "wargear"
       }
     ],
     "ability_names": [
@@ -4548,20 +4836,22 @@
     ],
     "category_id": "wargear.characteristic_set.leadership.this_unit",
     "category_name": "Leadership Characteristic",
-    "coverage_row_count": 2,
+    "coverage_row_count": 3,
     "coverage_row_ids": [
       "chaos-daemons-bridge-catalog/000001115/wargear/000001115:daemonic-icon/000001115:daemonic-icon",
-      "chaos-daemons-bridge-catalog/000001114/wargear/000001114:daemonic-icon/000001114:daemonic-icon"
+      "chaos-daemons-bridge-catalog/000001114/wargear/000001114:daemonic-icon/000001114:daemonic-icon",
+      "chaos-daemons-bridge-catalog/000001132/wargear/000001132:daemonic-icon/000001132:daemonic-icon"
     ],
     "datasheet_names": [
       "Bloodcrushers",
-      "Bloodletters"
+      "Bloodletters",
+      "Plaguebearers"
     ],
     "runtime_consumer_ids": [
       "catalog-ir:leadership-characteristic-query"
     ],
     "source_kind_counts": {
-      "wargear": 2
+      "wargear": 3
     },
     "support_stages": [
       "engine_consumed"

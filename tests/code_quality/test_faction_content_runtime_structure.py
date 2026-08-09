@@ -365,6 +365,43 @@ def test_generated_manifest_module_paths_match_scaffold_files() -> None:
         assert row.execution_record_ids
 
 
+def test_generated_manifest_covers_every_executable_detachment_subrule() -> None:
+    rows_by_identity = {
+        (
+            row.family,
+            row.owner_faction_id,
+            row.owner_detachment_id,
+            row.content_id,
+        ): row
+        for row in generated_manifest.generated_runtime_content_rows()
+    }
+    executable_statuses = {
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        faction_execution_2026_27.Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+    }
+    family_by_coverage_kind = {
+        "detachment_enhancement": RuntimeContentModuleFamily.ENHANCEMENT,
+        "detachment_stratagem": RuntimeContentModuleFamily.STRATAGEM,
+    }
+
+    for record in faction_execution_2026_27.execution_records():
+        family = family_by_coverage_kind.get(record.coverage_kind.value)
+        if family is None or record.execution_status not in executable_statuses:
+            continue
+        if record.detachment_id is None or record.rule_id is None:
+            raise AssertionError("Executable detachment subrule source identity is incomplete.")
+        identity = (
+            family,
+            record.faction_id,
+            record.detachment_id,
+            record.rule_id,
+        )
+        row = rows_by_identity[identity]
+        assert row.semantic_status is RuntimeContentSemanticStatus.IMPLEMENTED
+        assert record.execution_id in row.execution_record_ids
+        assert set(record.source_ids) <= set(row.source_ids)
+
+
 def test_generated_manifest_semantic_status_is_source_backed() -> None:
     status_counts = {
         RuntimeContentSemanticStatus.PLACEHOLDER: 0,

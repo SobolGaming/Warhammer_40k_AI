@@ -22,7 +22,11 @@ def build_runtime_content_bundle(config: GameConfig) -> RuntimeContentBundle:
     if type(config) is not GameConfig:
         raise GameLifecycleError("Runtime content bundle build requires GameConfig.")
     armies = tuple(
-        muster_army(catalog=config.army_catalog, request=request)
+        muster_army(
+            catalog=config.army_catalog,
+            request=request,
+            model_geometries=config.model_geometries,
+        )
         for request in config.army_muster_requests
     )
     return build_runtime_content_bundle_for_armies(config=config, armies=armies)

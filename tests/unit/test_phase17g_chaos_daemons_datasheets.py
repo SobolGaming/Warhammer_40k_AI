@@ -92,6 +92,38 @@ from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext
 
 
+def test_named_datasheet_behavior_uses_stable_ability_id_and_retains_source_provenance() -> None:
+    unit = unit_by_id(battle_state(), "army-alpha:intercessor-unit-1")
+    bridged_ability = _datasheet_ability(datasheets.BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID)
+    assert bridged_ability.source_id != datasheets.BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID
+    bridged_unit = replace(unit, datasheet_abilities=(bridged_ability,))
+
+    assert datasheets._unit_has_datasheet_ability(  # pyright: ignore[reportPrivateUsage]
+        bridged_unit,
+        datasheets.BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID,
+    )
+    assert not datasheets._unit_has_datasheet_ability(  # pyright: ignore[reportPrivateUsage]
+        replace(
+            bridged_unit,
+            datasheet_abilities=(
+                replace(
+                    bridged_ability,
+                    ability_id="phase17g-wrong-ability-id",
+                    source_id=datasheets.BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID,
+                ),
+            ),
+        ),
+        datasheets.BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID,
+    )
+
+    khorne_binding = next(
+        binding
+        for binding in datasheets.runtime_contribution().hit_roll_modifier_bindings
+        if binding.modifier_id == datasheets.KHORNE_HIT_MODIFIER_ID
+    )
+    assert khorne_binding.source_id == datasheets.BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID
+
+
 def test_daemon_lord_auras_apply_only_to_matching_legiones_daemonica_keywords() -> None:
     state = battle_state(
         player_a_units=(
@@ -110,8 +142,8 @@ def test_daemon_lord_auras_apply_only_to_matching_legiones_daemonica_keywords() 
         keywords=("Character", "Monster", "Khorne", "Tzeentch"),
         faction_keywords=("Legiones Daemonica",),
         datasheet_abilities=(
-            _datasheet_ability(datasheets.BLOODTHIRSTER_DAEMON_LORD_SOURCE_ID),
-            _datasheet_ability(datasheets.LORD_OF_CHANGE_DAEMON_LORD_SOURCE_ID),
+            _datasheet_ability(datasheets.BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID),
+            _datasheet_ability(datasheets.LORD_OF_CHANGE_DAEMON_LORD_ABILITY_ID),
         ),
     )
     _replace_unit_keywords_and_abilities(
@@ -170,7 +202,7 @@ def test_daemon_lord_auras_apply_only_to_matching_legiones_daemonica_keywords() 
         )
     )
     assert modified_ranged.strength.final == 6
-    assert datasheets.LORD_OF_CHANGE_DAEMON_LORD_SOURCE_ID in modified_ranged.source_ids
+    assert datasheets.LORD_OF_CHANGE_DAEMON_LORD_ABILITY_ID in modified_ranged.source_ids
 
 
 def test_skarbrand_and_keeper_weapon_auras_modify_friendly_melee_profiles() -> None:
@@ -192,7 +224,7 @@ def test_skarbrand_and_keeper_weapon_auras_modify_friendly_melee_profiles() -> N
         unit_instance_id=source_unit_id,
         keywords=("Character", "Monster", "Khorne"),
         faction_keywords=("Legiones Daemonica",),
-        datasheet_abilities=(_datasheet_ability(datasheets.SKARBRAND_RAGE_EMBODIED_SOURCE_ID),),
+        datasheet_abilities=(_datasheet_ability(datasheets.SKARBRAND_RAGE_EMBODIED_ABILITY_ID),),
     )
     _replace_unit_keywords_and_abilities(
         state,
@@ -219,14 +251,16 @@ def test_skarbrand_and_keeper_weapon_auras_modify_friendly_melee_profiles() -> N
     )
     assert rage_modified.attack_profile.fixed_attacks == 2
     assert rage_modified.armor_penetration.final == -1
-    assert datasheets.SKARBRAND_RAGE_EMBODIED_SOURCE_ID in rage_modified.source_ids
+    assert datasheets.SKARBRAND_RAGE_EMBODIED_ABILITY_ID in rage_modified.source_ids
 
     _replace_unit_keywords_and_abilities(
         state,
         unit_instance_id=source_unit_id,
         keywords=("Character", "Monster", "Slaanesh"),
         faction_keywords=("Legiones Daemonica",),
-        datasheet_abilities=(_datasheet_ability(datasheets.KEEPER_DAEMON_LORD_SLAANESH_SOURCE_ID),),
+        datasheet_abilities=(
+            _datasheet_ability(datasheets.KEEPER_DAEMON_LORD_SLAANESH_ABILITY_ID),
+        ),
     )
     _replace_unit_keywords_and_abilities(
         state,
@@ -247,7 +281,7 @@ def test_skarbrand_and_keeper_weapon_auras_modify_friendly_melee_profiles() -> N
     )
     assert slaanesh_modified.attack_profile.fixed_attacks == 1
     assert slaanesh_modified.armor_penetration.final == -2
-    assert datasheets.KEEPER_DAEMON_LORD_SLAANESH_SOURCE_ID in slaanesh_modified.source_ids
+    assert datasheets.KEEPER_DAEMON_LORD_SLAANESH_ABILITY_ID in slaanesh_modified.source_ids
 
 
 def test_rotigus_deluge_modifies_enemy_move_and_objective_control_within_aura() -> None:
@@ -265,7 +299,7 @@ def test_rotigus_deluge_modifies_enemy_move_and_objective_control_within_aura() 
         unit_instance_id=source_unit_id,
         keywords=("Character", "Monster", "Nurgle"),
         faction_keywords=("Legiones Daemonica",),
-        datasheet_abilities=(_datasheet_ability(datasheets.ROTIGUS_DELUGE_SOURCE_ID),),
+        datasheet_abilities=(_datasheet_ability(datasheets.ROTIGUS_DELUGE_ABILITY_ID),),
     )
     registry = _datasheet_runtime_modifier_registry()
 
@@ -312,7 +346,7 @@ def test_nurglings_mischief_makers_modifies_enemy_melee_hits_in_engagement_range
         unit_instance_id=source_unit_id,
         keywords=("Swarm", "Nurgle"),
         faction_keywords=("Legiones Daemonica",),
-        datasheet_abilities=(_datasheet_ability(datasheets.NURGLINGS_MISCHIEF_MAKERS_SOURCE_ID),),
+        datasheet_abilities=(_datasheet_ability(datasheets.NURGLINGS_MISCHIEF_MAKERS_ABILITY_ID),),
     )
     registry = _datasheet_runtime_modifier_registry()
 
@@ -367,7 +401,9 @@ def test_poxbringer_feculent_despair_modifies_enemy_battle_shock_within_aura() -
         unit_instance_id=source_unit_id,
         keywords=("Character", "Nurgle"),
         faction_keywords=("Legiones Daemonica",),
-        datasheet_abilities=(_datasheet_ability(datasheets.POXBRINGER_FECULENT_DESPAIR_SOURCE_ID),),
+        datasheet_abilities=(
+            _datasheet_ability(datasheets.POXBRINGER_FECULENT_DESPAIR_ABILITY_ID),
+        ),
     )
     target_unit = unit_by_id(state, target_unit_id)
     request = BattleShockTestRequest.for_unit(
@@ -403,7 +439,7 @@ def test_poxbringer_feculent_despair_modifies_enemy_battle_shock_within_aura() -
     assert modifier.modifier_id == (
         f"{datasheets.FECULENT_DESPAIR_HOOK_ID}:{request.request_id}:player-a"
     )
-    assert modifier.source_id == datasheets.POXBRINGER_FECULENT_DESPAIR_SOURCE_ID
+    assert modifier.source_id == datasheets.POXBRINGER_FECULENT_DESPAIR_ABILITY_ID
     assert modifier.operand == -1
 
     _place_units_near_center(
@@ -431,7 +467,7 @@ def test_infected_outbreak_records_sticky_state_when_plaguebearers_control_objec
         keywords=("Battleline", "Infantry", "Nurgle"),
         faction_keywords=("Legiones Daemonica",),
         datasheet_abilities=(
-            _datasheet_ability(datasheets.PLAGUEBEARERS_INFECTED_OUTBREAK_SOURCE_ID),
+            _datasheet_ability(datasheets.PLAGUEBEARERS_INFECTED_OUTBREAK_ABILITY_ID),
         ),
     )
     decisions = DecisionController()
@@ -447,7 +483,7 @@ def test_infected_outbreak_records_sticky_state_when_plaguebearers_control_objec
 
     assert len(sticky_states) == 1
     sticky_state = sticky_states[0]
-    assert sticky_state.source_rule_id == datasheets.PLAGUEBEARERS_INFECTED_OUTBREAK_SOURCE_ID
+    assert sticky_state.source_rule_id == datasheets.PLAGUEBEARERS_INFECTED_OUTBREAK_ABILITY_ID
     assert sticky_state.player_id == "player-a"
     assert sticky_state.objective_id == center_marker_definition(state).objective_marker_id
     replay_payload = cast(dict[str, JsonValue], sticky_state.replay_payload)
@@ -456,7 +492,7 @@ def test_infected_outbreak_records_sticky_state_when_plaguebearers_control_objec
 
 def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wounds() -> None:
     state = _relentless_carnage_state(
-        game_id="phase17g-relentless-carnage",
+        game_id="phase17g-current-source-4-3",
     )
     target_unit_id = "army-beta:intercessor-unit-3"
     decisions = DecisionController()
@@ -477,7 +513,7 @@ def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wound
     request_payload = cast(dict[str, JsonValue], request.payload)
     assert request.actor_id == "player-a"
     assert (
-        request_payload["source_rule_id"] == datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID
+        request_payload["source_rule_id"] == datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID
     )
     assert request_payload["eligible_enemy_unit_instance_ids"] == [target_unit_id]
     result = DecisionResult.for_request(
@@ -503,12 +539,12 @@ def test_relentless_carnage_fight_end_handler_requests_and_resolves_mortal_wound
 
     assert resolved_status is None
     payload = _event_payload(decisions, datasheets.RELENTLESS_CARNAGE_RESOLVED_EVENT)
-    assert payload["source_rule_id"] == datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID
+    assert payload["source_rule_id"] == datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID
     assert payload["hook_id"] == datasheets.RELENTLESS_CARNAGE_HOOK_ID
     assert payload["target_enemy_unit_instance_id"] == target_unit_id
     assert payload["mortal_wounds"] == 4
     d6_payload = cast(dict[str, JsonValue], payload["d6_result"])
-    assert d6_payload["current_values"] == [6, 3, 3, 5, 2, 5, 4, 3]
+    assert d6_payload["current_values"] == [3, 5, 1, 3, 1, 5, 6, 5]
     application = cast(dict[str, JsonValue], payload["mortal_wound_application"])
     assert application["mortal_wounds"] == 4
     assert (
@@ -561,7 +597,7 @@ def test_relentless_carnage_fight_end_handler_records_decline_without_damage() -
 
 
 def test_relentless_carnage_records_zero_mortal_wounds_without_application() -> None:
-    state = _relentless_carnage_state(game_id="phase17g-zero-mw-real-218")
+    state = _relentless_carnage_state(game_id="phase17g-current-source-0-91")
     source_unit_id = "army-alpha:intercessor-unit-1"
     target_unit_id = "army-beta:intercessor-unit-3"
     decisions = DecisionController()
@@ -614,7 +650,7 @@ def test_relentless_carnage_prior_fight_phase_record_does_not_block_later_round(
         keywords=("Character", "Monster", "Khorne"),
         faction_keywords=("Legiones Daemonica",),
         datasheet_abilities=(
-            _datasheet_ability(datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID),
+            _datasheet_ability(datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID),
         ),
     )
     _set_fight_phase_end_state(state, engaged_unit_ids=(source_unit_id, target_unit_id))
@@ -845,8 +881,8 @@ def test_daemon_lord_modifiers_ignore_wrong_weapon_types_and_duplicate_sources()
         keywords=("Character", "Monster", "Khorne", "Tzeentch"),
         faction_keywords=("Legiones Daemonica",),
         datasheet_abilities=(
-            _datasheet_ability(datasheets.BLOODTHIRSTER_DAEMON_LORD_SOURCE_ID),
-            _datasheet_ability(datasheets.LORD_OF_CHANGE_DAEMON_LORD_SOURCE_ID),
+            _datasheet_ability(datasheets.BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID),
+            _datasheet_ability(datasheets.LORD_OF_CHANGE_DAEMON_LORD_ABILITY_ID),
         ),
     )
     _replace_unit_keywords_and_abilities(
@@ -892,7 +928,7 @@ def test_daemon_lord_modifiers_ignore_wrong_weapon_types_and_duplicate_sources()
     )
     already_modified = replace(
         _ranged_profile(),
-        source_ids=(datasheets.LORD_OF_CHANGE_DAEMON_LORD_SOURCE_ID,),
+        source_ids=(datasheets.LORD_OF_CHANGE_DAEMON_LORD_ABILITY_ID,),
     )
     assert (
         registry.modified_weapon_profile(
@@ -917,7 +953,7 @@ def test_relentless_carnage_mortal_wound_routing_records_pending_fnp() -> None:
     }
     progress = MortalWoundApplicationProgress.start(
         application_id="phase17g-relentless-carnage-pending-application",
-        source_rule_id=datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+        source_rule_id=datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
         source_context={
             "source_kind": datasheets.RELENTLESS_CARNAGE_SOURCE_KIND,
             "phase": BattlePhase.FIGHT.value,
@@ -961,7 +997,7 @@ def test_datasheet_private_helpers_fail_fast_on_invalid_inputs() -> None:
     decisions = DecisionController()
     progress = MortalWoundApplicationProgress.start(
         application_id="phase17g-helper-guard-application",
-        source_rule_id=datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+        source_rule_id=datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
         source_context={
             "source_kind": datasheets.RELENTLESS_CARNAGE_SOURCE_KIND,
             "phase": BattlePhase.FIGHT.value,
@@ -1070,9 +1106,9 @@ def test_datasheet_private_helpers_fail_fast_on_invalid_inputs() -> None:
             second_models=(),
         )
     with pytest.raises(GameLifecycleError, match="Datasheet ability lookup requires UnitInstance"):
-        datasheets._unit_has_datasheet_ability_source(  # pyright: ignore[reportPrivateUsage]
+        datasheets._unit_has_datasheet_ability(  # pyright: ignore[reportPrivateUsage]
             cast(UnitInstance, object()),
-            datasheets.BLOODTHIRSTER_DAEMON_LORD_SOURCE_ID,
+            datasheets.BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID,
         )
     with pytest.raises(GameLifecycleError, match="Chaos Daemons army lookup requires GameState"):
         datasheets._chaos_daemons_armies(object())  # pyright: ignore[reportPrivateUsage]
@@ -1124,7 +1160,7 @@ def test_relentless_carnage_does_not_request_without_source_or_engaged_enemy() -
         keywords=("Character", "Monster", "Khorne"),
         faction_keywords=("Legiones Daemonica",),
         datasheet_abilities=(
-            _datasheet_ability(datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID),
+            _datasheet_ability(datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID),
         ),
     )
     _set_fight_phase_end_state(
@@ -1194,7 +1230,7 @@ def test_infected_outbreak_and_daemon_lord_paths_ignore_nonmatching_windows() ->
         unit_instance_id=source_unit_id,
         keywords=("Character", "Monster", "Khorne"),
         faction_keywords=("Legiones Daemonica",),
-        datasheet_abilities=(_datasheet_ability(datasheets.BLOODTHIRSTER_DAEMON_LORD_SOURCE_ID),),
+        datasheet_abilities=(_datasheet_ability(datasheets.BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID),),
     )
     _replace_unit_keywords_and_abilities(
         state,
@@ -1770,12 +1806,11 @@ def _datasheet_runtime_modifier_registry() -> RuntimeModifierRegistry:
     )
 
 
-def _datasheet_ability(source_id: str) -> DatasheetAbilityDescriptor:
-    ability_id_suffix = source_id.split("Datasheets_abilities:", maxsplit=1)[1].replace(":", "-")
+def _datasheet_ability(ability_id: str) -> DatasheetAbilityDescriptor:
     return DatasheetAbilityDescriptor(
-        ability_id=f"phase17g-datasheet:{ability_id_suffix}",
+        ability_id=ability_id,
         name="Source Backed Datasheet Ability",
-        source_id=source_id,
+        source_id=f"data-package:core-v2:phase17g-datasheet-test:{ability_id}",
         support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
         source_kind=CatalogAbilitySourceKind.DATASHEET,
         effect_description="source-backed datasheet test ability",
@@ -1950,7 +1985,7 @@ def _relentless_carnage_record_payload(
     source_unit_instance_id: str,
 ) -> dict[str, JsonValue]:
     return {
-        "source_rule_id": datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+        "source_rule_id": datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
         "phase": BattlePhase.FIGHT.value,
         "battle_round": battle_round,
         "active_player_id": "player-a",
@@ -1988,7 +2023,7 @@ def _relentless_carnage_state(
         keywords=("Character", "Monster", "Khorne"),
         faction_keywords=("Legiones Daemonica",),
         datasheet_abilities=(
-            _datasheet_ability(datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID),
+            _datasheet_ability(datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID),
         ),
     )
     _retain_one_alive_model(state=state, unit_instance_id=source_unit_id)

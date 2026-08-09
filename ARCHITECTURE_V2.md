@@ -4956,6 +4956,22 @@ remain explicit unsupported results until checked-in certified-scenario and
 replay evidence exists. Phase 20A and Phase 20D booleans are derived from those
 evidence-bearing results, not from prose or the legacy three-state rollup.
 
+The checked-in July 2026 Chaos Daemons regression roster is the concrete
+selected-content proof for this distinction. Its 1,980-point eight-unit
+selection has a production catalog whose exact five datasheets are reconciled
+against the current official PDF through a typed, hashed artifact. That
+runtime-safe artifact pins the historical generator inputs by hash without
+carrying their retired package identity, hashes the reviewed gameplay payloads,
+enforces Be'lakor's `DAMAGED 1-7`, and keeps `SHADOW LEGION` as a detachment-time
+keyword grant. MFM mustering and active runtime-consumer evidence cover those
+five datasheets, Cavalcade of Chaos and Shadow Legion bundles, and selected
+Apocalyptic Steeds assignments. The artifact preserves official base sizes, but
+Bloodthirster, Lord of Change, Plaguebearers, and Plagueridden heights remain
+review-blocked; their diagnostics prevent `PHYSICALLY_PLAYABLE` from being
+claimed. This is not an exhaustive whole-faction source review. The exact load,
+muster, and semantic checks remain independent of physical, full-game, and
+replay certification; Phase 20 evidence still owns the latter claims.
+
 Phase 17O evolves the existing `support_profile()` baseline into a versioned,
 client-readable capability manifest. It must answer whether the selected
 ruleset, mission, battlefield, roster, physical models, and executable rules can

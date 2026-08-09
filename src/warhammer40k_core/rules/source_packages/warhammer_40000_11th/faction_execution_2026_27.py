@@ -392,19 +392,27 @@ def phase17f_execution_package() -> Phase17FExecutionPackage:
         july_faction_packs_2026_07,
     )
 
-    successor = july_faction_packs_2026_07.exalted_patron().execution_record()
+    exalted_patron_successor = july_faction_packs_2026_07.exalted_patron().execution_record()
+    daemonic_manifestation_successor = july_faction_packs_2026_07.daemonic_manifestation()
     records: list[Phase17FExecutionRecord] = []
-    replacements = 0
+    exalted_patron_replacements = 0
+    daemonic_manifestation_records = 0
     for row in _coverage_rows():
         record = _execution_record(row)
-        if record.execution_id == successor.execution_id:
-            records.append(successor)
-            replacements += 1
+        if record.execution_id == exalted_patron_successor.execution_id:
+            records.append(exalted_patron_successor)
+            exalted_patron_replacements += 1
         else:
             records.append(record)
-    if replacements != 1:
+        if record.execution_id == daemonic_manifestation_successor.phase17f_execution_id:
+            daemonic_manifestation_records += 1
+    if exalted_patron_replacements != 1:
         raise Phase17FFactionExecutionError(
             "July execution package requires exactly one Exalted Patron predecessor."
+        )
+    if daemonic_manifestation_records != 1:
+        raise Phase17FFactionExecutionError(
+            "July execution package requires exactly one Daemonic Manifestation successor."
         )
     return Phase17FExecutionPackage(execution_records=tuple(records))
 
@@ -456,7 +464,7 @@ def _execution_record(row: Phase17ECoverageRow) -> Phase17FExecutionRecord:
         raise Phase17FFactionExecutionError("Unsupported Phase17E coverage status.")
 
     return Phase17FExecutionRecord(
-        execution_id=f"phase17f:{row.descriptor_id}",
+        execution_id=_execution_id(row),
         coverage_descriptor_id=row.descriptor_id,
         coverage_kind=row.coverage_kind,
         coverage_status=row.status,
@@ -480,6 +488,21 @@ def _execution_record(row: Phase17ECoverageRow) -> Phase17FExecutionRecord:
         rule_ir_hash=row.rule_ir_hash,
         phase17e_unsupported_reason=phase17e_unsupported_reason,
     )
+
+
+def _execution_id(row: Phase17ECoverageRow) -> str:
+    if (
+        row.coverage_kind is Phase17ECoverageKind.FACTION_ARMY_RULE
+        and row.faction_id == "chaos-daemons"
+    ):
+        from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+            july_faction_packs_2026_07,
+        )
+
+        successor = july_faction_packs_2026_07.daemonic_manifestation()
+        if row.descriptor_id == successor.phase17e_descriptor_id:
+            return successor.phase17f_execution_id
+    return f"phase17f:{row.descriptor_id}"
 
 
 def _validate_execution_records(
