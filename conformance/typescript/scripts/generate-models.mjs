@@ -80,7 +80,7 @@ try {
       `${JSON.stringify(normalized, null, 2)}\n`,
       "utf8",
     );
-    for (const [definitionName, definition] of Object.entries(source.$defs ?? {})) {
+    for (const [definitionName, definition] of Object.entries(schemaDefinitions(source))) {
       const definitionPath = resolve(
         normalizedSchemaRoot,
         definitionFileName(schemaName, definitionName),
@@ -136,6 +136,12 @@ function normalizeReference(reference, currentSchemaName) {
   if (reference.startsWith("#/$defs/")) {
     return definitionReference(currentSchemaName, reference.slice(1));
   }
+  if (reference.startsWith("#/properties/config/$defs/")) {
+    return definitionReference(
+      currentSchemaName,
+      reference.slice("#/properties/config".length),
+    );
+  }
   if (!reference.startsWith(localSchemaPrefix)) {
     return reference;
   }
@@ -161,6 +167,18 @@ function definitionFileName(schemaName, definitionName) {
   const stem = schemaName.replace(/\.schema\.json$/, "");
   const safeDefinitionName = definitionName.replace(/[^A-Za-z0-9_.-]/g, "-");
   return `${stem}--${safeDefinitionName}.schema.json`;
+}
+
+function schemaDefinitions(source) {
+  const definitions = { ...(source.$defs ?? {}) };
+  const configDefinitions = source.properties?.config?.$defs ?? {};
+  for (const [definitionName, definition] of Object.entries(configDefinitions)) {
+    if (Object.hasOwn(definitions, definitionName)) {
+      throw new Error(`Duplicate JSON Schema definition ${definitionName}.`);
+    }
+    definitions[definitionName] = definition;
+  }
+  return definitions;
 }
 
 function selectedEntries(value, names) {

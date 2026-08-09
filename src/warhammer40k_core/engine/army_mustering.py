@@ -94,6 +94,9 @@ CULT_OF_DARK_GODS_POINTS_CAP_BY_BATTLE_SIZE = {
 DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_SOURCE_ID = (
     "phase17g:drukhari:corsairs-and-travelling-players"
 )
+DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_MUSTERING_CONSUMER_ID = (
+    "army-mustering:drukhari-corsairs-and-travelling-players"
+)
 DRUKHARI_CORSAIRS_AND_TRAVELLING_PLAYERS_POINTS_CAP_BY_BATTLE_SIZE = {
     BattleSize.INCURSION: 250,
     BattleSize.STRIKE_FORCE: 500,
@@ -1023,7 +1026,7 @@ def muster_army(
     *,
     catalog: ArmyCatalog,
     request: ArmyMusterRequest,
-    model_geometries: tuple[ModelGeometryCatalogRecord, ...] = (),
+    model_geometries: tuple[ModelGeometryCatalogRecord, ...] | None = None,
 ) -> ArmyDefinition:
     if type(catalog) is not ArmyCatalog:
         raise ArmyMusteringError("catalog must be an ArmyCatalog.")
@@ -1046,7 +1049,10 @@ def muster_army(
         raise ArmyMusteringError("ArmyMusterRequest detachment selection is invalid.") from exc
 
     try:
-        factory = UnitFactory(catalog=catalog, model_geometries=model_geometries)
+        factory = UnitFactory(
+            catalog=catalog,
+            model_geometries=() if model_geometries is None else model_geometries,
+        )
     except UnitFactoryError as exc:
         raise ArmyMusteringError("ArmyMusterRequest model geometries are invalid.") from exc
     units: list[UnitInstance] = []

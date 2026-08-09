@@ -141,14 +141,16 @@ class Phase17INamedHandlerBudgetReport:
     def unapproved_named_handler_execution_ids(self) -> tuple[str, ...]:
         approved_ids = set(self.approved_execution_ids)
         return tuple(
-            execution_id
-            for execution_id in self.named_handler_execution_ids
-            if execution_id not in approved_ids
+            record.execution_id
+            for record in self.named_handler_records
+            if _budget_execution_id_for_record(record) not in approved_ids
         )
 
     @property
     def stale_approved_execution_ids(self) -> tuple[str, ...]:
-        named_handler_ids = set(self.named_handler_execution_ids)
+        named_handler_ids = {
+            _budget_execution_id_for_record(record) for record in self.named_handler_records
+        }
         return tuple(
             execution_id
             for execution_id in self.approved_execution_ids
@@ -241,6 +243,17 @@ def source_package_identity_payload() -> dict[str, str]:
         "source_payload_checksum_sha256": report.source_payload_checksum_sha256(),
         "upstream_payload_checksum_sha256": _upstream_payload_checksum_sha256(),
     }
+
+
+def _budget_execution_id_for_record(record: Phase17FExecutionRecord) -> str:
+    from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+        july_faction_packs_2026_07,
+    )
+
+    successor = july_faction_packs_2026_07.daemonic_manifestation()
+    if record.execution_id == successor.phase17f_execution_id:
+        return successor.named_handler_budget_execution_id
+    return record.execution_id
 
 
 def _named_handler_records() -> tuple[Phase17FExecutionRecord, ...]:

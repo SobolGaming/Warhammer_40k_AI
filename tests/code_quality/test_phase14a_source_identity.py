@@ -1,11 +1,42 @@
 from __future__ import annotations
 
+import ast
+import hashlib
 import re
 from pathlib import Path
+
+import pytest
+
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
+    datasheets as chaos_daemons_datasheets,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    chaos_daemons_roster_2026_07,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 THIS_FILE = Path(__file__).resolve()
 HEX_DIGEST_PATTERN = re.compile(r"\b[0-9a-fA-F]{32,}\b")
+RECONCILIATION_ARTIFACT = (
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "rules"
+    / "source_packages"
+    / "warhammer_40000_11th"
+    / "chaos_daemons_roster_2026_07"
+    / chaos_daemons_roster_2026_07.RECONCILIATION_ARTIFACT_PATH
+)
+CHAOS_DAEMONS_DATASHEET_RUNTIME = (
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "engine"
+    / "faction_content"
+    / "warhammer_40000_11th"
+    / "chaos_daemons"
+    / "datasheets.py"
+)
 
 
 def test_active_code_tests_and_docs_do_not_reference_retired_edition_ids() -> None:
@@ -22,6 +53,99 @@ def test_active_code_tests_and_docs_do_not_reference_retired_edition_ids() -> No
         "Phase 14A requires active runtime, test, and docs identity to be 11th Edition-only:\n"
         + "\n".join(violations)
     )
+
+
+def test_retired_identity_scanner_folds_concatenated_string_literals() -> None:
+    source = 'RETIRED = "warhammer_40000_" + "1" + "0" + "th"'
+
+    assert "warhammer_40000_10th" in _python_constant_strings(source)
+
+
+def test_chaos_daemons_datasheet_runtime_does_not_construct_retired_source_ids() -> None:
+    source = _without_hex_digests(CHAOS_DAEMONS_DATASHEET_RUNTIME.read_text(encoding="utf-8"))
+    evaluated_strings = _python_constant_strings(source)
+
+    assert not {
+        token
+        for token in _retired_identity_tokens()
+        if token in source or any(token in value for value in evaluated_strings)
+    }
+
+
+def test_chaos_daemons_runtime_sources_are_stable_ability_ids() -> None:
+    contribution = chaos_daemons_datasheets.runtime_contribution()
+    source_ids = frozenset(
+        (
+            *(binding.source_id for binding in contribution.hit_roll_modifier_bindings),
+            *(binding.source_id for binding in contribution.movement_budget_modifier_bindings),
+            *(binding.source_id for binding in contribution.objective_control_modifier_bindings),
+            *(binding.source_id for binding in contribution.weapon_profile_modifier_bindings),
+            *(binding.source_id for binding in contribution.hook_bindings),
+        )
+    )
+
+    assert source_ids == frozenset(
+        {
+            chaos_daemons_datasheets.BLOODTHIRSTER_DAEMON_LORD_ABILITY_ID,
+            chaos_daemons_datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
+            chaos_daemons_datasheets.SKARBRAND_RAGE_EMBODIED_ABILITY_ID,
+            chaos_daemons_datasheets.LORD_OF_CHANGE_DAEMON_LORD_ABILITY_ID,
+            chaos_daemons_datasheets.PLAGUEBEARERS_INFECTED_OUTBREAK_ABILITY_ID,
+            chaos_daemons_datasheets.KEEPER_DAEMON_LORD_SLAANESH_ABILITY_ID,
+            chaos_daemons_datasheets.ROTIGUS_DELUGE_ABILITY_ID,
+            chaos_daemons_datasheets.NURGLINGS_MISCHIEF_MAKERS_ABILITY_ID,
+            chaos_daemons_datasheets.POXBRINGER_FECULENT_DESPAIR_ABILITY_ID,
+        }
+    )
+    assert not any(
+        retired_token in source_id
+        for source_id in source_ids
+        for retired_token in _retired_identity_tokens()
+    )
+
+
+def test_exact_roster_reconciliation_is_current_only_hash_and_schema_bounded() -> None:
+    raw = RECONCILIATION_ARTIFACT.read_bytes()
+    expected_name, expected_hash = (
+        chaos_daemons_roster_2026_07.EXPECTED_RECONCILIATION_SOURCE_ARTIFACT
+    )
+    reconciliation = chaos_daemons_roster_2026_07.reconciliation_manifest()
+
+    assert expected_name == "official-pdf-exact-five-reconciliation.json"
+    assert hashlib.sha256(raw).hexdigest() == expected_hash
+    assert reconciliation.official_pdf.source_package_id == (
+        chaos_daemons_roster_2026_07.EXPECTED_CURRENT_FACTION_SOURCE_PACKAGE_ID
+    )
+    assert reconciliation.generator_inputs.artifact_hashes == tuple(
+        sorted(chaos_daemons_roster_2026_07.EXPECTED_GENERATOR_INPUT_ARTIFACT_HASHES)
+    )
+    assert set(reconciliation.to_payload()["generator_inputs"]) == {"artifact_hashes"}
+    assert tuple(row.datasheet_id for row in reconciliation.datasheets) == (
+        chaos_daemons_roster_2026_07.EXPECTED_DATASHEET_IDS
+    )
+
+
+def test_runtime_reconciliation_loader_rejects_raw_hash_drift(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    raw = RECONCILIATION_ARTIFACT.read_bytes()
+
+    def drifted_artifact_bytes(package_name: str, artifact_path: str) -> bytes:
+        assert package_name
+        assert artifact_path == chaos_daemons_roster_2026_07.RECONCILIATION_ARTIFACT_PATH
+        return raw + b"\n"
+
+    chaos_daemons_roster_2026_07.reconciliation_manifest.cache_clear()
+    monkeypatch.setattr(
+        chaos_daemons_roster_2026_07,
+        "package_artifact_bytes",
+        drifted_artifact_bytes,
+    )
+    with pytest.raises(
+        chaos_daemons_roster_2026_07.ChaosDaemonsRosterCatalogError,
+        match="raw artifact hash drifted",
+    ):
+        chaos_daemons_roster_2026_07.reconciliation_manifest()
 
 
 def _scanned_paths() -> tuple[Path, ...]:
@@ -69,3 +193,21 @@ def _retired_identity_tokens() -> tuple[str, ...]:
 
 def _without_hex_digests(text: str) -> str:
     return HEX_DIGEST_PATTERN.sub("", text)
+
+
+def _python_constant_strings(source: str) -> tuple[str, ...]:
+    tree = ast.parse(source)
+    return tuple(
+        value for node in ast.walk(tree) if (value := _static_string_value(node)) is not None
+    )
+
+
+def _static_string_value(node: ast.AST) -> str | None:
+    if isinstance(node, ast.Constant) and type(node.value) is str:
+        return node.value
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+        left = _static_string_value(node.left)
+        right = _static_string_value(node.right)
+        if left is not None and right is not None:
+            return left + right
+    return None

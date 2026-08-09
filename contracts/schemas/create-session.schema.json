@@ -4,6 +4,279 @@
   "additionalProperties": false,
   "properties": {
     "config": {
+      "$defs": {
+        "geometry_dimensions": {
+          "additionalProperties": {"exclusiveMinimum": 0, "type": "number"},
+          "minProperties": 1,
+          "type": "object"
+        },
+        "model_footprint": {
+          "additionalProperties": false,
+          "properties": {
+            "canonical_units": {"const": "inches", "type": "string"},
+            "coordinate_frame": {"const": "model_centered_z_up", "type": "string"},
+            "evidence_id": {"minLength": 1, "type": "string"},
+            "footprint_id": {"minLength": 1, "type": "string"},
+            "footprint_kind": {
+              "enum": ["circular", "oval", "rectangular", "hull"],
+              "type": "string"
+            },
+            "origin": {
+              "enum": [
+                "footprint_center_table_surface",
+                "support_base_center_table_surface"
+              ],
+              "type": "string"
+            },
+            "parts": {
+              "items": {
+                "$ref": "#/properties/config/$defs/model_footprint_part"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "source_units": {
+              "enum": ["millimeters", "inches"],
+              "type": "string"
+            }
+          },
+          "required": [
+            "footprint_id",
+            "footprint_kind",
+            "parts",
+            "source_units",
+            "canonical_units",
+            "coordinate_frame",
+            "origin",
+            "evidence_id"
+          ],
+          "type": "object"
+        },
+        "model_footprint_part": {
+          "additionalProperties": false,
+          "properties": {
+            "canonical_units": {"const": "inches", "type": "string"},
+            "coordinate_frame": {"const": "model_centered_z_up", "type": "string"},
+            "evidence_id": {"minLength": 1, "type": "string"},
+            "footprint_kind": {
+              "enum": ["circular", "oval", "rectangular", "hull"],
+              "type": "string"
+            },
+            "offset_x_inches": {"type": "number"},
+            "offset_y_inches": {"type": "number"},
+            "part_id": {"minLength": 1, "type": "string"},
+            "radius_x_inches": {"exclusiveMinimum": 0, "type": "number"},
+            "radius_y_inches": {"exclusiveMinimum": 0, "type": "number"},
+            "source_units": {
+              "enum": ["millimeters", "inches"],
+              "type": "string"
+            },
+            "origin": {
+              "enum": [
+                "footprint_center_table_surface",
+                "support_base_center_table_surface"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "part_id",
+            "footprint_kind",
+            "radius_x_inches",
+            "radius_y_inches",
+            "offset_x_inches",
+            "offset_y_inches",
+            "source_units",
+            "canonical_units",
+            "coordinate_frame",
+            "origin",
+            "evidence_id"
+          ],
+          "type": "object"
+        },
+        "model_geometry_catalog_record": {
+          "additionalProperties": false,
+          "properties": {
+            "evidence": {
+              "items": {
+                "$ref": "#/properties/config/$defs/model_geometry_source_evidence"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "footprint": {
+              "$ref": "#/properties/config/$defs/model_footprint"
+            },
+            "height": {
+              "$ref": "#/properties/config/$defs/model_height"
+            },
+            "model_geometry_id": {"minLength": 1, "type": "string"},
+            "model_profile_id": {"minLength": 1, "type": "string"},
+            "rules_footprint_policy": {
+              "enum": ["use_footprint", "use_support_base", "use_hull"],
+              "type": "string"
+            },
+            "source_ids": {
+              "items": {"minLength": 1, "type": "string"},
+              "type": "array",
+              "uniqueItems": true
+            },
+            "support_base": {
+              "oneOf": [
+                {"$ref": "#/properties/config/$defs/model_footprint"},
+                {"type": "null"}
+              ]
+            },
+            "z_offset": {
+              "oneOf": [
+                {"$ref": "#/properties/config/$defs/model_z_offset"},
+                {"type": "null"}
+              ]
+            }
+          },
+          "required": [
+            "model_geometry_id",
+            "model_profile_id",
+            "rules_footprint_policy",
+            "footprint",
+            "support_base",
+            "z_offset",
+            "height",
+            "evidence",
+            "source_ids"
+          ],
+          "type": "object"
+        },
+        "model_geometry_source_evidence": {
+          "additionalProperties": false,
+          "properties": {
+            "canonical_dimensions": {
+              "$ref": "#/properties/config/$defs/geometry_dimensions"
+            },
+            "canonical_units": {"const": "inches", "type": "string"},
+            "coordinate_frame": {"const": "model_centered_z_up", "type": "string"},
+            "document_reference": {
+              "oneOf": [
+                {"minLength": 1, "type": "string"},
+                {"type": "null"}
+              ]
+            },
+            "evidence_id": {"minLength": 1, "type": "string"},
+            "evidence_kind": {
+              "enum": [
+                "official_base_size",
+                "official_model_profile",
+                "manual_measurement",
+                "crowd_sourced_measurement"
+              ],
+              "type": "string"
+            },
+            "measurement_kind": {
+              "enum": ["footprint", "support_base", "z_offset", "height"],
+              "type": "string"
+            },
+            "origin": {
+              "enum": [
+                "footprint_center_table_surface",
+                "support_base_center_table_surface"
+              ],
+              "type": "string"
+            },
+            "reviewer_status": {
+              "enum": ["accepted", "needs_review"],
+              "type": "string"
+            },
+            "source_dimensions": {
+              "$ref": "#/properties/config/$defs/geometry_dimensions"
+            },
+            "source_id": {"minLength": 1, "type": "string"},
+            "source_units": {
+              "enum": ["millimeters", "inches"],
+              "type": "string"
+            },
+            "url": {
+              "oneOf": [
+                {"minLength": 1, "type": "string"},
+                {"type": "null"}
+              ]
+            }
+          },
+          "required": [
+            "evidence_id",
+            "evidence_kind",
+            "measurement_kind",
+            "source_id",
+            "source_units",
+            "source_dimensions",
+            "canonical_units",
+            "canonical_dimensions",
+            "coordinate_frame",
+            "origin",
+            "document_reference",
+            "url",
+            "reviewer_status"
+          ],
+          "type": "object"
+        },
+        "model_height": {
+          "additionalProperties": false,
+          "properties": {
+            "canonical_units": {"const": "inches", "type": "string"},
+            "coordinate_frame": {"const": "model_centered_z_up", "type": "string"},
+            "evidence_id": {"minLength": 1, "type": "string"},
+            "height_inches": {"exclusiveMinimum": 0, "type": "number"},
+            "origin": {
+              "enum": [
+                "footprint_center_table_surface",
+                "support_base_center_table_surface"
+              ],
+              "type": "string"
+            },
+            "source_units": {
+              "enum": ["millimeters", "inches"],
+              "type": "string"
+            }
+          },
+          "required": [
+            "height_inches",
+            "source_units",
+            "canonical_units",
+            "coordinate_frame",
+            "origin",
+            "evidence_id"
+          ],
+          "type": "object"
+        },
+        "model_z_offset": {
+          "additionalProperties": false,
+          "properties": {
+            "canonical_units": {"const": "inches", "type": "string"},
+            "coordinate_frame": {"const": "model_centered_z_up", "type": "string"},
+            "evidence_id": {"minLength": 1, "type": "string"},
+            "origin": {
+              "enum": [
+                "footprint_center_table_surface",
+                "support_base_center_table_surface"
+              ],
+              "type": "string"
+            },
+            "source_units": {
+              "enum": ["millimeters", "inches"],
+              "type": "string"
+            },
+            "z_offset_inches": {"minimum": 0, "type": "number"}
+          },
+          "required": [
+            "z_offset_inches",
+            "source_units",
+            "canonical_units",
+            "coordinate_frame",
+            "origin",
+            "evidence_id"
+          ],
+          "type": "object"
+        }
+      },
       "additionalProperties": false,
       "properties": {
         "allow_legacy_non_strict_rosters": {"type": "boolean"},
@@ -25,6 +298,13 @@
             {"minProperties": 1, "type": "object"},
             {"type": "null"}
           ]
+        },
+        "model_geometries": {
+          "items": {
+            "$ref": "#/properties/config/$defs/model_geometry_catalog_record"
+          },
+          "minItems": 1,
+          "type": "array"
         },
         "player_ids": {
           "items": {"minLength": 1, "type": "string"},

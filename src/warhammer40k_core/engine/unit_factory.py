@@ -575,8 +575,6 @@ class UnitFactory:
         for record in self.model_geometries:
             if record.model_profile_id == requested_model_profile_id:
                 return record
-        if self.model_geometries:
-            raise UnitFactoryError("Catalog model geometry is incomplete for selected profile.")
         return None
 
 

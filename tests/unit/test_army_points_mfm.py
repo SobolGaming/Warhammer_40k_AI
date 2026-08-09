@@ -388,6 +388,76 @@ def test_catalog_with_mfm_points_overlays_enhancement_prices_for_roster_total() 
     assert roster_total == 650
 
 
+def test_mfm_enhancement_pricing_resolves_canonical_id_by_exact_source_id() -> None:
+    catalog = _catalog()
+    mfm_package = _mfm_package()
+    mfm_enhancement = mfm_package.faction_by_id("test-faction").detachments[0].enhancements[0]
+    canonical_enhancement_id = "test-faction:test-detachment:canonical-upgrade"
+    catalog = replace(
+        catalog,
+        detachments=(
+            replace(
+                catalog.detachments[0],
+                enhancement_ids=(canonical_enhancement_id,),
+            ),
+        ),
+        enhancements=(
+            replace(
+                catalog.enhancements[0],
+                enhancement_id=canonical_enhancement_id,
+                name="Canonical Upgrade",
+                source_id=mfm_enhancement.source_id,
+            ),
+        ),
+    )
+    request = ArmyMusterRequest(
+        army_id="army-one",
+        player_id="player-one",
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="test-faction",
+            detachment_ids=("test-detachment",),
+            enhancement_ids=(canonical_enhancement_id,),
+        ),
+        force_disposition_id="test-force",
+        unit_selections=(
+            _unit_selection("variable-one", "variable-unit", (("variable-model", 1),)),
+        ),
+        enhancement_assignments=(
+            EnhancementAssignment(
+                enhancement_id=canonical_enhancement_id,
+                target_unit_selection_id="variable-one",
+                source_id=mfm_enhancement.source_id,
+            ),
+        ),
+    )
+
+    overlay = catalog_with_mfm_points(
+        catalog=catalog,
+        faction_id="test-faction",
+        source_package=mfm_package,
+    )
+    calculation = calculate_mfm_army_points(
+        catalog=catalog,
+        request=request,
+        source_package=mfm_package,
+    )
+
+    assert overlay.enhancements[0].enhancement_id == canonical_enhancement_id
+    assert overlay.enhancements[0].points == 15
+    assert calculation.total_points == 115
+    assert calculation.enhancement_lines == (
+        MfmEnhancementPointLine(
+            enhancement_id=canonical_enhancement_id,
+            target_unit_selection_id="variable-one",
+            points=15,
+            source_id=mfm_enhancement.source_id,
+        ),
+    )
+
+
 def test_catalog_with_mfm_points_feeds_roster_legality_enhancement_prices() -> None:
     catalog = _catalog()
     request = ArmyMusterRequest(

@@ -11,6 +11,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_named_handler_budget_2026_27 as budget_source,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    july_faction_packs_2026_07,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.faction_execution_2026_27 import (
     Phase17FExecutionBlockReason,
     Phase17FExecutionStatus,
@@ -30,6 +33,12 @@ def test_phase17i_named_handler_budget_covers_current_phase17f_named_handlers() 
     assert len(report.approved_entries) == 23
     assert report.unapproved_named_handler_execution_ids == ()
     assert report.stale_approved_execution_ids == ()
+    daemonic_manifestation = july_faction_packs_2026_07.daemonic_manifestation()
+    assert daemonic_manifestation.phase17f_execution_id in report.named_handler_execution_ids
+    assert (
+        daemonic_manifestation.predecessor_source_rule_id not in report.named_handler_execution_ids
+    )
+    assert daemonic_manifestation.named_handler_budget_execution_id in report.approved_execution_ids
     pre_ws14_reason = (
         budget_source.Phase17INamedHandlerApprovalReason.PRE_WS14_EXISTING_RUNTIME_CONSUMER.value
     )

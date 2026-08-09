@@ -1632,9 +1632,9 @@ def _blood_legion_khorne_monster_datasheet(
         abilities=(
             *base_datasheet.abilities,
             DatasheetAbilityDescriptor(
-                ability_id="phase17g-blood-legion-relentless-carnage",
+                ability_id=datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
                 name="Relentless Carnage",
-                source_id=datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_SOURCE_ID,
+                source_id=datasheets.BLOODTHIRSTER_RELENTLESS_CARNAGE_ABILITY_ID,
                 support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
                 source_kind=CatalogAbilitySourceKind.DATASHEET,
                 effect_description="Fight-end Relentless Carnage runtime source.",

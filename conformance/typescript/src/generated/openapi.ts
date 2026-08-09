@@ -223,6 +223,100 @@ export interface components {
                 [key: string]: components["schemas"]["rules-catalog--display_record.schema"];
             };
         };
+        "create-session--geometry_dimensions.schema": {
+            [key: string]: number;
+        };
+        "create-session--model_geometry_source_evidence.schema": {
+            canonical_dimensions: components["schemas"]["create-session--geometry_dimensions.schema"];
+            /** @constant */
+            canonical_units: "inches";
+            /** @constant */
+            coordinate_frame: "model_centered_z_up";
+            document_reference: string | null;
+            evidence_id: string;
+            /** @enum {string} */
+            evidence_kind: "official_base_size" | "official_model_profile" | "manual_measurement" | "crowd_sourced_measurement";
+            /** @enum {string} */
+            measurement_kind: "footprint" | "support_base" | "z_offset" | "height";
+            /** @enum {string} */
+            origin: "footprint_center_table_surface" | "support_base_center_table_surface";
+            /** @enum {string} */
+            reviewer_status: "accepted" | "needs_review";
+            source_dimensions: components["schemas"]["create-session--geometry_dimensions.schema"];
+            source_id: string;
+            /** @enum {string} */
+            source_units: "millimeters" | "inches";
+            url: string | null;
+        };
+        "create-session--model_footprint_part.schema": {
+            /** @constant */
+            canonical_units: "inches";
+            /** @constant */
+            coordinate_frame: "model_centered_z_up";
+            evidence_id: string;
+            /** @enum {string} */
+            footprint_kind: "circular" | "oval" | "rectangular" | "hull";
+            offset_x_inches: number;
+            offset_y_inches: number;
+            part_id: string;
+            radius_x_inches: number;
+            radius_y_inches: number;
+            /** @enum {string} */
+            source_units: "millimeters" | "inches";
+            /** @enum {string} */
+            origin: "footprint_center_table_surface" | "support_base_center_table_surface";
+        };
+        "create-session--model_footprint.schema": {
+            /** @constant */
+            canonical_units: "inches";
+            /** @constant */
+            coordinate_frame: "model_centered_z_up";
+            evidence_id: string;
+            footprint_id: string;
+            /** @enum {string} */
+            footprint_kind: "circular" | "oval" | "rectangular" | "hull";
+            /** @enum {string} */
+            origin: "footprint_center_table_surface" | "support_base_center_table_surface";
+            parts: components["schemas"]["create-session--model_footprint_part.schema"][];
+            /** @enum {string} */
+            source_units: "millimeters" | "inches";
+        };
+        "create-session--model_height.schema": {
+            /** @constant */
+            canonical_units: "inches";
+            /** @constant */
+            coordinate_frame: "model_centered_z_up";
+            evidence_id: string;
+            height_inches: number;
+            /** @enum {string} */
+            origin: "footprint_center_table_surface" | "support_base_center_table_surface";
+            /** @enum {string} */
+            source_units: "millimeters" | "inches";
+        };
+        "create-session--model_z_offset.schema": {
+            /** @constant */
+            canonical_units: "inches";
+            /** @constant */
+            coordinate_frame: "model_centered_z_up";
+            evidence_id: string;
+            /** @enum {string} */
+            origin: "footprint_center_table_surface" | "support_base_center_table_surface";
+            /** @enum {string} */
+            source_units: "millimeters" | "inches";
+            z_offset_inches: number;
+        };
+        "create-session--model_geometry_catalog_record.schema": {
+            evidence: components["schemas"]["create-session--model_geometry_source_evidence.schema"][];
+            footprint: components["schemas"]["create-session--model_footprint.schema"];
+            height: components["schemas"]["create-session--model_height.schema"];
+            model_geometry_id: string;
+            model_profile_id: string;
+            /** @enum {string} */
+            rules_footprint_policy: "use_footprint" | "use_support_base" | "use_hull";
+            source_ids: string[];
+            support_base: components["schemas"]["create-session--model_footprint.schema"] | null;
+            z_offset: components["schemas"]["create-session--model_z_offset.schema"] | null;
+        };
         config: {
             allow_legacy_non_strict_rosters: boolean;
             army_catalog: Record<string, never>;
@@ -231,6 +325,7 @@ export interface components {
             game_id: string;
             max_lifecycle_transitions: number;
             mission_setup: Record<string, never> | null;
+            model_geometries?: components["schemas"]["create-session--model_geometry_catalog_record.schema"][];
             player_ids: string[];
             reserve_unit_points: Record<string, never>[];
             ruleset_descriptor: Record<string, never>;

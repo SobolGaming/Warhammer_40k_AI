@@ -81,15 +81,15 @@ CHAOS_DAEMONS_FACTION_ID = "chaos-daemons"
 LEGIONES_DAEMONICA = "LEGIONES DAEMONICA"
 CORRUPTED_REALSPACE_STICKY_EFFECT_KIND = "chaos_daemons_corrupted_realspace_objective"
 CORRUPTED_REALSPACE_SHADOW_AURA_INCHES = 6.0
-GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID = (
-    (chaos_daemons_datasheets.BLOODTHIRSTER_GREATER_DAEMON_SOURCE_ID, "KHORNE"),
-    (chaos_daemons_datasheets.SKARBRAND_GREATER_DAEMON_SOURCE_ID, "KHORNE"),
-    (chaos_daemons_datasheets.LORD_OF_CHANGE_GREATER_DAEMON_SOURCE_ID, "TZEENTCH"),
-    (chaos_daemons_datasheets.KAIROS_GREATER_DAEMON_SOURCE_ID, "TZEENTCH"),
-    (chaos_daemons_datasheets.GREAT_UNCLEAN_ONE_GREATER_DAEMON_SOURCE_ID, "NURGLE"),
-    (chaos_daemons_datasheets.ROTIGUS_GREATER_DAEMON_SOURCE_ID, "NURGLE"),
-    (chaos_daemons_datasheets.KEEPER_GREATER_DAEMON_SOURCE_ID, "SLAANESH"),
-    (chaos_daemons_datasheets.SHALAXI_GREATER_DAEMON_SOURCE_ID, "SLAANESH"),
+GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_ABILITY_ID = (
+    (chaos_daemons_datasheets.BLOODTHIRSTER_GREATER_DAEMON_ABILITY_ID, "KHORNE"),
+    (chaos_daemons_datasheets.SKARBRAND_GREATER_DAEMON_ABILITY_ID, "KHORNE"),
+    (chaos_daemons_datasheets.LORD_OF_CHANGE_GREATER_DAEMON_ABILITY_ID, "TZEENTCH"),
+    (chaos_daemons_datasheets.KAIROS_GREATER_DAEMON_ABILITY_ID, "TZEENTCH"),
+    (chaos_daemons_datasheets.GREAT_UNCLEAN_ONE_GREATER_DAEMON_ABILITY_ID, "NURGLE"),
+    (chaos_daemons_datasheets.ROTIGUS_GREATER_DAEMON_ABILITY_ID, "NURGLE"),
+    (chaos_daemons_datasheets.KEEPER_GREATER_DAEMON_ABILITY_ID, "SLAANESH"),
+    (chaos_daemons_datasheets.SHALAXI_GREATER_DAEMON_ABILITY_ID, "SLAANESH"),
 )
 
 
@@ -829,8 +829,8 @@ def _greater_daemon_shadow_aura_keyword(unit: UnitInstance) -> str | None:
     for ability in unit.datasheet_abilities:
         if ability.source_kind is not CatalogAbilitySourceKind.DATASHEET:
             continue
-        for source_id, keyword in GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_SOURCE_ID:
-            if ability.source_id == source_id:
+        for ability_id, keyword in GREATER_DAEMON_SHADOW_AURA_KEYWORDS_BY_ABILITY_ID:
+            if ability.ability_id == ability_id:
                 return keyword
     return None
 
@@ -1299,7 +1299,7 @@ def _is_greater_daemon_terror_unit(unit: UnitInstance) -> bool:
         raise GameLifecycleError("Greater Daemon terror lookup requires UnitInstance.")
     return any(
         ability.source_kind is CatalogAbilitySourceKind.DATASHEET
-        and ability.source_id in chaos_daemons_datasheets.GREATER_DAEMON_SHADOW_AURA_SOURCE_IDS
+        and ability.ability_id in chaos_daemons_datasheets.GREATER_DAEMON_SHADOW_AURA_ABILITY_IDS
         for ability in unit.datasheet_abilities
     )
 

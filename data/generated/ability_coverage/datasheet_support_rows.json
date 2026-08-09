@@ -1193,7 +1193,7 @@
       "shadow-legion",
       "warptide"
     ],
-    "tests_evidence": "Runtime consumers: `army-mustering:supreme-commander`, `catalog-ir:battle-shock-failed-heal`, `catalog-ir:battle-shock-forced-test`, `catalog-ir:hit-roll-reroll`, `catalog-ir:shadow-form-choice`, `catalog-ir:shadow-of-chaos-aura`, `catalog-ir:shooting-target-range-restriction`, `core:stealth`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `army-mustering:supreme-commander`, `catalog-ir:battle-shock-failed-heal`, `catalog-ir:battle-shock-forced-test`, `catalog-ir:hit-roll-reroll`, `catalog-ir:shadow-form-choice`, `catalog-ir:shadow-of-chaos-aura`, `catalog-ir:shooting-target-range-restriction`, `core:stealth`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },
@@ -1233,7 +1233,7 @@
       "shadow-legion",
       "warptide"
     ],
-    "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:leadership-characteristic-query`, `catalog-ir:unit-move-completed-mortal-wounds`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:leadership-characteristic-query`, `catalog-ir:unit-move-completed-mortal-wounds`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },
@@ -1273,9 +1273,50 @@
       "shadow-legion",
       "warptide"
     ],
-    "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:desperate-escape-roll-modifier`, `catalog-ir:force-desperate-escape`, `catalog-ir:leadership-characteristic-query`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:desperate-escape-roll-modifier`, `catalog-ir:force-desperate-escape`, `catalog-ir:leadership-characteristic-query`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "None"
+  },
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000002582/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000002582/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000002582/datasheet/000002582:daemon-lord-of-khorne-aura/none",
+      "chaos-daemons-bridge-catalog/000002582/datasheet/000002582:greater-daemon-of-khorne-aura/none",
+      "chaos-daemons-bridge-catalog/000002582/datasheet/000002582:relentless-carnage/none",
+      "chaos-daemons-bridge-catalog/000002582/faction/000008433/none"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Blocked",
+    "datasheet_id": "000002582",
+    "datasheet_name": "Bloodthirster",
+    "detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "legion-of-excess",
+      "lords-of-the-warp",
+      "plague-legion",
+      "scintillating-legion",
+      "shadow-legion",
+      "warptide"
+    ],
+    "faction_id": "chaos-daemons",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Blocked",
+    "notes": "Missing model geometry: `000002582:bloodthirster`. `000002582:relentless-carnage` Relentless Carnage: diagnostics `unsupported_language` Faction army rule consumed; implemented detachment rules 6/9. Implemented detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
+    "overall": "Blocked",
+    "supported_detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "lords-of-the-warp",
+      "shadow-legion",
+      "warptide"
+    ],
+    "tests_evidence": "Runtime consumers: `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026`, `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:daemon_lord_of_khorne`, `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage`, `warhammer_40000_11th:chaos_daemons:datasheet:bloodthirster:relentless_carnage:mortal-wound-fnp`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
   },
   {
     "ability_coverage_row_ids": [
@@ -1319,7 +1360,7 @@
       "shadow-legion",
       "warptide"
     ],
-    "tests_evidence": "Runtime consumers: `army-mustering:required-datasheet-option`, `catalog-ir:attacks-characteristic-modifier`, `catalog-ir:aura-ability:stealth`, `catalog-ir:conditional-ability:lone-operative`, `catalog-ir:movement-characteristic-modifier`, `catalog-ir:once-per-battle-ability`, `catalog-ir:strength-characteristic-modifier`, `catalog-ir:toughness-characteristic-modifier`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `army-mustering:required-datasheet-option`, `catalog-ir:attacks-characteristic-modifier`, `catalog-ir:aura-ability:stealth`, `catalog-ir:conditional-ability:lone-operative`, `catalog-ir:movement-characteristic-modifier`, `catalog-ir:once-per-battle-ability`, `catalog-ir:strength-characteristic-modifier`, `catalog-ir:toughness-characteristic-modifier`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "None"
   },
@@ -1364,7 +1405,7 @@
       "shadow-legion",
       "warptide"
     ],
-    "tests_evidence": "Runtime consumers: `army-mustering:required-datasheet-option`, `catalog-ir:attacks-characteristic-modifier`, `catalog-ir:fight-selected-weapon-ability-choice`, `catalog-ir:movement-characteristic-modifier`, `catalog-ir:once-per-battle-ability`, `catalog-ir:strength-characteristic-modifier`, `catalog-ir:toughness-characteristic-modifier`, `catalog-ir:weapon-keyword-grant`, `catalog-ir:weapon-keyword-grant:lethal-hits`, `catalog-ir:weapon-keyword-grant:precision`, `catalog-ir:weapon-keyword-grant:sustained-hits`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `army-mustering:required-datasheet-option`, `catalog-ir:attacks-characteristic-modifier`, `catalog-ir:fight-selected-weapon-ability-choice`, `catalog-ir:movement-characteristic-modifier`, `catalog-ir:once-per-battle-ability`, `catalog-ir:strength-characteristic-modifier`, `catalog-ir:toughness-characteristic-modifier`, `catalog-ir:weapon-keyword-grant`, `catalog-ir:weapon-keyword-grant:lethal-hits`, `catalog-ir:weapon-keyword-grant:precision`, `catalog-ir:weapon-keyword-grant:sustained-hits`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "None"
   },
@@ -1403,7 +1444,88 @@
       "shadow-legion",
       "warptide"
     ],
-    "tests_evidence": "Runtime consumers: `catalog-ir:can-be-placed-in-reserves`, `catalog-ir:feel-no-pain-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `catalog-ir:can-be-placed-in-reserves`, `catalog-ir:feel-no-pain-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001120/core/000008339/none",
+      "chaos-daemons-bridge-catalog/000001120/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000001120/datasheet/000001120:daemon-lord-of-tzeentch-aura/none",
+      "chaos-daemons-bridge-catalog/000001120/datasheet/000001120:greater-daemon-of-tzeentch-aura/none",
+      "chaos-daemons-bridge-catalog/000001120/datasheet/000001120:master-of-magicks-psychic/none",
+      "chaos-daemons-bridge-catalog/000001120/faction/000008433/none"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Blocked",
+    "datasheet_id": "000001120",
+    "datasheet_name": "Lord of Change",
+    "detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "legion-of-excess",
+      "lords-of-the-warp",
+      "plague-legion",
+      "scintillating-legion",
+      "shadow-legion",
+      "warptide"
+    ],
+    "faction_id": "chaos-daemons",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Blocked",
+    "notes": "Missing model geometry: `000001120:lord-of-change`. `000001120:daemon-lord-of-tzeentch-aura` Daemon Lord of Tzeentch (Aura): diagnostics `unsupported_language` Faction army rule consumed; implemented detachment rules 6/9. Implemented detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
+    "overall": "Blocked",
+    "supported_detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "lords-of-the-warp",
+      "shadow-legion",
+      "warptide"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:named-weapon-ability-choice`, `catalog-ir:weapon-keyword-grant`, `catalog-ir:weapon-keyword-grant:ignores-cover`, `catalog-ir:weapon-keyword-grant:lethal-hits`, `catalog-ir:weapon-keyword-grant:sustained-hits`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026`, `warhammer_40000_11th:chaos_daemons:datasheet:lord_of_change:daemon_lord_of_tzeentch`; coverage artifact only",
+    "wargear_status": "Full",
+    "weapon_keyword_status": "Full"
+  },
+  {
+    "ability_coverage_row_ids": [
+      "chaos-daemons-bridge-catalog/000001132/core/000008343/none",
+      "chaos-daemons-bridge-catalog/000001132/datasheet/000001132:infected-outbreak/none",
+      "chaos-daemons-bridge-catalog/000001132/faction/000008433/none",
+      "chaos-daemons-bridge-catalog/000001132/wargear/000001132:daemonic-icon/000001132:daemonic-icon",
+      "chaos-daemons-bridge-catalog/000001132/wargear/000001132:instrument-of-chaos/000001132:instrument-of-chaos"
+    ],
+    "catalog_status": "Full",
+    "datasheet_ability_status": "Blocked",
+    "datasheet_id": "000001132",
+    "datasheet_name": "Plaguebearers",
+    "detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "legion-of-excess",
+      "lords-of-the-warp",
+      "plague-legion",
+      "scintillating-legion",
+      "shadow-legion",
+      "warptide"
+    ],
+    "faction_id": "chaos-daemons",
+    "faction_interaction_status": "Partial",
+    "model_geometry_status": "Blocked",
+    "notes": "Missing model geometry: `000001132:plaguebearers`, `000001132:plagueridden`. `000001132:infected-outbreak` Infected Outbreak: diagnostics `unsupported_language` Faction army rule consumed; implemented detachment rules 6/9. Implemented detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
+    "overall": "Blocked",
+    "supported_detachment_ids": [
+      "blood-legion",
+      "cavalcade-of-chaos",
+      "daemonic-incursion",
+      "lords-of-the-warp",
+      "shadow-legion",
+      "warptide"
+    ],
+    "tests_evidence": "Runtime consumers: `catalog-ir:charge-roll-modifier`, `catalog-ir:leadership-characteristic-query`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026`, `warhammer_40000_11th:chaos_daemons:datasheet:plaguebearers:infected_outbreak`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },
@@ -1443,7 +1565,7 @@
       "shadow-legion",
       "warptide"
     ],
-    "tests_evidence": "Runtime consumers: `army-mustering:required-datasheet-option`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos`; coverage artifact only",
+    "tests_evidence": "Runtime consumers: `army-mustering:required-datasheet-option`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026`; coverage artifact only",
     "wargear_status": "Full",
     "weapon_keyword_status": "Full"
   },

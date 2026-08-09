@@ -56,6 +56,7 @@ from warhammer40k_core.core.datasheet import (
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometryEvidenceKind,
     GeometryMeasurementKind,
+    GeometryReviewStatus,
     GeometrySourceUnits,
 )
 from warhammer40k_core.core.weapon_profiles import (
@@ -118,6 +119,69 @@ from warhammer40k_core.rules.wahapedia_bridge import (
     ModelHeightOverride,
     build_wahapedia_canonical_bridge_artifacts,
 )
+from warhammer40k_core.rules.wahapedia_bridge_defaults import DEFAULT_HEIGHT_OVERRIDES
+
+
+def test_default_geometry_keeps_unverified_chaos_daemons_heights_review_blocked() -> None:
+    expected = {
+        ("000001148", "Be'lakor - EPIC HERO"): (
+            170.0,
+            GeometrySourceUnits.MILLIMETERS,
+            "geometry-review:chaos-daemons:belakor:height",
+            "Chaos Daemons Be'lakor product listing",
+            GeometryReviewStatus.ACCEPTED,
+            GeometryEvidenceKind.MANUAL_MEASUREMENT,
+        ),
+        ("000002582", "Bloodthirster"): (
+            200.0,
+            GeometrySourceUnits.MILLIMETERS,
+            "geometry-candidate:reddit:v0zdiv:bloodthirster:low-pose-highest-point",
+            (
+                "https://www.reddit.com/r/ageofsigmar/comments/v0zdiv/"
+                "looking_to_convert_a_bloodthirster_whats_the/"
+            ),
+            GeometryReviewStatus.NEEDS_REVIEW,
+            GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
+        ),
+        ("000001120", "Lord of Change"): (
+            185.0,
+            GeometrySourceUnits.MILLIMETERS,
+            "geometry-candidate:dakkadakka:745548:lord-of-change:highest-wing",
+            "https://www.dakkadakka.com/dakkaforum/posts/list/745548.page",
+            GeometryReviewStatus.NEEDS_REVIEW,
+            GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
+        ),
+        ("000001132", "Plagueridden"): (
+            40.0,
+            GeometrySourceUnits.MILLIMETERS,
+            "geometry-candidate:reddit:wh19l0:plagueridden:regular-model-proxy",
+            "https://www.reddit.com/r/ageofsigmar/comments/wh19l0/plaguebearer_height/",
+            GeometryReviewStatus.NEEDS_REVIEW,
+            GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
+        ),
+        ("000001132", "Plaguebearers"): (
+            40.0,
+            GeometrySourceUnits.MILLIMETERS,
+            "geometry-candidate:reddit:wh19l0:plaguebearers:excluding-base-upper-bound",
+            "https://www.reddit.com/r/ageofsigmar/comments/wh19l0/plaguebearer_height/",
+            GeometryReviewStatus.NEEDS_REVIEW,
+            GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
+        ),
+    }
+    actual = {
+        (override.datasheet_id, override.model_name): (
+            override.height,
+            override.height_units,
+            override.height_source_id,
+            override.height_document_reference,
+            override.reviewer_status,
+            override.evidence_kind,
+        )
+        for override in DEFAULT_HEIGHT_OVERRIDES
+        if (override.datasheet_id, override.model_name) in expected
+    }
+
+    assert actual == expected
 
 
 def test_phase17k_bloodcrushers_bridge_generates_pdf_corrected_canonical_catalog() -> None:

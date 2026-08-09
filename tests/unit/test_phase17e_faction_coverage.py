@@ -402,8 +402,8 @@ ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:unit-characteristic",
     "warhammer_40000_11th:astra_militarum:army_rule:voice_of_command:weapon-profile",
 )
-CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMERS = (
-    "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos",
+CHAOS_DAEMONS_DAEMONIC_MANIFESTATION_RUNTIME_CONSUMERS = (
+    "warhammer_40000_11th:chaos_daemons:army_rule:shadow_of_chaos:july_2026",
 )
 CHAOS_KNIGHTS_HARBINGERS_OF_DREAD_RUNTIME_CONSUMERS = (
     "warhammer_40000_11th:chaos_knights:army_rule:harbingers_of_dread",
@@ -524,7 +524,7 @@ FACTION_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "aeldari": "Battle Focus",
     "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",
-    "chaos-daemons": "The Shadow of Chaos",
+    "chaos-daemons": "Daemonic Manifestation",
     "chaos-knights": "Harbingers of Dread",
     "chaos-space-marines": "Dark Pacts",
     "death-guard": "Nurgle's Gift",
@@ -549,7 +549,7 @@ FACTION_ARMY_RULE_RUNTIME_CONSUMERS_BY_FACTION_ID = {
     "aeldari": AELDARI_BATTLE_FOCUS_RUNTIME_CONSUMERS,
     "astra-militarum": ASTRA_MILITARUM_VOICE_OF_COMMAND_RUNTIME_CONSUMERS,
     "black-templars": BLACK_TEMPLARS_TEMPLAR_VOWS_RUNTIME_CONSUMERS,
-    "chaos-daemons": CHAOS_DAEMONS_SHADOW_OF_CHAOS_RUNTIME_CONSUMERS,
+    "chaos-daemons": CHAOS_DAEMONS_DAEMONIC_MANIFESTATION_RUNTIME_CONSUMERS,
     "chaos-knights": CHAOS_KNIGHTS_HARBINGERS_OF_DREAD_RUNTIME_CONSUMERS,
     "chaos-space-marines": CHAOS_SPACE_MARINES_DARK_PACTS_RUNTIME_CONSUMERS,
     "death-guard": DEATH_GUARD_NURGLES_GIFT_RUNTIME_CONSUMERS,
@@ -1420,7 +1420,12 @@ def test_phase17e_source_backed_army_rule_is_engine_consumed(
         and row.faction_id == faction_id
     )
 
-    assert coverage_row.descriptor_id == f"phase17e:{faction_id}:army-rule"
+    expected_descriptor_id = f"phase17e:{faction_id}:army-rule"
+    if faction_id == "chaos-daemons":
+        expected_descriptor_id = (
+            july_faction_packs_2026_07.daemonic_manifestation().phase17e_descriptor_id
+        )
+    assert coverage_row.descriptor_id == expected_descriptor_id
     assert coverage_row.rule_name == rule_name
     assert coverage_row.status is Phase17ECoverageStatus.IMPLEMENTED
     assert coverage_row.runtime_support_status is not None

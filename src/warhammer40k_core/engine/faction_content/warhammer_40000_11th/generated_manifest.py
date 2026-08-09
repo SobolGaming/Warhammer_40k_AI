@@ -68,6 +68,16 @@ def generated_runtime_content_rows() -> tuple[RuntimeContentManifestRow, ...]:
                 coverage_kind="detachment_enhancement",
             )
         ),
+        *tuple(
+            _stratagem_row(row)
+            for row in faction_subrules_2026_27.stratagem_rows()
+            if _executable_execution_ids_for_rule(
+                faction_id=row.faction_id,
+                detachment_id=row.detachment_id,
+                rule_id=row.stratagem_id,
+                coverage_kind="detachment_stratagem",
+            )
+        ),
         *_pilot_runtime_content_rows(),
     )
 
@@ -143,6 +153,34 @@ def _enhancement_row(
             detachment_id=row.detachment_id,
             rule_id=row.enhancement_id,
             coverage_kind="detachment_enhancement",
+        ),
+        owner_faction_id=row.faction_id,
+        owner_detachment_id=row.detachment_id,
+        execution_record_ids=execution_record_ids,
+        module_path=(f"{_BASE}.{faction_module}.detachments.{detachment_module}.manifest"),
+        semantic_status=_semantic_status_for_execution_ids(execution_record_ids),
+    )
+
+
+def _stratagem_row(
+    row: faction_subrules_2026_27.SourceStratagemRow,
+) -> RuntimeContentManifestRow:
+    faction_module = _module_name_for_id(row.faction_id)
+    detachment_module = _module_name_for_id(row.detachment_id)
+    execution_record_ids = _executable_execution_ids_for_rule(
+        faction_id=row.faction_id,
+        detachment_id=row.detachment_id,
+        rule_id=row.stratagem_id,
+        coverage_kind="detachment_stratagem",
+    )
+    return _row(
+        content_id=row.stratagem_id,
+        family=RuntimeContentModuleFamily.STRATAGEM,
+        source_ids=_source_ids_for_rule(
+            faction_id=row.faction_id,
+            detachment_id=row.detachment_id,
+            rule_id=row.stratagem_id,
+            coverage_kind="detachment_stratagem",
         ),
         owner_faction_id=row.faction_id,
         owner_detachment_id=row.detachment_id,

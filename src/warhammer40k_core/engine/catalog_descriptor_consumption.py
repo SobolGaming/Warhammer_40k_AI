@@ -53,6 +53,18 @@ def catalog_descriptor_consumption_for(
     return None if not matches else matches[0]
 
 
+def catalog_descriptor_registered_runtime_consumer_ids() -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            {
+                consumer_id
+                for record in _default_records()
+                for consumer_id in record.runtime_consumer_ids
+            }
+        )
+    )
+
+
 def _default_records() -> tuple[CatalogDescriptorConsumptionRecord, ...]:
     from warhammer40k_core.engine.core_descriptor_consumption import (
         core_descriptor_consumption_records,

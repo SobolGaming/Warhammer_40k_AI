@@ -221,7 +221,7 @@ SOURCE_BACKED_ARMY_RULE_NAMES_BY_FACTION_ID = {
     "aeldari": "Battle Focus",
     "astra-militarum": "Voice of Command",
     "black-templars": "Templar Vows",
-    "chaos-daemons": "The Shadow of Chaos",
+    "chaos-daemons": "Daemonic Manifestation",
     "chaos-knights": "Harbingers of Dread",
     "chaos-space-marines": "Dark Pacts",
     "death-guard": "Nurgle's Gift",
@@ -683,8 +683,14 @@ def test_phase17f_source_backed_army_rule_execution_records_are_named_handlers()
                 ]
             )
         )
-        assert record.coverage_descriptor_id == f"phase17e:{faction_id}:army-rule"
-        assert record.execution_id == f"phase17f:phase17e:{faction_id}:army-rule"
+        expected_descriptor_id = f"phase17e:{faction_id}:army-rule"
+        expected_execution_id = f"phase17f:{expected_descriptor_id}"
+        if faction_id == "chaos-daemons":
+            successor = july_faction_packs_2026_07.daemonic_manifestation()
+            expected_descriptor_id = successor.phase17e_descriptor_id
+            expected_execution_id = successor.phase17f_execution_id
+        assert record.coverage_descriptor_id == expected_descriptor_id
+        assert record.execution_id == expected_execution_id
         assert record.rule_name == rule_name
         assert record.runtime_support_status == "engine_consumed"
         assert record.runtime_consumer_ids == runtime_consumers
@@ -1080,6 +1086,40 @@ def test_phase17f_registry_rejects_executable_records_without_registered_executo
     assert named_result.reason == "named_handler_not_registered"
     assert generic_result.status is FactionRuleExecutionStatus.UNSUPPORTED
     assert generic_result.reason == "generic_ir_executor_not_registered"
+
+
+def test_phase17f_registry_active_execution_evidence_excludes_blocked_and_requires_wiring() -> None:
+    blocked_record = _first_execution_record(
+        Phase17FExecutionStatus.BLOCKED_STRUCTURED_SEMANTICS_REQUIRED
+    )
+    named_record = replace(
+        blocked_record,
+        execution_id=f"{blocked_record.execution_id}:named",
+        execution_status=Phase17FExecutionStatus.EXECUTABLE_NAMED_HANDLER,
+        block_reason=None,
+    )
+    generic_record = replace(
+        blocked_record,
+        execution_id=f"{blocked_record.execution_id}:generic",
+        execution_status=Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR,
+        block_reason=None,
+        rule_ir_hash="0" * 64,
+    )
+
+    assert (
+        FactionRuleExecutionRegistry.from_records((blocked_record,)).active_execution_record_ids()
+        == ()
+    )
+    with pytest.raises(GameLifecycleError, match="requires a registered handler"):
+        FactionRuleExecutionRegistry.from_records((named_record,)).active_execution_record_ids()
+    with pytest.raises(GameLifecycleError, match="requires a registered executor"):
+        FactionRuleExecutionRegistry.from_records((generic_record,)).active_execution_record_ids()
+    handler_id = _require_handler_id(named_record)
+    assert FactionRuleExecutionRegistry.from_records(
+        (blocked_record, named_record)
+    ).active_execution_record_ids(active_handler_ids=frozenset({handler_id})) == (
+        named_record.execution_id,
+    )
 
 
 def test_phase17f_registry_applies_executable_records_only_after_registered_executor_runs() -> None:

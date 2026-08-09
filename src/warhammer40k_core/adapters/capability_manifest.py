@@ -7,6 +7,24 @@ from enum import StrEnum
 from typing import Literal, TypedDict, cast
 
 from warhammer40k_core import __version__ as ENGINE_VERSION
+from warhammer40k_core.adapters.capability_manifest_runtime import (
+    runtime_rule_semantics as _runtime_rule_semantics,
+)
+from warhammer40k_core.adapters.capability_manifest_runtime import (
+    selected_content_ids_for_request as _selected_content_ids_for_request,
+)
+from warhammer40k_core.adapters.capability_manifest_runtime import (
+    semantic_runtime_rows as _semantic_runtime_rows,
+)
+from warhammer40k_core.adapters.capability_manifest_runtime import (
+    validate_selected_ability_runtime_evidence as _validate_selected_ability_runtime_evidence,
+)
+from warhammer40k_core.adapters.capability_manifest_runtime import (
+    validate_selected_manifest_runtime_evidence as _validate_selected_manifest_runtime_evidence,
+)
+from warhammer40k_core.adapters.capability_manifest_runtime import (
+    validate_selected_runtime_manifest_identity as _validate_selected_runtime_manifest_identity,
+)
 from warhammer40k_core.adapters.external_contract import EXTERNAL_CONTRACT_VERSION
 from warhammer40k_core.core.datasheet import DatasheetAbilityDescriptor
 from warhammer40k_core.core.missions import MissionPackDefinition, PrimaryMissionDefinition
@@ -15,14 +33,23 @@ from warhammer40k_core.engine.ability_coverage import (
     AbilityCoverageSupportStage,
     ability_coverage_rows_from_catalog,
 )
-from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.manifest import (
     RuntimeContentManifest,
     RuntimeContentManifestRow,
-    RuntimeContentSemanticStatus,
     RuntimeContentSupportStatus,
 )
+from warhammer40k_core.engine.faction_content.runtime import (
+    build_runtime_content_bundle_for_armies,
+    runtime_content_manifest_for_ruleset,
+)
+from warhammer40k_core.engine.faction_content.runtime_evidence import (
+    active_runtime_evidence_inventory,
+)
+from warhammer40k_core.engine.faction_rule_execution import FactionRuleExecutionRegistry
 from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.interaction_metadata import (
     DecisionInteractionSupportPayload,
@@ -140,6 +167,7 @@ def build_capability_manifest(
     config: GameConfig,
     armies: tuple[ArmyDefinition, ...],
     runtime_manifest: RuntimeContentManifest,
+    runtime_bundle: RuntimeContentBundle,
 ) -> CapabilityManifestPayload:
     if type(config) is not GameConfig:
         raise GameLifecycleError("Capability manifest requires a GameConfig.")
@@ -147,10 +175,26 @@ def build_capability_manifest(
         raise GameLifecycleError("Capability manifest armies must contain ArmyDefinition values.")
     if type(runtime_manifest) is not RuntimeContentManifest:
         raise GameLifecycleError("Capability manifest requires a RuntimeContentManifest.")
+    if type(runtime_bundle) is not RuntimeContentBundle:
+        raise GameLifecycleError("Capability manifest requires a RuntimeContentBundle.")
     if {army.army_id for army in armies} != {
         request.army_id for request in config.army_muster_requests
     }:
         raise GameLifecycleError("Capability manifest army selection drifted from GameConfig.")
+    expected_activation = RuntimeContentActivation.from_armies(
+        armies=armies,
+        catalog=config.army_catalog,
+    )
+    if (
+        runtime_bundle.activation.roster_content_ids() != expected_activation.roster_content_ids()
+        or runtime_bundle.activation.loaded_unit_instance_ids
+        != expected_activation.loaded_unit_instance_ids
+        or runtime_bundle.activation.selected_enhancement_assignments
+        != expected_activation.selected_enhancement_assignments
+    ):
+        raise GameLifecycleError(
+            "Capability manifest runtime bundle activation drifted from selected armies."
+        )
 
     ability_rows = ability_coverage_rows_from_catalog(
         config.army_catalog,
@@ -165,11 +209,39 @@ def build_capability_manifest(
         ),
     )
     ability_rows_by_datasheet = _group_ability_rows(ability_rows)
+    expected_runtime_bundle = build_runtime_content_bundle_for_armies(
+        config=config,
+        armies=armies,
+    )
+    expected_runtime_manifest = runtime_content_manifest_for_ruleset(
+        ruleset_descriptor=config.ruleset_descriptor,
+        config=config,
+    )
+    expected_active_evidence = active_runtime_evidence_inventory(expected_runtime_bundle)
+    active_evidence = active_runtime_evidence_inventory(runtime_bundle)
+    _validate_selected_ability_runtime_evidence(
+        ability_rows=ability_rows,
+        expected_active_evidence=expected_active_evidence,
+        active_evidence=active_evidence,
+    )
+    _validate_selected_manifest_runtime_evidence(
+        config=config,
+        runtime_manifest=runtime_manifest,
+        faction_execution_registry=expected_runtime_bundle.faction_rule_execution_registry,
+        expected_active_evidence=expected_active_evidence,
+        active_evidence=active_evidence,
+    )
+    _validate_selected_runtime_manifest_identity(
+        config=config,
+        runtime_manifest=runtime_manifest,
+        expected_runtime_manifest=expected_runtime_manifest,
+    )
     roster_rows = _roster_rows(
         config=config,
         armies=armies,
         ability_rows_by_datasheet=ability_rows_by_datasheet,
         runtime_manifest=runtime_manifest,
+        faction_execution_registry=expected_runtime_bundle.faction_rule_execution_registry,
     )
     unit_rows = _unit_rows(
         config=config,
@@ -180,6 +252,7 @@ def build_capability_manifest(
         config=config,
         ability_rows_by_datasheet=ability_rows_by_datasheet,
         runtime_manifest=runtime_manifest,
+        faction_execution_registry=expected_runtime_bundle.faction_rule_execution_registry,
     )
     mission_rows, mission_pack = _mission_rows(config=config)
     geometry_rows = _geometry_rows(armies=armies)
@@ -316,6 +389,7 @@ def _roster_rows(
     armies: tuple[ArmyDefinition, ...],
     ability_rows_by_datasheet: Mapping[str, tuple[AbilityCoverageRow, ...]],
     runtime_manifest: RuntimeContentManifest,
+    faction_execution_registry: FactionRuleExecutionRegistry,
 ) -> list[CapabilityRowPayload]:
     army_by_id = {army.army_id: army for army in armies}
     rows: list[CapabilityRowPayload] = []
@@ -324,14 +398,15 @@ def _roster_rows(
         runtime_rows = runtime_manifest.reachable_rows_for_content_ids(
             _selected_content_ids_for_request(request)
         )
+        semantic_runtime_rows = _semantic_runtime_rows(runtime_rows)
         semantic_supported = all(
-            row.semantic_status is RuntimeContentSemanticStatus.IMPLEMENTED for row in runtime_rows
+            _runtime_rule_semantics(
+                row,
+                faction_execution_registry=faction_execution_registry,
+            )[0]
+            for row in semantic_runtime_rows
         ) and all(
-            coverage.support_stage
-            in {
-                AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,
-                AbilityCoverageSupportStage.ENGINE_CONSUMED,
-            }
+            coverage.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
             for selection in request.unit_selections
             for coverage in ability_rows_by_datasheet.get(selection.datasheet_id, ())
         )
@@ -385,7 +460,7 @@ def _roster_rows(
                     CapabilityDimension.SEMANTICALLY_EXECUTABLE: (
                         semantic_supported,
                         "selected_rule_semantics_incomplete",
-                        tuple(sorted(row.content_id for row in runtime_rows))
+                        tuple(sorted(row.content_id for row in semantic_runtime_rows))
                         or (f"roster-rule-set:{army.army_id}:empty",),
                     ),
                     CapabilityDimension.NETWORK_SAFE: (
@@ -423,11 +498,7 @@ def _unit_rows(
         for selection, unit in zip(request.unit_selections, army.units, strict=True):
             coverage_rows = ability_rows_by_datasheet.get(selection.datasheet_id, ())
             semantic_supported = all(
-                coverage.support_stage
-                in {
-                    AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,
-                    AbilityCoverageSupportStage.ENGINE_CONSUMED,
-                }
+                coverage.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
                 for coverage in coverage_rows
             )
             physical_supported = all(
@@ -506,6 +577,7 @@ def _rule_rows(
     config: GameConfig,
     ability_rows_by_datasheet: Mapping[str, tuple[AbilityCoverageRow, ...]],
     runtime_manifest: RuntimeContentManifest,
+    faction_execution_registry: FactionRuleExecutionRegistry,
 ) -> list[CapabilityRowPayload]:
     rows: list[CapabilityRowPayload] = []
     ability_by_id = {
@@ -517,10 +589,7 @@ def _rule_rows(
         for selection in request.unit_selections:
             for coverage in ability_rows_by_datasheet.get(selection.datasheet_id, ()):
                 descriptor = ability_by_id[(selection.datasheet_id, coverage.ability_id)]
-                executable = coverage.support_stage in {
-                    AbilityCoverageSupportStage.GENERIC_IR_EXECUTABLE,
-                    AbilityCoverageSupportStage.ENGINE_CONSUMED,
-                }
+                executable = coverage.support_stage is AbilityCoverageSupportStage.ENGINE_CONSUMED
                 rows.append(
                     _ability_rule_row(
                         player_id=request.player_id,
@@ -530,10 +599,18 @@ def _rule_rows(
                         executable=executable,
                     )
                 )
-        for runtime_row in runtime_manifest.reachable_rows_for_content_ids(
-            _selected_content_ids_for_request(request)
+        for runtime_row in _semantic_runtime_rows(
+            runtime_manifest.reachable_rows_for_content_ids(
+                _selected_content_ids_for_request(request)
+            )
         ):
-            rows.append(_runtime_rule_row(player_id=request.player_id, row=runtime_row))
+            rows.append(
+                _runtime_rule_row(
+                    player_id=request.player_id,
+                    row=runtime_row,
+                    faction_execution_registry=faction_execution_registry,
+                )
+            )
     return sorted(rows, key=lambda row: row["row_id"])
 
 
@@ -591,13 +668,22 @@ def _runtime_rule_row(
     *,
     player_id: str,
     row: RuntimeContentManifestRow,
+    faction_execution_registry: FactionRuleExecutionRegistry,
 ) -> CapabilityRowPayload:
     loadable = row.support_status is RuntimeContentSupportStatus.SUPPORTED
-    executable = row.semantic_status is RuntimeContentSemanticStatus.IMPLEMENTED
+    (
+        executable,
+        semantic_execution,
+        semantic_evidence_refs,
+        excluded_execution_record_ids,
+    ) = _runtime_rule_semantics(
+        row,
+        faction_execution_registry=faction_execution_registry,
+    )
     load_reason = (
         "" if loadable else row.unsupported_reason or f"runtime_{row.support_status.value}"
     )
-    semantic_reason = "" if executable else f"runtime_semantic_{row.semantic_status.value}"
+    semantic_reason = "" if executable else f"runtime_semantic_{semantic_execution}"
     return _row(
         row_id=f"rule:{player_id}:runtime:{row.family.value}:{row.content_id}",
         row_kind="rule",
@@ -606,7 +692,7 @@ def _runtime_rule_row(
         display_name=row.content_id,
         source_ids=row.source_ids,
         load_support=row.support_status.value,
-        semantic_execution=row.semantic_status.value,
+        semantic_execution=semantic_execution,
         applicable={
             CapabilityDimension.LOADABLE: (
                 loadable,
@@ -621,7 +707,7 @@ def _runtime_rule_row(
             CapabilityDimension.SEMANTICALLY_EXECUTABLE: (
                 executable,
                 semantic_reason,
-                tuple(row.execution_record_ids),
+                semantic_evidence_refs,
             ),
             CapabilityDimension.NETWORK_SAFE: (
                 True,
@@ -634,6 +720,8 @@ def _runtime_rule_row(
             "source_package_id": row.source_package_id,
             "source_package_hash": row.source_package_hash,
             "execution_record_ids": list(row.execution_record_ids),
+            "excluded_aggregate_execution_record_ids": list(excluded_execution_record_ids),
+            "aggregate_semantic_execution": row.semantic_status.value,
             "required_for_matched_play": row.required_for_matched_play,
         },
     )
@@ -1256,25 +1344,6 @@ def _group_ability_rows(
         datasheet_id: tuple(sorted(values, key=lambda row: row.coverage_row_id))
         for datasheet_id, values in grouped.items()
     }
-
-
-def _selected_content_ids_for_request(request: ArmyMusterRequest) -> tuple[str, ...]:
-    if type(request) is not ArmyMusterRequest:
-        raise GameLifecycleError("Selected content IDs require an ArmyMusterRequest.")
-    selected = {
-        request.detachment_selection.faction_id,
-        *request.detachment_selection.detachment_ids,
-        *request.detachment_selection.enhancement_ids,
-        *request.detachment_selection.stratagem_ids,
-        *(selection.datasheet_id for selection in request.unit_selections),
-        *(
-            wargear_id
-            for selection in request.unit_selections
-            for wargear_selection in selection.wargear_selections
-            for wargear_id in wargear_selection.wargear_ids
-        ),
-    }
-    return tuple(sorted(selected))
 
 
 def _primary_mission_executable(primary: PrimaryMissionDefinition) -> bool:

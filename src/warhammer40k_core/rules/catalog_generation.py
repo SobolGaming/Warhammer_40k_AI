@@ -11,7 +11,7 @@ from warhammer40k_core.core.attachment_eligibility import (
     AttachmentRole,
     AttachmentTargetEligibility,
 )
-from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.content_scope import (
     CatalogContentScope,
     catalog_content_scope_from_token,
@@ -44,7 +44,6 @@ from warhammer40k_core.core.detachment import (
     EnhancementSubtype,
     StratagemDefinition,
 )
-from warhammer40k_core.core.dice import DiceExpression, DiceRollSpecError
 from warhammer40k_core.core.faction import ArmyRuleDefinition, FactionDefinition
 from warhammer40k_core.core.model_geometry_catalog import (
     GeometryEvidenceKind,
@@ -67,9 +66,6 @@ from warhammer40k_core.core.wargear_selection_limits import DatasheetWargearSele
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AbilityDescriptorPayload,
-    AttackProfile,
-    DamageProfile,
-    RangeProfile,
     WeaponKeyword,
     WeaponProfile,
     WeaponProfileError,
@@ -91,6 +87,42 @@ from warhammer40k_core.rules.catalog_generation_fields import (
 )
 from warhammer40k_core.rules.catalog_generation_fields import (
     split_field_value as _split_field_value,
+)
+from warhammer40k_core.rules.catalog_generation_values import (
+    attack_profile_from_raw_text as _attack_profile_from_raw_text,
+)
+from warhammer40k_core.rules.catalog_generation_values import (
+    characteristic_from_row as _characteristic_from_row,
+)
+from warhammer40k_core.rules.catalog_generation_values import (
+    characteristic_token_from_field as _characteristic_token_from_field,
+)
+from warhammer40k_core.rules.catalog_generation_values import (
+    characteristic_value_from_raw_text as _characteristic_value_from_raw_text,
+)
+from warhammer40k_core.rules.catalog_generation_values import (
+    damage_profile_from_raw_text as _damage_profile_from_raw_text,
+)
+from warhammer40k_core.rules.catalog_generation_values import (
+    optional_characteristic_from_row as _optional_characteristic_from_row,
+)
+from warhammer40k_core.rules.catalog_generation_values import (
+    optional_positive_int as _optional_positive_int,
+)
+from warhammer40k_core.rules.catalog_generation_values import (
+    range_profile_from_token as _range_profile_from_token,
+)
+from warhammer40k_core.rules.catalog_generation_values import (
+    required_bool as _required_bool,
+)
+from warhammer40k_core.rules.catalog_generation_values import (
+    required_non_negative_int as _required_non_negative_int,
+)
+from warhammer40k_core.rules.catalog_generation_values import (
+    required_number as _required_number,
+)
+from warhammer40k_core.rules.catalog_generation_values import (
+    required_positive_int as _required_positive_int,
 )
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.data_package import CatalogVersion, DataPackageId
@@ -120,11 +152,6 @@ _OVAL_BASE_RE = re.compile(
     r"^(?P<length>\d+(?:\.\d+)?)\s*x\s*(?P<width>\d+(?:\.\d+)?)\s*mm(?:\s*oval)?$",
     re.IGNORECASE,
 )
-_DICE_CHARACTERISTIC_RE = re.compile(
-    r"^(?P<quantity>\d*)D(?P<sides>\d+)(?P<modifier>[+-]\d+)?$",
-    re.IGNORECASE,
-)
-_INTEGER_CHARACTERISTIC_RE = re.compile(r"^[+-]?\d+$")
 
 
 @dataclass(frozen=True, slots=True)
@@ -200,7 +227,14 @@ def build_canonical_catalog_report(
             continue
         geometry_records.append(generated_record)
 
-    if diagnostics:
+    if any(
+        diagnostic.reason
+        not in {
+            ModelGeometryDiagnosticReason.MISSING_HEIGHT,
+            ModelGeometryDiagnosticReason.UNREVIEWED_EVIDENCE,
+        }
+        for diagnostic in diagnostics
+    ):
         return CanonicalCatalogBuildReport(package=None, diagnostics=tuple(diagnostics))
 
     army_catalog = _army_catalog_from_rows(
@@ -216,8 +250,9 @@ def build_canonical_catalog_report(
         source_artifacts=_source_artifact_hashes(source_artifacts),
         army_catalog=army_catalog,
         model_geometries=tuple(geometry_records),
+        diagnostics=tuple(diagnostics),
     )
-    return CanonicalCatalogBuildReport(package=package, diagnostics=())
+    return CanonicalCatalogBuildReport(package=package, diagnostics=tuple(diagnostics))
 
 
 def _army_catalog_from_rows(
@@ -332,7 +367,13 @@ def _model_profile_from_row(
     geometry_by_profile_id: dict[str, ModelGeometryCatalogRecord],
 ) -> ModelProfileDefinition:
     model_profile_id = _required_field(row=row, column_name="model_profile_id")
-    geometry_record = geometry_by_profile_id[model_profile_id]
+    geometry_record = geometry_by_profile_id.get(model_profile_id)
+    if geometry_record is None:
+        base_size = _base_size_from_model_row(row)
+        geometry_source_ids: tuple[str, ...] = ()
+    else:
+        base_size = _base_size_from_geometry_record(geometry_record)
+        geometry_source_ids = (geometry_record.stable_identity(),)
     return ModelProfileDefinition(
         model_profile_id=model_profile_id,
         name=_required_field(row=row, column_name="name"),
@@ -367,10 +408,8 @@ def _model_profile_from_row(
                 row=row, column_name="w", characteristic=Characteristic.WOUNDS
             ),
         ),
-        base_size=_base_size_from_geometry_record(geometry_record),
-        source_ids=_deduplicated_ids(
-            (*_source_ids_from_row(row), geometry_record.stable_identity())
-        ),
+        base_size=base_size,
+        source_ids=_deduplicated_ids((*_source_ids_from_row(row), *geometry_source_ids)),
     )
 
 
@@ -1118,6 +1157,26 @@ def _base_size_from_geometry_record(record: ModelGeometryCatalogRecord) -> BaseS
     return BaseSizeDefinition.rectangular(length_mm=length_mm, width_mm=width_mm)
 
 
+def _base_size_from_model_row(row: NormalizedSourceRow) -> BaseSizeDefinition:
+    base_size_text = _required_field(row=row, column_name="base_size").strip()
+    circular_match = _CIRCULAR_BASE_RE.fullmatch(base_size_text)
+    if circular_match is not None:
+        diameter_mm = float(circular_match.group("diameter"))
+        canonical_radius = diameter_mm / 25.4 / 2.0
+        return BaseSizeDefinition.circular(canonical_radius * 2.0 * 25.4)
+    oval_match = _OVAL_BASE_RE.fullmatch(base_size_text)
+    if oval_match is not None:
+        length_radius = float(oval_match.group("length")) / 25.4 / 2.0
+        width_radius = float(oval_match.group("width")) / 25.4 / 2.0
+        return BaseSizeDefinition.oval(
+            length_mm=length_radius * 2.0 * 25.4,
+            width_mm=width_radius * 2.0 * 25.4,
+        )
+    raise CatalogGenerationError(
+        "Model profile without accepted height evidence must retain a derivable base size."
+    )
+
+
 def _rows_by_table(
     source_artifacts: tuple[SourceArtifact, ...],
 ) -> dict[str, tuple[NormalizedSourceRow, ...]]:
@@ -1193,92 +1252,6 @@ def _content_scope_from_row(row: NormalizedSourceRow) -> CatalogContentScope:
         )
     except ValueError as exc:
         raise CatalogGenerationError("Source row content_scope is invalid.") from exc
-
-
-def _characteristic_from_row(
-    *,
-    row: NormalizedSourceRow,
-    column_name: str,
-    characteristic: Characteristic,
-) -> CharacteristicValue:
-    return _characteristic_value_from_raw_text(
-        characteristic=characteristic,
-        raw_text=_required_field(row=row, column_name=column_name),
-    )
-
-
-def _optional_characteristic_from_row(
-    *,
-    row: NormalizedSourceRow,
-    column_name: str,
-    characteristic: Characteristic,
-) -> CharacteristicValue:
-    return _characteristic_value_from_raw_text(
-        characteristic=characteristic,
-        raw_text=_optional_field(row=row, column_name=column_name) or "-",
-    )
-
-
-def _characteristic_value_from_raw_text(
-    *,
-    characteristic: Characteristic,
-    raw_text: str,
-) -> CharacteristicValue:
-    text = raw_text.strip()
-    if text == "-":
-        return CharacteristicValue.source_dash(characteristic)
-    return CharacteristicValue.from_raw(characteristic, _int_from_text(text))
-
-
-def _characteristic_token_from_field(value: str) -> Characteristic:
-    if value == Characteristic.BALLISTIC_SKILL.value:
-        return Characteristic.BALLISTIC_SKILL
-    if value == Characteristic.WEAPON_SKILL.value:
-        return Characteristic.WEAPON_SKILL
-    raise CatalogGenerationError(
-        "Weapon skill_characteristic must be weapon_skill or ballistic_skill."
-    )
-
-
-def _range_profile_from_token(value: str) -> RangeProfile:
-    if value.strip().lower() == "melee":
-        return RangeProfile.melee()
-    return RangeProfile.distance(_int_from_text(value))
-
-
-def _attack_profile_from_raw_text(value: str) -> AttackProfile:
-    fixed = _optional_int_from_text(value)
-    if fixed is not None:
-        if fixed < 1:
-            raise CatalogGenerationError("Attack profile fixed attacks must be at least 1.")
-        return AttackProfile.fixed(fixed)
-    return AttackProfile.dice(_dice_expression_from_text(value))
-
-
-def _damage_profile_from_raw_text(value: str) -> DamageProfile:
-    fixed = _optional_int_from_text(value)
-    if fixed is not None:
-        if fixed < 1:
-            raise CatalogGenerationError("Damage profile fixed damage must be at least 1.")
-        return DamageProfile.fixed(fixed)
-    return DamageProfile.dice(_dice_expression_from_text(value))
-
-
-def _dice_expression_from_text(value: str) -> DiceExpression:
-    match = _DICE_CHARACTERISTIC_RE.fullmatch(value.strip().replace(" ", ""))
-    if match is None:
-        raise CatalogGenerationError(
-            f"Source value must be fixed integer or dice expression: {value}."
-        )
-    quantity_token = match.group("quantity")
-    quantity = 1 if not quantity_token else _int_from_text(quantity_token)
-    sides = _int_from_text(match.group("sides"))
-    modifier_token = match.group("modifier")
-    modifier = 0 if modifier_token is None else _int_from_text(modifier_token)
-    try:
-        return DiceExpression(quantity=quantity, sides=sides, modifier=modifier)
-    except DiceRollSpecError as exc:
-        raise CatalogGenerationError("Source dice expression is invalid.") from exc
 
 
 def _weapon_keywords_from_field(value: str) -> tuple[WeaponKeyword, ...]:
@@ -1418,66 +1391,6 @@ def _enhancement_subtypes_from_tokens(tokens: tuple[str, ...]) -> tuple[Enhancem
         seen.add(subtype)
         subtypes.append(subtype)
     return tuple(sorted(subtypes, key=lambda subtype: subtype.value))
-
-
-def _required_positive_int(row: NormalizedSourceRow, column_name: str) -> int:
-    value = _required_int(row=row, column_name=column_name)
-    if value < 1:
-        raise CatalogGenerationError(f"Source row {column_name} must be at least 1.")
-    return value
-
-
-def _required_non_negative_int(row: NormalizedSourceRow, column_name: str) -> int:
-    value = _required_int(row=row, column_name=column_name)
-    if value < 0:
-        raise CatalogGenerationError(f"Source row {column_name} must not be negative.")
-    return value
-
-
-def _optional_positive_int(row: NormalizedSourceRow, column_name: str) -> int | None:
-    value = _optional_field(row=row, column_name=column_name)
-    if value is None:
-        return None
-    integer = _int_from_text(value)
-    if integer < 1:
-        raise CatalogGenerationError(f"Source row {column_name} must be at least 1.")
-    return integer
-
-
-def _required_int(row: NormalizedSourceRow, column_name: str) -> int:
-    return _int_from_text(_required_field(row=row, column_name=column_name))
-
-
-def _required_bool(row: NormalizedSourceRow, column_name: str) -> bool:
-    value = _required_field(row=row, column_name=column_name).casefold()
-    if value == "true":
-        return True
-    if value == "false":
-        return False
-    raise CatalogGenerationError(f"Source row {column_name} must be true or false.")
-
-
-def _required_number(row: NormalizedSourceRow, column_name: str) -> float:
-    value = _required_field(row=row, column_name=column_name)
-    try:
-        return float(value)
-    except ValueError as exc:
-        raise CatalogGenerationError(f"Source row {column_name} must be numeric.") from exc
-
-
-def _int_from_text(value: str) -> int:
-    normalized = value.strip().removesuffix('"').removesuffix("+")
-    try:
-        return int(normalized)
-    except ValueError as exc:
-        raise CatalogGenerationError(f"Source value must be an integer: {value}.") from exc
-
-
-def _optional_int_from_text(value: str) -> int | None:
-    normalized = value.strip().removesuffix('"').removesuffix("+")
-    if _INTEGER_CHARACTERISTIC_RE.fullmatch(normalized) is None:
-        return None
-    return int(normalized)
 
 
 def _validate_diagnostics(

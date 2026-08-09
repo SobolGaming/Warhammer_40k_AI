@@ -787,6 +787,9 @@ def _runtime_consumer_ids(
 ) -> tuple[str, ...]:
     if type(ability) is not DatasheetAbilityDescriptor:
         raise GameLifecycleError("Ability runtime consumers require a descriptor.")
+    descriptor_consumption = catalog_descriptor_consumption_for(ability)
+    if descriptor_consumption is not None:
+        return descriptor_consumption.runtime_consumer_ids
     if rule_ir is not None:
         return catalog_rule_ir_consumers_for_rule(rule_ir)
     return _descriptor_runtime_consumer_ids(ability)
@@ -798,20 +801,11 @@ def _descriptor_runtime_consumer_ids(
     if type(ability) is not DatasheetAbilityDescriptor:
         raise GameLifecycleError("Ability descriptor consumers require a descriptor.")
     if descriptor_is_deep_strike(ability):
-        return (
-            "descriptor:movement:deep-strike-placement",
-            "descriptor:reserve-declaration:deep-strike",
-        )
+        return DEEP_STRIKE_DESCRIPTOR_RUNTIME_CONSUMER_IDS
     if descriptor_is_deadly_demise(ability):
-        return (
-            "descriptor:destruction-reaction:deadly-demise-source",
-            "descriptor:destruction-reaction:deadly-demise-resolution",
-        )
+        return DEADLY_DEMISE_DESCRIPTOR_RUNTIME_CONSUMER_IDS
     if descriptor_is_feel_no_pain(ability):
-        return (
-            "descriptor:lost-wound:feel-no-pain-source",
-            "descriptor:lost-wound:feel-no-pain-resolution",
-        )
+        return FEEL_NO_PAIN_DESCRIPTOR_RUNTIME_CONSUMER_IDS
     if descriptor_is_stealth(ability):
         return (CORE_STEALTH_RUNTIME_CONSUMER_ID,)
     descriptor_consumption = catalog_descriptor_consumption_for(ability)
@@ -834,6 +828,11 @@ def _support_stage(
         raise GameLifecycleError("Ability support stage requires a descriptor.")
     if type(consumer_ids) is not tuple:
         raise GameLifecycleError("Ability support stage consumer_ids must be a tuple.")
+    descriptor_consumption = catalog_descriptor_consumption_for(ability)
+    if descriptor_consumption is not None:
+        if consumer_ids != descriptor_consumption.runtime_consumer_ids:
+            raise GameLifecycleError("Descriptor consumption evidence drifted during coverage.")
+        return AbilityCoverageSupportStage.ENGINE_CONSUMED
     if ability.support is CatalogAbilitySupport.GENERIC_RULE_IR and rule_ir is not None:
         rollup = ability_support_rollup_for_rule_ir(
             source_ability_id=ability.source_id,
@@ -863,6 +862,9 @@ def _semantic_categories(
     ability: DatasheetAbilityDescriptor,
     rule_ir: RuleIR | None,
 ) -> tuple[str, ...]:
+    descriptor_consumption = catalog_descriptor_consumption_for(ability)
+    if descriptor_consumption is not None:
+        return descriptor_consumption.semantic_categories
     if rule_ir is None:
         return _descriptor_semantic_categories(ability)
     categories: set[str] = set()
@@ -1212,6 +1214,18 @@ _CATEGORY_NAMES: Mapping[str, str] = {
 CORE_STEALTH_RUNTIME_CONSUMER_ID = "core:stealth"
 SUPREME_COMMANDER_MUSTERING_CONSUMER_ID = "army-mustering:supreme-commander"
 WARLORD_RESTRICTION_MUSTERING_CONSUMER_ID = "army-mustering:warlord-restriction"
+DEEP_STRIKE_DESCRIPTOR_RUNTIME_CONSUMER_IDS = (
+    "descriptor:movement:deep-strike-placement",
+    "descriptor:reserve-declaration:deep-strike",
+)
+DEADLY_DEMISE_DESCRIPTOR_RUNTIME_CONSUMER_IDS = (
+    "descriptor:destruction-reaction:deadly-demise-source",
+    "descriptor:destruction-reaction:deadly-demise-resolution",
+)
+FEEL_NO_PAIN_DESCRIPTOR_RUNTIME_CONSUMER_IDS = (
+    "descriptor:lost-wound:feel-no-pain-source",
+    "descriptor:lost-wound:feel-no-pain-resolution",
+)
 
 
 def _category_name(category_id: str) -> str:

@@ -107,17 +107,30 @@ def test_support_categories_retain_structured_ability_and_datasheet_evidence() -
 
     leadership = categories["Leadership Characteristic"]
     assert leadership.ability_names == ("Daemonic Icon",)
-    assert leadership.datasheet_names == ("Bloodcrushers", "Bloodletters")
-    assert leadership.coverage_row_count == 2
-    assert leadership.source_kind_counts == (("wargear", 2),)
+    assert leadership.datasheet_names == ("Bloodcrushers", "Bloodletters", "Plaguebearers")
+    assert leadership.coverage_row_count == 3
+    assert leadership.source_kind_counts == (("wargear", 3),)
     assert tuple(
         (pair.ability_name, pair.datasheet_name) for pair in leadership.ability_datasheet_pairs
-    ) == (("Daemonic Icon", "Bloodcrushers"), ("Daemonic Icon", "Bloodletters"))
+    ) == (
+        ("Daemonic Icon", "Bloodcrushers"),
+        ("Daemonic Icon", "Bloodletters"),
+        ("Daemonic Icon", "Plaguebearers"),
+    )
     assert leadership.support_stages == (AbilityCoverageSupportStage.ENGINE_CONSUMED,)
 
     charge = categories["Charge Roll Modifier"]
     assert charge.ability_names == ("Instrument of Chaos",)
-    assert charge.datasheet_names == ("Bloodcrushers", "Bloodletters")
+    assert charge.datasheet_names == ("Bloodcrushers", "Bloodletters", "Plaguebearers")
+    assert charge.coverage_row_count == 3
+    assert charge.source_kind_counts == (("wargear", 3),)
+    assert tuple(
+        (pair.ability_name, pair.datasheet_name) for pair in charge.ability_datasheet_pairs
+    ) == (
+        ("Instrument of Chaos", "Bloodcrushers"),
+        ("Instrument of Chaos", "Bloodletters"),
+        ("Instrument of Chaos", "Plaguebearers"),
+    )
     assert charge.support_stages == (AbilityCoverageSupportStage.ENGINE_CONSUMED,)
 
     deep_strike = categories["Deep Strike Reserve Arrival"]

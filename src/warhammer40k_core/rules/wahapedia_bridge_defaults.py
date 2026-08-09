@@ -169,6 +169,17 @@ CHAOS_DAEMONS_SKULL_ALTAR_PDF_CORRECTION = PdfDatasheetCorrection(
     source_package_version=july_source.SOURCE_VERSION,
 )
 
+CHAOS_DAEMONS_BELAKOR_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000001148",
+        model_name="Be'lakor - EPIC HERO",
+        height=170.0,
+        height_units=GeometrySourceUnits.MILLIMETERS,
+        height_source_id="geometry-review:chaos-daemons:belakor:height",
+        height_document_reference="Chaos Daemons Be'lakor product listing",
+    ),
+)
+
 CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000001115",
@@ -188,6 +199,22 @@ CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES = (
     ),
 )
 
+CHAOS_DAEMONS_BLOODTHIRSTER_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000002582",
+        model_name="Bloodthirster",
+        height=200.0,
+        height_units=GeometrySourceUnits.MILLIMETERS,
+        height_source_id="geometry-candidate:reddit:v0zdiv:bloodthirster:low-pose-highest-point",
+        height_document_reference=(
+            "https://www.reddit.com/r/ageofsigmar/comments/v0zdiv/"
+            "looking_to_convert_a_bloodthirster_whats_the/"
+        ),
+        reviewer_status=GeometryReviewStatus.NEEDS_REVIEW,
+        evidence_kind=GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
+    ),
+)
+
 CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES = (
     ModelHeightOverride(
         datasheet_id="000001117",
@@ -196,6 +223,46 @@ CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES = (
         height_units=GeometrySourceUnits.INCHES,
         height_source_id="geometry-review:chaos-daemons:kairos-fateweaver:height",
         height_document_reference="https://www.adeptusars.com/miniatures/kairos-fateweaver",
+        evidence_kind=GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
+    ),
+)
+
+CHAOS_DAEMONS_LORD_OF_CHANGE_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000001120",
+        model_name="Lord of Change",
+        height=185.0,
+        height_units=GeometrySourceUnits.MILLIMETERS,
+        height_source_id="geometry-candidate:dakkadakka:745548:lord-of-change:highest-wing",
+        height_document_reference="https://www.dakkadakka.com/dakkaforum/posts/list/745548.page",
+        reviewer_status=GeometryReviewStatus.NEEDS_REVIEW,
+        evidence_kind=GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
+    ),
+)
+
+CHAOS_DAEMONS_PLAGUEBEARERS_HEIGHT_OVERRIDES = (
+    ModelHeightOverride(
+        datasheet_id="000001132",
+        model_name="Plagueridden",
+        height=40.0,
+        height_units=GeometrySourceUnits.MILLIMETERS,
+        height_source_id="geometry-candidate:reddit:wh19l0:plagueridden:regular-model-proxy",
+        height_document_reference=(
+            "https://www.reddit.com/r/ageofsigmar/comments/wh19l0/plaguebearer_height/"
+        ),
+        reviewer_status=GeometryReviewStatus.NEEDS_REVIEW,
+        evidence_kind=GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
+    ),
+    ModelHeightOverride(
+        datasheet_id="000001132",
+        model_name="Plaguebearers",
+        height=40.0,
+        height_units=GeometrySourceUnits.MILLIMETERS,
+        height_source_id="geometry-candidate:reddit:wh19l0:plaguebearers:excluding-base-upper-bound",
+        height_document_reference=(
+            "https://www.reddit.com/r/ageofsigmar/comments/wh19l0/plaguebearer_height/"
+        ),
+        reviewer_status=GeometryReviewStatus.NEEDS_REVIEW,
         evidence_kind=GeometryEvidenceKind.CROWD_SOURCED_MEASUREMENT,
     ),
 )
@@ -878,8 +945,12 @@ DEFAULT_HEIGHT_OVERRIDES = (
     *AELDARI_CORSAIR_VOID_UNITS_HEIGHT_OVERRIDES,
     *AELDARI_KHARSETH_HEIGHT_OVERRIDES,
     *AELDARI_WAVE_SERPENT_SHINING_SPEARS_ELDRAD_DIRE_AVENGERS_HEIGHT_OVERRIDES,
+    *CHAOS_DAEMONS_BELAKOR_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_BLOODCRUSHERS_HEIGHT_OVERRIDES,
+    *CHAOS_DAEMONS_BLOODTHIRSTER_HEIGHT_OVERRIDES,
     *CHAOS_DAEMONS_KAIROS_FATEWEAVER_HEIGHT_OVERRIDES,
+    *CHAOS_DAEMONS_LORD_OF_CHANGE_HEIGHT_OVERRIDES,
+    *CHAOS_DAEMONS_PLAGUEBEARERS_HEIGHT_OVERRIDES,
     *CHAOS_DEFILER_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_CHAOS_TERMINATORS_HEIGHT_OVERRIDES,
     *EMPERORS_CHILDREN_FLAWLESS_BLADES_HEIGHT_OVERRIDES,

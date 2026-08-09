@@ -3,43 +3,43 @@
     "capability_counts": {
       "DISPLAYABLE": {
         "not_applicable": 0,
-        "supported": 15,
+        "supported": 12,
         "unsupported": 0
       },
       "FULL_GAME_SUPPORTED": {
         "not_applicable": 0,
         "supported": 0,
-        "unsupported": 15
+        "unsupported": 12
       },
       "LOADABLE": {
         "not_applicable": 0,
         "supported": 10,
-        "unsupported": 5
+        "unsupported": 2
       },
       "MUSTERABLE": {
-        "not_applicable": 11,
+        "not_applicable": 8,
         "supported": 3,
         "unsupported": 1
       },
       "NETWORK_SAFE": {
         "not_applicable": 0,
-        "supported": 15,
+        "supported": 12,
         "unsupported": 0
       },
       "PHYSICALLY_PLAYABLE": {
-        "not_applicable": 7,
+        "not_applicable": 4,
         "supported": 0,
         "unsupported": 8
       },
       "REPLAY_VERIFIED": {
         "not_applicable": 0,
         "supported": 0,
-        "unsupported": 15
+        "unsupported": 12
       },
       "SEMANTICALLY_EXECUTABLE": {
         "not_applicable": 3,
         "supported": 2,
-        "unsupported": 10
+        "unsupported": 7
       }
     },
     "certification_claims": {
@@ -926,7 +926,7 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "4.1.0",
+        "contract_version": "4.2.0",
         "identity_hash": "320d31af5048139c3543d094d0e271f29ecd23cc65e634a034bc8e97442ff281",
         "identity_id": "https://warhammer40k-core.local/contracts/v4/capability-manifest.schema.json"
       },
@@ -974,7 +974,7 @@
       "roster_construction",
       "weapon_allocation_matrix"
     ],
-    "manifest_id": "capability-manifest:2d2d71c8dbf0eba8ef1317a8ef41bb4a437e44c1ff6dec2f44f8476c9f68061e",
+    "manifest_id": "capability-manifest:6a8089a1e49039a2e3844397438647b8b91eeef2690cb3832256fae47b865a4a",
     "mission_rows": [
       {
         "capabilities": [
@@ -1109,9 +1109,6 @@
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-a:army-alpha",
           "rule:player-a:deep-strike-unit:ability:core-deep-strike",
-          "rule:player-a:runtime:datasheet:core-deep-strike-unit",
-          "rule:player-a:runtime:datasheet:core-intercessor-like-infantry",
-          "rule:player-a:runtime:datasheet:core-vehicle-monster",
           "rule:player-a:runtime:detachment:core-combined-arms",
           "rule:player-a:runtime:faction:core-marine-force",
           "rule:player-a:scout-redeploy-unit:ability:core-scouts",
@@ -1149,9 +1146,6 @@
           "adapter:unit_display_projection",
           "catalog:ability:core-deep-strike:descriptor",
           "catalog:ability:core-scouts:descriptor",
-          "datasheet:core-deep-strike-unit",
-          "datasheet:core-intercessor-like-infantry",
-          "datasheet:core-vehicle-monster",
           "detachment:core-combined-arms",
           "faction:core-marine-force",
           "geometry:player-a:army-alpha:deep-strike-unit:core-deep-strike-model",
@@ -1161,9 +1155,6 @@
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-a:army-alpha",
           "rule:player-a:deep-strike-unit:ability:core-deep-strike",
-          "rule:player-a:runtime:datasheet:core-deep-strike-unit",
-          "rule:player-a:runtime:datasheet:core-intercessor-like-infantry",
-          "rule:player-a:runtime:datasheet:core-vehicle-monster",
           "rule:player-a:runtime:detachment:core-combined-arms",
           "rule:player-a:runtime:faction:core-marine-force",
           "rule:player-a:scout-redeploy-unit:ability:core-scouts",
@@ -1248,10 +1239,7 @@
         "evidence_refs": [
           "catalog:datasheet:core-vehicle-monster:no-abilities",
           "core-combined-arms",
-          "core-deep-strike-unit",
-          "core-intercessor-like-infantry",
           "core-marine-force",
-          "core-vehicle-monster",
           "descriptor:movement:deep-strike-placement",
           "descriptor:reserve-declaration:deep-strike",
           "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object",
@@ -1260,9 +1248,6 @@
           "phase9a-canonical/core-intercessor-like-infantry/core/core-scouts/none",
           "roster:player-a:army-alpha",
           "rule:player-a:deep-strike-unit:ability:core-deep-strike",
-          "rule:player-a:runtime:datasheet:core-deep-strike-unit",
-          "rule:player-a:runtime:datasheet:core-intercessor-like-infantry",
-          "rule:player-a:runtime:datasheet:core-vehicle-monster",
           "rule:player-a:runtime:detachment:core-combined-arms",
           "rule:player-a:runtime:faction:core-marine-force",
           "rule:player-a:scout-redeploy-unit:ability:core-scouts",
@@ -1293,9 +1278,6 @@
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-a:army-alpha",
           "rule:player-a:deep-strike-unit:ability:core-deep-strike",
-          "rule:player-a:runtime:datasheet:core-deep-strike-unit",
-          "rule:player-a:runtime:datasheet:core-intercessor-like-infantry",
-          "rule:player-a:runtime:datasheet:core-vehicle-monster",
           "rule:player-a:runtime:detachment:core-combined-arms",
           "rule:player-a:runtime:faction:core-marine-force",
           "rule:player-a:scout-redeploy-unit:ability:core-scouts",
@@ -1330,9 +1312,6 @@
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-a:army-alpha",
           "rule:player-a:deep-strike-unit:ability:core-deep-strike",
-          "rule:player-a:runtime:datasheet:core-deep-strike-unit",
-          "rule:player-a:runtime:datasheet:core-intercessor-like-infantry",
-          "rule:player-a:runtime:datasheet:core-vehicle-monster",
           "rule:player-a:runtime:detachment:core-combined-arms",
           "rule:player-a:runtime:faction:core-marine-force",
           "rule:player-a:scout-redeploy-unit:ability:core-scouts",
@@ -1366,9 +1345,6 @@
           "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-a:army-alpha",
           "rule:player-a:deep-strike-unit:ability:core-deep-strike",
-          "rule:player-a:runtime:datasheet:core-deep-strike-unit",
-          "rule:player-a:runtime:datasheet:core-intercessor-like-infantry",
-          "rule:player-a:runtime:datasheet:core-vehicle-monster",
           "rule:player-a:runtime:detachment:core-combined-arms",
           "rule:player-a:runtime:faction:core-marine-force",
           "rule:player-a:scout-redeploy-unit:ability:core-scouts",
@@ -1464,10 +1440,7 @@
             "dimension": "SEMANTICALLY_EXECUTABLE",
             "evidence_refs": [
               "core-combined-arms",
-              "core-deep-strike-unit",
-              "core-intercessor-like-infantry",
-              "core-marine-force",
-              "core-vehicle-monster"
+              "core-marine-force"
             ],
             "reason_code": "selected_rule_semantics_incomplete",
             "source_ids": [
@@ -1728,297 +1701,6 @@
             "evidence_refs": [],
             "reason_code": "runtime_source_only",
             "source_ids": [
-              "datasheet:core-deep-strike-unit"
-            ],
-            "status": "unsupported"
-          },
-          {
-            "dimension": "DISPLAYABLE",
-            "evidence_refs": [
-              "datasheet:core-deep-strike-unit"
-            ],
-            "reason_code": null,
-            "source_ids": [
-              "datasheet:core-deep-strike-unit"
-            ],
-            "status": "supported"
-          },
-          {
-            "dimension": "MUSTERABLE",
-            "evidence_refs": [],
-            "reason_code": "rule_musterable_not_applicable",
-            "source_ids": [
-              "datasheet:core-deep-strike-unit"
-            ],
-            "status": "not_applicable"
-          },
-          {
-            "dimension": "PHYSICALLY_PLAYABLE",
-            "evidence_refs": [],
-            "reason_code": "rule_physically_playable_not_applicable",
-            "source_ids": [
-              "datasheet:core-deep-strike-unit"
-            ],
-            "status": "not_applicable"
-          },
-          {
-            "dimension": "SEMANTICALLY_EXECUTABLE",
-            "evidence_refs": [],
-            "reason_code": "runtime_semantic_placeholder",
-            "source_ids": [
-              "datasheet:core-deep-strike-unit"
-            ],
-            "status": "unsupported"
-          },
-          {
-            "dimension": "FULL_GAME_SUPPORTED",
-            "evidence_refs": [],
-            "reason_code": "certified_full_game_evidence_missing",
-            "source_ids": [
-              "datasheet:core-deep-strike-unit"
-            ],
-            "status": "unsupported"
-          },
-          {
-            "dimension": "NETWORK_SAFE",
-            "evidence_refs": [
-              "adapter:redaction:capability_manifest"
-            ],
-            "reason_code": null,
-            "source_ids": [
-              "datasheet:core-deep-strike-unit"
-            ],
-            "status": "supported"
-          },
-          {
-            "dimension": "REPLAY_VERIFIED",
-            "evidence_refs": [],
-            "reason_code": "certified_replay_evidence_missing",
-            "source_ids": [
-              "datasheet:core-deep-strike-unit"
-            ],
-            "status": "unsupported"
-          }
-        ],
-        "display_name": "core-deep-strike-unit",
-        "load_support": "source_only",
-        "metadata": {
-          "content_family": "datasheet",
-          "execution_record_ids": [],
-          "required_for_matched_play": true,
-          "source_package_hash": null,
-          "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
-        },
-        "owner_id": "core-deep-strike-unit",
-        "player_id": "player-a",
-        "row_id": "rule:player-a:runtime:datasheet:core-deep-strike-unit",
-        "row_kind": "rule",
-        "semantic_execution": "placeholder",
-        "source_ids": [
-          "datasheet:core-deep-strike-unit"
-        ]
-      },
-      {
-        "capabilities": [
-          {
-            "dimension": "LOADABLE",
-            "evidence_refs": [],
-            "reason_code": "runtime_source_only",
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "unsupported"
-          },
-          {
-            "dimension": "DISPLAYABLE",
-            "evidence_refs": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "reason_code": null,
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "supported"
-          },
-          {
-            "dimension": "MUSTERABLE",
-            "evidence_refs": [],
-            "reason_code": "rule_musterable_not_applicable",
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "not_applicable"
-          },
-          {
-            "dimension": "PHYSICALLY_PLAYABLE",
-            "evidence_refs": [],
-            "reason_code": "rule_physically_playable_not_applicable",
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "not_applicable"
-          },
-          {
-            "dimension": "SEMANTICALLY_EXECUTABLE",
-            "evidence_refs": [],
-            "reason_code": "runtime_semantic_placeholder",
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "unsupported"
-          },
-          {
-            "dimension": "FULL_GAME_SUPPORTED",
-            "evidence_refs": [],
-            "reason_code": "certified_full_game_evidence_missing",
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "unsupported"
-          },
-          {
-            "dimension": "NETWORK_SAFE",
-            "evidence_refs": [
-              "adapter:redaction:capability_manifest"
-            ],
-            "reason_code": null,
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "supported"
-          },
-          {
-            "dimension": "REPLAY_VERIFIED",
-            "evidence_refs": [],
-            "reason_code": "certified_replay_evidence_missing",
-            "source_ids": [
-              "datasheet:core-intercessor-like-infantry"
-            ],
-            "status": "unsupported"
-          }
-        ],
-        "display_name": "core-intercessor-like-infantry",
-        "load_support": "source_only",
-        "metadata": {
-          "content_family": "datasheet",
-          "execution_record_ids": [],
-          "required_for_matched_play": true,
-          "source_package_hash": null,
-          "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
-        },
-        "owner_id": "core-intercessor-like-infantry",
-        "player_id": "player-a",
-        "row_id": "rule:player-a:runtime:datasheet:core-intercessor-like-infantry",
-        "row_kind": "rule",
-        "semantic_execution": "placeholder",
-        "source_ids": [
-          "datasheet:core-intercessor-like-infantry"
-        ]
-      },
-      {
-        "capabilities": [
-          {
-            "dimension": "LOADABLE",
-            "evidence_refs": [],
-            "reason_code": "runtime_source_only",
-            "source_ids": [
-              "datasheet:core-vehicle-monster"
-            ],
-            "status": "unsupported"
-          },
-          {
-            "dimension": "DISPLAYABLE",
-            "evidence_refs": [
-              "datasheet:core-vehicle-monster"
-            ],
-            "reason_code": null,
-            "source_ids": [
-              "datasheet:core-vehicle-monster"
-            ],
-            "status": "supported"
-          },
-          {
-            "dimension": "MUSTERABLE",
-            "evidence_refs": [],
-            "reason_code": "rule_musterable_not_applicable",
-            "source_ids": [
-              "datasheet:core-vehicle-monster"
-            ],
-            "status": "not_applicable"
-          },
-          {
-            "dimension": "PHYSICALLY_PLAYABLE",
-            "evidence_refs": [],
-            "reason_code": "rule_physically_playable_not_applicable",
-            "source_ids": [
-              "datasheet:core-vehicle-monster"
-            ],
-            "status": "not_applicable"
-          },
-          {
-            "dimension": "SEMANTICALLY_EXECUTABLE",
-            "evidence_refs": [],
-            "reason_code": "runtime_semantic_placeholder",
-            "source_ids": [
-              "datasheet:core-vehicle-monster"
-            ],
-            "status": "unsupported"
-          },
-          {
-            "dimension": "FULL_GAME_SUPPORTED",
-            "evidence_refs": [],
-            "reason_code": "certified_full_game_evidence_missing",
-            "source_ids": [
-              "datasheet:core-vehicle-monster"
-            ],
-            "status": "unsupported"
-          },
-          {
-            "dimension": "NETWORK_SAFE",
-            "evidence_refs": [
-              "adapter:redaction:capability_manifest"
-            ],
-            "reason_code": null,
-            "source_ids": [
-              "datasheet:core-vehicle-monster"
-            ],
-            "status": "supported"
-          },
-          {
-            "dimension": "REPLAY_VERIFIED",
-            "evidence_refs": [],
-            "reason_code": "certified_replay_evidence_missing",
-            "source_ids": [
-              "datasheet:core-vehicle-monster"
-            ],
-            "status": "unsupported"
-          }
-        ],
-        "display_name": "core-vehicle-monster",
-        "load_support": "source_only",
-        "metadata": {
-          "content_family": "datasheet",
-          "execution_record_ids": [],
-          "required_for_matched_play": true,
-          "source_package_hash": null,
-          "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
-        },
-        "owner_id": "core-vehicle-monster",
-        "player_id": "player-a",
-        "row_id": "rule:player-a:runtime:datasheet:core-vehicle-monster",
-        "row_kind": "rule",
-        "semantic_execution": "placeholder",
-        "source_ids": [
-          "datasheet:core-vehicle-monster"
-        ]
-      },
-      {
-        "capabilities": [
-          {
-            "dimension": "LOADABLE",
-            "evidence_refs": [],
-            "reason_code": "runtime_source_only",
-            "source_ids": [
               "detachment:core-combined-arms"
             ],
             "status": "unsupported"
@@ -2094,7 +1776,9 @@
         "display_name": "core-combined-arms",
         "load_support": "source_only",
         "metadata": {
+          "aggregate_semantic_execution": "placeholder",
           "content_family": "detachment",
+          "excluded_aggregate_execution_record_ids": [],
           "execution_record_ids": [],
           "required_for_matched_play": true,
           "source_package_hash": null,
@@ -2191,7 +1875,9 @@
         "display_name": "core-marine-force",
         "load_support": "source_only",
         "metadata": {
+          "aggregate_semantic_execution": "placeholder",
           "content_family": "faction",
+          "excluded_aggregate_execution_record_ids": [],
           "execution_record_ids": [],
           "required_for_matched_play": true,
           "source_package_hash": null,
@@ -2646,36 +2332,6 @@
         "rule_row_id": "rule:player-a:deep-strike-unit:ability:core-deep-strike",
         "source_ids": [
           "datasheet:core-deep-strike-unit:ability:deep-strike"
-        ]
-      },
-      {
-        "effect_id": "unsupported-effect:rule:player-a:runtime:datasheet:core-deep-strike-unit",
-        "message": "core-deep-strike-unit is not fully executable: runtime_semantic_placeholder.",
-        "player_id": "player-a",
-        "reason_code": "runtime_semantic_placeholder",
-        "rule_row_id": "rule:player-a:runtime:datasheet:core-deep-strike-unit",
-        "source_ids": [
-          "datasheet:core-deep-strike-unit"
-        ]
-      },
-      {
-        "effect_id": "unsupported-effect:rule:player-a:runtime:datasheet:core-intercessor-like-infantry",
-        "message": "core-intercessor-like-infantry is not fully executable: runtime_semantic_placeholder.",
-        "player_id": "player-a",
-        "reason_code": "runtime_semantic_placeholder",
-        "rule_row_id": "rule:player-a:runtime:datasheet:core-intercessor-like-infantry",
-        "source_ids": [
-          "datasheet:core-intercessor-like-infantry"
-        ]
-      },
-      {
-        "effect_id": "unsupported-effect:rule:player-a:runtime:datasheet:core-vehicle-monster",
-        "message": "core-vehicle-monster is not fully executable: runtime_semantic_placeholder.",
-        "player_id": "player-a",
-        "reason_code": "runtime_semantic_placeholder",
-        "rule_row_id": "rule:player-a:runtime:datasheet:core-vehicle-monster",
-        "source_ids": [
-          "datasheet:core-vehicle-monster"
         ]
       },
       {
