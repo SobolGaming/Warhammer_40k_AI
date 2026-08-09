@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from functools import cache
+
 from warhammer40k_core.core.deployment_zones import DeploymentZone
 from warhammer40k_core.core.missions import (
     BattlefieldLayoutDefinition,
@@ -46,8 +48,9 @@ EVENT_COMPANION_2026_07_SOURCE_ID = event_source_data.SOURCE_PACKAGE_ID
 EVENT_COMPANION_2026_07_SOURCE_VERSION = event_source_data.SOURCE_VERSION
 
 
+@cache
 def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
-    """Build the source-linked Chapter Approved 2026-27 mission pack descriptors."""
+    """Build and cache the immutable Chapter Approved 2026-27 mission pack."""
 
     typed_battlefield_layouts = event_source_data.battlefield_layout_definitions()
     chapter_approved_rows = source_data.battlefield_layout_rows()
@@ -174,8 +177,9 @@ def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
     )
 
 
+@cache
 def warhammer_event_companion_2026_07_mission_pack() -> MissionPackDefinition:
-    """Build the current source-linked Warhammer Event Companion mission pack descriptors."""
+    """Build and cache the immutable Warhammer Event Companion mission pack."""
 
     deployment_maps = _deployment_maps(
         rows=event_source_data.battlefield_layout_rows(),

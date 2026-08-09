@@ -56,6 +56,7 @@ from warhammer40k_core.engine.shooting_terrain_visibility import (
     model_within_solid_terrain,
     terrain_visibility_areas_from_placements,
 )
+from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.base import CircularBase
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.visibility import (
@@ -1000,6 +1001,68 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
         terrain_features=(),
         terrain_areas=(light_area,),
     )
+
+
+def test_phase17n_visibility_resolves_feature_area_associations_once_per_query(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+    visibility_areas = terrain_visibility_areas_from_placements(setup.terrain_areas)
+    terrain_features = setup.terrain_features[:2]
+    original_polygon_within_polygon = shapely_backend.polygon_within_polygon
+    association_check_count = 0
+
+    def counting_polygon_within_polygon(
+        inner: tuple[tuple[float, float], ...],
+        outer: tuple[tuple[float, float], ...],
+    ) -> bool:
+        nonlocal association_check_count
+        association_check_count += 1
+        return original_polygon_within_polygon(inner, outer)
+
+    monkeypatch.setattr(
+        shapely_backend,
+        "polygon_within_polygon",
+        counting_polygon_within_polygon,
+    )
+
+    witness = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="phase17n-feature-area-association-cache",
+        ),
+        los_cache_key="los:phase17n-feature-area-association-cache",
+        observer_model=Model(
+            model_id="observer",
+            pose=Pose.at(x=2.0, y=2.0),
+            base=CircularBase(radius=0.35),
+            volume=ModelVolume(height=2.0),
+        ),
+        target_models=(
+            Model(
+                model_id="target-a",
+                pose=Pose.at(x=42.0, y=58.0),
+                base=CircularBase(radius=0.35),
+                volume=ModelVolume(height=2.0),
+            ),
+            Model(
+                model_id="target-b",
+                pose=Pose.at(x=40.0, y=56.0),
+                base=CircularBase(radius=0.35),
+                volume=ModelVolume(height=2.0),
+            ),
+        ),
+        terrain_features=terrain_features,
+        terrain_areas=visibility_areas,
+    ).resolve_line_of_sight()
+
+    assert witness.target_model_ids == ("target-a", "target-b")
+    assert 0 < association_check_count <= (len(terrain_features) * len(visibility_areas))
 
 
 def test_phase17j_terrain_area_footprint_templates_match_source_polygons() -> None:

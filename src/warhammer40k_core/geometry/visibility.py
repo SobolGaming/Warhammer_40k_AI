@@ -34,7 +34,7 @@ from warhammer40k_core.geometry.terrain_area_visibility import (
     TerrainVisibilityArea,
     TerrainVisibilityAreaPayload,
     classification_has_visibility_semantics,
-    feature_is_associated_with_terrain_area,
+    feature_ids_associated_with_terrain_areas,
     model_intersects_terrain_area,
     ray_intersects_terrain_area,
     validate_terrain_visibility_areas,
@@ -1135,8 +1135,16 @@ class TerrainVisibilityContext:
         )
 
     def resolve_line_of_sight(self) -> LineOfSightWitness:
+        terrain_area_feature_ids = feature_ids_associated_with_terrain_areas(
+            self.terrain_features,
+            self.terrain_areas,
+        )
         records = tuple(
-            self._resolve_model_line_of_sight(target_model) for target_model in self.target_models
+            self._resolve_model_line_of_sight(
+                target_model,
+                terrain_area_feature_ids=terrain_area_feature_ids,
+            )
+            for target_model in self.target_models
         )
         return LineOfSightWitness.from_records(
             ruleset_descriptor_hash=self.ruleset_descriptor_hash,
@@ -1205,7 +1213,12 @@ class TerrainVisibilityContext:
             target_keywords=tuple(payload["target_keywords"]),
         )
 
-    def _resolve_model_line_of_sight(self, target_model: Model) -> ModelLineOfSightRecord:
+    def _resolve_model_line_of_sight(
+        self,
+        target_model: Model,
+        *,
+        terrain_area_feature_ids: frozenset[str],
+    ) -> ModelLineOfSightRecord:
         rays = _volume_sample_rays(self.observer_model, target_model)
         clear_ray_indices: list[int] = []
         blocker_records: list[VisibilityBlockerRecord] = []
@@ -1216,6 +1229,7 @@ class TerrainVisibilityContext:
                 ray_index=ray_index,
                 target_model=target_model,
                 volume_feature_index=volume_feature_index,
+                terrain_area_feature_ids=terrain_area_feature_ids,
             )
             blocker_records.extend(ray_blockers)
             if not any(record.blocks_model_visibility for record in ray_blockers):
@@ -1239,6 +1253,7 @@ class TerrainVisibilityContext:
         ray_index: int,
         target_model: Model,
         volume_feature_index: dict[str, TerrainFeatureDefinition],
+        terrain_area_feature_ids: frozenset[str],
     ) -> tuple[VisibilityBlockerRecord, ...]:
         physical_result = VisibilityQuery(
             rays=(ray,),
@@ -1272,6 +1287,7 @@ class TerrainVisibilityContext:
                 ray=ray,
                 ray_index=ray_index,
                 target_model=target_model,
+                terrain_area_feature_ids=terrain_area_feature_ids,
             )
         )
         records.extend(
@@ -1371,10 +1387,11 @@ class TerrainVisibilityContext:
         ray: VisibilityRay,
         ray_index: int,
         target_model: Model,
+        terrain_area_feature_ids: frozenset[str],
     ) -> tuple[VisibilityBlockerRecord, ...]:
         records: list[VisibilityBlockerRecord] = []
         for feature in self.terrain_features:
-            if feature_is_associated_with_terrain_area(feature, self.terrain_areas):
+            if feature.feature_id in terrain_area_feature_ids:
                 continue
             policy = _feature_visibility_policy(
                 self.terrain_visibility_policy,

@@ -146,14 +146,32 @@ def feature_is_associated_with_terrain_area(
 ) -> bool:
     if type(feature) is not TerrainFeatureDefinition:
         raise GeometryError("terrain-area feature must be TerrainFeatureDefinition.")
+    return feature.feature_id in feature_ids_associated_with_terrain_areas((feature,), areas)
+
+
+def feature_ids_associated_with_terrain_areas(
+    features: tuple[TerrainFeatureDefinition, ...],
+    areas: tuple[TerrainVisibilityArea, ...],
+) -> frozenset[str]:
+    if type(features) is not tuple:
+        raise GeometryError("terrain-area features must be a tuple.")
     validated_areas = validate_terrain_visibility_areas("terrain feature areas", areas)
-    return any(
-        shapely_backend.polygon_within_polygon(
-            feature.rules_footprint_points(),
-            area.footprint_polygon,
-        )
-        for area in validated_areas
-    )
+    associated_feature_ids: set[str] = set()
+    for feature in cast(tuple[object, ...], features):
+        if type(feature) is not TerrainFeatureDefinition:
+            raise GeometryError(
+                "terrain-area features must contain TerrainFeatureDefinition values."
+            )
+        feature_footprint = feature.rules_footprint_points()
+        if any(
+            shapely_backend.polygon_within_polygon(
+                feature_footprint,
+                area.footprint_polygon,
+            )
+            for area in validated_areas
+        ):
+            associated_feature_ids.add(feature.feature_id)
+    return frozenset(associated_feature_ids)
 
 
 def _validate_model_and_area(model: Model, area: TerrainVisibilityArea) -> None:

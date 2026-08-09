@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import replace
+from dataclasses import FrozenInstanceError, replace
 from typing import cast
 
 import pytest
@@ -43,6 +43,7 @@ from warhammer40k_core.engine.mission_setup import (
     MissionSetupError,
     instantiate_terrain_layout_template,
 )
+from warhammer40k_core.engine.missions import mission_pack_for_id, supported_mission_packs
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     PlacementProposalPayload,
@@ -86,6 +87,29 @@ PHASE16A_BATTLEFIELD_LAYOUT_ID = "take-and-hold-vs-purge-the-foe-layout-3"
 PHASE16A_DEPLOYMENT_MAP_ID = "take-and-hold-vs-purge-the-foe-layout-3-deployment"
 PHASE16A_MISSION_POOL_ENTRY_ID = "mission-take-and-hold-vs-purge-the-foe-layout-3"
 TYPED_TAKE_AND_HOLD_LAYOUT_C_ID = "take-and-hold-vs-take-and-hold-layout-3"
+
+
+def test_supported_mission_pack_builders_cache_only_immutable_definition_graphs() -> None:
+    chapter_pack = chapter_approved_2026_27_mission_pack()
+    event_pack = warhammer_event_companion_2026_07_mission_pack()
+    inventory = supported_mission_packs()
+
+    assert chapter_approved_2026_27_mission_pack() is chapter_pack
+    assert warhammer_event_companion_2026_07_mission_pack() is event_pack
+    assert inventory == (chapter_pack, event_pack)
+    assert inventory[0] is chapter_pack
+    assert inventory[1] is event_pack
+    assert mission_pack_for_id(chapter_pack.mission_pack_id) is chapter_pack
+    assert mission_pack_for_id(event_pack.mission_pack_id) is event_pack
+
+    with pytest.raises(FrozenInstanceError):
+        type(event_pack).__setattr__(event_pack, "name", "mutated")
+
+    detached_payload = event_pack.to_payload()
+    detached_payload["deployment_maps"].clear()
+
+    assert event_pack.deployment_maps
+    assert event_pack.to_payload()["deployment_maps"]
 
 
 def test_chapter_approved_mission_pack_round_trips_without_object_reprs() -> None:
