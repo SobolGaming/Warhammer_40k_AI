@@ -1036,7 +1036,7 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "4.2.0",
+        "contract_version": "4.3.0",
         "identity_hash": "320d31af5048139c3543d094d0e271f29ecd23cc65e634a034bc8e97442ff281",
         "identity_id": "https://warhammer40k-core.local/contracts/v4/capability-manifest.schema.json"
       },
