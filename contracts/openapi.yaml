@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Warhammer 40,000 CORE V2 Adapter Contract",
-    "version": "4.0.0",
-    "description": "Authenticated Phase 18G/18H session protocol with Phase 18I typed interactions and the Phase 18J battlefield coordinate/geometry contract, mandatory engine-owned spatial context on physical proposal requests, mandatory rules-overlay source identity, replay artifact v2, server-owned role bindings, opaque role-bound cursors, deterministic pagination, and explicit projection resynchronization."
+    "version": "4.1.0",
+    "description": "Phase 17O viewer-scoped capability manifests and the authenticated Phase 18G/18H session protocol with Phase 18I typed interactions and the Phase 18J battlefield coordinate/geometry contract, mandatory engine-owned spatial context on physical proposal requests, mandatory rules-overlay source identity, replay artifact v2, server-owned role bindings, opaque role-bound cursors, deterministic pagination, and explicit projection resynchronization."
   },
   "servers": [{"url": "http://127.0.0.1:8000"}],
   "security": [{"bearerAuth": []}],
@@ -308,6 +308,7 @@
     },
     "schemas": {
       "AnnotatedDecisionRequest": {"$ref": "./schemas/annotated-decision-request.schema.json"},
+      "CapabilityManifest": {"$ref": "./schemas/capability-manifest.schema.json"},
       "CreateSession": {"$ref": "./schemas/create-session.schema.json"},
       "DecisionRequestView": {"$ref": "./schemas/decision-request-view.schema.json"},
       "ErrorEnvelope": {"$ref": "./schemas/error-envelope.schema.json"},

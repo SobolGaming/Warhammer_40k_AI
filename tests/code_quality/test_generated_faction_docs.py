@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 from tools.canonical_json_hash import canonical_json_sha256
 from tools.generate_ability_support_matrix import (
+    FACTION_SUPPORT_SECTION_TITLES,
     faction_support_markdown_files,
 )
 
@@ -38,6 +39,32 @@ def test_generated_json_dependency_hashes_ignore_checkout_line_endings(tmp_path:
     crlf_path.write_bytes(payload.replace(b"\n", b"\r\n"))
 
     assert canonical_json_sha256(lf_path) == canonical_json_sha256(crlf_path)
+
+
+@pytest.mark.parametrize("filename", FACTION_DOCUMENT_FILENAMES)
+def test_generated_faction_documents_separate_component_evidence_from_game_support(
+    filename: str,
+) -> None:
+    document = _generated_faction_documents()[filename]
+
+    assert "## At a glance" in document
+    assert "Implemented / executable" in document
+    assert "Partial" in document
+    assert "Source-only" in document
+    assert "This is not a full-game support claim." in document
+    assert "Phase 17O capabilities" in document
+    assert "## Datasheet component coverage" in document
+    assert "Supported detachments" not in document
+
+
+@pytest.mark.parametrize("filename", FACTION_DOCUMENT_FILENAMES)
+def test_generated_faction_documents_share_one_section_structure(filename: str) -> None:
+    document = _generated_faction_documents()[filename]
+    section_titles = tuple(
+        line.removeprefix("## ") for line in document.splitlines() if line.startswith("## ")
+    )
+
+    assert section_titles == FACTION_SUPPORT_SECTION_TITLES
 
 
 @cache

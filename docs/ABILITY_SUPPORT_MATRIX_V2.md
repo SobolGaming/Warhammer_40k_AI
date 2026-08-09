@@ -182,38 +182,38 @@ This generated section reports pregame army-list rules enforced by `army_musteri
 
 ## Factions
 
-Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into generated per-faction files under `docs/factions/`. The exact rows expose their coverage row IDs, source IDs, timing/category metadata, and current support status. Supported detachment counts report semantic engine support, not just source-row intake.
+Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into generated per-faction files under `docs/factions/`. Counts below separate implemented, partial, and source-only detachment rules. They do not claim that a whole faction, roster, mission, or full game is supported; selected-game claims come from the Phase 17O capability manifest.
 
-| Faction | Detachments | Supported detachments | Exact Enhancements | Exact Stratagems | Engine-supported rows | File |
+| Faction | Detachments | Implemented | Partial | Source-only | Executable exact rules | File |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Orks | 12 | 1 | 44 | 66 | 14 | [orks](factions/orks.md) |
-| Aeldari | 15 | 2 | 52 | 78 | 16 | [aeldari](factions/aeldari.md) |
-| Drukhari | 9 | 0 | 20 | 30 | 1 | [drukhari](factions/drukhari.md) |
-| Tyranids | 10 | 0 | 32 | 48 | 3 | [tyranids](factions/tyranids.md) |
-| Genestealer Cults | 9 | 0 | 20 | 30 | 3 | [genestealer-cults](factions/genestealer-cults.md) |
-| Necrons | 12 | 0 | 36 | 54 | 4 | [necrons](factions/necrons.md) |
-| Leagues of Votann | 10 | 0 | 28 | 42 | 3 | [leagues-of-votann](factions/leagues-of-votann.md) |
-| T'au Empire | 7 | 0 | 16 | 24 | 1 | [tau-empire](factions/tau-empire.md) |
-| Space Marines | 22 | 0 | 72 | 107 | 17 | [space-marines](factions/space-marines.md) |
-| Dark Angels | 8 | 0 | 0 | 0 | 0 | [dark-angels](factions/dark-angels.md) |
-| Blood Angels | 8 | 0 | 0 | 0 | 0 | [blood-angels](factions/blood-angels.md) |
-| Space Wolves | 7 | 0 | 0 | 0 | 0 | [space-wolves](factions/space-wolves.md) |
-| Black Templars | 6 | 0 | 0 | 0 | 1 | [black-templars](factions/black-templars.md) |
-| Deathwatch | 1 | 0 | 0 | 0 | 0 | [deathwatch](factions/deathwatch.md) |
-| Grey Knights | 9 | 0 | 24 | 36 | 1 | [grey-knights](factions/grey-knights.md) |
-| Chaos Space Marines | 17 | 0 | 56 | 84 | 5 | [chaos-space-marines](factions/chaos-space-marines.md) |
-| World Eaters | 8 | 0 | 24 | 36 | 1 | [world-eaters](factions/world-eaters.md) |
-| Emperor's Children | 10 | 3 | 26 | 39 | 20 | [emperors-children](factions/emperors-children.md) |
-| Death Guard | 9 | 0 | 20 | 30 | 1 | [death-guard](factions/death-guard.md) |
-| Thousand Sons | 9 | 0 | 24 | 36 | 2 | [thousand-sons](factions/thousand-sons.md) |
-| Chaos Knights | 8 | 0 | 26 | 36 | 3 | [chaos-knights](factions/chaos-knights.md) |
-| Chaos Daemons | 9 | 6 | 29 | 46 | 45 | [chaos-daemons](factions/chaos-daemons.md) |
-| Astra Militarum | 11 | 0 | 36 | 54 | 3 | [astra-militarum](factions/astra-militarum.md) |
-| Adepta Sororitas | 8 | 0 | 20 | 30 | 2 | [adepta-sororitas](factions/adepta-sororitas.md) |
-| Adeptus Mechanicus | 10 | 0 | 28 | 42 | 1 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
-| Imperial Knights | 8 | 0 | 24 | 36 | 3 | [imperial-knights](factions/imperial-knights.md) |
-| Adeptus Custodes | 9 | 0 | 24 | 36 | 3 | [adeptus-custodes](factions/adeptus-custodes.md) |
-| Imperial Agents | 5 | 0 | 20 | 30 | 2 | [imperial-agents](factions/imperial-agents.md) |
+| Orks | 12 | 1 | 0 | 11 | 14 | [orks](factions/orks.md) |
+| Aeldari | 15 | 2 | 0 | 13 | 16 | [aeldari](factions/aeldari.md) |
+| Drukhari | 9 | 0 | 0 | 9 | 1 | [drukhari](factions/drukhari.md) |
+| Tyranids | 10 | 0 | 0 | 10 | 3 | [tyranids](factions/tyranids.md) |
+| Genestealer Cults | 9 | 0 | 0 | 9 | 3 | [genestealer-cults](factions/genestealer-cults.md) |
+| Necrons | 12 | 0 | 0 | 12 | 4 | [necrons](factions/necrons.md) |
+| Leagues of Votann | 10 | 0 | 0 | 10 | 3 | [leagues-of-votann](factions/leagues-of-votann.md) |
+| T'au Empire | 7 | 0 | 0 | 7 | 1 | [tau-empire](factions/tau-empire.md) |
+| Space Marines | 22 | 0 | 0 | 22 | 17 | [space-marines](factions/space-marines.md) |
+| Dark Angels | 8 | 0 | 0 | 8 | 0 | [dark-angels](factions/dark-angels.md) |
+| Blood Angels | 8 | 0 | 0 | 8 | 0 | [blood-angels](factions/blood-angels.md) |
+| Space Wolves | 7 | 0 | 0 | 7 | 0 | [space-wolves](factions/space-wolves.md) |
+| Black Templars | 6 | 0 | 0 | 6 | 1 | [black-templars](factions/black-templars.md) |
+| Deathwatch | 1 | 0 | 0 | 1 | 0 | [deathwatch](factions/deathwatch.md) |
+| Grey Knights | 9 | 0 | 0 | 9 | 1 | [grey-knights](factions/grey-knights.md) |
+| Chaos Space Marines | 17 | 0 | 0 | 17 | 5 | [chaos-space-marines](factions/chaos-space-marines.md) |
+| World Eaters | 8 | 0 | 0 | 8 | 1 | [world-eaters](factions/world-eaters.md) |
+| Emperor's Children | 10 | 2 | 1 | 7 | 20 | [emperors-children](factions/emperors-children.md) |
+| Death Guard | 9 | 0 | 0 | 9 | 1 | [death-guard](factions/death-guard.md) |
+| Thousand Sons | 9 | 0 | 0 | 9 | 2 | [thousand-sons](factions/thousand-sons.md) |
+| Chaos Knights | 8 | 0 | 0 | 8 | 3 | [chaos-knights](factions/chaos-knights.md) |
+| Chaos Daemons | 9 | 6 | 0 | 3 | 45 | [chaos-daemons](factions/chaos-daemons.md) |
+| Astra Militarum | 11 | 0 | 0 | 11 | 3 | [astra-militarum](factions/astra-militarum.md) |
+| Adepta Sororitas | 8 | 0 | 0 | 8 | 2 | [adepta-sororitas](factions/adepta-sororitas.md) |
+| Adeptus Mechanicus | 10 | 0 | 0 | 10 | 1 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |
+| Imperial Knights | 8 | 0 | 0 | 8 | 3 | [imperial-knights](factions/imperial-knights.md) |
+| Adeptus Custodes | 9 | 0 | 0 | 9 | 3 | [adeptus-custodes](factions/adeptus-custodes.md) |
+| Imperial Agents | 5 | 0 | 0 | 5 | 2 | [imperial-agents](factions/imperial-agents.md) |
 
 ## Datasheet Abilities
 

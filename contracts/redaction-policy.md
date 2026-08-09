@@ -36,6 +36,19 @@ Status payloads may include request/actor details only when the corresponding
 request is visible to that viewer. Catalog projections contain static public
 display data and no live hidden state.
 
+The nested Phase 17O capability manifest is projected by this same redaction
+module. A non-omniscient viewer receives only owned roster, unit, rule,
+geometry, and unsupported-effect rows. Capability counts and mode results are
+rebuilt from visible rows. Selection hashes and manifest IDs cover the viewer's
+complete canonical muster request plus a digest of the complete public mission
+setup, never an opponent's selection. Certification blocker details are rebuilt
+from visible rows, but the authoritative Phase 20A and Phase 20D booleans are
+preserved so redaction cannot strengthen a certification claim. When a hidden
+authoritative blocker would otherwise disappear, the projection emits only a
+generic redacted-blocker reason code. The common
+mission/catalog/ruleset/contract identities and neutral interaction inventory
+contain no selected opponent content.
+
 Session metadata is always principal scoped. Viewer-scoped command checkpoints
 and event ranges use only that role's redacted projection and stream; they must
 not become a hash, count, cursor, or next-actor oracle for hidden opponent state.
@@ -58,7 +71,9 @@ A role, player binding, policy, or registry authorization-epoch change changes
 cursor scope and invalidates previously issued cursors. Delayed spectators read a retained historical revision snapshot;
 they do not receive current hidden state with fields merely omitted.
 
-`examples/projections/hidden_secondary_redaction_view.json` and the generated
+`examples/projections/hidden_secondary_redaction_view.json`,
+`examples/support-profile.json`, both
+`examples/support-profile-player-*-redacted.json` files, and the generated
 event/status examples are conformance fixtures. Adding a visibility-sensitive
 payload requires valid owner and opponent examples plus a regression proving
 that counts and metadata do not leak.

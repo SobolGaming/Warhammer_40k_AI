@@ -382,6 +382,7 @@ Implemented foundation and partial integration baselines:
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
 | 17J | Complete | Warhammer Event Companion v1.0 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with pending coordinate extraction, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
+| 17O | Complete | Viewer-scoped eight-axis capability manifest with selected roster/unit/rule/mission/geometry rows, evidence, blockers, identities, and mechanically derived certification claims |
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
 | 18C | Complete | Shared adapter session facade for CLI, UI, network, headless, and replay producers |
@@ -402,7 +403,6 @@ Next / planned sequence:
 | 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
 | 17M | Planned | Source-backed generic semantic completion organized by reusable mechanic family |
 | 17N | Planned | Mission, terrain, deployment, objective, and battlefield package completion |
-| 17O | Planned | Multi-axis engine capability and support manifest |
 | 18J | Complete | Versioned battlefield coordinate contract with separated authoritative, interaction, and render geometry |
 | 18K-18L | Planned | Interface intent and persistence |
 | 18M-B+ | Planned | Remaining decision-family, race, golden-corpus, persistence-claim, and Phase 20A backend certification coverage |
@@ -4940,6 +4940,21 @@ Completion gate:
 ## Phase 17O: engine capability and support manifest
 
 Priority: required for external contract and certification claims.
+
+Status: Complete. `adapters.capability_manifest` builds
+`capability-manifest-v1` for the exact selected configuration and nests it in
+the existing `support_profile()` response. The Phase 18D schema is
+`contracts/schemas/capability-manifest.schema.json`; generated administrator
+and player-scoped fixtures prove both unredacted and redacted shapes. The
+manifest records all eight dimensions independently on roster, unit, rule,
+mission, and geometry rows, while preserving the underlying load-support and
+semantic-execution tokens as separate fields.
+
+No current manifest is promoted to full-game or release support merely because
+it loads or can run a setup smoke. `FULL_GAME_SUPPORTED` and `REPLAY_VERIFIED`
+remain explicit unsupported results until checked-in certified-scenario and
+replay evidence exists. Phase 20A and Phase 20D booleans are derived from those
+evidence-bearing results, not from prose or the legacy three-state rollup.
 
 Phase 17O evolves the existing `support_profile()` baseline into a versioned,
 client-readable capability manifest. It must answer whether the selected

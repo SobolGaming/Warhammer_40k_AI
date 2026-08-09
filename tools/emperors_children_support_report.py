@@ -68,9 +68,9 @@ _DATASHEET_REVIEW_ROWS = (
         semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(
             "No known Fulgrim blocker; catalog, model geometry, wargear, weapon-keyword, "
-            "datasheet-ability, and Thrill Seekers runtime-consumption evidence are Full. "
-            "The generated overall row remains Playable while faction-wide detachment "
-            "interaction coverage is partial."
+            "datasheet-ability, and Thrill Seekers component evidence is complete. The "
+            "historical rollup token is `Playable`, but selected-game capabilities remain "
+            "separate while detachment coverage is partial."
         ),
     ),
     EmperorsChildrenDatasheetReviewRow(
@@ -103,9 +103,9 @@ _DATASHEET_REVIEW_ROWS = (
         semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(
             "No known Tormentors blocker; catalog, model geometry, wargear, weapon-keyword, "
-            "datasheet-ability, and Thrill Seekers runtime-consumption evidence are Full. "
-            "The generated overall row remains Playable while faction-wide detachment "
-            "interaction coverage is partial."
+            "datasheet-ability, and Thrill Seekers component evidence is complete. The "
+            "historical rollup token is `Playable`, but selected-game capabilities remain "
+            "separate while detachment coverage is partial."
         ),
     ),
     EmperorsChildrenDatasheetReviewRow(
@@ -122,9 +122,9 @@ _DATASHEET_REVIEW_ROWS = (
         semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(
             "No known Infractors blocker; catalog, model geometry, wargear, weapon-keyword, "
-            "datasheet-ability, and Thrill Seekers runtime-consumption evidence are Full. "
-            "The generated overall row remains Playable while faction-wide detachment "
-            "interaction coverage is partial."
+            "datasheet-ability, and Thrill Seekers component evidence is complete. The "
+            "historical rollup token is `Playable`, but selected-game capabilities remain "
+            "separate while detachment coverage is partial."
         ),
     ),
     EmperorsChildrenDatasheetReviewRow(
@@ -145,9 +145,9 @@ _DATASHEET_REVIEW_ROWS = (
         semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(
             "No known Chaos Terminators blocker; catalog, model geometry, wargear, "
-            "weapon-keyword, datasheet-ability, and Thrill Seekers runtime-consumption "
-            "evidence are Full. The generated overall row remains Playable while "
-            "faction-wide detachment interaction coverage is partial."
+            "weapon-keyword, datasheet-ability, and Thrill Seekers component evidence is "
+            "complete. The historical rollup token is `Playable`, but selected-game "
+            "capabilities remain separate while detachment coverage is partial."
         ),
     ),
     EmperorsChildrenDatasheetReviewRow(
@@ -164,9 +164,9 @@ _DATASHEET_REVIEW_ROWS = (
         semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(
             "No known Lucius blocker; catalog, model geometry, wargear, weapon-keyword, "
-            "datasheet-ability, and Thrill Seekers runtime-consumption evidence are Full. "
-            "The generated overall row remains Playable while faction-wide detachment "
-            "interaction coverage is partial."
+            "datasheet-ability, and Thrill Seekers component evidence is complete. The "
+            "historical rollup token is `Playable`, but selected-game capabilities remain "
+            "separate while detachment coverage is partial."
         ),
     ),
     EmperorsChildrenDatasheetReviewRow(
@@ -183,8 +183,8 @@ _DATASHEET_REVIEW_ROWS = (
         semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(
             "No known Lord Kakophonist blocker; catalog, model geometry, wargear, "
-            "weapon-keyword, datasheet-ability, and Thrill Seekers runtime-consumption "
-            "evidence are Full."
+            "weapon-keyword, datasheet-ability, and Thrill Seekers component evidence is "
+            "complete."
         ),
     ),
     EmperorsChildrenDatasheetReviewRow(
@@ -215,7 +215,7 @@ _DATASHEET_REVIEW_ROWS = (
         semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(
             "No known Noise Marines blocker; catalog, model geometry, wargear, "
-            "datasheet-ability, and Thrill Seekers runtime-consumption evidence are Full."
+            "datasheet-ability and Thrill Seekers component evidence is complete."
         ),
     ),
     EmperorsChildrenDatasheetReviewRow(
@@ -236,9 +236,9 @@ _DATASHEET_REVIEW_ROWS = (
         semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(
             "No known Flawless Blades blocker; catalog, model geometry, wargear, "
-            "weapon-keyword, datasheet-ability, and Thrill Seekers runtime-consumption evidence "
-            "are Full. The generated overall row remains Playable while faction-wide detachment "
-            "interaction coverage is partial."
+            "weapon-keyword, datasheet-ability, and Thrill Seekers component evidence is "
+            "complete. The historical rollup token is `Playable`, but selected-game "
+            "capabilities remain separate while detachment coverage is partial."
         ),
     ),
     EmperorsChildrenDatasheetReviewRow(
@@ -326,9 +326,9 @@ _DATASHEET_REVIEW_ROWS = (
         semantics_needed="None in the exact source ability rows.",
         catalog_blockers=(
             "No known Defiler blocker; catalog, model geometry, wargear, weapon-keyword, "
-            "datasheet-ability, and Thrill Seekers runtime-consumption evidence are Full. "
-            "The generated overall row remains Playable while faction-wide detachment "
-            "interaction coverage is partial."
+            "datasheet-ability, and Thrill Seekers component evidence is complete. The "
+            "historical rollup token is `Playable`, but selected-game capabilities remain "
+            "separate while detachment coverage is partial."
         ),
     ),
     EmperorsChildrenDatasheetReviewRow(
@@ -453,7 +453,7 @@ def emperors_children_secondary_reference_audit_markdown(
 
     lines = [
         "",
-        "## 39k PRO Secondary-reference Audit",
+        "## Secondary-reference Audit",
         "",
         (
             f"Observed {rendered_audit_date} from the verified "
@@ -715,7 +715,7 @@ def emperors_children_faction_pack_review_markdown(
 ) -> list[str]:
     lines = [
         "",
-        "## 11th Edition Faction Pack Review",
+        "## Faction Pack Review",
         "",
         (
             "Faction Pack version 1.0 is legal for matched play from 20 June 2026. It is the "
@@ -759,7 +759,7 @@ def emperors_children_faction_pack_review_markdown(
                     _markdown_line_list(rules),
                     _markdown_line_list(enhancements),
                     _markdown_line_list(stratagems),
-                    "Full" if supported else "Still needs semantic support",
+                    "Implemented" if supported else "Still needs semantic support",
                 )
             )
             + " |"
@@ -830,7 +830,7 @@ def emperors_children_semantic_snapshot_markdown(
         "",
         "### Detachments",
         "",
-        "| Fully supported | Still needs semantic support |",
+        "| Implemented detachment rules | Still needs semantic support |",
         "| --- | --- |",
         (
             f"| {_markdown_line_list(name for name, supported in detachment_rows if supported)} | "

@@ -31,7 +31,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -73,7 +73,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -114,7 +114,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -155,7 +155,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -198,7 +198,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -239,7 +239,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -280,7 +280,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -320,7 +320,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -361,7 +361,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -402,7 +402,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -444,7 +444,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -486,7 +486,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -528,7 +528,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -568,7 +568,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -610,7 +610,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -652,7 +652,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -692,7 +692,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -734,7 +734,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -776,7 +776,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -817,7 +817,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -860,7 +860,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -901,7 +901,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -941,7 +941,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -981,7 +981,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -1022,7 +1022,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -1062,7 +1062,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 2/15. Supported detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/15. Implemented detachment IDs: `corsair-coterie`, `path-of-the-outcast`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -1102,7 +1102,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "No source-backed faction ability row; detachment support 2/15.",
+    "notes": "No source-backed faction ability row; implemented detachment rules 2/15.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -1142,7 +1142,7 @@
     "faction_id": "aeldari",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "No source-backed faction ability row; detachment support 2/15.",
+    "notes": "No source-backed faction ability row; implemented detachment rules 2/15.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "corsair-coterie",
@@ -1183,7 +1183,7 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 6/9. Implemented detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
@@ -1223,7 +1223,7 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 6/9. Implemented detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
@@ -1263,7 +1263,7 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 6/9. Implemented detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
@@ -1309,7 +1309,7 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 6/9. Implemented detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
@@ -1354,7 +1354,7 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 6/9. Implemented detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
@@ -1393,7 +1393,7 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 6/9. Implemented detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
@@ -1433,7 +1433,7 @@
     "faction_id": "chaos-daemons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 6/9. Supported detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 6/9. Implemented detachment IDs: `blood-legion`, `cavalcade-of-chaos`, `daemonic-incursion`, `lords-of-the-warp`, `shadow-legion`, `warptide`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "blood-legion",
@@ -1480,7 +1480,7 @@
     "faction_id": "chaos-space-marines",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 0/17. Supported detachment IDs: None.",
+    "notes": "Faction army rule consumed; implemented detachment rules 0/17. Implemented detachment IDs: None.",
     "overall": "Playable",
     "supported_detachment_ids": [],
     "tests_evidence": "Runtime consumers: `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:attack_sequence_completed`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:defiler-daemonforge:wound-reroll`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:fight:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:mortal_wound_feel_no_pain`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:lethal_hits`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:shooting:sustained_hits_1`, `warhammer_40000_11th:chaos_space_marines:army_rule:dark_pacts:weapon_profile_modifier`; coverage artifact only",
@@ -1512,7 +1512,7 @@
     "faction_id": "death-guard",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 0/9. Supported detachment IDs: None.",
+    "notes": "Faction army rule consumed; implemented detachment rules 0/9. Implemented detachment IDs: None.",
     "overall": "Playable",
     "supported_detachment_ids": [],
     "tests_evidence": "Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:post-shoot-hit-target-status`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:armour-save-option`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:leadership`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:melee-hit-roll`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:movement-budget`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:objective-control`, `warhammer_40000_11th:death_guard:army_rule:nurgles_gift:toughness`; coverage artifact only",
@@ -1544,11 +1544,10 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/10. Implemented detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
-      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:post-shoot-hit-target-effect`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1581,11 +1580,10 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/10. Implemented detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
-      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:hit-roll-modifier`, `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1616,11 +1614,10 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/10. Implemented detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
-      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:fight-end-failed-activation-model-destruction`, `catalog-ir:fight-selected-critical-wound-threshold`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1659,11 +1656,10 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/10. Implemented detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
-      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `army-mustering:supreme-commander`, `catalog-ir:command-phase-ability-mode`, `catalog-ir:movement-transit-permission`, `catalog-ir:poisoned-command-mortal-wounds`, `catalog-ir:post-fight-hit-target-effect`, `catalog-ir:post-shoot-hit-target-effect`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `descriptor:movement:deep-strike-placement`, `descriptor:reserve-declaration:deep-strike`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1696,11 +1692,10 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/10. Implemented detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
-      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:command-point-gain`, `catalog-ir:wound-roll-reroll`, `descriptor:prebattle:scouts`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1733,11 +1728,10 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/10. Implemented detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
-      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:post-shoot-hit-target-effect`, `catalog-ir:weapon-keyword-grant`, `catalog-ir:weapon-keyword-grant:sustained-hits`, `descriptor:army-mustering:leader-attachment`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1772,11 +1766,10 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/10. Implemented detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
-      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:conditional-not-leading-ability:fights-first`, `catalog-ir:hit-roll-reroll`, `catalog-ir:wound-roll-reroll`, `descriptor:army-mustering:leader-attachment`, `descriptor:lost-wound:feel-no-pain-resolution`, `descriptor:lost-wound:feel-no-pain-source`, `descriptor:shooting-target:lone-operative`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1807,11 +1800,10 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/10. Implemented detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
-      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:post-shoot-hit-target-effect`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1844,11 +1836,10 @@
     "faction_id": "emperors-children",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 3/10. Supported detachment IDs: `court-of-the-phoenician`, `mercurial-host`, `spectacle-of-slaughter`.",
+    "notes": "Faction army rule consumed; implemented detachment rules 2/10. Implemented detachment IDs: `court-of-the-phoenician`, `spectacle-of-slaughter`.",
     "overall": "Playable",
     "supported_detachment_ids": [
       "court-of-the-phoenician",
-      "mercurial-host",
       "spectacle-of-slaughter"
     ],
     "tests_evidence": "Runtime consumers: `catalog-ir:command-end-sticky-objective-control`, `catalog-ir:command-point-gain`, `descriptor:prebattle:infiltrators`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:advance-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:charge-target-restriction`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:fall-back-eligibility`, `warhammer_40000_11th:emperors_children:army_rule:thrill_seekers:shooting-target-restriction`; coverage artifact only",
@@ -1879,7 +1870,7 @@
     "faction_id": "thousand-sons",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "No source-backed faction ability row; detachment support 0/9.",
+    "notes": "No source-backed faction ability row; implemented detachment rules 0/9.",
     "overall": "Playable",
     "supported_detachment_ids": [],
     "tests_evidence": "Runtime consumers: `catalog-ir:movement-transit-permission`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:counteroffensive-discount`, `warhammer_40000_11th:thousand_sons:defiler:destroyer-of-futures:phase-use-exception`; coverage artifact only",
@@ -1910,7 +1901,7 @@
     "faction_id": "world-eaters",
     "faction_interaction_status": "Partial",
     "model_geometry_status": "Full",
-    "notes": "Faction army rule consumed; detachment support 0/8. Supported detachment IDs: None.",
+    "notes": "Faction army rule consumed; implemented detachment rules 0/8. Implemented detachment IDs: None.",
     "overall": "Playable",
     "supported_detachment_ids": [],
     "tests_evidence": "Runtime consumers: `catalog-ir:movement-transit-permission`, `catalog-ir:setup-reactive-shoot-charge`, `descriptor:destruction-reaction:deadly-demise-resolution`, `descriptor:destruction-reaction:deadly-demise-source`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:rage_fuelled_invigoration`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:total_carnage`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:unbridled_bloodlust:charge_roll`, `warhammer_40000_11th:world_eaters:army_rule:blessings_of_khorne:weapon-profile-keywords`; coverage artifact only",

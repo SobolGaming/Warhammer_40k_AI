@@ -3,6 +3,10 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import Literal, TypedDict, cast
 
+from warhammer40k_core.adapters.capability_manifest import (
+    CapabilityManifestPayload,
+    build_capability_manifest,
+)
 from warhammer40k_core.core.datasheet import CatalogAbilitySupport
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, muster_army
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
@@ -83,6 +87,7 @@ class SupportProfilePayload(TypedDict):
     detachment_faction_support_rows: list[RuntimeSupportRowPayload]
     interaction_kinds: list[str]
     decision_interaction_support_rows: list[DecisionInteractionSupportPayload]
+    capability_manifest: CapabilityManifestPayload
 
 
 def build_support_profile(*, config: GameConfig) -> SupportProfilePayload:
@@ -134,6 +139,11 @@ def build_support_profile(*, config: GameConfig) -> SupportProfilePayload:
         "detachment_faction_support_rows": runtime_support_rows,
         "interaction_kinds": sorted(kind.value for kind in InteractionKind),
         "decision_interaction_support_rows": decision_interaction_support_rows(),
+        "capability_manifest": build_capability_manifest(
+            config=config,
+            armies=armies,
+            runtime_manifest=manifest,
+        ),
     }
     return cast(SupportProfilePayload, validate_json_value(payload))
 
@@ -143,7 +153,15 @@ def _selected_runtime_content_ids(*, config: GameConfig) -> tuple[str, ...]:
     for request in config.army_muster_requests:
         selected.add(request.detachment_selection.faction_id)
         selected.update(request.detachment_selection.detachment_ids)
+        selected.update(request.detachment_selection.enhancement_ids)
+        selected.update(request.detachment_selection.stratagem_ids)
         selected.update(selection.datasheet_id for selection in request.unit_selections)
+        selected.update(
+            wargear_id
+            for selection in request.unit_selections
+            for wargear_selection in selection.wargear_selections
+            for wargear_id in wargear_selection.wargear_ids
+        )
     return tuple(sorted(selected))
 
 

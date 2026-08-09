@@ -145,9 +145,9 @@ def faction_pack_datasheet_review_markdown(faction_id: str) -> list[str]:
         "",
         (
             "This source-review subsection alone makes no catalog-load or semantic-execution "
-            "claim. The separate Datasheet / Unit Support section below preserves the generated "
-            "catalog, exact-text parsing, runtime-consumer, and diagnostic evidence for every "
-            "datasheet that currently has it."
+            "claim. The separate Datasheet component coverage section below preserves the "
+            "generated catalog, exact-text parsing, runtime-consumer, and diagnostic evidence "
+            "for every datasheet that currently has it."
         ),
         "",
     ]

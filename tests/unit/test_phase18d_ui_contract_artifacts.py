@@ -1067,7 +1067,8 @@ def test_contract_manifest_hashes_baseline_with_canonical_line_endings() -> None
     ).hexdigest()
 
     assert len(baseline_schema_names) == 15
-    assert len(canonical_schema_names) == 25
+    assert len(canonical_schema_names) == 26
+    assert "capability-manifest.schema.json" in canonical_schema_names
     assert baseline_schema_names < canonical_schema_names
     assert hashes["compatibility/1.0.0-shape.json"] == canonical_hash
 

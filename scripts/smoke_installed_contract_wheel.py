@@ -12,6 +12,7 @@ EXPECTED_SCHEMA_NAMES = frozenset(
     {
         "annotated-decision-request.schema.json",
         "battlefield-view.schema.json",
+        "capability-manifest.schema.json",
         "create-session.schema.json",
         "decision-family-coverage.schema.json",
         "decision-family-live.schema.json",
@@ -60,33 +61,7 @@ from warhammer40k_core.adapters.external_contract import (
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.engine.event_log import validate_json_value
 
-expected_schema_names = {
-    "annotated-decision-request.schema.json",
-    "battlefield-view.schema.json",
-    "create-session.schema.json",
-    "decision-family-coverage.schema.json",
-    "decision-family-live.schema.json",
-    "decision-request-view.schema.json",
-    "error-envelope.schema.json",
-    "event-delta.schema.json",
-    "finite-submission.schema.json",
-    "game-view.schema.json",
-    "interaction-conformance.schema.json",
-    "interaction-descriptor.schema.json",
-    "lifecycle-status.schema.json",
-    "opportunity-window-example.schema.json",
-    "parameterized-submission.schema.json",
-    "proposal-payload.schema.json",
-    "replay-metadata.schema.json",
-    "rules-catalog.schema.json",
-    "session-command-envelope.schema.json",
-    "session-command-outcome.schema.json",
-    "session-command-result.schema.json",
-    "session-create.schema.json",
-    "session-metadata.schema.json",
-    "session-projection.schema.json",
-    "support-profile.schema.json",
-}
+expected_schema_names = set(json.loads(__EXPECTED_SCHEMA_NAMES_JSON__))
 module_path = Path(external_contract.__file__).resolve()
 repository_candidate = module_path.parents[3] / "contracts" / "schemas"
 if repository_candidate.is_dir():
@@ -222,6 +197,10 @@ print(
     )
 )
 """
+SMOKE_PROGRAM = SMOKE_PROGRAM.replace(
+    "__EXPECTED_SCHEMA_NAMES_JSON__",
+    repr(json.dumps(sorted(EXPECTED_SCHEMA_NAMES))),
+)
 
 
 def main() -> int:
