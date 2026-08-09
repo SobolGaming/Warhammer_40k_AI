@@ -41,7 +41,8 @@ from warhammer40k_core.engine.faction_content.runtime import (
     runtime_content_manifest_for_ruleset,
 )
 from warhammer40k_core.engine.faction_content.runtime_evidence import (
-    active_runtime_evidence_ids,
+    RuntimeEvidenceProvider,
+    active_runtime_evidence_inventory,
 )
 from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleExecutionRegistry,
@@ -56,6 +57,7 @@ from warhammer40k_core.engine.player_army_list import (
     load_player_army_list,
     player_army_list_from_json_bytes,
 )
+from warhammer40k_core.geometry.model_geometry import GeometrySourceKind, HeightSourceKind
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -132,11 +134,12 @@ def exact_roster_runtime() -> _ExactRosterRuntime:
             attacker_player_id="player-a",
             defender_player_id="player-b",
         ),
+        model_geometries=package.model_geometries,
     )
     armies = tuple(
         muster_army(
             catalog=package.army_catalog,
-            request=request,
+            request=replace(request, roster_legality_required=False),
             model_geometries=config.model_geometries,
         )
         for request in requests
@@ -165,7 +168,7 @@ def _capability_result(
     return next(result for result in row["capabilities"] if result["dimension"] == dimension)
 
 
-def test_saved_player_army_list_musters_with_exact_current_mfm_points() -> None:
+def test_saved_player_army_list_reconciles_with_exact_current_mfm_points() -> None:
     army_list = load_player_army_list(_ARMY_LIST_PATH)
     package = catalog_package()
     catalog = package.army_catalog
@@ -197,7 +200,7 @@ def test_saved_player_army_list_musters_with_exact_current_mfm_points() -> None:
         "belakor": (1, 390, 390),
         "bloodcrushers-1": (1, 190, 190),
         "bloodcrushers-2": (2, 190, 190),
-        "bloodcrushers-3": (3, 115, 115),
+        "bloodcrushers-3": (3, 210, 210),
         "bloodthirster": (1, 320, 320),
         "lord-of-change-1": (1, 320, 320),
         "lord-of-change-2": (2, 320, 320),
@@ -214,9 +217,10 @@ def test_saved_player_army_list_musters_with_exact_current_mfm_points() -> None:
         (_APOCALYPTIC_STEEDS_ID, "bloodcrushers-1", 10),
         (_APOCALYPTIC_STEEDS_ID, "bloodcrushers-2", 10),
     )
-    assert calculation.total_points == 1980
+    assert calculation.total_points == 2075
     assert request.points_source_package_id == points_source.source_package_id
-    assert sum(point.points for point in request.unit_points) == 1960
+    assert sum(point.points for point in request.unit_points) == 2055
+    assert sum(point.points for point in request.enhancement_point_values) == 20
     assert tuple(
         (
             point.enhancement_id,
@@ -246,15 +250,25 @@ def test_saved_player_army_list_musters_with_exact_current_mfm_points() -> None:
         ),
     )
 
+    assert request.roster_legality_required is True
+    with pytest.raises(ArmyMusteringError, match="points_limit_exceeded"):
+        muster_army(
+            catalog=catalog,
+            request=request,
+        )
+
     army = muster_army(
         catalog=catalog,
-        request=request,
+        request=replace(request, roster_legality_required=False),
     )
 
     assert army.force_disposition_id == "purge-the-foe"
     assert army.points_source_package_id == points_source.source_package_id
     assert army.enhancement_point_values == request.enhancement_point_values
-    assert army.roster_legality_report.is_legal
+    assert not army.roster_legality_report.is_legal
+    assert tuple(
+        violation.violation_code for violation in army.roster_legality_report.violations
+    ) == ("points_limit_exceeded",)
     assert len(army.units) == 8
     assert army.warlord_selection is not None
     assert army.warlord_selection.unit_selection_id == "belakor"
@@ -528,7 +542,7 @@ def test_shadow_legion_keyword_is_granted_only_by_selected_detachment() -> None:
     )
     with_shadow = muster_army(
         catalog=package.army_catalog,
-        request=with_shadow_request,
+        request=replace(with_shadow_request, roster_legality_required=False),
     )
     without_shadow_list = replace(
         army_list,
@@ -547,11 +561,15 @@ def test_shadow_legion_keyword_is_granted_only_by_selected_detachment() -> None:
     )
     without_shadow = muster_army(
         catalog=package.army_catalog,
-        request=without_shadow_request,
+        request=replace(without_shadow_request, roster_legality_required=False),
     )
 
-    assert with_shadow.roster_legality_report.is_legal
-    assert without_shadow.roster_legality_report.is_legal
+    assert all(not army.roster_legality_report.is_legal for army in (with_shadow, without_shadow))
+    assert all(
+        tuple(violation.violation_code for violation in army.roster_legality_report.violations)
+        == ("points_limit_exceeded",)
+        for army in (with_shadow, without_shadow)
+    )
     assert all("SHADOW LEGION" in unit.keywords for unit in with_shadow.units)
     assert all("SHADOW LEGION" not in unit.keywords for unit in without_shadow.units)
 
@@ -562,20 +580,29 @@ def test_exact_roster_phase17o_support_has_active_runtime_evidence(
     config, armies, runtime_manifest, runtime_bundle, manifest = exact_roster_runtime
 
     assert config.allow_legacy_non_strict_rosters is False
-    assert config.model_geometries is None
+    assert config.model_geometries is not None
+    assert tuple(record.model_profile_id for record in config.model_geometries) == (
+        chaos_daemons_roster_2026_07.EXPECTED_GEOMETRY_PROFILE_IDS
+    )
+    assert GameConfig.from_payload(config.to_payload()).model_geometries == config.model_geometries
     assert len(config.army_muster_requests) == 2
     assert {request.player_id for request in config.army_muster_requests} == {
         "player-a",
         "player-b",
     }
-    assert all(army.roster_legality_report.is_legal for army in armies)
+    assert all(not army.roster_legality_report.is_legal for army in armies)
+    assert all(
+        tuple(violation.violation_code for violation in army.roster_legality_report.violations)
+        == ("points_limit_exceeded",)
+        for army in armies
+    )
     assert all(
         calculate_mfm_army_points(
             catalog=config.army_catalog,
             request=request,
             source_package=mfm_2026_07.source_package(),
         ).total_points
-        == 1980
+        == 2075
         for request in config.army_muster_requests
     )
 
@@ -616,16 +643,116 @@ def test_exact_roster_phase17o_support_has_active_runtime_evidence(
         and row["metadata"]["runtime_consumer_ids"]
         for row in ability_rule_rows
     )
-    for row in (*manifest["roster_rows"], *manifest["unit_rows"]):
+    geometry_kinds_by_profile = {
+        model.model_profile_id: {
+            (candidate.geometry.geometry_source_kind, candidate.geometry.height_source_kind)
+            for army in armies
+            for unit in army.units
+            for candidate in unit.own_models
+            if candidate.model_profile_id == model.model_profile_id
+        }
+        for army in armies
+        for unit in army.units
+        for model in unit.own_models
+    }
+    accepted_geometry_profile_ids = frozenset(
+        chaos_daemons_roster_2026_07.EXPECTED_GEOMETRY_PROFILE_IDS
+    )
+    blocked_geometry_profile_ids = frozenset(
+        chaos_daemons_roster_2026_07.EXPECTED_GEOMETRY_BLOCKED_PROFILE_IDS
+    )
+    assert frozenset(geometry_kinds_by_profile) == (
+        accepted_geometry_profile_ids | blocked_geometry_profile_ids
+    )
+    assert all(
+        geometry_kinds_by_profile[profile_id]
+        == {
+            (
+                GeometrySourceKind.CATALOG_GEOMETRY_RECORD,
+                HeightSourceKind.CATALOG_GEOMETRY_RECORD,
+            )
+        }
+        for profile_id in accepted_geometry_profile_ids
+    )
+    assert all(
+        geometry_kinds_by_profile[profile_id]
+        == {(GeometrySourceKind.CATALOG_BASE_SIZE, HeightSourceKind.KEYWORD_HEURISTIC)}
+        for profile_id in blocked_geometry_profile_ids
+    )
+
+    for row in manifest["roster_rows"]:
         physical_result = _capability_result(row, "PHYSICALLY_PLAYABLE")
         assert physical_result["status"] == "unsupported"
         assert physical_result["reason_code"] == "accepted_model_geometry_missing"
         assert _capability_result(row, "SEMANTICALLY_EXECUTABLE")["status"] == "supported"
+    supported_unit_rows = tuple(
+        row
+        for row in manifest["unit_rows"]
+        if _capability_result(row, "PHYSICALLY_PLAYABLE")["status"] == "supported"
+    )
+    unsupported_unit_rows = tuple(
+        row
+        for row in manifest["unit_rows"]
+        if _capability_result(row, "PHYSICALLY_PLAYABLE")["status"] == "unsupported"
+    )
+    assert len(supported_unit_rows) == 8
+    assert {row["owner_id"] for row in supported_unit_rows} == {
+        "belakor",
+        "bloodcrushers-1",
+        "bloodcrushers-2",
+        "bloodcrushers-3",
+    }
+    assert len(unsupported_unit_rows) == 8
+    assert {row["owner_id"] for row in unsupported_unit_rows} == {
+        "bloodthirster",
+        "lord-of-change-1",
+        "lord-of-change-2",
+        "plaguebearers",
+    }
     assert all(
-        _capability_result(row, "PHYSICALLY_PLAYABLE")["status"] == "unsupported"
-        and _capability_result(row, "PHYSICALLY_PLAYABLE")["reason_code"]
-        == "heuristic_model_height_not_certified"
+        _capability_result(row, "PHYSICALLY_PLAYABLE")["reason_code"]
+        == "accepted_model_geometry_missing"
+        for row in unsupported_unit_rows
+    )
+    assert all(
+        _capability_result(row, "SEMANTICALLY_EXECUTABLE")["status"] == "supported"
+        for row in manifest["unit_rows"]
+    )
+    assert all(
+        _capability_result(row, "MUSTERABLE")["status"] == "unsupported"
+        and _capability_result(row, "MUSTERABLE")["reason_code"] == "roster_legality_invalid"
+        and row["metadata"]["legality_status"] == "invalid"
+        for row in manifest["roster_rows"]
+    )
+    assert all(
+        _capability_result(row, "MUSTERABLE")["status"] == "supported"
+        for row in manifest["unit_rows"]
+    )
+    supported_geometry_rows = tuple(
+        row
         for row in manifest["geometry_rows"]
+        if _capability_result(row, "PHYSICALLY_PLAYABLE")["status"] == "supported"
+    )
+    unsupported_geometry_rows = tuple(
+        row
+        for row in manifest["geometry_rows"]
+        if _capability_result(row, "PHYSICALLY_PLAYABLE")["status"] == "unsupported"
+    )
+    assert len(supported_geometry_rows) == 14
+    assert {row["owner_id"] for row in supported_geometry_rows} == accepted_geometry_profile_ids
+    assert all(
+        row["metadata"]["geometry_source_kind"] == GeometrySourceKind.CATALOG_GEOMETRY_RECORD.value
+        and row["metadata"]["height_source_kind"] == HeightSourceKind.CATALOG_GEOMETRY_RECORD.value
+        for row in supported_geometry_rows
+    )
+    assert len(unsupported_geometry_rows) == 10
+    assert {row["owner_id"] for row in unsupported_geometry_rows} == blocked_geometry_profile_ids
+    assert all(
+        _capability_result(row, "PHYSICALLY_PLAYABLE")["reason_code"]
+        == "heuristic_model_height_not_certified"
+        and row["metadata"]["geometry_source_kind"] == GeometrySourceKind.CATALOG_BASE_SIZE.value
+        and row["metadata"]["height_source_kind"] == HeightSourceKind.KEYWORD_HEURISTIC.value
+        for row in unsupported_geometry_rows
     )
     assert all(
         _capability_result(row, "SEMANTICALLY_EXECUTABLE")["status"] == "supported"
@@ -711,7 +838,8 @@ def test_exact_roster_phase17o_support_has_active_runtime_evidence(
         for record in runtime_bundle.faction_rule_execution_registry.all_records()
     }
     assert _DAEMONIC_MANIFESTATION_PREDECESSOR_EXECUTION_ID not in all_faction_execution_ids
-    active_evidence_id_set = active_runtime_evidence_ids(runtime_bundle)
+    active_evidence = active_runtime_evidence_inventory(runtime_bundle)
+    active_evidence_id_set = active_evidence.evidence_ids
     assert _DAEMONIC_MANIFESTATION_EXECUTION_ID in active_evidence_id_set
     assert _DAEMONIC_MANIFESTATION_PREDECESSOR_EXECUTION_ID not in active_evidence_id_set
 
@@ -725,8 +853,21 @@ def test_exact_roster_phase17o_support_has_active_runtime_evidence(
         (binding.effect_id, binding.enhancement_id)
         for binding in runtime_bundle.enhancement_effect_registry.all_bindings()
     } == {(apocalyptic_execution_id, _APOCALYPTIC_STEEDS_ID)}
+    assert {
+        (record.provider, record.owner_content_id)
+        for record in active_evidence.records_for_evidence_id(apocalyptic_execution_id)
+    } >= {
+        (RuntimeEvidenceProvider.FACTION_EXECUTION_RECORD, _APOCALYPTIC_STEEDS_ID),
+        (RuntimeEvidenceProvider.ENHANCEMENT_EFFECT_BINDING, _APOCALYPTIC_STEEDS_ID),
+    }
 
     mode_capabilities = {result["dimension"]: result for result in manifest["mode_capabilities"]}
+    assert mode_capabilities["MUSTERABLE"]["status"] == "unsupported"
+    assert mode_capabilities["MUSTERABLE"]["reason_code"] == "roster_legality_invalid"
+    assert mode_capabilities["PHYSICALLY_PLAYABLE"]["status"] == "unsupported"
+    assert mode_capabilities["PHYSICALLY_PLAYABLE"]["reason_code"] == (
+        "multiple_capability_blockers"
+    )
     assert mode_capabilities["SEMANTICALLY_EXECUTABLE"]["status"] == "supported"
     assert mode_capabilities["FULL_GAME_SUPPORTED"]["status"] == "unsupported"
     assert mode_capabilities["REPLAY_VERIFIED"]["status"] == "unsupported"
@@ -767,6 +908,89 @@ def test_exact_roster_phase17o_rejects_inactive_named_runtime_evidence(
         )
 
     assert _DAEMON_LORD_OF_KHORNE_RUNTIME_ID in str(exc_info.value)
+
+
+def test_exact_roster_phase17o_rejects_missing_selected_enhancement_effect_binding(
+    exact_roster_runtime: _ExactRosterRuntime,
+) -> None:
+    config, armies, runtime_manifest, runtime_bundle, _ = exact_roster_runtime
+    original_bindings = runtime_bundle.enhancement_effect_registry.all_bindings()
+    assert len(original_bindings) == 1
+    apocalyptic_binding = original_bindings[0]
+    assert apocalyptic_binding.enhancement_id == _APOCALYPTIC_STEEDS_ID
+    drifted_bundle = replace(
+        runtime_bundle,
+        enhancement_effect_registry=replace(
+            runtime_bundle.enhancement_effect_registry,
+            bindings=(),
+        ),
+    )
+
+    drifted_evidence = active_runtime_evidence_inventory(drifted_bundle)
+    apocalyptic_records = drifted_evidence.records_for_evidence_id(apocalyptic_binding.effect_id)
+    assert any(
+        record.provider is RuntimeEvidenceProvider.FACTION_EXECUTION_RECORD
+        for record in apocalyptic_records
+    )
+    assert all(
+        record.provider is not RuntimeEvidenceProvider.ENHANCEMENT_EFFECT_BINDING
+        for record in apocalyptic_records
+    )
+
+    with pytest.raises(GameLifecycleError, match="inactive runtime consumer evidence") as exc_info:
+        build_capability_manifest(
+            config=config,
+            armies=armies,
+            runtime_manifest=runtime_manifest,
+            runtime_bundle=drifted_bundle,
+        )
+
+    message = str(exc_info.value)
+    assert apocalyptic_binding.effect_id in message
+    assert RuntimeEvidenceProvider.ENHANCEMENT_EFFECT_BINDING.value in message
+    assert _APOCALYPTIC_STEEDS_ID in message
+
+
+def test_exact_roster_phase17o_rejects_selected_enhancement_binding_identity_drift(
+    exact_roster_runtime: _ExactRosterRuntime,
+) -> None:
+    config, armies, runtime_manifest, runtime_bundle, _ = exact_roster_runtime
+    original_binding = runtime_bundle.enhancement_effect_registry.all_bindings()[0]
+    drifted_binding = replace(
+        original_binding,
+        enhancement_id="chaos-daemons:cavalcade-of-chaos:wrong-enhancement",
+        source_id="test:wrong-enhancement-source",
+    )
+    drifted_bundle = replace(
+        runtime_bundle,
+        enhancement_effect_registry=replace(
+            runtime_bundle.enhancement_effect_registry,
+            bindings=(drifted_binding,),
+        ),
+    )
+
+    drifted_records = active_runtime_evidence_inventory(drifted_bundle).records_for_evidence_id(
+        original_binding.effect_id
+    )
+    assert any(
+        record.provider is RuntimeEvidenceProvider.ENHANCEMENT_EFFECT_BINDING
+        and record.owner_content_id == drifted_binding.enhancement_id
+        and record.source_id == drifted_binding.source_id
+        for record in drifted_records
+    )
+
+    with pytest.raises(GameLifecycleError, match="inactive runtime consumer evidence") as exc_info:
+        build_capability_manifest(
+            config=config,
+            armies=armies,
+            runtime_manifest=runtime_manifest,
+            runtime_bundle=drifted_bundle,
+        )
+
+    message = str(exc_info.value)
+    assert original_binding.effect_id in message
+    assert original_binding.enhancement_id in message
+    assert original_binding.source_id in message
 
 
 def test_exact_roster_phase17o_rejects_missing_brass_stampede_runtime_hook(
@@ -856,7 +1080,7 @@ def test_exact_roster_phase17o_rejects_active_execution_evidence_owned_by_anothe
         for execution_id in cavalcade_row.execution_record_ids
         if execution_id not in apocalyptic_steeds_row.execution_record_ids
     )
-    assert wrong_execution_id in active_runtime_evidence_ids(runtime_bundle)
+    assert wrong_execution_id in active_runtime_evidence_inventory(runtime_bundle).evidence_ids
     drifted_rows = tuple(
         replace(row, execution_record_ids=(wrong_execution_id,))
         if row.content_id == _APOCALYPTIC_STEEDS_ID
@@ -892,7 +1116,10 @@ def test_exact_roster_phase17o_rejects_blocked_faction_execution_as_active_evide
         blocked_record.execution_id
         in runtime_bundle.to_summary_payload()["faction_execution_record_ids"]
     )
-    assert blocked_record.execution_id not in active_runtime_evidence_ids(runtime_bundle)
+    assert (
+        blocked_record.execution_id
+        not in active_runtime_evidence_inventory(runtime_bundle).evidence_ids
+    )
 
     drifted_rows = tuple(
         replace(

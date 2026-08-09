@@ -16,7 +16,7 @@
   },
   "force_disposition_id": "purge-the-foe",
   "battle_size": "strike_force",
-  "declared_total_points": 1980,
+  "declared_total_points": 2075,
   "units": [
     {
       "selection": {
@@ -205,7 +205,7 @@
           },
           {
             "model_profile_id": "000001115:bloodcrushers",
-            "model_count": 2
+            "model_count": 5
           }
         ],
         "wargear_selections": [
@@ -226,7 +226,7 @@
         ],
         "mustering_option_selections": []
       },
-      "declared_points": 115
+      "declared_points": 210
     }
   ],
   "attachment_declarations": [],

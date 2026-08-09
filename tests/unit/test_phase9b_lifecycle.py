@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import json
+from dataclasses import replace
 from typing import cast
 
 import pytest
@@ -499,9 +500,69 @@ def test_lifecycle_mustering_uses_game_config_reviewed_model_geometry() -> None:
     assert restored.to_payload() == lifecycle.to_payload()
 
 
+def test_lifecycle_mustering_preserves_partial_reviewed_model_geometry() -> None:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    reviewed_geometry = accepted_model_geometry()
+    player_a_request = _army_muster_request(
+        catalog=catalog,
+        player_id="player-a",
+        army_id="army-alpha",
+        unit_selection_id="intercessor-unit-1",
+    )
+    player_b_request = replace(
+        _army_muster_request(
+            catalog=catalog,
+            player_id="player-b",
+            army_id="army-beta",
+            unit_selection_id="boyz-unit-1",
+        ),
+        unit_selections=(
+            UnitMusterSelection(
+                unit_selection_id="boyz-unit-1",
+                datasheet_id="core-boyz-like-infantry",
+                model_profile_selections=(
+                    ModelProfileSelection(
+                        model_profile_id="core-boyz-like",
+                        model_count=10,
+                    ),
+                ),
+                wargear_selections=(),
+            ),
+        ),
+    )
+    config = _config(
+        army_catalog=catalog,
+        army_muster_requests=(player_a_request, player_b_request),
+        model_geometries=(reviewed_geometry,),
+    )
+    lifecycle = _start_lifecycle(config)
+
+    status = lifecycle.advance_until_decision_or_terminal()
+
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert lifecycle.state is not None
+    armies_by_player_id = {army.player_id: army for army in lifecycle.state.army_definitions}
+    accepted_model = armies_by_player_id["player-a"].units[0].own_models[0]
+    unresolved_model = armies_by_player_id["player-b"].units[0].own_models[0]
+    assert accepted_model.geometry.geometry_source_kind is (
+        GeometrySourceKind.CATALOG_GEOMETRY_RECORD
+    )
+    assert accepted_model.geometry.height_source_kind is (HeightSourceKind.CATALOG_GEOMETRY_RECORD)
+    assert unresolved_model.geometry.geometry_source_kind is GeometrySourceKind.CATALOG_BASE_SIZE
+    assert unresolved_model.geometry.height_source_kind is HeightSourceKind.KEYWORD_HEURISTIC
+    assert GameConfig.from_payload(config.to_payload()).model_geometries == (reviewed_geometry,)
+
+
 def test_game_config_rejects_model_geometry_for_unknown_catalog_profile() -> None:
     with pytest.raises(GameLifecycleError, match="unknown catalog model profile"):
         _config(model_geometries=(accepted_model_geometry("unknown-model-profile"),))
+
+
+def test_game_config_rejects_duplicate_model_geometry_profiles() -> None:
+    geometry = accepted_model_geometry()
+
+    with pytest.raises(GameLifecycleError, match="unique by model_profile_id"):
+        _config(model_geometries=(geometry, geometry))
 
 
 def test_game_config_payload_rejects_structurally_incomplete_model_geometry() -> None:

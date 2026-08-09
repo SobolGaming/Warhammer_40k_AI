@@ -142,17 +142,19 @@ decision path. Adapters normalize the external roster once into a versioned
 `ArmyMusterRequest` is the only roster input passed to `GameConfig` and the
 ordinary setup lifecycle.
 
-`GameConfig.model_geometries` is an optional tuple of accepted,
-source-attributed `ModelGeometryCatalogRecord` values. When present, every
-record must reference a model profile in the accompanying `army_catalog`, the
-tuple must cover every model profile selected by the muster requests, and the
-same records flow through setup mustering, support-profile evaluation, runtime
-content activation, and replay serialization. The create-session schema accepts
-the corresponding optional `model_geometries` array. Omission is the explicit
-legal state for a configuration with no reviewed model geometry; models then
-retain their existing heuristic height provenance and must not be reported as
-physically supported merely because mustering succeeded. Adapters must not
-invent measurements, silently replace missing records, or send an empty array
+`GameConfig.model_geometries` is an optional, sparse tuple of accepted,
+source-attributed `ModelGeometryCatalogRecord` overrides. When present, every
+record must reference a model profile in the accompanying `army_catalog`, but
+the tuple may cover only the selected profiles for which reviewed geometry is
+available. The accepted records flow unchanged through setup mustering,
+support-profile evaluation, runtime content activation, and replay
+serialization. A selected profile without a record retains its explicit
+heuristic height provenance and remains a physical-playability blocker; it does
+not prevent accepted records for other selected profiles from being used. The
+create-session schema accepts the corresponding optional, non-empty
+`model_geometries` array. Omission is the explicit legal state for a
+configuration with no reviewed model geometry. Adapters must not invent
+measurements, silently replace an absent reviewed record, or send an empty array
 as a substitute for omission.
 
 Unit-scoped resources obtained through optional wargear are selected through

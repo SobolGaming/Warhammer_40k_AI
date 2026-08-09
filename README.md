@@ -251,17 +251,22 @@ Current status:
   selected rosters, units, rules, mission, and geometry. Player views omit every
   opponent-owned row, unsupported reason, count, and derived selection hash;
   current full-game and release claims remain false without certified evidence.
-- The checked-in July 2026 Chaos Daemons Strike Force is validated at 1,980
-  points through the production roster catalog and July MFM package. A typed,
+- The checked-in Chaos Daemons Strike Force reprices to 2,075 points under the
+  July 2026 MFM package and is correctly rejected as 75 points over the
+  2,000-point limit; the original three six-model Bloodcrusher units remain
+  unchanged. A typed,
   hashed reconciliation reviews its exact five datasheets against the current
   official PDF and pins every historical generator input by hash without
   importing its retired package identity into runtime. It enforces Be'lakor's
   `DAMAGED 1-7` and keeps `SHADOW LEGION` as a detachment grant. Its
   eight selected units, Cavalcade of Chaos and Shadow Legion runtime bundles,
-  selected abilities, and Apocalyptic Steeds assignments carry active mustering
-  and semantic runtime evidence. Official base sizes are retained, but four
-  representative heights remain review-blocked, so the capability manifest does
-  not claim `PHYSICALLY_PLAYABLE`. This is exact selected-component semantic
+  selected abilities, and Apocalyptic Steeds assignments carry active semantic
+  runtime evidence independently of that mustering failure. The accepted
+  Bloodcrushers, Bloodhunter, and Be'lakor geometry records are applied at
+  runtime; only the four Bloodthirster, Lord of Change, Plaguebearers, and
+  Plagueridden representative heights remain review-blocked. Those four blockers
+  keep the roster from claiming `PHYSICALLY_PLAYABLE`. This is exact
+  selected-component semantic
   support, not a whole-faction or Phase 20 full-game/replay claim.
   Verify the committed catalog with
   `uv run python tools/generate_chaos_daemons_roster_catalog.py --check`.

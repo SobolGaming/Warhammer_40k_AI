@@ -12,6 +12,7 @@ from warhammer40k_core.engine.faction_content.manifest import (
     RuntimeContentSemanticStatus,
 )
 from warhammer40k_core.engine.faction_content.runtime_evidence import (
+    ActiveRuntimeEvidenceInventory,
     validate_active_runtime_consumer_ids,
 )
 from warhammer40k_core.engine.faction_rule_execution import FactionRuleExecutionRegistry
@@ -117,16 +118,16 @@ def runtime_rule_semantics(
 def validate_selected_ability_runtime_evidence(
     *,
     ability_rows: tuple[AbilityCoverageRow, ...],
-    expected_active_evidence_ids: frozenset[str],
-    active_evidence_ids: frozenset[str],
+    expected_active_evidence: ActiveRuntimeEvidenceInventory,
+    active_evidence: ActiveRuntimeEvidenceInventory,
 ) -> None:
     for coverage in ability_rows:
         if coverage.support_stage is not AbilityCoverageSupportStage.ENGINE_CONSUMED:
             continue
         validate_active_runtime_consumer_ids(
             runtime_consumer_ids=coverage.runtime_consumer_ids,
-            expected_active_evidence_ids=expected_active_evidence_ids,
-            active_evidence_ids=active_evidence_ids,
+            expected_active_evidence=expected_active_evidence,
+            active_evidence=active_evidence,
             context=coverage.coverage_row_id,
         )
 
@@ -136,8 +137,8 @@ def validate_selected_manifest_runtime_evidence(
     config: GameConfig,
     runtime_manifest: RuntimeContentManifest,
     faction_execution_registry: FactionRuleExecutionRegistry,
-    expected_active_evidence_ids: frozenset[str],
-    active_evidence_ids: frozenset[str],
+    expected_active_evidence: ActiveRuntimeEvidenceInventory,
+    active_evidence: ActiveRuntimeEvidenceInventory,
 ) -> None:
     for request in config.army_muster_requests:
         rows = semantic_runtime_rows(
@@ -154,8 +155,8 @@ def validate_selected_manifest_runtime_evidence(
                 continue
             validate_active_runtime_consumer_ids(
                 runtime_consumer_ids=evidence_refs,
-                expected_active_evidence_ids=expected_active_evidence_ids,
-                active_evidence_ids=active_evidence_ids,
+                expected_active_evidence=expected_active_evidence,
+                active_evidence=active_evidence,
                 context=f"runtime:{row.family.value}:{row.content_id}",
             )
 

@@ -676,7 +676,6 @@ class GameConfig:
             validate_optional_game_config_model_geometries(
                 self.model_geometries,
                 catalog=self.army_catalog,
-                army_muster_requests=self.army_muster_requests,
             ),
         )
         _validate_lifecycle_sequences(self.ruleset_descriptor)

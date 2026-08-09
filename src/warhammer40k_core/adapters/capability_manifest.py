@@ -47,7 +47,7 @@ from warhammer40k_core.engine.faction_content.runtime import (
     runtime_content_manifest_for_ruleset,
 )
 from warhammer40k_core.engine.faction_content.runtime_evidence import (
-    active_runtime_evidence_ids,
+    active_runtime_evidence_inventory,
 )
 from warhammer40k_core.engine.faction_rule_execution import FactionRuleExecutionRegistry
 from warhammer40k_core.engine.game_state import GameConfig
@@ -217,19 +217,19 @@ def build_capability_manifest(
         ruleset_descriptor=config.ruleset_descriptor,
         config=config,
     )
-    expected_active_evidence_ids = active_runtime_evidence_ids(expected_runtime_bundle)
-    active_evidence_ids = active_runtime_evidence_ids(runtime_bundle)
+    expected_active_evidence = active_runtime_evidence_inventory(expected_runtime_bundle)
+    active_evidence = active_runtime_evidence_inventory(runtime_bundle)
     _validate_selected_ability_runtime_evidence(
         ability_rows=ability_rows,
-        expected_active_evidence_ids=expected_active_evidence_ids,
-        active_evidence_ids=active_evidence_ids,
+        expected_active_evidence=expected_active_evidence,
+        active_evidence=active_evidence,
     )
     _validate_selected_manifest_runtime_evidence(
         config=config,
         runtime_manifest=runtime_manifest,
         faction_execution_registry=expected_runtime_bundle.faction_rule_execution_registry,
-        expected_active_evidence_ids=expected_active_evidence_ids,
-        active_evidence_ids=active_evidence_ids,
+        expected_active_evidence=expected_active_evidence,
+        active_evidence=active_evidence,
     )
     _validate_selected_runtime_manifest_identity(
         config=config,

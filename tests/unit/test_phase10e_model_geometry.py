@@ -214,33 +214,43 @@ def test_unit_factory_requires_resolved_model_geometry() -> None:
         replace(model, geometry=cast(ModelGeometry, "bad-geometry"))
 
 
-def test_unit_factory_rejects_partial_catalog_geometry_for_selected_profile() -> None:
+def test_unit_factory_applies_partial_catalog_geometry_per_model_profile() -> None:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
-    datasheet = catalog.datasheet_by_id("core-boyz-like-infantry")
+    intercessor_datasheet = catalog.datasheet_by_id("core-intercessor-like-infantry")
+    boyz_datasheet = catalog.datasheet_by_id("core-boyz-like-infantry")
     partial_catalog_geometry = (_catalog_geometry_record("core-intercessor-like"),)
+    factory = UnitFactory(
+        catalog=catalog,
+        model_geometries=partial_catalog_geometry,
+    )
 
-    with pytest.raises(
-        UnitFactoryError,
-        match="Catalog model geometry is incomplete for selected profile",
-    ):
-        UnitFactory(
-            catalog=catalog,
-            model_geometries=partial_catalog_geometry,
-        ).instantiate_unit(
-            army_id="army-alpha",
-            selection=UnitMusterSelection(
-                unit_selection_id="boyz-unit-1",
-                datasheet_id="core-boyz-like-infantry",
-                model_profile_selections=(
-                    ModelProfileSelection(
-                        model_profile_id="core-boyz-like",
-                        model_count=10,
-                    ),
+    reviewed_unit = factory.instantiate_unit(
+        army_id="army-alpha",
+        selection=_unit_selection(),
+        datasheet=intercessor_datasheet,
+    )
+    unresolved_unit = factory.instantiate_unit(
+        army_id="army-alpha",
+        selection=UnitMusterSelection(
+            unit_selection_id="boyz-unit-1",
+            datasheet_id="core-boyz-like-infantry",
+            model_profile_selections=(
+                ModelProfileSelection(
+                    model_profile_id="core-boyz-like",
+                    model_count=10,
                 ),
-                wargear_selections=(),
             ),
-            datasheet=datasheet,
-        )
+            wargear_selections=(),
+        ),
+        datasheet=boyz_datasheet,
+    )
+
+    reviewed_geometry = reviewed_unit.own_models[0].geometry
+    unresolved_geometry = unresolved_unit.own_models[0].geometry
+    assert reviewed_geometry.geometry_source_kind is GeometrySourceKind.CATALOG_GEOMETRY_RECORD
+    assert reviewed_geometry.height_source_kind is HeightSourceKind.CATALOG_GEOMETRY_RECORD
+    assert unresolved_geometry.geometry_source_kind is GeometrySourceKind.CATALOG_BASE_SIZE
+    assert unresolved_geometry.height_source_kind is HeightSourceKind.KEYWORD_HEURISTIC
 
 
 def test_model_instance_from_payload_rejects_geometry_footprint_kind_drift() -> None:

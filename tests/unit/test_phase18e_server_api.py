@@ -924,7 +924,7 @@ def test_phase18e_command_result_schema_requires_accepted_commands_to_be_committ
         validator.validate({**example, "committed": False, "accepted": True})
 
 
-def test_phase18e_create_session_schema_requires_complete_nonempty_model_geometries() -> None:
+def test_phase18e_create_session_schema_requires_nonempty_well_formed_geometry_records() -> None:
     validator = _schema_validator("create-session.schema.json")
     body = _game_config_body(game_id="phase18e-model-geometry-schema")
 
@@ -940,9 +940,9 @@ def test_phase18e_create_session_schema_requires_complete_nonempty_model_geometr
     with pytest.raises(ValidationError):
         validator.validate(body)
 
-    incomplete_geometry = dict(geometry)
-    del incomplete_geometry["support_base"]
-    config["model_geometries"] = [incomplete_geometry]
+    structurally_incomplete_geometry = dict(geometry)
+    del structurally_incomplete_geometry["support_base"]
+    config["model_geometries"] = [structurally_incomplete_geometry]
     with pytest.raises(ValidationError):
         validator.validate(body)
 

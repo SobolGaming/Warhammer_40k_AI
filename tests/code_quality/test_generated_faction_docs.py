@@ -72,7 +72,10 @@ def test_generated_faction_documents_share_one_section_structure(filename: str) 
 def test_chaos_daemons_document_scopes_checked_in_roster_evidence() -> None:
     document = _generated_faction_documents()["chaos-daemons.md"]
 
-    assert "is a 1,980-point Strike Force with eight unit selections" in document
+    assert "reprices to 2,075 points under the July MFM" in document
+    assert "correctly rejected as 75 points over the 2,000-point limit" in document
+    assert "accepted Bloodcrushers, Bloodhunter, and Be'lakor geometry records" in document
+    assert "those four diagnostics" in document
     assert "Cavalcade of Chaos and Shadow Legion runtime bundles" in document
     assert "does not claim `FULL_GAME_SUPPORTED` or `REPLAY_VERIFIED`" in document
 
