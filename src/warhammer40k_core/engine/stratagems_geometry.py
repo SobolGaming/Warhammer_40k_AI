@@ -547,6 +547,7 @@ def _visible_enemy_target_is_visible_and_in_range(
     scenario = _battlefield_scenario_for_stratagem(state)
     source_unit = _unit_by_id(state=state, unit_instance_id=source_unit_instance_id)
     return unit_has_line_of_sight_to_target(
+        state=state,
         scenario=scenario,
         ruleset_descriptor=_stratagem_ruleset_descriptor(),
         observing_unit=source_unit,

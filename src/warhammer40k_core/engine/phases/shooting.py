@@ -110,7 +110,7 @@ __all__ = (
     "_forced_shooting_type_for_out_of_phase",
     "_friendly_unit_has_shot_timing_window_id",
     "_heavy_hit_roll_modifier_applies",
-    "_hidden_target_unit_ids",
+    "_hidden_target_model_ids",
     "_invalid_finite_decision_status",
     "_invalid_if_current_option_payload_drifted",
     "_legal_shooting_types_for_rules_unit",

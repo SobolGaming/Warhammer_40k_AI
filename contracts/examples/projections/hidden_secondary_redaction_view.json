@@ -396,7 +396,7 @@
       "hints_by_entity_id": {},
       "hit_regions_by_entity_id": {}
     },
-    "schema_version": "battlefield-view-v1"
+    "schema_version": "battlefield-view-v2-phase17n"
   },
   "current_battle_phase": null,
   "current_setup_step": "select_secondary_missions",
@@ -1920,8 +1920,8 @@
     "player-b"
   ],
   "primary_unit_terrain_turn_start_snapshots": [],
-  "projection_schema": "game-view-v6-interaction",
-  "projection_state_hash": "98a2fa673cec86023976be27582378131f78fd85b70f915eddf3b0aab2b9bee2",
+  "projection_schema": "game-view-v7-phase17n",
+  "projection_state_hash": "ea2c41c0a96c368ca8486bbf1d079949e2039d1b3b3f59fc1db5c82dfff81a40",
   "public_command_point_ledgers": [
     {
       "command_points": 0,

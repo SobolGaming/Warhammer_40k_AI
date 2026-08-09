@@ -185,7 +185,7 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     ShootingTargetRestrictionContext,
     ShootingTargetRestrictionHookRegistry,
 )
-from warhammer40k_core.engine.terrain_hidden import unit_is_hidden_by_terrain
+from warhammer40k_core.engine.terrain_hidden import terrain_hidden_model_ids
 from warhammer40k_core.engine.transports import (
     FiringDeckWeaponSelection,
     resolve_firing_deck_selection,
@@ -427,7 +427,7 @@ __all__ = (
     "unit_firing_deck_value",
     "unit_has_line_of_sight_to_target",
     "unit_is_hidden_by_effects",
-    "unit_is_hidden_by_terrain",
+    "terrain_hidden_model_ids",
     "unresolved_attacks_for_validation",
     "unresolved_target_unit_ids",
     "validate_json_value",

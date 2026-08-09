@@ -341,7 +341,7 @@ def test_return_on_death_runtime_empty_indexes_have_no_hooks() -> None:
     assert runtime.phase_end_bindings() == ()
 
 
-def test_return_on_death_runtime_fail_fast_and_phase_end_filter_paths() -> None:
+def test_return_on_death_runtime_fail_fast_filter_and_out_of_phase_paths() -> None:
     state = _battle_state_with_destroyed_beta_unit()
     beta = _beta_unit(state)
     destroyed_model_id = beta.own_models[0].model_instance_id
@@ -421,7 +421,7 @@ def test_return_on_death_runtime_fail_fast_and_phase_end_filter_paths() -> None:
             "model_instance_id": _beta_unit(filtered_state).own_models[0].model_instance_id,
         },
     )
-    filtered_decisions.event_log.append(
+    out_of_phase_event = filtered_decisions.event_log.append(
         "model_destroyed",
         {
             "game_id": filtered_state.game_id,
@@ -440,7 +440,13 @@ def test_return_on_death_runtime_fail_fast_and_phase_end_filter_paths() -> None:
             runtime_modifier_registry=RuntimeModifierRegistry.empty(),
         )
     )
-    assert filtered_state.pending_return_on_death == []
+    (out_of_phase_pending,) = filtered_state.pending_return_on_death
+    assert out_of_phase_pending.trigger_phase == filtered_phase.value
+    assert out_of_phase_pending.destroyed_position_payload == {
+        "source": "model_destroyed_event",
+        "model_destroyed_event_id": out_of_phase_event.event_id,
+        "model_destroyed_payload": out_of_phase_event.payload,
+    }
 
     malformed_event_decisions = DecisionController()
     malformed_event_decisions.event_log.append("model_destroyed", [])

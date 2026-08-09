@@ -1,11 +1,105 @@
 {
-  "active_player_id": null,
-  "battle_round": 0,
+  "active_player_id": "player-a",
+  "battle_round": 1,
   "battlefield_state": {
     "battlefield_depth_inches": 44.0,
-    "battlefield_id": "ui-contract-initial:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
+    "battlefield_id": "ui-contract-terrain-snapshot-hidden-reserve:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
     "battlefield_width_inches": 60.0,
-    "placed_armies": [],
+    "placed_armies": [
+      {
+        "army_id": "army-alpha",
+        "player_id": "player-a",
+        "unit_placements": [
+          {
+            "army_id": "army-alpha",
+            "model_placements": [
+              {
+                "army_id": "army-alpha",
+                "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+                "player_id": "player-a",
+                "pose": {
+                  "facing": {
+                    "degrees": 0.0
+                  },
+                  "position": {
+                    "x": 3.0,
+                    "y": 24.0,
+                    "z": 0.0
+                  }
+                },
+                "unit_instance_id": "army-alpha:intercessor-unit-1"
+              },
+              {
+                "army_id": "army-alpha",
+                "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+                "player_id": "player-a",
+                "pose": {
+                  "facing": {
+                    "degrees": 0.0
+                  },
+                  "position": {
+                    "x": 3.0,
+                    "y": 25.8,
+                    "z": 0.0
+                  }
+                },
+                "unit_instance_id": "army-alpha:intercessor-unit-1"
+              },
+              {
+                "army_id": "army-alpha",
+                "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+                "player_id": "player-a",
+                "pose": {
+                  "facing": {
+                    "degrees": 0.0
+                  },
+                  "position": {
+                    "x": 3.0,
+                    "y": 27.6,
+                    "z": 0.0
+                  }
+                },
+                "unit_instance_id": "army-alpha:intercessor-unit-1"
+              },
+              {
+                "army_id": "army-alpha",
+                "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+                "player_id": "player-a",
+                "pose": {
+                  "facing": {
+                    "degrees": 0.0
+                  },
+                  "position": {
+                    "x": 4.8,
+                    "y": 24.0,
+                    "z": 0.0
+                  }
+                },
+                "unit_instance_id": "army-alpha:intercessor-unit-1"
+              },
+              {
+                "army_id": "army-alpha",
+                "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:005",
+                "player_id": "player-a",
+                "pose": {
+                  "facing": {
+                    "degrees": 0.0
+                  },
+                  "position": {
+                    "x": 4.8,
+                    "y": 25.8,
+                    "z": 0.0
+                  }
+                },
+                "unit_instance_id": "army-alpha:intercessor-unit-1"
+              }
+            ],
+            "player_id": "player-a",
+            "unit_instance_id": "army-alpha:intercessor-unit-1"
+          }
+        ]
+      }
+    ],
     "removed_model_ids": [],
     "terrain_features": []
   },
@@ -73,7 +167,7 @@
         }
       },
       "models_by_id": {
-        "army-beta:intercessor-unit-2:core-intercessor-like:001": {
+        "army-alpha:intercessor-unit-1:core-intercessor-like:001": {
           "entity_kind": "model",
           "geometry": {
             "geometry_source_id": "core-intercessor-like",
@@ -109,17 +203,24 @@
               "width_inches": null
             }
           },
-          "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:001",
-          "owner_player_id": "player-b",
-          "pose": null,
-          "state": "undeployed",
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+          "owner_player_id": "player-a",
+          "pose": {
+            "facing_degrees": 0.0,
+            "position": {
+              "x_inches": 3.0,
+              "y_inches": 24.0,
+              "z_inches": 0.0
+            }
+          },
+          "state": "placed",
           "state_context": {
             "reserve_kind": null,
             "transport_unit_instance_id": null
           },
-          "unit_instance_id": "army-beta:intercessor-unit-2"
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
         },
-        "army-beta:intercessor-unit-2:core-intercessor-like:002": {
+        "army-alpha:intercessor-unit-1:core-intercessor-like:002": {
           "entity_kind": "model",
           "geometry": {
             "geometry_source_id": "core-intercessor-like",
@@ -155,17 +256,24 @@
               "width_inches": null
             }
           },
-          "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:002",
-          "owner_player_id": "player-b",
-          "pose": null,
-          "state": "undeployed",
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+          "owner_player_id": "player-a",
+          "pose": {
+            "facing_degrees": 0.0,
+            "position": {
+              "x_inches": 3.0,
+              "y_inches": 25.8,
+              "z_inches": 0.0
+            }
+          },
+          "state": "placed",
           "state_context": {
             "reserve_kind": null,
             "transport_unit_instance_id": null
           },
-          "unit_instance_id": "army-beta:intercessor-unit-2"
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
         },
-        "army-beta:intercessor-unit-2:core-intercessor-like:003": {
+        "army-alpha:intercessor-unit-1:core-intercessor-like:003": {
           "entity_kind": "model",
           "geometry": {
             "geometry_source_id": "core-intercessor-like",
@@ -201,17 +309,24 @@
               "width_inches": null
             }
           },
-          "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:003",
-          "owner_player_id": "player-b",
-          "pose": null,
-          "state": "undeployed",
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+          "owner_player_id": "player-a",
+          "pose": {
+            "facing_degrees": 0.0,
+            "position": {
+              "x_inches": 3.0,
+              "y_inches": 27.6,
+              "z_inches": 0.0
+            }
+          },
+          "state": "placed",
           "state_context": {
             "reserve_kind": null,
             "transport_unit_instance_id": null
           },
-          "unit_instance_id": "army-beta:intercessor-unit-2"
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
         },
-        "army-beta:intercessor-unit-2:core-intercessor-like:004": {
+        "army-alpha:intercessor-unit-1:core-intercessor-like:004": {
           "entity_kind": "model",
           "geometry": {
             "geometry_source_id": "core-intercessor-like",
@@ -247,17 +362,24 @@
               "width_inches": null
             }
           },
-          "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:004",
-          "owner_player_id": "player-b",
-          "pose": null,
-          "state": "undeployed",
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+          "owner_player_id": "player-a",
+          "pose": {
+            "facing_degrees": 0.0,
+            "position": {
+              "x_inches": 4.8,
+              "y_inches": 24.0,
+              "z_inches": 0.0
+            }
+          },
+          "state": "placed",
           "state_context": {
             "reserve_kind": null,
             "transport_unit_instance_id": null
           },
-          "unit_instance_id": "army-beta:intercessor-unit-2"
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
         },
-        "army-beta:intercessor-unit-2:core-intercessor-like:005": {
+        "army-alpha:intercessor-unit-1:core-intercessor-like:005": {
           "entity_kind": "model",
           "geometry": {
             "geometry_source_id": "core-intercessor-like",
@@ -293,15 +415,22 @@
               "width_inches": null
             }
           },
-          "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:005",
-          "owner_player_id": "player-b",
-          "pose": null,
-          "state": "undeployed",
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:005",
+          "owner_player_id": "player-a",
+          "pose": {
+            "facing_degrees": 0.0,
+            "position": {
+              "x_inches": 4.8,
+              "y_inches": 25.8,
+              "z_inches": 0.0
+            }
+          },
+          "state": "placed",
           "state_context": {
             "reserve_kind": null,
             "transport_unit_instance_id": null
           },
-          "unit_instance_id": "army-beta:intercessor-unit-2"
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
         }
       },
       "objectives_by_id": {
@@ -374,8 +503,8 @@
       "terrain_areas_by_id": {},
       "terrain_features_by_id": {}
     },
-    "authoritative_geometry_hash": "a0c2e9e6e5a2f6e3135d323ab96721d3f5550924e9d786927aa7d1f1786d94cd",
-    "battlefield_id": "ui-contract-initial:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
+    "authoritative_geometry_hash": "dae37047f6ee1db95626c3322f7b0fe56ee8fa41dbd5ed713cde105f35555c2d",
+    "battlefield_id": "ui-contract-terrain-snapshot-hidden-reserve:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
     "bounds": {
       "max_x_inches": 60.0,
       "max_y_inches": 44.0,
@@ -386,10 +515,15 @@
     "coordinate_space": "battlefield_inches_right_handed_z_up",
     "coordinate_spec_version": "battlefield-coordinate-v1",
     "interaction": {
-      "legal_candidate_refs": [],
+      "legal_candidate_refs": [
+        {
+          "reference_id": "army-alpha:intercessor-unit-1",
+          "reference_kind": "decision_option"
+        }
+      ],
       "measurement_overlays": [],
       "path_overlays": [],
-      "request_id": "hidden-request",
+      "request_id": "decision-request-000007",
       "selected_or_acting_entity_ids": []
     },
     "render": {
@@ -398,9 +532,9 @@
     },
     "schema_version": "battlefield-view-v2-phase17n"
   },
-  "current_battle_phase": null,
-  "current_setup_step": "select_secondary_missions",
-  "game_id": "ui-contract-initial",
+  "current_battle_phase": "movement",
+  "current_setup_step": null,
+  "game_id": "ui-contract-terrain-snapshot-hidden-reserve",
   "mission_setup": {
     "attacker_player_id": "player-a",
     "battlefield_depth_inches": 44.0,
@@ -552,7 +686,7 @@
     "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
   },
   "model_display_by_id": {
-    "army-beta:intercessor-unit-2:core-intercessor-like:001": {
+    "army-alpha:intercessor-unit-1:core-intercessor-like:001": {
       "base_characteristics": {
         "InSv": {
           "applied_modifier_ids": [],
@@ -780,7 +914,7 @@
         ]
       },
       "model_display_name": "CORE Intercessor-like Infantry",
-      "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:001",
+      "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
       "model_profile_id": "core-intercessor-like",
       "model_profile_name": "CORE Intercessor-like Infantry",
       "redaction": {
@@ -796,7 +930,7 @@
         "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
       },
       "starting_wounds": 2,
-      "unit_instance_id": "army-beta:intercessor-unit-2",
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
       "visible_modifiers": [],
       "visible_status": "visible",
       "wargear_ids": [
@@ -804,7 +938,7 @@
       ],
       "wounds_remaining": 2
     },
-    "army-beta:intercessor-unit-2:core-intercessor-like:002": {
+    "army-alpha:intercessor-unit-1:core-intercessor-like:002": {
       "base_characteristics": {
         "InSv": {
           "applied_modifier_ids": [],
@@ -1032,7 +1166,7 @@
         ]
       },
       "model_display_name": "CORE Intercessor-like Infantry",
-      "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:002",
+      "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:002",
       "model_profile_id": "core-intercessor-like",
       "model_profile_name": "CORE Intercessor-like Infantry",
       "redaction": {
@@ -1048,7 +1182,7 @@
         "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
       },
       "starting_wounds": 2,
-      "unit_instance_id": "army-beta:intercessor-unit-2",
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
       "visible_modifiers": [],
       "visible_status": "visible",
       "wargear_ids": [
@@ -1056,7 +1190,7 @@
       ],
       "wounds_remaining": 2
     },
-    "army-beta:intercessor-unit-2:core-intercessor-like:003": {
+    "army-alpha:intercessor-unit-1:core-intercessor-like:003": {
       "base_characteristics": {
         "InSv": {
           "applied_modifier_ids": [],
@@ -1284,7 +1418,7 @@
         ]
       },
       "model_display_name": "CORE Intercessor-like Infantry",
-      "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:003",
+      "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:003",
       "model_profile_id": "core-intercessor-like",
       "model_profile_name": "CORE Intercessor-like Infantry",
       "redaction": {
@@ -1300,7 +1434,7 @@
         "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
       },
       "starting_wounds": 2,
-      "unit_instance_id": "army-beta:intercessor-unit-2",
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
       "visible_modifiers": [],
       "visible_status": "visible",
       "wargear_ids": [
@@ -1308,7 +1442,7 @@
       ],
       "wounds_remaining": 2
     },
-    "army-beta:intercessor-unit-2:core-intercessor-like:004": {
+    "army-alpha:intercessor-unit-1:core-intercessor-like:004": {
       "base_characteristics": {
         "InSv": {
           "applied_modifier_ids": [],
@@ -1536,7 +1670,7 @@
         ]
       },
       "model_display_name": "CORE Intercessor-like Infantry",
-      "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:004",
+      "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:004",
       "model_profile_id": "core-intercessor-like",
       "model_profile_name": "CORE Intercessor-like Infantry",
       "redaction": {
@@ -1552,7 +1686,7 @@
         "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
       },
       "starting_wounds": 2,
-      "unit_instance_id": "army-beta:intercessor-unit-2",
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
       "visible_modifiers": [],
       "visible_status": "visible",
       "wargear_ids": [
@@ -1560,7 +1694,7 @@
       ],
       "wounds_remaining": 2
     },
-    "army-beta:intercessor-unit-2:core-intercessor-like:005": {
+    "army-alpha:intercessor-unit-1:core-intercessor-like:005": {
       "base_characteristics": {
         "InSv": {
           "applied_modifier_ids": [],
@@ -1788,7 +1922,7 @@
         ]
       },
       "model_display_name": "CORE Intercessor-like Infantry",
-      "model_instance_id": "army-beta:intercessor-unit-2:core-intercessor-like:005",
+      "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:005",
       "model_profile_id": "core-intercessor-like",
       "model_profile_name": "CORE Intercessor-like Infantry",
       "redaction": {
@@ -1804,7 +1938,7 @@
         "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
       },
       "starting_wounds": 2,
-      "unit_instance_id": "army-beta:intercessor-unit-2",
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
       "visible_modifiers": [],
       "visible_status": "visible",
       "wargear_ids": [
@@ -1815,16 +1949,75 @@
   },
   "nested_interaction_requests": [],
   "pending_decision": {
-    "actor_id": null,
-    "decision_type": "hidden_decision",
-    "interaction": null,
-    "is_parameterized": false,
-    "options": [],
-    "payload": {
-      "hidden": true,
-      "secret": true
+    "actor_id": "player-a",
+    "decision_type": "select_movement_unit",
+    "interaction": {
+      "constraints": {
+        "candidate_option_ids": [
+          "army-alpha:intercessor-unit-1"
+        ],
+        "entity_kinds": [
+          "unit"
+        ],
+        "exact_model_count": null,
+        "maximum_distance_in": null,
+        "maximum_selections": 1,
+        "may_enter_engagement_range": null,
+        "minimum_enemy_distance_in": null,
+        "minimum_selections": 1,
+        "must_preserve_coherency": null,
+        "placement_kinds": [],
+        "proposal_schema_ref": null,
+        "submission_schema_ref": "finite-submission.schema.json"
+      },
+      "display_hints": {
+        "confirm_label": "Confirm Selection",
+        "decline_label": null
+      },
+      "interaction_kind": "entity_selection",
+      "proposal_kind": null,
+      "required_inputs": [
+        "selected_entities"
+      ],
+      "schema_version": "interaction-descriptor-v2-variants",
+      "selected_entity_ids": [],
+      "submission_kind": "finite",
+      "submission_variants": [
+        {
+          "display_label": "Confirm Selection",
+          "interaction_kind": "entity_selection",
+          "proposal_schema_ref": null,
+          "required_inputs": [
+            "selected_entities"
+          ],
+          "variant_id": "finite_option"
+        }
+      ]
     },
-    "request_id": "hidden-request",
+    "is_parameterized": false,
+    "options": [
+      {
+        "label": "CORE Intercessor-like Infantry",
+        "option_id": "army-alpha:intercessor-unit-1",
+        "payload": {
+          "model_instance_ids": [
+            "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+            "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+            "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+            "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+            "army-alpha:intercessor-unit-1:core-intercessor-like:005"
+          ],
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
+        }
+      }
+    ],
+    "payload": {
+      "active_player_id": "player-a",
+      "battle_round": 1,
+      "game_id": "ui-contract-terrain-snapshot-hidden-reserve",
+      "phase": "movement"
+    },
+    "request_id": "decision-request-000007",
     "schema_version": "decision-request-view-v2-interaction"
   },
   "pending_proposal": null,
@@ -1832,23 +2025,123 @@
     "player-a",
     "player-b"
   ],
-  "primary_unit_terrain_turn_start_snapshots": [],
-  "projection_schema": "game-view-v7-phase17n",
-  "projection_state_hash": "93ab1146b2b4956be2adbb7703e8749156f9e49acf5fd409bb339055525ed611",
-  "public_command_point_ledgers": [
+  "primary_unit_terrain_turn_start_snapshots": [
     {
-      "command_points": 0,
-      "player_id": "player-a",
-      "transactions": []
-    },
-    {
-      "command_points": 0,
-      "player_id": "player-b",
-      "transactions": []
+      "active_player_id": "player-a",
+      "battle_round": 1,
+      "game_id": "ui-contract-terrain-snapshot-hidden-reserve",
+      "snapshot_id": "primary-unit-terrain-turn-start:ui-contract-terrain-snapshot-hidden-reserve:round-01:player-a",
+      "source_id": "ui-contract-terrain-snapshot-hidden-reserve:primary-unit-terrain-turn-start:round-01:player-a",
+      "unit_memberships": [
+        {
+          "terrain_feature_ids": [],
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
+        }
+      ]
     }
   ],
-  "public_secondary_mission_card_states": [],
-  "public_secondary_mission_choices": [],
+  "projection_schema": "game-view-v7-phase17n",
+  "projection_state_hash": "590005e823052cb7315fb40ab342a4cda8132a9f62e11081bf85726fa34fb60e",
+  "public_command_point_ledgers": [
+    {
+      "command_points": 1,
+      "player_id": "player-a",
+      "transactions": [
+        {
+          "amount": 1,
+          "battle_round": 1,
+          "cap_exempt": true,
+          "player_id": "player-a",
+          "source_id": "command-phase-start:round-01:active-player-a",
+          "source_kind": "command_phase_start",
+          "transaction_id": "command-point:player-a:round-01:000001"
+        }
+      ]
+    },
+    {
+      "command_points": 1,
+      "player_id": "player-b",
+      "transactions": [
+        {
+          "amount": 1,
+          "battle_round": 1,
+          "cap_exempt": true,
+          "player_id": "player-b",
+          "source_id": "command-phase-start:round-01:active-player-a",
+          "source_kind": "command_phase_start",
+          "transaction_id": "command-point:player-b:round-01:000001"
+        }
+      ]
+    }
+  ],
+  "public_secondary_mission_card_states": [
+    {
+      "battle_round": 1,
+      "discarded_result_id": null,
+      "hidden": false,
+      "mode": "fixed",
+      "player_id": "player-a",
+      "scored_transaction_id": null,
+      "secondary_mission_id": "assassination",
+      "source_result_id": null,
+      "status": "active"
+    },
+    {
+      "battle_round": 1,
+      "discarded_result_id": null,
+      "hidden": false,
+      "mode": "fixed",
+      "player_id": "player-a",
+      "scored_transaction_id": null,
+      "secondary_mission_id": "bring_it_down",
+      "source_result_id": null,
+      "status": "active"
+    },
+    {
+      "battle_round": 1,
+      "discarded_result_id": null,
+      "hidden": false,
+      "mode": "fixed",
+      "player_id": "player-b",
+      "scored_transaction_id": null,
+      "secondary_mission_id": "assassination",
+      "source_result_id": null,
+      "status": "active"
+    },
+    {
+      "battle_round": 1,
+      "discarded_result_id": null,
+      "hidden": false,
+      "mode": "fixed",
+      "player_id": "player-b",
+      "scored_transaction_id": null,
+      "secondary_mission_id": "bring_it_down",
+      "source_result_id": null,
+      "status": "active"
+    }
+  ],
+  "public_secondary_mission_choices": [
+    {
+      "fixed_mission_ids": [
+        "assassination",
+        "bring_it_down"
+      ],
+      "hidden": false,
+      "mode": "fixed",
+      "player_id": "player-a",
+      "selected": true
+    },
+    {
+      "fixed_mission_ids": [
+        "assassination",
+        "bring_it_down"
+      ],
+      "hidden": false,
+      "mode": "fixed",
+      "player_id": "player-b",
+      "selected": true
+    }
+  ],
   "public_stratagem_use_records": [],
   "public_victory_point_ledgers": [
     {
@@ -1873,9 +2166,9 @@
     "source_hash": "867152e5e5856a1d37d8993a333fa5b733e1e4aa1352072cbd56d03c86711e04",
     "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
   },
-  "stage": "setup",
+  "stage": "battle",
   "unit_display_by_id": {
-    "army-beta:intercessor-unit-2": {
+    "army-alpha:intercessor-unit-1": {
       "datasheet_id": "core-intercessor-like-infantry",
       "faction_keywords": [
         "CORE MARINES"
@@ -1885,13 +2178,13 @@
         "INFANTRY"
       ],
       "model_instance_ids": [
-        "army-beta:intercessor-unit-2:core-intercessor-like:001",
-        "army-beta:intercessor-unit-2:core-intercessor-like:002",
-        "army-beta:intercessor-unit-2:core-intercessor-like:003",
-        "army-beta:intercessor-unit-2:core-intercessor-like:004",
-        "army-beta:intercessor-unit-2:core-intercessor-like:005"
+        "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:005"
       ],
-      "owner_player_id": "player-b",
+      "owner_player_id": "player-a",
       "redaction": {
         "hidden": false,
         "reason": null
@@ -1908,10 +2201,10 @@
         "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
       },
       "unit_display_name": "CORE Intercessor-like Infantry",
-      "unit_instance_id": "army-beta:intercessor-unit-2",
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
       "visible_status": "visible"
     }
   },
-  "viewer_player_id": "player-b",
+  "viewer_player_id": "player-a",
   "viewer_role": "player"
 }

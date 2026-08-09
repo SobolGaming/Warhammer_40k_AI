@@ -176,6 +176,15 @@ def build_ui_contract_bundle() -> UiContractBundle:
     if pending_movement is None:
         raise GameLifecycleError("UI contract movement fixture requires a pending decision.")
 
+    hidden_reserve_session, _hidden_reserve_status = build_local_session_at_movement_request(
+        game_id="ui-contract-terrain-snapshot-hidden-reserve"
+    )
+    _session_state(hidden_reserve_session).reposition_unit_to_strategic_reserves(
+        player_id=PLAYER_B,
+        unit_instance_id=UNIT_BETA,
+        source_rule_ids=("ui-contract:fixture:hidden-reserve",),
+    )
+
     modifier_session, _modifier_status = build_local_session_at_movement_request(
         game_id="ui-contract-visible-modifier"
     )
@@ -199,6 +208,12 @@ def build_ui_contract_bundle() -> UiContractBundle:
         "post_deployment_view.json": validate_json_value(cast(JsonValue, post_deployment_view)),
         "rules_catalog_view.json": validate_json_value(
             cast(JsonValue, initial_session.rules_catalog_view())
+        ),
+        "terrain_snapshot_hidden_reserve_view_player_a.json": validate_json_value(
+            cast(JsonValue, hidden_reserve_session.view(viewer_player_id=PLAYER_A))
+        ),
+        "terrain_snapshot_hidden_reserve_view_player_b.json": validate_json_value(
+            cast(JsonValue, hidden_reserve_session.view(viewer_player_id=PLAYER_B))
         ),
         "visible_modifier_datacard_view.json": validate_json_value(
             cast(JsonValue, modifier_session.view(viewer_player_id=PLAYER_A))

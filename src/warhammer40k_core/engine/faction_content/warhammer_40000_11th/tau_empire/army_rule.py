@@ -650,6 +650,7 @@ def _rules_unit_has_visible_target(
     terrain_features = _terrain_features_for_state(state)
     for component in observer_rules_unit.components:
         if unit_has_line_of_sight_to_target(
+            state=state,
             scenario=scenario,
             ruleset_descriptor=ruleset_descriptor,
             observing_unit=component.unit,

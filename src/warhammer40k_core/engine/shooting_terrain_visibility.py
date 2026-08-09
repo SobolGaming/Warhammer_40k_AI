@@ -12,6 +12,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.core.terrain_areas import PlacedTerrainArea
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, SpatialIndexState
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import RulesUnitView
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.terrain_area_visibility import (
     TerrainVisibilityArea,
@@ -92,6 +93,24 @@ def terrain_visibility_areas_from_placements(
         )
         for area in validate_shooting_terrain_areas(terrain_areas)
     )
+
+
+def model_visibility_keywords_for_rules_unit(
+    *,
+    rules_unit: RulesUnitView,
+    models: tuple[Model, ...],
+) -> tuple[tuple[str, tuple[str, ...]], ...]:
+    if type(rules_unit) is not RulesUnitView:
+        raise GameLifecycleError("Model visibility keywords require a RulesUnitView.")
+    if type(models) is not tuple or not models:
+        raise GameLifecycleError("Model visibility keywords require a non-empty model tuple.")
+    rows: list[tuple[str, tuple[str, ...]]] = []
+    for model in models:
+        if type(model) is not Model:
+            raise GameLifecycleError("Model visibility keywords require geometry Model values.")
+        component = rules_unit.component_unit_for_model(model.model_id)
+        rows.append((model.model_id, component.keywords))
+    return tuple(sorted(rows))
 
 
 def model_within_solid_terrain(

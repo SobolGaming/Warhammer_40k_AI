@@ -36,6 +36,13 @@ Status payloads may include request/actor details only when the corresponding
 request is visible to that viewer. Catalog projections contain static public
 display data and no live hidden state.
 
+Phase 17N turn-start terrain snapshots preserve their public game/round/source
+metadata, but their `unit_memberships` rows are filtered through the exact unit
+ID set already emitted in that viewer's `unit_display_by_id`. An owned unplaced
+unit remains visible to its owner. An opponent's unplaced reserve is absent;
+the snapshot must not reveal its stable ID or add a row from which its presence
+or count can be inferred. Omniscient views retain every authoritative row.
+
 The nested Phase 17O capability manifest is projected by this same redaction
 module. A non-omniscient viewer receives only owned roster, unit, rule,
 geometry, and unsupported-effect rows. Capability counts and mode results are

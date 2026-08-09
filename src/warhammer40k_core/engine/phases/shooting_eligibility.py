@@ -36,7 +36,7 @@ __all__ = (
     "_advanced_unit_is_restricted_to_assault_weapons",
     "_cached_shooting_target_candidate_for_model",
     "_detection_range_bonus_inches_by_target_id",
-    "_hidden_target_unit_ids",
+    "_hidden_target_model_ids",
     "_legal_shooting_types_for_rules_unit",
     "_legal_shooting_unit_ids",
     "_rules_unit_advanced_is_restricted_to_assault_weapons",
@@ -128,7 +128,7 @@ def _rules_unit_has_legal_shooting_declaration(
     )
     terrain_features = _terrain_features_for_state(state)
     terrain_areas = _terrain_areas_for_state(state)
-    hidden_target_unit_ids = _hidden_target_unit_ids(
+    hidden_target_model_ids = _hidden_target_model_ids(
         state=state,
         ruleset_descriptor=ruleset_descriptor,
         target_unit_ids=resolved_target_unit_ids,
@@ -163,7 +163,7 @@ def _rules_unit_has_legal_shooting_declaration(
                 target_unit_id=target_unit_id,
                 terrain_features=terrain_features,
                 terrain_areas=terrain_areas,
-                hidden_target_unit_ids=hidden_target_unit_ids,
+                hidden_target_model_ids=hidden_target_model_ids,
                 target_unit_ids_with_recent_ranged_attacks=(
                     target_unit_ids_with_recent_ranged_attacks
                 ),
@@ -192,27 +192,28 @@ def _rules_unit_has_legal_shooting_declaration(
     return False
 
 
-def _hidden_target_unit_ids(
+def _hidden_target_model_ids(
     *,
     state: GameState,
     ruleset_descriptor: RulesetDescriptor,
     target_unit_ids: tuple[str, ...],
 ) -> tuple[str, ...]:
-    return tuple(
-        sorted(
-            target_unit_id
-            for target_unit_id in _validate_identifier_tuple(
-                "hidden target target_unit_ids",
-                target_unit_ids,
-            )
-            if unit_is_hidden_by_effects(state.persisting_effects_for_unit(target_unit_id))
-            or unit_is_hidden_by_terrain(
+    hidden_model_ids: set[str] = set()
+    for target_unit_id in _validate_identifier_tuple(
+        "hidden target target_unit_ids",
+        target_unit_ids,
+    ):
+        rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=target_unit_id)
+        if unit_is_hidden_by_effects(state.persisting_effects_for_unit(target_unit_id)):
+            hidden_model_ids.update(model.model_instance_id for model in rules_unit.alive_models())
+        hidden_model_ids.update(
+            terrain_hidden_model_ids(
                 state=state,
                 ruleset_descriptor=ruleset_descriptor,
                 unit_instance_id=target_unit_id,
             )
         )
-    )
+    return tuple(sorted(hidden_model_ids))
 
 
 def _detection_range_bonus_inches_by_target_id(
@@ -263,14 +264,14 @@ def _target_unit_ids_with_recent_ranged_attacks(
 
 def _targeting_detection_context_fingerprint(
     *,
-    hidden_target_unit_ids: tuple[str, ...],
+    hidden_target_model_ids: tuple[str, ...],
     target_unit_ids_with_recent_ranged_attacks: tuple[str, ...],
     detection_range_bonus_by_target_id: dict[str, int],
 ) -> str:
     return canonical_json(
         validate_json_value(
             {
-                "hidden_target_unit_ids": list(hidden_target_unit_ids),
+                "hidden_target_model_ids": list(hidden_target_model_ids),
                 "target_unit_ids_with_recent_ranged_attacks": list(
                     target_unit_ids_with_recent_ranged_attacks
                 ),
@@ -300,7 +301,7 @@ def _unit_has_legal_shooting_declaration(
     )
     terrain_features = _terrain_features_for_state(state)
     terrain_areas = _terrain_areas_for_state(state)
-    hidden_target_unit_ids = _hidden_target_unit_ids(
+    hidden_target_model_ids = _hidden_target_model_ids(
         state=state,
         ruleset_descriptor=ruleset_descriptor,
         target_unit_ids=resolved_target_unit_ids,
@@ -331,7 +332,7 @@ def _unit_has_legal_shooting_declaration(
                 target_unit_id=target_unit_id,
                 terrain_features=terrain_features,
                 terrain_areas=terrain_areas,
-                hidden_target_unit_ids=hidden_target_unit_ids,
+                hidden_target_model_ids=hidden_target_model_ids,
                 target_unit_ids_with_recent_ranged_attacks=(
                     target_unit_ids_with_recent_ranged_attacks
                 ),
@@ -379,7 +380,7 @@ def _legal_shooting_types_for_rules_unit(
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
     terrain_areas = _terrain_areas_for_state(state)
-    hidden_target_unit_ids = _hidden_target_unit_ids(
+    hidden_target_model_ids = _hidden_target_model_ids(
         state=state,
         ruleset_descriptor=ruleset_descriptor,
         target_unit_ids=resolved_target_unit_ids,
@@ -421,7 +422,7 @@ def _legal_shooting_types_for_rules_unit(
                     target_unit_id=target_unit_id,
                     terrain_features=terrain_features,
                     terrain_areas=terrain_areas,
-                    hidden_target_unit_ids=hidden_target_unit_ids,
+                    hidden_target_model_ids=hidden_target_model_ids,
                     target_unit_ids_with_recent_ranged_attacks=(
                         target_unit_ids_with_recent_ranged_attacks
                     ),
@@ -470,7 +471,7 @@ def _cached_shooting_target_candidate_for_model(
     target_unit_id: str,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     terrain_areas: tuple[PlacedTerrainArea, ...],
-    hidden_target_unit_ids: tuple[str, ...],
+    hidden_target_model_ids: tuple[str, ...],
     target_unit_ids_with_recent_ranged_attacks: tuple[str, ...],
     target_detection_range_bonus_inches: int,
     shooting_target_restriction_hooks: ShootingTargetRestrictionHookRegistry | None = None,
@@ -480,7 +481,7 @@ def _cached_shooting_target_candidate_for_model(
     cache_key = _shooting_model_candidate_cache_key(
         weapon=weapon,
         target_unit_id=target_unit_id,
-        target_is_hidden=target_unit_id in hidden_target_unit_ids,
+        hidden_target_model_ids=hidden_target_model_ids,
         target_made_recent_ranged_attacks=(
             target_unit_id in target_unit_ids_with_recent_ranged_attacks
         ),
@@ -496,7 +497,7 @@ def _cached_shooting_target_candidate_for_model(
             target_unit_id=target_unit_id,
             terrain_features=terrain_features,
             terrain_areas=terrain_areas,
-            hidden_target_unit_ids=hidden_target_unit_ids,
+            hidden_target_model_ids=hidden_target_model_ids,
             target_unit_ids_with_recent_ranged_attacks=(target_unit_ids_with_recent_ranged_attacks),
             target_detection_range_bonus_inches=target_detection_range_bonus_inches,
         )
@@ -536,7 +537,7 @@ def _shooting_model_candidate_cache_key(
     *,
     weapon: _AvailableWeapon,
     target_unit_id: str,
-    target_is_hidden: bool,
+    hidden_target_model_ids: tuple[str, ...],
     target_made_recent_ranged_attacks: bool,
     target_detection_range_bonus_inches: int,
 ) -> _ShootingModelCandidateCacheKey:
@@ -549,7 +550,7 @@ def _shooting_model_candidate_cache_key(
         weapon.get("firing_deck_source_model_instance_id"),
         _weapon_profile_cache_fingerprint(profile),
         target_unit_id,
-        target_is_hidden,
+        hidden_target_model_ids,
         target_made_recent_ranged_attacks,
         target_detection_range_bonus_inches,
     )

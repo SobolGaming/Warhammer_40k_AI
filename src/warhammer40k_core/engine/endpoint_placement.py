@@ -243,10 +243,10 @@ def terrain_endpoint_placement_violation(
                 or feature_policy.endpoint_support_policy
                 is TerrainEndpointSupportPolicy.ALLOWED_ON_TOP_WITH_NO_OVERHANG
             )
-            if support_containment_required and not shapely_backend.base_footprint_within_bounds(
+            if support_containment_required and not shapely_backend.base_footprint_within_polygon(
                 model.base,
                 model.pose,
-                surface.bounds(),
+                surface.footprint_polygon(),
             ):
                 return TerrainEndpointPlacementViolation(
                     violation_code=code,
@@ -298,10 +298,10 @@ def _model_endpoint_is_on_support_surface(
         surface.z_inches,
         rel_tol=0.0,
         abs_tol=_EPSILON,
-    ) and shapely_backend.base_footprint_intersects_bounds(
+    ) and shapely_backend.base_footprint_intersects_polygon(
         model.base,
         model.pose,
-        surface.bounds(),
+        surface.footprint_polygon(),
     )
 
 

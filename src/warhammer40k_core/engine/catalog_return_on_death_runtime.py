@@ -33,6 +33,7 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedContext,
     UnitDestroyedHookBinding,
+    model_destroyed_events_for_lifecycle_phase,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.rules.rule_ir import (
@@ -334,23 +335,14 @@ def _model_destroyed_events_for_phase(
 ) -> tuple[tuple[str, dict[str, JsonValue]], ...]:
     if type(context) is not PhaseEndObjectiveControlContext:
         raise GameLifecycleError("Return-on-death phase-end capture requires context.")
-    events: list[tuple[int, str, dict[str, JsonValue]]] = []
-    for event_order, record in enumerate(context.event_log.records):
-        if record.event_type != "model_destroyed":
-            continue
-        payload = validate_json_value(record.payload)
-        if not isinstance(payload, dict):
-            raise GameLifecycleError("model_destroyed event payload must be an object.")
-        if payload.get("game_id") != context.state.game_id:
-            continue
-        if payload.get("battle_round") != context.state.battle_round:
-            continue
-        if payload.get("active_player_id") != context.state.active_player_id:
-            continue
-        if payload.get("phase") != context.completed_phase.value:
-            continue
-        events.append((event_order, record.event_id, dict(payload)))
-    return tuple((event_id, payload) for _order, event_id, payload in sorted(events))
+    return tuple(
+        (event_id, payload)
+        for _event_order, event_id, payload in model_destroyed_events_for_lifecycle_phase(
+            state=context.state,
+            event_log=context.event_log,
+            completed_phase=context.completed_phase,
+        )
+    )
 
 
 def _record_source_matches_destroyed_target(

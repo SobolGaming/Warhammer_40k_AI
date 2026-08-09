@@ -204,6 +204,10 @@ from warhammer40k_core.engine.saves import (
     save_options_for_model,
     saving_throw_roll_spec,
 )
+from warhammer40k_core.engine.shooting_selection_range import (
+    geometry_models_for_unit_placements,
+    unit_placements_for_rules_unit_or_none,
+)
 from warhammer40k_core.engine.shooting_targets import (
     BENEFIT_OF_COVER_RULE_ID,
     PLUNGING_FIRE_RULE_ID,
@@ -211,6 +215,7 @@ from warhammer40k_core.engine.shooting_targets import (
     shooting_visibility_cache_key,
 )
 from warhammer40k_core.engine.shooting_terrain_visibility import (
+    model_visibility_keywords_for_rules_unit,
     shooting_terrain_areas_for_state,
     terrain_visibility_areas_from_placements,
 )
@@ -464,6 +469,7 @@ __all__ = (
     "dataclass",
     "devastating_wounds_resolution",
     "geometry_model_for_placement",
+    "geometry_models_for_unit_placements",
     "has_weapon_keyword",
     "hazard_mortal_wounds_per_failed_roll",
     "hazard_roll_failed",
@@ -475,6 +481,7 @@ __all__ = (
     "mandatory_save_option",
     "melta_damage_bonus",
     "model_by_id",
+    "model_visibility_keywords_for_rules_unit",
     "objective_marker_controls_model",
     "opportunity_boundary_game_state_payload",
     "opportunity_boundary_state_hash",
@@ -499,6 +506,7 @@ __all__ = (
     "sustained_hits_generated_hits",
     "unified_attack_reroll_permission_contexts_for_unit",
     "unit_by_id",
+    "unit_placements_for_rules_unit_or_none",
     "unit_effect_hit_roll_modifier",
     "unit_effect_invulnerable_save",
     "unit_effects_deny_benefit_of_cover",

@@ -547,6 +547,23 @@ def test_phase17n_meatgrinder_exact_slice_artifact_is_source_hashed_and_strict()
     with pytest.raises(ValueError, match="objective terrain-area mapping drifted"):
         event_layouts.validate_exact_slice_artifact_bytes(json.dumps(wrong_area_payload).encode())
 
+    unreflected_source_affine_payload = json.loads(raw)
+    unreflected_source_affine_payload["layouts"][0]["terrain_areas"][3]["local_transform"] = (
+        "identity"
+    )
+    unreflected_source_affine_payload["package_hash"] = ""
+    unreflected_source_affine_payload["package_hash"] = hashlib.sha256(
+        json.dumps(
+            unreflected_source_affine_payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+    ).hexdigest()
+    with pytest.raises(ValueError, match="local reflection must match its source affine"):
+        event_layouts.validate_exact_slice_artifact_bytes(
+            json.dumps(unreflected_source_affine_payload).encode()
+        )
+
 
 def test_phase17n_meatgrinder_exact_slice_builder_reproduces_committed_artifact(
     tmp_path: Path,
@@ -677,6 +694,74 @@ def test_phase17n_meatgrinder_exact_slice_builder_reproduces_committed_artifact(
 
     assert drifted_raster_result.returncode != 0
     assert "raster-reviewed pose must pin the reviewed estimate" in (drifted_raster_result.stderr)
+
+
+def test_phase17n_exact_terrain_area_reflections_follow_source_affine_orientation() -> None:
+    repository_root = Path(__file__).resolve().parents[2]
+    extraction_payload = json.loads(
+        (
+            repository_root
+            / "data/source_audits/event_companion_2026_06"
+            / "phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json"
+        ).read_text(encoding="utf-8")
+    )
+    source_orientation_reversing_ids = {
+        area["terrain_area_id"]
+        for layout in extraction_payload["layouts"]
+        for area in layout["terrain_areas"]
+        if (
+            area["source_image"]["pdf_page_affine_normalized_image_to_points"][0]
+            * area["source_image"]["pdf_page_affine_normalized_image_to_points"][3]
+        )
+        - (
+            area["source_image"]["pdf_page_affine_normalized_image_to_points"][1]
+            * area["source_image"]["pdf_page_affine_normalized_image_to_points"][2]
+        )
+        < 0.0
+    }
+    artifact = event_layouts.exact_slice_artifact()
+    artifact_mirrored_ids = {
+        area.area_id
+        for layout in artifact.layouts
+        for area in layout.terrain_areas
+        if area.local_transform == "mirror_y_axis"
+    }
+
+    assert len(source_orientation_reversing_ids) == 12
+    assert artifact_mirrored_ids == source_orientation_reversing_ids
+
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+    layout_a_area_04 = next(
+        area
+        for area in setup.terrain_areas
+        if area.terrain_area_id == "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04"
+    )
+
+    assert layout_a_area_04.local_transform is TerrainAreaLocalTransform.MIRROR_Y_AXIS
+    assert tuple(
+        (point.x_inches, point.y_inches) for point in layout_a_area_04.footprint_polygon
+    ) == (
+        (40.5, 46.0),
+        (34.5, 46.0),
+        (34.5, 44.7),
+        (34.0, 44.0),
+        (34.4, 43.3),
+        (34.2, 43.0),
+        (34.5, 42.8),
+        (34.5, 42.0),
+        (37.2, 42.0),
+        (37.3, 41.8),
+        (37.7, 41.9),
+        (38.5, 41.5),
+        (39.3, 42.0),
+        (40.5, 42.0),
+    )
 
 
 def test_phase17n_meatgrinder_exact_layouts_build_all_source_components() -> None:
@@ -882,6 +967,7 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
         los_cache_key="los:phase17n-dense-gap",
         observer_model=model("observer", 29.0, 51.6),
         target_models=(model("target", 31.5, 51.6),),
+        target_model_keywords=(("target", ("INFANTRY",)),),
         terrain_features=setup.terrain_features,
         terrain_areas=tuple(visibility_areas.values()),
     )
@@ -907,6 +993,7 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
         los_cache_key="los:phase17n-through-dense",
         observer_model=model("observer", 28.0, 53.0),
         target_models=(model("target", 39.0, 53.0),),
+        target_model_keywords=(("target", ("INFANTRY",)),),
         terrain_areas=(dense_visibility_area,),
     ).resolve_line_of_sight()
     assert not blocked_through_dense.unit_visible
@@ -926,6 +1013,7 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
             los_cache_key=f"los:phase17n-{expected_exception}",
             observer_model=model("observer", *observer_xy),
             target_models=(model("target", *target_xy),),
+            target_model_keywords=(("target", ("INFANTRY",)),),
             terrain_areas=(dense_visibility_area,),
         ).resolve_line_of_sight()
         assert exception_witness.unit_visible
@@ -939,6 +1027,7 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
         los_cache_key="los:phase17n-mixed",
         observer_model=model("observer", 17.5, 45.3),
         target_models=(model("target", 18.1, 45.3),),
+        target_model_keywords=(("target", ("INFANTRY",)),),
         terrain_areas=(mixed_visibility_area,),
     )
     mixed_witness = mixed_context.resolve_line_of_sight()
@@ -956,6 +1045,7 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
         los_cache_key="los:phase17n-light",
         observer_model=model("observer", 32.0, 43.0),
         target_models=(model("target", 36.0, 43.0),),
+        target_model_keywords=(("target", ("INFANTRY",)),),
         terrain_areas=(light_visibility_area,),
     )
     light_witness = light_context.resolve_line_of_sight()
@@ -974,6 +1064,7 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
         los_cache_key="los:phase17n-through-light",
         observer_model=model("observer", 32.0, 43.0),
         target_models=(model("target", 43.0, 43.0),),
+        target_model_keywords=(("target", ("INFANTRY",)),),
         terrain_areas=(light_visibility_area,),
     ).resolve_line_of_sight()
     assert not blocked_through_light.unit_visible
@@ -1056,6 +1147,10 @@ def test_phase17n_visibility_resolves_feature_area_associations_once_per_query(
                 base=CircularBase(radius=0.35),
                 volume=ModelVolume(height=2.0),
             ),
+        ),
+        target_model_keywords=(
+            ("target-a", ("INFANTRY",)),
+            ("target-b", ("INFANTRY",)),
         ),
         terrain_features=terrain_features,
         terrain_areas=visibility_areas,

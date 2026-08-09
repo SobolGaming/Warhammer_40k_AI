@@ -119,26 +119,14 @@ def unit_destruction_completion_events_for_phase(
     if state.battlefield_state is None:
         return ()
     events_by_unit: dict[str, list[tuple[int, str, dict[str, JsonValue]]]] = {}
-    for event_order, record in enumerate(event_log.records):
-        if record.event_type != "model_destroyed":
-            continue
-        payload = record.payload
-        if not isinstance(payload, dict):
-            raise GameLifecycleError("model_destroyed event payload must be an object.")
-        event_payload = validate_json_value(payload)
-        if not isinstance(event_payload, dict):
-            raise GameLifecycleError("model_destroyed event payload must be an object.")
-        if event_payload.get("game_id") != state.game_id:
-            continue
-        if event_payload.get("battle_round") != state.battle_round:
-            continue
-        if event_payload.get("active_player_id") != state.active_player_id:
-            continue
-        if event_payload.get("phase") != phase.value:
-            continue
+    for event_order, event_id, event_payload in model_destroyed_events_for_lifecycle_phase(
+        state=state,
+        event_log=event_log,
+        completed_phase=phase,
+    ):
         target_unit_id = _payload_identifier(event_payload, key="target_unit_instance_id")
         events_by_unit.setdefault(target_unit_id, []).append(
-            (event_order, record.event_id, dict(event_payload))
+            (event_order, event_id, dict(event_payload))
         )
     completions_by_unit: dict[str, tuple[int, str, dict[str, JsonValue]]] = {}
     for target_unit_id, events in events_by_unit.items():
@@ -175,6 +163,50 @@ def unit_destruction_completion_events_for_phase(
             key=lambda item: (item[0], _payload_identifier(item[2], key="target_unit_instance_id")),
         )
     )
+
+
+def model_destroyed_events_for_lifecycle_phase(
+    *,
+    state: GameState,
+    event_log: EventLog,
+    completed_phase: BattlePhase,
+) -> tuple[tuple[int, str, dict[str, JsonValue]], ...]:
+    """Return destruction events that occurred inside the current lifecycle phase.
+
+    An out-of-phase attack retains its attack phase in ``payload["phase"]``.  Event
+    occurrence therefore comes from the lifecycle event boundary, not from that
+    attack-semantic field.
+    """
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Model-destruction phase lookup requires GameState.")
+    if type(event_log) is not EventLog:
+        raise GameLifecycleError("Model-destruction phase lookup requires EventLog.")
+    phase = _battle_phase_from_token(completed_phase)
+    if state.current_battle_phase is not phase:
+        raise GameLifecycleError(
+            "Model-destruction phase lookup must match the current lifecycle phase."
+        )
+    boundary_order = -1
+    for event_order, record in enumerate(event_log.records):
+        if record.event_type == "battle_phase_completed":
+            boundary_order = event_order
+    events: list[tuple[int, str, dict[str, JsonValue]]] = []
+    for event_order, record in enumerate(event_log.records):
+        if event_order <= boundary_order or record.event_type != "model_destroyed":
+            continue
+        event_payload = validate_json_value(record.payload)
+        if not isinstance(event_payload, dict):
+            raise GameLifecycleError("model_destroyed event payload must be an object.")
+        if event_payload.get("game_id") != state.game_id:
+            continue
+        if event_payload.get("battle_round") != state.battle_round:
+            continue
+        if event_payload.get("active_player_id") != state.active_player_id:
+            continue
+        events.append((event_order, record.event_id, dict(event_payload)))
+    return tuple(events)
 
 
 def _component_units_for_target(

@@ -383,7 +383,7 @@ export interface components {
             ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v4-contract";
+            schema_version: "session-metadata-v5-contract";
             server_contract_version: string;
             session_id: string;
             session_revision: number;
@@ -681,7 +681,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v4-contract";
+            schema_version: "session-command-outcome-v5-contract";
             session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
@@ -806,7 +806,7 @@ export interface components {
         };
         "battlefield-view--terrain_feature.schema": {
             /** @enum {string} */
-            classification?: "dense" | "light" | "mixed" | "unknown";
+            classification: "dense" | "light" | "mixed" | "unknown";
             /** @constant */
             entity_kind: "terrain_feature";
             footprint: components["schemas"]["battlefield-view--shape.schema"];
@@ -903,7 +903,7 @@ export interface components {
             interaction: components["schemas"]["battlefield-view--interaction.schema"];
             render: components["schemas"]["battlefield-view--render.schema"];
             /** @constant */
-            schema_version: "battlefield-view-v1";
+            schema_version: "battlefield-view-v2-phase17n";
         };
         "game-view--redaction.schema": {
             hidden: boolean;
@@ -1069,12 +1069,12 @@ export interface components {
             nested_interaction_requests: components["schemas"]["annotated-decision-request.schema"][];
             player_ids: string[];
             /** @constant */
-            projection_schema: "game-view-v6-interaction";
+            projection_schema: "game-view-v7-phase17n";
             projection_state_hash: string;
             public_command_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_card_states: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_choices: components["schemas"]["game-view--json_value.schema"][];
-            primary_unit_terrain_turn_start_snapshots?: components["schemas"]["game-view--primary_unit_terrain_turn_start_snapshot.schema"][];
+            primary_unit_terrain_turn_start_snapshots: components["schemas"]["game-view--primary_unit_terrain_turn_start_snapshot.schema"][];
             public_stratagem_use_records: components["schemas"]["game-view--json_value.schema"][];
             public_victory_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             rules_catalog: components["schemas"]["game-view--rules_catalog_reference.schema"];
@@ -1095,7 +1095,7 @@ export interface components {
             retention_limit: number;
             revision_retention_limit: number;
             /** @constant */
-            schema_version: "session-projection-v2-interaction";
+            schema_version: "session-projection-v3-phase17n";
             session_id: string;
             session_revision: number;
             /** @enum {string} */
@@ -1160,7 +1160,7 @@ export interface components {
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v2-phase18i";
+            schema_version: "replay-artifact-v3-phase17n";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
         };
         /** CORE V2 FiniteOptionSubmissionPayload */
@@ -1405,7 +1405,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Replay artifact v2 with mandatory ruleset descriptor and overlay source identity for an administrator, or for a replay viewer after the session is terminal or closed. */
+            /** @description Replay artifact v3 with mandatory ruleset descriptor, overlay source identity, and Phase 17N turn-start terrain evidence for an administrator, or for a replay viewer after the session is terminal or closed. */
             200: {
                 headers: {
                     [name: string]: unknown;

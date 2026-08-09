@@ -395,6 +395,7 @@ def selection_visibility_conditions_apply(
         )
         if not any(
             unit_has_line_of_sight_to_target(
+                state=state,
                 scenario=scenario,
                 ruleset_descriptor=ruleset_descriptor,
                 observing_unit=observing_unit,

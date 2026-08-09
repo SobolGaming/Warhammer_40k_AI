@@ -2004,8 +2004,6 @@ Objects:
 - `CoverSourceRecord`
 - `CoverPolicyDescriptor`
 - `BenefitOfCoverResult`
-- `HiddenDetectionResult`
-- `GoneToGroundResult`
 
 Invariants:
 
@@ -2017,10 +2015,13 @@ Invariants:
 - Dense terrain features have Solid line-of-sight blocking for enclosed gaps 3" or less from ground level;
 - Hidden can apply only to `INFANTRY`, `BEASTS`, and `SWARM` models;
 - a model is Hidden when it is at least partially within a terrain area
-  containing a Dense or Light terrain element and its unit did not make ranged
-  attacks last turn;
-- Hidden units can only be visible to enemy models within the target unit's
-  Detection Range characteristic, defaulting to 15";
+  containing a Dense terrain element and its unit did not make ranged
+  attacks in the current or previous player turn;
+- Hidden detection is evaluated per target model using that model's own
+  keywords and terrain-area occupancy; eligible and ineligible models in one
+  attached rules unit never share Hidden status;
+- Hidden models can only be visible to enemy models within the applicable
+  Detection Range, defaulting to 15";
 - Gone to Ground applies to a model that is not fully visible to the attacking
   model because a terrain piece is at least partially in the way;
 - Gone to Ground improves Detection Range by -3", making the default Hidden
@@ -2032,7 +2033,7 @@ Invariants:
 - Benefit of Cover worsens the attack's BS characteristic by 1 unless an ability such as `[IGNORES COVER]` removes it;
 - cover eligibility is visible in attack context before hit rolls are made;
 - LoS witnesses carry ruleset hash and spatial revision cache-key data;
-- Hidden distance gates, last-turn shot-state loss, Gone to Ground cancellation,
+- Hidden distance gates, current-or-previous-turn shot-state loss, Gone to Ground cancellation,
   and visibility output are first-class 11th Edition terrain behavior;
 - Phase 13A uses deterministic broad-phase candidate filtering and cache-key witnesses, but does not claim a persistent memoized shooting LoS cache; Phase 13B/13C must add or consume a real cache/index before high-volume shooting loops;
 - model silhouette sampling is an explicit deterministic approximation, not an exact hull; downstream cover and Plunging Fire behavior must carry accuracy tests for that sampling budget;
@@ -2043,9 +2044,11 @@ Required tests:
 - terrain visibility fixture can block LoS deterministically;
 - terrain-area Obscuring blocks LoS only when all lines cross eligible areas and neither model is within the crossed area;
 - Dense terrain Solid blocks LoS through enclosed gaps 3" or less from ground level;
-- Hidden `INFANTRY`/`BEASTS`/`SWARM` models in Dense or Light terrain areas are
-  visible only within the target unit's Detection Range while their last-turn
-  shot-state condition is satisfied;
+- Hidden `INFANTRY`/`BEASTS`/`SWARM` models in Dense terrain areas are
+  visible only within Detection Range while their current-or-previous-turn
+  shot-state condition is satisfied, including after an attached unit splits;
+- mixed attached rules units apply Hidden and Detection Range per model, and
+  every rules-level visible-target query consumes the same model gate;
 - Gone to Ground applies only when the attacking model's full-visibility failure
   is caused by intervening terrain, applies the -3" Detection Range modifier,
   and is cancelled by Hidden-shooting rules that preserve Hidden;
@@ -4924,13 +4927,16 @@ scoring rows retain their separate reviewed Chapter Approved mission-deck
 provenance in the Event Companion source package.
 
 The exact battlefield artifact has package hash
-`005f8ad96d525dcaeb23eacc9d98d7cdf57d245242ce591e3ccd60e11f0c472c`,
+`e000de2eee57a1a9e8be21be2c88c427b2317ce0f832cf98e32e50bff18b6997`,
 raw artifact SHA-256
-`28241fd8961eb74345620179d3b9b3e903e65cfdafd47ebfa0dcdd942220c543`,
+`8818f310453fb73ccfe9dcf88ab3232026896b449b059957110015e3d565ade0`,
 and reviewed extraction payload hash
 `8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30`.
 The loader pins both artifact hashes, so a structurally valid re-hashed
 coordinate mutation remains rejected.
+The builder preserves all 12 orientation-reversing terrain-area source affines
+as a typed local reflection; its transformed-vertex anchor is derived
+deterministically from the reviewed registration anchor.
 
 Those four rows are loaded from the strict, versioned JSON artifact at
 `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-meatgrinder-scoring.json`,
@@ -5104,7 +5110,7 @@ Completion gate:
 
 Status: Complete. The implemented adapter contract currently uses
 `RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"` for the static
-catalog projection and `PROJECTION_SCHEMA_VERSION = "game-view-v4-unit-resources"`
+catalog projection and `PROJECTION_SCHEMA_VERSION = "game-view-v7-phase17n"`
 for live game views. Live views expose `rules_catalog`,
 `projection_state_hash`, `unit_display_by_id`, and `model_display_by_id`.
 
@@ -5886,8 +5892,9 @@ Required tests:
 
 Completion gate:
 
-`battlefield-view-v1` is emitted through the shared viewer projection and
-published in Contract 4.0. It defines one right-handed inches-based world frame,
+`battlefield-view-v1` was first published in Contract 4.0. The current shared
+viewer projection emits `battlefield-view-v2-phase17n` under Contract 5.0 so
+strict clients can distinguish the added terrain-classification fields. The family defines one right-handed inches-based world frame,
 stable external entities for the required battlefield concepts, explicit model
 physical states, typed model/support/terrain/zone/path geometry, and a hash over
 viewer-visible authoritative geometry. The canonical geometry-conformance

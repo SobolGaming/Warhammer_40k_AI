@@ -19,7 +19,7 @@ from warhammer40k_core.geometry.model_geometry import BaseFootprintKind
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
-BATTLEFIELD_VIEW_SCHEMA_VERSION = "battlefield-view-v1"
+BATTLEFIELD_VIEW_SCHEMA_VERSION = "battlefield-view-v2-phase17n"
 BATTLEFIELD_COORDINATE_SPEC_VERSION = "battlefield-coordinate-v1"
 BATTLEFIELD_COORDINATE_SPACE = "battlefield_inches_right_handed_z_up"
 

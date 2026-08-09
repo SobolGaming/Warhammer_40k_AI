@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
     CoverEffect,
@@ -24,6 +24,10 @@ from warhammer40k_core.engine.lone_operative import (
     lone_operative_target_allowed,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.ranged_rule_effects import (
+    detection_range_bonus_inches_for_effects,
+    unit_is_hidden_by_effects,
+)
 from warhammer40k_core.engine.rules_units import (
     RulesUnitView,
     rules_unit_view_from_armies,
@@ -48,6 +52,7 @@ from warhammer40k_core.engine.shooting_selection_range import (
 )
 from warhammer40k_core.engine.shooting_terrain_visibility import (
     blocker_record_is_solid,
+    model_visibility_keywords_for_rules_unit,
     model_within_solid_terrain,
     terrain_visibility_areas_from_placements,
     validate_shooting_terrain_areas,
@@ -56,6 +61,7 @@ from warhammer40k_core.engine.shooting_terrain_visibility import (
     shooting_visibility_cache_key as shooting_visibility_cache_key,
 )
 from warhammer40k_core.engine.shooting_types import ShootingType, validate_shooting_type_tuple
+from warhammer40k_core.engine.terrain_hidden import terrain_hidden_model_ids
 from warhammer40k_core.engine.unit_abilities import unit_has_stealth
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
@@ -84,6 +90,9 @@ PLUNGING_FIRE_RULE_ID = "core-rules:plunging-fire"
 PLUNGING_FIRE_TERRAIN_HEIGHT_INCHES = 3.0
 PLUNGING_FIRE_TOWERING_RANGE_INCHES = 12.0
 _GROUND_LEVEL_EPSILON = 1e-9
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
 
 
 class ShootingTargetViolationCode(StrEnum):
@@ -379,7 +388,7 @@ def shooting_target_candidates_for_unit(
     target_unit_ids: tuple[str, ...],
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     terrain_areas: tuple[PlacedTerrainArea, ...] = (),
-    hidden_target_unit_ids: tuple[str, ...] = (),
+    hidden_target_model_ids: tuple[str, ...] = (),
     target_unit_ids_with_recent_ranged_attacks: tuple[str, ...] = (),
     target_detection_range_bonus_inches_by_unit_id: Mapping[str, int] | None = None,
 ) -> tuple[ShootingTargetCandidate, ...]:
@@ -392,7 +401,10 @@ def shooting_target_candidates_for_unit(
         terrain_features=terrain_features,
         terrain_areas=terrain_areas,
     )
-    hidden_target_ids = _validate_identifier_tuple("hidden_target_unit_ids", hidden_target_unit_ids)
+    hidden_model_ids = _validate_identifier_tuple(
+        "hidden_target_model_ids",
+        hidden_target_model_ids,
+    )
     recent_ranged_attack_target_ids = _validate_identifier_tuple(
         "target_unit_ids_with_recent_ranged_attacks",
         target_unit_ids_with_recent_ranged_attacks,
@@ -414,7 +426,7 @@ def shooting_target_candidates_for_unit(
             target_unit_id=target_unit_id,
             terrain_features=terrain_features,
             terrain_areas=terrain_areas,
-            hidden_target_unit_ids=hidden_target_ids,
+            hidden_target_model_ids=hidden_model_ids,
             target_unit_ids_with_recent_ranged_attacks=recent_ranged_attack_target_ids,
             target_detection_range_bonus_inches=(
                 detection_range_bonus_by_unit_id.get(target_unit_id, 0)
@@ -434,7 +446,7 @@ def shooting_target_candidate_for_model(
     target_unit_id: str,
     terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
     terrain_areas: tuple[PlacedTerrainArea, ...] = (),
-    hidden_target_unit_ids: tuple[str, ...] = (),
+    hidden_target_model_ids: tuple[str, ...] = (),
     target_unit_ids_with_recent_ranged_attacks: tuple[str, ...] = (),
     target_detection_range_bonus_inches: int = 0,
 ) -> ShootingTargetCandidate:
@@ -447,7 +459,10 @@ def shooting_target_candidate_for_model(
         terrain_features=terrain_features,
         terrain_areas=terrain_areas,
     )
-    hidden_target_ids = _validate_identifier_tuple("hidden_target_unit_ids", hidden_target_unit_ids)
+    hidden_model_ids = _validate_identifier_tuple(
+        "hidden_target_model_ids",
+        hidden_target_model_ids,
+    )
     recent_ranged_attack_target_ids = _validate_identifier_tuple(
         "target_unit_ids_with_recent_ranged_attacks",
         target_unit_ids_with_recent_ranged_attacks,
@@ -464,7 +479,7 @@ def shooting_target_candidate_for_model(
         target_unit_id=target_unit_id,
         terrain_features=terrain_features,
         terrain_areas=terrain_areas,
-        hidden_target_unit_ids=hidden_target_ids,
+        hidden_target_model_ids=hidden_model_ids,
         target_unit_ids_with_recent_ranged_attacks=recent_ranged_attack_target_ids,
         target_detection_range_bonus_inches=_validate_non_negative_int(
             "target_detection_range_bonus_inches",
@@ -475,6 +490,7 @@ def shooting_target_candidate_for_model(
 
 def unit_has_line_of_sight_to_target(
     *,
+    state: GameState,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
     observing_unit: UnitInstance,
@@ -520,6 +536,30 @@ def unit_has_line_of_sight_to_target(
         scenario=scenario,
         unit_placements=target_placements,
     )
+    hidden_model_ids = set(
+        terrain_hidden_model_ids(
+            state=state,
+            ruleset_descriptor=ruleset_descriptor,
+            unit_instance_id=target_rules_unit.unit_instance_id,
+        )
+    )
+    if unit_is_hidden_by_effects(
+        state.persisting_effects_for_unit(target_rules_unit.unit_instance_id)
+    ):
+        hidden_model_ids.update(model.model_id for model in target_models)
+    shooting_state = state.shooting_phase_state
+    shot_source_unit_ids = () if shooting_state is None else shooting_state.shot_unit_ids
+    detection_range_bonus_inches = detection_range_bonus_inches_for_effects(
+        state.persisting_effects_for_unit(target_rules_unit.unit_instance_id),
+        shot_source_unit_ids=shot_source_unit_ids,
+    )
+    target_unit_ids_with_recent_ranged_attacks = (
+        (target_rules_unit.unit_instance_id,)
+        if state.unit_made_ranged_attacks_current_or_previous_turn(
+            unit_instance_id=target_rules_unit.unit_instance_id
+        )
+        else ()
+    )
     blocker_models = _shooting_dynamic_model_blockers(
         scenario=scenario,
         observing_unit_id=observing_unit.unit_instance_id,
@@ -536,18 +576,41 @@ def unit_has_line_of_sight_to_target(
         if not observer_models:
             raise GameLifecycleError("Line of sight target query observer model is not placed.")
     for observer_model in observer_models:
+        detection_eligible_model_ids = set(
+            _hidden_detection_eligible_target_model_ids(
+                scenario=scenario,
+                ruleset_descriptor=ruleset_descriptor,
+                attacker_unit=observing_unit,
+                attacker_models=(observer_model,),
+                target_rules_unit=target_rules_unit,
+                target_models=target_models,
+                visibility_cache_key=visibility_cache_key,
+                terrain_features=terrain_features,
+                terrain_areas=terrain_areas,
+                hidden_target_model_ids=tuple(sorted(hidden_model_ids)),
+                target_unit_ids_with_recent_ranged_attacks=(
+                    target_unit_ids_with_recent_ranged_attacks
+                ),
+                target_detection_range_bonus_inches=detection_range_bonus_inches,
+            )
+        )
         context = TerrainVisibilityContext.from_ruleset_descriptor(
             ruleset_descriptor=ruleset_descriptor,
             los_cache_key=visibility_cache_key,
             observer_model=observer_model,
             target_models=target_models,
+            target_model_keywords=model_visibility_keywords_for_rules_unit(
+                rules_unit=target_rules_unit,
+                models=target_models,
+            ),
             terrain_features=terrain_features,
             terrain_areas=terrain_visibility_areas_from_placements(terrain_areas),
             dynamic_model_blockers=blocker_models,
             observer_keywords=observing_unit.keywords,
-            target_keywords=target_rules_unit.keywords,
         )
-        if context.resolve_line_of_sight().visible_model_ids:
+        if detection_eligible_model_ids.intersection(
+            context.resolve_line_of_sight().visible_model_ids
+        ):
             return True
     return False
 
@@ -592,7 +655,7 @@ def _target_candidate(
     target_unit_id: str,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     terrain_areas: tuple[PlacedTerrainArea, ...],
-    hidden_target_unit_ids: tuple[str, ...],
+    hidden_target_model_ids: tuple[str, ...],
     target_unit_ids_with_recent_ranged_attacks: tuple[str, ...],
     target_detection_range_bonus_inches: int,
 ) -> ShootingTargetCandidate:
@@ -680,28 +743,32 @@ def _target_candidate(
             message="No target model is within the weapon's range profile.",
             visibility_cache_key=visibility_cache_key,
         )
-    detection_validation = _hidden_target_detection_validation(
+    detection_eligible_model_ids = _hidden_detection_eligible_target_model_ids(
         scenario=scenario,
         ruleset_descriptor=ruleset_descriptor,
         attacker_unit=attacker_unit,
         attacker_models=attacker_models,
         target_rules_unit=target_rules_unit,
         target_models=target_models,
-        target_unit_id=target_unit_id,
         visibility_cache_key=visibility_cache_key,
         terrain_features=terrain_features,
         terrain_areas=terrain_areas,
-        hidden_target_unit_ids=hidden_target_unit_ids,
+        hidden_target_model_ids=hidden_target_model_ids,
         target_unit_ids_with_recent_ranged_attacks=target_unit_ids_with_recent_ranged_attacks,
         target_detection_range_bonus_inches=target_detection_range_bonus_inches,
     )
-    if detection_validation is not None:
+    detectable_in_range_model_ids = tuple(
+        model_id
+        for model_id in target_in_range_model_ids
+        if model_id in detection_eligible_model_ids
+    )
+    if not detectable_in_range_model_ids:
         return _invalid_candidate(
             attacker_unit=attacker_unit,
             weapon_profile=weapon_profile,
             target_unit_id=target_unit_id,
             violation_code=ShootingTargetViolationCode.OUTSIDE_DETECTION_RANGE,
-            message=detection_validation,
+            message="Hidden target models are outside the attacker's effective detection range.",
             visibility_cache_key=visibility_cache_key,
             target_in_range_model_ids=target_in_range_model_ids,
         )
@@ -717,6 +784,7 @@ def _target_candidate(
         range_inches=range_inches,
         terrain_features=terrain_features,
         terrain_areas=terrain_areas,
+        eligible_target_model_ids=detection_eligible_model_ids,
     )
     indirect_no_visible = (
         evidence is not None
@@ -771,7 +839,7 @@ def _target_candidate(
                 violation_code=ShootingTargetViolationCode.LOCKED_IN_COMBAT,
                 message=locked_validation,
                 visibility_cache_key=visibility_cache_key,
-                target_visible_model_ids=witness.visible_model_ids,
+                target_visible_model_ids=evidence.visible_and_in_range_target_model_ids,
                 target_in_range_model_ids=target_in_range_model_ids,
                 line_of_sight_witness=witness,
                 observer_model_id=witness.observer_model_id,
@@ -1015,7 +1083,7 @@ def _shooting_dynamic_model_blockers(
     )
 
 
-def _hidden_target_detection_validation(
+def _hidden_detection_eligible_target_model_ids(
     *,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
@@ -1023,69 +1091,37 @@ def _hidden_target_detection_validation(
     attacker_models: tuple[Model, ...],
     target_rules_unit: RulesUnitView,
     target_models: tuple[Model, ...],
-    target_unit_id: str,
     visibility_cache_key: str,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     terrain_areas: tuple[PlacedTerrainArea, ...],
-    hidden_target_unit_ids: tuple[str, ...],
+    hidden_target_model_ids: tuple[str, ...],
     target_unit_ids_with_recent_ranged_attacks: tuple[str, ...],
     target_detection_range_bonus_inches: int,
-) -> str | None:
-    if target_unit_id not in hidden_target_unit_ids:
-        return None
+) -> tuple[str, ...]:
+    target_model_ids = {model.model_id for model in target_models}
+    hidden_model_ids = target_model_ids.intersection(hidden_target_model_ids)
+    if not hidden_model_ids:
+        return tuple(sorted(target_model_ids))
     visibility_policy = ruleset_descriptor.terrain_visibility_policy
     if not visibility_policy.hidden_supported:
         raise GameLifecycleError("Hidden target state requires hidden visibility support.")
     hidden_detection_range = visibility_policy.hidden_detection_range_inches
     if hidden_detection_range is None:
         raise GameLifecycleError("Hidden target state requires a detection range.")
-    target_within_detection = _target_within_effective_hidden_detection_range(
-        scenario=scenario,
-        ruleset_descriptor=ruleset_descriptor,
-        attacker_unit=attacker_unit,
-        attacker_models=attacker_models,
-        target_rules_unit=target_rules_unit,
-        target_models=target_models,
-        visibility_cache_key=visibility_cache_key,
-        terrain_features=terrain_features,
-        terrain_areas=terrain_areas,
-        hidden_detection_range_inches=hidden_detection_range,
-        target_detection_range_bonus_inches=target_detection_range_bonus_inches,
-        target_made_recent_ranged_attacks=(
-            target_unit_id in target_unit_ids_with_recent_ranged_attacks
-        ),
-    )
-    if target_within_detection:
-        return None
-    return "Hidden target is outside the attacker's effective detection range."
-
-
-def _target_within_effective_hidden_detection_range(
-    *,
-    scenario: BattlefieldScenario,
-    ruleset_descriptor: RulesetDescriptor,
-    attacker_unit: UnitInstance,
-    attacker_models: tuple[Model, ...],
-    target_rules_unit: RulesUnitView,
-    target_models: tuple[Model, ...],
-    visibility_cache_key: str,
-    terrain_features: tuple[TerrainFeatureDefinition, ...],
-    terrain_areas: tuple[PlacedTerrainArea, ...],
-    hidden_detection_range_inches: float,
-    target_detection_range_bonus_inches: int,
-    target_made_recent_ranged_attacks: bool,
-) -> bool:
-    visibility_policy = ruleset_descriptor.terrain_visibility_policy
-    base_detection_range = hidden_detection_range_inches + float(
-        target_detection_range_bonus_inches
-    )
+    base_detection_range = hidden_detection_range + float(target_detection_range_bonus_inches)
     blocker_models = _shooting_dynamic_model_blockers(
         scenario=scenario,
         observing_unit_id=attacker_unit.unit_instance_id,
         target_unit_id=target_rules_unit.unit_instance_id,
     )
-    for attacker_model in attacker_models:
-        for target_model in target_models:
+    eligible_model_ids = target_model_ids - hidden_model_ids
+    target_made_recent_ranged_attacks = (
+        target_rules_unit.unit_instance_id in target_unit_ids_with_recent_ranged_attacks
+    )
+    for target_model in target_models:
+        if target_model.model_id not in hidden_model_ids:
+            continue
+        for attacker_model in attacker_models:
             effective_detection_range = base_detection_range
             if (
                 not target_made_recent_ranged_attacks
@@ -1106,8 +1142,9 @@ def _target_within_effective_hidden_detection_range(
                     visibility_policy.hidden_gone_to_ground_detection_penalty_inches
                 )
             if attacker_model.range_to(target_model) <= max(0.0, effective_detection_range):
-                return True
-    return False
+                eligible_model_ids.add(target_model.model_id)
+                break
+    return tuple(sorted(eligible_model_ids))
 
 
 def _target_model_has_gone_to_ground_against_attacker(
@@ -1134,11 +1171,14 @@ def _target_model_has_gone_to_ground_against_attacker(
         los_cache_key=visibility_cache_key,
         observer_model=attacker_model,
         target_models=(target_model,),
+        target_model_keywords=model_visibility_keywords_for_rules_unit(
+            rules_unit=target_rules_unit,
+            models=(target_model,),
+        ),
         terrain_features=terrain_features,
         terrain_areas=terrain_visibility_areas_from_placements(terrain_areas),
         dynamic_model_blockers=dynamic_model_blockers,
         observer_keywords=attacker_unit.keywords,
-        target_keywords=target_rules_unit.keywords,
     )
     witness = context.resolve_line_of_sight()
     if witness.unit_fully_visible:
@@ -1234,7 +1274,11 @@ def _best_line_of_sight_range_evidence(
     range_inches: int,
     terrain_features: tuple[TerrainFeatureDefinition, ...],
     terrain_areas: tuple[PlacedTerrainArea, ...],
+    eligible_target_model_ids: tuple[str, ...],
 ) -> _LineOfSightRangeEvidence | None:
+    eligible_model_ids = set(eligible_target_model_ids)
+    if not eligible_model_ids.issubset(model.model_id for model in target_models):
+        raise GameLifecycleError("Detection-eligible model IDs must belong to the target unit.")
     best_evidence: _LineOfSightRangeEvidence | None = None
     best_blocked_evidence: _LineOfSightRangeEvidence | None = None
     blocker_models = _shooting_dynamic_model_blockers(
@@ -1255,18 +1299,21 @@ def _best_line_of_sight_range_evidence(
             los_cache_key=visibility_cache_key,
             observer_model=attacker_model,
             target_models=target_models,
+            target_model_keywords=model_visibility_keywords_for_rules_unit(
+                rules_unit=target_rules_unit,
+                models=target_models,
+            ),
             terrain_features=terrain_features,
             terrain_areas=terrain_visibility_areas_from_placements(terrain_areas),
             dynamic_model_blockers=blocker_models,
             observer_keywords=attacker_unit.keywords,
-            target_keywords=target_rules_unit.keywords,
         )
         witness = context.resolve_line_of_sight()
         cover_result = context.benefit_of_cover(witness)
         visible_and_in_range_ids = tuple(
             target_model_id
             for target_model_id in witness.visible_model_ids
-            if target_model_id in in_range_model_ids
+            if target_model_id in in_range_model_ids and target_model_id in eligible_model_ids
         )
         evidence = _LineOfSightRangeEvidence(
             witness=witness,

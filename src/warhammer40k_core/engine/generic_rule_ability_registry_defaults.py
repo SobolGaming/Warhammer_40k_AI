@@ -123,7 +123,10 @@ from warhammer40k_core.engine.target_restriction_hooks import (
     TargetRestriction,
 )
 from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext, TurnEndResultContext
-from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
+from warhammer40k_core.engine.unit_destroyed_hooks import (
+    UnitDestroyedContext,
+    model_destroyed_events_for_lifecycle_phase,
+)
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
@@ -1062,23 +1065,14 @@ def _current_objective_control_record(
 def _model_destroyed_events_for_phase(
     context: PhaseEndObjectiveControlContext,
 ) -> tuple[tuple[str, dict[str, JsonValue]], ...]:
-    events: list[tuple[str, dict[str, JsonValue]]] = []
-    for record in context.event_log.records:
-        if record.event_type != "model_destroyed":
-            continue
-        payload = record.payload
-        if not isinstance(payload, dict):
-            continue
-        if payload.get("game_id") != context.state.game_id:
-            continue
-        if payload.get("battle_round") != context.state.battle_round:
-            continue
-        if payload.get("active_player_id") != context.state.active_player_id:
-            continue
-        if payload.get("phase") != context.completed_phase.value:
-            continue
-        events.append((record.event_id, payload))
-    return tuple(events)
+    return tuple(
+        (event_id, payload)
+        for _event_order, event_id, payload in model_destroyed_events_for_lifecycle_phase(
+            state=context.state,
+            event_log=context.event_log,
+            completed_phase=context.completed_phase,
+        )
+    )
 
 
 def _unit_destruction_completion_events_for_phase(

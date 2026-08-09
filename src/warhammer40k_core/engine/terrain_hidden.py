@@ -14,7 +14,7 @@ from warhammer40k_core.engine.shooting_terrain_visibility import (
     terrain_visibility_areas_from_placements,
 )
 from warhammer40k_core.geometry.terrain_area_visibility import (
-    classification_has_visibility_semantics,
+    classification_is_solid,
     model_intersects_terrain_area,
 )
 
@@ -22,54 +22,61 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
-def unit_is_hidden_by_terrain(
+def terrain_hidden_model_ids(
     *,
     state: GameState,
     ruleset_descriptor: RulesetDescriptor,
     unit_instance_id: str,
-) -> bool:
+) -> tuple[str, ...]:
     if type(ruleset_descriptor) is not RulesetDescriptor:
         raise GameLifecycleError("Terrain Hidden evaluation requires RulesetDescriptor.")
     policy = ruleset_descriptor.terrain_visibility_policy
     if not policy.hidden_supported:
-        return False
+        return ()
     rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
     required_keywords = {_canonical_keyword(keyword) for keyword in policy.hidden_requires_keywords}
-    unit_keywords = {_canonical_keyword(keyword) for keyword in rules_unit.keywords}
-    if required_keywords and not required_keywords.intersection(unit_keywords):
-        return False
     if policy.hidden_lost_after_shooting and (
         state.unit_made_ranged_attacks_current_or_previous_turn(
             unit_instance_id=rules_unit.unit_instance_id
         )
     ):
-        return False
+        return ()
     if not policy.hidden_requires_terrain_area_occupancy:
-        return True
+        return tuple(sorted(model.model_instance_id for model in rules_unit.alive_models()))
     mission_setup = state.mission_setup
     if mission_setup is None:
-        return False
+        return ()
     eligible_areas = tuple(
         area
         for area in terrain_visibility_areas_from_placements(mission_setup.terrain_areas)
-        if classification_has_visibility_semantics(area.classification)
+        if classification_is_solid(area.classification)
     )
     if not eligible_areas:
-        return False
+        return ()
     scenario = battlefield_scenario_for_state(state=state)
     placements = unit_placements_for_rules_unit_or_none(
         scenario=scenario,
         rules_unit=rules_unit,
     )
     if placements is None:
-        return False
+        return ()
     models = geometry_models_for_unit_placements(
         scenario=scenario,
         unit_placements=placements,
     )
-    return bool(models) and all(
-        any(model_intersects_terrain_area(model, area) for area in eligible_areas)
-        for model in models
+    return tuple(
+        sorted(
+            model.model_id
+            for model in models
+            if (
+                not required_keywords
+                or required_keywords.intersection(
+                    _canonical_keyword(keyword)
+                    for keyword in rules_unit.component_unit_for_model(model.model_id).keywords
+                )
+            )
+            and any(model_intersects_terrain_area(model, area) for area in eligible_areas)
+        )
     )
 
 

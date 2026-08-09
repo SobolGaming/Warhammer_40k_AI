@@ -211,6 +211,7 @@ from warhammer40k_core.engine.scoring import (
     victory_point_source_kind_from_token,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     STRATAGEM_DECISION_TYPE,
@@ -229,6 +230,10 @@ from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
+)
+from warhammer40k_core.engine.weapon_abilities import (
+    FIRE_OVERWATCH_RULE_ID,
+    SNAP_SHOOTING_RULE_ID,
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
@@ -634,7 +639,7 @@ def test_turn_start_terrain_snapshot_keeps_attached_physical_components_separate
     assert destruction.started_turn_terrain_feature_ids == (feature_id,)
 
 
-def test_turn_start_terrain_snapshot_is_public_and_unplaced_units_have_no_position() -> None:
+def test_turn_start_terrain_snapshot_redacts_unplaced_opponent_unit_identity() -> None:
     config = _config_for_primary(
         "primary-death-trap",
         objective_terrain_feature_id=SCORING_TERRAIN_FEATURE_ID,
@@ -651,12 +656,32 @@ def test_turn_start_terrain_snapshot_is_public_and_unplaced_units_have_no_positi
 
     player_payload = session.view(viewer_player_id="player-a")
     opponent_payload = session.view(viewer_player_id="player-b")
-
     assert snapshot.membership_for_unit(reserve_unit_id).terrain_feature_ids == ()
-    assert (
-        player_payload["primary_unit_terrain_turn_start_snapshots"]
-        == opponent_payload["primary_unit_terrain_turn_start_snapshots"]
-        == [snapshot.to_payload()]
+    player_snapshot = player_payload["primary_unit_terrain_turn_start_snapshots"][0]
+    opponent_snapshot = opponent_payload["primary_unit_terrain_turn_start_snapshots"][0]
+    player_memberships = player_snapshot["unit_memberships"]
+    opponent_memberships = opponent_snapshot["unit_memberships"]
+    assert all(
+        membership["unit_instance_id"] != reserve_unit_id for membership in player_memberships
+    )
+    assert any(
+        membership["unit_instance_id"] == reserve_unit_id for membership in opponent_memberships
+    )
+    assert opponent_snapshot == snapshot.to_payload()
+    assert player_snapshot["snapshot_id"] == opponent_snapshot["snapshot_id"]
+    assert player_snapshot["game_id"] == opponent_snapshot["game_id"]
+    assert player_snapshot["active_player_id"] == opponent_snapshot["active_player_id"]
+    assert player_snapshot["battle_round"] == opponent_snapshot["battle_round"]
+    assert player_snapshot["source_id"] == opponent_snapshot["source_id"]
+    assert set(player_payload["unit_display_by_id"]) == {
+        membership["unit_instance_id"] for membership in player_memberships
+    }
+    assert set(opponent_payload["unit_display_by_id"]) == {
+        membership["unit_instance_id"] for membership in opponent_memberships
+    }
+    assert reserve_unit_id not in json.dumps(
+        player_payload["primary_unit_terrain_turn_start_snapshots"],
+        sort_keys=True,
     )
     assert json.loads(json.dumps(player_payload, sort_keys=True)) == player_payload
 
@@ -859,6 +884,197 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
     ]
     assert str(comparison_metadata["scoring_rule_source_id"]).startswith(
         "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-meatgrinder:"
+    )
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+
+def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> None:
+    config = _config_with_player_b_character(
+        mission_setup=_event_companion_meatgrinder_mission_setup()
+    )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    state = _battle_state_from_config(config)
+    lifecycle.state = state
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.advance_to_next_battle_phase()
+    assert state.active_player_id == "player-b"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    assert state.battlefield_state is not None
+
+    attacker = state.army_definitions[0].unit_by_id("army-alpha:intercessor-unit-1")
+    defender = state.army_definitions[1].unit_by_id("army-beta:character-unit-3")
+    original_placement = state.battlefield_state.unit_placement_by_id(defender.unit_instance_id)
+    (defender_model,) = defender.own_models
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence_id = "phase17n-meatgrinder-overwatch-return-on-death"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    overwatch_pool = replace(
+        _attack_pool_for_test(
+            attacker=attacker,
+            defender=defender,
+            weapon_profile=weapon_profile,
+            attacks=1,
+        ),
+        shooting_type=ShootingType.SNAP,
+        targeting_rule_ids=(FIRE_OVERWATCH_RULE_ID,),
+    )
+    remaining, _allocated_model_ids, attack_status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=config.ruleset_descriptor,
+        attack_sequence=AttackSequence.start(
+            sequence_id=sequence_id,
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(overwatch_pool,),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:hit",
+                    spec=attack_sequence_hit_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id="player-a",
+                        reroll_forbidden_rule_ids=(SNAP_SHOOTING_RULE_ID,),
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:wound",
+                    spec=attack_sequence_wound_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:save",
+                    spec=saving_throw_roll_spec(
+                        save_kind=SaveKind.ARMOUR,
+                        player_id="player-b",
+                        allocated_model_id=defender_model.model_instance_id,
+                        attack_context_id=attack_context_id,
+                    ),
+                    value=1,
+                ),
+            ),
+        ),
+    )
+    assert remaining is None
+    assert attack_status is None
+    (destroyed_event,) = tuple(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "model_destroyed"
+    )
+    destroyed_payload = cast(dict[str, JsonValue], destroyed_event.payload)
+    assert destroyed_payload["phase"] == BattlePhase.SHOOTING.value
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+
+    state.record_pending_return_on_death(
+        PendingReturnOnDeath(
+            pending_id="phase17n-meatgrinder-overwatch-return-on-death:pending",
+            source_rule_id="phase17n-meatgrinder-overwatch-return-on-death:rule",
+            source_ability_id="phase17n-meatgrinder-overwatch-return-on-death:ability",
+            source_clause_id="phase17n-meatgrinder-overwatch-return-on-death:clause",
+            source_effect_index=0,
+            owner_player_id="player-b",
+            target_scope=ReturnDestroyedTargetScope.DESTROYED_UNIT,
+            destroyed_unit_instance_id=defender.unit_instance_id,
+            destroyed_model_instance_id=None,
+            destroyed_position_payload=cast(
+                JsonValue,
+                {
+                    "source": "model_destroyed_event",
+                    "model_destroyed_event_id": destroyed_event.event_id,
+                    "model_destroyed_payload": destroyed_payload,
+                },
+            ),
+            trigger_battle_round=state.battle_round,
+            trigger_phase=BattlePhase.MOVEMENT.value,
+            resolution_timing="phase_end",
+            roll_expression="D6",
+            roll_count=1,
+            success_threshold=2,
+            placement_anchor="destroyed_position",
+            placement_preference="as_close_as_possible",
+            engagement_range_restriction=True,
+            restore_wounds_mode=ReturnRestoreWoundsMode.FULL_HEALTH,
+            wounds_remaining=None,
+            resolved=False,
+        )
+    )
+    flow = BattleRoundFlow(
+        phase_handlers={
+            BattlePhase.MOVEMENT: PlaceholderPhaseHandler(BattlePhase.MOVEMENT),
+        }
+    )
+    waiting = flow.advance(state=state, decisions=lifecycle.decision_controller)
+
+    assert waiting.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = waiting.decision_request
+    assert request is not None
+    assert request.decision_type == SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE
+    (destruction,) = state.primary_unit_destruction_states
+    assert destruction.destroyed_unit_instance_id == defender.unit_instance_id
+    assert destruction.phase == BattlePhase.MOVEMENT.value
+    capture_events = tuple(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "primary_unit_destruction_recorded"
+    )
+    assert len(capture_events) == 1
+
+    result = DecisionResult(
+        result_id="phase17n-meatgrinder-overwatch-return-on-death:placement-result",
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=cast(
+            JsonValue,
+            {
+                "submission_kind": SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+                "attempted_placement": original_placement.to_payload(),
+            },
+        ),
+    )
+    lifecycle.decision_controller.submit_result(result)
+    apply_return_on_death_placement_decision(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        request=request,
+        result=result,
+        ruleset_descriptor=config.ruleset_descriptor,
+    )
+    assert all(model.is_alive for model in defender.own_models)
+    assert state.battlefield_state.unit_placement_by_id(defender.unit_instance_id) == (
+        original_placement
+    )
+
+    advanced = flow.advance(state=state, decisions=lifecycle.decision_controller)
+    assert advanced.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert state.battle_phase_index == state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    assert len(state.primary_unit_destruction_states) == 1
+    assert (
+        len(
+            tuple(
+                event
+                for event in lifecycle.decision_controller.event_log.records
+                if event.event_type == "primary_unit_destruction_recorded"
+            )
+        )
+        == 1
     )
     assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
 

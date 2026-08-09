@@ -8343,7 +8343,7 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v2-phase18i",
+  "schema_version": "replay-artifact-v3-phase17n",
   "source_identity": {
     "catalog_hash": "24846bc075bda480343623eeaeec61238d52bae950b069a3a24336c5aef3955d",
     "catalog_id": "phase9a-canonical",

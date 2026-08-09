@@ -26,6 +26,7 @@ from warhammer40k_core.geometry.pose import (
     GeometryError,
     Point3,
     Point3Payload,
+    Pose,
     validate_finite_number,
     validate_point3,
 )
@@ -68,6 +69,34 @@ class TerrainFloorDefinitionPayload(TypedDict):
     depth_inches: float
     thickness_inches: float
     rotation_degrees: float
+
+
+def dense_feature_allows_model_transit(
+    feature: TerrainFeatureDefinition,
+    movement_keywords: tuple[str, ...],
+    touching_poses: tuple[Pose, ...],
+) -> bool:
+    """Return the model-scoped Dense transit permission for a sampled path."""
+    if type(feature) is not TerrainFeatureDefinition:
+        raise GeometryError("Dense transit requires a TerrainFeatureDefinition.")
+    if type(movement_keywords) is not tuple or any(
+        type(keyword) is not str or not keyword for keyword in movement_keywords
+    ):
+        raise GeometryError("Dense transit requires canonical movement keywords.")
+    if (
+        type(touching_poses) is not tuple
+        or not touching_poses
+        or any(type(pose) is not Pose for pose in touching_poses)
+    ):
+        raise GeometryError("Dense transit requires a non-empty pose tuple.")
+    if feature.classification is not TerrainAreaClassification.DENSE:
+        return False
+    keywords = frozenset(movement_keywords)
+    if keywords & {"BEAST", "INFANTRY", "SWARM"}:
+        return True
+    return "MOBILE" in keywords and all(
+        math.isclose(pose.position.z, touching_poses[0].position.z) for pose in touching_poses[1:]
+    )
 
 
 class TerrainSupportSurfacePayload(TypedDict):
@@ -605,6 +634,15 @@ class TerrainSupportSurface:
             rotation_degrees=self.rotation_degrees,
         )
 
+    def footprint_polygon(self) -> tuple[tuple[float, float], ...]:
+        return rotated_rectangle_polygon(
+            center_x_inches=self.center_x_inches,
+            center_y_inches=self.center_y_inches,
+            width_inches=self.width_inches,
+            depth_inches=self.depth_inches,
+            rotation_degrees=self.rotation_degrees,
+        )
+
     def to_payload(self) -> TerrainSupportSurfacePayload:
         return {
             "surface_id": self.surface_id,
@@ -944,6 +982,26 @@ def rotated_rectangle_bounds(
     depth_inches: float,
     rotation_degrees: float,
 ) -> tuple[float, float, float, float]:
+    corners = rotated_rectangle_polygon(
+        center_x_inches=center_x_inches,
+        center_y_inches=center_y_inches,
+        width_inches=width_inches,
+        depth_inches=depth_inches,
+        rotation_degrees=rotation_degrees,
+    )
+    x_values = tuple(point[0] for point in corners)
+    y_values = tuple(point[1] for point in corners)
+    return (min(x_values), min(y_values), max(x_values), max(y_values))
+
+
+def rotated_rectangle_polygon(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+    rotation_degrees: float,
+) -> tuple[tuple[float, float], ...]:
     center_x = _validate_finite_coordinate("rotated rectangle center_x_inches", center_x_inches)
     center_y = _validate_finite_coordinate("rotated rectangle center_y_inches", center_y_inches)
     width = _validate_positive_number("rotated rectangle width_inches", width_inches)
@@ -951,7 +1009,7 @@ def rotated_rectangle_bounds(
     rotation = _validate_finite_coordinate("rotated rectangle rotation_degrees", rotation_degrees)
     half_width = width / 2.0
     half_depth = depth / 2.0
-    corners = tuple(
+    return tuple(
         rotate_local_point(
             x_inches=x,
             y_inches=y,
@@ -966,9 +1024,6 @@ def rotated_rectangle_bounds(
             (-half_width, half_depth),
         )
     )
-    x_values = tuple(point[0] for point in corners)
-    y_values = tuple(point[1] for point in corners)
-    return (min(x_values), min(y_values), max(x_values), max(y_values))
 
 
 def rotate_local_point(

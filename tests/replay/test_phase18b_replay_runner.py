@@ -64,6 +64,7 @@ from warhammer40k_core.engine.phases.shooting import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.replay import (
+    LEGACY_REPLAY_ARTIFACT_SCHEMA_VERSION,
     REPLAY_ARTIFACT_SCHEMA_VERSION,
     ReplayArtifact,
     ReplayArtifactError,
@@ -125,7 +126,51 @@ def test_setup_to_battle_replay_reproduces_exactly() -> None:
     assert payload["event_records"]
     assert payload["projection_checkpoints"]
     assert payload["schema_version"] == REPLAY_ARTIFACT_SCHEMA_VERSION
-    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v2-phase18i"
+    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v3-phase17n"
+
+
+def test_published_replay_v2_without_phase17n_terrain_snapshot_is_migrated() -> None:
+    artifact = _setup_to_battle_artifact()
+    legacy_payload = _artifact_payload_copy(artifact)
+    legacy_payload["schema_version"] = LEGACY_REPLAY_ARTIFACT_SCHEMA_VERSION
+    legacy_state = cast(
+        dict[str, JsonValue],
+        legacy_payload["initial_lifecycle"]["state"],
+    )
+    legacy_state.pop("primary_unit_terrain_turn_start_snapshots")
+
+    restored = ReplayArtifact.from_payload(legacy_payload)
+
+    assert "primary_unit_terrain_turn_start_snapshots" not in legacy_state
+    assert restored.schema_version == REPLAY_ARTIFACT_SCHEMA_VERSION
+    assert (
+        restored.initial_lifecycle_payload["state"]["primary_unit_terrain_turn_start_snapshots"]
+        == []
+    )
+    assert ReplayArtifact.from_payload(restored.to_payload()) == restored
+
+
+def test_replay_v2_migration_rejects_malformed_lifecycle_with_typed_error() -> None:
+    artifact = _setup_to_battle_artifact()
+    legacy_payload = _artifact_payload_copy(artifact)
+    legacy_payload["schema_version"] = LEGACY_REPLAY_ARTIFACT_SCHEMA_VERSION
+    legacy_lifecycle = cast(dict[str, JsonValue], legacy_payload["initial_lifecycle"])
+    legacy_lifecycle["state"] = None
+
+    with pytest.raises(ReplayArtifactError, match="v2 lifecycle state must be an object"):
+        ReplayArtifact.from_payload(legacy_payload)
+
+
+def test_replay_v3_missing_phase17n_terrain_snapshot_fails_with_typed_error() -> None:
+    payload = _artifact_payload_copy(_setup_to_battle_artifact())
+    state = cast(dict[str, JsonValue], payload["initial_lifecycle"]["state"])
+    state.pop("primary_unit_terrain_turn_start_snapshots")
+
+    with pytest.raises(
+        ReplayArtifactError,
+        match="missing required field: primary_unit_terrain_turn_start_snapshots",
+    ):
+        ReplayArtifact.from_payload(payload)
 
 
 def test_replay_source_identity_verifies_active_rules_overlay() -> None:

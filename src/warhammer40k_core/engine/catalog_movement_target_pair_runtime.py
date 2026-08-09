@@ -507,6 +507,7 @@ class CatalogMovementTargetPairRuntime:
             if not rules_unit_has_placed_alive_model(state=state, rules_unit=view):
                 continue
             if unit_has_line_of_sight_to_target(
+                state=state,
                 scenario=scenario,
                 ruleset_descriptor=state.runtime_ruleset_descriptor(),
                 observing_unit=observing_unit,

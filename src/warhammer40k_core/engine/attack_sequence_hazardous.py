@@ -328,6 +328,20 @@ def _cover_for_allocated_model(
         volume for feature in terrain_features for volume in feature.terrain_volumes()
     )
     attacking_unit_id = attack_pool_attacker_unit_id(state=state, pool=pool)
+    target_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=pool.target_unit_instance_id,
+    )
+    target_placements = unit_placements_for_rules_unit_or_none(
+        scenario=scenario,
+        rules_unit=target_rules_unit,
+    )
+    if target_placements is None:
+        raise GameLifecycleError("Allocated-model cover requires a placed target rules unit.")
+    target_geometries = geometry_models_for_unit_placements(
+        scenario=scenario,
+        unit_placements=target_placements,
+    )
     dynamic_blockers = shooting_dynamic_model_blockers(
         scenario=scenario,
         observing_unit_id=attacking_unit_id,
@@ -341,7 +355,7 @@ def _cover_for_allocated_model(
             terrain_areas=terrain_areas,
         ),
         observer_model=observer_geometry,
-        target_models=(target_geometry,),
+        target_models=target_geometries,
         terrain_features=terrain_features,
         terrain_areas=terrain_visibility_areas_from_placements(terrain_areas),
         terrain_volumes=terrain_volumes,
@@ -350,10 +364,10 @@ def _cover_for_allocated_model(
             state=state,
             unit_instance_id=attacking_unit_id,
         ).keywords,
-        target_keywords=rules_unit_view_by_id(
-            state=state,
-            unit_instance_id=pool.target_unit_instance_id,
-        ).keywords,
+        target_model_keywords=model_visibility_keywords_for_rules_unit(
+            rules_unit=target_rules_unit,
+            models=target_geometries,
+        ),
     )
     witness = context.resolve_line_of_sight()
     cover_result = context.benefit_of_cover(witness)
@@ -425,10 +439,13 @@ def _fortification_cover_for_allocated_model(
                 state=state,
                 unit_instance_id=attacking_unit_id,
             ).keywords,
-            target_keywords=rules_unit_view_by_id(
-                state=state,
-                unit_instance_id=pool.target_unit_instance_id,
-            ).keywords,
+            target_model_keywords=model_visibility_keywords_for_rules_unit(
+                rules_unit=rules_unit_view_by_id(
+                    state=state,
+                    unit_instance_id=pool.target_unit_instance_id,
+                ),
+                models=(target_geometry,),
+            ),
         )
         witness = context.resolve_line_of_sight()
         fortification_blocker_ids = _fortification_full_visibility_blocker_ids(

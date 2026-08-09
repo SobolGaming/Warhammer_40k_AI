@@ -22,7 +22,8 @@ from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
 
-REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v2-phase18i"
+LEGACY_REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v2-phase18i"
+REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v3-phase17n"
 
 
 class ReplayArtifactError(ValueError):
@@ -445,25 +446,35 @@ class ReplayArtifact:
 
     @classmethod
     def from_payload(cls, payload: ReplayArtifactPayload) -> Self:
-        return cls(
-            schema_version=payload["schema_version"],
-            artifact_id=payload["artifact_id"],
-            source_identity=ReplaySourceIdentity.from_payload(payload["source_identity"]),
-            initial_rng_state=payload["initial_rng_state"],
-            initial_lifecycle_payload=payload["initial_lifecycle"],
-            decision_records=tuple(
-                DecisionRecord.from_payload(record_payload)
-                for record_payload in payload["decision_records"]
-            ),
-            event_records=tuple(
-                EventRecord.from_payload(event_payload)
-                for event_payload in payload["event_records"]
-            ),
-            projection_checkpoints=tuple(
-                ReplayProjectionCheckpoint.from_payload(checkpoint)
-                for checkpoint in payload["projection_checkpoints"]
-            ),
-        )
+        migrated_payload = _migrate_replay_artifact_payload(payload)
+        try:
+            return cls(
+                schema_version=migrated_payload["schema_version"],
+                artifact_id=migrated_payload["artifact_id"],
+                source_identity=ReplaySourceIdentity.from_payload(
+                    migrated_payload["source_identity"]
+                ),
+                initial_rng_state=migrated_payload["initial_rng_state"],
+                initial_lifecycle_payload=migrated_payload["initial_lifecycle"],
+                decision_records=tuple(
+                    DecisionRecord.from_payload(record_payload)
+                    for record_payload in migrated_payload["decision_records"]
+                ),
+                event_records=tuple(
+                    EventRecord.from_payload(event_payload)
+                    for event_payload in migrated_payload["event_records"]
+                ),
+                projection_checkpoints=tuple(
+                    ReplayProjectionCheckpoint.from_payload(checkpoint)
+                    for checkpoint in migrated_payload["projection_checkpoints"]
+                ),
+            )
+        except GameLifecycleError as exc:
+            raise ReplayArtifactError("ReplayArtifact lifecycle payload is invalid.") from exc
+        except KeyError as exc:
+            raise ReplayArtifactError(
+                f"ReplayArtifact payload is missing required field: {exc.args[0]}."
+            ) from exc
 
 
 @dataclass(frozen=True, slots=True)
@@ -1059,6 +1070,55 @@ def _validate_schema_version(value: object) -> str:
     if schema != REPLAY_ARTIFACT_SCHEMA_VERSION:
         raise ReplayArtifactError("ReplayArtifact schema_version is unsupported.")
     return schema
+
+
+def _migrate_replay_artifact_payload(payload: object) -> ReplayArtifactPayload:
+    """Upgrade the published replay-v2 state shape before strict engine loading."""
+    if not isinstance(payload, dict):
+        raise ReplayArtifactError("ReplayArtifact payload must be an object.")
+    raw_payload = cast(dict[str, object], payload)
+    schema_version = raw_payload.get("schema_version")
+    if type(schema_version) is not str:
+        raise ReplayArtifactError("ReplayArtifact schema_version must be a string.")
+    required_keys = (
+        "artifact_id",
+        "source_identity",
+        "initial_rng_state",
+        "initial_lifecycle",
+        "decision_records",
+        "event_records",
+        "projection_checkpoints",
+    )
+    missing_keys = tuple(key for key in required_keys if key not in raw_payload)
+    if missing_keys:
+        raise ReplayArtifactError(
+            f"ReplayArtifact payload is missing required field: {missing_keys[0]}."
+        )
+    if schema_version == REPLAY_ARTIFACT_SCHEMA_VERSION:
+        return cast(ReplayArtifactPayload, raw_payload)
+    if schema_version != LEGACY_REPLAY_ARTIFACT_SCHEMA_VERSION:
+        raise ReplayArtifactError("ReplayArtifact schema_version is unsupported.")
+
+    initial_lifecycle_value = raw_payload.get("initial_lifecycle")
+    if not isinstance(initial_lifecycle_value, dict):
+        raise ReplayArtifactError("ReplayArtifact v2 initial_lifecycle must be an object.")
+    initial_lifecycle = cast(dict[str, object], initial_lifecycle_value)
+    state_value = initial_lifecycle.get("state")
+    if not isinstance(state_value, dict):
+        raise ReplayArtifactError("ReplayArtifact v2 lifecycle state must be an object.")
+
+    migrated_state = dict(cast(dict[str, object], state_value))
+    migrated_state.setdefault("primary_unit_terrain_turn_start_snapshots", [])
+    migrated_lifecycle = dict(initial_lifecycle)
+    migrated_lifecycle["state"] = migrated_state
+    return cast(
+        ReplayArtifactPayload,
+        {
+            **raw_payload,
+            "schema_version": REPLAY_ARTIFACT_SCHEMA_VERSION,
+            "initial_lifecycle": migrated_lifecycle,
+        },
+    )
 
 
 def _lifecycle_payload(payload: GameLifecyclePayload) -> GameLifecyclePayload:

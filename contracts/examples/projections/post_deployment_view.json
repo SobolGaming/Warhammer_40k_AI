@@ -888,7 +888,7 @@
       "hints_by_entity_id": {},
       "hit_regions_by_entity_id": {}
     },
-    "schema_version": "battlefield-view-v1"
+    "schema_version": "battlefield-view-v2-phase17n"
   },
   "current_battle_phase": "movement",
   "current_setup_step": null,
@@ -3662,8 +3662,8 @@
       ]
     }
   ],
-  "projection_schema": "game-view-v6-interaction",
-  "projection_state_hash": "d95b6e55fad94a066dcea00a1fc99adb44a1e34a684206504cfc6411387ec3a8",
+  "projection_schema": "game-view-v7-phase17n",
+  "projection_state_hash": "5064f176bbc65462a3112651898de208cc3de574fdf51772f1f10bc28a92d82a",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

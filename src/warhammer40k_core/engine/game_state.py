@@ -155,6 +155,7 @@ from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryUnitTerrainTurnStartSnapshot,
     current_primary_unit_terrain_membership,
     primary_unit_terrain_snapshots_with_created_unit,
+    primary_unit_terrain_turn_start_snapshots_from_payload,
     record_primary_turn_start_evidence,
     record_primary_unit_terrain_turn_start_snapshot,
     validate_primary_objective_turn_start_states,
@@ -169,6 +170,12 @@ from warhammer40k_core.engine.primary_unit_destruction_tracking import (
 )
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     validate_primary_unit_destruction_states as _validate_primary_unit_destruction_states,
+)
+from warhammer40k_core.engine.ranged_attack_history_lineage import (
+    ranged_attack_history_source_unit_ids as _ranged_attack_history_source_unit_ids,
+)
+from warhammer40k_core.engine.ranged_attack_history_lineage import (
+    ranged_attack_history_unit_owner_ids as _ranged_attack_history_unit_owner_ids,
 )
 from warhammer40k_core.engine.reserve_state_queries import (
     reserve_state_for_rules_unit,
@@ -1387,6 +1394,7 @@ class GameState:
             self.ranged_attack_history_records,
             army_definitions=self.army_definitions,
             starting_strength_records=self.starting_strength_records,
+            starting_attached_unit_records=self.starting_attached_unit_records,
             player_ids=self.player_ids,
         )
         self.reserve_states = _validate_reserve_states(
@@ -1799,6 +1807,7 @@ class GameState:
             [*self.ranged_attack_history_records, record],
             army_definitions=self.army_definitions,
             starting_strength_records=self.starting_strength_records,
+            starting_attached_unit_records=self.starting_attached_unit_records,
             player_ids=self.player_ids,
         )
 
@@ -1811,17 +1820,23 @@ class GameState:
             "Ranged attack history unit_instance_id",
             unit_instance_id,
         )
-        known_unit_ids = _known_rules_unit_ids(
+        owner_ids_by_unit_id = _ranged_attack_history_unit_owner_ids(
             army_definitions=self.army_definitions,
             starting_strength_records=self.starting_strength_records,
+            starting_attached_unit_records=self.starting_attached_unit_records,
         )
-        if known_unit_ids and requested_unit_id not in known_unit_ids:
+        if owner_ids_by_unit_id and requested_unit_id not in owner_ids_by_unit_id:
             raise GameLifecycleError("Ranged attack history unit_instance_id is unknown.")
         relevant_turn_keys = set(self._current_and_previous_player_turn_keys())
         if not relevant_turn_keys:
             return False
+        history_source_unit_ids = _ranged_attack_history_source_unit_ids(
+            unit_instance_id=requested_unit_id,
+            starting_attached_unit_records=self.starting_attached_unit_records,
+        )
         return any(
-            record.unit_instance_id == requested_unit_id and record.turn_key in relevant_turn_keys
+            record.unit_instance_id in history_source_unit_ids
+            and record.turn_key in relevant_turn_keys
             for record in self.ranged_attack_history_records
         )
 
@@ -5070,10 +5085,11 @@ class GameState:
                 PrimaryObjectiveTurnStartState.from_payload(state)
                 for state in payload["primary_objective_turn_start_states"]
             ],
-            primary_unit_terrain_turn_start_snapshots=[
-                PrimaryUnitTerrainTurnStartSnapshot.from_payload(snapshot)
-                for snapshot in payload["primary_unit_terrain_turn_start_snapshots"]
-            ],
+            primary_unit_terrain_turn_start_snapshots=(
+                primary_unit_terrain_turn_start_snapshots_from_payload(
+                    payload["primary_unit_terrain_turn_start_snapshots"]
+                )
+            ),
             primary_terrain_trap_states=[
                 PrimaryTerrainTrapState.from_payload(state)
                 for state in payload["primary_terrain_trap_states"]
@@ -5793,18 +5809,17 @@ def _validate_ranged_attack_history_records(
     *,
     army_definitions: list[ArmyDefinition],
     starting_strength_records: list[StartingStrengthRecord],
+    starting_attached_unit_records: list[StartingAttachedUnitRecord],
     player_ids: tuple[str, ...],
 ) -> list[RangedAttackHistoryRecord]:
     if not isinstance(values, list):
         raise GameLifecycleError("GameState ranged attack history records must be a list.")
-    known_unit_ids = _known_rules_unit_ids(
+    owner_ids_by_unit_id = _ranged_attack_history_unit_owner_ids(
         army_definitions=army_definitions,
         starting_strength_records=starting_strength_records,
+        starting_attached_unit_records=starting_attached_unit_records,
     )
-    owner_ids_by_unit_id = _known_rules_unit_owner_ids(
-        army_definitions=army_definitions,
-        starting_strength_records=starting_strength_records,
-    )
+    known_unit_ids = set(owner_ids_by_unit_id)
     records: list[RangedAttackHistoryRecord] = []
     seen_result_ids: set[str] = set()
     for value in cast(list[object], values):

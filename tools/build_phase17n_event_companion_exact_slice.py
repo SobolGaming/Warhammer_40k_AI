@@ -693,9 +693,21 @@ def _pdf_affine(source_image: dict[str, Any]) -> dict[str, float]:
     return {"a": a, "b": b, "c": c, "d": d, "e": e, "f": f}
 
 
+def _source_image_is_orientation_reversing(source_image: dict[str, Any]) -> bool:
+    a, b, c, d, _, _ = source_image["pdf_page_affine_normalized_image_to_points"]
+    determinant = (a * d) - (b * c)
+    if math.isclose(determinant, 0.0, rel_tol=0.0, abs_tol=1e-9):
+        raise ValueError("Phase 17N terrain-area source affine must be invertible.")
+    orientation_reversing = determinant < 0.0
+    if source_image["mirrored_in_image_y_up_to_battlefield_frame"] is not orientation_reversing:
+        raise ValueError("Phase 17N terrain-area source affine mirror flag drifted.")
+    return orientation_reversing
+
+
 def _area_row(
     layout: dict[str, Any],
     raw: dict[str, Any],
+    template_anchor_points: dict[str, tuple[float, float]],
 ) -> dict[str, Any]:
     index = int(raw["terrain_area_id"].rsplit("-", maxsplit=1)[-1])
     source_asset = raw["source_image_asset"]
@@ -706,7 +718,7 @@ def _area_row(
     ]
     classifications = {component["terrain_density_color"] for component in components}
     review = raw["accepted_pose_review"]
-    anchor_x, anchor_y = review["accepted_anchor_inches"]
+    reviewed_anchor_x, reviewed_anchor_y = review["accepted_anchor_inches"]
     rotation_degrees = review["accepted_rotation_degrees"]
     vector_path = (
         None
@@ -716,6 +728,28 @@ def _area_row(
             review["source_pdf_vector_path_item_index_zero_based"],
         )
     )
+    orientation_reversing = _source_image_is_orientation_reversing(raw["source_image"])
+    anchor_x = reviewed_anchor_x
+    anchor_y = reviewed_anchor_y
+    if orientation_reversing:
+        # Terrain-area MIRROR_Y_AXIS preserves the stored vertex-zero anchor. Shift that
+        # anchor by the rotated distance to its reflected counterpart so the resulting
+        # polygon is reflected about the reviewed template origin without moving its
+        # source-registered footprint extents.
+        template_anchor_x, _ = template_anchor_points[raw["footprint_template_id"]]
+        radians = math.radians(rotation_degrees)
+        anchor_delta = -2.0 * template_anchor_x
+        anchor_x += anchor_delta * math.cos(radians)
+        anchor_y += anchor_delta * math.sin(radians)
+        anchor_x = round(anchor_x, 9)
+        anchor_y = round(anchor_y, 9)
+    pose_basis = (
+        "reviewed_pdf_vector_path_reversed_long_edge"
+        if vector_path is not None
+        else "reviewed_pdf_raster_template_registration"
+    )
+    if orientation_reversing:
+        pose_basis = f"{pose_basis}_with_source_affine_reflection"
     return {
         "area_id": raw["terrain_area_id"],
         "footprint_template_id": raw["footprint_template_id"],
@@ -723,16 +757,8 @@ def _area_row(
         "anchor_x_inches": anchor_x,
         "anchor_y_inches": anchor_y,
         "rotation_degrees": rotation_degrees,
-        # The asymmetric AB source outline matches the canonical first edge in reverse.
-        # Its reviewed pose therefore anchors canonical vertex zero at the matched second
-        # vertex and rotates 180 degrees. PDF image reflections remain preserved in the
-        # exact source affines; they are not battlefield-local reflections.
-        "local_transform": "identity",
-        "pose_basis": (
-            "reviewed_pdf_vector_path_reversed_long_edge"
-            if vector_path is not None
-            else "reviewed_pdf_raster_template_registration"
-        ),
+        "local_transform": "mirror_y_axis" if orientation_reversing else "identity",
+        "pose_basis": pose_basis,
         "source_pdf_vector_path_index_zero_based": (
             vector_path[0] if vector_path is not None else None
         ),
@@ -829,7 +855,7 @@ def _layout_row(
     template_anchor_points: dict[str, tuple[float, float]],
 ) -> dict[str, Any]:
     layout_id = layout["layout_id"]
-    area_rows = [_area_row(layout, raw) for raw in layout["terrain_areas"]]
+    area_rows = [_area_row(layout, raw, template_anchor_points) for raw in layout["terrain_areas"]]
     area_by_id = {area["area_id"]: area for area in area_rows}
     component_rows = [
         _component_row(

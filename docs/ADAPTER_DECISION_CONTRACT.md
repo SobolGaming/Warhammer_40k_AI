@@ -32,9 +32,10 @@ Adapters are producers of answers. The engine remains the owner of validation, m
 
 ## Phase 17O capability manifest
 
-`LocalGameSession.support_profile()` retains its existing 4.x envelope and now
-includes the versioned `capability_manifest` member. Its canonical language-
-neutral schema is `contracts/schemas/capability-manifest.schema.json`. Clients
+`LocalGameSession.support_profile()` retains the existing
+`support-profile-v3-interactions` payload family and includes the
+versioned `capability_manifest` member. Its canonical language-neutral schema is
+`contracts/schemas/capability-manifest.schema.json`. Clients
 may use this manifest to disable or explain UI flows, but it never grants roster
 legality, accepts a proposal, or mutates authoritative state.
 
@@ -401,16 +402,22 @@ reference server currently requires:
 - `decision-request-view-v2-interaction` for visible or redacted pending decisions;
 - `event-delta-v1` for the in-process integer-cursor adapter delta only;
 - `event-delta-v2` for authenticated role-bound HTTP event deltas;
-- `session-projection-v2-interaction` for full role-scoped reconnect projections;
-- `session-create-v2`, `session-metadata-v4-contract`,
-  `session-command-result-v4-contract`, and `session-command-outcome-v4-contract` for the
+- `game-view-v7-phase17n` for role-scoped game projections whose turn-start terrain
+  evidence contains exactly the units visible in `unit_display_by_id`;
+- `battlefield-view-v2-phase17n` for authoritative battlefield geometry with explicit
+  terrain area and feature classifications;
+- `session-projection-v3-phase17n` for full role-scoped reconnect projections;
+- `session-create-v2`, `session-metadata-v5-contract`,
+  `session-command-result-v5-contract`, and `session-command-outcome-v5-contract` for the
   authenticated formal session protocol;
-- `replay-artifact-v2-phase18i` for replay artifacts whose required source identity includes
-  `ruleset_descriptor_hash` and `rules_overlay_ids`;
+- `replay-artifact-v3-phase17n` for replay artifacts whose required source identity includes
+  `ruleset_descriptor_hash`, `rules_overlay_ids`, and Phase 17N engine-state evidence;
 - `error-envelope-v1` for typed transport errors.
 
-Game views, rules catalogs, and support profiles retain their existing explicit
-projection schema fields. A mismatched request version fails before queue
+The replay loader recognizes the published `replay-artifact-v2-phase18i`
+discriminator and initializes only its absent turn-start terrain snapshot
+collection to empty before strict v3 loading. It does not apply that migration
+to unknown versions or malformed lifecycle payloads. A mismatched request version fails before queue
 consumption or engine mutation. External error and status payloads are
 viewer-scoped by the same shared redaction policy as game projections and
 events.
@@ -1145,9 +1152,9 @@ Required Phase 12 adapter-contract tests:
 
 ## Phase 13 Shooting Decisions
 
-Phase 13A terrain visibility, line of sight, and cover foundation does not create player-facing choices. Its `LineOfSightWitness` and `BenefitOfCoverResult` payloads are engine-owned evidence consumed by later shooting decisions and events. `BenefitOfCoverResult` records deterministic feature sources through `source_feature_ids` and feature `source_records`, and terrain-area sources through `source_terrain_area_ids` and typed area records containing the terrain-area ID, classification, LoS policy, and cover-source reason. Feature reasons remain `wholly_within_feature` or `not_fully_visible_because_of_feature`; area reasons are `within_terrain_area` or `not_fully_visible_because_of_terrain_area`.
+Phase 13A terrain visibility, line of sight, and cover foundation does not create player-facing choices. Its `LineOfSightWitness` and `BenefitOfCoverResult` payloads are engine-owned evidence consumed by later shooting decisions and events. `BenefitOfCoverResult` records deterministic feature sources through `source_feature_ids` and feature `source_records`, and terrain-area sources through `source_terrain_area_ids` and typed area records containing the terrain-area ID, classification, LoS policy, and cover-source reason. The current 11th Edition producer uses `not_fully_visible_because_of_feature` for feature evidence and `within_terrain_area` or `not_fully_visible_because_of_terrain_area` for area evidence; `wholly_within_feature` remains deserializable for historical evidence but does not independently grant 11th Edition cover.
 
-The engine converts source `PlacedTerrainArea` values into geometry-owned `TerrainVisibilityArea` descriptors. Dense, Light, and Mixed terrain areas use `LineOfSightPolicy.AREA_OBSCURING`; Dense and Mixed areas are Solid, while Light areas are not. Hidden eligibility is engine-derived from canonical unit keywords, every eligible model's terrain-area occupancy, and authoritative current/previous-turn ranged-attack history. Adapters must consume line-of-sight witnesses and target candidates rather than locally interpreting terrain-area polygons, classifications, openings, cover, Hidden status, or Solid detection penalties. Phase 13C attack allocation must request cover evidence with a single allocated target model in `target_models`; multi-model target contexts are selection/debug evidence only and must not drive final save/AP modifiers.
+The engine converts source `PlacedTerrainArea` values into geometry-owned `TerrainVisibilityArea` descriptors. Dense, Light, and Mixed terrain areas use `LineOfSightPolicy.AREA_OBSCURING`; Dense and Mixed areas are Solid, while Light areas are not. Hidden eligibility is engine-derived per model from that model's component-unit keywords and Dense terrain-area occupancy, together with authoritative unit-scoped current/previous-turn ranged-attack history. Detection-range filtering is likewise model-scoped. Benefit of Cover is granted only when every alive model in the target rules unit independently qualifies: an `INFANTRY`/`BEASTS`/`SWARM` model is within a terrain area, or that model is not fully visible because of intervening terrain. Adapters must consume line-of-sight witnesses and target candidates rather than locally interpreting terrain-area polygons, classifications, openings, cover, Hidden status, or Solid detection penalties. Phase 13C attack allocation therefore evaluates cover against the entire alive target rules unit even though damage remains allocated to one model.
 
 Phase 13B and later shooting slices add player-facing attacker and defender choices. They must not introduce UI, headless, replay, or network-specific mutation paths. Every accepted choice must pass through the same lifecycle submission path and produce deterministic replay-facing records.
 
@@ -2708,7 +2715,8 @@ The submission contract is shared. The information available to a producer is no
 
 Phase 18J publishes `GameViewPayload.battlefield_view` as the canonical visual
 play-surface contract. The member remains optional because projections can
-exist before battlefield and mission state; current engine projections emit `battlefield-view-v1` when
+exist before battlefield and mission state; current engine projections emit
+`battlefield-view-v2-phase17n` when
 both battlefield and mission state exist and emit `null` before that boundary.
 Its normative world frame is defined in `contracts/coordinate-system.md`:
 inches, lower-left origin, positive X/Y on the board plane, positive Z above
@@ -2807,8 +2815,9 @@ hybrid projection model:
    tooltips from it. `LocalGameSession.rules_catalog_view()` exposes the same
    static projection for local UI/CLI clients that already consume
    `LocalGameSession.view(...)`.
-2. Live viewer-safe unit/model projection. `GameViewPayload` uses
-   `projection_schema: "game-view-v3-phase18a"`, includes
+2. Live viewer-safe unit/model projection. Phase 18A introduced
+   `projection_schema: "game-view-v3-phase18a"`; the current `GameViewPayload`
+   uses `game-view-v7-phase17n`, includes
    `projection_state_hash`, references the static catalog through
    `rules_catalog`, and exposes read-only `unit_display_by_id` and
    `model_display_by_id` maps keyed by stable `unit_instance_id` and
@@ -2882,16 +2891,17 @@ Phase 11E adds scoring state to the viewer projection:
   through the secondary-mission reveal gate.
 - `public_victory_point_ledgers`: victory point ledgers scoped to the viewer.
 - `primary_unit_terrain_turn_start_snapshots`: deterministic, engine-owned
-  public evidence recording each physical unit's intersection with manifested
-  battlefield terrain at each player-turn boundary.
+  evidence recording each viewer-visible physical unit's intersection with
+  manifested battlefield terrain at each player-turn boundary.
 
-Turn-start terrain snapshots are viewer-identical because they contain only
-public battlefield-derived membership, not a new position or visibility oracle.
-Each physical unit has one row so Attached Unit components remain distinct;
-units that are not placed on the battlefield, including unrevealed reserve
-positions, record an empty terrain-membership list. Adapters may display this
-evidence for scoring audit but must not recalculate it from current positions or
-use it to infer an unplaced unit's location.
+Turn-start terrain snapshot metadata is public, but each viewer receives only
+membership rows for unit IDs present in that same view's `unit_display_by_id`.
+Owned unplaced units retain an empty terrain-membership list; an opponent's
+unrevealed reserve row is omitted entirely, so neither its stable ID nor its
+presence contributes to the viewer payload. Visible Attached Unit components
+remain separate physical rows. Adapters may display this evidence for scoring
+audit but must not recalculate it from current positions or use omitted rows to
+infer hidden roster state.
 
 Chapter Approved 2026-27 secondary selection is simultaneous-secret. A player's
 Fixed/Tactical mode and Fixed mission IDs are secret only until every player has

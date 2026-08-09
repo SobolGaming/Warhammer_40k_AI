@@ -12,7 +12,7 @@ from referencing.jsonschema import Schema
 
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
-EXTERNAL_CONTRACT_VERSION = "4.3.0"
+EXTERNAL_CONTRACT_VERSION = "5.0.0"
 
 CREATE_SESSION_SCHEMA_VERSION = "create-session-v1"
 DECISION_FAMILY_COVERAGE_SCHEMA_VERSION = "decision-family-coverage-v2-interactions"
@@ -22,12 +22,12 @@ EVENT_STREAM_DELTA_SCHEMA_VERSION = "event-delta-v2"
 FINITE_SUBMISSION_SCHEMA_VERSION = "finite-submission-v1"
 LIFECYCLE_STATUS_SCHEMA_VERSION = "lifecycle-status-v1"
 PARAMETERIZED_SUBMISSION_SCHEMA_VERSION = "parameterized-submission-v1"
-SESSION_COMMAND_RESULT_SCHEMA_VERSION = "session-command-result-v4-contract"
+SESSION_COMMAND_RESULT_SCHEMA_VERSION = "session-command-result-v5-contract"
 SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION = "session-command-envelope-v1"
-SESSION_COMMAND_OUTCOME_SCHEMA_VERSION = "session-command-outcome-v4-contract"
+SESSION_COMMAND_OUTCOME_SCHEMA_VERSION = "session-command-outcome-v5-contract"
 SESSION_CREATE_SCHEMA_VERSION = "session-create-v2"
-SESSION_METADATA_SCHEMA_VERSION = "session-metadata-v4-contract"
-SESSION_PROJECTION_SCHEMA_VERSION = "session-projection-v2-interaction"
+SESSION_METADATA_SCHEMA_VERSION = "session-metadata-v5-contract"
+SESSION_PROJECTION_SCHEMA_VERSION = "session-projection-v3-phase17n"
 
 CREATE_SESSION_SCHEMA_NAME = "create-session.schema.json"
 FINITE_SUBMISSION_SCHEMA_NAME = "finite-submission.schema.json"

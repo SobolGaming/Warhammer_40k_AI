@@ -5,13 +5,18 @@ import math
 from dataclasses import replace
 from typing import cast
 
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
+from warhammer40k_core.core.datasheet import BaseSizeDefinition
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.battlefield_state import ModelDisplacementKind
+from warhammer40k_core.engine.endpoint_placement import terrain_endpoint_placement_violation
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
 from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.geometry.base import CircularBase
+from warhammer40k_core.geometry.model_geometry import ModelGeometry
 from warhammer40k_core.geometry.pathing import (
     PathWitness,
     TerrainEndpointViolationCode,
@@ -29,6 +34,7 @@ from warhammer40k_core.geometry.terrain import (
     TerrainVolume,
     TerrainWallDefinition,
 )
+from warhammer40k_core.geometry.terrain_classification import TerrainAreaClassification
 from warhammer40k_core.geometry.volume import Model, ModelVolume
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
@@ -240,6 +246,123 @@ def test_model_cannot_end_mid_climb() -> None:
     assert result.violations[0].terrain_id == "container-stack"
 
 
+def test_exact_event_dense_category_allows_horizontal_infantry_transit() -> None:
+    mission_setup = _exact_event_companion_meatgrinder_setup()
+    dense_feature = next(
+        feature
+        for feature in mission_setup.terrain_features
+        if feature.classification is TerrainAreaClassification.DENSE
+        and feature.feature_kind is TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY
+        and any(wall.height_inches > 2.0 for wall in feature.walls)
+    )
+    wall = next(wall for wall in dense_feature.walls if wall.height_inches > 2.0)
+    start_pose, middle_pose, end_pose = _wall_crossing_poses(wall)
+
+    assert dense_feature.source_id is not None
+    assert "gw_event_companion_v1_purge_the_foe_vs_purge_the_foe_meatgrinder_layout_a" in (
+        dense_feature.source_id
+    )
+    assert wall.height_inches == 3.5
+
+    for keyword in ("INFANTRY", "BEAST", "SWARM", "MOBILE"):
+        mover = _model(
+            f"dense-{keyword.lower()}-mover",
+            start_pose.position.x,
+            start_pose.position.y,
+        )
+        result = _terrain_context(
+            _normal_legality_context(keywords=(keyword,)),
+            moving_model=mover,
+            terrain_features=(dense_feature,),
+            middle_pose=middle_pose,
+            end_pose=end_pose,
+        ).validate()
+
+        assert result.is_valid
+        assert any(
+            segment.terrain_id == f"{dense_feature.feature_id}:{wall.wall_id}"
+            and segment.traversal_mode.value == "through_feature"
+            for segment in result.segments
+        )
+
+    mounted = _model(
+        "dense-mounted-mover",
+        start_pose.position.x,
+        start_pose.position.y,
+    )
+    mounted_result = _terrain_context(
+        _normal_legality_context(keywords=("MOUNTED",)),
+        moving_model=mounted,
+        terrain_features=(dense_feature,),
+        middle_pose=middle_pose,
+        end_pose=end_pose,
+    ).validate()
+    assert not mounted_result.is_valid
+    assert mounted_result.violations[0].violation_code == "terrain_feature_transit_forbidden"
+    assert mounted_result.violations[0].terrain_id == (f"{dense_feature.feature_id}:{wall.wall_id}")
+
+
+def test_exact_event_light_category_uses_two_inch_free_traversal() -> None:
+    mission_setup = _exact_event_companion_meatgrinder_setup()
+    light_feature = next(
+        feature
+        for feature in mission_setup.terrain_features
+        if feature.classification is TerrainAreaClassification.LIGHT
+        and feature.feature_kind is TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY
+        and any(wall.height_inches == 2.0 and wall.width_inches >= 3.5 for wall in feature.walls)
+    )
+    wall = next(
+        wall
+        for wall in light_feature.walls
+        if wall.height_inches == 2.0 and wall.width_inches >= 3.5
+    )
+    start_pose, middle_pose, end_pose = _wall_crossing_poses(wall)
+    mover = _model("light-vehicle-mover", start_pose.position.x, start_pose.position.y)
+
+    result = _terrain_context(
+        _normal_legality_context(keywords=("VEHICLE",)),
+        moving_model=mover,
+        terrain_features=(light_feature,),
+        middle_pose=middle_pose,
+        end_pose=end_pose,
+    ).validate()
+
+    assert light_feature.source_id is not None
+    assert "gw_event_companion_v1_purge_the_foe_vs_purge_the_foe_meatgrinder_layout_a" in (
+        light_feature.source_id
+    )
+    assert result.is_valid
+    assert any(
+        segment.terrain_id == f"{light_feature.feature_id}:{wall.wall_id}"
+        and segment.traversal_mode.value == "freely_traversable"
+        for segment in result.segments
+    )
+
+
+def test_light_classification_does_not_override_tall_feature_movement_policy() -> None:
+    feature = replace(
+        _ruins_blocking_wall_feature(),
+        feature_id="tall-light-policy-feature",
+        feature_kind=TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY,
+        classification=TerrainAreaClassification.LIGHT,
+    )
+    wall = feature.walls[0]
+    start_pose, middle_pose, end_pose = _wall_crossing_poses(wall)
+    mover = _model("tall-light-mounted-mover", start_pose.position.x, start_pose.position.y)
+
+    result = _terrain_context(
+        _normal_legality_context(keywords=("MOUNTED",)),
+        moving_model=mover,
+        terrain_features=(feature,),
+        middle_pose=middle_pose,
+        end_pose=end_pose,
+    ).validate()
+
+    assert not result.is_valid
+    assert result.violations[0].violation_code == "terrain_feature_transit_forbidden"
+    assert result.violations[0].terrain_id == f"{feature.feature_id}:{wall.wall_id}"
+
+
 def test_exact_event_companion_ruins_apply_keyword_specific_wall_traversal() -> None:
     mission_setup = _exact_event_companion_meatgrinder_setup()
     ruins = next(
@@ -260,7 +383,13 @@ def test_exact_event_companion_ruins_apply_keyword_specific_wall_traversal() -> 
         ruins.source_id
     )
 
-    for keywords in (("INFANTRY",), ("BEAST",), ("MOBILE",)):
+    for keywords in (
+        ("INFANTRY",),
+        ("BEAST",),
+        ("MOBILE",),
+        ("BELISARIUS_CAWL",),
+        ("IMPERIUM_PRIMARCH",),
+    ):
         mover = _model(
             f"{keywords[0].lower()}-mover",
             start_pose.position.x,
@@ -465,6 +594,56 @@ def test_upper_ruins_floor_endpoint_fails_when_base_overhangs() -> None:
     )
 
 
+def test_rotated_floor_rejects_25mm_base_inside_aabb_but_overhanging_surface() -> None:
+    mover, feature, floor, end_pose, base_radius_inches = _rotated_floor_overhang_case()
+    surface = feature.support_surfaces(no_overhang_required=True)[0]
+    min_x, min_y, max_x, max_y = surface.bounds()
+
+    assert min_x <= end_pose.position.x - base_radius_inches
+    assert end_pose.position.x + base_radius_inches <= max_x
+    assert min_y <= end_pose.position.y - base_radius_inches
+    assert end_pose.position.y + base_radius_inches <= max_y
+
+    result = _terrain_context(
+        _normal_legality_context(),
+        moving_model=mover,
+        terrain_features=(feature,),
+        middle_pose=Pose.at(floor.center_x_inches, floor.center_y_inches, 3.0),
+        end_pose=end_pose,
+    ).validate()
+
+    assert not result.is_valid
+    assert (
+        result.violations[0].violation_code
+        == TerrainEndpointViolationCode.BASE_OVERHANGS_SUPPORT_SURFACE.value
+    )
+    assert result.violations[0].surface_id == floor.floor_id
+
+
+def test_shared_endpoint_placement_rejects_rotated_floor_aabb_overhang() -> None:
+    mover, feature, floor, end_pose, _base_radius_inches = _rotated_floor_overhang_case()
+    unit = _endpoint_placement_unit(
+        unit_instance_id="rotated-floor-endpoint-unit",
+        model_instance_id=mover.model_id,
+        keywords=("VEHICLE",),
+    )
+
+    violation = terrain_endpoint_placement_violation(
+        model=replace(mover, pose=end_pose),
+        unit=unit,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        terrain_features=(feature,),
+        violation_code="rotated_floor_overhang",
+        placement_label="Test placement",
+    )
+
+    assert violation is not None
+    assert violation.violation_code == "rotated_floor_overhang"
+    assert violation.message == "Test placement base overhangs support surface."
+    assert violation.model_instance_id == mover.model_id
+    assert violation.blocker_id == floor.floor_id
+
+
 def test_missing_contact_footprint_returns_manual_geometry_required_for_no_overhang() -> None:
     mover = _model("manual-contact-mover", 1.0, 1.0)
     hill = _support_feature(
@@ -613,6 +792,98 @@ def _model(model_id: str, x: float, y: float) -> Model:
         pose=Pose.at(x, y),
         base=CircularBase(radius=0.5),
         volume=ModelVolume(height=2.0),
+    )
+
+
+def _rotated_floor_overhang_case() -> tuple[
+    Model,
+    TerrainFeatureDefinition,
+    TerrainFloorDefinition,
+    Pose,
+    float,
+]:
+    base_radius_inches = 25.0 / (2.0 * 25.4)
+    mover = Model(
+        model_id="rotated-floor-endpoint-unit:model-001",
+        pose=Pose.at(1.0, 1.0),
+        base=CircularBase(radius=base_radius_inches),
+        volume=ModelVolume(height=2.0),
+    )
+    floor_center_x = 3.0
+    floor_center_y = 3.0
+    floor = TerrainFloorDefinition(
+        floor_id="rotated-upper-floor",
+        center_x_inches=floor_center_x,
+        center_y_inches=floor_center_y,
+        bottom_z_inches=3.0,
+        width_inches=4.0,
+        depth_inches=2.0,
+        thickness_inches=0.12,
+        rotation_degrees=45.0,
+    )
+    feature = TerrainFeatureDefinition(
+        feature_id="rotated-floor-feature",
+        feature_kind=TerrainFeatureKind.HILLS,
+        footprint_center_x_inches=floor_center_x,
+        footprint_center_y_inches=floor_center_y,
+        footprint_width_inches=6.0,
+        footprint_depth_inches=6.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=floor_center_x,
+            center_y_inches=floor_center_y,
+            width_inches=6.0,
+            depth_inches=6.0,
+        ).footprint_polygon,
+        display_geometry=_display_geometry(
+            center_x_inches=floor_center_x,
+            center_y_inches=floor_center_y,
+            width_inches=6.0,
+            depth_inches=6.0,
+        ),
+        floors=(floor,),
+    )
+    return mover, feature, floor, Pose.at(4.5, 4.5, 3.0), base_radius_inches
+
+
+def _endpoint_placement_unit(
+    *,
+    unit_instance_id: str,
+    model_instance_id: str,
+    keywords: tuple[str, ...],
+) -> UnitInstance:
+    datasheet_id = "endpoint-placement-datasheet"
+    model_profile_id = f"{datasheet_id}-profile"
+    base_size = BaseSizeDefinition.circular(25.0)
+    model = ModelInstance(
+        model_instance_id=model_instance_id,
+        datasheet_id=datasheet_id,
+        model_profile_id=model_profile_id,
+        name="Endpoint placement model",
+        characteristics=(
+            CharacteristicValue.from_raw(Characteristic.WOUNDS, 1),
+            CharacteristicValue.from_raw(Characteristic.LEADERSHIP, 7),
+        ),
+        base_size=base_size,
+        geometry=ModelGeometry.from_base_size(
+            base_size,
+            keywords=keywords,
+            geometry_source_id=model_profile_id,
+        ),
+        starting_wounds=1,
+        wounds_remaining=1,
+        wargear_ids=(),
+        source_ids=(f"source:{model_profile_id}",),
+    )
+    return UnitInstance(
+        unit_instance_id=unit_instance_id,
+        datasheet_id=datasheet_id,
+        name="Endpoint placement unit",
+        keywords=keywords,
+        faction_keywords=(),
+        datasheet_abilities=(),
+        datasheet_source_ids=(f"source:{datasheet_id}",),
+        own_models=(model,),
+        wargear_selections=(),
     )
 
 

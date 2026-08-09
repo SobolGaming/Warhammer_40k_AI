@@ -66,10 +66,20 @@ class PrimaryUnitTerrainMembership:
         }
 
     @classmethod
-    def from_payload(cls, payload: PrimaryUnitTerrainMembershipPayload) -> Self:
+    def from_payload(cls, payload: object) -> Self:
+        raw_payload = _required_payload_mapping(
+            payload,
+            field_name="PrimaryUnitTerrainMembership payload",
+            required_keys=("unit_instance_id", "terrain_feature_ids"),
+        )
+        terrain_feature_ids = raw_payload["terrain_feature_ids"]
+        if type(terrain_feature_ids) is not list:
+            raise GameLifecycleError(
+                "PrimaryUnitTerrainMembership terrain_feature_ids must be a list."
+            )
         return cls(
-            unit_instance_id=payload["unit_instance_id"],
-            terrain_feature_ids=tuple(payload["terrain_feature_ids"]),
+            unit_instance_id=cast(str, raw_payload["unit_instance_id"]),
+            terrain_feature_ids=tuple(cast(list[str], terrain_feature_ids)),
         )
 
 
@@ -140,18 +150,63 @@ class PrimaryUnitTerrainTurnStartSnapshot:
         }
 
     @classmethod
-    def from_payload(cls, payload: PrimaryUnitTerrainTurnStartSnapshotPayload) -> Self:
+    def from_payload(cls, payload: object) -> Self:
+        raw_payload = _required_payload_mapping(
+            payload,
+            field_name="PrimaryUnitTerrainTurnStartSnapshot payload",
+            required_keys=(
+                "snapshot_id",
+                "game_id",
+                "active_player_id",
+                "battle_round",
+                "unit_memberships",
+                "source_id",
+            ),
+        )
+        unit_memberships = raw_payload["unit_memberships"]
+        if type(unit_memberships) is not list:
+            raise GameLifecycleError(
+                "PrimaryUnitTerrainTurnStartSnapshot unit_memberships must be a list."
+            )
         return cls(
-            snapshot_id=payload["snapshot_id"],
-            game_id=payload["game_id"],
-            active_player_id=payload["active_player_id"],
-            battle_round=payload["battle_round"],
+            snapshot_id=cast(str, raw_payload["snapshot_id"]),
+            game_id=cast(str, raw_payload["game_id"]),
+            active_player_id=cast(str, raw_payload["active_player_id"]),
+            battle_round=cast(int, raw_payload["battle_round"]),
             unit_memberships=tuple(
                 PrimaryUnitTerrainMembership.from_payload(membership)
-                for membership in payload["unit_memberships"]
+                for membership in cast(list[object], unit_memberships)
             ),
-            source_id=payload["source_id"],
+            source_id=cast(str, raw_payload["source_id"]),
         )
+
+
+def primary_unit_terrain_turn_start_snapshots_from_payload(
+    payload: object,
+) -> list[PrimaryUnitTerrainTurnStartSnapshot]:
+    if type(payload) is not list:
+        raise GameLifecycleError(
+            "GameState primary terrain turn-start snapshot payloads must be a list."
+        )
+    return [
+        PrimaryUnitTerrainTurnStartSnapshot.from_payload(snapshot)
+        for snapshot in cast(list[object], payload)
+    ]
+
+
+def _required_payload_mapping(
+    payload: object,
+    *,
+    field_name: str,
+    required_keys: tuple[str, ...],
+) -> dict[str, object]:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError(f"{field_name} must be an object.")
+    raw_payload = cast(dict[str, object], payload)
+    missing_keys = tuple(key for key in required_keys if key not in raw_payload)
+    if missing_keys:
+        raise GameLifecycleError(f"{field_name} is missing required field: {missing_keys[0]}.")
+    return raw_payload
 
 
 def record_primary_turn_start_evidence(

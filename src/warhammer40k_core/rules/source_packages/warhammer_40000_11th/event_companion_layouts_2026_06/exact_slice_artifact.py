@@ -16,8 +16,8 @@ SOURCE_PAGES = (24, 25, 26)
 SOURCE_EXTRACTION_PAYLOAD_SHA256 = (
     "8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30"
 )
-EXPECTED_PACKAGE_HASH = "005f8ad96d525dcaeb23eacc9d98d7cdf57d245242ce591e3ccd60e11f0c472c"
-EXPECTED_ARTIFACT_SHA256 = "28241fd8961eb74345620179d3b9b3e903e65cfdafd47ebfa0dcdd942220c543"
+EXPECTED_PACKAGE_HASH = "e000de2eee57a1a9e8be21be2c88c427b2317ce0f832cf98e32e50bff18b6997"
+EXPECTED_ARTIFACT_SHA256 = "8818f310453fb73ccfe9dcf88ab3232026896b449b059957110015e3d565ade0"
 PRIMARY_MISSION_ID = "primary-meatgrinder"
 FORCE_DISPOSITION_ID = "purge-the-foe"
 BATTLEFIELD_WIDTH_INCHES = 44.0
@@ -666,16 +666,26 @@ def _validate_terrain_area(
         area.source_pdf_vector_path_index_zero_based,
         area.source_pdf_vector_path_item_index_zero_based,
     )
+    source_affine_is_orientation_reversing = (
+        (area.source_pdf_affine.a * area.source_pdf_affine.d)
+        - (area.source_pdf_affine.b * area.source_pdf_affine.c)
+    ) < 0.0
+    if (area.local_transform == "mirror_y_axis") is not source_affine_is_orientation_reversing:
+        raise EventCompanionExactSliceArtifactError(
+            "Event Companion terrain-area local reflection must match its source affine."
+        )
+    reflection_suffix = (
+        "_with_source_affine_reflection" if source_affine_is_orientation_reversing else ""
+    )
     if expected_vector_path is None:
-        if area.pose_basis != "reviewed_pdf_raster_template_registration" or actual_vector_path != (
-            None,
-            None,
-        ):
+        if area.pose_basis != (
+            f"reviewed_pdf_raster_template_registration{reflection_suffix}"
+        ) or actual_vector_path != (None, None):
             raise EventCompanionExactSliceArtifactError(
                 "Event Companion terrain-area raster pose provenance drifted."
             )
     elif (
-        area.pose_basis != "reviewed_pdf_vector_path_reversed_long_edge"
+        area.pose_basis != f"reviewed_pdf_vector_path_reversed_long_edge{reflection_suffix}"
         or actual_vector_path != expected_vector_path
     ):
         raise EventCompanionExactSliceArtifactError(

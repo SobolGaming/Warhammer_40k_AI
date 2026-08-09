@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v3/game-view.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v4/game-view.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -19,7 +19,7 @@
     "battlefield_view": {
       "oneOf": [
         {
-          "$ref": "https://warhammer40k-core.local/contracts/v3/battlefield-view.schema.json"
+          "$ref": "https://warhammer40k-core.local/contracts/v4/battlefield-view.schema.json"
         },
         {
           "type": "null"
@@ -79,7 +79,7 @@
       "type": "array"
     },
     "projection_schema": {
-      "const": "game-view-v6-interaction",
+      "const": "game-view-v7-phase17n",
       "minLength": 1,
       "type": "string"
     },
@@ -165,6 +165,7 @@
     "mission_setup",
     "public_secondary_mission_choices",
     "public_secondary_mission_card_states",
+    "primary_unit_terrain_turn_start_snapshots",
     "public_command_point_ledgers",
     "public_victory_point_ledgers",
     "public_stratagem_use_records",

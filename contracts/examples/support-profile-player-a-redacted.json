@@ -926,7 +926,7 @@
         "identity_id": "phase9a-canonical"
       },
       "contract_schema": {
-        "contract_version": "4.3.0",
+        "contract_version": "5.0.0",
         "identity_hash": "320d31af5048139c3543d094d0e271f29ecd23cc65e634a034bc8e97442ff281",
         "identity_id": "https://warhammer40k-core.local/contracts/v4/capability-manifest.schema.json"
       },
@@ -935,7 +935,7 @@
         "identity_id": "warhammer40k-core-v2:0.1.0"
       },
       "mission_pack": {
-        "identity_hash": "fd5980e6170ad14fe844a7ec9228edbfe247bc84bca766d5e47934146aa324fd",
+        "identity_hash": "ea1d5118dc10db332b960546872b6450f43a5b55e561b61489ba319772c5d669",
         "identity_id": "11e-chapter-approved-2026-27"
       },
       "ruleset": {
