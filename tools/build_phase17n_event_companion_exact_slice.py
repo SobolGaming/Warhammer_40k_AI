@@ -488,7 +488,7 @@ def _ruin_parts(
                     "bottom_z_inches": bottom_z,
                     "width_inches": width - 0.02,
                     "depth_inches": 0.12,
-                    "height_inches": 3.0 if floor_index == 0 else 2.0,
+                    "height_inches": 2.0 if floor_index == floor_count - 1 else 3.0,
                     "rotation_degrees": 0.0,
                 },
                 {
@@ -498,7 +498,7 @@ def _ruin_parts(
                     "bottom_z_inches": bottom_z,
                     "width_inches": depth - 0.02,
                     "depth_inches": 0.12,
-                    "height_inches": 3.0 if floor_index == 0 else 2.0,
+                    "height_inches": 2.0 if floor_index == floor_count - 1 else 3.0,
                     "rotation_degrees": 90.0,
                 },
             )
@@ -654,11 +654,11 @@ def _archetype_modeling_basis(model_kind: str) -> str:
     if model_kind == "ruin":
         return (
             "PDF pages 24-26 provide component identity and source-image pose. The user "
-            "supplied the ruin category, three-inch floor spacing, solid three-inch "
-            "ground-floor walls, and approximately two-inch upper walls. Compact primitive "
-            "dimensions and the reviewed AB/EF three-floor versus CD/GH two-floor assignment "
-            "are engine modeling assumptions, not PDF measurements. Raster art remains "
-            "non-authoritative."
+            "supplied the ruin category, three-inch floor spacing, solid three-inch walls "
+            "below every upper floor, and approximately two-inch top-floor walls. Compact "
+            "primitive dimensions and the reviewed AB/EF three-floor versus CD/GH two-floor "
+            "assignment are engine modeling assumptions, not PDF measurements. Raster art "
+            "remains non-authoritative."
         )
     if model_kind == "light_solid":
         return (

@@ -16,8 +16,8 @@ SOURCE_PAGES = (24, 25, 26)
 SOURCE_EXTRACTION_PAYLOAD_SHA256 = (
     "8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30"
 )
-EXPECTED_PACKAGE_HASH = "e000de2eee57a1a9e8be21be2c88c427b2317ce0f832cf98e32e50bff18b6997"
-EXPECTED_ARTIFACT_SHA256 = "8818f310453fb73ccfe9dcf88ab3232026896b449b059957110015e3d565ade0"
+EXPECTED_PACKAGE_HASH = "3137c55f272aa84e72ee4b4d171df2cb0082b83d01d44d160b3741204b619e31"
+EXPECTED_ARTIFACT_SHA256 = "12ce8bcc352b3a09ba8d3e3b40f0652183b227f20059f877a657826ad95e125b"
 PRIMARY_MISSION_ID = "primary-meatgrinder"
 FORCE_DISPOSITION_ID = "purge-the-foe"
 BATTLEFIELD_WIDTH_INCHES = 44.0
@@ -543,13 +543,14 @@ def _validate_archetype_parts(archetype: TerrainFeatureArchetypeArtifact) -> Non
             raise EventCompanionExactSliceArtifactError(
                 "Event Companion ruins require walls at every floor level."
             )
+        top_floor_level = floor_levels[-1]
         if any(
-            wall.height_inches != (3.0 if wall.bottom_z_inches == 0.0 else 2.0)
+            wall.height_inches != (2.0 if wall.bottom_z_inches == top_floor_level else 3.0)
             for wall in archetype.walls
         ):
             raise EventCompanionExactSliceArtifactError(
-                "Event Companion ruins require solid three-inch ground walls and "
-                "two-inch upper walls."
+                "Event Companion ruins require solid three-inch walls below every upper "
+                "floor and two-inch top-floor walls."
             )
     elif archetype.model_kind == "dense_solid":
         if (

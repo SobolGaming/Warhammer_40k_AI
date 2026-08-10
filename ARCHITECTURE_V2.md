@@ -4958,9 +4958,9 @@ scoring rows retain their separate reviewed Chapter Approved mission-deck
 provenance in the Event Companion source package.
 
 The exact battlefield artifact has package hash
-`e000de2eee57a1a9e8be21be2c88c427b2317ce0f832cf98e32e50bff18b6997`,
+`3137c55f272aa84e72ee4b4d171df2cb0082b83d01d44d160b3741204b619e31`,
 raw artifact SHA-256
-`8818f310453fb73ccfe9dcf88ab3232026896b449b059957110015e3d565ade0`,
+`12ce8bcc352b3a09ba8d3e3b40f0652183b227f20059f877a657826ad95e125b`,
 and reviewed extraction payload hash
 `8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30`.
 The loader pins both artifact hashes, so a structurally valid re-hashed
@@ -4993,8 +4993,8 @@ Terrain-area and component source-image affines and battlefield regions are
 source-extracted facts. Compact component rules polygons and wall/floor
 primitives are reviewed engine models, not traced raster silhouettes.
 Project-owner-supplied semantics establish three-inch floor spacing, solid
-three-inch ground-floor walls, approximately two-inch upper walls, and
-approximately two-inch Light terrain. The AB/EF three-floor versus CD/GH
+three-inch walls below every upper floor, approximately two-inch top-floor
+walls, and approximately two-inch Light terrain. The AB/EF three-floor versus CD/GH
 two-floor assignment, compact primitive dimensions, and 3.5-inch Dense
 non-ruin height are explicit initial engine modeling assumptions rather than
 PDF measurements. Those choices are committed for review and later tuning;

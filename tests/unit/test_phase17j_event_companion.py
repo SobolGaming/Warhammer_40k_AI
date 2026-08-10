@@ -8,6 +8,7 @@ import sys
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import replace
+from itertools import pairwise
 from pathlib import Path
 from typing import cast
 
@@ -853,11 +854,21 @@ def test_phase17n_meatgrinder_exact_layouts_build_all_source_components() -> Non
             in {(0.0, 3.0), (0.0, 3.0, 6.0)}
             for ruin in ruins
         )
-        assert all(
-            wall.height_inches == (3.0 if wall.bottom_z_inches == 0.0 else 2.0)
-            for ruin in ruins
-            for wall in ruin.walls
-        )
+        for ruin in ruins:
+            floor_levels = tuple(sorted(floor.bottom_z_inches for floor in ruin.floors))
+            top_floor_level = floor_levels[-1]
+            assert all(
+                wall.height_inches == (2.0 if wall.bottom_z_inches == top_floor_level else 3.0)
+                for wall in ruin.walls
+            )
+            assert all(
+                any(
+                    wall.bottom_z_inches == floor_level
+                    and wall.bottom_z_inches + wall.height_inches == next_floor_level
+                    for wall in ruin.walls
+                )
+                for floor_level, next_floor_level in pairwise(floor_levels)
+            )
         assert {(marker.x_inches, marker.y_inches) for marker in setup.objective_markers} == set(
             expected_objective_coordinates[layout_number]
         )
