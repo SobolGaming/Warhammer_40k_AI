@@ -217,6 +217,8 @@ def test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls(
     assert "clipWorldPolygonToNearPlane" in geometry_javascript
     assert "clipWorldLineToNearPlane" in geometry_javascript
     assert "hatchLineSegments" in geometry_javascript
+    assert "sharedTerritoryBoundarySegments" in geometry_javascript
+    assert "context.setLineDash(lineDash)" in javascript
     assert "collectObjectiveFaces" not in javascript
     assert "cylinderFaces" not in javascript
     assert "marker_diameter_inches" not in javascript
@@ -252,10 +254,12 @@ def test_mock_event_layout_ui_executes_bounded_close_camera_rendering(
         "defender_zone_visible": True,
         "elevation_degrees": 12,
         "terrain_area_14_visible": True,
+        "territory_divider_visible": True,
         "zoom": 3.5,
     }
     assert result["tested_azimuth_count"] == 360
     assert _number(result["maximum_hatch_strokes"]) <= _number(result["hatch_stroke_budget"])
+    assert result["territory_divider_segments_by_layout"] == {"1": 1, "2": 1, "3": 1}
 
 
 def _embedded_layout_data(html: str) -> dict[str, object]:

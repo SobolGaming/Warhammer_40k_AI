@@ -44,6 +44,32 @@ const defenderTerritory = Object.values(authoritative.battlefield_regions_by_id)
 if (defenderTerritory === undefined) {
   throw new Error("Renderer regression defender territory is missing.");
 }
+const territoryDividerSegmentsByLayout = {};
+for (let layoutNumber = 1; layoutNumber <= 3; layoutNumber += 1) {
+  const testedLayoutId = `purge-the-foe-vs-purge-the-foe-layout-${String(layoutNumber)}`;
+  const testedLayout = payload.layouts[testedLayoutId];
+  if (testedLayout === undefined) {
+    throw new Error(`Territory-divider regression layout is missing: ${testedLayoutId}.`);
+  }
+  const segments = geometry.sharedTerritoryBoundarySegments(
+    testedLayout.battlefield_view.authoritative.battlefield_regions_by_id,
+  );
+  if (segments.length !== 1) {
+    throw new Error(
+      `Territory-divider regression expected one shared segment for ${testedLayoutId}.`,
+    );
+  }
+  territoryDividerSegmentsByLayout[String(layoutNumber)] = segments.length;
+}
+const closeCameraTerritoryDividerVisible = geometry
+  .sharedTerritoryBoundarySegments(authoritative.battlefield_regions_by_id)
+  .some((segment) =>
+    geometry.clipWorldLineToNearPlane(
+      geometry.worldPoint(segment.start.x_inches, segment.start.y_inches, 0.022),
+      geometry.worldPoint(segment.end.x_inches, segment.end.y_inches, 0.022),
+      closeCamera,
+    ) !== null,
+  );
 
 const hatchEntities = [
   ...Object.values(authoritative.terrain_areas_by_id).map((area) => ({
@@ -110,6 +136,7 @@ process.stdout.write(
     close_camera: {
       azimuth_degrees: 315,
       board_visible: boardVisible,
+      territory_divider_visible: closeCameraTerritoryDividerVisible,
       defender_territory_visible: projectRegion(defenderTerritory.shape, 0.015, closeCamera),
       defender_zone_visible: projectRegion(defenderZone.shape, 0.025, closeCamera),
       elevation_degrees: 12,
@@ -121,6 +148,7 @@ process.stdout.write(
     maximum_entity_id: maximumEntityId,
     maximum_hatch_strokes: maximumHatchStrokes,
     tested_azimuth_count: 360,
+    territory_divider_segments_by_layout: territoryDividerSegmentsByLayout,
   }),
 );
 

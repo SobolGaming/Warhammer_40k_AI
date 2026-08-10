@@ -1159,7 +1159,12 @@ def test_phase17n_terrain_placements_use_reviewed_grid_symmetry_and_contacts() -
             )
 
     reviewed_anchors_by_layout = {
-        1: {"04": (34.0, 41.1), "07": (23.0, 42.5), "08": (5.15, 36.0)},
+        1: {
+            "04": (34.0, 41.1),
+            "06": (16.85, 41.0),
+            "07": (23.0, 42.5),
+            "08": (4.85, 35.55),
+        },
         2: {"02": (31.0, 50.0), "07": (17.55, 39.05)},
         3: {"02": (22.8, 50.05), "06": (9.5, 39.6)},
     }
@@ -1209,6 +1214,35 @@ def test_phase17n_terrain_placements_use_reviewed_grid_symmetry_and_contacts() -
                 )
                 <= increment
             )
+
+        if layout_number == 1:
+            light_pipe = shapely_backend.footprint_for_polygon(
+                tuple(
+                    (point.x_inches, point.y_inches)
+                    for point in runtime_areas["08"].footprint_polygon
+                )
+            )
+            mirrored_light_pipe = shapely_backend.footprint_for_polygon(
+                tuple(
+                    (point.x_inches, point.y_inches)
+                    for point in runtime_areas["09"].footprint_polygon
+                )
+            )
+            mixed = shapely_backend.footprint_for_polygon(
+                tuple(
+                    (point.x_inches, point.y_inches)
+                    for point in runtime_areas["06"].footprint_polygon
+                )
+            )
+            assert math.isclose(light_pipe.bounds[0], 4.0, rel_tol=0.0, abs_tol=0.05)
+            assert math.isclose(
+                44.0 - mirrored_light_pipe.bounds[2],
+                4.0,
+                rel_tol=0.0,
+                abs_tol=0.05,
+            )
+            assert light_pipe.distance(mixed) <= 0.01
+            assert light_pipe.intersection(mixed).is_empty
 
 
 def test_phase17n_meatgrinder_exact_layouts_build_all_source_components() -> None:

@@ -17,6 +17,7 @@ const {
   projectPoint,
   projectWorldPoints,
   rectangleWorldPoints,
+  sharedTerritoryBoundarySegments,
   shapeWorldPoints,
   worldPoint,
 } = VIEWER_GEOMETRY;
@@ -664,6 +665,21 @@ function drawBattlefieldRegions(context, camera, regionsById) {
     const style = regionStyle(region);
     drawRegionShape(context, camera, region.shape, 0.015, style, entityRecord("region", region));
   }
+  drawTerritoryDivider(context, camera, regionsById);
+}
+
+function drawTerritoryDivider(context, camera, regionsById) {
+  for (const segment of sharedTerritoryBoundarySegments(regionsById)) {
+    drawWorldLine(
+      context,
+      camera,
+      worldPoint(segment.start.x_inches, segment.start.y_inches, 0.022),
+      worldPoint(segment.end.x_inches, segment.end.y_inches, 0.022),
+      "#000000",
+      3.5,
+      [10, 7],
+    );
+  }
 }
 
 function drawDeploymentZones(context, camera, zonesById) {
@@ -1020,7 +1036,7 @@ function addPolygonToPath(path, points) {
   path.closePath();
 }
 
-function drawWorldLine(context, camera, start, end, stroke, lineWidth) {
+function drawWorldLine(context, camera, start, end, stroke, lineWidth, lineDash = []) {
   const clippedLine = clipWorldLineToNearPlane(start, end, camera);
   if (clippedLine === null) {
     return;
@@ -1036,6 +1052,7 @@ function drawWorldLine(context, camera, start, end, stroke, lineWidth) {
   context.lineTo(projectedEnd.x, projectedEnd.y);
   context.strokeStyle = stroke;
   context.lineWidth = lineWidth;
+  context.setLineDash(lineDash);
   context.stroke();
   context.restore();
 }

@@ -109,9 +109,9 @@ Secondary status:
   separate reviewed Chapter Approved mission-deck provenance in the Event
   Companion source package.
 - The exact battlefield artifact has package hash
-  `90b60b7621659917cd9e2cbeed9dde0f172c178b1c9a92cfe54cf75805800744`
+  `1e9f38c315ccad9a09f953fe0f79efcf2094b3f2234bcda93237c0d01418a26f`
   and raw artifact SHA-256
-  `048d04f87437692053c34612db07098ecd4c455ac8fa34d38e357635339285bb`.
+  `c9ab1d92148c31d3c12fd5a5b47797a701137df35a1c99b20d938ec46cc27daa`.
   Its reviewed extraction payload is pinned as
   `8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30`.
   The loader rejects structurally valid re-hashed coordinate drift as well as

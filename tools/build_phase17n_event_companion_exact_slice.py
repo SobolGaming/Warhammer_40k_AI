@@ -261,12 +261,17 @@ _REVIEWED_SOURCE_IMAGE_AXIS_SPANS = {
 }
 _REVIEWED_PRIMARY_AREA_TRANSLATIONS = {
     "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04": (0.0, -0.4),
+    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-06": (-0.15, 0.0),
     "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-07": (0.0, -0.5),
-    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-08": (0.15, 0.0),
+    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-08": (-0.15, -0.45),
     "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-02": (0.1, 0.0),
     "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-07": (-0.05, -0.85),
     "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-02": (0.25, 0.1),
     "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-06": (0.0, -0.4),
+}
+_REVIEWED_PRIMARY_COMPONENT_TRANSLATIONS = {
+    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-06": (-0.15, 0.0),
+    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-08": (-0.15, -0.45),
 }
 
 
@@ -931,8 +936,12 @@ def _component_row(
             ) % 360.0
     if reviewed_battlefield_center is None:
         raw_center_x, raw_center_y = raw["source_image"]["battlefield_image_center_inches"]
-        center_x = _quantize_terrain_coordinate(raw_center_x)
-        center_y = _quantize_terrain_coordinate(raw_center_y)
+        translation_x, translation_y = _REVIEWED_PRIMARY_COMPONENT_TRANSLATIONS.get(
+            raw["terrain_area_id"],
+            (0.0, 0.0),
+        )
+        center_x = _quantize_terrain_coordinate(raw_center_x + translation_x)
+        center_y = _quantize_terrain_coordinate(raw_center_y + translation_y)
     else:
         center_x, center_y = reviewed_battlefield_center
     battlefield_delta_x = center_x - area_center_x
