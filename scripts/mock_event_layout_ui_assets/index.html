@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Event Companion Battlefield Viewer</title>
+  <link rel="stylesheet" href="/viewer.css">
+</head>
+<body>
+  <main>
+    <aside class="control-panel">
+      <header class="viewer-heading">
+        <p class="eyebrow">Phase 17N projection</p>
+        <h1>Event Companion Battlefield</h1>
+        <p class="intro">
+          An interactive schematic of authoritative battlefield geometry. Drag the battlefield
+          to orbit, use the wheel to zoom, and click a component for details.
+        </p>
+      </header>
+
+      <section class="control-section" aria-labelledby="mission-heading">
+        <h2 id="mission-heading">Mission pairing</h2>
+        <label>
+          Force Disposition 1
+          <select id="force-one">
+<!-- force-disposition-options -->
+          </select>
+        </label>
+        <label>
+          Force Disposition 2
+          <select id="force-two">
+<!-- force-disposition-options -->
+          </select>
+        </label>
+        <label>
+          Layout
+          <select id="layout-variant">
+            <option value="0">A</option>
+            <option value="1">B</option>
+            <option value="2">C</option>
+          </select>
+        </label>
+        <div id="geometry-status" class="status-banner" role="status"></div>
+        <dl class="layout-summary">
+          <dt>Layout</dt><dd id="layout-id"></dd>
+          <dt>Attacker</dt><dd id="attacker-edge"></dd>
+          <dt>Defender</dt><dd id="defender-edge"></dd>
+          <dt>Geometry</dt><dd id="terrain-count"></dd>
+          <dt>Projection</dt><dd id="projection-version"></dd>
+          <dt>Geometry hash</dt><dd id="geometry-hash" class="hash-value"></dd>
+        </dl>
+      </section>
+
+      <section class="control-section" aria-labelledby="camera-heading">
+        <h2 id="camera-heading">Camera</h2>
+        <div class="button-grid camera-presets">
+          <button id="view-isometric" type="button">Isometric</button>
+          <button id="view-top" type="button">Top</button>
+          <button id="view-attacker" type="button">Attacker edge</button>
+          <button id="view-defender" type="button">Defender edge</button>
+        </div>
+        <label class="range-control">
+          <span>Azimuth <output id="azimuth-value">315°</output></span>
+          <input id="camera-azimuth" type="range" min="0" max="359" value="315">
+        </label>
+        <label class="range-control">
+          <span>Elevation <output id="elevation-value">48°</output></span>
+          <input id="camera-elevation" type="range" min="12" max="90" value="48">
+        </label>
+        <label class="range-control">
+          <span>Zoom <output id="zoom-value">1.00×</output></span>
+          <input id="camera-zoom" type="range" min="45" max="350" value="100">
+        </label>
+        <p id="camera-help" class="help-text">
+          Drag or use arrow keys to rotate. Use the wheel or +/− keys to zoom. Press T for top
+          view and 0 to reset.
+        </p>
+      </section>
+
+      <section class="control-section" aria-labelledby="layers-heading">
+        <h2 id="layers-heading">Layers</h2>
+        <div class="toggle-grid">
+          <label><input id="show-grid" type="checkbox" checked> Grid</label>
+          <label><input id="show-regions" type="checkbox" checked> Territories / NML</label>
+          <label><input id="show-deployment" type="checkbox" checked> Deployment zones</label>
+          <label><input id="show-areas" type="checkbox" checked> Terrain areas</label>
+          <label><input id="show-components" type="checkbox" checked> Components</label>
+          <label><input id="show-walls" type="checkbox" checked> Walls</label>
+          <label><input id="show-floors" type="checkbox" checked> Floors</label>
+          <label><input id="show-objectives" type="checkbox" checked> Objectives</label>
+        </div>
+      </section>
+
+      <section class="control-section legend" aria-labelledby="legend-heading">
+        <h2 id="legend-heading">Classification</h2>
+        <div class="legend-grid">
+          <div><span class="swatch dense"></span>Dense</div>
+          <div><span class="swatch light"></span>Light</div>
+          <div><span class="swatch mixed"></span>Mixed</div>
+          <div><span class="swatch unknown"></span>Unknown</div>
+          <div><span class="swatch attacker"></span>Attacker</div>
+          <div><span class="swatch defender"></span>Defender</div>
+          <div><span class="swatch no-mans-land"></span>No Man's Land</div>
+          <div><span class="swatch objective"></span>Objective</div>
+        </div>
+      </section>
+
+      <section class="control-section inspector" aria-labelledby="inspector-heading">
+        <h2 id="inspector-heading">Selected geometry</h2>
+        <div id="entity-details" aria-live="polite">
+          Click a terrain component, area, objective, or region to inspect it.
+        </div>
+      </section>
+    </aside>
+
+    <section class="stage" aria-labelledby="layout-name">
+      <div class="title-line">
+        <div>
+          <p class="eyebrow">44″ × 60″ · inches · right-handed Z-up</p>
+          <h2 id="layout-name"></h2>
+        </div>
+        <output id="camera-summary" class="camera-summary" aria-live="polite"></output>
+      </div>
+      <div class="board-wrap">
+        <canvas
+          id="battlefield"
+          tabindex="0"
+          aria-label="Interactive three-dimensional battlefield"
+          aria-describedby="camera-help"
+        ></canvas>
+        <div id="viewer-error" class="viewer-error" role="alert" hidden></div>
+        <div class="canvas-note">Schematic geometry · rendering is non-authoritative</div>
+      </div>
+    </section>
+  </main>
+
+  <script id="layout-data" type="application/json">
+<!-- layout-data-json -->
+  </script>
+  <script src="/viewer-geometry.js"></script>
+  <script src="/viewer.js" defer></script>
+</body>
+</html>

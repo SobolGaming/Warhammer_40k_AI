@@ -88,6 +88,15 @@ Secondary status:
   and its A/B/C layout variants. These are the first three source-hashed exact
   layouts. Together with six older coordinate-extracted layouts, 9 of 45 are
   executable; the other 36 layout identities remain explicit pending work.
+- The local [Event Companion Battlefield Viewer](BATTLEFIELD_VIEWER.md) now
+  consumes `battlefield-view-v2-phase17n` directly. It provides an orbitable
+  3D schematic of classifications, component footprints, walls, floors,
+  source-linked objective terrain-area footprints, deployment zones,
+  territories, and No Man's Land. Objective identity records remain labels;
+  missing footprint bindings are labelled pending and never become inferred
+  marker disks or selectable solids. Layouts without runtime terrain geometry
+  are likewise labelled pending and never fall back to legacy source-row
+  rectangles or inferred geometry.
 - The three layouts are extracted from pages 24-26 of
   `eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf`, whose
   SHA-256 is
