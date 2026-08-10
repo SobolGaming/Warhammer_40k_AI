@@ -57,6 +57,19 @@ uv run python scripts/build_test_shards.py \
   --shard-count 4
 ```
 
+## Battlefield viewer
+
+Inspect the Event Companion battlefield projection with an orbitable 3D camera:
+
+```powershell
+uv run python scripts/mock_event_layout_ui.py --host 127.0.0.1 --port 8765
+```
+
+Open `http://127.0.0.1:8765/`. Purge the Foe versus Purge the Foe layouts A/B/C
+show the complete exact Phase 17N terrain, region, objective, wall, and floor
+geometry. See [docs/BATTLEFIELD_VIEWER.md](docs/BATTLEFIELD_VIEWER.md) for
+controls, data authority, and current coverage limits.
+
 CI uploads each shard's JUnit report for future median-duration profiles. Full behavioral shards
 run for ready pull requests, merge candidates, and pushes to `main`; draft pull requests keep the
 faster quality and parallel type-check feedback without repeatedly running the complete suite.
