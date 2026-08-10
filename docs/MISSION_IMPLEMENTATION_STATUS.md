@@ -109,16 +109,24 @@ Secondary status:
   separate reviewed Chapter Approved mission-deck provenance in the Event
   Companion source package.
 - The exact battlefield artifact has package hash
-  `3137c55f272aa84e72ee4b4d171df2cb0082b83d01d44d160b3741204b619e31`
+  `8a8808522d7761df326c2c37eb5f636a9665b7c341e72c809117eeb657dcf1b7`
   and raw artifact SHA-256
-  `12ce8bcc352b3a09ba8d3e3b40f0652183b227f20059f877a657826ad95e125b`.
+  `a1990d8d0d010cdaf105dc3c5d885dde6c2becdd1ab47ff7dd36c66e510dce38`.
   Its reviewed extraction payload is pinned as
   `8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30`.
   The loader rejects structurally valid re-hashed coordinate drift as well as
   malformed or stale content.
   All 12 orientation-reversing terrain-area source affines are preserved as typed
   local reflections with transformed-vertex anchors derived from the reviewed
-  registration anchors.
+  registration anchors. Orientation-reversing registrations of source asset
+  xref 5506 additionally apply its reviewed intrinsic half-turn about the placed
+  footprint bounds, so the asymmetric bump-outs remain on the source-image edges.
+  Terrain-area anchors and component battlefield centers use a 0.05-inch
+  placement grid; every second-half placement is derived by exact point symmetry
+  from its reviewed first-half counterpart. Layout A also pins its reviewed
+  0.5-inch central-footprint correction and the contact-preserving corner/pipe
+  and angled-obstacle adjustments. Layouts B and C pin their corresponding
+  reviewed contact-pair adjustments on the same grid.
 - Meatgrinder's canonical scoring text, source timing, VP values, and structured
   condition tokens are committed separately in
   `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-meatgrinder-scoring.json`.
@@ -139,16 +147,19 @@ Secondary status:
 - Each variant contains 16 source terrain areas and 30 individually placed
   terrain components: 8 ruins, 8 dense non-ruin components, and 14 light
   components. Terrain-area and component source-image placement and orientation
-  come from the reviewed source-page affine records. The compact component
-  rules polygons and physical wall/floor primitives are engine models rather
-  than traced raster silhouettes. Project-owner-supplied semantics establish
+  come from the reviewed source-page affine records. Ruin and Light corner-piece
+  envelopes use grid-aligned dimensions validated against the reviewed
+  source-image axis spans, with each schematic L-wall joint registered to the
+  source image's lower-left corner. Component rules polygons and physical
+  wall/floor primitives remain engine models rather than traced raster silhouettes.
+  Project-owner-supplied semantics establish
   three-inch floor spacing, solid three-inch walls below every upper floor,
   approximately two-inch top-floor walls, and approximately two-inch Light
   terrain. The reviewed AB/EF three-floor versus CD/GH two-floor assignment,
-  compact primitive dimensions, and 3.5-inch Dense non-ruin height are explicit
-  initial engine modeling assumptions; the PDF does not measure or prescribe
-  them. All of those choices are committed and reviewable for later
-  placement/model tweaks.
+  wall thickness, rectangular floors, compact non-ruin primitive dimensions,
+  and 3.5-inch Dense non-ruin height are explicit engine modeling assumptions;
+  the PDF does not prescribe them. All of those choices are committed and
+  reviewable for later placement/model tweaks.
 - Rendering images remain non-authoritative. Runtime setup, movement, collision,
   visibility, and scoring consume the validated structured package, not a page
   image or a renderer-derived measurement.

@@ -59,6 +59,7 @@ from warhammer40k_core.engine.shooting_terrain_visibility import (
 )
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.base import CircularBase
+from warhammer40k_core.geometry.polygons import polygon_overlap_area
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.visibility import (
     BenefitOfCoverResult,
@@ -470,28 +471,28 @@ def test_phase17n_meatgrinder_exact_slice_artifact_is_source_hashed_and_strict()
         if area.footprint_template_id == "FOOTPRINT_8X11_5_POLYGON"
     } == {
         "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-02": (
-            27.042098342,
-            50.182832221,
+            27.05,
+            50.2,
         ),
         "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-15": (
-            16.697859026,
-            9.700151112,
+            16.95,
+            9.8,
         ),
         "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-03": (
-            15.891604839,
-            44.107128805,
+            15.9,
+            44.1,
         ),
         "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-14": (
-            28.146336111,
-            15.825812322,
+            28.1,
+            15.9,
         ),
         "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-05": (
-            32.027815928,
-            43.018007668,
+            32.05,
+            43.0,
         ),
         "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-12": (
-            12.014226239,
-            15.866469927,
+            11.95,
+            17.0,
         ),
     }
     assert {
@@ -567,6 +568,161 @@ def test_phase17n_meatgrinder_exact_slice_artifact_is_source_hashed_and_strict()
         event_layouts.validate_exact_slice_artifact_bytes(
             json.dumps(unreflected_source_affine_payload).encode()
         )
+
+
+def test_phase17n_ruin_wall_joints_follow_source_image_registration() -> None:
+    repository_root = Path(__file__).resolve().parents[2]
+    extraction_payload = json.loads(
+        (
+            repository_root
+            / "data/source_audits/event_companion_2026_06"
+            / "phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json"
+        ).read_text(encoding="utf-8")
+    )
+    artifact = event_layouts.exact_slice_artifact()
+    archetypes_by_xref = {
+        archetype.source_assets[0].source_pdf_image_xref: archetype
+        for archetype in artifact.feature_archetypes
+        if archetype.model_kind == "ruin"
+    }
+    placements_by_id = {
+        component.component_id: component
+        for layout in artifact.layouts
+        for component in layout.terrain_components
+    }
+
+    assert set(archetypes_by_xref) == {5470, 5472, 5474, 5476}
+    for archetype in archetypes_by_xref.values():
+        minimum_x = min(point.x_inches for point in archetype.rules_footprint_polygon)
+        minimum_y = min(point.y_inches for point in archetype.rules_footprint_polygon)
+        ground_walls = {
+            wall.wall_id: wall for wall in archetype.walls if wall.bottom_z_inches == 0.0
+        }
+        assert math.isclose(
+            ground_walls["ground-long-solid-wall"].center_y_inches,
+            minimum_y + 0.07,
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+        assert math.isclose(
+            ground_walls["ground-short-solid-wall"].center_x_inches,
+            minimum_x + 0.07,
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+
+    checked_component_ids: set[str] = set()
+    for source_layout in extraction_payload["layouts"]:
+        for source_component in source_layout["terrain_components"]:
+            area_index = int(source_component["terrain_area_id"].rsplit("-", maxsplit=1)[-1])
+            if area_index > 8:
+                continue
+            source_image = source_component["source_image"]
+            source_xref = source_image["xref"]
+            source_archetype = archetypes_by_xref.get(source_xref)
+            if source_archetype is None:
+                continue
+            placement = placements_by_id[source_component["component_id"]]
+            assert placement.local_transform == "identity"
+            minimum_x = min(point.x_inches for point in source_archetype.rules_footprint_polygon)
+            minimum_y = min(point.y_inches for point in source_archetype.rules_footprint_polygon)
+            radians = math.radians(placement.battlefield_rotation_degrees)
+            modeled_joint_x = (
+                placement.battlefield_center_x_inches
+                + (minimum_x * math.cos(radians))
+                - (minimum_y * math.sin(radians))
+            )
+            modeled_joint_y = (
+                placement.battlefield_center_y_inches
+                + (minimum_x * math.sin(radians))
+                + (minimum_y * math.cos(radians))
+            )
+            source_joint_x, source_joint_y = source_image[
+                "battlefield_quad_inches_top_left_top_right_bottom_right_bottom_left"
+            ][3]
+            assert (
+                math.dist(
+                    (modeled_joint_x, modeled_joint_y),
+                    (source_joint_x, source_joint_y),
+                )
+                <= 0.4
+            )
+            checked_component_ids.add(source_component["component_id"])
+
+    assert len(checked_component_ids) == 12
+
+
+def test_phase17n_light_corner_wall_joints_follow_source_image_registration() -> None:
+    repository_root = Path(__file__).resolve().parents[2]
+    extraction_payload = json.loads(
+        (
+            repository_root
+            / "data/source_audits/event_companion_2026_06"
+            / "phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json"
+        ).read_text(encoding="utf-8")
+    )
+    artifact = event_layouts.exact_slice_artifact()
+    archetypes_by_xref = {
+        archetype.source_assets[0].source_pdf_image_xref: archetype
+        for archetype in artifact.feature_archetypes
+        if archetype.archetype_id.startswith("light-corner-")
+    }
+
+    assert set(archetypes_by_xref) == {5478, 5480, 5482, 5484}
+    for archetype in archetypes_by_xref.values():
+        minimum_x = min(point.x_inches for point in archetype.rules_footprint_polygon)
+        maximum_x = max(point.x_inches for point in archetype.rules_footprint_polygon)
+        minimum_y = min(point.y_inches for point in archetype.rules_footprint_polygon)
+        maximum_y = max(point.y_inches for point in archetype.rules_footprint_polygon)
+        arm_thickness = min(maximum_x - minimum_x, maximum_y - minimum_y) * 0.35
+        walls = {wall.wall_id: wall for wall in archetype.walls}
+        assert math.isclose(
+            walls["long-solid-arm"].center_y_inches,
+            minimum_y + (arm_thickness / 2.0),
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+        assert math.isclose(
+            walls["short-solid-arm"].center_x_inches,
+            minimum_x + (arm_thickness / 2.0),
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    checked_component_ids: set[str] = set()
+    for source_layout in extraction_payload["layouts"]:
+        layout_id = source_layout["layout_id"]
+        setup = MissionSetup.from_mission_pack(
+            mission_pack=mission_pack,
+            mission_pool_entry_id=f"mission-{layout_id}",
+            attacker_player_id="player-alpha",
+            defender_player_id="player-beta",
+        )
+        features_by_id = {feature.feature_id: feature for feature in setup.terrain_features}
+        for source_component in source_layout["terrain_components"]:
+            area_index = int(source_component["terrain_area_id"].rsplit("-", maxsplit=1)[-1])
+            if area_index > 8:
+                continue
+            source_image = source_component["source_image"]
+            if source_image["xref"] not in archetypes_by_xref:
+                continue
+            modeled_joint = features_by_id[
+                source_component["component_id"]
+            ].rules_footprint_polygon[0]
+            source_joint_x, source_joint_y = source_image[
+                "battlefield_quad_inches_top_left_top_right_bottom_right_bottom_left"
+            ][3]
+            assert (
+                math.dist(
+                    (modeled_joint.x_inches, modeled_joint.y_inches),
+                    (source_joint_x, source_joint_y),
+                )
+                <= 0.85
+            )
+            checked_component_ids.add(source_component["component_id"])
+
+    assert len(checked_component_ids) == 12
 
 
 def test_phase17n_meatgrinder_exact_slice_builder_reproduces_committed_artifact(
@@ -733,6 +889,17 @@ def test_phase17n_exact_terrain_area_reflections_follow_source_affine_orientatio
 
     assert len(source_orientation_reversing_ids) == 12
     assert artifact_mirrored_ids == source_orientation_reversing_ids
+    assert {
+        area.area_id
+        for layout in artifact.layouts
+        for area in layout.terrain_areas
+        if "_and_reviewed_half_turn" in area.pose_basis
+    } == {
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04",
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-13",
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-01",
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-16",
+    }
 
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
     setup = MissionSetup.from_mission_pack(
@@ -749,23 +916,152 @@ def test_phase17n_exact_terrain_area_reflections_follow_source_affine_orientatio
 
     assert layout_a_area_04.local_transform is TerrainAreaLocalTransform.MIRROR_Y_AXIS
     assert tuple(
-        (point.x_inches, point.y_inches) for point in layout_a_area_04.footprint_polygon
+        (round(point.x_inches, 9), round(point.y_inches, 9))
+        for point in layout_a_area_04.footprint_polygon
     ) == (
-        (40.5, 46.0),
-        (34.5, 46.0),
-        (34.5, 44.7),
-        (34.0, 44.0),
-        (34.4, 43.3),
-        (34.2, 43.0),
-        (34.5, 42.8),
-        (34.5, 42.0),
-        (37.2, 42.0),
-        (37.3, 41.8),
-        (37.7, 41.9),
-        (38.5, 41.5),
-        (39.3, 42.0),
-        (40.5, 42.0),
+        (34.0, 41.1),
+        (40.0, 41.1),
+        (40.0, 42.4),
+        (40.5, 43.1),
+        (40.1, 43.8),
+        (40.3, 44.1),
+        (40.0, 44.3),
+        (40.0, 45.1),
+        (37.3, 45.1),
+        (37.2, 45.3),
+        (36.8, 45.2),
+        (36.0, 45.6),
+        (35.2, 45.1),
+        (34.0, 45.1),
     )
+
+
+def test_phase17n_terrain_placements_use_reviewed_grid_symmetry_and_contacts() -> None:
+    artifact = event_layouts.exact_slice_artifact()
+    increment = artifact.source_coordinate_frame.terrain_placement_increment_inches
+
+    assert increment == 0.05
+    for layout in artifact.layouts:
+        areas_by_id = {area.area_id: area for area in layout.terrain_areas}
+        components_by_id = {
+            component.component_id: component for component in layout.terrain_components
+        }
+        for area in layout.terrain_areas:
+            assert math.isclose(
+                area.anchor_x_inches / increment,
+                round(area.anchor_x_inches / increment),
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                area.anchor_y_inches / increment,
+                round(area.anchor_y_inches / increment),
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            area_index = int(area.area_id.rsplit("-", maxsplit=1)[-1])
+            if area_index > 8:
+                continue
+            mirror_area = areas_by_id[area.mirror_area_id]
+            assert area.anchor_x_inches + mirror_area.anchor_x_inches == 44.0
+            assert area.anchor_y_inches + mirror_area.anchor_y_inches == 60.0
+            assert (mirror_area.rotation_degrees - area.rotation_degrees) % 360.0 == 180.0
+            assert mirror_area.local_transform == area.local_transform
+        for component in layout.terrain_components:
+            assert math.isclose(
+                component.battlefield_center_x_inches / increment,
+                round(component.battlefield_center_x_inches / increment),
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                component.battlefield_center_y_inches / increment,
+                round(component.battlefield_center_y_inches / increment),
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            area_index_text, component_ordinal = component.component_id.rsplit(
+                "-terrain-area-",
+                maxsplit=1,
+            )[1].split("-component-", maxsplit=1)
+            area_index = int(area_index_text)
+            if area_index > 8:
+                continue
+            mirror_component_id = (
+                f"{layout.layout_id}-terrain-area-{17 - area_index:02d}"
+                f"-component-{component_ordinal}"
+            )
+            mirror_component = components_by_id[mirror_component_id]
+            assert (
+                component.battlefield_center_x_inches + mirror_component.battlefield_center_x_inches
+                == 44.0
+            )
+            assert (
+                component.battlefield_center_y_inches + mirror_component.battlefield_center_y_inches
+                == 60.0
+            )
+            assert math.isclose(
+                (
+                    mirror_component.battlefield_rotation_degrees
+                    - component.battlefield_rotation_degrees
+                )
+                % 360.0,
+                180.0,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+
+    reviewed_anchors_by_layout = {
+        1: {"04": (34.0, 41.1), "07": (23.0, 42.5), "08": (5.15, 36.0)},
+        2: {"02": (31.0, 50.0), "07": (17.55, 39.05)},
+        3: {"02": (22.8, 50.05), "06": (9.5, 39.6)},
+    }
+    contact_pairs_by_layout = {
+        1: (("04", "05"), ("06", "08"), ("09", "11"), ("12", "13")),
+        2: (("01", "02"), ("05", "07"), ("10", "12"), ("15", "16")),
+        3: (("02", "04"), ("06", "09"), ("08", "11"), ("13", "15")),
+    }
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    for layout_number, reviewed_anchors in reviewed_anchors_by_layout.items():
+        artifact_areas = {
+            area.area_id.rsplit("-", maxsplit=1)[-1]: area
+            for area in artifact.layouts[layout_number - 1].terrain_areas
+        }
+        assert {
+            area_suffix: (
+                artifact_areas[area_suffix].anchor_x_inches,
+                artifact_areas[area_suffix].anchor_y_inches,
+            )
+            for area_suffix in reviewed_anchors
+        } == reviewed_anchors
+
+        setup = MissionSetup.from_mission_pack(
+            mission_pack=mission_pack,
+            mission_pool_entry_id=(
+                f"mission-purge-the-foe-vs-purge-the-foe-layout-{layout_number}"
+            ),
+            attacker_player_id="player-alpha",
+            defender_player_id="player-beta",
+        )
+        runtime_areas = {
+            area.terrain_area_id.rsplit("-", maxsplit=1)[-1]: area for area in setup.terrain_areas
+        }
+        for first_suffix, second_suffix in contact_pairs_by_layout[layout_number]:
+            first = tuple(
+                (point.x_inches, point.y_inches)
+                for point in runtime_areas[first_suffix].footprint_polygon
+            )
+            second = tuple(
+                (point.x_inches, point.y_inches)
+                for point in runtime_areas[second_suffix].footprint_polygon
+            )
+            assert polygon_overlap_area(first, second) <= 1e-6
+            assert (
+                shapely_backend.footprint_for_polygon(first).distance(
+                    shapely_backend.footprint_for_polygon(second)
+                )
+                <= increment
+            )
 
 
 def test_phase17n_meatgrinder_exact_layouts_build_all_source_components() -> None:

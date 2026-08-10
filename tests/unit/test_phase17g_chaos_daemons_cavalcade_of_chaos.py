@@ -1872,11 +1872,11 @@ def _place_warp_riders_ruins_traversal_positions(state: GameState) -> None:
         poses=tuple(
             Pose.at(
                 ground_wall.center_x_inches
-                + (((index % 3) - 1) * 3.7 * tangent_x)
+                + ((index % 3) * 3.7 * tangent_x)
                 - (traversal_dx / 2.0)
                 + (((index // 3) - 0.5) * 2.2 * normal_x),
                 ground_wall.center_y_inches
-                + (((index % 3) - 1) * 3.7 * tangent_y)
+                + ((index % 3) * 3.7 * tangent_y)
                 - (traversal_dy / 2.0)
                 + (((index // 3) - 0.5) * 2.2 * normal_y),
                 facing_degrees=ground_wall.rotation_degrees,
