@@ -757,12 +757,15 @@ def _target_candidate(
         target_unit_ids_with_recent_ranged_attacks=target_unit_ids_with_recent_ranged_attacks,
         target_detection_range_bonus_inches=target_detection_range_bonus_inches,
     )
+    indirect_fire_can_target_without_visibility = has_weapon_keyword(
+        weapon_profile, WeaponKeyword.INDIRECT_FIRE
+    ) and not has_weapon_keyword(weapon_profile, WeaponKeyword.TORRENT)
     detectable_in_range_model_ids = tuple(
         model_id
         for model_id in target_in_range_model_ids
         if model_id in detection_eligible_model_ids
     )
-    if not detectable_in_range_model_ids:
+    if not detectable_in_range_model_ids and not indirect_fire_can_target_without_visibility:
         return _invalid_candidate(
             attacker_unit=attacker_unit,
             weapon_profile=weapon_profile,
@@ -789,8 +792,7 @@ def _target_candidate(
     indirect_no_visible = (
         evidence is not None
         and not evidence.visible_and_in_range_target_model_ids
-        and WeaponKeyword.INDIRECT_FIRE in weapon_profile.keywords
-        and WeaponKeyword.TORRENT not in weapon_profile.keywords
+        and indirect_fire_can_target_without_visibility
     )
     if evidence is None or (
         not evidence.visible_and_in_range_target_model_ids and not indirect_no_visible

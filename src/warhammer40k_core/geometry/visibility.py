@@ -894,6 +894,8 @@ class BenefitOfCoverResult:
         cover_effects: set[CoverEffect] = set()
         for record in records:
             if type(record) is TerrainAreaCoverSourceRecord:
+                if not cover_policy.grants_benefit_of_cover:
+                    continue
                 if (
                     record.reason is CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_TERRAIN_AREA
                     and cover_policy.requires_not_fully_visible
@@ -1323,15 +1325,18 @@ class TerrainVisibilityContext:
             matching_areas = tuple(
                 area
                 for area in self.terrain_areas
-                if classification_has_visibility_semantics(area.classification)
-                and model_intersects_terrain_area(target_model, area)
+                if model_intersects_terrain_area(target_model, area)
             )
             if not area_keyword_gate or area_keyword_gate.intersection(model_keywords):
                 model_records.update(
                     TerrainAreaCoverSourceRecord(
                         terrain_area_id=area.terrain_area_id,
                         classification=area.classification,
-                        policy_kind=LineOfSightPolicy.AREA_OBSCURING,
+                        policy_kind=(
+                            LineOfSightPolicy.AREA_OBSCURING
+                            if classification_has_visibility_semantics(area.classification)
+                            else LineOfSightPolicy.TRUE_LINE_OF_SIGHT
+                        ),
                         reason=CoverSourceReason.WITHIN_TERRAIN_AREA,
                     )
                     for area in matching_areas

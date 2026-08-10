@@ -339,7 +339,7 @@ def test_exact_event_light_category_uses_two_inch_free_traversal() -> None:
     )
 
 
-def test_light_classification_does_not_override_tall_feature_movement_policy() -> None:
+def test_light_classification_allows_mounted_through_three_inch_feature() -> None:
     feature = replace(
         _ruins_blocking_wall_feature(),
         feature_id="tall-light-policy-feature",
@@ -347,7 +347,9 @@ def test_light_classification_does_not_override_tall_feature_movement_policy() -
         classification=TerrainAreaClassification.LIGHT,
     )
     wall = feature.walls[0]
-    start_pose, middle_pose, end_pose = _wall_crossing_poses(wall)
+    start_pose = Pose.at(wall.center_x_inches - 4.0, wall.center_y_inches)
+    middle_pose = Pose.at(wall.center_x_inches, wall.center_y_inches, 1.5)
+    end_pose = Pose.at(wall.center_x_inches + 4.0, wall.center_y_inches)
     mover = _model("tall-light-mounted-mover", start_pose.position.x, start_pose.position.y)
 
     result = _terrain_context(
@@ -358,9 +360,13 @@ def test_light_classification_does_not_override_tall_feature_movement_policy() -
         end_pose=end_pose,
     ).validate()
 
-    assert not result.is_valid
-    assert result.violations[0].violation_code == "terrain_feature_transit_forbidden"
-    assert result.violations[0].terrain_id == f"{feature.feature_id}:{wall.wall_id}"
+    assert result.is_valid
+    assert any(
+        segment.terrain_id == f"{feature.feature_id}:{wall.wall_id}"
+        and segment.traversal_mode.value == "through_feature"
+        and segment.vertical_distance_inches > 0.0
+        for segment in result.segments
+    )
 
 
 def test_exact_event_companion_ruins_apply_keyword_specific_wall_traversal() -> None:
@@ -386,9 +392,8 @@ def test_exact_event_companion_ruins_apply_keyword_specific_wall_traversal() -> 
     for keywords in (
         ("INFANTRY",),
         ("BEAST",),
+        ("SWARM",),
         ("MOBILE",),
-        ("BELISARIUS_CAWL",),
-        ("IMPERIUM_PRIMARCH",),
     ):
         mover = _model(
             f"{keywords[0].lower()}-mover",
@@ -406,7 +411,13 @@ def test_exact_event_companion_ruins_apply_keyword_specific_wall_traversal() -> 
         assert result.is_valid
         assert any(segment.traversal_mode.value == "through_feature" for segment in result.segments)
 
-    for keywords in (("MOUNTED",), ("VEHICLE",), ("MONSTER",)):
+    for keywords in (
+        ("MOUNTED",),
+        ("VEHICLE",),
+        ("MONSTER",),
+        ("BELISARIUS_CAWL",),
+        ("IMPERIUM_PRIMARCH",),
+    ):
         mover = _model(
             f"{keywords[0].lower()}-mover",
             start_pose.position.x,
@@ -423,6 +434,50 @@ def test_exact_event_companion_ruins_apply_keyword_specific_wall_traversal() -> 
         assert not result.is_valid
         assert result.violations[0].violation_code == "terrain_feature_transit_forbidden"
         assert result.violations[0].terrain_id == f"{ruins.feature_id}:{wall.wall_id}"
+
+
+def test_exact_event_dense_ruin_mobile_vertical_path_climbs_instead_of_passing_through() -> None:
+    mission_setup = _exact_event_companion_meatgrinder_setup()
+    ruins = next(
+        feature
+        for feature in mission_setup.terrain_features
+        if feature.classification is TerrainAreaClassification.DENSE
+        and feature.feature_kind is TerrainFeatureKind.RUINS
+        and any(wall.wall_id == "ground-long-solid-wall" for wall in feature.walls)
+    )
+    wall = next(wall for wall in ruins.walls if wall.wall_id == "ground-long-solid-wall")
+    rotation_radians = math.radians(wall.rotation_degrees)
+    normal_x = -math.sin(rotation_radians)
+    normal_y = math.cos(rotation_radians)
+    clearance_inches = 3.0
+    start_pose = Pose.at(
+        wall.center_x_inches - normal_x * clearance_inches,
+        wall.center_y_inches - normal_y * clearance_inches,
+    )
+    middle_pose = Pose.at(wall.center_x_inches, wall.center_y_inches, 3.0)
+    end_pose = Pose.at(
+        wall.center_x_inches + normal_x * clearance_inches,
+        wall.center_y_inches + normal_y * clearance_inches,
+    )
+    mover = _model("dense-mobile-vertical-mover", start_pose.position.x, start_pose.position.y)
+
+    result = _terrain_context(
+        _normal_legality_context(keywords=("MOBILE",)),
+        moving_model=mover,
+        terrain_features=(ruins,),
+        middle_pose=middle_pose,
+        end_pose=end_pose,
+    ).validate()
+
+    assert result.is_valid
+    matching_segments = tuple(
+        segment
+        for segment in result.segments
+        if segment.terrain_id == f"{ruins.feature_id}:{wall.wall_id}"
+    )
+    assert matching_segments
+    assert all(segment.traversal_mode.value == "climb" for segment in matching_segments)
+    assert all(segment.vertical_distance_inches > 0.0 for segment in matching_segments)
 
 
 def test_infantry_can_move_through_ruins_wall_but_cannot_end_inside_wall() -> None:

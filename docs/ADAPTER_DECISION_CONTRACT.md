@@ -544,6 +544,15 @@ Adapter helper APIs should take `request_id` explicitly even when a local wrappe
 
 Movement action option payloads include the selected `movement_mode`. Default Normal Move and Advance keep their existing option IDs, while Take to the Skies variants append the mode, for example `normal_move:fly_take_to_skies` or `advance:fly_take_to_skies`. Fall Back options are explicitly mode-scoped: `fall_back:ordered_retreat` or `fall_back:desperate_escape`, with `:fly_take_to_skies` appended when that movement mode is selected. Remain Stationary resolves as a finite action. Normal Move, Advance, and Fall Back always emit a follow-up `submit_movement_proposal` request carrying the same mode context; adapters must submit the actual `PathWitness` and model poses through that parameterized request.
 
+Terrain classification is authoritative during movement-proposal validation.
+All models can move horizontally and vertically through Light terrain.
+`INFANTRY`/`BEASTS`/`SWARM` models can move horizontally and vertically through
+Dense terrain, while `MOBILE` grants only horizontal Dense transit. A denied
+Dense direct-transit permission cannot be promoted by a retired feature-kind
+policy, although an otherwise legal vertical path may still climb over the
+feature. Adapters must submit the path actually taken and must not infer
+terrain traversal from feature display kind.
+
 Accepted Fall Back proposals may include source-backed `fall_back_eligibility_grants` in the resulting `movement_activation_completed` event. These grants are replay-safe audit payloads produced by runtime faction content and do not create a new adapter choice. The Movement engine remains the only writer of `FellBackUnitState.can_shoot` and `FellBackUnitState.can_declare_charge`; Shooting and Charge phase selection consume those recorded permissions instead of adapters inferring Fall Back exceptions locally.
 
 Movement-action optional grants use a finite/proposal split. After a Normal
@@ -1154,7 +1163,7 @@ Required Phase 12 adapter-contract tests:
 
 Phase 13A terrain visibility, line of sight, and cover foundation does not create player-facing choices. Its `LineOfSightWitness` and `BenefitOfCoverResult` payloads are engine-owned evidence consumed by later shooting decisions and events. `BenefitOfCoverResult` records deterministic feature sources through `source_feature_ids` and feature `source_records`, and terrain-area sources through `source_terrain_area_ids` and typed area records containing the terrain-area ID, classification, LoS policy, and cover-source reason. The current 11th Edition producer uses `not_fully_visible_because_of_feature` for feature evidence and `within_terrain_area` or `not_fully_visible_because_of_terrain_area` for area evidence; `wholly_within_feature` remains deserializable for historical evidence but does not independently grant 11th Edition cover.
 
-The engine converts source `PlacedTerrainArea` values into geometry-owned `TerrainVisibilityArea` descriptors. Dense, Light, and Mixed terrain areas use `LineOfSightPolicy.AREA_OBSCURING`; Dense and Mixed areas are Solid, while Light areas are not. Hidden eligibility is engine-derived per model from that model's component-unit keywords and Dense terrain-area occupancy, together with authoritative unit-scoped current/previous-turn ranged-attack history. Detection-range filtering is likewise model-scoped. Benefit of Cover is granted only when every alive model in the target rules unit independently qualifies: an `INFANTRY`/`BEASTS`/`SWARM` model is within a terrain area, or that model is not fully visible because of intervening terrain. Adapters must consume line-of-sight witnesses and target candidates rather than locally interpreting terrain-area polygons, classifications, openings, cover, Hidden status, or Solid detection penalties. Phase 13C attack allocation therefore evaluates cover against the entire alive target rules unit even though damage remains allocated to one model.
+The engine converts source `PlacedTerrainArea` values into geometry-owned `TerrainVisibilityArea` descriptors. Dense, Light, and Mixed terrain areas use `LineOfSightPolicy.AREA_OBSCURING`; Dense and Mixed areas are Solid, while Light areas are not. Hidden eligibility is engine-derived per model from that model's component-unit keywords and Dense terrain-area occupancy, together with authoritative unit-scoped current/previous-turn ranged-attack history. Detection-range filtering is likewise model-scoped. Benefit of Cover is granted only when every alive model in the target rules unit independently qualifies: an `INFANTRY`/`BEASTS`/`SWARM` model is within any terrain area regardless of classification, or that model is not fully visible because of intervening terrain. A within-area Cover record for an Unknown area carries `WITHIN_TERRAIN_AREA` evidence without claiming that the area is Obscuring. Adapters must consume line-of-sight witnesses and target candidates rather than locally interpreting terrain-area polygons, classifications, openings, cover, Hidden status, or Solid detection penalties. Phase 13C attack allocation therefore evaluates cover against the entire alive target rules unit even though damage remains allocated to one model.
 
 Phase 13B and later shooting slices add player-facing attacker and defender choices. They must not introduce UI, headless, replay, or network-specific mutation paths. Every accepted choice must pass through the same lifecycle submission path and produce deterministic replay-facing records.
 
@@ -1367,6 +1376,14 @@ previous player turn. Units that made ranged attacks in either turn cannot
 benefit even if another rule lets them shoot while remaining Hidden. Adapters
 must not locally add, remove, or reinterpret Hidden/detection state, terrain
 Solid status, or ranged-attack history.
+
+Detection Range is a visibility gate, not an independent Indirect Fire
+targeting prohibition. An eligible `[INDIRECT FIRE]` weapon can therefore
+target an in-range Hidden model outside Detection Range through the normal
+not-visible Indirect path and restrictions. Lone Operative remains distinct
+because its rule separately prohibits Indirect Fire outside its stated range.
+The finalized Core Rules section 13.09 Dense qualifier controls terrain-derived
+Hidden, so a Light-only terrain area does not grant it.
 
 Defender allocation/save/defensive/destruction-reaction decisions may auto-resolve only when the rules leave exactly one legal outcome and no optional player choice. Otherwise the defending or destroyed-model controlling player is the `DecisionRequest.actor_id`, even though they may not be the active player. Adapters must not infer that Shooting phase decisions always belong to the active player. Stale, drifted, wrong-actor, wrong-option, or payload-mismatched destruction-reaction submissions return typed invalid diagnostics before queue pop and before a `DecisionRecord` is created.
 

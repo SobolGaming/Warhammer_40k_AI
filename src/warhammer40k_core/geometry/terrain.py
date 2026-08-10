@@ -71,26 +71,33 @@ class TerrainFloorDefinitionPayload(TypedDict):
     rotation_degrees: float
 
 
-def dense_feature_allows_model_transit(
+def classified_feature_transit_permission(
     feature: TerrainFeatureDefinition,
     movement_keywords: tuple[str, ...],
     touching_poses: tuple[Pose, ...],
-) -> bool:
-    """Return the model-scoped Dense transit permission for a sampled path."""
+) -> bool | None:
+    """Return authoritative classified transit permission, or None when unclassified."""
     if type(feature) is not TerrainFeatureDefinition:
-        raise GeometryError("Dense transit requires a TerrainFeatureDefinition.")
+        raise GeometryError("Classified transit requires a TerrainFeatureDefinition.")
     if type(movement_keywords) is not tuple or any(
         type(keyword) is not str or not keyword for keyword in movement_keywords
     ):
-        raise GeometryError("Dense transit requires canonical movement keywords.")
+        raise GeometryError("Classified transit requires canonical movement keywords.")
     if (
         type(touching_poses) is not tuple
         or not touching_poses
         or any(type(pose) is not Pose for pose in touching_poses)
     ):
-        raise GeometryError("Dense transit requires a non-empty pose tuple.")
-    if feature.classification is not TerrainAreaClassification.DENSE:
-        return False
+        raise GeometryError("Classified transit requires a non-empty pose tuple.")
+    if feature.classification is TerrainAreaClassification.UNKNOWN:
+        return None
+    if feature.classification is TerrainAreaClassification.LIGHT:
+        return True
+    if feature.classification not in {
+        TerrainAreaClassification.DENSE,
+        TerrainAreaClassification.MIXED,
+    }:
+        raise GeometryError("Unsupported classified terrain transit semantics.")
     keywords = frozenset(movement_keywords)
     if keywords & {"BEAST", "INFANTRY", "SWARM"}:
         return True

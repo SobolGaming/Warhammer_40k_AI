@@ -31,7 +31,7 @@ from warhammer40k_core.core.missions import (
     ObjectiveMarkerRole,
     objective_marker_role_from_token,
 )
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import LineOfSightPolicy, RulesetDescriptor
 from warhammer40k_core.core.terrain_areas import (
     TerrainAreaClassification,
     TerrainAreaLocalTransform,
@@ -60,6 +60,9 @@ from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.base import CircularBase
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.visibility import (
+    BenefitOfCoverResult,
+    CoverSourceReason,
+    TerrainAreaCoverSourceRecord,
     TerrainVisibilityContext,
     VisibilityBlockerKind,
 )
@@ -1092,6 +1095,74 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
         terrain_features=(),
         terrain_areas=(light_area,),
     )
+
+
+def test_phase17n_unknown_terrain_area_classification_does_not_gate_membership_cover() -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+    exact_light_area = next(
+        area
+        for area in terrain_visibility_areas_from_placements(setup.terrain_areas)
+        if area.terrain_area_id == "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04"
+    )
+    unknown_area = replace(
+        exact_light_area,
+        classification=TerrainAreaClassification.UNKNOWN,
+    )
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="phase17n-unknown-area-membership-cover",
+        ),
+        los_cache_key="los:phase17n-unknown-area-membership-cover",
+        observer_model=Model(
+            model_id="observer",
+            pose=Pose.at(x=32.0, y=43.0),
+            base=CircularBase(radius=0.35),
+            volume=ModelVolume(height=2.0),
+        ),
+        target_models=(
+            Model(
+                model_id="target",
+                pose=Pose.at(x=36.0, y=43.0),
+                base=CircularBase(radius=0.35),
+                volume=ModelVolume(height=2.0),
+            ),
+        ),
+        target_model_keywords=(("target", ("INFANTRY",)),),
+        terrain_areas=(unknown_area,),
+    )
+
+    witness = context.resolve_line_of_sight()
+    cover = context.benefit_of_cover(witness)
+
+    assert witness.unit_visible
+    assert witness.unit_fully_visible
+    assert witness.all_blocker_records() == ()
+    assert cover.has_benefit
+    assert cover.source_terrain_area_ids == (unknown_area.terrain_area_id,)
+    assert len(cover.source_records) == 1
+    source_record = cover.source_records[0]
+    assert type(source_record) is TerrainAreaCoverSourceRecord
+    assert source_record.classification is TerrainAreaClassification.UNKNOWN
+    assert source_record.policy_kind is LineOfSightPolicy.TRUE_LINE_OF_SIGHT
+    assert source_record.reason is CoverSourceReason.WITHIN_TERRAIN_AREA
+    disabled_cover_policy = replace(
+        context.terrain_visibility_policy,
+        cover_policy=replace(
+            context.terrain_visibility_policy.cover_policy,
+            grants_benefit_of_cover=False,
+        ),
+    )
+    assert not BenefitOfCoverResult.from_cover_sources(
+        witness=witness,
+        terrain_visibility_policy=disabled_cover_policy,
+        source_records=cover.source_records,
+    ).has_benefit
 
 
 def test_phase17n_visibility_resolves_feature_area_associations_once_per_query(

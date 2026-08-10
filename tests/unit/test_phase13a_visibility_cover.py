@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import cast
 
 import pytest
@@ -12,6 +13,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry, TerrainDisplayPoint
 from warhammer40k_core.engine.battlefield_state import SpatialIndexState
+from warhammer40k_core.engine.shooting_terrain_visibility import model_within_solid_terrain
 from warhammer40k_core.geometry.base import CircularBase
 from warhammer40k_core.geometry.pose import GeometryError, Point3, Pose
 from warhammer40k_core.geometry.terrain import (
@@ -199,6 +201,49 @@ def test_eleventh_ruleset_has_explicit_ruins_and_woods_visibility_policies() -> 
     assert woods.towering_uses_true_los_through_feature
     assert not woods.towering_uses_true_los_when_wholly_within_feature
     assert woods.cover_policy.non_stacking
+
+
+def test_explicit_feature_classification_is_authoritative_for_solid_terrain() -> None:
+    model = _model("model-inside-feature", 0.0, 0.0)
+    light_ruins = replace(
+        _visibility_ruin(),
+        feature_id="light-classified-ruins",
+        classification=TerrainAreaClassification.LIGHT,
+    )
+    dense_hill = replace(
+        _visibility_ruin(),
+        feature_id="dense-classified-hill",
+        feature_kind=TerrainFeatureKind.HILLS,
+        classification=TerrainAreaClassification.DENSE,
+    )
+
+    assert not model_within_solid_terrain(
+        ruleset_descriptor=_ruleset(),
+        model=model,
+        terrain_features=(light_ruins,),
+        terrain_areas=(),
+    )
+    assert model_within_solid_terrain(
+        ruleset_descriptor=_ruleset(),
+        model=model,
+        terrain_features=(dense_hill,),
+        terrain_areas=(),
+    )
+
+
+def test_explicit_light_classification_overrides_legacy_dense_feature_policy() -> None:
+    light_woods = replace(
+        TerrainFactory.woods_fixture(center_x_inches=0.0, center_y_inches=0.0)[0],
+        feature_id="light-classified-woods",
+        classification=TerrainAreaClassification.LIGHT,
+    )
+
+    assert not model_within_solid_terrain(
+        ruleset_descriptor=_ruleset(),
+        model=_model("model-inside-light-woods", 0.0, 0.0),
+        terrain_features=(light_woods,),
+        terrain_areas=(),
+    )
 
 
 def test_ruins_area_visibility_blocks_los_without_physical_wall_intersection() -> None:

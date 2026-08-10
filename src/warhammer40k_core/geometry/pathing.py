@@ -45,7 +45,7 @@ from warhammer40k_core.geometry.terrain import (
     TerrainSupportSurface,
     TerrainVolume,
     TerrainVolumePayload,
-    dense_feature_allows_model_transit,
+    classified_feature_transit_permission,
     terrain_volume_from_payload,
 )
 from warhammer40k_core.geometry.volume import Model, ModelPayload
@@ -1318,6 +1318,7 @@ class TerrainPathLegalityContext:
             free_height = max(free_height, self.terrain_as_if_absent_height_inches)
         if terrain.height <= free_height:
             return TerrainTraversalMode.FREELY_TRAVERSABLE
+        can_move_over = feature_policy is None or feature_policy.can_move_over
         if type(terrain) is ObstacleVolume:
             if self._can_move_through_feature(
                 feature=feature,
@@ -1325,14 +1326,10 @@ class TerrainPathLegalityContext:
                 touching_poses=touching_poses,
             ):
                 return self.terrain_movement_policy.infantry_beast_ruins_wall_traversal_mode
-            if (
-                feature_policy is None or feature_policy.can_move_over
-            ) and _path_reaches_or_clears_terrain_top(touching_poses, terrain):
+            if can_move_over and _path_reaches_or_clears_terrain_top(touching_poses, terrain):
                 return TerrainTraversalMode.CLIMB
             return TerrainTraversalMode.BLOCKED
-        if (
-            feature_policy is None or feature_policy.can_move_over
-        ) and _path_reaches_or_clears_terrain_top(touching_poses, terrain):
+        if can_move_over and _path_reaches_or_clears_terrain_top(touching_poses, terrain):
             return TerrainTraversalMode.CLIMB
         return TerrainTraversalMode.BLOCKED
 
@@ -1347,8 +1344,11 @@ class TerrainPathLegalityContext:
             return self.can_move_through_terrain or self.can_traverse_ruins_walls
         if feature is None:
             raise GeometryError("Terrain feature movement policy requires its typed feature.")
-        if dense_feature_allows_model_transit(feature, self.movement_keywords, touching_poses):
-            return True
+        classified_permission = classified_feature_transit_permission(
+            feature, self.movement_keywords, touching_poses
+        )
+        if classified_permission is not None:
+            return classified_permission
         if feature_policy.can_move_through:
             return True
         if not self.terrain_movement_policy.requires_permission_to_move_through_features:

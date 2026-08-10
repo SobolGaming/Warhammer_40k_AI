@@ -9,7 +9,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
-from warhammer40k_core.core.terrain_areas import PlacedTerrainArea
+from warhammer40k_core.core.terrain_areas import PlacedTerrainArea, TerrainAreaClassification
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, SpatialIndexState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
@@ -151,8 +151,8 @@ def _feature_is_solid(
     ruleset_descriptor: RulesetDescriptor,
     feature: TerrainFeatureDefinition,
 ) -> bool:
-    if classification_is_solid(feature.classification):
-        return True
+    if feature.classification is not TerrainAreaClassification.UNKNOWN:
+        return classification_is_solid(feature.classification)
     policy = ruleset_descriptor.terrain_visibility_policy.policy_for_feature_kind(
         TerrainFeatureKind(feature.feature_kind)
     )

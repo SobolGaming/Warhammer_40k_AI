@@ -2017,11 +2017,17 @@ Invariants:
 - a model is Hidden when it is at least partially within a terrain area
   containing a Dense terrain element and its unit did not make ranged
   attacks in the current or previous player turn;
+- the finalized Core Rules section 13.09 Dense qualifier is authoritative for
+  Hidden; a Light-only terrain area does not grant Hidden;
 - Hidden detection is evaluated per target model using that model's own
   keywords and terrain-area occupancy; eligible and ineligible models in one
   attached rules unit never share Hidden status;
 - Hidden models can only be visible to enemy models within the applicable
   Detection Range, defaulting to 15";
+- Detection Range limits visibility rather than adding a separate targeting
+  prohibition, so `[INDIRECT FIRE]` can target a Hidden model outside Detection
+  Range; rules such as Lone Operative that separately prohibit Indirect Fire
+  remain authoritative;
 - Gone to Ground applies to a model that is not fully visible to the attacking
   model because a terrain piece is at least partially in the way;
 - Gone to Ground improves Detection Range by -3", making the default Hidden
@@ -2029,7 +2035,10 @@ Invariants:
 - rules, abilities, or Stratagems that let a Hidden unit shoot and remain Hidden
   cancel Gone to Ground for that interaction;
 - Benefit of Cover is a policy result consumed by attacks, not a save-side effect;
-- Benefit of Cover applies to the target unit only when every model in that unit qualifies through terrain-area membership or terrain/obscuring not-fully-visible evidence;
+- Benefit of Cover applies to the target unit only when every model in that unit
+  qualifies through terrain-area membership or terrain/obscuring
+  not-fully-visible evidence; eligible-keyword membership applies in any terrain
+  area regardless of its Light, Dense, Mixed, or Unknown classification;
 - Benefit of Cover worsens the attack's BS characteristic by 1 unless an ability such as `[IGNORES COVER]` removes it;
 - cover eligibility is visible in attack context before hit rolls are made;
 - LoS witnesses carry ruleset hash and spatial revision cache-key data;
@@ -2047,6 +2056,9 @@ Required tests:
 - Hidden `INFANTRY`/`BEASTS`/`SWARM` models in Dense terrain areas are
   visible only within Detection Range while their current-or-previous-turn
   shot-state condition is satisfied, including after an attached unit splits;
+- direct fire rejects a Hidden model outside Detection Range while eligible
+  `[INDIRECT FIRE]` accepts the same in-range model as not visible and applies
+  the normal Indirect restrictions;
 - mixed attached rules units apply Hidden and Detection Range per model, and
   every rules-level visible-target query consumes the same model gate;
 - Gone to Ground applies only when the attacking model's full-visibility failure
@@ -2375,7 +2387,10 @@ Required tests:
 - `[LANCE]` adds +1 to Wound rolls only when the attacking model's unit made a
   Charge move this turn and is absent for non-charged, out-of-phase, and
   non-Lance attacks;
-- Indirect Fire applies Benefit of Cover, disables Hit-roll rerolls, and enforces unmodified 1-5 fail or stationary-plus-friendly-visibility unmodified 1-3 fail;
+- Indirect Fire can target in-range models that are not visible, including
+  Hidden models outside Detection Range, applies Benefit of Cover, disables
+  Hit-roll rerolls, and enforces unmodified 1-5 fail or
+  stationary-plus-friendly-visibility unmodified 1-3 fail;
 - Close-quarters Shooting and shooting at engaged MONSTER/VEHICLE restrictions interact correctly with `[BLAST]` bans and per-model `[CLOSE-QUARTERS]` versus other-ranged weapon exclusivity;
 - Hazardous and Devastating Wounds mortal-wound allocation ordering is correct.
 - Fire Overwatch rejects invalid target bindings before CP spend and does not create marker-only effects;
@@ -2549,6 +2564,12 @@ Invariants:
   `HOVER` unit takes to the skies, the 2" subtraction is not applied. Charge
   integration remains a Phase 15 charge-move task;
 - terrain areas and Exposed/Light/Dense categories replace retired terrain-feature policies;
+- all models can move horizontally and vertically through Light terrain;
+  `INFANTRY`/`BEASTS`/`SWARM` can move horizontally and vertically through
+  Dense terrain, while `MOBILE` grants only horizontal Dense transit. A denied
+  Dense direct-transit permission cannot fall through to a retired
+  feature-kind keyword whitelist, although an otherwise legal path can still
+  ascend or descend the feature as a climb;
 - Dense movement, vertical movement, stable non-ground endpoints, Solid, Hidden,
   Gone to Ground, Obscuring, and Benefit of Cover are represented from
   structured terrain descriptors;
@@ -2568,7 +2589,8 @@ Required tests:
 - FLY take-to-the-skies changes pathing and movement budget deterministically,
   including the no-2" subtraction rule for `HOVER` units;
 - terrain visibility and terrain movement consume terrain-area descriptors,
-  including Light/Dense Hidden eligibility and Gone to Ground detection modifiers;
+  including Light/Dense movement behavior, Dense-only Hidden eligibility, and
+  Gone to Ground detection modifiers;
 - objective-control geometry supports terrain areas and marker fallback;
 - action cancellation rejects moves other than pile-in/consolidation and rejects leaving the battlefield.
 
@@ -2668,7 +2690,10 @@ Invariants:
 - non-`MONSTER`/non-`VEHICLE` close-quarters shooting can only select `[CLOSE-QUARTERS]` weapons and engaged targets;
 - `MONSTER`/`VEHICLE` close-quarters and engaged-target shooting apply the correct -1 Hit modifier except for qualifying `[CLOSE-QUARTERS]` attacks;
 - `[BLAST]` weapons cannot target engaged units through close-quarters or engaged `MONSTER`/`VEHICLE` shooting;
-- Indirect shooting can only declare `[INDIRECT FIRE]` weapon profiles, grants cover, forbids hit rerolls, and has the 1-5/1-3 unmodified fail policy;
+- Indirect shooting can only declare `[INDIRECT FIRE]` weapon profiles, can
+  target Hidden models outside Detection Range because that range gates
+  visibility rather than Indirect targeting, grants cover, forbids hit rerolls,
+  and has the 1-5/1-3 unmodified fail policy;
 - Snap Shooting targets one visible enemy unit within 24", hits only on unmodified 6, and forbids Hit-roll rerolls;
 - after a unit shoots in the Shooting phase, it cannot start a Mission Action until the phase ends.
 - after a unit starts a Mission Action, it cannot shoot in that Shooting phase
@@ -2867,8 +2892,8 @@ Invariants:
 - keyword-gated weapon abilities apply only to target units with at least one listed keyword;
 - `[HUNTER X]` is target eligibility, not an attack modifier: the weapon can
   only be declared into units matching at least one listed keyword;
-- future ability-runtime families such as `STEALTH`, `HOVER`, Super-heavy
-  Walker, and `MOBILE` remain future runtime work until an owning phase adds
+- future ability-runtime families such as Super-heavy Walker remain future
+  runtime work until an owning phase adds
   source-backed hosts, adapter-contract updates for player-facing choices, and
   focused regressions; `[PSYCHIC]` modifier-ignore/classification and `[ONE
   SHOT]` weapon-use tracking now have phase-owned hosts and regressions, while
@@ -2896,8 +2921,8 @@ Required tests:
   future coverage;
 - Hunter X target declaration accepts at least one listed keyword match and
   rejects target units with none;
-- future ability-runtime families such as `STEALTH`, `HOVER`, Super-heavy
-  Walker, and `MOBILE` require focused implementation tests, replay coverage,
+- future ability-runtime families such as Super-heavy Walker require focused
+  implementation tests, replay coverage,
   and adapter-contract updates in their owning phases before runtime completion
   can be claimed; `[PSYCHIC]` and `[ONE SHOT]` have focused coverage for their
   current attack-sequence/declaration responsibilities;

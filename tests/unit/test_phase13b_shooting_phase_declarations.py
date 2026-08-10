@@ -78,6 +78,7 @@ from warhammer40k_core.engine.attack_sequence import (
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
+    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.game_state import (
@@ -121,6 +122,8 @@ from warhammer40k_core.engine.transports import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
     HUNTER_RULE_ID,
+    INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
+    INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
     WEAPON_ABILITY_SELECTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.weapon_declaration import (
@@ -1627,6 +1630,88 @@ def test_phase17n_automatic_hidden_is_derived_for_each_eligible_model_in_dense_t
         observing_unit=observer,
         target_unit_id=target.unit_instance_id,
     )
+
+
+def test_phase17n_indirect_fire_can_target_hidden_models_outside_detection_range() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    attacker = units["intercessor-1"]
+    target = units["enemy"]
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=tuple(
+            Pose.at(x=10.135984 + (1.4 * index), y=35.0)
+            for index in range(len(attacker.own_models))
+        ),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(Pose.at(x=x, y=43.0) for x in (34.5, 35.7, 36.9, 38.1, 39.3)),
+    )
+    attacker_model = attacker.own_models[-1]
+    target_model = target.own_models[0]
+    attacker_geometry = geometry_model_for_placement(
+        model=attacker_model,
+        placement=scenario.battlefield_state.model_placement_by_id(
+            attacker_model.model_instance_id
+        ),
+    )
+    target_geometry = geometry_model_for_placement(
+        model=target_model,
+        placement=scenario.battlefield_state.model_placement_by_id(target_model.model_instance_id),
+    )
+    assert round(attacker_geometry.range_to(target_geometry), 4) == 19.1384
+    direct_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase17n-hidden-direct-24",
+        range_profile=RangeProfile.distance(24),
+        keywords=(),
+        abilities=(),
+    )
+    hidden_model_ids = tuple(model.model_instance_id for model in target.own_models)
+
+    direct_candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker_model.model_instance_id,
+        weapon_profile=direct_profile,
+        target_unit_id=target.unit_instance_id,
+        hidden_target_model_ids=hidden_model_ids,
+    )
+    indirect_candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker_model.model_instance_id,
+        weapon_profile=replace(
+            direct_profile,
+            profile_id="phase17n-hidden-indirect-24",
+            keywords=(WeaponKeyword.INDIRECT_FIRE,),
+        ),
+        target_unit_id=target.unit_instance_id,
+        hidden_target_model_ids=hidden_model_ids,
+    )
+
+    assert direct_candidate.violation_code is ShootingTargetViolationCode.OUTSIDE_DETECTION_RANGE
+    assert indirect_candidate.is_legal
+    assert indirect_candidate.target_visible_model_ids == ()
+    assert indirect_candidate.target_in_range_model_ids
+    assert indirect_candidate.shooting_types == (ShootingType.INDIRECT,)
+    assert indirect_candidate.hit_roll_modifier == -1
+    assert INDIRECT_FIRE_NO_VISIBLE_RULE_ID in indirect_candidate.targeting_rule_ids
+    assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in indirect_candidate.targeting_rule_ids
 
 
 def test_phase17n_hidden_and_detection_range_apply_to_models_not_attached_unit_keywords() -> None:
