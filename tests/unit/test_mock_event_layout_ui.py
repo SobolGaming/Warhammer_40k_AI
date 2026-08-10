@@ -97,6 +97,7 @@ def test_mock_event_layout_ui_consumes_exact_battlefield_projections(
         assert set(hints) == set(features)
         assert all(_object_map(hint)["asset_id"] is not None for hint in hints.values())
         assert len(_object_list(layout["objective_terrain_areas"])) == 6
+        assert layout["objective_footprint_status"] == "source_linked_footprints_available"
 
     assert len(hashes) == 3
 
@@ -125,6 +126,39 @@ def test_mock_event_layout_ui_marks_source_only_geometry_without_fallback(
             assert region_count > 0
         else:
             assert (feature_count, area_count, region_count) == (0, 0, 0)
+
+
+def test_mock_event_layout_ui_preserves_source_linked_objective_footprints(
+    viewer_data: dict[str, object],
+) -> None:
+    layouts = _object_map(viewer_data["layouts"])
+    for layout_value in layouts.values():
+        layout = _object_map(layout_value)
+        view = _object_map(layout["battlefield_view"])
+        authoritative = _object_map(view["authoritative"])
+        objectives = _object_map(authoritative["objectives_by_id"])
+        areas = _object_map(authoritative["terrain_areas_by_id"])
+        bindings = _object_list(layout["objective_terrain_areas"])
+
+        bound_objective_ids: set[str] = set()
+        for binding in bindings:
+            objective_id = _string(binding["objective_marker_id"])
+            assert objective_id not in bound_objective_ids
+            bound_objective_ids.add(objective_id)
+            objective = _object_map(objectives[objective_id])
+            assert binding["objective_role"] == objective["objective_role"]
+            area_ids = _string_list(binding["terrain_area_ids"])
+            assert area_ids
+            assert set(area_ids) <= set(areas)
+
+        expected_status = (
+            "source_linked_footprints_available"
+            if bound_objective_ids == set(objectives)
+            else "footprint_binding_pending"
+        )
+        assert layout["objective_footprint_status"] == expected_status
+        if bindings:
+            assert bound_objective_ids == set(objectives)
 
 
 def test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls(
@@ -166,6 +200,13 @@ def test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls(
     assert 'addEventListener("keydown", keyboardCamera)' in javascript
     assert "cameraForBounds" in javascript
     assert "projectPoint" in javascript
+    assert "resolveObjectiveTerrainFootprints" in javascript
+    assert "drawObjectiveTerrainFootprints" in javascript
+    assert "clipWorldPolygonToNearPlane" in javascript
+    assert "clipWorldLineToNearPlane" in javascript
+    assert "collectObjectiveFaces" not in javascript
+    assert "cylinderFaces" not in javascript
+    assert "marker_diameter_inches" not in javascript
     assert "layout.terrain_features" not in javascript
     assert "row.terrain_features" not in javascript
 

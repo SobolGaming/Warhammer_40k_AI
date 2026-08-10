@@ -124,6 +124,14 @@ def _build_data_payload() -> dict[str, object]:
             armies=armies,
         )
         mission_payload = mission_setup.to_payload()
+        objective_ids = set(battlefield_view["authoritative"]["objectives_by_id"])
+        bound_objective_ids = {
+            binding["objective_marker_id"] for binding in mission_payload["objective_terrain_areas"]
+        }
+        if not bound_objective_ids <= objective_ids:
+            raise GameLifecycleError(
+                "Viewer objective-terrain binding references an unknown objective."
+            )
         layouts[layout_id] = {
             "id": layout_id,
             "name": row.name,
@@ -133,6 +141,11 @@ def _build_data_payload() -> dict[str, object]:
                 "runtime_geometry_available"
                 if layout_id in runtime_geometry_layout_ids
                 else "terrain_geometry_pending"
+            ),
+            "objective_footprint_status": (
+                "source_linked_footprints_available"
+                if bound_objective_ids == objective_ids
+                else "footprint_binding_pending"
             ),
             "objective_terrain_areas": mission_payload["objective_terrain_areas"],
             "battlefield_view": battlefield_view,

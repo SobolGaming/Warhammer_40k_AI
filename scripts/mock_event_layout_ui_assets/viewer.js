@@ -6,6 +6,8 @@ const COORDINATE_SPEC = "battlefield-coordinate-v1";
 const COORDINATE_SPACE = "battlefield_inches_right_handed_z_up";
 const DEG_TO_RAD = Math.PI / 180;
 const RAD_TO_DEG = 180 / Math.PI;
+const NEAR_PLANE_DEPTH = 0.05;
+const PROJECTION_EPSILON = 0.0000001;
 
 const COLORS = Object.freeze({
   board: "#f5f0e5",
@@ -258,10 +260,23 @@ function updateLayoutSummary(layout) {
   const authoritative = view.authoritative;
   const features = Object.values(authoritative.terrain_features_by_id);
   const areas = Object.values(authoritative.terrain_areas_by_id);
+  const objectives = Object.values(authoritative.objectives_by_id);
   const regions = Object.values(authoritative.battlefield_regions_by_id);
   const volumeCounts = countVolumes(features);
   const territoryCount = regions.filter((region) => region.region_kind === "territory").length;
   const noMansLandCount = regions.filter((region) => region.region_kind === "no_mans_land").length;
+  const objectiveFootprints = resolveObjectiveTerrainFootprints(
+    authoritative.objectives_by_id,
+    authoritative.terrain_areas_by_id,
+    layout.objective_terrain_areas,
+  );
+  const pendingObjectiveFootprintCount = objectives.length - objectiveFootprints.length;
+  const expectedObjectiveFootprintStatus = pendingObjectiveFootprintCount === 0
+    ? "source_linked_footprints_available"
+    : "footprint_binding_pending";
+  if (layout.objective_footprint_status !== expectedObjectiveFootprintStatus) {
+    throw new Error("Objective footprint status does not match its source bindings.");
+  }
 
   state.layoutName.textContent = layout.name;
   state.layoutId.textContent = layout.id;
@@ -272,6 +287,7 @@ function updateLayoutSummary(layout) {
     `${features.length} components`,
     `${volumeCounts.wall} walls`,
     `${volumeCounts.floor} floors`,
+    `${objectiveFootprints.length}/${objectives.length} objective footprints`,
     `${territoryCount} territories`,
     `${noMansLandCount} No Man's Land`,
   ].join(" · ");
@@ -279,10 +295,26 @@ function updateLayoutSummary(layout) {
   state.geometryHash.textContent = view.authoritative_geometry_hash;
 
   const runtimeGeometryAvailable = layout.geometry_status === "runtime_geometry_available";
-  state.geometryStatus.classList.toggle("pending", !runtimeGeometryAvailable);
-  state.geometryStatus.textContent = runtimeGeometryAvailable
-    ? "Runtime terrain geometry is available for this layout."
-    : "Terrain geometry is pending; only currently projected objectives and zones are shown.";
+  const objectiveFootprintsPending = pendingObjectiveFootprintCount > 0;
+  state.geometryStatus.classList.toggle(
+    "pending",
+    !runtimeGeometryAvailable || objectiveFootprintsPending,
+  );
+  if (!runtimeGeometryAvailable && objectiveFootprintsPending) {
+    state.geometryStatus.textContent =
+      `Terrain geometry and ${pendingObjectiveFootprintCount} objective footprints are pending; ` +
+      "objective identity labels and currently projected zones remain visible.";
+  } else if (objectiveFootprintsPending) {
+    state.geometryStatus.textContent =
+      `${pendingObjectiveFootprintCount} objective footprints are pending source bindings; ` +
+      "no standalone marker geometry is inferred.";
+  } else if (!runtimeGeometryAvailable) {
+    state.geometryStatus.textContent =
+      "Terrain geometry is pending; source-linked objective footprints and projected zones remain visible.";
+  } else {
+    state.geometryStatus.textContent =
+      "Runtime terrain and source-linked objective footprint geometry is available for this layout.";
+  }
   state.canvas.setAttribute("aria-label", `Interactive three-dimensional battlefield: ${layout.name}`);
 }
 
@@ -494,6 +526,11 @@ function renderScene() {
     validateBattlefieldView(view);
     const camera = cameraForBounds(view.bounds, size.width, size.height);
     const authoritative = view.authoritative;
+    const objectiveFootprints = resolveObjectiveTerrainFootprints(
+      authoritative.objectives_by_id,
+      authoritative.terrain_areas_by_id,
+      state.layout.objective_terrain_areas,
+    );
     drawBoard(context, camera, view.bounds);
     if (state.layers.grid.checked) {
       drawGrid(context, camera, view.bounds);
@@ -506,12 +543,9 @@ function renderScene() {
     }
     if (state.layers.areas.checked) {
       drawTerrainAreas(context, camera, authoritative.terrain_areas_by_id);
-      drawObjectiveTerrainOutlines(
-        context,
-        camera,
-        authoritative.terrain_areas_by_id,
-        state.layout.objective_terrain_areas,
-      );
+    }
+    if (state.layers.objectives.checked) {
+      drawObjectiveTerrainFootprints(context, camera, objectiveFootprints);
     }
     if (state.layers.components.checked) {
       drawTerrainFootprints(
@@ -528,9 +562,6 @@ function renderScene() {
       authoritative.terrain_features_by_id,
       view.render.hints_by_entity_id,
     );
-    if (state.layers.objectives.checked) {
-      collectObjectiveFaces(faces, authoritative.objectives_by_id);
-    }
     drawSortedFaces(context, camera, faces);
 
     if (state.layers.objectives.checked) {
@@ -597,7 +628,7 @@ function cameraForBounds(bounds, width, height) {
 function projectPoint(point, camera) {
   const relative = subtract(point, camera.position);
   const depth = dot(relative, camera.forward);
-  if (depth <= 0.01) {
+  if (depth < NEAR_PLANE_DEPTH - PROJECTION_EPSILON) {
     return null;
   }
   const perspective = camera.focalLength / depth;
@@ -702,19 +733,72 @@ function drawTerrainAreas(context, camera, areasById) {
   }
 }
 
-function drawObjectiveTerrainOutlines(context, camera, areasById, objectiveTerrainAreas) {
-  for (const objectiveTerrain of objectiveTerrainAreas) {
-    for (const areaId of objectiveTerrain.terrain_area_ids) {
+function resolveObjectiveTerrainFootprints(objectivesById, areasById, objectiveTerrainAreas) {
+  if (!Array.isArray(objectiveTerrainAreas)) {
+    throw new Error("Objective-terrain bindings must be an array.");
+  }
+  const seenObjectiveIds = new Set();
+  const resolved = [];
+  for (const binding of objectiveTerrainAreas) {
+    const objectiveId = binding.objective_marker_id;
+    const objective = objectivesById[objectiveId];
+    if (objective === undefined) {
+      throw new Error(`Objective-terrain binding references unknown objective: ${String(objectiveId)}.`);
+    }
+    if (seenObjectiveIds.has(objectiveId)) {
+      throw new Error(`Objective has duplicate terrain bindings: ${objectiveId}.`);
+    }
+    if (binding.objective_role !== objective.objective_role) {
+      throw new Error(`Objective-terrain binding role does not match objective: ${objectiveId}.`);
+    }
+    if (!Array.isArray(binding.terrain_area_ids) || binding.terrain_area_ids.length === 0) {
+      throw new Error(`Objective-terrain binding has no footprint areas: ${objectiveId}.`);
+    }
+    const seenAreaIds = new Set();
+    const areas = [];
+    for (const areaId of binding.terrain_area_ids) {
+      if (seenAreaIds.has(areaId)) {
+        throw new Error(`Objective-terrain binding repeats area: ${areaId}.`);
+      }
       const area = areasById[areaId];
       if (area === undefined) {
-        throw new Error(`Objective terrain references unknown area: ${areaId}.`);
+        throw new Error(`Objective-terrain binding references unknown area: ${areaId}.`);
       }
+      seenAreaIds.add(areaId);
+      areas.push(area);
+    }
+    seenObjectiveIds.add(objectiveId);
+    resolved.push({ objective, binding, areas });
+  }
+  return resolved.sort((left, right) =>
+    left.objective.objective_id.localeCompare(right.objective.objective_id),
+  );
+}
+
+function drawObjectiveTerrainFootprints(context, camera, objectiveFootprints) {
+  for (const footprint of objectiveFootprints) {
+    const projectedPolygons = [];
+    for (const area of footprint.areas) {
       const points = shapeWorldPoints(area.footprint, 0.055);
       const screenPoints = projectWorldPoints(points, camera);
       if (screenPoints === null) {
         continue;
       }
-      strokeScreenPolygon(context, screenPoints, hexToRgba(COLORS.objective, 0.95), 2);
+      drawScreenPolygon(context, screenPoints, {
+        fill: hexToRgba(COLORS.objective, 0.2),
+        stroke: hexToRgba(COLORS.objective, 0.95),
+        lineWidth: 2,
+      });
+      projectedPolygons.push(screenPoints);
+    }
+    if (projectedPolygons.length > 0) {
+      state.hitRegions.push(
+        hitRecord(
+          projectedPolygons,
+          [],
+          entityRecord("objective", footprint.objective, footprint.binding),
+        ),
+      );
     }
   }
 }
@@ -764,18 +848,6 @@ function collectTerrainVolumeFaces(faces, featuresById, hintsById) {
         : classificationColor(feature.classification);
       faces.push(...boxFaces(volume, baseColor, entity));
     }
-  }
-}
-
-function collectObjectiveFaces(faces, objectivesById) {
-  const objectives = Object.values(objectivesById).sort((left, right) =>
-    left.objective_id.localeCompare(right.objective_id),
-  );
-  for (const objective of objectives) {
-    const radius = Number(objective.marker_diameter_inches) / 2;
-    const center = objective.position;
-    const entity = entityRecord("objective", objective);
-    faces.push(...cylinderFaces(center, radius, 0.22, COLORS.objective, entity));
   }
 }
 
@@ -969,10 +1041,14 @@ function addPolygonToPath(path, points) {
 }
 
 function drawWorldLine(context, camera, start, end, stroke, lineWidth) {
-  const projectedStart = projectPoint(start, camera);
-  const projectedEnd = projectPoint(end, camera);
-  if (projectedStart === null || projectedEnd === null) {
+  const clippedLine = clipWorldLineToNearPlane(start, end, camera);
+  if (clippedLine === null) {
     return;
+  }
+  const projectedStart = projectPoint(clippedLine[0], camera);
+  const projectedEnd = projectPoint(clippedLine[1], camera);
+  if (projectedStart === null || projectedEnd === null) {
+    throw new Error("Near-plane line clipping produced an unprojectable endpoint.");
   }
   context.save();
   context.beginPath();
@@ -985,15 +1061,76 @@ function drawWorldLine(context, camera, start, end, stroke, lineWidth) {
 }
 
 function projectWorldPoints(points, camera) {
+  const clippedPoints = clipWorldPolygonToNearPlane(points, camera);
+  if (clippedPoints.length < 3) {
+    return null;
+  }
   const projected = [];
-  for (const point of points) {
+  for (const point of clippedPoints) {
     const screenPoint = projectPoint(point, camera);
     if (screenPoint === null) {
-      return null;
+      throw new Error("Near-plane polygon clipping produced an unprojectable vertex.");
     }
     projected.push(screenPoint);
   }
   return projected;
+}
+
+function clipWorldPolygonToNearPlane(points, camera) {
+  if (!Array.isArray(points) || points.length < 3) {
+    throw new Error("World polygon must contain at least three points.");
+  }
+  const clipped = [];
+  let previous = points[points.length - 1];
+  let previousDepth = cameraDepth(previous, camera);
+  for (const current of points) {
+    const currentDepth = cameraDepth(current, camera);
+    const previousInside = previousDepth >= NEAR_PLANE_DEPTH;
+    const currentInside = currentDepth >= NEAR_PLANE_DEPTH;
+    if (currentInside) {
+      if (!previousInside) {
+        clipped.push(nearPlaneIntersection(previous, current, previousDepth, currentDepth));
+      }
+      clipped.push(current);
+    } else if (previousInside) {
+      clipped.push(nearPlaneIntersection(previous, current, previousDepth, currentDepth));
+    }
+    previous = current;
+    previousDepth = currentDepth;
+  }
+  return clipped;
+}
+
+function clipWorldLineToNearPlane(start, end, camera) {
+  const startDepth = cameraDepth(start, camera);
+  const endDepth = cameraDepth(end, camera);
+  const startInside = startDepth >= NEAR_PLANE_DEPTH;
+  const endInside = endDepth >= NEAR_PLANE_DEPTH;
+  if (!startInside && !endInside) {
+    return null;
+  }
+  if (startInside && endInside) {
+    return [start, end];
+  }
+  const intersection = nearPlaneIntersection(start, end, startDepth, endDepth);
+  return startInside ? [start, intersection] : [intersection, end];
+}
+
+function nearPlaneIntersection(start, end, startDepth, endDepth) {
+  const depthDelta = endDepth - startDepth;
+  if (Math.abs(depthDelta) <= PROJECTION_EPSILON) {
+    throw new Error("Near-plane intersection requires a crossing segment.");
+  }
+  const amount = (NEAR_PLANE_DEPTH - startDepth) / depthDelta;
+  return worldPoint(
+    start.x + (end.x - start.x) * amount,
+    start.y + (end.y - start.y) * amount,
+    start.z + (end.z - start.z) * amount,
+  );
+}
+
+function cameraDepth(point, camera) {
+  return dot(subtract(point, camera.position), camera.forward);
 }
 
 function shapeWorldPoints(shape, z) {
@@ -1103,33 +1240,6 @@ function boxFaces(volume, color, entity) {
   return faces;
 }
 
-function cylinderFaces(center, radius, height, color, entity) {
-  const bottomZ = Number(center.z_inches) + 0.08;
-  const topZ = bottomZ + height;
-  const bottom = ellipseWorldPoints(center, radius, radius, 0, bottomZ);
-  const top = bottom.map((point) => worldPoint(point.x, point.y, topZ));
-  const faces = [
-    {
-      points: top,
-      fill: hexToRgba(lighten(color, 0.16), 0.98),
-      stroke: "rgba(76, 57, 15, 0.8)",
-      lineWidth: 0.9,
-      entity,
-    },
-  ];
-  for (let index = 0; index < bottom.length; index += 1) {
-    const next = (index + 1) % bottom.length;
-    faces.push({
-      points: [bottom[index], bottom[next], top[next], top[index]],
-      fill: hexToRgba(lighten(color, -0.08), 0.94),
-      stroke: "rgba(76, 57, 15, 0.45)",
-      lineWidth: 0.45,
-      entity,
-    });
-  }
-  return faces;
-}
-
 function selectAtCanvasPoint(event) {
   const rectangle = state.canvas.getBoundingClientRect();
   const point = { x: event.clientX - rectangle.left, y: event.clientY - rectangle.top };
@@ -1197,9 +1307,15 @@ function showEntityDetails(entity) {
     appendDetail(definitionList, "Role", humanize(payload.objective_role));
     appendDetail(
       definitionList,
+      "Footprint areas",
+      entity.hint.terrain_area_ids.join(", "),
+    );
+    appendDetail(
+      definitionList,
       "Position",
       `${formatNumber(payload.position.x_inches)}, ${formatNumber(payload.position.y_inches)}, ${formatNumber(payload.position.z_inches)} in`,
     );
+    appendDetail(definitionList, "Footprint source", entity.hint.source_id);
     appendDetail(definitionList, "Source", payload.source_id);
   } else if (entity.kind === "region") {
     appendDetail(definitionList, "Region", humanize(payload.region_kind));
