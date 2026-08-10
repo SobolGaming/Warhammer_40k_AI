@@ -52,8 +52,8 @@ _ARCHETYPES = {
         "dense",
         None,
         "FOOTPRINT_6X4",
-        3.0,
-        1.0,
+        4.25,
+        1.4,
         3.5,
         0,
     ),
@@ -65,8 +65,8 @@ _ARCHETYPES = {
         "light",
         None,
         "FOOTPRINT_6X2",
-        4.0,
-        0.45,
+        4.8,
+        1.0,
         2.0,
         0,
     ),
@@ -78,8 +78,8 @@ _ARCHETYPES = {
         "dense",
         None,
         "FOOTPRINT_10X2_5",
-        2.2,
-        1.0,
+        3.45,
+        1.95,
         3.5,
         0,
     ),
@@ -91,8 +91,8 @@ _ARCHETYPES = {
         "light",
         None,
         "FOOTPRINT_10X2_5",
-        0.8,
-        0.2,
+        3.5,
+        1.25,
         2.0,
         0,
     ),
@@ -156,8 +156,8 @@ _ARCHETYPES = {
         "light",
         None,
         "FOOTPRINT_8X11_5_POLYGON",
-        1.5,
-        1.5,
+        1.65,
+        1.7,
         2.0,
         0,
     ),
@@ -169,8 +169,8 @@ _ARCHETYPES = {
         "light",
         None,
         "FOOTPRINT_6X4",
-        1.8,
-        0.9,
+        2.2,
+        1.3,
         2.0,
         0,
     ),
@@ -182,8 +182,8 @@ _ARCHETYPES = {
         "light",
         None,
         "FOOTPRINT_7X11_5",
-        1.4,
-        2.8,
+        1.85,
+        2.95,
         2.0,
         0,
     ),
@@ -195,8 +195,8 @@ _ARCHETYPES = {
         "light",
         None,
         "FOOTPRINT_6X4",
-        1.8,
-        0.9,
+        2.9,
+        1.15,
         2.0,
         0,
     ),
@@ -208,8 +208,8 @@ _ARCHETYPES = {
         "dense",
         None,
         "FOOTPRINT_6X4",
-        1.0,
-        1.2,
+        1.5,
+        2.7,
         3.5,
         0,
     ),
@@ -221,8 +221,8 @@ _ARCHETYPES = {
         "dense",
         None,
         "FOOTPRINT_6X2",
-        4.0,
-        0.45,
+        6.0,
+        1.7,
         3.5,
         0,
     ),
@@ -241,6 +241,24 @@ _RASTER_REVIEW_METHOD = "source_page_raster_overlay_registration_review"
 _VECTOR_REVIEW_METHOD = "pdf_vector_edge_correction_plus_source_page_raster_overlay_review"
 _REVIEW_RESULT = "canonical_template_outline_aligned_to_source_page_terrain_area"
 _TERRAIN_PLACEMENT_INCREMENT_INCHES = Decimal("0.05")
+_RUIN_FLOOR_MAXIMUM_AXIS_SPAN_INCHES = 3.5
+_RUIN_FLOOR_EDGE_INSET_INCHES = 0.02
+_REVIEWED_SOURCE_IMAGE_AXIS_SPANS = {
+    5462: (4.25, 1.75),
+    5464: (4.8, 1.6),
+    5466: (3.45, 2.6),
+    5468: (3.8, 1.25),
+    5470: (6.5, 3.25),
+    5472: (3.15, 6.35),
+    5474: (6.35, 4.9),
+    5476: (4.55, 5.0),
+    5478: (1.65, 1.85),
+    5480: (3.1, 1.7),
+    5482: (1.85, 2.95),
+    5484: (2.9, 1.85),
+    5486: (1.5, 2.7),
+    5488: (8.1, 1.9),
+}
 _REVIEWED_PRIMARY_AREA_TRANSLATIONS = {
     "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04": (0.0, -0.4),
     "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-07": (0.0, -0.5),
@@ -480,6 +498,16 @@ def _ruin_parts(
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     walls: list[dict[str, Any]] = []
     floors: list[dict[str, Any]] = []
+    floor_width = min(
+        width - (2.0 * _RUIN_FLOOR_EDGE_INSET_INCHES),
+        _RUIN_FLOOR_MAXIMUM_AXIS_SPAN_INCHES,
+    )
+    floor_depth = min(
+        depth - (2.0 * _RUIN_FLOOR_EDGE_INSET_INCHES),
+        _RUIN_FLOOR_MAXIMUM_AXIS_SPAN_INCHES,
+    )
+    floor_center_x = (-width / 2.0) + _RUIN_FLOOR_EDGE_INSET_INCHES + (floor_width / 2.0)
+    floor_center_y = (-depth / 2.0) + _RUIN_FLOOR_EDGE_INSET_INCHES + (floor_depth / 2.0)
     for floor_index in range(floor_count):
         bottom_z = float(floor_index * 3)
         floor_name = ("ground", "first", "second")[floor_index]
@@ -510,11 +538,11 @@ def _ruin_parts(
         floors.append(
             {
                 "floor_id": f"{floor_name}-floor",
-                "center_x_inches": 0.0,
-                "center_y_inches": 0.0,
+                "center_x_inches": floor_center_x,
+                "center_y_inches": floor_center_y,
                 "bottom_z_inches": bottom_z,
-                "width_inches": max(0.2, width - 0.12),
-                "depth_inches": max(0.2, depth - 0.12),
+                "width_inches": floor_width,
+                "depth_inches": floor_depth,
                 "thickness_inches": 0.12,
                 "rotation_degrees": 0.0,
             }
@@ -583,10 +611,10 @@ def _source_asset(raw: dict[str, Any]) -> dict[str, Any]:
 def _validate_reviewed_component_axis_spans(
     extraction: dict[str, Any],
     *,
-    source_pdf_image_xref: int,
-    width: float,
-    depth: float,
-    maximum_axis_inset_inches: float,
+    source_pdf_image_xrefs: tuple[int, ...],
+    expected_width: float,
+    expected_depth: float,
+    expected_placement_count: int,
 ) -> None:
     spans = tuple(
         (
@@ -595,22 +623,25 @@ def _validate_reviewed_component_axis_spans(
         )
         for layout in extraction["layouts"]
         for component in layout["terrain_components"]
-        if component["source_image"]["xref"] == source_pdf_image_xref
+        if component["source_image"]["xref"] in source_pdf_image_xrefs
     )
-    if len(spans) != 6:
-        raise ValueError(f"Source image {source_pdf_image_xref} requires six reviewed placements.")
+    if len(spans) != expected_placement_count:
+        raise ValueError(
+            f"Source images {source_pdf_image_xrefs} require "
+            f"{expected_placement_count} reviewed placements."
+        )
     median_width = float(statistics.median(span[0] for span in spans))
     median_depth = float(statistics.median(span[1] for span in spans))
     if (
-        min(width, depth) <= 0.12
-        or abs(median_width - width) > maximum_axis_inset_inches
-        or abs(median_depth - depth) > maximum_axis_inset_inches
+        min(expected_width, expected_depth) <= 0.12
+        or abs(median_width - expected_width) > 0.05
+        or abs(median_depth - expected_depth) > 0.05
         or any(
             abs(span_width - median_width) > 0.05 or abs(span_depth - median_depth) > 0.05
             for span_width, span_depth in spans
         )
     ):
-        raise ValueError(f"Source image {source_pdf_image_xref} axis-span registration drifted.")
+        raise ValueError(f"Source images {source_pdf_image_xrefs} axis-span registration drifted.")
 
 
 def _archetypes(extraction: dict[str, Any]) -> list[dict[str, Any]]:
@@ -632,16 +663,20 @@ def _archetypes(extraction: dict[str, Any]) -> list[dict[str, Any]]:
         ) = config
         if width is None or depth is None:
             raise ValueError("Terrain archetypes require explicit engine-model dimensions.")
-        if model_kind == "ruin" or archetype_id.startswith("light-corner-"):
-            _validate_reviewed_component_axis_spans(
-                extraction,
-                source_pdf_image_xref=primary_xref,
-                width=width,
-                depth=depth,
-                maximum_axis_inset_inches=(
-                    1.4 if archetype_id.startswith("light-corner-") else 0.6
-                ),
-            )
+        xrefs = (primary_xref, 5675) if primary_xref == 5486 else (primary_xref,)
+        reviewed_width, reviewed_depth = _REVIEWED_SOURCE_IMAGE_AXIS_SPANS.get(
+            primary_xref,
+            (width, depth),
+        )
+        _validate_reviewed_component_axis_spans(
+            extraction,
+            source_pdf_image_xrefs=xrefs,
+            expected_width=reviewed_width,
+            expected_depth=reviewed_depth,
+            expected_placement_count=12 if primary_xref == 5468 else 6,
+        )
+        if width > reviewed_width or depth > reviewed_depth:
+            raise ValueError("Terrain archetype envelope exceeds its reviewed source span.")
         if model_kind == "ruin":
             walls, floors = _ruin_parts(
                 width=width,
@@ -659,7 +694,6 @@ def _archetypes(extraction: dict[str, Any]) -> list[dict[str, Any]]:
             )
         else:
             walls, floors = _solid_parts(width=width, depth=depth, height=height), []
-        xrefs = (primary_xref, 5675) if primary_xref == 5486 else (primary_xref,)
         rows.append(
             {
                 "archetype_id": archetype_id,
@@ -691,26 +725,31 @@ def _archetype_modeling_basis(model_kind: str) -> str:
             "wall joint. The user "
             "supplied the ruin category, three-inch floor spacing, solid three-inch walls "
             "below every upper floor, and approximately two-inch top-floor walls. Wall "
-            "thickness, rectangular floors, and the reviewed AB/EF three-floor versus CD/GH "
-            "two-floor assignment remain engine modeling assumptions. Raster styling remains "
-            "non-authoritative."
+            "thickness and the reviewed AB/EF three-floor versus CD/GH two-floor assignment "
+            "remain engine modeling assumptions. Every floor uses the reviewed shared "
+            "3.5-inch corner plate so longer wall arms retain their source-visible wall-only "
+            "tails. Raster styling remains non-authoritative."
         )
     if model_kind == "light_solid":
         return (
             "PDF pages 24-26 provide component identity and source-image pose; the PDF key "
             "and user instruction identify Light terrain, and the user supplied its "
-            "approximately two-inch height. Corner-piece grid-aligned envelopes are validated "
-            "against the reviewed image-axis spans and their L-wall joints are registered to "
-            "the source image's lower-left corner. Wall thickness and other compact Light "
-            "solid primitives remain reviewed engine models. Raster styling remains "
+            "approximately two-inch height. Shared grid-aligned envelopes are bounded by the "
+            "reviewed image-axis spans and enlarged to the nearest legal 0.05-inch placement "
+            "that remains inside every reused terrain-area footprint; corner-piece L-wall "
+            "joints are registered to the source image's lower-left corner. Wall thickness "
+            "remains a reviewed engine modeling assumption. Raster styling remains "
             "non-authoritative."
         )
     if model_kind == "dense_solid":
         return (
             "PDF pages 24-26 provide component identity and source-image pose; the PDF key "
-            "and user instruction identify Dense non-ruin terrain. The compact rules polygon, "
-            "solid primitive dimensions, and 3.5-inch height are reviewed engine modeling "
-            "assumptions, not PDF measurements. Raster art remains non-authoritative."
+            "and user instruction identify Dense non-ruin terrain. Shared grid-aligned "
+            "envelopes are bounded by the reviewed image-axis spans and enlarged to the nearest "
+            "legal 0.05-inch placement that remains inside every reused terrain-area footprint, "
+            "preserving pipe coverage and mixed-feature contact. Solid primitive shape and "
+            "3.5-inch height remain reviewed engine modeling assumptions. Raster art remains "
+            "non-authoritative."
         )
     raise ValueError("Unsupported Event Companion terrain archetype model kind.")
 
@@ -873,6 +912,23 @@ def _component_row(
     rotated_anchor_y = (template_anchor_x * area_sine) + (template_anchor_y * area_cosine)
     area_center_x = area["anchor_x_inches"] - rotated_anchor_x
     area_center_y = area["anchor_y_inches"] - rotated_anchor_y
+    if primary_xref == 5488:
+        reviewed_local_transform = "identity"
+        if reviewed_battlefield_center is None:
+            # The pipe raster has decorative end overhang beyond its terrain-area image.
+            # Center the shared legal solid on the registered footprint rather than treating
+            # the raster-image bounds as a standalone physical rectangle.
+            transformed_center_x = (
+                2.0 * template_anchor_x if area["local_transform"] == "mirror_y_axis" else 0.0
+            )
+            reviewed_battlefield_center = (
+                _quantize_terrain_coordinate(area_center_x + (transformed_center_x * area_cosine)),
+                _quantize_terrain_coordinate(area_center_y + (transformed_center_x * area_sine)),
+            )
+            reviewed_battlefield_rotation = (
+                area["rotation_degrees"]
+                + (180.0 if area["local_transform"] == "mirror_y_axis" else 0.0)
+            ) % 360.0
     if reviewed_battlefield_center is None:
         raw_center_x, raw_center_y = raw["source_image"]["battlefield_image_center_inches"]
         center_x = _quantize_terrain_coordinate(raw_center_x)

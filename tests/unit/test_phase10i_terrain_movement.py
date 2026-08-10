@@ -790,7 +790,8 @@ def test_take_to_the_skies_flies_over_exact_event_companion_dense_non_ruin() -> 
         if feature.feature_kind is TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY
         and len(feature.walls) == 1
         and feature.walls[0].height_inches == 3.5
-        and feature.walls[0].width_inches >= 3.5
+        and feature.source_id is not None
+        and ":terrain-archetype:dense-long-pipes:" in feature.source_id
     )
     wall = dense_non_ruin.walls[0]
     start_pose, _, end_pose = _wall_crossing_poses(wall)

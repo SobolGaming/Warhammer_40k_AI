@@ -49,20 +49,20 @@
       "footprint_template_id": "FOOTPRINT_6X4",
       "rules_footprint_polygon": [
         {
-          "x_inches": -1.5,
-          "y_inches": -0.5
+          "x_inches": -2.125,
+          "y_inches": -0.7
         },
         {
-          "x_inches": 1.5,
-          "y_inches": -0.5
+          "x_inches": 2.125,
+          "y_inches": -0.7
         },
         {
-          "x_inches": 1.5,
-          "y_inches": 0.5
+          "x_inches": 2.125,
+          "y_inches": 0.7
         },
         {
-          "x_inches": -1.5,
-          "y_inches": 0.5
+          "x_inches": -2.125,
+          "y_inches": 0.7
         }
       ],
       "walls": [
@@ -71,14 +71,14 @@
           "center_x_inches": 0.0,
           "center_y_inches": 0.0,
           "bottom_z_inches": 0.0,
-          "width_inches": 2.98,
-          "depth_inches": 0.98,
+          "width_inches": 4.23,
+          "depth_inches": 1.38,
           "height_inches": 3.5,
           "rotation_degrees": 0.0
         }
       ],
       "floors": [],
-      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Dense non-ruin terrain. The compact rules polygon, solid primitive dimensions, and 3.5-inch height are reviewed engine modeling assumptions, not PDF measurements. Raster art remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Dense non-ruin terrain. Shared grid-aligned envelopes are bounded by the reviewed image-axis spans and enlarged to the nearest legal 0.05-inch placement that remains inside every reused terrain-area footprint, preserving pipe coverage and mixed-feature contact. Solid primitive shape and 3.5-inch height remain reviewed engine modeling assumptions. Raster art remains non-authoritative."
     },
     {
       "archetype_id": "light-long-barricade",
@@ -100,20 +100,20 @@
       "footprint_template_id": "FOOTPRINT_6X2",
       "rules_footprint_polygon": [
         {
-          "x_inches": -2.0,
-          "y_inches": -0.225
+          "x_inches": -2.4,
+          "y_inches": -0.5
         },
         {
-          "x_inches": 2.0,
-          "y_inches": -0.225
+          "x_inches": 2.4,
+          "y_inches": -0.5
         },
         {
-          "x_inches": 2.0,
-          "y_inches": 0.225
+          "x_inches": 2.4,
+          "y_inches": 0.5
         },
         {
-          "x_inches": -2.0,
-          "y_inches": 0.225
+          "x_inches": -2.4,
+          "y_inches": 0.5
         }
       ],
       "walls": [
@@ -122,14 +122,14 @@
           "center_x_inches": 0.0,
           "center_y_inches": 0.0,
           "bottom_z_inches": 0.0,
-          "width_inches": 3.98,
-          "depth_inches": 0.43,
+          "width_inches": 4.78,
+          "depth_inches": 0.98,
           "height_inches": 2.0,
           "rotation_degrees": 0.0
         }
       ],
       "floors": [],
-      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Light terrain, and the user supplied its approximately two-inch height. Corner-piece grid-aligned envelopes are validated against the reviewed image-axis spans and their L-wall joints are registered to the source image's lower-left corner. Wall thickness and other compact Light solid primitives remain reviewed engine models. Raster styling remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Light terrain, and the user supplied its approximately two-inch height. Shared grid-aligned envelopes are bounded by the reviewed image-axis spans and enlarged to the nearest legal 0.05-inch placement that remains inside every reused terrain-area footprint; corner-piece L-wall joints are registered to the source image's lower-left corner. Wall thickness remains a reviewed engine modeling assumption. Raster styling remains non-authoritative."
     },
     {
       "archetype_id": "dense-industrial-crates",
@@ -151,20 +151,20 @@
       "footprint_template_id": "FOOTPRINT_10X2_5",
       "rules_footprint_polygon": [
         {
-          "x_inches": -1.1,
-          "y_inches": -0.5
+          "x_inches": -1.725,
+          "y_inches": -0.975
         },
         {
-          "x_inches": 1.1,
-          "y_inches": -0.5
+          "x_inches": 1.725,
+          "y_inches": -0.975
         },
         {
-          "x_inches": 1.1,
-          "y_inches": 0.5
+          "x_inches": 1.725,
+          "y_inches": 0.975
         },
         {
-          "x_inches": -1.1,
-          "y_inches": 0.5
+          "x_inches": -1.725,
+          "y_inches": 0.975
         }
       ],
       "walls": [
@@ -173,14 +173,14 @@
           "center_x_inches": 0.0,
           "center_y_inches": 0.0,
           "bottom_z_inches": 0.0,
-          "width_inches": 2.18,
-          "depth_inches": 0.98,
+          "width_inches": 3.43,
+          "depth_inches": 1.93,
           "height_inches": 3.5,
           "rotation_degrees": 0.0
         }
       ],
       "floors": [],
-      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Dense non-ruin terrain. The compact rules polygon, solid primitive dimensions, and 3.5-inch height are reviewed engine modeling assumptions, not PDF measurements. Raster art remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Dense non-ruin terrain. Shared grid-aligned envelopes are bounded by the reviewed image-axis spans and enlarged to the nearest legal 0.05-inch placement that remains inside every reused terrain-area footprint, preserving pipe coverage and mixed-feature contact. Solid primitive shape and 3.5-inch height remain reviewed engine modeling assumptions. Raster art remains non-authoritative."
     },
     {
       "archetype_id": "light-end-barricade",
@@ -202,20 +202,20 @@
       "footprint_template_id": "FOOTPRINT_10X2_5",
       "rules_footprint_polygon": [
         {
-          "x_inches": -0.4,
-          "y_inches": -0.1
+          "x_inches": -1.75,
+          "y_inches": -0.625
         },
         {
-          "x_inches": 0.4,
-          "y_inches": -0.1
+          "x_inches": 1.75,
+          "y_inches": -0.625
         },
         {
-          "x_inches": 0.4,
-          "y_inches": 0.1
+          "x_inches": 1.75,
+          "y_inches": 0.625
         },
         {
-          "x_inches": -0.4,
-          "y_inches": 0.1
+          "x_inches": -1.75,
+          "y_inches": 0.625
         }
       ],
       "walls": [
@@ -224,14 +224,14 @@
           "center_x_inches": 0.0,
           "center_y_inches": 0.0,
           "bottom_z_inches": 0.0,
-          "width_inches": 0.78,
-          "depth_inches": 0.18000000000000002,
+          "width_inches": 3.48,
+          "depth_inches": 1.23,
           "height_inches": 2.0,
           "rotation_degrees": 0.0
         }
       ],
       "floors": [],
-      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Light terrain, and the user supplied its approximately two-inch height. Corner-piece grid-aligned envelopes are validated against the reviewed image-axis spans and their L-wall joints are registered to the source image's lower-left corner. Wall thickness and other compact Light solid primitives remain reviewed engine models. Raster styling remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Light terrain, and the user supplied its approximately two-inch height. Shared grid-aligned envelopes are bounded by the reviewed image-axis spans and enlarged to the nearest legal 0.05-inch placement that remains inside every reused terrain-area footprint; corner-piece L-wall joints are registered to the source image's lower-left corner. Wall thickness remains a reviewed engine modeling assumption. Raster styling remains non-authoritative."
     },
     {
       "archetype_id": "ruins-cd",
@@ -314,26 +314,26 @@
       "floors": [
         {
           "floor_id": "ground-floor",
-          "center_x_inches": 0.0,
+          "center_x_inches": -1.23,
           "center_y_inches": 0.0,
           "bottom_z_inches": 0.0,
-          "width_inches": 5.88,
-          "depth_inches": 2.88,
+          "width_inches": 3.5,
+          "depth_inches": 2.96,
           "thickness_inches": 0.12,
           "rotation_degrees": 0.0
         },
         {
           "floor_id": "first-floor",
-          "center_x_inches": 0.0,
+          "center_x_inches": -1.23,
           "center_y_inches": 0.0,
           "bottom_z_inches": 3.0,
-          "width_inches": 5.88,
-          "depth_inches": 2.88,
+          "width_inches": 3.5,
+          "depth_inches": 2.96,
           "thickness_inches": 0.12,
           "rotation_degrees": 0.0
         }
       ],
-      "modeling_basis": "PDF pages 24-26 provide component identity, source-image pose, and reviewed image-axis spans used to register the schematic ruin envelope and lower-left wall joint. The user supplied the ruin category, three-inch floor spacing, solid three-inch walls below every upper floor, and approximately two-inch top-floor walls. Wall thickness, rectangular floors, and the reviewed AB/EF three-floor versus CD/GH two-floor assignment remain engine modeling assumptions. Raster styling remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity, source-image pose, and reviewed image-axis spans used to register the schematic ruin envelope and lower-left wall joint. The user supplied the ruin category, three-inch floor spacing, solid three-inch walls below every upper floor, and approximately two-inch top-floor walls. Wall thickness and the reviewed AB/EF three-floor versus CD/GH two-floor assignment remain engine modeling assumptions. Every floor uses the reviewed shared 3.5-inch corner plate so longer wall arms retain their source-visible wall-only tails. Raster styling remains non-authoritative."
     },
     {
       "archetype_id": "ruins-gh",
@@ -417,25 +417,25 @@
         {
           "floor_id": "ground-floor",
           "center_x_inches": 0.0,
-          "center_y_inches": 0.0,
+          "center_y_inches": -1.23,
           "bottom_z_inches": 0.0,
-          "width_inches": 2.88,
-          "depth_inches": 5.88,
+          "width_inches": 2.96,
+          "depth_inches": 3.5,
           "thickness_inches": 0.12,
           "rotation_degrees": 0.0
         },
         {
           "floor_id": "first-floor",
           "center_x_inches": 0.0,
-          "center_y_inches": 0.0,
+          "center_y_inches": -1.23,
           "bottom_z_inches": 3.0,
-          "width_inches": 2.88,
-          "depth_inches": 5.88,
+          "width_inches": 2.96,
+          "depth_inches": 3.5,
           "thickness_inches": 0.12,
           "rotation_degrees": 0.0
         }
       ],
-      "modeling_basis": "PDF pages 24-26 provide component identity, source-image pose, and reviewed image-axis spans used to register the schematic ruin envelope and lower-left wall joint. The user supplied the ruin category, three-inch floor spacing, solid three-inch walls below every upper floor, and approximately two-inch top-floor walls. Wall thickness, rectangular floors, and the reviewed AB/EF three-floor versus CD/GH two-floor assignment remain engine modeling assumptions. Raster styling remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity, source-image pose, and reviewed image-axis spans used to register the schematic ruin envelope and lower-left wall joint. The user supplied the ruin category, three-inch floor spacing, solid three-inch walls below every upper floor, and approximately two-inch top-floor walls. Wall thickness and the reviewed AB/EF three-floor versus CD/GH two-floor assignment remain engine modeling assumptions. Every floor uses the reviewed shared 3.5-inch corner plate so longer wall arms retain their source-visible wall-only tails. Raster styling remains non-authoritative."
     },
     {
       "archetype_id": "ruins-ef",
@@ -538,36 +538,36 @@
       "floors": [
         {
           "floor_id": "ground-floor",
-          "center_x_inches": 0.0,
-          "center_y_inches": 0.0,
+          "center_x_inches": -1.23,
+          "center_y_inches": -0.48,
           "bottom_z_inches": 0.0,
-          "width_inches": 5.88,
-          "depth_inches": 4.38,
+          "width_inches": 3.5,
+          "depth_inches": 3.5,
           "thickness_inches": 0.12,
           "rotation_degrees": 0.0
         },
         {
           "floor_id": "first-floor",
-          "center_x_inches": 0.0,
-          "center_y_inches": 0.0,
+          "center_x_inches": -1.23,
+          "center_y_inches": -0.48,
           "bottom_z_inches": 3.0,
-          "width_inches": 5.88,
-          "depth_inches": 4.38,
+          "width_inches": 3.5,
+          "depth_inches": 3.5,
           "thickness_inches": 0.12,
           "rotation_degrees": 0.0
         },
         {
           "floor_id": "second-floor",
-          "center_x_inches": 0.0,
-          "center_y_inches": 0.0,
+          "center_x_inches": -1.23,
+          "center_y_inches": -0.48,
           "bottom_z_inches": 6.0,
-          "width_inches": 5.88,
-          "depth_inches": 4.38,
+          "width_inches": 3.5,
+          "depth_inches": 3.5,
           "thickness_inches": 0.12,
           "rotation_degrees": 0.0
         }
       ],
-      "modeling_basis": "PDF pages 24-26 provide component identity, source-image pose, and reviewed image-axis spans used to register the schematic ruin envelope and lower-left wall joint. The user supplied the ruin category, three-inch floor spacing, solid three-inch walls below every upper floor, and approximately two-inch top-floor walls. Wall thickness, rectangular floors, and the reviewed AB/EF three-floor versus CD/GH two-floor assignment remain engine modeling assumptions. Raster styling remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity, source-image pose, and reviewed image-axis spans used to register the schematic ruin envelope and lower-left wall joint. The user supplied the ruin category, three-inch floor spacing, solid three-inch walls below every upper floor, and approximately two-inch top-floor walls. Wall thickness and the reviewed AB/EF three-floor versus CD/GH two-floor assignment remain engine modeling assumptions. Every floor uses the reviewed shared 3.5-inch corner plate so longer wall arms retain their source-visible wall-only tails. Raster styling remains non-authoritative."
     },
     {
       "archetype_id": "ruins-ab",
@@ -670,36 +670,36 @@
       "floors": [
         {
           "floor_id": "ground-floor",
-          "center_x_inches": 0.0,
-          "center_y_inches": 0.0,
+          "center_x_inches": -0.22999999999999998,
+          "center_y_inches": -0.48,
           "bottom_z_inches": 0.0,
-          "width_inches": 3.88,
-          "depth_inches": 4.38,
+          "width_inches": 3.5,
+          "depth_inches": 3.5,
           "thickness_inches": 0.12,
           "rotation_degrees": 0.0
         },
         {
           "floor_id": "first-floor",
-          "center_x_inches": 0.0,
-          "center_y_inches": 0.0,
+          "center_x_inches": -0.22999999999999998,
+          "center_y_inches": -0.48,
           "bottom_z_inches": 3.0,
-          "width_inches": 3.88,
-          "depth_inches": 4.38,
+          "width_inches": 3.5,
+          "depth_inches": 3.5,
           "thickness_inches": 0.12,
           "rotation_degrees": 0.0
         },
         {
           "floor_id": "second-floor",
-          "center_x_inches": 0.0,
-          "center_y_inches": 0.0,
+          "center_x_inches": -0.22999999999999998,
+          "center_y_inches": -0.48,
           "bottom_z_inches": 6.0,
-          "width_inches": 3.88,
-          "depth_inches": 4.38,
+          "width_inches": 3.5,
+          "depth_inches": 3.5,
           "thickness_inches": 0.12,
           "rotation_degrees": 0.0
         }
       ],
-      "modeling_basis": "PDF pages 24-26 provide component identity, source-image pose, and reviewed image-axis spans used to register the schematic ruin envelope and lower-left wall joint. The user supplied the ruin category, three-inch floor spacing, solid three-inch walls below every upper floor, and approximately two-inch top-floor walls. Wall thickness, rectangular floors, and the reviewed AB/EF three-floor versus CD/GH two-floor assignment remain engine modeling assumptions. Raster styling remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity, source-image pose, and reviewed image-axis spans used to register the schematic ruin envelope and lower-left wall joint. The user supplied the ruin category, three-inch floor spacing, solid three-inch walls below every upper floor, and approximately two-inch top-floor walls. Wall thickness and the reviewed AB/EF three-floor versus CD/GH two-floor assignment remain engine modeling assumptions. Every floor uses the reviewed shared 3.5-inch corner plate so longer wall arms retain their source-visible wall-only tails. Raster styling remains non-authoritative."
     },
     {
       "archetype_id": "light-corner-ab",
@@ -721,54 +721,54 @@
       "footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
       "rules_footprint_polygon": [
         {
-          "x_inches": -0.75,
-          "y_inches": -0.75
+          "x_inches": -0.825,
+          "y_inches": -0.85
         },
         {
-          "x_inches": 0.75,
-          "y_inches": -0.75
+          "x_inches": 0.825,
+          "y_inches": -0.85
         },
         {
-          "x_inches": 0.75,
-          "y_inches": -0.2250000000000001
+          "x_inches": 0.825,
+          "y_inches": -0.2725000000000001
         },
         {
-          "x_inches": -0.2250000000000001,
-          "y_inches": -0.2250000000000001
+          "x_inches": -0.24750000000000005,
+          "y_inches": -0.2725000000000001
         },
         {
-          "x_inches": -0.2250000000000001,
-          "y_inches": 0.75
+          "x_inches": -0.24750000000000005,
+          "y_inches": 0.85
         },
         {
-          "x_inches": -0.75,
-          "y_inches": 0.75
+          "x_inches": -0.825,
+          "y_inches": 0.85
         }
       ],
       "walls": [
         {
           "wall_id": "long-solid-arm",
           "center_x_inches": 0.0,
-          "center_y_inches": -0.48750000000000004,
+          "center_y_inches": -0.56125,
           "bottom_z_inches": 0.0,
-          "width_inches": 1.48,
-          "depth_inches": 0.5049999999999999,
+          "width_inches": 1.63,
+          "depth_inches": 0.5574999999999999,
           "height_inches": 2.0,
           "rotation_degrees": 0.0
         },
         {
           "wall_id": "short-solid-arm",
-          "center_x_inches": -0.48750000000000004,
+          "center_x_inches": -0.53625,
           "center_y_inches": 0.0,
           "bottom_z_inches": 0.0,
-          "width_inches": 1.48,
-          "depth_inches": 0.5049999999999999,
+          "width_inches": 1.68,
+          "depth_inches": 0.5574999999999999,
           "height_inches": 2.0,
           "rotation_degrees": 90.0
         }
       ],
       "floors": [],
-      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Light terrain, and the user supplied its approximately two-inch height. Corner-piece grid-aligned envelopes are validated against the reviewed image-axis spans and their L-wall joints are registered to the source image's lower-left corner. Wall thickness and other compact Light solid primitives remain reviewed engine models. Raster styling remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Light terrain, and the user supplied its approximately two-inch height. Shared grid-aligned envelopes are bounded by the reviewed image-axis spans and enlarged to the nearest legal 0.05-inch placement that remains inside every reused terrain-area footprint; corner-piece L-wall joints are registered to the source image's lower-left corner. Wall thickness remains a reviewed engine modeling assumption. Raster styling remains non-authoritative."
     },
     {
       "archetype_id": "light-corner-cd",
@@ -790,54 +790,54 @@
       "footprint_template_id": "FOOTPRINT_6X4",
       "rules_footprint_polygon": [
         {
-          "x_inches": -0.9,
-          "y_inches": -0.45
+          "x_inches": -1.1,
+          "y_inches": -0.65
         },
         {
-          "x_inches": 0.9,
-          "y_inches": -0.45
+          "x_inches": 1.1,
+          "y_inches": -0.65
         },
         {
-          "x_inches": 0.9,
-          "y_inches": -0.135
+          "x_inches": 1.1,
+          "y_inches": -0.19500000000000006
         },
         {
-          "x_inches": -0.585,
-          "y_inches": -0.135
+          "x_inches": -0.6450000000000001,
+          "y_inches": -0.19500000000000006
         },
         {
-          "x_inches": -0.585,
-          "y_inches": 0.45
+          "x_inches": -0.6450000000000001,
+          "y_inches": 0.65
         },
         {
-          "x_inches": -0.9,
-          "y_inches": 0.45
+          "x_inches": -1.1,
+          "y_inches": 0.65
         }
       ],
       "walls": [
         {
           "wall_id": "long-solid-arm",
           "center_x_inches": 0.0,
-          "center_y_inches": -0.2925,
+          "center_y_inches": -0.42250000000000004,
           "bottom_z_inches": 0.0,
-          "width_inches": 1.78,
-          "depth_inches": 0.295,
+          "width_inches": 2.18,
+          "depth_inches": 0.43499999999999994,
           "height_inches": 2.0,
           "rotation_degrees": 0.0
         },
         {
           "wall_id": "short-solid-arm",
-          "center_x_inches": -0.7425,
+          "center_x_inches": -0.8725,
           "center_y_inches": 0.0,
           "bottom_z_inches": 0.0,
-          "width_inches": 0.88,
-          "depth_inches": 0.295,
+          "width_inches": 1.28,
+          "depth_inches": 0.43499999999999994,
           "height_inches": 2.0,
           "rotation_degrees": 90.0
         }
       ],
       "floors": [],
-      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Light terrain, and the user supplied its approximately two-inch height. Corner-piece grid-aligned envelopes are validated against the reviewed image-axis spans and their L-wall joints are registered to the source image's lower-left corner. Wall thickness and other compact Light solid primitives remain reviewed engine models. Raster styling remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Light terrain, and the user supplied its approximately two-inch height. Shared grid-aligned envelopes are bounded by the reviewed image-axis spans and enlarged to the nearest legal 0.05-inch placement that remains inside every reused terrain-area footprint; corner-piece L-wall joints are registered to the source image's lower-left corner. Wall thickness remains a reviewed engine modeling assumption. Raster styling remains non-authoritative."
     },
     {
       "archetype_id": "light-corner-ef",
@@ -859,54 +859,54 @@
       "footprint_template_id": "FOOTPRINT_7X11_5",
       "rules_footprint_polygon": [
         {
-          "x_inches": -0.7,
-          "y_inches": -1.4
+          "x_inches": -0.925,
+          "y_inches": -1.475
         },
         {
-          "x_inches": 0.7,
-          "y_inches": -1.4
+          "x_inches": 0.925,
+          "y_inches": -1.475
         },
         {
-          "x_inches": 0.7,
-          "y_inches": -0.9099999999999999
+          "x_inches": 0.925,
+          "y_inches": -0.8275000000000001
         },
         {
-          "x_inches": -0.21000000000000002,
-          "y_inches": -0.9099999999999999
+          "x_inches": -0.2775000000000001,
+          "y_inches": -0.8275000000000001
         },
         {
-          "x_inches": -0.21000000000000002,
-          "y_inches": 1.4
+          "x_inches": -0.2775000000000001,
+          "y_inches": 1.475
         },
         {
-          "x_inches": -0.7,
-          "y_inches": 1.4
+          "x_inches": -0.925,
+          "y_inches": 1.475
         }
       ],
       "walls": [
         {
           "wall_id": "long-solid-arm",
           "center_x_inches": 0.0,
-          "center_y_inches": -1.155,
+          "center_y_inches": -1.15125,
           "bottom_z_inches": 0.0,
-          "width_inches": 1.38,
-          "depth_inches": 0.4699999999999999,
+          "width_inches": 1.83,
+          "depth_inches": 0.6275,
           "height_inches": 2.0,
           "rotation_degrees": 0.0
         },
         {
           "wall_id": "short-solid-arm",
-          "center_x_inches": -0.45499999999999996,
+          "center_x_inches": -0.6012500000000001,
           "center_y_inches": 0.0,
           "bottom_z_inches": 0.0,
-          "width_inches": 2.78,
-          "depth_inches": 0.4699999999999999,
+          "width_inches": 2.93,
+          "depth_inches": 0.6275,
           "height_inches": 2.0,
           "rotation_degrees": 90.0
         }
       ],
       "floors": [],
-      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Light terrain, and the user supplied its approximately two-inch height. Corner-piece grid-aligned envelopes are validated against the reviewed image-axis spans and their L-wall joints are registered to the source image's lower-left corner. Wall thickness and other compact Light solid primitives remain reviewed engine models. Raster styling remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Light terrain, and the user supplied its approximately two-inch height. Shared grid-aligned envelopes are bounded by the reviewed image-axis spans and enlarged to the nearest legal 0.05-inch placement that remains inside every reused terrain-area footprint; corner-piece L-wall joints are registered to the source image's lower-left corner. Wall thickness remains a reviewed engine modeling assumption. Raster styling remains non-authoritative."
     },
     {
       "archetype_id": "light-corner-gh",
@@ -928,54 +928,54 @@
       "footprint_template_id": "FOOTPRINT_6X4",
       "rules_footprint_polygon": [
         {
-          "x_inches": -0.9,
-          "y_inches": -0.45
+          "x_inches": -1.45,
+          "y_inches": -0.575
         },
         {
-          "x_inches": 0.9,
-          "y_inches": -0.45
+          "x_inches": 1.45,
+          "y_inches": -0.575
         },
         {
-          "x_inches": 0.9,
-          "y_inches": -0.135
+          "x_inches": 1.45,
+          "y_inches": -0.1725
         },
         {
-          "x_inches": -0.585,
-          "y_inches": -0.135
+          "x_inches": -1.0474999999999999,
+          "y_inches": -0.1725
         },
         {
-          "x_inches": -0.585,
-          "y_inches": 0.45
+          "x_inches": -1.0474999999999999,
+          "y_inches": 0.575
         },
         {
-          "x_inches": -0.9,
-          "y_inches": 0.45
+          "x_inches": -1.45,
+          "y_inches": 0.575
         }
       ],
       "walls": [
         {
           "wall_id": "long-solid-arm",
           "center_x_inches": 0.0,
-          "center_y_inches": -0.2925,
+          "center_y_inches": -0.37374999999999997,
           "bottom_z_inches": 0.0,
-          "width_inches": 1.78,
-          "depth_inches": 0.295,
+          "width_inches": 2.88,
+          "depth_inches": 0.38249999999999995,
           "height_inches": 2.0,
           "rotation_degrees": 0.0
         },
         {
           "wall_id": "short-solid-arm",
-          "center_x_inches": -0.7425,
+          "center_x_inches": -1.24875,
           "center_y_inches": 0.0,
           "bottom_z_inches": 0.0,
-          "width_inches": 0.88,
-          "depth_inches": 0.295,
+          "width_inches": 1.13,
+          "depth_inches": 0.38249999999999995,
           "height_inches": 2.0,
           "rotation_degrees": 90.0
         }
       ],
       "floors": [],
-      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Light terrain, and the user supplied its approximately two-inch height. Corner-piece grid-aligned envelopes are validated against the reviewed image-axis spans and their L-wall joints are registered to the source image's lower-left corner. Wall thickness and other compact Light solid primitives remain reviewed engine models. Raster styling remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Light terrain, and the user supplied its approximately two-inch height. Shared grid-aligned envelopes are bounded by the reviewed image-axis spans and enlarged to the nearest legal 0.05-inch placement that remains inside every reused terrain-area footprint; corner-piece L-wall joints are registered to the source image's lower-left corner. Wall thickness remains a reviewed engine modeling assumption. Raster styling remains non-authoritative."
     },
     {
       "archetype_id": "dense-tall-crates",
@@ -1005,20 +1005,20 @@
       "footprint_template_id": "FOOTPRINT_6X4",
       "rules_footprint_polygon": [
         {
-          "x_inches": -0.5,
-          "y_inches": -0.6
+          "x_inches": -0.75,
+          "y_inches": -1.35
         },
         {
-          "x_inches": 0.5,
-          "y_inches": -0.6
+          "x_inches": 0.75,
+          "y_inches": -1.35
         },
         {
-          "x_inches": 0.5,
-          "y_inches": 0.6
+          "x_inches": 0.75,
+          "y_inches": 1.35
         },
         {
-          "x_inches": -0.5,
-          "y_inches": 0.6
+          "x_inches": -0.75,
+          "y_inches": 1.35
         }
       ],
       "walls": [
@@ -1027,14 +1027,14 @@
           "center_x_inches": 0.0,
           "center_y_inches": 0.0,
           "bottom_z_inches": 0.0,
-          "width_inches": 0.98,
-          "depth_inches": 1.18,
+          "width_inches": 1.48,
+          "depth_inches": 2.68,
           "height_inches": 3.5,
           "rotation_degrees": 0.0
         }
       ],
       "floors": [],
-      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Dense non-ruin terrain. The compact rules polygon, solid primitive dimensions, and 3.5-inch height are reviewed engine modeling assumptions, not PDF measurements. Raster art remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Dense non-ruin terrain. Shared grid-aligned envelopes are bounded by the reviewed image-axis spans and enlarged to the nearest legal 0.05-inch placement that remains inside every reused terrain-area footprint, preserving pipe coverage and mixed-feature contact. Solid primitive shape and 3.5-inch height remain reviewed engine modeling assumptions. Raster art remains non-authoritative."
     },
     {
       "archetype_id": "dense-long-pipes",
@@ -1056,20 +1056,20 @@
       "footprint_template_id": "FOOTPRINT_6X2",
       "rules_footprint_polygon": [
         {
-          "x_inches": -2.0,
-          "y_inches": -0.225
+          "x_inches": -3.0,
+          "y_inches": -0.85
         },
         {
-          "x_inches": 2.0,
-          "y_inches": -0.225
+          "x_inches": 3.0,
+          "y_inches": -0.85
         },
         {
-          "x_inches": 2.0,
-          "y_inches": 0.225
+          "x_inches": 3.0,
+          "y_inches": 0.85
         },
         {
-          "x_inches": -2.0,
-          "y_inches": 0.225
+          "x_inches": -3.0,
+          "y_inches": 0.85
         }
       ],
       "walls": [
@@ -1078,14 +1078,14 @@
           "center_x_inches": 0.0,
           "center_y_inches": 0.0,
           "bottom_z_inches": 0.0,
-          "width_inches": 3.98,
-          "depth_inches": 0.43,
+          "width_inches": 5.98,
+          "depth_inches": 1.68,
           "height_inches": 3.5,
           "rotation_degrees": 0.0
         }
       ],
       "floors": [],
-      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Dense non-ruin terrain. The compact rules polygon, solid primitive dimensions, and 3.5-inch height are reviewed engine modeling assumptions, not PDF measurements. Raster art remains non-authoritative."
+      "modeling_basis": "PDF pages 24-26 provide component identity and source-image pose; the PDF key and user instruction identify Dense non-ruin terrain. Shared grid-aligned envelopes are bounded by the reviewed image-axis spans and enlarged to the nearest legal 0.05-inch placement that remains inside every reused terrain-area footprint, preserving pipe coverage and mixed-feature contact. Solid primitive shape and 3.5-inch height remain reviewed engine modeling assumptions. Raster art remains non-authoritative."
     }
   ],
   "layouts": [
@@ -1801,13 +1801,13 @@
           "component_id": "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-05-component-01",
           "terrain_area_id": "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-05",
           "archetype_id": "dense-long-pipes",
-          "local_offset_x_inches": -0.35,
-          "local_offset_y_inches": 0.3,
+          "local_offset_x_inches": 0.0,
+          "local_offset_y_inches": -0.0,
           "local_rotation_degrees": 0.0,
-          "local_transform": "mirror_y_axis",
-          "battlefield_center_x_inches": 34.85,
-          "battlefield_center_y_inches": 38.4,
-          "battlefield_rotation_degrees": 90.0,
+          "local_transform": "identity",
+          "battlefield_center_x_inches": 35.15,
+          "battlefield_center_y_inches": 38.05,
+          "battlefield_rotation_degrees": 270.0,
           "source_pdf_image_xref": 5488,
           "source_pdf_bounds": {
             "x0_points": 390.200317,
@@ -2152,13 +2152,13 @@
           "component_id": "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-12-component-01",
           "terrain_area_id": "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-12",
           "archetype_id": "dense-long-pipes",
-          "local_offset_x_inches": -0.35,
-          "local_offset_y_inches": 0.3,
+          "local_offset_x_inches": 0.0,
+          "local_offset_y_inches": -0.0,
           "local_rotation_degrees": 0.0,
-          "local_transform": "mirror_y_axis",
-          "battlefield_center_x_inches": 9.15,
-          "battlefield_center_y_inches": 21.6,
-          "battlefield_rotation_degrees": 270.0,
+          "local_transform": "identity",
+          "battlefield_center_x_inches": 8.85,
+          "battlefield_center_y_inches": 21.95,
+          "battlefield_rotation_degrees": 90.0,
           "source_pdf_image_xref": 5488,
           "source_pdf_bounds": {
             "x0_points": 190.568939,
@@ -3701,13 +3701,13 @@
           "component_id": "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-07-component-01",
           "terrain_area_id": "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-07",
           "archetype_id": "dense-long-pipes",
-          "local_offset_x_inches": -0.890376,
-          "local_offset_y_inches": 0.603627,
-          "local_rotation_degrees": 359.786249,
-          "local_transform": "mirror_y_axis",
-          "battlefield_center_x_inches": 19.15,
-          "battlefield_center_y_inches": 37.5,
-          "battlefield_rotation_degrees": 149.893249,
+          "local_offset_x_inches": -0.026782,
+          "local_offset_y_inches": 0.004289,
+          "local_rotation_degrees": 0.0,
+          "local_transform": "identity",
+          "battlefield_center_x_inches": 19.6,
+          "battlefield_center_y_inches": 36.55,
+          "battlefield_rotation_degrees": 330.10699999999997,
           "source_pdf_image_xref": 5488,
           "source_pdf_bounds": {
             "x0_points": 245.457855,
@@ -3836,13 +3836,13 @@
           "component_id": "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-10-component-01",
           "terrain_area_id": "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-10",
           "archetype_id": "dense-long-pipes",
-          "local_offset_x_inches": -0.890376,
-          "local_offset_y_inches": 0.603627,
-          "local_rotation_degrees": 359.786249,
-          "local_transform": "mirror_y_axis",
-          "battlefield_center_x_inches": 24.85,
-          "battlefield_center_y_inches": 22.5,
-          "battlefield_rotation_degrees": 329.89324899999997,
+          "local_offset_x_inches": -0.026782,
+          "local_offset_y_inches": 0.004289,
+          "local_rotation_degrees": 360.0,
+          "local_transform": "identity",
+          "battlefield_center_x_inches": 24.4,
+          "battlefield_center_y_inches": 23.45,
+          "battlefield_rotation_degrees": 150.10699999999997,
           "source_pdf_image_xref": 5488,
           "source_pdf_bounds": {
             "x0_points": 288.403046,
@@ -4969,13 +4969,13 @@
           "component_id": "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-02-component-01",
           "terrain_area_id": "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-02",
           "archetype_id": "dense-long-pipes",
-          "local_offset_x_inches": -0.340075,
-          "local_offset_y_inches": -0.358743,
-          "local_rotation_degrees": 0.242212,
-          "local_transform": "mirror_y_axis",
-          "battlefield_center_x_inches": 19.9,
-          "battlefield_center_y_inches": 51.15,
-          "battlefield_rotation_degrees": -50.121212,
+          "local_offset_x_inches": 0.010048,
+          "local_offset_y_inches": 0.001693,
+          "local_rotation_degrees": 0.0,
+          "local_transform": "identity",
+          "battlefield_center_x_inches": 19.95,
+          "battlefield_center_y_inches": 51.65,
+          "battlefield_rotation_degrees": 130.121,
           "source_pdf_image_xref": 5488,
           "source_pdf_bounds": {
             "x0_points": 256.301453,
@@ -5644,13 +5644,13 @@
           "component_id": "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-15-component-01",
           "terrain_area_id": "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-15",
           "archetype_id": "dense-long-pipes",
-          "local_offset_x_inches": -0.340075,
-          "local_offset_y_inches": -0.358743,
-          "local_rotation_degrees": 0.242212,
-          "local_transform": "mirror_y_axis",
-          "battlefield_center_x_inches": 24.1,
-          "battlefield_center_y_inches": 8.85,
-          "battlefield_rotation_degrees": 129.878788,
+          "local_offset_x_inches": 0.010048,
+          "local_offset_y_inches": 0.001693,
+          "local_rotation_degrees": 0.0,
+          "local_transform": "identity",
+          "battlefield_center_x_inches": 24.05,
+          "battlefield_center_y_inches": 8.35,
+          "battlefield_rotation_degrees": 310.121,
           "source_pdf_image_xref": 5488,
           "source_pdf_bounds": {
             "x0_points": 287.760925,
@@ -5958,5 +5958,5 @@
       ]
     }
   ],
-  "package_hash": "8a8808522d7761df326c2c37eb5f636a9665b7c341e72c809117eeb657dcf1b7"
+  "package_hash": "90b60b7621659917cd9e2cbeed9dde0f172c178b1c9a92cfe54cf75805800744"
 }

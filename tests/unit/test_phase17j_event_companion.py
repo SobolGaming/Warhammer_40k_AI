@@ -652,6 +652,153 @@ def test_phase17n_ruin_wall_joints_follow_source_image_registration() -> None:
     assert len(checked_component_ids) == 12
 
 
+def test_phase17n_ruin_floors_preserve_source_visible_wall_only_tails() -> None:
+    artifact = event_layouts.exact_slice_artifact()
+    expected_geometry = {
+        "ruins-cd": (3.5, 2.96, 2.48, 0.02),
+        "ruins-gh": (2.96, 3.5, 0.02, 2.48),
+        "ruins-ef": (3.5, 3.5, 2.48, 0.98),
+        "ruins-ab": (3.5, 3.5, 0.48, 0.98),
+    }
+
+    for archetype in artifact.feature_archetypes:
+        if archetype.archetype_id not in expected_geometry:
+            continue
+        minimum_x = min(point.x_inches for point in archetype.rules_footprint_polygon)
+        maximum_x = max(point.x_inches for point in archetype.rules_footprint_polygon)
+        minimum_y = min(point.y_inches for point in archetype.rules_footprint_polygon)
+        maximum_y = max(point.y_inches for point in archetype.rules_footprint_polygon)
+        expected_width, expected_depth, expected_x_tail, expected_y_tail = expected_geometry[
+            archetype.archetype_id
+        ]
+        for floor in archetype.floors:
+            assert (floor.width_inches, floor.depth_inches) == (
+                expected_width,
+                expected_depth,
+            )
+            assert math.isclose(
+                floor.center_x_inches - (floor.width_inches / 2.0),
+                minimum_x + 0.02,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                floor.center_y_inches - (floor.depth_inches / 2.0),
+                minimum_y + 0.02,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                maximum_x - (floor.center_x_inches + (floor.width_inches / 2.0)),
+                expected_x_tail,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                maximum_y - (floor.center_y_inches + (floor.depth_inches / 2.0)),
+                expected_y_tail,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+
+
+def test_phase17n_shared_non_ruin_archetypes_expand_to_legal_source_proportions_and_touch() -> None:
+    artifact = event_layouts.exact_slice_artifact()
+    expected_axis_spans = {
+        "dense-downed-hovercraft": (4.25, 1.4),
+        "light-long-barricade": (4.8, 1.0),
+        "dense-industrial-crates": (3.45, 1.95),
+        "light-end-barricade": (3.5, 1.25),
+        "light-corner-ab": (1.65, 1.7),
+        "light-corner-cd": (2.2, 1.3),
+        "light-corner-ef": (1.85, 2.95),
+        "light-corner-gh": (2.9, 1.15),
+        "dense-tall-crates": (1.5, 2.7),
+        "dense-long-pipes": (6.0, 1.7),
+    }
+    expected_usage_counts = {
+        "dense-downed-hovercraft": 6,
+        "light-long-barricade": 6,
+        "dense-industrial-crates": 6,
+        "light-end-barricade": 12,
+        "ruins-cd": 6,
+        "ruins-gh": 6,
+        "ruins-ef": 6,
+        "ruins-ab": 6,
+        "light-corner-ab": 6,
+        "light-corner-cd": 6,
+        "light-corner-ef": 6,
+        "light-corner-gh": 6,
+        "dense-tall-crates": 6,
+        "dense-long-pipes": 6,
+    }
+    archetypes_by_id = {
+        archetype.archetype_id: archetype for archetype in artifact.feature_archetypes
+    }
+
+    assert Counter(
+        component.archetype_id
+        for layout in artifact.layouts
+        for component in layout.terrain_components
+    ) == Counter(expected_usage_counts)
+    for archetype_id, expected_span in expected_axis_spans.items():
+        polygon = archetypes_by_id[archetype_id].rules_footprint_polygon
+        assert (
+            max(point.x_inches for point in polygon) - min(point.x_inches for point in polygon),
+            max(point.y_inches for point in polygon) - min(point.y_inches for point in polygon),
+        ) == expected_span
+
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    reviewed_multi_piece_xrefs = {5462, 5466, 5468, 5486, 5675}
+    primary_xrefs = {5462, 5466}
+    checked_companion_count = 0
+    for layout in artifact.layouts:
+        setup = MissionSetup.from_mission_pack(
+            mission_pack=mission_pack,
+            mission_pool_entry_id=f"mission-{layout.layout_id}",
+            attacker_player_id="player-alpha",
+            defender_player_id="player-beta",
+        )
+        features_by_id = {feature.feature_id: feature for feature in setup.terrain_features}
+        components_by_area = {
+            component.terrain_area_id: tuple(
+                candidate
+                for candidate in layout.terrain_components
+                if candidate.terrain_area_id == component.terrain_area_id
+                and candidate.source_pdf_image_xref in reviewed_multi_piece_xrefs
+            )
+            for component in layout.terrain_components
+            if component.source_pdf_image_xref in primary_xrefs
+        }
+        for components in components_by_area.values():
+            primary = next(
+                component
+                for component in components
+                if component.source_pdf_image_xref in primary_xrefs
+            )
+            primary_feature = features_by_id[primary.component_id]
+            primary_footprint = shapely_backend.footprint_for_polygon(
+                tuple(
+                    (point.x_inches, point.y_inches)
+                    for point in primary_feature.rules_footprint_polygon
+                )
+            )
+            for companion in components:
+                if companion is primary:
+                    continue
+                companion_feature = features_by_id[companion.component_id]
+                companion_footprint = shapely_backend.footprint_for_polygon(
+                    tuple(
+                        (point.x_inches, point.y_inches)
+                        for point in companion_feature.rules_footprint_polygon
+                    )
+                )
+                assert primary_footprint.distance(companion_footprint) <= 1e-9
+                checked_companion_count += 1
+
+    assert checked_companion_count == 18
+
+
 def test_phase17n_light_corner_wall_joints_follow_source_image_registration() -> None:
     repository_root = Path(__file__).resolve().parents[2]
     extraction_payload = json.loads(

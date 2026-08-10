@@ -4958,9 +4958,9 @@ scoring rows retain their separate reviewed Chapter Approved mission-deck
 provenance in the Event Companion source package.
 
 The exact battlefield artifact has package hash
-`8a8808522d7761df326c2c37eb5f636a9665b7c341e72c809117eeb657dcf1b7`,
+`90b60b7621659917cd9e2cbeed9dde0f172c178b1c9a92cfe54cf75805800744`,
 raw artifact SHA-256
-`a1990d8d0d010cdaf105dc3c5d885dde6c2becdd1ab47ff7dd36c66e510dce38`,
+`048d04f87437692053c34612db07098ecd4c455ac8fa34d38e357635339285bb`,
 and reviewed extraction payload hash
 `8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30`.
 The loader pins both artifact hashes, so a structurally valid re-hashed
@@ -4999,17 +4999,20 @@ source PDF hash, and fails without writing if the committed runtime artifact
 has drifted.
 
 Terrain-area and component source-image affines and battlefield regions are
-source-extracted facts. Ruin and Light corner-piece envelopes use grid-aligned
-dimensions validated against the reviewed source-image axis spans, and each
-schematic L-wall joint is registered to the source image's lower-left corner.
-Component rules polygons and wall/floor primitives remain reviewed engine
-models, not traced raster silhouettes.
+source-extracted facts. Recurring component geometry is defined once per shared
+source archetype and reused by all three layouts. Ruin envelopes and all
+non-ruin component envelopes use grid-aligned dimensions validated against the
+reviewed source-image axis spans, and each schematic L-wall joint is registered
+to the source image's lower-left corner. The shared ruin floor plate is anchored
+at that joint and capped at 3.5 inches per axis, leaving the source-visible
+wall-only tails on longer arms. Component rules polygons and wall/floor
+primitives remain reviewed engine models, not traced raster silhouettes.
 Project-owner-supplied semantics establish three-inch floor spacing, solid
 three-inch walls below every upper floor, approximately two-inch top-floor
 walls, and approximately two-inch Light terrain. The AB/EF three-floor versus CD/GH
-two-floor assignment, wall thickness, rectangular floors, compact non-ruin
-primitive dimensions, and 3.5-inch Dense non-ruin height are explicit engine
-modeling assumptions rather than traced raster measurements. Those choices are
+two-floor assignment, wall thickness, simplified solid shapes, and 3.5-inch
+Dense non-ruin height are explicit engine modeling assumptions rather than
+traced raster measurements. Those choices are
 committed for review and later tuning; rendering images remain non-authoritative.
 
 Meatgrinder's destruction comparison counts enemy units lost during the current

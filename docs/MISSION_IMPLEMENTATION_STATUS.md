@@ -109,9 +109,9 @@ Secondary status:
   separate reviewed Chapter Approved mission-deck provenance in the Event
   Companion source package.
 - The exact battlefield artifact has package hash
-  `8a8808522d7761df326c2c37eb5f636a9665b7c341e72c809117eeb657dcf1b7`
+  `90b60b7621659917cd9e2cbeed9dde0f172c178b1c9a92cfe54cf75805800744`
   and raw artifact SHA-256
-  `a1990d8d0d010cdaf105dc3c5d885dde6c2becdd1ab47ff7dd36c66e510dce38`.
+  `048d04f87437692053c34612db07098ecd4c455ac8fa34d38e357635339285bb`.
   Its reviewed extraction payload is pinned as
   `8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30`.
   The loader rejects structurally valid re-hashed coordinate drift as well as
@@ -147,17 +147,21 @@ Secondary status:
 - Each variant contains 16 source terrain areas and 30 individually placed
   terrain components: 8 ruins, 8 dense non-ruin components, and 14 light
   components. Terrain-area and component source-image placement and orientation
-  come from the reviewed source-page affine records. Ruin and Light corner-piece
-  envelopes use grid-aligned dimensions validated against the reviewed
-  source-image axis spans, with each schematic L-wall joint registered to the
-  source image's lower-left corner. Component rules polygons and physical
-  wall/floor primitives remain engine models rather than traced raster silhouettes.
+  come from the reviewed source-page affine records. Recurring component
+  geometry is defined once per source archetype and reused across all three
+  layouts. Ruin and non-ruin envelopes use dimensions rounded to the 0.05-inch
+  grid and validated against the reviewed source-image axis spans, with each
+  schematic L-wall joint registered to the source image's lower-left corner.
+  Shared ruin floors are corner-anchored and capped at 3.5 inches per axis so
+  longer wall arms retain their source-visible wall-only tails. Component rules
+  polygons and physical wall/floor primitives remain engine models rather than
+  traced raster silhouettes.
   Project-owner-supplied semantics establish
   three-inch floor spacing, solid three-inch walls below every upper floor,
   approximately two-inch top-floor walls, and approximately two-inch Light
   terrain. The reviewed AB/EF three-floor versus CD/GH two-floor assignment,
-  wall thickness, rectangular floors, compact non-ruin primitive dimensions,
-  and 3.5-inch Dense non-ruin height are explicit engine modeling assumptions;
+  wall thickness, simplified solid shapes, and 3.5-inch Dense non-ruin height
+  are explicit engine modeling assumptions;
   the PDF does not prescribe them. All of those choices are committed and
   reviewable for later placement/model tweaks.
 - Rendering images remain non-authoritative. Runtime setup, movement, collision,
