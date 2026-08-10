@@ -2015,10 +2015,15 @@ Invariants:
 - Dense terrain features have Solid line-of-sight blocking for enclosed gaps 3" or less from ground level;
 - Hidden can apply only to `INFANTRY`, `BEASTS`, and `SWARM` models;
 - a model is Hidden when it is at least partially within a terrain area
-  containing a Dense terrain element and its unit did not make ranged
-  attacks in the current or previous player turn;
-- the finalized Core Rules section 13.09 Dense qualifier is authoritative for
-  Hidden; a Light-only terrain area does not grant Hidden;
+  containing one or more Light or Dense terrain features and its unit did not
+  make ranged attacks in the current or previous player turn;
+- the project-owner-supplied official Warhammer 40,000 App transcription
+  observed on 2026-08-09 (source package
+  `gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09`) supersedes
+  the older Core Rules section 13.09 Dense-only wording for Hidden;
+  Light, Dense, and Mixed terrain areas qualify, while an Unknown
+  classification does not establish the required Light/Dense feature;
+- on the first turn, the previous-turn no-ranged-attacks condition is true;
 - Hidden detection is evaluated per target model using that model's own
   keywords and terrain-area occupancy; eligible and ineligible models in one
   attached rules unit never share Hidden status;
@@ -2053,9 +2058,10 @@ Required tests:
 - terrain visibility fixture can block LoS deterministically;
 - terrain-area Obscuring blocks LoS only when all lines cross eligible areas and neither model is within the crossed area;
 - Dense terrain Solid blocks LoS through enclosed gaps 3" or less from ground level;
-- Hidden `INFANTRY`/`BEASTS`/`SWARM` models in Dense terrain areas are
-  visible only within Detection Range while their current-or-previous-turn
-  shot-state condition is satisfied, including after an attached unit splits;
+- Hidden `INFANTRY`/`BEASTS`/`SWARM` models in Light, Dense, or Mixed terrain
+  areas are visible only within Detection Range while their
+  current-or-previous-turn shot-state condition is satisfied, including on the
+  first turn and after an attached unit splits;
 - direct fire rejects a Hidden model outside Detection Range while eligible
   `[INDIRECT FIRE]` accepts the same in-range model as not visible and applies
   the normal Indirect restrictions;
@@ -2589,7 +2595,7 @@ Required tests:
 - FLY take-to-the-skies changes pathing and movement budget deterministically,
   including the no-2" subtraction rule for `HOVER` units;
 - terrain visibility and terrain movement consume terrain-area descriptors,
-  including Light/Dense movement behavior, Dense-only Hidden eligibility, and
+  including Light/Dense movement behavior, Light/Dense Hidden eligibility, and
   Gone to Ground detection modifiers;
 - objective-control geometry supports terrain areas and marker fallback;
 - action cancellation rejects moves other than pile-in/consolidation and rejects leaving the battlefield.

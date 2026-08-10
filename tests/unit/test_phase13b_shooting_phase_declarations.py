@@ -1531,7 +1531,7 @@ def test_phase17n_terrain_areas_participate_in_shooting_visibility_cache_key() -
     assert with_dense_area != with_reclassified_area
 
 
-def test_phase17n_automatic_hidden_is_derived_for_each_eligible_model_in_dense_terrain() -> None:
+def test_phase17n_automatic_hidden_uses_exact_light_and_dense_terrain_areas() -> None:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
     setup = _phase17n_exact_meatgrinder_setup()
@@ -1577,6 +1577,49 @@ def test_phase17n_automatic_hidden_is_derived_for_each_eligible_model_in_dense_t
         poses=tuple(Pose.at(x=x, y=43.0) for x in (34.5, 35.7, 36.9, 38.1, 39.3)),
     )
     state.battlefield_state = all_inside_light.battlefield_state
+    assert state.battle_round == 1
+    assert not state.unit_made_ranged_attacks_current_or_previous_turn(
+        unit_instance_id=target.unit_instance_id
+    )
+    light_hidden_ids = _hidden_target_model_ids(
+        state=state,
+        ruleset_descriptor=_ruleset(),
+        target_unit_ids=(target.unit_instance_id,),
+    )
+    assert light_hidden_ids == tuple(sorted(model.model_instance_id for model in target.own_models))
+    assert not unit_has_line_of_sight_to_target(
+        state=state,
+        scenario=all_inside_light,
+        ruleset_descriptor=_ruleset(),
+        observing_unit=observer,
+        target_unit_id=target.unit_instance_id,
+    )
+
+    exact_light_area_id = "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04"
+    state.mission_setup = replace(
+        setup,
+        terrain_areas=tuple(
+            replace(area, classification=TerrainAreaClassification.MIXED)
+            if area.terrain_area_id == exact_light_area_id
+            else area
+            for area in setup.terrain_areas
+        ),
+    )
+    assert _hidden_target_model_ids(
+        state=state,
+        ruleset_descriptor=_ruleset(),
+        target_unit_ids=(target.unit_instance_id,),
+    ) == tuple(sorted(model.model_instance_id for model in target.own_models))
+
+    state.mission_setup = replace(
+        setup,
+        terrain_areas=tuple(
+            replace(area, classification=TerrainAreaClassification.UNKNOWN)
+            if area.terrain_area_id == exact_light_area_id
+            else area
+            for area in setup.terrain_areas
+        ),
+    )
     assert (
         _hidden_target_model_ids(
             state=state,
@@ -1585,6 +1628,7 @@ def test_phase17n_automatic_hidden_is_derived_for_each_eligible_model_in_dense_t
         )
         == ()
     )
+    state.mission_setup = setup
 
     one_outside = _scenario_with_unit_pose(
         scenario=all_inside,

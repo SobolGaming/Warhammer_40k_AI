@@ -6005,13 +6005,17 @@ def _structured_support_sections_markdown() -> list[str]:
                 SupportSectionRow(
                     "Hidden and Detection Range",
                     "Terrain visibility policy plus Shooting target detection gate",
-                    "Architecture and adapter contract",
-                    "Ruleset descriptor, Shooting target, and Path of the Outcast tests",
+                    "Official App transcription source package, architecture, and adapter contract",
+                    (
+                        "Source-identity, ruleset descriptor, Shooting target, and Path of the "
+                        "Outcast tests"
+                    ),
                     "Full",
                     (
                         "The 11th Edition descriptor enables Hidden with a 15 inch detection "
                         "range, an eligible keyword and occupancy in a terrain area containing "
-                        "a Dense feature, and hidden-status loss after ranged attacks; "
+                        "one or more Light or Dense features, and hidden-status loss after "
+                        "ranged attacks; "
                         "detection modifiers are consumed from "
                         "engine-owned persisting effects. Detection Range gates visibility "
                         "and does not independently prohibit Indirect Fire."

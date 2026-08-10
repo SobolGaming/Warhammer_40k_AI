@@ -14,7 +14,7 @@ from warhammer40k_core.engine.shooting_terrain_visibility import (
     terrain_visibility_areas_from_placements,
 )
 from warhammer40k_core.geometry.terrain_area_visibility import (
-    classification_is_solid,
+    classification_has_visibility_semantics,
     model_intersects_terrain_area,
 )
 
@@ -49,7 +49,7 @@ def terrain_hidden_model_ids(
     eligible_areas = tuple(
         area
         for area in terrain_visibility_areas_from_placements(mission_setup.terrain_areas)
-        if classification_is_solid(area.classification)
+        if classification_has_visibility_semantics(area.classification)
     )
     if not eligible_areas:
         return ()
