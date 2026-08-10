@@ -48,8 +48,10 @@ _SUPPORTED_STRUCTURED_PRIMARY_CONDITIONS = (
             "each_non_home_objective_controlled_round_five",
             "each_terrain_area_trapped_this_turn",
             "each_trapped_objective_terrain_area_this_turn",
+            "more_enemy_units_destroyed_than_friendly_previous_turn",
             "one_or_more_enemy_units_destroyed_after_starting_turn_in_trapped_terrain",
             "one_or_more_enemy_units_destroyed_this_turn",
+            "control_opponent_home_objective",
         )
     )
 )

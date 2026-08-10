@@ -140,6 +140,9 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    record_primary_turn_start_evidence,
+)
 from warhammer40k_core.engine.roster_points import RosterUnitPointValue
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
@@ -4956,6 +4959,7 @@ def _corsair_lifecycle_for_state(*, config: GameConfig, state: GameState) -> Gam
     lifecycle = GameLifecycle()
     lifecycle.start(config)
     _use_source_backed_lifecycle_armies(config=config, state=state)
+    record_primary_turn_start_evidence(state=state)
     lifecycle.state = state
     refresh_runtime_content_bundle = cast(
         Callable[[], None],

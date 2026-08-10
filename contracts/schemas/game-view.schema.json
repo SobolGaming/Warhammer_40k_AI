@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v3/game-view.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v4/game-view.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -19,7 +19,7 @@
     "battlefield_view": {
       "oneOf": [
         {
-          "$ref": "https://warhammer40k-core.local/contracts/v3/battlefield-view.schema.json"
+          "$ref": "https://warhammer40k-core.local/contracts/v4/battlefield-view.schema.json"
         },
         {
           "type": "null"
@@ -79,7 +79,7 @@
       "type": "array"
     },
     "projection_schema": {
-      "const": "game-view-v6-interaction",
+      "const": "game-view-v7-phase17n",
       "minLength": 1,
       "type": "string"
     },
@@ -104,6 +104,13 @@
         "$ref": "#/$defs/json_value"
       },
       "type": "array"
+    },
+    "primary_unit_terrain_turn_start_snapshots": {
+      "items": {
+        "$ref": "#/$defs/primary_unit_terrain_turn_start_snapshot"
+      },
+      "type": "array",
+      "uniqueItems": true
     },
     "public_stratagem_use_records": {
       "items": {
@@ -158,6 +165,7 @@
     "mission_setup",
     "public_secondary_mission_choices",
     "public_secondary_mission_card_states",
+    "primary_unit_terrain_turn_start_snapshots",
     "public_command_point_ledgers",
     "public_victory_point_ledgers",
     "public_stratagem_use_records",
@@ -340,6 +348,69 @@
         "current_characteristics",
         "visible_modifiers",
         "redaction"
+      ],
+      "type": "object"
+    },
+    "primary_unit_terrain_turn_start_snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "active_player_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "battle_round": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "game_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "snapshot_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "unit_memberships": {
+          "items": {
+            "$ref": "#/$defs/primary_unit_terrain_membership"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "game_id",
+        "active_player_id",
+        "battle_round",
+        "unit_memberships",
+        "source_id"
+      ],
+      "type": "object"
+    },
+    "primary_unit_terrain_membership": {
+      "additionalProperties": false,
+      "properties": {
+        "terrain_feature_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "unit_instance_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "unit_instance_id",
+        "terrain_feature_ids"
       ],
       "type": "object"
     },

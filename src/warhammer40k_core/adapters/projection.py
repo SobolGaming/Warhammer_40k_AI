@@ -14,6 +14,7 @@ from warhammer40k_core.adapters.external_contract import (
 from warhammer40k_core.adapters.redaction import (
     HIDDEN_REQUEST_ID,
     decision_request_hidden_from_context,
+    public_primary_unit_terrain_turn_start_snapshots,
     redacted_decision_type_for_hidden_viewer,
 )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -40,13 +41,16 @@ from warhammer40k_core.engine.interaction_metadata import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    PrimaryUnitTerrainTurnStartSnapshotPayload,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_starting_total,
     unit_resource_total,
 )
 
-PROJECTION_SCHEMA_VERSION = "game-view-v6-interaction"
+PROJECTION_SCHEMA_VERSION = "game-view-v7-phase17n"
 RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"
 
 _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (
@@ -307,6 +311,7 @@ class GameViewPayload(TypedDict):
     mission_setup: JsonValue
     public_secondary_mission_choices: list[JsonValue]
     public_secondary_mission_card_states: list[JsonValue]
+    primary_unit_terrain_turn_start_snapshots: list[PrimaryUnitTerrainTurnStartSnapshotPayload]
     public_command_point_ledgers: list[JsonValue]
     public_victory_point_ledgers: list[JsonValue]
     public_stratagem_use_records: list[JsonValue]
@@ -585,6 +590,12 @@ def project_game_view(
                 domain_viewer=domain_viewer,
             )
         ],
+        "primary_unit_terrain_turn_start_snapshots": (
+            public_primary_unit_terrain_turn_start_snapshots(
+                state.primary_unit_terrain_turn_start_snapshots,
+                visible_unit_instance_ids=frozenset(unit_display_by_id),
+            )
+        ),
         "public_command_point_ledgers": [
             validate_json_value(ledger.to_payload()) for ledger in state.command_point_ledgers
         ],

@@ -15,9 +15,12 @@ from warhammer40k_core.core.missions import (
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.terrain_layouts import (
+    TerrainFeatureAreaPlacement,
+    TerrainFeatureLocalTransform,
     TerrainFeaturePreset,
     TerrainFeatureTemplate,
     TerrainFloorTemplate,
+    TerrainLayoutError,
     TerrainWallTemplate,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -93,17 +96,29 @@ def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -
         for template in base_pack.terrain_area_footprint_templates
         if template.footprint_template_id == area.footprint_template_id
     )
+    source_placement = next(
+        placement
+        for placement in layout.terrain_feature_placements
+        if placement.terrain_area_id == area.terrain_area_id
+    )
     source_preset = next(
         preset
         for preset in base_pack.terrain_feature_presets
-        if preset.footprint_template_id == area.footprint_template_id
+        if preset.terrain_feature_preset_id == source_placement.terrain_feature_preset_id
     )
     custom_preset = TerrainFeaturePreset(
         terrain_feature_preset_id=source_preset.terrain_feature_preset_id,
         feature_kind=TerrainFeatureKind.RUINS,
         footprint_template_id=footprint_template.footprint_template_id,
+        footprint_center_x_inches=0.0,
+        footprint_center_y_inches=0.0,
         footprint_width_inches=footprint_template.bounding_width_inches,
         footprint_depth_inches=footprint_template.bounding_depth_inches,
+        local_rules_footprint_polygon=footprint_template.polygon_vertices_inches,
+        local_display_geometry=TerrainDisplayGeometry(
+            display_template_id=footprint_template.footprint_template_id,
+            footprint_polygon=footprint_template.polygon_vertices_inches,
+        ),
         walls=(
             TerrainWallTemplate(
                 wall_id="asymmetric-wall",
@@ -174,19 +189,51 @@ def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -
     assert wall.rotation_degrees == 150.0
 
 
-def test_mission_pack_rejects_area_placement_feature_kind_mismatch() -> None:
+def test_mission_pack_uses_component_kind_independently_of_coarse_area_kind() -> None:
     base_pack = warhammer_event_companion_2026_07_mission_pack()
-    source_preset = base_pack.terrain_feature_presets[0]
-    mismatched_preset = replace(source_preset, feature_kind=TerrainFeatureKind.WOODS)
+    source_layout = base_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-1")
+    source_placement = source_layout.terrain_feature_placements[0]
+    source_preset = next(
+        preset
+        for preset in base_pack.terrain_feature_presets
+        if preset.terrain_feature_preset_id == source_placement.terrain_feature_preset_id
+    )
+    woods_component_preset = replace(source_preset, feature_kind=TerrainFeatureKind.WOODS)
+    mission_pack = replace(
+        base_pack,
+        terrain_feature_presets=tuple(
+            woods_component_preset
+            if preset.terrain_feature_preset_id == woods_component_preset.terrain_feature_preset_id
+            else preset
+            for preset in base_pack.terrain_feature_presets
+        ),
+    )
+    layout = mission_pack.battlefield_layout(source_layout.battlefield_layout_id)
+    placement = next(
+        candidate
+        for candidate in layout.terrain_feature_placements
+        if candidate.terrain_feature_preset_id == woods_component_preset.terrain_feature_preset_id
+    )
+    mission_pool_entry = next(
+        entry
+        for entry in mission_pack.mission_pool_entries
+        if layout.battlefield_layout_id in entry.terrain_layout_ids
+    )
 
-    with pytest.raises(MissionPackError, match="preset feature kind"):
-        replace(
-            base_pack,
-            terrain_feature_presets=(
-                mismatched_preset,
-                *base_pack.terrain_feature_presets[1:],
-            ),
-        )
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id=mission_pool_entry.mission_pool_entry_id,
+        terrain_layout_id=layout.terrain_layout_id,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+
+    feature = next(
+        candidate
+        for candidate in setup.terrain_features
+        if candidate.feature_id == placement.feature_id
+    )
+    assert feature.feature_kind is TerrainFeatureKind.WOODS
 
 
 def test_mission_pack_rejects_area_placement_static_feature_id_collision() -> None:
@@ -202,6 +249,13 @@ def test_mission_pack_rejects_area_placement_static_feature_id_collision() -> No
         footprint_center_y_inches=4.0,
         footprint_width_inches=2.0,
         footprint_depth_inches=2.0,
+        rules_footprint_polygon=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=4.0,
+            center_y_inches=4.0,
+            width_inches=2.0,
+            depth_inches=2.0,
+            display_template_id=None,
+        ).footprint_polygon,
         display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
             center_x_inches=4.0,
             center_y_inches=4.0,
@@ -223,6 +277,59 @@ def test_mission_pack_rejects_area_placement_static_feature_id_collision() -> No
                 for candidate in base_pack.terrain_layout_templates
             ),
         )
+
+
+def test_mission_pack_rejects_component_transform_outside_referenced_area() -> None:
+    base_pack = warhammer_event_companion_2026_07_mission_pack()
+    layout = base_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-1")
+    source_placement = layout.terrain_feature_placements[0]
+    drifted_placement = replace(source_placement, local_offset_x_inches=100.0)
+    drifted_layout = replace(
+        layout,
+        terrain_feature_placements=(
+            drifted_placement,
+            *layout.terrain_feature_placements[1:],
+        ),
+    )
+
+    with pytest.raises(MissionPackError, match="placement footprint must fit"):
+        replace(
+            base_pack,
+            battlefield_layouts=tuple(
+                drifted_layout
+                if candidate.battlefield_layout_id == drifted_layout.battlefield_layout_id
+                else candidate
+                for candidate in base_pack.battlefield_layouts
+            ),
+        )
+
+
+def test_component_rules_polygon_is_required_by_source_preset_loader() -> None:
+    source_preset = warhammer_event_companion_2026_07_mission_pack().terrain_feature_presets[0]
+    payload = dict(source_preset.to_payload())
+    payload.pop("local_rules_footprint_polygon")
+
+    with pytest.raises(TerrainLayoutError, match="local_rules_footprint_polygon"):
+        TerrainFeaturePreset.from_payload(payload)
+
+
+def test_component_transform_fields_are_required_by_placement_loader() -> None:
+    payload = dict(
+        TerrainFeatureAreaPlacement(
+            feature_id="strict-feature",
+            terrain_area_id="strict-area",
+            terrain_feature_preset_id="strict-preset",
+            local_offset_x_inches=0.0,
+            local_offset_y_inches=0.0,
+            local_rotation_degrees=90.0,
+            local_transform=TerrainFeatureLocalTransform.MIRROR_Y_AXIS,
+            source_id="test:strict-feature-placement",
+        ).to_payload()
+    )
+    payload.pop("local_rotation_degrees")
+
+    with pytest.raises(TerrainLayoutError, match="local_rotation_degrees"):
+        TerrainFeatureAreaPlacement.from_payload(payload)
 
 
 def test_area_placed_terrain_feature_payloads_round_trip_and_preserve_rotation() -> None:

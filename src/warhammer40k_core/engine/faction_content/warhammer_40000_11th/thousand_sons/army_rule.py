@@ -98,6 +98,11 @@ from warhammer40k_core.engine.shooting_targets import (
     shooting_dynamic_model_blockers,
     shooting_visibility_cache_key,
 )
+from warhammer40k_core.engine.shooting_terrain_visibility import (
+    model_visibility_keywords_for_rules_unit,
+    shooting_terrain_areas_for_state,
+    terrain_visibility_areas_from_placements,
+)
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_effect_payload,
 )
@@ -1529,6 +1534,7 @@ def _manifesting_model_can_see_target(
 ) -> bool:
     scenario = _battlefield_scenario(state)
     terrain_features = _terrain_features_for_state(state)
+    terrain_areas = shooting_terrain_areas_for_state(state)
     observer_model = _geometry_model_for_manifesting_model(
         scenario=scenario,
         component_unit_id=manifesting_model.component_unit.unit_instance_id,
@@ -1554,17 +1560,22 @@ def _manifesting_model_can_see_target(
         los_cache_key=shooting_visibility_cache_key(
             scenario=scenario,
             terrain_features=terrain_features,
+            terrain_areas=terrain_areas,
         ),
         observer_model=observer_model,
         target_models=target_models,
+        target_model_keywords=model_visibility_keywords_for_rules_unit(
+            rules_unit=target_rules_unit,
+            models=target_models,
+        ),
         terrain_features=terrain_features,
+        terrain_areas=terrain_visibility_areas_from_placements(terrain_areas),
         dynamic_model_blockers=shooting_dynamic_model_blockers(
             scenario=scenario,
             observing_unit_id=manifesting_model.component_unit.unit_instance_id,
             target_unit_id=target_rules_unit.unit_instance_id,
         ),
         observer_keywords=manifesting_model.component_unit.keywords,
-        target_keywords=target_rules_unit.keywords,
     )
     witness = context.resolve_line_of_sight()
     return any(target_id in in_range_ids for target_id in witness.visible_model_ids)

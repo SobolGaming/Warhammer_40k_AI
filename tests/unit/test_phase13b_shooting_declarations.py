@@ -6153,12 +6153,14 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
     )
 
     assert unit_has_line_of_sight_to_target(
+        state=state,
         scenario=scenario,
         ruleset_descriptor=_ruleset(),
         observing_unit=observer,
         target_unit_id=defender.unit_instance_id,
     )
     assert not unit_has_line_of_sight_to_target(
+        state=state,
         scenario=scenario,
         ruleset_descriptor=_ruleset(),
         observing_unit=observer,
@@ -6174,6 +6176,7 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
     )
     with pytest.raises(GameLifecycleError, match="requires placed units"):
         unit_has_line_of_sight_to_target(
+            state=state,
             scenario=unplaced_scenario,
             ruleset_descriptor=_ruleset(),
             observing_unit=observer,
@@ -6181,6 +6184,7 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
         )
     with pytest.raises(GameLifecycleError, match="requires a BattlefieldScenario"):
         unit_has_line_of_sight_to_target(
+            state=state,
             scenario=cast(BattlefieldScenario, object()),
             ruleset_descriptor=_ruleset(),
             observing_unit=observer,
@@ -6188,6 +6192,7 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
         )
     with pytest.raises(GameLifecycleError, match="requires a RulesetDescriptor"):
         unit_has_line_of_sight_to_target(
+            state=state,
             scenario=scenario,
             ruleset_descriptor=cast(RulesetDescriptor, object()),
             observing_unit=observer,
@@ -6195,6 +6200,7 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
         )
     with pytest.raises(GameLifecycleError, match="requires a UnitInstance"):
         unit_has_line_of_sight_to_target(
+            state=state,
             scenario=scenario,
             ruleset_descriptor=_ruleset(),
             observing_unit=cast(UnitInstance, object()),
@@ -6202,6 +6208,7 @@ def test_phase14f_friendly_visibility_query_uses_real_los_evidence() -> None:
         )
     with pytest.raises(GameLifecycleError, match="terrain_features must contain"):
         unit_has_line_of_sight_to_target(
+            state=state,
             scenario=scenario,
             ruleset_descriptor=_ruleset(),
             observing_unit=observer,
@@ -7947,6 +7954,12 @@ def test_phase14e_plunging_fire_evidence_improves_ballistic_skill_before_hit_rol
         footprint_center_y_inches=35.0,
         footprint_width_inches=12.0,
         footprint_depth_inches=6.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=12.0,
+            center_y_inches=35.0,
+            width_inches=12.0,
+            depth_inches=6.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=12.0,
             center_y_inches=35.0,

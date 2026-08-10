@@ -2195,10 +2195,7 @@ def _visible_enemy_rules_unit_ids_for_source(
         raise GameLifecycleError("Visible enemy rules-unit range must be positive.")
     if state.battlefield_state is None:
         raise GameLifecycleError("Visible enemy rules-unit query requires battlefield state.")
-    source_rules_unit = rules_unit_view_by_id(
-        state=state,
-        unit_instance_id=source_unit_instance_id,
-    )
+    source_rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=source_unit_instance_id)
     source_models = _placed_alive_geometry_models_for_rules_unit(
         state=state,
         rules_unit_instance_id=source_rules_unit.unit_instance_id,
@@ -2225,11 +2222,15 @@ def _visible_enemy_rules_unit_ids_for_source(
             state.battlefield_state.unit_placement_or_none(component.unit.unit_instance_id)
             is not None
             and unit_has_line_of_sight_to_target(
+                state=state,
                 scenario=scenario,
                 ruleset_descriptor=ruleset_descriptor,
                 observing_unit=component.unit,
                 target_unit_id=target_rules_unit.unit_instance_id,
                 terrain_features=state.battlefield_state.terrain_features,
+                terrain_areas=(
+                    () if state.mission_setup is None else state.mission_setup.terrain_areas
+                ),
             )
             for component in source_rules_unit.components
         )
@@ -6361,7 +6362,6 @@ def _validate_armies(value: object) -> tuple[ArmyDefinition, ...]:
     return tuple(sorted(armies, key=lambda army: army.player_id))
 
 
-# Explicit package-internal API consumed by the extracted move-completed runtime.
 CATALOG_UNIT_MOVE_COMPLETED_RUNTIME_PRIVATE_API = (
     _available_catalog_unit_move_completed_mortal_wounds_groups,
     _has_catalog_unit_move_completed_mortal_wounds_records,
@@ -6385,4 +6385,4 @@ CATALOG_UNIT_MOVE_COMPLETED_RUNTIME_PRIVATE_API = (
     _unit_move_completed_mortal_wounds_target_request_payload,
     _validate_ability_index_mapping,
     _validate_armies,
-)
+)  # Package-internal API consumed by the extracted move-completed runtime.

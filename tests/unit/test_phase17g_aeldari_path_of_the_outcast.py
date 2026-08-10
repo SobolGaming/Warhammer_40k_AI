@@ -641,7 +641,7 @@ def test_casting_back_the_veil_applies_detection_effect_to_hit_enemy() -> None:
 
 
 def test_detection_range_effect_makes_hidden_target_legal_for_shooting() -> None:
-    state, _army, rangers, _shroud_runners, _enemy = _path_state(enemy_x=18.0)
+    state, _army, rangers, _shroud_runners, enemy = _path_state(enemy_x=18.0)
     state.record_persisting_effect(
         _hidden_effect(effect_id="hidden:enemy", target_id=_ENEMY_UNIT_ID)
     )
@@ -659,7 +659,7 @@ def test_detection_range_effect_makes_hidden_target_legal_for_shooting() -> None
         attacker_model_instance_id=rangers.own_models[0].model_instance_id,
         weapon_profile=profile,
         target_unit_id=_ENEMY_UNIT_ID,
-        hidden_target_unit_ids=(_ENEMY_UNIT_ID,),
+        hidden_target_model_ids=(enemy.own_models[0].model_instance_id,),
     )
 
     assert not without_bonus.is_legal
@@ -694,7 +694,7 @@ def test_detection_range_effect_makes_hidden_target_legal_for_shooting() -> None
         attacker_model_instance_id=rangers.own_models[0].model_instance_id,
         weapon_profile=profile,
         target_unit_id=_ENEMY_UNIT_ID,
-        hidden_target_unit_ids=(_ENEMY_UNIT_ID,),
+        hidden_target_model_ids=(enemy.own_models[0].model_instance_id,),
         target_detection_range_bonus_inches=detection_range_bonus_inches_for_effects(
             state.persisting_effects_for_unit(_ENEMY_UNIT_ID),
         ),
@@ -704,7 +704,7 @@ def test_detection_range_effect_makes_hidden_target_legal_for_shooting() -> None
 
 
 def test_far_reaching_doom_detection_effect_makes_hidden_target_legal_until_source_shoots() -> None:
-    state, _army, rangers, _shroud_runners, _enemy = _path_state(enemy_x=18.0)
+    state, _army, rangers, _shroud_runners, enemy = _path_state(enemy_x=18.0)
     state.record_persisting_effect(
         _hidden_effect(effect_id="hidden:enemy", target_id=_ENEMY_UNIT_ID)
     )
@@ -731,7 +731,7 @@ def test_far_reaching_doom_detection_effect_makes_hidden_target_legal_until_sour
         attacker_model_instance_id=rangers.own_models[0].model_instance_id,
         weapon_profile=_test_weapon_profile(ap=0),
         target_unit_id=_ENEMY_UNIT_ID,
-        hidden_target_unit_ids=(_ENEMY_UNIT_ID,),
+        hidden_target_model_ids=(enemy.own_models[0].model_instance_id,),
         target_detection_range_bonus_inches=detection_range_bonus_inches_for_effects(
             state.persisting_effects_for_unit(_ENEMY_UNIT_ID),
             shot_source_unit_ids=(),

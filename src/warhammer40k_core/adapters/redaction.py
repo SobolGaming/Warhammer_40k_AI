@@ -10,6 +10,10 @@ from warhammer40k_core.adapters.support_profile import SupportProfilePayload
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import EventRecordPayload, JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    PrimaryUnitTerrainTurnStartSnapshot,
+    PrimaryUnitTerrainTurnStartSnapshotPayload,
+)
 
 HIDDEN_DECISION_TYPE = "hidden_decision"
 HIDDEN_REQUEST_ID = "hidden-request"
@@ -24,6 +28,35 @@ class RedactedLifecycleStatusPayload(TypedDict):
     pending_request_id: str | None
     decision_type: str | None
     actor_id: str | None
+
+
+def public_primary_unit_terrain_turn_start_snapshots(
+    snapshots: Sequence[PrimaryUnitTerrainTurnStartSnapshot],
+    *,
+    visible_unit_instance_ids: frozenset[str],
+) -> list[PrimaryUnitTerrainTurnStartSnapshotPayload]:
+    """Project turn-start terrain evidence without revealing hidden unit identities."""
+    if any(type(snapshot) is not PrimaryUnitTerrainTurnStartSnapshot for snapshot in snapshots):
+        raise GameLifecycleError("Terrain snapshot redaction requires typed snapshots.")
+    if type(visible_unit_instance_ids) is not frozenset or any(
+        type(unit_id) is not str or not unit_id.strip() for unit_id in visible_unit_instance_ids
+    ):
+        raise GameLifecycleError("Terrain snapshot redaction visible unit IDs are invalid.")
+    return [
+        {
+            "snapshot_id": snapshot.snapshot_id,
+            "game_id": snapshot.game_id,
+            "active_player_id": snapshot.active_player_id,
+            "battle_round": snapshot.battle_round,
+            "unit_memberships": [
+                membership.to_payload()
+                for membership in snapshot.unit_memberships
+                if membership.unit_instance_id in visible_unit_instance_ids
+            ],
+            "source_id": snapshot.source_id,
+        }
+        for snapshot in snapshots
+    ]
 
 
 def public_error_envelope(*, code: str, message: str) -> dict[str, JsonValue]:

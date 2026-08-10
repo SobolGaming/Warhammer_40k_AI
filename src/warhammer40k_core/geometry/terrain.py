@@ -16,14 +16,24 @@ from warhammer40k_core.core.ruleset_descriptor import (
 from warhammer40k_core.core.terrain_display import (
     TerrainDisplayGeometry,
     TerrainDisplayGeometryPayload,
+    TerrainDisplayPoint,
+    TerrainDisplayPointPayload,
 )
 from warhammer40k_core.geometry import shapely_backend
+from warhammer40k_core.geometry.polygons import polygon_bounds as geometry_polygon_bounds
+from warhammer40k_core.geometry.polygons import polygon_self_intersects, signed_polygon_area
 from warhammer40k_core.geometry.pose import (
     GeometryError,
     Point3,
     Point3Payload,
+    Pose,
     validate_finite_number,
     validate_point3,
+)
+from warhammer40k_core.geometry.terrain_classification import (
+    TerrainAreaClassification,
+    TerrainClassificationError,
+    terrain_area_classification_from_token,
 )
 from warhammer40k_core.geometry.volume import Model
 
@@ -61,6 +71,41 @@ class TerrainFloorDefinitionPayload(TypedDict):
     rotation_degrees: float
 
 
+def classified_feature_transit_permission(
+    feature: TerrainFeatureDefinition,
+    movement_keywords: tuple[str, ...],
+    touching_poses: tuple[Pose, ...],
+) -> bool | None:
+    """Return authoritative classified transit permission, or None when unclassified."""
+    if type(feature) is not TerrainFeatureDefinition:
+        raise GeometryError("Classified transit requires a TerrainFeatureDefinition.")
+    if type(movement_keywords) is not tuple or any(
+        type(keyword) is not str or not keyword for keyword in movement_keywords
+    ):
+        raise GeometryError("Classified transit requires canonical movement keywords.")
+    if (
+        type(touching_poses) is not tuple
+        or not touching_poses
+        or any(type(pose) is not Pose for pose in touching_poses)
+    ):
+        raise GeometryError("Classified transit requires a non-empty pose tuple.")
+    if feature.classification is TerrainAreaClassification.UNKNOWN:
+        return None
+    if feature.classification is TerrainAreaClassification.LIGHT:
+        return True
+    if feature.classification not in {
+        TerrainAreaClassification.DENSE,
+        TerrainAreaClassification.MIXED,
+    }:
+        raise GeometryError("Unsupported classified terrain transit semantics.")
+    keywords = frozenset(movement_keywords)
+    if keywords & {"BEAST", "INFANTRY", "SWARM"}:
+        return True
+    return "MOBILE" in keywords and all(
+        math.isclose(pose.position.z, touching_poses[0].position.z) for pose in touching_poses[1:]
+    )
+
+
 class TerrainSupportSurfacePayload(TypedDict):
     surface_id: str
     terrain_feature_id: str
@@ -76,10 +121,12 @@ class TerrainSupportSurfacePayload(TypedDict):
 class TerrainFeatureDefinitionPayload(TypedDict):
     feature_id: str
     feature_kind: str
+    classification: str
     footprint_center_x_inches: float
     footprint_center_y_inches: float
     footprint_width_inches: float
     footprint_depth_inches: float
+    rules_footprint_polygon: list[TerrainDisplayPointPayload]
     display_geometry: TerrainDisplayGeometryPayload
     walls: list[TerrainWallDefinitionPayload]
     floors: list[TerrainFloorDefinitionPayload]
@@ -89,10 +136,12 @@ class TerrainFeatureDefinitionPayload(TypedDict):
 class TerrainFeatureRulesGeometryPayload(TypedDict):
     feature_id: str
     feature_kind: str
+    classification: str
     footprint_center_x_inches: float
     footprint_center_y_inches: float
     footprint_width_inches: float
     footprint_depth_inches: float
+    rules_footprint_polygon: list[TerrainDisplayPointPayload]
     walls: list[TerrainWallDefinitionPayload]
     floors: list[TerrainFloorDefinitionPayload]
 
@@ -592,6 +641,15 @@ class TerrainSupportSurface:
             rotation_degrees=self.rotation_degrees,
         )
 
+    def footprint_polygon(self) -> tuple[tuple[float, float], ...]:
+        return rotated_rectangle_polygon(
+            center_x_inches=self.center_x_inches,
+            center_y_inches=self.center_y_inches,
+            width_inches=self.width_inches,
+            depth_inches=self.depth_inches,
+            rotation_degrees=self.rotation_degrees,
+        )
+
     def to_payload(self) -> TerrainSupportSurfacePayload:
         return {
             "surface_id": self.surface_id,
@@ -646,10 +704,12 @@ class TerrainFeatureDefinition:
     footprint_center_y_inches: float
     footprint_width_inches: float
     footprint_depth_inches: float
+    rules_footprint_polygon: tuple[TerrainDisplayPoint, ...]
     display_geometry: TerrainDisplayGeometry
     walls: tuple[TerrainWallDefinition, ...] = ()
     floors: tuple[TerrainFloorDefinition, ...] = ()
     source_id: str | None = None
+    classification: TerrainAreaClassification = TerrainAreaClassification.UNKNOWN
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -665,6 +725,11 @@ class TerrainFeatureDefinition:
             self,
             "feature_kind",
             terrain_feature_kind_from_token(self.feature_kind),
+        )
+        object.__setattr__(
+            self,
+            "classification",
+            _terrain_area_classification_from_token(self.classification),
         )
         object.__setattr__(
             self,
@@ -700,11 +765,19 @@ class TerrainFeatureDefinition:
         )
         object.__setattr__(
             self,
+            "rules_footprint_polygon",
+            _validate_rules_footprint_polygon(
+                "TerrainFeatureDefinition rules_footprint_polygon",
+                self.rules_footprint_polygon,
+                expected_bounds=self.bounds(),
+            ),
+        )
+        object.__setattr__(
+            self,
             "display_geometry",
             _validate_display_geometry(
                 "TerrainFeatureDefinition display_geometry",
                 self.display_geometry,
-                feature_bounds=self.bounds(),
             ),
         )
         object.__setattr__(self, "walls", _validate_wall_tuple(self.walls))
@@ -723,6 +796,9 @@ class TerrainFeatureDefinition:
             self.footprint_center_x_inches + half_width,
             self.footprint_center_y_inches + half_depth,
         )
+
+    def rules_footprint_points(self) -> tuple[tuple[float, float], ...]:
+        return tuple((point.x_inches, point.y_inches) for point in self.rules_footprint_polygon)
 
     def wall_volumes(self) -> tuple[ObstacleVolume, ...]:
         return tuple(wall.to_terrain_volume(feature_id=self.feature_id) for wall in self.walls)
@@ -755,10 +831,14 @@ class TerrainFeatureDefinition:
         return {
             "feature_id": self.feature_id,
             "feature_kind": self.feature_kind.value,
+            "classification": self.classification.value,
             "footprint_center_x_inches": self.footprint_center_x_inches,
             "footprint_center_y_inches": self.footprint_center_y_inches,
             "footprint_width_inches": self.footprint_width_inches,
             "footprint_depth_inches": self.footprint_depth_inches,
+            "rules_footprint_polygon": [
+                point.to_payload() for point in self.rules_footprint_polygon
+            ],
             "display_geometry": self.display_geometry.to_payload(),
             "walls": [wall.to_payload() for wall in self.walls],
             "floors": [floor.to_payload() for floor in self.floors],
@@ -769,10 +849,14 @@ class TerrainFeatureDefinition:
         return {
             "feature_id": self.feature_id,
             "feature_kind": self.feature_kind.value,
+            "classification": self.classification.value,
             "footprint_center_x_inches": self.footprint_center_x_inches,
             "footprint_center_y_inches": self.footprint_center_y_inches,
             "footprint_width_inches": self.footprint_width_inches,
             "footprint_depth_inches": self.footprint_depth_inches,
+            "rules_footprint_polygon": [
+                point.to_payload() for point in self.rules_footprint_polygon
+            ],
             "walls": [wall.to_payload() for wall in self.walls],
             "floors": [floor.to_payload() for floor in self.floors],
         }
@@ -782,6 +866,24 @@ class TerrainFeatureDefinition:
         if not isinstance(payload, dict):
             raise GeometryError("Terrain feature payload must be a mapping.")
         raw_payload = cast(TerrainFeatureDefinitionPayload, payload)
+        _require_payload_keys(
+            "Terrain feature payload",
+            raw_payload,
+            (
+                "feature_id",
+                "feature_kind",
+                "classification",
+                "footprint_center_x_inches",
+                "footprint_center_y_inches",
+                "footprint_width_inches",
+                "footprint_depth_inches",
+                "rules_footprint_polygon",
+                "display_geometry",
+                "walls",
+                "floors",
+                "source_id",
+            ),
+        )
         walls = tuple(
             TerrainWallDefinition.from_payload(wall_payload)
             for wall_payload in raw_payload["walls"]
@@ -793,10 +895,15 @@ class TerrainFeatureDefinition:
         return cls(
             feature_id=raw_payload["feature_id"],
             feature_kind=terrain_feature_kind_from_token(raw_payload["feature_kind"]),
+            classification=_terrain_area_classification_from_token(raw_payload["classification"]),
             footprint_center_x_inches=raw_payload["footprint_center_x_inches"],
             footprint_center_y_inches=raw_payload["footprint_center_y_inches"],
             footprint_width_inches=raw_payload["footprint_width_inches"],
             footprint_depth_inches=raw_payload["footprint_depth_inches"],
+            rules_footprint_polygon=tuple(
+                TerrainDisplayPoint.from_payload(point_payload)
+                for point_payload in raw_payload["rules_footprint_polygon"]
+            ),
             display_geometry=TerrainDisplayGeometry.from_payload(raw_payload["display_geometry"]),
             walls=walls,
             floors=floors,
@@ -824,6 +931,13 @@ def terrain_feature_kind_from_token(token: object) -> TerrainFeatureKind:
         return core_terrain_feature_kind_from_token(token)
     except RulesetDescriptorError as exc:
         raise GeometryError("Unsupported terrain feature kind token.") from exc
+
+
+def _terrain_area_classification_from_token(token: object) -> TerrainAreaClassification:
+    try:
+        return terrain_area_classification_from_token(token)
+    except TerrainClassificationError as exc:
+        raise GeometryError("Unsupported terrain area classification token.") from exc
 
 
 def terrain_volume_from_payload(payload: TerrainVolumePayload) -> TerrainVolume:
@@ -875,6 +989,26 @@ def rotated_rectangle_bounds(
     depth_inches: float,
     rotation_degrees: float,
 ) -> tuple[float, float, float, float]:
+    corners = rotated_rectangle_polygon(
+        center_x_inches=center_x_inches,
+        center_y_inches=center_y_inches,
+        width_inches=width_inches,
+        depth_inches=depth_inches,
+        rotation_degrees=rotation_degrees,
+    )
+    x_values = tuple(point[0] for point in corners)
+    y_values = tuple(point[1] for point in corners)
+    return (min(x_values), min(y_values), max(x_values), max(y_values))
+
+
+def rotated_rectangle_polygon(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+    rotation_degrees: float,
+) -> tuple[tuple[float, float], ...]:
     center_x = _validate_finite_coordinate("rotated rectangle center_x_inches", center_x_inches)
     center_y = _validate_finite_coordinate("rotated rectangle center_y_inches", center_y_inches)
     width = _validate_positive_number("rotated rectangle width_inches", width_inches)
@@ -882,7 +1016,7 @@ def rotated_rectangle_bounds(
     rotation = _validate_finite_coordinate("rotated rectangle rotation_degrees", rotation_degrees)
     half_width = width / 2.0
     half_depth = depth / 2.0
-    corners = tuple(
+    return tuple(
         rotate_local_point(
             x_inches=x,
             y_inches=y,
@@ -897,9 +1031,6 @@ def rotated_rectangle_bounds(
             (-half_width, half_depth),
         )
     )
-    x_values = tuple(point[0] for point in corners)
-    y_values = tuple(point[1] for point in corners)
-    return (min(x_values), min(y_values), max(x_values), max(y_values))
 
 
 def rotate_local_point(
@@ -976,14 +1107,36 @@ def _validate_optional_source_id(value: object) -> str | None:
 def _validate_display_geometry(
     field_name: str,
     value: object,
-    *,
-    feature_bounds: tuple[float, float, float, float],
 ) -> TerrainDisplayGeometry:
     if type(value) is not TerrainDisplayGeometry:
         raise GeometryError(f"{field_name} must be a TerrainDisplayGeometry.")
-    if not value.is_within_bounds(feature_bounds):
-        raise GeometryError(f"{field_name} polygon must fit feature footprint.")
     return value
+
+
+def _validate_rules_footprint_polygon(
+    field_name: str,
+    value: object,
+    *,
+    expected_bounds: tuple[float, float, float, float],
+) -> tuple[TerrainDisplayPoint, ...]:
+    if type(value) is not tuple:
+        raise GeometryError(f"{field_name} must be a tuple.")
+    polygon = cast(tuple[object, ...], value)
+    if len(polygon) < 3 or any(type(point) is not TerrainDisplayPoint for point in polygon):
+        raise GeometryError(f"{field_name} must contain at least three TerrainDisplayPoint values.")
+    points = cast(tuple[TerrainDisplayPoint, ...], polygon)
+    if points[0] == points[-1]:
+        raise GeometryError(f"{field_name} must be unclosed.")
+    raw_points = tuple((point.x_inches, point.y_inches) for point in points)
+    if abs(signed_polygon_area(raw_points)) <= 1e-9 or polygon_self_intersects(raw_points):
+        raise GeometryError(f"{field_name} must be a simple polygon with positive area.")
+    actual_bounds = geometry_polygon_bounds(raw_points)
+    if any(
+        not math.isclose(actual, expected, rel_tol=0.0, abs_tol=1e-9)
+        for actual, expected in zip(actual_bounds, expected_bounds, strict=True)
+    ):
+        raise GeometryError(f"{field_name} bounds must match the declared footprint.")
+    return points
 
 
 def _validate_finite_coordinate(field_name: str, value: object) -> float:

@@ -13,7 +13,7 @@ from warhammer40k_core.core.attributes import (
     CharacteristicValue,
     CharacteristicValueKind,
 )
-from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
+from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.objectives import Objective, ObjectiveMarker, ObjectiveMarkerPayload
 from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
@@ -66,7 +66,10 @@ from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.geometry.volume import Model as GeometryModel
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
+)
 
 
 def test_objective_control_sums_oc_by_player_from_current_runtime_models() -> None:
@@ -251,6 +254,12 @@ def test_terrain_objectives_derive_from_coincident_marker_and_control_area() -> 
         footprint_center_y_inches=marker.y_inches,
         footprint_width_inches=6.0,
         footprint_depth_inches=6.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=marker.x_inches,
+            center_y_inches=marker.y_inches,
+            width_inches=6.0,
+            depth_inches=6.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=marker.x_inches,
             center_y_inches=marker.y_inches,
@@ -308,6 +317,12 @@ def test_terrain_objective_control_requires_terrain_area_containment_not_marker_
         footprint_center_y_inches=marker.y_inches,
         footprint_width_inches=6.0,
         footprint_depth_inches=6.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=marker.x_inches,
+            center_y_inches=marker.y_inches,
+            width_inches=6.0,
+            depth_inches=6.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=marker.x_inches,
             center_y_inches=marker.y_inches,
@@ -342,6 +357,142 @@ def test_terrain_objective_control_requires_terrain_area_containment_not_marker_
     )
     assert result.status is ObjectiveControlStatus.UNCONTROLLED
     assert result.contributors == ()
+
+
+@pytest.mark.parametrize("layout_number", [1, 2, 3])
+def test_phase17n_opponent_home_control_uses_source_linked_area_not_marker_radius(
+    layout_number: int,
+) -> None:
+    state = _phase17n_linked_objective_state(layout_number)
+    assert state.mission_setup is not None
+    assert state.battlefield_state is not None
+    defender_home = next(
+        marker
+        for marker in state.mission_setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.DEFENDER_HOME
+    )
+    link = next(
+        definition
+        for definition in state.mission_setup.objective_terrain_areas
+        if definition.objective_marker_id == defender_home.objective_marker_id
+    )
+    areas_by_id = {area.terrain_area_id: area for area in state.mission_setup.terrain_areas}
+    farthest_point = max(
+        (
+            point
+            for terrain_area_id in link.terrain_area_ids
+            for point in areas_by_id[terrain_area_id].footprint_polygon
+        ),
+        key=lambda point: math.hypot(
+            point.x_inches - defender_home.x_inches,
+            point.y_inches - defender_home.y_inches,
+        ),
+    )
+    assert (
+        math.hypot(
+            farthest_point.x_inches - defender_home.x_inches,
+            farthest_point.y_inches - defender_home.y_inches,
+        )
+        > 7.0
+    )
+
+    battlefield = state.battlefield_state
+    player_a = battlefield.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    selected = player_a.model_placements[0]
+    moved_player_a = player_a.with_model_placements(
+        (
+            selected.with_pose(
+                Pose.at(
+                    farthest_point.x_inches,
+                    farthest_point.y_inches,
+                    0.0,
+                    facing_degrees=selected.pose.facing.degrees,
+                )
+            ),
+            *player_a.model_placements[1:],
+        )
+    )
+    battlefield = battlefield.with_unit_placement(moved_player_a)
+    battlefield = battlefield.with_removed_models(
+        tuple(
+            model_instance_id
+            for model_instance_id in battlefield.placed_model_ids()
+            if model_instance_id != selected.model_instance_id
+        )
+    )
+    state.replace_battlefield_state(battlefield)
+
+    context = ObjectiveControlContext.from_game_state(
+        state,
+        timing=ObjectiveControlTiming.PHASE_END,
+        phase=BattlePhase.COMMAND,
+        ruleset_descriptor=_ruleset(),
+    )
+    result = resolve_objective_control(context).result_by_objective_id(
+        defender_home.objective_marker_id
+    )
+
+    assert defender_home.objective_marker_id not in {
+        marker.objective_marker_id for marker in context.objective_markers
+    }
+    assert link in context.objective_terrain_areas
+    assert defender_home.to_objective_marker() in context.objective_terrain_area_markers
+    assert result.status is ObjectiveControlStatus.CONTROLLED
+    assert result.controlled_by_player_id == "player-a"
+    assert tuple(contributor.model_instance_id for contributor in result.contributors) == (
+        selected.model_instance_id,
+    )
+    assert result.contributors[0].horizontal_distance_inches == 0.0
+
+
+def test_source_linked_and_explicit_terrain_objectives_are_mutually_exclusive() -> None:
+    state = _phase17n_linked_objective_state(1)
+
+    with pytest.raises(GameLifecycleError, match="mutually exclusive"):
+        ObjectiveControlContext.from_game_state(
+            state,
+            timing=ObjectiveControlTiming.PHASE_END,
+            phase=BattlePhase.COMMAND,
+            ruleset_descriptor=_ruleset(),
+            terrain_objectives=(
+                Objective.terrain("explicit-terrain-objective", "Explicit", "ruin-alpha"),
+            ),
+        )
+
+
+def test_source_linked_objective_context_requires_exact_area_and_marker_containment() -> None:
+    state = _phase17n_linked_objective_state(1)
+    context = ObjectiveControlContext.from_game_state(
+        state,
+        timing=ObjectiveControlTiming.PHASE_END,
+        phase=BattlePhase.COMMAND,
+        ruleset_descriptor=_ruleset(),
+    )
+    first_link = context.objective_terrain_areas[0]
+
+    with pytest.raises(GameLifecycleError, match="unknown terrain area"):
+        replace(
+            context,
+            terrain_areas=tuple(
+                area
+                for area in context.terrain_areas
+                if area.terrain_area_id not in first_link.terrain_area_ids
+            ),
+        )
+
+    linked_marker = next(
+        marker
+        for marker in context.objective_terrain_area_markers
+        if marker.objective_marker_id == first_link.objective_marker_id
+    )
+    with pytest.raises(GameLifecycleError, match="must intersect"):
+        replace(
+            context,
+            objective_terrain_area_markers=tuple(
+                replace(marker, x_inches=0.0, y_inches=0.0) if marker == linked_marker else marker
+                for marker in context.objective_terrain_area_markers
+            ),
+        )
 
 
 def test_nonblocking_objective_marker_can_be_occupied_at_endpoint() -> None:
@@ -697,6 +848,30 @@ def test_objective_control_validation_is_fail_fast() -> None:
             controlled_by_player_id="player-b",
             scores=(score_a, score_b),
         )
+
+
+def _phase17n_linked_objective_state(layout_number: int) -> GameState:
+    mission_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id=(f"mission-purge-the-foe-vs-purge-the-foe-layout-{layout_number}"),
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    config = _config(mission_setup=mission_setup)
+    armies = _mustered_armies(config)
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id=f"phase17n-linked-objective-layout-{layout_number}",
+        armies=armies,
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+        terrain_features=mission_setup.terrain_features,
+    )
+    state.record_battlefield_state(scenario.battlefield_state)
+    _force_battle_for_objective_fixture(state)
+    return state
 
 
 def _battle_state_with_center_objective_positions(

@@ -6005,14 +6005,20 @@ def _structured_support_sections_markdown() -> list[str]:
                 SupportSectionRow(
                     "Hidden and Detection Range",
                     "Terrain visibility policy plus Shooting target detection gate",
-                    "Architecture and adapter contract",
-                    "Ruleset descriptor, Shooting target, and Path of the Outcast tests",
+                    "Official App transcription source package, architecture, and adapter contract",
+                    (
+                        "Source-identity, ruleset descriptor, Shooting target, and Path of the "
+                        "Outcast tests"
+                    ),
                     "Full",
                     (
                         "The 11th Edition descriptor enables Hidden with a 15 inch detection "
-                        "range, terrain-area and keyword requirements, and hidden-status loss "
-                        "after ranged attacks; detection modifiers are consumed from "
-                        "engine-owned persisting effects."
+                        "range, an eligible keyword and occupancy in a terrain area containing "
+                        "one or more Light or Dense features, and hidden-status loss after "
+                        "ranged attacks; "
+                        "detection modifiers are consumed from "
+                        "engine-owned persisting effects. Detection Range gates visibility "
+                        "and does not independently prohibit Indirect Fire."
                     ),
                 ),
                 SupportSectionRow(
@@ -6034,7 +6040,7 @@ def _structured_support_sections_markdown() -> list[str]:
                     "Focused Shooting target and ranged attack history tests",
                     "Full",
                     (
-                        "Hidden models within Dense terrain features, represented by "
+                        "Hidden models within an area containing a Dense feature, represented by "
                         "`LineOfSightPolicy.DENSE_COVER`, subtract 3 inches from effective "
                         "Detection Range when they are not fully visible because of intervening "
                         "Solid terrain and their unit has not made ranged attacks in the current "
@@ -6796,7 +6802,10 @@ def _wargear_keyword_support_rows() -> tuple[SupportSectionRow, ...]:
         _full_wargear_row(
             "[INDIRECT FIRE]",
             "Indirect targeting restrictions and modifiers",
-            "Includes no-visible-target and no-reroll restrictions.",
+            (
+                "Includes not-visible targets such as Hidden models outside Detection Range, "
+                "plus the normal no-reroll restrictions."
+            ),
         ),
         _full_wargear_row(
             "[LANCE]",

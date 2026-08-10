@@ -8,6 +8,9 @@ import pytest
 from tests.phase13b_shooting_declaration_helpers import (
     _advanced_unit_state,
     _assert_waiting_for_movement_unit,
+    _attached_enemy_declarations,
+    _attached_enemy_unit_specs,
+    _attached_formation_for_player,
     _attack_pool_for_test,
     _attack_step_payloads,
     _blocking_ruin,
@@ -55,6 +58,7 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
+from warhammer40k_core.core.terrain_areas import TerrainAreaClassification
 from warhammer40k_core.core.weapon_profiles import (
     AbilityDescriptor,
     AttackProfile,
@@ -64,6 +68,9 @@ from warhammer40k_core.core.weapon_profiles import (
     WeaponProfile,
     WeaponProfilePayload,
 )
+from warhammer40k_core.engine.attached_unit_reconciliation import (
+    split_attached_rules_unit_if_required,
+)
 from warhammer40k_core.engine.attack_sequence import (
     AttackSequence,
     AttackSequenceStep,
@@ -71,6 +78,7 @@ from warhammer40k_core.engine.attack_sequence import (
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
+    geometry_model_for_placement,
 )
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.game_state import (
@@ -78,6 +86,8 @@ from warhammer40k_core.engine.game_state import (
     GameStatePayload,
     RangedAttackHistoryRecord,
 )
+from warhammer40k_core.engine.list_validation import AttachmentDeclaration
+from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -90,6 +100,7 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseState,
     ShootingTypeSelection,
     ShootingUnitSelection,
+    _hidden_target_model_ids,
 )
 from warhammer40k_core.engine.shooting_targets import (
     LONE_OPERATIVE_RULE_ID,
@@ -98,6 +109,8 @@ from warhammer40k_core.engine.shooting_targets import (
     shooting_target_candidate_for_model,
     shooting_target_candidates_for_unit,
     shooting_target_violation_code_from_token,
+    shooting_visibility_cache_key,
+    unit_has_line_of_sight_to_target,
 )
 from warhammer40k_core.engine.shooting_types import (
     ShootingType,
@@ -109,6 +122,8 @@ from warhammer40k_core.engine.transports import (
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.weapon_abilities import (
     HUNTER_RULE_ID,
+    INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID,
+    INDIRECT_FIRE_NO_VISIBLE_RULE_ID,
     WEAPON_ABILITY_SELECTION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.weapon_declaration import (
@@ -126,6 +141,9 @@ from warhammer40k_core.geometry.terrain import (
 )
 from warhammer40k_core.geometry.visibility import (
     VisibilityBlockerKind,
+)
+from warhammer40k_core.rules.mission_pack_import import (
+    warhammer_event_companion_2026_07_mission_pack,
 )
 
 
@@ -1132,6 +1150,12 @@ def test_target_range_visibility_and_lone_operative_gates_are_explicit() -> None
         footprint_center_y_inches=35.0,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=20.0,
+            center_y_inches=35.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=20.0,
             center_y_inches=35.0,
@@ -1234,7 +1258,7 @@ def test_gone_to_ground_reduces_hidden_detection_range_in_solid_terrain() -> Non
         weapon_profile=profile,
         target_unit_id=target.unit_instance_id,
         terrain_features=(solid_woods,),
-        hidden_target_unit_ids=(target.unit_instance_id,),
+        hidden_target_model_ids=tuple(model.model_instance_id for model in target.own_models),
     )
     recent_shot_candidate = shooting_target_candidate_for_model(
         scenario=scenario,
@@ -1244,7 +1268,7 @@ def test_gone_to_ground_reduces_hidden_detection_range_in_solid_terrain() -> Non
         weapon_profile=profile,
         target_unit_id=target.unit_instance_id,
         terrain_features=(solid_woods,),
-        hidden_target_unit_ids=(target.unit_instance_id,),
+        hidden_target_model_ids=tuple(model.model_instance_id for model in target.own_models),
         target_unit_ids_with_recent_ranged_attacks=(target.unit_instance_id,),
     )
 
@@ -1252,7 +1276,7 @@ def test_gone_to_ground_reduces_hidden_detection_range_in_solid_terrain() -> Non
         ShootingTargetViolationCode.OUTSIDE_DETECTION_RANGE
     )
     assert gone_to_ground_candidate.message == (
-        "Hidden target is outside the attacker's effective detection range."
+        "Hidden target models are outside the attacker's effective detection range."
     )
     assert recent_shot_candidate.is_legal
     assert recent_shot_candidate.line_of_sight_witness is not None
@@ -1271,7 +1295,7 @@ def test_gone_to_ground_does_not_reduce_detection_when_solid_target_fully_visibl
         weapon_profile=profile,
         target_unit_id=target.unit_instance_id,
         terrain_features=(_dense_solid_woods(),),
-        hidden_target_unit_ids=(target.unit_instance_id,),
+        hidden_target_model_ids=tuple(model.model_instance_id for model in target.own_models),
     )
 
     assert candidate.is_legal
@@ -1291,7 +1315,7 @@ def test_gone_to_ground_does_not_reduce_detection_for_non_solid_obscuring_terrai
         weapon_profile=profile,
         target_unit_id=target.unit_instance_id,
         terrain_features=(non_solid_hill,),
-        hidden_target_unit_ids=(target.unit_instance_id,),
+        hidden_target_model_ids=tuple(model.model_instance_id for model in target.own_models),
     )
 
     assert candidate.is_legal
@@ -1333,6 +1357,510 @@ def test_ranged_attack_history_tracks_current_and_previous_player_turns() -> Non
     restored_state.active_player_id = "player-a"
     assert not restored_state.unit_made_ranged_attacks_current_or_previous_turn(
         unit_instance_id=unit_id
+    )
+
+
+def test_phase17n_attached_ranged_history_follows_split_descendants_without_sibling_leak() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=_attached_enemy_unit_specs(),
+        enemy_attachment_declarations=_attached_enemy_declarations(),
+    )
+    state = _state(lifecycle)
+    formation = _attached_formation_for_player(state=state, player_id="player-b")
+    attached_unit_id = formation.attached_unit_instance_id
+    leader = units["leader-unit"]
+    support = units["support-unit"]
+    bodyguard = units["bodyguard-unit"]
+    state.record_ranged_attack_history(
+        RangedAttackHistoryRecord(
+            player_id="player-b",
+            unit_instance_id=attached_unit_id,
+            battle_round=1,
+            active_player_id="player-a",
+            phase=BattlePhase.SHOOTING,
+            request_id="phase17n-attached-history-request",
+            result_id="phase17n-attached-history-result",
+        )
+    )
+    _replace_unit_instance_in_state(
+        state=state,
+        replacement=replace(
+            bodyguard,
+            own_models=tuple(replace(model, wounds_remaining=0) for model in bodyguard.own_models),
+        ),
+    )
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models(
+            tuple(model.model_instance_id for model in bodyguard.own_models)
+        )
+    )
+
+    surviving_unit_ids = split_attached_rules_unit_if_required(
+        state=state,
+        event_log=lifecycle.decision_controller.event_log,
+        rules_unit_instance_id=attached_unit_id,
+    )
+
+    assert surviving_unit_ids == tuple(sorted((leader.unit_instance_id, support.unit_instance_id)))
+    setup = _phase17n_exact_meatgrinder_setup()
+    state.mission_setup = setup
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=replace(
+            state.battlefield_state,
+            terrain_features=setup.terrain_features,
+        ),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=leader,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(Pose.at(x=33.0, y=53.0),),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=support,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(Pose.at(x=35.0, y=53.0),),
+    )
+    state.battlefield_state = scenario.battlefield_state
+
+    for surviving_unit_id in surviving_unit_ids:
+        assert state.unit_made_ranged_attacks_current_or_previous_turn(
+            unit_instance_id=surviving_unit_id
+        )
+    assert (
+        _hidden_target_model_ids(
+            state=state,
+            ruleset_descriptor=_ruleset(),
+            target_unit_ids=surviving_unit_ids,
+        )
+        == ()
+    )
+
+    payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    restored_state = GameState.from_payload(payload)
+    for surviving_unit_id in surviving_unit_ids:
+        assert restored_state.unit_made_ranged_attacks_current_or_previous_turn(
+            unit_instance_id=surviving_unit_id
+        )
+    wrong_owner_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    cast(
+        list[dict[str, object]],
+        wrong_owner_payload["ranged_attack_history_records"],
+    )[0]["player_id"] = "player-a"
+    with pytest.raises(
+        GameLifecycleError,
+        match="player_id must control unit_instance_id",
+    ):
+        GameState.from_payload(wrong_owner_payload)
+
+    restored_state.battle_round = 2
+    restored_state.active_player_id = "player-a"
+    for surviving_unit_id in surviving_unit_ids:
+        assert not restored_state.unit_made_ranged_attacks_current_or_previous_turn(
+            unit_instance_id=surviving_unit_id
+        )
+    restored_state.record_ranged_attack_history(
+        RangedAttackHistoryRecord(
+            player_id="player-b",
+            unit_instance_id=leader.unit_instance_id,
+            battle_round=2,
+            active_player_id="player-a",
+            phase=BattlePhase.SHOOTING,
+            request_id="phase17n-leader-history-request",
+            result_id="phase17n-leader-history-result",
+        )
+    )
+
+    assert restored_state.unit_made_ranged_attacks_current_or_previous_turn(
+        unit_instance_id=leader.unit_instance_id
+    )
+    assert not restored_state.unit_made_ranged_attacks_current_or_previous_turn(
+        unit_instance_id=support.unit_instance_id
+    )
+    assert _hidden_target_model_ids(
+        state=restored_state,
+        ruleset_descriptor=_ruleset(),
+        target_unit_ids=surviving_unit_ids,
+    ) == (support.own_models[0].model_instance_id,)
+
+
+def test_phase17n_terrain_areas_participate_in_shooting_visibility_cache_key() -> None:
+    lifecycle, _ = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    setup = _phase17n_exact_meatgrinder_setup()
+    dense_area = setup.terrain_areas[0]
+    reclassified_area = replace(
+        dense_area,
+        classification=TerrainAreaClassification.LIGHT,
+    )
+
+    without_area = shooting_visibility_cache_key(scenario=scenario)
+    with_dense_area = shooting_visibility_cache_key(
+        scenario=scenario,
+        terrain_areas=(dense_area,),
+    )
+    with_same_area = shooting_visibility_cache_key(
+        scenario=scenario,
+        terrain_areas=(dense_area,),
+    )
+    with_reclassified_area = shooting_visibility_cache_key(
+        scenario=scenario,
+        terrain_areas=(reclassified_area,),
+    )
+
+    assert with_dense_area == with_same_area
+    assert without_area != with_dense_area
+    assert with_dense_area != with_reclassified_area
+
+
+def test_phase17n_automatic_hidden_uses_exact_light_and_dense_terrain_areas() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    setup = _phase17n_exact_meatgrinder_setup()
+    state.mission_setup = setup
+    assert state.battlefield_state is not None
+    target = units["enemy"]
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=replace(
+            state.battlefield_state,
+            terrain_features=setup.terrain_features,
+        ),
+    )
+    all_inside = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(Pose.at(x=x, y=53.0) for x in (31.3, 32.6, 33.9, 35.2, 36.3)),
+    )
+    state.battlefield_state = all_inside.battlefield_state
+
+    hidden_ids = _hidden_target_model_ids(
+        state=state,
+        ruleset_descriptor=_ruleset(),
+        target_unit_ids=(target.unit_instance_id,),
+    )
+    assert hidden_ids == tuple(sorted(model.model_instance_id for model in target.own_models))
+    observer = units["intercessor-1"]
+    assert not unit_has_line_of_sight_to_target(
+        state=state,
+        scenario=all_inside,
+        ruleset_descriptor=_ruleset(),
+        observing_unit=observer,
+        target_unit_id=target.unit_instance_id,
+    )
+
+    all_inside_light = _scenario_with_unit_pose(
+        scenario=all_inside,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(Pose.at(x=x, y=43.0) for x in (34.5, 35.7, 36.9, 38.1, 39.3)),
+    )
+    state.battlefield_state = all_inside_light.battlefield_state
+    assert state.battle_round == 1
+    assert not state.unit_made_ranged_attacks_current_or_previous_turn(
+        unit_instance_id=target.unit_instance_id
+    )
+    light_hidden_ids = _hidden_target_model_ids(
+        state=state,
+        ruleset_descriptor=_ruleset(),
+        target_unit_ids=(target.unit_instance_id,),
+    )
+    assert light_hidden_ids == tuple(sorted(model.model_instance_id for model in target.own_models))
+    assert not unit_has_line_of_sight_to_target(
+        state=state,
+        scenario=all_inside_light,
+        ruleset_descriptor=_ruleset(),
+        observing_unit=observer,
+        target_unit_id=target.unit_instance_id,
+    )
+
+    exact_light_area_id = "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04"
+    state.mission_setup = replace(
+        setup,
+        terrain_areas=tuple(
+            replace(area, classification=TerrainAreaClassification.MIXED)
+            if area.terrain_area_id == exact_light_area_id
+            else area
+            for area in setup.terrain_areas
+        ),
+    )
+    assert _hidden_target_model_ids(
+        state=state,
+        ruleset_descriptor=_ruleset(),
+        target_unit_ids=(target.unit_instance_id,),
+    ) == tuple(sorted(model.model_instance_id for model in target.own_models))
+
+    state.mission_setup = replace(
+        setup,
+        terrain_areas=tuple(
+            replace(area, classification=TerrainAreaClassification.UNKNOWN)
+            if area.terrain_area_id == exact_light_area_id
+            else area
+            for area in setup.terrain_areas
+        ),
+    )
+    assert (
+        _hidden_target_model_ids(
+            state=state,
+            ruleset_descriptor=_ruleset(),
+            target_unit_ids=(target.unit_instance_id,),
+        )
+        == ()
+    )
+    state.mission_setup = setup
+
+    one_outside = _scenario_with_unit_pose(
+        scenario=all_inside,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            Pose.at(x=29.0, y=53.0),
+            *(Pose.at(x=x, y=53.0) for x in (32.6, 33.9, 35.2, 36.3)),
+        ),
+    )
+    state.battlefield_state = one_outside.battlefield_state
+    assert _hidden_target_model_ids(
+        state=state,
+        ruleset_descriptor=_ruleset(),
+        target_unit_ids=(target.unit_instance_id,),
+    ) == tuple(sorted(model.model_instance_id for model in target.own_models[1:]))
+
+    state.battlefield_state = all_inside.battlefield_state
+    state.record_ranged_attack_history(
+        RangedAttackHistoryRecord(
+            player_id="player-b",
+            unit_instance_id=target.unit_instance_id,
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            phase=BattlePhase.SHOOTING,
+            request_id="phase17n-hidden-ranged-history-request",
+            result_id="phase17n-hidden-ranged-history-result",
+        )
+    )
+    assert (
+        _hidden_target_model_ids(
+            state=state,
+            ruleset_descriptor=_ruleset(),
+            target_unit_ids=(target.unit_instance_id,),
+        )
+        == ()
+    )
+    assert unit_has_line_of_sight_to_target(
+        state=state,
+        scenario=all_inside,
+        ruleset_descriptor=_ruleset(),
+        observing_unit=observer,
+        target_unit_id=target.unit_instance_id,
+    )
+
+
+def test_phase17n_indirect_fire_can_target_hidden_models_outside_detection_range() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    attacker = units["intercessor-1"]
+    target = units["enemy"]
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=tuple(
+            Pose.at(x=10.135984 + (1.4 * index), y=35.0)
+            for index in range(len(attacker.own_models))
+        ),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(Pose.at(x=x, y=43.0) for x in (34.5, 35.7, 36.9, 38.1, 39.3)),
+    )
+    attacker_model = attacker.own_models[-1]
+    target_model = target.own_models[0]
+    attacker_geometry = geometry_model_for_placement(
+        model=attacker_model,
+        placement=scenario.battlefield_state.model_placement_by_id(
+            attacker_model.model_instance_id
+        ),
+    )
+    target_geometry = geometry_model_for_placement(
+        model=target_model,
+        placement=scenario.battlefield_state.model_placement_by_id(target_model.model_instance_id),
+    )
+    assert round(attacker_geometry.range_to(target_geometry), 4) == 19.1384
+    direct_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        profile_id="phase17n-hidden-direct-24",
+        range_profile=RangeProfile.distance(24),
+        keywords=(),
+        abilities=(),
+    )
+    hidden_model_ids = tuple(model.model_instance_id for model in target.own_models)
+
+    direct_candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker_model.model_instance_id,
+        weapon_profile=direct_profile,
+        target_unit_id=target.unit_instance_id,
+        hidden_target_model_ids=hidden_model_ids,
+    )
+    indirect_candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker_model.model_instance_id,
+        weapon_profile=replace(
+            direct_profile,
+            profile_id="phase17n-hidden-indirect-24",
+            keywords=(WeaponKeyword.INDIRECT_FIRE,),
+        ),
+        target_unit_id=target.unit_instance_id,
+        hidden_target_model_ids=hidden_model_ids,
+    )
+
+    assert direct_candidate.violation_code is ShootingTargetViolationCode.OUTSIDE_DETECTION_RANGE
+    assert indirect_candidate.is_legal
+    assert indirect_candidate.target_visible_model_ids == ()
+    assert indirect_candidate.target_in_range_model_ids
+    assert indirect_candidate.shooting_types == (ShootingType.INDIRECT,)
+    assert indirect_candidate.hit_roll_modifier == -1
+    assert INDIRECT_FIRE_NO_VISIBLE_RULE_ID in indirect_candidate.targeting_rule_ids
+    assert INDIRECT_FIRE_BENEFIT_OF_COVER_RULE_ID in indirect_candidate.targeting_rule_ids
+
+
+def test_phase17n_hidden_and_detection_range_apply_to_models_not_attached_unit_keywords() -> None:
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_unit_specs=(
+            (
+                "bodyguard-unit",
+                "core-intercessor-like-infantry",
+                "core-intercessor-like",
+                5,
+            ),
+            ("leader-unit", "core-character-leader", "core-character-leader", 1),
+        ),
+        enemy_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+        ),
+    )
+    state = _state(lifecycle)
+    exact_setup = _phase17n_exact_meatgrinder_setup()
+    setup = replace(
+        exact_setup,
+        terrain_areas=(exact_setup.terrain_areas[0],),
+        terrain_features=(),
+        objective_terrain_areas=(),
+    )
+    state.mission_setup = setup
+    assert state.battlefield_state is not None
+    attacker = units["intercessor-1"]
+    bodyguard = units["bodyguard-unit"]
+    vehicle_leader = replace(units["leader-unit"], keywords=("VEHICLE",))
+    _replace_unit_instance_in_state(state=state, replacement=vehicle_leader)
+    attached = _attached_formation_for_player(state=state, player_id="player-b")
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=replace(
+            state.battlefield_state,
+            terrain_features=setup.terrain_features,
+        ),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=tuple(Pose.at(x=11.0, y=y) for y in (51.0, 52.0, 53.0, 54.0, 55.0)),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=bodyguard,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=tuple(Pose.at(x=x, y=53.0) for x in (31.3, 32.6, 33.9, 35.2, 36.3)),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=vehicle_leader,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(Pose.at(x=34.5, y=51.0),),
+    )
+    state.battlefield_state = scenario.battlefield_state
+
+    hidden_model_ids = _hidden_target_model_ids(
+        state=state,
+        ruleset_descriptor=_ruleset(),
+        target_unit_ids=(attached.attached_unit_instance_id,),
+    )
+    assert hidden_model_ids == tuple(
+        sorted(model.model_instance_id for model in bodyguard.own_models)
+    )
+    assert vehicle_leader.own_models[0].model_instance_id not in hidden_model_ids
+
+    candidate = shooting_target_candidate_for_model(
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        attacker_unit=attacker,
+        attacker_model_instance_id=attacker.own_models[0].model_instance_id,
+        weapon_profile=_first_weapon_profile(lifecycle, attacker),
+        target_unit_id=attached.attached_unit_instance_id,
+        terrain_features=setup.terrain_features,
+        terrain_areas=setup.terrain_areas,
+        hidden_target_model_ids=hidden_model_ids,
+    )
+
+    assert candidate.is_legal
+    assert candidate.target_visible_model_ids == (vehicle_leader.own_models[0].model_instance_id,)
+    assert unit_has_line_of_sight_to_target(
+        state=state,
+        scenario=scenario,
+        ruleset_descriptor=_ruleset(),
+        observing_unit=attacker,
+        target_unit_id=attached.attached_unit_instance_id,
+    )
+
+
+def _phase17n_exact_meatgrinder_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
     )
 
 
@@ -2038,6 +2566,10 @@ def test_unit_level_target_legality_requires_one_model_with_range_and_visibility
         scenario.battlefield_state,
         terrain_features=(blocking_ruin,),
     )
+    state.mission_setup = replace(
+        state.mission_setup,
+        terrain_features=(blocking_ruin,),
+    )
     status = lifecycle.advance_until_decision_or_terminal()
     _assert_waiting_for_movement_unit(status)
     assert state.current_battle_phase is BattlePhase.MOVEMENT
@@ -2168,6 +2700,12 @@ def test_phase13c_allocated_cover_excludes_attacker_and_target_units_as_blockers
         footprint_center_y_inches=10.0,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=80.0,
+            center_y_inches=10.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=80.0,
             center_y_inches=10.0,
@@ -2220,6 +2758,60 @@ def test_phase13c_allocated_cover_excludes_attacker_and_target_units_as_blockers
     assert cover.target_unit_visible is True
     assert cover.target_unit_fully_visible is True
     assert cover.has_benefit is False
+
+
+def test_phase17n_allocated_cover_requires_every_alive_target_model_to_qualify() -> None:
+    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    state = _state(lifecycle)
+    assert state.battlefield_state is not None
+    attacker = units["intercessor-1"]
+    target = units["enemy"]
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=attacker,
+        army_id="army-alpha",
+        player_id="player-a",
+        poses=tuple(Pose.at(x=10.0, y=y) for y in (35.0, 36.4, 37.8, 39.2, 40.6)),
+    )
+    scenario = _scenario_with_unit_pose(
+        scenario=scenario,
+        unit=target,
+        army_id="army-beta",
+        player_id="player-b",
+        poses=(
+            Pose.at(x=20.0, y=35.0),
+            Pose.at(x=37.0, y=35.0),
+            Pose.at(x=37.0, y=36.4),
+            Pose.at(x=37.0, y=37.8),
+            Pose.at(x=37.0, y=39.2),
+        ),
+    )
+    state.battlefield_state = replace(
+        scenario.battlefield_state,
+        terrain_features=(_dense_solid_woods(),),
+    )
+    pool = _attack_pool_for_test(
+        attacker=attacker,
+        defender=target,
+        weapon_profile=_first_weapon_profile(lifecycle, attacker),
+        attacks=1,
+    )
+
+    cover = cover_for_allocated_model(
+        state=state,
+        ruleset_descriptor=_ruleset(),
+        pool=pool,
+        allocated_model_id=target.own_models[1].model_instance_id,
+    )
+
+    assert cover is not None
+    assert cover.target_unit_visible
+    assert not cover.target_unit_fully_visible
+    assert not cover.has_benefit
 
 
 def test_weapon_declaration_payload_round_trips_and_preserves_selection_evidence() -> None:

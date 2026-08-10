@@ -551,10 +551,10 @@ def _model_is_within_terrain_area(
     if type(feature) is not TerrainFeatureDefinition:
         raise GameLifecycleError("terrain target check requires TerrainFeatureDefinition.")
     return (
-        shapely_backend.base_footprint_distance_to_bounds(
+        shapely_backend.base_footprint_distance_to_polygon(
             model.base,
             model.pose,
-            feature.bounds(),
+            feature.rules_footprint_points(),
         )
         == 0.0
     )

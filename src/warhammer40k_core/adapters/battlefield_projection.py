@@ -19,7 +19,7 @@ from warhammer40k_core.geometry.model_geometry import BaseFootprintKind
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
-BATTLEFIELD_VIEW_SCHEMA_VERSION = "battlefield-view-v1"
+BATTLEFIELD_VIEW_SCHEMA_VERSION = "battlefield-view-v2-phase17n"
 BATTLEFIELD_COORDINATE_SPEC_VERSION = "battlefield-coordinate-v1"
 BATTLEFIELD_COORDINATE_SPACE = "battlefield_inches_right_handed_z_up"
 
@@ -97,6 +97,7 @@ class BattlefieldTerrainFeatureEntityPayload(TypedDict):
     entity_kind: Literal["terrain_feature"]
     terrain_feature_id: str
     terrain_feature_kind: str
+    classification: str
     footprint: BattlefieldShapePayload
     volumes: list[BattlefieldVolumePayload]
     source_id: str | None
@@ -508,13 +509,9 @@ def _terrain_feature_entity(
         "entity_kind": "terrain_feature",
         "terrain_feature_id": feature.feature_id,
         "terrain_feature_kind": feature.feature_kind.value,
-        "footprint": _rectangle_shape(
-            length=feature.footprint_width_inches,
-            width=feature.footprint_depth_inches,
-            center=(
-                feature.footprint_center_x_inches,
-                feature.footprint_center_y_inches,
-            ),
+        "classification": feature.classification.value,
+        "footprint": _polygon_shape(
+            tuple((point.x_inches, point.y_inches) for point in feature.rules_footprint_polygon)
         ),
         "volumes": sorted(volumes, key=lambda item: (item["volume_kind"], item["volume_id"])),
         "source_id": feature.source_id,

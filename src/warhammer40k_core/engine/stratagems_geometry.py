@@ -14,6 +14,9 @@ from warhammer40k_core.engine.stratagems_eligibility import *
 from warhammer40k_core.engine.stratagems_targeting import *
 from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.shooting_targets import unit_has_line_of_sight_to_target
+from warhammer40k_core.engine.shooting_terrain_visibility import (
+    shooting_terrain_areas_for_state,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -493,6 +496,7 @@ def _explosives_target_is_visible_and_in_range(
             weapon_profile=profile,
             target_unit_id=target_unit_instance_id,
             terrain_features=terrain_features,
+            terrain_areas=shooting_terrain_areas_for_state(state),
         )
         if candidate.is_legal:
             return True
@@ -543,11 +547,13 @@ def _visible_enemy_target_is_visible_and_in_range(
     scenario = _battlefield_scenario_for_stratagem(state)
     source_unit = _unit_by_id(state=state, unit_instance_id=source_unit_instance_id)
     return unit_has_line_of_sight_to_target(
+        state=state,
         scenario=scenario,
         ruleset_descriptor=_stratagem_ruleset_descriptor(),
         observing_unit=source_unit,
         target_unit_id=target_unit_instance_id,
         terrain_features=_stratagem_terrain_features(state),
+        terrain_areas=shooting_terrain_areas_for_state(state),
     )
 
 

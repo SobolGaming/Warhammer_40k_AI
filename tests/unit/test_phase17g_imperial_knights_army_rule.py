@@ -560,7 +560,7 @@ def test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_unit
     assert gain.transaction.cap_exempt is True
 
 
-def test_code_chivalric_tally_counts_current_phase_unit_completion_evidence() -> None:
+def test_code_chivalric_tally_counts_out_of_phase_unit_completion_evidence() -> None:
     config = phase11c_config()
     state = battle_state()
     _mark_player_as_imperial_knights(state, player_id="player-a")
@@ -584,7 +584,7 @@ def test_code_chivalric_tally_counts_current_phase_unit_completion_evidence() ->
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "active_player_id": state.active_player_id,
-            "phase": BattlePhase.FIGHT.value,
+            "phase": BattlePhase.SHOOTING.value,
             "destroying_player_id": "player-a",
             "attacking_unit_instance_id": IMPERIAL_KNIGHTS_UNIT_ID,
             "target_unit_instance_id": ENEMY_UNIT_ID,

@@ -11,6 +11,7 @@ from warhammer40k_core.core.missions import MissionSourcePackageDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.rules.source_catalog import SourceCatalog
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    app_core_rules_hidden_2026_08_09,
     chapter_approved_2026_27,
     core_abilities,
     core_rules,
@@ -135,6 +136,95 @@ def test_july_rules_updates_source_catalog_cites_pdfs_and_app_core_rules() -> No
         assert hashlib.sha256(Path(relative_path).read_bytes()).hexdigest() == expected_sha256
 
 
+def test_app_hidden_transcription_is_source_hashed_honest_and_cataloged() -> None:
+    artifact = app_core_rules_hidden_2026_08_09.hidden_transcription_artifact()
+    payload = _app_hidden_transcription_payload()
+    raw = _app_hidden_transcription_artifact_path().read_bytes()
+    catalog = app_core_rules_hidden_2026_08_09.source_catalog()
+    catalog_payload = catalog.to_payload()
+    source_capture = cast(dict[str, object], payload["source_capture"])
+
+    assert hashlib.sha256(raw).hexdigest() == (
+        app_core_rules_hidden_2026_08_09.EXPECTED_ARTIFACT_SHA256
+    )
+    assert hashlib.sha256(artifact.rule.source_text.encode()).hexdigest() == (
+        app_core_rules_hidden_2026_08_09.TRANSCRIPTION_SHA256
+    )
+    assert artifact.source_capture.observation_date == "2026-08-09"
+    assert artifact.source_capture.provenance_kind == (
+        "project_owner_supplied_official_app_transcription"
+    )
+    assert artifact.source_capture.availability == (
+        "transcription_only_no_source_url_app_version_or_binary"
+    )
+    assert set(source_capture) == {
+        "availability",
+        "observation_date",
+        "provenance_kind",
+        "source_platform",
+        "source_title",
+        "supplied_by",
+    }
+    assert artifact.supersession.supersedes_source_package_id == core_rules.SOURCE_PACKAGE_ID
+    assert artifact.supersession.supersedes_rule_reference == "13.09 Hidden"
+    assert artifact.supersession.supersession_scope == ("hidden_terrain_area_feature_eligibility")
+    assert len(catalog.documents) == 1
+    assert catalog.catalog_version.source_date == "2026-08-09"
+    assert "App version unavailable" in catalog.documents[0].title
+    assert (
+        catalog.source_text_by_id(app_core_rules_hidden_2026_08_09.RULE_SOURCE_ID).raw_text
+        == artifact.rule.source_text
+    )
+    provenance = catalog.source_text_by_id(
+        f"{app_core_rules_hidden_2026_08_09.SOURCE_PACKAGE_ID}:manifest:provenance"
+    )
+    assert "no upstream artifact hash is claimed" in provenance.raw_text
+    assert "supersedes" in provenance.raw_text
+    assert SourceCatalog.from_payload(catalog_payload).to_payload() == catalog_payload
+
+
+def test_app_hidden_transcription_artifact_rejects_unrecorded_source_metadata() -> None:
+    payload = _app_hidden_transcription_payload()
+    source_capture = cast(dict[str, object], payload["source_capture"])
+    source_capture["source_url"] = "https://example.invalid/unrecorded"
+
+    with pytest.raises(
+        app_core_rules_hidden_2026_08_09.AppHiddenTranscriptionArtifactError,
+        match="artifact is invalid",
+    ):
+        app_core_rules_hidden_2026_08_09.app_hidden_transcription_artifact_from_json_bytes(
+            json.dumps(payload, sort_keys=True).encode()
+        )
+
+
+def test_app_hidden_transcription_artifact_rejects_text_and_byte_drift() -> None:
+    payload = _app_hidden_transcription_payload()
+    rule = cast(dict[str, object], payload["rule"])
+    rule["source_text"] = f"{rule['source_text']} altered"
+
+    with pytest.raises(
+        app_core_rules_hidden_2026_08_09.AppHiddenTranscriptionArtifactError,
+        match="source-text hash is stale",
+    ):
+        app_core_rules_hidden_2026_08_09.app_hidden_transcription_artifact_from_json_bytes(
+            json.dumps(payload, sort_keys=True).encode()
+        )
+
+    raw = _app_hidden_transcription_artifact_path().read_bytes()
+    app_core_rules_hidden_2026_08_09.validate_hidden_transcription_artifact_bytes(raw)
+    semantically_equivalent_bytes = json.dumps(
+        _app_hidden_transcription_payload(), sort_keys=True
+    ).encode()
+    assert semantically_equivalent_bytes != raw
+    with pytest.raises(
+        app_core_rules_hidden_2026_08_09.AppHiddenTranscriptionArtifactError,
+        match="artifact bytes drifted",
+    ):
+        app_core_rules_hidden_2026_08_09.validate_hidden_transcription_artifact_bytes(
+            semantically_equivalent_bytes
+        )
+
+
 def test_july_rules_updates_artifact_rejects_unknown_fields() -> None:
     payload = _july_rules_update_payload()
     payload["unexpected"] = True
@@ -245,6 +335,20 @@ def _july_rules_update_payload() -> dict[str, object]:
                 "july_rules_updates_2026_07/artifacts/package.json"
             ).read_text()
         ),
+    )
+
+
+def _app_hidden_transcription_artifact_path() -> Path:
+    return Path(
+        "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/"
+        "app_core_rules_hidden_2026_08_09/artifacts/hidden.json"
+    )
+
+
+def _app_hidden_transcription_payload() -> dict[str, object]:
+    return cast(
+        dict[str, object],
+        json.loads(_app_hidden_transcription_artifact_path().read_text()),
     )
 
 

@@ -45,6 +45,7 @@ from warhammer40k_core.geometry.terrain import (
     TerrainSupportSurface,
     TerrainVolume,
     TerrainVolumePayload,
+    classified_feature_transit_permission,
     terrain_volume_from_payload,
 )
 from warhammer40k_core.geometry.volume import Model, ModelPayload
@@ -1232,6 +1233,7 @@ class TerrainPathLegalityContext:
         traversal_mode = self._traversal_mode_for_terrain(
             terrain,
             touching_poses,
+            feature=feature,
             feature_policy=feature_policy,
         )
         if traversal_mode is not TerrainTraversalMode.BLOCKED:
@@ -1297,6 +1299,7 @@ class TerrainPathLegalityContext:
         terrain: TerrainVolume,
         touching_poses: tuple[Pose, ...],
         *,
+        feature: TerrainFeatureDefinition | None,
         feature_policy: TerrainFeatureMovementPolicy | None,
     ) -> TerrainTraversalMode:
         if (
@@ -1315,26 +1318,37 @@ class TerrainPathLegalityContext:
             free_height = max(free_height, self.terrain_as_if_absent_height_inches)
         if terrain.height <= free_height:
             return TerrainTraversalMode.FREELY_TRAVERSABLE
+        can_move_over = feature_policy is None or feature_policy.can_move_over
         if type(terrain) is ObstacleVolume:
-            if self._can_move_through_feature(feature_policy):
+            if self._can_move_through_feature(
+                feature=feature,
+                feature_policy=feature_policy,
+                touching_poses=touching_poses,
+            ):
                 return self.terrain_movement_policy.infantry_beast_ruins_wall_traversal_mode
-            if (
-                feature_policy is None or feature_policy.can_move_over
-            ) and _path_reaches_or_clears_terrain_top(touching_poses, terrain):
+            if can_move_over and _path_reaches_or_clears_terrain_top(touching_poses, terrain):
                 return TerrainTraversalMode.CLIMB
             return TerrainTraversalMode.BLOCKED
-        if (
-            feature_policy is None or feature_policy.can_move_over
-        ) and _path_reaches_or_clears_terrain_top(touching_poses, terrain):
+        if can_move_over and _path_reaches_or_clears_terrain_top(touching_poses, terrain):
             return TerrainTraversalMode.CLIMB
         return TerrainTraversalMode.BLOCKED
 
     def _can_move_through_feature(
         self,
+        *,
+        feature: TerrainFeatureDefinition | None,
         feature_policy: TerrainFeatureMovementPolicy | None,
+        touching_poses: tuple[Pose, ...],
     ) -> bool:
         if feature_policy is None:
             return self.can_move_through_terrain or self.can_traverse_ruins_walls
+        if feature is None:
+            raise GeometryError("Terrain feature movement policy requires its typed feature.")
+        classified_permission = classified_feature_transit_permission(
+            feature, self.movement_keywords, touching_poses
+        )
+        if classified_permission is not None:
+            return classified_permission
         if feature_policy.can_move_through:
             return True
         if not self.terrain_movement_policy.requires_permission_to_move_through_features:
@@ -2152,14 +2166,10 @@ def _model_endpoint_is_on_support_surface(
 ) -> bool:
     if not math.isclose(model.pose.position.z, surface.z_inches):
         return False
-    return shapely_backend.base_footprint_within_bounds(
+    return shapely_backend.base_footprint_intersects_polygon(
         model.base,
         model.pose,
-        surface.bounds(),
-    ) or shapely_backend.base_footprint_intersects_bounds(
-        model.base,
-        model.pose,
-        surface.bounds(),
+        surface.footprint_polygon(),
     )
 
 
@@ -2181,10 +2191,10 @@ def _model_endpoint_intersects_feature_footprint(
     model: Model,
     feature: TerrainFeatureDefinition,
 ) -> bool:
-    return shapely_backend.base_footprint_intersects_bounds(
+    return shapely_backend.base_footprint_intersects_polygon(
         model.base,
         model.pose,
-        feature.bounds(),
+        feature.rules_footprint_points(),
     )
 
 
@@ -2192,10 +2202,10 @@ def _model_base_is_fully_supported(
     model: Model,
     surface: TerrainSupportSurface,
 ) -> bool:
-    return shapely_backend.base_footprint_within_bounds(
+    return shapely_backend.base_footprint_within_polygon(
         model.base,
         model.pose,
-        surface.bounds(),
+        surface.footprint_polygon(),
     )
 
 

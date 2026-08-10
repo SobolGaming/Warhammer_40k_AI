@@ -5,6 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phases.movement_imports import *
+from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+    record_primary_unit_destructions_for_destroyed_models,
+)
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
 from warhammer40k_core.engine.phases.movement_handler import *
@@ -187,6 +190,25 @@ def _apply_fall_back_result(
             fall_back_result.attempted_placement
         ).with_removed_models(destroyed_model_ids)
     )
+    if destroyed_model_ids:
+        for destruction in record_primary_unit_destructions_for_destroyed_models(
+            state=state,
+            destroyed_model_instance_ids=destroyed_model_ids,
+            destroying_player_id=None,
+            source_id=f"core-rules:desperate-escape:{result.result_id}",
+        ):
+            decisions.event_log.append(
+                "primary_unit_destruction_recorded",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "active_player_id": state.active_player_id,
+                    "phase": BattlePhase.MOVEMENT.value,
+                    "source_rule_id": "desperate_escape",
+                    "source_result_id": result.result_id,
+                    "primary_unit_destruction_state": destruction.to_payload(),
+                },
+            )
     permission_grants: tuple[FallBackEligibilityGrant, ...] = ()
     if surviving_placement is not None:
         permission_grants = fall_back_hooks.grants_for(

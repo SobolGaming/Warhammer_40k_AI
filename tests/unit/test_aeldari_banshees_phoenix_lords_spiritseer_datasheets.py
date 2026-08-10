@@ -656,6 +656,13 @@ def test_tears_of_isha_revival_rejects_terrain_and_base_crossing_edge() -> None:
         footprint_center_y_inches=terrain_pose.y,
         footprint_width_inches=1.0,
         footprint_depth_inches=1.0,
+        rules_footprint_polygon=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=terrain_pose.x,
+            center_y_inches=terrain_pose.y,
+            width_inches=1.0,
+            depth_inches=1.0,
+            display_template_id="tears-of-isha-adjacent-wall-rules",
+        ).footprint_polygon,
         display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
             center_x_inches=terrain_pose.x,
             center_y_inches=terrain_pose.y,

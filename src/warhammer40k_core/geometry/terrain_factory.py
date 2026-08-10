@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry, TerrainDisplayPoint
 from warhammer40k_core.geometry.pose import GeometryError
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
@@ -11,6 +11,7 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFloorDefinition,
     TerrainWallDefinition,
 )
+from warhammer40k_core.geometry.terrain_classification import TerrainAreaClassification
 
 RUINS_FLOOR_HEIGHT_INCHES = 3.0
 RUINS_FLOOR_THICKNESS_INCHES = 0.12
@@ -73,21 +74,29 @@ class TerrainFactory:
                 thickness_inches=RUINS_FLOOR_THICKNESS_INCHES,
             ),
         )
+        display_geometry = TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=center_x_inches,
+            center_y_inches=center_y_inches,
+            width_inches=half_width * 2.0,
+            depth_inches=half_depth * 2.0,
+            display_template_id="ruins_rect_12x6",
+        )
         return (
             TerrainFeatureDefinition(
                 feature_id=feature_id,
                 feature_kind=TerrainFeatureKind.RUINS,
+                classification=TerrainAreaClassification.DENSE,
                 footprint_center_x_inches=center_x_inches,
                 footprint_center_y_inches=center_y_inches,
                 footprint_width_inches=half_width * 2.0,
                 footprint_depth_inches=half_depth * 2.0,
-                display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+                rules_footprint_polygon=_axis_aligned_rules_footprint(
                     center_x_inches=center_x_inches,
                     center_y_inches=center_y_inches,
                     width_inches=half_width * 2.0,
                     depth_inches=half_depth * 2.0,
-                    display_template_id="ruins_rect_12x6",
                 ),
+                display_geometry=display_geometry,
                 walls=walls,
                 floors=floors,
                 source_id="phase10f_deterministic_ruins_fixture",
@@ -101,21 +110,29 @@ class TerrainFactory:
         center_x_inches: float = 22.0,
         center_y_inches: float = 30.0,
     ) -> tuple[TerrainFeatureDefinition, ...]:
+        display_geometry = TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=center_x_inches,
+            center_y_inches=center_y_inches,
+            width_inches=7.0,
+            depth_inches=5.0,
+            display_template_id="woods_rect_7x5",
+        )
         return (
             TerrainFeatureDefinition(
                 feature_id=feature_id,
                 feature_kind=TerrainFeatureKind.WOODS,
+                classification=TerrainAreaClassification.DENSE,
                 footprint_center_x_inches=center_x_inches,
                 footprint_center_y_inches=center_y_inches,
                 footprint_width_inches=7.0,
                 footprint_depth_inches=5.0,
-                display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
+                rules_footprint_polygon=_axis_aligned_rules_footprint(
                     center_x_inches=center_x_inches,
                     center_y_inches=center_y_inches,
                     width_inches=7.0,
                     depth_inches=5.0,
-                    display_template_id="woods_rect_7x5",
                 ),
+                display_geometry=display_geometry,
                 walls=(),
                 floors=(),
                 source_id="phase13a_deterministic_woods_fixture",
@@ -152,3 +169,20 @@ def _validate_feature_tuple(
             raise GeometryError(f"Duplicate terrain feature ID: {feature.feature_id}.")
         feature_ids.add(feature.feature_id)
     return tuple(sorted(features, key=lambda feature: feature.feature_id))
+
+
+def _axis_aligned_rules_footprint(
+    *,
+    center_x_inches: float,
+    center_y_inches: float,
+    width_inches: float,
+    depth_inches: float,
+) -> tuple[TerrainDisplayPoint, ...]:
+    half_width = width_inches / 2.0
+    half_depth = depth_inches / 2.0
+    return (
+        TerrainDisplayPoint(center_x_inches - half_width, center_y_inches - half_depth),
+        TerrainDisplayPoint(center_x_inches + half_width, center_y_inches - half_depth),
+        TerrainDisplayPoint(center_x_inches + half_width, center_y_inches + half_depth),
+        TerrainDisplayPoint(center_x_inches - half_width, center_y_inches + half_depth),
+    )

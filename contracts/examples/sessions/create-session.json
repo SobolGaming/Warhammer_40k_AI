@@ -2396,7 +2396,7 @@
           "source_transform": "explicit",
           "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 23.465948054933786,
@@ -2472,7 +2472,7 @@
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
           "symmetry_axis": "point_center",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-south-center",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 38.2,
@@ -2532,7 +2532,7 @@
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
           "symmetry_axis": "point_center",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-east-midfield",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 36.7,
@@ -2592,7 +2592,7 @@
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
           "symmetry_axis": "point_center",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-north-east",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 7.3,
@@ -2652,7 +2652,7 @@
           "source_transform": "explicit",
           "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 5.8,
@@ -2712,7 +2712,7 @@
           "source_transform": "explicit",
           "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 33.25,
@@ -2784,7 +2784,7 @@
           "source_transform": "explicit",
           "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 10.75,
@@ -2856,7 +2856,7 @@
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
           "symmetry_axis": "point_center",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-west",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 13.25,
@@ -2928,7 +2928,7 @@
           "source_transform": "explicit",
           "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 30.75,
@@ -3000,7 +3000,7 @@
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
           "symmetry_axis": "point_center",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-south-east",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 34.2,
@@ -3072,7 +3072,7 @@
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
           "symmetry_axis": "point_center",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 9.87114177668623,
@@ -3144,7 +3144,7 @@
           "source_transform": "explicit",
           "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 34.12885822331377,
@@ -3216,7 +3216,7 @@
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
           "symmetry_axis": "point_center",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 9.8,
@@ -3288,7 +3288,7 @@
           "source_transform": "explicit",
           "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 21.75,
@@ -3340,7 +3340,7 @@
           "source_transform": "explicit",
           "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 22.25,
@@ -3392,7 +3392,7 @@
           "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
           "symmetry_axis": "point_center",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east",
-          "terrain_feature_kind": "ruins"
+          "terrain_feature_kind": "terrain_layout_area"
         }
       ],
       "terrain_features": [],

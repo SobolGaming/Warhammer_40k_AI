@@ -1,0 +1,27 @@
+{
+  "artifact_schema": "core-v2-warhammer-40000-app-hidden-transcription-v1",
+  "source_package_id": "gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09",
+  "source_capture": {
+    "provenance_kind": "project_owner_supplied_official_app_transcription",
+    "source_title": "Warhammer 40,000 App Core Rules",
+    "source_platform": "Warhammer 40,000 App",
+    "observation_date": "2026-08-09",
+    "supplied_by": "project_owner",
+    "availability": "transcription_only_no_source_url_app_version_or_binary"
+  },
+  "rule": {
+    "rule_id": "13.09-hidden",
+    "source_id": "gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09:rule:13.09-hidden",
+    "behavior_descriptor": "hidden_applies_in_light_or_dense_terrain_areas",
+    "source_text": "A model is hidden while all of the following apply to it:\n\nThat model has the INFANTRY/BEASTS/SWARM keyword and is within a terrain area that contains one or more light/dense terrain features\nThat model's unit did not make one or more ranged attacks during this turn or during the previous turn. While a model is hidden, it can only be visible to enemy models that are within its detection range. Unless otherwise stated, a model's detection range is 15\".\n\nNOTE: During the first turn, conditions that require something not have happened during the previous turn are true. For the Hidden rule, this means that during the first turn a unit has not made ranged attacks during the previous turn.",
+    "transcription_sha256": "f296139496b5385347ec6c91bf2b898b9ac7ead996ae4f345cc2122002cf769e"
+  },
+  "supersession": {
+    "supersedes_source_package_id": "gw-11e-core-rules",
+    "supersedes_document_id": "eng_01-06_warhammer40k_new40k_core_rules",
+    "supersedes_rule_reference": "13.09 Hidden",
+    "supersession_scope": "hidden_terrain_area_feature_eligibility",
+    "relationship": "later_official_app_wording_supersedes_older_core_rules_pdf"
+  },
+  "package_hash": "12061dc13eda2edeeb1efaaec2725ed0048a306858fbb8a92e9a9d3ac603f984"
+}

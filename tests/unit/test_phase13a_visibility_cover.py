@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import cast
 
 import pytest
@@ -10,8 +11,9 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
-from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry, TerrainDisplayPoint
 from warhammer40k_core.engine.battlefield_state import SpatialIndexState
+from warhammer40k_core.engine.shooting_terrain_visibility import model_within_solid_terrain
 from warhammer40k_core.geometry.base import CircularBase
 from warhammer40k_core.geometry.pose import GeometryError, Point3, Pose
 from warhammer40k_core.geometry.terrain import (
@@ -20,6 +22,8 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFloorDefinition,
     TerrainWallDefinition,
 )
+from warhammer40k_core.geometry.terrain_area_visibility import TerrainVisibilityArea
+from warhammer40k_core.geometry.terrain_classification import TerrainAreaClassification
 from warhammer40k_core.geometry.terrain_factory import TerrainFactory
 from warhammer40k_core.geometry.visibility import (
     BenefitOfCoverResult,
@@ -57,6 +61,13 @@ def _model(
     )
 
 
+def _target_model_keywords(
+    *model_ids: str,
+    keywords: tuple[str, ...] = (),
+) -> tuple[tuple[str, tuple[str, ...]], ...]:
+    return tuple((model_id, keywords) for model_id in model_ids)
+
+
 def _ruleset() -> RulesetDescriptor:
     return RulesetDescriptor.warhammer_40000_eleventh(descriptor_version="core-v2-phase13a-test")
 
@@ -69,6 +80,12 @@ def _visibility_ruin() -> TerrainFeatureDefinition:
         footprint_center_y_inches=0.0,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=0.0,
+            center_y_inches=0.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=0.0,
             center_y_inches=0.0,
@@ -98,6 +115,51 @@ def _visibility_ruin() -> TerrainFeatureDefinition:
             ),
         ),
         source_id="phase13a_visibility_ruin",
+    )
+
+
+def _triangular_visibility_ruin() -> TerrainFeatureDefinition:
+    return TerrainFeatureDefinition(
+        feature_id="triangular-visibility-ruin",
+        feature_kind=TerrainFeatureKind.RUINS,
+        footprint_center_x_inches=0.0,
+        footprint_center_y_inches=0.0,
+        footprint_width_inches=4.0,
+        footprint_depth_inches=4.0,
+        rules_footprint_polygon=(
+            TerrainDisplayPoint(-2.0, -2.0),
+            TerrainDisplayPoint(2.0, -2.0),
+            TerrainDisplayPoint(-2.0, 2.0),
+        ),
+        display_geometry=_display_geometry(
+            center_x_inches=0.0,
+            center_y_inches=0.0,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ),
+        walls=(
+            TerrainWallDefinition(
+                wall_id="lower-left-wall",
+                center_x_inches=-1.5,
+                center_y_inches=-1.5,
+                bottom_z_inches=0.0,
+                width_inches=0.25,
+                depth_inches=0.25,
+                height_inches=3.0,
+            ),
+        ),
+        floors=(
+            TerrainFloorDefinition(
+                floor_id="ground-floor",
+                center_x_inches=0.0,
+                center_y_inches=0.0,
+                bottom_z_inches=0.0,
+                width_inches=4.0,
+                depth_inches=4.0,
+                thickness_inches=0.1,
+            ),
+        ),
+        source_id="phase13a_triangular_visibility_ruin",
     )
 
 
@@ -141,6 +203,49 @@ def test_eleventh_ruleset_has_explicit_ruins_and_woods_visibility_policies() -> 
     assert woods.cover_policy.non_stacking
 
 
+def test_explicit_feature_classification_is_authoritative_for_solid_terrain() -> None:
+    model = _model("model-inside-feature", 0.0, 0.0)
+    light_ruins = replace(
+        _visibility_ruin(),
+        feature_id="light-classified-ruins",
+        classification=TerrainAreaClassification.LIGHT,
+    )
+    dense_hill = replace(
+        _visibility_ruin(),
+        feature_id="dense-classified-hill",
+        feature_kind=TerrainFeatureKind.HILLS,
+        classification=TerrainAreaClassification.DENSE,
+    )
+
+    assert not model_within_solid_terrain(
+        ruleset_descriptor=_ruleset(),
+        model=model,
+        terrain_features=(light_ruins,),
+        terrain_areas=(),
+    )
+    assert model_within_solid_terrain(
+        ruleset_descriptor=_ruleset(),
+        model=model,
+        terrain_features=(dense_hill,),
+        terrain_areas=(),
+    )
+
+
+def test_explicit_light_classification_overrides_legacy_dense_feature_policy() -> None:
+    light_woods = replace(
+        TerrainFactory.woods_fixture(center_x_inches=0.0, center_y_inches=0.0)[0],
+        feature_id="light-classified-woods",
+        classification=TerrainAreaClassification.LIGHT,
+    )
+
+    assert not model_within_solid_terrain(
+        ruleset_descriptor=_ruleset(),
+        model=_model("model-inside-light-woods", 0.0, 0.0),
+        terrain_features=(light_woods,),
+        terrain_areas=(),
+    )
+
+
 def test_ruins_area_visibility_blocks_los_without_physical_wall_intersection() -> None:
     feature = _visibility_ruin()
     context = TerrainVisibilityContext.from_ruleset_descriptor(
@@ -148,6 +253,7 @@ def test_ruins_area_visibility_blocks_los_without_physical_wall_intersection() -
         los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
         observer_model=_model("observer", -5.0, 0.0),
         target_models=(_model("target", 5.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_features=(feature,),
     )
 
@@ -166,6 +272,57 @@ def test_ruins_area_visibility_blocks_los_without_physical_wall_intersection() -
     assert not context.benefit_of_cover(witness).has_benefit
 
 
+def test_ruins_visibility_uses_exact_rules_polygon_not_its_bounding_box() -> None:
+    feature = _triangular_visibility_ruin()
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
+        observer_model=_model("observer", 0.0, 3.0, radius=0.25),
+        target_models=(_model("target", 3.0, 0.0, radius=0.25),),
+        target_model_keywords=_target_model_keywords("target"),
+        terrain_features=(feature,),
+    )
+
+    witness = context.resolve_line_of_sight()
+
+    assert witness.unit_visible
+    assert not any(
+        record.blocker_kind is VisibilityBlockerKind.TERRAIN_FEATURE
+        for record in witness.all_blocker_records()
+    )
+
+
+@pytest.mark.parametrize(
+    ("observer_xy", "target_xy"),
+    [
+        ((-5.0, 0.0), (1.5, 1.5)),
+        ((1.5, 1.5), (-5.0, 0.0)),
+    ],
+)
+def test_ruins_inside_exceptions_use_exact_rules_polygon(
+    observer_xy: tuple[float, float],
+    target_xy: tuple[float, float],
+) -> None:
+    feature = _triangular_visibility_ruin()
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
+        observer_model=_model("observer", *observer_xy, radius=0.25),
+        target_models=(_model("target", *target_xy, radius=0.25),),
+        target_model_keywords=_target_model_keywords("target"),
+        terrain_features=(feature,),
+    )
+
+    witness = context.resolve_line_of_sight()
+
+    assert not witness.unit_visible
+    assert any(
+        record.blocker_kind is VisibilityBlockerKind.TERRAIN_FEATURE
+        and record.exception_applied is None
+        for record in witness.all_blocker_records()
+    )
+
+
 def test_ruins_wall_floor_context_records_physical_wall_blockers_not_floors() -> None:
     feature = TerrainFactory.ruins_fixture(center_x_inches=22.0, center_y_inches=30.0)[0]
     context = TerrainVisibilityContext.from_ruleset_descriptor(
@@ -173,6 +330,7 @@ def test_ruins_wall_floor_context_records_physical_wall_blockers_not_floors() ->
         los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
         observer_model=_model("observer", 14.0, 30.0),
         target_models=(_model("target", 30.0, 30.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_features=(feature,),
     )
 
@@ -195,6 +353,7 @@ def test_towering_outside_ruin_does_not_ignore_area_visibility() -> None:
         los_cache_key=cache_key,
         observer_model=_model("observer", -5.0, 0.0),
         target_models=(_model("target", 5.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_features=(feature,),
         observer_keywords=("TOWERING",),
     ).resolve_line_of_sight()
@@ -215,6 +374,7 @@ def test_towering_inside_ruin_and_aircraft_exceptions_are_represented_in_witness
         los_cache_key=cache_key,
         observer_model=_model("observer", 0.0, 0.0),
         target_models=(_model("target", 5.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_features=(feature,),
         observer_keywords=("TOWERING",),
     ).resolve_line_of_sight()
@@ -223,8 +383,8 @@ def test_towering_inside_ruin_and_aircraft_exceptions_are_represented_in_witness
         los_cache_key=cache_key,
         observer_model=_model("observer", -5.0, 0.0),
         target_models=(_model("target", 5.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target", keywords=("AIRCRAFT",)),
         terrain_features=(feature,),
-        target_keywords=("AIRCRAFT",),
     ).resolve_line_of_sight()
 
     assert towering_inside.unit_visible
@@ -237,13 +397,14 @@ def test_towering_inside_ruin_and_aircraft_exceptions_are_represented_in_witness
     assert {record.exception_applied for record in aircraft.all_blocker_records()} == {"aircraft"}
 
 
-def test_ruins_target_wholly_within_is_visible_and_preserves_cover_source() -> None:
+def test_ruins_target_wholly_within_without_terrain_area_does_not_grant_cover() -> None:
     feature = _visibility_ruin()
     context = TerrainVisibilityContext.from_ruleset_descriptor(
         ruleset_descriptor=_ruleset(),
         los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
         observer_model=_model("observer", -5.0, 0.0),
         target_models=(_model("target", 0.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_features=(feature,),
     )
 
@@ -255,11 +416,7 @@ def test_ruins_target_wholly_within_is_visible_and_preserves_cover_source() -> N
     assert {record.exception_applied for record in witness.all_blocker_records()} == {
         "target_intersects"
     }
-    assert cover.has_benefit
-    assert cover.source_feature_ids == ("visibility-ruin",)
-    assert CoverSourceReason.WHOLLY_WITHIN_FEATURE in {
-        record.reason for record in cover.source_records
-    }
+    assert not cover.has_benefit
 
 
 def test_ruins_partial_footprint_intersection_is_visible_but_not_wholly_within_cover() -> None:
@@ -269,6 +426,7 @@ def test_ruins_partial_footprint_intersection_is_visible_but_not_wholly_within_c
         los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
         observer_model=_model("observer", -5.0, 0.0),
         target_models=(_model("target", 2.25, 0.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_features=(feature,),
     )
 
@@ -290,6 +448,7 @@ def test_woods_target_wholly_within_preserves_cover_source() -> None:
         los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
         observer_model=_model("observer", -5.0, 0.0),
         target_models=(_model("target", 0.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_features=(feature,),
     )
 
@@ -300,7 +459,7 @@ def test_woods_target_wholly_within_preserves_cover_source() -> None:
     assert not witness.unit_fully_visible
     assert cover.has_benefit
     assert cover.source_feature_ids == ("woods-alpha",)
-    assert CoverSourceReason.WHOLLY_WITHIN_FEATURE in {
+    assert CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_FEATURE in {
         record.reason for record in cover.source_records
     }
 
@@ -312,6 +471,7 @@ def test_observer_wholly_within_woods_sees_out_without_granting_target_cover() -
         los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
         observer_model=_model("observer", 0.0, 0.0),
         target_models=(_model("target", 5.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_features=(feature,),
     )
 
@@ -333,6 +493,7 @@ def test_woods_target_wholly_within_same_feature_is_not_fully_visible_from_insid
         los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
         observer_model=_model("observer", -1.0, 0.0),
         target_models=(_model("target", 1.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_features=(feature,),
     )
 
@@ -348,7 +509,7 @@ def test_woods_target_wholly_within_same_feature_is_not_fully_visible_from_insid
         for record in witness.all_blocker_records()
     )
     assert cover.has_benefit
-    assert CoverSourceReason.WHOLLY_WITHIN_FEATURE in {
+    assert CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_FEATURE in {
         record.reason for record in cover.source_records
     }
 
@@ -361,6 +522,7 @@ def test_towering_and_aircraft_use_true_los_through_woods_without_cover_source()
         los_cache_key=cache_key,
         observer_model=_model("observer", -5.0, 0.0),
         target_models=(_model("target", 5.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_features=(feature,),
         observer_keywords=("TOWERING",),
     )
@@ -369,8 +531,8 @@ def test_towering_and_aircraft_use_true_los_through_woods_without_cover_source()
         los_cache_key=cache_key,
         observer_model=_model("observer", -5.0, 0.0),
         target_models=(_model("target", 5.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target", keywords=("AIRCRAFT",)),
         terrain_features=(feature,),
-        target_keywords=("AIRCRAFT",),
     )
 
     towering_witness = towering_context.resolve_line_of_sight()
@@ -397,6 +559,7 @@ def test_woods_visibility_blocks_full_visibility_and_grants_cover_policy_result(
         los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
         observer_model=_model("observer", -5.0, 0.0),
         target_models=(_model("target", 5.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_features=(feature,),
     )
 
@@ -423,6 +586,61 @@ def test_woods_visibility_blocks_full_visibility_and_grants_cover_policy_result(
     assert cover.non_stacking
 
 
+def test_terrain_area_cover_requires_each_model_to_meet_the_keyword_or_obscuration_gate() -> None:
+    feature = _visibility_ruin()
+    light_area = TerrainVisibilityArea(
+        terrain_area_id="light-area",
+        classification=TerrainAreaClassification.LIGHT,
+        footprint_polygon=((-2.0, -2.0), (2.0, -2.0), (2.0, 2.0), (-2.0, 2.0)),
+    )
+    target = _model("target", 0.0, 0.0)
+    vehicle_context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key="los:vehicle-in-light-area",
+        observer_model=_model("observer", -5.0, 0.0),
+        target_models=(target,),
+        target_model_keywords=_target_model_keywords("target", keywords=("VEHICLE",)),
+        terrain_features=(feature,),
+        terrain_areas=(light_area,),
+    )
+    infantry_context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key="los:infantry-in-light-area",
+        observer_model=_model("observer", -5.0, 0.0),
+        target_models=(target,),
+        target_model_keywords=_target_model_keywords("target", keywords=("INFANTRY",)),
+        terrain_features=(feature,),
+        terrain_areas=(light_area,),
+    )
+
+    assert not vehicle_context.benefit_of_cover(vehicle_context.resolve_line_of_sight()).has_benefit
+    assert infantry_context.benefit_of_cover(infantry_context.resolve_line_of_sight()).has_benefit
+
+
+def test_one_obscured_model_does_not_grant_cover_when_another_model_has_no_cover_source() -> None:
+    woods = TerrainFactory.woods_fixture(center_x_inches=0.0, center_y_inches=0.0)[0]
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key=SpatialIndexState.from_terrain_features((woods,)).los_cache_key(),
+        observer_model=_model("observer", -10.0, 0.0),
+        target_models=(
+            _model("fully-visible-target", -7.0, 0.0),
+            _model("obscured-target", 5.0, 0.0),
+        ),
+        target_model_keywords=_target_model_keywords(
+            "fully-visible-target",
+            "obscured-target",
+            keywords=("INFANTRY",),
+        ),
+        terrain_features=(woods,),
+    )
+    witness = context.resolve_line_of_sight()
+
+    assert "fully-visible-target" in witness.fully_visible_model_ids
+    assert "obscured-target" not in witness.fully_visible_model_ids
+    assert not context.benefit_of_cover(witness).has_benefit
+
+
 def test_model_volume_participates_in_los_visibility_and_full_visibility() -> None:
     low_wall = ObstacleVolume(
         terrain_id="low-wall",
@@ -436,6 +654,7 @@ def test_model_volume_participates_in_los_visibility_and_full_visibility() -> No
         los_cache_key="los:manual-low-wall",
         observer_model=_model("observer", -3.0, 0.0, height=4.0),
         target_models=(_model("target", 3.0, 0.0, height=4.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_volumes=(low_wall,),
     )
 
@@ -456,6 +675,7 @@ def test_phase13a_model_silhouette_sampling_budget_is_explicit() -> None:
         los_cache_key="los:manual-sampling-budget",
         observer_model=_model("observer", -3.0, 0.0, height=4.0),
         target_models=(_model("target", 3.0, 0.0, height=4.0),),
+        target_model_keywords=_target_model_keywords("target"),
     )
 
     witness = context.resolve_line_of_sight()
@@ -479,12 +699,14 @@ def test_los_cache_key_changes_when_terrain_revision_changes() -> None:
         los_cache_key=empty_key,
         observer_model=observer,
         target_models=(target,),
+        target_model_keywords=_target_model_keywords(target.model_id),
     ).resolve_line_of_sight()
     woods_witness = TerrainVisibilityContext.from_ruleset_descriptor(
         ruleset_descriptor=_ruleset(),
         los_cache_key=woods_key,
         observer_model=observer,
         target_models=(target,),
+        target_model_keywords=_target_model_keywords(target.model_id),
         terrain_features=(woods,),
     ).resolve_line_of_sight()
 
@@ -500,6 +722,7 @@ def test_phase13a_visibility_and_cover_payloads_round_trip_without_object_reprs(
         los_cache_key=SpatialIndexState.from_terrain_features((feature,)).los_cache_key(),
         observer_model=_model("observer", -5.0, 0.0),
         target_models=(_model("target", 5.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target"),
         terrain_features=(feature,),
     )
     witness = context.resolve_line_of_sight()
@@ -625,6 +848,7 @@ def test_phase13a_visibility_context_and_tokens_fail_fast() -> None:
         los_cache_key="los:manual",
         observer_model=observer,
         target_models=(target,),
+        target_model_keywords=_target_model_keywords(target.model_id),
     )
     witness = context.resolve_line_of_sight()
 
@@ -634,6 +858,7 @@ def test_phase13a_visibility_context_and_tokens_fail_fast() -> None:
             los_cache_key="los:manual",
             observer_model=observer,
             target_models=(target,),
+            target_model_keywords=_target_model_keywords(target.model_id),
         )
     with pytest.raises(GeometryError, match="must not include observer"):
         TerrainVisibilityContext.from_ruleset_descriptor(
@@ -641,6 +866,7 @@ def test_phase13a_visibility_context_and_tokens_fail_fast() -> None:
             los_cache_key="los:manual",
             observer_model=observer,
             target_models=(observer,),
+            target_model_keywords=_target_model_keywords(observer.model_id),
         )
     with pytest.raises(GeometryError, match="exclude observer and target"):
         TerrainVisibilityContext.from_ruleset_descriptor(
@@ -648,6 +874,7 @@ def test_phase13a_visibility_context_and_tokens_fail_fast() -> None:
             los_cache_key="los:manual",
             observer_model=observer,
             target_models=(target,),
+            target_model_keywords=_target_model_keywords(target.model_id),
             dynamic_model_blockers=(target,),
         )
     with pytest.raises(GeometryError, match="LineOfSightWitness"):
@@ -671,6 +898,7 @@ def test_phase13a_visibility_context_and_tokens_fail_fast() -> None:
         los_cache_key="los:manual",
         observer_model=observer,
         target_models=(_model("different-target", 5.0, 1.5),),
+        target_model_keywords=_target_model_keywords("different-target"),
     )
     with pytest.raises(GeometryError, match="targets do not match"):
         mismatched_target_context.benefit_of_cover(witness)
@@ -679,6 +907,7 @@ def test_phase13a_visibility_context_and_tokens_fail_fast() -> None:
         los_cache_key="los:manual",
         observer_model=_model("different-observer", -5.0, 1.5),
         target_models=(target,),
+        target_model_keywords=_target_model_keywords(target.model_id),
     )
     with pytest.raises(GeometryError, match="observer does not match"):
         mismatched_observer_context.benefit_of_cover(witness)
@@ -780,6 +1009,7 @@ def test_phase13a_context_tuple_validation_fails_fast() -> None:
             los_cache_key="los:manual",
             observer_model=observer,
             target_models=(),
+            target_model_keywords=(),
         )
     with pytest.raises(GeometryError, match="terrain_features must be a tuple"):
         TerrainVisibilityContext.from_ruleset_descriptor(
@@ -787,6 +1017,7 @@ def test_phase13a_context_tuple_validation_fails_fast() -> None:
             los_cache_key="los:manual",
             observer_model=observer,
             target_models=(target,),
+            target_model_keywords=_target_model_keywords(target.model_id),
             terrain_features=cast(tuple[TerrainFeatureDefinition, ...], [feature]),
         )
     with pytest.raises(GeometryError, match="duplicate IDs"):
@@ -795,6 +1026,7 @@ def test_phase13a_context_tuple_validation_fails_fast() -> None:
             los_cache_key="los:manual",
             observer_model=observer,
             target_models=(target,),
+            target_model_keywords=_target_model_keywords(target.model_id),
             terrain_features=(feature, duplicate_feature),
         )
     with pytest.raises(GeometryError, match="terrain_volumes must be a tuple"):
@@ -803,6 +1035,7 @@ def test_phase13a_context_tuple_validation_fails_fast() -> None:
             los_cache_key="los:manual",
             observer_model=observer,
             target_models=(target,),
+            target_model_keywords=_target_model_keywords(target.model_id),
             terrain_volumes=cast(tuple[ObstacleVolume, ...], [terrain]),
         )
     with pytest.raises(GeometryError, match="duplicate IDs"):
@@ -811,6 +1044,7 @@ def test_phase13a_context_tuple_validation_fails_fast() -> None:
             los_cache_key="los:manual",
             observer_model=observer,
             target_models=(target,),
+            target_model_keywords=_target_model_keywords(target.model_id),
             terrain_volumes=(terrain, terrain),
         )
     with pytest.raises(GeometryError, match="duplicate keywords"):
@@ -819,5 +1053,6 @@ def test_phase13a_context_tuple_validation_fails_fast() -> None:
             los_cache_key="los:manual",
             observer_model=observer,
             target_models=(target,),
+            target_model_keywords=_target_model_keywords(target.model_id),
             observer_keywords=("AIRCRAFT", "aircraft"),
         )

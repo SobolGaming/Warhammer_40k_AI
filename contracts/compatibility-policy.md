@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`4.2.0`, declared in `openapi.yaml`, `manifest.json`, and
+`5.0.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -27,10 +27,10 @@ The pull-request contract audit performs three independent checks:
    contract requires a major increase. This preserves compatible additions
    made anywhere in the current major line.
 2. The proposed contract is compared with the oldest committed baseline for
-   its current major, currently `compatibility/4.0.0-shape.json`. Breaking
-   changes are rejected while the bundle major remains `4`, preserving the
+   its current major, currently `compatibility/5.0.0-shape.json`. Breaking
+   changes are rejected while the bundle major remains `5`, preserving the
    original clients for the full supported major. The immutable 1.0.0,
-   2.0.0, and 3.0.0 baselines remain committed as historical compatibility
+   2.0.0, 3.0.0, and 4.0.0 baselines remain committed as historical compatibility
    anchors.
 3. Every released baseline present on the base commit must retain the exact
    decoded UTF-8 text after line-ending normalization.
@@ -47,20 +47,22 @@ must be reviewed in the same change.
 
 ## Support window
 
-The reference server supports one contract major at a time. Contract 4 makes
-the engine-owned `spatial_context_hash` mandatory on every published movement
-and placement proposal request. This closes the Contract 3 shape that allowed a
-client to accept a physical proposal request without the opaque context used by
-the engine's pre-mutation drift validation.
+The reference server supports one contract major at a time. Contract 5 changes
+the game-view, battlefield-view, replay, and enclosing session response-family
+discriminators so strict clients cannot mistake the Phase 17N terrain-evidence
+and terrain-classification shapes for their predecessors. It also narrows
+turn-start terrain evidence to the unit identities visible to that viewer.
 
-Deployers upgrading a hosted 3.x service must retain a separately deployed 3.x
-adapter through at least 2027-02-06 and one released 4.x minor line, whichever
-is later. The retained adapter is a separate deployment pinned to a 3.x build;
-the repository's Contract 4 reference server does not provide content
-negotiation or parallel 3.x endpoints. Contract 4 clients must regenerate from
-the Contract 4 schemas, discard pending Contract 3 physical proposal requests,
-and fetch a fresh projection after authentication. Contract 3 cursors remain
-valid only against the retained 3.x deployment. See `migrations/3-to-4.md`.
+Deployers upgrading a hosted 4.x service must retain a separately deployed 4.x
+adapter through at least 2027-08-09 and one released 5.x minor line, whichever
+is later. The retained adapter is a separate deployment pinned to a 4.x build;
+the repository's Contract 5 reference server does not provide content
+negotiation or parallel 4.x endpoints. Contract 5 clients must regenerate from
+the Contract 5 schemas, discard cached Contract 4 projections/checkpoints, and
+fetch a fresh projection after authentication. Contract 4 cursors remain valid
+only against the retained 4.x deployment. The prior Contract 3 retention date
+of 2027-02-06 remains in force for deployers covered by that migration. See
+`migrations/4-to-5.md` and `migrations/3-to-4.md`.
 
 Unknown or mismatched request `schema_version` values fail before engine
 mutation with `schema_version_mismatch`. Servers never reinterpret a request

@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import math
+import subprocess
+import sys
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import replace
+from pathlib import Path
 from typing import cast
 
 import pytest
@@ -12,6 +16,8 @@ import pytest
 from warhammer40k_core.core.deployment_zones import (
     DeploymentZone,
     DeploymentZoneCircleCutout,
+    DeploymentZonePoint,
+    DeploymentZonePolygon,
     DeploymentZoneShape,
 )
 from warhammer40k_core.core.missions import (
@@ -25,7 +31,11 @@ from warhammer40k_core.core.missions import (
     ObjectiveMarkerRole,
     objective_marker_role_from_token,
 )
-from warhammer40k_core.core.terrain_areas import TerrainAreaLocalTransform
+from warhammer40k_core.core.ruleset_descriptor import LineOfSightPolicy, RulesetDescriptor
+from warhammer40k_core.core.terrain_areas import (
+    TerrainAreaClassification,
+    TerrainAreaLocalTransform,
+)
 from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.missions import (
@@ -42,6 +52,21 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointLedger,
     VictoryPointSourceKind,
 )
+from warhammer40k_core.engine.shooting_terrain_visibility import (
+    model_within_solid_terrain,
+    terrain_visibility_areas_from_placements,
+)
+from warhammer40k_core.geometry import shapely_backend
+from warhammer40k_core.geometry.base import CircularBase
+from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.visibility import (
+    BenefitOfCoverResult,
+    CoverSourceReason,
+    TerrainAreaCoverSourceRecord,
+    TerrainVisibilityContext,
+    VisibilityBlockerKind,
+)
+from warhammer40k_core.geometry.volume import Model, ModelVolume
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
 )
@@ -55,6 +80,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_layouts_2026_06 as event_layouts,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    event_companion_primary_scoring_2026_06 as event_primary_scoring,
 )
 
 
@@ -251,12 +279,16 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
         "disruption-vs-reconnaissance-layout-1",
         "disruption-vs-reconnaissance-layout-2",
         "disruption-vs-reconnaissance-layout-3",
+        "purge-the-foe-vs-purge-the-foe-layout-1",
+        "purge-the-foe-vs-purge-the-foe-layout-2",
+        "purge-the-foe-vs-purge-the-foe-layout-3",
     }
     disruption_reconnaissance_layout_ids = {
         "disruption-vs-reconnaissance-layout-1",
         "disruption-vs-reconnaissance-layout-2",
         "disruption-vs-reconnaissance-layout-3",
     }
+    exact_slice_layout_ids = set(event_layouts.EXACT_SLICE_LAYOUT_IDS)
 
     assert len(mission_pack.primary_missions) == 25
     assert len(mission_pack.primary_mission_matrix_cells) == 25
@@ -265,9 +297,9 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
         for cell in mission_pack.primary_mission_matrix_cells
     )
     assert len(layout_ids) == 45
-    assert len(mission_pack.battlefield_layouts) == 6
+    assert len(mission_pack.battlefield_layouts) == 9
     assert len(mission_pack.terrain_area_footprint_templates) == 5
-    assert len(mission_pack.terrain_feature_presets) == 5
+    assert len(mission_pack.terrain_feature_presets) == 19
     assert len(deployment_map_ids) == 45
     assert len(mission_pack.mission_pool_entries) == 45
     assert pool_layout_ids == layout_ids
@@ -292,7 +324,9 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
         terrain_layout_id = entry.terrain_layout_ids[0]
         if terrain_layout_id in extracted_layout_ids:
             assert setup.battlefield_layout_id == entry.terrain_layout_ids[0]
-            assert len(setup.terrain_features) == 16
+            assert len(setup.terrain_features) == (
+                30 if terrain_layout_id in exact_slice_layout_ids else 16
+            )
             assert len(setup.terrain_areas) == 16
             assert len(setup.battlefield_regions) == 5
         else:
@@ -301,10 +335,900 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
             assert setup.battlefield_regions == ()
             assert setup.terrain_features == ()
         expected_objective_count = (
-            6 if terrain_layout_id in disruption_reconnaissance_layout_ids else 5
+            6
+            if terrain_layout_id in disruption_reconnaissance_layout_ids | exact_slice_layout_ids
+            else 5
         )
         assert len(setup.objective_markers) == expected_objective_count
         assert len(setup.deployment_zones) == 2
+
+
+def test_phase17n_meatgrinder_scoring_artifact_is_source_hashed_strict_and_consumed() -> None:
+    artifact = event_primary_scoring.meatgrinder_primary_scoring_artifact()
+    repository_root = Path(__file__).resolve().parents[2]
+    artifact_path = (
+        repository_root
+        / "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th"
+        / "event_companion_2026_06_artifacts/primary-meatgrinder-scoring.json"
+    )
+    raw = artifact_path.read_bytes()
+
+    assert hashlib.sha256(raw).hexdigest() == (
+        event_primary_scoring.MEATGRINDER_SCORING_ARTIFACT_SHA256
+    )
+    assert artifact.package_hash == event_primary_scoring.MEATGRINDER_SCORING_PACKAGE_HASH
+    assert artifact.authoritative_source.source_kind == (
+        "project_owner_supplied_official_source_transcription"
+    )
+    assert artifact.authoritative_source.review_pull_request == 134
+    assert artifact.authoritative_source.review_commit == "35b9ddaf5"
+    assert artifact.secondary_corroboration.authority_status == (
+        "secondary_corroboration_not_official_gw_source"
+    )
+    assert artifact.secondary_corroboration.card_image_sha256 == (
+        "d4bcc1dfde2d72fb2fc31b095964d1ea7721dcd082967b0063bcfd77c9965c24"
+    )
+    assert artifact.layout_source_boundary.source_pages == (24, 25, 26)
+    assert artifact.layout_source_boundary.authority_scope == ("battlefield_and_layout_facts_only")
+    assert not artifact.layout_source_boundary.contains_meatgrinder_scoring_clauses
+    assert tuple(rule.canonical_text for rule in artifact.scoring_rules) == (
+        "One or more enemy units were destroyed this turn.",
+        "You control one or more objectives (excluding your home objective).",
+        (
+            "More enemy units were destroyed this turn than friendly units were "
+            "destroyed in the previous turn."
+        ),
+        "You control your opponent's home objective.",
+    )
+
+    runtime_row = next(
+        row
+        for row in event_source.primary_mission_rows()
+        if row.primary_mission_id == artifact.primary_mission_id
+    )
+    assert runtime_row.name == artifact.mission_name
+    assert runtime_row.scoring_kind == artifact.scoring_kind
+    assert tuple(rule.to_payload() for rule in runtime_row.scoring_rules) == tuple(
+        {
+            "rule_id": rule.rule_id,
+            "timing": rule.timing,
+            "source_kind": rule.source_kind,
+            "victory_points": rule.victory_points,
+            "cap": rule.cap,
+            "condition": rule.condition,
+        }
+        for rule in artifact.scoring_rules
+    )
+    event_primary_scoring.validate_meatgrinder_primary_scoring_artifact_bytes(raw)
+
+    with pytest.raises(ValueError, match="artifact bytes drifted"):
+        event_primary_scoring.validate_meatgrinder_primary_scoring_artifact_bytes(raw + b"\n")
+
+    unknown_field_payload = json.loads(raw)
+    unknown_field_payload["scoring_rules"][0]["unexpected"] = True
+    with pytest.raises(ValueError, match="artifact is invalid"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(unknown_field_payload).encode()
+        )
+
+    stale_hash_payload = json.loads(raw)
+    stale_hash_payload["scoring_rules"][2]["canonical_text"] += " Drift."
+    with pytest.raises(ValueError, match="package hash is stale"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(stale_hash_payload).encode()
+        )
+
+    rehashed_drift_payload = stale_hash_payload
+    rehashed_drift_payload["package_hash"] = ""
+    rehashed_drift_payload["package_hash"] = hashlib.sha256(
+        json.dumps(
+            rehashed_drift_payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+    ).hexdigest()
+    with pytest.raises(ValueError, match="drifted from its reviewed pin"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(rehashed_drift_payload).encode()
+        )
+
+
+def test_phase17n_meatgrinder_exact_slice_artifact_is_source_hashed_and_strict() -> None:
+    artifact = event_layouts.exact_slice_artifact()
+    repository_root = Path(__file__).resolve().parents[2]
+    artifact_path = (
+        repository_root
+        / "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th"
+        / "event_companion_layouts_2026_06/artifacts"
+        / "purge-the-foe-vs-purge-the-foe-meatgrinder.json"
+    )
+    source_pdf_path = (
+        repository_root
+        / "docs/source_rules"
+        / "eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf"
+    )
+    raw = artifact_path.read_bytes()
+
+    assert artifact.source_pages == (24, 25, 26)
+    assert artifact.source_extraction_payload_sha256 == (
+        "8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30"
+    )
+    assert artifact.source_pdf_sha256 == (
+        "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20"
+    )
+    assert hashlib.sha256(source_pdf_path.read_bytes()).hexdigest() == artifact.source_pdf_sha256
+    assert hashlib.sha256(raw).hexdigest() == event_layouts.EXACT_SLICE_ARTIFACT_SHA256
+    assert artifact.package_hash == event_layouts.EXACT_SLICE_PACKAGE_HASH
+    assert len(artifact.feature_archetypes) == 14
+    assert tuple(len(layout.terrain_areas) for layout in artifact.layouts) == (16, 16, 16)
+    assert tuple(len(layout.terrain_components) for layout in artifact.layouts) == (30, 30, 30)
+    assert {
+        area.area_id: (area.anchor_x_inches, area.anchor_y_inches)
+        for layout in artifact.layouts
+        for area in layout.terrain_areas
+        if area.footprint_template_id == "FOOTPRINT_8X11_5_POLYGON"
+    } == {
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-02": (
+            27.042098342,
+            50.182832221,
+        ),
+        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-15": (
+            16.697859026,
+            9.700151112,
+        ),
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-03": (
+            15.891604839,
+            44.107128805,
+        ),
+        "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-14": (
+            28.146336111,
+            15.825812322,
+        ),
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-05": (
+            32.027815928,
+            43.018007668,
+        ),
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-12": (
+            12.014226239,
+            15.866469927,
+        ),
+    }
+    assert {
+        asset.source_pdf_image_xref
+        for archetype in artifact.feature_archetypes
+        if archetype.archetype_id == "dense-tall-crates"
+        for asset in archetype.source_assets
+    } == {5486, 5675}
+    event_layouts.validate_exact_slice_artifact_bytes(raw)
+
+    unknown_field_payload = json.loads(raw)
+    unknown_field_payload["unexpected"] = True
+    with pytest.raises(ValueError, match="artifact is invalid"):
+        event_layouts.validate_exact_slice_artifact_bytes(
+            json.dumps(unknown_field_payload).encode()
+        )
+
+    missing_source_assets_payload = json.loads(raw)
+    missing_source_assets_payload["feature_archetypes"][0]["source_assets"] = []
+    with pytest.raises(ValueError, match="require source-image assets"):
+        event_layouts.validate_exact_slice_artifact_bytes(
+            json.dumps(missing_source_assets_payload).encode()
+        )
+
+    stale_hash_payload = json.loads(raw)
+    stale_hash_payload["layouts"][0]["objectives"][0]["x_inches"] = 8.59
+    with pytest.raises(ValueError, match="package hash is stale"):
+        event_layouts.validate_exact_slice_artifact_bytes(json.dumps(stale_hash_payload).encode())
+
+    rehashed_coordinate_payload = json.loads(raw)
+    rehashed_coordinate_payload["layouts"][0]["objectives"][0]["x_inches"] = 8.59
+    rehashed_coordinate_payload["package_hash"] = ""
+    rehashed_coordinate_payload["package_hash"] = hashlib.sha256(
+        json.dumps(
+            rehashed_coordinate_payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+    ).hexdigest()
+    with pytest.raises(ValueError, match="drifted from its reviewed pin"):
+        event_layouts.validate_exact_slice_artifact_bytes(
+            json.dumps(rehashed_coordinate_payload).encode()
+        )
+
+    wrong_area_payload = json.loads(raw)
+    wrong_area_payload["layouts"][2]["objectives"][4]["terrain_area_ids"] = [
+        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-05"
+    ]
+    wrong_area_payload["package_hash"] = ""
+    wrong_area_payload["package_hash"] = hashlib.sha256(
+        json.dumps(
+            wrong_area_payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+    ).hexdigest()
+    with pytest.raises(ValueError, match="objective terrain-area mapping drifted"):
+        event_layouts.validate_exact_slice_artifact_bytes(json.dumps(wrong_area_payload).encode())
+
+    unreflected_source_affine_payload = json.loads(raw)
+    unreflected_source_affine_payload["layouts"][0]["terrain_areas"][3]["local_transform"] = (
+        "identity"
+    )
+    unreflected_source_affine_payload["package_hash"] = ""
+    unreflected_source_affine_payload["package_hash"] = hashlib.sha256(
+        json.dumps(
+            unreflected_source_affine_payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+    ).hexdigest()
+    with pytest.raises(ValueError, match="local reflection must match its source affine"):
+        event_layouts.validate_exact_slice_artifact_bytes(
+            json.dumps(unreflected_source_affine_payload).encode()
+        )
+
+
+def test_phase17n_meatgrinder_exact_slice_builder_reproduces_committed_artifact(
+    tmp_path: Path,
+) -> None:
+    repository_root = Path(__file__).resolve().parents[2]
+    extraction_path = (
+        repository_root
+        / "data/source_audits/event_companion_2026_06"
+        / "phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json"
+    )
+    artifact_path = (
+        repository_root
+        / "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th"
+        / "event_companion_layouts_2026_06/artifacts"
+        / "purge-the-foe-vs-purge-the-foe-meatgrinder.json"
+    )
+    extraction_payload = json.loads(extraction_path.read_text(encoding="utf-8"))
+    pose_reviews = tuple(
+        area["accepted_pose_review"]
+        for layout in extraction_payload["layouts"]
+        for area in layout["terrain_areas"]
+    )
+    assert extraction_payload["status"] == ("reviewed_source_registration_ready_for_exact_runtime")
+    assert extraction_payload["placement_pose_review"] == {
+        "accepted_area_count": 48,
+        "rendered_overlays_authoritative": False,
+        "reviewed_on": "2026-08-09",
+        "reviewed_source_pdf_pages": [24, 25, 26],
+        "reviewed_source_pdf_sha256": (
+            "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20"
+        ),
+        "source_page_raster_overlay_registration_review_count": 42,
+        "status": "accepted_for_exact_runtime",
+        "vector_edge_correction_plus_raster_review_count": 6,
+    }
+    assert len(pose_reviews) == 48
+    assert Counter(review["method"] for review in pose_reviews) == Counter(
+        {
+            "source_page_raster_overlay_registration_review": 42,
+            "pdf_vector_edge_correction_plus_source_page_raster_overlay_review": 6,
+        }
+    )
+    assert all(review["status"] == "accepted_for_exact_runtime" for review in pose_reviews)
+    assert all(not review["rendered_overlay_authoritative"] for review in pose_reviews)
+    modified_at_before_check = artifact_path.stat().st_mtime_ns
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(repository_root / "tools/build_phase17n_event_companion_exact_slice.py"),
+            "--check",
+        ],
+        cwd=repository_root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert artifact_path.stat().st_mtime_ns == modified_at_before_check
+
+    stale_output_path = tmp_path / "stale-phase17n-artifact.json"
+    stale_output_path.write_text("{}\n", encoding="utf-8")
+    stale_bytes = stale_output_path.read_bytes()
+    stale_result = subprocess.run(
+        [
+            sys.executable,
+            str(repository_root / "tools/build_phase17n_event_companion_exact_slice.py"),
+            str(extraction_path),
+            str(stale_output_path),
+            "--check",
+        ],
+        cwd=repository_root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert stale_result.returncode != 0
+    assert "exact-slice artifact is stale" in stale_result.stderr
+    assert stale_output_path.read_bytes() == stale_bytes
+
+    unreviewed_payload = json.loads(extraction_path.read_text(encoding="utf-8"))
+    unreviewed_payload["layouts"][0]["terrain_areas"][0]["accepted_pose_review"]["status"] = (
+        "pending_source_page_review"
+    )
+    unreviewed_extraction_path = tmp_path / "unreviewed-phase17n-extraction.json"
+    unreviewed_extraction_path.write_text(
+        json.dumps(unreviewed_payload, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    unreviewed_result = subprocess.run(
+        [
+            sys.executable,
+            str(repository_root / "tools/build_phase17n_event_companion_exact_slice.py"),
+            str(unreviewed_extraction_path),
+            str(tmp_path / "unreviewed-output.json"),
+        ],
+        cwd=repository_root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert unreviewed_result.returncode != 0
+    assert "pose review is not accepted for exact runtime use" in unreviewed_result.stderr
+
+    drifted_raster_payload = json.loads(extraction_path.read_text(encoding="utf-8"))
+    drifted_raster_payload["layouts"][0]["terrain_areas"][0]["accepted_pose_review"][
+        "accepted_anchor_inches"
+    ][0] += 0.25
+    drifted_raster_path = tmp_path / "drifted-raster-phase17n-extraction.json"
+    drifted_raster_path.write_text(
+        json.dumps(drifted_raster_payload, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    drifted_raster_result = subprocess.run(
+        [
+            sys.executable,
+            str(repository_root / "tools/build_phase17n_event_companion_exact_slice.py"),
+            str(drifted_raster_path),
+            str(tmp_path / "drifted-raster-output.json"),
+        ],
+        cwd=repository_root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert drifted_raster_result.returncode != 0
+    assert "raster-reviewed pose must pin the reviewed estimate" in (drifted_raster_result.stderr)
+
+
+def test_phase17n_exact_terrain_area_reflections_follow_source_affine_orientation() -> None:
+    repository_root = Path(__file__).resolve().parents[2]
+    extraction_payload = json.loads(
+        (
+            repository_root
+            / "data/source_audits/event_companion_2026_06"
+            / "phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json"
+        ).read_text(encoding="utf-8")
+    )
+    source_orientation_reversing_ids = {
+        area["terrain_area_id"]
+        for layout in extraction_payload["layouts"]
+        for area in layout["terrain_areas"]
+        if (
+            area["source_image"]["pdf_page_affine_normalized_image_to_points"][0]
+            * area["source_image"]["pdf_page_affine_normalized_image_to_points"][3]
+        )
+        - (
+            area["source_image"]["pdf_page_affine_normalized_image_to_points"][1]
+            * area["source_image"]["pdf_page_affine_normalized_image_to_points"][2]
+        )
+        < 0.0
+    }
+    artifact = event_layouts.exact_slice_artifact()
+    artifact_mirrored_ids = {
+        area.area_id
+        for layout in artifact.layouts
+        for area in layout.terrain_areas
+        if area.local_transform == "mirror_y_axis"
+    }
+
+    assert len(source_orientation_reversing_ids) == 12
+    assert artifact_mirrored_ids == source_orientation_reversing_ids
+
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+    layout_a_area_04 = next(
+        area
+        for area in setup.terrain_areas
+        if area.terrain_area_id == "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04"
+    )
+
+    assert layout_a_area_04.local_transform is TerrainAreaLocalTransform.MIRROR_Y_AXIS
+    assert tuple(
+        (point.x_inches, point.y_inches) for point in layout_a_area_04.footprint_polygon
+    ) == (
+        (40.5, 46.0),
+        (34.5, 46.0),
+        (34.5, 44.7),
+        (34.0, 44.0),
+        (34.4, 43.3),
+        (34.2, 43.0),
+        (34.5, 42.8),
+        (34.5, 42.0),
+        (37.2, 42.0),
+        (37.3, 41.8),
+        (37.7, 41.9),
+        (38.5, 41.5),
+        (39.3, 42.0),
+        (40.5, 42.0),
+    )
+
+
+def test_phase17n_meatgrinder_exact_layouts_build_all_source_components() -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    artifact = event_layouts.exact_slice_artifact()
+    artifact_layouts = {layout.layout_id: layout for layout in artifact.layouts}
+    archetypes_by_id = {
+        archetype.archetype_id: archetype for archetype in artifact.feature_archetypes
+    }
+    terrain_area_templates = {
+        template.footprint_template_id: template
+        for template in mission_pack.terrain_area_footprint_templates
+    }
+    expected_objective_coordinates = {
+        1: (
+            (8.58, 50.32),
+            (36.08, 9.01),
+            (26.51, 37.47),
+            (17.82, 22.31),
+            (32.15, 52.67),
+            (12.36, 8.33),
+        ),
+        2: (
+            (9.90, 47.73),
+            (33.63, 12.05),
+            (11.39, 29.61),
+            (32.92, 30.55),
+            (37.23, 42.98),
+            (6.86, 17.11),
+        ),
+        3: (
+            (9.08, 51.19),
+            (34.81, 9.01),
+            (22.33, 35.93),
+            (21.23, 23.67),
+            (29.28, 51.31),
+            (15.25, 8.98),
+        ),
+    }
+
+    for layout_number in (1, 2, 3):
+        layout_id = f"purge-the-foe-vs-purge-the-foe-layout-{layout_number}"
+        setup = MissionSetup.from_mission_pack(
+            mission_pack=mission_pack,
+            mission_pool_entry_id=f"mission-{layout_id}",
+            attacker_player_id="player-alpha",
+            defender_player_id="player-beta",
+        )
+        source_layout = artifact_layouts[layout_id]
+        battlefield_layout = mission_pack.battlefield_layout(layout_id)
+        areas_by_id = {area.terrain_area_id: area for area in setup.terrain_areas}
+        placements_by_id = {
+            placement.feature_id: placement
+            for placement in battlefield_layout.terrain_feature_placements
+        }
+        features_by_id = {feature.feature_id: feature for feature in setup.terrain_features}
+        objective_markers_by_id = {
+            marker.objective_marker_id: marker for marker in setup.objective_markers
+        }
+        ruins = tuple(
+            feature for feature in setup.terrain_features if feature.feature_kind.value == "ruins"
+        )
+        light = tuple(
+            feature
+            for feature in setup.terrain_features
+            if feature.classification is TerrainAreaClassification.LIGHT
+        )
+        dense = tuple(
+            feature
+            for feature in setup.terrain_features
+            if feature.classification is TerrainAreaClassification.DENSE
+        )
+
+        assert len(setup.terrain_areas) == 16
+        assert {area.terrain_feature_kind for area in setup.terrain_areas} == {
+            "terrain_layout_area"
+        }
+        assert Counter(area.classification.value for area in setup.terrain_areas) == Counter(
+            {"dense": 6, "mixed": 6, "light": 4}
+        )
+        assert len(setup.terrain_features) == 30
+        assert (len(ruins), len(dense), len(light)) == (8, 16, 14)
+        assert Counter(len(ruin.floors) for ruin in ruins) == Counter({2: 4, 3: 4})
+        assert all(
+            tuple(sorted(floor.bottom_z_inches for floor in ruin.floors))
+            in {(0.0, 3.0), (0.0, 3.0, 6.0)}
+            for ruin in ruins
+        )
+        assert all(
+            wall.height_inches == (3.0 if wall.bottom_z_inches == 0.0 else 2.0)
+            for ruin in ruins
+            for wall in ruin.walls
+        )
+        assert {(marker.x_inches, marker.y_inches) for marker in setup.objective_markers} == set(
+            expected_objective_coordinates[layout_number]
+        )
+        for objective_terrain_area in setup.objective_terrain_areas:
+            objective = objective_markers_by_id[objective_terrain_area.objective_marker_id]
+            for terrain_area_id in objective_terrain_area.terrain_area_ids:
+                terrain_area = areas_by_id[terrain_area_id]
+                terrain_polygon = DeploymentZonePolygon(
+                    vertices=tuple(
+                        DeploymentZonePoint(x=point.x_inches, y=point.y_inches)
+                        for point in terrain_area.footprint_polygon
+                    )
+                )
+                assert terrain_polygon.contains_point(
+                    objective.x_inches,
+                    objective.y_inches,
+                    include_boundary=True,
+                )
+        for source_component in source_layout.terrain_components:
+            area = areas_by_id[source_component.terrain_area_id]
+            placement = placements_by_id[source_component.component_id]
+            feature = features_by_id[source_component.component_id]
+            template = terrain_area_templates[area.footprint_template_id]
+            local_x = placement.local_offset_x_inches
+            if area.local_transform is TerrainAreaLocalTransform.MIRROR_Y_AXIS:
+                local_x = (2.0 * template.polygon_vertices_inches[0].x_inches) - local_x
+            radians = math.radians(area.rotation_degrees)
+            battlefield_x = (
+                area.center_x_inches
+                + (local_x * math.cos(radians))
+                - (placement.local_offset_y_inches * math.sin(radians))
+            )
+            battlefield_y = (
+                area.center_y_inches
+                + (local_x * math.sin(radians))
+                + (placement.local_offset_y_inches * math.cos(radians))
+            )
+            assert math.isclose(
+                battlefield_x,
+                source_component.battlefield_center_x_inches,
+                rel_tol=0.0,
+                abs_tol=1e-6,
+            )
+            assert math.isclose(
+                battlefield_y,
+                source_component.battlefield_center_y_inches,
+                rel_tol=0.0,
+                abs_tol=1e-6,
+            )
+            component_rotation = placement.local_rotation_degrees
+            if placement.local_transform.value == "mirror_y_axis":
+                component_rotation += 180.0
+            battlefield_rotation = (
+                area.rotation_degrees + 180.0 - component_rotation
+                if area.local_transform is TerrainAreaLocalTransform.MIRROR_Y_AXIS
+                else area.rotation_degrees + component_rotation
+            ) % 360.0
+            rotation_delta = (
+                battlefield_rotation - source_component.battlefield_rotation_degrees + 180.0
+            ) % 360.0 - 180.0
+            assert math.isclose(rotation_delta, 0.0, rel_tol=0.0, abs_tol=1e-6)
+            assert feature.classification.value == (
+                archetypes_by_id[source_component.archetype_id].classification
+            )
+            assert feature.to_rules_geometry_payload()["classification"] == (
+                feature.classification.value
+            )
+            assert feature.source_id is not None
+            assert (
+                f"terrain-feature-placement:"
+                f"{source_component.component_id.removeprefix(f'{layout_id}-')}"
+            ) in feature.source_id
+            assert event_layouts.EXACT_SLICE_PACKAGE_HASH in feature.source_id
+            assert feature.source_id.endswith(f":{event_layouts.EXACT_SLICE_PACKAGE_HASH}")
+
+
+def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence() -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+    ruleset = RulesetDescriptor.warhammer_40000_eleventh(
+        descriptor_version="phase17n-exact-terrain-visibility",
+    )
+    areas = {area.terrain_area_id: area for area in setup.terrain_areas}
+    dense_area = areas["purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-01"]
+    mixed_area = areas["purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-02"]
+    light_area = areas["purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04"]
+    visibility_areas = {
+        area.terrain_area_id: area
+        for area in terrain_visibility_areas_from_placements(setup.terrain_areas)
+    }
+    dense_visibility_area = visibility_areas[dense_area.terrain_area_id]
+    mixed_visibility_area = visibility_areas[mixed_area.terrain_area_id]
+    light_visibility_area = visibility_areas[light_area.terrain_area_id]
+
+    def model(model_id: str, x: float, y: float) -> Model:
+        return Model(
+            model_id=model_id,
+            pose=Pose.at(x=x, y=y),
+            base=CircularBase(radius=0.35),
+            volume=ModelVolume(height=2.0),
+        )
+
+    target_in_dense_gap = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=ruleset,
+        los_cache_key="los:phase17n-dense-gap",
+        observer_model=model("observer", 29.0, 51.6),
+        target_models=(model("target", 31.5, 51.6),),
+        target_model_keywords=(("target", ("INFANTRY",)),),
+        terrain_features=setup.terrain_features,
+        terrain_areas=tuple(visibility_areas.values()),
+    )
+    round_tripped = TerrainVisibilityContext.from_payload(target_in_dense_gap.to_payload())
+    dense_witness = round_tripped.resolve_line_of_sight()
+    dense_cover = round_tripped.benefit_of_cover(dense_witness)
+
+    assert round_tripped == target_in_dense_gap
+    assert dense_witness.unit_visible
+    assert dense_witness.unit_fully_visible
+    assert dense_cover.has_benefit
+    assert dense_cover.source_feature_ids == ()
+    assert dense_cover.source_terrain_area_ids == (dense_area.terrain_area_id,)
+    assert any(
+        record.blocker_kind is VisibilityBlockerKind.TERRAIN_AREA
+        and record.terrain_area_id == dense_area.terrain_area_id
+        and record.exception_applied == "target_intersects_area"
+        for record in dense_witness.all_blocker_records()
+    )
+
+    blocked_through_dense = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=ruleset,
+        los_cache_key="los:phase17n-through-dense",
+        observer_model=model("observer", 28.0, 53.0),
+        target_models=(model("target", 39.0, 53.0),),
+        target_model_keywords=(("target", ("INFANTRY",)),),
+        terrain_areas=(dense_visibility_area,),
+    ).resolve_line_of_sight()
+    assert not blocked_through_dense.unit_visible
+    assert any(
+        record.blocker_kind is VisibilityBlockerKind.TERRAIN_AREA
+        and record.terrain_area_classification is TerrainAreaClassification.DENSE
+        and record.blocks_model_visibility
+        for record in blocked_through_dense.all_blocker_records()
+    )
+
+    for observer_xy, target_xy, expected_exception in (
+        ((31.5, 51.6), (29.0, 51.6), "observer_intersects_area"),
+        ((29.0, 51.6), (31.5, 51.6), "target_intersects_area"),
+    ):
+        exception_witness = TerrainVisibilityContext.from_ruleset_descriptor(
+            ruleset_descriptor=ruleset,
+            los_cache_key=f"los:phase17n-{expected_exception}",
+            observer_model=model("observer", *observer_xy),
+            target_models=(model("target", *target_xy),),
+            target_model_keywords=(("target", ("INFANTRY",)),),
+            terrain_areas=(dense_visibility_area,),
+        ).resolve_line_of_sight()
+        assert exception_witness.unit_visible
+        assert any(
+            record.exception_applied == expected_exception
+            for record in exception_witness.all_blocker_records()
+        )
+
+    mixed_context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=ruleset,
+        los_cache_key="los:phase17n-mixed",
+        observer_model=model("observer", 17.5, 45.3),
+        target_models=(model("target", 18.1, 45.3),),
+        target_model_keywords=(("target", ("INFANTRY",)),),
+        terrain_areas=(mixed_visibility_area,),
+    )
+    mixed_witness = mixed_context.resolve_line_of_sight()
+    mixed_cover = mixed_context.benefit_of_cover(mixed_witness)
+    assert mixed_witness.unit_visible
+    assert mixed_cover.has_benefit
+    assert mixed_cover.source_terrain_area_ids == (mixed_area.terrain_area_id,)
+    assert any(
+        record.terrain_area_classification is TerrainAreaClassification.MIXED
+        for record in mixed_witness.all_blocker_records()
+    )
+
+    light_context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=ruleset,
+        los_cache_key="los:phase17n-light",
+        observer_model=model("observer", 32.0, 43.0),
+        target_models=(model("target", 36.0, 43.0),),
+        target_model_keywords=(("target", ("INFANTRY",)),),
+        terrain_areas=(light_visibility_area,),
+    )
+    light_witness = light_context.resolve_line_of_sight()
+    light_cover = light_context.benefit_of_cover(light_witness)
+    assert light_witness.unit_visible
+    assert light_cover.has_benefit
+    assert light_cover.source_terrain_area_ids == (light_area.terrain_area_id,)
+    assert any(
+        record.terrain_area_classification is TerrainAreaClassification.LIGHT
+        and record.exception_applied == "target_intersects_area"
+        for record in light_witness.all_blocker_records()
+    )
+
+    blocked_through_light = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=ruleset,
+        los_cache_key="los:phase17n-through-light",
+        observer_model=model("observer", 32.0, 43.0),
+        target_models=(model("target", 43.0, 43.0),),
+        target_model_keywords=(("target", ("INFANTRY",)),),
+        terrain_areas=(light_visibility_area,),
+    ).resolve_line_of_sight()
+    assert not blocked_through_light.unit_visible
+    assert any(
+        record.terrain_area_classification is TerrainAreaClassification.LIGHT
+        and record.blocks_model_visibility
+        for record in blocked_through_light.all_blocker_records()
+    )
+
+    assert model_within_solid_terrain(
+        ruleset_descriptor=ruleset,
+        model=model("dense-model", 31.5, 51.6),
+        terrain_features=(),
+        terrain_areas=(dense_area,),
+    )
+    assert model_within_solid_terrain(
+        ruleset_descriptor=ruleset,
+        model=model("mixed-model", 18.1, 45.3),
+        terrain_features=(),
+        terrain_areas=(mixed_area,),
+    )
+    assert not model_within_solid_terrain(
+        ruleset_descriptor=ruleset,
+        model=model("light-model", 36.0, 43.0),
+        terrain_features=(),
+        terrain_areas=(light_area,),
+    )
+
+
+def test_phase17n_unknown_terrain_area_classification_does_not_gate_membership_cover() -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+    exact_light_area = next(
+        area
+        for area in terrain_visibility_areas_from_placements(setup.terrain_areas)
+        if area.terrain_area_id == "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04"
+    )
+    unknown_area = replace(
+        exact_light_area,
+        classification=TerrainAreaClassification.UNKNOWN,
+    )
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="phase17n-unknown-area-membership-cover",
+        ),
+        los_cache_key="los:phase17n-unknown-area-membership-cover",
+        observer_model=Model(
+            model_id="observer",
+            pose=Pose.at(x=32.0, y=43.0),
+            base=CircularBase(radius=0.35),
+            volume=ModelVolume(height=2.0),
+        ),
+        target_models=(
+            Model(
+                model_id="target",
+                pose=Pose.at(x=36.0, y=43.0),
+                base=CircularBase(radius=0.35),
+                volume=ModelVolume(height=2.0),
+            ),
+        ),
+        target_model_keywords=(("target", ("INFANTRY",)),),
+        terrain_areas=(unknown_area,),
+    )
+
+    witness = context.resolve_line_of_sight()
+    cover = context.benefit_of_cover(witness)
+
+    assert witness.unit_visible
+    assert witness.unit_fully_visible
+    assert witness.all_blocker_records() == ()
+    assert cover.has_benefit
+    assert cover.source_terrain_area_ids == (unknown_area.terrain_area_id,)
+    assert len(cover.source_records) == 1
+    source_record = cover.source_records[0]
+    assert type(source_record) is TerrainAreaCoverSourceRecord
+    assert source_record.classification is TerrainAreaClassification.UNKNOWN
+    assert source_record.policy_kind is LineOfSightPolicy.TRUE_LINE_OF_SIGHT
+    assert source_record.reason is CoverSourceReason.WITHIN_TERRAIN_AREA
+    disabled_cover_policy = replace(
+        context.terrain_visibility_policy,
+        cover_policy=replace(
+            context.terrain_visibility_policy.cover_policy,
+            grants_benefit_of_cover=False,
+        ),
+    )
+    assert not BenefitOfCoverResult.from_cover_sources(
+        witness=witness,
+        terrain_visibility_policy=disabled_cover_policy,
+        source_records=cover.source_records,
+    ).has_benefit
+
+
+def test_phase17n_visibility_resolves_feature_area_associations_once_per_query(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+    visibility_areas = terrain_visibility_areas_from_placements(setup.terrain_areas)
+    terrain_features = setup.terrain_features[:2]
+    original_polygon_within_polygon = shapely_backend.polygon_within_polygon
+    association_check_count = 0
+
+    def counting_polygon_within_polygon(
+        inner: tuple[tuple[float, float], ...],
+        outer: tuple[tuple[float, float], ...],
+    ) -> bool:
+        nonlocal association_check_count
+        association_check_count += 1
+        return original_polygon_within_polygon(inner, outer)
+
+    monkeypatch.setattr(
+        shapely_backend,
+        "polygon_within_polygon",
+        counting_polygon_within_polygon,
+    )
+
+    witness = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+            descriptor_version="phase17n-feature-area-association-cache",
+        ),
+        los_cache_key="los:phase17n-feature-area-association-cache",
+        observer_model=Model(
+            model_id="observer",
+            pose=Pose.at(x=2.0, y=2.0),
+            base=CircularBase(radius=0.35),
+            volume=ModelVolume(height=2.0),
+        ),
+        target_models=(
+            Model(
+                model_id="target-a",
+                pose=Pose.at(x=42.0, y=58.0),
+                base=CircularBase(radius=0.35),
+                volume=ModelVolume(height=2.0),
+            ),
+            Model(
+                model_id="target-b",
+                pose=Pose.at(x=40.0, y=56.0),
+                base=CircularBase(radius=0.35),
+                volume=ModelVolume(height=2.0),
+            ),
+        ),
+        target_model_keywords=(
+            ("target-a", ("INFANTRY",)),
+            ("target-b", ("INFANTRY",)),
+        ),
+        terrain_features=terrain_features,
+        terrain_areas=visibility_areas,
+    ).resolve_line_of_sight()
+
+    assert witness.target_model_ids == ("target-a", "target-b")
+    assert 0 < association_check_count <= (len(terrain_features) * len(visibility_areas))
 
 
 def test_phase17j_terrain_area_footprint_templates_match_source_polygons() -> None:
@@ -815,6 +1739,9 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
     disruption_layout_a = _layout_descriptor("disruption", "reconnaissance", "a")
     disruption_layout_b = _layout_descriptor("disruption", "reconnaissance", "b")
     disruption_layout_c = _layout_descriptor("disruption", "reconnaissance", "c")
+    meatgrinder_layouts = tuple(
+        _layout_descriptor("purge-the-foe", "purge-the-foe", variant) for variant in ("a", "b", "c")
+    )
     extracted_layout_ids = {
         layout_a.layout_id,
         layout_b.layout_id,
@@ -822,6 +1749,7 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
         disruption_layout_a.layout_id,
         disruption_layout_b.layout_id,
         disruption_layout_c.layout_id,
+        *(layout.layout_id for layout in meatgrinder_layouts),
     }
     pending_descriptors = tuple(
         descriptor for descriptor in descriptors if descriptor.layout_id not in extracted_layout_ids
@@ -871,14 +1799,19 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
             [[x, y] for x, y in polygon]
             for polygon in extracted_layout_c.no_mans_land_shape.polygons
         ]
-    assert len(pending_descriptors) == 39
+    assert len(pending_descriptors) == 36
     assert all(len(descriptor.objective_points) == 5 for descriptor in pending_descriptors)
     assert all(
         len(descriptor.objective_points) == 5 for descriptor in (layout_a, layout_b, layout_c)
     )
     assert all(
         len(descriptor.objective_points) == 6
-        for descriptor in (disruption_layout_a, disruption_layout_b, disruption_layout_c)
+        for descriptor in (
+            disruption_layout_a,
+            disruption_layout_b,
+            disruption_layout_c,
+            *meatgrinder_layouts,
+        )
     )
     assert all(
         {"dense", "light"} <= {feature.density for feature in descriptor.terrain_features}
@@ -889,6 +1822,7 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
             disruption_layout_a,
             disruption_layout_b,
             disruption_layout_c,
+            *meatgrinder_layouts,
         )
     )
     assert all(descriptor.terrain_features == () for descriptor in pending_descriptors)
@@ -904,6 +1838,10 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
     assert disruption_layout_a.geometry_extraction_status == "layout_geometry_extracted"
     assert disruption_layout_b.geometry_extraction_status == "layout_geometry_extracted"
     assert disruption_layout_c.geometry_extraction_status == "layout_geometry_extracted"
+    assert all(
+        descriptor.geometry_extraction_status == "source_hashed_exact_layout_geometry"
+        for descriptor in meatgrinder_layouts
+    )
     assert all(
         descriptor.geometry_extraction_status
         == "layout_identity_source_page_bound_coordinates_pending"
@@ -922,7 +1860,16 @@ def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> 
             if row.battlefield_layout_id == layout_id
         ).source_status
         == "event_companion_layout_geometry_extracted"
-        for layout_id in extracted_layout_ids
+        for layout_id in extracted_layout_ids - set(event_layouts.EXACT_SLICE_LAYOUT_IDS)
+    )
+    assert all(
+        next(
+            row
+            for row in event_source.battlefield_layout_rows()
+            if row.battlefield_layout_id == layout_id
+        ).source_status
+        == "event_companion_source_hashed_exact_slice"
+        for layout_id in event_layouts.EXACT_SLICE_LAYOUT_IDS
     )
     assert all(
         row.source_status.endswith("layout_identity_coordinate_extraction_pending")
@@ -2121,8 +3068,8 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
 
     assert len(coverage_rows) == 25
     assert status_counts == {
-        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 3,
-        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 22,
+        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 4,
+        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 21,
         event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 0,
     }
     assert {
@@ -2182,13 +3129,12 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         "primary-vanguard-operation": 4,
         "primary-vital-link": 5,
     }
-    assert primary_rows["primary-meatgrinder"].scoring_kind == (
-        "event_companion_primary_source_known_engine_pending"
-    )
+    assert primary_rows["primary-meatgrinder"].scoring_kind == ("meatgrinder")
     assert primary_rows["primary-battlefield-dominance"].scoring_kind == (
         "event_companion_primary_source_known_engine_pending"
     )
     assert coverage_rows["primary-unstoppable-force"].needed_work == ()
+    assert coverage_rows["primary-meatgrinder"].needed_work == ()
     assert coverage_rows["primary-death-trap"].mission_action_count == 1
     assert coverage_rows["primary-smoke-and-mirrors"].mission_action_count == 1
     assert coverage_rows["primary-gather-intel"].mission_action_count == 1
@@ -2216,6 +3162,27 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     )
     assert "source_objective_role:expansion_objective" in (
         coverage_rows["primary-delaying-action"].needed_work
+    )
+    assert coverage_rows["primary-destroyers-wrath"].needed_work == (
+        "engine_primary_condition:control_more_objectives_than_opponent",
+    )
+    assert coverage_rows["primary-punishment"].needed_work == (
+        "engine_primary_start_turn_choice:condemned_enemy_units",
+        "engine_primary_condition:condemned_enemy_units_left_battlefield",
+        "engine_primary_condition:control_more_objectives_than_opponent",
+        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
+    )
+    assert coverage_rows["primary-inescapable-dominion"].needed_work == (
+        "engine_primary_condition:control_three_or_more_objectives",
+        "engine_primary_condition:control_two_or_more_objectives_from_battle_round_two",
+        "engine_primary_condition:control_more_objectives_than_opponent",
+        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
+    )
+    assert coverage_rows["primary-vanguard-operation"].needed_work == (
+        "engine_primary_action:vanguard-operation",
+        "engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn",
+        "engine_primary_condition:enemy_territory_terrain_area_control",
+        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
     )
 
 
@@ -2328,7 +3295,7 @@ def test_phase17j_source_known_engine_pending_primary_scoring_fails_closed() -> 
     mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-07")
     setup = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
-        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        mission_pool_entry_id="mission-purge-the-foe-vs-disruption-layout-1",
         attacker_player_id="player-alpha",
         defender_player_id="player-beta",
     )

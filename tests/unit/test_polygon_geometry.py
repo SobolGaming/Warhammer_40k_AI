@@ -6,6 +6,7 @@ import pytest
 
 from warhammer40k_core.geometry.polygons import (
     convex_polygon_intersection_area,
+    point_intersects_polygon,
     polygon_bounds,
     polygon_overlap_area,
     polygon_self_intersects,
@@ -50,6 +51,16 @@ def test_polygon_self_intersection_and_degenerate_inputs_are_strict() -> None:
         signed_polygon_area(((0.0, 0.0), (1.0, 1.0)))
     with pytest.raises(GeometryError, match="finite"):
         polygon_bounds(((0.0, 0.0), (math.nan, 0.0), (1.0, 1.0)))
+
+
+def test_point_intersection_supports_concave_polygons_and_their_boundaries() -> None:
+    concave = ((0.0, 0.0), (4.0, 0.0), (4.0, 4.0), (2.0, 2.0), (0.0, 4.0))
+
+    assert point_intersects_polygon((1.0, 1.0), concave)
+    assert point_intersects_polygon((2.0, 2.0), concave)
+    assert not point_intersects_polygon((2.0, 3.0), concave)
+    with pytest.raises(GeometryError, match="point must be a Point2D"):
+        point_intersects_polygon((1.0,), concave)  # type: ignore[arg-type]
 
 
 def _triangle_area_sum(triangles: tuple[tuple[tuple[float, float], ...], ...]) -> float:

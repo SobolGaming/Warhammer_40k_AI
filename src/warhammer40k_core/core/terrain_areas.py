@@ -18,6 +18,15 @@ from warhammer40k_core.geometry.polygons import (
 from warhammer40k_core.geometry.polygons import (
     polygon_bounds as geometry_polygon_bounds,
 )
+from warhammer40k_core.geometry.terrain_classification import (
+    TerrainAreaClassification as TerrainAreaClassification,
+)
+from warhammer40k_core.geometry.terrain_classification import (
+    TerrainClassificationError,
+)
+from warhammer40k_core.geometry.terrain_classification import (
+    terrain_area_classification_from_token as geometry_terrain_area_classification_from_token,
+)
 
 _AREA_EPSILON = 1e-9
 _GEOMETRY_EPSILON = 1e-6
@@ -25,12 +34,6 @@ _GEOMETRY_EPSILON = 1e-6
 
 class TerrainAreaError(ValueError):
     """Raised when terrain-area footprint data violates CORE V2 invariants."""
-
-
-class TerrainAreaClassification(StrEnum):
-    DENSE = "dense"
-    LIGHT = "light"
-    UNKNOWN = "unknown"
 
 
 class SymmetryAxis(StrEnum):
@@ -371,14 +374,10 @@ class PlacedTerrainArea:
 
 
 def terrain_area_classification_from_token(token: object) -> TerrainAreaClassification:
-    if type(token) is TerrainAreaClassification:
-        return token
-    if type(token) is not str:
-        raise TerrainAreaError("TerrainAreaClassification token must be a string.")
     try:
-        return TerrainAreaClassification(token)
-    except ValueError as exc:
-        raise TerrainAreaError(f"Unsupported TerrainAreaClassification token: {token}.") from exc
+        return geometry_terrain_area_classification_from_token(token)
+    except TerrainClassificationError as exc:
+        raise TerrainAreaError("Unsupported TerrainAreaClassification token.") from exc
 
 
 def symmetry_axis_from_token(token: object) -> SymmetryAxis:

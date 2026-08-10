@@ -220,6 +220,9 @@ from warhammer40k_core.engine.phases.shooting import (
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    record_primary_turn_start_evidence,
+)
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.replay import ReplayArtifact, ReplayArtifactPayload, ReplayRunner
 from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
@@ -871,8 +874,9 @@ def test_post_shoot_order_survives_target_set_change_after_feel_no_pain() -> Non
         target_a,
         target_b,
         source_attached_id,
-    ) = _configured_kakophonist_multi_target_fixture()
-    state.game_id = "kakophonist-runtime-test"
+    ) = _configured_kakophonist_multi_target_fixture(
+        game_id="kakophonist-runtime-test",
+    )
     survivor_id = _leave_one_wound_on_unit(state=state, unit=target_a)
     source_a = FeelNoPainSource(source_id="mutable-target-fnp-a", threshold=5)
     source_b = FeelNoPainSource(source_id="mutable-target-fnp-b", threshold=6)
@@ -977,14 +981,15 @@ def test_post_shoot_order_survives_attached_target_splitting_after_first_effect(
         target_lord,
         source_attached_id,
         target_attached_id,
-    ) = _configured_kakophonist_attached_target_fixture()
+    ) = _configured_kakophonist_attached_target_fixture(
+        game_id=("kakophonist-attached-target-fnp-destruction" if use_feel_no_pain else None),
+    )
     survivor_id = _leave_one_wound_on_unit(state=state, unit=target_noise_marines)
     feel_no_pain_source = FeelNoPainSource(
         source_id="attached-target-split-fnp-a",
         threshold=5,
     )
     if use_feel_no_pain:
-        state.game_id = "kakophonist-attached-target-fnp-destruction"
         state.record_model_feel_no_pain_sources(
             model_instance_id=survivor_id,
             sources=(
@@ -1141,8 +1146,9 @@ def test_doom_siren_splits_bodyguard_from_surviving_leader_and_support_after_cha
         target_support,
         source_attached_id,
         target_attached_id,
-    ) = _configured_kakophonist_leader_support_target_fixture()
-    state.game_id = "kakophonist-leader-support-split-fnp-destruction"
+    ) = _configured_kakophonist_leader_support_target_fixture(
+        game_id="kakophonist-leader-support-split-fnp-destruction",
+    )
     final_bodyguard_model_id = _leave_one_wound_on_unit(state=state, unit=target_bodyguard)
     survivor_ids = tuple(sorted((target_leader.unit_instance_id, target_support.unit_instance_id)))
     _record_attached_split_authoritative_state(
@@ -1421,6 +1427,7 @@ def test_selected_target_attached_split_lifecycle_and_replay_round_trip() -> Non
 def test_leader_support_split_lifecycle_and_replay_round_trip(
     use_feel_no_pain: bool,
 ) -> None:
+    explicit_game_id = "kakophonist-leader-support-replay-explicit-0" if use_feel_no_pain else None
     (
         config,
         armies,
@@ -1434,11 +1441,8 @@ def test_leader_support_split_lifecycle_and_replay_round_trip(
         target_attached_id,
     ) = _configured_kakophonist_leader_support_target_fixture(
         single_wound_bodyguard=True,
+        game_id=explicit_game_id,
     )
-    if use_feel_no_pain:
-        explicit_game_id = "kakophonist-leader-support-replay-explicit-0"
-        config = replace(config, game_id=explicit_game_id)
-        state.game_id = explicit_game_id
     assert len(target_bodyguard.own_models) == 1
     assert target_bodyguard.own_models[0].wounds_remaining == 1
     survivor_ids = tuple(sorted((target_leader.unit_instance_id, target_support.unit_instance_id)))
@@ -2399,8 +2403,8 @@ def test_infractors_excessive_assault_grants_only_melee_wound_rerolls() -> None:
 @pytest.mark.parametrize(
     ("within_objective_range", "game_id", "expected_wound_value"),
     [
-        (True, "phase18j-excessive-inside-0001", 4),
-        (False, "phase18j-excessive-outside-0003", 1),
+        (True, "phase18j-excessive-inside-0002", 4),
+        (False, "phase18j-excessive-outside-0008", 1),
     ],
 )
 def test_infractors_excessive_assault_uses_fight_lifecycle_decision_and_replays(
@@ -2427,8 +2431,8 @@ def test_infractors_excessive_assault_uses_fight_lifecycle_decision_and_replays(
             y=marker.y_inches,
         )
     else:
-        _move_unit(state, target.unit_instance_id, x=12.0, y=10.0)
-        _move_unit(state, infractors.unit_instance_id, x=10.0, y=10.0)
+        _move_unit(state, target.unit_instance_id, x=18.0, y=10.0)
+        _move_unit(state, infractors.unit_instance_id, x=16.0, y=10.0)
     status = session.advance_until_decision_or_terminal()
     status = _advance_battleline_fight_to_source_reroll(
         session=session,
@@ -2597,8 +2601,8 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
     ),
     [
         ("icon-lifecycle-outcome-0", False, True, "applied"),
-        ("icon-lifecycle-outcome-8", False, False, None),
-        ("icon-cap-outcome-1", True, True, "capped"),
+        ("icon-of-excess-fail-0", False, False, None),
+        ("icon-cap-outcome-2", True, True, "capped"),
     ],
 )
 def test_icon_of_excess_uses_shooting_lifecycle_destruction_and_replays(
@@ -3915,6 +3919,7 @@ def _fulgrim_opponent_turn_fight_session(
         )
     _move_unit(state, fulgrim.unit_instance_id, x=10.0, y=10.0)
     _move_unit(state, enemy.unit_instance_id, x=15.5, y=10.0)
+    record_primary_turn_start_evidence(state=state)
     lifecycle = GameLifecycle.from_payload(
         cast(
             GameLifecyclePayload,
@@ -4263,7 +4268,10 @@ def _kakophonist_attached_target_runtime_fixture() -> tuple[
     )
 
 
-def _configured_kakophonist_multi_target_fixture() -> tuple[
+def _configured_kakophonist_multi_target_fixture(
+    *,
+    game_id: str | None = None,
+) -> tuple[
     GameConfig,
     tuple[ArmyDefinition, ...],
     GameState,
@@ -4275,6 +4283,7 @@ def _configured_kakophonist_multi_target_fixture() -> tuple[
 ]:
     config, armies, state, indexes = _configured_kakophonist_fixture(
         attached_target=False,
+        game_id=game_id,
     )
     source_noise_marines = _unit_from_state(state, "army-a:source-noise-marines")
     target_a = _unit_from_state(state, "army-b:target-noise-marines-a")
@@ -4294,6 +4303,7 @@ def _configured_kakophonist_multi_target_fixture() -> tuple[
 def _configured_kakophonist_attached_target_fixture(
     *,
     single_wound_noise_marines: bool = False,
+    game_id: str | None = None,
 ) -> tuple[
     GameConfig,
     tuple[ArmyDefinition, ...],
@@ -4308,6 +4318,7 @@ def _configured_kakophonist_attached_target_fixture(
     config, armies, state, indexes = _configured_kakophonist_fixture(
         attached_target=True,
         single_wound_noise_marines=single_wound_noise_marines,
+        game_id=game_id,
     )
     source_noise_marines = _unit_from_state(state, "army-a:source-noise-marines")
     target_noise_marines = _unit_from_state(state, "army-b:target-noise-marines")
@@ -4328,6 +4339,7 @@ def _configured_kakophonist_attached_target_fixture(
 def _configured_kakophonist_leader_support_target_fixture(
     *,
     single_wound_bodyguard: bool = False,
+    game_id: str | None = None,
 ) -> tuple[
     GameConfig,
     tuple[ArmyDefinition, ...],
@@ -4344,6 +4356,7 @@ def _configured_kakophonist_leader_support_target_fixture(
         attached_target=True,
         leader_support_target=True,
         single_wound_core_bodyguard=single_wound_bodyguard,
+        game_id=game_id,
     )
     source_noise_marines = _unit_from_state(state, "army-a:source-noise-marines")
     target_bodyguard = _unit_from_state(state, "army-b:target-bodyguard")
@@ -4449,6 +4462,7 @@ def _configured_kakophonist_fixture(
     single_wound_noise_marines: bool = False,
     leader_support_target: bool = False,
     single_wound_core_bodyguard: bool = False,
+    game_id: str | None = None,
 ) -> tuple[
     GameConfig,
     tuple[ArmyDefinition, ...],
@@ -4696,11 +4710,15 @@ def _configured_kakophonist_fixture(
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     config = GameConfig(
         game_id=(
-            "kakophonist-runtime-test"
-            if leader_support_target
-            else "kakophonist-attached-target-sequencing"
-            if attached_target
-            else "kakophonist-multi-target-sequencing"
+            game_id
+            if game_id is not None
+            else (
+                "kakophonist-runtime-test"
+                if leader_support_target
+                else "kakophonist-attached-target-sequencing"
+                if attached_target
+                else "kakophonist-multi-target-sequencing"
+            )
         ),
         allow_legacy_non_strict_rosters=True,
         ruleset_descriptor=descriptor,
@@ -4734,6 +4752,7 @@ def _configured_kakophonist_fixture(
                 fixed_mission_ids=("assassination", "bring_it_down"),
             )
         )
+    record_primary_turn_start_evidence(state=state)
     records = catalog_ability_records_from_catalog(catalog)
     indexes = {
         army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
@@ -5388,6 +5407,7 @@ def _battleline_lifecycle_session(
                 fixed_mission_ids=("assassination", "bring_it_down"),
             )
         )
+    record_primary_turn_start_evidence(state=state)
     lifecycle = GameLifecycle.from_payload(
         cast(
             GameLifecyclePayload,

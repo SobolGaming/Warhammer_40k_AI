@@ -98,13 +98,18 @@ completion, and deterministic replay-safe fight-order hardening. **Phase 17J is
 complete** for the Warhammer Event Companion mission-pack source package:
 Event Mission Sequence descriptors, Tactical/Fixed Secondary procedure
 descriptors, all 25 implemented Primary Mission matrix cells, all 45
-source-page layout identities with pending coordinate-extraction status, Primary
-Mission scoring coverage rows grouped as engine-implemented, source-known
-engine-pending, or awaiting-source, Event Companion mission-pack import,
-scoring/draw pack resolution, separate empty card-amendment and FAQ patch
-records, Base Size Guide source rows with geometry-resolution statuses,
-deployment remainder-drain coverage, and a static audit preventing runtime Event
-Companion PDF parsing.
+source-page layout identities with explicit coordinate-extraction status,
+Primary Mission scoring coverage rows grouped as engine-implemented,
+source-known engine-pending, or awaiting-source, Event Companion mission-pack
+import, scoring/draw pack resolution, separate empty card-amendment and FAQ
+patch records, Base Size Guide source rows with geometry-resolution statuses,
+deployment remainder-drain coverage, and a static audit preventing runtime
+Event Companion PDF parsing.
+**Phase 17N is partial**: one complete Purge the Foe versus Purge the Foe /
+Meatgrinder pairing slice supplies exact executable A/B/C battlefield packages,
+bringing executable coordinate coverage to 9 of 45 layouts. Three are
+source-hashed exact, six retain the older coordinate-extracted status, and the
+other 36 remain explicit pending work.
 **Phase 18A is complete** for local CLI/human decision entry and viewer-safe
 hybrid datacard projections: `interfaces/cli.py` renders pending finite and
 parameterized requests, submits normal lifecycle `DecisionResult`s, and
@@ -381,7 +386,8 @@ Implemented foundation and partial integration baselines:
 | 17D | Complete | Generic RuleIR execution handlers, source-linked events, Aura recomputation, and ability/Stratagem IR bridges |
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
-| 17J | Complete | Warhammer Event Companion v1.0 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with pending coordinate extraction, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
+| 17J | Complete | Warhammer Event Companion v1.0 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with explicit extraction status, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
+| 17N | Partial | One complete Purge the Foe versus Purge the Foe / Meatgrinder A/B/C slice; 9 of 45 executable coordinate layouts (3 source-hashed exact and 6 older coordinate-extracted), with 36 still pending |
 | 17O | Complete | Viewer-scoped eight-axis capability manifest with selected roster/unit/rule/mission/geometry rows, evidence, blockers, identities, and mechanically derived certification claims |
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
@@ -1998,8 +2004,6 @@ Objects:
 - `CoverSourceRecord`
 - `CoverPolicyDescriptor`
 - `BenefitOfCoverResult`
-- `HiddenDetectionResult`
-- `GoneToGroundResult`
 
 Invariants:
 
@@ -2011,10 +2015,24 @@ Invariants:
 - Dense terrain features have Solid line-of-sight blocking for enclosed gaps 3" or less from ground level;
 - Hidden can apply only to `INFANTRY`, `BEASTS`, and `SWARM` models;
 - a model is Hidden when it is at least partially within a terrain area
-  containing a Dense or Light terrain element and its unit did not make ranged
-  attacks last turn;
-- Hidden units can only be visible to enemy models within the target unit's
-  Detection Range characteristic, defaulting to 15";
+  containing one or more Light or Dense terrain features and its unit did not
+  make ranged attacks in the current or previous player turn;
+- the project-owner-supplied official Warhammer 40,000 App transcription
+  observed on 2026-08-09 (source package
+  `gw-11e-app-core-rules-hidden-transcription-observed-2026-08-09`) supersedes
+  the older Core Rules section 13.09 Dense-only wording for Hidden;
+  Light, Dense, and Mixed terrain areas qualify, while an Unknown
+  classification does not establish the required Light/Dense feature;
+- on the first turn, the previous-turn no-ranged-attacks condition is true;
+- Hidden detection is evaluated per target model using that model's own
+  keywords and terrain-area occupancy; eligible and ineligible models in one
+  attached rules unit never share Hidden status;
+- Hidden models can only be visible to enemy models within the applicable
+  Detection Range, defaulting to 15";
+- Detection Range limits visibility rather than adding a separate targeting
+  prohibition, so `[INDIRECT FIRE]` can target a Hidden model outside Detection
+  Range; rules such as Lone Operative that separately prohibit Indirect Fire
+  remain authoritative;
 - Gone to Ground applies to a model that is not fully visible to the attacking
   model because a terrain piece is at least partially in the way;
 - Gone to Ground improves Detection Range by -3", making the default Hidden
@@ -2022,11 +2040,14 @@ Invariants:
 - rules, abilities, or Stratagems that let a Hidden unit shoot and remain Hidden
   cancel Gone to Ground for that interaction;
 - Benefit of Cover is a policy result consumed by attacks, not a save-side effect;
-- Benefit of Cover applies to the target unit only when every model in that unit qualifies through terrain-area membership or terrain/obscuring not-fully-visible evidence;
+- Benefit of Cover applies to the target unit only when every model in that unit
+  qualifies through terrain-area membership or terrain/obscuring
+  not-fully-visible evidence; eligible-keyword membership applies in any terrain
+  area regardless of its Light, Dense, Mixed, or Unknown classification;
 - Benefit of Cover worsens the attack's BS characteristic by 1 unless an ability such as `[IGNORES COVER]` removes it;
 - cover eligibility is visible in attack context before hit rolls are made;
 - LoS witnesses carry ruleset hash and spatial revision cache-key data;
-- Hidden distance gates, last-turn shot-state loss, Gone to Ground cancellation,
+- Hidden distance gates, current-or-previous-turn shot-state loss, Gone to Ground cancellation,
   and visibility output are first-class 11th Edition terrain behavior;
 - Phase 13A uses deterministic broad-phase candidate filtering and cache-key witnesses, but does not claim a persistent memoized shooting LoS cache; Phase 13B/13C must add or consume a real cache/index before high-volume shooting loops;
 - model silhouette sampling is an explicit deterministic approximation, not an exact hull; downstream cover and Plunging Fire behavior must carry accuracy tests for that sampling budget;
@@ -2037,9 +2058,15 @@ Required tests:
 - terrain visibility fixture can block LoS deterministically;
 - terrain-area Obscuring blocks LoS only when all lines cross eligible areas and neither model is within the crossed area;
 - Dense terrain Solid blocks LoS through enclosed gaps 3" or less from ground level;
-- Hidden `INFANTRY`/`BEASTS`/`SWARM` models in Dense or Light terrain areas are
-  visible only within the target unit's Detection Range while their last-turn
-  shot-state condition is satisfied;
+- Hidden `INFANTRY`/`BEASTS`/`SWARM` models in Light, Dense, or Mixed terrain
+  areas are visible only within Detection Range while their
+  current-or-previous-turn shot-state condition is satisfied, including on the
+  first turn and after an attached unit splits;
+- direct fire rejects a Hidden model outside Detection Range while eligible
+  `[INDIRECT FIRE]` accepts the same in-range model as not visible and applies
+  the normal Indirect restrictions;
+- mixed attached rules units apply Hidden and Detection Range per model, and
+  every rules-level visible-target query consumes the same model gate;
 - Gone to Ground applies only when the attacking model's full-visibility failure
   is caused by intervening terrain, applies the -3" Detection Range modifier,
   and is cancelled by Hidden-shooting rules that preserve Hidden;
@@ -2366,7 +2393,10 @@ Required tests:
 - `[LANCE]` adds +1 to Wound rolls only when the attacking model's unit made a
   Charge move this turn and is absent for non-charged, out-of-phase, and
   non-Lance attacks;
-- Indirect Fire applies Benefit of Cover, disables Hit-roll rerolls, and enforces unmodified 1-5 fail or stationary-plus-friendly-visibility unmodified 1-3 fail;
+- Indirect Fire can target in-range models that are not visible, including
+  Hidden models outside Detection Range, applies Benefit of Cover, disables
+  Hit-roll rerolls, and enforces unmodified 1-5 fail or
+  stationary-plus-friendly-visibility unmodified 1-3 fail;
 - Close-quarters Shooting and shooting at engaged MONSTER/VEHICLE restrictions interact correctly with `[BLAST]` bans and per-model `[CLOSE-QUARTERS]` versus other-ranged weapon exclusivity;
 - Hazardous and Devastating Wounds mortal-wound allocation ordering is correct.
 - Fire Overwatch rejects invalid target bindings before CP spend and does not create marker-only effects;
@@ -2540,6 +2570,12 @@ Invariants:
   `HOVER` unit takes to the skies, the 2" subtraction is not applied. Charge
   integration remains a Phase 15 charge-move task;
 - terrain areas and Exposed/Light/Dense categories replace retired terrain-feature policies;
+- all models can move horizontally and vertically through Light terrain;
+  `INFANTRY`/`BEASTS`/`SWARM` can move horizontally and vertically through
+  Dense terrain, while `MOBILE` grants only horizontal Dense transit. A denied
+  Dense direct-transit permission cannot fall through to a retired
+  feature-kind keyword whitelist, although an otherwise legal path can still
+  ascend or descend the feature as a climb;
 - Dense movement, vertical movement, stable non-ground endpoints, Solid, Hidden,
   Gone to Ground, Obscuring, and Benefit of Cover are represented from
   structured terrain descriptors;
@@ -2559,7 +2595,8 @@ Required tests:
 - FLY take-to-the-skies changes pathing and movement budget deterministically,
   including the no-2" subtraction rule for `HOVER` units;
 - terrain visibility and terrain movement consume terrain-area descriptors,
-  including Light/Dense Hidden eligibility and Gone to Ground detection modifiers;
+  including Light/Dense movement behavior, Light/Dense Hidden eligibility, and
+  Gone to Ground detection modifiers;
 - objective-control geometry supports terrain areas and marker fallback;
 - action cancellation rejects moves other than pile-in/consolidation and rejects leaving the battlefield.
 
@@ -2659,7 +2696,10 @@ Invariants:
 - non-`MONSTER`/non-`VEHICLE` close-quarters shooting can only select `[CLOSE-QUARTERS]` weapons and engaged targets;
 - `MONSTER`/`VEHICLE` close-quarters and engaged-target shooting apply the correct -1 Hit modifier except for qualifying `[CLOSE-QUARTERS]` attacks;
 - `[BLAST]` weapons cannot target engaged units through close-quarters or engaged `MONSTER`/`VEHICLE` shooting;
-- Indirect shooting can only declare `[INDIRECT FIRE]` weapon profiles, grants cover, forbids hit rerolls, and has the 1-5/1-3 unmodified fail policy;
+- Indirect shooting can only declare `[INDIRECT FIRE]` weapon profiles, can
+  target Hidden models outside Detection Range because that range gates
+  visibility rather than Indirect targeting, grants cover, forbids hit rerolls,
+  and has the 1-5/1-3 unmodified fail policy;
 - Snap Shooting targets one visible enemy unit within 24", hits only on unmodified 6, and forbids Hit-roll rerolls;
 - after a unit shoots in the Shooting phase, it cannot start a Mission Action until the phase ends.
 - after a unit starts a Mission Action, it cannot shoot in that Shooting phase
@@ -2858,8 +2898,8 @@ Invariants:
 - keyword-gated weapon abilities apply only to target units with at least one listed keyword;
 - `[HUNTER X]` is target eligibility, not an attack modifier: the weapon can
   only be declared into units matching at least one listed keyword;
-- future ability-runtime families such as `STEALTH`, `HOVER`, Super-heavy
-  Walker, and `MOBILE` remain future runtime work until an owning phase adds
+- future ability-runtime families such as Super-heavy Walker remain future
+  runtime work until an owning phase adds
   source-backed hosts, adapter-contract updates for player-facing choices, and
   focused regressions; `[PSYCHIC]` modifier-ignore/classification and `[ONE
   SHOT]` weapon-use tracking now have phase-owned hosts and regressions, while
@@ -2887,8 +2927,8 @@ Required tests:
   future coverage;
 - Hunter X target declaration accepts at least one listed keyword match and
   rejects target units with none;
-- future ability-runtime families such as `STEALTH`, `HOVER`, Super-heavy
-  Walker, and `MOBILE` require focused implementation tests, replay coverage,
+- future ability-runtime families such as Super-heavy Walker require focused
+  implementation tests, replay coverage,
   and adapter-contract updates in their owning phases before runtime completion
   can be claimed; `[PSYCHIC]` and `[ONE SHOT]` have focused coverage for their
   current attack-sequence/declaration responsibilities;
@@ -4694,11 +4734,12 @@ Implemented coverage:
   implemented matrix cells, 45 deployment maps, 45 terrain layout templates, and
   45 mission-pool entries.
 - `primary_mission_scoring_coverage_rows()` tracks Primary Mission scoring
-  status: 3 missions are engine-implemented, 22 are source-known but require
-  engine implementation, and 0 still await source scoring text.
+  status: 4 of 25 missions are engine-implemented, 21 are source-known but
+  require engine implementation, and 0 still await source scoring text.
 - All 45 source-page layout identities instantiate as 44" x 60" mission setups
-  with deterministic layout descriptors while exact per-page coordinate
-  extraction remains explicitly marked pending.
+  with deterministic layout descriptors. Nine layouts have executable
+  coordinates: 3 source-hashed exact and 6 with the older coordinate-extracted
+  status. The other 36 remain explicitly marked pending.
 - Event Companion v1.0 card amendments are explicitly empty and distinct from
   source-linked FAQ patch records.
 - Base Size Guide source rows record round, oval, Hull, Small Flying Base, Large
@@ -4797,8 +4838,9 @@ Invariants:
   Attacker/Defender edges, deployment-zone polygons, No Man's Land polygon,
   player territory polygons, typed objective points, terrain areas, dense/light
   terrain features, source page, and coordinate-extraction status.
-- All Event Companion layout records bind to source pages and expose pending
-  coordinate-extraction status rather than consuming screenshots at runtime.
+- All Event Companion layout records bind to source pages and expose their exact
+  or pending coordinate-extraction status rather than consuming screenshots at
+  runtime.
 - Base Size Guide rows import with `base_source_kind` values for round, oval,
   Small Flying Base, Large Flying Base, Hull, Unique, and unresolved source
   shapes.
@@ -4895,6 +4937,74 @@ Completion gate:
 ## Phase 17N: mission, terrain, and battlefield package completion
 
 Priority: required before certifying a visual matched-play slice.
+
+Status: Partial. One complete pairing slice is executable: Purge the Foe versus
+Purge the Foe, Primary Mission Meatgrinder, and layout variants A/B/C. These
+three variants are the first source-hashed exact layouts. Together with six
+older coordinate-extracted layouts, 9 of 45 are executable; the other 36 remain
+pending and must not be represented as complete or source-hashed exact.
+
+The slice's battlefield facts come from pages 24-26 of
+[`eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf`](docs/source_rules/eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf),
+SHA-256
+`97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20`.
+Each variant commits 16 terrain areas and 30 separately placed components:
+8 ruins, 8 dense non-ruins, and 14 light components. Strict source-hashed JSON
+records the source affines, objective coordinates, deployment-zone polygons,
+territories, and No Man's Land regions; a strict loader validates the package
+before runtime consumption. Those pages are authoritative only for battlefield
+and layout facts and contain no Meatgrinder scoring clauses. Meatgrinder's four
+scoring rows retain their separate reviewed Chapter Approved mission-deck
+provenance in the Event Companion source package.
+
+The exact battlefield artifact has package hash
+`e000de2eee57a1a9e8be21be2c88c427b2317ce0f832cf98e32e50bff18b6997`,
+raw artifact SHA-256
+`8818f310453fb73ccfe9dcf88ab3232026896b449b059957110015e3d565ade0`,
+and reviewed extraction payload hash
+`8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30`.
+The loader pins both artifact hashes, so a structurally valid re-hashed
+coordinate mutation remains rejected.
+The builder preserves all 12 orientation-reversing terrain-area source affines
+as a typed local reflection; its transformed-vertex anchor is derived
+deterministically from the reviewed registration anchor.
+
+Those four rows are loaded from the strict, versioned JSON artifact at
+`src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-meatgrinder-scoring.json`,
+with package hash
+`21b3fabcb585ee33b2295a888963d666a42f85d3f09200e973dd7de8253bd39c`
+and raw artifact SHA-256
+`5e892581956e2b3c81bac893caef6b04f71cf19c1c3e2590ea33256b1a786342`.
+It records the project-owner-supplied official Chapter Approved 2026-27 card
+transcription reviewed in PR #134 at commit `35b9ddaf5`. Its GDMissions page and
+card-image checks are explicitly non-official secondary corroboration, not GW
+source authority. Runtime mission rows are constructed from this artifact; the
+loader rejects unknown fields, malformed rows, stale content hashes, and drift
+from the reviewed artifact pin.
+
+The reviewed extraction input is committed at
+`data/source_audits/event_companion_2026_06/phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json`.
+`uv run python tools/build_phase17n_event_companion_exact_slice.py --check`
+rebuilds the package in memory from that versioned input, verifies the pinned
+source PDF hash, and fails without writing if the committed runtime artifact
+has drifted.
+
+Terrain-area and component source-image affines and battlefield regions are
+source-extracted facts. Compact component rules polygons and wall/floor
+primitives are reviewed engine models, not traced raster silhouettes.
+Project-owner-supplied semantics establish three-inch floor spacing, solid
+three-inch ground-floor walls, approximately two-inch upper walls, and
+approximately two-inch Light terrain. The AB/EF three-floor versus CD/GH
+two-floor assignment, compact primitive dimensions, and 3.5-inch Dense
+non-ruin height are explicit initial engine modeling assumptions rather than
+PDF measurements. Those choices are committed for review and later tuning;
+rendering images remain non-authoritative.
+
+Meatgrinder's destruction comparison counts enemy units lost during the current
+scoring player's turn against that player's friendly units lost during the
+opponent's immediately prior player turn. Runtime evidence preserves both turn
+keys, counts, and unit-ID sets; it does not treat enemy self-losses during the
+opponent's prior turn as current-turn enemy losses.
 
 Phase 17N converts the Phase 17J source inventory into complete, executable,
 source-hashed battlefield packages. A client must be able to display a standard
@@ -5031,7 +5141,7 @@ Completion gate:
 
 Status: Complete. The implemented adapter contract currently uses
 `RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"` for the static
-catalog projection and `PROJECTION_SCHEMA_VERSION = "game-view-v4-unit-resources"`
+catalog projection and `PROJECTION_SCHEMA_VERSION = "game-view-v7-phase17n"`
 for live game views. Live views expose `rules_catalog`,
 `projection_state_hash`, `unit_display_by_id`, and `model_display_by_id`.
 
@@ -5813,8 +5923,9 @@ Required tests:
 
 Completion gate:
 
-`battlefield-view-v1` is emitted through the shared viewer projection and
-published in Contract 4.0. It defines one right-handed inches-based world frame,
+`battlefield-view-v1` was first published in Contract 4.0. The current shared
+viewer projection emits `battlefield-view-v2-phase17n` under Contract 5.0 so
+strict clients can distinguish the added terrain-classification fields. The family defines one right-handed inches-based world frame,
 stable external entities for the required battlefield concepts, explicit model
 physical states, typed model/support/terrain/zone/path geometry, and a hash over
 viewer-visible authoritative geometry. The canonical geometry-conformance

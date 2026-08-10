@@ -76,6 +76,7 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedContext,
     UnitDestroyedHookBinding,
+    model_destroyed_events_for_lifecycle_phase,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
@@ -1224,25 +1225,15 @@ def _unit_destruction_completion_events_for_current_phase(
     completed_phase = state.current_battle_phase
     if completed_phase is None:
         raise GameLifecycleError("Code Chivalric tally requires a current phase.")
-    active_player_id = _active_player_id(state)
     removed_model_ids = set(state.battlefield_state.removed_model_ids)
     events_by_unit: dict[str, list[tuple[int, str, dict[str, JsonValue]]]] = {}
-    for event_order, record in enumerate(event_log.records):
-        if record.event_type != "model_destroyed":
-            continue
-        payload = _payload_object(record.payload)
-        if payload.get("game_id") != state.game_id:
-            continue
-        if payload.get("battle_round") != state.battle_round:
-            continue
-        if payload.get("active_player_id") != active_player_id:
-            continue
-        if payload.get("phase") != completed_phase.value:
-            continue
+    for event_order, event_id, payload in model_destroyed_events_for_lifecycle_phase(
+        state=state,
+        event_log=event_log,
+        completed_phase=completed_phase,
+    ):
         target_unit_id = _payload_string(payload, key="target_unit_instance_id")
-        events_by_unit.setdefault(target_unit_id, []).append(
-            (event_order, record.event_id, dict(payload))
-        )
+        events_by_unit.setdefault(target_unit_id, []).append((event_order, event_id, dict(payload)))
     completions: list[tuple[int, str, dict[str, JsonValue]]] = []
     for target_unit_id, events in events_by_unit.items():
         model_ids = _model_instance_ids_for_unit(state=state, unit_instance_id=target_unit_id)

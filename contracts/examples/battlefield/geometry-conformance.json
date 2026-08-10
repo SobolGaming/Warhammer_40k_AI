@@ -348,6 +348,7 @@
     },
     "terrain_features_by_id": {
       "geometry-conformance-terrain": {
+        "classification": "unknown",
         "entity_kind": "terrain_feature",
         "footprint": {
           "center": {
@@ -395,7 +396,7 @@
       }
     }
   },
-  "authoritative_geometry_hash": "a782ecf39e00ea7e959604b13a116e258adfc0e34a789a7b49a8cc6261f43c1f",
+  "authoritative_geometry_hash": "fc0a8fc117dc2aeb73658cb9dae50e9f2848d6af6659d2bfd8f62dfb8f1c9e77",
   "battlefield_id": "geometry-conformance-battlefield",
   "bounds": {
     "max_x_inches": 60.0,
@@ -519,5 +520,5 @@
       }
     }
   },
-  "schema_version": "battlefield-view-v1"
+  "schema_version": "battlefield-view-v2-phase17n"
 }

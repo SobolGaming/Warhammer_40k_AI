@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import Self, TypedDict, TypeGuard, cast
 
 from warhammer40k_core.core.ruleset_descriptor import (
     CoverEffect,
@@ -22,8 +22,6 @@ from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.pose import (
     GeometryError,
     Point3,
-    Point3Payload,
-    validate_point3,
 )
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
@@ -32,42 +30,44 @@ from warhammer40k_core.geometry.terrain import (
     TerrainVolumePayload,
     terrain_volume_from_payload,
 )
+from warhammer40k_core.geometry.terrain_area_visibility import (
+    TerrainVisibilityArea,
+    TerrainVisibilityAreaPayload,
+    classification_has_visibility_semantics,
+    feature_ids_associated_with_terrain_areas,
+    model_intersects_terrain_area,
+    ray_intersects_terrain_area,
+    validate_terrain_visibility_areas,
+)
+from warhammer40k_core.geometry.terrain_classification import (
+    TerrainAreaClassification,
+    TerrainClassificationError,
+    terrain_area_classification_from_token,
+)
+from warhammer40k_core.geometry.visibility_query import (
+    VisibilityMetrics as VisibilityMetrics,
+)
+from warhammer40k_core.geometry.visibility_query import (
+    VisibilityMetricsPayload as VisibilityMetricsPayload,
+)
+from warhammer40k_core.geometry.visibility_query import VisibilityQuery as VisibilityQuery
+from warhammer40k_core.geometry.visibility_query import (
+    VisibilityQueryPayload as VisibilityQueryPayload,
+)
+from warhammer40k_core.geometry.visibility_query import VisibilityRay as VisibilityRay
+from warhammer40k_core.geometry.visibility_query import (
+    VisibilityRayPayload as VisibilityRayPayload,
+)
+from warhammer40k_core.geometry.visibility_query import VisibilityResult as VisibilityResult
+from warhammer40k_core.geometry.visibility_query import (
+    VisibilityResultPayload as VisibilityResultPayload,
+)
 from warhammer40k_core.geometry.volume import Model, ModelPayload
-
-type VisibilityRay = tuple[Point3, Point3]
-
-
-class VisibilityRayPayload(TypedDict):
-    start: Point3Payload
-    end: Point3Payload
-
-
-class VisibilityQueryPayload(TypedDict):
-    rays: list[VisibilityRayPayload]
-    static_terrain: list[TerrainVolumePayload]
-    dynamic_model_blockers: list[ModelPayload]
-
-
-class VisibilityResultPayload(TypedDict):
-    has_line_of_sight: bool
-    checked_ray_count: int
-    clear_ray_index: int | None
-    blocking_terrain_ids: list[str]
-    blocking_model_ids: list[str]
-    checked_terrain_ids: list[str]
-    checked_model_ids: list[str]
-    metrics: VisibilityMetricsPayload
-
-
-class VisibilityMetricsPayload(TypedDict):
-    terrain_candidate_count: int
-    model_candidate_count: int
-    exact_terrain_check_count: int
-    exact_model_check_count: int
 
 
 class VisibilityBlockerKind(StrEnum):
     TERRAIN_FEATURE = "terrain_feature"
+    TERRAIN_AREA = "terrain_area"
     TERRAIN_VOLUME = "terrain_volume"
     MODEL = "model"
 
@@ -75,6 +75,8 @@ class VisibilityBlockerKind(StrEnum):
 class CoverSourceReason(StrEnum):
     WHOLLY_WITHIN_FEATURE = "wholly_within_feature"
     NOT_FULLY_VISIBLE_BECAUSE_OF_FEATURE = "not_fully_visible_because_of_feature"
+    WITHIN_TERRAIN_AREA = "within_terrain_area"
+    NOT_FULLY_VISIBLE_BECAUSE_OF_TERRAIN_AREA = "not_fully_visible_because_of_terrain_area"
 
 
 class VisibilityBlockerRecordPayload(TypedDict):
@@ -83,6 +85,8 @@ class VisibilityBlockerRecordPayload(TypedDict):
     ray_index: int
     terrain_feature_id: str | None
     terrain_feature_kind: str | None
+    terrain_area_id: str | None
+    terrain_area_classification: str | None
     line_of_sight_policy: str
     blocks_model_visibility: bool
     blocks_full_visibility: bool
@@ -96,265 +100,11 @@ class CoverSourceRecordPayload(TypedDict):
     reason: str
 
 
-class ModelLineOfSightRecordPayload(TypedDict):
-    target_model_id: str
-    model_visible: bool
-    model_fully_visible: bool
-    checked_ray_count: int
-    clear_ray_indices: list[int]
-    blocker_records: list[VisibilityBlockerRecordPayload]
-
-
-class LineOfSightWitnessPayload(TypedDict):
-    ruleset_descriptor_hash: str
-    los_cache_key: str
-    observer_model_id: str
-    target_model_ids: list[str]
-    visible_model_ids: list[str]
-    fully_visible_model_ids: list[str]
-    unit_visible: bool
-    unit_fully_visible: bool
-    model_records: list[ModelLineOfSightRecordPayload]
-
-
-class TerrainVisibilityContextPayload(TypedDict):
-    ruleset_descriptor_hash: str
-    los_cache_key: str
-    observer_model: ModelPayload
-    target_models: list[ModelPayload]
-    terrain_features: list[TerrainFeatureDefinitionPayload]
-    terrain_volumes: list[TerrainVolumePayload]
-    dynamic_model_blockers: list[ModelPayload]
-    observer_keywords: list[str]
-    target_keywords: list[str]
-    terrain_visibility_policy: TerrainVisibilityPolicyDescriptorPayload
-
-
-class BenefitOfCoverResultPayload(TypedDict):
-    has_benefit: bool
-    cover_effect: str
-    source_feature_ids: list[str]
-    source_policy_kinds: list[str]
-    source_records: list[CoverSourceRecordPayload]
-    los_cache_key: str
-    target_unit_visible: bool
-    target_unit_fully_visible: bool
-    non_stacking: bool
-    ap_zero_save_bonus_excluded_for_save_3_plus_or_better: bool
-
-
-@dataclass(frozen=True, slots=True)
-class VisibilityQuery:
-    rays: tuple[VisibilityRay, ...]
-    static_terrain: tuple[TerrainVolume, ...] = ()
-    dynamic_model_blockers: tuple[Model, ...] = ()
-
-    def __post_init__(self) -> None:
-        if type(self.rays) is not tuple:
-            raise GeometryError("VisibilityQuery rays must be a tuple.")
-        if not self.rays:
-            raise GeometryError("VisibilityQuery rays must not be empty.")
-        if type(self.static_terrain) is not tuple:
-            raise GeometryError("VisibilityQuery static_terrain must be a tuple.")
-        if type(self.dynamic_model_blockers) is not tuple:
-            raise GeometryError("VisibilityQuery dynamic_model_blockers must be a tuple.")
-
-        rays = tuple(_validate_ray(ray) for ray in self.rays)
-        terrain = tuple(
-            _validate_terrain("VisibilityQuery static terrain", volume)
-            for volume in self.static_terrain
-        )
-        models = tuple(
-            _validate_model("VisibilityQuery dynamic model blocker", model)
-            for model in self.dynamic_model_blockers
-        )
-        _validate_unique_terrain_ids(terrain)
-        _validate_unique_model_ids(models)
-        object.__setattr__(self, "rays", rays)
-        object.__setattr__(
-            self,
-            "static_terrain",
-            tuple(sorted(terrain, key=lambda volume: volume.terrain_id)),
-        )
-        object.__setattr__(
-            self,
-            "dynamic_model_blockers",
-            tuple(sorted(models, key=lambda model: model.model_id)),
-        )
-
-    @classmethod
-    def from_segment(
-        cls,
-        start: Point3,
-        end: Point3,
-        static_terrain: tuple[TerrainVolume, ...] = (),
-        dynamic_model_blockers: tuple[Model, ...] = (),
-    ) -> Self:
-        return cls(
-            rays=((start, end),),
-            static_terrain=static_terrain,
-            dynamic_model_blockers=dynamic_model_blockers,
-        )
-
-    def resolve(self) -> VisibilityResult:
-        checked_terrain_ids: set[str] = set()
-        checked_model_ids: set[str] = set()
-        blocking_terrain_ids: set[str] = set()
-        blocking_model_ids: set[str] = set()
-        terrain_candidate_count = 0
-        model_candidate_count = 0
-        exact_terrain_check_count = 0
-        exact_model_check_count = 0
-
-        for ray_index, ray in enumerate(self.rays):
-            start, end = ray
-            terrain_candidates = tuple(
-                terrain
-                for terrain in self.static_terrain
-                if terrain.blocks_line_of_sight and _terrain_broad_phase_intersects(ray, terrain)
-            )
-            model_candidates = tuple(
-                model
-                for model in self.dynamic_model_blockers
-                if _model_broad_phase_intersects(ray, model)
-            )
-            terrain_candidate_count += len(terrain_candidates)
-            model_candidate_count += len(model_candidates)
-
-            checked_terrain_ids.update(terrain.terrain_id for terrain in terrain_candidates)
-            checked_model_ids.update(model.model_id for model in model_candidates)
-
-            exact_terrain_check_count += len(terrain_candidates)
-            terrain_blockers = tuple(
-                terrain.terrain_id
-                for terrain in terrain_candidates
-                if terrain.blocks_line_segment(start, end)
-            )
-            exact_model_check_count += len(model_candidates)
-            model_blockers = tuple(
-                model.model_id
-                for model in model_candidates
-                if shapely_backend.segment_intersects_model_footprint(start, end, model)
-            )
-            if not terrain_blockers and not model_blockers:
-                return VisibilityResult(
-                    has_line_of_sight=True,
-                    checked_ray_count=ray_index + 1,
-                    clear_ray_index=ray_index,
-                    checked_terrain_ids=tuple(sorted(checked_terrain_ids)),
-                    checked_model_ids=tuple(sorted(checked_model_ids)),
-                    metrics=VisibilityMetrics(
-                        terrain_candidate_count=terrain_candidate_count,
-                        model_candidate_count=model_candidate_count,
-                        exact_terrain_check_count=exact_terrain_check_count,
-                        exact_model_check_count=exact_model_check_count,
-                    ),
-                )
-
-            blocking_terrain_ids.update(terrain_blockers)
-            blocking_model_ids.update(model_blockers)
-
-        return VisibilityResult(
-            has_line_of_sight=False,
-            checked_ray_count=len(self.rays),
-            clear_ray_index=None,
-            blocking_terrain_ids=tuple(sorted(blocking_terrain_ids)),
-            blocking_model_ids=tuple(sorted(blocking_model_ids)),
-            checked_terrain_ids=tuple(sorted(checked_terrain_ids)),
-            checked_model_ids=tuple(sorted(checked_model_ids)),
-            metrics=VisibilityMetrics(
-                terrain_candidate_count=terrain_candidate_count,
-                model_candidate_count=model_candidate_count,
-                exact_terrain_check_count=exact_terrain_check_count,
-                exact_model_check_count=exact_model_check_count,
-            ),
-        )
-
-    def to_payload(self) -> VisibilityQueryPayload:
-        return {
-            "rays": [
-                {"start": start.to_payload(), "end": end.to_payload()} for start, end in self.rays
-            ],
-            "static_terrain": [terrain.to_payload() for terrain in self.static_terrain],
-            "dynamic_model_blockers": [model.to_payload() for model in self.dynamic_model_blockers],
-        }
-
-    @classmethod
-    def from_payload(cls, payload: VisibilityQueryPayload) -> Self:
-        return cls(
-            rays=tuple(
-                (
-                    Point3.from_payload(ray["start"]),
-                    Point3.from_payload(ray["end"]),
-                )
-                for ray in payload["rays"]
-            ),
-            static_terrain=tuple(
-                terrain_volume_from_payload(terrain) for terrain in payload["static_terrain"]
-            ),
-            dynamic_model_blockers=tuple(
-                Model.from_payload(model) for model in payload["dynamic_model_blockers"]
-            ),
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class VisibilityMetrics:
-    terrain_candidate_count: int = 0
-    model_candidate_count: int = 0
-    exact_terrain_check_count: int = 0
-    exact_model_check_count: int = 0
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "terrain_candidate_count",
-            _validate_non_negative_int(
-                "VisibilityMetrics terrain_candidate_count",
-                self.terrain_candidate_count,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "model_candidate_count",
-            _validate_non_negative_int(
-                "VisibilityMetrics model_candidate_count",
-                self.model_candidate_count,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "exact_terrain_check_count",
-            _validate_non_negative_int(
-                "VisibilityMetrics exact_terrain_check_count",
-                self.exact_terrain_check_count,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "exact_model_check_count",
-            _validate_non_negative_int(
-                "VisibilityMetrics exact_model_check_count",
-                self.exact_model_check_count,
-            ),
-        )
-
-    def to_payload(self) -> VisibilityMetricsPayload:
-        return {
-            "terrain_candidate_count": self.terrain_candidate_count,
-            "model_candidate_count": self.model_candidate_count,
-            "exact_terrain_check_count": self.exact_terrain_check_count,
-            "exact_model_check_count": self.exact_model_check_count,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: VisibilityMetricsPayload) -> Self:
-        return cls(
-            terrain_candidate_count=payload["terrain_candidate_count"],
-            model_candidate_count=payload["model_candidate_count"],
-            exact_terrain_check_count=payload["exact_terrain_check_count"],
-            exact_model_check_count=payload["exact_model_check_count"],
-        )
+class TerrainAreaCoverSourceRecordPayload(TypedDict):
+    terrain_area_id: str
+    classification: str
+    policy_kind: str
+    reason: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -367,6 +117,8 @@ class VisibilityBlockerRecord:
     blocks_full_visibility: bool
     terrain_feature_id: str | None = None
     terrain_feature_kind: TerrainFeatureKind | None = None
+    terrain_area_id: str | None = None
+    terrain_area_classification: TerrainAreaClassification | None = None
     exception_applied: str | None = None
 
     def __post_init__(self) -> None:
@@ -402,24 +154,34 @@ class VisibilityBlockerRecord:
             self,
             "terrain_feature_id",
             _validate_optional_identifier(
-                "VisibilityBlockerRecord terrain_feature_id",
-                self.terrain_feature_id,
+                "VisibilityBlockerRecord terrain_feature_id", self.terrain_feature_id
             ),
         )
-        terrain_feature_kind = self.terrain_feature_kind
-        if terrain_feature_kind is not None:
-            terrain_feature_kind = _terrain_feature_kind_from_token_for_visibility(
-                terrain_feature_kind
-            )
-        object.__setattr__(self, "terrain_feature_kind", terrain_feature_kind)
+        feature_kind = self.terrain_feature_kind
+        if feature_kind is not None:
+            feature_kind = _terrain_feature_kind_from_token_for_visibility(feature_kind)
+        object.__setattr__(self, "terrain_feature_kind", feature_kind)
+        object.__setattr__(
+            self,
+            "terrain_area_id",
+            _validate_optional_identifier(
+                "VisibilityBlockerRecord terrain_area_id", self.terrain_area_id
+            ),
+        )
+        classification = self.terrain_area_classification
+        if classification is not None:
+            classification = _terrain_area_classification_from_token_for_visibility(classification)
+        object.__setattr__(self, "terrain_area_classification", classification)
         object.__setattr__(
             self,
             "exception_applied",
             _validate_optional_identifier(
-                "VisibilityBlockerRecord exception_applied",
-                self.exception_applied,
+                "VisibilityBlockerRecord exception_applied", self.exception_applied
             ),
         )
+        self._validate_source_fields()
+
+    def _validate_source_fields(self) -> None:
         if self.blocker_kind is VisibilityBlockerKind.TERRAIN_FEATURE:
             if self.terrain_feature_id != self.blocker_id:
                 raise GeometryError(
@@ -429,13 +191,39 @@ class VisibilityBlockerRecord:
                 raise GeometryError(
                     "Terrain-feature VisibilityBlockerRecord requires terrain_feature_kind."
                 )
-        if self.blocker_kind is not VisibilityBlockerKind.TERRAIN_FEATURE and (
-            self.exception_applied is not None
-            and not self.blocks_model_visibility
-            and not self.blocks_full_visibility
+            if self.terrain_area_id is not None or self.terrain_area_classification is not None:
+                raise GeometryError(
+                    "Terrain-feature VisibilityBlockerRecord must not include terrain-area data."
+                )
+        if self.blocker_kind is VisibilityBlockerKind.TERRAIN_AREA:
+            if self.terrain_area_id != self.blocker_id:
+                raise GeometryError(
+                    "Terrain-area VisibilityBlockerRecord must use matching terrain area ID."
+                )
+            if self.terrain_area_classification is None:
+                raise GeometryError(
+                    "Terrain-area VisibilityBlockerRecord requires terrain_area_classification."
+                )
+            if self.terrain_feature_id is not None or self.terrain_feature_kind is not None:
+                raise GeometryError(
+                    "Terrain-area VisibilityBlockerRecord must not include terrain-feature data."
+                )
+        if self.blocker_kind is not VisibilityBlockerKind.TERRAIN_AREA and (
+            self.terrain_area_id is not None or self.terrain_area_classification is not None
         ):
             raise GeometryError(
-                "Only terrain-feature records may preserve non-blocking visibility exceptions."
+                "Non-terrain-area VisibilityBlockerRecord must not include terrain-area data."
+            )
+        if (
+            self.blocker_kind
+            not in (
+                VisibilityBlockerKind.TERRAIN_FEATURE,
+                VisibilityBlockerKind.TERRAIN_AREA,
+            )
+            and self.exception_applied is not None
+        ):
+            raise GeometryError(
+                "Only terrain feature or area records may preserve visibility exceptions."
             )
 
     def to_payload(self) -> VisibilityBlockerRecordPayload:
@@ -447,6 +235,12 @@ class VisibilityBlockerRecord:
             "terrain_feature_kind": (
                 None if self.terrain_feature_kind is None else self.terrain_feature_kind.value
             ),
+            "terrain_area_id": self.terrain_area_id,
+            "terrain_area_classification": (
+                None
+                if self.terrain_area_classification is None
+                else self.terrain_area_classification.value
+            ),
             "line_of_sight_policy": self.line_of_sight_policy.value,
             "blocks_model_visibility": self.blocks_model_visibility,
             "blocks_full_visibility": self.blocks_full_visibility,
@@ -455,7 +249,8 @@ class VisibilityBlockerRecord:
 
     @classmethod
     def from_payload(cls, payload: VisibilityBlockerRecordPayload) -> Self:
-        terrain_feature_kind = payload["terrain_feature_kind"]
+        feature_kind = payload["terrain_feature_kind"]
+        classification = payload["terrain_area_classification"]
         return cls(
             blocker_kind=visibility_blocker_kind_from_token(payload["blocker_kind"]),
             blocker_id=payload["blocker_id"],
@@ -463,8 +258,14 @@ class VisibilityBlockerRecord:
             terrain_feature_id=payload["terrain_feature_id"],
             terrain_feature_kind=(
                 None
-                if terrain_feature_kind is None
-                else _terrain_feature_kind_from_token_for_visibility(terrain_feature_kind)
+                if feature_kind is None
+                else _terrain_feature_kind_from_token_for_visibility(feature_kind)
+            ),
+            terrain_area_id=payload["terrain_area_id"],
+            terrain_area_classification=(
+                None
+                if classification is None
+                else _terrain_area_classification_from_token_for_visibility(classification)
             ),
             line_of_sight_policy=_line_of_sight_policy_from_token_for_visibility(
                 payload["line_of_sight_policy"]
@@ -473,6 +274,249 @@ class VisibilityBlockerRecord:
             blocks_full_visibility=payload["blocks_full_visibility"],
             exception_applied=payload["exception_applied"],
         )
+
+
+@dataclass(frozen=True, slots=True)
+class CoverSourceRecord:
+    feature_id: str
+    feature_kind: TerrainFeatureKind
+    policy_kind: LineOfSightPolicy
+    reason: CoverSourceReason
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "feature_id",
+            _validate_identifier("CoverSourceRecord feature_id", self.feature_id),
+        )
+        object.__setattr__(
+            self,
+            "feature_kind",
+            _terrain_feature_kind_from_token_for_visibility(self.feature_kind),
+        )
+        object.__setattr__(
+            self,
+            "policy_kind",
+            _line_of_sight_policy_from_token_for_visibility(self.policy_kind),
+        )
+        object.__setattr__(self, "reason", cover_source_reason_from_token(self.reason))
+        if self.reason not in (
+            CoverSourceReason.WHOLLY_WITHIN_FEATURE,
+            CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_FEATURE,
+        ):
+            raise GeometryError("Feature cover source requires a terrain-feature reason.")
+
+    def to_payload(self) -> CoverSourceRecordPayload:
+        return {
+            "feature_id": self.feature_id,
+            "feature_kind": self.feature_kind.value,
+            "policy_kind": self.policy_kind.value,
+            "reason": self.reason.value,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: CoverSourceRecordPayload) -> Self:
+        return cls(
+            feature_id=payload["feature_id"],
+            feature_kind=_terrain_feature_kind_from_token_for_visibility(payload["feature_kind"]),
+            policy_kind=_line_of_sight_policy_from_token_for_visibility(payload["policy_kind"]),
+            reason=cover_source_reason_from_token(payload["reason"]),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class TerrainAreaCoverSourceRecord:
+    terrain_area_id: str
+    classification: TerrainAreaClassification
+    policy_kind: LineOfSightPolicy
+    reason: CoverSourceReason
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "terrain_area_id",
+            _validate_identifier(
+                "TerrainAreaCoverSourceRecord terrain_area_id", self.terrain_area_id
+            ),
+        )
+        object.__setattr__(
+            self,
+            "classification",
+            _terrain_area_classification_from_token_for_visibility(self.classification),
+        )
+        object.__setattr__(
+            self,
+            "policy_kind",
+            _line_of_sight_policy_from_token_for_visibility(self.policy_kind),
+        )
+        object.__setattr__(self, "reason", cover_source_reason_from_token(self.reason))
+        if self.reason not in (
+            CoverSourceReason.WITHIN_TERRAIN_AREA,
+            CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_TERRAIN_AREA,
+        ):
+            raise GeometryError("Terrain-area cover source requires a terrain-area reason.")
+
+    def to_payload(self) -> TerrainAreaCoverSourceRecordPayload:
+        return {
+            "terrain_area_id": self.terrain_area_id,
+            "classification": self.classification.value,
+            "policy_kind": self.policy_kind.value,
+            "reason": self.reason.value,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: TerrainAreaCoverSourceRecordPayload) -> Self:
+        return cls(
+            terrain_area_id=payload["terrain_area_id"],
+            classification=_terrain_area_classification_from_token_for_visibility(
+                payload["classification"]
+            ),
+            policy_kind=_line_of_sight_policy_from_token_for_visibility(payload["policy_kind"]),
+            reason=cover_source_reason_from_token(payload["reason"]),
+        )
+
+
+type CoverEvidenceRecord = CoverSourceRecord | TerrainAreaCoverSourceRecord
+
+
+def visibility_blocker_kind_from_token(token: object) -> VisibilityBlockerKind:
+    if type(token) is VisibilityBlockerKind:
+        return token
+    if type(token) is not str:
+        raise GeometryError("VisibilityBlockerKind token must be a string.")
+    try:
+        return VisibilityBlockerKind(token)
+    except ValueError as exc:
+        raise GeometryError("Unsupported VisibilityBlockerKind token.") from exc
+
+
+def cover_source_reason_from_token(token: object) -> CoverSourceReason:
+    if type(token) is CoverSourceReason:
+        return token
+    if type(token) is not str:
+        raise GeometryError("CoverSourceReason token must be a string.")
+    try:
+        return CoverSourceReason(token)
+    except ValueError as exc:
+        raise GeometryError("Unsupported CoverSourceReason token.") from exc
+
+
+def _validate_cover_source_records(
+    field_name: str,
+    values: object,
+) -> tuple[CoverEvidenceRecord, ...]:
+    if type(values) is not tuple:
+        raise GeometryError(f"{field_name} must be a tuple.")
+    records: list[CoverEvidenceRecord] = []
+    seen: set[tuple[str, str, str, str]] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is CoverSourceRecord:
+            key = ("feature", value.feature_id, value.policy_kind.value, value.reason.value)
+        elif type(value) is TerrainAreaCoverSourceRecord:
+            key = (
+                "terrain_area",
+                value.terrain_area_id,
+                value.policy_kind.value,
+                value.reason.value,
+            )
+        else:
+            raise GeometryError(f"{field_name} must contain typed cover source records.")
+        if key in seen:
+            raise GeometryError(f"{field_name} must not contain duplicate records.")
+        seen.add(key)
+        records.append(value)
+    return tuple(sorted(records, key=_cover_source_record_sort_key))
+
+
+def _cover_source_record_sort_key(
+    record: CoverEvidenceRecord,
+) -> tuple[str, str, str, str]:
+    if type(record) is CoverSourceRecord:
+        return ("feature", record.feature_id, record.policy_kind.value, record.reason.value)
+    if type(record) is TerrainAreaCoverSourceRecord:
+        return (
+            "terrain_area",
+            record.terrain_area_id,
+            record.policy_kind.value,
+            record.reason.value,
+        )
+    raise GeometryError("Unsupported typed cover source record.")
+
+
+def _cover_source_record_from_payload(
+    payload: CoverSourceRecordPayload | TerrainAreaCoverSourceRecordPayload,
+) -> CoverEvidenceRecord:
+    if _is_terrain_area_cover_source_payload(payload):
+        return TerrainAreaCoverSourceRecord.from_payload(payload)
+    if _is_feature_cover_source_payload(payload):
+        return CoverSourceRecord.from_payload(payload)
+    raise GeometryError("Cover source payload must identify its typed source.")
+
+
+def _is_terrain_area_cover_source_payload(
+    payload: CoverSourceRecordPayload | TerrainAreaCoverSourceRecordPayload,
+) -> TypeGuard[TerrainAreaCoverSourceRecordPayload]:
+    return "terrain_area_id" in payload
+
+
+def _is_feature_cover_source_payload(
+    payload: CoverSourceRecordPayload | TerrainAreaCoverSourceRecordPayload,
+) -> TypeGuard[CoverSourceRecordPayload]:
+    return "feature_id" in payload
+
+
+class ModelLineOfSightRecordPayload(TypedDict):
+    target_model_id: str
+    model_visible: bool
+    model_fully_visible: bool
+    checked_ray_count: int
+    clear_ray_indices: list[int]
+    blocker_records: list[VisibilityBlockerRecordPayload]
+
+
+class LineOfSightWitnessPayload(TypedDict):
+    ruleset_descriptor_hash: str
+    los_cache_key: str
+    observer_model_id: str
+    target_model_ids: list[str]
+    visible_model_ids: list[str]
+    fully_visible_model_ids: list[str]
+    unit_visible: bool
+    unit_fully_visible: bool
+    model_records: list[ModelLineOfSightRecordPayload]
+
+
+class ModelVisibilityKeywordsPayload(TypedDict):
+    model_id: str
+    keywords: list[str]
+
+
+class TerrainVisibilityContextPayload(TypedDict):
+    ruleset_descriptor_hash: str
+    los_cache_key: str
+    observer_model: ModelPayload
+    target_models: list[ModelPayload]
+    terrain_features: list[TerrainFeatureDefinitionPayload]
+    terrain_areas: list[TerrainVisibilityAreaPayload]
+    terrain_volumes: list[TerrainVolumePayload]
+    dynamic_model_blockers: list[ModelPayload]
+    observer_keywords: list[str]
+    target_model_keywords: list[ModelVisibilityKeywordsPayload]
+    terrain_visibility_policy: TerrainVisibilityPolicyDescriptorPayload
+
+
+class BenefitOfCoverResultPayload(TypedDict):
+    has_benefit: bool
+    cover_effect: str
+    source_feature_ids: list[str]
+    source_terrain_area_ids: list[str]
+    source_policy_kinds: list[str]
+    source_records: list[CoverSourceRecordPayload | TerrainAreaCoverSourceRecordPayload]
+    los_cache_key: str
+    target_unit_visible: bool
+    target_unit_fully_visible: bool
+    non_stacking: bool
+    ap_zero_save_bonus_excluded_for_save_3_plus_or_better: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -700,64 +744,18 @@ class LineOfSightWitness:
 
 
 @dataclass(frozen=True, slots=True)
-class CoverSourceRecord:
-    feature_id: str
-    feature_kind: TerrainFeatureKind
-    policy_kind: LineOfSightPolicy
-    reason: CoverSourceReason
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "feature_id",
-            _validate_identifier("CoverSourceRecord feature_id", self.feature_id),
-        )
-        object.__setattr__(
-            self,
-            "feature_kind",
-            _terrain_feature_kind_from_token_for_visibility(self.feature_kind),
-        )
-        object.__setattr__(
-            self,
-            "policy_kind",
-            _line_of_sight_policy_from_token_for_visibility(self.policy_kind),
-        )
-        object.__setattr__(
-            self,
-            "reason",
-            cover_source_reason_from_token(self.reason),
-        )
-
-    def to_payload(self) -> CoverSourceRecordPayload:
-        return {
-            "feature_id": self.feature_id,
-            "feature_kind": self.feature_kind.value,
-            "policy_kind": self.policy_kind.value,
-            "reason": self.reason.value,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: CoverSourceRecordPayload) -> Self:
-        return cls(
-            feature_id=payload["feature_id"],
-            feature_kind=_terrain_feature_kind_from_token_for_visibility(payload["feature_kind"]),
-            policy_kind=_line_of_sight_policy_from_token_for_visibility(payload["policy_kind"]),
-            reason=cover_source_reason_from_token(payload["reason"]),
-        )
-
-
-@dataclass(frozen=True, slots=True)
 class BenefitOfCoverResult:
     has_benefit: bool
     cover_effect: CoverEffect
     source_feature_ids: tuple[str, ...]
     source_policy_kinds: tuple[LineOfSightPolicy, ...]
-    source_records: tuple[CoverSourceRecord, ...]
+    source_records: tuple[CoverEvidenceRecord, ...]
     los_cache_key: str
     target_unit_visible: bool
     target_unit_fully_visible: bool
     non_stacking: bool
     ap_zero_save_bonus_excluded_for_save_3_plus_or_better: bool
+    source_terrain_area_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if type(self.has_benefit) is not bool:
@@ -775,6 +773,14 @@ class BenefitOfCoverResult:
                 self.source_feature_ids,
             ),
         )
+        object.__setattr__(
+            self,
+            "source_terrain_area_ids",
+            _validate_identifier_tuple(
+                "BenefitOfCoverResult source_terrain_area_ids",
+                self.source_terrain_area_ids,
+            ),
+        )
         if type(self.source_policy_kinds) is not tuple:
             raise GeometryError("BenefitOfCoverResult source_policy_kinds must be a tuple.")
         source_policy_kinds = tuple(
@@ -790,7 +796,7 @@ class BenefitOfCoverResult:
             "source_policy_kinds",
             tuple(sorted(source_policy_kinds, key=lambda policy: policy.value)),
         )
-        source_records = _validate_cover_source_record_tuple(
+        source_records = _validate_cover_source_records(
             "BenefitOfCoverResult source_records",
             self.source_records,
         )
@@ -811,22 +817,50 @@ class BenefitOfCoverResult:
                 "BenefitOfCoverResult ap_zero_save_bonus_excluded_for_save_3_plus_or_better "
                 "must be a bool."
             )
-        if self.has_benefit and not self.source_feature_ids:
-            raise GeometryError("BenefitOfCoverResult with benefit requires source_feature_ids.")
+        if self.has_benefit and not (self.source_feature_ids or self.source_terrain_area_ids):
+            raise GeometryError(
+                "BenefitOfCoverResult with benefit requires source_feature_ids or "
+                "source_terrain_area_ids."
+            )
         if self.has_benefit and not self.source_records:
             raise GeometryError("BenefitOfCoverResult with benefit requires source_records.")
         if not self.has_benefit and self.source_feature_ids:
             raise GeometryError(
                 "BenefitOfCoverResult without benefit must not include source_feature_ids."
             )
+        if not self.has_benefit and self.source_terrain_area_ids:
+            raise GeometryError(
+                "BenefitOfCoverResult without benefit must not include source_terrain_area_ids."
+            )
         if not self.has_benefit and self.source_records:
             raise GeometryError(
                 "BenefitOfCoverResult without benefit must not include source_records."
             )
-        record_feature_ids = tuple(sorted({record.feature_id for record in source_records}))
+        record_feature_ids = tuple(
+            sorted(
+                {
+                    record.feature_id
+                    for record in source_records
+                    if type(record) is CoverSourceRecord
+                }
+            )
+        )
         if self.source_feature_ids != record_feature_ids:
             raise GeometryError(
                 "BenefitOfCoverResult source_feature_ids must match source_records."
+            )
+        record_terrain_area_ids = tuple(
+            sorted(
+                {
+                    record.terrain_area_id
+                    for record in source_records
+                    if type(record) is TerrainAreaCoverSourceRecord
+                }
+            )
+        )
+        if self.source_terrain_area_ids != record_terrain_area_ids:
+            raise GeometryError(
+                "BenefitOfCoverResult source_terrain_area_ids must match source_records."
             )
         record_policy_kinds = tuple(
             sorted(
@@ -845,20 +879,34 @@ class BenefitOfCoverResult:
         *,
         witness: LineOfSightWitness,
         terrain_visibility_policy: TerrainVisibilityPolicyDescriptor,
-        source_records: tuple[CoverSourceRecord, ...],
+        source_records: tuple[CoverEvidenceRecord, ...],
     ) -> Self:
         if type(witness) is not LineOfSightWitness:
             raise GeometryError("Benefit of Cover requires a LineOfSightWitness.")
         if type(terrain_visibility_policy) is not TerrainVisibilityPolicyDescriptor:
             raise GeometryError("Benefit of Cover requires a TerrainVisibilityPolicyDescriptor.")
-        records = _validate_cover_source_record_tuple(
+        records = _validate_cover_source_records(
             "Benefit of Cover source_records",
             source_records,
         )
         cover_policy = terrain_visibility_policy.cover_policy
-        eligible_records: set[CoverSourceRecord] = set()
+        eligible_records: set[CoverEvidenceRecord] = set()
         cover_effects: set[CoverEffect] = set()
         for record in records:
+            if type(record) is TerrainAreaCoverSourceRecord:
+                if not cover_policy.grants_benefit_of_cover:
+                    continue
+                if (
+                    record.reason is CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_TERRAIN_AREA
+                    and cover_policy.requires_not_fully_visible
+                    and witness.unit_fully_visible
+                ):
+                    continue
+                eligible_records.add(record)
+                cover_effects.add(cover_policy.cover_effect)
+                continue
+            if type(record) is not CoverSourceRecord:
+                raise GeometryError("Unsupported typed cover source record.")
             feature_policy = _feature_visibility_policy(
                 terrain_visibility_policy,
                 record.feature_kind,
@@ -885,7 +933,24 @@ class BenefitOfCoverResult:
         return cls(
             has_benefit=has_benefit,
             cover_effect=cover_effect,
-            source_feature_ids=tuple(sorted({record.feature_id for record in sorted_records})),
+            source_feature_ids=tuple(
+                sorted(
+                    {
+                        record.feature_id
+                        for record in sorted_records
+                        if type(record) is CoverSourceRecord
+                    }
+                )
+            ),
+            source_terrain_area_ids=tuple(
+                sorted(
+                    {
+                        record.terrain_area_id
+                        for record in sorted_records
+                        if type(record) is TerrainAreaCoverSourceRecord
+                    }
+                )
+            ),
             source_policy_kinds=tuple(
                 sorted(
                     {record.policy_kind for record in sorted_records},
@@ -907,6 +972,7 @@ class BenefitOfCoverResult:
             "has_benefit": self.has_benefit,
             "cover_effect": self.cover_effect.value,
             "source_feature_ids": list(self.source_feature_ids),
+            "source_terrain_area_ids": list(self.source_terrain_area_ids),
             "source_policy_kinds": [policy.value for policy in self.source_policy_kinds],
             "source_records": [record.to_payload() for record in self.source_records],
             "los_cache_key": self.los_cache_key,
@@ -924,12 +990,13 @@ class BenefitOfCoverResult:
             has_benefit=payload["has_benefit"],
             cover_effect=_cover_effect_from_token_for_visibility(payload["cover_effect"]),
             source_feature_ids=tuple(payload["source_feature_ids"]),
+            source_terrain_area_ids=tuple(payload["source_terrain_area_ids"]),
             source_policy_kinds=tuple(
                 _line_of_sight_policy_from_token_for_visibility(policy)
                 for policy in payload["source_policy_kinds"]
             ),
             source_records=tuple(
-                CoverSourceRecord.from_payload(record) for record in payload["source_records"]
+                _cover_source_record_from_payload(record) for record in payload["source_records"]
             ),
             los_cache_key=payload["los_cache_key"],
             target_unit_visible=payload["target_unit_visible"],
@@ -948,11 +1015,12 @@ class TerrainVisibilityContext:
     terrain_visibility_policy: TerrainVisibilityPolicyDescriptor
     observer_model: Model
     target_models: tuple[Model, ...]
+    target_model_keywords: tuple[tuple[str, tuple[str, ...]], ...]
     terrain_features: tuple[TerrainFeatureDefinition, ...] = ()
+    terrain_areas: tuple[TerrainVisibilityArea, ...] = ()
     terrain_volumes: tuple[TerrainVolume, ...] = ()
     dynamic_model_blockers: tuple[Model, ...] = ()
     observer_keywords: tuple[str, ...] = ()
-    target_keywords: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -986,11 +1054,27 @@ class TerrainVisibilityContext:
         if any(target.model_id == observer_model.model_id for target in target_models):
             raise GeometryError("TerrainVisibilityContext target_models must not include observer.")
         object.__setattr__(self, "target_models", target_models)
+        object.__setattr__(
+            self,
+            "target_model_keywords",
+            _validate_target_model_keywords(
+                self.target_model_keywords,
+                target_model_ids=tuple(model.model_id for model in target_models),
+            ),
+        )
         terrain_features = _validate_terrain_feature_tuple(
             "TerrainVisibilityContext terrain_features",
             self.terrain_features,
         )
         object.__setattr__(self, "terrain_features", terrain_features)
+        object.__setattr__(
+            self,
+            "terrain_areas",
+            validate_terrain_visibility_areas(
+                "TerrainVisibilityContext terrain_areas",
+                self.terrain_areas,
+            ),
+        )
         terrain_volumes = self.terrain_volumes
         if not terrain_volumes:
             terrain_volumes = tuple(
@@ -1026,14 +1110,6 @@ class TerrainVisibilityContext:
                 self.observer_keywords,
             ),
         )
-        object.__setattr__(
-            self,
-            "target_keywords",
-            _validate_keyword_tuple(
-                "TerrainVisibilityContext target_keywords",
-                self.target_keywords,
-            ),
-        )
 
     @classmethod
     def from_ruleset_descriptor(
@@ -1043,11 +1119,12 @@ class TerrainVisibilityContext:
         los_cache_key: str,
         observer_model: Model,
         target_models: tuple[Model, ...],
+        target_model_keywords: tuple[tuple[str, tuple[str, ...]], ...],
         terrain_features: tuple[TerrainFeatureDefinition, ...] = (),
+        terrain_areas: tuple[TerrainVisibilityArea, ...] = (),
         terrain_volumes: tuple[TerrainVolume, ...] = (),
         dynamic_model_blockers: tuple[Model, ...] = (),
         observer_keywords: tuple[str, ...] = (),
-        target_keywords: tuple[str, ...] = (),
     ) -> Self:
         descriptor = _validate_ruleset_descriptor(ruleset_descriptor)
         return cls(
@@ -1056,16 +1133,25 @@ class TerrainVisibilityContext:
             terrain_visibility_policy=descriptor.terrain_visibility_policy,
             observer_model=observer_model,
             target_models=target_models,
+            target_model_keywords=target_model_keywords,
             terrain_features=terrain_features,
+            terrain_areas=terrain_areas,
             terrain_volumes=terrain_volumes,
             dynamic_model_blockers=dynamic_model_blockers,
             observer_keywords=observer_keywords,
-            target_keywords=target_keywords,
         )
 
     def resolve_line_of_sight(self) -> LineOfSightWitness:
+        terrain_area_feature_ids = feature_ids_associated_with_terrain_areas(
+            self.terrain_features,
+            self.terrain_areas,
+        )
         records = tuple(
-            self._resolve_model_line_of_sight(target_model) for target_model in self.target_models
+            self._resolve_model_line_of_sight(
+                target_model,
+                terrain_area_feature_ids=terrain_area_feature_ids,
+            )
+            for target_model in self.target_models
         )
         return LineOfSightWitness.from_records(
             ruleset_descriptor_hash=self.ruleset_descriptor_hash,
@@ -1099,10 +1185,14 @@ class TerrainVisibilityContext:
             "observer_model": self.observer_model.to_payload(),
             "target_models": [model.to_payload() for model in self.target_models],
             "terrain_features": [feature.to_payload() for feature in self.terrain_features],
+            "terrain_areas": [area.to_payload() for area in self.terrain_areas],
             "terrain_volumes": [volume.to_payload() for volume in self.terrain_volumes],
             "dynamic_model_blockers": [model.to_payload() for model in self.dynamic_model_blockers],
             "observer_keywords": list(self.observer_keywords),
-            "target_keywords": list(self.target_keywords),
+            "target_model_keywords": [
+                {"model_id": model_id, "keywords": list(keywords)}
+                for model_id, keywords in self.target_model_keywords
+            ],
             "terrain_visibility_policy": self.terrain_visibility_policy.to_payload(),
         }
 
@@ -1120,6 +1210,9 @@ class TerrainVisibilityContext:
                 TerrainFeatureDefinition.from_payload(feature)
                 for feature in payload["terrain_features"]
             ),
+            terrain_areas=tuple(
+                TerrainVisibilityArea.from_payload(area) for area in payload["terrain_areas"]
+            ),
             terrain_volumes=tuple(
                 terrain_volume_from_payload(volume) for volume in payload["terrain_volumes"]
             ),
@@ -1127,10 +1220,18 @@ class TerrainVisibilityContext:
                 Model.from_payload(model) for model in payload["dynamic_model_blockers"]
             ),
             observer_keywords=tuple(payload["observer_keywords"]),
-            target_keywords=tuple(payload["target_keywords"]),
+            target_model_keywords=tuple(
+                (row["model_id"], tuple(row["keywords"]))
+                for row in payload["target_model_keywords"]
+            ),
         )
 
-    def _resolve_model_line_of_sight(self, target_model: Model) -> ModelLineOfSightRecord:
+    def _resolve_model_line_of_sight(
+        self,
+        target_model: Model,
+        *,
+        terrain_area_feature_ids: frozenset[str],
+    ) -> ModelLineOfSightRecord:
         rays = _volume_sample_rays(self.observer_model, target_model)
         clear_ray_indices: list[int] = []
         blocker_records: list[VisibilityBlockerRecord] = []
@@ -1141,6 +1242,7 @@ class TerrainVisibilityContext:
                 ray_index=ray_index,
                 target_model=target_model,
                 volume_feature_index=volume_feature_index,
+                terrain_area_feature_ids=terrain_area_feature_ids,
             )
             blocker_records.extend(ray_blockers)
             if not any(record.blocks_model_visibility for record in ray_blockers):
@@ -1164,6 +1266,7 @@ class TerrainVisibilityContext:
         ray_index: int,
         target_model: Model,
         volume_feature_index: dict[str, TerrainFeatureDefinition],
+        terrain_area_feature_ids: frozenset[str],
     ) -> tuple[VisibilityBlockerRecord, ...]:
         physical_result = VisibilityQuery(
             rays=(ray,),
@@ -1197,55 +1300,89 @@ class TerrainVisibilityContext:
                 ray=ray,
                 ray_index=ray_index,
                 target_model=target_model,
+                terrain_area_feature_ids=terrain_area_feature_ids,
+            )
+        )
+        records.extend(
+            self._terrain_area_policy_records_for_ray(
+                ray=ray,
+                ray_index=ray_index,
+                target_model=target_model,
             )
         )
         return tuple(sorted(records, key=_visibility_blocker_record_sort_key))
 
-    def _cover_source_records(self, witness: LineOfSightWitness) -> tuple[CoverSourceRecord, ...]:
-        records: set[CoverSourceRecord] = set()
-        for feature in self.terrain_features:
-            feature_policy = _feature_visibility_policy(
-                self.terrain_visibility_policy,
-                feature.feature_kind,
+    def _cover_source_records(self, witness: LineOfSightWitness) -> tuple[CoverEvidenceRecord, ...]:
+        records: set[CoverEvidenceRecord] = set()
+        model_record_by_id = {record.target_model_id: record for record in witness.model_records}
+        area_keyword_gate = {
+            keyword.strip().upper().replace(" ", "_").replace("-", "_")
+            for keyword in self.terrain_visibility_policy.hidden_requires_keywords
+        }
+        for target_model in self.target_models:
+            model_records: set[CoverEvidenceRecord] = set()
+            model_keywords = set(self._keywords_for_target_model(target_model.model_id))
+            matching_areas = tuple(
+                area
+                for area in self.terrain_areas
+                if model_intersects_terrain_area(target_model, area)
             )
-            if not feature_policy.cover_policy.grants_benefit_of_cover:
-                continue
-            if any(
-                _model_footprint_wholly_within_feature(target_model, feature)
-                for target_model in self.target_models
-            ):
-                records.add(
-                    CoverSourceRecord(
-                        feature_id=feature.feature_id,
-                        feature_kind=feature.feature_kind,
-                        policy_kind=feature_policy.line_of_sight_policy,
-                        reason=CoverSourceReason.WHOLLY_WITHIN_FEATURE,
+            if not area_keyword_gate or area_keyword_gate.intersection(model_keywords):
+                model_records.update(
+                    TerrainAreaCoverSourceRecord(
+                        terrain_area_id=area.terrain_area_id,
+                        classification=area.classification,
+                        policy_kind=(
+                            LineOfSightPolicy.AREA_OBSCURING
+                            if classification_has_visibility_semantics(area.classification)
+                            else LineOfSightPolicy.TRUE_LINE_OF_SIGHT
+                        ),
+                        reason=CoverSourceReason.WITHIN_TERRAIN_AREA,
                     )
+                    for area in matching_areas
                 )
-
-        for blocker_record in witness.all_blocker_records():
-            if not blocker_record.blocks_full_visibility:
-                continue
-            if (
-                blocker_record.terrain_feature_id is None
-                or blocker_record.terrain_feature_kind is None
-            ):
-                continue
-            feature_policy = _feature_visibility_policy(
-                self.terrain_visibility_policy,
-                blocker_record.terrain_feature_kind,
-            )
-            if not feature_policy.cover_policy.grants_benefit_of_cover:
-                continue
-            records.add(
-                CoverSourceRecord(
-                    feature_id=blocker_record.terrain_feature_id,
-                    feature_kind=blocker_record.terrain_feature_kind,
-                    policy_kind=feature_policy.line_of_sight_policy,
-                    reason=CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_FEATURE,
-                )
-            )
+            for blocker_record in model_record_by_id[target_model.model_id].blocker_records:
+                if not blocker_record.blocks_full_visibility:
+                    continue
+                if (
+                    blocker_record.terrain_feature_id is not None
+                    and blocker_record.terrain_feature_kind is not None
+                ):
+                    feature_policy = _feature_visibility_policy(
+                        self.terrain_visibility_policy,
+                        blocker_record.terrain_feature_kind,
+                    )
+                    if feature_policy.cover_policy.grants_benefit_of_cover:
+                        model_records.add(
+                            CoverSourceRecord(
+                                feature_id=blocker_record.terrain_feature_id,
+                                feature_kind=blocker_record.terrain_feature_kind,
+                                policy_kind=feature_policy.line_of_sight_policy,
+                                reason=(CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_FEATURE),
+                            )
+                        )
+                if (
+                    blocker_record.terrain_area_id is not None
+                    and blocker_record.terrain_area_classification is not None
+                ):
+                    model_records.add(
+                        TerrainAreaCoverSourceRecord(
+                            terrain_area_id=blocker_record.terrain_area_id,
+                            classification=blocker_record.terrain_area_classification,
+                            policy_kind=blocker_record.line_of_sight_policy,
+                            reason=(CoverSourceReason.NOT_FULLY_VISIBLE_BECAUSE_OF_TERRAIN_AREA),
+                        )
+                    )
+            if not model_records:
+                return ()
+            records.update(model_records)
         return tuple(sorted(records, key=_cover_source_record_sort_key))
+
+    def _keywords_for_target_model(self, model_id: str) -> tuple[str, ...]:
+        for target_model_id, keywords in self.target_model_keywords:
+            if target_model_id == model_id:
+                return keywords
+        raise GeometryError("Target model keyword context is incomplete.")
 
     def _terrain_feature_policy_records_for_ray(
         self,
@@ -1253,9 +1390,12 @@ class TerrainVisibilityContext:
         ray: VisibilityRay,
         ray_index: int,
         target_model: Model,
+        terrain_area_feature_ids: frozenset[str],
     ) -> tuple[VisibilityBlockerRecord, ...]:
         records: list[VisibilityBlockerRecord] = []
         for feature in self.terrain_features:
+            if feature.feature_id in terrain_area_feature_ids:
+                continue
             policy = _feature_visibility_policy(
                 self.terrain_visibility_policy,
                 feature.feature_kind,
@@ -1273,7 +1413,7 @@ class TerrainVisibilityContext:
                 observer_model=self.observer_model,
                 target_model=target_model,
                 observer_keywords=self.observer_keywords,
-                target_keywords=self.target_keywords,
+                target_keywords=self._keywords_for_target_model(target_model.model_id),
             )
             records.append(
                 VisibilityBlockerRecord(
@@ -1298,110 +1438,42 @@ class TerrainVisibilityContext:
             )
         return tuple(sorted(records, key=_visibility_blocker_record_sort_key))
 
-
-@dataclass(frozen=True, slots=True)
-class VisibilityResult:
-    has_line_of_sight: bool
-    checked_ray_count: int
-    clear_ray_index: int | None
-    blocking_terrain_ids: tuple[str, ...] = ()
-    blocking_model_ids: tuple[str, ...] = ()
-    checked_terrain_ids: tuple[str, ...] = ()
-    checked_model_ids: tuple[str, ...] = ()
-    metrics: VisibilityMetrics = field(default_factory=VisibilityMetrics)
-
-    def __post_init__(self) -> None:
-        if type(self.has_line_of_sight) is not bool:
-            raise GeometryError("VisibilityResult has_line_of_sight must be a bool.")
-        if type(self.checked_ray_count) is not int or self.checked_ray_count < 1:
-            raise GeometryError("VisibilityResult checked_ray_count must be a positive integer.")
-        if self.clear_ray_index is not None:
-            if type(self.clear_ray_index) is not int:
-                raise GeometryError("VisibilityResult clear_ray_index must be an integer.")
-            if self.clear_ray_index < 0 or self.clear_ray_index >= self.checked_ray_count:
-                raise GeometryError("VisibilityResult clear_ray_index is outside checked rays.")
-        if self.has_line_of_sight and self.clear_ray_index is None:
-            raise GeometryError("Visible VisibilityResult must include clear_ray_index.")
-        if not self.has_line_of_sight and self.clear_ray_index is not None:
-            raise GeometryError("Blocked VisibilityResult must not include clear_ray_index.")
-
-        object.__setattr__(
-            self,
-            "blocking_terrain_ids",
-            _validate_identifier_tuple(
-                "VisibilityResult blocking_terrain_ids", self.blocking_terrain_ids
-            ),
-        )
-        object.__setattr__(
-            self,
-            "blocking_model_ids",
-            _validate_identifier_tuple(
-                "VisibilityResult blocking_model_ids", self.blocking_model_ids
-            ),
-        )
-        object.__setattr__(
-            self,
-            "checked_terrain_ids",
-            _validate_identifier_tuple(
-                "VisibilityResult checked_terrain_ids", self.checked_terrain_ids
-            ),
-        )
-        object.__setattr__(
-            self,
-            "checked_model_ids",
-            _validate_identifier_tuple(
-                "VisibilityResult checked_model_ids", self.checked_model_ids
-            ),
-        )
-        if type(self.metrics) is not VisibilityMetrics:
-            raise GeometryError("VisibilityResult metrics must be VisibilityMetrics.")
-
-    def to_payload(self) -> VisibilityResultPayload:
-        return {
-            "has_line_of_sight": self.has_line_of_sight,
-            "checked_ray_count": self.checked_ray_count,
-            "clear_ray_index": self.clear_ray_index,
-            "blocking_terrain_ids": list(self.blocking_terrain_ids),
-            "blocking_model_ids": list(self.blocking_model_ids),
-            "checked_terrain_ids": list(self.checked_terrain_ids),
-            "checked_model_ids": list(self.checked_model_ids),
-            "metrics": self.metrics.to_payload(),
-        }
-
-    @classmethod
-    def from_payload(cls, payload: VisibilityResultPayload) -> Self:
-        return cls(
-            has_line_of_sight=payload["has_line_of_sight"],
-            checked_ray_count=payload["checked_ray_count"],
-            clear_ray_index=payload["clear_ray_index"],
-            blocking_terrain_ids=tuple(payload["blocking_terrain_ids"]),
-            blocking_model_ids=tuple(payload["blocking_model_ids"]),
-            checked_terrain_ids=tuple(payload["checked_terrain_ids"]),
-            checked_model_ids=tuple(payload["checked_model_ids"]),
-            metrics=VisibilityMetrics.from_payload(payload["metrics"]),
-        )
-
-
-def visibility_blocker_kind_from_token(token: object) -> VisibilityBlockerKind:
-    if type(token) is VisibilityBlockerKind:
-        return token
-    if type(token) is not str:
-        raise GeometryError("VisibilityBlockerKind token must be a string.")
-    try:
-        return VisibilityBlockerKind(token)
-    except ValueError as exc:
-        raise GeometryError(f"Unsupported VisibilityBlockerKind token: {token}.") from exc
-
-
-def cover_source_reason_from_token(token: object) -> CoverSourceReason:
-    if type(token) is CoverSourceReason:
-        return token
-    if type(token) is not str:
-        raise GeometryError("CoverSourceReason token must be a string.")
-    try:
-        return CoverSourceReason(token)
-    except ValueError as exc:
-        raise GeometryError(f"Unsupported CoverSourceReason token: {token}.") from exc
+    def _terrain_area_policy_records_for_ray(
+        self,
+        *,
+        ray: VisibilityRay,
+        ray_index: int,
+        target_model: Model,
+    ) -> tuple[VisibilityBlockerRecord, ...]:
+        records: list[VisibilityBlockerRecord] = []
+        for area in self.terrain_areas:
+            if not classification_has_visibility_semantics(area.classification):
+                continue
+            if not ray_intersects_terrain_area(ray[0], ray[1], area):
+                continue
+            observer_intersects = model_intersects_terrain_area(self.observer_model, area)
+            target_intersects = model_intersects_terrain_area(target_model, area)
+            exception: str | None = None
+            if observer_intersects and target_intersects:
+                exception = "observer_and_target_intersect_area"
+            elif observer_intersects:
+                exception = "observer_intersects_area"
+            elif target_intersects:
+                exception = "target_intersects_area"
+            records.append(
+                VisibilityBlockerRecord(
+                    blocker_kind=VisibilityBlockerKind.TERRAIN_AREA,
+                    blocker_id=area.terrain_area_id,
+                    ray_index=ray_index,
+                    terrain_area_id=area.terrain_area_id,
+                    terrain_area_classification=area.classification,
+                    line_of_sight_policy=LineOfSightPolicy.AREA_OBSCURING,
+                    blocks_model_visibility=exception is None,
+                    blocks_full_visibility=exception is None,
+                    exception_applied=exception,
+                )
+            )
+        return tuple(sorted(records, key=_visibility_blocker_record_sort_key))
 
 
 def _cover_effect_from_token_for_visibility(token: object) -> CoverEffect:
@@ -1425,6 +1497,15 @@ def _terrain_feature_kind_from_token_for_visibility(token: object) -> TerrainFea
         raise GeometryError("Unsupported TerrainFeatureKind token.") from exc
 
 
+def _terrain_area_classification_from_token_for_visibility(
+    token: object,
+) -> TerrainAreaClassification:
+    try:
+        return terrain_area_classification_from_token(token)
+    except TerrainClassificationError as exc:
+        raise GeometryError("Unsupported TerrainAreaClassification token.") from exc
+
+
 def _feature_visibility_policy(
     terrain_visibility_policy: TerrainVisibilityPolicyDescriptor,
     terrain_feature_kind: TerrainFeatureKind,
@@ -1439,19 +1520,6 @@ def _validate_ruleset_descriptor(value: object) -> RulesetDescriptor:
     if type(value) is not RulesetDescriptor:
         raise GeometryError("Terrain visibility requires an explicit RulesetDescriptor.")
     return value
-
-
-def _validate_ray(value: object) -> VisibilityRay:
-    if type(value) is not tuple:
-        raise GeometryError("VisibilityQuery rays must contain Point3 pairs.")
-    ray = cast(tuple[object, object], value)
-    if len(ray) != 2:
-        raise GeometryError("VisibilityQuery rays must contain Point3 pairs.")
-    start, end = ray
-    return (
-        validate_point3("VisibilityQuery ray start", start),
-        validate_point3("VisibilityQuery ray end", end),
-    )
 
 
 def _validate_terrain(field_name: str, value: object) -> TerrainVolume:
@@ -1580,6 +1648,31 @@ def _validate_keyword_tuple(field_name: str, values: object) -> tuple[str, ...]:
     return tuple(sorted(keywords))
 
 
+def _validate_target_model_keywords(
+    values: object,
+    *,
+    target_model_ids: tuple[str, ...],
+) -> tuple[tuple[str, tuple[str, ...]], ...]:
+    if type(values) is not tuple:
+        raise GeometryError("TerrainVisibilityContext target_model_keywords must be a tuple.")
+    rows: list[tuple[str, tuple[str, ...]]] = []
+    seen: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not tuple:
+            raise GeometryError("Target model keyword rows must be (model_id, keywords) tuples.")
+        row = cast(tuple[object, ...], value)
+        if len(row) != 2:
+            raise GeometryError("Target model keyword rows must be (model_id, keywords) tuples.")
+        model_id = _validate_identifier("Target model keyword model_id", row[0])
+        if model_id in seen:
+            raise GeometryError("Target model keyword rows must not duplicate model IDs.")
+        seen.add(model_id)
+        rows.append((model_id, _validate_keyword_tuple("Target model keyword keywords", row[1])))
+    if seen != set(target_model_ids):
+        raise GeometryError("Target model keyword rows must exactly match target_models.")
+    return tuple(sorted(rows))
+
+
 def _validate_ray_index_tuple(
     field_name: str,
     values: object,
@@ -1626,30 +1719,6 @@ def _validate_blocker_record_tuple(
         seen.add(key)
         records.append(value)
     return tuple(sorted(records, key=_visibility_blocker_record_sort_key))
-
-
-def _validate_cover_source_record_tuple(
-    field_name: str,
-    values: object,
-) -> tuple[CoverSourceRecord, ...]:
-    if type(values) is not tuple:
-        raise GeometryError(f"{field_name} must be a tuple.")
-    records: list[CoverSourceRecord] = []
-    seen: set[tuple[str, str, str, str]] = set()
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not CoverSourceRecord:
-            raise GeometryError(f"{field_name} must contain CoverSourceRecord values.")
-        key = (
-            value.feature_id,
-            value.feature_kind.value,
-            value.policy_kind.value,
-            value.reason.value,
-        )
-        if key in seen:
-            raise GeometryError(f"{field_name} must not contain duplicate records.")
-        seen.add(key)
-        records.append(value)
-    return tuple(sorted(records, key=_cover_source_record_sort_key))
 
 
 def _validate_model_los_record_tuple(
@@ -1719,17 +1788,6 @@ def _visibility_blocker_record_sort_key(
         record.blocker_kind.value,
         record.blocker_id,
         record.exception_applied,
-    )
-
-
-def _cover_source_record_sort_key(
-    record: CoverSourceRecord,
-) -> tuple[str, str, str, str]:
-    return (
-        record.feature_id,
-        record.feature_kind.value,
-        record.policy_kind.value,
-        record.reason.value,
     )
 
 
@@ -1804,10 +1862,10 @@ def _model_footprint_intersects_feature(
     valid_model = _validate_model("model", model)
     if type(feature) is not TerrainFeatureDefinition:
         raise GeometryError("feature must be a TerrainFeatureDefinition.")
-    return shapely_backend.base_footprint_intersects_bounds(
+    return shapely_backend.base_footprint_intersects_polygon(
         valid_model.base,
         valid_model.pose,
-        feature.bounds(),
+        feature.rules_footprint_points(),
     )
 
 
@@ -1820,10 +1878,10 @@ def _model_footprint_wholly_within_feature(
         raise GeometryError("feature must be a TerrainFeatureDefinition.")
     if not _model_footprint_intersects_feature(valid_model, feature):
         return False
-    return shapely_backend.base_footprint_within_bounds(
+    return shapely_backend.base_footprint_within_polygon(
         valid_model.base,
         valid_model.pose,
-        feature.bounds(),
+        feature.rules_footprint_points(),
     )
 
 
@@ -1833,90 +1891,8 @@ def _ray_crosses_feature_footprint_between_observer_and_target(
 ) -> bool:
     if type(feature) is not TerrainFeatureDefinition:
         raise GeometryError("feature must be a TerrainFeatureDefinition.")
-    return _segment_intersects_bounds(ray, feature.bounds())
-
-
-def _segment_intersects_bounds(
-    ray: VisibilityRay,
-    bounds: tuple[float, float, float, float],
-) -> bool:
-    start, end = ray
-    min_x, min_y, max_x, max_y = bounds
-    dx = end.x - start.x
-    dy = end.y - start.y
-    start_t = 0.0
-    end_t = 1.0
-
-    for edge_delta, edge_distance in (
-        (-dx, start.x - min_x),
-        (dx, max_x - start.x),
-        (-dy, start.y - min_y),
-        (dy, max_y - start.y),
-    ):
-        if edge_delta == 0.0:
-            if edge_distance < 0.0:
-                return False
-            continue
-        edge_t = edge_distance / edge_delta
-        if edge_delta < 0.0:
-            if edge_t > end_t:
-                return False
-            start_t = max(start_t, edge_t)
-        else:
-            if edge_t < start_t:
-                return False
-            end_t = min(end_t, edge_t)
-    return True
-
-
-def _terrain_broad_phase_intersects(ray: VisibilityRay, terrain: TerrainVolume) -> bool:
-    start, end = ray
-    return _bounds_overlap(
-        _segment_bounds(start, end), (*terrain.horizontal_bounds(), *terrain.vertical_interval())
-    )
-
-
-def _model_broad_phase_intersects(ray: VisibilityRay, model: Model) -> bool:
-    radius = model.base.max_radius()
-    model_bounds = (
-        model.pose.position.x - radius,
-        model.pose.position.y - radius,
-        model.pose.position.x + radius,
-        model.pose.position.y + radius,
-        *model.volume.vertical_interval(model.pose),
-    )
-    return _bounds_overlap(_segment_bounds(ray[0], ray[1]), model_bounds)
-
-
-def _segment_bounds(start: Point3, end: Point3) -> tuple[float, float, float, float, float, float]:
-    return (
-        min(start.x, end.x),
-        min(start.y, end.y),
-        max(start.x, end.x),
-        max(start.y, end.y),
-        min(start.z, end.z),
-        max(start.z, end.z),
-    )
-
-
-def _bounds_overlap(
-    segment_bounds: tuple[float, float, float, float, float, float],
-    obstacle_bounds: tuple[float, float, float, float, float, float],
-) -> bool:
-    min_x, min_y, max_x, max_y, min_z, max_z = segment_bounds
-    (
-        obstacle_min_x,
-        obstacle_min_y,
-        obstacle_max_x,
-        obstacle_max_y,
-        obstacle_min_z,
-        obstacle_max_z,
-    ) = obstacle_bounds
-    return (
-        max_x >= obstacle_min_x
-        and min_x <= obstacle_max_x
-        and max_y >= obstacle_min_y
-        and min_y <= obstacle_max_y
-        and max_z >= obstacle_min_z
-        and min_z <= obstacle_max_z
+    return shapely_backend.segment_intersects_polygon(
+        ray[0],
+        ray[1],
+        feature.rules_footprint_points(),
     )

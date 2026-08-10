@@ -810,7 +810,7 @@
           "marker_diameter_inches": 1.5748031496062993,
           "measurement_anchor": "center",
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-left-home",
-          "objective_role": "home",
+          "objective_role": "attacker_home",
           "position": {
             "x_inches": 9.5,
             "y_inches": 10.5,
@@ -836,7 +836,7 @@
           "marker_diameter_inches": 1.5748031496062993,
           "measurement_anchor": "center",
           "objective_id": "take-and-hold-vs-purge-the-foe-layout-3-right-home",
-          "objective_role": "home",
+          "objective_role": "defender_home",
           "position": {
             "x_inches": 52.5,
             "y_inches": 34.5,
@@ -861,7 +861,7 @@
       "terrain_areas_by_id": {},
       "terrain_features_by_id": {}
     },
-    "authoritative_geometry_hash": "02437317968af9b0086bbdd299267ae39f06c88c57a9c3ede7acacbdab8c7435",
+    "authoritative_geometry_hash": "3be909ad72d8b91d0f2972e1df470da2170c8abc09f15c46c3684a68305bc8d8",
     "battlefield_id": "ui-contract-visible-modifier:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
     "bounds": {
       "max_x_inches": 60.0,
@@ -888,7 +888,7 @@
       "hints_by_entity_id": {},
       "hit_regions_by_entity_id": {}
     },
-    "schema_version": "battlefield-view-v1"
+    "schema_version": "battlefield-view-v2-phase17n"
   },
   "current_battle_phase": "movement",
   "current_setup_step": null,
@@ -986,7 +986,7 @@
         "measurement_anchor": "center",
         "name": "Left Home Objective",
         "objective_marker_id": "take-and-hold-vs-purge-the-foe-layout-3-left-home",
-        "objective_role": "home",
+        "objective_role": "attacker_home",
         "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-left-home",
         "x_inches": 9.5,
         "y_inches": 10.5,
@@ -1014,7 +1014,7 @@
         "measurement_anchor": "center",
         "name": "Right Home Objective",
         "objective_marker_id": "take-and-hold-vs-purge-the-foe-layout-3-right-home",
-        "objective_role": "home",
+        "objective_role": "defender_home",
         "source_id": "gw-11e-chapter-approved-2026-27:battlefield-layout:take-and-hold-vs-purge-the-foe-layout-3:objective:take-and-hold-vs-purge-the-foe-layout-3-right-home",
         "x_inches": 52.5,
         "y_inches": 34.5,
@@ -3660,8 +3660,27 @@
     "player-a",
     "player-b"
   ],
-  "projection_schema": "game-view-v6-interaction",
-  "projection_state_hash": "67aff63d7fbdd4e9da8caa94b5c79a00b4fe4b2a487d8ecf8cbad9a5e01d2b51",
+  "primary_unit_terrain_turn_start_snapshots": [
+    {
+      "active_player_id": "player-a",
+      "battle_round": 1,
+      "game_id": "ui-contract-visible-modifier",
+      "snapshot_id": "primary-unit-terrain-turn-start:ui-contract-visible-modifier:round-01:player-a",
+      "source_id": "ui-contract-visible-modifier:primary-unit-terrain-turn-start:round-01:player-a",
+      "unit_memberships": [
+        {
+          "terrain_feature_ids": [],
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
+        },
+        {
+          "terrain_feature_ids": [],
+          "unit_instance_id": "army-beta:intercessor-unit-2"
+        }
+      ]
+    }
+  ],
+  "projection_schema": "game-view-v7-phase17n",
+  "projection_state_hash": "2ea0de404c886ad2e1379b7944c6f79b6e61c7853ccfd6dc25c56a16653ac37f",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

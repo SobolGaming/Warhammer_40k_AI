@@ -9,6 +9,11 @@ from tests.movement_submission_helpers import (
     straight_line_witness_for_unit,
     submit_action_and_movement_proposal,
 )
+from tests.phase13b_shooting_declaration_helpers import (
+    _attack_pool_for_test,
+    _first_weapon_profile,
+    _fixed_roll_result,
+)
 from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
@@ -22,13 +27,14 @@ from warhammer40k_core.core.deployment_zones import (
     DeploymentZoneShape,
 )
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
-from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
+from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
     RulesetDescriptor,
     TerrainFeatureKind,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+from warhammer40k_core.core.weapon_profiles import DamageProfile
 from warhammer40k_core.engine.actions import (
     MissionActionState,
     MissionActionStatus,
@@ -38,6 +44,15 @@ from warhammer40k_core.engine.actions import (
     mission_action_status_from_token,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.attack_sequence import (
+    AttackSequence,
+    resolve_attack_sequence_until_blocked,
+)
+from warhammer40k_core.engine.attack_sequence_model import (
+    attack_sequence_hit_roll_spec,
+    attack_sequence_wound_roll_spec,
+)
+from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battle_shock import (
     BattleShockResult,
     BattleShockTestReason,
@@ -48,6 +63,7 @@ from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     BattlefieldTransitionBatch,
     ModelDisplacementKind,
+    ModelPlacement,
     UnitPlacement,
 )
 from warhammer40k_core.engine.command_points import (
@@ -56,7 +72,10 @@ from warhammer40k_core.engine.command_points import (
 )
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionRequest
+from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
+    DecisionRequest,
+)
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.game_state import (
@@ -112,6 +131,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
+    PlaceholderPhaseHandler,
 )
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
@@ -133,11 +153,30 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseState,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_scoring_conditions import (
+    PrimaryUnitDestructionEvidence,
+    cross_turn_destruction_comparison_evidence,
+    opponent_home_control_evidence,
+)
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    PrimaryUnitTerrainTurnStartSnapshot,
+)
+from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+    record_primary_unit_destructions_for_destroyed_models,
+)
 from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
     ReserveState,
     ReserveStatus,
+)
+from warhammer40k_core.engine.return_on_death import (
+    SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+    PendingReturnOnDeath,
+    ReturnDestroyedTargetScope,
+    ReturnRestoreWoundsMode,
+    apply_return_on_death_placement_decision,
+    build_return_on_death_placement_request,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked
 from warhammer40k_core.engine.runtime_modifiers import (
@@ -145,12 +184,14 @@ from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
     RuntimeModifierRegistry,
 )
+from warhammer40k_core.engine.saves import SaveKind, saving_throw_roll_spec
 from warhammer40k_core.engine.scoring import (
     MissionScoringPolicy,
     PrimaryMissionScoringRule,
     PrimaryObjectiveTurnStartState,
     PrimaryTerrainTrapState,
     PrimaryUnitDestructionState,
+    PrimaryUnitDestructionStatePayload,
     SecondaryDestroyedModelState,
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
@@ -170,6 +211,7 @@ from warhammer40k_core.engine.scoring import (
     victory_point_source_kind_from_token,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
+from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     STRATAGEM_DECISION_TYPE,
@@ -188,6 +230,10 @@ from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
+)
+from warhammer40k_core.engine.weapon_abilities import (
+    FIRE_OVERWATCH_RULE_ID,
+    SNAP_SHOOTING_RULE_ID,
 )
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
@@ -322,10 +368,13 @@ def test_unstoppable_force_scores_kills_new_objectives_and_end_battle_central_co
         unit_instance_id="army-alpha:intercessor-unit-1",
         target_suffix="center",
     )
+    _remove_unit_for_primary_destruction(
+        turn_state,
+        unit_instance_id="army-beta:intercessor-unit-3",
+    )
     turn_state.record_primary_unit_destruction(
         destroying_player_id="player-a",
         destroyed_unit_instance_id="army-beta:intercessor-unit-3",
-        started_turn_terrain_feature_ids=(),
         source_id="phase16:unstoppable-force:enemy-destroyed",
     )
     turn_state.battle_phase_index = turn_state.battle_phase_sequence.index(BattlePhase.FIGHT)
@@ -394,18 +443,29 @@ def test_unstoppable_force_scores_kills_new_objectives_and_end_battle_central_co
 
 def test_death_trap_booby_trap_action_tracks_and_scores_trapped_objective_terrain() -> None:
     feature_id = SCORING_TERRAIN_FEATURE_ID
-    lifecycle = _battle_lifecycle_for_primary(
+    config = _config_for_primary(
         "primary-death-trap",
         objective_terrain_feature_id=feature_id,
     )
-    state = lifecycle.state
-    assert state is not None
-    assert state.mission_setup is not None
     feature = next(
         feature
-        for feature in state.mission_setup.terrain_features
+        for feature in cast(MissionSetup, config.mission_setup).terrain_features
         if feature.feature_id == feature_id
     )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        turn_start_unit_positions=(
+            (
+                "army-beta:intercessor-unit-3",
+                feature.footprint_center_x_inches,
+                feature.footprint_center_y_inches - 3.5,
+            ),
+        ),
+    )
+    state = lifecycle.state
+    assert state is not None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     _place_unit_near_point(
         state,
@@ -443,10 +503,13 @@ def test_death_trap_booby_trap_action_tracks_and_scores_trapped_objective_terrai
     assert trap_state.terrain_feature_id == feature_id
     assert trap_state.is_objective is True
 
+    _remove_unit_for_primary_destruction(
+        state,
+        unit_instance_id="army-beta:intercessor-unit-3",
+    )
     state.record_primary_unit_destruction(
         destroying_player_id="player-a",
         destroyed_unit_instance_id="army-beta:intercessor-unit-3",
-        started_turn_terrain_feature_ids=(feature_id,),
         source_id="phase16:death-trap:enemy-destroyed-in-trapped-terrain",
     )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
@@ -464,30 +527,1180 @@ def test_death_trap_booby_trap_action_tracks_and_scores_trapped_objective_terrai
     ]
 
 
-def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
+@pytest.mark.parametrize(
+    ("starts_inside", "expected_victory_points"),
+    [
+        pytest.param(True, 8, id="start-inside-move-out"),
+        pytest.param(False, 5, id="start-outside-move-in"),
+    ],
+)
+def test_death_trap_scores_authoritative_turn_start_terrain_membership(
+    starts_inside: bool,
+    expected_victory_points: int,
+) -> None:
     feature_id = SCORING_TERRAIN_FEATURE_ID
+    config = _config_for_primary(
+        "primary-death-trap",
+        objective_terrain_feature_id=feature_id,
+    )
+    feature = _terrain_feature_by_id(cast(MissionSetup, config.mission_setup), feature_id)
+    enemy_unit_id = "army-beta:intercessor-unit-3"
+    inside = (feature.footprint_center_x_inches, feature.footprint_center_y_inches)
+    outside = (5.0, 5.0)
+    start = inside if starts_inside else outside
     state = _battle_state_from_config(
-        _config_for_primary(
-            "primary-death-trap",
-            objective_terrain_feature_id=feature_id,
+        config,
+        turn_start_unit_positions=((enemy_unit_id, *start),),
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    state.record_primary_terrain_trap(
+        player_id="player-a",
+        terrain_feature_id=feature_id,
+        action_id=f"mission-action:death-trap-turn-start-{starts_inside}",
+        phase=BattlePhase.SHOOTING,
+        source_id="phase17n:death-trap:turn-start-membership",
+    )
+
+    end = outside if starts_inside else inside
+    _place_unit_near_point(
+        state,
+        unit_instance_id=enemy_unit_id,
+        x_inches=end[0],
+        y_inches=end[1],
+    )
+    enemy_unit = state.army_definitions[1].unit_by_id(enemy_unit_id)
+    destroyed_model_ids = tuple(model.model_instance_id for model in enemy_unit.own_models)
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models(destroyed_model_ids)
+    )
+    (destruction,) = record_primary_unit_destructions_for_destroyed_models(
+        state=state,
+        destroyed_model_instance_ids=destroyed_model_ids,
+        destroying_player_id="player-a",
+        source_id="phase17n:death-trap:runtime-destruction",
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+
+    state.advance_to_next_battle_phase()
+
+    assert destruction.started_turn_terrain_feature_ids == ((feature_id,) if starts_inside else ())
+    assert state.victory_point_total("player-a") == expected_victory_points
+    scored_rule_ids = tuple(
+        cast(str, _transaction_metadata(transaction)["scoring_rule_id"])
+        for transaction in state.victory_point_ledger_for_player("player-a").transactions
+    )
+    assert ("death-trap-destroyed-in-trapped-terrain-turn-end" in scored_rule_ids) is starts_inside
+
+
+def test_turn_start_terrain_snapshot_keeps_attached_physical_components_separate() -> None:
+    feature_id = SCORING_TERRAIN_FEATURE_ID
+    mission_setup = _mission_setup_for_primary(
+        "primary-death-trap",
+        objective_terrain_feature_id=feature_id,
+    )
+    config = replace(
+        _config_with_player_a_attached_unit(),
+        mission_setup=mission_setup,
+    )
+    feature = _terrain_feature_by_id(mission_setup, feature_id)
+    bodyguard_id = "army-alpha:bodyguard-unit"
+    leader_id = "army-alpha:leader-unit"
+    state = _battle_state_from_config(
+        config,
+        turn_start_unit_positions=(
+            (
+                bodyguard_id,
+                feature.footprint_center_x_inches,
+                feature.footprint_center_y_inches,
+            ),
+            (leader_id, 5.0, 5.0),
+        ),
+    )
+
+    snapshot = state.primary_unit_terrain_turn_start_snapshots[0]
+    assert snapshot.membership_for_unit(bodyguard_id).terrain_feature_ids == (feature_id,)
+    assert snapshot.membership_for_unit(leader_id).terrain_feature_ids == ()
+
+    bodyguard = state.army_definitions[0].unit_by_id(bodyguard_id)
+    destroyed_model_ids = tuple(model.model_instance_id for model in bodyguard.own_models)
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models(destroyed_model_ids)
+    )
+    (destruction,) = record_primary_unit_destructions_for_destroyed_models(
+        state=state,
+        destroyed_model_instance_ids=destroyed_model_ids,
+        destroying_player_id="player-b",
+        source_id="phase17n:death-trap:attached-bodyguard-destruction",
+    )
+
+    assert destruction.destroyed_unit_instance_id == bodyguard_id
+    assert destruction.started_turn_terrain_feature_ids == (feature_id,)
+
+
+def test_turn_start_terrain_snapshot_redacts_unplaced_opponent_unit_identity() -> None:
+    config = _config_for_primary(
+        "primary-death-trap",
+        objective_terrain_feature_id=SCORING_TERRAIN_FEATURE_ID,
+    )
+    reserve_unit_id = "army-beta:intercessor-unit-3"
+    state = _battle_state_from_config(
+        config,
+        turn_start_unplaced_unit_ids=(reserve_unit_id,),
+    )
+    snapshot = state.primary_unit_terrain_turn_start_snapshots[0]
+    session = LocalGameSession()
+    session.start(config)
+    session.lifecycle.state = state
+
+    player_payload = session.view(viewer_player_id="player-a")
+    opponent_payload = session.view(viewer_player_id="player-b")
+    assert snapshot.membership_for_unit(reserve_unit_id).terrain_feature_ids == ()
+    player_snapshot = player_payload["primary_unit_terrain_turn_start_snapshots"][0]
+    opponent_snapshot = opponent_payload["primary_unit_terrain_turn_start_snapshots"][0]
+    player_memberships = player_snapshot["unit_memberships"]
+    opponent_memberships = opponent_snapshot["unit_memberships"]
+    assert all(
+        membership["unit_instance_id"] != reserve_unit_id for membership in player_memberships
+    )
+    assert any(
+        membership["unit_instance_id"] == reserve_unit_id for membership in opponent_memberships
+    )
+    assert opponent_snapshot == snapshot.to_payload()
+    assert player_snapshot["snapshot_id"] == opponent_snapshot["snapshot_id"]
+    assert player_snapshot["game_id"] == opponent_snapshot["game_id"]
+    assert player_snapshot["active_player_id"] == opponent_snapshot["active_player_id"]
+    assert player_snapshot["battle_round"] == opponent_snapshot["battle_round"]
+    assert player_snapshot["source_id"] == opponent_snapshot["source_id"]
+    assert set(player_payload["unit_display_by_id"]) == {
+        membership["unit_instance_id"] for membership in player_memberships
+    }
+    assert set(opponent_payload["unit_display_by_id"]) == {
+        membership["unit_instance_id"] for membership in opponent_memberships
+    }
+    assert reserve_unit_id not in json.dumps(
+        player_payload["primary_unit_terrain_turn_start_snapshots"],
+        sort_keys=True,
+    )
+    assert json.loads(json.dumps(player_payload, sort_keys=True)) == player_payload
+
+
+def test_turn_start_terrain_snapshot_participates_in_projection_hash() -> None:
+    config = _config_for_primary(
+        "primary-death-trap",
+        objective_terrain_feature_id=SCORING_TERRAIN_FEATURE_ID,
+    )
+    feature = _terrain_feature_by_id(
+        cast(MissionSetup, config.mission_setup),
+        SCORING_TERRAIN_FEATURE_ID,
+    )
+    unit_id = "army-beta:intercessor-unit-3"
+    outside = (5.0, 5.0)
+    started_inside = _battle_state_from_config(
+        config,
+        turn_start_unit_positions=(
+            (
+                unit_id,
+                feature.footprint_center_x_inches,
+                feature.footprint_center_y_inches,
+            ),
+        ),
+    )
+    _place_unit_near_point(
+        started_inside,
+        unit_instance_id=unit_id,
+        x_inches=outside[0],
+        y_inches=outside[1],
+    )
+    started_outside = _battle_state_from_config(
+        config,
+        turn_start_unit_positions=((unit_id, *outside),),
+    )
+    assert started_inside.battlefield_state == started_outside.battlefield_state
+
+    inside_session = LocalGameSession()
+    inside_session.start(config)
+    inside_session.lifecycle.state = started_inside
+    outside_session = LocalGameSession()
+    outside_session.start(config)
+    outside_session.lifecycle.state = started_outside
+    inside_view = inside_session.view(viewer_player_id="player-a")
+    outside_view = outside_session.view(viewer_player_id="player-a")
+
+    assert (
+        inside_view["primary_unit_terrain_turn_start_snapshots"]
+        != outside_view["primary_unit_terrain_turn_start_snapshots"]
+    )
+    assert inside_view["projection_state_hash"] != outside_view["projection_state_hash"]
+
+
+def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn() -> None:
+    config = _config_with_player_b_character(
+        mission_setup=_event_companion_meatgrinder_mission_setup()
+    )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    state = _battle_state_from_config(config)
+    lifecycle.state = state
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.advance_to_next_battle_phase()
+    assert state.active_player_id == "player-b"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.advance_to_next_battle_phase()
+    assert state.battle_round == 2
+    assert state.active_player_id == "player-a"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    attacker = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == "army-alpha:intercessor-unit-1"
+    )
+    defender = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == "army-beta:character-unit-3"
+    )
+    (defender_model,) = defender.own_models
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence_id = "phase17n-meatgrinder-runtime-attack"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    remaining, _allocated_model_ids, attack_status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=config.ruleset_descriptor,
+        attack_sequence=AttackSequence.start(
+            sequence_id=sequence_id,
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:hit",
+                    spec=attack_sequence_hit_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:wound",
+                    spec=attack_sequence_wound_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:save",
+                    spec=saving_throw_roll_spec(
+                        save_kind=SaveKind.ARMOUR,
+                        player_id="player-b",
+                        allocated_model_id=defender_model.model_instance_id,
+                        attack_context_id=attack_context_id,
+                    ),
+                    value=1,
+                ),
+            ),
+        ),
+    )
+    assert remaining is None
+    assert attack_status is None
+    flow = BattleRoundFlow(
+        phase_handlers={
+            BattlePhase.SHOOTING: PlaceholderPhaseHandler(BattlePhase.SHOOTING),
+            BattlePhase.FIGHT: PlaceholderPhaseHandler(BattlePhase.FIGHT),
+        }
+    )
+    flow.advance(state=state, decisions=lifecycle.decision_controller)
+    (destruction,) = state.primary_unit_destruction_states
+    assert destruction.destroyed_unit_instance_id == defender.unit_instance_id
+    assert destruction.started_turn_terrain_feature_ids == ()
+    capture_events = tuple(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "primary_unit_destruction_recorded"
+    )
+    assert len(capture_events) == 1
+
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    _place_unit_near_objective(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        target_suffix="defender_home",
+    )
+
+    flow.advance(state=state, decisions=lifecycle.decision_controller)
+
+    transactions = state.victory_point_ledger_for_player("player-a").transactions
+    current_turn_destruction_metadata = _transaction_metadata(transactions[0])
+    comparison_metadata = _transaction_metadata(transactions[1])
+    home_metadata = _transaction_metadata(transactions[2])
+    assert state.victory_point_total("player-a") == 13
+    assert [
+        metadata["scoring_rule_id"] for metadata in map(_transaction_metadata, transactions)
+    ] == [
+        "meatgrinder-enemy-destroyed-turn-end",
+        "meatgrinder-more-destroyed-turn-end",
+        "meatgrinder-opponent-home-turn-end",
+    ]
+    assert current_turn_destruction_metadata["destroyed_unit_instance_ids"] == [
+        "army-beta:character-unit-3"
+    ]
+    assert comparison_metadata["previous_turn_battle_round"] == 1
+    assert comparison_metadata["previous_turn_active_player_id"] == "player-b"
+    assert comparison_metadata["current_turn_battle_round"] == 2
+    assert comparison_metadata["current_turn_active_player_id"] == "player-a"
+    assert comparison_metadata["enemy_units_destroyed"] == 1
+    assert comparison_metadata["friendly_units_destroyed"] == 0
+    assert comparison_metadata["enemy_destroyed_unit_instance_ids"] == [
+        "army-beta:character-unit-3"
+    ]
+    assert comparison_metadata["friendly_destroyed_unit_instance_ids"] == []
+    assert home_metadata["controlled_objective_ids"] == [
+        "purge-the-foe-vs-purge-the-foe-layout-1-defender-home"
+    ]
+    assert home_metadata["opponent_home_objective_ids"] == [
+        "purge-the-foe-vs-purge-the-foe-layout-1-defender-home"
+    ]
+    assert str(comparison_metadata["scoring_rule_source_id"]).startswith(
+        "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-meatgrinder:"
+    )
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+
+def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> None:
+    config = _config_with_player_b_character(
+        mission_setup=_event_companion_meatgrinder_mission_setup()
+    )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    state = _battle_state_from_config(config)
+    lifecycle.state = state
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.advance_to_next_battle_phase()
+    assert state.active_player_id == "player-b"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    assert state.battlefield_state is not None
+
+    attacker = state.army_definitions[0].unit_by_id("army-alpha:intercessor-unit-1")
+    defender = state.army_definitions[1].unit_by_id("army-beta:character-unit-3")
+    original_placement = state.battlefield_state.unit_placement_by_id(defender.unit_instance_id)
+    (defender_model,) = defender.own_models
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence_id = "phase17n-meatgrinder-overwatch-return-on-death"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+    overwatch_pool = replace(
+        _attack_pool_for_test(
+            attacker=attacker,
+            defender=defender,
+            weapon_profile=weapon_profile,
+            attacks=1,
+        ),
+        shooting_type=ShootingType.SNAP,
+        targeting_rule_ids=(FIRE_OVERWATCH_RULE_ID,),
+    )
+    remaining, _allocated_model_ids, attack_status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=config.ruleset_descriptor,
+        attack_sequence=AttackSequence.start(
+            sequence_id=sequence_id,
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(overwatch_pool,),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:hit",
+                    spec=attack_sequence_hit_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id="player-a",
+                        reroll_forbidden_rule_ids=(SNAP_SHOOTING_RULE_ID,),
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:wound",
+                    spec=attack_sequence_wound_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:save",
+                    spec=saving_throw_roll_spec(
+                        save_kind=SaveKind.ARMOUR,
+                        player_id="player-b",
+                        allocated_model_id=defender_model.model_instance_id,
+                        attack_context_id=attack_context_id,
+                    ),
+                    value=1,
+                ),
+            ),
+        ),
+    )
+    assert remaining is None
+    assert attack_status is None
+    (destroyed_event,) = tuple(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "model_destroyed"
+    )
+    destroyed_payload = cast(dict[str, JsonValue], destroyed_event.payload)
+    assert destroyed_payload["phase"] == BattlePhase.SHOOTING.value
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+
+    state.record_pending_return_on_death(
+        PendingReturnOnDeath(
+            pending_id="phase17n-meatgrinder-overwatch-return-on-death:pending",
+            source_rule_id="phase17n-meatgrinder-overwatch-return-on-death:rule",
+            source_ability_id="phase17n-meatgrinder-overwatch-return-on-death:ability",
+            source_clause_id="phase17n-meatgrinder-overwatch-return-on-death:clause",
+            source_effect_index=0,
+            owner_player_id="player-b",
+            target_scope=ReturnDestroyedTargetScope.DESTROYED_UNIT,
+            destroyed_unit_instance_id=defender.unit_instance_id,
+            destroyed_model_instance_id=None,
+            destroyed_position_payload=cast(
+                JsonValue,
+                {
+                    "source": "model_destroyed_event",
+                    "model_destroyed_event_id": destroyed_event.event_id,
+                    "model_destroyed_payload": destroyed_payload,
+                },
+            ),
+            trigger_battle_round=state.battle_round,
+            trigger_phase=BattlePhase.MOVEMENT.value,
+            resolution_timing="phase_end",
+            roll_expression="D6",
+            roll_count=1,
+            success_threshold=2,
+            placement_anchor="destroyed_position",
+            placement_preference="as_close_as_possible",
+            engagement_range_restriction=True,
+            restore_wounds_mode=ReturnRestoreWoundsMode.FULL_HEALTH,
+            wounds_remaining=None,
+            resolved=False,
         )
     )
-    first_turn_start = state.primary_objective_turn_start_states[0]
+    flow = BattleRoundFlow(
+        phase_handlers={
+            BattlePhase.MOVEMENT: PlaceholderPhaseHandler(BattlePhase.MOVEMENT),
+        }
+    )
+    waiting = flow.advance(state=state, decisions=lifecycle.decision_controller)
 
-    with pytest.raises(GameLifecycleError, match="unknown started-turn terrain"):
-        state.record_primary_unit_destruction(
-            destroying_player_id="player-a",
-            destroyed_unit_instance_id="army-beta:intercessor-unit-3",
-            started_turn_terrain_feature_ids=("missing-terrain",),
-            source_id="phase16:death-trap:unknown-terrain",
+    assert waiting.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = waiting.decision_request
+    assert request is not None
+    assert request.decision_type == SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE
+    (destruction,) = state.primary_unit_destruction_states
+    assert destruction.destroyed_unit_instance_id == defender.unit_instance_id
+    assert destruction.phase == BattlePhase.MOVEMENT.value
+    capture_events = tuple(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "primary_unit_destruction_recorded"
+    )
+    assert len(capture_events) == 1
+
+    result = DecisionResult(
+        result_id="phase17n-meatgrinder-overwatch-return-on-death:placement-result",
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=cast(
+            JsonValue,
+            {
+                "submission_kind": SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+                "attempted_placement": original_placement.to_payload(),
+            },
+        ),
+    )
+    lifecycle.decision_controller.submit_result(result)
+    apply_return_on_death_placement_decision(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        request=request,
+        result=result,
+        ruleset_descriptor=config.ruleset_descriptor,
+    )
+    assert all(model.is_alive for model in defender.own_models)
+    assert state.battlefield_state.unit_placement_by_id(defender.unit_instance_id) == (
+        original_placement
+    )
+
+    advanced = flow.advance(state=state, decisions=lifecycle.decision_controller)
+    assert advanced.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert state.battle_phase_index == state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    assert len(state.primary_unit_destruction_states) == 1
+    assert (
+        len(
+            tuple(
+                event
+                for event in lifecycle.decision_controller.event_log.records
+                if event.event_type == "primary_unit_destruction_recorded"
+            )
         )
-    with pytest.raises(GameLifecycleError, match="must target an enemy unit"):
+        == 1
+    )
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+
+def test_meatgrinder_round_five_objective_control_scores_only_at_turn_end() -> None:
+    config = _config_with_player_b_character(
+        mission_setup=_event_companion_meatgrinder_mission_setup()
+    )
+    state = _battle_state_from_config(config)
+    state.battle_round = 5
+    _place_unit_near_objective(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+        target_suffix="central-north",
+    )
+
+    completed_phase = state.advance_to_next_battle_phase()
+
+    assert completed_phase is BattlePhase.COMMAND
+    assert state.victory_point_total("player-a") == 0
+
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.advance_to_next_battle_phase()
+
+    transactions = state.victory_point_ledger_for_player("player-a").transactions
+    assert state.victory_point_total("player-a") == 4
+    assert [
+        _transaction_metadata(transaction)["scoring_rule_id"] for transaction in transactions
+    ] == ["meatgrinder-objective-control"]
+
+
+def test_return_on_death_same_unit_id_records_a_second_destruction_occurrence() -> None:
+    config = _config_with_player_b_character(
+        mission_setup=_event_companion_meatgrinder_mission_setup()
+    )
+    state = _battle_state_from_config(config)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.advance_to_next_battle_phase()
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.advance_to_next_battle_phase()
+    assert state.battle_round == 2
+    assert state.active_player_id == "player-a"
+    assert state.battlefield_state is not None
+    unit = state.army_definitions[1].unit_by_id("army-beta:character-unit-3")
+    original_placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    (original_model_placement,) = original_placement.model_placements
+
+    _set_unit_wounds_remaining(
+        state,
+        unit_instance_id=unit.unit_instance_id,
+        wounds_remaining=0,
+    )
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models(unit.own_model_ids())
+    )
+    (first_destruction,) = record_primary_unit_destructions_for_destroyed_models(
+        state=state,
+        destroyed_model_instance_ids=unit.own_model_ids(),
+        destroying_player_id="player-a",
+        source_id="phase17n:return-on-death:first-destruction",
+    )
+    current_phase = state.current_battle_phase
+    assert current_phase is BattlePhase.COMMAND
+    pending = PendingReturnOnDeath(
+        pending_id="phase17n:return-on-death:pending",
+        source_rule_id="phase17n:return-on-death:rule",
+        source_ability_id="phase17n:return-on-death:ability",
+        source_clause_id="phase17n:return-on-death:clause",
+        source_effect_index=0,
+        owner_player_id="player-b",
+        target_scope=ReturnDestroyedTargetScope.DESTROYED_UNIT,
+        destroyed_unit_instance_id=unit.unit_instance_id,
+        destroyed_model_instance_id=None,
+        destroyed_position_payload=cast(
+            JsonValue,
+            {
+                "source": "model_destroyed_event",
+                "model_destroyed_event_id": "phase17n:return-on-death:first-event",
+                "model_destroyed_payload": {
+                    "model_instance_id": original_model_placement.model_instance_id,
+                    "destroyed_model_placement": original_model_placement.to_payload(),
+                },
+            },
+        ),
+        trigger_battle_round=state.battle_round,
+        trigger_phase=current_phase.value,
+        resolution_timing="phase_end",
+        roll_expression="D6",
+        roll_count=1,
+        success_threshold=2,
+        placement_anchor="destroyed_position",
+        placement_preference="as_close_as_possible",
+        engagement_range_restriction=True,
+        restore_wounds_mode=ReturnRestoreWoundsMode.FULL_HEALTH,
+        wounds_remaining=None,
+        resolved=False,
+    )
+    state.record_pending_return_on_death(pending)
+    request = build_return_on_death_placement_request(state=state, pending=pending)
+    decisions = DecisionController()
+    apply_return_on_death_placement_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        result=DecisionResult(
+            result_id="phase17n:return-on-death:placement-result",
+            request_id=request.request_id,
+            decision_type=request.decision_type,
+            actor_id=request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=cast(
+                JsonValue,
+                {
+                    "submission_kind": SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+                    "attempted_placement": original_placement.to_payload(),
+                },
+            ),
+        ),
+        ruleset_descriptor=config.ruleset_descriptor,
+    )
+    returned_unit = state.army_definitions[1].unit_by_id(unit.unit_instance_id)
+    assert all(model.is_alive for model in returned_unit.own_models)
+    assert state.battlefield_state.unit_placement_by_id(unit.unit_instance_id) == (
+        original_placement
+    )
+
+    _set_unit_wounds_remaining(
+        state,
+        unit_instance_id=unit.unit_instance_id,
+        wounds_remaining=0,
+    )
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models(unit.own_model_ids())
+    )
+    (second_destruction,) = record_primary_unit_destructions_for_destroyed_models(
+        state=state,
+        destroyed_model_instance_ids=unit.own_model_ids(),
+        destroying_player_id="player-a",
+        source_id="phase17n:return-on-death:second-destruction",
+    )
+
+    assert first_destruction.destroyed_unit_instance_id == (
+        second_destruction.destroyed_unit_instance_id
+    )
+    assert first_destruction.destruction_id != second_destruction.destruction_id
+    assert len(state.primary_unit_destruction_states) == 2
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.advance_to_next_battle_phase()
+
+    transactions = state.victory_point_ledger_for_player("player-a").transactions
+    comparison_metadata = next(
+        _transaction_metadata(transaction)
+        for transaction in transactions
+        if _transaction_metadata(transaction)["scoring_rule_id"]
+        == "meatgrinder-more-destroyed-turn-end"
+    )
+    assert comparison_metadata["enemy_units_destroyed"] == 2
+    assert comparison_metadata["enemy_destroyed_unit_instance_ids"] == [unit.unit_instance_id]
+    assert comparison_metadata["enemy_destruction_ids"] == sorted(
+        [first_destruction.destruction_id, second_destruction.destruction_id]
+    )
+
+
+def test_primary_destruction_capture_maps_attached_target_to_destroyed_component() -> None:
+    config = replace(
+        _config_with_player_a_attached_unit(),
+        mission_setup=_event_companion_meatgrinder_mission_setup(),
+    )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    state = _battle_state_from_config(config)
+    lifecycle.state = state
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.advance_to_next_battle_phase()
+    assert state.active_player_id == "player-b"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    attacker = state.army_definitions[1].unit_by_id("army-beta:intercessor-unit-3")
+    bodyguard = state.army_definitions[0].unit_by_id("army-alpha:bodyguard-unit")
+    surviving_model_id = bodyguard.own_models[-1].model_instance_id
+    pre_destroyed_model_ids = tuple(
+        model.model_instance_id
+        for model in bodyguard.own_models
+        if model.model_instance_id != surviving_model_id
+    )
+    state.replace_army_definitions(
+        [
+            replace(
+                army,
+                units=tuple(
+                    replace(
+                        unit,
+                        own_models=tuple(
+                            replace(model, wounds_remaining=0)
+                            if model.model_instance_id in pre_destroyed_model_ids
+                            else model
+                            for model in unit.own_models
+                        ),
+                    )
+                    if unit.unit_instance_id == bodyguard.unit_instance_id
+                    else unit
+                    for unit in army.units
+                ),
+            )
+            for army in state.army_definitions
+        ]
+    )
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models(pre_destroyed_model_ids)
+    )
+    bodyguard = state.army_definitions[0].unit_by_id("army-alpha:bodyguard-unit")
+    surviving_model = next(
+        model for model in bodyguard.own_models if model.model_instance_id == surviving_model_id
+    )
+    attack_target = replace(bodyguard, own_models=(surviving_model,))
+    attached_unit_id = "attached-unit:army-alpha:bodyguard-unit"
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(surviving_model.wounds_remaining),
+    )
+    sequence_id = "phase17n-attached-component-runtime-attack"
+    attack_models = ((1, surviving_model),)
+    injected_results = (
+        *(
+            result
+            for attack_index, _model in attack_models
+            for result in (
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:hit:{attack_index}",
+                    spec=attack_sequence_hit_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=f"{sequence_id}:pool-001:attack-{attack_index:03d}",
+                        attacker_player_id="player-b",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:wound:{attack_index}",
+                    spec=attack_sequence_wound_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=f"{sequence_id}:pool-001:attack-{attack_index:03d}",
+                        attacker_player_id="player-b",
+                    ),
+                    value=6,
+                ),
+            )
+        ),
+        *(
+            _fixed_roll_result(
+                roll_id=f"{sequence_id}:save:{attack_index}",
+                spec=saving_throw_roll_spec(
+                    save_kind=SaveKind.ARMOUR,
+                    player_id="player-a",
+                    allocated_model_id=surviving_model.model_instance_id,
+                    attack_context_id=f"{sequence_id}:pool-001:attack-{attack_index:03d}",
+                ),
+                value=1,
+            )
+            for attack_index, _model in attack_models
+        ),
+    )
+
+    remaining, _allocated_model_ids, attack_status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=config.ruleset_descriptor,
+        attack_sequence=AttackSequence.start(
+            sequence_id=sequence_id,
+            attacker_player_id="player-b",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=attack_target,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                    target_unit_instance_id=attached_unit_id,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=injected_results,
+        ),
+    )
+    assert remaining is None, attack_status
+    assert attack_status is None
+
+    BattleRoundFlow(
+        phase_handlers={BattlePhase.SHOOTING: PlaceholderPhaseHandler(BattlePhase.SHOOTING)}
+    ).advance(state=state, decisions=lifecycle.decision_controller)
+
+    (destruction,) = state.primary_unit_destruction_states
+    assert destruction.destroyed_unit_instance_id == bodyguard.unit_instance_id
+    assert destruction.destroying_player_id == "player-b"
+    assert all(
+        not model.is_alive
+        for model in state.army_definitions[0].unit_by_id(bodyguard.unit_instance_id).own_models
+    )
+    assert all(
+        model.is_alive
+        for model in state.army_definitions[0].unit_by_id("army-alpha:leader-unit").own_models
+    )
+
+
+def test_meatgrinder_current_turn_enemy_destruction_changes_comparison_result() -> None:
+    evidence = cross_turn_destruction_comparison_evidence(
+        turn_order=("player-a", "player-b"),
+        battle_round=2,
+        active_player_id="player-a",
+        scoring_player_id="player-a",
+        destruction_evidence=(
+            PrimaryUnitDestructionEvidence(
+                destruction_id="destruction:current-turn-loss",
+                battle_round=2,
+                active_player_id="player-a",
+                destroyed_player_id="player-b",
+                destroyed_unit_instance_id="army-beta:current-turn-loss",
+            ),
+        ),
+    )
+
+    assert evidence["score_count"] == 1
+    assert evidence["enemy_units_destroyed"] == 1
+    assert evidence["enemy_destroyed_unit_instance_ids"] == ["army-beta:current-turn-loss"]
+
+
+def test_meatgrinder_counts_repeated_destruction_occurrences_for_the_same_unit() -> None:
+    repeated_unit_id = "army-beta:returning-unit"
+    evidence = cross_turn_destruction_comparison_evidence(
+        turn_order=("player-a", "player-b"),
+        battle_round=2,
+        active_player_id="player-a",
+        scoring_player_id="player-a",
+        destruction_evidence=(
+            PrimaryUnitDestructionEvidence(
+                destruction_id="destruction:returning-unit:first",
+                battle_round=2,
+                active_player_id="player-a",
+                destroyed_player_id="player-b",
+                destroyed_unit_instance_id=repeated_unit_id,
+            ),
+            PrimaryUnitDestructionEvidence(
+                destruction_id="destruction:returning-unit:second",
+                battle_round=2,
+                active_player_id="player-a",
+                destroyed_player_id="player-b",
+                destroyed_unit_instance_id=repeated_unit_id,
+            ),
+        ),
+    )
+
+    assert evidence["score_count"] == 1
+    assert evidence["enemy_units_destroyed"] == 2
+    assert evidence["enemy_destroyed_unit_instance_ids"] == [repeated_unit_id]
+    assert evidence["enemy_destruction_ids"] == [
+        "destruction:returning-unit:first",
+        "destruction:returning-unit:second",
+    ]
+
+
+def test_meatgrinder_enemy_self_loss_in_previous_turn_is_not_current_enemy_loss() -> None:
+    evidence = cross_turn_destruction_comparison_evidence(
+        turn_order=("player-a", "player-b"),
+        battle_round=2,
+        active_player_id="player-a",
+        scoring_player_id="player-a",
+        destruction_evidence=(
+            PrimaryUnitDestructionEvidence(
+                destruction_id="destruction:previous-turn-self-loss",
+                battle_round=1,
+                active_player_id="player-b",
+                destroyed_player_id="player-b",
+                destroyed_unit_instance_id="army-beta:previous-turn-self-loss",
+            ),
+        ),
+    )
+
+    assert evidence["score_count"] == 0
+    assert evidence["enemy_units_destroyed"] == 0
+    assert evidence["friendly_units_destroyed"] == 0
+    assert evidence["enemy_destroyed_unit_instance_ids"] == []
+
+
+def test_meatgrinder_previous_opponent_turn_friendly_loss_prevents_tie_score() -> None:
+    evidence = cross_turn_destruction_comparison_evidence(
+        turn_order=("player-a", "player-b"),
+        battle_round=2,
+        active_player_id="player-a",
+        scoring_player_id="player-a",
+        destruction_evidence=(
+            PrimaryUnitDestructionEvidence(
+                destruction_id="destruction:previous-turn-friendly-loss",
+                battle_round=1,
+                active_player_id="player-b",
+                destroyed_player_id="player-a",
+                destroyed_unit_instance_id="army-alpha:previous-turn-loss",
+            ),
+            PrimaryUnitDestructionEvidence(
+                destruction_id="destruction:current-turn-enemy-loss",
+                battle_round=2,
+                active_player_id="player-a",
+                destroyed_player_id="player-b",
+                destroyed_unit_instance_id="army-beta:current-turn-loss",
+            ),
+        ),
+    )
+
+    assert evidence["score_count"] == 0
+    assert evidence["enemy_units_destroyed"] == 1
+    assert evidence["friendly_units_destroyed"] == 1
+    assert evidence["friendly_destroyed_unit_instance_ids"] == ["army-alpha:previous-turn-loss"]
+
+
+def test_meatgrinder_round_boundary_uses_prior_round_player_b_turn_for_player_a() -> None:
+    evidence = cross_turn_destruction_comparison_evidence(
+        turn_order=("player-a", "player-b"),
+        battle_round=3,
+        active_player_id="player-a",
+        scoring_player_id="player-a",
+        destruction_evidence=(
+            PrimaryUnitDestructionEvidence(
+                destruction_id="destruction:round-two-player-b-loss",
+                battle_round=2,
+                active_player_id="player-b",
+                destroyed_player_id="player-a",
+                destroyed_unit_instance_id="army-alpha:round-two-player-b-loss",
+            ),
+            PrimaryUnitDestructionEvidence(
+                destruction_id="destruction:round-three-player-a-loss",
+                battle_round=3,
+                active_player_id="player-a",
+                destroyed_player_id="player-b",
+                destroyed_unit_instance_id="army-beta:round-three-player-a-loss",
+            ),
+        ),
+    )
+
+    assert evidence["current_turn_battle_round"] == 3
+    assert evidence["current_turn_active_player_id"] == "player-a"
+    assert evidence["previous_turn_battle_round"] == 2
+    assert evidence["previous_turn_active_player_id"] == "player-b"
+
+
+def test_meatgrinder_opponent_home_uses_typed_role_not_deployment_zone_geometry() -> None:
+    setup = _event_companion_meatgrinder_mission_setup()
+    defender_home = next(
+        marker
+        for marker in setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.DEFENDER_HOME
+    )
+    non_home_inside_defender_zone = replace(
+        defender_home,
+        objective_marker_id="expansion-inside-defender-deployment-zone",
+        name="Expansion Inside Defender Deployment Zone",
+        objective_role=ObjectiveMarkerRole.EXPANSION,
+        source_id="phase17n:test:typed-home-objective-role",
+    )
+    setup_with_non_home_marker = replace(
+        setup,
+        objective_markers=(*setup.objective_markers, non_home_inside_defender_zone),
+    )
+
+    non_home_only = opponent_home_control_evidence(
+        mission_setup=setup_with_non_home_marker,
+        player_id="player-a",
+        controlled_objective_ids=(non_home_inside_defender_zone.objective_marker_id,),
+    )
+    typed_home = opponent_home_control_evidence(
+        mission_setup=setup_with_non_home_marker,
+        player_id="player-a",
+        controlled_objective_ids=(
+            non_home_inside_defender_zone.objective_marker_id,
+            defender_home.objective_marker_id,
+        ),
+    )
+
+    assert non_home_only["score_count"] == 0
+    assert non_home_only["controlled_objective_ids"] == []
+    assert non_home_only["opponent_home_objective_ids"] == [defender_home.objective_marker_id]
+    assert typed_home["score_count"] == 1
+    assert typed_home["controlled_objective_ids"] == [defender_home.objective_marker_id]
+
+
+def test_primary_destruction_tracking_counts_transition_only_enemy_loss() -> None:
+    state = _battle_state_for_primary("primary-unstoppable-force")
+    unit = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == "army-beta:intercessor-unit-3"
+    )
+    destroyed_model_ids = tuple(model.model_instance_id for model in unit.own_models)
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models(destroyed_model_ids)
+    )
+
+    (destruction,) = record_primary_unit_destructions_for_destroyed_models(
+        state=state,
+        destroyed_model_instance_ids=destroyed_model_ids,
+        destroying_player_id=None,
+        source_id="core-rules:test-transition-only-destruction",
+    )
+
+    assert destruction.destroying_player_id is None
+    assert destruction.destroyed_player_id == "player-b"
+    assert destruction.destroyed_unit_instance_id == unit.unit_instance_id
+    assert destruction.started_turn_terrain_feature_ids == ()
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.advance_to_next_battle_phase()
+
+    transactions = state.victory_point_ledger_for_player("player-a").transactions
+    assert [
+        _transaction_metadata(transaction)["scoring_rule_id"] for transaction in transactions
+    ] == ["unstoppable-force-enemy-destroyed-turn-end"]
+
+
+def test_runtime_added_unit_backfills_turn_start_evidence_and_can_be_destroyed_same_turn() -> None:
+    config = _config_with_player_b_character(
+        mission_setup=_event_companion_meatgrinder_mission_setup()
+    )
+    state = _battle_state_from_config(config)
+    template = state.army_definitions[1].unit_by_id("army-beta:character-unit-3")
+    added_unit_id = "army-beta:created-unit-4"
+    added_unit = replace(
+        template,
+        unit_instance_id=added_unit_id,
+        own_models=tuple(
+            replace(
+                model,
+                model_instance_id=f"{added_unit_id}:model-{index:03d}",
+            )
+            for index, model in enumerate(template.own_models, start=1)
+        ),
+    )
+
+    state.add_unit_to_army(
+        player_id="player-b",
+        unit=added_unit,
+        source_id="phase17n:test:created-unit",
+    )
+
+    assert state.primary_unit_terrain_turn_start_snapshots
+    assert all(
+        snapshot.membership_for_unit(added_unit_id).terrain_feature_ids == ()
+        for snapshot in state.primary_unit_terrain_turn_start_snapshots
+    )
+    assert state.battlefield_state is not None
+    added_placement = UnitPlacement(
+        army_id="army-beta",
+        player_id="player-b",
+        unit_instance_id=added_unit_id,
+        model_placements=tuple(
+            ModelPlacement(
+                army_id="army-beta",
+                player_id="player-b",
+                unit_instance_id=added_unit_id,
+                model_instance_id=model.model_instance_id,
+                pose=Pose.at(40.0 + index, 30.0),
+            )
+            for index, model in enumerate(added_unit.own_models)
+        ),
+    )
+    state.replace_battlefield_state(
+        state.battlefield_state.with_added_unit_placement(added_placement)
+    )
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models(added_unit.own_model_ids())
+    )
+    (destruction,) = record_primary_unit_destructions_for_destroyed_models(
+        state=state,
+        destroyed_model_instance_ids=added_unit.own_model_ids(),
+        destroying_player_id="player-a",
+        source_id="phase17n:test:created-unit-destruction",
+    )
+
+    assert destruction.destroyed_unit_instance_id == added_unit_id
+    assert destruction.started_turn_terrain_feature_ids == ()
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+
+def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
+    feature_id = SCORING_TERRAIN_FEATURE_ID
+    config = _config_for_primary(
+        "primary-death-trap",
+        objective_terrain_feature_id=feature_id,
+    )
+    feature = _terrain_feature_by_id(cast(MissionSetup, config.mission_setup), feature_id)
+    state = _battle_state_from_config(
+        config,
+        turn_start_unit_positions=(
+            (
+                "army-beta:intercessor-unit-3",
+                feature.footprint_center_x_inches,
+                feature.footprint_center_y_inches,
+            ),
+        ),
+    )
+    first_turn_start = state.primary_objective_turn_start_states[0]
+    first_terrain_snapshot = state.primary_unit_terrain_turn_start_snapshots[0]
+
+    with pytest.raises(GameLifecycleError, match="destroyed physical unit"):
         state.record_primary_unit_destruction(
             destroying_player_id="player-a",
             destroyed_unit_instance_id="army-alpha:intercessor-unit-1",
-            started_turn_terrain_feature_ids=(),
-            source_id="phase16:death-trap:friendly-unit",
+            source_id="phase16:death-trap:alive-unit-rejected",
         )
+    _remove_unit_for_primary_destruction(
+        state,
+        unit_instance_id="army-alpha:intercessor-unit-1",
+    )
+    friendly_destruction = state.record_primary_unit_destruction(
+        destroying_player_id="player-a",
+        destroyed_unit_instance_id="army-alpha:intercessor-unit-1",
+        source_id="phase16:death-trap:friendly-unit",
+    )
+    assert friendly_destruction.destroying_player_id == friendly_destruction.destroyed_player_id
 
     trap = state.record_primary_terrain_trap(
         player_id="player-a",
@@ -496,10 +1709,13 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
         phase=BattlePhase.SHOOTING,
         source_id="phase16:death-trap:booby-trap",
     )
+    _remove_unit_for_primary_destruction(
+        state,
+        unit_instance_id="army-beta:intercessor-unit-3",
+    )
     destruction = state.record_primary_unit_destruction(
         destroying_player_id="player-a",
         destroyed_unit_instance_id="army-beta:intercessor-unit-3",
-        started_turn_terrain_feature_ids=(feature_id,),
         source_id="phase16:death-trap:enemy-destroyed",
     )
     payload = cast(GameStatePayload, json.loads(json.dumps(state.to_payload(), sort_keys=True)))
@@ -507,9 +1723,80 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
     assert PrimaryObjectiveTurnStartState.from_payload(first_turn_start.to_payload()) == (
         first_turn_start
     )
+    assert (
+        PrimaryUnitTerrainTurnStartSnapshot.from_payload(first_terrain_snapshot.to_payload())
+        == first_terrain_snapshot
+    )
     assert PrimaryTerrainTrapState.from_payload(trap.to_payload()) == trap
     assert PrimaryUnitDestructionState.from_payload(destruction.to_payload()) == destruction
+    assert (
+        PrimaryUnitDestructionState.from_payload(friendly_destruction.to_payload())
+        == friendly_destruction
+    )
     assert GameState.from_payload(payload).to_payload() == state.to_payload()
+
+    invalid_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    snapshot_payload = invalid_payload["primary_unit_terrain_turn_start_snapshots"][0]
+    snapshot_payload["unit_memberships"][0]["terrain_feature_ids"] = ["missing-terrain"]
+    with pytest.raises(GameLifecycleError, match="unknown terrain feature"):
+        GameState.from_payload(invalid_payload)
+
+    incomplete_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    incomplete_payload["primary_unit_terrain_turn_start_snapshots"][0]["unit_memberships"].pop()
+    with pytest.raises(GameLifecycleError, match="every physical unit"):
+        GameState.from_payload(incomplete_payload)
+
+    drifted_destruction_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    enemy_destruction_payload = next(
+        row
+        for row in drifted_destruction_payload["primary_unit_destruction_states"]
+        if row["destroyed_unit_instance_id"] == "army-beta:intercessor-unit-3"
+    )
+    enemy_destruction_payload["started_turn_terrain_feature_ids"] = []
+    with pytest.raises(GameLifecycleError, match="does not match its turn snapshot"):
+        GameState.from_payload(drifted_destruction_payload)
+
+    owner_drift_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    owner_drift_row = next(
+        row
+        for row in owner_drift_payload["primary_unit_destruction_states"]
+        if row["destroyed_unit_instance_id"] == "army-beta:intercessor-unit-3"
+    )
+    owner_drift_row["destroyed_player_id"] = "player-a"
+    with pytest.raises(GameLifecycleError, match="destroyed player drift"):
+        GameState.from_payload(owner_drift_payload)
+
+    identity_drift_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    identity_drift_payload["primary_unit_destruction_states"][0]["destruction_id"] = (
+        "primary-unit-destruction:tampered"
+    )
+    with pytest.raises(GameLifecycleError, match="destruction_id drift"):
+        GameState.from_payload(identity_drift_payload)
+
+    nullable_destruction_payload = cast(
+        dict[str, object],
+        json.loads(json.dumps(destruction.to_payload(), sort_keys=True)),
+    )
+    nullable_destruction_payload["started_turn_terrain_feature_ids"] = None
+    with pytest.raises(GameLifecycleError, match="must be a list"):
+        PrimaryUnitDestructionState.from_payload(
+            cast(PrimaryUnitDestructionStatePayload, nullable_destruction_payload)
+        )
 
     with pytest.raises(GameLifecycleError, match="terrain trap already exists"):
         state.record_primary_terrain_trap(
@@ -523,13 +1810,17 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
         state.record_primary_unit_destruction(
             destroying_player_id="player-a",
             destroyed_unit_instance_id="army-beta:intercessor-unit-3",
-            started_turn_terrain_feature_ids=(feature_id,),
-            source_id="phase16:death-trap:enemy-destroyed-duplicate",
+            source_id="phase16:death-trap:enemy-destroyed",
         )
     with pytest.raises(GameLifecycleError, match="owner's turn"):
         replace(trap, active_player_id="player-b")
-    with pytest.raises(GameLifecycleError, match="must target an enemy unit"):
-        replace(destruction, destroyed_player_id="player-a")
+    with pytest.raises(GameLifecycleError):
+        replace(destruction, destroying_player_id="")
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        replace(
+            destruction,
+            started_turn_terrain_feature_ids=cast(tuple[str, ...], None),
+        )
 
 
 def test_booby_trap_action_is_primary_scoped_and_immediate_zero_vp() -> None:
@@ -3742,17 +5033,19 @@ def test_plunder_excludes_terrain_area_in_player_territory_outside_deployment_zo
         player_id="player-a",
         feature=scoring_feature,
     )
+    relocated_display_geometry = TerrainDisplayGeometry.axis_aligned_rectangle(
+        center_x_inches=center_x,
+        center_y_inches=center_y,
+        width_inches=scoring_feature.footprint_width_inches,
+        depth_inches=scoring_feature.footprint_depth_inches,
+        display_template_id="phase11e_scoring_debris_8x8_in_territory",
+    )
     scoring_feature = replace(
         scoring_feature,
         footprint_center_x_inches=center_x,
         footprint_center_y_inches=center_y,
-        display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
-            center_x_inches=center_x,
-            center_y_inches=center_y,
-            width_inches=scoring_feature.footprint_width_inches,
-            depth_inches=scoring_feature.footprint_depth_inches,
-            display_template_id="phase11e_scoring_debris_8x8_in_territory",
-        ),
+        rules_footprint_polygon=relocated_display_geometry.footprint_polygon,
+        display_geometry=relocated_display_geometry,
     )
     mission_setup = replace(
         mission_setup,
@@ -4509,6 +5802,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         policy.primary_awards_from_objective_control(
             record=cast(ObjectiveControlRecord, object()),
             mission_setup=scoring_state.mission_setup,
+            turn_order=scoring_state.turn_order,
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=(),
             unit_destruction_states=(),
@@ -4517,6 +5811,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         policy.primary_awards_from_objective_control(
             record=record,
             mission_setup=cast(MissionSetup, object()),
+            turn_order=scoring_state.turn_order,
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=(),
             unit_destruction_states=(),
@@ -4528,6 +5823,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         ).primary_awards_from_objective_control(
             record=record,
             mission_setup=scoring_state.mission_setup,
+            turn_order=scoring_state.turn_order,
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=(),
             unit_destruction_states=(),
@@ -4537,6 +5833,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         policy.primary_awards_from_objective_control(
             record=record,
             mission_setup=scoring_state.mission_setup,
+            turn_order=scoring_state.turn_order,
             turn_start_states=cast(tuple[PrimaryObjectiveTurnStartState, ...], []),
             terrain_trap_states=(),
             unit_destruction_states=(),
@@ -4545,6 +5842,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         policy.primary_awards_from_objective_control(
             record=record,
             mission_setup=scoring_state.mission_setup,
+            turn_order=scoring_state.turn_order,
             turn_start_states=cast(
                 tuple[PrimaryObjectiveTurnStartState, ...],
                 ("not-a-turn-start-state",),
@@ -4556,6 +5854,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         policy.primary_awards_from_objective_control(
             record=record,
             mission_setup=scoring_state.mission_setup,
+            turn_order=scoring_state.turn_order,
             turn_start_states=(turn_start, turn_start),
             terrain_trap_states=(),
             unit_destruction_states=(),
@@ -4564,6 +5863,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         policy.primary_awards_from_objective_control(
             record=record,
             mission_setup=scoring_state.mission_setup,
+            turn_order=scoring_state.turn_order,
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=cast(tuple[PrimaryTerrainTrapState, ...], []),
             unit_destruction_states=(),
@@ -4572,6 +5872,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         policy.primary_awards_from_objective_control(
             record=record,
             mission_setup=scoring_state.mission_setup,
+            turn_order=scoring_state.turn_order,
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=cast(tuple[PrimaryTerrainTrapState, ...], ("not-a-trap",)),
             unit_destruction_states=(),
@@ -4580,6 +5881,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         policy.primary_awards_from_objective_control(
             record=record,
             mission_setup=scoring_state.mission_setup,
+            turn_order=scoring_state.turn_order,
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=(),
             unit_destruction_states=cast(tuple[PrimaryUnitDestructionState, ...], []),
@@ -4588,6 +5890,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         policy.primary_awards_from_objective_control(
             record=record,
             mission_setup=scoring_state.mission_setup,
+            turn_order=scoring_state.turn_order,
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=(),
             unit_destruction_states=cast(
@@ -5498,6 +6801,52 @@ def _place_unit_near_point(
     )
 
 
+def _remove_unit_for_primary_destruction(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+) -> None:
+    if state.battlefield_state is None:
+        raise AssertionError("test state requires battlefield state")
+    unit = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == unit_instance_id
+    )
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models(unit.own_model_ids())
+    )
+
+
+def _set_unit_wounds_remaining(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    wounds_remaining: int,
+) -> None:
+    state.replace_army_definitions(
+        [
+            replace(
+                army,
+                units=tuple(
+                    replace(
+                        unit,
+                        own_models=tuple(
+                            replace(model, wounds_remaining=wounds_remaining)
+                            for model in unit.own_models
+                        ),
+                    )
+                    if unit.unit_instance_id == unit_instance_id
+                    else unit
+                    for unit in army.units
+                ),
+            )
+            for army in state.army_definitions
+        ]
+    )
+
+
 def _decline_stratagem_window_if_pending(
     lifecycle: GameLifecycle,
     status: LifecycleStatus,
@@ -5713,15 +7062,48 @@ def _battle_state_from_config(
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_a_fixed_mission_ids: tuple[str, str] = ("assassination", "bring-it-down"),
+    turn_start_unit_positions: tuple[tuple[str, float, float], ...] = (),
+    turn_start_unplaced_unit_ids: tuple[str, ...] = (),
 ) -> GameState:
     state = GameState.from_config(config)
     for army in _mustered_armies(config):
         state.record_army_definition(army)
+    assert config.mission_setup is not None
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase11e-battlefield",
         armies=tuple(state.army_definitions),
+        battlefield_width_inches=config.mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=config.mission_setup.battlefield_depth_inches,
+        terrain_features=config.mission_setup.terrain_features,
     )
     state.record_battlefield_state(scenario.battlefield_state)
+    for unit_instance_id, x_inches, y_inches in turn_start_unit_positions:
+        _place_unit_near_point(
+            state,
+            unit_instance_id=unit_instance_id,
+            x_inches=x_inches,
+            y_inches=y_inches,
+        )
+    for unit_instance_id in turn_start_unplaced_unit_ids:
+        assert state.battlefield_state is not None
+        state.replace_battlefield_state(
+            state.battlefield_state.without_unit_placement(unit_instance_id)
+        )
+        owner = next(
+            army.player_id
+            for army in state.army_definitions
+            if any(unit.unit_instance_id == unit_instance_id for unit in army.units)
+        )
+        state.record_reserve_state(
+            ReserveState.declared_before_battle(
+                player_id=owner,
+                unit_instance_id=unit_instance_id,
+                reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+                destruction_deadline_policy=reserve_destruction_policy_from_scoring_policy(
+                    mission_scoring_policy_from_setup(config.mission_setup)
+                ),
+            )
+        )
     state.record_secondary_mission_choice(
         _secondary_choice(
             player_id="player-a",
@@ -5988,6 +7370,48 @@ def _config_with_player_a_transport() -> GameConfig:
     )
 
 
+def _config_with_player_b_character(*, mission_setup: MissionSetup) -> GameConfig:
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    return GameConfig(
+        game_id="phase11e-game",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-a",
+                army_id="army-alpha",
+                unit_selection_ids=("intercessor-unit-1",),
+            ),
+            ArmyMusterRequest(
+                army_id="army-beta",
+                player_id="player-b",
+                catalog_id=catalog.catalog_id,
+                source_package_id=catalog.source_package_id,
+                ruleset_id=catalog.ruleset_id,
+                detachment_selection=DetachmentSelection(
+                    faction_id="core-marine-force",
+                    detachment_ids=("core-combined-arms",),
+                ),
+                force_disposition_id="purge-the-foe",
+                unit_selections=(
+                    _unit_muster_selection(
+                        unit_selection_id="character-unit-3",
+                        datasheet_id="core-character-leader",
+                        model_profile_id="core-character-leader",
+                        model_count=1,
+                    ),
+                ),
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
+        mission_setup=mission_setup,
+    )
+
+
 def _config_with_player_b_vehicles(vehicle_unit_ids: tuple[str, ...]) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
@@ -6141,6 +7565,16 @@ def _event_companion_mission_setup() -> MissionSetup:
     )
 
 
+def _event_companion_meatgrinder_mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+
+
 def _mission_setup_for_primary(
     primary_mission_id: str,
     *,
@@ -6215,6 +7649,13 @@ def _scoring_terrain_feature(*, feature_id: str) -> TerrainFeatureDefinition:
         footprint_center_y_inches=22.0,
         footprint_width_inches=8.0,
         footprint_depth_inches=8.0,
+        rules_footprint_polygon=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=30.0,
+            center_y_inches=22.0,
+            width_inches=8.0,
+            depth_inches=8.0,
+            display_template_id="phase11e_scoring_debris_8x8_rules",
+        ).footprint_polygon,
         display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
             center_x_inches=30.0,
             center_y_inches=22.0,
@@ -6254,12 +7695,19 @@ def _objective_marker_matches_suffix(objective_marker_id: str, target_suffix: st
 
 def _objective_marker_suffix_aliases(target_suffix: str) -> tuple[str, ...]:
     if target_suffix == "center":
-        return ("-center", "-center-central")
+        return (
+            "-center",
+            "-center-central",
+            "-central-north",
+            "-central-south",
+            "-central-west",
+            "-central-east",
+        )
     if target_suffix in {"northeast", "northwest"}:
         return (f"-{target_suffix}", "-upper-central")
     if target_suffix in {"southeast", "southwest"}:
         return (f"-{target_suffix}", "-lower-central")
-    return (target_suffix,)
+    return (target_suffix, f"-{target_suffix.replace('_', '-')}")
 
 
 def _ruleset() -> RulesetDescriptor:

@@ -18,11 +18,10 @@ from warhammer40k_core.core.deployment_zones import (
     DeploymentZonePayload,
     DeploymentZoneShape,
 )
-from warhammer40k_core.core.objectives import Objective, ObjectiveMarker
-from warhammer40k_core.core.ruleset_descriptor import (
-    RulesetDescriptorError,
-    terrain_feature_kind_from_token,
+from warhammer40k_core.core.objective_terrain_area_references import (
+    validate_objective_terrain_area_references,
 )
+from warhammer40k_core.core.objectives import Objective, ObjectiveMarker
 from warhammer40k_core.core.terrain_areas import (
     PlacedTerrainArea,
     PlacedTerrainAreaPayload,
@@ -39,6 +38,7 @@ from warhammer40k_core.core.terrain_layouts import (
     TerrainFeaturePresetPayload,
     TerrainLayoutTemplate,
     TerrainLayoutTemplatePayload,
+    transform_terrain_feature_local_point,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.geometry.polygons import (
@@ -778,10 +778,33 @@ class BattlefieldLayoutDefinition:
             width=self.battlefield_width_inches,
             depth=self.battlefield_depth_inches,
         )
-        _validate_objective_terrain_area_references(
-            objective_terrain_areas=objective_terrain_areas,
-            objective_markers=markers,
-            terrain_areas=terrain_areas,
+        validate_objective_terrain_area_references(
+            context_name="BattlefieldLayoutDefinition",
+            objective_terrain_areas=tuple(
+                (
+                    definition.objective_marker_id,
+                    definition.objective_role,
+                    definition.terrain_area_ids,
+                )
+                for definition in objective_terrain_areas
+            ),
+            objective_markers=tuple(
+                (
+                    marker.objective_marker_id,
+                    marker.objective_role,
+                    marker.x_inches,
+                    marker.y_inches,
+                )
+                for marker in markers
+            ),
+            terrain_areas=tuple(
+                (
+                    area.terrain_area_id,
+                    tuple((point.x_inches, point.y_inches) for point in area.footprint_polygon),
+                )
+                for area in terrain_areas
+            ),
+            error_factory=MissionPackError,
         )
         _validate_terrain_feature_area_placement_references(
             terrain_feature_placements=terrain_feature_placements,
@@ -2412,7 +2435,6 @@ def _validate_terrain_feature_area_placements(
         )
     placements: list[TerrainFeatureAreaPlacement] = []
     seen_feature_ids: set[str] = set()
-    seen_area_ids: set[str] = set()
     for value in cast(tuple[object, ...], values):
         if type(value) is not TerrainFeatureAreaPlacement:
             raise MissionPackError(
@@ -2424,13 +2446,7 @@ def _validate_terrain_feature_area_placements(
                 "BattlefieldLayoutDefinition terrain_feature_placements must not duplicate "
                 "feature IDs."
             )
-        if value.terrain_area_id in seen_area_ids:
-            raise MissionPackError(
-                "BattlefieldLayoutDefinition terrain_feature_placements must not duplicate "
-                "terrain area IDs."
-            )
         seen_feature_ids.add(value.feature_id)
-        seen_area_ids.add(value.terrain_area_id)
         placements.append(value)
     return tuple(sorted(placements, key=lambda placement: placement.feature_id))
 
@@ -2463,43 +2479,6 @@ def _validate_objective_terrain_area_tuple(
             key=lambda objective_terrain_area: objective_terrain_area.objective_marker_id,
         )
     )
-
-
-def _validate_objective_terrain_area_references(
-    *,
-    objective_terrain_areas: tuple[ObjectiveTerrainAreaDefinition, ...],
-    objective_markers: tuple[ObjectiveMarkerDefinition, ...],
-    terrain_areas: tuple[PlacedTerrainArea, ...],
-) -> None:
-    marker_roles_by_id = {
-        marker.objective_marker_id: marker.objective_role for marker in objective_markers
-    }
-    terrain_area_ids = {terrain_area.terrain_area_id for terrain_area in terrain_areas}
-    seen_terrain_area_ids: set[str] = set()
-    for objective_terrain_area in objective_terrain_areas:
-        marker_role = marker_roles_by_id.get(objective_terrain_area.objective_marker_id)
-        if marker_role is None:
-            raise MissionPackError(
-                "BattlefieldLayoutDefinition objective_terrain_areas references unknown "
-                "objective marker."
-            )
-        if marker_role is not objective_terrain_area.objective_role:
-            raise MissionPackError(
-                "BattlefieldLayoutDefinition objective_terrain_areas objective_role must "
-                "match the referenced objective marker."
-            )
-        for terrain_area_id in objective_terrain_area.terrain_area_ids:
-            if terrain_area_id not in terrain_area_ids:
-                raise MissionPackError(
-                    "BattlefieldLayoutDefinition objective_terrain_areas references unknown "
-                    "terrain area."
-                )
-            if terrain_area_id in seen_terrain_area_ids:
-                raise MissionPackError(
-                    "BattlefieldLayoutDefinition objective_terrain_areas terrain areas must "
-                    "belong to at most one objective."
-                )
-            seen_terrain_area_ids.add(terrain_area_id)
 
 
 def _validate_terrain_feature_area_placement_references(
@@ -2963,6 +2942,7 @@ def _validate_battlefield_layout_references(
             layout=layout,
             terrain_layout=terrain_layout,
             terrain_feature_presets=terrain_feature_presets,
+            templates_by_id=terrain_area_templates_by_id,
         )
 
 
@@ -2978,21 +2958,6 @@ def _validate_terrain_feature_presets_match_footprint_templates(
                 "TerrainFeaturePreset footprint_template_id references unknown terrain area "
                 "footprint template."
             )
-        if not math.isclose(
-            preset.footprint_width_inches,
-            template.bounding_width_inches,
-            rel_tol=0.0,
-            abs_tol=_GEOMETRY_EPSILON,
-        ) or not math.isclose(
-            preset.footprint_depth_inches,
-            template.bounding_depth_inches,
-            rel_tol=0.0,
-            abs_tol=_GEOMETRY_EPSILON,
-        ):
-            raise MissionPackError(
-                "TerrainFeaturePreset footprint dimensions must match its terrain area "
-                "footprint template."
-            )
 
 
 def _validate_terrain_feature_area_placements_match_sources(
@@ -3000,6 +2965,7 @@ def _validate_terrain_feature_area_placements_match_sources(
     layout: BattlefieldLayoutDefinition,
     terrain_layout: TerrainLayoutTemplate,
     terrain_feature_presets: tuple[TerrainFeaturePreset, ...],
+    templates_by_id: dict[str, TerrainAreaFootprintTemplate],
 ) -> None:
     static_feature_ids = set(terrain_layout.terrain_feature_ids())
     placed_feature_ids = {placement.feature_id for placement in layout.terrain_feature_placements}
@@ -3019,16 +2985,27 @@ def _validate_terrain_feature_area_placements_match_sources(
                 "BattlefieldLayoutDefinition terrain_feature_placements preset footprint "
                 "must match the referenced terrain area."
             )
-        try:
-            area_feature_kind = terrain_feature_kind_from_token(terrain_area.terrain_feature_kind)
-        except RulesetDescriptorError as exc:
+        template = templates_by_id[terrain_area.footprint_template_id]
+        area_polygon = tuple(
+            (point.x_inches, point.y_inches) for point in template.polygon_vertices_inches
+        )
+        placed_polygon = tuple(
+            (point.x_inches, point.y_inches)
+            for point in (
+                transform_terrain_feature_local_point(point, placement=placement)
+                for point in preset.local_rules_footprint_polygon
+            )
+        )
+        component_area = abs(_signed_polygon_area(placed_polygon))
+        if not math.isclose(
+            component_area,
+            _polygon_overlap_area(area_polygon, placed_polygon),
+            rel_tol=0.0,
+            abs_tol=_GEOMETRY_EPSILON,
+        ):
             raise MissionPackError(
-                "BattlefieldLayoutDefinition terrain_area terrain_feature_kind is unsupported."
-            ) from exc
-        if preset.feature_kind is not area_feature_kind:
-            raise MissionPackError(
-                "BattlefieldLayoutDefinition terrain_feature_placements preset feature kind "
-                "must match the referenced terrain area."
+                "BattlefieldLayoutDefinition terrain feature placement footprint must fit "
+                "within the referenced terrain area."
             )
 
 

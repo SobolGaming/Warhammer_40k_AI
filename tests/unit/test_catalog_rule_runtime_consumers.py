@@ -6695,6 +6695,13 @@ def _line_blocking_ruin() -> TerrainFeatureDefinition:
         footprint_center_y_inches=10.0,
         footprint_width_inches=1.0,
         footprint_depth_inches=20.0,
+        rules_footprint_polygon=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=15.0,
+            center_y_inches=10.0,
+            width_inches=1.0,
+            depth_inches=20.0,
+            display_template_id="catalog-selected-target-line-blocker-rules",
+        ).footprint_polygon,
         display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
             center_x_inches=15.0,
             center_y_inches=10.0,

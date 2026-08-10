@@ -1034,6 +1034,13 @@ def _terrain_endpoint_feature(
         footprint_center_y_inches=center_y_inches,
         footprint_width_inches=width_inches,
         footprint_depth_inches=depth_inches,
+        rules_footprint_polygon=TerrainDisplayGeometry.axis_aligned_rectangle(
+            center_x_inches=center_x_inches,
+            center_y_inches=center_y_inches,
+            width_inches=width_inches,
+            depth_inches=depth_inches,
+            display_template_id="phase16a_terrain_endpoint_hill_rules",
+        ).footprint_polygon,
         display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
             center_x_inches=center_x_inches,
             center_y_inches=center_y_inches,

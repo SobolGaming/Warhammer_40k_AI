@@ -1727,6 +1727,12 @@ def _blocking_wall_feature(*, x: float, y: float) -> TerrainFeatureDefinition:
         footprint_center_y_inches=y,
         footprint_width_inches=4.0,
         footprint_depth_inches=4.0,
+        rules_footprint_polygon=_display_geometry(
+            center_x_inches=x,
+            center_y_inches=y,
+            width_inches=4.0,
+            depth_inches=4.0,
+        ).footprint_polygon,
         display_geometry=_display_geometry(
             center_x_inches=x,
             center_y_inches=y,
