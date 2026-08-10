@@ -4,10 +4,22 @@ const VIEWER_SCHEMA = "event-companion-battlefield-viewer-v2";
 const BATTLEFIELD_VIEW_SCHEMA = "battlefield-view-v2-phase17n";
 const COORDINATE_SPEC = "battlefield-coordinate-v1";
 const COORDINATE_SPACE = "battlefield_inches_right_handed_z_up";
-const DEG_TO_RAD = Math.PI / 180;
-const RAD_TO_DEG = 180 / Math.PI;
-const NEAR_PLANE_DEPTH = 0.05;
-const PROJECTION_EPSILON = 0.0000001;
+const VIEWER_GEOMETRY = globalThis.BattlefieldViewerGeometry;
+if (VIEWER_GEOMETRY === undefined) {
+  throw new Error("Battlefield viewer geometry module is missing.");
+}
+const {
+  DEG_TO_RAD,
+  RAD_TO_DEG,
+  cameraForBounds,
+  clipWorldLineToNearPlane,
+  hatchLineSegments,
+  projectPoint,
+  projectWorldPoints,
+  rectangleWorldPoints,
+  shapeWorldPoints,
+  worldPoint,
+} = VIEWER_GEOMETRY;
 
 const COLORS = Object.freeze({
   board: "#f5f0e5",
@@ -524,7 +536,7 @@ function renderScene() {
   try {
     const view = state.layout.battlefield_view;
     validateBattlefieldView(view);
-    const camera = cameraForBounds(view.bounds, size.width, size.height);
+    const camera = cameraForBounds(view.bounds, size.width, size.height, state.camera);
     const authoritative = view.authoritative;
     const objectiveFootprints = resolveObjectiveTerrainFootprints(
       authoritative.objectives_by_id,
@@ -600,43 +612,6 @@ function drawBackdrop(context, width, height) {
   gradient.addColorStop(1, "#bdc8cd");
   context.fillStyle = gradient;
   context.fillRect(0, 0, width, height);
-}
-
-function cameraForBounds(bounds, width, height) {
-  const battlefieldWidth = Number(bounds.max_x_inches) - Number(bounds.min_x_inches);
-  const battlefieldDepth = Number(bounds.max_y_inches) - Number(bounds.min_y_inches);
-  const target = {
-    x: Number(bounds.min_x_inches) + battlefieldWidth / 2,
-    y: Number(bounds.min_y_inches) + battlefieldDepth / 2,
-    z: 2.25,
-  };
-  const distance = Math.max(battlefieldWidth, battlefieldDepth) * 1.48 / state.camera.zoom;
-  const elevation = clamp(state.camera.elevation, 12 * DEG_TO_RAD, 89.5 * DEG_TO_RAD);
-  const horizontalDistance = distance * Math.cos(elevation);
-  const cameraPosition = {
-    x: target.x + horizontalDistance * Math.cos(state.camera.azimuth),
-    y: target.y + horizontalDistance * Math.sin(state.camera.azimuth),
-    z: target.z + distance * Math.sin(elevation),
-  };
-  const forward = normalize(subtract(target, cameraPosition));
-  const right = normalize(cross(forward, { x: 0, y: 0, z: 1 }));
-  const up = normalize(cross(right, forward));
-  const focalLength = Math.min(width, height) * 0.92;
-  return { position: cameraPosition, forward, right, up, focalLength, width, height };
-}
-
-function projectPoint(point, camera) {
-  const relative = subtract(point, camera.position);
-  const depth = dot(relative, camera.forward);
-  if (depth < NEAR_PLANE_DEPTH - PROJECTION_EPSILON) {
-    return null;
-  }
-  const perspective = camera.focalLength / depth;
-  return {
-    x: camera.width / 2 + dot(relative, camera.right) * perspective,
-    y: camera.height / 2 - dot(relative, camera.up) * perspective,
-    depth,
-  };
 }
 
 function drawBoard(context, camera, bounds) {
@@ -723,12 +698,17 @@ function drawTerrainAreas(context, camera, areasById) {
       continue;
     }
     const color = classificationColor(area.classification);
-    drawHatchedScreenPolygon(context, screenPoints, {
-      fill: hexToRgba(color, 0.16),
-      stroke: hexToRgba(color, 0.72),
-      lineWidth: 1,
-      classification: area.classification,
-    });
+    drawHatchedScreenPolygon(
+      context,
+      screenPoints,
+      {
+        fill: hexToRgba(color, 0.16),
+        stroke: hexToRgba(color, 0.72),
+        lineWidth: 1,
+        classification: area.classification,
+      },
+      camera,
+    );
     state.hitRegions.push(hitRecord([screenPoints], [], entityRecord("terrain_area", area)));
   }
 }
@@ -814,12 +794,17 @@ function drawTerrainFootprints(context, camera, featuresById, hintsById) {
       continue;
     }
     const color = classificationColor(feature.classification);
-    drawHatchedScreenPolygon(context, screenPoints, {
-      fill: hexToRgba(color, 0.32),
-      stroke: hexToRgba(color, 0.96),
-      lineWidth: 1.4,
-      classification: feature.classification,
-    });
+    drawHatchedScreenPolygon(
+      context,
+      screenPoints,
+      {
+        fill: hexToRgba(color, 0.32),
+        stroke: hexToRgba(color, 0.96),
+        lineWidth: 1.4,
+        classification: feature.classification,
+      },
+      camera,
+    );
     state.hitRegions.push(
       hitRecord(
         [screenPoints],
@@ -998,24 +983,19 @@ function drawScreenPolygon(context, points, style) {
   context.restore();
 }
 
-function drawHatchedScreenPolygon(context, points, style) {
+function drawHatchedScreenPolygon(context, points, style, viewport) {
   drawScreenPolygon(context, points, style);
   context.save();
   context.beginPath();
   movePolygonPath(context, points);
   context.clip();
-  const bounds = screenBounds(points);
-  const spacing = 9;
   context.strokeStyle = hexToRgba(classificationColor(style.classification), 0.28);
   context.lineWidth = 0.7;
-  const directions = style.classification === "mixed" ? [1, -1] : [style.classification === "light" ? -1 : 1];
-  for (const direction of directions) {
-    for (let offset = bounds.minX - bounds.height; offset < bounds.maxX + bounds.height; offset += spacing) {
-      context.beginPath();
-      context.moveTo(offset, direction > 0 ? bounds.maxY : bounds.minY);
-      context.lineTo(offset + bounds.height, direction > 0 ? bounds.minY : bounds.maxY);
-      context.stroke();
-    }
+  for (const segment of hatchLineSegments(points, style.classification, viewport)) {
+    context.beginPath();
+    context.moveTo(segment.start.x, segment.start.y);
+    context.lineTo(segment.end.x, segment.end.y);
+    context.stroke();
   }
   context.restore();
 }
@@ -1058,152 +1038,6 @@ function drawWorldLine(context, camera, start, end, stroke, lineWidth) {
   context.lineWidth = lineWidth;
   context.stroke();
   context.restore();
-}
-
-function projectWorldPoints(points, camera) {
-  const clippedPoints = clipWorldPolygonToNearPlane(points, camera);
-  if (clippedPoints.length < 3) {
-    return null;
-  }
-  const projected = [];
-  for (const point of clippedPoints) {
-    const screenPoint = projectPoint(point, camera);
-    if (screenPoint === null) {
-      throw new Error("Near-plane polygon clipping produced an unprojectable vertex.");
-    }
-    projected.push(screenPoint);
-  }
-  return projected;
-}
-
-function clipWorldPolygonToNearPlane(points, camera) {
-  if (!Array.isArray(points) || points.length < 3) {
-    throw new Error("World polygon must contain at least three points.");
-  }
-  const clipped = [];
-  let previous = points[points.length - 1];
-  let previousDepth = cameraDepth(previous, camera);
-  for (const current of points) {
-    const currentDepth = cameraDepth(current, camera);
-    const previousInside = previousDepth >= NEAR_PLANE_DEPTH;
-    const currentInside = currentDepth >= NEAR_PLANE_DEPTH;
-    if (currentInside) {
-      if (!previousInside) {
-        clipped.push(nearPlaneIntersection(previous, current, previousDepth, currentDepth));
-      }
-      clipped.push(current);
-    } else if (previousInside) {
-      clipped.push(nearPlaneIntersection(previous, current, previousDepth, currentDepth));
-    }
-    previous = current;
-    previousDepth = currentDepth;
-  }
-  return clipped;
-}
-
-function clipWorldLineToNearPlane(start, end, camera) {
-  const startDepth = cameraDepth(start, camera);
-  const endDepth = cameraDepth(end, camera);
-  const startInside = startDepth >= NEAR_PLANE_DEPTH;
-  const endInside = endDepth >= NEAR_PLANE_DEPTH;
-  if (!startInside && !endInside) {
-    return null;
-  }
-  if (startInside && endInside) {
-    return [start, end];
-  }
-  const intersection = nearPlaneIntersection(start, end, startDepth, endDepth);
-  return startInside ? [start, intersection] : [intersection, end];
-}
-
-function nearPlaneIntersection(start, end, startDepth, endDepth) {
-  const depthDelta = endDepth - startDepth;
-  if (Math.abs(depthDelta) <= PROJECTION_EPSILON) {
-    throw new Error("Near-plane intersection requires a crossing segment.");
-  }
-  const amount = (NEAR_PLANE_DEPTH - startDepth) / depthDelta;
-  return worldPoint(
-    start.x + (end.x - start.x) * amount,
-    start.y + (end.y - start.y) * amount,
-    start.z + (end.z - start.z) * amount,
-  );
-}
-
-function cameraDepth(point, camera) {
-  return dot(subtract(point, camera.position), camera.forward);
-}
-
-function shapeWorldPoints(shape, z) {
-  if (shape.kind === "polygon") {
-    return shape.vertices.map((point) => worldPoint(point.x_inches, point.y_inches, z));
-  }
-  if (shape.center === null) {
-    throw new Error(`Shape ${String(shape.kind)} requires a center.`);
-  }
-  if (shape.kind === "circle") {
-    return ellipseWorldPoints(
-      shape.center,
-      Number(shape.radius_inches),
-      Number(shape.radius_inches),
-      0,
-      z,
-    );
-  }
-  if (shape.kind === "ellipse") {
-    return ellipseWorldPoints(
-      shape.center,
-      Number(shape.length_inches) / 2,
-      Number(shape.width_inches) / 2,
-      Number(shape.rotation_degrees),
-      z,
-    );
-  }
-  if (shape.kind === "rectangle") {
-    return rectangleWorldPoints(
-      shape.center,
-      Number(shape.length_inches),
-      Number(shape.width_inches),
-      Number(shape.rotation_degrees),
-      z,
-    );
-  }
-  throw new Error(`Unsupported projected shape: ${String(shape.kind)}.`);
-}
-
-function ellipseWorldPoints(center, radiusX, radiusY, rotationDegrees, z) {
-  const points = [];
-  const rotation = rotationDegrees * DEG_TO_RAD;
-  for (let index = 0; index < 32; index += 1) {
-    const angle = (index / 32) * Math.PI * 2;
-    const localX = Math.cos(angle) * radiusX;
-    const localY = Math.sin(angle) * radiusY;
-    points.push(
-      worldPoint(
-        Number(center.x_inches) + localX * Math.cos(rotation) - localY * Math.sin(rotation),
-        Number(center.y_inches) + localX * Math.sin(rotation) + localY * Math.cos(rotation),
-        z,
-      ),
-    );
-  }
-  return points;
-}
-
-function rectangleWorldPoints(center, width, depth, rotationDegrees, z) {
-  const halfWidth = width / 2;
-  const halfDepth = depth / 2;
-  const rotation = rotationDegrees * DEG_TO_RAD;
-  return [
-    [-halfWidth, -halfDepth],
-    [halfWidth, -halfDepth],
-    [halfWidth, halfDepth],
-    [-halfWidth, halfDepth],
-  ].map(([localX, localY]) =>
-    worldPoint(
-      Number(center.x_inches) + localX * Math.cos(rotation) - localY * Math.sin(rotation),
-      Number(center.y_inches) + localX * Math.sin(rotation) + localY * Math.cos(rotation),
-      z,
-    ),
-  );
 }
 
 function boxFaces(volume, color, entity) {
@@ -1388,44 +1222,6 @@ function humanize(value) {
 
 function formatNumber(value) {
   return String(Math.round(Number(value) * 100) / 100);
-}
-
-function screenBounds(points) {
-  const xValues = points.map((point) => point.x);
-  const yValues = points.map((point) => point.y);
-  const minX = Math.min(...xValues);
-  const maxX = Math.max(...xValues);
-  const minY = Math.min(...yValues);
-  const maxY = Math.max(...yValues);
-  return { minX, maxX, minY, maxY, height: maxY - minY };
-}
-
-function worldPoint(x, y, z) {
-  return { x: Number(x), y: Number(y), z: Number(z) };
-}
-
-function subtract(left, right) {
-  return { x: left.x - right.x, y: left.y - right.y, z: left.z - right.z };
-}
-
-function dot(left, right) {
-  return left.x * right.x + left.y * right.y + left.z * right.z;
-}
-
-function cross(left, right) {
-  return {
-    x: left.y * right.z - left.z * right.y,
-    y: left.z * right.x - left.x * right.z,
-    z: left.x * right.y - left.y * right.x,
-  };
-}
-
-function normalize(vector) {
-  const length = Math.hypot(vector.x, vector.y, vector.z);
-  if (!(length > 0.000001)) {
-    throw new Error("Camera basis vector is degenerate.");
-  }
-  return { x: vector.x / length, y: vector.y / length, z: vector.z / length };
 }
 
 function average(values) {

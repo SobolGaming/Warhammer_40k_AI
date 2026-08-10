@@ -75,6 +75,10 @@ def html_document(*, data: dict[str, object] | None = None) -> str:
     return _html_document(data=build_data_payload() if data is None else data)
 
 
+def viewer_geometry_javascript() -> str:
+    return _asset_text("viewer_geometry.js")
+
+
 def viewer_javascript() -> str:
     return _asset_text("viewer.js")
 
@@ -320,6 +324,7 @@ def _handler_for(
     encoded_html = html.encode("utf-8")
     encoded_data = json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")
     encoded_css = viewer_stylesheet().encode("utf-8")
+    encoded_geometry_javascript = viewer_geometry_javascript().encode("utf-8")
     encoded_javascript = viewer_javascript().encode("utf-8")
 
     class EventLayoutMockHandler(BaseHTTPRequestHandler):
@@ -343,6 +348,13 @@ def _handler_for(
                 self._send_response(
                     body=encoded_css,
                     content_type="text/css; charset=utf-8",
+                    status=HTTPStatus.OK,
+                )
+                return
+            if path == "/viewer-geometry.js":
+                self._send_response(
+                    body=encoded_geometry_javascript,
+                    content_type="text/javascript; charset=utf-8",
                     status=HTTPStatus.OK,
                 )
                 return

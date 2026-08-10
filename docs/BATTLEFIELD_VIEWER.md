@@ -51,11 +51,13 @@ Z-up, inches-based coordinates to screen pixels. Rules geometry remains the
 only source for component placement and dimensions; asset hints affect labels
 only. Polygons and grid segments that cross the camera near plane are clipped
 before projection so supported close-camera settings retain their visible
-geometry. Objective-to-terrain-area links are retained beside the projection
-in the viewer-only envelope because that association is mission metadata
-rather than part of `battlefield-view-v2-phase17n`. The viewer never converts
-the objective identity record's marker diameter into a standalone rules or
-selection footprint.
+geometry. Hatch generation intersects those projected bounds with the canvas
+viewport, keeping per-frame drawing work bounded even when near-plane clipping
+produces far-off-screen vertices. Objective-to-terrain-area links are retained
+beside the projection in the viewer-only envelope because that association is
+mission metadata rather than part of `battlefield-view-v2-phase17n`. The viewer
+never converts the objective identity record's marker diameter into a
+standalone rules or selection footprint.
 
 ## Honest scope
 

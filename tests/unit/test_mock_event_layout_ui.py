@@ -1,11 +1,21 @@
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 from collections import Counter
+from pathlib import Path
 from typing import cast
 
 import pytest
 from scripts import mock_event_layout_ui
+
+_VIEWER_RENDERER_TEST = (
+    Path(__file__).resolve().parents[2]
+    / "scripts"
+    / "mock_event_layout_ui_assets"
+    / "viewer_renderer_test.cjs"
+)
 
 
 @pytest.fixture(scope="module")
@@ -165,12 +175,14 @@ def test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls(
     viewer_data: dict[str, object],
 ) -> None:
     html = mock_event_layout_ui.html_document(data=viewer_data)
+    geometry_javascript = mock_event_layout_ui.viewer_geometry_javascript()
     javascript = mock_event_layout_ui.viewer_javascript()
     stylesheet = mock_event_layout_ui.viewer_stylesheet()
     embedded_data = _embedded_layout_data(html)
 
     assert embedded_data == viewer_data
     assert '<canvas\n          id="battlefield"' in html
+    assert '<script src="/viewer-geometry.js"></script>' in html
     assert '<script src="/viewer.js" defer></script>' in html
     assert '<link rel="stylesheet" href="/viewer.css">' in html
     assert html.count('<option value="purge-the-foe" selected>Purge the Foe</option>') == 2
@@ -202,8 +214,9 @@ def test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls(
     assert "projectPoint" in javascript
     assert "resolveObjectiveTerrainFootprints" in javascript
     assert "drawObjectiveTerrainFootprints" in javascript
-    assert "clipWorldPolygonToNearPlane" in javascript
-    assert "clipWorldLineToNearPlane" in javascript
+    assert "clipWorldPolygonToNearPlane" in geometry_javascript
+    assert "clipWorldLineToNearPlane" in geometry_javascript
+    assert "hatchLineSegments" in geometry_javascript
     assert "collectObjectiveFaces" not in javascript
     assert "cylinderFaces" not in javascript
     assert "marker_diameter_inches" not in javascript
@@ -217,9 +230,40 @@ def test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls(
     assert ".swatch.no-mans-land" in stylesheet
 
 
+def test_mock_event_layout_ui_executes_bounded_close_camera_rendering(
+    viewer_data: dict[str, object],
+) -> None:
+    node = shutil.which("node")
+    assert node is not None, "Node.js is required for the executable viewer renderer regression."
+    completed = subprocess.run(
+        [node, str(_VIEWER_RENDERER_TEST)],
+        input=json.dumps(viewer_data, sort_keys=True, separators=(",", ":")),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    result = _object_map(json.loads(completed.stdout))
+    close_camera = _object_map(result["close_camera"])
+    assert close_camera == {
+        "azimuth_degrees": 315,
+        "board_visible": True,
+        "defender_territory_visible": True,
+        "defender_zone_visible": True,
+        "elevation_degrees": 12,
+        "terrain_area_14_visible": True,
+        "zoom": 3.5,
+    }
+    assert result["tested_azimuth_count"] == 360
+    assert _number(result["maximum_hatch_strokes"]) <= _number(result["hatch_stroke_budget"])
+
+
 def _embedded_layout_data(html: str) -> dict[str, object]:
     start_tag = '  <script id="layout-data" type="application/json">\n'
-    end_tag = '\n  </script>\n  <script src="/viewer.js" defer></script>'
+    end_tag = (
+        '\n  </script>\n  <script src="/viewer-geometry.js"></script>\n'
+        '  <script src="/viewer.js" defer></script>'
+    )
     start = html.index(start_tag) + len(start_tag)
     end = html.index(end_tag, start)
     return _object_map(json.loads(html[start:end].strip()))
