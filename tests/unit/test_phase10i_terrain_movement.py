@@ -375,12 +375,16 @@ def test_exact_event_companion_ruins_apply_keyword_specific_wall_traversal() -> 
         feature
         for feature in mission_setup.terrain_features
         if feature.feature_kind is TerrainFeatureKind.RUINS
+        and len(feature.floors) == 3
         and any(
             wall.wall_id == "ground-long-solid-wall" and wall.width_inches >= 2.5
             for wall in feature.walls
         )
     )
     wall = next(wall for wall in ruins.walls if wall.wall_id == "ground-long-solid-wall")
+    middle_wall = next(
+        candidate for candidate in ruins.walls if candidate.wall_id == "first-long-solid-wall"
+    )
     start_pose, middle_pose, end_pose = _wall_crossing_poses(wall)
 
     assert ruins.feature_id.startswith("purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-")
@@ -388,6 +392,7 @@ def test_exact_event_companion_ruins_apply_keyword_specific_wall_traversal() -> 
     assert "gw_event_companion_v1_purge_the_foe_vs_purge_the_foe_meatgrinder_layout_a" in (
         ruins.source_id
     )
+    assert wall.bottom_z_inches + wall.height_inches == middle_wall.bottom_z_inches
 
     for keywords in (
         ("INFANTRY",),
@@ -433,7 +438,7 @@ def test_exact_event_companion_ruins_apply_keyword_specific_wall_traversal() -> 
 
         assert not result.is_valid
         assert result.violations[0].violation_code == "terrain_feature_transit_forbidden"
-        assert result.violations[0].terrain_id == f"{ruins.feature_id}:{wall.wall_id}"
+        assert result.violations[0].terrain_id == f"{ruins.feature_id}:{middle_wall.wall_id}"
 
 
 def test_exact_event_dense_ruin_mobile_vertical_path_climbs_instead_of_passing_through() -> None:
@@ -443,9 +448,17 @@ def test_exact_event_dense_ruin_mobile_vertical_path_climbs_instead_of_passing_t
         for feature in mission_setup.terrain_features
         if feature.classification is TerrainAreaClassification.DENSE
         and feature.feature_kind is TerrainFeatureKind.RUINS
+        and len(feature.floors) == 3
         and any(wall.wall_id == "ground-long-solid-wall" for wall in feature.walls)
     )
     wall = next(wall for wall in ruins.walls if wall.wall_id == "ground-long-solid-wall")
+    aligned_walls = tuple(
+        candidate for candidate in ruins.walls if candidate.wall_id.endswith("long-solid-wall")
+    )
+    wall_stack_top = max(
+        candidate.bottom_z_inches + candidate.height_inches for candidate in aligned_walls
+    )
+    assert wall_stack_top == 8.0
     rotation_radians = math.radians(wall.rotation_degrees)
     normal_x = -math.sin(rotation_radians)
     normal_y = math.cos(rotation_radians)
@@ -454,7 +467,7 @@ def test_exact_event_dense_ruin_mobile_vertical_path_climbs_instead_of_passing_t
         wall.center_x_inches - normal_x * clearance_inches,
         wall.center_y_inches - normal_y * clearance_inches,
     )
-    middle_pose = Pose.at(wall.center_x_inches, wall.center_y_inches, 3.0)
+    middle_pose = Pose.at(wall.center_x_inches, wall.center_y_inches, wall_stack_top)
     end_pose = Pose.at(
         wall.center_x_inches + normal_x * clearance_inches,
         wall.center_y_inches + normal_y * clearance_inches,
@@ -473,10 +486,15 @@ def test_exact_event_dense_ruin_mobile_vertical_path_climbs_instead_of_passing_t
     matching_segments = tuple(
         segment
         for segment in result.segments
-        if segment.terrain_id == f"{ruins.feature_id}:{wall.wall_id}"
+        if segment.terrain_id
+        in {f"{ruins.feature_id}:{candidate.wall_id}" for candidate in aligned_walls}
     )
     assert matching_segments
-    assert all(segment.traversal_mode.value == "climb" for segment in matching_segments)
+    assert any(segment.traversal_mode.value == "climb" for segment in matching_segments)
+    assert all(
+        segment.traversal_mode.value in {"climb", "freely_traversable"}
+        for segment in matching_segments
+    )
     assert all(segment.vertical_distance_inches > 0.0 for segment in matching_segments)
 
 
@@ -772,7 +790,8 @@ def test_take_to_the_skies_flies_over_exact_event_companion_dense_non_ruin() -> 
         if feature.feature_kind is TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY
         and len(feature.walls) == 1
         and feature.walls[0].height_inches == 3.5
-        and feature.walls[0].width_inches >= 3.5
+        and feature.source_id is not None
+        and ":terrain-archetype:dense-long-pipes:" in feature.source_id
     )
     wall = dense_non_ruin.walls[0]
     start_pose, _, end_pose = _wall_crossing_poses(wall)

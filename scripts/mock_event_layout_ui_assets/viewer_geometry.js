@@ -14,6 +14,7 @@
   const NEAR_PLANE_DEPTH = 0.05;
   const PROJECTION_EPSILON = 0.0000001;
   const HATCH_SPACING = 9;
+  const TERRITORY_BOUNDARY_EPSILON = 0.000001;
 
   function cameraForBounds(bounds, width, height, cameraState) {
     const battlefieldWidth = Number(bounds.max_x_inches) - Number(bounds.min_x_inches);
@@ -251,6 +252,64 @@
     return { minX, maxX, minY, maxY, height: maxY - minY };
   }
 
+  function sharedTerritoryBoundarySegments(regionsById) {
+    const territories = Object.values(regionsById).filter(
+      (region) => region.region_kind === "territory",
+    );
+    if (territories.length === 0) {
+      return [];
+    }
+    if (territories.length !== 2) {
+      throw new Error("Territory divider requires exactly two territory regions.");
+    }
+    const attacker = territories.find((region) => region.owner_role === "attacker");
+    const defender = territories.find((region) => region.owner_role === "defender");
+    if (attacker === undefined || defender === undefined) {
+      throw new Error("Territory divider requires attacker and defender territory regions.");
+    }
+    const defenderEdges = polygonEdges(defender.shape.polygons);
+    const shared = [];
+    for (const attackerEdge of polygonEdges(attacker.shape.polygons)) {
+      const match = defenderEdges.find(
+        (defenderEdge) =>
+          (sameBattlefieldPoint(attackerEdge.start, defenderEdge.start) &&
+            sameBattlefieldPoint(attackerEdge.end, defenderEdge.end)) ||
+          (sameBattlefieldPoint(attackerEdge.start, defenderEdge.end) &&
+            sameBattlefieldPoint(attackerEdge.end, defenderEdge.start)),
+      );
+      if (match !== undefined) {
+        shared.push(attackerEdge);
+      }
+    }
+    if (shared.length === 0) {
+      throw new Error("Attacker and defender territories do not share a boundary segment.");
+    }
+    return shared;
+  }
+
+  function polygonEdges(polygons) {
+    const edges = [];
+    for (const polygon of polygons) {
+      if (!Array.isArray(polygon) || polygon.length < 3) {
+        throw new Error("Territory polygon must contain at least three points.");
+      }
+      for (let index = 0; index < polygon.length; index += 1) {
+        edges.push({
+          start: polygon[index],
+          end: polygon[(index + 1) % polygon.length],
+        });
+      }
+    }
+    return edges;
+  }
+
+  function sameBattlefieldPoint(left, right) {
+    return (
+      Math.abs(Number(left.x_inches) - Number(right.x_inches)) <= TERRITORY_BOUNDARY_EPSILON &&
+      Math.abs(Number(left.y_inches) - Number(right.y_inches)) <= TERRITORY_BOUNDARY_EPSILON
+    );
+  }
+
   function hatchDirections(classification) {
     if (classification === "mixed") {
       return [1, -1];
@@ -322,6 +381,7 @@
     projectPoint,
     projectWorldPoints,
     rectangleWorldPoints,
+    sharedTerritoryBoundarySegments,
     shapeWorldPoints,
     worldPoint,
   });

@@ -109,16 +109,24 @@ Secondary status:
   separate reviewed Chapter Approved mission-deck provenance in the Event
   Companion source package.
 - The exact battlefield artifact has package hash
-  `e000de2eee57a1a9e8be21be2c88c427b2317ce0f832cf98e32e50bff18b6997`
+  `c1e796a17bfcd533822dfe6300210a61169348d5273b3fe94bbe540594c0f04e`
   and raw artifact SHA-256
-  `8818f310453fb73ccfe9dcf88ab3232026896b449b059957110015e3d565ade0`.
+  `b1c487bb4d9da504e730905be3c7beaa6cb0ad59e9e44fd5d54cea7f35e455e5`.
   Its reviewed extraction payload is pinned as
   `8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30`.
   The loader rejects structurally valid re-hashed coordinate drift as well as
   malformed or stale content.
   All 12 orientation-reversing terrain-area source affines are preserved as typed
   local reflections with transformed-vertex anchors derived from the reviewed
-  registration anchors.
+  registration anchors. Orientation-reversing registrations of source asset
+  xref 5506 additionally apply its reviewed intrinsic half-turn about the placed
+  footprint bounds, so the asymmetric bump-outs remain on the source-image edges.
+  Terrain-area anchors and component battlefield centers use a 0.05-inch
+  placement grid; every second-half placement is derived by exact point symmetry
+  from its reviewed first-half counterpart. Layout A also pins its reviewed
+  0.5-inch central-footprint correction and the contact-preserving corner/pipe
+  and angled-obstacle adjustments. Layouts B and C pin their corresponding
+  reviewed contact-pair adjustments on the same grid.
 - Meatgrinder's canonical scoring text, source timing, VP values, and structured
   condition tokens are committed separately in
   `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-meatgrinder-scoring.json`.
@@ -139,15 +147,23 @@ Secondary status:
 - Each variant contains 16 source terrain areas and 30 individually placed
   terrain components: 8 ruins, 8 dense non-ruin components, and 14 light
   components. Terrain-area and component source-image placement and orientation
-  come from the reviewed source-page affine records. The compact component
-  rules polygons and physical wall/floor primitives are engine models rather
-  than traced raster silhouettes. Project-owner-supplied semantics establish
-  three-inch floor spacing, solid three-inch ground-floor walls, approximately
-  two-inch upper walls, and approximately two-inch Light terrain. The reviewed
-  AB/EF three-floor versus CD/GH two-floor assignment, compact primitive
-  dimensions, and 3.5-inch Dense non-ruin height are explicit initial engine
-  modeling assumptions; the PDF does not measure or prescribe them. All of
-  those choices are committed and reviewable for later placement/model tweaks.
+  come from the reviewed source-page affine records. Recurring component
+  geometry is defined once per source archetype and reused across all three
+  layouts. Ruin and non-ruin envelopes use dimensions rounded to the 0.05-inch
+  grid and validated against the reviewed source-image axis spans, with each
+  schematic L-wall joint registered to the source image's lower-left corner.
+  Shared ruin floors are corner-anchored and capped at 3.5 inches per axis so
+  longer wall arms retain their source-visible wall-only tails. Component rules
+  polygons and physical wall/floor primitives remain engine models rather than
+  traced raster silhouettes.
+  Project-owner-supplied semantics establish
+  three-inch floor spacing, solid three-inch walls below every upper floor,
+  approximately two-inch top-floor walls, and approximately two-inch Light
+  terrain. The reviewed AB/EF three-floor versus CD/GH two-floor assignment,
+  wall thickness, simplified solid shapes, and 3.5-inch Dense non-ruin height
+  are explicit engine modeling assumptions;
+  the PDF does not prescribe them. All of those choices are committed and
+  reviewable for later placement/model tweaks.
 - Rendering images remain non-authoritative. Runtime setup, movement, collision,
   visibility, and scoring consume the validated structured package, not a page
   image or a renderer-derived measurement.

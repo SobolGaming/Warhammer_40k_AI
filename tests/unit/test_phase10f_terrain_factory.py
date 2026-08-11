@@ -431,7 +431,7 @@ def test_area_factory_composes_mixed_dense_ruins_and_light_obstacle_features() -
     assert ruins.display_geometry.footprint_polygon != light.display_geometry.footprint_polygon
     assert tuple(floor.bottom_z_inches for floor in ruins.floors) == (0.0, 3.0, 6.0)
     assert tuple(wall.bottom_z_inches for wall in ruins.walls) == (0.0, 3.0, 6.0)
-    assert tuple(wall.height_inches for wall in ruins.walls) == (3.0, 2.0, 2.0)
+    assert tuple(wall.height_inches for wall in ruins.walls) == (3.0, 3.0, 2.0)
     assert light.walls[0].height_inches == 2.0
     assert light.wall_volumes()[0].top_z_inches() == 2.0
     assert {ruins.feature_id, light.feature_id} == {
@@ -751,7 +751,7 @@ def _three_level_ruins_component_preset(
                 bottom_z_inches=float(level * 3),
                 width_inches=0.12,
                 depth_inches=4.0,
-                height_inches=3.0 if level == 0 else 2.0,
+                height_inches=2.0 if level == 2 else 3.0,
             )
             for level in range(3)
         ),

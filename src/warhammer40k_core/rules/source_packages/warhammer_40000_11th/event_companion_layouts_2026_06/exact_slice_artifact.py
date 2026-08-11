@@ -16,12 +16,13 @@ SOURCE_PAGES = (24, 25, 26)
 SOURCE_EXTRACTION_PAYLOAD_SHA256 = (
     "8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30"
 )
-EXPECTED_PACKAGE_HASH = "e000de2eee57a1a9e8be21be2c88c427b2317ce0f832cf98e32e50bff18b6997"
-EXPECTED_ARTIFACT_SHA256 = "8818f310453fb73ccfe9dcf88ab3232026896b449b059957110015e3d565ade0"
+EXPECTED_PACKAGE_HASH = "c1e796a17bfcd533822dfe6300210a61169348d5273b3fe94bbe540594c0f04e"
+EXPECTED_ARTIFACT_SHA256 = "b1c487bb4d9da504e730905be3c7beaa6cb0ad59e9e44fd5d54cea7f35e455e5"
 PRIMARY_MISSION_ID = "primary-meatgrinder"
 FORCE_DISPOSITION_ID = "purge-the-foe"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
+TERRAIN_PLACEMENT_INCREMENT_INCHES = 0.05
 
 EXPECTED_LAYOUT_IDS = frozenset(
     {
@@ -159,6 +160,7 @@ class SourceCoordinateFrameArtifact(msgspec.Struct, frozen=True, forbid_unknown_
     battlefield_origin: str
     battlefield_orientation: str
     coordinate_precision_decimal_places: int
+    terrain_placement_increment_inches: float
 
 
 class TerrainWallArtifact(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
@@ -415,12 +417,14 @@ def _validate_source_coordinate_frame(frame: SourceCoordinateFrameArtifact) -> N
         frame.battlefield_origin,
         frame.battlefield_orientation,
         frame.coordinate_precision_decimal_places,
+        frame.terrain_placement_increment_inches,
     ) != (
         BATTLEFIELD_WIDTH_INCHES,
         BATTLEFIELD_DEPTH_INCHES,
         "bottom_left",
         "x_right_along_44_inch_edge_y_up_along_60_inch_edge",
         6,
+        TERRAIN_PLACEMENT_INCREMENT_INCHES,
     ):
         raise EventCompanionExactSliceArtifactError(
             "Event Companion source coordinate-frame semantics drifted."
@@ -543,13 +547,14 @@ def _validate_archetype_parts(archetype: TerrainFeatureArchetypeArtifact) -> Non
             raise EventCompanionExactSliceArtifactError(
                 "Event Companion ruins require walls at every floor level."
             )
+        top_floor_level = floor_levels[-1]
         if any(
-            wall.height_inches != (3.0 if wall.bottom_z_inches == 0.0 else 2.0)
+            wall.height_inches != (2.0 if wall.bottom_z_inches == top_floor_level else 3.0)
             for wall in archetype.walls
         ):
             raise EventCompanionExactSliceArtifactError(
-                "Event Companion ruins require solid three-inch ground walls and "
-                "two-inch upper walls."
+                "Event Companion ruins require solid three-inch walls below every upper "
+                "floor and two-inch top-floor walls."
             )
     elif archetype.model_kind == "dense_solid":
         if (
@@ -634,6 +639,7 @@ def _validate_layout(
             areas_by_id=areas_by_id,
             archetypes_by_id=archetypes_by_id,
         )
+    _validate_component_point_symmetry(components_by_id)
     _validate_area_classifications(
         layout.terrain_areas,
         layout.terrain_components,
@@ -653,6 +659,7 @@ def _validate_terrain_area(
     areas_by_id: dict[str, TerrainAreaArtifact],
 ) -> None:
     _validate_non_empty_strings(area.area_id, area.footprint_template_id, area.pose_basis)
+    area_index = int(area.area_id.rsplit("-", maxsplit=1)[-1])
     if area.classification not in {"dense", "light", "mixed"}:
         raise EventCompanionExactSliceArtifactError(
             "Event Companion terrain-area classification is unsupported."
@@ -677,25 +684,35 @@ def _validate_terrain_area(
     reflection_suffix = (
         "_with_source_affine_reflection" if source_affine_is_orientation_reversing else ""
     )
+    reviewed_half_turn_suffix = (
+        "_and_reviewed_half_turn"
+        if source_affine_is_orientation_reversing and area.source_pdf_image_xref == 5506
+        else ""
+    )
+    reviewed_point_symmetry_suffix = "_with_reviewed_point_symmetry" if area_index > 8 else ""
     if expected_vector_path is None:
         if area.pose_basis != (
-            f"reviewed_pdf_raster_template_registration{reflection_suffix}"
+            "reviewed_pdf_raster_template_registration"
+            f"{reflection_suffix}{reviewed_half_turn_suffix}"
+            f"{reviewed_point_symmetry_suffix}"
         ) or actual_vector_path != (None, None):
             raise EventCompanionExactSliceArtifactError(
                 "Event Companion terrain-area raster pose provenance drifted."
             )
     elif (
-        area.pose_basis != f"reviewed_pdf_vector_path_reversed_long_edge{reflection_suffix}"
+        area.pose_basis
+        != (
+            "reviewed_pdf_vector_path_reversed_long_edge"
+            f"{reflection_suffix}{reviewed_half_turn_suffix}"
+            f"{reviewed_point_symmetry_suffix}"
+        )
         or actual_vector_path != expected_vector_path
     ):
         raise EventCompanionExactSliceArtifactError(
             "Event Companion terrain-area vector-path pose provenance drifted."
         )
-    _validate_finite_values(
-        area.anchor_x_inches,
-        area.anchor_y_inches,
-        area.rotation_degrees,
-    )
+    _validate_terrain_placement_coordinates(area.anchor_x_inches, area.anchor_y_inches)
+    _validate_finite_values(area.rotation_degrees)
     mirror = areas_by_id.get(area.mirror_area_id)
     if mirror is None or mirror.mirror_area_id != area.area_id:
         raise EventCompanionExactSliceArtifactError(
@@ -704,6 +721,30 @@ def _validate_terrain_area(
     if mirror.footprint_template_id != area.footprint_template_id:
         raise EventCompanionExactSliceArtifactError(
             "Event Companion mirrored terrain areas require the same footprint template."
+        )
+    if area_index <= 8 and (
+        not math.isclose(
+            area.anchor_x_inches + mirror.anchor_x_inches,
+            BATTLEFIELD_WIDTH_INCHES,
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+        or not math.isclose(
+            area.anchor_y_inches + mirror.anchor_y_inches,
+            BATTLEFIELD_DEPTH_INCHES,
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+        or not math.isclose(
+            (mirror.rotation_degrees - area.rotation_degrees) % 360.0,
+            180.0,
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+        or mirror.local_transform != area.local_transform
+    ):
+        raise EventCompanionExactSliceArtifactError(
+            "Event Companion terrain-area mirror pairs must use exact point symmetry."
         )
     _validate_pdf_bounds(area.source_pdf_bounds)
     _validate_pdf_affine(area.source_pdf_affine)
@@ -746,9 +787,11 @@ def _validate_component(
         component.local_offset_x_inches,
         component.local_offset_y_inches,
         component.local_rotation_degrees,
+        component.battlefield_rotation_degrees,
+    )
+    _validate_terrain_placement_coordinates(
         component.battlefield_center_x_inches,
         component.battlefield_center_y_inches,
-        component.battlefield_rotation_degrees,
     )
     if not (
         0.0 <= component.battlefield_center_x_inches <= BATTLEFIELD_WIDTH_INCHES
@@ -759,6 +802,70 @@ def _validate_component(
         )
     _validate_pdf_bounds(component.source_pdf_bounds)
     _validate_pdf_affine(component.source_pdf_affine)
+
+
+def _validate_component_point_symmetry(
+    components_by_id: dict[str, TerrainComponentPlacementArtifact],
+) -> None:
+    matched_mirror_component_ids: set[str] = set()
+    for component in components_by_id.values():
+        area_prefix, component_suffix = component.component_id.rsplit(
+            "-terrain-area-",
+            maxsplit=1,
+        )
+        area_index_text, _component_ordinal = component_suffix.split(
+            "-component-",
+            maxsplit=1,
+        )
+        area_index = int(area_index_text)
+        if area_index > 8:
+            continue
+        mirror_area_id = f"{area_prefix}-terrain-area-{17 - area_index:02d}"
+        matching_mirrors = tuple(
+            candidate
+            for candidate in components_by_id.values()
+            if candidate.terrain_area_id == mirror_area_id
+            and candidate.archetype_id == component.archetype_id
+            and candidate.local_transform == component.local_transform
+            and math.isclose(
+                component.battlefield_center_x_inches + candidate.battlefield_center_x_inches,
+                BATTLEFIELD_WIDTH_INCHES,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            and math.isclose(
+                component.battlefield_center_y_inches + candidate.battlefield_center_y_inches,
+                BATTLEFIELD_DEPTH_INCHES,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            and math.isclose(
+                (candidate.battlefield_rotation_degrees - component.battlefield_rotation_degrees)
+                % 360.0,
+                180.0,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+        )
+        if len(matching_mirrors) != 1:
+            raise EventCompanionExactSliceArtifactError(
+                "Event Companion terrain-component mirror pairs must use exact point symmetry."
+            )
+        mirror_component_id = matching_mirrors[0].component_id
+        if mirror_component_id in matched_mirror_component_ids:
+            raise EventCompanionExactSliceArtifactError(
+                "Event Companion terrain-component mirror pairs must be one-to-one."
+            )
+        matched_mirror_component_ids.add(mirror_component_id)
+
+    mirror_component_count = sum(
+        int(component.component_id.rsplit("-terrain-area-", maxsplit=1)[1].split("-", 1)[0]) > 8
+        for component in components_by_id.values()
+    )
+    if len(matched_mirror_component_ids) != mirror_component_count:
+        raise EventCompanionExactSliceArtifactError(
+            "Every mirrored Event Companion terrain component must have one point-symmetric pair."
+        )
 
 
 def _validate_area_classifications(
@@ -985,6 +1092,22 @@ def _validate_finite_values(*values: object) -> None:
     ):
         raise EventCompanionExactSliceArtifactError(
             "Event Companion exact-slice coordinates must be finite numbers."
+        )
+
+
+def _validate_terrain_placement_coordinates(*values: float) -> None:
+    _validate_finite_values(*values)
+    if any(
+        not math.isclose(
+            value / TERRAIN_PLACEMENT_INCREMENT_INCHES,
+            round(value / TERRAIN_PLACEMENT_INCREMENT_INCHES),
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+        for value in values
+    ):
+        raise EventCompanionExactSliceArtifactError(
+            "Event Companion terrain placements must use 0.05-inch coordinate increments."
         )
 
 

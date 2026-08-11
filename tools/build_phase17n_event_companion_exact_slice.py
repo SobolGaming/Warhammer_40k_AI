@@ -4,6 +4,9 @@ import argparse
 import hashlib
 import json
 import math
+import statistics
+from decimal import ROUND_HALF_UP, Decimal
+from itertools import permutations
 from pathlib import Path
 from typing import Any
 
@@ -50,8 +53,8 @@ _ARCHETYPES = {
         "dense",
         None,
         "FOOTPRINT_6X4",
-        3.0,
-        1.0,
+        4.25,
+        1.4,
         3.5,
         0,
     ),
@@ -63,8 +66,8 @@ _ARCHETYPES = {
         "light",
         None,
         "FOOTPRINT_6X2",
-        4.0,
-        0.45,
+        4.8,
+        1.0,
         2.0,
         0,
     ),
@@ -76,8 +79,8 @@ _ARCHETYPES = {
         "dense",
         None,
         "FOOTPRINT_10X2_5",
-        2.2,
-        1.0,
+        3.45,
+        1.95,
         3.5,
         0,
     ),
@@ -89,8 +92,8 @@ _ARCHETYPES = {
         "light",
         None,
         "FOOTPRINT_10X2_5",
-        0.8,
-        0.2,
+        3.5,
+        1.25,
         2.0,
         0,
     ),
@@ -102,7 +105,7 @@ _ARCHETYPES = {
         "dense",
         "CD",
         "FOOTPRINT_7X11_5",
-        1.0,
+        6.0,
         3.0,
         0.0,
         2,
@@ -116,7 +119,7 @@ _ARCHETYPES = {
         "GH",
         "FOOTPRINT_7X11_5",
         3.0,
-        1.0,
+        6.0,
         0.0,
         2,
     ),
@@ -128,8 +131,8 @@ _ARCHETYPES = {
         "dense",
         "EF",
         "FOOTPRINT_7X11_5",
-        3.0,
-        2.0,
+        6.0,
+        4.5,
         0.0,
         3,
     ),
@@ -141,8 +144,8 @@ _ARCHETYPES = {
         "dense",
         "AB",
         "FOOTPRINT_8X11_5_POLYGON",
-        1.2,
-        1.6,
+        4.0,
+        4.5,
         0.0,
         3,
     ),
@@ -154,8 +157,8 @@ _ARCHETYPES = {
         "light",
         None,
         "FOOTPRINT_8X11_5_POLYGON",
-        0.7,
-        0.7,
+        1.65,
+        1.7,
         2.0,
         0,
     ),
@@ -167,8 +170,8 @@ _ARCHETYPES = {
         "light",
         None,
         "FOOTPRINT_6X4",
-        1.0,
-        0.5,
+        2.2,
+        1.3,
         2.0,
         0,
     ),
@@ -180,8 +183,8 @@ _ARCHETYPES = {
         "light",
         None,
         "FOOTPRINT_7X11_5",
-        0.2,
-        0.6,
+        1.85,
+        2.95,
         2.0,
         0,
     ),
@@ -193,8 +196,8 @@ _ARCHETYPES = {
         "light",
         None,
         "FOOTPRINT_6X4",
-        1.2,
-        0.7,
+        2.9,
+        1.15,
         2.0,
         0,
     ),
@@ -206,8 +209,8 @@ _ARCHETYPES = {
         "dense",
         None,
         "FOOTPRINT_6X4",
-        1.0,
-        1.2,
+        1.5,
+        2.7,
         3.5,
         0,
     ),
@@ -219,8 +222,8 @@ _ARCHETYPES = {
         "dense",
         None,
         "FOOTPRINT_6X2",
-        4.0,
-        0.45,
+        6.0,
+        1.7,
         3.5,
         0,
     ),
@@ -238,6 +241,41 @@ _SUPERSEDED_ESTIMATE_STATUS = "superseded_by_accepted_pose_review"
 _RASTER_REVIEW_METHOD = "source_page_raster_overlay_registration_review"
 _VECTOR_REVIEW_METHOD = "pdf_vector_edge_correction_plus_source_page_raster_overlay_review"
 _REVIEW_RESULT = "canonical_template_outline_aligned_to_source_page_terrain_area"
+_TERRAIN_PLACEMENT_INCREMENT_INCHES = Decimal("0.05")
+_BATTLEFIELD_WIDTH_INCHES = 44.0
+_BATTLEFIELD_DEPTH_INCHES = 60.0
+_RUIN_FLOOR_MAXIMUM_AXIS_SPAN_INCHES = 3.5
+_RUIN_FLOOR_EDGE_INSET_INCHES = 0.02
+_REVIEWED_SOURCE_IMAGE_AXIS_SPANS = {
+    5462: (4.25, 1.75),
+    5464: (4.8, 1.6),
+    5466: (3.45, 2.6),
+    5468: (3.8, 1.25),
+    5470: (6.5, 3.25),
+    5472: (3.15, 6.35),
+    5474: (6.35, 4.9),
+    5476: (4.55, 5.0),
+    5478: (1.65, 1.85),
+    5480: (3.1, 1.7),
+    5482: (1.85, 2.95),
+    5484: (2.9, 1.85),
+    5486: (1.5, 2.7),
+    5488: (8.1, 1.9),
+}
+_REVIEWED_PRIMARY_AREA_TRANSLATIONS = {
+    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04": (0.0, -0.4),
+    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-06": (-0.15, 0.0),
+    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-07": (0.0, -0.5),
+    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-08": (-0.15, -0.45),
+    "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-02": (0.1, 0.0),
+    "purge-the-foe-vs-purge-the-foe-layout-2-terrain-area-07": (-0.05, -0.85),
+    "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-02": (0.25, 0.1),
+    "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-06": (0.0, -0.4),
+}
+_REVIEWED_PRIMARY_COMPONENT_TRANSLATIONS = {
+    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-06": (-0.15, 0.0),
+    "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-08": (-0.15, -0.45),
+}
 
 
 def _parse_args() -> argparse.Namespace:
@@ -305,6 +343,15 @@ def _finite_number(field_name: str, value: object) -> float:
     if not math.isfinite(number):
         raise ValueError(f"{field_name} must be finite.")
     return number
+
+
+def _quantize_terrain_coordinate(value: float) -> float:
+    decimal_value = Decimal(str(value))
+    increment_count = (decimal_value / _TERRAIN_PLACEMENT_INCREMENT_INCHES).quantize(
+        Decimal("1"),
+        rounding=ROUND_HALF_UP,
+    )
+    return float(increment_count * _TERRAIN_PLACEMENT_INCREMENT_INCHES)
 
 
 def _accepted_pose_review(
@@ -436,38 +483,21 @@ def _rectangle(width: float, depth: float) -> list[dict[str, float]]:
     ]
 
 
-def _l_shape(
-    width: float,
-    depth: float,
-    *,
-    right_top: bool = False,
-) -> list[dict[str, float]]:
+def _l_shape(width: float, depth: float) -> list[dict[str, float]]:
     arm_thickness = min(width, depth) * 0.35
-    if right_top:
-        return [
-            {"x_inches": -width / 2.0, "y_inches": -depth / 2.0},
-            {
-                "x_inches": -width / 2.0,
-                "y_inches": (-depth / 2.0) + arm_thickness,
-            },
-            {
-                "x_inches": (width / 2.0) - arm_thickness,
-                "y_inches": (-depth / 2.0) + arm_thickness,
-            },
-            {"x_inches": (width / 2.0) - arm_thickness, "y_inches": depth / 2.0},
-            {"x_inches": width / 2.0, "y_inches": depth / 2.0},
-            {"x_inches": width / 2.0, "y_inches": -depth / 2.0},
-        ]
     return [
         {"x_inches": -width / 2.0, "y_inches": -depth / 2.0},
-        {"x_inches": -width / 2.0, "y_inches": depth / 2.0},
-        {"x_inches": width / 2.0, "y_inches": depth / 2.0},
-        {"x_inches": width / 2.0, "y_inches": (depth / 2.0) - arm_thickness},
+        {"x_inches": width / 2.0, "y_inches": -depth / 2.0},
+        {
+            "x_inches": width / 2.0,
+            "y_inches": (-depth / 2.0) + arm_thickness,
+        },
         {
             "x_inches": (-width / 2.0) + arm_thickness,
-            "y_inches": (depth / 2.0) - arm_thickness,
+            "y_inches": (-depth / 2.0) + arm_thickness,
         },
-        {"x_inches": (-width / 2.0) + arm_thickness, "y_inches": -depth / 2.0},
+        {"x_inches": (-width / 2.0) + arm_thickness, "y_inches": depth / 2.0},
+        {"x_inches": -width / 2.0, "y_inches": depth / 2.0},
     ]
 
 
@@ -476,6 +506,16 @@ def _ruin_parts(
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     walls: list[dict[str, Any]] = []
     floors: list[dict[str, Any]] = []
+    floor_width = min(
+        width - (2.0 * _RUIN_FLOOR_EDGE_INSET_INCHES),
+        _RUIN_FLOOR_MAXIMUM_AXIS_SPAN_INCHES,
+    )
+    floor_depth = min(
+        depth - (2.0 * _RUIN_FLOOR_EDGE_INSET_INCHES),
+        _RUIN_FLOOR_MAXIMUM_AXIS_SPAN_INCHES,
+    )
+    floor_center_x = (-width / 2.0) + _RUIN_FLOOR_EDGE_INSET_INCHES + (floor_width / 2.0)
+    floor_center_y = (-depth / 2.0) + _RUIN_FLOOR_EDGE_INSET_INCHES + (floor_depth / 2.0)
     for floor_index in range(floor_count):
         bottom_z = float(floor_index * 3)
         floor_name = ("ground", "first", "second")[floor_index]
@@ -484,11 +524,11 @@ def _ruin_parts(
                 {
                     "wall_id": f"{floor_name}-long-solid-wall",
                     "center_x_inches": 0.0,
-                    "center_y_inches": (depth / 2.0) - 0.07,
+                    "center_y_inches": (-depth / 2.0) + 0.07,
                     "bottom_z_inches": bottom_z,
                     "width_inches": width - 0.02,
                     "depth_inches": 0.12,
-                    "height_inches": 3.0 if floor_index == 0 else 2.0,
+                    "height_inches": 2.0 if floor_index == floor_count - 1 else 3.0,
                     "rotation_degrees": 0.0,
                 },
                 {
@@ -498,7 +538,7 @@ def _ruin_parts(
                     "bottom_z_inches": bottom_z,
                     "width_inches": depth - 0.02,
                     "depth_inches": 0.12,
-                    "height_inches": 3.0 if floor_index == 0 else 2.0,
+                    "height_inches": 2.0 if floor_index == floor_count - 1 else 3.0,
                     "rotation_degrees": 90.0,
                 },
             )
@@ -506,11 +546,11 @@ def _ruin_parts(
         floors.append(
             {
                 "floor_id": f"{floor_name}-floor",
-                "center_x_inches": 0.0,
-                "center_y_inches": 0.0,
+                "center_x_inches": floor_center_x,
+                "center_y_inches": floor_center_y,
                 "bottom_z_inches": bottom_z,
-                "width_inches": max(0.2, width - 0.12),
-                "depth_inches": max(0.2, depth - 0.12),
+                "width_inches": floor_width,
+                "depth_inches": floor_depth,
                 "thickness_inches": 0.12,
                 "rotation_degrees": 0.0,
             }
@@ -538,24 +578,13 @@ def _corner_parts(
     width: float,
     depth: float,
     height: float,
-    right_top: bool = False,
 ) -> list[dict[str, Any]]:
     arm_thickness = min(width, depth) * 0.35
-    horizontal_y = (
-        (-depth / 2.0) + (arm_thickness / 2.0)
-        if right_top
-        else (depth / 2.0) - (arm_thickness / 2.0)
-    )
-    vertical_x = (
-        (width / 2.0) - (arm_thickness / 2.0)
-        if right_top
-        else (-width / 2.0) + (arm_thickness / 2.0)
-    )
     return [
         {
             "wall_id": "long-solid-arm",
             "center_x_inches": 0.0,
-            "center_y_inches": horizontal_y,
+            "center_y_inches": (-depth / 2.0) + (arm_thickness / 2.0),
             "bottom_z_inches": 0.0,
             "width_inches": width - 0.02,
             "depth_inches": arm_thickness - 0.02,
@@ -564,7 +593,7 @@ def _corner_parts(
         },
         {
             "wall_id": "short-solid-arm",
-            "center_x_inches": vertical_x,
+            "center_x_inches": (-width / 2.0) + (arm_thickness / 2.0),
             "center_y_inches": 0.0,
             "bottom_z_inches": 0.0,
             "width_inches": depth - 0.02,
@@ -587,6 +616,42 @@ def _source_asset(raw: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _validate_reviewed_component_axis_spans(
+    extraction: dict[str, Any],
+    *,
+    source_pdf_image_xrefs: tuple[int, ...],
+    expected_width: float,
+    expected_depth: float,
+    expected_placement_count: int,
+) -> None:
+    spans = tuple(
+        (
+            float(component["source_image"]["battlefield_image_width_axis_span_inches"]),
+            float(component["source_image"]["battlefield_image_height_axis_span_inches"]),
+        )
+        for layout in extraction["layouts"]
+        for component in layout["terrain_components"]
+        if component["source_image"]["xref"] in source_pdf_image_xrefs
+    )
+    if len(spans) != expected_placement_count:
+        raise ValueError(
+            f"Source images {source_pdf_image_xrefs} require "
+            f"{expected_placement_count} reviewed placements."
+        )
+    median_width = float(statistics.median(span[0] for span in spans))
+    median_depth = float(statistics.median(span[1] for span in spans))
+    if (
+        min(expected_width, expected_depth) <= 0.12
+        or abs(median_width - expected_width) > 0.05
+        or abs(median_depth - expected_depth) > 0.05
+        or any(
+            abs(span_width - median_width) > 0.05 or abs(span_depth - median_depth) > 0.05
+            for span_width, span_depth in spans
+        )
+    ):
+        raise ValueError(f"Source images {source_pdf_image_xrefs} axis-span registration drifted.")
+
+
 def _archetypes(extraction: dict[str, Any]) -> list[dict[str, Any]]:
     source_assets = extraction["source_image_assets_by_xref"]
     rows: list[dict[str, Any]] = []
@@ -604,6 +669,22 @@ def _archetypes(extraction: dict[str, Any]) -> list[dict[str, Any]]:
             height,
             floor_count,
         ) = config
+        if width is None or depth is None:
+            raise ValueError("Terrain archetypes require explicit engine-model dimensions.")
+        xrefs = (primary_xref, 5675) if primary_xref == 5486 else (primary_xref,)
+        reviewed_width, reviewed_depth = _REVIEWED_SOURCE_IMAGE_AXIS_SPANS.get(
+            primary_xref,
+            (width, depth),
+        )
+        _validate_reviewed_component_axis_spans(
+            extraction,
+            source_pdf_image_xrefs=xrefs,
+            expected_width=reviewed_width,
+            expected_depth=reviewed_depth,
+            expected_placement_count=12 if primary_xref == 5468 else 6,
+        )
+        if width > reviewed_width or depth > reviewed_depth:
+            raise ValueError("Terrain archetype envelope exceeds its reviewed source span.")
         if model_kind == "ruin":
             walls, floors = _ruin_parts(
                 width=width,
@@ -616,13 +697,11 @@ def _archetypes(extraction: dict[str, Any]) -> list[dict[str, Any]]:
                     width=width,
                     depth=depth,
                     height=height,
-                    right_top=archetype_id == "light-corner-cd",
                 ),
                 [],
             )
         else:
             walls, floors = _solid_parts(width=width, depth=depth, height=height), []
-        xrefs = (primary_xref, 5675) if primary_xref == 5486 else (primary_xref,)
         rows.append(
             {
                 "archetype_id": archetype_id,
@@ -634,11 +713,7 @@ def _archetypes(extraction: dict[str, Any]) -> list[dict[str, Any]]:
                 "classification": classification,
                 "footprint_template_id": footprint_template_id,
                 "rules_footprint_polygon": (
-                    _l_shape(
-                        width,
-                        depth,
-                        right_top=archetype_id == "light-corner-cd",
-                    )
+                    _l_shape(width, depth)
                     if archetype_id.startswith("light-corner-")
                     else _rectangle(width, depth)
                 ),
@@ -653,27 +728,36 @@ def _archetypes(extraction: dict[str, Any]) -> list[dict[str, Any]]:
 def _archetype_modeling_basis(model_kind: str) -> str:
     if model_kind == "ruin":
         return (
-            "PDF pages 24-26 provide component identity and source-image pose. The user "
-            "supplied the ruin category, three-inch floor spacing, solid three-inch "
-            "ground-floor walls, and approximately two-inch upper walls. Compact primitive "
-            "dimensions and the reviewed AB/EF three-floor versus CD/GH two-floor assignment "
-            "are engine modeling assumptions, not PDF measurements. Raster art remains "
-            "non-authoritative."
+            "PDF pages 24-26 provide component identity, source-image pose, and reviewed "
+            "image-axis spans used to register the schematic ruin envelope and lower-left "
+            "wall joint. The user "
+            "supplied the ruin category, three-inch floor spacing, solid three-inch walls "
+            "below every upper floor, and approximately two-inch top-floor walls. Wall "
+            "thickness and the reviewed AB/EF three-floor versus CD/GH two-floor assignment "
+            "remain engine modeling assumptions. Every floor uses the reviewed shared "
+            "3.5-inch corner plate so longer wall arms retain their source-visible wall-only "
+            "tails. Raster styling remains non-authoritative."
         )
     if model_kind == "light_solid":
         return (
             "PDF pages 24-26 provide component identity and source-image pose; the PDF key "
             "and user instruction identify Light terrain, and the user supplied its "
-            "approximately two-inch height. The compact rules polygon and solid primitives "
-            "are reviewed engine models, not PDF measurements. Raster art remains "
+            "approximately two-inch height. Shared grid-aligned envelopes are bounded by the "
+            "reviewed image-axis spans and enlarged to the nearest legal 0.05-inch placement "
+            "that remains inside every reused terrain-area footprint; corner-piece L-wall "
+            "joints are registered to the source image's lower-left corner. Wall thickness "
+            "remains a reviewed engine modeling assumption. Raster styling remains "
             "non-authoritative."
         )
     if model_kind == "dense_solid":
         return (
             "PDF pages 24-26 provide component identity and source-image pose; the PDF key "
-            "and user instruction identify Dense non-ruin terrain. The compact rules polygon, "
-            "solid primitive dimensions, and 3.5-inch height are reviewed engine modeling "
-            "assumptions, not PDF measurements. Raster art remains non-authoritative."
+            "and user instruction identify Dense non-ruin terrain. Shared grid-aligned "
+            "envelopes are bounded by the reviewed image-axis spans and enlarged to the nearest "
+            "legal 0.05-inch placement that remains inside every reused terrain-area footprint, "
+            "preserving pipe coverage and mixed-feature contact. Solid primitive shape and "
+            "3.5-inch height remain reviewed engine modeling assumptions. Raster art remains "
+            "non-authoritative."
         )
     raise ValueError("Unsupported Event Companion terrain archetype model kind.")
 
@@ -729,6 +813,7 @@ def _area_row(
         )
     )
     orientation_reversing = _source_image_is_orientation_reversing(raw["source_image"])
+    requires_reviewed_half_turn = orientation_reversing and raw["source_image"]["xref"] == 5506
     anchor_x = reviewed_anchor_x
     anchor_y = reviewed_anchor_y
     if orientation_reversing:
@@ -743,6 +828,29 @@ def _area_row(
         anchor_y += anchor_delta * math.sin(radians)
         anchor_x = round(anchor_x, 9)
         anchor_y = round(anchor_y, 9)
+    if requires_reviewed_half_turn:
+        # The orientation-reversing 6x4 source images register the asymmetric
+        # footprint with the opposite intrinsic half-turn from the canonical
+        # template. Rotate about the already registered footprint-bounds center,
+        # not the template's vertex-zero anchor, so its battlefield extents stay
+        # fixed while its top/right bump-outs follow the reviewed PDF image.
+        template_anchor_x, template_anchor_y = template_anchor_points[raw["footprint_template_id"]]
+        radians = math.radians(rotation_degrees)
+        anchor_x += 2.0 * (
+            (template_anchor_x * math.cos(radians)) + (template_anchor_y * math.sin(radians))
+        )
+        anchor_y += 2.0 * (
+            (template_anchor_x * math.sin(radians)) - (template_anchor_y * math.cos(radians))
+        )
+        anchor_x = round(anchor_x, 9)
+        anchor_y = round(anchor_y, 9)
+        rotation_degrees = (rotation_degrees + 180.0) % 360.0
+    translation_x, translation_y = _REVIEWED_PRIMARY_AREA_TRANSLATIONS.get(
+        raw["terrain_area_id"],
+        (0.0, 0.0),
+    )
+    anchor_x = _quantize_terrain_coordinate(anchor_x + translation_x)
+    anchor_y = _quantize_terrain_coordinate(anchor_y + translation_y)
     pose_basis = (
         "reviewed_pdf_vector_path_reversed_long_edge"
         if vector_path is not None
@@ -750,6 +858,8 @@ def _area_row(
     )
     if orientation_reversing:
         pose_basis = f"{pose_basis}_with_source_affine_reflection"
+    if requires_reviewed_half_turn:
+        pose_basis = f"{pose_basis}_and_reviewed_half_turn"
     return {
         "area_id": raw["terrain_area_id"],
         "footprint_template_id": raw["footprint_template_id"],
@@ -774,15 +884,133 @@ def _area_row(
     }
 
 
+def _apply_reviewed_point_symmetry_to_area_rows(
+    area_rows: list[dict[str, Any]],
+) -> None:
+    areas_by_id = {area["area_id"]: area for area in area_rows}
+    for area in area_rows:
+        index = int(area["area_id"].rsplit("-", maxsplit=1)[-1])
+        if index > 8:
+            continue
+        mirror = areas_by_id[area["mirror_area_id"]]
+        mirror["anchor_x_inches"] = _quantize_terrain_coordinate(
+            _BATTLEFIELD_WIDTH_INCHES - area["anchor_x_inches"]
+        )
+        mirror["anchor_y_inches"] = _quantize_terrain_coordinate(
+            _BATTLEFIELD_DEPTH_INCHES - area["anchor_y_inches"]
+        )
+        mirror["rotation_degrees"] = (area["rotation_degrees"] + 180.0) % 360.0
+        mirror["local_transform"] = area["local_transform"]
+        mirror["pose_basis"] = f"{mirror['pose_basis']}_with_reviewed_point_symmetry"
+
+
+def _component_primary_xref(raw: dict[str, Any]) -> int:
+    source_xref = raw["source_image"]["xref"]
+    return 5486 if source_xref == 5675 else source_xref
+
+
+def _component_archetype_id(raw: dict[str, Any]) -> str:
+    return _ARCHETYPES[_component_primary_xref(raw)][0]
+
+
+def _point_symmetric_source_distance_squared(
+    primary: dict[str, Any],
+    mirror: dict[str, Any],
+) -> float:
+    primary_x, primary_y = primary["source_image"]["battlefield_image_center_inches"]
+    mirror_x, mirror_y = mirror["source_image"]["battlefield_image_center_inches"]
+    return (_BATTLEFIELD_WIDTH_INCHES - primary_x - mirror_x) ** 2 + (
+        _BATTLEFIELD_DEPTH_INCHES - primary_y - mirror_y
+    ) ** 2
+
+
+def _mirrored_primary_component_ids(layout: dict[str, Any]) -> dict[str, str]:
+    layout_id = layout["layout_id"]
+    components_by_area_id: dict[str, list[dict[str, Any]]] = {}
+    for component in layout["terrain_components"]:
+        components_by_area_id.setdefault(component["terrain_area_id"], []).append(component)
+
+    bindings: dict[str, str] = {}
+    for primary_area_index in range(1, 9):
+        primary_area_id = f"{layout_id}-terrain-area-{primary_area_index:02d}"
+        mirror_area_id = f"{layout_id}-terrain-area-{17 - primary_area_index:02d}"
+        primary_by_archetype: dict[str, list[dict[str, Any]]] = {}
+        mirror_by_archetype: dict[str, list[dict[str, Any]]] = {}
+        for component in components_by_area_id[primary_area_id]:
+            primary_by_archetype.setdefault(_component_archetype_id(component), []).append(
+                component
+            )
+        for component in components_by_area_id[mirror_area_id]:
+            mirror_by_archetype.setdefault(_component_archetype_id(component), []).append(component)
+        if primary_by_archetype.keys() != mirror_by_archetype.keys():
+            raise ValueError(
+                f"Mirrored terrain areas {primary_area_id} and {mirror_area_id} must contain "
+                "matching component archetypes."
+            )
+
+        for archetype_id in sorted(primary_by_archetype):
+            primary_components = sorted(
+                primary_by_archetype[archetype_id],
+                key=lambda component: component["component_id"],
+            )
+            mirror_components = sorted(
+                mirror_by_archetype[archetype_id],
+                key=lambda component: component["component_id"],
+            )
+            if len(primary_components) != len(mirror_components):
+                raise ValueError(
+                    f"Mirrored terrain areas {primary_area_id} and {mirror_area_id} must contain "
+                    f"the same number of {archetype_id} source instances."
+                )
+            scored_assignments: list[tuple[float, tuple[str, ...]]] = []
+            for assignment in permutations(primary_components):
+                score = sum(
+                    _point_symmetric_source_distance_squared(primary, mirror)
+                    for primary, mirror in zip(assignment, mirror_components, strict=True)
+                )
+                scored_assignments.append(
+                    (score, tuple(component["component_id"] for component in assignment))
+                )
+            scored_assignments.sort()
+            if len(scored_assignments) > 1 and math.isclose(
+                scored_assignments[0][0],
+                scored_assignments[1][0],
+                rel_tol=0.0,
+                abs_tol=1e-12,
+            ):
+                raise ValueError(
+                    f"Mirrored terrain areas {primary_area_id} and {mirror_area_id} have "
+                    f"ambiguous {archetype_id} source-instance bindings."
+                )
+            for mirror, primary_component_id in zip(
+                mirror_components,
+                scored_assignments[0][1],
+                strict=True,
+            ):
+                bindings[mirror["component_id"]] = primary_component_id
+
+    expected_binding_count = sum(
+        len(components)
+        for area_id, components in components_by_area_id.items()
+        if int(area_id.rsplit("-", maxsplit=1)[-1]) > 8
+    )
+    if len(bindings) != expected_binding_count:
+        raise ValueError("Every mirrored terrain component must have one source-instance binding.")
+    return bindings
+
+
 def _component_row(
     *,
     raw: dict[str, Any],
     area_by_id: dict[str, dict[str, Any]],
     template_anchor_points: dict[str, tuple[float, float]],
+    reviewed_battlefield_center: tuple[float, float] | None = None,
+    reviewed_battlefield_rotation: float | None = None,
+    reviewed_local_transform: str | None = None,
 ) -> dict[str, Any]:
     area = area_by_id[raw["terrain_area_id"]]
-    primary_xref = 5486 if raw["source_image"]["xref"] == 5675 else raw["source_image"]["xref"]
-    archetype_id = _ARCHETYPES[primary_xref][0]
+    primary_xref = _component_primary_xref(raw)
+    archetype_id = _component_archetype_id(raw)
     template_anchor_x, template_anchor_y = template_anchor_points[area["footprint_template_id"]]
     area_radians = math.radians(area["rotation_degrees"])
     area_cosine = math.cos(area_radians)
@@ -791,7 +1019,33 @@ def _component_row(
     rotated_anchor_y = (template_anchor_x * area_sine) + (template_anchor_y * area_cosine)
     area_center_x = area["anchor_x_inches"] - rotated_anchor_x
     area_center_y = area["anchor_y_inches"] - rotated_anchor_y
-    center_x, center_y = raw["source_image"]["battlefield_image_center_inches"]
+    if primary_xref == 5488:
+        reviewed_local_transform = "identity"
+        if reviewed_battlefield_center is None:
+            # The pipe raster has decorative end overhang beyond its terrain-area image.
+            # Center the shared legal solid on the registered footprint rather than treating
+            # the raster-image bounds as a standalone physical rectangle.
+            transformed_center_x = (
+                2.0 * template_anchor_x if area["local_transform"] == "mirror_y_axis" else 0.0
+            )
+            reviewed_battlefield_center = (
+                _quantize_terrain_coordinate(area_center_x + (transformed_center_x * area_cosine)),
+                _quantize_terrain_coordinate(area_center_y + (transformed_center_x * area_sine)),
+            )
+            reviewed_battlefield_rotation = (
+                area["rotation_degrees"]
+                + (180.0 if area["local_transform"] == "mirror_y_axis" else 0.0)
+            ) % 360.0
+    if reviewed_battlefield_center is None:
+        raw_center_x, raw_center_y = raw["source_image"]["battlefield_image_center_inches"]
+        translation_x, translation_y = _REVIEWED_PRIMARY_COMPONENT_TRANSLATIONS.get(
+            raw["terrain_area_id"],
+            (0.0, 0.0),
+        )
+        center_x = _quantize_terrain_coordinate(raw_center_x + translation_x)
+        center_y = _quantize_terrain_coordinate(raw_center_y + translation_y)
+    else:
+        center_x, center_y = reviewed_battlefield_center
     battlefield_delta_x = center_x - area_center_x
     battlefield_delta_y = center_y - area_center_y
     transformed_local_x = (battlefield_delta_x * area_cosine) + (battlefield_delta_y * area_sine)
@@ -802,10 +1056,18 @@ def _component_row(
         else transformed_local_x
     )
     affine = raw["parent_image_local_affine_normalized_component_to_normalized_parent"]
-    component_mirrored = ((affine[0] * affine[3]) - (affine[1] * affine[2])) < 0.0
+    component_mirrored = (
+        reviewed_local_transform == "mirror_y_axis"
+        if reviewed_local_transform is not None
+        else ((affine[0] * affine[3]) - (affine[1] * affine[2])) < 0.0
+    )
     area_mirrored = area["local_transform"] == "mirror_y_axis"
     area_rotation = area["rotation_degrees"]
-    battlefield_rotation = raw["source_image"]["battlefield_image_x_axis_rotation_degrees"]
+    battlefield_rotation = (
+        raw["source_image"]["battlefield_image_x_axis_rotation_degrees"]
+        if reviewed_battlefield_rotation is None
+        else reviewed_battlefield_rotation
+    )
     inner_rotation = (
         180.0 + area_rotation - battlefield_rotation
         if area_mirrored
@@ -856,15 +1118,42 @@ def _layout_row(
 ) -> dict[str, Any]:
     layout_id = layout["layout_id"]
     area_rows = [_area_row(layout, raw, template_anchor_points) for raw in layout["terrain_areas"]]
+    _apply_reviewed_point_symmetry_to_area_rows(area_rows)
     area_by_id = {area["area_id"]: area for area in area_rows}
-    component_rows = [
-        _component_row(
-            raw=raw,
-            area_by_id=area_by_id,
-            template_anchor_points=template_anchor_points,
-        )
-        for raw in layout["terrain_components"]
-    ]
+    mirrored_primary_component_ids = _mirrored_primary_component_ids(layout)
+    component_rows: list[dict[str, Any]] = []
+    component_by_id: dict[str, dict[str, Any]] = {}
+    for raw in layout["terrain_components"]:
+        area_index = int(raw["terrain_area_id"].rsplit("-", maxsplit=1)[-1])
+        if area_index <= 8:
+            component = _component_row(
+                raw=raw,
+                area_by_id=area_by_id,
+                template_anchor_points=template_anchor_points,
+            )
+        else:
+            primary_component_id = mirrored_primary_component_ids[raw["component_id"]]
+            primary_component = component_by_id[primary_component_id]
+            component = _component_row(
+                raw=raw,
+                area_by_id=area_by_id,
+                template_anchor_points=template_anchor_points,
+                reviewed_battlefield_center=(
+                    _quantize_terrain_coordinate(
+                        _BATTLEFIELD_WIDTH_INCHES - primary_component["battlefield_center_x_inches"]
+                    ),
+                    _quantize_terrain_coordinate(
+                        _BATTLEFIELD_DEPTH_INCHES - primary_component["battlefield_center_y_inches"]
+                    ),
+                ),
+                reviewed_battlefield_rotation=(
+                    primary_component["battlefield_rotation_degrees"] + 180.0
+                )
+                % 360.0,
+                reviewed_local_transform=primary_component["local_transform"],
+            )
+        component_rows.append(component)
+        component_by_id[component["component_id"]] = component
     objective_area_indices = _OBJECTIVE_AREA_INDICES[layout["variant"]]
     objectives = []
     role_counts: dict[str, int] = {}
@@ -967,11 +1256,12 @@ def build_artifact(extraction: dict[str, Any]) -> dict[str, Any]:
                 "x1_points": bounds[2],
                 "y1_points": bounds[3],
             },
-            "battlefield_width_inches": 44.0,
-            "battlefield_depth_inches": 60.0,
+            "battlefield_width_inches": _BATTLEFIELD_WIDTH_INCHES,
+            "battlefield_depth_inches": _BATTLEFIELD_DEPTH_INCHES,
             "battlefield_origin": "bottom_left",
             "battlefield_orientation": "x_right_along_44_inch_edge_y_up_along_60_inch_edge",
             "coordinate_precision_decimal_places": 6,
+            "terrain_placement_increment_inches": 0.05,
         },
         "player_force_disposition_id": "purge-the-foe",
         "opponent_force_disposition_id": "purge-the-foe",
