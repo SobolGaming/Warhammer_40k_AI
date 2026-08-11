@@ -56,7 +56,7 @@ RAW_BYTE_HASHED_JSON_ARTIFACTS = (
     / "warhammer_40000_11th"
     / "event_companion_layouts_2026_06"
     / "artifacts"
-    / "purge-the-foe-vs-purge-the-foe-meatgrinder.json",
+    / "event-companion-battlefields.json",
 )
 
 

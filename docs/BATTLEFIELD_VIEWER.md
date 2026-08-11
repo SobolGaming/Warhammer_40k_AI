@@ -1,7 +1,7 @@
 # Event Companion Battlefield Viewer
 
 The local battlefield viewer renders the canonical
-`battlefield-view-v2-phase17n` projection. It does not read PDF images, source
+`battlefield-view-v3-phase17n` projection. It does not read PDF images, source
 row geometry, or terrain names to reconstruct the board.
 
 Start it from the repository root:
@@ -10,9 +10,10 @@ Start it from the repository root:
 uv run python scripts/mock_event_layout_ui.py --host 127.0.0.1 --port 8765
 ```
 
-Open `http://127.0.0.1:8765/`, select `Purge the Foe` for both players, and use
-Layout A, B, or C. The JSON envelope used by the viewer is available at
-`http://127.0.0.1:8765/data.json`. Stop the server with `Ctrl+C`.
+Open `http://127.0.0.1:8765/`, select any supported player and opponent Force
+Disposition pairing, and use Layout A, B, or C. All 15 pairings and all 45
+layout variants are available. The JSON envelope used by the viewer is
+available at `http://127.0.0.1:8765/data.json`. Stop the server with `Ctrl+C`.
 
 ## Camera and inspection
 
@@ -24,13 +25,16 @@ Layout A, B, or C. The JSON envelope used by the viewer is available at
   corresponding source-defined edge.
 - Click terrain, source-linked objective footprints, deployment zones, or
   regions for their stable ID, classification, kind, source, and volume
-  details. An objective whose footprint binding is pending retains a
-  presentation-only identity label and is not an inferred selectable disk.
+  details. Objective identity labels remain presentation-only and are never
+  converted into inferred selectable disks.
 
 Independent controls show or hide the inch grid, territories and No Man's
 Land, deployment zones, terrain areas, component footprints, walls, floors,
 and source-linked objective footprints and labels. Dense, Light, Mixed, and
-Unknown classifications have distinct colors and hatch directions.
+Unknown classifications have distinct colors and hatch directions. On the
+terrain-area layer, a blue joined-circle glyph marks two physical footprint
+pieces that page 8 defines as one logical terrain area; a red split-circle
+glyph marks adjoining pieces that remain separate terrain areas.
 
 ## Data boundary
 
@@ -46,6 +50,13 @@ renders these projection fields directly:
 - render-only component asset hints; and
 - the authoritative geometry hash and coordinate discriminators.
 
+The closed battlefield projection retains all 720 physical terrain-area
+footprints and the authoritative `logical_terrain_area_id` of each placement;
+those IDs participate in its geometry hash. Single/Separate contact records
+and their layout-page source icon coordinates live beside it in the viewer-only
+envelope. The viewer fails closed if the projected IDs disagree with a Single
+or Separate source contact interpreted using the page-8 legend.
+
 The camera is presentation-only. It converts the unchanged right-handed,
 Z-up, inches-based coordinates to screen pixels. Rules geometry remains the
 only source for component placement and dimensions; asset hints affect labels
@@ -55,22 +66,69 @@ geometry. Hatch generation intersects those projected bounds with the canvas
 viewport, keeping per-frame drawing work bounded even when near-plane clipping
 produces far-off-screen vertices. Objective-to-terrain-area links are retained
 beside the projection in the viewer-only envelope because that association is
-mission metadata rather than part of `battlefield-view-v2-phase17n`. The viewer
+mission metadata rather than part of `battlefield-view-v3-phase17n`. The viewer
 never converts the objective identity record's marker diameter into a
 standalone rules or selection footprint.
 
-## Honest scope
+## Coverage and authority
 
-Nine of the 45 Event Companion layouts currently have runtime terrain
-geometry. The viewer labels the other 36 as terrain-geometry pending and does
-not fall back to legacy rectangles or image-derived guesses. It can still show
-objective identity labels and deployment zones that the canonical projection
-supplies. Any layout without complete source-backed objective-to-terrain-area
-bindings separately reports its objective footprints as pending.
+All 45 Event Companion layouts have source-hashed executable battlefield
+packages. Every package contains 16 terrain-area footprint pieces, explicit
+physical component placements, source-linked objective-to-terrain-area
+bindings, two deployment zones, two territories, and No Man's Land. The 720
+physical footprint pieces form 608 logical rules areas: 112 source-declared
+two-piece Single joins plus 496 singletons. The package also contains 1,349
+physical components. The page 9 Take and Hold versus Take and Hold Layout A
+diagram contains one source-backed exception: it has 29 components because one
+downed hovercraft has no tall-crate companion. Every other layout has 30
+components.
 
-The three Purge the Foe versus Purge the Foe / Meatgrinder layouts contain the
-complete Phase 17N exact slice: 16 terrain areas, 30 components, 70 wall
-volumes, 20 floor volumes, six source-linked objective footprints, two
-deployment zones, two territories, and No Man's Land. The result is a
-schematic geometry inspection tool, not a photorealistic terrain renderer.
-Rendered pixels are non-authoritative.
+The canonical generated artifact has SHA-256
+`ca4bc9ab7a25808b013c8d3095b29be058db807e854253c96b2451b2626df47d`
+and package hash
+`d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd`.
+Its reviewed page-8 key plus pages-9-53 layout extraction has SHA-256
+`3c1e95bda2c2b35749bbc607128597a595e57aa608d0fe73ae82ef211e13e7ea`;
+the generator also pins the stable runtime identity map at
+`ca818fce9686d631e2302c34fc49fced96e1f462e4fe388fa6c4c1a87d667df3`.
+
+All 224 layout-page contact glyphs are retained at 0.05-inch source precision
+and interpreted using the page-8 legend: 112 Single and 112 Separate. Final
+runtime footprint polygons preserve at most one 0.05-inch placement quantum of
+source-fit residual and permit at most `0.000001` square inches of numerical
+overlap. Of the 224 declared contacts, 43 have zero recorded gap and 181 retain
+a source-fit open sliver no wider than 0.05 inches: 80 Single and 101 Separate.
+Of those 43 zero-gap contacts, 41 also have zero overlap. Two page-12 Single
+pairs have `0.00000087` square inches of overlap after six-decimal geometry
+quantization; every other pair has zero recorded overlap.
+Single joins share one rules identity and Separate pairs remain distinct, while
+both preserve source-drawn open board between physical polygons. Two repeated
+Single joins on pages 36 and 46 require one explicit
+`0.011834688335`-inch exact normal correction after their 0.05-inch source
+placement; those joins close with zero gap and zero overlap. The source anchors
+remain separately recorded, and the strict artifact permits no other sub-grid
+pose. Neither label invents rules footprint in source-drawn open board between
+physical polygons. Each measured runtime gap and overlap is retained in the
+generated artifact and validated by the viewer; source-measured
+pre-finalization gaps remain separate provenance.
+Objective centers retain the source vectors' finer 0.01-inch precision.
+When a source-linked objective falls on one physical member of a Single pair,
+its runtime terrain-objective binding expands to every physical member of that
+logical terrain area; open-field objectives remain unbound.
+
+The 14 shared terrain archetypes define recurring component footprints and
+wall/floor geometry once for reuse by every layout. The page 9 exception has 69
+wall volumes and 20 floor volumes; the other layouts each have 70 wall volumes
+and 20 floor volumes. Objective counts follow the source layout and therefore
+vary between five and six.
+
+Battlefield availability does not imply that every associated Primary Mission
+scoring rule is executable. Meatgrinder and the other explicitly
+engine-implemented Primary Missions retain their existing scoring support;
+non-Meatgrinder missions recorded as `source_known_engine_pending` remain
+fail-closed until their missing choices, state, actions, and scoring conditions
+are implemented. See [Mission Implementation Status](MISSION_IMPLEMENTATION_STATUS.md).
+
+The viewer is a schematic geometry inspection tool, not a photorealistic
+terrain renderer. Rendered pixels are non-authoritative, and no layout falls
+back to legacy rectangles or image-derived guesses.

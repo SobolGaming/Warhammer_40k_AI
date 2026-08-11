@@ -1,14 +1,21 @@
 from __future__ import annotations
 
 import json
+import math
 import shutil
 import subprocess
 from collections import Counter
+from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
 import pytest
 from scripts import mock_event_layout_ui
+
+from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    event_companion_layouts_2026_06 as event_layouts,
+)
 
 _VIEWER_RENDERER_TEST = (
     Path(__file__).resolve().parents[2]
@@ -26,8 +33,8 @@ def viewer_data() -> dict[str, object]:
 def test_mock_event_layout_ui_consumes_exact_battlefield_projections(
     viewer_data: dict[str, object],
 ) -> None:
-    assert viewer_data["viewer_schema"] == "event-companion-battlefield-viewer-v2"
-    assert viewer_data["battlefield_view_schema"] == "battlefield-view-v2-phase17n"
+    assert viewer_data["viewer_schema"] == "event-companion-battlefield-viewer-v3"
+    assert viewer_data["battlefield_view_schema"] == "battlefield-view-v3-phase17n"
     assert viewer_data["force_dispositions"] == [
         {"id": "purge-the-foe", "name": "Purge the Foe"},
         {"id": "take-and-hold", "name": "Take and Hold"},
@@ -54,7 +61,7 @@ def test_mock_event_layout_ui_consumes_exact_battlefield_projections(
         assert "terrain_features" not in layout
 
         view = _object_map(layout["battlefield_view"])
-        assert view["schema_version"] == "battlefield-view-v2-phase17n"
+        assert view["schema_version"] == "battlefield-view-v3-phase17n"
         assert view["coordinate_spec_version"] == "battlefield-coordinate-v1"
         assert view["coordinate_space"] == "battlefield_inches_right_handed_z_up"
         bounds = _object_map(view["bounds"])
@@ -112,36 +119,111 @@ def test_mock_event_layout_ui_consumes_exact_battlefield_projections(
     assert len(hashes) == 3
 
 
-def test_mock_event_layout_ui_marks_source_only_geometry_without_fallback(
+def test_mock_event_layout_ui_exposes_full_runtime_geometry_without_fallback(
     viewer_data: dict[str, object],
 ) -> None:
     layouts = _object_map(viewer_data["layouts"])
+    assert len(layouts) == 45
     status_counts = Counter(
         _string(_object_map(layout)["geometry_status"]) for layout in layouts.values()
     )
-    assert status_counts == Counter(
-        {"runtime_geometry_available": 9, "terrain_geometry_pending": 36}
-    )
+    assert status_counts == Counter({"runtime_geometry_available": 45})
 
-    for layout_value in layouts.values():
+    total_area_count = 0
+    total_component_count = 0
+    total_contact_count = 0
+    total_logical_area_count = 0
+    contact_kind_counts: Counter[str] = Counter()
+    page_9_layout_id = "take-and-hold-vs-take-and-hold-layout-1"
+    for layout_id, layout_value in layouts.items():
         layout = _object_map(layout_value)
         view = _object_map(layout["battlefield_view"])
         authoritative = _object_map(view["authoritative"])
         feature_count = len(_object_map(authoritative["terrain_features_by_id"]))
         area_count = len(_object_map(authoritative["terrain_areas_by_id"]))
         region_count = len(_object_map(authoritative["battlefield_regions_by_id"]))
-        if layout["geometry_status"] == "runtime_geometry_available":
-            assert feature_count > 0
-            assert area_count > 0
-            assert region_count > 0
-        else:
-            assert (feature_count, area_count, region_count) == (0, 0, 0)
+        assert layout["geometry_status"] == "runtime_geometry_available"
+        assert area_count == 16
+        assert feature_count == (29 if layout_id == page_9_layout_id else 30)
+        assert region_count > 0
+        assert layout["objective_footprint_status"] == ("source_linked_footprints_available")
+        contacts = _object_list(layout["terrain_area_contacts"])
+        single_contact_count = 0
+        for contact in contacts:
+            contact_record = _object_map(contact)
+            area_ids = _string_list(contact_record["terrain_area_ids"])
+            assert len(area_ids) == 2
+            assert set(area_ids) <= set(_object_map(authoritative["terrain_areas_by_id"]))
+            assert len(_string_list(contact_record["source_icon_ids"])) == 1
+            kind = _string(contact_record["kind"])
+            contact_kind_counts[kind] += 1
+            single_contact_count += int(kind == "single")
+            for field_name in ("source_icon_x_inches", "source_icon_y_inches"):
+                coordinate = _number(contact_record[field_name])
+                assert math.isclose(
+                    coordinate,
+                    round(coordinate / 0.05) * 0.05,
+                    rel_tol=0.0,
+                    abs_tol=1e-9,
+                )
+            assert 0.0 <= _number(contact_record["runtime_pair_gap_inches"]) <= 0.050001
+            assert 0.0 <= _number(contact_record["runtime_pair_overlap_square_inches"]) <= 0.000001
+        logical_area_count = int(_number(layout["logical_terrain_area_count"]))
+        assert logical_area_count == area_count - single_contact_count
+        total_contact_count += len(contacts)
+        total_logical_area_count += logical_area_count
+        total_area_count += area_count
+        total_component_count += feature_count
+
+    assert total_area_count == 720
+    assert total_component_count == 1_349
+    assert total_logical_area_count == 608
+    assert total_contact_count == 224
+    assert contact_kind_counts == Counter({"single": 112, "separate": 112})
+
+
+def test_mock_event_layout_ui_rejects_contacts_without_logical_area_ids() -> None:
+    layout_id = "take-and-hold-vs-take-and-hold-layout-1"
+    artifact_layout = next(
+        candidate
+        for candidate in event_layouts.battlefield_artifact().layouts
+        if candidate.layout_id == layout_id
+    )
+    terrain_areas_by_id: dict[str, dict[str, object]] = {
+        area.area_id: {"logical_terrain_area_id": area.area_id}
+        for area in artifact_layout.terrain_areas
+    }
+    for contact in artifact_layout.terrain_area_contacts:
+        if contact.kind != "single":
+            continue
+        logical_group_id = contact.source_icon_ids[0]
+        for area_id in contact.terrain_area_ids:
+            terrain_areas_by_id[area_id]["logical_terrain_area_id"] = logical_group_id
+    single_contact = next(
+        contact for contact in artifact_layout.terrain_area_contacts if contact.kind == "single"
+    )
+    for area_id in single_contact.terrain_area_ids:
+        terrain_areas_by_id[area_id].pop("logical_terrain_area_id")
+
+    validate_contacts = cast(
+        Callable[..., None],
+        vars(mock_event_layout_ui)["_validate_terrain_area_contacts"],
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="requires runtime logical terrain-area IDs",
+    ):
+        validate_contacts(
+            artifact_layout=artifact_layout,
+            terrain_areas_by_id=terrain_areas_by_id,
+        )
 
 
 def test_mock_event_layout_ui_preserves_source_linked_objective_footprints(
     viewer_data: dict[str, object],
 ) -> None:
     layouts = _object_map(viewer_data["layouts"])
+    total_source_unbound = 0
     for layout_value in layouts.values():
         layout = _object_map(layout_value)
         view = _object_map(layout["battlefield_view"])
@@ -149,6 +231,7 @@ def test_mock_event_layout_ui_preserves_source_linked_objective_footprints(
         objectives = _object_map(authoritative["objectives_by_id"])
         areas = _object_map(authoritative["terrain_areas_by_id"])
         bindings = _object_list(layout["objective_terrain_areas"])
+        source_unbound_objective_ids = set(_string_list(layout["source_unbound_objective_ids"]))
 
         bound_objective_ids: set[str] = set()
         for binding in bindings:
@@ -161,14 +244,13 @@ def test_mock_event_layout_ui_preserves_source_linked_objective_footprints(
             assert area_ids
             assert set(area_ids) <= set(areas)
 
-        expected_status = (
-            "source_linked_footprints_available"
-            if bound_objective_ids == set(objectives)
-            else "footprint_binding_pending"
-        )
-        assert layout["objective_footprint_status"] == expected_status
-        if bindings:
-            assert bound_objective_ids == set(objectives)
+        assert bindings
+        assert not bound_objective_ids & source_unbound_objective_ids
+        assert bound_objective_ids | source_unbound_objective_ids == set(objectives)
+        assert layout["objective_footprint_status"] == ("source_linked_footprints_available")
+        total_source_unbound += len(source_unbound_objective_ids)
+
+    assert total_source_unbound == 3
 
 
 def test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls(
@@ -198,8 +280,11 @@ def test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls(
     assert 'id="show-walls"' in html
     assert 'id="show-floors"' in html
     assert 'id="entity-details" aria-live="polite"' in html
+    assert "Legend (PDF p. 8)" in html
+    assert "Single terrain area" in html
+    assert "Separate terrain areas" in html
 
-    assert 'const BATTLEFIELD_VIEW_SCHEMA = "battlefield-view-v2-phase17n";' in javascript
+    assert 'const BATTLEFIELD_VIEW_SCHEMA = "battlefield-view-v3-phase17n";' in javascript
     assert 'const COORDINATE_SPACE = "battlefield_inches_right_handed_z_up";' in javascript
     assert "layout.battlefield_view" in javascript
     assert "view.authoritative" in javascript
@@ -214,6 +299,14 @@ def test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls(
     assert "projectPoint" in javascript
     assert "resolveObjectiveTerrainFootprints" in javascript
     assert "drawObjectiveTerrainFootprints" in javascript
+    assert "validateTerrainAreaContacts" in javascript
+    assert 'appendDetail(definitionList, "Logical area", payload.logical_terrain_area_id)' in (
+        javascript
+    )
+    assert 'typeof runtimeGap !== "number"' in javascript
+    assert 'typeof sourceGap !== "number"' in javascript
+    assert "contact.source_icon_ids.length !== 1" in javascript
+    assert "drawTerrainAreaContacts" in javascript
     assert "clipWorldPolygonToNearPlane" in geometry_javascript
     assert "clipWorldLineToNearPlane" in geometry_javascript
     assert "hatchLineSegments" in geometry_javascript
@@ -235,15 +328,7 @@ def test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls(
 def test_mock_event_layout_ui_executes_bounded_close_camera_rendering(
     viewer_data: dict[str, object],
 ) -> None:
-    node = shutil.which("node")
-    assert node is not None, "Node.js is required for the executable viewer renderer regression."
-    completed = subprocess.run(
-        [node, str(_VIEWER_RENDERER_TEST)],
-        input=json.dumps(viewer_data, sort_keys=True, separators=(",", ":")),
-        text=True,
-        capture_output=True,
-        check=False,
-    )
+    completed = _execute_viewer_renderer(viewer_data)
     assert completed.returncode == 0, completed.stderr
     result = _object_map(json.loads(completed.stdout))
     close_camera = _object_map(result["close_camera"])
@@ -260,6 +345,56 @@ def test_mock_event_layout_ui_executes_bounded_close_camera_rendering(
     assert result["tested_azimuth_count"] == 360
     assert _number(result["maximum_hatch_strokes"]) <= _number(result["hatch_stroke_budget"])
     assert result["territory_divider_segments_by_layout"] == {"1": 1, "2": 1, "3": 1}
+    assert result["full_catalog_projection_counts"] == {
+        "layouts": 45,
+        "terrain_areas": 720,
+        "terrain_features": 1_349,
+        "terrain_area_contacts": 224,
+        "deployment_zones": 90,
+        "battlefield_regions": 225,
+        "objective_binding_records": 243,
+        "objective_binding_areas": 264,
+    }
+
+
+def test_mock_event_layout_ui_renderer_rejects_coerced_contact_evidence(
+    viewer_data: dict[str, object],
+) -> None:
+    mutations: tuple[tuple[str, object], ...] = (
+        ("source_icon_ids", []),
+        ("source_icon_x_inches", None),
+        ("source_icon_y_inches", "0"),
+        ("source_pair_gap_inches", None),
+        ("runtime_pair_gap_inches", "0"),
+        ("runtime_pair_overlap_square_inches", None),
+    )
+
+    for field_name, invalid_value in mutations:
+        invalid_payload = _object_map(json.loads(json.dumps(viewer_data)))
+        layouts = _object_map(invalid_payload["layouts"])
+        first_layout_id, first_layout_value = next(iter(layouts.items()))
+        first_layout = _object_map(first_layout_value)
+        contacts = cast(list[object], first_layout["terrain_area_contacts"])
+        raw_first_contact: object = contacts[0]
+        assert isinstance(raw_first_contact, dict)
+        first_contact = cast(dict[str, object], raw_first_contact)
+        first_contact[field_name] = invalid_value
+
+        completed = _execute_viewer_renderer(invalid_payload)
+
+        assert completed.returncode != 0, (field_name, first_layout_id)
+
+
+def _execute_viewer_renderer(payload: dict[str, object]) -> subprocess.CompletedProcess[str]:
+    node = shutil.which("node")
+    assert node is not None, "Node.js is required for the executable viewer renderer regression."
+    return subprocess.run(
+        [node, str(_VIEWER_RENDERER_TEST)],
+        input=json.dumps(payload, sort_keys=True, separators=(",", ":")),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
 
 
 def _embedded_layout_data(html: str) -> dict[str, object]:

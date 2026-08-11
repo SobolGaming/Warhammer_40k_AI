@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v5/session-metadata.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v6/session-metadata.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -21,8 +21,8 @@
     },
     "ruleset_descriptor_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
     "ruleset_id": {"minProperties": 1, "type": "object"},
-    "schema_version": {"const": "session-metadata-v5-contract", "type": "string"},
-    "server_contract_version": {"pattern": "^5\\.[0-9]+\\.[0-9]+$", "type": "string"},
+    "schema_version": {"const": "session-metadata-v6-contract", "type": "string"},
+    "server_contract_version": {"pattern": "^6\\.[0-9]+\\.[0-9]+$", "type": "string"},
     "session_id": {"minLength": 1, "type": "string"},
     "session_revision": {"minimum": 0, "type": "integer"},
     "session_state": {

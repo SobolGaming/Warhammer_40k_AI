@@ -110,7 +110,13 @@ def _setup_prebattle_smoke_mission_setup() -> MissionSetup:
         ),
         battlefield_regions=typed_layout.battlefield_regions,
         terrain_areas=typed_layout.terrain_areas,
-        terrain_features=instantiate_terrain_layout_template(typed_terrain_layout),
+        terrain_features=instantiate_terrain_layout_template(
+            typed_terrain_layout,
+            terrain_areas=typed_layout.terrain_areas,
+            terrain_area_footprint_templates=mission_pack.terrain_area_footprint_templates,
+            terrain_feature_presets=mission_pack.terrain_feature_presets,
+            terrain_feature_placements=typed_layout.terrain_feature_placements,
+        ),
         objective_terrain_areas=typed_layout.objective_terrain_areas,
     )
 

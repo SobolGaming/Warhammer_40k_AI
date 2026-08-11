@@ -296,6 +296,21 @@ input[type="range"] {
   background: var(--objective);
 }
 
+.contact-glyph {
+  flex: 0 0 auto;
+  width: 24px;
+  font: 700 11px/14px ui-monospace, "Cascadia Mono", monospace;
+  text-align: center;
+}
+
+.contact-glyph.single {
+  color: #176b87;
+}
+
+.contact-glyph.separate {
+  color: #8b3a35;
+}
+
 .inspector {
   min-height: 110px;
 }

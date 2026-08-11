@@ -22,7 +22,10 @@ from warhammer40k_core.geometry.terrain import (
     TerrainFloorDefinition,
     TerrainWallDefinition,
 )
-from warhammer40k_core.geometry.terrain_area_visibility import TerrainVisibilityArea
+from warhammer40k_core.geometry.terrain_area_visibility import (
+    TerrainVisibilityArea,
+    feature_is_associated_with_terrain_area,
+)
 from warhammer40k_core.geometry.terrain_classification import TerrainAreaClassification
 from warhammer40k_core.geometry.terrain_factory import TerrainFactory
 from warhammer40k_core.geometry.visibility import (
@@ -590,8 +593,9 @@ def test_terrain_area_cover_requires_each_model_to_meet_the_keyword_or_obscurati
     feature = _visibility_ruin()
     light_area = TerrainVisibilityArea(
         terrain_area_id="light-area",
+        member_terrain_area_ids=("light-area",),
         classification=TerrainAreaClassification.LIGHT,
-        footprint_polygon=((-2.0, -2.0), (2.0, -2.0), (2.0, 2.0), (-2.0, 2.0)),
+        footprint_polygons=(((-2.0, -2.0), (2.0, -2.0), (2.0, 2.0), (-2.0, 2.0)),),
     )
     target = _model("target", 0.0, 0.0)
     vehicle_context = TerrainVisibilityContext.from_ruleset_descriptor(
@@ -615,6 +619,65 @@ def test_terrain_area_cover_requires_each_model_to_meet_the_keyword_or_obscurati
 
     assert not vehicle_context.benefit_of_cover(vehicle_context.resolve_line_of_sight()).has_benefit
     assert infantry_context.benefit_of_cover(infantry_context.resolve_line_of_sight()).has_benefit
+
+
+def test_linked_terrain_footprints_share_visibility_exception_and_feature_association() -> None:
+    linked_area = TerrainVisibilityArea(
+        terrain_area_id="logical-linked-area",
+        member_terrain_area_ids=("physical-left", "physical-right"),
+        classification=TerrainAreaClassification.DENSE,
+        footprint_polygons=(
+            ((-2.0, -2.0), (0.0, -2.0), (0.0, 2.0), (-2.0, 2.0)),
+            ((0.0, -2.0), (2.0, -2.0), (2.0, 2.0), (0.0, 2.0)),
+        ),
+    )
+    context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key="los:linked-terrain-area",
+        observer_model=_model("observer", -1.0, 0.0),
+        target_models=(_model("target", 1.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target", keywords=("INFANTRY",)),
+        terrain_areas=(linked_area,),
+    )
+
+    witness = context.resolve_line_of_sight()
+    terrain_area_records = tuple(
+        record
+        for record in witness.all_blocker_records()
+        if record.blocker_kind is VisibilityBlockerKind.TERRAIN_AREA
+    )
+
+    assert witness.unit_visible
+    assert terrain_area_records
+    assert {record.terrain_area_id for record in terrain_area_records} == {"logical-linked-area"}
+    assert {record.exception_applied for record in terrain_area_records} == {
+        "observer_and_target_intersect_area"
+    }
+    cover = context.benefit_of_cover(witness)
+    assert cover.has_benefit
+    assert cover.source_terrain_area_ids == ("logical-linked-area",)
+    assert feature_is_associated_with_terrain_area(_visibility_ruin(), (linked_area,))
+
+    beyond_group_context = TerrainVisibilityContext.from_ruleset_descriptor(
+        ruleset_descriptor=_ruleset(),
+        los_cache_key="los:linked-terrain-area-observer-exception",
+        observer_model=_model("observer", -1.0, 0.0),
+        target_models=(_model("target-beyond-group", 3.0, 0.0),),
+        target_model_keywords=_target_model_keywords("target-beyond-group"),
+        terrain_areas=(linked_area,),
+    )
+    beyond_group_witness = beyond_group_context.resolve_line_of_sight()
+    beyond_group_records = tuple(
+        record
+        for record in beyond_group_witness.all_blocker_records()
+        if record.blocker_kind is VisibilityBlockerKind.TERRAIN_AREA
+    )
+
+    assert beyond_group_witness.unit_visible
+    assert beyond_group_records
+    assert {record.exception_applied for record in beyond_group_records} == {
+        "observer_intersects_area"
+    }
 
 
 def test_one_obscured_model_does_not_grant_cover_when_another_model_has_no_cover_source() -> None:

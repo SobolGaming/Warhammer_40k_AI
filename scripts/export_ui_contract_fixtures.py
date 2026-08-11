@@ -88,7 +88,7 @@ from warhammer40k_core.engine.weapon_declaration import (
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose, PosePayload
 from warhammer40k_core.rules.mission_pack_import import (
-    chapter_approved_2026_27_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
 )
 
 UI_FIXTURE_DIR = Path("contracts/examples/projections")
@@ -381,6 +381,7 @@ def _battlefield_geometry_conformance_example() -> BattlefieldViewPayload:
                     "geometry-conformance-area": {
                         "entity_kind": "terrain_area",
                         "terrain_area_id": "geometry-conformance-area",
+                        "logical_terrain_area_id": "geometry-conformance-area",
                         "classification": "crater",
                         "footprint": _conformance_shape(
                             kind="polygon",
@@ -864,7 +865,6 @@ def _deployment_placement_payload_for_request(request: DecisionRequest) -> dict[
                 pose=_default_deployment_pose(
                     index=index,
                     player_id=request_context.player_id,
-                    unit_instance_id=request_context.unit_instance_id,
                 ),
             )
         )
@@ -1025,7 +1025,7 @@ def _config(*, game_id: str) -> GameConfig:
         turn_order=(PLAYER_A, PLAYER_B),
         fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
         mission_setup=MissionSetup.from_mission_pack(
-            mission_pack=chapter_approved_2026_27_mission_pack(),
+            mission_pack=warhammer_event_companion_2026_07_mission_pack(),
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id=PLAYER_A,
@@ -1071,32 +1071,22 @@ def _default_deployment_pose(
     *,
     index: int,
     player_id: str,
-    unit_instance_id: str,
 ) -> Pose:
     row = index // 3
     column = index % 3
-    base_y = _deployment_base_y_for_unit(unit_instance_id)
     if player_id == PLAYER_B:
-        return Pose.at(57.0 - (row * 1.8), base_y + (column * 1.8), 0.0, facing_degrees=180.0)
-    return Pose.at(3.0 + (row * 1.8), base_y + (column * 1.8), 0.0, facing_degrees=0.0)
-
-
-def _deployment_base_y_for_unit(unit_instance_id: str) -> float:
-    slots = (24.0, 3.0, 13.5, 32.0)
-    return slots[_unit_slot(unit_instance_id) % len(slots)]
-
-
-def _unit_slot(unit_instance_id: str) -> int:
-    digits = ""
-    for character in reversed(unit_instance_id):
-        if character.isdigit():
-            digits = f"{character}{digits}"
-            continue
-        if digits:
-            break
-    if not digits:
-        return 0
-    return max(int(digits) - 1, 0)
+        return Pose.at(
+            2.0 + (row * 1.8),
+            2.0 + (column * 1.8),
+            0.0,
+            facing_degrees=180.0,
+        )
+    return Pose.at(
+        2.0 + (row * 1.8),
+        54.0 + (column * 1.8),
+        0.0,
+        facing_degrees=0.0,
+    )
 
 
 def _army_id_from_unit_id(unit_instance_id: str) -> str:

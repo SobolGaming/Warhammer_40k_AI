@@ -1,6 +1,6 @@
 # CORE V2 external contract
 
-Contract version: `5.0.0`
+Contract version: `6.0.0`
 
 This directory is the canonical, language-neutral Phase 17O capability and
 Phase 18D contract, Phase 18E session protocol, Phase 18F
@@ -43,15 +43,17 @@ references without inferring rules interactions from `decision_type` or display
 text. Hidden decisions expose `interaction: null` and no nested interaction
 requests. The typed `nested_interaction_requests` field publishes nested choices
 without forcing clients to inspect arbitrary proposal JSON.
-Phase 18J adds the optional `battlefield_view` game-view member. Contract 5
-publishes the Phase 17N additions as `game-view-v7-phase17n` and
-`battlefield-view-v2-phase17n`: turn-start terrain evidence is filtered through
+Phase 18J adds the optional `battlefield_view` game-view member. Contract 6
+publishes the Phase 17N additions as `game-view-v8-phase17n` and
+`battlefield-view-v3-phase17n`: turn-start terrain evidence is filtered through
 the same viewer-visible unit set as datacards, and terrain areas/features carry
-explicit classification. The battlefield family separates viewer-scoped authoritative
+explicit classification. Authoritative terrain-area entities also require
+logical terrain-area identity, which participates in the authoritative geometry
+hash. The battlefield family separates viewer-scoped authoritative
 geometry and its hash from interaction overlays and non-authoritative render
 hints under the normative `coordinate-system.md` world frame.
 `examples/battlefield/geometry-conformance.json` is the canonical standalone
-`battlefield-view-v2-phase17n` fixture for every declared geometry union surface and is
+`battlefield-view-v3-phase17n` fixture for every declared geometry union surface and is
 validated by both Python and the generated TypeScript client. Movement and
 shared placement proposal requests use a separate opaque engine-owned
 `spatial_context_hash`; the viewer-scoped authoritative hash is informational.
@@ -61,11 +63,11 @@ family as the standalone submission schema; it is not an unrestricted JSON
 value. The generated TypeScript gate constructs and schema-validates all 81
 published interaction cases.
 
-Replay exports use `replay-artifact-v3-phase17n`. Runtime import retains a
-single explicit migration for the published `replay-artifact-v2-phase18i`
-shape: when its lifecycle state predates turn-start terrain evidence, the
-missing collection is initialized empty before strict loading. Unknown replay
-versions and malformed v2 lifecycle/state objects remain typed errors.
+Replay exports use `replay-artifact-v4-phase17n`. Its embedded mission setup
+requires explicit logical terrain-area identities. Runtime import accepts only
+that exact discriminator; older v2 and v3 artifacts remain supported by the
+retained 5.x deployment and fail with a typed unsupported-version error on the
+6.x runtime. The runtime never infers missing logical grouping.
 
 Phase 17O adds `capability-manifest-v1` inside the compatible support-profile
 envelope. It publishes independent evidence-bearing load, display, muster,

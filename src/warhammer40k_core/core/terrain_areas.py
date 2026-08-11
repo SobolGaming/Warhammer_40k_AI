@@ -12,6 +12,8 @@ from warhammer40k_core.core.terrain_display import (
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.geometry.polygons import (
     Point2D,
+    polygon_distance,
+    polygon_overlap_area,
     polygon_self_intersects,
     signed_polygon_area,
 )
@@ -30,6 +32,7 @@ from warhammer40k_core.geometry.terrain_classification import (
 
 _AREA_EPSILON = 1e-9
 _GEOMETRY_EPSILON = 1e-6
+_LOGICAL_TERRAIN_AREA_MAX_MEMBER_GAP_INCHES = 0.05
 
 
 class TerrainAreaError(ValueError):
@@ -59,6 +62,7 @@ class TerrainAreaFootprintTemplatePayload(TypedDict):
 
 class PlacedTerrainAreaPayload(TypedDict):
     terrain_area_id: str
+    logical_terrain_area_id: str
     footprint_template_id: str
     terrain_feature_kind: str
     classification: str
@@ -169,6 +173,7 @@ class TerrainAreaFootprintTemplate:
 @dataclass(frozen=True, slots=True)
 class PlacedTerrainArea:
     terrain_area_id: str
+    logical_terrain_area_id: str
     footprint_template_id: str
     terrain_feature_kind: str
     classification: TerrainAreaClassification
@@ -189,6 +194,15 @@ class PlacedTerrainArea:
             _validate_unprefixed_identifier(
                 "PlacedTerrainArea terrain_area_id",
                 self.terrain_area_id,
+                reserved_prefix="terrain-area:",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "logical_terrain_area_id",
+            _validate_unprefixed_identifier(
+                "PlacedTerrainArea logical_terrain_area_id",
+                self.logical_terrain_area_id,
                 reserved_prefix="terrain-area:",
             ),
         )
@@ -264,6 +278,7 @@ class PlacedTerrainArea:
         cls,
         *,
         terrain_area_id: str,
+        logical_terrain_area_id: str,
         template: TerrainAreaFootprintTemplate,
         terrain_feature_kind: str,
         classification: TerrainAreaClassification,
@@ -280,6 +295,7 @@ class PlacedTerrainArea:
             raise TerrainAreaError("PlacedTerrainArea template must be a footprint template.")
         return cls(
             terrain_area_id=terrain_area_id,
+            logical_terrain_area_id=logical_terrain_area_id,
             footprint_template_id=template.footprint_template_id,
             terrain_feature_kind=terrain_feature_kind,
             classification=classification,
@@ -315,6 +331,7 @@ class PlacedTerrainArea:
     def to_payload(self) -> PlacedTerrainAreaPayload:
         return {
             "terrain_area_id": self.terrain_area_id,
+            "logical_terrain_area_id": self.logical_terrain_area_id,
             "footprint_template_id": self.footprint_template_id,
             "terrain_feature_kind": self.terrain_feature_kind,
             "classification": self.classification.value,
@@ -339,6 +356,7 @@ class PlacedTerrainArea:
             raw_payload,
             (
                 "terrain_area_id",
+                "logical_terrain_area_id",
                 "footprint_template_id",
                 "terrain_feature_kind",
                 "classification",
@@ -355,6 +373,7 @@ class PlacedTerrainArea:
         )
         return cls(
             terrain_area_id=raw_payload["terrain_area_id"],
+            logical_terrain_area_id=raw_payload["logical_terrain_area_id"],
             footprint_template_id=raw_payload["footprint_template_id"],
             terrain_feature_kind=raw_payload["terrain_feature_kind"],
             classification=terrain_area_classification_from_token(raw_payload["classification"]),
@@ -378,6 +397,131 @@ def terrain_area_classification_from_token(token: object) -> TerrainAreaClassifi
         return geometry_terrain_area_classification_from_token(token)
     except TerrainClassificationError as exc:
         raise TerrainAreaError("Unsupported TerrainAreaClassification token.") from exc
+
+
+def validate_placed_terrain_area_logical_groups(
+    field_name: str,
+    values: object,
+) -> tuple[PlacedTerrainArea, ...]:
+    if type(field_name) is not str or not field_name.strip():
+        raise TerrainAreaError("Logical terrain-area grouping field_name must be non-empty.")
+    if type(values) is not tuple:
+        raise TerrainAreaError(f"{field_name} must be a tuple.")
+    areas: list[PlacedTerrainArea] = []
+    physical_ids: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not PlacedTerrainArea:
+            raise TerrainAreaError(f"{field_name} must contain PlacedTerrainArea values.")
+        if value.terrain_area_id in physical_ids:
+            raise TerrainAreaError(f"{field_name} must not contain duplicate physical IDs.")
+        physical_ids.add(value.terrain_area_id)
+        areas.append(value)
+    grouped_areas: dict[str, list[PlacedTerrainArea]] = {}
+    for area in areas:
+        grouped_areas.setdefault(area.logical_terrain_area_id, []).append(area)
+    for logical_terrain_area_id, members in grouped_areas.items():
+        if logical_terrain_area_id in physical_ids:
+            if len(members) != 1 or members[0].terrain_area_id != logical_terrain_area_id:
+                raise TerrainAreaError(
+                    f"{field_name} logical ID must not ambiguously alias a physical area ID."
+                )
+        elif len(members) < 2:
+            raise TerrainAreaError(
+                f"{field_name} distinct logical ID must group at least two physical areas."
+            )
+        if len({member.source_layout_id for member in members}) != 1:
+            raise TerrainAreaError(
+                f"{field_name} logical group must not combine different source layouts."
+            )
+        connected_member_indices: dict[int, set[int]] = {
+            index: set() for index in range(len(members))
+        }
+        for first_index, first in enumerate(members):
+            first_polygon = _terrain_points_to_polygon_points(first.footprint_polygon)
+            for second_index, second in enumerate(
+                members[first_index + 1 :],
+                start=first_index + 1,
+            ):
+                second_polygon = _terrain_points_to_polygon_points(second.footprint_polygon)
+                if polygon_overlap_area(first_polygon, second_polygon) > _GEOMETRY_EPSILON:
+                    raise TerrainAreaError(
+                        f"{field_name} logical group members must not overlap by positive area."
+                    )
+                if polygon_distance(first_polygon, second_polygon) <= (
+                    _LOGICAL_TERRAIN_AREA_MAX_MEMBER_GAP_INCHES + _GEOMETRY_EPSILON
+                ):
+                    connected_member_indices[first_index].add(second_index)
+                    connected_member_indices[second_index].add(first_index)
+        reachable = {0}
+        frontier = [0]
+        while frontier:
+            current = frontier.pop()
+            for neighbor in connected_member_indices[current] - reachable:
+                reachable.add(neighbor)
+                frontier.append(neighbor)
+        if len(reachable) != len(members):
+            raise TerrainAreaError(
+                f"{field_name} logical group must be connected within one 0.05-inch "
+                "placement quantum."
+            )
+        aggregate_logical_terrain_area_classification(
+            f"{field_name} logical group {logical_terrain_area_id}",
+            tuple(members),
+        )
+    return tuple(sorted(areas, key=lambda area: area.terrain_area_id))
+
+
+def logical_terrain_area_group_contains_polygon(
+    field_name: str,
+    polygon: tuple[TerrainDisplayPoint, ...],
+    *,
+    terrain_areas: tuple[PlacedTerrainArea, ...],
+) -> bool:
+    if type(field_name) is not str or not field_name.strip():
+        raise TerrainAreaError("Logical terrain-area containment field_name must be non-empty.")
+    candidate = _validate_polygon(field_name, polygon)
+    members = validate_placed_terrain_area_logical_groups(field_name, terrain_areas)
+    logical_ids = {member.logical_terrain_area_id for member in members}
+    if len(logical_ids) != 1:
+        raise TerrainAreaError(
+            f"{field_name} terrain areas must belong to one logical terrain area."
+        )
+    candidate_points = _terrain_points_to_polygon_points(candidate)
+    overlap_area = sum(
+        polygon_overlap_area(
+            candidate_points,
+            _terrain_points_to_polygon_points(member.footprint_polygon),
+        )
+        for member in members
+    )
+    return math.isclose(
+        overlap_area,
+        abs(signed_polygon_area(candidate_points)),
+        rel_tol=0.0,
+        abs_tol=_GEOMETRY_EPSILON,
+    )
+
+
+def aggregate_logical_terrain_area_classification(
+    field_name: str,
+    values: object,
+) -> TerrainAreaClassification:
+    if type(values) is not tuple or not values:
+        raise TerrainAreaError(f"{field_name} must be a non-empty tuple.")
+    classifications: set[TerrainAreaClassification] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not PlacedTerrainArea:
+            raise TerrainAreaError(f"{field_name} must contain PlacedTerrainArea values.")
+        classifications.add(value.classification)
+    if TerrainAreaClassification.UNKNOWN in classifications:
+        if classifications != {TerrainAreaClassification.UNKNOWN}:
+            raise TerrainAreaError(
+                f"{field_name} must not mix UNKNOWN with a known terrain classification."
+            )
+        return TerrainAreaClassification.UNKNOWN
+    if len(classifications) == 1:
+        return next(iter(classifications))
+    return TerrainAreaClassification.MIXED
 
 
 def symmetry_axis_from_token(token: object) -> SymmetryAxis:
@@ -454,12 +598,43 @@ def transform_polygon(
     )
 
 
+def transform_terrain_area_local_point(
+    point: TerrainDisplayPoint,
+    *,
+    area: PlacedTerrainArea,
+    template: TerrainAreaFootprintTemplate,
+) -> TerrainDisplayPoint:
+    if type(point) is not TerrainDisplayPoint:
+        raise TerrainAreaError("Terrain-area local point transform requires a TerrainDisplayPoint.")
+    if type(area) is not PlacedTerrainArea:
+        raise TerrainAreaError("Terrain-area local point transform requires a placed area.")
+    if type(template) is not TerrainAreaFootprintTemplate:
+        raise TerrainAreaError("Terrain-area local point transform requires a template.")
+    if area.footprint_template_id != template.footprint_template_id:
+        raise TerrainAreaError("Terrain-area local point transform template identity drifted.")
+    x_inches = point.x_inches
+    if area.local_transform is TerrainAreaLocalTransform.MIRROR_Y_AXIS:
+        anchor_x_inches = template.polygon_vertices_inches[0].x_inches
+        x_inches = (2.0 * anchor_x_inches) - x_inches
+    elif area.local_transform is not TerrainAreaLocalTransform.IDENTITY:
+        raise TerrainAreaError("Unsupported terrain-area local point transform.")
+    return translate_point(
+        rotate_point(
+            TerrainDisplayPoint(x_inches=x_inches, y_inches=point.y_inches),
+            area.rotation_degrees,
+        ),
+        dx_inches=area.center_x_inches,
+        dy_inches=area.center_y_inches,
+    )
+
+
 def mirror_placed_terrain_area(
     area: PlacedTerrainArea,
     *,
     battlefield_width_inches: float,
     battlefield_depth_inches: float,
     terrain_area_id: str,
+    logical_terrain_area_id: str,
     source_id: str,
     symmetry_axis: SymmetryAxis,
 ) -> PlacedTerrainArea:
@@ -480,6 +655,7 @@ def mirror_placed_terrain_area(
     )
     return PlacedTerrainArea(
         terrain_area_id=terrain_area_id,
+        logical_terrain_area_id=logical_terrain_area_id,
         footprint_template_id=area.footprint_template_id,
         terrain_feature_kind=area.terrain_feature_kind,
         classification=area.classification,

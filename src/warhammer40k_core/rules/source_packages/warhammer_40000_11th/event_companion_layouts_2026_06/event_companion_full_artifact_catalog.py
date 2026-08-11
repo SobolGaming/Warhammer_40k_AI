@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections import Counter
+from functools import cache
 from typing import Final
 
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
@@ -21,57 +23,47 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 )
 
 from .common import EventBattlefieldLayoutSource
-from .exact_slice_artifact import (
-    EXPECTED_ARTIFACT_SHA256,
+from .event_companion_full_artifact_types import (
+    BattlefieldLayoutArtifact,
     BattlefieldShapeArtifact,
-    EventCompanionExactSliceArtifact,
-    EventCompanionExactSliceArtifactError,
-    ExactBattlefieldLayoutArtifact,
+    EventCompanionBattlefieldArtifact,
     PointArtifact,
     TerrainFeatureArchetypeArtifact,
-    event_companion_exact_slice_artifact_from_json_bytes,
+)
+from .event_companion_full_artifact_validation import (
+    EventCompanionBattlefieldArtifactError,
+    event_companion_battlefield_artifact_from_json_bytes,
 )
 
-_ARTIFACT_PATH: Final = "artifacts/purge-the-foe-vs-purge-the-foe-meatgrinder.json"
+_ARTIFACT_PATH: Final = "artifacts/event-companion-battlefields.json"
 _ARTIFACT_PACKAGE: Final = (
     "warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_layouts_2026_06"
 )
+_OBJECTIVE_ROLE_ORDER: Final = (
+    ObjectiveMarkerRole.ATTACKER_HOME,
+    ObjectiveMarkerRole.DEFENDER_HOME,
+    ObjectiveMarkerRole.CENTRAL,
+    ObjectiveMarkerRole.EXPANSION,
+    ObjectiveMarkerRole.HOME,
+)
 
 __all__ = (
-    "EXACT_SLICE_ARTIFACT_SHA256",
-    "EXACT_SLICE_LAYOUT_IDS",
-    "EXACT_SLICE_PACKAGE_HASH",
-    "EXACT_SLICE_SOURCE_PDF_SHA256",
-    "LAYOUTS",
-    "TERRAIN_FEATURE_PRESETS",
-    "exact_slice_artifact",
-    "validate_exact_slice_artifact_bytes",
+    "event_companion_battlefield_artifact",
+    "event_companion_battlefield_layouts",
+    "event_companion_terrain_feature_presets",
 )
 
 
-def _load_artifact() -> EventCompanionExactSliceArtifact:
+@cache
+def event_companion_battlefield_artifact() -> EventCompanionBattlefieldArtifact:
+    """Load and strictly validate the complete Event Companion battlefield artifact."""
     try:
         raw = package_artifact_bytes(_ARTIFACT_PACKAGE, _ARTIFACT_PATH)
     except SourcePackageArtifactError as exc:
-        raise EventCompanionExactSliceArtifactError(
-            "Event Companion Phase 17N exact-slice artifact could not be loaded."
+        raise EventCompanionBattlefieldArtifactError(
+            "Complete Event Companion battlefield artifact could not be loaded."
         ) from exc
-    return event_companion_exact_slice_artifact_from_json_bytes(raw)
-
-
-_ARTIFACT: Final = _load_artifact()
-EXACT_SLICE_ARTIFACT_SHA256: Final = EXPECTED_ARTIFACT_SHA256
-EXACT_SLICE_PACKAGE_HASH: Final = _ARTIFACT.package_hash
-EXACT_SLICE_SOURCE_PDF_SHA256: Final = _ARTIFACT.source_pdf_sha256
-EXACT_SLICE_LAYOUT_IDS: Final = frozenset(layout.layout_id for layout in _ARTIFACT.layouts)
-
-
-def exact_slice_artifact() -> EventCompanionExactSliceArtifact:
-    return _ARTIFACT
-
-
-def validate_exact_slice_artifact_bytes(raw: bytes) -> None:
-    event_companion_exact_slice_artifact_from_json_bytes(raw)
+    return event_companion_battlefield_artifact_from_json_bytes(raw)
 
 
 def _point(point: PointArtifact) -> TerrainDisplayPoint:
@@ -79,10 +71,14 @@ def _point(point: PointArtifact) -> TerrainDisplayPoint:
 
 
 def _terrain_feature_preset_id(archetype_id: str) -> str:
+    # Keep the established IDs so the full artifact replaces, rather than forks,
+    # the shared presets introduced by the exact Meatgrinder slice.
     return f"event-companion-exact-{archetype_id}"
 
 
 def _terrain_feature_preset(
+    *,
+    artifact: EventCompanionBattlefieldArtifact,
     archetype: TerrainFeatureArchetypeArtifact,
 ) -> TerrainFeaturePreset:
     polygon = tuple(_point(point) for point in archetype.rules_footprint_polygon)
@@ -129,22 +125,26 @@ def _terrain_feature_preset(
             for floor in archetype.floors
         ),
         source_id=(
-            f"{_ARTIFACT.source_package_id}:phase17n-exact-slice:"
-            f"terrain-archetype:{archetype.archetype_id}:{_ARTIFACT.package_hash}"
+            f"{artifact.source_package_id}:full-battlefield-layouts:"
+            f"terrain-archetype:{archetype.archetype_id}:{artifact.package_hash}"
         ),
     )
 
 
-TERRAIN_FEATURE_PRESETS: Final = tuple(
-    _terrain_feature_preset(archetype) for archetype in _ARTIFACT.feature_archetypes
-)
+@cache
+def event_companion_terrain_feature_presets() -> tuple[TerrainFeaturePreset, ...]:
+    artifact = event_companion_battlefield_artifact()
+    return tuple(
+        _terrain_feature_preset(artifact=artifact, archetype=archetype)
+        for archetype in artifact.feature_archetypes
+    )
 
 
 def _suffix(layout_id: str, stable_id: str) -> str:
     prefix = f"{layout_id}-"
     if not stable_id.startswith(prefix):
-        raise EventCompanionExactSliceArtifactError(
-            "Event Companion exact-slice stable ID does not belong to its layout."
+        raise EventCompanionBattlefieldArtifactError(
+            "Event Companion battlefield stable ID does not belong to its layout."
         )
     return stable_id.removeprefix(prefix)
 
@@ -157,22 +157,55 @@ def _shape_polygons(
     )
 
 
-def _layout_source(
-    layout: ExactBattlefieldLayoutArtifact,
-) -> EventBattlefieldLayoutSource:
-    role_counts: list[tuple[ObjectiveMarkerRole, int]] = []
-    for role, count in (
-        (ObjectiveMarkerRole.ATTACKER_HOME, 1),
-        (ObjectiveMarkerRole.DEFENDER_HOME, 1),
-        (ObjectiveMarkerRole.CENTRAL, 2),
-        (ObjectiveMarkerRole.EXPANSION, 2),
-    ):
-        role_counts.append((role, count))
+def _terrain_area_local_transform_specs(
+    layout: BattlefieldLayoutArtifact,
+) -> tuple[tuple[str, TerrainAreaLocalTransform], ...]:
+    specs: list[tuple[str, TerrainAreaLocalTransform]] = []
+    for area in layout.terrain_areas:
+        local_transform = TerrainAreaLocalTransform(area.local_transform)
+        if local_transform is TerrainAreaLocalTransform.IDENTITY:
+            continue
+        specs.append((_suffix(layout.layout_id, area.area_id), local_transform))
+    return tuple(specs)
+
+
+def _terrain_area_group_specs(
+    layout: BattlefieldLayoutArtifact,
+) -> tuple[tuple[str, tuple[str, ...]], ...]:
+    specs: list[tuple[str, tuple[str, ...]]] = []
+    for contact in layout.terrain_area_contacts:
+        if contact.kind == "separate":
+            continue
+        if contact.kind != "single" or len(contact.source_icon_ids) != 1:
+            raise EventCompanionBattlefieldArtifactError(
+                "Event Companion single-terrain-area contact identity is malformed."
+            )
+        source_icon_suffix = _suffix(layout.layout_id, contact.source_icon_ids[0])
+        specs.append(
+            (
+                f"logical-{source_icon_suffix}",
+                tuple(
+                    _suffix(layout.layout_id, terrain_area_id)
+                    for terrain_area_id in contact.terrain_area_ids
+                ),
+            )
+        )
+    return tuple(sorted(specs))
+
+
+def _objective_role_counts(
+    layout: BattlefieldLayoutArtifact,
+) -> tuple[tuple[ObjectiveMarkerRole, int], ...]:
+    counts = Counter(ObjectiveMarkerRole(objective.role) for objective in layout.objectives)
+    return tuple((role, counts[role]) for role in _OBJECTIVE_ROLE_ORDER if counts[role] > 0)
+
+
+def _layout_source(layout: BattlefieldLayoutArtifact) -> EventBattlefieldLayoutSource:
     return EventBattlefieldLayoutSource(
         layout_id=layout.layout_id,
         name=layout.name,
         source_layout_id=layout.source_layout_id,
-        objective_role_counts=tuple(role_counts),
+        objective_role_counts=_objective_role_counts(layout),
         terrain_area_specs=tuple(
             (
                 _suffix(layout.layout_id, area.area_id),
@@ -183,15 +216,12 @@ def _layout_source(
             )
             for area in layout.terrain_areas
         ),
+        # Every reviewed area pose is explicit in the full artifact. This field is
+        # a runtime synthesis instruction, not mirror-link metadata; populating it
+        # would duplicate the artifact's 16 areas. Mirror links remain available
+        # on the strict artifact returned by event_companion_battlefield_artifact.
         terrain_area_mirror_pairs=(),
-        terrain_area_local_transform_specs=tuple(
-            (
-                _suffix(layout.layout_id, area.area_id),
-                TerrainAreaLocalTransform.MIRROR_Y_AXIS,
-            )
-            for area in layout.terrain_areas
-            if area.local_transform == "mirror_y_axis"
-        ),
+        terrain_area_local_transform_specs=_terrain_area_local_transform_specs(layout),
         objective_terrain_area_specs=tuple(
             (
                 _suffix(layout.layout_id, objective.objective_id),
@@ -207,6 +237,7 @@ def _layout_source(
             (_suffix(layout.layout_id, area.area_id), area.classification)
             for area in layout.terrain_areas
         ),
+        terrain_area_group_specs=_terrain_area_group_specs(layout),
         terrain_feature_placement_specs=tuple(
             (
                 _suffix(layout.layout_id, component.component_id),
@@ -230,4 +261,7 @@ def _layout_source(
     )
 
 
-LAYOUTS: Final = tuple(_layout_source(layout) for layout in _ARTIFACT.layouts)
+@cache
+def event_companion_battlefield_layouts() -> tuple[EventBattlefieldLayoutSource, ...]:
+    artifact = event_companion_battlefield_artifact()
+    return tuple(_layout_source(layout) for layout in artifact.layouts)

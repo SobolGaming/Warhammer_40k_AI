@@ -7,7 +7,7 @@ from html import escape
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from urllib.parse import urlparse
 
 from warhammer40k_core.adapters.battlefield_projection import (
@@ -35,10 +35,16 @@ from warhammer40k_core.rules.mission_pack_import import (
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_2026_06 as event_source,
 )
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    event_companion_layouts_2026_06 as event_layouts,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_layouts_2026_06.event_companion_full_artifact_types import (  # noqa: E501
+    BattlefieldLayoutArtifact,
+)
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
-VIEWER_SCHEMA_VERSION = "event-companion-battlefield-viewer-v2"
+VIEWER_SCHEMA_VERSION = "event-companion-battlefield-viewer-v3"
 
 _ATTACKER_PLAYER_ID = "viewer-attacker"
 _DEFENDER_PLAYER_ID = "viewer-defender"
@@ -99,10 +105,10 @@ def _build_data_payload() -> dict[str, object]:
     descriptors = {
         descriptor.layout_id: descriptor for descriptor in event_source.layout_descriptor_rows()
     }
-    mission_pool_entry_by_layout_id = _mission_pool_entry_by_layout_id(mission_pack)
-    runtime_geometry_layout_ids = {
-        layout.battlefield_layout_id for layout in mission_pack.battlefield_layouts
+    artifact_layouts = {
+        layout.layout_id: layout for layout in event_layouts.battlefield_artifact().layouts
     }
+    mission_pool_entry_by_layout_id = _mission_pool_entry_by_layout_id(mission_pack)
     ruleset, catalog, muster_requests, armies = _preview_projection_dependencies()
 
     layouts: dict[str, object] = {}
@@ -111,6 +117,9 @@ def _build_data_payload() -> dict[str, object]:
         descriptor = descriptors.get(layout_id)
         if descriptor is None:
             raise GameLifecycleError("Viewer layout descriptor is missing.")
+        artifact_layout = artifact_layouts.get(layout_id)
+        if artifact_layout is None:
+            raise GameLifecycleError("Viewer source artifact layout is missing.")
         mission_pool_entry_id = mission_pool_entry_by_layout_id.get(layout_id)
         if mission_pool_entry_id is None:
             raise GameLifecycleError("Viewer mission-pool entry is missing.")
@@ -128,30 +137,55 @@ def _build_data_payload() -> dict[str, object]:
             armies=armies,
         )
         mission_payload = mission_setup.to_payload()
+        terrain_areas_by_id = battlefield_view["authoritative"]["terrain_areas_by_id"]
+        logical_terrain_area_ids = {
+            area["logical_terrain_area_id"] for area in terrain_areas_by_id.values()
+        }
+        _validate_terrain_area_contacts(
+            artifact_layout=artifact_layout,
+            terrain_areas_by_id=terrain_areas_by_id,
+        )
         objective_ids = set(battlefield_view["authoritative"]["objectives_by_id"])
         bound_objective_ids = {
             binding["objective_marker_id"] for binding in mission_payload["objective_terrain_areas"]
         }
-        if not bound_objective_ids <= objective_ids:
+        source_unbound_objective_ids = {
+            objective.objective_id
+            for objective in artifact_layout.objectives
+            if not objective.terrain_area_ids
+        }
+        if (
+            bound_objective_ids & source_unbound_objective_ids
+            or bound_objective_ids | source_unbound_objective_ids != objective_ids
+        ):
             raise GameLifecycleError(
-                "Viewer objective-terrain binding references an unknown objective."
+                "Viewer objective-terrain bindings drifted from the reviewed source artifact."
             )
         layouts[layout_id] = {
             "id": layout_id,
             "name": row.name,
             "attacker_edge": descriptor.attacker_edge,
             "defender_edge": descriptor.defender_edge,
-            "geometry_status": (
-                "runtime_geometry_available"
-                if layout_id in runtime_geometry_layout_ids
-                else "terrain_geometry_pending"
-            ),
-            "objective_footprint_status": (
-                "source_linked_footprints_available"
-                if bound_objective_ids == objective_ids
-                else "footprint_binding_pending"
-            ),
+            "geometry_status": "runtime_geometry_available",
+            "logical_terrain_area_count": len(logical_terrain_area_ids),
+            "objective_footprint_status": "source_linked_footprints_available",
             "objective_terrain_areas": mission_payload["objective_terrain_areas"],
+            "source_unbound_objective_ids": sorted(source_unbound_objective_ids),
+            "terrain_area_contacts": [
+                {
+                    "terrain_area_ids": list(contact.terrain_area_ids),
+                    "kind": contact.kind,
+                    "source_icon_ids": list(contact.source_icon_ids),
+                    "source_icon_x_inches": contact.source_icon_x_inches,
+                    "source_icon_y_inches": contact.source_icon_y_inches,
+                    "source_pair_gap_inches": contact.source_pair_gap_inches,
+                    "runtime_pair_gap_inches": contact.runtime_pair_gap_inches,
+                    "runtime_pair_overlap_square_inches": (
+                        contact.runtime_pair_overlap_square_inches
+                    ),
+                }
+                for contact in artifact_layout.terrain_area_contacts
+            ],
             "battlefield_view": battlefield_view,
         }
     return {
@@ -161,6 +195,42 @@ def _build_data_payload() -> dict[str, object]:
         "matrix": matrix,
         "layouts": layouts,
     }
+
+
+def _validate_terrain_area_contacts(
+    *,
+    artifact_layout: BattlefieldLayoutArtifact,
+    terrain_areas_by_id: dict[str, Any],
+) -> None:
+    for contact in artifact_layout.terrain_area_contacts:
+        first_id, second_id = contact.terrain_area_ids
+        first = terrain_areas_by_id.get(first_id)
+        second = terrain_areas_by_id.get(second_id)
+        if not isinstance(first, dict) or not isinstance(second, dict):
+            raise GameLifecycleError(
+                "Viewer terrain-area contact references unknown runtime geometry."
+            )
+        first_payload = cast(dict[str, object], first)
+        second_payload = cast(dict[str, object], second)
+        first_group_id = first_payload.get("logical_terrain_area_id")
+        second_group_id = second_payload.get("logical_terrain_area_id")
+        if (
+            not isinstance(first_group_id, str)
+            or not first_group_id.strip()
+            or not isinstance(second_group_id, str)
+            or not second_group_id.strip()
+        ):
+            raise GameLifecycleError(
+                "Viewer terrain-area contact requires runtime logical terrain-area IDs."
+            )
+        if contact.kind == "single" and first_group_id != second_group_id:
+            raise GameLifecycleError(
+                "Viewer single-terrain-area contact drifted from runtime grouping."
+            )
+        if contact.kind == "separate" and first_group_id == second_group_id:
+            raise GameLifecycleError(
+                "Viewer separate-terrain-area contact drifted from runtime grouping."
+            )
 
 
 def _mission_pool_entry_by_layout_id(mission_pack: MissionPackDefinition) -> dict[str, str]:
@@ -183,7 +253,7 @@ def _preview_projection_dependencies() -> tuple[
 ]:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     ruleset = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
-        descriptor_version="event-companion-battlefield-viewer-v2"
+        descriptor_version="event-companion-battlefield-viewer-v3"
     )
     muster_requests = (
         _preview_muster_request(

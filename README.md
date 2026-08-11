@@ -65,11 +65,19 @@ Inspect the Event Companion battlefield projection with an orbitable 3D camera:
 uv run python scripts/mock_event_layout_ui.py --host 127.0.0.1 --port 8765
 ```
 
-Open `http://127.0.0.1:8765/`. Purge the Foe versus Purge the Foe layouts A/B/C
-show the complete exact Phase 17N terrain, region, source-linked objective
-footprint, wall, and floor geometry. See
+Open `http://127.0.0.1:8765/`. All 15 Event Companion force-disposition
+pairings and every A/B/C variant are available: 45 of 45 source-hashed
+executable battlefield packages with terrain, regions, source-linked objective
+footprints, walls, and floors. Across the package, the viewer exposes 720
+physical terrain-area footprint pieces forming 608 logical rules areas, plus
+1,349 physical components. The PDF layout-page Single/Separate glyphs are
+rendered at their source coordinates using the page-8 legend; 112 Single joins
+pair 224 footprint pieces and the other 496 pieces remain individual areas.
+Page 9 contains the source-backed 29-component exception, while every other
+layout contains 30. See
 [docs/BATTLEFIELD_VIEWER.md](docs/BATTLEFIELD_VIEWER.md) for controls, data
-authority, and current coverage limits.
+authority, and the distinction between complete battlefield geometry and
+primary-scoring semantics that remain pending outside the implemented missions.
 
 CI uploads each shard's JUnit report for future median-duration profiles. Full behavioral shards
 run for ready pull requests, merge candidates, and pushes to `main`; draft pull requests keep the

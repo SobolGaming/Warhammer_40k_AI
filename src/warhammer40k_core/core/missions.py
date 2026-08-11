@@ -25,10 +25,14 @@ from warhammer40k_core.core.objectives import Objective, ObjectiveMarker
 from warhammer40k_core.core.terrain_areas import (
     PlacedTerrainArea,
     PlacedTerrainAreaPayload,
+    TerrainAreaError,
     TerrainAreaFootprintTemplate,
     TerrainAreaFootprintTemplatePayload,
+    logical_terrain_area_group_contains_polygon,
     polygon_bounds,
     transform_polygon,
+    transform_terrain_area_local_point,
+    validate_placed_terrain_area_logical_groups,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
 from warhammer40k_core.core.terrain_layouts import (
@@ -2423,7 +2427,13 @@ def _validate_placed_terrain_areas(values: object) -> tuple[PlacedTerrainArea, .
         terrain_areas.append(value)
     if not terrain_areas:
         raise MissionPackError("BattlefieldLayoutDefinition terrain_areas must not be empty.")
-    return tuple(sorted(terrain_areas, key=lambda area: area.terrain_area_id))
+    try:
+        return validate_placed_terrain_area_logical_groups(
+            "BattlefieldLayoutDefinition terrain_areas",
+            tuple(terrain_areas),
+        )
+    except TerrainAreaError as exc:
+        raise MissionPackError(str(exc)) from exc
 
 
 def _validate_terrain_feature_area_placements(
@@ -2976,6 +2986,9 @@ def _validate_terrain_feature_area_placements_match_sources(
             f"static terrain feature IDs: {', '.join(sorted(colliding_ids))}."
         )
     terrain_areas_by_id = {area.terrain_area_id: area for area in layout.terrain_areas}
+    terrain_areas_by_logical_id: dict[str, list[PlacedTerrainArea]] = {}
+    for area in layout.terrain_areas:
+        terrain_areas_by_logical_id.setdefault(area.logical_terrain_area_id, []).append(area)
     presets_by_id = {preset.terrain_feature_preset_id: preset for preset in terrain_feature_presets}
     for placement in layout.terrain_feature_placements:
         terrain_area = terrain_areas_by_id[placement.terrain_area_id]
@@ -2986,26 +2999,29 @@ def _validate_terrain_feature_area_placements_match_sources(
                 "must match the referenced terrain area."
             )
         template = templates_by_id[terrain_area.footprint_template_id]
-        area_polygon = tuple(
-            (point.x_inches, point.y_inches) for point in template.polygon_vertices_inches
-        )
         placed_polygon = tuple(
-            (point.x_inches, point.y_inches)
-            for point in (
-                transform_terrain_feature_local_point(point, placement=placement)
-                for point in preset.local_rules_footprint_polygon
+            transform_terrain_area_local_point(
+                transform_terrain_feature_local_point(point, placement=placement),
+                area=terrain_area,
+                template=template,
             )
+            for point in preset.local_rules_footprint_polygon
         )
-        component_area = abs(_signed_polygon_area(placed_polygon))
-        if not math.isclose(
-            component_area,
-            _polygon_overlap_area(area_polygon, placed_polygon),
-            rel_tol=0.0,
-            abs_tol=_GEOMETRY_EPSILON,
-        ):
+        logical_group = tuple(terrain_areas_by_logical_id[terrain_area.logical_terrain_area_id])
+        try:
+            fits_logical_area = logical_terrain_area_group_contains_polygon(
+                "BattlefieldLayoutDefinition terrain feature placement footprint",
+                placed_polygon,
+                terrain_areas=logical_group,
+            )
+        except TerrainAreaError as exc:
+            raise MissionPackError(
+                "BattlefieldLayoutDefinition terrain feature placement geometry is invalid."
+            ) from exc
+        if not fits_logical_area:
             raise MissionPackError(
                 "BattlefieldLayoutDefinition terrain feature placement footprint must fit "
-                "within the referenced terrain area."
+                "within the referenced logical terrain area."
             )
 
 

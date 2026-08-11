@@ -25,6 +25,7 @@ type EventTerrainAreaSpec = tuple[
 type EventTerrainAreaMirrorPair = tuple[str, str]
 type EventTerrainAreaLocalTransformSpec = tuple[str, TerrainAreaLocalTransform]
 type EventTerrainAreaClassificationSpec = tuple[str, str]
+type EventTerrainAreaGroupSpec = tuple[str, tuple[str, ...]]
 type EventTerrainFeaturePlacementSpec = tuple[
     str,
     str,
@@ -51,6 +52,7 @@ class EventBattlefieldLayoutSource:
     terrain_area_local_transform_specs: tuple[EventTerrainAreaLocalTransformSpec, ...] = ()
     objective_terrain_area_specs: tuple[EventObjectiveTerrainAreaSpec, ...] = ()
     terrain_area_classification_specs: tuple[EventTerrainAreaClassificationSpec, ...] = ()
+    terrain_area_group_specs: tuple[EventTerrainAreaGroupSpec, ...] = ()
     terrain_feature_placement_specs: tuple[EventTerrainFeaturePlacementSpec, ...] = ()
     deployment_zone_shape_specs: tuple[EventDeploymentZoneShapeSpec, ...] = ()
     no_mans_land_shape_polygons: EventShapePolygonsSpec = ()

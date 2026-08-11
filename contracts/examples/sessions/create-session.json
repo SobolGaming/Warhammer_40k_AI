@@ -2210,12 +2210,12 @@
           "is_flat": true,
           "marker_diameter_mm": 40.0,
           "measurement_anchor": "center",
-          "name": "Attacker Home Objective",
+          "name": "Attacker Home Objective 1",
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-attacker-home",
           "objective_role": "attacker_home",
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-attacker-home",
-          "x_inches": 9.45,
-          "y_inches": 50.3,
+          "x_inches": 10.08,
+          "y_inches": 50.44,
           "z_inches": 0.0
         },
         {
@@ -2224,12 +2224,12 @@
           "is_flat": true,
           "marker_diameter_mm": 40.0,
           "measurement_anchor": "center",
-          "name": "Central Objective",
+          "name": "Central Objective 1",
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-central",
           "objective_role": "central",
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-central",
-          "x_inches": 22.0,
-          "y_inches": 30.0,
+          "x_inches": 21.99,
+          "y_inches": 30.01,
           "z_inches": 0.0
         },
         {
@@ -2238,12 +2238,12 @@
           "is_flat": true,
           "marker_diameter_mm": 40.0,
           "measurement_anchor": "center",
-          "name": "Defender Home Objective",
+          "name": "Defender Home Objective 1",
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-defender-home",
           "objective_role": "defender_home",
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-defender-home",
-          "x_inches": 34.55,
-          "y_inches": 9.7,
+          "x_inches": 33.74,
+          "y_inches": 8.88,
           "z_inches": 0.0
         },
         {
@@ -2252,12 +2252,12 @@
           "is_flat": true,
           "marker_diameter_mm": 40.0,
           "measurement_anchor": "center",
-          "name": "North-east Expansion Objective",
+          "name": "Expansion Objective 1",
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-expansion-north-east",
           "objective_role": "expansion",
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-expansion-north-east",
-          "x_inches": 34.3,
-          "y_inches": 49.45,
+          "x_inches": 34.95,
+          "y_inches": 49.26,
           "z_inches": 0.0
         },
         {
@@ -2266,12 +2266,12 @@
           "is_flat": true,
           "marker_diameter_mm": 40.0,
           "measurement_anchor": "center",
-          "name": "South-west Expansion Objective",
+          "name": "Expansion Objective 2",
           "objective_marker_id": "take-and-hold-vs-take-and-hold-layout-3-expansion-south-west",
           "objective_role": "expansion",
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:take-and-hold-vs-take-and-hold-layout-3:objective:take-and-hold-vs-take-and-hold-layout-3-expansion-south-west",
-          "x_inches": 9.7,
-          "y_inches": 10.55,
+          "x_inches": 10.21,
+          "y_inches": 10.7,
           "z_inches": 0.0
         }
       ],
@@ -2323,74 +2323,75 @@
       "source_version": "2026-27",
       "terrain_areas": [
         {
-          "center_x_inches": 20.534051945066214,
-          "center_y_inches": 46.13489972860844,
-          "classification": "light",
+          "center_x_inches": 21.24839011196216,
+          "center_y_inches": 46.01796626811553,
+          "classification": "mixed",
           "footprint_polygon": [
             {
-              "x_inches": 15.75,
-              "y_inches": 44.25
+              "x_inches": 25.950000000000003,
+              "y_inches": 48.1
             },
             {
-              "x_inches": 16.159576022144496,
-              "y_inches": 44.53678821817552
+              "x_inches": 25.552692720084572,
+              "y_inches": 47.796442879631854
             },
             {
-              "x_inches": 16.10221837850939,
-              "y_inches": 44.61870342260442
+              "x_inches": 25.613404144158203,
+              "y_inches": 47.71698142364877
             },
             {
-              "x_inches": 17.044158226767355,
-              "y_inches": 45.88864409927549
+              "x_inches": 24.725039424780068,
+              "y_inches": 46.40900278262889
             },
             {
-              "x_inches": 17.797880110722478,
-              "y_inches": 45.68394109087761
+              "x_inches": 23.963463600422862,
+              "y_inches": 46.58221439815925
             },
             {
-              "x_inches": 21.811725127738537,
-              "y_inches": 48.49446562899774
+              "x_inches": 20.069852257251664,
+              "y_inches": 43.60735461855138
             },
             {
-              "x_inches": 21.832161427508577,
-              "y_inches": 48.8139689273402
+              "x_inches": 20.06270790546957,
+              "y_inches": 43.28727813044641
             },
             {
-              "x_inches": 22.54896196759863,
-              "y_inches": 49.01068442171368
+              "x_inches": 19.354699153403892,
+              "y_inches": 43.06095180188871
             },
             {
-              "x_inches": 23.941520442889917,
-              "y_inches": 49.985764363510455
+              "x_inches": 18.003854401691438,
+              "y_inches": 42.028857592637
             },
             {
-              "x_inches": 25.37546153376753,
-              "y_inches": 47.93788425278798
+              "x_inches": 16.486068799850685,
+              "y_inches": 44.01539399221414
             },
             {
-              "x_inches": 23.040878207543905,
-              "y_inches": 46.3031914091875
+              "x_inches": 18.750720295368627,
+              "y_inches": 45.745669578312594
             },
             {
-              "x_inches": 22.967205525162523,
-              "y_inches": 45.88537286499549
+              "x_inches": 18.806970391096996,
+              "y_inches": 46.166188218482745
             },
             {
-              "x_inches": 22.26276876814374,
-              "y_inches": 45.147966019786644
+              "x_inches": 19.48016210278059,
+              "y_inches": 46.93222537118522
             },
             {
-              "x_inches": 21.689277334467068,
-              "y_inches": 45.35679028920827
+              "x_inches": 20.06183431908954,
+              "y_inches": 46.747408075527495
             },
             {
-              "x_inches": 17.183941090877614,
-              "y_inches": 42.20211988927752
+              "x_inches": 24.43221439815925,
+              "y_inches": 50.08653639957714
             }
           ],
           "footprint_template_id": "FOOTPRINT_10X2_5",
           "local_transform": "identity",
-          "rotation_degrees": 35.0,
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
+          "rotation_degrees": 217.381135,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:10x2-5-north-center",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "explicit",
@@ -2399,253 +2400,257 @@
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
-          "center_x_inches": 23.465948054933786,
-          "center_y_inches": 13.865100271391562,
-          "classification": "light",
+          "center_x_inches": 22.801609888037845,
+          "center_y_inches": 13.932033731884474,
+          "classification": "mixed",
           "footprint_polygon": [
             {
-              "x_inches": 28.25,
-              "y_inches": 15.75
+              "x_inches": 18.1,
+              "y_inches": 11.85
             },
             {
-              "x_inches": 27.840423977855504,
-              "y_inches": 15.463211781824477
+              "x_inches": 18.497307279915432,
+              "y_inches": 12.153557120368149
             },
             {
-              "x_inches": 27.89778162149061,
-              "y_inches": 15.381296577395581
+              "x_inches": 18.4365958558418,
+              "y_inches": 12.233018576351235
             },
             {
-              "x_inches": 26.955841773232645,
-              "y_inches": 14.111355900724512
+              "x_inches": 19.324960575219936,
+              "y_inches": 13.540997217371114
             },
             {
-              "x_inches": 26.202119889277522,
-              "y_inches": 14.31605890912239
+              "x_inches": 20.08653639957714,
+              "y_inches": 13.367785601840751
             },
             {
-              "x_inches": 22.188274872261463,
-              "y_inches": 11.505534371002263
+              "x_inches": 23.98014774274834,
+              "y_inches": 16.342645381448623
             },
             {
-              "x_inches": 22.167838572491423,
-              "y_inches": 11.186031072659802
+              "x_inches": 23.987292094530435,
+              "y_inches": 16.662721869553597
             },
             {
-              "x_inches": 21.45103803240137,
-              "y_inches": 10.989315578286323
+              "x_inches": 24.695300846596112,
+              "y_inches": 16.889048198111293
             },
             {
-              "x_inches": 20.058479557110083,
-              "y_inches": 10.014235636489545
+              "x_inches": 26.046145598308566,
+              "y_inches": 17.921142407363003
             },
             {
-              "x_inches": 18.62453846623247,
-              "y_inches": 12.062115747212019
+              "x_inches": 27.56393120014932,
+              "y_inches": 15.934606007785863
             },
             {
-              "x_inches": 20.959121792456095,
-              "y_inches": 13.696808590812502
+              "x_inches": 25.299279704631378,
+              "y_inches": 14.204330421687406
             },
             {
-              "x_inches": 21.032794474837477,
-              "y_inches": 14.114627135004511
+              "x_inches": 25.24302960890301,
+              "y_inches": 13.78381178151726
             },
             {
-              "x_inches": 21.73723123185626,
-              "y_inches": 14.852033980213356
+              "x_inches": 24.569837897219415,
+              "y_inches": 13.017774628814788
             },
             {
-              "x_inches": 22.310722665532932,
-              "y_inches": 14.64320971079173
+              "x_inches": 23.988165680910463,
+              "y_inches": 13.202591924472511
             },
             {
-              "x_inches": 26.816058909122386,
-              "y_inches": 17.79788011072248
+              "x_inches": 19.617785601840755,
+              "y_inches": 9.863463600422858
             }
           ],
           "footprint_template_id": "FOOTPRINT_10X2_5",
           "local_transform": "identity",
-          "rotation_degrees": 215.0,
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-south-center",
+          "rotation_degrees": 37.381135,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:10x2-5-south-center",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
-          "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
-          "symmetry_axis": "point_center",
+          "source_transform": "explicit",
+          "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-south-center",
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
-          "center_x_inches": 38.2,
-          "center_y_inches": 23.9,
-          "classification": "light",
+          "center_x_inches": 29.999999999999996,
+          "center_y_inches": 24.1,
+          "classification": "dense",
           "footprint_polygon": [
             {
-              "x_inches": 41.25,
+              "x_inches": 33.05,
+              "y_inches": 22.950000000000003
+            },
+            {
+              "x_inches": 34.05,
+              "y_inches": 22.950000000000003
+            },
+            {
+              "x_inches": 34.05,
               "y_inches": 22.75
             },
             {
-              "x_inches": 40.25,
+              "x_inches": 35.05,
               "y_inches": 22.75
             },
             {
-              "x_inches": 40.25,
-              "y_inches": 22.549999999999997
+              "x_inches": 35.05,
+              "y_inches": 22.95
             },
             {
-              "x_inches": 39.25,
-              "y_inches": 22.549999999999997
+              "x_inches": 39.14999999999999,
+              "y_inches": 22.95
             },
             {
-              "x_inches": 39.25,
-              "y_inches": 22.75
+              "x_inches": 39.14999999999999,
+              "y_inches": 24.95
             },
             {
-              "x_inches": 35.15,
-              "y_inches": 22.75
+              "x_inches": 38.25,
+              "y_inches": 24.95
             },
             {
-              "x_inches": 35.15,
-              "y_inches": 24.75
+              "x_inches": 37.4,
+              "y_inches": 25.45
             },
             {
-              "x_inches": 36.05,
-              "y_inches": 24.75
+              "x_inches": 36.55,
+              "y_inches": 24.95
             },
             {
-              "x_inches": 36.9,
-              "y_inches": 25.25
-            },
-            {
-              "x_inches": 37.75,
-              "y_inches": 24.75
-            },
-            {
-              "x_inches": 41.25,
-              "y_inches": 24.75
+              "x_inches": 33.05,
+              "y_inches": 24.950000000000003
             }
           ],
           "footprint_template_id": "FOOTPRINT_6X2",
-          "local_transform": "identity",
+          "local_transform": "mirror_y_axis",
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-east-midfield",
           "rotation_degrees": 180.0,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x2-east-midfield",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
-          "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
-          "symmetry_axis": "point_center",
+          "source_transform": "explicit",
+          "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-east-midfield",
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
-          "center_x_inches": 36.7,
-          "center_y_inches": 36.65,
+          "center_x_inches": 36.050000000000004,
+          "center_y_inches": 37.15,
           "classification": "light",
           "footprint_polygon": [
             {
-              "x_inches": 39.75,
-              "y_inches": 35.5
+              "x_inches": 39.1,
+              "y_inches": 36.0
             },
             {
-              "x_inches": 38.75,
-              "y_inches": 35.5
+              "x_inches": 38.1,
+              "y_inches": 36.0
             },
             {
-              "x_inches": 38.75,
-              "y_inches": 35.3
+              "x_inches": 38.1,
+              "y_inches": 35.8
             },
             {
-              "x_inches": 37.75,
-              "y_inches": 35.3
+              "x_inches": 37.1,
+              "y_inches": 35.8
             },
             {
-              "x_inches": 37.75,
-              "y_inches": 35.5
+              "x_inches": 37.1,
+              "y_inches": 36.0
             },
             {
-              "x_inches": 33.65,
-              "y_inches": 35.5
+              "x_inches": 33.00000000000001,
+              "y_inches": 36.0
             },
             {
-              "x_inches": 33.65,
-              "y_inches": 37.5
-            },
-            {
-              "x_inches": 34.55,
-              "y_inches": 37.5
-            },
-            {
-              "x_inches": 35.4,
+              "x_inches": 33.00000000000001,
               "y_inches": 38.0
             },
             {
-              "x_inches": 36.25,
-              "y_inches": 37.5
+              "x_inches": 33.900000000000006,
+              "y_inches": 38.0
             },
             {
-              "x_inches": 39.75,
-              "y_inches": 37.5
+              "x_inches": 34.75000000000001,
+              "y_inches": 38.5
+            },
+            {
+              "x_inches": 35.6,
+              "y_inches": 38.0
+            },
+            {
+              "x_inches": 39.1,
+              "y_inches": 38.0
             }
           ],
           "footprint_template_id": "FOOTPRINT_6X2",
           "local_transform": "identity",
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-north-east",
           "rotation_degrees": 180.0,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x2-north-east",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
-          "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
-          "symmetry_axis": "point_center",
+          "source_transform": "explicit",
+          "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-north-east",
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
-          "center_x_inches": 7.3,
-          "center_y_inches": 23.35,
+          "center_x_inches": 7.8999999999999995,
+          "center_y_inches": 22.75,
           "classification": "light",
           "footprint_polygon": [
             {
-              "x_inches": 4.25,
-              "y_inches": 24.5
+              "x_inches": 4.85,
+              "y_inches": 23.9
             },
             {
-              "x_inches": 5.25,
-              "y_inches": 24.5
+              "x_inches": 5.85,
+              "y_inches": 23.9
             },
             {
-              "x_inches": 5.25,
-              "y_inches": 24.700000000000003
+              "x_inches": 5.85,
+              "y_inches": 24.1
             },
             {
-              "x_inches": 6.25,
-              "y_inches": 24.700000000000003
+              "x_inches": 6.85,
+              "y_inches": 24.1
             },
             {
-              "x_inches": 6.25,
-              "y_inches": 24.5
+              "x_inches": 6.85,
+              "y_inches": 23.9
             },
             {
-              "x_inches": 10.35,
-              "y_inches": 24.5
+              "x_inches": 10.95,
+              "y_inches": 23.9
             },
             {
-              "x_inches": 10.35,
-              "y_inches": 22.5
+              "x_inches": 10.95,
+              "y_inches": 21.9
             },
             {
-              "x_inches": 9.45,
-              "y_inches": 22.5
+              "x_inches": 10.049999999999999,
+              "y_inches": 21.9
             },
             {
-              "x_inches": 8.6,
-              "y_inches": 22.0
+              "x_inches": 9.2,
+              "y_inches": 21.4
             },
             {
-              "x_inches": 7.75,
-              "y_inches": 22.5
+              "x_inches": 8.35,
+              "y_inches": 21.9
             },
             {
-              "x_inches": 4.25,
-              "y_inches": 22.5
+              "x_inches": 4.85,
+              "y_inches": 21.9
             }
           ],
           "footprint_template_id": "FOOTPRINT_6X2",
           "local_transform": "identity",
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
           "rotation_degrees": 0.0,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x2-south-west",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
@@ -2655,57 +2660,58 @@
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
-          "center_x_inches": 5.8,
-          "center_y_inches": 36.1,
-          "classification": "light",
+          "center_x_inches": 14.05,
+          "center_y_inches": 35.85,
+          "classification": "dense",
           "footprint_polygon": [
             {
-              "x_inches": 2.75,
-              "y_inches": 37.25
+              "x_inches": 11.0,
+              "y_inches": 37.0
             },
             {
-              "x_inches": 3.75,
-              "y_inches": 37.25
+              "x_inches": 10.0,
+              "y_inches": 37.0
             },
             {
-              "x_inches": 3.75,
-              "y_inches": 37.45
+              "x_inches": 10.0,
+              "y_inches": 37.2
             },
             {
-              "x_inches": 4.75,
-              "y_inches": 37.45
+              "x_inches": 9.0,
+              "y_inches": 37.2
             },
             {
-              "x_inches": 4.75,
-              "y_inches": 37.25
+              "x_inches": 9.0,
+              "y_inches": 37.0
             },
             {
-              "x_inches": 8.85,
-              "y_inches": 37.25
+              "x_inches": 4.900000000000002,
+              "y_inches": 37.0
             },
             {
-              "x_inches": 8.85,
-              "y_inches": 35.25
+              "x_inches": 4.900000000000002,
+              "y_inches": 35.0
             },
             {
-              "x_inches": 7.949999999999999,
-              "y_inches": 35.25
+              "x_inches": 5.800000000000001,
+              "y_inches": 35.0
             },
             {
-              "x_inches": 7.1,
-              "y_inches": 34.75
+              "x_inches": 6.650000000000001,
+              "y_inches": 34.5
             },
             {
-              "x_inches": 6.25,
-              "y_inches": 35.25
+              "x_inches": 7.500000000000001,
+              "y_inches": 35.0
             },
             {
-              "x_inches": 2.75,
-              "y_inches": 35.25
+              "x_inches": 11.0,
+              "y_inches": 35.0
             }
           ],
           "footprint_template_id": "FOOTPRINT_6X2",
-          "local_transform": "identity",
+          "local_transform": "mirror_y_axis",
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
           "rotation_degrees": 0.0,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x2-west-midfield",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
@@ -2715,70 +2721,71 @@
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
-          "center_x_inches": 33.25,
-          "center_y_inches": 34.0,
-          "classification": "light",
+          "center_x_inches": 32.7,
+          "center_y_inches": 32.6,
+          "classification": "dense",
           "footprint_polygon": [
             {
-              "x_inches": 31.0,
-              "y_inches": 30.75
+              "x_inches": 34.95,
+              "y_inches": 35.85
             },
             {
-              "x_inches": 31.0,
-              "y_inches": 36.75
+              "x_inches": 34.95,
+              "y_inches": 29.85
             },
             {
-              "x_inches": 32.3,
-              "y_inches": 36.75
+              "x_inches": 33.650000000000006,
+              "y_inches": 29.85
             },
             {
-              "x_inches": 33.0,
-              "y_inches": 37.25
+              "x_inches": 32.95,
+              "y_inches": 29.35
             },
             {
-              "x_inches": 33.7,
-              "y_inches": 36.85
+              "x_inches": 32.25,
+              "y_inches": 29.75
             },
             {
-              "x_inches": 34.0,
-              "y_inches": 37.05
+              "x_inches": 31.950000000000003,
+              "y_inches": 29.55
             },
             {
-              "x_inches": 34.2,
-              "y_inches": 36.75
+              "x_inches": 31.750000000000004,
+              "y_inches": 29.85
             },
             {
-              "x_inches": 35.0,
-              "y_inches": 36.75
+              "x_inches": 30.950000000000003,
+              "y_inches": 29.85
             },
             {
-              "x_inches": 35.0,
-              "y_inches": 34.05
+              "x_inches": 30.950000000000003,
+              "y_inches": 32.550000000000004
             },
             {
-              "x_inches": 35.2,
-              "y_inches": 33.95
+              "x_inches": 30.750000000000004,
+              "y_inches": 32.65
             },
             {
-              "x_inches": 35.1,
-              "y_inches": 33.55
+              "x_inches": 30.85,
+              "y_inches": 33.050000000000004
             },
             {
-              "x_inches": 35.5,
-              "y_inches": 32.75
+              "x_inches": 30.450000000000003,
+              "y_inches": 33.85
             },
             {
-              "x_inches": 35.0,
-              "y_inches": 31.95
+              "x_inches": 30.950000000000003,
+              "y_inches": 34.65
             },
             {
-              "x_inches": 35.0,
-              "y_inches": 30.75
+              "x_inches": 30.950000000000003,
+              "y_inches": 35.85
             }
           ],
           "footprint_template_id": "FOOTPRINT_6X4",
           "local_transform": "identity",
-          "rotation_degrees": 90.0,
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
+          "rotation_degrees": 270.0,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x4-central-east",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "explicit",
@@ -2787,141 +2794,143 @@
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
-          "center_x_inches": 10.75,
-          "center_y_inches": 26.0,
-          "classification": "light",
+          "center_x_inches": 11.2,
+          "center_y_inches": 27.25,
+          "classification": "dense",
           "footprint_polygon": [
             {
-              "x_inches": 13.0,
-              "y_inches": 29.25
+              "x_inches": 8.95,
+              "y_inches": 24.0
             },
             {
-              "x_inches": 13.0,
-              "y_inches": 23.25
+              "x_inches": 8.95,
+              "y_inches": 30.0
             },
             {
-              "x_inches": 11.700000000000003,
-              "y_inches": 23.25
+              "x_inches": 10.25,
+              "y_inches": 30.0
             },
             {
-              "x_inches": 11.0,
-              "y_inches": 22.75
+              "x_inches": 10.95,
+              "y_inches": 30.5
             },
             {
-              "x_inches": 10.299999999999997,
-              "y_inches": 23.15
+              "x_inches": 11.649999999999999,
+              "y_inches": 30.1
             },
             {
-              "x_inches": 10.0,
-              "y_inches": 22.950000000000003
+              "x_inches": 11.95,
+              "y_inches": 30.3
             },
             {
-              "x_inches": 9.799999999999997,
-              "y_inches": 23.25
+              "x_inches": 12.149999999999999,
+              "y_inches": 30.0
             },
             {
-              "x_inches": 9.0,
-              "y_inches": 23.25
+              "x_inches": 12.95,
+              "y_inches": 30.0
             },
             {
-              "x_inches": 9.0,
-              "y_inches": 25.950000000000003
+              "x_inches": 12.95,
+              "y_inches": 27.3
             },
             {
-              "x_inches": 8.799999999999997,
-              "y_inches": 26.049999999999997
+              "x_inches": 13.149999999999999,
+              "y_inches": 27.2
             },
             {
-              "x_inches": 8.899999999999999,
-              "y_inches": 26.450000000000003
+              "x_inches": 13.049999999999999,
+              "y_inches": 26.8
             },
             {
-              "x_inches": 8.5,
-              "y_inches": 27.25
+              "x_inches": 13.45,
+              "y_inches": 26.0
             },
             {
-              "x_inches": 9.0,
-              "y_inches": 28.05
+              "x_inches": 12.95,
+              "y_inches": 25.2
             },
             {
-              "x_inches": 9.0,
-              "y_inches": 29.25
+              "x_inches": 12.95,
+              "y_inches": 24.0
             }
           ],
           "footprint_template_id": "FOOTPRINT_6X4",
           "local_transform": "identity",
-          "rotation_degrees": 270.0,
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-west",
+          "rotation_degrees": 90.0,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x4-central-west",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
-          "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
-          "symmetry_axis": "point_center",
+          "source_transform": "explicit",
+          "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-west",
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
           "center_x_inches": 13.25,
-          "center_y_inches": 40.5,
+          "center_y_inches": 40.2,
           "classification": "light",
           "footprint_polygon": [
             {
               "x_inches": 11.0,
-              "y_inches": 37.25
+              "y_inches": 36.95
             },
             {
               "x_inches": 11.0,
-              "y_inches": 43.25
+              "y_inches": 42.95
             },
             {
               "x_inches": 12.3,
-              "y_inches": 43.25
+              "y_inches": 42.95
             },
             {
               "x_inches": 13.0,
-              "y_inches": 43.75
+              "y_inches": 43.45
             },
             {
               "x_inches": 13.7,
-              "y_inches": 43.35
+              "y_inches": 43.050000000000004
             },
             {
               "x_inches": 14.0,
-              "y_inches": 43.55
+              "y_inches": 43.25
             },
             {
               "x_inches": 14.2,
-              "y_inches": 43.25
+              "y_inches": 42.95
             },
             {
               "x_inches": 15.0,
-              "y_inches": 43.25
+              "y_inches": 42.95
             },
             {
               "x_inches": 15.0,
-              "y_inches": 40.55
+              "y_inches": 40.25
             },
             {
               "x_inches": 15.2,
-              "y_inches": 40.45
+              "y_inches": 40.150000000000006
             },
             {
               "x_inches": 15.1,
-              "y_inches": 40.05
+              "y_inches": 39.75
             },
             {
               "x_inches": 15.5,
-              "y_inches": 39.25
+              "y_inches": 38.95
             },
             {
               "x_inches": 15.0,
-              "y_inches": 38.45
+              "y_inches": 38.150000000000006
             },
             {
               "x_inches": 15.0,
-              "y_inches": 37.25
+              "y_inches": 36.95
             }
           ],
           "footprint_template_id": "FOOTPRINT_6X4",
           "local_transform": "identity",
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
           "rotation_degrees": 90.0,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x4-north-west",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
@@ -2931,214 +2940,217 @@
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
-          "center_x_inches": 30.75,
-          "center_y_inches": 19.5,
+          "center_x_inches": 30.799999999999997,
+          "center_y_inches": 19.65,
           "classification": "light",
           "footprint_polygon": [
             {
-              "x_inches": 33.0,
-              "y_inches": 22.75
+              "x_inches": 33.05,
+              "y_inches": 22.9
             },
             {
-              "x_inches": 33.0,
-              "y_inches": 16.75
+              "x_inches": 33.05,
+              "y_inches": 16.9
             },
             {
-              "x_inches": 31.7,
-              "y_inches": 16.75
+              "x_inches": 31.749999999999996,
+              "y_inches": 16.9
             },
             {
-              "x_inches": 31.0,
-              "y_inches": 16.25
+              "x_inches": 31.049999999999997,
+              "y_inches": 16.4
             },
             {
-              "x_inches": 30.3,
-              "y_inches": 16.65
+              "x_inches": 30.349999999999998,
+              "y_inches": 16.799999999999997
             },
             {
-              "x_inches": 30.0,
-              "y_inches": 16.450000000000003
+              "x_inches": 30.049999999999997,
+              "y_inches": 16.599999999999998
             },
             {
-              "x_inches": 29.8,
-              "y_inches": 16.75
+              "x_inches": 29.849999999999998,
+              "y_inches": 16.9
             },
             {
-              "x_inches": 29.0,
-              "y_inches": 16.75
+              "x_inches": 29.049999999999997,
+              "y_inches": 16.9
             },
             {
-              "x_inches": 29.0,
-              "y_inches": 19.450000000000003
+              "x_inches": 29.049999999999997,
+              "y_inches": 19.599999999999998
             },
             {
-              "x_inches": 28.8,
-              "y_inches": 19.549999999999997
+              "x_inches": 28.849999999999998,
+              "y_inches": 19.7
             },
             {
-              "x_inches": 28.9,
-              "y_inches": 19.950000000000003
+              "x_inches": 28.949999999999996,
+              "y_inches": 20.099999999999998
             },
             {
-              "x_inches": 28.5,
-              "y_inches": 20.75
+              "x_inches": 28.549999999999997,
+              "y_inches": 20.9
             },
             {
-              "x_inches": 29.0,
-              "y_inches": 21.549999999999997
+              "x_inches": 29.049999999999997,
+              "y_inches": 21.7
             },
             {
-              "x_inches": 29.0,
-              "y_inches": 22.75
+              "x_inches": 29.049999999999997,
+              "y_inches": 22.9
             }
           ],
           "footprint_template_id": "FOOTPRINT_6X4",
           "local_transform": "identity",
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-south-east",
           "rotation_degrees": 270.0,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:6x4-south-east",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
-          "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
-          "symmetry_axis": "point_center",
+          "source_transform": "explicit",
+          "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-south-east",
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
-          "center_x_inches": 34.2,
-          "center_y_inches": 49.25,
-          "classification": "dense",
+          "center_x_inches": 34.300000000000004,
+          "center_y_inches": 49.2,
+          "classification": "mixed",
           "footprint_polygon": [
             {
-              "x_inches": 38.0,
-              "y_inches": 43.5
+              "x_inches": 38.1,
+              "y_inches": 43.45
             },
             {
-              "x_inches": 31.0,
-              "y_inches": 43.5
+              "x_inches": 31.1,
+              "y_inches": 43.45
             },
             {
-              "x_inches": 31.0,
-              "y_inches": 44.6
+              "x_inches": 31.100000000000005,
+              "y_inches": 44.550000000000004
             },
             {
-              "x_inches": 30.7,
-              "y_inches": 45.2
+              "x_inches": 30.800000000000004,
+              "y_inches": 45.150000000000006
             },
             {
-              "x_inches": 30.75,
-              "y_inches": 45.5
+              "x_inches": 30.850000000000005,
+              "y_inches": 45.45
             },
             {
-              "x_inches": 30.4,
-              "y_inches": 46.5
+              "x_inches": 30.500000000000004,
+              "y_inches": 46.45
             },
             {
-              "x_inches": 31.0,
-              "y_inches": 47.0
+              "x_inches": 31.100000000000005,
+              "y_inches": 46.95
             },
             {
-              "x_inches": 31.0,
-              "y_inches": 47.8
+              "x_inches": 31.100000000000005,
+              "y_inches": 47.75
             },
             {
-              "x_inches": 30.9,
-              "y_inches": 48.5
+              "x_inches": 31.000000000000004,
+              "y_inches": 48.45
             },
             {
-              "x_inches": 31.0,
-              "y_inches": 49.2
+              "x_inches": 31.100000000000005,
+              "y_inches": 49.150000000000006
             },
             {
-              "x_inches": 30.5,
-              "y_inches": 50.4
+              "x_inches": 30.600000000000005,
+              "y_inches": 50.35
             },
             {
-              "x_inches": 31.0,
-              "y_inches": 51.5
+              "x_inches": 31.100000000000005,
+              "y_inches": 51.45
             },
             {
-              "x_inches": 31.0,
-              "y_inches": 55.0
+              "x_inches": 31.100000000000005,
+              "y_inches": 54.95
             },
             {
-              "x_inches": 38.0,
-              "y_inches": 55.0
+              "x_inches": 38.10000000000001,
+              "y_inches": 54.95
             }
           ],
           "footprint_template_id": "FOOTPRINT_7X11_5",
           "local_transform": "identity",
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east",
           "rotation_degrees": 180.0,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:7x11-5-north-east",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
-          "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
-          "symmetry_axis": "point_center",
+          "source_transform": "explicit",
+          "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east",
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
-          "center_x_inches": 9.87114177668623,
-          "center_y_inches": 49.99713023966847,
+          "center_x_inches": 10.2143429719297,
+          "center_y_inches": 49.905817363942425,
           "classification": "dense",
           "footprint_polygon": [
             {
-              "x_inches": 11.25,
-              "y_inches": 56.75
+              "x_inches": 8.85,
+              "y_inches": 43.15
             },
             {
-              "x_inches": 16.19974746830583,
-              "y_inches": 51.80025253169417
+              "x_inches": 3.8896268439481556,
+              "y_inches": 48.08909892113129
             },
             {
-              "x_inches": 15.42193000900063,
-              "y_inches": 51.022435072388966
+              "x_inches": 4.665770960125929,
+              "y_inches": 48.868586131368005
             },
             {
-              "x_inches": 15.209797974644664,
-              "y_inches": 50.38603896932107
+              "x_inches": 4.876534875249246,
+              "y_inches": 49.50543664136379
             },
             {
-              "x_inches": 14.962310601229373,
-              "y_inches": 50.20926227402443
+              "x_inches": 5.123641780126672,
+              "y_inches": 49.68274478432936
             },
             {
-              "x_inches": 14.502691193458116,
-              "y_inches": 49.2546681194226
+              "x_inches": 5.581208682485692,
+              "y_inches": 50.63832446696476
             },
             {
-              "x_inches": 13.724873734152913,
-              "y_inches": 49.32537879754125
+              "x_inches": 6.3591763045138,
+              "y_inches": 50.56928549915721
             },
             {
-              "x_inches": 13.159188309203675,
-              "y_inches": 48.75969337259201
+              "x_inches": 6.9236447526430895,
+              "y_inches": 51.13618528842028
             },
             {
-              "x_inches": 12.734924240491747,
-              "y_inches": 48.194007947642774
+              "x_inches": 7.346692171098335,
+              "y_inches": 51.702781160041624
             },
             {
-              "x_inches": 12.169238815542508,
-              "y_inches": 47.769743878930846
+              "x_inches": 7.911464536869348,
+              "y_inches": 52.12825991963064
             },
             {
-              "x_inches": 11.674264068711924,
-              "y_inches": 46.567662350913714
+              "x_inches": 8.403854840773864,
+              "y_inches": 53.331402383606054
             },
             {
-              "x_inches": 10.542893218813449,
-              "y_inches": 46.14339828220179
+              "x_inches": 9.534311325241056,
+              "y_inches": 53.758096813761966
             },
             {
-              "x_inches": 8.068019484660532,
-              "y_inches": 43.66852454804887
+              "x_inches": 12.003860785806701,
+              "y_inches": 56.23828339178789
             },
             {
-              "x_inches": 3.118272016354701,
-              "y_inches": 48.61827201635471
+              "x_inches": 16.964233941858545,
+              "y_inches": 51.2991844706566
             }
           ],
           "footprint_template_id": "FOOTPRINT_7X11_5",
           "local_transform": "identity",
-          "rotation_degrees": 315.0,
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
+          "rotation_degrees": 135.12313,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:7x11-5-north-west",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
           "source_transform": "explicit",
@@ -3147,141 +3159,143 @@
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
-          "center_x_inches": 34.12885822331377,
-          "center_y_inches": 10.002869760331528,
+          "center_x_inches": 33.7856570280703,
+          "center_y_inches": 9.19418263605757,
           "classification": "dense",
           "footprint_polygon": [
             {
-              "x_inches": 32.75,
-              "y_inches": 3.25
+              "x_inches": 35.15,
+              "y_inches": 15.95
             },
             {
-              "x_inches": 27.80025253169417,
-              "y_inches": 8.19974746830583
+              "x_inches": 40.11037315605184,
+              "y_inches": 11.01090107886871
             },
             {
-              "x_inches": 28.57806999099937,
-              "y_inches": 8.977564927611034
+              "x_inches": 39.33422903987407,
+              "y_inches": 10.231413868631993
             },
             {
-              "x_inches": 28.790202025355335,
-              "y_inches": 9.61396103067893
+              "x_inches": 39.12346512475075,
+              "y_inches": 9.594563358636208
             },
             {
-              "x_inches": 29.037689398770627,
-              "y_inches": 9.790737725975568
+              "x_inches": 38.876358219873325,
+              "y_inches": 9.417255215670636
             },
             {
-              "x_inches": 29.497308806541884,
-              "y_inches": 10.745331880577403
+              "x_inches": 38.418791317514305,
+              "y_inches": 8.461675533035237
             },
             {
-              "x_inches": 30.275126265847085,
-              "y_inches": 10.674621202458752
+              "x_inches": 37.6408236954862,
+              "y_inches": 8.530714500842787
             },
             {
-              "x_inches": 30.840811690796325,
-              "y_inches": 11.240306627407989
+              "x_inches": 37.07635524735691,
+              "y_inches": 7.963814711579721
             },
             {
-              "x_inches": 31.265075759508253,
-              "y_inches": 11.805992052357226
+              "x_inches": 36.65330782890166,
+              "y_inches": 7.397218839958375
             },
             {
-              "x_inches": 31.830761184457494,
-              "y_inches": 12.230256121069154
+              "x_inches": 36.08853546313065,
+              "y_inches": 6.971740080369352
             },
             {
-              "x_inches": 32.32573593128808,
-              "y_inches": 13.432337649086286
+              "x_inches": 35.59614515922613,
+              "y_inches": 5.768597616393944
             },
             {
-              "x_inches": 33.45710678118655,
-              "y_inches": 13.856601717798213
+              "x_inches": 34.46568867475894,
+              "y_inches": 5.3419031862380315
             },
             {
-              "x_inches": 35.93198051533947,
-              "y_inches": 16.33147545195113
+              "x_inches": 31.996139214193295,
+              "y_inches": 2.8617166082121095
             },
             {
-              "x_inches": 40.8817279836453,
-              "y_inches": 11.381727983645291
+              "x_inches": 27.03576605814145,
+              "y_inches": 7.800815529343399
             }
           ],
           "footprint_template_id": "FOOTPRINT_7X11_5",
           "local_transform": "identity",
-          "rotation_degrees": 135.0,
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east",
+          "rotation_degrees": 315.12313,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:7x11-5-south-east",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
-          "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
-          "symmetry_axis": "point_center",
+          "source_transform": "explicit",
+          "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east",
           "terrain_feature_kind": "terrain_layout_area"
         },
         {
-          "center_x_inches": 9.8,
+          "center_x_inches": 9.75,
           "center_y_inches": 10.75,
-          "classification": "dense",
+          "classification": "mixed",
           "footprint_polygon": [
             {
-              "x_inches": 6.000000000000001,
+              "x_inches": 5.95,
               "y_inches": 16.5
             },
             {
-              "x_inches": 13.0,
+              "x_inches": 12.95,
               "y_inches": 16.5
             },
             {
-              "x_inches": 13.0,
+              "x_inches": 12.95,
               "y_inches": 15.4
             },
             {
-              "x_inches": 13.3,
+              "x_inches": 13.25,
               "y_inches": 14.8
             },
             {
-              "x_inches": 13.25,
+              "x_inches": 13.2,
               "y_inches": 14.5
             },
             {
-              "x_inches": 13.600000000000001,
+              "x_inches": 13.55,
               "y_inches": 13.5
             },
             {
-              "x_inches": 13.0,
+              "x_inches": 12.95,
               "y_inches": 13.0
             },
             {
-              "x_inches": 13.0,
+              "x_inches": 12.95,
               "y_inches": 12.2
             },
             {
-              "x_inches": 13.100000000000001,
+              "x_inches": 13.05,
               "y_inches": 11.5
             },
             {
-              "x_inches": 13.0,
+              "x_inches": 12.95,
               "y_inches": 10.8
             },
             {
-              "x_inches": 13.5,
+              "x_inches": 13.45,
               "y_inches": 9.6
             },
             {
-              "x_inches": 13.0,
+              "x_inches": 12.95,
               "y_inches": 8.5
             },
             {
-              "x_inches": 13.0,
+              "x_inches": 12.95,
               "y_inches": 5.0
             },
             {
-              "x_inches": 6.000000000000001,
+              "x_inches": 5.95,
               "y_inches": 5.0
             }
           ],
           "footprint_template_id": "FOOTPRINT_7X11_5",
           "local_transform": "identity",
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
           "rotation_degrees": 0.0,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:7x11-5-south-west",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
@@ -3293,7 +3307,7 @@
         {
           "center_x_inches": 21.75,
           "center_y_inches": 31.0,
-          "classification": "dense",
+          "classification": "mixed",
           "footprint_polygon": [
             {
               "x_inches": 16.25,
@@ -3334,6 +3348,7 @@
           ],
           "footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
           "local_transform": "identity",
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-logical-terrain-contact-icon-02",
           "rotation_degrees": 0.0,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:8x11-5-polygon-central-north-west",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
@@ -3345,7 +3360,7 @@
         {
           "center_x_inches": 22.25,
           "center_y_inches": 29.0,
-          "classification": "dense",
+          "classification": "mixed",
           "footprint_polygon": [
             {
               "x_inches": 27.75,
@@ -3377,7 +3392,7 @@
             },
             {
               "x_inches": 28.25,
-              "y_inches": 29.6
+              "y_inches": 29.599999999999998
             },
             {
               "x_inches": 27.75,
@@ -3386,16 +3401,2704 @@
           ],
           "footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
           "local_transform": "identity",
+          "logical_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-logical-terrain-contact-icon-02",
           "rotation_degrees": 180.0,
           "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-area:8x11-5-polygon-central-south-east",
           "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
-          "source_transform": "mirrored_from:take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
-          "symmetry_axis": "point_center",
+          "source_transform": "explicit",
+          "symmetry_axis": "none",
           "terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east",
           "terrain_feature_kind": "terrain_layout_area"
         }
       ],
-      "terrain_features": [],
+      "terrain_features": [
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-dense-industrial-crates",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 20.478796818619738,
+                "y_inches": 44.22476108157362
+              },
+              {
+                "x_inches": 23.21149796672151,
+                "y_inches": 46.330668115410404
+              },
+              {
+                "x_inches": 22.021202686726802,
+                "y_inches": 47.87523832955488
+              },
+              {
+                "x_inches": 19.28850153862503,
+                "y_inches": 45.769331295718096
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 21.24999975267327,
+          "footprint_center_y_inches": 46.04999970556425,
+          "footprint_depth_inches": 3.6504772479812644,
+          "footprint_width_inches": 3.9229964280964786,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 20.478796818619738,
+              "y_inches": 44.22476108157362
+            },
+            {
+              "x_inches": 23.21149796672151,
+              "y_inches": 46.330668115410404
+            },
+            {
+              "x_inches": 22.021202686726802,
+              "y_inches": 47.87523832955488
+            },
+            {
+              "x_inches": 19.28850153862503,
+              "y_inches": 45.769331295718096
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-north-center-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 21.249999752673272,
+              "center_y_inches": 46.049999705564254,
+              "depth_inches": 1.93,
+              "height_inches": 3.5,
+              "rotation_degrees": 37.61899800000003,
+              "wall_id": "solid-body",
+              "width_inches": 3.43
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-end-barricade",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 19.80464832806822,
+                "y_inches": 45.713268237090006
+              },
+              {
+                "x_inches": 17.03234281550121,
+                "y_inches": 43.576840811458474
+              },
+              {
+                "x_inches": 17.795352610369612,
+                "y_inches": 42.586731699827396
+              },
+              {
+                "x_inches": 20.567658122936624,
+                "y_inches": 44.72315912545893
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center-component-02",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 18.800000469218915,
+          "footprint_center_y_inches": 44.1499999684587,
+          "footprint_depth_inches": 3.1265365372626093,
+          "footprint_width_inches": 3.5353153074354147,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 19.80464832806822,
+              "y_inches": 45.713268237090006
+            },
+            {
+              "x_inches": 17.03234281550121,
+              "y_inches": 43.576840811458474
+            },
+            {
+              "x_inches": 17.795352610369612,
+              "y_inches": 42.586731699827396
+            },
+            {
+              "x_inches": 20.567658122936624,
+              "y_inches": 44.72315912545893
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-north-center-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 18.80000046921892,
+              "center_y_inches": 44.1499999684587,
+              "depth_inches": 1.23,
+              "height_inches": 2.0,
+              "rotation_degrees": 217.618998,
+              "wall_id": "solid-body",
+              "width_inches": 3.48
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-end-barricade",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 24.75464814423945,
+                "y_inches": 49.56326864570424
+              },
+              {
+                "x_inches": 21.982342631672438,
+                "y_inches": 47.42684122007272
+              },
+              {
+                "x_inches": 22.74535242654084,
+                "y_inches": 46.43673210844164
+              },
+              {
+                "x_inches": 25.517657939107856,
+                "y_inches": 48.57315953407316
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center-component-03",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 23.750000285390147,
+          "footprint_center_y_inches": 48.000000377072936,
+          "footprint_depth_inches": 3.126536537262602,
+          "footprint_width_inches": 3.535315307435418,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 24.75464814423945,
+              "y_inches": 49.56326864570424
+            },
+            {
+              "x_inches": 21.982342631672438,
+              "y_inches": 47.42684122007272
+            },
+            {
+              "x_inches": 22.74535242654084,
+              "y_inches": 46.43673210844164
+            },
+            {
+              "x_inches": 25.517657939107856,
+              "y_inches": 48.57315953407316
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-north-center-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 23.750000285390147,
+              "center_y_inches": 48.000000377072936,
+              "depth_inches": 1.23,
+              "height_inches": 2.0,
+              "rotation_degrees": 217.618998,
+              "wall_id": "solid-body",
+              "width_inches": 3.48
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-dense-industrial-crates",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 23.571203181380262,
+                "y_inches": 15.725238918426388
+              },
+              {
+                "x_inches": 20.838502033278495,
+                "y_inches": 13.619331884589595
+              },
+              {
+                "x_inches": 22.028797313273202,
+                "y_inches": 12.074761670445117
+              },
+              {
+                "x_inches": 24.761498461374973,
+                "y_inches": 14.180668704281908
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-south-center-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 22.800000247326736,
+          "footprint_center_y_inches": 13.900000294435753,
+          "footprint_depth_inches": 3.6504772479812715,
+          "footprint_width_inches": 3.9229964280964786,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 23.571203181380262,
+              "y_inches": 15.725238918426388
+            },
+            {
+              "x_inches": 20.838502033278495,
+              "y_inches": 13.619331884589595
+            },
+            {
+              "x_inches": 22.028797313273202,
+              "y_inches": 12.074761670445117
+            },
+            {
+              "x_inches": 24.761498461374973,
+              "y_inches": 14.180668704281908
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-south-center-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 22.800000247326732,
+              "center_y_inches": 13.900000294435753,
+              "depth_inches": 1.93,
+              "height_inches": 3.5,
+              "rotation_degrees": 217.618998,
+              "wall_id": "solid-body",
+              "width_inches": 3.43
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-end-barricade",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 19.295351855760554,
+                "y_inches": 10.386731354295762
+              },
+              {
+                "x_inches": 22.067657368327566,
+                "y_inches": 12.523158779927288
+              },
+              {
+                "x_inches": 21.304647573459164,
+                "y_inches": 13.513267891558364
+              },
+              {
+                "x_inches": 18.532342060892148,
+                "y_inches": 11.376840465926836
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-south-center-component-02",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 20.299999714609857,
+          "footprint_center_y_inches": 11.949999622927063,
+          "footprint_depth_inches": 3.126536537262602,
+          "footprint_width_inches": 3.535315307435418,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 19.295351855760554,
+              "y_inches": 10.386731354295762
+            },
+            {
+              "x_inches": 22.067657368327566,
+              "y_inches": 12.523158779927288
+            },
+            {
+              "x_inches": 21.304647573459164,
+              "y_inches": 13.513267891558364
+            },
+            {
+              "x_inches": 18.532342060892148,
+              "y_inches": 11.376840465926836
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-south-center-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 20.299999714609857,
+              "center_y_inches": 11.949999622927063,
+              "depth_inches": 1.23,
+              "height_inches": 2.0,
+              "rotation_degrees": 37.618998,
+              "wall_id": "solid-body",
+              "width_inches": 3.48
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-end-barricade",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 24.245351671931783,
+                "y_inches": 14.23673176291
+              },
+              {
+                "x_inches": 27.017657184498795,
+                "y_inches": 16.37315918854153
+              },
+              {
+                "x_inches": 26.254647389630392,
+                "y_inches": 17.363268300172603
+              },
+              {
+                "x_inches": 23.48234187706338,
+                "y_inches": 15.226840874541077
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-south-center-component-03",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 25.24999953078109,
+          "footprint_center_y_inches": 15.800000031541302,
+          "footprint_depth_inches": 3.126536537262602,
+          "footprint_width_inches": 3.5353153074354147,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 24.245351671931783,
+              "y_inches": 14.23673176291
+            },
+            {
+              "x_inches": 27.017657184498795,
+              "y_inches": 16.37315918854153
+            },
+            {
+              "x_inches": 26.254647389630392,
+              "y_inches": 17.363268300172603
+            },
+            {
+              "x_inches": 23.48234187706338,
+              "y_inches": 15.226840874541077
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-south-center-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 25.249999530781086,
+              "center_y_inches": 15.800000031541302,
+              "depth_inches": 1.23,
+              "height_inches": 2.0,
+              "rotation_degrees": 37.618998,
+              "wall_id": "solid-body",
+              "width_inches": 3.48
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-dense-long-pipes",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 33.099999999999994,
+                "y_inches": 23.25
+              },
+              {
+                "x_inches": 39.099999999999994,
+                "y_inches": 23.25
+              },
+              {
+                "x_inches": 39.099999999999994,
+                "y_inches": 24.95
+              },
+              {
+                "x_inches": 33.099999999999994,
+                "y_inches": 24.95
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-east-midfield-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 36.099999999999994,
+          "footprint_center_y_inches": 24.1,
+          "footprint_depth_inches": 1.6999999999999993,
+          "footprint_width_inches": 6.0,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 33.099999999999994,
+              "y_inches": 23.25
+            },
+            {
+              "x_inches": 39.099999999999994,
+              "y_inches": 23.25
+            },
+            {
+              "x_inches": 39.099999999999994,
+              "y_inches": 24.95
+            },
+            {
+              "x_inches": 33.099999999999994,
+              "y_inches": 24.95
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x2-east-midfield-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 36.099999999999994,
+              "center_y_inches": 24.1,
+              "depth_inches": 1.68,
+              "height_inches": 3.5,
+              "rotation_degrees": 0.0,
+              "wall_id": "solid-body",
+              "width_inches": 5.98
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-long-barricade",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 38.400000000000006,
+                "y_inches": 37.55
+              },
+              {
+                "x_inches": 33.6,
+                "y_inches": 37.55
+              },
+              {
+                "x_inches": 33.6,
+                "y_inches": 36.55
+              },
+              {
+                "x_inches": 38.400000000000006,
+                "y_inches": 36.55
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-north-east-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 36.0,
+          "footprint_center_y_inches": 37.05,
+          "footprint_depth_inches": 1.0,
+          "footprint_width_inches": 4.800000000000004,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 38.400000000000006,
+              "y_inches": 37.55
+            },
+            {
+              "x_inches": 33.6,
+              "y_inches": 37.55
+            },
+            {
+              "x_inches": 33.6,
+              "y_inches": 36.55
+            },
+            {
+              "x_inches": 38.400000000000006,
+              "y_inches": 36.55
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x2-north-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 36.00000000000001,
+              "center_y_inches": 37.05,
+              "depth_inches": 0.98,
+              "height_inches": 2.0,
+              "rotation_degrees": 180.0,
+              "wall_id": "solid-body",
+              "width_inches": 4.78
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-long-barricade",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 5.549999999999999,
+                "y_inches": 22.35
+              },
+              {
+                "x_inches": 10.35,
+                "y_inches": 22.35
+              },
+              {
+                "x_inches": 10.35,
+                "y_inches": 23.35
+              },
+              {
+                "x_inches": 5.549999999999999,
+                "y_inches": 23.35
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-south-west-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 7.949999999999999,
+          "footprint_center_y_inches": 22.85,
+          "footprint_depth_inches": 1.0,
+          "footprint_width_inches": 4.800000000000001,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 5.549999999999999,
+              "y_inches": 22.35
+            },
+            {
+              "x_inches": 10.35,
+              "y_inches": 22.35
+            },
+            {
+              "x_inches": 10.35,
+              "y_inches": 23.35
+            },
+            {
+              "x_inches": 5.549999999999999,
+              "y_inches": 23.35
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x2-south-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 7.949999999999999,
+              "center_y_inches": 22.85,
+              "depth_inches": 0.98,
+              "height_inches": 2.0,
+              "rotation_degrees": 0.0,
+              "wall_id": "solid-body",
+              "width_inches": 4.78
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-dense-long-pipes",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 10.950000000000001,
+                "y_inches": 36.7
+              },
+              {
+                "x_inches": 4.950000000000001,
+                "y_inches": 36.7
+              },
+              {
+                "x_inches": 4.950000000000001,
+                "y_inches": 35.0
+              },
+              {
+                "x_inches": 10.950000000000001,
+                "y_inches": 35.0
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 7.950000000000001,
+          "footprint_center_y_inches": 35.85,
+          "footprint_depth_inches": 1.7000000000000028,
+          "footprint_width_inches": 6.0,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 10.950000000000001,
+              "y_inches": 36.7
+            },
+            {
+              "x_inches": 4.950000000000001,
+              "y_inches": 36.7
+            },
+            {
+              "x_inches": 4.950000000000001,
+              "y_inches": 35.0
+            },
+            {
+              "x_inches": 10.950000000000001,
+              "y_inches": 35.0
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x2-west-midfield-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 7.950000000000001,
+              "center_y_inches": 35.85,
+              "depth_inches": 1.68,
+              "height_inches": 3.5,
+              "rotation_degrees": 180.0,
+              "wall_id": "solid-body",
+              "width_inches": 5.98
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-dense-downed-hovercraft",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 34.050000000000004,
+                "y_inches": 30.825000000000003
+              },
+              {
+                "x_inches": 34.050000000000004,
+                "y_inches": 35.075
+              },
+              {
+                "x_inches": 32.650000000000006,
+                "y_inches": 35.075
+              },
+              {
+                "x_inches": 32.650000000000006,
+                "y_inches": 30.825000000000003
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-east-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 33.35000000000001,
+          "footprint_center_y_inches": 32.95,
+          "footprint_depth_inches": 4.25,
+          "footprint_width_inches": 1.3999999999999986,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 34.050000000000004,
+              "y_inches": 30.825000000000003
+            },
+            {
+              "x_inches": 34.050000000000004,
+              "y_inches": 35.075
+            },
+            {
+              "x_inches": 32.650000000000006,
+              "y_inches": 35.075
+            },
+            {
+              "x_inches": 32.650000000000006,
+              "y_inches": 30.825000000000003
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-central-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 33.35,
+              "center_y_inches": 32.95,
+              "depth_inches": 1.38,
+              "height_inches": 3.5,
+              "rotation_degrees": 90.0,
+              "wall_id": "solid-body",
+              "width_inches": 4.23
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-dense-tall-crates",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 31.300000000000004,
+                "y_inches": 31.6
+              },
+              {
+                "x_inches": 32.800000000000004,
+                "y_inches": 31.6
+              },
+              {
+                "x_inches": 32.800000000000004,
+                "y_inches": 34.300000000000004
+              },
+              {
+                "x_inches": 31.300000000000004,
+                "y_inches": 34.300000000000004
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-east-component-02",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 32.050000000000004,
+          "footprint_center_y_inches": 32.95,
+          "footprint_depth_inches": 2.700000000000003,
+          "footprint_width_inches": 1.5,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 31.300000000000004,
+              "y_inches": 31.6
+            },
+            {
+              "x_inches": 32.800000000000004,
+              "y_inches": 31.6
+            },
+            {
+              "x_inches": 32.800000000000004,
+              "y_inches": 34.300000000000004
+            },
+            {
+              "x_inches": 31.300000000000004,
+              "y_inches": 34.300000000000004
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-central-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 32.050000000000004,
+              "center_y_inches": 32.95,
+              "depth_inches": 2.68,
+              "height_inches": 3.5,
+              "rotation_degrees": 0.0,
+              "wall_id": "solid-body",
+              "width_inches": 1.48
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-dense-downed-hovercraft",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 9.9,
+                "y_inches": 29.075
+              },
+              {
+                "x_inches": 9.899999999999999,
+                "y_inches": 24.825
+              },
+              {
+                "x_inches": 11.299999999999999,
+                "y_inches": 24.825
+              },
+              {
+                "x_inches": 11.299999999999999,
+                "y_inches": 29.075
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-west-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 10.599999999999998,
+          "footprint_center_y_inches": 26.95,
+          "footprint_depth_inches": 4.25,
+          "footprint_width_inches": 1.4000000000000004,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 9.9,
+              "y_inches": 29.075
+            },
+            {
+              "x_inches": 9.899999999999999,
+              "y_inches": 24.825
+            },
+            {
+              "x_inches": 11.299999999999999,
+              "y_inches": 24.825
+            },
+            {
+              "x_inches": 11.299999999999999,
+              "y_inches": 29.075
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-central-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 10.6,
+              "center_y_inches": 26.95,
+              "depth_inches": 1.38,
+              "height_inches": 3.5,
+              "rotation_degrees": 270.0,
+              "wall_id": "solid-body",
+              "width_inches": 4.23
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-dense-tall-crates",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 12.649999999999999,
+                "y_inches": 28.3
+              },
+              {
+                "x_inches": 11.149999999999999,
+                "y_inches": 28.3
+              },
+              {
+                "x_inches": 11.149999999999999,
+                "y_inches": 25.6
+              },
+              {
+                "x_inches": 12.649999999999999,
+                "y_inches": 25.6
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-west-component-02",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 11.899999999999999,
+          "footprint_center_y_inches": 26.950000000000003,
+          "footprint_depth_inches": 2.6999999999999993,
+          "footprint_width_inches": 1.5,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 12.649999999999999,
+              "y_inches": 28.3
+            },
+            {
+              "x_inches": 11.149999999999999,
+              "y_inches": 28.3
+            },
+            {
+              "x_inches": 11.149999999999999,
+              "y_inches": 25.6
+            },
+            {
+              "x_inches": 12.649999999999999,
+              "y_inches": 25.6
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-central-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 11.899999999999999,
+              "center_y_inches": 26.95,
+              "depth_inches": 2.68,
+              "height_inches": 3.5,
+              "rotation_degrees": 180.0,
+              "wall_id": "solid-body",
+              "width_inches": 1.48
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-corner-cd",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 14.4,
+                "y_inches": 42.7
+              },
+              {
+                "x_inches": 12.2,
+                "y_inches": 42.7
+              },
+              {
+                "x_inches": 12.2,
+                "y_inches": 42.245000000000005
+              },
+              {
+                "x_inches": 13.945,
+                "y_inches": 42.245000000000005
+              },
+              {
+                "x_inches": 13.945,
+                "y_inches": 41.400000000000006
+              },
+              {
+                "x_inches": 14.4,
+                "y_inches": 41.400000000000006
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-north-west-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 13.3,
+          "footprint_center_y_inches": 42.050000000000004,
+          "footprint_depth_inches": 1.2999999999999972,
+          "footprint_width_inches": 2.200000000000001,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 14.4,
+              "y_inches": 42.7
+            },
+            {
+              "x_inches": 12.2,
+              "y_inches": 42.7
+            },
+            {
+              "x_inches": 12.2,
+              "y_inches": 42.245000000000005
+            },
+            {
+              "x_inches": 13.945,
+              "y_inches": 42.245000000000005
+            },
+            {
+              "x_inches": 13.945,
+              "y_inches": 41.400000000000006
+            },
+            {
+              "x_inches": 14.4,
+              "y_inches": 41.400000000000006
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-north-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 13.3,
+              "center_y_inches": 42.472500000000004,
+              "depth_inches": 0.43499999999999994,
+              "height_inches": 2.0,
+              "rotation_degrees": 180.0,
+              "wall_id": "long-solid-arm",
+              "width_inches": 2.18
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 14.1725,
+              "center_y_inches": 42.050000000000004,
+              "depth_inches": 0.43499999999999994,
+              "height_inches": 2.0,
+              "rotation_degrees": 270.0,
+              "wall_id": "short-solid-arm",
+              "width_inches": 1.28
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-corner-gh",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 11.35,
+                "y_inches": 37.575
+              },
+              {
+                "x_inches": 14.25,
+                "y_inches": 37.575
+              },
+              {
+                "x_inches": 14.25,
+                "y_inches": 37.977500000000006
+              },
+              {
+                "x_inches": 11.7525,
+                "y_inches": 37.977500000000006
+              },
+              {
+                "x_inches": 11.7525,
+                "y_inches": 38.725
+              },
+              {
+                "x_inches": 11.35,
+                "y_inches": 38.725
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-north-west-component-02",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 12.8,
+          "footprint_center_y_inches": 38.150000000000006,
+          "footprint_depth_inches": 1.1499999999999986,
+          "footprint_width_inches": 2.9000000000000004,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 11.35,
+              "y_inches": 37.575
+            },
+            {
+              "x_inches": 14.25,
+              "y_inches": 37.575
+            },
+            {
+              "x_inches": 14.25,
+              "y_inches": 37.977500000000006
+            },
+            {
+              "x_inches": 11.7525,
+              "y_inches": 37.977500000000006
+            },
+            {
+              "x_inches": 11.7525,
+              "y_inches": 38.725
+            },
+            {
+              "x_inches": 11.35,
+              "y_inches": 38.725
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-north-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 12.799999999999999,
+              "center_y_inches": 37.776250000000005,
+              "depth_inches": 0.38249999999999995,
+              "height_inches": 2.0,
+              "rotation_degrees": 0.0,
+              "wall_id": "long-solid-arm",
+              "width_inches": 2.88
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 11.55125,
+              "center_y_inches": 38.150000000000006,
+              "depth_inches": 0.38249999999999995,
+              "height_inches": 2.0,
+              "rotation_degrees": 90.0,
+              "wall_id": "short-solid-arm",
+              "width_inches": 1.13
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-corner-cd",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 29.749999999999996,
+                "y_inches": 17.2
+              },
+              {
+                "x_inches": 31.949999999999996,
+                "y_inches": 17.2
+              },
+              {
+                "x_inches": 31.949999999999996,
+                "y_inches": 17.654999999999998
+              },
+              {
+                "x_inches": 30.205,
+                "y_inches": 17.654999999999998
+              },
+              {
+                "x_inches": 30.205,
+                "y_inches": 18.5
+              },
+              {
+                "x_inches": 29.749999999999996,
+                "y_inches": 18.5
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-south-east-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 30.849999999999994,
+          "footprint_center_y_inches": 17.85,
+          "footprint_depth_inches": 1.3000000000000007,
+          "footprint_width_inches": 2.1999999999999993,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 29.749999999999996,
+              "y_inches": 17.2
+            },
+            {
+              "x_inches": 31.949999999999996,
+              "y_inches": 17.2
+            },
+            {
+              "x_inches": 31.949999999999996,
+              "y_inches": 17.654999999999998
+            },
+            {
+              "x_inches": 30.205,
+              "y_inches": 17.654999999999998
+            },
+            {
+              "x_inches": 30.205,
+              "y_inches": 18.5
+            },
+            {
+              "x_inches": 29.749999999999996,
+              "y_inches": 18.5
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-south-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 30.849999999999998,
+              "center_y_inches": 17.4275,
+              "depth_inches": 0.43499999999999994,
+              "height_inches": 2.0,
+              "rotation_degrees": 0.0,
+              "wall_id": "long-solid-arm",
+              "width_inches": 2.18
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 29.977499999999996,
+              "center_y_inches": 17.849999999999998,
+              "depth_inches": 0.43499999999999994,
+              "height_inches": 2.0,
+              "rotation_degrees": 90.0,
+              "wall_id": "short-solid-arm",
+              "width_inches": 1.28
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-corner-gh",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 32.699999999999996,
+                "y_inches": 22.325
+              },
+              {
+                "x_inches": 29.799999999999997,
+                "y_inches": 22.325
+              },
+              {
+                "x_inches": 29.799999999999997,
+                "y_inches": 21.9225
+              },
+              {
+                "x_inches": 32.2975,
+                "y_inches": 21.9225
+              },
+              {
+                "x_inches": 32.2975,
+                "y_inches": 21.174999999999997
+              },
+              {
+                "x_inches": 32.699999999999996,
+                "y_inches": 21.174999999999997
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-south-east-component-02",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 31.249999999999996,
+          "footprint_center_y_inches": 21.75,
+          "footprint_depth_inches": 1.1500000000000021,
+          "footprint_width_inches": 2.8999999999999986,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 32.699999999999996,
+              "y_inches": 22.325
+            },
+            {
+              "x_inches": 29.799999999999997,
+              "y_inches": 22.325
+            },
+            {
+              "x_inches": 29.799999999999997,
+              "y_inches": 21.9225
+            },
+            {
+              "x_inches": 32.2975,
+              "y_inches": 21.9225
+            },
+            {
+              "x_inches": 32.2975,
+              "y_inches": 21.174999999999997
+            },
+            {
+              "x_inches": 32.699999999999996,
+              "y_inches": 21.174999999999997
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-south-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 31.249999999999996,
+              "center_y_inches": 22.123749999999998,
+              "depth_inches": 0.38249999999999995,
+              "height_inches": 2.0,
+              "rotation_degrees": 180.0,
+              "wall_id": "long-solid-arm",
+              "width_inches": 2.88
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 32.49875,
+              "center_y_inches": 21.749999999999996,
+              "depth_inches": 0.38249999999999995,
+              "height_inches": 2.0,
+              "rotation_degrees": 270.0,
+              "wall_id": "short-solid-arm",
+              "width_inches": 1.13
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-corner-ef",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 31.325000000000006,
+                "y_inches": 54.775000000000006
+              },
+              {
+                "x_inches": 31.325000000000003,
+                "y_inches": 52.925000000000004
+              },
+              {
+                "x_inches": 31.972500000000004,
+                "y_inches": 52.925000000000004
+              },
+              {
+                "x_inches": 31.972500000000004,
+                "y_inches": 54.127500000000005
+              },
+              {
+                "x_inches": 34.275000000000006,
+                "y_inches": 54.127500000000005
+              },
+              {
+                "x_inches": 34.275000000000006,
+                "y_inches": 54.775000000000006
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 32.800000000000004,
+          "footprint_center_y_inches": 53.85000000000001,
+          "footprint_depth_inches": 1.8500000000000014,
+          "footprint_width_inches": 2.950000000000003,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 31.325000000000006,
+              "y_inches": 54.775000000000006
+            },
+            {
+              "x_inches": 31.325000000000003,
+              "y_inches": 52.925000000000004
+            },
+            {
+              "x_inches": 31.972500000000004,
+              "y_inches": 52.925000000000004
+            },
+            {
+              "x_inches": 31.972500000000004,
+              "y_inches": 54.127500000000005
+            },
+            {
+              "x_inches": 34.275000000000006,
+              "y_inches": 54.127500000000005
+            },
+            {
+              "x_inches": 34.275000000000006,
+              "y_inches": 54.775000000000006
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-north-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 31.648750000000003,
+              "center_y_inches": 53.85,
+              "depth_inches": 0.6275,
+              "height_inches": 2.0,
+              "rotation_degrees": 270.0,
+              "wall_id": "long-solid-arm",
+              "width_inches": 1.83
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 32.800000000000004,
+              "center_y_inches": 54.45125,
+              "depth_inches": 0.6275,
+              "height_inches": 2.0,
+              "rotation_degrees": 0.0,
+              "wall_id": "short-solid-arm",
+              "width_inches": 2.93
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-ruins-ef",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 31.711023873006503,
+                "y_inches": 43.902928289844965
+              },
+              {
+                "x_inches": 37.71010215730702,
+                "y_inches": 43.797762996929656
+              },
+              {
+                "x_inches": 37.788976126993504,
+                "y_inches": 48.297071710155045
+              },
+              {
+                "x_inches": 31.789897842692987,
+                "y_inches": 48.402237003070354
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east-component-02",
+          "feature_kind": "ruins",
+          "floors": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 33.51177572828517,
+              "center_y_inches": 45.6416326223036,
+              "depth_inches": 3.5,
+              "floor_id": "first-floor",
+              "rotation_degrees": 358.99569399999996,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 33.51177572828517,
+              "center_y_inches": 45.6416326223036,
+              "depth_inches": 3.5,
+              "floor_id": "ground-floor",
+              "rotation_degrees": 358.99569399999996,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            },
+            {
+              "bottom_z_inches": 6.0,
+              "center_x_inches": 33.51177572828517,
+              "center_y_inches": 45.6416326223036,
+              "depth_inches": 3.5,
+              "floor_id": "second-floor",
+              "rotation_degrees": 358.99569399999996,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            }
+          ],
+          "footprint_center_x_inches": 34.75,
+          "footprint_center_y_inches": 46.10000000000001,
+          "footprint_depth_inches": 4.604474006140698,
+          "footprint_width_inches": 6.077952253987,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 31.711023873006503,
+              "y_inches": 43.902928289844965
+            },
+            {
+              "x_inches": 37.71010215730702,
+              "y_inches": 43.797762996929656
+            },
+            {
+              "x_inches": 37.788976126993504,
+              "y_inches": 48.297071710155045
+            },
+            {
+              "x_inches": 31.789897842692987,
+              "y_inches": 48.402237003070354
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-north-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 34.71178994357411,
+              "center_y_inches": 43.92033489003748,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 358.99569399999996,
+              "wall_id": "first-long-solid-wall",
+              "width_inches": 5.98
+            },
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 31.82045010449992,
+              "center_y_inches": 46.151355718040314,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 88.99569399999996,
+              "wall_id": "first-short-solid-wall",
+              "width_inches": 4.48
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 34.71178994357411,
+              "center_y_inches": 43.92033489003748,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 358.99569399999996,
+              "wall_id": "ground-long-solid-wall",
+              "width_inches": 5.98
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 31.82045010449992,
+              "center_y_inches": 46.151355718040314,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 88.99569399999996,
+              "wall_id": "ground-short-solid-wall",
+              "width_inches": 4.48
+            },
+            {
+              "bottom_z_inches": 6.0,
+              "center_x_inches": 34.71178994357411,
+              "center_y_inches": 43.92033489003748,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 358.99569399999996,
+              "wall_id": "second-long-solid-wall",
+              "width_inches": 5.98
+            },
+            {
+              "bottom_z_inches": 6.0,
+              "center_x_inches": 31.82045010449992,
+              "center_y_inches": 46.151355718040314,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 88.99569399999996,
+              "wall_id": "second-short-solid-wall",
+              "width_inches": 4.48
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-ruins-cd",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 8.946179804732711,
+                "y_inches": 43.56574743780999
+              },
+              {
+                "x_inches": 13.179693165702387,
+                "y_inches": 47.817495857283
+              },
+              {
+                "x_inches": 11.053818955965884,
+                "y_inches": 49.93425253776784
+              },
+              {
+                "x_inches": 6.820305594996207,
+                "y_inches": 45.68250411829483
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west-component-01",
+          "feature_kind": "ruins",
+          "floors": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 9.132129141350514,
+              "center_y_inches": 45.87839156179695,
+              "depth_inches": 2.96,
+              "floor_id": "first-floor",
+              "rotation_degrees": 45.12313,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 9.132129141350514,
+              "center_y_inches": 45.87839156179695,
+              "depth_inches": 2.96,
+              "floor_id": "ground-floor",
+              "rotation_degrees": 45.12313,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            }
+          ],
+          "footprint_center_x_inches": 9.999999380349298,
+          "footprint_center_y_inches": 46.74999998778891,
+          "footprint_depth_inches": 6.368505099957851,
+          "footprint_width_inches": 6.35938757070618,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 8.946179804732711,
+              "y_inches": 43.56574743780999
+            },
+            {
+              "x_inches": 13.179693165702387,
+              "y_inches": 47.817495857283
+            },
+            {
+              "x_inches": 11.053818955965884,
+              "y_inches": 49.93425253776784
+            },
+            {
+              "x_inches": 6.820305594996207,
+              "y_inches": 45.68250411829483
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-north-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 11.01333275365703,
+              "center_y_inches": 45.74101263675781,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 45.12313,
+              "wall_id": "first-long-solid-wall",
+              "width_inches": 5.98
+            },
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 7.932633689075772,
+              "center_y_inches": 44.67372950961293,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 135.12313,
+              "wall_id": "first-short-solid-wall",
+              "width_inches": 2.98
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 11.01333275365703,
+              "center_y_inches": 45.74101263675781,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 45.12313,
+              "wall_id": "ground-long-solid-wall",
+              "width_inches": 5.98
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 7.932633689075772,
+              "center_y_inches": 44.67372950961293,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 135.12313,
+              "wall_id": "ground-short-solid-wall",
+              "width_inches": 2.98
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-ruins-gh",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 12.28250368158279,
+                "y_inches": 55.679693798073934
+              },
+              {
+                "x_inches": 10.165747001097952,
+                "y_inches": 53.55381958833743
+              },
+              {
+                "x_inches": 14.417495420570962,
+                "y_inches": 49.32030622736776
+              },
+              {
+                "x_inches": 16.5342521010558,
+                "y_inches": 51.44618043710426
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west-component-02",
+          "feature_kind": "ruins",
+          "floors": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 12.478391125084908,
+              "center_y_inches": 53.36787025171963,
+              "depth_inches": 3.5,
+              "floor_id": "first-floor",
+              "rotation_degrees": 225.12313,
+              "thickness_inches": 0.12,
+              "width_inches": 2.96
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 12.478391125084908,
+              "center_y_inches": 53.36787025171963,
+              "depth_inches": 3.5,
+              "floor_id": "ground-floor",
+              "rotation_degrees": 225.12313,
+              "thickness_inches": 0.12,
+              "width_inches": 2.96
+            }
+          ],
+          "footprint_center_x_inches": 13.349999551076875,
+          "footprint_center_y_inches": 52.50000001272085,
+          "footprint_depth_inches": 6.3593875707061756,
+          "footprint_width_inches": 6.368505099957847,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 12.28250368158279,
+              "y_inches": 55.679693798073934
+            },
+            {
+              "x_inches": 10.165747001097952,
+              "y_inches": 53.55381958833743
+            },
+            {
+              "x_inches": 14.417495420570962,
+              "y_inches": 49.32030622736776
+            },
+            {
+              "x_inches": 16.5342521010558,
+              "y_inches": 51.44618043710426
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-north-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 11.27372907290089,
+              "center_y_inches": 54.56736570399437,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 225.12313,
+              "wall_id": "first-long-solid-wall",
+              "width_inches": 2.98
+            },
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 14.358986902107983,
+              "center_y_inches": 53.51333338602858,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 315.12313,
+              "wall_id": "first-short-solid-wall",
+              "width_inches": 5.98
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 11.27372907290089,
+              "center_y_inches": 54.56736570399437,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 225.12313,
+              "wall_id": "ground-long-solid-wall",
+              "width_inches": 2.98
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 14.358986902107983,
+              "center_y_inches": 53.51333338602858,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 315.12313,
+              "wall_id": "ground-short-solid-wall",
+              "width_inches": 5.98
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-ruins-cd",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 35.15381938064283,
+                "y_inches": 15.384252180123065
+              },
+              {
+                "x_inches": 30.920306019673156,
+                "y_inches": 11.132503760650057
+              },
+              {
+                "x_inches": 33.04618022940966,
+                "y_inches": 9.015747080165218
+              },
+              {
+                "x_inches": 37.27969359037934,
+                "y_inches": 13.267495499638226
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east-component-01",
+          "feature_kind": "ruins",
+          "floors": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 34.96787004402503,
+              "center_y_inches": 13.071608056136107,
+              "depth_inches": 2.96,
+              "floor_id": "first-floor",
+              "rotation_degrees": 225.12312999999995,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 34.96787004402503,
+              "center_y_inches": 13.071608056136107,
+              "depth_inches": 2.96,
+              "floor_id": "ground-floor",
+              "rotation_degrees": 225.12312999999995,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            }
+          ],
+          "footprint_center_x_inches": 34.09999980502624,
+          "footprint_center_y_inches": 12.199999630144141,
+          "footprint_depth_inches": 6.368505099957847,
+          "footprint_width_inches": 6.359387570706183,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 35.15381938064283,
+              "y_inches": 15.384252180123065
+            },
+            {
+              "x_inches": 30.920306019673156,
+              "y_inches": 11.132503760650057
+            },
+            {
+              "x_inches": 33.04618022940966,
+              "y_inches": 9.015747080165218
+            },
+            {
+              "x_inches": 37.27969359037934,
+              "y_inches": 13.267495499638226
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-south-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 33.08666643171851,
+              "center_y_inches": 13.208986981175247,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 225.12312999999995,
+              "wall_id": "first-long-solid-wall",
+              "width_inches": 5.98
+            },
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 36.16736549629977,
+              "center_y_inches": 14.276270108320126,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 315.12313,
+              "wall_id": "first-short-solid-wall",
+              "width_inches": 2.98
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 33.08666643171851,
+              "center_y_inches": 13.208986981175247,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 225.12312999999995,
+              "wall_id": "ground-long-solid-wall",
+              "width_inches": 5.98
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 36.16736549629977,
+              "center_y_inches": 14.276270108320126,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 315.12313,
+              "wall_id": "ground-short-solid-wall",
+              "width_inches": 2.98
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-ruins-gh",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 31.867495932058763,
+                "y_inches": 3.420306820849831
+              },
+              {
+                "x_inches": 33.9842526125436,
+                "y_inches": 5.546181030586336
+              },
+              {
+                "x_inches": 29.732504193070593,
+                "y_inches": 9.779694391556013
+              },
+              {
+                "x_inches": 27.615747512585756,
+                "y_inches": 7.653820181819508
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east-component-02",
+          "feature_kind": "ruins",
+          "floors": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 31.671608488556647,
+              "center_y_inches": 5.732130367204138,
+              "depth_inches": 3.5,
+              "floor_id": "first-floor",
+              "rotation_degrees": 45.12313,
+              "thickness_inches": 0.12,
+              "width_inches": 2.96
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 31.671608488556647,
+              "center_y_inches": 5.732130367204138,
+              "depth_inches": 3.5,
+              "floor_id": "ground-floor",
+              "rotation_degrees": 45.12313,
+              "thickness_inches": 0.12,
+              "width_inches": 2.96
+            }
+          ],
+          "footprint_center_x_inches": 30.800000062564678,
+          "footprint_center_y_inches": 6.600000606202922,
+          "footprint_depth_inches": 6.359387570706183,
+          "footprint_width_inches": 6.368505099957844,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 31.867495932058763,
+              "y_inches": 3.420306820849831
+            },
+            {
+              "x_inches": 33.9842526125436,
+              "y_inches": 5.546181030586336
+            },
+            {
+              "x_inches": 29.732504193070593,
+              "y_inches": 9.779694391556013
+            },
+            {
+              "x_inches": 27.615747512585756,
+              "y_inches": 7.653820181819508
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-south-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 32.87627054074066,
+              "center_y_inches": 4.532634914929396,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 45.12313,
+              "wall_id": "first-long-solid-wall",
+              "width_inches": 2.98
+            },
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 29.791012711533572,
+              "center_y_inches": 5.586667232895188,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 135.12313,
+              "wall_id": "first-short-solid-wall",
+              "width_inches": 5.98
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 32.87627054074066,
+              "center_y_inches": 4.532634914929396,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 45.12313,
+              "wall_id": "ground-long-solid-wall",
+              "width_inches": 2.98
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 29.791012711533572,
+              "center_y_inches": 5.586667232895188,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 135.12313,
+              "wall_id": "ground-short-solid-wall",
+              "width_inches": 5.98
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-corner-ef",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 12.825,
+                "y_inches": 5.125
+              },
+              {
+                "x_inches": 12.825,
+                "y_inches": 6.975
+              },
+              {
+                "x_inches": 12.1775,
+                "y_inches": 6.975
+              },
+              {
+                "x_inches": 12.1775,
+                "y_inches": 5.7725
+              },
+              {
+                "x_inches": 9.875,
+                "y_inches": 5.7725
+              },
+              {
+                "x_inches": 9.875,
+                "y_inches": 5.125
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 11.35,
+          "footprint_center_y_inches": 6.05,
+          "footprint_depth_inches": 1.8499999999999996,
+          "footprint_width_inches": 2.9499999999999993,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 12.825,
+              "y_inches": 5.125
+            },
+            {
+              "x_inches": 12.825,
+              "y_inches": 6.975
+            },
+            {
+              "x_inches": 12.1775,
+              "y_inches": 6.975
+            },
+            {
+              "x_inches": 12.1775,
+              "y_inches": 5.7725
+            },
+            {
+              "x_inches": 9.875,
+              "y_inches": 5.7725
+            },
+            {
+              "x_inches": 9.875,
+              "y_inches": 5.125
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-south-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 12.50125,
+              "center_y_inches": 6.05,
+              "depth_inches": 0.6275,
+              "height_inches": 2.0,
+              "rotation_degrees": 90.0,
+              "wall_id": "long-solid-arm",
+              "width_inches": 1.83
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 11.35,
+              "center_y_inches": 5.4487499999999995,
+              "depth_inches": 0.6275,
+              "height_inches": 2.0,
+              "rotation_degrees": 180.0,
+              "wall_id": "short-solid-arm",
+              "width_inches": 2.93
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-ruins-ef",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 12.55,
+                "y_inches": 16.2
+              },
+              {
+                "x_inches": 6.550000000000001,
+                "y_inches": 16.200000000000003
+              },
+              {
+                "x_inches": 6.549999999999999,
+                "y_inches": 11.700000000000001
+              },
+              {
+                "x_inches": 12.549999999999999,
+                "y_inches": 11.7
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west-component-02",
+          "feature_kind": "ruins",
+          "floors": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 10.78,
+              "center_y_inches": 14.43,
+              "depth_inches": 3.5,
+              "floor_id": "first-floor",
+              "rotation_degrees": 180.0,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 10.78,
+              "center_y_inches": 14.43,
+              "depth_inches": 3.5,
+              "floor_id": "ground-floor",
+              "rotation_degrees": 180.0,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            },
+            {
+              "bottom_z_inches": 6.0,
+              "center_x_inches": 10.78,
+              "center_y_inches": 14.43,
+              "depth_inches": 3.5,
+              "floor_id": "second-floor",
+              "rotation_degrees": 180.0,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            }
+          ],
+          "footprint_center_x_inches": 9.55,
+          "footprint_center_y_inches": 13.950000000000001,
+          "footprint_depth_inches": 4.5000000000000036,
+          "footprint_width_inches": 6.000000000000002,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 12.55,
+              "y_inches": 16.2
+            },
+            {
+              "x_inches": 6.550000000000001,
+              "y_inches": 16.200000000000003
+            },
+            {
+              "x_inches": 6.549999999999999,
+              "y_inches": 11.700000000000001
+            },
+            {
+              "x_inches": 12.549999999999999,
+              "y_inches": 11.7
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-south-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 9.55,
+              "center_y_inches": 16.130000000000003,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 180.0,
+              "wall_id": "first-long-solid-wall",
+              "width_inches": 5.98
+            },
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 12.48,
+              "center_y_inches": 13.95,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 270.0,
+              "wall_id": "first-short-solid-wall",
+              "width_inches": 4.48
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 9.55,
+              "center_y_inches": 16.130000000000003,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 180.0,
+              "wall_id": "ground-long-solid-wall",
+              "width_inches": 5.98
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 12.48,
+              "center_y_inches": 13.95,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 270.0,
+              "wall_id": "ground-short-solid-wall",
+              "width_inches": 4.48
+            },
+            {
+              "bottom_z_inches": 6.0,
+              "center_x_inches": 9.55,
+              "center_y_inches": 16.130000000000003,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 180.0,
+              "wall_id": "second-long-solid-wall",
+              "width_inches": 5.98
+            },
+            {
+              "bottom_z_inches": 6.0,
+              "center_x_inches": 12.48,
+              "center_y_inches": 13.95,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 270.0,
+              "wall_id": "second-short-solid-wall",
+              "width_inches": 4.48
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-corner-ab",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 27.525,
+                "y_inches": 34.5
+              },
+              {
+                "x_inches": 25.875,
+                "y_inches": 34.5
+              },
+              {
+                "x_inches": 25.875,
+                "y_inches": 33.9225
+              },
+              {
+                "x_inches": 26.9475,
+                "y_inches": 33.9225
+              },
+              {
+                "x_inches": 26.947499999999998,
+                "y_inches": 32.8
+              },
+              {
+                "x_inches": 27.525,
+                "y_inches": 32.8
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 26.7,
+          "footprint_center_y_inches": 33.65,
+          "footprint_depth_inches": 1.7000000000000028,
+          "footprint_width_inches": 1.6499999999999986,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 27.525,
+              "y_inches": 34.5
+            },
+            {
+              "x_inches": 25.875,
+              "y_inches": 34.5
+            },
+            {
+              "x_inches": 25.875,
+              "y_inches": 33.9225
+            },
+            {
+              "x_inches": 26.9475,
+              "y_inches": 33.9225
+            },
+            {
+              "x_inches": 26.947499999999998,
+              "y_inches": 32.8
+            },
+            {
+              "x_inches": 27.525,
+              "y_inches": 32.8
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:8x11-5-polygon-central-north-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 26.7,
+              "center_y_inches": 34.21125,
+              "depth_inches": 0.5574999999999999,
+              "height_inches": 2.0,
+              "rotation_degrees": 180.0,
+              "wall_id": "long-solid-arm",
+              "width_inches": 1.63
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 27.23625,
+              "center_y_inches": 33.65,
+              "depth_inches": 0.5574999999999999,
+              "height_inches": 2.0,
+              "rotation_degrees": 270.0,
+              "wall_id": "short-solid-arm",
+              "width_inches": 1.68
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-ruins-ab",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 16.700000000000003,
+                "y_inches": 34.35
+              },
+              {
+                "x_inches": 16.7,
+                "y_inches": 30.35
+              },
+              {
+                "x_inches": 21.2,
+                "y_inches": 30.35
+              },
+              {
+                "x_inches": 21.2,
+                "y_inches": 34.35
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west-component-02",
+          "feature_kind": "ruins",
+          "floors": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 18.47,
+              "center_y_inches": 32.58,
+              "depth_inches": 3.5,
+              "floor_id": "first-floor",
+              "rotation_degrees": 270.0,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 18.47,
+              "center_y_inches": 32.58,
+              "depth_inches": 3.5,
+              "floor_id": "ground-floor",
+              "rotation_degrees": 270.0,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            },
+            {
+              "bottom_z_inches": 6.0,
+              "center_x_inches": 18.47,
+              "center_y_inches": 32.58,
+              "depth_inches": 3.5,
+              "floor_id": "second-floor",
+              "rotation_degrees": 270.0,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            }
+          ],
+          "footprint_center_x_inches": 18.95,
+          "footprint_center_y_inches": 32.35,
+          "footprint_depth_inches": 4.0,
+          "footprint_width_inches": 4.5,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 16.700000000000003,
+              "y_inches": 34.35
+            },
+            {
+              "x_inches": 16.7,
+              "y_inches": 30.35
+            },
+            {
+              "x_inches": 21.2,
+              "y_inches": 30.35
+            },
+            {
+              "x_inches": 21.2,
+              "y_inches": 34.35
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:8x11-5-polygon-central-north-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 16.77,
+              "center_y_inches": 32.35,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 270.0,
+              "wall_id": "first-long-solid-wall",
+              "width_inches": 3.98
+            },
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 18.95,
+              "center_y_inches": 34.28,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 0.0,
+              "wall_id": "first-short-solid-wall",
+              "width_inches": 4.48
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 16.77,
+              "center_y_inches": 32.35,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 270.0,
+              "wall_id": "ground-long-solid-wall",
+              "width_inches": 3.98
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 18.95,
+              "center_y_inches": 34.28,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 0.0,
+              "wall_id": "ground-short-solid-wall",
+              "width_inches": 4.48
+            },
+            {
+              "bottom_z_inches": 6.0,
+              "center_x_inches": 16.77,
+              "center_y_inches": 32.35,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 270.0,
+              "wall_id": "second-long-solid-wall",
+              "width_inches": 3.98
+            },
+            {
+              "bottom_z_inches": 6.0,
+              "center_x_inches": 18.95,
+              "center_y_inches": 34.28,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 0.0,
+              "wall_id": "second-short-solid-wall",
+              "width_inches": 4.48
+            }
+          ]
+        },
+        {
+          "classification": "light",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-light-corner-ab",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 16.525,
+                "y_inches": 25.5
+              },
+              {
+                "x_inches": 18.175,
+                "y_inches": 25.5
+              },
+              {
+                "x_inches": 18.175,
+                "y_inches": 26.0775
+              },
+              {
+                "x_inches": 17.1025,
+                "y_inches": 26.0775
+              },
+              {
+                "x_inches": 17.1025,
+                "y_inches": 27.2
+              },
+              {
+                "x_inches": 16.525,
+                "y_inches": 27.2
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east-component-01",
+          "feature_kind": "battlefield_debris_and_statuary",
+          "floors": [],
+          "footprint_center_x_inches": 17.35,
+          "footprint_center_y_inches": 26.35,
+          "footprint_depth_inches": 1.6999999999999993,
+          "footprint_width_inches": 1.6500000000000021,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 16.525,
+              "y_inches": 25.5
+            },
+            {
+              "x_inches": 18.175,
+              "y_inches": 25.5
+            },
+            {
+              "x_inches": 18.175,
+              "y_inches": 26.0775
+            },
+            {
+              "x_inches": 17.1025,
+              "y_inches": 26.0775
+            },
+            {
+              "x_inches": 17.1025,
+              "y_inches": 27.2
+            },
+            {
+              "x_inches": 16.525,
+              "y_inches": 27.2
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:8x11-5-polygon-central-south-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 17.35,
+              "center_y_inches": 25.78875,
+              "depth_inches": 0.5574999999999999,
+              "height_inches": 2.0,
+              "rotation_degrees": 0.0,
+              "wall_id": "long-solid-arm",
+              "width_inches": 1.63
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 16.81375,
+              "center_y_inches": 26.35,
+              "depth_inches": 0.5574999999999999,
+              "height_inches": 2.0,
+              "rotation_degrees": 90.0,
+              "wall_id": "short-solid-arm",
+              "width_inches": 1.68
+            }
+          ]
+        },
+        {
+          "classification": "dense",
+          "display_geometry": {
+            "coordinate_space": "battlefield_inches",
+            "display_template_id": "event-companion-exact-ruins-ab",
+            "footprint_kind": "polygon",
+            "footprint_polygon": [
+              {
+                "x_inches": 27.0,
+                "y_inches": 25.7
+              },
+              {
+                "x_inches": 27.0,
+                "y_inches": 29.7
+              },
+              {
+                "x_inches": 22.5,
+                "y_inches": 29.7
+              },
+              {
+                "x_inches": 22.5,
+                "y_inches": 25.7
+              }
+            ],
+            "schema_version": "terrain-display-v1"
+          },
+          "feature_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east-component-02",
+          "feature_kind": "ruins",
+          "floors": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 25.23,
+              "center_y_inches": 27.47,
+              "depth_inches": 3.5,
+              "floor_id": "first-floor",
+              "rotation_degrees": 90.0,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 25.23,
+              "center_y_inches": 27.47,
+              "depth_inches": 3.5,
+              "floor_id": "ground-floor",
+              "rotation_degrees": 90.0,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            },
+            {
+              "bottom_z_inches": 6.0,
+              "center_x_inches": 25.23,
+              "center_y_inches": 27.47,
+              "depth_inches": 3.5,
+              "floor_id": "second-floor",
+              "rotation_degrees": 90.0,
+              "thickness_inches": 0.12,
+              "width_inches": 3.5
+            }
+          ],
+          "footprint_center_x_inches": 24.75,
+          "footprint_center_y_inches": 27.7,
+          "footprint_depth_inches": 4.0,
+          "footprint_width_inches": 4.5,
+          "rules_footprint_polygon": [
+            {
+              "x_inches": 27.0,
+              "y_inches": 25.7
+            },
+            {
+              "x_inches": 27.0,
+              "y_inches": 29.7
+            },
+            {
+              "x_inches": 22.5,
+              "y_inches": 29.7
+            },
+            {
+              "x_inches": 22.5,
+              "y_inches": 25.7
+            }
+          ],
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:8x11-5-polygon-central-south-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "walls": [
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 26.93,
+              "center_y_inches": 27.7,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 90.0,
+              "wall_id": "first-long-solid-wall",
+              "width_inches": 3.98
+            },
+            {
+              "bottom_z_inches": 3.0,
+              "center_x_inches": 24.75,
+              "center_y_inches": 25.77,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 180.0,
+              "wall_id": "first-short-solid-wall",
+              "width_inches": 4.48
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 26.93,
+              "center_y_inches": 27.7,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 90.0,
+              "wall_id": "ground-long-solid-wall",
+              "width_inches": 3.98
+            },
+            {
+              "bottom_z_inches": 0.0,
+              "center_x_inches": 24.75,
+              "center_y_inches": 25.77,
+              "depth_inches": 0.12,
+              "height_inches": 3.0,
+              "rotation_degrees": 180.0,
+              "wall_id": "ground-short-solid-wall",
+              "width_inches": 4.48
+            },
+            {
+              "bottom_z_inches": 6.0,
+              "center_x_inches": 26.93,
+              "center_y_inches": 27.7,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 90.0,
+              "wall_id": "second-long-solid-wall",
+              "width_inches": 3.98
+            },
+            {
+              "bottom_z_inches": 6.0,
+              "center_x_inches": 24.75,
+              "center_y_inches": 25.77,
+              "depth_inches": 0.12,
+              "height_inches": 2.0,
+              "rotation_degrees": 180.0,
+              "wall_id": "second-short-solid-wall",
+              "width_inches": 4.48
+            }
+          ]
+        }
+      ],
       "terrain_layout_id": "take-and-hold-vs-take-and-hold-layout-3"
     },
     "player_ids": [
@@ -3992,5 +6695,5 @@
       "player-b"
     ]
   },
-  "schema_version": "create-session-v1"
+  "schema_version": "create-session-v2"
 }

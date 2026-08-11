@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import cast
 
 from warhammer40k_core.geometry.pose import GeometryError, validate_finite_number
@@ -25,6 +26,35 @@ def polygon_overlap_area(first: tuple[Point2D, ...], second: tuple[Point2D, ...]
         for second_triangle in triangulate_polygon(second):
             total_area += convex_polygon_intersection_area(first_triangle, second_triangle)
     return total_area
+
+
+def polygon_distance(first: tuple[Point2D, ...], second: tuple[Point2D, ...]) -> float:
+    first_points = _validate_polygon_vertices("first", first)
+    second_points = _validate_polygon_vertices("second", second)
+    first_edges = tuple(zip(first_points, (*first_points[1:], first_points[0]), strict=True))
+    second_edges = tuple(zip(second_points, (*second_points[1:], second_points[0]), strict=True))
+    if (
+        any(
+            _segments_intersect(first_start, first_end, second_start, second_end)
+            for first_start, first_end in first_edges
+            for second_start, second_end in second_edges
+        )
+        or point_intersects_polygon(first_points[0], second_points)
+        or point_intersects_polygon(second_points[0], first_points)
+    ):
+        return 0.0
+    return min(
+        *(
+            _point_to_segment_distance(point, start, end)
+            for point in first_points
+            for start, end in second_edges
+        ),
+        *(
+            _point_to_segment_distance(point, start, end)
+            for point in second_points
+            for start, end in first_edges
+        ),
+    )
 
 
 def triangulate_polygon(vertices: tuple[Point2D, ...]) -> tuple[tuple[Point2D, ...], ...]:
@@ -224,6 +254,23 @@ def _point_on_segment(point: Point2D, start: Point2D, end: Point2D) -> bool:
         <= point[1]
         <= max(start[1], end[1]) + GEOMETRY_EPSILON
     )
+
+
+def _point_to_segment_distance(point: Point2D, start: Point2D, end: Point2D) -> float:
+    delta_x = end[0] - start[0]
+    delta_y = end[1] - start[1]
+    length_squared = (delta_x * delta_x) + (delta_y * delta_y)
+    if length_squared <= GEOMETRY_EPSILON * GEOMETRY_EPSILON:
+        return math.dist(point, start)
+    projection = (
+        ((point[0] - start[0]) * delta_x) + ((point[1] - start[1]) * delta_y)
+    ) / length_squared
+    clamped_projection = min(1.0, max(0.0, projection))
+    closest = (
+        start[0] + clamped_projection * delta_x,
+        start[1] + clamped_projection * delta_y,
+    )
+    return math.dist(point, closest)
 
 
 def _cross(first: Point2D, second: Point2D, third: Point2D) -> float:

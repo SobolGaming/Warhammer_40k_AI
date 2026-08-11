@@ -9,7 +9,13 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainFeatureKind,
 )
-from warhammer40k_core.core.terrain_areas import PlacedTerrainArea, TerrainAreaClassification
+from warhammer40k_core.core.terrain_areas import (
+    PlacedTerrainArea,
+    TerrainAreaClassification,
+    TerrainAreaError,
+    aggregate_logical_terrain_area_classification,
+    validate_placed_terrain_area_logical_groups,
+)
 from warhammer40k_core.engine.battlefield_state import BattlefieldScenario, SpatialIndexState
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView
@@ -59,18 +65,10 @@ def shooting_visibility_cache_key(
 def validate_shooting_terrain_areas(
     values: object,
 ) -> tuple[PlacedTerrainArea, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("terrain_areas must be a tuple.")
-    areas: list[PlacedTerrainArea] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not PlacedTerrainArea:
-            raise GameLifecycleError("terrain_areas must contain PlacedTerrainArea values.")
-        if value.terrain_area_id in seen:
-            raise GameLifecycleError("terrain_areas must not contain duplicate IDs.")
-        seen.add(value.terrain_area_id)
-        areas.append(value)
-    return tuple(sorted(areas, key=lambda area: area.terrain_area_id))
+    try:
+        return validate_placed_terrain_area_logical_groups("terrain_areas", values)
+    except TerrainAreaError as exc:
+        raise GameLifecycleError(str(exc)) from exc
 
 
 def shooting_terrain_areas_for_state(state: GameState) -> tuple[PlacedTerrainArea, ...]:
@@ -83,15 +81,23 @@ def shooting_terrain_areas_for_state(state: GameState) -> tuple[PlacedTerrainAre
 def terrain_visibility_areas_from_placements(
     terrain_areas: tuple[PlacedTerrainArea, ...],
 ) -> tuple[TerrainVisibilityArea, ...]:
+    grouped_areas: dict[str, list[PlacedTerrainArea]] = {}
+    for area in validate_shooting_terrain_areas(terrain_areas):
+        grouped_areas.setdefault(area.logical_terrain_area_id, []).append(area)
     return tuple(
         TerrainVisibilityArea(
-            terrain_area_id=area.terrain_area_id,
-            classification=area.classification,
-            footprint_polygon=tuple(
-                (point.x_inches, point.y_inches) for point in area.footprint_polygon
+            terrain_area_id=logical_terrain_area_id,
+            member_terrain_area_ids=tuple(area.terrain_area_id for area in members),
+            classification=aggregate_logical_terrain_area_classification(
+                f"logical terrain area {logical_terrain_area_id}",
+                tuple(members),
+            ),
+            footprint_polygons=tuple(
+                tuple((point.x_inches, point.y_inches) for point in area.footprint_polygon)
+                for area in members
             ),
         )
-        for area in validate_shooting_terrain_areas(terrain_areas)
+        for logical_terrain_area_id, members in sorted(grouped_areas.items())
     )
 
 

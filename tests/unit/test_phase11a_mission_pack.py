@@ -41,7 +41,6 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_setup import (
     MissionSetup,
     MissionSetupError,
-    instantiate_terrain_layout_template,
 )
 from warhammer40k_core.engine.missions import mission_pack_for_id, supported_mission_packs
 from warhammer40k_core.engine.movement_proposals import (
@@ -627,18 +626,34 @@ def test_chapter_approved_exposes_typed_event_companion_battlefield_layouts() ->
     assert terrain_layout.terrain_features == ()
 
 
-def test_pending_chapter_approved_layout_has_no_terrain_features_until_validated() -> None:
-    mission_pack = chapter_approved_2026_27_mission_pack()
-    template = mission_pack.terrain_layout_template(PHASE16A_BATTLEFIELD_LAYOUT_ID)
+def test_typed_event_layout_instantiates_source_area_placements() -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    layout_id = "purge-the-foe-vs-purge-the-foe-layout-1"
+    mission_pool_entry_id = f"mission-{layout_id}"
+    template = mission_pack.terrain_layout_template(layout_id)
+    layout = mission_pack.battlefield_layout(layout_id)
+    first = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id=mission_pool_entry_id,
+        terrain_layout_id=layout_id,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    second = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id=mission_pool_entry_id,
+        terrain_layout_id=layout_id,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
 
-    first = instantiate_terrain_layout_template(template)
-    second = instantiate_terrain_layout_template(type(template).from_payload(template.to_payload()))
-
-    assert [feature.to_payload() for feature in first] == [
-        feature.to_payload() for feature in second
-    ]
-    assert first == ()
+    assert first.to_payload() == second.to_payload()
     assert template.terrain_features == ()
+    assert len(layout.terrain_feature_placements) == 30
+    assert len(first.terrain_features) == 30
+    assert {feature.feature_id for feature in first.terrain_features} == {
+        placement.feature_id for placement in layout.terrain_feature_placements
+    }
 
 
 def test_phase16a_battlefield_layout_template_matches_source_snapshot() -> None:
@@ -806,6 +821,47 @@ def test_mission_setup_payload_preserves_mission_pool_entry_id() -> None:
     assert MissionSetup.from_payload(setup.to_payload()).to_payload() == setup.to_payload()
 
 
+def test_battlefield_layout_and_mission_setup_reject_orphan_logical_terrain_group() -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    layout_id = "purge-the-foe-vs-purge-the-foe-layout-1"
+    layout = mission_pack.battlefield_layout(layout_id)
+    grouped_layout_area = next(
+        area
+        for area in layout.terrain_areas
+        if area.logical_terrain_area_id != area.terrain_area_id
+    )
+    invalid_layout_areas = (
+        *(
+            replace(area, logical_terrain_area_id="orphan-logical-terrain-area")
+            if area.terrain_area_id == grouped_layout_area.terrain_area_id
+            else area
+            for area in layout.terrain_areas
+        ),
+    )
+
+    with pytest.raises(MissionPackError, match="at least two physical areas"):
+        replace(layout, terrain_areas=invalid_layout_areas)
+
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id=f"mission-{layout_id}",
+        terrain_layout_id=layout_id,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    invalid_setup_areas = (
+        *(
+            replace(area, logical_terrain_area_id="orphan-logical-terrain-area")
+            if area.terrain_area_id == grouped_layout_area.terrain_area_id
+            else area
+            for area in setup.terrain_areas
+        ),
+    )
+
+    with pytest.raises(MissionSetupError, match="at least two physical areas"):
+        replace(setup, terrain_areas=invalid_setup_areas)
+
+
 def test_mission_setup_from_payload_rejects_out_of_bounds_terrain() -> None:
     mission_pack = chapter_approved_2026_27_mission_pack()
     setup = MissionSetup.from_mission_pack(
@@ -829,6 +885,22 @@ def test_mission_setup_from_payload_rejects_out_of_bounds_terrain() -> None:
         MissionSetup.from_payload(payload)
 
 
+def test_mission_setup_from_payload_wraps_invalid_logical_terrain_identity() -> None:
+    layout_id = "purge-the-foe-vs-purge-the-foe-layout-1"
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id=f"mission-{layout_id}",
+        terrain_layout_id=layout_id,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    payload = setup.to_payload()
+    cast(dict[str, object], payload["terrain_areas"][0]).pop("logical_terrain_area_id")
+
+    with pytest.raises(MissionSetupError, match="terrain-area payload is invalid"):
+        MissionSetup.from_payload(payload)
+
+
 def test_game_state_round_trips_populated_mission_setup() -> None:
     mission_setup = MissionSetup.from_mission_pack(
         mission_pack=chapter_approved_2026_27_mission_pack(),
@@ -842,7 +914,7 @@ def test_game_state_round_trips_populated_mission_setup() -> None:
     assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
 
 
-def test_phase17n_exact_terrain_provenance_survives_config_round_trip_and_projection() -> None:
+def test_phase17n_battlefield_provenance_survives_config_and_projection() -> None:
     mission_setup = MissionSetup.from_mission_pack(
         mission_pack=warhammer_event_companion_2026_07_mission_pack(),
         mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
@@ -856,7 +928,7 @@ def test_phase17n_exact_terrain_provenance_survives_config_round_trip_and_projec
     assert round_tripped.mission_setup is not None
     assert all(
         feature.source_id is not None
-        and event_layouts.EXACT_SLICE_PACKAGE_HASH in feature.source_id
+        and event_layouts.BATTLEFIELD_PACKAGE_HASH in feature.source_id
         for feature in round_tripped.mission_setup.terrain_features
     )
 
@@ -888,7 +960,7 @@ def test_phase17n_exact_terrain_provenance_survives_config_round_trip_and_projec
     }
     assert all(
         feature["source_id"] is not None
-        and event_layouts.EXACT_SLICE_PACKAGE_HASH in feature["source_id"]
+        and event_layouts.BATTLEFIELD_PACKAGE_HASH in feature["source_id"]
         for feature in projected_features
     )
 

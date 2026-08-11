@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import math
-from collections.abc import Callable
-
 from warhammer40k_core.core.deployment_zones import (
     DeploymentZonePoint,
     DeploymentZonePolygon,
@@ -21,13 +18,11 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companio
     EventDeploymentZoneShapeSpec,
     EventShapePolygonsSpec,
     EventTerrainAreaClassificationSpec,
+    EventTerrainAreaGroupSpec,
     EventTerrainAreaSpec,
     EventTerrainFeaturePlacementSpec,
     EventTerritoryShapeSpec,
 )
-
-_DEPLOYMENT_CUTOUT_RADIUS_INCHES = 9.0
-_ARC_SEGMENTS = 16
 
 
 def shape_from_polygon_specs(polygons: EventShapePolygonsSpec) -> DeploymentZoneShape:
@@ -44,88 +39,17 @@ def shape_from_polygon_specs(polygons: EventShapePolygonsSpec) -> DeploymentZone
 def event_no_mans_land_shape(
     *,
     explicit_polygons: EventShapePolygonsSpec,
-    layout_number: int,
 ) -> DeploymentZoneShape:
-    if explicit_polygons:
-        return shape_from_polygon_specs(explicit_polygons)
-    if layout_number == 1:
-        return shape_from_polygon_specs(
-            (
-                (
-                    (0.0, 12.0),
-                    (22.0, 12.0),
-                    (22.0, 20.0),
-                    (44.0, 20.0),
-                    (44.0, 48.0),
-                    (22.0, 48.0),
-                    (22.0, 40.0),
-                    (0.0, 40.0),
-                ),
-            )
-        )
-    if layout_number == 2:
-        return DeploymentZoneShape.rectangle(min_x=12.0, min_y=0.0, max_x=32.0, max_y=60.0)
-    if layout_number == 3:
-        return shape_from_polygon_specs(
-            (
-                ((0.0, 0.0), (22.0, 0.0), (22.0, 30.0), (0.0, 30.0)),
-                ((22.0, 30.0), (44.0, 30.0), (44.0, 60.0), (22.0, 60.0)),
-                _quarter_circle_sector_vertices(start_degrees=90.0, end_degrees=180.0),
-                _quarter_circle_sector_vertices(start_degrees=-90.0, end_degrees=0.0),
-            )
-        )
-    raise MissionPackError("Unsupported extracted battlefield layout number.")
+    return shape_from_polygon_specs(explicit_polygons)
 
 
 def event_territory_vertices(
     *,
     explicit_specs: tuple[EventTerritoryShapeSpec, ...],
-    layout_number: int,
 ) -> tuple[tuple[str, tuple[tuple[float, float], ...]], ...]:
-    if explicit_specs:
-        return territory_vertices_from_specs(explicit_specs)
-    if layout_number == 1:
-        return (
-            ("attacker_territory", ((0.0, 30.0), (44.0, 30.0), (44.0, 60.0), (0.0, 60.0))),
-            ("defender_territory", ((0.0, 0.0), (44.0, 0.0), (44.0, 30.0), (0.0, 30.0))),
-        )
-    if layout_number == 2:
-        return (
-            ("attacker_territory", ((0.0, 0.0), (22.0, 0.0), (22.0, 60.0), (0.0, 60.0))),
-            ("defender_territory", ((22.0, 0.0), (44.0, 0.0), (44.0, 60.0), (22.0, 60.0))),
-        )
-    if layout_number == 3:
-        return (
-            ("attacker_territory", ((0.0, 0.0), (44.0, 60.0), (0.0, 60.0))),
-            ("defender_territory", ((0.0, 0.0), (44.0, 0.0), (44.0, 60.0))),
-        )
-    raise MissionPackError("Unsupported extracted battlefield layout number.")
-
-
-def _quarter_circle_sector_vertices(
-    *,
-    start_degrees: float,
-    end_degrees: float,
-) -> tuple[tuple[float, float], ...]:
-    return (
-        (22.0, 30.0),
-        *tuple(
-            (
-                round(
-                    22.0 + (_DEPLOYMENT_CUTOUT_RADIUS_INCHES * math.cos(math.radians(degrees))),
-                    6,
-                ),
-                round(
-                    30.0 + (_DEPLOYMENT_CUTOUT_RADIUS_INCHES * math.sin(math.radians(degrees))),
-                    6,
-                ),
-            )
-            for degrees in (
-                start_degrees + ((end_degrees - start_degrees) * index / _ARC_SEGMENTS)
-                for index in range(_ARC_SEGMENTS + 1)
-            )
-        ),
-    )
+    if not explicit_specs:
+        raise MissionPackError("Explicit Event Companion territories require source polygons.")
+    return territory_vertices_from_specs(explicit_specs)
 
 
 def deployment_zone_rows_from_specs(
@@ -176,6 +100,10 @@ def terrain_feature_placements_from_specs(
     terrain_areas: tuple[PlacedTerrainArea, ...],
     specs: tuple[EventTerrainFeaturePlacementSpec, ...],
 ) -> tuple[TerrainFeatureAreaPlacement, ...]:
+    if not specs:
+        raise MissionPackError(
+            "Event Companion battlefield layout requires explicit terrain component placements."
+        )
     area_ids_by_suffix = {
         area.terrain_area_id.removeprefix(f"{layout_id}-"): area.terrain_area_id
         for area in terrain_areas
@@ -217,15 +145,12 @@ def terrain_area_classifications_by_suffix(
     *,
     explicit_specs: tuple[EventTerrainAreaSpec, ...],
     classification_specs: tuple[EventTerrainAreaClassificationSpec, ...],
-    default_for_template: Callable[[str], TerrainAreaClassification],
 ) -> dict[str, TerrainAreaClassification]:
-    classifications = {
-        area_id: default_for_template(template_id)
-        for area_id, template_id, _x, _y, _rotation in explicit_specs
-    }
+    expected_area_ids = {area_id for area_id, *_rest in explicit_specs}
+    classifications: dict[str, TerrainAreaClassification] = {}
     seen: set[str] = set()
     for area_id, token in classification_specs:
-        if area_id not in classifications:
+        if area_id not in expected_area_ids:
             raise MissionPackError(
                 "Event Companion terrain-area classification references unknown area."
             )
@@ -241,4 +166,42 @@ def terrain_area_classifications_by_suffix(
             ) from exc
         classifications[area_id] = classification
         seen.add(area_id)
+    if seen != expected_area_ids:
+        raise MissionPackError(
+            "Event Companion terrain-area classifications must cover every explicit area."
+        )
     return classifications
+
+
+def terrain_area_group_ids_by_suffix(
+    *,
+    area_suffixes: tuple[str, ...],
+    group_specs: tuple[EventTerrainAreaGroupSpec, ...],
+) -> dict[str, str]:
+    group_ids_by_area = {area_suffix: area_suffix for area_suffix in area_suffixes}
+    if len(group_ids_by_area) != len(area_suffixes):
+        raise MissionPackError("Event Companion terrain areas must not duplicate suffixes.")
+    seen_group_ids: set[str] = set()
+    grouped_area_suffixes: set[str] = set()
+    for group_id, member_area_suffixes in group_specs:
+        if group_id in seen_group_ids:
+            raise MissionPackError("Event Companion logical terrain-area IDs must be unique.")
+        if len(member_area_suffixes) < 2 or len(set(member_area_suffixes)) != len(
+            member_area_suffixes
+        ):
+            raise MissionPackError(
+                "Event Companion logical terrain areas require distinct physical members."
+            )
+        for area_suffix in member_area_suffixes:
+            if area_suffix not in group_ids_by_area:
+                raise MissionPackError(
+                    "Event Companion logical terrain area references an unknown physical area."
+                )
+            if area_suffix in grouped_area_suffixes:
+                raise MissionPackError(
+                    "Event Companion physical terrain area belongs to multiple logical areas."
+                )
+            group_ids_by_area[area_suffix] = group_id
+            grouped_area_suffixes.add(area_suffix)
+        seen_group_ids.add(group_id)
+    return group_ids_by_area

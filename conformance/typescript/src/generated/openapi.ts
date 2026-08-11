@@ -324,7 +324,11 @@ export interface components {
             fixed_secondary_mission_ids: string[];
             game_id: string;
             max_lifecycle_transitions: number;
-            mission_setup: Record<string, never> | null;
+            mission_setup: {
+                terrain_areas: {
+                    logical_terrain_area_id: string;
+                }[];
+            } | null;
             model_geometries?: components["schemas"]["create-session--model_geometry_catalog_record.schema"][];
             player_ids: string[];
             reserve_unit_points: Record<string, never>[];
@@ -336,7 +340,7 @@ export interface components {
         "session-create.schema": {
             config: components["schemas"]["config"];
             /** @constant */
-            schema_version: "session-create-v2";
+            schema_version: "session-create-v3";
         };
         "lifecycle-status--json_value.schema": null | boolean | number | string | components["schemas"]["lifecycle-status--json_value.schema"][] | {
             [key: string]: components["schemas"]["lifecycle-status--json_value.schema"];
@@ -383,7 +387,7 @@ export interface components {
             ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v5-contract";
+            schema_version: "session-metadata-v6-contract";
             server_contract_version: string;
             session_id: string;
             session_revision: number;
@@ -681,7 +685,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v5-contract";
+            schema_version: "session-command-outcome-v6-contract";
             session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
@@ -791,6 +795,7 @@ export interface components {
             /** @constant */
             entity_kind: "terrain_area";
             footprint: components["schemas"]["battlefield-view--shape.schema"];
+            logical_terrain_area_id: string;
             source_id: string;
             terrain_area_id: string;
         };
@@ -903,8 +908,13 @@ export interface components {
             interaction: components["schemas"]["battlefield-view--interaction.schema"];
             render: components["schemas"]["battlefield-view--render.schema"];
             /** @constant */
-            schema_version: "battlefield-view-v2-phase17n";
+            schema_version: "battlefield-view-v3-phase17n";
         };
+        mission_setup: {
+            terrain_areas: {
+                logical_terrain_area_id: string;
+            }[];
+        } | null;
         "game-view--redaction.schema": {
             hidden: boolean;
             reason: string | null;
@@ -1060,7 +1070,7 @@ export interface components {
             current_battle_phase: string | null;
             current_setup_step: string | null;
             game_id: string;
-            mission_setup: components["schemas"]["game-view--json_value.schema"];
+            mission_setup: components["schemas"]["mission_setup"];
             model_display_by_id: {
                 [key: string]: components["schemas"]["game-view--model_display.schema"];
             };
@@ -1069,7 +1079,7 @@ export interface components {
             nested_interaction_requests: components["schemas"]["annotated-decision-request.schema"][];
             player_ids: string[];
             /** @constant */
-            projection_schema: "game-view-v7-phase17n";
+            projection_schema: "game-view-v8-phase17n";
             projection_state_hash: string;
             public_command_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_card_states: components["schemas"]["game-view--json_value.schema"][];
@@ -1095,7 +1105,7 @@ export interface components {
             retention_limit: number;
             revision_retention_limit: number;
             /** @constant */
-            schema_version: "session-projection-v3-phase17n";
+            schema_version: "session-projection-v4-phase17n";
             session_id: string;
             session_revision: number;
             /** @enum {string} */
@@ -1156,11 +1166,13 @@ export interface components {
             artifact_id: string;
             decision_records: Record<string, never>[];
             event_records: Record<string, never>[];
-            initial_lifecycle: Record<string, never>;
+            initial_lifecycle: {
+                config: components["schemas"]["config"];
+            };
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v3-phase17n";
+            schema_version: "replay-artifact-v4-phase17n";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
         };
         /** CORE V2 FiniteOptionSubmissionPayload */
@@ -1405,7 +1417,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Replay artifact v3 with mandatory ruleset descriptor, overlay source identity, and Phase 17N turn-start terrain evidence for an administrator, or for a replay viewer after the session is terminal or closed. */
+            /** @description Replay artifact v4 with mandatory ruleset descriptor, overlay source identity, explicit logical terrain-area identity, and Phase 17N turn-start terrain evidence for an administrator, or for a replay viewer after the session is terminal or closed. */
             200: {
                 headers: {
                     [name: string]: unknown;

@@ -1,0 +1,2648 @@
+{
+  "audits": {
+    "all_reciprocal_symmetry_pairs_preserved": true,
+    "ambiguous_mapping_count": 0,
+    "footprint_family_mismatch_count": 8,
+    "layout_count": 6,
+    "objective_mapping_count": 33,
+    "terrain_area_mapping_count": 96
+  },
+  "layouts": [
+    {
+      "audit_layout_id": "take-and-hold-vs-take-and-hold-layout-1",
+      "discrepancies": [],
+      "established_runtime_layout_id": "take-and-hold-vs-take-and-hold-layout-1",
+      "established_source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_a",
+      "objective_evidence": {
+        "take-and-hold-vs-take-and-hold-layout-1-attacker-home-01": {
+          "audit_source_center_inches": [
+            16.490494,
+            49.849964
+          ],
+          "coordinate_delta_inches": 0.029968,
+          "established_runtime_center_inches": [
+            16.49,
+            49.82
+          ],
+          "role": "attacker_home",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-1-attacker-home",
+          "stable_semantic_suffix": "attacker-home"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-central-01": {
+          "audit_source_center_inches": [
+            22.019032,
+            30.013933
+          ],
+          "coordinate_delta_inches": 0.013967,
+          "established_runtime_center_inches": [
+            22.02,
+            30.0
+          ],
+          "role": "central",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-1-central",
+          "stable_semantic_suffix": "central"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-defender-home-01": {
+          "audit_source_center_inches": [
+            25.764569,
+            12.706594
+          ],
+          "coordinate_delta_inches": 0.014163,
+          "established_runtime_center_inches": [
+            25.76,
+            12.72
+          ],
+          "role": "defender_home",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-1-defender-home",
+          "stable_semantic_suffix": "defender-home"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-expansion-01": {
+          "audit_source_center_inches": [
+            36.717283,
+            41.897674
+          ],
+          "coordinate_delta_inches": 0.027807,
+          "established_runtime_center_inches": [
+            36.72,
+            41.87
+          ],
+          "role": "expansion",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-1-expansion-east",
+          "stable_semantic_suffix": "expansion-east"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-expansion-02": {
+          "audit_source_center_inches": [
+            7.398202,
+            19.160786
+          ],
+          "coordinate_delta_inches": 0.001962,
+          "established_runtime_center_inches": [
+            7.4,
+            19.16
+          ],
+          "role": "expansion",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-1-expansion-west",
+          "stable_semantic_suffix": "expansion-west"
+        }
+      },
+      "objective_id_map": {
+        "take-and-hold-vs-take-and-hold-layout-1-attacker-home-01": "take-and-hold-vs-take-and-hold-layout-1-attacker-home",
+        "take-and-hold-vs-take-and-hold-layout-1-central-01": "take-and-hold-vs-take-and-hold-layout-1-central",
+        "take-and-hold-vs-take-and-hold-layout-1-defender-home-01": "take-and-hold-vs-take-and-hold-layout-1-defender-home",
+        "take-and-hold-vs-take-and-hold-layout-1-expansion-01": "take-and-hold-vs-take-and-hold-layout-1-expansion-east",
+        "take-and-hold-vs-take-and-hold-layout-1-expansion-02": "take-and-hold-vs-take-and-hold-layout-1-expansion-west"
+      },
+      "source_pdf_page_number": 9,
+      "terrain_area_evidence": {
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-01": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-16",
+          "audit_source_centroid_inches": [
+            29.843024,
+            49.203182
+          ],
+          "centroid_delta_inches": 0.192243,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            29.956581,
+            49.048062
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-6x4-lower-left",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-6x4-upper-right",
+          "stable_semantic_suffix": "6x4-upper-right"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-02": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-15",
+          "audit_source_centroid_inches": [
+            17.566117,
+            48.307852
+          ],
+          "centroid_delta_inches": 0.035391,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            17.562493,
+            48.272647
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-lower-right",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-upper-left",
+          "stable_semantic_suffix": "7x11-5-upper-left"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-03": {
+          "audit_footprint_template_id": "FOOTPRINT_10X2_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-14",
+          "audit_source_centroid_inches": [
+            7.087602,
+            44.743787
+          ],
+          "centroid_delta_inches": 0.038465,
+          "established_footprint_template_id": "FOOTPRINT_10X2_5",
+          "established_runtime_centroid_inches": [
+            7.049905,
+            44.736137
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-10x2-5-lower-right",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-10x2-5-upper-left",
+          "stable_semantic_suffix": "10x2-5-upper-left"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-04": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-13",
+          "audit_source_centroid_inches": [
+            24.044648,
+            41.472074
+          ],
+          "centroid_delta_inches": 0.113738,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            23.931092,
+            41.478493
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-6x2-lower-center",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-6x2-upper-center",
+          "stable_semantic_suffix": "6x2-upper-center"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-05": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-12",
+          "audit_source_centroid_inches": [
+            36.456293,
+            41.199831
+          ],
+          "centroid_delta_inches": 0.033322,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            36.437507,
+            41.227353
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-lower-left",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-upper-right",
+          "stable_semantic_suffix": "7x11-5-upper-right"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-06": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-11",
+          "audit_source_centroid_inches": [
+            10.171819,
+            35.102314
+          ],
+          "centroid_delta_inches": 0.137056,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            10.048062,
+            35.043419
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-6x4-east-midfield",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-6x4-west-midfield",
+          "stable_semantic_suffix": "6x4-west-midfield"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-07": {
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-10",
+          "audit_source_centroid_inches": [
+            20.601741,
+            32.043138
+          ],
+          "centroid_delta_inches": 0.146817,
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_runtime_centroid_inches": [
+            20.718076,
+            32.132701
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-8x11-5-polygon-central-south",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-8x11-5-polygon-central-north",
+          "stable_semantic_suffix": "8x11-5-polygon-central-north"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-08": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-09",
+          "audit_source_centroid_inches": [
+            7.074611,
+            30.927955
+          ],
+          "centroid_delta_inches": 0.050858,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            7.068908,
+            30.978493
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-6x2-east-midfield",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-6x2-west-midfield",
+          "stable_semantic_suffix": "6x2-west-midfield"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-09": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-08",
+          "audit_source_centroid_inches": [
+            36.942647,
+            29.059217
+          ],
+          "centroid_delta_inches": 0.03944,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            36.931092,
+            29.021507
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-6x2-west-midfield",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-6x2-east-midfield",
+          "stable_semantic_suffix": "6x2-east-midfield"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-10": {
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-07",
+          "audit_source_centroid_inches": [
+            23.406087,
+            27.880417
+          ],
+          "centroid_delta_inches": 0.124854,
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_runtime_centroid_inches": [
+            23.281924,
+            27.867299
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-8x11-5-polygon-central-north",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-8x11-5-polygon-central-south",
+          "stable_semantic_suffix": "8x11-5-polygon-central-south"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-11": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-06",
+          "audit_source_centroid_inches": [
+            33.845454,
+            24.884888
+          ],
+          "centroid_delta_inches": 0.128369,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            33.951938,
+            24.956581
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-6x4-west-midfield",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-6x4-east-midfield",
+          "stable_semantic_suffix": "6x4-east-midfield"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-12": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-05",
+          "audit_source_centroid_inches": [
+            7.54054,
+            18.734773
+          ],
+          "centroid_delta_inches": 0.043776,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            7.562493,
+            18.772647
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-upper-right",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-lower-left",
+          "stable_semantic_suffix": "7x11-5-lower-left"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-13": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-04",
+          "audit_source_centroid_inches": [
+            20.017546,
+            18.508896
+          ],
+          "centroid_delta_inches": 0.052888,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            20.068908,
+            18.521507
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-6x2-upper-center",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-6x2-lower-center",
+          "stable_semantic_suffix": "6x2-lower-center"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-14": {
+          "audit_footprint_template_id": "FOOTPRINT_10X2_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-03",
+          "audit_source_centroid_inches": [
+            36.876243,
+            15.146632
+          ],
+          "centroid_delta_inches": 0.138554,
+          "established_footprint_template_id": "FOOTPRINT_10X2_5",
+          "established_runtime_centroid_inches": [
+            36.950095,
+            15.263863
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-10x2-5-upper-left",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-10x2-5-lower-right",
+          "stable_semantic_suffix": "10x2-5-lower-right"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-15": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-02",
+          "audit_source_centroid_inches": [
+            26.460625,
+            11.610274
+          ],
+          "centroid_delta_inches": 0.11934,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            26.437507,
+            11.727353
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-upper-left",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-lower-right",
+          "stable_semantic_suffix": "7x11-5-lower-right"
+        },
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-16": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-1-terrain-area-01",
+          "audit_source_centroid_inches": [
+            14.087574,
+            10.825938
+          ],
+          "centroid_delta_inches": 0.133512,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            14.043419,
+            10.951938
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-1-6x4-upper-right",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-1-6x4-lower-left",
+          "stable_semantic_suffix": "6x4-lower-left"
+        }
+      },
+      "terrain_area_id_map": {
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-01": "take-and-hold-vs-take-and-hold-layout-1-6x4-upper-right",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-02": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-upper-left",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-03": "take-and-hold-vs-take-and-hold-layout-1-10x2-5-upper-left",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-04": "take-and-hold-vs-take-and-hold-layout-1-6x2-upper-center",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-05": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-upper-right",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-06": "take-and-hold-vs-take-and-hold-layout-1-6x4-west-midfield",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-07": "take-and-hold-vs-take-and-hold-layout-1-8x11-5-polygon-central-north",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-08": "take-and-hold-vs-take-and-hold-layout-1-6x2-west-midfield",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-09": "take-and-hold-vs-take-and-hold-layout-1-6x2-east-midfield",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-10": "take-and-hold-vs-take-and-hold-layout-1-8x11-5-polygon-central-south",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-11": "take-and-hold-vs-take-and-hold-layout-1-6x4-east-midfield",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-12": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-lower-left",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-13": "take-and-hold-vs-take-and-hold-layout-1-6x2-lower-center",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-14": "take-and-hold-vs-take-and-hold-layout-1-10x2-5-lower-right",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-15": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-lower-right",
+        "take-and-hold-vs-take-and-hold-layout-1-terrain-area-16": "take-and-hold-vs-take-and-hold-layout-1-6x4-lower-left"
+      },
+      "terrain_assignment_second_best_margin_inches": 20.120035,
+      "terrain_assignment_total_centroid_delta_inches": 1.528624
+    },
+    {
+      "audit_layout_id": "take-and-hold-vs-take-and-hold-layout-2",
+      "discrepancies": [],
+      "established_runtime_layout_id": "take-and-hold-vs-take-and-hold-layout-2",
+      "established_source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_b",
+      "objective_evidence": {
+        "take-and-hold-vs-take-and-hold-layout-2-attacker-home-01": {
+          "audit_source_center_inches": [
+            6.763134,
+            31.201753
+          ],
+          "coordinate_delta_inches": 0.003591,
+          "established_runtime_center_inches": [
+            6.76,
+            31.2
+          ],
+          "role": "attacker_home",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-2-attacker-home",
+          "stable_semantic_suffix": "attacker-home"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-central-01": {
+          "audit_source_center_inches": [
+            22.160364,
+            30.032666
+          ],
+          "coordinate_delta_inches": 0.007343,
+          "established_runtime_center_inches": [
+            22.16,
+            30.04
+          ],
+          "role": "central",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-2-central",
+          "stable_semantic_suffix": "central"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-defender-home-01": {
+          "audit_source_center_inches": [
+            37.241384,
+            28.667114
+          ],
+          "coordinate_delta_inches": 0.003201,
+          "established_runtime_center_inches": [
+            37.24,
+            28.67
+          ],
+          "role": "defender_home",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-2-defender-home",
+          "stable_semantic_suffix": "defender-home"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-expansion-01": {
+          "audit_source_center_inches": [
+            24.916519,
+            50.642714
+          ],
+          "coordinate_delta_inches": 0.032899,
+          "established_runtime_center_inches": [
+            24.92,
+            50.61
+          ],
+          "role": "expansion",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-2-expansion-north",
+          "stable_semantic_suffix": "expansion-north"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-expansion-02": {
+          "audit_source_center_inches": [
+            19.205897,
+            10.246361
+          ],
+          "coordinate_delta_inches": 0.034152,
+          "established_runtime_center_inches": [
+            19.2,
+            10.28
+          ],
+          "role": "expansion",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-2-expansion-south",
+          "stable_semantic_suffix": "expansion-south"
+        }
+      },
+      "objective_id_map": {
+        "take-and-hold-vs-take-and-hold-layout-2-attacker-home-01": "take-and-hold-vs-take-and-hold-layout-2-attacker-home",
+        "take-and-hold-vs-take-and-hold-layout-2-central-01": "take-and-hold-vs-take-and-hold-layout-2-central",
+        "take-and-hold-vs-take-and-hold-layout-2-defender-home-01": "take-and-hold-vs-take-and-hold-layout-2-defender-home",
+        "take-and-hold-vs-take-and-hold-layout-2-expansion-01": "take-and-hold-vs-take-and-hold-layout-2-expansion-north",
+        "take-and-hold-vs-take-and-hold-layout-2-expansion-02": "take-and-hold-vs-take-and-hold-layout-2-expansion-south"
+      },
+      "source_pdf_page_number": 10,
+      "terrain_area_evidence": {
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-01": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-16",
+          "audit_source_centroid_inches": [
+            7.989835,
+            52.532686
+          ],
+          "centroid_delta_inches": 0.38054,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            8.32201,
+            52.347023
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-6x2-south-east",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-6x2-north-west",
+          "stable_semantic_suffix": "6x2-north-west"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-02": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-15",
+          "audit_source_centroid_inches": [
+            37.310896,
+            50.145832
+          ],
+          "centroid_delta_inches": 0.110128,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            37.34029,
+            50.251964
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-6x4-south-west",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-6x4-north-east",
+          "stable_semantic_suffix": "6x4-north-east"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-03": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-14",
+          "audit_source_centroid_inches": [
+            25.167008,
+            49.588167
+          ],
+          "centroid_delta_inches": 0.065579,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            25.227353,
+            49.562493
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-south-expansion",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-north-expansion",
+          "stable_semantic_suffix": "7x11-5-north-expansion"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-04": {
+          "audit_footprint_template_id": "FOOTPRINT_10X2_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-13",
+          "audit_source_centroid_inches": [
+            9.14338,
+            44.88299
+          ],
+          "centroid_delta_inches": 0.262661,
+          "established_footprint_template_id": "FOOTPRINT_10X2_5",
+          "established_runtime_centroid_inches": [
+            9.357348,
+            44.730645
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-10x2-5-south-east",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-10x2-5-north-west",
+          "stable_semantic_suffix": "10x2-5-north-west"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-05": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-12",
+          "audit_source_centroid_inches": [
+            36.664703,
+            43.820409
+          ],
+          "centroid_delta_inches": 0.292993,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            36.576516,
+            44.099815
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-6x2-south-west",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-6x2-north-east",
+          "stable_semantic_suffix": "6x2-north-east"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-06": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-11",
+          "audit_source_centroid_inches": [
+            17.836642,
+            42.713112
+          ],
+          "centroid_delta_inches": 0.080985,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            17.90971,
+            42.748036
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-6x4-north-west",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-6x4-south-east",
+          "stable_semantic_suffix": "6x4-south-east"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-07": {
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-10",
+          "audit_source_centroid_inches": [
+            23.957707,
+            31.413268
+          ],
+          "centroid_delta_inches": 0.218801,
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_runtime_centroid_inches": [
+            24.132701,
+            31.281924
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-8x11-5-polygon-central-north",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-8x11-5-polygon-central-south",
+          "stable_semantic_suffix": "8x11-5-polygon-central-south"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-08": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-09",
+          "audit_source_centroid_inches": [
+            36.577897,
+            30.243208
+          ],
+          "centroid_delta_inches": 0.033226,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            36.562493,
+            30.272647
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-left-home",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-right-home",
+          "stable_semantic_suffix": "7x11-5-right-home"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-09": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-08",
+          "audit_source_centroid_inches": [
+            7.249124,
+            29.764928
+          ],
+          "centroid_delta_inches": 0.192094,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            7.437507,
+            29.727353
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-right-home",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-left-home",
+          "stable_semantic_suffix": "7x11-5-left-home"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-10": {
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-07",
+          "audit_source_centroid_inches": [
+            19.981584,
+            28.605574
+          ],
+          "centroid_delta_inches": 0.160367,
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_runtime_centroid_inches": [
+            19.867299,
+            28.718076
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-8x11-5-polygon-central-south",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-8x11-5-polygon-central-north",
+          "stable_semantic_suffix": "8x11-5-polygon-central-north"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-11": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-06",
+          "audit_source_centroid_inches": [
+            26.210367,
+            17.074099
+          ],
+          "centroid_delta_inches": 0.214603,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            26.09029,
+            17.251964
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-6x4-south-east",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-6x4-north-west",
+          "stable_semantic_suffix": "6x4-north-west"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-12": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-05",
+          "audit_source_centroid_inches": [
+            7.358031,
+            16.122993
+          ],
+          "centroid_delta_inches": 0.232223,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            7.423484,
+            15.900185
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-6x2-north-east",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-6x2-south-west",
+          "stable_semantic_suffix": "6x2-south-west"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-13": {
+          "audit_footprint_template_id": "FOOTPRINT_10X2_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-04",
+          "audit_source_centroid_inches": [
+            34.694634,
+            15.301901
+          ],
+          "centroid_delta_inches": 0.06133,
+          "established_footprint_template_id": "FOOTPRINT_10X2_5",
+          "established_runtime_centroid_inches": [
+            34.642652,
+            15.269355
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-10x2-5-north-west",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-10x2-5-south-east",
+          "stable_semantic_suffix": "10x2-5-south-east"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-14": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-03",
+          "audit_source_centroid_inches": [
+            18.879997,
+            10.199029
+          ],
+          "centroid_delta_inches": 0.261526,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            18.772647,
+            10.437507
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-north-expansion",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-south-expansion",
+          "stable_semantic_suffix": "7x11-5-south-expansion"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-15": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-02",
+          "audit_source_centroid_inches": [
+            6.711835,
+            9.797585
+          ],
+          "centroid_delta_inches": 0.071918,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            6.65971,
+            9.748036
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-6x4-north-east",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-6x4-south-west",
+          "stable_semantic_suffix": "6x4-south-west"
+        },
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-16": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-2-terrain-area-01",
+          "audit_source_centroid_inches": [
+            35.903189,
+            7.619055
+          ],
+          "centroid_delta_inches": 0.227739,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            35.67799,
+            7.652977
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-2-6x2-north-west",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-2-6x2-south-east",
+          "stable_semantic_suffix": "6x2-south-east"
+        }
+      },
+      "terrain_area_id_map": {
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-01": "take-and-hold-vs-take-and-hold-layout-2-6x2-north-west",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-02": "take-and-hold-vs-take-and-hold-layout-2-6x4-north-east",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-03": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-north-expansion",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-04": "take-and-hold-vs-take-and-hold-layout-2-10x2-5-north-west",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-05": "take-and-hold-vs-take-and-hold-layout-2-6x2-north-east",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-06": "take-and-hold-vs-take-and-hold-layout-2-6x4-south-east",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-07": "take-and-hold-vs-take-and-hold-layout-2-8x11-5-polygon-central-south",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-08": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-right-home",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-09": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-left-home",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-10": "take-and-hold-vs-take-and-hold-layout-2-8x11-5-polygon-central-north",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-11": "take-and-hold-vs-take-and-hold-layout-2-6x4-north-west",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-12": "take-and-hold-vs-take-and-hold-layout-2-6x2-south-west",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-13": "take-and-hold-vs-take-and-hold-layout-2-10x2-5-south-east",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-14": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-south-expansion",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-15": "take-and-hold-vs-take-and-hold-layout-2-6x4-south-west",
+        "take-and-hold-vs-take-and-hold-layout-2-terrain-area-16": "take-and-hold-vs-take-and-hold-layout-2-6x2-south-east"
+      },
+      "terrain_assignment_second_best_margin_inches": 24.407178,
+      "terrain_assignment_total_centroid_delta_inches": 2.866713
+    },
+    {
+      "audit_layout_id": "take-and-hold-vs-take-and-hold-layout-3",
+      "discrepancies": [],
+      "established_runtime_layout_id": "take-and-hold-vs-take-and-hold-layout-3",
+      "established_source_layout_id": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c",
+      "objective_evidence": {
+        "take-and-hold-vs-take-and-hold-layout-3-attacker-home-01": {
+          "audit_source_center_inches": [
+            10.08481,
+            50.435246
+          ],
+          "coordinate_delta_inches": 0.649057,
+          "established_runtime_center_inches": [
+            9.45,
+            50.3
+          ],
+          "role": "attacker_home",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-3-attacker-home",
+          "stable_semantic_suffix": "attacker-home"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-central-01": {
+          "audit_source_center_inches": [
+            21.991673,
+            30.013933
+          ],
+          "coordinate_delta_inches": 0.016232,
+          "established_runtime_center_inches": [
+            22.0,
+            30.0
+          ],
+          "role": "central",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-3-central",
+          "stable_semantic_suffix": "central"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-defender-home-01": {
+          "audit_source_center_inches": [
+            33.737216,
+            8.877746
+          ],
+          "coordinate_delta_inches": 1.156166,
+          "established_runtime_center_inches": [
+            34.55,
+            9.7
+          ],
+          "role": "defender_home",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-3-defender-home",
+          "stable_semantic_suffix": "defender-home"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-expansion-01": {
+          "audit_source_center_inches": [
+            34.95436,
+            49.255939
+          ],
+          "coordinate_delta_inches": 0.68253,
+          "established_runtime_center_inches": [
+            34.3,
+            49.45
+          ],
+          "role": "expansion",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-3-expansion-north-east",
+          "stable_semantic_suffix": "expansion-north-east"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-expansion-02": {
+          "audit_source_center_inches": [
+            10.205205,
+            10.699422
+          ],
+          "coordinate_delta_inches": 0.526839,
+          "established_runtime_center_inches": [
+            9.7,
+            10.55
+          ],
+          "role": "expansion",
+          "stable_runtime_objective_id": "take-and-hold-vs-take-and-hold-layout-3-expansion-south-west",
+          "stable_semantic_suffix": "expansion-south-west"
+        }
+      },
+      "objective_id_map": {
+        "take-and-hold-vs-take-and-hold-layout-3-attacker-home-01": "take-and-hold-vs-take-and-hold-layout-3-attacker-home",
+        "take-and-hold-vs-take-and-hold-layout-3-central-01": "take-and-hold-vs-take-and-hold-layout-3-central",
+        "take-and-hold-vs-take-and-hold-layout-3-defender-home-01": "take-and-hold-vs-take-and-hold-layout-3-defender-home",
+        "take-and-hold-vs-take-and-hold-layout-3-expansion-01": "take-and-hold-vs-take-and-hold-layout-3-expansion-north-east",
+        "take-and-hold-vs-take-and-hold-layout-3-expansion-02": "take-and-hold-vs-take-and-hold-layout-3-expansion-south-west"
+      },
+      "source_pdf_page_number": 11,
+      "terrain_area_evidence": {
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-01": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-16",
+          "audit_source_centroid_inches": [
+            10.383781,
+            49.735338
+          ],
+          "centroid_delta_inches": 0.800214,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            9.719213,
+            50.181087
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
+          "stable_semantic_suffix": "7x11-5-north-west"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-02": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-15",
+          "audit_source_centroid_inches": [
+            34.526207,
+            49.200535
+          ],
+          "centroid_delta_inches": 0.092665,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            34.437507,
+            49.227353
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east",
+          "stable_semantic_suffix": "7x11-5-north-east"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-03": {
+          "audit_footprint_template_id": "FOOTPRINT_10X2_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-14",
+          "audit_source_centroid_inches": [
+            21.288775,
+            46.090578
+          ],
+          "centroid_delta_inches": 0.775,
+          "established_footprint_template_id": "FOOTPRINT_10X2_5",
+          "established_runtime_centroid_inches": [
+            20.513899,
+            46.076674
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-south-center",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
+          "stable_semantic_suffix": "10x2-5-north-center"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-04": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-13",
+          "audit_source_centroid_inches": [
+            13.063309,
+            40.009975
+          ],
+          "centroid_delta_inches": 0.283854,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            13.048062,
+            40.293419
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-south-east",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
+          "stable_semantic_suffix": "6x4-north-west"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-05": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-12",
+          "audit_source_centroid_inches": [
+            36.012144,
+            37.003399
+          ],
+          "centroid_delta_inches": 0.824445,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            36.681092,
+            36.521507
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-north-east",
+          "stable_semantic_suffix": "6x2-north-east"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-06": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-11",
+          "audit_source_centroid_inches": [
+            7.938975,
+            35.963916
+          ],
+          "centroid_delta_inches": 2.136512,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            5.818908,
+            36.228493
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-east-midfield",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
+          "stable_semantic_suffix": "6x2-west-midfield"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-07": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-10",
+          "audit_source_centroid_inches": [
+            32.914924,
+            32.829052
+          ],
+          "centroid_delta_inches": 0.973514,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            33.048062,
+            33.793419
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-west",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
+          "stable_semantic_suffix": "6x4-central-east"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-08": {
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-09",
+          "audit_source_centroid_inches": [
+            20.613071,
+            32.112505
+          ],
+          "centroid_delta_inches": 0.106929,
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_runtime_centroid_inches": [
+            20.718076,
+            32.132701
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
+          "stable_semantic_suffix": "8x11-5-polygon-central-north-west"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-09": {
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-08",
+          "audit_source_centroid_inches": [
+            23.42501,
+            27.880219
+          ],
+          "centroid_delta_inches": 0.143668,
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_runtime_centroid_inches": [
+            23.281924,
+            27.867299
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east",
+          "stable_semantic_suffix": "8x11-5-polygon-central-south-east"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-10": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-07",
+          "audit_source_centroid_inches": [
+            11.022788,
+            27.061654
+          ],
+          "centroid_delta_inches": 0.858004,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            10.951938,
+            26.206581
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-west",
+          "stable_semantic_suffix": "6x4-central-west"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-11": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-06",
+          "audit_source_centroid_inches": [
+            36.141082,
+            24.009233
+          ],
+          "centroid_delta_inches": 2.053814,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            38.181092,
+            23.771507
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-east-midfield",
+          "stable_semantic_suffix": "6x2-east-midfield"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-12": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-05",
+          "audit_source_centroid_inches": [
+            7.925568,
+            22.887297
+          ],
+          "centroid_delta_inches": 0.847082,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            7.318908,
+            23.478493
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-north-east",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
+          "stable_semantic_suffix": "6x2-south-west"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-13": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-04",
+          "audit_source_centroid_inches": [
+            31.016736,
+            19.852684
+          ],
+          "centroid_delta_inches": 0.159828,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            30.951938,
+            19.706581
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-6x4-south-east",
+          "stable_semantic_suffix": "6x4-south-east"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-14": {
+          "audit_footprint_template_id": "FOOTPRINT_10X2_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-03",
+          "audit_source_centroid_inches": [
+            22.759012,
+            13.863945
+          ],
+          "centroid_delta_inches": 0.729509,
+          "established_footprint_template_id": "FOOTPRINT_10X2_5",
+          "established_runtime_centroid_inches": [
+            23.486101,
+            13.923326
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-south-center",
+          "stable_semantic_suffix": "10x2-5-south-center"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-15": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-02",
+          "audit_source_centroid_inches": [
+            9.533463,
+            10.754862
+          ],
+          "centroid_delta_inches": 0.034045,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            9.562493,
+            10.772647
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
+          "stable_semantic_suffix": "7x11-5-south-west"
+        },
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-16": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "take-and-hold-vs-take-and-hold-layout-3-terrain-area-01",
+          "audit_source_centroid_inches": [
+            33.649929,
+            9.362604
+          ],
+          "centroid_delta_inches": 0.778588,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            34.280787,
+            9.818913
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
+          "stable_runtime_terrain_area_id": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east",
+          "stable_semantic_suffix": "7x11-5-south-east"
+        }
+      },
+      "terrain_area_id_map": {
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-01": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-02": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-03": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-04": "take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-05": "take-and-hold-vs-take-and-hold-layout-3-6x2-north-east",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-06": "take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-07": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-08": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-09": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-10": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-west",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-11": "take-and-hold-vs-take-and-hold-layout-3-6x2-east-midfield",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-12": "take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-13": "take-and-hold-vs-take-and-hold-layout-3-6x4-south-east",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-14": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-south-center",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-15": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-16": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east"
+      },
+      "terrain_assignment_second_best_margin_inches": 15.785692,
+      "terrain_assignment_total_centroid_delta_inches": 11.597674
+    },
+    {
+      "audit_layout_id": "disruption-vs-reconnaissance-layout-1",
+      "discrepancies": [],
+      "established_runtime_layout_id": "disruption-vs-reconnaissance-layout-1",
+      "established_source_layout_id": "gw_event_companion_v1_disruption_vs_reconnaissance_smoke_and_mirrors_surveil_the_foe_layout_a",
+      "objective_evidence": {
+        "disruption-vs-reconnaissance-layout-1-attacker-home-01": {
+          "audit_source_center_inches": [
+            17.315967,
+            49.353466
+          ],
+          "coordinate_delta_inches": 0.122706,
+          "established_runtime_center_inches": [
+            17.25,
+            49.25
+          ],
+          "role": "attacker_home",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-1-attacker-home",
+          "stable_semantic_suffix": "attacker-home"
+        },
+        "disruption-vs-reconnaissance-layout-1-central-01": {
+          "audit_source_center_inches": [
+            26.316144,
+            36.704816
+          ],
+          "coordinate_delta_inches": 0.305243,
+          "established_runtime_center_inches": [
+            26.3,
+            36.4
+          ],
+          "role": "central",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-1-central-north",
+          "stable_semantic_suffix": "central-north"
+        },
+        "disruption-vs-reconnaissance-layout-1-central-02": {
+          "audit_source_center_inches": [
+            17.727414,
+            23.175626
+          ],
+          "coordinate_delta_inches": 0.425259,
+          "established_runtime_center_inches": [
+            17.7,
+            23.6
+          ],
+          "role": "central",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-1-central-south",
+          "stable_semantic_suffix": "central-south"
+        },
+        "disruption-vs-reconnaissance-layout-1-defender-home-01": {
+          "audit_source_center_inches": [
+            26.316142,
+            10.276382
+          ],
+          "coordinate_delta_inches": 0.642298,
+          "established_runtime_center_inches": [
+            26.75,
+            10.75
+          ],
+          "role": "defender_home",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-1-defender-home",
+          "stable_semantic_suffix": "defender-home"
+        },
+        "disruption-vs-reconnaissance-layout-1-expansion-01": {
+          "audit_source_center_inches": [
+            37.65249,
+            41.418781
+          ],
+          "coordinate_delta_inches": 0.018945,
+          "established_runtime_center_inches": [
+            37.65,
+            41.4
+          ],
+          "role": "expansion",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-1-expansion-east",
+          "stable_semantic_suffix": "expansion-east"
+        },
+        "disruption-vs-reconnaissance-layout-1-expansion-02": {
+          "audit_source_center_inches": [
+            6.32458,
+            18.881789
+          ],
+          "coordinate_delta_inches": 0.282933,
+          "established_runtime_center_inches": [
+            6.35,
+            18.6
+          ],
+          "role": "expansion",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-1-expansion-west",
+          "stable_semantic_suffix": "expansion-west"
+        }
+      },
+      "objective_id_map": {
+        "disruption-vs-reconnaissance-layout-1-attacker-home-01": "disruption-vs-reconnaissance-layout-1-attacker-home",
+        "disruption-vs-reconnaissance-layout-1-central-01": "disruption-vs-reconnaissance-layout-1-central-north",
+        "disruption-vs-reconnaissance-layout-1-central-02": "disruption-vs-reconnaissance-layout-1-central-south",
+        "disruption-vs-reconnaissance-layout-1-defender-home-01": "disruption-vs-reconnaissance-layout-1-defender-home",
+        "disruption-vs-reconnaissance-layout-1-expansion-01": "disruption-vs-reconnaissance-layout-1-expansion-east",
+        "disruption-vs-reconnaissance-layout-1-expansion-02": "disruption-vs-reconnaissance-layout-1-expansion-west"
+      },
+      "source_pdf_page_number": 39,
+      "terrain_area_evidence": {
+        "disruption-vs-reconnaissance-layout-1-terrain-area-01": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-16",
+          "audit_source_centroid_inches": [
+            10.061897,
+            49.011439
+          ],
+          "centroid_delta_inches": 0.305475,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            10.338493,
+            49.141092
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-6x2-defender-east",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-6x2-attacker-west",
+          "stable_semantic_suffix": "6x2-attacker-west"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-02": {
+          "audit_footprint_template_id": "FOOTPRINT_10X2_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-15",
+          "audit_source_centroid_inches": [
+            28.968379,
+            48.463214
+          ],
+          "centroid_delta_inches": 0.07937,
+          "established_footprint_template_id": "FOOTPRINT_10X2_5",
+          "established_runtime_centroid_inches": [
+            28.970095,
+            48.383863
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-10x2-5-defender-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-10x2-5-attacker-midfield",
+          "stable_semantic_suffix": "10x2-5-attacker-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-03": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-14",
+          "audit_source_centroid_inches": [
+            17.522199,
+            48.344664
+          ],
+          "centroid_delta_inches": 0.027822,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            17.527507,
+            48.317353
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-7x11-5-defender-home",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-7x11-5-attacker-home",
+          "stable_semantic_suffix": "7x11-5-attacker-home"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-04": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-13",
+          "audit_source_centroid_inches": [
+            6.063252,
+            43.865033
+          ],
+          "centroid_delta_inches": 0.036905,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            6.063419,
+            43.901938
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-6x4-defender-east",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-6x4-attacker-west",
+          "stable_semantic_suffix": "6x4-attacker-west"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-05": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-12",
+          "audit_source_centroid_inches": [
+            37.485035,
+            41.274304
+          ],
+          "centroid_delta_inches": 0.473391,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            37.012493,
+            41.302647
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-7x11-5-west-expansion",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-7x11-5-east-expansion",
+          "stable_semantic_suffix": "7x11-5-east-expansion"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-06": {
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-11",
+          "audit_source_centroid_inches": [
+            24.121264,
+            35.255368
+          ],
+          "centroid_delta_inches": 2.844712,
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_runtime_centroid_inches": [
+            25.888463,
+            37.484582
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-8x11-5-polygon-south-center",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-8x11-5-polygon-north-center",
+          "stable_semantic_suffix": "8x11-5-polygon-north-center"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-07": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-10",
+          "audit_source_centroid_inches": [
+            11.562976,
+            34.273407
+          ],
+          "centroid_delta_inches": 1.247194,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            12.468307,
+            35.131234
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-6x4-east-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-6x4-west-midfield",
+          "stable_semantic_suffix": "6x4-west-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-08": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-09",
+          "audit_source_centroid_inches": [
+            8.022736,
+            30.580546
+          ],
+          "centroid_delta_inches": 0.77107,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            8.363124,
+            29.888676
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-6x2-east-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-6x2-west-midfield",
+          "stable_semantic_suffix": "6x2-west-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-09": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-08",
+          "audit_source_centroid_inches": [
+            35.930236,
+            29.362027
+          ],
+          "centroid_delta_inches": 0.804678,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            35.636876,
+            30.111324
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-6x2-west-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-6x2-east-midfield",
+          "stable_semantic_suffix": "6x2-east-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-10": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-07",
+          "audit_source_centroid_inches": [
+            32.326335,
+            25.731808
+          ],
+          "centroid_delta_inches": 1.173157,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            31.531693,
+            24.868766
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-6x4-west-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-6x4-east-midfield",
+          "stable_semantic_suffix": "6x4-east-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-11": {
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-06",
+          "audit_source_centroid_inches": [
+            19.822072,
+            24.648994
+          ],
+          "centroid_delta_inches": 2.734607,
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_runtime_centroid_inches": [
+            18.111537,
+            22.515418
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-8x11-5-polygon-north-center",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-8x11-5-polygon-south-center",
+          "stable_semantic_suffix": "8x11-5-polygon-south-center"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-12": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-05",
+          "audit_source_centroid_inches": [
+            6.602084,
+            18.761444
+          ],
+          "centroid_delta_inches": 0.390715,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            6.987507,
+            18.697353
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-7x11-5-east-expansion",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-7x11-5-west-expansion",
+          "stable_semantic_suffix": "7x11-5-west-expansion"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-13": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-04",
+          "audit_source_centroid_inches": [
+            37.864254,
+            15.868995
+          ],
+          "centroid_delta_inches": 0.240214,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            37.936581,
+            16.098062
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-6x4-attacker-west",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-6x4-defender-east",
+          "stable_semantic_suffix": "6x4-defender-east"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-14": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-03",
+          "audit_source_centroid_inches": [
+            26.454926,
+            11.735259
+          ],
+          "centroid_delta_inches": 0.055467,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            26.472493,
+            11.682647
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-7x11-5-attacker-home",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-7x11-5-defender-home",
+          "stable_semantic_suffix": "7x11-5-defender-home"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-15": {
+          "audit_footprint_template_id": "FOOTPRINT_10X2_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-02",
+          "audit_source_centroid_inches": [
+            15.096736,
+            11.572531
+          ],
+          "centroid_delta_inches": 0.079799,
+          "established_footprint_template_id": "FOOTPRINT_10X2_5",
+          "established_runtime_centroid_inches": [
+            15.029905,
+            11.616137
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-10x2-5-attacker-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-10x2-5-defender-midfield",
+          "stable_semantic_suffix": "10x2-5-defender-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-1-terrain-area-16": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-1-terrain-area-01",
+          "audit_source_centroid_inches": [
+            33.862208,
+            10.786034
+          ],
+          "centroid_delta_inches": 0.213521,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            33.661507,
+            10.858908
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-1-6x2-attacker-west",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-1-6x2-defender-east",
+          "stable_semantic_suffix": "6x2-defender-east"
+        }
+      },
+      "terrain_area_id_map": {
+        "disruption-vs-reconnaissance-layout-1-terrain-area-01": "disruption-vs-reconnaissance-layout-1-6x2-attacker-west",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-02": "disruption-vs-reconnaissance-layout-1-10x2-5-attacker-midfield",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-03": "disruption-vs-reconnaissance-layout-1-7x11-5-attacker-home",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-04": "disruption-vs-reconnaissance-layout-1-6x4-attacker-west",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-05": "disruption-vs-reconnaissance-layout-1-7x11-5-east-expansion",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-06": "disruption-vs-reconnaissance-layout-1-8x11-5-polygon-north-center",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-07": "disruption-vs-reconnaissance-layout-1-6x4-west-midfield",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-08": "disruption-vs-reconnaissance-layout-1-6x2-west-midfield",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-09": "disruption-vs-reconnaissance-layout-1-6x2-east-midfield",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-10": "disruption-vs-reconnaissance-layout-1-6x4-east-midfield",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-11": "disruption-vs-reconnaissance-layout-1-8x11-5-polygon-south-center",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-12": "disruption-vs-reconnaissance-layout-1-7x11-5-west-expansion",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-13": "disruption-vs-reconnaissance-layout-1-6x4-defender-east",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-14": "disruption-vs-reconnaissance-layout-1-7x11-5-defender-home",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-15": "disruption-vs-reconnaissance-layout-1-10x2-5-defender-midfield",
+        "disruption-vs-reconnaissance-layout-1-terrain-area-16": "disruption-vs-reconnaissance-layout-1-6x2-defender-east"
+      },
+      "terrain_assignment_second_best_margin_inches": 19.5716,
+      "terrain_assignment_total_centroid_delta_inches": 11.478098
+    },
+    {
+      "audit_layout_id": "disruption-vs-reconnaissance-layout-2",
+      "discrepancies": [
+        {
+          "audit_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-02",
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "explanation": "Spatial geometry and reciprocal symmetry uniquely preserve the established semantic ID; the old pairing module assigned the opposite dense footprint family.",
+          "kind": "legacy_footprint_family_migration",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-north-east"
+        },
+        {
+          "audit_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-07",
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "explanation": "Spatial geometry and reciprocal symmetry uniquely preserve the established semantic ID; the old pairing module assigned the opposite dense footprint family.",
+          "kind": "legacy_footprint_family_migration",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-7x11-5-central-east"
+        },
+        {
+          "audit_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-10",
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "explanation": "Spatial geometry and reciprocal symmetry uniquely preserve the established semantic ID; the old pairing module assigned the opposite dense footprint family.",
+          "kind": "legacy_footprint_family_migration",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-7x11-5-central-west"
+        },
+        {
+          "audit_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-15",
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "explanation": "Spatial geometry and reciprocal symmetry uniquely preserve the established semantic ID; the old pairing module assigned the opposite dense footprint family.",
+          "kind": "legacy_footprint_family_migration",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-south-west"
+        }
+      ],
+      "established_runtime_layout_id": "disruption-vs-reconnaissance-layout-2",
+      "established_source_layout_id": "gw_event_companion_v1_disruption_vs_reconnaissance_smoke_and_mirrors_surveil_the_foe_layout_b",
+      "objective_evidence": {
+        "disruption-vs-reconnaissance-layout-2-attacker-home-01": {
+          "audit_source_center_inches": [
+            7.554786,
+            44.187719
+          ],
+          "coordinate_delta_inches": 0.018354,
+          "established_runtime_center_inches": [
+            7.55,
+            44.17
+          ],
+          "role": "attacker_home",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-2-attacker-home",
+          "stable_semantic_suffix": "attacker-home"
+        },
+        "disruption-vs-reconnaissance-layout-2-central-01": {
+          "audit_source_center_inches": [
+            29.245944,
+            31.449734
+          ],
+          "coordinate_delta_inches": 0.00595,
+          "established_runtime_center_inches": [
+            29.24,
+            31.45
+          ],
+          "role": "central",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-2-central-east",
+          "stable_semantic_suffix": "central-east"
+        },
+        "disruption-vs-reconnaissance-layout-2-central-02": {
+          "audit_source_center_inches": [
+            14.308495,
+            28.939953
+          ],
+          "coordinate_delta_inches": 0.010159,
+          "established_runtime_center_inches": [
+            14.31,
+            28.95
+          ],
+          "role": "central",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-2-central-west",
+          "stable_semantic_suffix": "central-west"
+        },
+        "disruption-vs-reconnaissance-layout-2-defender-home-01": {
+          "audit_source_center_inches": [
+            36.532047,
+            15.992367
+          ],
+          "coordinate_delta_inches": 0.027709,
+          "established_runtime_center_inches": [
+            36.53,
+            16.02
+          ],
+          "role": "defender_home",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-2-defender-home",
+          "stable_semantic_suffix": "defender-home"
+        },
+        "disruption-vs-reconnaissance-layout-2-expansion-01": {
+          "audit_source_center_inches": [
+            23.984466,
+            51.444156
+          ],
+          "coordinate_delta_inches": 0.021017,
+          "established_runtime_center_inches": [
+            24.0,
+            51.43
+          ],
+          "role": "expansion",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-2-expansion-north",
+          "stable_semantic_suffix": "expansion-north"
+        },
+        "disruption-vs-reconnaissance-layout-2-expansion-02": {
+          "audit_source_center_inches": [
+            20.049331,
+            8.561786
+          ],
+          "coordinate_delta_inches": 0.03822,
+          "established_runtime_center_inches": [
+            20.05,
+            8.6
+          ],
+          "role": "expansion",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-2-expansion-south",
+          "stable_semantic_suffix": "expansion-south"
+        }
+      },
+      "objective_id_map": {
+        "disruption-vs-reconnaissance-layout-2-attacker-home-01": "disruption-vs-reconnaissance-layout-2-attacker-home",
+        "disruption-vs-reconnaissance-layout-2-central-01": "disruption-vs-reconnaissance-layout-2-central-east",
+        "disruption-vs-reconnaissance-layout-2-central-02": "disruption-vs-reconnaissance-layout-2-central-west",
+        "disruption-vs-reconnaissance-layout-2-defender-home-01": "disruption-vs-reconnaissance-layout-2-defender-home",
+        "disruption-vs-reconnaissance-layout-2-expansion-01": "disruption-vs-reconnaissance-layout-2-expansion-north",
+        "disruption-vs-reconnaissance-layout-2-expansion-02": "disruption-vs-reconnaissance-layout-2-expansion-south"
+      },
+      "source_pdf_page_number": 40,
+      "terrain_area_evidence": {
+        "disruption-vs-reconnaissance-layout-2-terrain-area-01": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-16",
+          "audit_source_centroid_inches": [
+            12.084012,
+            51.177974
+          ],
+          "centroid_delta_inches": 0.073708,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            12.021507,
+            51.138908
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-6x2-south-east",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-6x2-north-west",
+          "stable_semantic_suffix": "6x2-north-west"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-02": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-15",
+          "audit_source_centroid_inches": [
+            24.713397,
+            50.450309
+          ],
+          "centroid_delta_inches": 1.625716,
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_runtime_centroid_inches": [
+            24.58874,
+            48.82938
+          ],
+          "footprint_family_match": false,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-south-west",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-north-east",
+          "stable_semantic_suffix": "8x11-5-polygon-north-east"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-03": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-14",
+          "audit_source_centroid_inches": [
+            36.301868,
+            49.911511
+          ],
+          "centroid_delta_inches": 0.198174,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            36.110127,
+            49.961593
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-6x4-south-west",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-6x4-north-east",
+          "stable_semantic_suffix": "6x4-north-east"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-04": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-13",
+          "audit_source_centroid_inches": [
+            35.992248,
+            43.352854
+          ],
+          "centroid_delta_inches": 0.002974,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            35.99441,
+            43.350811
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-6x2-south-west",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-6x2-north-east",
+          "stable_semantic_suffix": "6x2-north-east"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-05": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-12",
+          "audit_source_centroid_inches": [
+            7.46637,
+            42.247719
+          ],
+          "centroid_delta_inches": 0.474117,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            6.992493,
+            42.232647
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-7x11-5-defender-home",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-7x11-5-attacker-home",
+          "stable_semantic_suffix": "7x11-5-attacker-home"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-06": {
+          "audit_footprint_template_id": "FOOTPRINT_10X2_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-11",
+          "audit_source_centroid_inches": [
+            17.432683,
+            39.164251
+          ],
+          "centroid_delta_inches": 0.118503,
+          "established_footprint_template_id": "FOOTPRINT_10X2_5",
+          "established_runtime_centroid_inches": [
+            17.406344,
+            39.048713
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-10x2-5-south-east",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-10x2-5-north-west",
+          "stable_semantic_suffix": "10x2-5-north-west"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-07": {
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-10",
+          "audit_source_centroid_inches": [
+            27.983973,
+            34.526718
+          ],
+          "centroid_delta_inches": 1.438307,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            27.214364,
+            33.311634
+          ],
+          "footprint_family_match": false,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-7x11-5-central-west",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-7x11-5-central-east",
+          "stable_semantic_suffix": "7x11-5-central-east"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-08": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-09",
+          "audit_source_centroid_inches": [
+            35.553412,
+            33.609298
+          ],
+          "centroid_delta_inches": 0.255836,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            35.808866,
+            33.623283
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-6x4-west-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-6x4-east-midfield",
+          "stable_semantic_suffix": "6x4-east-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-09": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-08",
+          "audit_source_centroid_inches": [
+            8.566468,
+            26.385287
+          ],
+          "centroid_delta_inches": 0.375432,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            8.191134,
+            26.376717
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-6x4-east-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-6x4-west-midfield",
+          "stable_semantic_suffix": "6x4-west-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-10": {
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-07",
+          "audit_source_centroid_inches": [
+            15.909542,
+            25.347653
+          ],
+          "centroid_delta_inches": 1.601578,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            16.785636,
+            26.688366
+          ],
+          "footprint_family_match": false,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-7x11-5-central-east",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-7x11-5-central-west",
+          "stable_semantic_suffix": "7x11-5-central-west"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-11": {
+          "audit_footprint_template_id": "FOOTPRINT_10X2_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-06",
+          "audit_source_centroid_inches": [
+            26.626223,
+            20.885296
+          ],
+          "centroid_delta_inches": 0.07359,
+          "established_footprint_template_id": "FOOTPRINT_10X2_5",
+          "established_runtime_centroid_inches": [
+            26.593656,
+            20.951287
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-10x2-5-north-west",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-10x2-5-south-east",
+          "stable_semantic_suffix": "10x2-5-south-east"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-12": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-05",
+          "audit_source_centroid_inches": [
+            36.548135,
+            17.782602
+          ],
+          "centroid_delta_inches": 0.459625,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            37.007507,
+            17.767353
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-7x11-5-attacker-home",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-7x11-5-defender-home",
+          "stable_semantic_suffix": "7x11-5-defender-home"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-13": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-04",
+          "audit_source_centroid_inches": [
+            8.110327,
+            16.575676
+          ],
+          "centroid_delta_inches": 0.127961,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            8.00559,
+            16.649189
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-6x2-north-east",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-6x2-south-west",
+          "stable_semantic_suffix": "6x2-south-west"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-14": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-03",
+          "audit_source_centroid_inches": [
+            7.800695,
+            10.016996
+          ],
+          "centroid_delta_inches": 0.091713,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            7.889873,
+            10.038407
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-6x4-north-east",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-6x4-south-west",
+          "stable_semantic_suffix": "6x4-south-west"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-15": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-02",
+          "audit_source_centroid_inches": [
+            19.301495,
+            9.536725
+          ],
+          "centroid_delta_inches": 1.637578,
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_runtime_centroid_inches": [
+            19.41126,
+            11.17062
+          ],
+          "footprint_family_match": false,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-north-east",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-south-west",
+          "stable_semantic_suffix": "8x11-5-polygon-south-west"
+        },
+        "disruption-vs-reconnaissance-layout-2-terrain-area-16": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-2-terrain-area-01",
+          "audit_source_centroid_inches": [
+            31.904558,
+            8.879879
+          ],
+          "centroid_delta_inches": 0.076284,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            31.978493,
+            8.861092
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-2-6x2-north-west",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-2-6x2-south-east",
+          "stable_semantic_suffix": "6x2-south-east"
+        }
+      },
+      "terrain_area_id_map": {
+        "disruption-vs-reconnaissance-layout-2-terrain-area-01": "disruption-vs-reconnaissance-layout-2-6x2-north-west",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-02": "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-north-east",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-03": "disruption-vs-reconnaissance-layout-2-6x4-north-east",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-04": "disruption-vs-reconnaissance-layout-2-6x2-north-east",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-05": "disruption-vs-reconnaissance-layout-2-7x11-5-attacker-home",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-06": "disruption-vs-reconnaissance-layout-2-10x2-5-north-west",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-07": "disruption-vs-reconnaissance-layout-2-7x11-5-central-east",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-08": "disruption-vs-reconnaissance-layout-2-6x4-east-midfield",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-09": "disruption-vs-reconnaissance-layout-2-6x4-west-midfield",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-10": "disruption-vs-reconnaissance-layout-2-7x11-5-central-west",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-11": "disruption-vs-reconnaissance-layout-2-10x2-5-south-east",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-12": "disruption-vs-reconnaissance-layout-2-7x11-5-defender-home",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-13": "disruption-vs-reconnaissance-layout-2-6x2-south-west",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-14": "disruption-vs-reconnaissance-layout-2-6x4-south-west",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-15": "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-south-west",
+        "disruption-vs-reconnaissance-layout-2-terrain-area-16": "disruption-vs-reconnaissance-layout-2-6x2-south-east"
+      },
+      "terrain_assignment_second_best_margin_inches": 25.933211,
+      "terrain_assignment_total_centroid_delta_inches": 8.631096
+    },
+    {
+      "audit_layout_id": "disruption-vs-reconnaissance-layout-3",
+      "discrepancies": [
+        {
+          "audit_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-01",
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "explanation": "Spatial geometry and reciprocal symmetry uniquely preserve the established semantic ID; the old pairing module assigned the opposite dense footprint family.",
+          "kind": "legacy_footprint_family_migration",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-north-east"
+        },
+        {
+          "audit_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-06",
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "explanation": "Spatial geometry and reciprocal symmetry uniquely preserve the established semantic ID; the old pairing module assigned the opposite dense footprint family.",
+          "kind": "legacy_footprint_family_migration",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-7x11-5-central-north-west"
+        },
+        {
+          "audit_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-11",
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "explanation": "Spatial geometry and reciprocal symmetry uniquely preserve the established semantic ID; the old pairing module assigned the opposite dense footprint family.",
+          "kind": "legacy_footprint_family_migration",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-7x11-5-central-south-east"
+        },
+        {
+          "audit_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-16",
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "explanation": "Spatial geometry and reciprocal symmetry uniquely preserve the established semantic ID; the old pairing module assigned the opposite dense footprint family.",
+          "kind": "legacy_footprint_family_migration",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-south-west"
+        }
+      ],
+      "established_runtime_layout_id": "disruption-vs-reconnaissance-layout-3",
+      "established_source_layout_id": "gw_event_companion_v1_disruption_vs_reconnaissance_smoke_and_mirrors_surveil_the_foe_layout_c",
+      "objective_evidence": {
+        "disruption-vs-reconnaissance-layout-3-attacker-home-01": {
+          "audit_source_center_inches": [
+            6.453031,
+            45.414301
+          ],
+          "coordinate_delta_inches": 0.024489,
+          "established_runtime_center_inches": [
+            6.45,
+            45.39
+          ],
+          "role": "attacker_home",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-3-attacker-home",
+          "stable_semantic_suffix": "attacker-home"
+        },
+        "disruption-vs-reconnaissance-layout-3-central-01": {
+          "audit_source_center_inches": [
+            20.195743,
+            34.417331
+          ],
+          "coordinate_delta_inches": 0.237123,
+          "established_runtime_center_inches": [
+            20.15,
+            34.65
+          ],
+          "role": "central",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-3-central-north-west",
+          "stable_semantic_suffix": "central-north-west"
+        },
+        "disruption-vs-reconnaissance-layout-3-central-02": {
+          "audit_source_center_inches": [
+            23.8076,
+            25.522667
+          ],
+          "coordinate_delta_inches": 0.177797,
+          "established_runtime_center_inches": [
+            23.85,
+            25.35
+          ],
+          "role": "central",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-3-central-south-east",
+          "stable_semantic_suffix": "central-south-east"
+        },
+        "disruption-vs-reconnaissance-layout-3-defender-home-01": {
+          "audit_source_center_inches": [
+            37.397724,
+            14.878335
+          ],
+          "coordinate_delta_inches": 0.308531,
+          "established_runtime_center_inches": [
+            37.55,
+            14.61
+          ],
+          "role": "defender_home",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-3-defender-home",
+          "stable_semantic_suffix": "defender-home"
+        },
+        "disruption-vs-reconnaissance-layout-3-expansion-01": {
+          "audit_source_center_inches": [
+            31.887372,
+            50.92499
+          ],
+          "coordinate_delta_inches": 0.027999,
+          "established_runtime_center_inches": [
+            31.9,
+            50.9
+          ],
+          "role": "expansion",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-3-expansion-north-east",
+          "stable_semantic_suffix": "expansion-north-east"
+        },
+        "disruption-vs-reconnaissance-layout-3-expansion-02": {
+          "audit_source_center_inches": [
+            11.993803,
+            9.073911
+          ],
+          "coordinate_delta_inches": 0.109355,
+          "established_runtime_center_inches": [
+            12.1,
+            9.1
+          ],
+          "role": "expansion",
+          "stable_runtime_objective_id": "disruption-vs-reconnaissance-layout-3-expansion-south-west",
+          "stable_semantic_suffix": "expansion-south-west"
+        }
+      },
+      "objective_id_map": {
+        "disruption-vs-reconnaissance-layout-3-attacker-home-01": "disruption-vs-reconnaissance-layout-3-attacker-home",
+        "disruption-vs-reconnaissance-layout-3-central-01": "disruption-vs-reconnaissance-layout-3-central-north-west",
+        "disruption-vs-reconnaissance-layout-3-central-02": "disruption-vs-reconnaissance-layout-3-central-south-east",
+        "disruption-vs-reconnaissance-layout-3-defender-home-01": "disruption-vs-reconnaissance-layout-3-defender-home",
+        "disruption-vs-reconnaissance-layout-3-expansion-01": "disruption-vs-reconnaissance-layout-3-expansion-north-east",
+        "disruption-vs-reconnaissance-layout-3-expansion-02": "disruption-vs-reconnaissance-layout-3-expansion-south-west"
+      },
+      "source_pdf_page_number": 41,
+      "terrain_area_evidence": {
+        "disruption-vs-reconnaissance-layout-3-terrain-area-01": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-16",
+          "audit_source_centroid_inches": [
+            32.178178,
+            50.626989
+          ],
+          "centroid_delta_inches": 1.79352,
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_runtime_centroid_inches": [
+            32.334394,
+            48.840285
+          ],
+          "footprint_family_match": false,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-south-west",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-north-east",
+          "stable_semantic_suffix": "8x11-5-polygon-north-east"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-02": {
+          "audit_footprint_template_id": "FOOTPRINT_10X2_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-15",
+          "audit_source_centroid_inches": [
+            21.358377,
+            50.153916
+          ],
+          "centroid_delta_inches": 0.13667,
+          "established_footprint_template_id": "FOOTPRINT_10X2_5",
+          "established_runtime_centroid_inches": [
+            21.386137,
+            50.020095
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-10x2-5-south-center",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-10x2-5-north-center",
+          "stable_semantic_suffix": "10x2-5-north-center"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-03": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-14",
+          "audit_source_centroid_inches": [
+            6.623425,
+            44.247303
+          ],
+          "centroid_delta_inches": 0.018284,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            6.612493,
+            44.232647
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-7x11-5-defender-home",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-7x11-5-attacker-home",
+          "stable_semantic_suffix": "7x11-5-attacker-home"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-04": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-13",
+          "audit_source_centroid_inches": [
+            17.050546,
+            44.027026
+          ],
+          "centroid_delta_inches": 0.251472,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            17.048908,
+            44.278493
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-6x2-south-east",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-6x2-north-west",
+          "stable_semantic_suffix": "6x2-north-west"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-05": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-12",
+          "audit_source_centroid_inches": [
+            32.762072,
+            40.237641
+          ],
+          "centroid_delta_inches": 1.212152,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            33.312274,
+            39.157553
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-6x4-south-west-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-6x4-north-east-midfield",
+          "stable_semantic_suffix": "6x4-north-east-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-06": {
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-11",
+          "audit_source_centroid_inches": [
+            21.323665,
+            34.977657
+          ],
+          "centroid_delta_inches": 1.475251,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            20.107353,
+            35.812493
+          ],
+          "footprint_family_match": false,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-7x11-5-central-south-east",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-7x11-5-central-north-west",
+          "stable_semantic_suffix": "7x11-5-central-north-west"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-07": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-10",
+          "audit_source_centroid_inches": [
+            37.976536,
+            34.036686
+          ],
+          "centroid_delta_inches": 0.20338,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            37.908908,
+            34.228493
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-6x2-west-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-6x2-east-midfield",
+          "stable_semantic_suffix": "6x2-east-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-08": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-09",
+          "audit_source_centroid_inches": [
+            8.951274,
+            30.09185
+          ],
+          "centroid_delta_inches": 0.767495,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            9.491938,
+            30.636581
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-6x4-east-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-6x4-west-midfield",
+          "stable_semantic_suffix": "6x4-west-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-09": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-08",
+          "audit_source_centroid_inches": [
+            34.972717,
+            29.884134
+          ],
+          "centroid_delta_inches": 0.697888,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            34.508062,
+            29.363419
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-6x4-west-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-6x4-east-midfield",
+          "stable_semantic_suffix": "6x4-east-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-10": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-07",
+          "audit_source_centroid_inches": [
+            6.057448,
+            25.939297
+          ],
+          "centroid_delta_inches": 0.171129,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            6.091092,
+            25.771507
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-6x2-east-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-6x2-west-midfield",
+          "stable_semantic_suffix": "6x2-west-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-11": {
+          "audit_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-06",
+          "audit_source_centroid_inches": [
+            22.651062,
+            25.011698
+          ],
+          "centroid_delta_inches": 1.490243,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            23.892647,
+            24.187507
+          ],
+          "footprint_family_match": false,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-7x11-5-central-north-west",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-7x11-5-central-south-east",
+          "stable_semantic_suffix": "7x11-5-central-south-east"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-12": {
+          "audit_footprint_template_id": "FOOTPRINT_6X4",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-05",
+          "audit_source_centroid_inches": [
+            11.054263,
+            19.735356
+          ],
+          "centroid_delta_inches": 1.16619,
+          "established_footprint_template_id": "FOOTPRINT_6X4",
+          "established_runtime_centroid_inches": [
+            10.687726,
+            20.842447
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-6x4-north-east-midfield",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-6x4-south-west-midfield",
+          "stable_semantic_suffix": "6x4-south-west-midfield"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-13": {
+          "audit_footprint_template_id": "FOOTPRINT_6X2",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-04",
+          "audit_source_centroid_inches": [
+            26.936514,
+            15.869863
+          ],
+          "centroid_delta_inches": 0.14907,
+          "established_footprint_template_id": "FOOTPRINT_6X2",
+          "established_runtime_centroid_inches": [
+            26.951092,
+            15.721507
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-6x2-north-west",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-6x2-south-east",
+          "stable_semantic_suffix": "6x2-south-east"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-14": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-03",
+          "audit_source_centroid_inches": [
+            37.337671,
+            15.761695
+          ],
+          "centroid_delta_inches": 0.050156,
+          "established_footprint_template_id": "FOOTPRINT_7X11_5",
+          "established_runtime_centroid_inches": [
+            37.387507,
+            15.767353
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-7x11-5-attacker-home",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-7x11-5-defender-home",
+          "stable_semantic_suffix": "7x11-5-defender-home"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-15": {
+          "audit_footprint_template_id": "FOOTPRINT_10X2_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-02",
+          "audit_source_centroid_inches": [
+            22.62868,
+            9.742979
+          ],
+          "centroid_delta_inches": 0.237389,
+          "established_footprint_template_id": "FOOTPRINT_10X2_5",
+          "established_runtime_centroid_inches": [
+            22.613863,
+            9.979905
+          ],
+          "footprint_family_match": true,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-10x2-5-north-center",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-10x2-5-south-center",
+          "stable_semantic_suffix": "10x2-5-south-center"
+        },
+        "disruption-vs-reconnaissance-layout-3-terrain-area-16": {
+          "audit_footprint_template_id": "FOOTPRINT_7X11_5",
+          "audit_point_symmetry_partner_area_id": "disruption-vs-reconnaissance-layout-3-terrain-area-01",
+          "audit_source_centroid_inches": [
+            11.703036,
+            9.371969
+          ],
+          "centroid_delta_inches": 1.788138,
+          "established_footprint_template_id": "FOOTPRINT_8X11_5_POLYGON",
+          "established_runtime_centroid_inches": [
+            11.665606,
+            11.159715
+          ],
+          "footprint_family_match": false,
+          "stable_runtime_point_symmetry_partner_id": "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-north-east",
+          "stable_runtime_terrain_area_id": "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-south-west",
+          "stable_semantic_suffix": "8x11-5-polygon-south-west"
+        }
+      },
+      "terrain_area_id_map": {
+        "disruption-vs-reconnaissance-layout-3-terrain-area-01": "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-north-east",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-02": "disruption-vs-reconnaissance-layout-3-10x2-5-north-center",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-03": "disruption-vs-reconnaissance-layout-3-7x11-5-attacker-home",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-04": "disruption-vs-reconnaissance-layout-3-6x2-north-west",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-05": "disruption-vs-reconnaissance-layout-3-6x4-north-east-midfield",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-06": "disruption-vs-reconnaissance-layout-3-7x11-5-central-north-west",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-07": "disruption-vs-reconnaissance-layout-3-6x2-east-midfield",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-08": "disruption-vs-reconnaissance-layout-3-6x4-west-midfield",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-09": "disruption-vs-reconnaissance-layout-3-6x4-east-midfield",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-10": "disruption-vs-reconnaissance-layout-3-6x2-west-midfield",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-11": "disruption-vs-reconnaissance-layout-3-7x11-5-central-south-east",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-12": "disruption-vs-reconnaissance-layout-3-6x4-south-west-midfield",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-13": "disruption-vs-reconnaissance-layout-3-6x2-south-east",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-14": "disruption-vs-reconnaissance-layout-3-7x11-5-defender-home",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-15": "disruption-vs-reconnaissance-layout-3-10x2-5-south-center",
+        "disruption-vs-reconnaissance-layout-3-terrain-area-16": "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-south-west"
+      },
+      "terrain_assignment_second_best_margin_inches": 20.223679,
+      "terrain_assignment_total_centroid_delta_inches": 11.608427
+    }
+  ],
+  "method": {
+    "new_source_geometry_basis": "data/source_audits/event_companion_2026_06/phase17n_event_companion_battlefields_pages_9_53_extraction.json",
+    "objectives": "minimum same-role Euclidean coordinate distance",
+    "old_runtime_geometry_basis": "old pairing modules and Event Companion footprint polygons at current HEAD",
+    "terrain": "minimum total old-runtime-centroid to new-source-centroid distance over reciprocal point-symmetry pairs; footprint families verified after the spatial assignment"
+  },
+  "objective_id_map": {
+    "disruption-vs-reconnaissance-layout-1-attacker-home-01": "disruption-vs-reconnaissance-layout-1-attacker-home",
+    "disruption-vs-reconnaissance-layout-1-central-01": "disruption-vs-reconnaissance-layout-1-central-north",
+    "disruption-vs-reconnaissance-layout-1-central-02": "disruption-vs-reconnaissance-layout-1-central-south",
+    "disruption-vs-reconnaissance-layout-1-defender-home-01": "disruption-vs-reconnaissance-layout-1-defender-home",
+    "disruption-vs-reconnaissance-layout-1-expansion-01": "disruption-vs-reconnaissance-layout-1-expansion-east",
+    "disruption-vs-reconnaissance-layout-1-expansion-02": "disruption-vs-reconnaissance-layout-1-expansion-west",
+    "disruption-vs-reconnaissance-layout-2-attacker-home-01": "disruption-vs-reconnaissance-layout-2-attacker-home",
+    "disruption-vs-reconnaissance-layout-2-central-01": "disruption-vs-reconnaissance-layout-2-central-east",
+    "disruption-vs-reconnaissance-layout-2-central-02": "disruption-vs-reconnaissance-layout-2-central-west",
+    "disruption-vs-reconnaissance-layout-2-defender-home-01": "disruption-vs-reconnaissance-layout-2-defender-home",
+    "disruption-vs-reconnaissance-layout-2-expansion-01": "disruption-vs-reconnaissance-layout-2-expansion-north",
+    "disruption-vs-reconnaissance-layout-2-expansion-02": "disruption-vs-reconnaissance-layout-2-expansion-south",
+    "disruption-vs-reconnaissance-layout-3-attacker-home-01": "disruption-vs-reconnaissance-layout-3-attacker-home",
+    "disruption-vs-reconnaissance-layout-3-central-01": "disruption-vs-reconnaissance-layout-3-central-north-west",
+    "disruption-vs-reconnaissance-layout-3-central-02": "disruption-vs-reconnaissance-layout-3-central-south-east",
+    "disruption-vs-reconnaissance-layout-3-defender-home-01": "disruption-vs-reconnaissance-layout-3-defender-home",
+    "disruption-vs-reconnaissance-layout-3-expansion-01": "disruption-vs-reconnaissance-layout-3-expansion-north-east",
+    "disruption-vs-reconnaissance-layout-3-expansion-02": "disruption-vs-reconnaissance-layout-3-expansion-south-west",
+    "take-and-hold-vs-take-and-hold-layout-1-attacker-home-01": "take-and-hold-vs-take-and-hold-layout-1-attacker-home",
+    "take-and-hold-vs-take-and-hold-layout-1-central-01": "take-and-hold-vs-take-and-hold-layout-1-central",
+    "take-and-hold-vs-take-and-hold-layout-1-defender-home-01": "take-and-hold-vs-take-and-hold-layout-1-defender-home",
+    "take-and-hold-vs-take-and-hold-layout-1-expansion-01": "take-and-hold-vs-take-and-hold-layout-1-expansion-east",
+    "take-and-hold-vs-take-and-hold-layout-1-expansion-02": "take-and-hold-vs-take-and-hold-layout-1-expansion-west",
+    "take-and-hold-vs-take-and-hold-layout-2-attacker-home-01": "take-and-hold-vs-take-and-hold-layout-2-attacker-home",
+    "take-and-hold-vs-take-and-hold-layout-2-central-01": "take-and-hold-vs-take-and-hold-layout-2-central",
+    "take-and-hold-vs-take-and-hold-layout-2-defender-home-01": "take-and-hold-vs-take-and-hold-layout-2-defender-home",
+    "take-and-hold-vs-take-and-hold-layout-2-expansion-01": "take-and-hold-vs-take-and-hold-layout-2-expansion-north",
+    "take-and-hold-vs-take-and-hold-layout-2-expansion-02": "take-and-hold-vs-take-and-hold-layout-2-expansion-south",
+    "take-and-hold-vs-take-and-hold-layout-3-attacker-home-01": "take-and-hold-vs-take-and-hold-layout-3-attacker-home",
+    "take-and-hold-vs-take-and-hold-layout-3-central-01": "take-and-hold-vs-take-and-hold-layout-3-central",
+    "take-and-hold-vs-take-and-hold-layout-3-defender-home-01": "take-and-hold-vs-take-and-hold-layout-3-defender-home",
+    "take-and-hold-vs-take-and-hold-layout-3-expansion-01": "take-and-hold-vs-take-and-hold-layout-3-expansion-north-east",
+    "take-and-hold-vs-take-and-hold-layout-3-expansion-02": "take-and-hold-vs-take-and-hold-layout-3-expansion-south-west"
+  },
+  "schema_version": "event-companion-stable-identity-map-v1",
+  "scope": "six pre-existing non-Meatgrinder executable Event Companion layouts",
+  "source_layout_id_map": {
+    "disruption-vs-reconnaissance-layout-1": "gw_event_companion_v1_disruption_vs_reconnaissance_smoke_and_mirrors_surveil_the_foe_layout_a",
+    "disruption-vs-reconnaissance-layout-2": "gw_event_companion_v1_disruption_vs_reconnaissance_smoke_and_mirrors_surveil_the_foe_layout_b",
+    "disruption-vs-reconnaissance-layout-3": "gw_event_companion_v1_disruption_vs_reconnaissance_smoke_and_mirrors_surveil_the_foe_layout_c",
+    "take-and-hold-vs-take-and-hold-layout-1": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_a",
+    "take-and-hold-vs-take-and-hold-layout-2": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_b",
+    "take-and-hold-vs-take-and-hold-layout-3": "gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c"
+  },
+  "terrain_area_id_map": {
+    "disruption-vs-reconnaissance-layout-1-terrain-area-01": "disruption-vs-reconnaissance-layout-1-6x2-attacker-west",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-02": "disruption-vs-reconnaissance-layout-1-10x2-5-attacker-midfield",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-03": "disruption-vs-reconnaissance-layout-1-7x11-5-attacker-home",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-04": "disruption-vs-reconnaissance-layout-1-6x4-attacker-west",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-05": "disruption-vs-reconnaissance-layout-1-7x11-5-east-expansion",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-06": "disruption-vs-reconnaissance-layout-1-8x11-5-polygon-north-center",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-07": "disruption-vs-reconnaissance-layout-1-6x4-west-midfield",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-08": "disruption-vs-reconnaissance-layout-1-6x2-west-midfield",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-09": "disruption-vs-reconnaissance-layout-1-6x2-east-midfield",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-10": "disruption-vs-reconnaissance-layout-1-6x4-east-midfield",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-11": "disruption-vs-reconnaissance-layout-1-8x11-5-polygon-south-center",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-12": "disruption-vs-reconnaissance-layout-1-7x11-5-west-expansion",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-13": "disruption-vs-reconnaissance-layout-1-6x4-defender-east",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-14": "disruption-vs-reconnaissance-layout-1-7x11-5-defender-home",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-15": "disruption-vs-reconnaissance-layout-1-10x2-5-defender-midfield",
+    "disruption-vs-reconnaissance-layout-1-terrain-area-16": "disruption-vs-reconnaissance-layout-1-6x2-defender-east",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-01": "disruption-vs-reconnaissance-layout-2-6x2-north-west",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-02": "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-north-east",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-03": "disruption-vs-reconnaissance-layout-2-6x4-north-east",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-04": "disruption-vs-reconnaissance-layout-2-6x2-north-east",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-05": "disruption-vs-reconnaissance-layout-2-7x11-5-attacker-home",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-06": "disruption-vs-reconnaissance-layout-2-10x2-5-north-west",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-07": "disruption-vs-reconnaissance-layout-2-7x11-5-central-east",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-08": "disruption-vs-reconnaissance-layout-2-6x4-east-midfield",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-09": "disruption-vs-reconnaissance-layout-2-6x4-west-midfield",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-10": "disruption-vs-reconnaissance-layout-2-7x11-5-central-west",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-11": "disruption-vs-reconnaissance-layout-2-10x2-5-south-east",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-12": "disruption-vs-reconnaissance-layout-2-7x11-5-defender-home",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-13": "disruption-vs-reconnaissance-layout-2-6x2-south-west",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-14": "disruption-vs-reconnaissance-layout-2-6x4-south-west",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-15": "disruption-vs-reconnaissance-layout-2-8x11-5-polygon-south-west",
+    "disruption-vs-reconnaissance-layout-2-terrain-area-16": "disruption-vs-reconnaissance-layout-2-6x2-south-east",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-01": "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-north-east",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-02": "disruption-vs-reconnaissance-layout-3-10x2-5-north-center",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-03": "disruption-vs-reconnaissance-layout-3-7x11-5-attacker-home",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-04": "disruption-vs-reconnaissance-layout-3-6x2-north-west",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-05": "disruption-vs-reconnaissance-layout-3-6x4-north-east-midfield",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-06": "disruption-vs-reconnaissance-layout-3-7x11-5-central-north-west",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-07": "disruption-vs-reconnaissance-layout-3-6x2-east-midfield",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-08": "disruption-vs-reconnaissance-layout-3-6x4-west-midfield",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-09": "disruption-vs-reconnaissance-layout-3-6x4-east-midfield",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-10": "disruption-vs-reconnaissance-layout-3-6x2-west-midfield",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-11": "disruption-vs-reconnaissance-layout-3-7x11-5-central-south-east",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-12": "disruption-vs-reconnaissance-layout-3-6x4-south-west-midfield",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-13": "disruption-vs-reconnaissance-layout-3-6x2-south-east",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-14": "disruption-vs-reconnaissance-layout-3-7x11-5-defender-home",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-15": "disruption-vs-reconnaissance-layout-3-10x2-5-south-center",
+    "disruption-vs-reconnaissance-layout-3-terrain-area-16": "disruption-vs-reconnaissance-layout-3-8x11-5-polygon-south-west",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-01": "take-and-hold-vs-take-and-hold-layout-1-6x4-upper-right",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-02": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-upper-left",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-03": "take-and-hold-vs-take-and-hold-layout-1-10x2-5-upper-left",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-04": "take-and-hold-vs-take-and-hold-layout-1-6x2-upper-center",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-05": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-upper-right",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-06": "take-and-hold-vs-take-and-hold-layout-1-6x4-west-midfield",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-07": "take-and-hold-vs-take-and-hold-layout-1-8x11-5-polygon-central-north",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-08": "take-and-hold-vs-take-and-hold-layout-1-6x2-west-midfield",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-09": "take-and-hold-vs-take-and-hold-layout-1-6x2-east-midfield",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-10": "take-and-hold-vs-take-and-hold-layout-1-8x11-5-polygon-central-south",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-11": "take-and-hold-vs-take-and-hold-layout-1-6x4-east-midfield",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-12": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-lower-left",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-13": "take-and-hold-vs-take-and-hold-layout-1-6x2-lower-center",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-14": "take-and-hold-vs-take-and-hold-layout-1-10x2-5-lower-right",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-15": "take-and-hold-vs-take-and-hold-layout-1-7x11-5-lower-right",
+    "take-and-hold-vs-take-and-hold-layout-1-terrain-area-16": "take-and-hold-vs-take-and-hold-layout-1-6x4-lower-left",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-01": "take-and-hold-vs-take-and-hold-layout-2-6x2-north-west",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-02": "take-and-hold-vs-take-and-hold-layout-2-6x4-north-east",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-03": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-north-expansion",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-04": "take-and-hold-vs-take-and-hold-layout-2-10x2-5-north-west",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-05": "take-and-hold-vs-take-and-hold-layout-2-6x2-north-east",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-06": "take-and-hold-vs-take-and-hold-layout-2-6x4-south-east",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-07": "take-and-hold-vs-take-and-hold-layout-2-8x11-5-polygon-central-south",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-08": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-right-home",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-09": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-left-home",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-10": "take-and-hold-vs-take-and-hold-layout-2-8x11-5-polygon-central-north",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-11": "take-and-hold-vs-take-and-hold-layout-2-6x4-north-west",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-12": "take-and-hold-vs-take-and-hold-layout-2-6x2-south-west",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-13": "take-and-hold-vs-take-and-hold-layout-2-10x2-5-south-east",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-14": "take-and-hold-vs-take-and-hold-layout-2-7x11-5-south-expansion",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-15": "take-and-hold-vs-take-and-hold-layout-2-6x4-south-west",
+    "take-and-hold-vs-take-and-hold-layout-2-terrain-area-16": "take-and-hold-vs-take-and-hold-layout-2-6x2-south-east",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-01": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-west",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-02": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-north-east",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-03": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-north-center",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-04": "take-and-hold-vs-take-and-hold-layout-3-6x4-north-west",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-05": "take-and-hold-vs-take-and-hold-layout-3-6x2-north-east",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-06": "take-and-hold-vs-take-and-hold-layout-3-6x2-west-midfield",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-07": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-east",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-08": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-north-west",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-09": "take-and-hold-vs-take-and-hold-layout-3-8x11-5-polygon-central-south-east",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-10": "take-and-hold-vs-take-and-hold-layout-3-6x4-central-west",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-11": "take-and-hold-vs-take-and-hold-layout-3-6x2-east-midfield",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-12": "take-and-hold-vs-take-and-hold-layout-3-6x2-south-west",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-13": "take-and-hold-vs-take-and-hold-layout-3-6x4-south-east",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-14": "take-and-hold-vs-take-and-hold-layout-3-10x2-5-south-center",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-15": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-west",
+    "take-and-hold-vs-take-and-hold-layout-3-terrain-area-16": "take-and-hold-vs-take-and-hold-layout-3-7x11-5-south-east"
+  }
+}

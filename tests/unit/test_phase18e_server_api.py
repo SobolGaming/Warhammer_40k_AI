@@ -296,7 +296,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     identities = _field_object(capability_manifest, "identities")
     assert _field_object(identities, "mission_pack")
     assert _field_object(identities, "terrain_layout")
-    assert _field_object(identities, "contract_schema")["contract_version"] == "5.0.0"
+    assert _field_object(identities, "contract_schema")["contract_version"] == "6.0.0"
 
     player_a_support = _request(
         server,
@@ -411,7 +411,7 @@ def test_phase17n_exact_event_companion_mission_has_hashed_runtime_evidence() ->
     assert mission_source_package_evidence_id in semantic["evidence_refs"]
     assert terrain_source_ids.issubset(set(physical["evidence_refs"]))
     assert any(
-        event_companion_layouts_2026_06.EXACT_SLICE_PACKAGE_HASH in evidence_ref
+        event_companion_layouts_2026_06.BATTLEFIELD_PACKAGE_HASH in evidence_ref
         for evidence_ref in physical["evidence_refs"]
     )
     assert mission_row["metadata"]["mission_setup_hash"] == mission_setup_hash
@@ -1008,7 +1008,7 @@ def test_phase18e_command_result_schema_requires_accepted_commands_to_be_committ
     )
     example.pop("command_id")
     example.pop("outcome_code")
-    example["schema_version"] = "session-command-result-v5-contract"
+    example["schema_version"] = "session-command-result-v6-contract"
     for committed, accepted in ((True, True), (True, False), (False, False)):
         payload = {**example, "committed": committed, "accepted": accepted}
         validator.validate(payload)
@@ -1587,6 +1587,52 @@ def test_phase18d_canonical_request_schemas_fail_before_session_mutation() -> No
     assert _request_id(_field_object(unchanged_payload_view, "pending_decision")) == _request_id(
         placement_request
     )
+
+
+def test_contract6_create_routes_reject_missing_logical_terrain_identity() -> None:
+    server = AdapterGameServer()
+    event_mission_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id=PLAYER_A,
+        defender_player_id=PLAYER_B,
+    )
+    game_config = replace(
+        _config(game_id="contract6-logical-area-game"),
+        mission_setup=event_mission_setup,
+    )
+    session_config = replace(
+        _config(game_id="contract6-logical-area-session"),
+        mission_setup=event_mission_setup,
+    )
+    requests = (
+        (
+            "/games",
+            {
+                "schema_version": CREATE_SESSION_SCHEMA_VERSION,
+                "config": validate_json_value(cast(JsonValue, game_config.to_payload())),
+            },
+        ),
+        (
+            "/sessions",
+            {
+                "schema_version": SESSION_CREATE_SCHEMA_VERSION,
+                "config": validate_json_value(cast(JsonValue, session_config.to_payload())),
+            },
+        ),
+    )
+
+    for path, body in requests:
+        config = _field_object(body, "config")
+        mission_setup_payload = _field_object(config, "mission_setup")
+        first_area = _json_object(_field_list(mission_setup_payload, "terrain_areas")[0])
+        first_area.pop("logical_terrain_area_id")
+
+        response = _request_raw(server, "POST", path, body=body)
+
+        assert response.status_code == 400
+        assert _error_code(response) == "canonical_schema_invalid"
 
 
 def test_phase18e_server_route_errors_are_typed() -> None:

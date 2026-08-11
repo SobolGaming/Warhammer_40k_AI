@@ -94,6 +94,7 @@ FORBIDDEN_UI_STATE_KEYS = frozenset(
 )
 SCHEMA_FILES = (
     Path("contracts/schemas/battlefield-view.schema.json"),
+    Path("contracts/schemas/create-session.schema.json"),
     Path("contracts/schemas/decision-family-coverage.schema.json"),
     Path("contracts/schemas/decision-family-live.schema.json"),
     Path("contracts/schemas/decision-request-view.schema.json"),
@@ -229,20 +230,24 @@ def test_phase17n_projection_family_versions_cover_the_new_closed_shapes() -> No
     battlefield_properties = _json_object(battlefield_schema["properties"])
     battlefield_defs = _json_object(battlefield_schema["$defs"])
     terrain_feature = _json_object(battlefield_defs["terrain_feature"])
+    terrain_area = _json_object(battlefield_defs["terrain_area"])
 
     assert (
         _json_object(game_view_properties["projection_schema"])["const"]
         == PROJECTION_SCHEMA_VERSION
-        == "game-view-v7-phase17n"
+        == "game-view-v8-phase17n"
     )
     assert "primary_unit_terrain_turn_start_snapshots" in game_view_required
     assert (
         _json_object(battlefield_properties["schema_version"])["const"]
         == BATTLEFIELD_VIEW_SCHEMA_VERSION
-        == "battlefield-view-v2-phase17n"
+        == "battlefield-view-v3-phase17n"
     )
     assert "classification" in {
         _json_string(value) for value in _json_list(terrain_feature["required"])
+    }
+    assert "logical_terrain_area_id" in {
+        _json_string(value) for value in _json_list(terrain_area["required"])
     }
 
 
@@ -280,6 +285,21 @@ def test_phase17n_hidden_reserve_snapshot_examples_are_viewer_scoped() -> None:
     assert UNIT_BETA in json.dumps(owner_snapshots, sort_keys=True)
 
 
+def test_game_view_schema_requires_logical_terrain_area_identity() -> None:
+    registry = _schema_registry()
+    validator = _schema_validator("game-view.schema.json", registry=registry)
+    view = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/examples/projections/post_deployment_view.json"))
+    )
+    validator.validate(view)
+    mission_setup = _json_object(view["mission_setup"])
+    terrain_areas = _json_list(mission_setup["terrain_areas"])
+    terrain_areas.append({"terrain_area_id": "physical-area-without-logical-identity"})
+
+    with pytest.raises(ValidationError):
+        validator.validate(view)
+
+
 def test_live_movement_proposal_schema_requires_spatial_context_hash() -> None:
     registry = _schema_registry()
     validator = _schema_validator("decision-family-live.schema.json", registry=registry)
@@ -294,14 +314,14 @@ def test_live_movement_proposal_schema_requires_spatial_context_hash() -> None:
         validator.validate(without_spatial_context)
 
 
-def test_session_metadata_contract_version_accepts_compatible_major_five_releases() -> None:
+def test_session_metadata_contract_version_accepts_compatible_major_six_releases() -> None:
     registry = _schema_registry()
     validator = _schema_validator("session-metadata.schema.json", registry=registry)
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "5.1.0"}
-    incompatible = {**_json_object(metadata), "server_contract_version": "4.3.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "6.1.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "5.3.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):
@@ -325,12 +345,28 @@ def test_replay_metadata_schema_rejects_missing_rules_overlay_identity() -> None
         _read_json(REPO_ROOT / Path("contracts/schemas/replay-metadata.schema.json"))
     )
     assert replay_schema["$id"] == (
-        "https://warhammer40k-core.local/contracts/v3/replay-metadata.schema.json"
+        "https://warhammer40k-core.local/contracts/v4/replay-metadata.schema.json"
     )
     validator = _schema_validator("replay-metadata.schema.json", registry=_schema_registry())
     replay = _json_object(_read_json(REPO_ROOT / Path("contracts/examples/replay-metadata.json")))
     source_identity = _json_object(replay["source_identity"])
     source_identity.pop("rules_overlay_ids")
+
+    with pytest.raises(ValidationError):
+        validator.validate(replay)
+
+
+def test_replay_metadata_schema_requires_logical_terrain_area_identity() -> None:
+    registry = _schema_registry()
+    validator = _schema_validator("replay-metadata.schema.json", registry=registry)
+    replay = _json_object(_read_json(REPO_ROOT / Path("contracts/examples/replay-metadata.json")))
+    initial_lifecycle = _json_object(replay["initial_lifecycle"])
+    config = _json_object(initial_lifecycle["config"])
+    mission_setup = _json_object(config["mission_setup"])
+    terrain_areas = _json_list(mission_setup["terrain_areas"])
+    assert terrain_areas
+    first_area = _json_object(terrain_areas[0])
+    assert first_area.pop("logical_terrain_area_id")
 
     with pytest.raises(ValidationError):
         validator.validate(replay)
@@ -451,12 +487,12 @@ def test_phase18j_battlefield_projection_is_typed_joinable_and_viewer_scoped() -
         "min_x_inches": 0.0,
         "min_y_inches": 0.0,
         "min_z_inches": 0.0,
-        "max_x_inches": 60.0,
-        "max_y_inches": 44.0,
+        "max_x_inches": 44.0,
+        "max_y_inches": 60.0,
     }
     authoritative = battlefield["authoritative"]
     assert set(authoritative["models_by_id"]) == set(owner_view["model_display_by_id"])
-    assert len(authoritative["objectives_by_id"]) == 5
+    assert len(authoritative["objectives_by_id"]) == 6
     assert len(authoritative["deployment_zones_by_id"]) == 2
     assert all(
         "marker_diameter_inches" in objective and "marker_diameter_mm" not in objective
@@ -601,11 +637,22 @@ def test_phase18j_published_geometry_conformance_fixture_covers_declared_union()
     assert terrain["classification"] == "unknown"
     assert terrain["footprint"]["kind"] == "rectangle"
     assert {volume["volume_kind"] for volume in terrain["volumes"]} == {"wall", "floor"}
+    terrain_area = battlefield["authoritative"]["terrain_areas_by_id"]["geometry-conformance-area"]
+    assert terrain_area["footprint"]["kind"] == "polygon"
+    assert terrain_area["logical_terrain_area_id"] == "geometry-conformance-area"
+    logical_group_change = cast(
+        BattlefieldViewPayload,
+        json.loads(json.dumps(battlefield, sort_keys=True)),
+    )
+    logical_group_change["authoritative"]["terrain_areas_by_id"]["geometry-conformance-area"][
+        "logical_terrain_area_id"
+    ] = "geometry-conformance-logical-group"
     assert (
-        battlefield["authoritative"]["terrain_areas_by_id"]["geometry-conformance-area"][
-            "footprint"
-        ]["kind"]
-        == "polygon"
+        authoritative_geometry_hash(
+            bounds=logical_group_change["bounds"],
+            authoritative=logical_group_change["authoritative"],
+        )
+        != battlefield["authoritative_geometry_hash"]
     )
     assert battlefield["authoritative"]["objectives_by_id"]
 
@@ -658,6 +705,20 @@ def test_phase18j_shape_schema_rejects_missing_centers_and_unanchored_polygon_ro
     polygon["rotation_degrees"] = 15.0
     with pytest.raises(ValidationError):
         validator.validate(unanchored_rotation)
+
+    missing_logical_area_id = cast(
+        BattlefieldViewPayload,
+        json.loads(json.dumps(battlefield, sort_keys=True)),
+    )
+    raw_missing_logical_area = cast(
+        dict[str, object],
+        missing_logical_area_id["authoritative"]["terrain_areas_by_id"][
+            "geometry-conformance-area"
+        ],
+    )
+    raw_missing_logical_area.pop("logical_terrain_area_id")
+    with pytest.raises(ValidationError):
+        validator.validate(missing_logical_area_id)
 
 
 def test_phase18j_model_state_projection_is_explicit_and_fail_closed() -> None:

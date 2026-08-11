@@ -12,6 +12,7 @@ from warhammer40k_core.core.missions import (
     MissionActionDefinition,
     MissionDeckDefinition,
     MissionPackDefinition,
+    MissionPackError,
     MissionPackScoringDefinition,
     MissionPoolEntry,
     MissionScoringRuleDefinition,
@@ -47,12 +48,22 @@ CHAPTER_APPROVED_2026_27_SOURCE_VERSION = source_data.SOURCE_VERSION
 EVENT_COMPANION_2026_07_SOURCE_ID = event_source_data.SOURCE_PACKAGE_ID
 EVENT_COMPANION_2026_07_SOURCE_VERSION = event_source_data.SOURCE_VERSION
 
+_CHAPTER_APPROVED_TYPED_EVENT_LAYOUT_IDS = frozenset(
+    {
+        *(f"disruption-vs-reconnaissance-layout-{number}" for number in (1, 2, 3)),
+        *(f"purge-the-foe-vs-purge-the-foe-layout-{number}" for number in (1, 2, 3)),
+        *(f"take-and-hold-vs-take-and-hold-layout-{number}" for number in (1, 2, 3)),
+    }
+)
+
 
 @cache
 def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
     """Build and cache the immutable Chapter Approved 2026-27 mission pack."""
 
-    typed_battlefield_layouts = event_source_data.battlefield_layout_definitions()
+    typed_battlefield_layouts = _chapter_approved_typed_event_layouts(
+        event_source_data.battlefield_layout_definitions()
+    )
     chapter_approved_rows = source_data.battlefield_layout_rows()
     typed_deployment_maps = _deployment_maps_from_typed_battlefield_layouts(
         typed_battlefield_layouts=typed_battlefield_layouts,
@@ -140,6 +151,7 @@ def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
         force_dispositions=force_dispositions,
         primary_mission_matrix_cells=_primary_mission_matrix_cells(
             rows=source_data.primary_mission_matrix_rows(),
+            battlefield_layout_rows=source_data.primary_mission_matrix_rows(),
             source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
         ),
         mission_pool_entries=_mission_pool_entries(
@@ -244,6 +256,7 @@ def warhammer_event_companion_2026_07_mission_pack() -> MissionPackDefinition:
         force_dispositions=force_dispositions,
         primary_mission_matrix_cells=_primary_mission_matrix_cells(
             rows=event_source_data.primary_mission_matrix_rows(),
+            battlefield_layout_rows=event_source_data.primary_mission_matrix_rows(),
             source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
         ),
         mission_pool_entries=_mission_pool_entries(
@@ -287,6 +300,23 @@ def _deployment_maps(
     source_id: str,
 ) -> tuple[DeploymentMapDefinition, ...]:
     return tuple(_deployment_map_from_battlefield_layout(row, source_id=source_id) for row in rows)
+
+
+def _chapter_approved_typed_event_layouts(
+    layouts: tuple[BattlefieldLayoutDefinition, ...],
+) -> tuple[BattlefieldLayoutDefinition, ...]:
+    layouts_by_id = {layout.battlefield_layout_id: layout for layout in layouts}
+    if len(layouts_by_id) != len(layouts):
+        raise MissionPackError("Event battlefield layouts must not contain duplicate IDs.")
+    missing_layout_ids = _CHAPTER_APPROVED_TYPED_EVENT_LAYOUT_IDS - set(layouts_by_id)
+    if missing_layout_ids:
+        raise MissionPackError(
+            "Chapter Approved typed Event battlefield layouts are missing IDs: "
+            f"{', '.join(sorted(missing_layout_ids))}."
+        )
+    return tuple(
+        layouts_by_id[layout_id] for layout_id in sorted(_CHAPTER_APPROVED_TYPED_EVENT_LAYOUT_IDS)
+    )
 
 
 def _deployment_map_from_battlefield_layout(
@@ -555,14 +585,34 @@ def _force_dispositions(
 def _primary_mission_matrix_cells(
     *,
     rows: tuple[source_data.SourcePrimaryMissionMatrixCellRow, ...],
+    battlefield_layout_rows: tuple[source_data.SourcePrimaryMissionMatrixCellRow, ...],
     source_id: str,
 ) -> tuple[PrimaryMissionMatrixCell, ...]:
+    battlefield_layout_ids_by_cell = {
+        (row.player_force_disposition_id, row.opponent_force_disposition_id): (
+            row.battlefield_layout_ids
+        )
+        for row in battlefield_layout_rows
+    }
+    if len(battlefield_layout_ids_by_cell) != len(battlefield_layout_rows):
+        raise MissionPackError(
+            "Primary mission battlefield layout rows must not duplicate matrix cells."
+        )
+    row_keys = {
+        (row.player_force_disposition_id, row.opponent_force_disposition_id) for row in rows
+    }
+    if set(battlefield_layout_ids_by_cell) != row_keys:
+        raise MissionPackError(
+            "Primary mission matrix rows and battlefield layout rows must define identical cells."
+        )
     return tuple(
         PrimaryMissionMatrixCell(
             player_force_disposition_id=row.player_force_disposition_id,
             opponent_force_disposition_id=row.opponent_force_disposition_id,
             primary_mission_id=row.primary_mission_id,
-            battlefield_layout_ids=row.battlefield_layout_ids,
+            battlefield_layout_ids=battlefield_layout_ids_by_cell[
+                (row.player_force_disposition_id, row.opponent_force_disposition_id)
+            ],
             source_status=MissionSourceStatus(row.source_status),
             source_id=(
                 f"{source_id}:primary-mission-matrix:"

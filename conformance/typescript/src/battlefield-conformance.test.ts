@@ -27,8 +27,8 @@ test("generated client round-trips the Phase 18J battlefield coordinate contract
   assert.equal(battlefield.coordinate_spec_version, "battlefield-coordinate-v1");
   assert.equal(battlefield.coordinate_space, "battlefield_inches_right_handed_z_up");
   assert.deepEqual(battlefield.bounds, {
-    max_x_inches: 60,
-    max_y_inches: 44,
+    max_x_inches: 44,
+    max_y_inches: 60,
     min_x_inches: 0,
     min_y_inches: 0,
     min_z_inches: 0,

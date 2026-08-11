@@ -1596,6 +1596,11 @@ def test_phase17n_automatic_hidden_uses_exact_light_and_dense_terrain_areas() ->
     )
 
     exact_light_area_id = "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04"
+    exact_light_logical_area_id = next(
+        area.logical_terrain_area_id
+        for area in setup.terrain_areas
+        if area.terrain_area_id == exact_light_area_id
+    )
     state.mission_setup = replace(
         setup,
         terrain_areas=tuple(
@@ -1615,7 +1620,7 @@ def test_phase17n_automatic_hidden_uses_exact_light_and_dense_terrain_areas() ->
         setup,
         terrain_areas=tuple(
             replace(area, classification=TerrainAreaClassification.UNKNOWN)
-            if area.terrain_area_id == exact_light_area_id
+            if area.logical_terrain_area_id == exact_light_logical_area_id
             else area
             for area in setup.terrain_areas
         ),

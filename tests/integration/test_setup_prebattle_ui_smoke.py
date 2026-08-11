@@ -343,7 +343,12 @@ def _assert_typed_terrain_geometry_payload(mission_setup: dict[str, JsonValue]) 
     assert mission_setup["battlefield_depth_inches"] == 60.0
     terrain_features = mission_setup["terrain_features"]
     assert isinstance(terrain_features, list)
-    assert terrain_features == []
+    assert len(terrain_features) == 30
+    for feature in terrain_features:
+        assert isinstance(feature, dict)
+        assert _payload_string(feature, "source_id").startswith(
+            "gw-11e-warhammer-event-companion-v1-1-2026-07:"
+        )
     terrain_areas = mission_setup["terrain_areas"]
     assert isinstance(terrain_areas, list)
     assert len(terrain_areas) == 16
@@ -465,8 +470,8 @@ def _event_companion_prebattle_pose(index: int, player_id: str) -> Pose:
             facing_degrees=180.0,
         )
     return Pose.at(
-        4.0 + (row * 1.8),
-        36.0 + (column * 1.8),
+        2.0 + (row * 1.8),
+        40.0 + (column * 1.8),
         0.0,
         facing_degrees=0.0,
     )

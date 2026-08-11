@@ -19,7 +19,7 @@ from warhammer40k_core.geometry.model_geometry import BaseFootprintKind
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
-BATTLEFIELD_VIEW_SCHEMA_VERSION = "battlefield-view-v2-phase17n"
+BATTLEFIELD_VIEW_SCHEMA_VERSION = "battlefield-view-v3-phase17n"
 BATTLEFIELD_COORDINATE_SPEC_VERSION = "battlefield-coordinate-v1"
 BATTLEFIELD_COORDINATE_SPACE = "battlefield_inches_right_handed_z_up"
 
@@ -106,6 +106,7 @@ class BattlefieldTerrainFeatureEntityPayload(TypedDict):
 class BattlefieldTerrainAreaEntityPayload(TypedDict):
     entity_kind: Literal["terrain_area"]
     terrain_area_id: str
+    logical_terrain_area_id: str
     classification: str
     footprint: BattlefieldShapePayload
     source_id: str
@@ -244,6 +245,7 @@ def project_battlefield_view(
             area.terrain_area_id: {
                 "entity_kind": "terrain_area",
                 "terrain_area_id": area.terrain_area_id,
+                "logical_terrain_area_id": area.logical_terrain_area_id,
                 "classification": area.classification.value,
                 "footprint": _polygon_shape(
                     tuple((point.x_inches, point.y_inches) for point in area.footprint_polygon)

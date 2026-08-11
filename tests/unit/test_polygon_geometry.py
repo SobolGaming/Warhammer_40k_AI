@@ -8,6 +8,7 @@ from warhammer40k_core.geometry.polygons import (
     convex_polygon_intersection_area,
     point_intersects_polygon,
     polygon_bounds,
+    polygon_distance,
     polygon_overlap_area,
     polygon_self_intersects,
     signed_polygon_area,
@@ -41,6 +42,22 @@ def test_convex_clipping_and_overlap_area() -> None:
 
     assert convex_polygon_intersection_area(first, second) == 4.0
     assert polygon_overlap_area(first, second) == 4.0
+
+
+def test_polygon_distance_handles_separation_touching_and_containment() -> None:
+    first = ((0.0, 0.0), (2.0, 0.0), (2.0, 2.0), (0.0, 2.0))
+    separated = ((2.05, 0.0), (4.05, 0.0), (4.05, 2.0), (2.05, 2.0))
+    touching = ((2.0, 0.0), (4.0, 0.0), (4.0, 2.0), (2.0, 2.0))
+    contained = ((0.5, 0.5), (1.5, 0.5), (1.5, 1.5), (0.5, 1.5))
+
+    assert math.isclose(
+        polygon_distance(first, separated),
+        0.05,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+    assert polygon_distance(first, touching) == 0.0
+    assert polygon_distance(first, contained) == 0.0
 
 
 def test_polygon_self_intersection_and_degenerate_inputs_are_strict() -> None:

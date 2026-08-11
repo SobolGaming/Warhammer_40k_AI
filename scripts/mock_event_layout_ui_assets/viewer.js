@@ -1,7 +1,7 @@
 "use strict";
 
-const VIEWER_SCHEMA = "event-companion-battlefield-viewer-v2";
-const BATTLEFIELD_VIEW_SCHEMA = "battlefield-view-v2-phase17n";
+const VIEWER_SCHEMA = "event-companion-battlefield-viewer-v3";
+const BATTLEFIELD_VIEW_SCHEMA = "battlefield-view-v3-phase17n";
 const COORDINATE_SPEC = "battlefield-coordinate-v1";
 const COORDINATE_SPACE = "battlefield_inches_right_handed_z_up";
 const VIEWER_GEOMETRY = globalThis.BattlefieldViewerGeometry;
@@ -35,6 +35,8 @@ const COLORS = Object.freeze({
   defender: "#256a98",
   noMansLand: "#776685",
   objective: "#ddad35",
+  singleAreaContact: "#176b87",
+  separateAreaContact: "#8b3a35",
   selected: "#f24b31",
   wallEdge: "rgba(25, 31, 34, 0.62)",
   floor: "#aa9f88",
@@ -283,12 +285,33 @@ function updateLayoutSummary(layout) {
     authoritative.terrain_areas_by_id,
     layout.objective_terrain_areas,
   );
-  const pendingObjectiveFootprintCount = objectives.length - objectiveFootprints.length;
-  const expectedObjectiveFootprintStatus = pendingObjectiveFootprintCount === 0
+  const sourceUnboundObjectiveIds = new Set(layout.source_unbound_objective_ids);
+  const boundObjectiveIds = new Set(
+    layout.objective_terrain_areas.map((binding) => binding.objective_marker_id),
+  );
+  const allObjectiveIds = new Set(objectives.map((objective) => objective.objective_id));
+  const reviewedObjectiveIds = new Set([...boundObjectiveIds, ...sourceUnboundObjectiveIds]);
+  const hasInvalidSourceUnboundId = [...sourceUnboundObjectiveIds].some(
+    (objectiveId) => !allObjectiveIds.has(objectiveId) || boundObjectiveIds.has(objectiveId),
+  );
+  const sourceReviewIsComplete = !hasInvalidSourceUnboundId
+    && reviewedObjectiveIds.size === allObjectiveIds.size;
+  const pendingObjectiveFootprintCount = [...allObjectiveIds].filter(
+    (objectiveId) => !reviewedObjectiveIds.has(objectiveId),
+  ).length;
+  const expectedObjectiveFootprintStatus = sourceReviewIsComplete
     ? "source_linked_footprints_available"
     : "footprint_binding_pending";
   if (layout.objective_footprint_status !== expectedObjectiveFootprintStatus) {
     throw new Error("Objective footprint status does not match its source bindings.");
+  }
+  const terrainAreaContactCounts = validateTerrainAreaContacts(
+    layout.terrain_area_contacts,
+    authoritative.terrain_areas_by_id,
+  );
+  const expectedLogicalTerrainAreaCount = areas.length - terrainAreaContactCounts.single;
+  if (layout.logical_terrain_area_count !== expectedLogicalTerrainAreaCount) {
+    throw new Error("Logical terrain-area count does not match source contact semantics.");
   }
 
   state.layoutName.textContent = layout.name;
@@ -296,11 +319,16 @@ function updateLayoutSummary(layout) {
   state.attackerEdge.textContent = humanize(layout.attacker_edge);
   state.defenderEdge.textContent = humanize(layout.defender_edge);
   state.terrainCount.textContent = [
-    `${areas.length} areas`,
+    `${layout.logical_terrain_area_count} logical areas`,
+    `${areas.length} footprint pieces`,
+    `${terrainAreaContactCounts.single} single-area joins`,
+    `${terrainAreaContactCounts.separate} separate seams`,
+    `${terrainAreaContactCounts.maximumRuntimeGapInches.toFixed(3)}\u2033 max quantized seam`,
     `${features.length} components`,
     `${volumeCounts.wall} walls`,
     `${volumeCounts.floor} floors`,
-    `${objectiveFootprints.length}/${objectives.length} objective footprints`,
+    `${objectiveFootprints.length} terrain-linked objectives`,
+    `${sourceUnboundObjectiveIds.size} open-field objectives`,
     `${territoryCount} territories`,
     `${noMansLandCount} No Man's Land`,
   ].join(" · ");
@@ -556,6 +584,7 @@ function renderScene() {
     }
     if (state.layers.areas.checked) {
       drawTerrainAreas(context, camera, authoritative.terrain_areas_by_id);
+      drawTerrainAreaContacts(context, camera, state.layout.terrain_area_contacts);
     }
     if (state.layers.objectives.checked) {
       drawObjectiveTerrainFootprints(context, camera, objectiveFootprints);
@@ -726,6 +755,143 @@ function drawTerrainAreas(context, camera, areasById) {
       camera,
     );
     state.hitRegions.push(hitRecord([screenPoints], [], entityRecord("terrain_area", area)));
+  }
+}
+
+function validateTerrainAreaContacts(contacts, areasById) {
+  if (!Array.isArray(contacts)) {
+    throw new Error("Terrain-area contacts must be an array.");
+  }
+  const counts = { single: 0, separate: 0, maximumRuntimeGapInches: 0 };
+  const seenPairs = new Set();
+  const groupedPhysicalAreaIds = new Set();
+  for (const contact of contacts) {
+    if (
+      contact === null
+      || typeof contact !== "object"
+      || !Array.isArray(contact.terrain_area_ids)
+      || contact.terrain_area_ids.length !== 2
+    ) {
+      throw new Error("Terrain-area contact must reference exactly two areas.");
+    }
+    const [firstId, secondId] = contact.terrain_area_ids;
+    if (firstId === secondId || areasById[firstId] === undefined || areasById[secondId] === undefined) {
+      throw new Error("Terrain-area contact references invalid physical areas.");
+    }
+    const pairKey = [firstId, secondId].sort().join("|");
+    if (seenPairs.has(pairKey)) {
+      throw new Error("Terrain-area contact pair is duplicated.");
+    }
+    seenPairs.add(pairKey);
+    if (contact.kind !== "single" && contact.kind !== "separate") {
+      throw new Error(`Unsupported terrain-area contact kind: ${String(contact.kind)}.`);
+    }
+    const firstLogicalId = areasById[firstId].logical_terrain_area_id;
+    const secondLogicalId = areasById[secondId].logical_terrain_area_id;
+    if (
+      typeof firstLogicalId !== "string"
+      || firstLogicalId.length === 0
+      || typeof secondLogicalId !== "string"
+      || secondLogicalId.length === 0
+    ) {
+      throw new Error("Terrain-area contact requires authoritative logical area IDs.");
+    }
+    if (contact.kind === "single" && firstLogicalId !== secondLogicalId) {
+      throw new Error("Single terrain-area contact does not share one logical area ID.");
+    }
+    if (contact.kind === "separate" && firstLogicalId === secondLogicalId) {
+      throw new Error("Separate terrain-area contact unexpectedly shares a logical area ID.");
+    }
+    counts[contact.kind] += 1;
+    if (contact.kind === "single") {
+      if (groupedPhysicalAreaIds.has(firstId) || groupedPhysicalAreaIds.has(secondId)) {
+        throw new Error("Physical terrain area belongs to multiple logical groups.");
+      }
+      groupedPhysicalAreaIds.add(firstId);
+      groupedPhysicalAreaIds.add(secondId);
+    }
+    if (
+      !Array.isArray(contact.source_icon_ids)
+      || contact.source_icon_ids.length !== 1
+      || typeof contact.source_icon_ids[0] !== "string"
+      || contact.source_icon_ids[0].length === 0
+    ) {
+      throw new Error("Terrain-area contact requires exactly one source icon ID.");
+    }
+    const sourceX = contact.source_icon_x_inches;
+    const sourceY = contact.source_icon_y_inches;
+    if (
+      typeof sourceX !== "number"
+      || !Number.isFinite(sourceX)
+      || sourceX < 0
+      || sourceX > 44
+      || Math.abs(sourceX / 0.05 - Math.round(sourceX / 0.05)) > 0.000001
+      || typeof sourceY !== "number"
+      || !Number.isFinite(sourceY)
+      || sourceY < 0
+      || sourceY > 60
+      || Math.abs(sourceY / 0.05 - Math.round(sourceY / 0.05)) > 0.000001
+    ) {
+      throw new Error("Terrain-area contact source position is invalid.");
+    }
+    const sourceGap = contact.source_pair_gap_inches;
+    const runtimeGap = contact.runtime_pair_gap_inches;
+    const runtimeOverlap = contact.runtime_pair_overlap_square_inches;
+    const runtimeGapLimit = 0.050001;
+    if (
+      typeof sourceGap !== "number"
+      || !Number.isFinite(sourceGap)
+      || sourceGap < 0
+      || typeof runtimeGap !== "number"
+      || !Number.isFinite(runtimeGap)
+      || runtimeGap < 0
+      || runtimeGap > runtimeGapLimit
+      || typeof runtimeOverlap !== "number"
+      || !Number.isFinite(runtimeOverlap)
+      || runtimeOverlap < 0
+      || runtimeOverlap > 0.000001
+    ) {
+      throw new Error("Terrain-area contact violates the 0.05-inch closure tolerance.");
+    }
+    counts.maximumRuntimeGapInches = Math.max(
+      counts.maximumRuntimeGapInches,
+      runtimeGap,
+    );
+  }
+  return counts;
+}
+
+function drawTerrainAreaContacts(context, camera, contacts) {
+  for (const contact of contacts) {
+    const projected = projectPoint(
+      worldPoint(contact.source_icon_x_inches, contact.source_icon_y_inches, 0.11),
+      camera,
+    );
+    if (projected === null) {
+      continue;
+    }
+    const isSingle = contact.kind === "single";
+    const color = isSingle ? COLORS.singleAreaContact : COLORS.separateAreaContact;
+    context.save();
+    context.fillStyle = "rgba(255, 255, 255, 0.9)";
+    context.strokeStyle = color;
+    context.lineWidth = 1.8;
+    for (const offset of [-3.2, 3.2]) {
+      context.beginPath();
+      context.arc(projected.x + offset, projected.y, 2.5, 0, Math.PI * 2);
+      context.fill();
+      context.stroke();
+    }
+    context.beginPath();
+    if (isSingle) {
+      context.moveTo(projected.x - 0.7, projected.y);
+      context.lineTo(projected.x + 0.7, projected.y);
+    } else {
+      context.moveTo(projected.x, projected.y - 4.4);
+      context.lineTo(projected.x, projected.y + 4.4);
+    }
+    context.stroke();
+    context.restore();
   }
 }
 
@@ -1152,6 +1318,7 @@ function showEntityDetails(entity) {
     appendDetail(definitionList, "Asset hint", entity.hint?.asset_id ?? "None");
     appendDetail(definitionList, "Source", payload.source_id ?? "None");
   } else if (entity.kind === "terrain_area") {
+    appendDetail(definitionList, "Logical area", payload.logical_terrain_area_id);
     appendDetail(definitionList, "Classification", humanize(payload.classification));
     appendDetail(definitionList, "Source", payload.source_id);
   } else if (entity.kind === "objective") {

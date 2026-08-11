@@ -395,29 +395,30 @@ alternate schema authorities.
 Every external request or response declares its payload-family version. The
 reference server currently requires:
 
-- `create-session-v1` for create-session requests;
+- `create-session-v2` for create-session requests whose embedded mission setup
+  requires explicit logical terrain-area identities;
 - `finite-submission-v1` for finite option submissions;
 - `parameterized-submission-v1` for proposal submissions;
 - `lifecycle-status-v1` for server lifecycle responses;
 - `decision-request-view-v2-interaction` for visible or redacted pending decisions;
 - `event-delta-v1` for the in-process integer-cursor adapter delta only;
 - `event-delta-v2` for authenticated role-bound HTTP event deltas;
-- `game-view-v7-phase17n` for role-scoped game projections whose turn-start terrain
+- `game-view-v8-phase17n` for role-scoped game projections whose turn-start terrain
   evidence contains exactly the units visible in `unit_display_by_id`;
-- `battlefield-view-v2-phase17n` for authoritative battlefield geometry with explicit
-  terrain area and feature classifications;
-- `session-projection-v3-phase17n` for full role-scoped reconnect projections;
-- `session-create-v2`, `session-metadata-v5-contract`,
-  `session-command-result-v5-contract`, and `session-command-outcome-v5-contract` for the
+- `battlefield-view-v3-phase17n` for authoritative battlefield geometry with explicit
+  terrain-area logical identity and terrain area and feature classifications;
+- `session-projection-v4-phase17n` for full role-scoped reconnect projections;
+- `session-create-v3`, `session-metadata-v6-contract`,
+  `session-command-result-v6-contract`, and `session-command-outcome-v6-contract` for the
   authenticated formal session protocol;
-- `replay-artifact-v3-phase17n` for replay artifacts whose required source identity includes
-  `ruleset_descriptor_hash`, `rules_overlay_ids`, and Phase 17N engine-state evidence;
+- `replay-artifact-v4-phase17n` for replay artifacts whose required source identity includes
+  `ruleset_descriptor_hash`, `rules_overlay_ids`, Phase 17N engine-state evidence, and
+  explicit logical terrain-area identities in embedded mission setup;
 - `error-envelope-v1` for typed transport errors.
 
-The replay loader recognizes the published `replay-artifact-v2-phase18i`
-discriminator and initializes only its absent turn-start terrain snapshot
-collection to empty before strict v3 loading. It does not apply that migration
-to unknown versions or malformed lifecycle payloads. A mismatched request version fails before queue
+The Contract 6 replay loader accepts only `replay-artifact-v4-phase17n`; v2 and
+v3 artifacts require the retained 5.x deployment. It never infers missing
+logical terrain-area grouping. A mismatched request version fails before queue
 consumption or engine mutation. External error and status payloads are
 viewer-scoped by the same shared redaction policy as game projections and
 events.
@@ -2736,7 +2737,7 @@ The submission contract is shared. The information available to a producer is no
 Phase 18J publishes `GameViewPayload.battlefield_view` as the canonical visual
 play-surface contract. The member remains optional because projections can
 exist before battlefield and mission state; current engine projections emit
-`battlefield-view-v2-phase17n` when
+`battlefield-view-v3-phase17n` when
 both battlefield and mission state exist and emit `null` before that boundary.
 Its normative world frame is defined in `contracts/coordinate-system.md`:
 inches, lower-left origin, positive X/Y on the board plane, positive Z above
@@ -2745,7 +2746,7 @@ the board, and counter-clockwise degrees from positive X.
 The payload has three closed sections:
 
 - `authoritative` contains viewer-visible model measurement geometry, poses,
-  explicit physical states, terrain rules geometry, objectives, deployment
+  explicit physical states, terrain rules geometry and logical area identity, objectives, deployment
   zones, and battlefield regions. Its coordinate-versioned content and bounds
   produce `authoritative_geometry_hash`.
 - `interaction` contains the current request ID, engine-authored
@@ -2772,15 +2773,21 @@ covers the complete viewer-visible `battlefield_view`, while
 `authoritative_geometry_hash` deliberately excludes interaction and render
 changes.
 
-Mission setup terrain projections expose typed geometry for both current
-validated layout areas and future terrain features. Chapter Approved 2026-27
-layout geometry imported from Event Companion is represented as
+Authoritative battlefield terrain-area entities and mission setup terrain
+projections expose typed geometry for current validated layout areas. Warhammer
+Event Companion layout geometry is represented as
 `GameViewPayload.mission_setup.terrain_areas[*]`; adapters should render those
 area footprints from the typed `footprint_polygon` list of `{x_inches,
 y_inches}` vertices, along with the area `classification`,
 `footprint_template_id`, `center_x_inches`, `center_y_inches`, and
-`rotation_degrees` metadata. Terrain areas are layout footprints; they are not
-the terrain features that will later be placed on those areas.
+`rotation_degrees` metadata. Each physical placement also carries a required
+`logical_terrain_area_id`; the authoritative copy participates in
+`authoritative_geometry_hash`. An isolated footprint uses its own
+`terrain_area_id`; multiple physical placements share a distinct logical ID
+only when source data defines them as one rules terrain area. Adapters retain
+the physical polygons for rendering and must not infer or alter grouping from
+visual proximity. Terrain areas are layout footprints; they are distinct from
+the physical terrain features placed on those areas.
 
 Mission setup projections may also expose
 `GameViewPayload.mission_setup.objective_terrain_areas[*]` when source-backed
@@ -2813,7 +2820,7 @@ layout area and does not claim that every component on a multi-component area
 shares one terrain feature kind. Authoritative per-component kind and
 classification live on `terrain_features[*]`.
 
-Chapter Approved 2026-27 layout source geometry is canonical in `44x60` portrait
+Warhammer Event Companion layout source geometry is canonical in `44x60` portrait
 orientation. UI clients that prefer wide battlefield displays may rotate the
 rendered view by -90 degrees into landscape, but the adapter payload coordinates
 remain portrait source coordinates and should not be reinterpreted as native
@@ -2837,7 +2844,7 @@ hybrid projection model:
    `LocalGameSession.view(...)`.
 2. Live viewer-safe unit/model projection. Phase 18A introduced
    `projection_schema: "game-view-v3-phase18a"`; the current `GameViewPayload`
-   uses `game-view-v7-phase17n`, includes
+   uses `game-view-v8-phase17n`, includes
    `projection_state_hash`, references the static catalog through
    `rules_catalog`, and exposes read-only `unit_display_by_id` and
    `model_display_by_id` maps keyed by stable `unit_instance_id` and

@@ -25,7 +25,9 @@ from warhammer40k_core.core.objective_terrain_area_references import (
 from warhammer40k_core.core.terrain_areas import (
     PlacedTerrainArea,
     PlacedTerrainAreaPayload,
+    TerrainAreaError,
     TerrainAreaFootprintTemplate,
+    validate_placed_terrain_area_logical_groups,
 )
 from warhammer40k_core.core.terrain_layouts import (
     TerrainFeatureAreaPlacement,
@@ -433,7 +435,7 @@ class MissionSetup:
                 BattlefieldRegion.from_payload(region) for region in payload["battlefield_regions"]
             ),
             terrain_areas=tuple(
-                PlacedTerrainArea.from_payload(area) for area in payload["terrain_areas"]
+                _placed_terrain_area_from_payload(area) for area in payload["terrain_areas"]
             ),
             objective_terrain_areas=tuple(
                 ObjectiveTerrainAreaDefinition.from_payload(objective_terrain_area)
@@ -444,6 +446,15 @@ class MissionSetup:
                 for feature in payload["terrain_features"]
             ),
         )
+
+
+def _placed_terrain_area_from_payload(
+    payload: PlacedTerrainAreaPayload,
+) -> PlacedTerrainArea:
+    try:
+        return PlacedTerrainArea.from_payload(payload)
+    except TerrainAreaError as exc:
+        raise MissionSetupError("MissionSetup terrain-area payload is invalid.") from exc
 
 
 def instantiate_terrain_layout_template(
@@ -492,6 +503,9 @@ def _terrain_features_from_area_placements(
     presets = _validate_terrain_feature_presets(terrain_feature_presets)
     placements = _validate_terrain_feature_area_placements(terrain_feature_placements)
     areas_by_id = {area.terrain_area_id: area for area in areas}
+    areas_by_logical_id: dict[str, list[PlacedTerrainArea]] = {}
+    for member_area in areas:
+        areas_by_logical_id.setdefault(member_area.logical_terrain_area_id, []).append(member_area)
     footprint_templates_by_id = {
         template.footprint_template_id: template for template in footprint_templates
     }
@@ -519,6 +533,7 @@ def _terrain_features_from_area_placements(
                 footprint_template=footprint_template,
                 preset=preset,
                 placement=placement,
+                terrain_area_group=tuple(areas_by_logical_id[area.logical_terrain_area_id]),
             )
         )
     return tuple(sorted(features, key=lambda feature: feature.feature_id))
@@ -817,7 +832,13 @@ def _validate_terrain_areas(values: object) -> tuple[PlacedTerrainArea, ...]:
             raise MissionSetupError("MissionSetup terrain_areas must not contain duplicates.")
         seen.add(value.terrain_area_id)
         terrain_areas.append(value)
-    return tuple(sorted(terrain_areas, key=lambda area: area.terrain_area_id))
+    try:
+        return validate_placed_terrain_area_logical_groups(
+            "MissionSetup terrain_areas",
+            tuple(terrain_areas),
+        )
+    except TerrainAreaError as exc:
+        raise MissionSetupError(str(exc)) from exc
 
 
 def _validate_terrain_area_footprint_templates(

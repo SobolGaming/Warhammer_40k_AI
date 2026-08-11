@@ -4,7 +4,7 @@ Version: `battlefield-coordinate-v1`
 
 Wire coordinate space: `battlefield_inches_right_handed_z_up`
 
-This document is normative for `battlefield-view-v2-phase17n`, movement/placement
+This document is normative for `battlefield-view-v3-phase17n`, movement/placement
 proposals, and battlefield rendering. The JSON Schema is
 `schemas/battlefield-view.schema.json`.
 
@@ -59,7 +59,7 @@ legality; only an accepted engine submission does.
 
 ## Three geometry classes
 
-`battlefield-view-v2-phase17n` deliberately separates:
+`battlefield-view-v3-phase17n` deliberately separates:
 
 1. `authoritative`: engine/source-owned model measurement footprints and
    heights, model poses and physical states, terrain footprints/volumes,
@@ -107,8 +107,17 @@ entity is not evidence of reserves, embarkation, destruction, or roster size.
 
 Terrain feature footprints and volumes are authoritative collision/visibility
 inputs. Terrain hit regions and asset IDs are separate render data. Terrain
-areas are typed source-backed polygons. Objectives expose an inches-based world
-position and marker diameter; source/package artifacts retain any original
+areas are typed source-backed physical polygons. Each carries a required
+`logical_terrain_area_id`: isolated footprints use their physical ID, while
+source-defined multi-piece terrain areas share a distinct logical ID. Clients
+render the physical polygons and apply terrain-area rules to the logical group;
+the grouping participates in `authoritative_geometry_hash`. Shared logical
+identity does not fill or interpolate open board between disjoint physical
+polygons; containment and visibility use the physical polygon union. A logical
+group with one known member classification retains it; differing known member
+classifications aggregate to `mixed`, and `unknown` cannot mix with a known
+classification. Objectives expose an inches-based world position and marker
+diameter; source/package artifacts retain any original
 millimetre dimensions outside this battlefield wire payload.
 Deployment zones and battlefield regions use one or more exterior polygons plus
 explicit cutouts.

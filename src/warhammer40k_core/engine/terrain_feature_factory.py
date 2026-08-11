@@ -7,9 +7,12 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.core.terrain_areas import (
     PlacedTerrainArea,
+    TerrainAreaError,
     TerrainAreaFootprintTemplate,
     TerrainAreaLocalTransform,
+    logical_terrain_area_group_contains_polygon,
     polygon_bounds,
+    transform_terrain_area_local_point,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry, TerrainDisplayPoint
 from warhammer40k_core.core.terrain_layouts import (
@@ -22,14 +25,11 @@ from warhammer40k_core.core.terrain_layouts import (
     transform_terrain_feature_local_rotation,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.geometry.polygons import polygon_overlap_area, signed_polygon_area
 from warhammer40k_core.geometry.terrain import (
     TerrainFeatureDefinition,
     TerrainFloorDefinition,
     TerrainWallDefinition,
 )
-
-_GEOMETRY_EPSILON = 1e-6
 
 
 class TerrainFeatureFactoryError(GameLifecycleError):
@@ -67,6 +67,7 @@ class TerrainFeatureFactory:
         footprint_template: TerrainAreaFootprintTemplate,
         preset: TerrainFeaturePreset,
         placement: TerrainFeatureAreaPlacement,
+        terrain_area_group: tuple[PlacedTerrainArea, ...],
     ) -> TerrainFeatureDefinition:
         _validate_area_placement_inputs(
             area=area,
@@ -80,6 +81,24 @@ class TerrainFeatureFactory:
             preset=preset,
             placement=placement,
         )
+        if area not in terrain_area_group:
+            raise TerrainFeatureFactoryError(
+                "Terrain feature logical terrain-area group must contain its referenced area."
+            )
+        try:
+            fits_logical_area = logical_terrain_area_group_contains_polygon(
+                "Terrain feature placement footprint",
+                rules_footprint_polygon,
+                terrain_areas=terrain_area_group,
+            )
+        except TerrainAreaError as exc:
+            raise TerrainFeatureFactoryError(
+                "Terrain feature logical terrain-area group is invalid."
+            ) from exc
+        if not fits_logical_area:
+            raise TerrainFeatureFactoryError(
+                "Terrain feature preset footprint must fit within its logical terrain area."
+            )
         display_geometry = _placed_display_geometry(
             area=area,
             footprint_template=footprint_template,
@@ -148,11 +167,6 @@ def _validate_area_placement_inputs(
         raise TerrainFeatureFactoryError(
             "Terrain feature preset requires a canonical feature kind."
         )
-    _validate_component_polygon_within_area_template(
-        footprint_template=footprint_template,
-        preset=preset,
-        placement=placement,
-    )
 
 
 def _placed_display_geometry(
@@ -162,14 +176,13 @@ def _placed_display_geometry(
     preset: TerrainFeaturePreset,
     placement: TerrainFeatureAreaPlacement,
 ) -> TerrainDisplayGeometry:
-    anchor_x = _local_transform_anchor_x(footprint_template)
     return TerrainDisplayGeometry(
         display_template_id=preset.local_display_geometry.display_template_id,
         footprint_polygon=tuple(
             _place_local_point(
                 transform_terrain_feature_local_point(point, placement=placement),
                 area=area,
-                local_transform_anchor_x_inches=anchor_x,
+                footprint_template=footprint_template,
             )
             for point in preset.local_display_geometry.footprint_polygon
         ),
@@ -183,42 +196,14 @@ def _placed_rules_footprint_polygon(
     preset: TerrainFeaturePreset,
     placement: TerrainFeatureAreaPlacement,
 ) -> tuple[TerrainDisplayPoint, ...]:
-    anchor_x = _local_transform_anchor_x(footprint_template)
     return tuple(
         _place_local_point(
             transform_terrain_feature_local_point(point, placement=placement),
             area=area,
-            local_transform_anchor_x_inches=anchor_x,
+            footprint_template=footprint_template,
         )
         for point in preset.local_rules_footprint_polygon
     )
-
-
-def _validate_component_polygon_within_area_template(
-    *,
-    footprint_template: TerrainAreaFootprintTemplate,
-    preset: TerrainFeaturePreset,
-    placement: TerrainFeatureAreaPlacement,
-) -> None:
-    area_polygon = tuple(
-        (point.x_inches, point.y_inches) for point in footprint_template.polygon_vertices_inches
-    )
-    placed_component_points = tuple(
-        transform_terrain_feature_local_point(point, placement=placement)
-        for point in preset.local_rules_footprint_polygon
-    )
-    component_polygon = tuple((point.x_inches, point.y_inches) for point in placed_component_points)
-    component_area = abs(signed_polygon_area(component_polygon))
-    overlap_area = polygon_overlap_area(area_polygon, component_polygon)
-    if not math.isclose(
-        component_area,
-        overlap_area,
-        rel_tol=0.0,
-        abs_tol=_GEOMETRY_EPSILON,
-    ):
-        raise TerrainFeatureFactoryError(
-            "Terrain feature preset footprint must fit within its terrain area template."
-        )
 
 
 def _placed_terrain_wall_from_template(
@@ -234,7 +219,7 @@ def _placed_terrain_wall_from_template(
             placement=placement,
         ),
         area=area,
-        local_transform_anchor_x_inches=_local_transform_anchor_x(footprint_template),
+        footprint_template=footprint_template,
     )
     return TerrainWallDefinition(
         wall_id=wall.wall_id,
@@ -267,7 +252,7 @@ def _placed_terrain_floor_from_template(
             placement=placement,
         ),
         area=area,
-        local_transform_anchor_x_inches=_local_transform_anchor_x(footprint_template),
+        footprint_template=footprint_template,
     )
     return TerrainFloorDefinition(
         floor_id=floor.floor_id,
@@ -291,22 +276,18 @@ def _place_local_point(
     point: TerrainDisplayPoint,
     *,
     area: PlacedTerrainArea,
-    local_transform_anchor_x_inches: float,
+    footprint_template: TerrainAreaFootprintTemplate,
 ) -> TerrainDisplayPoint:
-    x_inches = point.x_inches
-    if area.local_transform is TerrainAreaLocalTransform.MIRROR_Y_AXIS:
-        x_inches = (2.0 * local_transform_anchor_x_inches) - x_inches
-    elif area.local_transform is not TerrainAreaLocalTransform.IDENTITY:
-        raise TerrainFeatureFactoryError(
-            "Unsupported terrain area local transform for feature placement."
+    try:
+        return transform_terrain_area_local_point(
+            point,
+            area=area,
+            template=footprint_template,
         )
-    radians = math.radians(area.rotation_degrees)
-    cosine = math.cos(radians)
-    sine = math.sin(radians)
-    return TerrainDisplayPoint(
-        x_inches=area.center_x_inches + (x_inches * cosine) - (point.y_inches * sine),
-        y_inches=area.center_y_inches + (x_inches * sine) + (point.y_inches * cosine),
-    )
+    except TerrainAreaError as exc:
+        raise TerrainFeatureFactoryError(
+            "Terrain feature placement area transform is invalid."
+        ) from exc
 
 
 def _place_local_rotation(
@@ -324,10 +305,6 @@ def _place_local_rotation(
             "Unsupported terrain area local transform for feature rotation."
         )
     return (area.rotation_degrees + local_rotation) % 360.0
-
-
-def _local_transform_anchor_x(footprint_template: TerrainAreaFootprintTemplate) -> float:
-    return footprint_template.polygon_vertices_inches[0].x_inches
 
 
 def _terrain_wall_from_template(wall: TerrainWallTemplate) -> TerrainWallDefinition:
