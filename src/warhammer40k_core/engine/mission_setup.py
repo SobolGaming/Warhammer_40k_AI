@@ -164,6 +164,10 @@ class MissionSetup:
         terrain_areas = _validate_terrain_areas(self.terrain_areas)
         features = _validate_terrain_features(self.terrain_features)
         objective_terrain_areas = _validate_objective_terrain_areas(self.objective_terrain_areas)
+        if self.battlefield_layout_id is None and (terrain_areas or objective_terrain_areas):
+            raise MissionSetupError(
+                "MissionSetup source-backed battlefield geometry requires battlefield_layout_id."
+            )
         _validate_markers_within_battlefield(
             markers=markers,
             width=self.battlefield_width_inches,
@@ -211,6 +215,7 @@ class MissionSetup:
             terrain_areas=tuple(
                 (
                     area.terrain_area_id,
+                    area.logical_terrain_area_id,
                     tuple((point.x_inches, point.y_inches) for point in area.footprint_polygon),
                 )
                 for area in terrain_areas
@@ -446,6 +451,51 @@ class MissionSetup:
                 for feature in payload["terrain_features"]
             ),
         )
+
+
+def validate_mission_setup_source_layout_identity(
+    mission_setup: MissionSetup,
+    *,
+    battlefield_layout: BattlefieldLayoutDefinition,
+    source_terrain_features: tuple[TerrainFeatureDefinition, ...],
+) -> None:
+    if type(mission_setup) is not MissionSetup:
+        raise MissionSetupError("Source-layout validation requires MissionSetup.")
+    if type(battlefield_layout) is not BattlefieldLayoutDefinition:
+        raise MissionSetupError("Source-layout validation requires BattlefieldLayoutDefinition.")
+    canonical_terrain_features = _validate_terrain_features(source_terrain_features)
+    actual_source_geometry = (
+        mission_setup.battlefield_layout_id,
+        mission_setup.deployment_map_id,
+        mission_setup.terrain_layout_id,
+        mission_setup.battlefield_width_inches,
+        mission_setup.battlefield_depth_inches,
+        mission_setup.objective_markers,
+        mission_setup.deployment_zones,
+        mission_setup.battlefield_regions,
+        mission_setup.terrain_areas,
+        mission_setup.objective_terrain_areas,
+        mission_setup.terrain_features,
+    )
+    canonical_source_geometry = (
+        battlefield_layout.battlefield_layout_id,
+        battlefield_layout.deployment_map_id,
+        battlefield_layout.terrain_layout_id,
+        battlefield_layout.battlefield_width_inches,
+        battlefield_layout.battlefield_depth_inches,
+        battlefield_layout.objective_markers,
+        _deployment_zones_for_players(
+            battlefield_layout.deployment_zones,
+            attacker_player_id=mission_setup.attacker_player_id,
+            defender_player_id=mission_setup.defender_player_id,
+        ),
+        battlefield_layout.battlefield_regions,
+        battlefield_layout.terrain_areas,
+        battlefield_layout.objective_terrain_areas,
+        canonical_terrain_features,
+    )
+    if actual_source_geometry != canonical_source_geometry:
+        raise MissionSetupError("MissionSetup battlefield geometry drifted from source layout.")
 
 
 def _placed_terrain_area_from_payload(

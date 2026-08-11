@@ -57,6 +57,25 @@ RAW_BYTE_HASHED_JSON_ARTIFACTS = (
     / "event_companion_layouts_2026_06"
     / "artifacts"
     / "event-companion-battlefields.json",
+    ROOT
+    / "data"
+    / "source_audits"
+    / "event_companion_2026_06"
+    / "phase17n_event_companion_battlefields_pages_9_53_extraction.json",
+    ROOT
+    / "data"
+    / "source_audits"
+    / "event_companion_2026_06"
+    / "phase17n_event_companion_stable_runtime_identity_map.json",
+    ROOT
+    / "src"
+    / "warhammer40k_core"
+    / "rules"
+    / "source_packages"
+    / "warhammer_40000_11th"
+    / "app_core_rules_hidden_2026_08_09"
+    / "artifacts"
+    / "hidden.json",
 )
 
 

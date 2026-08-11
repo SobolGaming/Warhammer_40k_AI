@@ -531,6 +531,28 @@ def test_phase16b_replay_restore_preserves_pending_redeploy_request() -> None:
     ) == PreBattleProposalRequest.from_decision_request_payload(request.payload)
 
 
+def test_phase16b_replay_restore_rejects_pending_redeploy_mission_setup_drift() -> None:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-intercessor-like-infantry": ("Infantry", "Battleline", "REDEPLOY")}
+    )
+    lifecycle, _request = _redeploy_placement_request(catalog)
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    decisions = cast(dict[str, JsonValue], payload["decisions"])
+    queue = cast(dict[str, JsonValue], decisions["queue"])
+    pending_requests = cast(list[JsonValue], queue["pending_requests"])
+    pending_request = cast(dict[str, JsonValue], pending_requests[0])
+    request_payload = cast(dict[str, JsonValue], pending_request["payload"])
+    proposal_request = cast(dict[str, JsonValue], request_payload["proposal_request"])
+    mission_setup = cast(dict[str, JsonValue], proposal_request["mission_setup"])
+    mission_setup["mission_pool_entry_id"] = "phase16b-drifted-mission-entry"
+
+    with pytest.raises(GameLifecycleError, match="mission_setup drifted from state"):
+        GameLifecycle.from_payload(payload)
+
+
 def test_phase16b_replay_restore_preserves_pending_scout_move_request() -> None:
     lifecycle, status = _advance_after_deployments(_scouts_config())
     request = _select_scout_move(lifecycle, _decision_request(status))

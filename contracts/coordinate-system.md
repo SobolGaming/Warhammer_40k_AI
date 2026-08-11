@@ -114,6 +114,17 @@ render the physical polygons and apply terrain-area rules to the logical group;
 the grouping participates in `authoritative_geometry_hash`. Shared logical
 identity does not fill or interpolate open board between disjoint physical
 polygons; containment and visibility use the physical polygon union. A logical
+terrain area is indivisible when linked to an objective: every
+`objective_terrain_areas[*].terrain_area_ids` entry that references one physical
+member must contain every physical member carrying that logical ID. Layout,
+mission-setup, create-session, replay, and objective-control validation reject
+partial membership before authoritative state is created or scored. A logical
+identity supplied by a client is not self-authenticating: source-backed setup
+geometry requires its `battlefield_layout_id` and is reconciled with the
+canonical mission-pack layout, so removing a member and relabelling the survivor
+as a singleton is also invalid. State-backed objective-control contexts must
+use the exact terrain-area inventory carried by their authoritative mission
+setup. A logical
 group with one known member classification retains it; differing known member
 classifications aggregate to `mixed`, and `unknown` cannot mix with a known
 classification. Objectives expose an inches-based world position and marker

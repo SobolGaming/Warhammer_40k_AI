@@ -1,8 +1,8 @@
 {
   "accepted": true,
   "checkpoint": {
-    "event_cursor": "l_2GQxVUWtfAJwU-lB5ut4MUdAEUZCNQnU-zn6mVDkky4rqWtGgXn7L9qHEUD-7E",
-    "projection_state_hash": "fe8b45a8e8b186516410c08add7fd64aef0aa476b9a2f48edeeadb9eb0378203",
+    "event_cursor": "T1SFNYF1inAfKX3mKE4Bd8u8uH2lr6y9ImDD71tvtNXOsMGaZaL3drBvnZ-PiUha",
+    "projection_state_hash": "869e66a71bd8c2f500c3e96d16eaf9f2ad24457e26ce94915bd732b6136488d7",
     "session_revision": 2,
     "viewer_player_id": null,
     "visibility_role": "administrator"
@@ -10,8 +10,8 @@
   "command_id": "phase18f-contract-command-000001",
   "committed": true,
   "event_range": {
-    "from_cursor": "57VZkXflOyLvjuZRwOeMQ7tyAgO02ktLBKZn3o6BvVbSSiIJUSJUcqt0x67pwNtd",
-    "to_cursor": "l_2GQxVUWtfAJwU-lB5ut4MUdAEUZCNQnU-zn6mVDkky4rqWtGgXn7L9qHEUD-7E"
+    "from_cursor": "G0BoHqhtswanfyMojVu1hLr1l7fsUJ-VvSzbhF60MzCHpn6dETeZywGqUnvWDxhX",
+    "to_cursor": "T1SFNYF1inAfKX3mKE4Bd8u8uH2lr6y9ImDD71tvtNXOsMGaZaL3drBvnZ-PiUha"
   },
   "operation": "close_session",
   "outcome_code": "command_committed",
@@ -21,7 +21,7 @@
     "created_at": "2026-07-18T20:00:00Z",
     "engine_build_id": "warhammer40k-core-v2:0.1.0",
     "engine_version": "0.1.0",
-    "event_cursor": "l_2GQxVUWtfAJwU-lB5ut4MUdAEUZCNQnU-zn6mVDkky4rqWtGgXn7L9qHEUD-7E",
+    "event_cursor": "T1SFNYF1inAfKX3mKE4Bd8u8uH2lr6y9ImDD71tvtNXOsMGaZaL3drBvnZ-PiUha",
     "game_id": "phase18e-contract-session",
     "last_activity_at": "2026-07-18T20:00:00Z",
     "lifecycle_status": {
@@ -33,9 +33,9 @@
       "stage": "setup",
       "status_kind": "waiting_for_decision"
     },
-    "projection_state_hash": "fe8b45a8e8b186516410c08add7fd64aef0aa476b9a2f48edeeadb9eb0378203",
+    "projection_state_hash": "869e66a71bd8c2f500c3e96d16eaf9f2ad24457e26ce94915bd732b6136488d7",
     "rules_overlay_ids": [],
-    "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
+    "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
     "ruleset_id": {
       "edition": "11e",
       "game": "warhammer_40000",

@@ -7613,13 +7613,21 @@ def _event_companion_mission_setup_with_scoring_terrain_feature(
     *,
     feature_id: str = SCORING_TERRAIN_FEATURE_ID,
 ) -> MissionSetup:
+    source_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-1",
+        terrain_layout_id="take-and-hold-vs-take-and-hold-layout-1",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
     return _with_scoring_terrain_feature(
-        MissionSetup.from_mission_pack(
-            mission_pack=warhammer_event_companion_2026_07_mission_pack(),
-            mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-1",
-            terrain_layout_id="take-and-hold-vs-take-and-hold-layout-1",
-            attacker_player_id="player-a",
-            defender_player_id="player-b",
+        replace(
+            source_setup,
+            battlefield_layout_id=None,
+            deployment_map_id="phase11e-custom-event-deployment-map",
+            terrain_layout_id="phase11e-custom-event-terrain-layout",
+            terrain_areas=(),
+            objective_terrain_areas=(),
         ),
         feature_id=feature_id,
     )

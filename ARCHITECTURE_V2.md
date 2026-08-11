@@ -4968,13 +4968,17 @@ extraction, package, and artifact hashes and rejects malformed, stale, or
 re-hashed coordinate drift.
 
 The reviewed page-8 key plus pages-9-53 layout extraction SHA-256 is
-`3c1e95bda2c2b35749bbc607128597a595e57aa608d0fe73ae82ef211e13e7ea`,
+`a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f`,
 the generated artifact SHA-256 is
-`ca4bc9ab7a25808b013c8d3095b29be058db807e854253c96b2451b2626df47d`,
+`88ba6d7390eab060d6b0c53eb60afbfb1a6813dd80715e3d42562dd0c89128d9`,
 and the canonical package hash is
-`d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd`.
+`e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924`.
 The generator pins the stable runtime identity map at
-`ca818fce9686d631e2302c34fc49fced96e1f462e4fe388fa6c4c1a87d667df3`.
+`742ab841d1ec1e696f4a5c0e3f2e8c251203d510bf1da85fb30af88023cb64f3`.
+Before emission it validates each extraction row's page identity, canonical
+force and mission display pairs, exact printed left-to-right order, and printed
+title. Runtime layout names preserve those validated source spellings and
+punctuation rather than reconstructing labels from slugs.
 
 Source terrain-area anchors and component battlefield centers use a 0.05-inch
 placement grid. Reviewed point symmetry, asymmetric local transforms, and

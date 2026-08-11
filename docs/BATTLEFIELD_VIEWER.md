@@ -84,13 +84,13 @@ downed hovercraft has no tall-crate companion. Every other layout has 30
 components.
 
 The canonical generated artifact has SHA-256
-`ca4bc9ab7a25808b013c8d3095b29be058db807e854253c96b2451b2626df47d`
+`88ba6d7390eab060d6b0c53eb60afbfb1a6813dd80715e3d42562dd0c89128d9`
 and package hash
-`d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd`.
+`e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924`.
 Its reviewed page-8 key plus pages-9-53 layout extraction has SHA-256
-`3c1e95bda2c2b35749bbc607128597a595e57aa608d0fe73ae82ef211e13e7ea`;
+`a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f`;
 the generator also pins the stable runtime identity map at
-`ca818fce9686d631e2302c34fc49fced96e1f462e4fe388fa6c4c1a87d667df3`.
+`742ab841d1ec1e696f4a5c0e3f2e8c251203d510bf1da85fb30af88023cb64f3`.
 
 All 224 layout-page contact glyphs are retained at 0.05-inch source precision
 and interpreted using the page-8 legend: 112 Single and 112 Separate. Final

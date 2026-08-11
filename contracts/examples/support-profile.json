@@ -1045,11 +1045,11 @@
         "identity_id": "warhammer40k-core-v2:0.1.0"
       },
       "mission_pack": {
-        "identity_hash": "1d3e32c590a807aee985e531668bb369a51c8252ab7ca733eebcd3556b37adf0",
-        "identity_id": "11e-chapter-approved-2026-27"
+        "identity_hash": "d18b76e4a954ff717e1db770bd76891833bd9b85d508751de79a470b70662931",
+        "identity_id": "11e-warhammer-event-companion-2026-07"
       },
       "ruleset": {
-        "identity_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
+        "identity_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
         "identity_id": "warhammer_40000:11e:core-v2-setup-prebattle-ui-smoke"
       },
       "source_packages": [
@@ -1059,14 +1059,14 @@
           "source_kind": "army_catalog"
         },
         {
-          "identity_hash": "47352dbc7a279cff3c56200f572492a9630edbdc188dc7b957dab382b1bf9c83",
-          "identity_id": "gw-11e-chapter-approved-2026-27",
+          "identity_hash": "4d2c24216668f731e18a92c48f265062fc4fe40ff1c2fb5d7376471787e1b415",
+          "identity_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
           "source_kind": "mission_pack"
         }
       ],
       "terrain_layout": {
-        "identity_hash": "a8b1e603663e55c70b39884d146bda07a4174432a1574dfc4cfc4555157bafa3",
-        "identity_id": "take-and-hold-vs-take-and-hold-layout-3"
+        "identity_hash": "069ba7d1ab12b554ccd751bc44c3b08be1b72efc5947d864751f03a8f3821614",
+        "identity_id": "take-and-hold-vs-purge-the-foe-layout-3"
       }
     },
     "interaction_kinds": [
@@ -1084,19 +1084,19 @@
       "roster_construction",
       "weapon_allocation_matrix"
     ],
-    "manifest_id": "capability-manifest:03f0223ef79a085d5c224b774bdb17f523aeda780810f4c412f93baab9bda952",
+    "manifest_id": "capability-manifest:88338f5124a6ac1b6b4fab38677cd277633d66ff72ae711629e73f3e4d0f9104",
     "mission_rows": [
       {
         "capabilities": [
           {
             "dimension": "LOADABLE",
             "evidence_refs": [
-              "gw-11e-chapter-approved-2026-27"
+              "gw-11e-warhammer-event-companion-v1-1-2026-07"
             ],
             "reason_code": null,
             "source_ids": [
-              "gw-11e-chapter-approved-2026-27",
-              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+              "gw-11e-warhammer-event-companion-v1-1-2026-07",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
             ],
             "status": "supported"
           },
@@ -1107,8 +1107,8 @@
             ],
             "reason_code": null,
             "source_ids": [
-              "gw-11e-chapter-approved-2026-27",
-              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+              "gw-11e-warhammer-event-companion-v1-1-2026-07",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
             ],
             "status": "supported"
           },
@@ -1117,65 +1117,65 @@
             "evidence_refs": [],
             "reason_code": "mission_musterable_not_applicable",
             "source_ids": [
-              "gw-11e-chapter-approved-2026-27",
-              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+              "gw-11e-warhammer-event-companion-v1-1-2026-07",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
             ],
             "status": "not_applicable"
           },
           {
             "dimension": "PHYSICALLY_PLAYABLE",
             "evidence_refs": [
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-north-center-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-north-center-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-north-center-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-south-center-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-south-center-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-south-center-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x2-east-midfield-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x2-north-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x2-south-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x2-west-midfield-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-central-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-central-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-central-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-central-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-north-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-north-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-south-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-south-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-north-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-north-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-north-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-north-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-south-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-south-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-south-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-south-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:8x11-5-polygon-central-north-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:8x11-5-polygon-central-north-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:8x11-5-polygon-central-south-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:8x11-5-polygon-central-south-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-              "mission-setup-sha256:d859705c758c9a60d0b98bdb778624bffec3a565b8f7f23af837a4d3df321438",
-              "take-and-hold-vs-take-and-hold-layout-3"
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-01-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-01-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-02-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-03-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-03-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-05-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-05-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-06-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-06-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-07-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-08-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-08-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-09-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-09-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-10-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-11-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-11-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-12-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-12-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-14-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-14-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-15-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+              "mission-setup-sha256:5f391f5950cebdd91aeca66570108c0d905d8e8246aa51e66295178952c7a7ac",
+              "take-and-hold-vs-purge-the-foe-layout-3"
             ],
             "reason_code": null,
             "source_ids": [
-              "gw-11e-chapter-approved-2026-27",
-              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+              "gw-11e-warhammer-event-companion-v1-1-2026-07",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
             ],
             "status": "supported"
           },
           {
             "dimension": "SEMANTICALLY_EXECUTABLE",
             "evidence_refs": [
-              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object",
-              "mission-setup-sha256:d859705c758c9a60d0b98bdb778624bffec3a565b8f7f23af837a4d3df321438",
-              "mission-source-package-hash:47352dbc7a279cff3c56200f572492a9630edbdc188dc7b957dab382b1bf9c83"
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object",
+              "mission-setup-sha256:5f391f5950cebdd91aeca66570108c0d905d8e8246aa51e66295178952c7a7ac",
+              "mission-source-package-hash:4d2c24216668f731e18a92c48f265062fc4fe40ff1c2fb5d7376471787e1b415"
             ],
             "reason_code": null,
             "source_ids": [
-              "gw-11e-chapter-approved-2026-27",
-              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+              "gw-11e-warhammer-event-companion-v1-1-2026-07",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
             ],
             "status": "supported"
           },
@@ -1184,8 +1184,8 @@
             "evidence_refs": [],
             "reason_code": "certified_full_game_evidence_missing",
             "source_ids": [
-              "gw-11e-chapter-approved-2026-27",
-              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+              "gw-11e-warhammer-event-companion-v1-1-2026-07",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
             ],
             "status": "unsupported"
           },
@@ -1196,8 +1196,8 @@
             ],
             "reason_code": null,
             "source_ids": [
-              "gw-11e-chapter-approved-2026-27",
-              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+              "gw-11e-warhammer-event-companion-v1-1-2026-07",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
             ],
             "status": "supported"
           },
@@ -1206,8 +1206,8 @@
             "evidence_refs": [],
             "reason_code": "certified_replay_evidence_missing",
             "source_ids": [
-              "gw-11e-chapter-approved-2026-27",
-              "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+              "gw-11e-warhammer-event-companion-v1-1-2026-07",
+              "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
             ],
             "status": "unsupported"
           }
@@ -1215,21 +1215,21 @@
         "display_name": "primary-immovable-object",
         "load_support": "engine_loaded",
         "metadata": {
-          "battlefield_layout_id": "take-and-hold-vs-take-and-hold-layout-3",
-          "mission_pack_id": "11e-chapter-approved-2026-27",
-          "mission_setup_hash": "d859705c758c9a60d0b98bdb778624bffec3a565b8f7f23af837a4d3df321438",
-          "mission_source_package_hash": "47352dbc7a279cff3c56200f572492a9630edbdc188dc7b957dab382b1bf9c83",
+          "battlefield_layout_id": "take-and-hold-vs-purge-the-foe-layout-3",
+          "mission_pack_id": "11e-warhammer-event-companion-2026-07",
+          "mission_setup_hash": "5f391f5950cebdd91aeca66570108c0d905d8e8246aa51e66295178952c7a7ac",
+          "mission_source_package_hash": "4d2c24216668f731e18a92c48f265062fc4fe40ff1c2fb5d7376471787e1b415",
           "primary_mission_id": "primary-immovable-object",
-          "terrain_layout_id": "take-and-hold-vs-take-and-hold-layout-3"
+          "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
         },
         "owner_id": "mission-take-and-hold-vs-purge-the-foe-layout-3",
         "player_id": null,
-        "row_id": "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+        "row_id": "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3",
         "row_kind": "mission",
         "semantic_execution": "executable",
         "source_ids": [
-          "gw-11e-chapter-approved-2026-27",
-          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+          "gw-11e-warhammer-event-companion-v1-1-2026-07",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
         ]
       }
     ],
@@ -1251,8 +1251,8 @@
           "geometry:player-a:army-alpha:scout-redeploy-unit:core-intercessor-like",
           "geometry:player-a:army-alpha:strategic-reserve-unit:core-vehicle-monster",
           "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
-          "gw-11e-chapter-approved-2026-27",
-          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07",
+          "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-a:army-alpha",
           "roster:player-b:army-beta",
           "rule:player-a:deep-strike-unit:ability:core-deep-strike",
@@ -1279,8 +1279,8 @@
           "datasheet:core-vehicle-monster:profile",
           "detachment:core-combined-arms",
           "faction:core-marine-force",
-          "gw-11e-chapter-approved-2026-27",
-          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+          "gw-11e-warhammer-event-companion-v1-1-2026-07",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
         ],
         "status": "unsupported"
       },
@@ -1305,7 +1305,7 @@
           "geometry:player-a:army-alpha:strategic-reserve-unit:core-vehicle-monster",
           "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
           "mission-setup:mission-take-and-hold-vs-purge-the-foe-layout-3",
-          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-a:army-alpha",
           "roster:player-b:army-beta",
           "rule:player-a:deep-strike-unit:ability:core-deep-strike",
@@ -1332,8 +1332,8 @@
           "datasheet:core-vehicle-monster:profile",
           "detachment:core-combined-arms",
           "faction:core-marine-force",
-          "gw-11e-chapter-approved-2026-27",
-          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+          "gw-11e-warhammer-event-companion-v1-1-2026-07",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
         ],
         "status": "supported"
       },
@@ -1373,43 +1373,43 @@
           "geometry:player-a:army-alpha:scout-redeploy-unit:core-intercessor-like",
           "geometry:player-a:army-alpha:strategic-reserve-unit:core-vehicle-monster",
           "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-north-center-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-north-center-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-north-center-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-south-center-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-south-center-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:10x2-5-south-center-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x2-east-midfield-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x2-north-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x2-south-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x2-west-midfield-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-central-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-central-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-central-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-central-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-north-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-north-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-south-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:6x4-south-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-north-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-north-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-north-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-north-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-south-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-south-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-south-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:7x11-5-south-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:8x11-5-polygon-central-north-west-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:8x11-5-polygon-central-north-west-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:8x11-5-polygon-central-south-east-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
-          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_take_and_hold_battlefield_dominance_layout_c:terrain-feature-placement:8x11-5-polygon-central-south-east-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-01-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-01-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-02-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-03-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-03-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-05-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-05-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-06-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-06-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-07-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-08-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-08-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-09-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-09-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-10-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-11-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-11-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-12-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-12-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-14-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-14-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-15-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
           "keyword:infantry_or_character",
           "keyword:monster_or_walker",
-          "mission-setup-sha256:d859705c758c9a60d0b98bdb778624bffec3a565b8f7f23af837a4d3df321438",
-          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "mission-setup-sha256:5f391f5950cebdd91aeca66570108c0d905d8e8246aa51e66295178952c7a7ac",
+          "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-a:army-alpha",
           "roster:player-b:army-beta",
-          "take-and-hold-vs-take-and-hold-layout-3",
+          "take-and-hold-vs-purge-the-foe-layout-3",
           "unit:player-a:deep-strike-unit",
           "unit:player-a:scout-redeploy-unit",
           "unit:player-a:strategic-reserve-unit",
@@ -1425,8 +1425,8 @@
           "datasheet:core-vehicle-monster:profile",
           "detachment:core-combined-arms",
           "faction:core-marine-force",
-          "gw-11e-chapter-approved-2026-27",
-          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+          "gw-11e-warhammer-event-companion-v1-1-2026-07",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
         ],
         "status": "unsupported"
       },
@@ -1438,10 +1438,10 @@
           "core-marine-force",
           "descriptor:movement:deep-strike-placement",
           "descriptor:reserve-declaration:deep-strike",
-          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object",
-          "mission-setup-sha256:d859705c758c9a60d0b98bdb778624bffec3a565b8f7f23af837a4d3df321438",
-          "mission-source-package-hash:47352dbc7a279cff3c56200f572492a9630edbdc188dc7b957dab382b1bf9c83",
-          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object",
+          "mission-setup-sha256:5f391f5950cebdd91aeca66570108c0d905d8e8246aa51e66295178952c7a7ac",
+          "mission-source-package-hash:4d2c24216668f731e18a92c48f265062fc4fe40ff1c2fb5d7376471787e1b415",
+          "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "phase9a-canonical/core-deep-strike-unit/core/core-deep-strike/none",
           "phase9a-canonical/core-intercessor-like-infantry/core/core-scouts/none",
           "roster:player-a:army-alpha",
@@ -1467,8 +1467,8 @@
           "datasheet:core-vehicle-monster",
           "detachment:core-combined-arms",
           "faction:core-marine-force",
-          "gw-11e-chapter-approved-2026-27",
-          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+          "gw-11e-warhammer-event-companion-v1-1-2026-07",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
         ],
         "status": "unsupported"
       },
@@ -1479,7 +1479,7 @@
           "geometry:player-a:army-alpha:scout-redeploy-unit:core-intercessor-like",
           "geometry:player-a:army-alpha:strategic-reserve-unit:core-vehicle-monster",
           "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
-          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-a:army-alpha",
           "roster:player-b:army-beta",
           "rule:player-a:deep-strike-unit:ability:core-deep-strike",
@@ -1506,8 +1506,8 @@
           "datasheet:core-vehicle-monster:profile",
           "detachment:core-combined-arms",
           "faction:core-marine-force",
-          "gw-11e-chapter-approved-2026-27",
-          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+          "gw-11e-warhammer-event-companion-v1-1-2026-07",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
         ],
         "status": "unsupported"
       },
@@ -1519,7 +1519,7 @@
           "geometry:player-a:army-alpha:scout-redeploy-unit:core-intercessor-like",
           "geometry:player-a:army-alpha:strategic-reserve-unit:core-vehicle-monster",
           "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
-          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-a:army-alpha",
           "roster:player-b:army-beta",
           "rule:player-a:deep-strike-unit:ability:core-deep-strike",
@@ -1546,8 +1546,8 @@
           "datasheet:core-vehicle-monster:profile",
           "detachment:core-combined-arms",
           "faction:core-marine-force",
-          "gw-11e-chapter-approved-2026-27",
-          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+          "gw-11e-warhammer-event-companion-v1-1-2026-07",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
         ],
         "status": "supported"
       },
@@ -1558,7 +1558,7 @@
           "geometry:player-a:army-alpha:scout-redeploy-unit:core-intercessor-like",
           "geometry:player-a:army-alpha:strategic-reserve-unit:core-vehicle-monster",
           "geometry:player-b:army-beta:scout-redeploy-unit:core-intercessor-like",
-          "mission:11e-chapter-approved-2026-27:mission-take-and-hold-vs-purge-the-foe-layout-3",
+          "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-a:army-alpha",
           "roster:player-b:army-beta",
           "rule:player-a:deep-strike-unit:ability:core-deep-strike",
@@ -1585,8 +1585,8 @@
           "datasheet:core-vehicle-monster:profile",
           "detachment:core-combined-arms",
           "faction:core-marine-force",
-          "gw-11e-chapter-approved-2026-27",
-          "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object"
+          "gw-11e-warhammer-event-companion-v1-1-2026-07",
+          "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object"
         ],
         "status": "unsupported"
       }
@@ -2686,7 +2686,7 @@
       }
     ],
     "schema_version": "capability-manifest-v1",
-    "selection_hash": "10f2bc829ebaff5487ec3ae017b9e76beccdf44c82ed0be584569dc2a0d9bd91",
+    "selection_hash": "08493c45be02a26cee746f0a192d312716f839815031fe83ea73aec5c70194af",
     "unit_rows": [
       {
         "capabilities": [
@@ -3835,7 +3835,7 @@
     }
   ],
   "overall_status": "unsupported",
-  "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
+  "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
   "schema_version": "support-profile-v3-interactions",
   "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0",
   "status_counts": {

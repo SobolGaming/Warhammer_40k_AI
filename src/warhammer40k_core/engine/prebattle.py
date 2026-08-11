@@ -476,7 +476,7 @@ class PreBattleProposalRequest:
     @classmethod
     def from_payload(cls, payload: PreBattleProposalRequestPayload) -> Self:
         raw_placement_kind = payload["placement_kind"]
-        return cls(
+        request = cls(
             request_id=payload["request_id"],
             decision_type=payload["decision_type"],
             actor_id=payload["actor_id"],
@@ -504,6 +504,13 @@ class PreBattleProposalRequest:
             scout_distance_inches=payload["scout_distance_inches"],
             context=payload["context"],
         )
+        if tuple(payload["deployment_zone_ids"]) != tuple(
+            zone.deployment_zone_id for zone in request.deployment_zones
+        ):
+            raise GameLifecycleError(
+                "PreBattleProposalRequest duplicated deployment zone IDs drifted."
+            )
+        return request
 
 
 @dataclass(frozen=True, slots=True)

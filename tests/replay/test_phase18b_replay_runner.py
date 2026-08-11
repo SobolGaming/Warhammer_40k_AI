@@ -87,7 +87,10 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import tacoma_open_2026
 
 pytestmark = pytest.mark.replay
@@ -152,6 +155,111 @@ def test_replay_v4_missing_phase17n_terrain_snapshot_fails_with_typed_error() ->
         match="missing required field: primary_unit_terrain_turn_start_snapshots",
     ):
         ReplayArtifact.from_payload(payload)
+
+
+@pytest.mark.parametrize("remove_and_relabel_member", [False, True])
+@pytest.mark.parametrize("mutation_target", ["config", "state"])
+def test_replay_v4_rejects_partial_logical_objective_bindings(
+    remove_and_relabel_member: bool,
+    mutation_target: str,
+) -> None:
+    payload, _event_setup = _event_layout_replay_payload()
+    lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
+    config_payload = cast(dict[str, JsonValue], lifecycle_payload["config"])
+    state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
+    mission_setup_payload = cast(
+        dict[str, JsonValue],
+        (config_payload if mutation_target == "config" else state_payload)["mission_setup"],
+    )
+    bindings = cast(list[JsonValue], mission_setup_payload["objective_terrain_areas"])
+    binding = next(
+        cast(dict[str, JsonValue], candidate)
+        for candidate in bindings
+        if len(cast(list[JsonValue], cast(dict[str, JsonValue], candidate)["terrain_area_ids"])) > 1
+    )
+    complete_ids = cast(list[JsonValue], binding["terrain_area_ids"])
+    retained_id = cast(str, complete_ids[-1])
+    binding["terrain_area_ids"] = [retained_id]
+    terrain_areas = cast(list[JsonValue], mission_setup_payload["terrain_areas"])
+    if remove_and_relabel_member:
+        terrain_areas[:] = [
+            candidate
+            for candidate in terrain_areas
+            if cast(dict[str, JsonValue], candidate)["terrain_area_id"] == retained_id
+            or cast(dict[str, JsonValue], candidate)["terrain_area_id"] not in complete_ids
+        ]
+        retained_area = next(
+            cast(dict[str, JsonValue], candidate)
+            for candidate in terrain_areas
+            if cast(dict[str, JsonValue], candidate)["terrain_area_id"] == retained_id
+        )
+        retained_area["logical_terrain_area_id"] = retained_id
+
+    with pytest.raises(ReplayArtifactError, match="lifecycle payload is invalid"):
+        ReplayArtifact.from_payload(payload)
+
+
+def test_replay_v4_rejects_runtime_battlefield_drift_from_source_layout() -> None:
+    payload, _event_setup = _event_layout_replay_payload()
+    lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
+    state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
+    battlefield_payload = cast(dict[str, JsonValue], state_payload["battlefield_state"])
+    terrain_features = cast(list[JsonValue], battlefield_payload["terrain_features"])
+    terrain_features.pop()
+
+    with pytest.raises(ReplayArtifactError, match="lifecycle payload is invalid") as exc_info:
+        ReplayArtifact.from_payload(payload)
+
+    assert isinstance(exc_info.value.__cause__, GameLifecycleError)
+    assert "battlefield runtime geometry drifted" in str(exc_info.value.__cause__)
+
+
+def test_replay_v4_rejects_state_mission_setup_drift_from_config() -> None:
+    payload = _artifact_payload_copy(_setup_to_battle_artifact())
+    lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
+    state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
+    state_payload["mission_setup"] = cast(
+        JsonValue,
+        MissionSetup.from_mission_pack(
+            mission_pack=chapter_approved_2026_27_mission_pack(),
+            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+            attacker_player_id="player-b",
+            defender_player_id="player-a",
+        ).to_payload(),
+    )
+
+    with pytest.raises(ReplayArtifactError, match="lifecycle payload is invalid") as exc_info:
+        ReplayArtifact.from_payload(payload)
+
+    assert isinstance(exc_info.value.__cause__, GameLifecycleError)
+    assert "state mission_setup does not match config" in str(exc_info.value.__cause__)
+
+
+def test_replay_v4_rejects_missing_state_mission_setup_with_config() -> None:
+    payload = _artifact_payload_copy(_setup_to_battle_artifact())
+    lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
+    state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
+    state_payload["mission_setup"] = None
+
+    with pytest.raises(ReplayArtifactError, match="lifecycle payload is invalid") as exc_info:
+        ReplayArtifact.from_payload(payload)
+
+    assert isinstance(exc_info.value.__cause__, GameLifecycleError)
+    assert "state mission_setup does not match config" in str(exc_info.value.__cause__)
+
+
+def test_replay_v4_rejects_source_linked_state_setup_missing_from_config() -> None:
+    payload, _event_setup = _event_layout_replay_payload()
+    lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
+    config_payload = cast(dict[str, JsonValue], lifecycle_payload["config"])
+    config_payload["mission_setup"] = None
+
+    with pytest.raises(ReplayArtifactError, match="lifecycle payload is invalid") as exc_info:
+        ReplayArtifact.from_payload(payload)
+
+    assert isinstance(exc_info.value.__cause__, GameLifecycleError)
+    assert "state mission_setup does not match config" in str(exc_info.value.__cause__)
 
 
 def test_replay_source_identity_verifies_active_rules_overlay() -> None:
@@ -864,6 +972,37 @@ def _artifact_payload_copy(artifact: ReplayArtifact) -> ReplayArtifactPayload:
         ReplayArtifactPayload,
         json.loads(json.dumps(artifact.to_payload(), sort_keys=True)),
     )
+
+
+def _event_layout_replay_payload() -> tuple[ReplayArtifactPayload, MissionSetup]:
+    layout_id = "take-and-hold-vs-take-and-hold-layout-2"
+    event_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id=f"mission-{layout_id}",
+        terrain_layout_id=layout_id,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    config = replace(
+        _setup_config(game_id="phase18b-event-layout-drift"),
+        ruleset_descriptor=(
+            RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
+                descriptor_version="core-v2-phase18b-event-layout-test"
+            )
+        ),
+        mission_setup=event_setup,
+    )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.advance_until_decision_or_terminal()
+    artifact = ReplayArtifact.capture(
+        artifact_id="phase18b-event-layout-drift",
+        initial_lifecycle_payload=_lifecycle_payload_copy(lifecycle),
+        final_lifecycle=lifecycle,
+    )
+    payload = _artifact_payload_copy(artifact)
+    assert ReplayArtifact.from_payload(payload).to_payload() == payload
+    return payload, event_setup
 
 
 def _mutate_unselected_option_label(

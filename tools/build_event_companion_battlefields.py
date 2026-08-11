@@ -19,6 +19,9 @@ from event_companion_battlefield_builder_catalog import (
     LAYOUT_CONFIG_BY_PAGE as _LAYOUT_CONFIG_BY_PAGE,
 )
 from event_companion_battlefield_builder_catalog import (
+    PRIMARY_MISSION_DISPLAY_NAME as _PRIMARY_MISSION_DISPLAY_NAME,
+)
+from event_companion_battlefield_builder_catalog import (
     REVIEWED_FIXED_COMPONENT_CENTERS as _REVIEWED_FIXED_COMPONENT_CENTERS,
 )
 from event_companion_battlefield_builder_catalog import (
@@ -41,8 +44,8 @@ ARTIFACT_SCHEMA = "core-v2-event-companion-full-battlefield-layouts-v1"
 SOURCE_PACKAGE_ID = "gw-11e-warhammer-event-companion-v1-1-2026-07"
 SOURCE_PDF_FILENAME = "eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf"
 SOURCE_PDF_SHA256 = "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20"
-EXPECTED_EXTRACTION_SHA256 = "3c1e95bda2c2b35749bbc607128597a595e57aa608d0fe73ae82ef211e13e7ea"
-EXPECTED_STABLE_IDENTITY_SHA256 = "ca818fce9686d631e2302c34fc49fced96e1f462e4fe388fa6c4c1a87d667df3"
+EXPECTED_EXTRACTION_SHA256 = "a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f"
+EXPECTED_STABLE_IDENTITY_SHA256 = "742ab841d1ec1e696f4a5c0e3f2e8c251203d510bf1da85fb30af88023cb64f3"
 _TERRAIN_GRID_INCHES = 0.05
 _GEOMETRY_TOLERANCE = 1e-6
 _PIPE_CENTER_SEARCH_STEPS = 2
@@ -83,6 +86,17 @@ class StableRuntimeIdentities:
 
     def objective_id(self, source_objective_id: str) -> str:
         return self.objective_id_by_source_id.get(source_objective_id, source_objective_id)
+
+
+@dataclass(frozen=True, slots=True)
+class SourceLayoutMetadata:
+    layout_id: str
+    force_pair: tuple[str, str]
+    missions: tuple[str, str]
+    template_number: int
+    variant: str
+    force_names: tuple[str, str]
+    mission_names: tuple[str, str]
 
 
 _MEATGRINDER_SOURCE_LAYOUT_IDS = {
@@ -1226,6 +1240,74 @@ def _objective_rows(
     return result
 
 
+def _source_string_pair(value: object, *, field_name: str) -> tuple[str, str]:
+    if (
+        type(value) is not list
+        or len(value) != 2
+        or any(type(item) is not str or not item.strip() for item in value)
+    ):
+        raise ValueError(f"Event Companion {field_name} must contain two names.")
+    return str(value[0]), str(value[1])
+
+
+def _source_layout_metadata(layout: dict[str, Any], *, source_page: int) -> SourceLayoutMetadata:
+    expected_layout_id, force_pair, missions, template_number = _LAYOUT_CONFIG_BY_PAGE[source_page]
+    variant = "ABC"[(source_page - 9) % 3]
+    force_names = _source_string_pair(
+        layout["force_disposition_pair"],
+        field_name="canonical force-disposition pair",
+    )
+    mission_names = _source_string_pair(
+        layout["primary_missions"],
+        field_name="canonical primary-mission pair",
+    )
+    if (
+        layout["layout_id"] != expected_layout_id
+        or layout["variant"] != variant.lower()
+        or layout["source_pdf_zero_based_page_index"] != source_page - 1
+        or force_names != tuple(_DISPLAY_NAME[force_id] for force_id in force_pair)
+        or mission_names
+        != tuple(_PRIMARY_MISSION_DISPLAY_NAME[mission_id] for mission_id in missions)
+    ):
+        raise ValueError("Event Companion canonical layout source metadata drifted.")
+    printed = layout["source_printed_left_to_right"]
+    if type(printed) is not dict or set(printed) != {
+        "force_dispositions",
+        "primary_missions",
+        "layout_label",
+    }:
+        raise ValueError("Event Companion printed layout source metadata drifted.")
+    printed_force_names = _source_string_pair(
+        printed["force_dispositions"],
+        field_name="printed force-disposition pair",
+    )
+    printed_mission_names = _source_string_pair(
+        printed["primary_missions"],
+        field_name="printed primary-mission pair",
+    )
+    printed_label = printed["layout_label"]
+    expected_printed_title = (
+        f"{printed_force_names[0]} vs {printed_force_names[1]} | "
+        f"{printed_mission_names[0]} / {printed_mission_names[1]} | {printed_label}"
+    )
+    if (
+        printed_force_names != force_names
+        or printed_mission_names != mission_names
+        or printed_label != f"Layout {variant}"
+        or layout["printed_title"] != expected_printed_title
+    ):
+        raise ValueError("Event Companion printed layout source metadata drifted.")
+    return SourceLayoutMetadata(
+        layout_id=expected_layout_id,
+        force_pair=force_pair,
+        missions=missions,
+        template_number=template_number,
+        variant=variant,
+        force_names=force_names,
+        mission_names=mission_names,
+    )
+
+
 def _layout_row(
     layout: dict[str, Any],
     *,
@@ -1234,7 +1316,8 @@ def _layout_row(
     identities: StableRuntimeIdentities,
 ) -> dict[str, Any]:
     source_page = int(layout["source_pdf_page_number"])
-    layout_id, force_pair, missions, template_number = _LAYOUT_CONFIG_BY_PAGE[source_page]
+    metadata = _source_layout_metadata(layout, source_page=source_page)
+    layout_id = metadata.layout_id
     solved_poses, _area_contact_pairs = solve_area_poses(
         layout,
         layout_id=layout_id,
@@ -1278,24 +1361,21 @@ def _layout_row(
     }
     zones, no_mans_land, territories, attacker_edge, defender_edge = region_rows(
         layout_id,
-        template_number,
-    )
-    variant = "ABC"[(source_page - 9) % 3]
-    mission_names = tuple(
-        mission.removeprefix("primary-").replace("-", " ").title() for mission in missions
+        metadata.template_number,
     )
     return {
         "layout_id": layout_id,
-        "layout_letter": variant,
+        "layout_letter": metadata.variant,
         "name": (
-            f"{_DISPLAY_NAME[force_pair[0]]} vs {_DISPLAY_NAME[force_pair[1]]} - "
-            f"{mission_names[0]} / {mission_names[1]} - Layout {variant}"
+            f"{metadata.force_names[0]} vs {metadata.force_names[1]} - "
+            f"{metadata.mission_names[0]} / {metadata.mission_names[1]} - "
+            f"Layout {metadata.variant}"
         ),
         "source_layout_id": identities.source_layout_id(layout_id),
         "source_page": source_page,
-        "force_disposition_pair": list(force_pair),
-        "primary_missions": list(missions),
-        "deployment_zone_template_number": template_number,
+        "force_disposition_pair": list(metadata.force_pair),
+        "primary_missions": list(metadata.missions),
+        "deployment_zone_template_number": metadata.template_number,
         "attacker_edge": attacker_edge,
         "defender_edge": defender_edge,
         "terrain_areas": area_rows,

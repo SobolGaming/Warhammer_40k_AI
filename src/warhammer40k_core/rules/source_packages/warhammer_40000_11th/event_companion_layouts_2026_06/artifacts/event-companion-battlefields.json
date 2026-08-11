@@ -51,7 +51,7 @@
     52,
     53
   ],
-  "source_extraction_payload_sha256": "3c1e95bda2c2b35749bbc607128597a595e57aa608d0fe73ae82ef211e13e7ea",
+  "source_extraction_payload_sha256": "a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f",
   "source_coordinate_frame": {
     "pdf_background_image_xref": 5490,
     "pdf_background_image_sha256": "2eda9e45dadd328907dba59ca1f6630e816571e2bcfc20b1f5bf97f0c8b8772a",
@@ -21657,7 +21657,7 @@
     {
       "layout_id": "take-and-hold-vs-reconnaissance-layout-1",
       "layout_letter": "A",
-      "name": "Take and Hold vs Reconnaissance - Purge And Secure / Reconnaissance Sweep - Layout A",
+      "name": "Take and Hold vs Reconnaissance - Purge and Secure / Reconnaissance Sweep - Layout A",
       "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_reconnaissance_layout_1",
       "source_page": 18,
       "force_disposition_pair": [
@@ -23931,7 +23931,7 @@
     {
       "layout_id": "take-and-hold-vs-reconnaissance-layout-2",
       "layout_letter": "B",
-      "name": "Take and Hold vs Reconnaissance - Purge And Secure / Reconnaissance Sweep - Layout B",
+      "name": "Take and Hold vs Reconnaissance - Purge and Secure / Reconnaissance Sweep - Layout B",
       "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_reconnaissance_layout_2",
       "source_page": 19,
       "force_disposition_pair": [
@@ -26123,7 +26123,7 @@
     {
       "layout_id": "take-and-hold-vs-reconnaissance-layout-3",
       "layout_letter": "C",
-      "name": "Take and Hold vs Reconnaissance - Purge And Secure / Reconnaissance Sweep - Layout C",
+      "name": "Take and Hold vs Reconnaissance - Purge and Secure / Reconnaissance Sweep - Layout C",
       "source_layout_id": "gw_event_companion_v1_take_and_hold_vs_reconnaissance_layout_3",
       "source_page": 20,
       "force_disposition_pair": [
@@ -55449,7 +55449,7 @@
     {
       "layout_id": "purge-the-foe-vs-priority-assets-layout-1",
       "layout_letter": "A",
-      "name": "Purge the Foe vs Priority Assets - Destroyers Wrath / Vital Link - Layout A",
+      "name": "Purge the Foe vs Priority Assets - Destroyer's Wrath / Vital Link - Layout A",
       "source_layout_id": "gw_event_companion_v1_purge_the_foe_vs_priority_assets_layout_1",
       "source_page": 33,
       "force_disposition_pair": [
@@ -57623,7 +57623,7 @@
     {
       "layout_id": "purge-the-foe-vs-priority-assets-layout-2",
       "layout_letter": "B",
-      "name": "Purge the Foe vs Priority Assets - Destroyers Wrath / Vital Link - Layout B",
+      "name": "Purge the Foe vs Priority Assets - Destroyer's Wrath / Vital Link - Layout B",
       "source_layout_id": "gw_event_companion_v1_purge_the_foe_vs_priority_assets_layout_2",
       "source_page": 34,
       "force_disposition_pair": [
@@ -60087,7 +60087,7 @@
     {
       "layout_id": "purge-the-foe-vs-priority-assets-layout-3",
       "layout_letter": "C",
-      "name": "Purge the Foe vs Priority Assets - Destroyers Wrath / Vital Link - Layout C",
+      "name": "Purge the Foe vs Priority Assets - Destroyer's Wrath / Vital Link - Layout C",
       "source_layout_id": "gw_event_companion_v1_purge_the_foe_vs_priority_assets_layout_3",
       "source_page": 35,
       "force_disposition_pair": [
@@ -62261,7 +62261,7 @@
     {
       "layout_id": "disruption-vs-disruption-layout-1",
       "layout_letter": "A",
-      "name": "Disruption vs Disruption - Outmaneuver / Outmaneuver - Layout A",
+      "name": "Disruption vs Disruption - Outmanoeuvre / Outmanoeuvre - Layout A",
       "source_layout_id": "gw_event_companion_v1_disruption_vs_disruption_layout_1",
       "source_page": 36,
       "force_disposition_pair": [
@@ -64482,7 +64482,7 @@
     {
       "layout_id": "disruption-vs-disruption-layout-2",
       "layout_letter": "B",
-      "name": "Disruption vs Disruption - Outmaneuver / Outmaneuver - Layout B",
+      "name": "Disruption vs Disruption - Outmanoeuvre / Outmanoeuvre - Layout B",
       "source_layout_id": "gw_event_companion_v1_disruption_vs_disruption_layout_2",
       "source_page": 37,
       "force_disposition_pair": [
@@ -66701,7 +66701,7 @@
     {
       "layout_id": "disruption-vs-disruption-layout-3",
       "layout_letter": "C",
-      "name": "Disruption vs Disruption - Outmaneuver / Outmaneuver - Layout C",
+      "name": "Disruption vs Disruption - Outmanoeuvre / Outmanoeuvre - Layout C",
       "source_layout_id": "gw_event_companion_v1_disruption_vs_disruption_layout_3",
       "source_page": 38,
       "force_disposition_pair": [
@@ -68978,7 +68978,7 @@
     {
       "layout_id": "disruption-vs-reconnaissance-layout-1",
       "layout_letter": "A",
-      "name": "Disruption vs Reconnaissance - Smoke And Mirrors / Surveil The Foe - Layout A",
+      "name": "Disruption vs Reconnaissance - Smoke and Mirrors / Surveil the Foe - Layout A",
       "source_layout_id": "gw_event_companion_v1_disruption_vs_reconnaissance_smoke_and_mirrors_surveil_the_foe_layout_a",
       "source_page": 39,
       "force_disposition_pair": [
@@ -71238,7 +71238,7 @@
     {
       "layout_id": "disruption-vs-reconnaissance-layout-2",
       "layout_letter": "B",
-      "name": "Disruption vs Reconnaissance - Smoke And Mirrors / Surveil The Foe - Layout B",
+      "name": "Disruption vs Reconnaissance - Smoke and Mirrors / Surveil the Foe - Layout B",
       "source_layout_id": "gw_event_companion_v1_disruption_vs_reconnaissance_smoke_and_mirrors_surveil_the_foe_layout_b",
       "source_page": 40,
       "force_disposition_pair": [
@@ -73416,7 +73416,7 @@
     {
       "layout_id": "disruption-vs-reconnaissance-layout-3",
       "layout_letter": "C",
-      "name": "Disruption vs Reconnaissance - Smoke And Mirrors / Surveil The Foe - Layout C",
+      "name": "Disruption vs Reconnaissance - Smoke and Mirrors / Surveil the Foe - Layout C",
       "source_layout_id": "gw_event_companion_v1_disruption_vs_reconnaissance_smoke_and_mirrors_surveil_the_foe_layout_c",
       "source_page": 41,
       "force_disposition_pair": [
@@ -75930,7 +75930,7 @@
     {
       "layout_id": "disruption-vs-priority-assets-layout-1",
       "layout_letter": "A",
-      "name": "Disruption vs Priority Assets - Locate And Deny / Extract Relic - Layout A",
+      "name": "Disruption vs Priority Assets - Locate and Deny / Extract Relic - Layout A",
       "source_layout_id": "gw_event_companion_v1_disruption_vs_priority_assets_layout_1",
       "source_page": 42,
       "force_disposition_pair": [
@@ -78095,7 +78095,7 @@
     {
       "layout_id": "disruption-vs-priority-assets-layout-2",
       "layout_letter": "B",
-      "name": "Disruption vs Priority Assets - Locate And Deny / Extract Relic - Layout B",
+      "name": "Disruption vs Priority Assets - Locate and Deny / Extract Relic - Layout B",
       "source_layout_id": "gw_event_companion_v1_disruption_vs_priority_assets_layout_2",
       "source_page": 43,
       "force_disposition_pair": [
@@ -80318,7 +80318,7 @@
     {
       "layout_id": "disruption-vs-priority-assets-layout-3",
       "layout_letter": "C",
-      "name": "Disruption vs Priority Assets - Locate And Deny / Extract Relic - Layout C",
+      "name": "Disruption vs Priority Assets - Locate and Deny / Extract Relic - Layout C",
       "source_layout_id": "gw_event_companion_v1_disruption_vs_priority_assets_layout_3",
       "source_page": 44,
       "force_disposition_pair": [
@@ -89506,7 +89506,7 @@
     {
       "layout_id": "reconnaissance-vs-priority-assets-layout-1",
       "layout_letter": "A",
-      "name": "Reconnaissance vs Priority Assets - Search And Scour / Vanguard Operation - Layout A",
+      "name": "Reconnaissance vs Priority Assets - Search and Scour / Vanguard Operation - Layout A",
       "source_layout_id": "gw_event_companion_v1_reconnaissance_vs_priority_assets_layout_1",
       "source_page": 48,
       "force_disposition_pair": [
@@ -91727,7 +91727,7 @@
     {
       "layout_id": "reconnaissance-vs-priority-assets-layout-2",
       "layout_letter": "B",
-      "name": "Reconnaissance vs Priority Assets - Search And Scour / Vanguard Operation - Layout B",
+      "name": "Reconnaissance vs Priority Assets - Search and Scour / Vanguard Operation - Layout B",
       "source_layout_id": "gw_event_companion_v1_reconnaissance_vs_priority_assets_layout_2",
       "source_page": 49,
       "force_disposition_pair": [
@@ -93946,7 +93946,7 @@
     {
       "layout_id": "reconnaissance-vs-priority-assets-layout-3",
       "layout_letter": "C",
-      "name": "Reconnaissance vs Priority Assets - Search And Scour / Vanguard Operation - Layout C",
+      "name": "Reconnaissance vs Priority Assets - Search and Scour / Vanguard Operation - Layout C",
       "source_layout_id": "gw_event_companion_v1_reconnaissance_vs_priority_assets_layout_3",
       "source_page": 50,
       "force_disposition_pair": [
@@ -102711,5 +102711,5 @@
       ]
     }
   ],
-  "package_hash": "d86c35071d609017597524c43bccd12145ddf845bf3ec1abf14a750eecef20bd"
+  "package_hash": "e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924"
 }

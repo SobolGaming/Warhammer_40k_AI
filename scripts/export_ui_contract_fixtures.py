@@ -1003,7 +1003,7 @@ def _config(*, game_id: str) -> GameConfig:
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
             descriptor_version="core-v2-ui-contract-fixtures"
         ),
         army_catalog=catalog,

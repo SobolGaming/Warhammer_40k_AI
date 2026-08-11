@@ -1571,6 +1571,12 @@ def _bloodcrushers_cavalcade_config_with_traversal_ruins() -> GameConfig:
         model_geometries=source_package.model_geometries,
         mission_setup=replace(
             mission_setup,
+            battlefield_layout_id=None,
+            deployment_map_id="phase17g-cavalcade-map",
+            terrain_layout_id="phase17g-cavalcade-layout",
+            battlefield_regions=(),
+            terrain_areas=(),
+            objective_terrain_areas=(),
             terrain_features=(ruins,),
         ),
     )
@@ -1921,12 +1927,12 @@ def _exact_phase17n_warp_riders_ruin(
 
 
 def _warp_riders_traversal_ruin_from_state(state: GameState) -> TerrainFeatureDefinition:
-    mission_setup = state.mission_setup
-    if mission_setup is None:
-        raise AssertionError("Warp Riders traversal test requires mission setup")
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise AssertionError("Warp Riders traversal test requires battlefield state")
     ruins = tuple(
         feature
-        for feature in mission_setup.terrain_features
+        for feature in battlefield_state.terrain_features
         if feature.feature_kind is TerrainFeatureKind.RUINS
     )
     if len(ruins) != 1:

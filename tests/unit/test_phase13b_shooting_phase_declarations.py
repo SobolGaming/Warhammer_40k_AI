@@ -1411,6 +1411,8 @@ def test_phase17n_attached_ranged_history_follows_split_descendants_without_sibl
         armies=tuple(state.army_definitions),
         battlefield_state=replace(
             state.battlefield_state,
+            battlefield_width_inches=setup.battlefield_width_inches,
+            battlefield_depth_inches=setup.battlefield_depth_inches,
             terrain_features=setup.terrain_features,
         ),
     )

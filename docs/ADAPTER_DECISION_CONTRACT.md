@@ -2796,9 +2796,16 @@ entry links one objective marker ID and role to one or more `terrain_area_ids`.
 Multiple terrain area IDs on one entry represent a single composite objective
 made from bordered footprint polygons. Adapters should render those linked
 terrain areas as the objective footprint and treat the objective marker as
-stable objective identity/label metadata. Adapters must not infer objective
-terrain, light/dense terrain traits, or terrain-feature rules from footprint
-colors, terrain area IDs, template IDs, or `source_id` strings.
+stable objective identity/label metadata. Adapters must submit complete logical
+membership: referencing any physical terrain area requires listing every
+mission-setup terrain area with the same `logical_terrain_area_id`. Layout,
+mission-setup, Contract 6 create, replay, and objective-control validation
+reject partial logical groups. Removing a physical member, relabelling the
+survivor, or clearing `battlefield_layout_id` does not bypass the canonical
+source-layout reconciliation. Replay state must retain the same mission setup
+as its validated config snapshot. Adapters must not infer objective terrain,
+light/dense terrain traits, or terrain-feature rules from footprint colors,
+terrain area IDs, template IDs, or `source_id` strings.
 
 Terrain features, when present, expose first-class display geometry under
 `GameViewPayload.mission_setup.terrain_features[*].display_geometry`. The

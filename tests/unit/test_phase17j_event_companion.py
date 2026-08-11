@@ -37,11 +37,12 @@ from warhammer40k_core.core.terrain_areas import (
     TerrainAreaLocalTransform,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
-from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mission_setup import MissionSetup, MissionSetupError
 from warhammer40k_core.engine.missions import (
     deterministic_tactical_secondary_draw,
     mission_pack_for_id,
     mission_scoring_policy_from_setup,
+    validate_mission_setup_source_layout,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.scoring import (
@@ -1002,6 +1003,59 @@ def test_phase17n_all_layout_geometry_closes_declared_seams_and_region_holes() -
     assert checked_component_containment == 1_349
     assert checked_objective_bindings == 264
     assert len(logical_terrain_area_ids) == 608
+
+
+def test_phase17n_runtime_layout_names_preserve_canonical_source_metadata() -> None:
+    repository_root = Path(__file__).resolve().parents[2]
+    extraction = json.loads(
+        (
+            repository_root
+            / "data/source_audits/event_companion_2026_06"
+            / "phase17n_event_companion_battlefields_pages_9_53_extraction.json"
+        ).read_text(encoding="utf-8")
+    )
+    artifact_layouts = {
+        layout.layout_id: layout for layout in event_layouts.battlefield_artifact().layouts
+    }
+    runtime_layouts = event_layouts.BATTLEFIELD_LAYOUTS_BY_ID
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    expected_names_by_id: dict[str, str] = {}
+
+    for source_layout in extraction["layouts"]:
+        layout_id = source_layout["layout_id"]
+        variant = source_layout["variant"].upper()
+        force_names = tuple(source_layout["force_disposition_pair"])
+        mission_names = tuple(source_layout["primary_missions"])
+        printed_metadata = source_layout["source_printed_left_to_right"]
+        printed_force_names = tuple(printed_metadata["force_dispositions"])
+        printed_mission_names = tuple(printed_metadata["primary_missions"])
+        printed_label = printed_metadata["layout_label"]
+
+        assert printed_force_names == force_names
+        assert printed_mission_names == mission_names
+        assert printed_label == f"Layout {variant}"
+        assert source_layout["printed_title"] == (
+            f"{printed_force_names[0]} vs {printed_force_names[1]} | "
+            f"{printed_mission_names[0]} / {printed_mission_names[1]} | "
+            f"{printed_label}"
+        )
+
+        expected_name = (
+            f"{force_names[0]} vs {force_names[1]} - "
+            f"{mission_names[0]} / {mission_names[1]} - "
+            f"Layout {variant}"
+        )
+        expected_names_by_id[layout_id] = expected_name
+        assert artifact_layouts[layout_id].name == expected_name
+        assert runtime_layouts[layout_id].name == expected_name
+        assert mission_pack.battlefield_layout(layout_id).name == expected_name
+
+    assert expected_names_by_id["purge-the-foe-vs-priority-assets-layout-1"] == (
+        "Purge the Foe vs Priority Assets - Destroyer's Wrath / Vital Link - Layout A"
+    )
+    assert expected_names_by_id["disruption-vs-disruption-layout-1"] == (
+        "Disruption vs Disruption - Outmanoeuvre / Outmanoeuvre - Layout A"
+    )
 
 
 def test_phase17n_full_artifact_preserves_all_source_extraction_records() -> None:
@@ -3096,6 +3150,166 @@ def test_phase17j_mission_setup_components_resolve_matching_battlefield_layout(
         (binding.objective_marker_id, binding.terrain_area_ids)
         for binding in layout.objective_terrain_areas
     }
+
+
+def test_phase17n_objective_bindings_require_complete_logical_terrain_areas() -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    layout_id = "take-and-hold-vs-take-and-hold-layout-2"
+    layout = mission_pack.battlefield_layout(layout_id)
+    complete_binding = next(
+        binding for binding in layout.objective_terrain_areas if len(binding.terrain_area_ids) > 1
+    )
+    partial_binding = replace(
+        complete_binding,
+        terrain_area_ids=complete_binding.terrain_area_ids[1:],
+    )
+    partial_layout_bindings = tuple(
+        partial_binding if binding == complete_binding else binding
+        for binding in layout.objective_terrain_areas
+    )
+
+    with pytest.raises(MissionPackError, match="every physical member"):
+        replace(layout, objective_terrain_areas=partial_layout_bindings)
+
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id=f"mission-{layout_id}",
+        attacker_player_id="player-alpha",
+        defender_player_id="player-beta",
+    )
+    with pytest.raises(MissionSetupError, match="every physical member"):
+        replace(
+            setup,
+            objective_terrain_areas=tuple(
+                partial_binding if binding == complete_binding else binding
+                for binding in setup.objective_terrain_areas
+            ),
+        )
+
+    retained_area_id = complete_binding.terrain_area_ids[-1]
+    relabelled_setup = replace(
+        setup,
+        terrain_areas=tuple(
+            replace(area, logical_terrain_area_id=retained_area_id)
+            if area.terrain_area_id == retained_area_id
+            else area
+            for area in setup.terrain_areas
+            if area.terrain_area_id not in complete_binding.terrain_area_ids[:-1]
+        ),
+        objective_terrain_areas=tuple(
+            replace(binding, terrain_area_ids=(retained_area_id,))
+            if binding.objective_marker_id == complete_binding.objective_marker_id
+            else binding
+            for binding in setup.objective_terrain_areas
+        ),
+    )
+    with pytest.raises(MissionSetupError, match="battlefield geometry drifted from source"):
+        validate_mission_setup_source_layout(relabelled_setup)
+
+    with pytest.raises(MissionSetupError, match="requires battlefield_layout_id"):
+        replace(setup, battlefield_layout_id=None)
+
+    layoutless_source_components = replace(
+        setup,
+        battlefield_layout_id=None,
+        battlefield_regions=(),
+        terrain_areas=(),
+        terrain_features=(),
+        objective_terrain_areas=(),
+    )
+    with pytest.raises(GameLifecycleError, match="component identities require"):
+        validate_mission_setup_source_layout(layoutless_source_components)
+
+    with pytest.raises(GameLifecycleError, match="primary mission drifted"):
+        validate_mission_setup_source_layout(
+            replace(setup, primary_mission_id="primary-meatgrinder")
+        )
+
+    bound_area_ids = {
+        terrain_area_id
+        for binding in setup.objective_terrain_areas
+        for terrain_area_id in binding.terrain_area_ids
+    }
+    unbound_area = next(
+        area for area in setup.terrain_areas if area.terrain_area_id not in bound_area_ids
+    )
+    x_shift = 0.05 if unbound_area.center_x_inches < 22.0 else -0.05
+    shifted_area = replace(
+        unbound_area,
+        center_x_inches=unbound_area.center_x_inches + x_shift,
+        footprint_polygon=tuple(
+            replace(point, x_inches=point.x_inches + x_shift)
+            for point in unbound_area.footprint_polygon
+        ),
+    )
+    shifted_setup = replace(
+        setup,
+        terrain_areas=tuple(
+            shifted_area if area == unbound_area else area for area in setup.terrain_areas
+        ),
+    )
+    with pytest.raises(MissionSetupError, match="battlefield geometry drifted from source"):
+        validate_mission_setup_source_layout(shifted_setup)
+
+    with pytest.raises(MissionSetupError, match="battlefield geometry drifted from source"):
+        validate_mission_setup_source_layout(replace(setup, terrain_features=()))
+
+    canonical_feature = setup.terrain_features[0]
+    custom_setup = replace(
+        setup,
+        battlefield_layout_id=None,
+        deployment_map_id="custom-event-companion-deployment-map",
+        terrain_layout_id="custom-event-companion-terrain-layout",
+        terrain_areas=(),
+        objective_terrain_areas=(),
+        terrain_features=(canonical_feature,),
+    )
+    validate_mission_setup_source_layout(custom_setup)
+    validate_mission_setup_source_layout(
+        replace(custom_setup, primary_mission_id="primary-meatgrinder")
+    )
+
+    with pytest.raises(GameLifecycleError, match="canonical battlefield region identity drifted"):
+        validate_mission_setup_source_layout(
+            replace(
+                custom_setup,
+                battlefield_regions=(
+                    replace(
+                        custom_setup.battlefield_regions[0],
+                        source_id="test:drifted-event-companion-region",
+                    ),
+                    *custom_setup.battlefield_regions[1:],
+                ),
+            )
+        )
+
+    with pytest.raises(GameLifecycleError, match="canonical terrain feature identity drifted"):
+        validate_mission_setup_source_layout(
+            replace(
+                custom_setup,
+                terrain_features=(
+                    replace(
+                        canonical_feature,
+                        classification=TerrainAreaClassification.UNKNOWN,
+                    ),
+                ),
+            )
+        )
+
+    with pytest.raises(GameLifecycleError, match="must not reuse source-backed provenance"):
+        validate_mission_setup_source_layout(
+            replace(
+                custom_setup,
+                terrain_features=(
+                    replace(
+                        canonical_feature,
+                        feature_id="custom-event-companion-feature",
+                        classification=TerrainAreaClassification.UNKNOWN,
+                        source_id=mission_pack.terrain_feature_presets[0].source_id,
+                    ),
+                ),
+            )
+        )
 
 
 def test_phase17j_objective_role_payload_is_required() -> None:

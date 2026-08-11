@@ -3,12 +3,19 @@ from __future__ import annotations
 from typing import cast
 
 from warhammer40k_core.core.missions import ObjectiveTerrainAreaDefinition
+from warhammer40k_core.core.objective_terrain_area_references import (
+    validate_objective_terrain_area_membership,
+)
 from warhammer40k_core.core.objectives import Objective, ObjectiveAnchorKind, ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
     TerrainObjectiveControlPolicy,
 )
-from warhammer40k_core.core.terrain_areas import PlacedTerrainArea
+from warhammer40k_core.core.terrain_areas import (
+    PlacedTerrainArea,
+    TerrainAreaError,
+    validate_placed_terrain_area_logical_groups,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
@@ -41,21 +48,7 @@ def resolve_objective_control_sources(
             "Explicit terrain_objectives and source-linked objective_terrain_areas are "
             "mutually exclusive."
         )
-    if terrain_objectives or ruleset_descriptor is None:
-        return markers, terrain_objectives, ()
-    if type(ruleset_descriptor) is not RulesetDescriptor:
-        raise GameLifecycleError("ruleset_descriptor must be a RulesetDescriptor.")
-    if not ruleset_descriptor.mission_policy.terrain_objective_missions_supported:
-        return markers, terrain_objectives, ()
-    if (
-        ObjectiveAnchorKind.TERRAIN
-        not in ruleset_descriptor.objective_policy.supported_anchor_kinds
-    ):
-        return markers, terrain_objectives, ()
-    if (
-        ruleset_descriptor.objective_policy.terrain_objective_control_policy
-        is TerrainObjectiveControlPolicy.UNSUPPORTED
-    ):
+    if terrain_objectives or not source_linked_terrain_objectives_supported(ruleset_descriptor):
         return markers, terrain_objectives, ()
     links_by_marker_id = {
         definition.objective_marker_id: definition for definition in linked_objectives
@@ -100,6 +93,22 @@ def resolve_objective_control_sources(
     )
 
 
+def source_linked_terrain_objectives_supported(
+    ruleset_descriptor: RulesetDescriptor | None,
+) -> bool:
+    if ruleset_descriptor is None:
+        return False
+    if type(ruleset_descriptor) is not RulesetDescriptor:
+        raise GameLifecycleError("ruleset_descriptor must be a RulesetDescriptor.")
+    return (
+        ruleset_descriptor.mission_policy.terrain_objective_missions_supported
+        and ObjectiveAnchorKind.TERRAIN
+        in ruleset_descriptor.objective_policy.supported_anchor_kinds
+        and ruleset_descriptor.objective_policy.terrain_objective_control_policy
+        is not TerrainObjectiveControlPolicy.UNSUPPORTED
+    )
+
+
 def validate_objective_control_source_references(
     *,
     objective_markers: tuple[ObjectiveMarker, ...],
@@ -108,6 +117,11 @@ def validate_objective_control_source_references(
     objective_terrain_area_markers: tuple[ObjectiveMarker, ...],
     terrain_areas: tuple[PlacedTerrainArea, ...],
 ) -> None:
+    if terrain_objectives and objective_terrain_areas:
+        raise GameLifecycleError(
+            "Explicit terrain_objectives and source-linked objective_terrain_areas are "
+            "mutually exclusive."
+        )
     point_ids = {marker.objective_marker_id for marker in objective_markers}
     explicit_ids = {objective.objective_id for objective in terrain_objectives}
     linked_ids = {definition.objective_marker_id for definition in objective_terrain_areas}
@@ -120,15 +134,21 @@ def validate_objective_control_source_references(
             "objective markers."
         )
     terrain_areas_by_id = {area.terrain_area_id: area for area in terrain_areas}
+    validate_objective_terrain_area_membership(
+        context_name="ObjectiveControlContext",
+        objective_terrain_areas=tuple(
+            (definition.objective_marker_id, definition.terrain_area_ids)
+            for definition in objective_terrain_areas
+        ),
+        terrain_areas=tuple(
+            (area.terrain_area_id, area.logical_terrain_area_id) for area in terrain_areas
+        ),
+        error_factory=GameLifecycleError,
+    )
     markers_by_id = {
         marker.objective_marker_id: marker for marker in objective_terrain_area_markers
     }
     for definition in objective_terrain_areas:
-        if any(area_id not in terrain_areas_by_id for area_id in definition.terrain_area_ids):
-            raise GameLifecycleError(
-                "ObjectiveControlContext objective_terrain_areas references an unknown "
-                "terrain area."
-            )
         marker = markers_by_id[definition.objective_marker_id]
         if not any(
             shapely_backend.point_intersects_polygon(
@@ -233,7 +253,10 @@ def validate_placed_terrain_area_tuple(
             raise GameLifecycleError(f"{field_name} must not contain duplicates.")
         seen.add(value.terrain_area_id)
         areas.append(value)
-    return tuple(sorted(areas, key=lambda value: value.terrain_area_id))
+    try:
+        return validate_placed_terrain_area_logical_groups(field_name, tuple(areas))
+    except TerrainAreaError as exc:
+        raise GameLifecycleError(str(exc)) from exc
 
 
 def _terrain_feature_contains_marker(

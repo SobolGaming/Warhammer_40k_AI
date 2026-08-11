@@ -117,6 +117,13 @@ from warhammer40k_core.engine.game_state_payloads import (
     TacticalSecondaryDrawPayload as TacticalSecondaryDrawPayload,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mission_state_validation import (
+    runtime_ruleset_descriptor_for_mission_setup,
+    validate_battlefield_state_matches_mission_setup,
+    validate_game_config_mission_setup,
+    validate_game_state_mission_setup,
+    validate_recorded_mission_setup,
+)
 from warhammer40k_core.engine.missions import (
     deterministic_tactical_secondary_draw,
     mission_scoring_policy_from_setup,
@@ -270,9 +277,6 @@ from warhammer40k_core.engine.unit_state import (
     StartingStrengthRecord,
 )
 from warhammer40k_core.geometry import shapely_backend
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
-    chapter_approved_2026_27 as eleventh_ca_2026_27_source,
-)
 
 
 class SecondaryMissionMode(StrEnum):
@@ -684,14 +688,15 @@ class GameConfig:
                 self.max_lifecycle_transitions,
             ),
         )
-        object.__setattr__(
-            self,
-            "mission_setup",
-            _validate_optional_mission_setup(
-                self.mission_setup,
-                player_ids=self.player_ids,
-            ),
+        mission_setup = _validate_optional_mission_setup(
+            self.mission_setup,
+            player_ids=self.player_ids,
         )
+        validate_game_config_mission_setup(
+            mission_setup,
+            ruleset_descriptor=self.ruleset_descriptor,
+        )
+        object.__setattr__(self, "mission_setup", mission_setup)
         object.__setattr__(
             self,
             "reserve_unit_points",
@@ -1358,6 +1363,10 @@ class GameState:
         self.mission_setup = _validate_optional_mission_setup(
             self.mission_setup,
             player_ids=self.player_ids,
+        )
+        validate_game_state_mission_setup(
+            self.mission_setup,
+            battlefield_state=self.battlefield_state,
         )
         self.movement_phase_state = _validate_optional_movement_phase_state(
             self.movement_phase_state
@@ -3603,6 +3612,10 @@ class GameState:
             )
         if self.battlefield_state is not None:
             raise GameLifecycleError("GameState battlefield_state already exists.")
+        validate_battlefield_state_matches_mission_setup(
+            battlefield_state=battlefield_state,
+            mission_setup=self.mission_setup,
+        )
         self._assert_battlefield_state_clear_of_objective_markers(battlefield_state)
         self.battlefield_state = battlefield_state
 
@@ -3613,16 +3626,27 @@ class GameState:
             )
         if self.battlefield_state is None:
             raise GameLifecycleError("GameState battlefield_state does not exist.")
+        validate_battlefield_state_matches_mission_setup(
+            battlefield_state=battlefield_state,
+            mission_setup=self.mission_setup,
+        )
         self._assert_battlefield_state_clear_of_objective_markers(battlefield_state)
         self.battlefield_state = battlefield_state
 
     def record_mission_setup(self, mission_setup: MissionSetup) -> None:
         if self.mission_setup is not None:
             raise GameLifecycleError("GameState mission_setup already exists.")
-        self.mission_setup = _validate_optional_mission_setup(
+        validated_setup = _validate_optional_mission_setup(
             mission_setup,
             player_ids=self.player_ids,
         )
+        if validated_setup is None:
+            raise GameLifecycleError("GameState mission_setup is required.")
+        validate_recorded_mission_setup(
+            validated_setup,
+            battlefield_state=self.battlefield_state,
+        )
+        self.mission_setup = validated_setup
 
     def record_tactical_secondary_draw(self, draw: TacticalSecondaryDraw) -> None:
         if draw.player_id not in self.player_ids:
@@ -5419,13 +5443,10 @@ class GameState:
         self.reserve_states = list(destruction.updated_reserve_states)
 
     def ruleset_descriptor_for_runtime_policy(self) -> RulesetDescriptor:
-        if self.mission_setup is not None and (
-            self.mission_setup.mission_pack_id == eleventh_ca_2026_27_source.MISSION_PACK_ID
-        ):
-            descriptor = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27()
-        else:
-            descriptor = RulesetDescriptor.warhammer_40000_eleventh()
-        return replace(descriptor, rules_overlay_ids=self.rules_overlay_ids, descriptor_hash="")
+        return runtime_ruleset_descriptor_for_mission_setup(
+            self.mission_setup,
+            rules_overlay_ids=self.rules_overlay_ids,
+        )
 
     def _active_player_is_last_in_round(self, player_id: str) -> bool:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)

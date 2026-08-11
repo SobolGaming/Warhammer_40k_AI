@@ -804,6 +804,7 @@ class BattlefieldLayoutDefinition:
             terrain_areas=tuple(
                 (
                     area.terrain_area_id,
+                    area.logical_terrain_area_id,
                     tuple((point.x_inches, point.y_inches) for point in area.footprint_polygon),
                 )
                 for area in terrain_areas

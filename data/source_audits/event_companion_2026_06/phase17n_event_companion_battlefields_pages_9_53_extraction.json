@@ -13873,10 +13873,10 @@
         "Purge the Foe"
       ],
       "primary_missions": [
-        "Unstoppable Force",
-        "Immovable Object"
+        "Immovable Object",
+        "Unstoppable Force"
       ],
-      "printed_title": "Take and Hold vs Purge the Foe | Unstoppable Force / Immovable Object | Layout A",
+      "printed_title": "Take and Hold vs Purge the Foe | Immovable Object / Unstoppable Force | Layout A",
       "source_pdf_page_number": 12,
       "source_pdf_zero_based_page_index": 11,
       "terrain_areas": [
@@ -18173,8 +18173,8 @@
           "Purge the Foe"
         ],
         "primary_missions": [
-          "Unstoppable Force",
-          "Immovable Object"
+          "Immovable Object",
+          "Unstoppable Force"
         ],
         "layout_label": "Layout A"
       }
@@ -18187,10 +18187,10 @@
         "Purge the Foe"
       ],
       "primary_missions": [
-        "Unstoppable Force",
-        "Immovable Object"
+        "Immovable Object",
+        "Unstoppable Force"
       ],
-      "printed_title": "Take and Hold vs Purge the Foe | Unstoppable Force / Immovable Object | Layout B",
+      "printed_title": "Take and Hold vs Purge the Foe | Immovable Object / Unstoppable Force | Layout B",
       "source_pdf_page_number": 13,
       "source_pdf_zero_based_page_index": 12,
       "terrain_areas": [
@@ -22398,8 +22398,8 @@
           "Purge the Foe"
         ],
         "primary_missions": [
-          "Unstoppable Force",
-          "Immovable Object"
+          "Immovable Object",
+          "Unstoppable Force"
         ],
         "layout_label": "Layout B"
       }
@@ -22412,10 +22412,10 @@
         "Purge the Foe"
       ],
       "primary_missions": [
-        "Unstoppable Force",
-        "Immovable Object"
+        "Immovable Object",
+        "Unstoppable Force"
       ],
-      "printed_title": "Take and Hold vs Purge the Foe | Unstoppable Force / Immovable Object | Layout C",
+      "printed_title": "Take and Hold vs Purge the Foe | Immovable Object / Unstoppable Force | Layout C",
       "source_pdf_page_number": 14,
       "source_pdf_zero_based_page_index": 13,
       "terrain_areas": [
@@ -26620,8 +26620,8 @@
           "Purge the Foe"
         ],
         "primary_missions": [
-          "Unstoppable Force",
-          "Immovable Object"
+          "Immovable Object",
+          "Unstoppable Force"
         ],
         "layout_label": "Layout C"
       }
@@ -26634,10 +26634,10 @@
         "Disruption"
       ],
       "primary_missions": [
-        "Death Trap",
-        "Determined Acquisition"
+        "Determined Acquisition",
+        "Death Trap"
       ],
-      "printed_title": "Take and Hold vs Disruption | Death Trap / Determined Acquisition | Layout A",
+      "printed_title": "Take and Hold vs Disruption | Determined Acquisition / Death Trap | Layout A",
       "source_pdf_page_number": 15,
       "source_pdf_zero_based_page_index": 14,
       "terrain_areas": [
@@ -30849,8 +30849,8 @@
           "Disruption"
         ],
         "primary_missions": [
-          "Death Trap",
-          "Determined Acquisition"
+          "Determined Acquisition",
+          "Death Trap"
         ],
         "layout_label": "Layout A"
       }
@@ -30863,10 +30863,10 @@
         "Disruption"
       ],
       "primary_missions": [
-        "Death Trap",
-        "Determined Acquisition"
+        "Determined Acquisition",
+        "Death Trap"
       ],
-      "printed_title": "Take and Hold vs Disruption | Death Trap / Determined Acquisition | Layout B",
+      "printed_title": "Take and Hold vs Disruption | Determined Acquisition / Death Trap | Layout B",
       "source_pdf_page_number": 16,
       "source_pdf_zero_based_page_index": 15,
       "terrain_areas": [
@@ -35073,8 +35073,8 @@
           "Disruption"
         ],
         "primary_missions": [
-          "Death Trap",
-          "Determined Acquisition"
+          "Determined Acquisition",
+          "Death Trap"
         ],
         "layout_label": "Layout B"
       }
@@ -35087,10 +35087,10 @@
         "Disruption"
       ],
       "primary_missions": [
-        "Death Trap",
-        "Determined Acquisition"
+        "Determined Acquisition",
+        "Death Trap"
       ],
-      "printed_title": "Take and Hold vs Disruption | Death Trap / Determined Acquisition | Layout C",
+      "printed_title": "Take and Hold vs Disruption | Determined Acquisition / Death Trap | Layout C",
       "source_pdf_page_number": 17,
       "source_pdf_zero_based_page_index": 16,
       "terrain_areas": [
@@ -39302,8 +39302,8 @@
           "Disruption"
         ],
         "primary_missions": [
-          "Death Trap",
-          "Determined Acquisition"
+          "Determined Acquisition",
+          "Death Trap"
         ],
         "layout_label": "Layout C"
       }
@@ -52099,10 +52099,10 @@
         "Priority Assets"
       ],
       "primary_missions": [
-        "Secure Asset",
-        "Inescapable Dominion"
+        "Inescapable Dominion",
+        "Secure Asset"
       ],
-      "printed_title": "Take and Hold vs Priority Assets | Secure Asset / Inescapable Dominion | Layout A",
+      "printed_title": "Take and Hold vs Priority Assets | Inescapable Dominion / Secure Asset | Layout A",
       "source_pdf_page_number": 21,
       "source_pdf_zero_based_page_index": 20,
       "terrain_areas": [
@@ -56302,8 +56302,8 @@
           "Priority Assets"
         ],
         "primary_missions": [
-          "Secure Asset",
-          "Inescapable Dominion"
+          "Inescapable Dominion",
+          "Secure Asset"
         ],
         "layout_label": "Layout A"
       }
@@ -56316,10 +56316,10 @@
         "Priority Assets"
       ],
       "primary_missions": [
-        "Secure Asset",
-        "Inescapable Dominion"
+        "Inescapable Dominion",
+        "Secure Asset"
       ],
-      "printed_title": "Take and Hold vs Priority Assets | Secure Asset / Inescapable Dominion | Layout B",
+      "printed_title": "Take and Hold vs Priority Assets | Inescapable Dominion / Secure Asset | Layout B",
       "source_pdf_page_number": 22,
       "source_pdf_zero_based_page_index": 21,
       "terrain_areas": [
@@ -60524,8 +60524,8 @@
           "Priority Assets"
         ],
         "primary_missions": [
-          "Secure Asset",
-          "Inescapable Dominion"
+          "Inescapable Dominion",
+          "Secure Asset"
         ],
         "layout_label": "Layout B"
       }
@@ -60538,10 +60538,10 @@
         "Priority Assets"
       ],
       "primary_missions": [
-        "Secure Asset",
-        "Inescapable Dominion"
+        "Inescapable Dominion",
+        "Secure Asset"
       ],
-      "printed_title": "Take and Hold vs Priority Assets | Secure Asset / Inescapable Dominion | Layout C",
+      "printed_title": "Take and Hold vs Priority Assets | Inescapable Dominion / Secure Asset | Layout C",
       "source_pdf_page_number": 23,
       "source_pdf_zero_based_page_index": 22,
       "terrain_areas": [
@@ -64838,8 +64838,8 @@
           "Priority Assets"
         ],
         "primary_missions": [
-          "Secure Asset",
-          "Inescapable Dominion"
+          "Inescapable Dominion",
+          "Secure Asset"
         ],
         "layout_label": "Layout C"
       }
@@ -75956,7 +75956,7 @@
         "Punishment",
         "Delaying Action"
       ],
-      "printed_title": "Disruption vs Purge the Foe | Delaying Action / Punishment | Layout A",
+      "printed_title": "Purge the Foe vs Disruption | Punishment / Delaying Action | Layout A",
       "source_pdf_page_number": 27,
       "source_pdf_zero_based_page_index": 26,
       "terrain_areas": [
@@ -80157,12 +80157,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Disruption",
-          "Purge the Foe"
+          "Purge the Foe",
+          "Disruption"
         ],
         "primary_missions": [
-          "Delaying Action",
-          "Punishment"
+          "Punishment",
+          "Delaying Action"
         ],
         "layout_label": "Layout A"
       }
@@ -80178,7 +80178,7 @@
         "Punishment",
         "Delaying Action"
       ],
-      "printed_title": "Disruption vs Purge the Foe | Delaying Action / Punishment | Layout B",
+      "printed_title": "Purge the Foe vs Disruption | Punishment / Delaying Action | Layout B",
       "source_pdf_page_number": 28,
       "source_pdf_zero_based_page_index": 27,
       "terrain_areas": [
@@ -84379,12 +84379,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Disruption",
-          "Purge the Foe"
+          "Purge the Foe",
+          "Disruption"
         ],
         "primary_missions": [
-          "Delaying Action",
-          "Punishment"
+          "Punishment",
+          "Delaying Action"
         ],
         "layout_label": "Layout B"
       }
@@ -84400,7 +84400,7 @@
         "Punishment",
         "Delaying Action"
       ],
-      "printed_title": "Disruption vs Purge the Foe | Delaying Action / Punishment | Layout C",
+      "printed_title": "Purge the Foe vs Disruption | Punishment / Delaying Action | Layout C",
       "source_pdf_page_number": 29,
       "source_pdf_zero_based_page_index": 28,
       "terrain_areas": [
@@ -88604,12 +88604,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Disruption",
-          "Purge the Foe"
+          "Purge the Foe",
+          "Disruption"
         ],
         "primary_missions": [
-          "Delaying Action",
-          "Punishment"
+          "Punishment",
+          "Delaying Action"
         ],
         "layout_label": "Layout C"
       }
@@ -88625,7 +88625,7 @@
         "Consecrate",
         "Triangulation"
       ],
-      "printed_title": "Reconnaissance vs Purge the Foe | Triangulation / Consecrate | Layout A",
+      "printed_title": "Purge the Foe vs Reconnaissance | Consecrate / Triangulation | Layout A",
       "source_pdf_page_number": 30,
       "source_pdf_zero_based_page_index": 29,
       "terrain_areas": [
@@ -92826,12 +92826,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Reconnaissance",
-          "Purge the Foe"
+          "Purge the Foe",
+          "Reconnaissance"
         ],
         "primary_missions": [
-          "Triangulation",
-          "Consecrate"
+          "Consecrate",
+          "Triangulation"
         ],
         "layout_label": "Layout A"
       }
@@ -92847,7 +92847,7 @@
         "Consecrate",
         "Triangulation"
       ],
-      "printed_title": "Reconnaissance vs Purge the Foe | Triangulation / Consecrate | Layout B",
+      "printed_title": "Purge the Foe vs Reconnaissance | Consecrate / Triangulation | Layout B",
       "source_pdf_page_number": 31,
       "source_pdf_zero_based_page_index": 30,
       "terrain_areas": [
@@ -97136,12 +97136,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Reconnaissance",
-          "Purge the Foe"
+          "Purge the Foe",
+          "Reconnaissance"
         ],
         "primary_missions": [
-          "Triangulation",
-          "Consecrate"
+          "Consecrate",
+          "Triangulation"
         ],
         "layout_label": "Layout B"
       }
@@ -97157,7 +97157,7 @@
         "Consecrate",
         "Triangulation"
       ],
-      "printed_title": "Reconnaissance vs Purge the Foe | Triangulation / Consecrate | Layout C",
+      "printed_title": "Purge the Foe vs Reconnaissance | Consecrate / Triangulation | Layout C",
       "source_pdf_page_number": 32,
       "source_pdf_zero_based_page_index": 31,
       "terrain_areas": [
@@ -101353,12 +101353,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Reconnaissance",
-          "Purge the Foe"
+          "Purge the Foe",
+          "Reconnaissance"
         ],
         "primary_missions": [
-          "Triangulation",
-          "Consecrate"
+          "Consecrate",
+          "Triangulation"
         ],
         "layout_label": "Layout C"
       }
@@ -101374,7 +101374,7 @@
         "Destroyer's Wrath",
         "Vital Link"
       ],
-      "printed_title": "Priority Assets vs Purge the Foe | Vital Link / Destroyer's Wrath | Layout A",
+      "printed_title": "Purge the Foe vs Priority Assets | Destroyer's Wrath / Vital Link | Layout A",
       "source_pdf_page_number": 33,
       "source_pdf_zero_based_page_index": 32,
       "terrain_areas": [
@@ -105575,12 +105575,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Priority Assets",
-          "Purge the Foe"
+          "Purge the Foe",
+          "Priority Assets"
         ],
         "primary_missions": [
-          "Vital Link",
-          "Destroyer's Wrath"
+          "Destroyer's Wrath",
+          "Vital Link"
         ],
         "layout_label": "Layout A"
       }
@@ -105596,7 +105596,7 @@
         "Destroyer's Wrath",
         "Vital Link"
       ],
-      "printed_title": "Priority Assets vs Purge the Foe | Vital Link / Destroyer's Wrath | Layout B",
+      "printed_title": "Purge the Foe vs Priority Assets | Destroyer's Wrath / Vital Link | Layout B",
       "source_pdf_page_number": 34,
       "source_pdf_zero_based_page_index": 33,
       "terrain_areas": [
@@ -109800,12 +109800,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Priority Assets",
-          "Purge the Foe"
+          "Purge the Foe",
+          "Priority Assets"
         ],
         "primary_missions": [
-          "Vital Link",
-          "Destroyer's Wrath"
+          "Destroyer's Wrath",
+          "Vital Link"
         ],
         "layout_label": "Layout B"
       }
@@ -109821,7 +109821,7 @@
         "Destroyer's Wrath",
         "Vital Link"
       ],
-      "printed_title": "Priority Assets vs Purge the Foe | Vital Link / Destroyer's Wrath | Layout C",
+      "printed_title": "Purge the Foe vs Priority Assets | Destroyer's Wrath / Vital Link | Layout C",
       "source_pdf_page_number": 35,
       "source_pdf_zero_based_page_index": 34,
       "terrain_areas": [
@@ -114022,12 +114022,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Priority Assets",
-          "Purge the Foe"
+          "Purge the Foe",
+          "Priority Assets"
         ],
         "primary_missions": [
-          "Vital Link",
-          "Destroyer's Wrath"
+          "Destroyer's Wrath",
+          "Vital Link"
         ],
         "layout_label": "Layout C"
       }
@@ -126914,7 +126914,7 @@
         "Smoke and Mirrors",
         "Surveil the Foe"
       ],
-      "printed_title": "Reconnaissance vs Disruption | Surveil the Foe / Smoke and Mirrors | Layout A",
+      "printed_title": "Disruption vs Reconnaissance | Smoke and Mirrors / Surveil the Foe | Layout A",
       "source_pdf_page_number": 39,
       "source_pdf_zero_based_page_index": 38,
       "terrain_areas": [
@@ -131207,12 +131207,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Reconnaissance",
-          "Disruption"
+          "Disruption",
+          "Reconnaissance"
         ],
         "primary_missions": [
-          "Surveil the Foe",
-          "Smoke and Mirrors"
+          "Smoke and Mirrors",
+          "Surveil the Foe"
         ],
         "layout_label": "Layout A"
       }
@@ -131228,7 +131228,7 @@
         "Smoke and Mirrors",
         "Surveil the Foe"
       ],
-      "printed_title": "Reconnaissance vs Disruption | Surveil the Foe / Smoke and Mirrors | Layout B",
+      "printed_title": "Disruption vs Reconnaissance | Smoke and Mirrors / Surveil the Foe | Layout B",
       "source_pdf_page_number": 40,
       "source_pdf_zero_based_page_index": 39,
       "terrain_areas": [
@@ -135432,12 +135432,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Reconnaissance",
-          "Disruption"
+          "Disruption",
+          "Reconnaissance"
         ],
         "primary_missions": [
-          "Surveil the Foe",
-          "Smoke and Mirrors"
+          "Smoke and Mirrors",
+          "Surveil the Foe"
         ],
         "layout_label": "Layout B"
       }
@@ -135453,7 +135453,7 @@
         "Smoke and Mirrors",
         "Surveil the Foe"
       ],
-      "printed_title": "Reconnaissance vs Disruption | Surveil the Foe / Smoke and Mirrors | Layout C",
+      "printed_title": "Disruption vs Reconnaissance | Smoke and Mirrors / Surveil the Foe | Layout C",
       "source_pdf_page_number": 41,
       "source_pdf_zero_based_page_index": 40,
       "terrain_areas": [
@@ -139746,12 +139746,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Reconnaissance",
-          "Disruption"
+          "Disruption",
+          "Reconnaissance"
         ],
         "primary_missions": [
-          "Surveil the Foe",
-          "Smoke and Mirrors"
+          "Smoke and Mirrors",
+          "Surveil the Foe"
         ],
         "layout_label": "Layout C"
       }
@@ -139767,7 +139767,7 @@
         "Locate and Deny",
         "Extract Relic"
       ],
-      "printed_title": "Priority Assets vs Disruption | Extract Relic / Locate and Deny | Layout A",
+      "printed_title": "Disruption vs Priority Assets | Locate and Deny / Extract Relic | Layout A",
       "source_pdf_page_number": 42,
       "source_pdf_zero_based_page_index": 41,
       "terrain_areas": [
@@ -143882,12 +143882,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Priority Assets",
-          "Disruption"
+          "Disruption",
+          "Priority Assets"
         ],
         "primary_missions": [
-          "Extract Relic",
-          "Locate and Deny"
+          "Locate and Deny",
+          "Extract Relic"
         ],
         "layout_label": "Layout A"
       }
@@ -143903,7 +143903,7 @@
         "Locate and Deny",
         "Extract Relic"
       ],
-      "printed_title": "Priority Assets vs Disruption | Extract Relic / Locate and Deny | Layout B",
+      "printed_title": "Disruption vs Priority Assets | Locate and Deny / Extract Relic | Layout B",
       "source_pdf_page_number": 43,
       "source_pdf_zero_based_page_index": 42,
       "terrain_areas": [
@@ -148115,12 +148115,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Priority Assets",
-          "Disruption"
+          "Disruption",
+          "Priority Assets"
         ],
         "primary_missions": [
-          "Extract Relic",
-          "Locate and Deny"
+          "Locate and Deny",
+          "Extract Relic"
         ],
         "layout_label": "Layout B"
       }
@@ -148136,7 +148136,7 @@
         "Locate and Deny",
         "Extract Relic"
       ],
-      "printed_title": "Priority Assets vs Disruption | Extract Relic / Locate and Deny | Layout C",
+      "printed_title": "Disruption vs Priority Assets | Locate and Deny / Extract Relic | Layout C",
       "source_pdf_page_number": 44,
       "source_pdf_zero_based_page_index": 43,
       "terrain_areas": [
@@ -152344,12 +152344,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Priority Assets",
-          "Disruption"
+          "Disruption",
+          "Priority Assets"
         ],
         "primary_missions": [
-          "Extract Relic",
-          "Locate and Deny"
+          "Locate and Deny",
+          "Extract Relic"
         ],
         "layout_label": "Layout C"
       }
@@ -165236,7 +165236,7 @@
         "Search and Scour",
         "Vanguard Operation"
       ],
-      "printed_title": "Priority Assets vs Reconnaissance | Vanguard Operation / Search and Scour | Layout A",
+      "printed_title": "Reconnaissance vs Priority Assets | Search and Scour / Vanguard Operation | Layout A",
       "source_pdf_page_number": 48,
       "source_pdf_zero_based_page_index": 47,
       "terrain_areas": [
@@ -169532,12 +169532,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Priority Assets",
-          "Reconnaissance"
+          "Reconnaissance",
+          "Priority Assets"
         ],
         "primary_missions": [
-          "Vanguard Operation",
-          "Search and Scour"
+          "Search and Scour",
+          "Vanguard Operation"
         ],
         "layout_label": "Layout A"
       }
@@ -169553,7 +169553,7 @@
         "Search and Scour",
         "Vanguard Operation"
       ],
-      "printed_title": "Priority Assets vs Reconnaissance | Vanguard Operation / Search and Scour | Layout B",
+      "printed_title": "Reconnaissance vs Priority Assets | Search and Scour / Vanguard Operation | Layout B",
       "source_pdf_page_number": 49,
       "source_pdf_zero_based_page_index": 48,
       "terrain_areas": [
@@ -173761,12 +173761,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Priority Assets",
-          "Reconnaissance"
+          "Reconnaissance",
+          "Priority Assets"
         ],
         "primary_missions": [
-          "Vanguard Operation",
-          "Search and Scour"
+          "Search and Scour",
+          "Vanguard Operation"
         ],
         "layout_label": "Layout B"
       }
@@ -173782,7 +173782,7 @@
         "Search and Scour",
         "Vanguard Operation"
       ],
-      "printed_title": "Priority Assets vs Reconnaissance | Vanguard Operation / Search and Scour | Layout C",
+      "printed_title": "Reconnaissance vs Priority Assets | Search and Scour / Vanguard Operation | Layout C",
       "source_pdf_page_number": 50,
       "source_pdf_zero_based_page_index": 49,
       "terrain_areas": [
@@ -178078,12 +178078,12 @@
       },
       "source_printed_left_to_right": {
         "force_dispositions": [
-          "Priority Assets",
-          "Reconnaissance"
+          "Reconnaissance",
+          "Priority Assets"
         ],
         "primary_missions": [
-          "Vanguard Operation",
-          "Search and Scour"
+          "Search and Scour",
+          "Vanguard Operation"
         ],
         "layout_label": "Layout C"
       }
@@ -190657,7 +190657,7 @@
         "reason": "source-absent point-symmetry counterpart on PDF page 9"
       }
     ],
-    "mission_metadata_semantics": "force_disposition_pair and primary_missions share canonical matrix order; source_printed_left_to_right preserves exact PDF column order. Reversed printed columns are retained separately on pages 27-35, 39-44, and 48-50."
+    "mission_metadata_semantics": "force_disposition_pair, primary_missions, source_printed_left_to_right, and printed_title preserve the PDF's visual left-to-right column order and canonical matrix pairing."
   },
   "reviewed_feature_archetype_basis": {
     "source": "Phase 17N Meatgrinder reviewed physical archetypes generalized by source xref identity",
