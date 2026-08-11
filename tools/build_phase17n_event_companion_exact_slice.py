@@ -6,6 +6,7 @@ import json
 import math
 import statistics
 from decimal import ROUND_HALF_UP, Decimal
+from itertools import permutations
 from pathlib import Path
 from typing import Any
 
@@ -241,6 +242,8 @@ _RASTER_REVIEW_METHOD = "source_page_raster_overlay_registration_review"
 _VECTOR_REVIEW_METHOD = "pdf_vector_edge_correction_plus_source_page_raster_overlay_review"
 _REVIEW_RESULT = "canonical_template_outline_aligned_to_source_page_terrain_area"
 _TERRAIN_PLACEMENT_INCREMENT_INCHES = Decimal("0.05")
+_BATTLEFIELD_WIDTH_INCHES = 44.0
+_BATTLEFIELD_DEPTH_INCHES = 60.0
 _RUIN_FLOOR_MAXIMUM_AXIS_SPAN_INCHES = 3.5
 _RUIN_FLOOR_EDGE_INSET_INCHES = 0.02
 _REVIEWED_SOURCE_IMAGE_AXIS_SPANS = {
@@ -890,11 +893,110 @@ def _apply_reviewed_point_symmetry_to_area_rows(
         if index > 8:
             continue
         mirror = areas_by_id[area["mirror_area_id"]]
-        mirror["anchor_x_inches"] = _quantize_terrain_coordinate(44.0 - area["anchor_x_inches"])
-        mirror["anchor_y_inches"] = _quantize_terrain_coordinate(60.0 - area["anchor_y_inches"])
+        mirror["anchor_x_inches"] = _quantize_terrain_coordinate(
+            _BATTLEFIELD_WIDTH_INCHES - area["anchor_x_inches"]
+        )
+        mirror["anchor_y_inches"] = _quantize_terrain_coordinate(
+            _BATTLEFIELD_DEPTH_INCHES - area["anchor_y_inches"]
+        )
         mirror["rotation_degrees"] = (area["rotation_degrees"] + 180.0) % 360.0
         mirror["local_transform"] = area["local_transform"]
         mirror["pose_basis"] = f"{mirror['pose_basis']}_with_reviewed_point_symmetry"
+
+
+def _component_primary_xref(raw: dict[str, Any]) -> int:
+    source_xref = raw["source_image"]["xref"]
+    return 5486 if source_xref == 5675 else source_xref
+
+
+def _component_archetype_id(raw: dict[str, Any]) -> str:
+    return _ARCHETYPES[_component_primary_xref(raw)][0]
+
+
+def _point_symmetric_source_distance_squared(
+    primary: dict[str, Any],
+    mirror: dict[str, Any],
+) -> float:
+    primary_x, primary_y = primary["source_image"]["battlefield_image_center_inches"]
+    mirror_x, mirror_y = mirror["source_image"]["battlefield_image_center_inches"]
+    return (_BATTLEFIELD_WIDTH_INCHES - primary_x - mirror_x) ** 2 + (
+        _BATTLEFIELD_DEPTH_INCHES - primary_y - mirror_y
+    ) ** 2
+
+
+def _mirrored_primary_component_ids(layout: dict[str, Any]) -> dict[str, str]:
+    layout_id = layout["layout_id"]
+    components_by_area_id: dict[str, list[dict[str, Any]]] = {}
+    for component in layout["terrain_components"]:
+        components_by_area_id.setdefault(component["terrain_area_id"], []).append(component)
+
+    bindings: dict[str, str] = {}
+    for primary_area_index in range(1, 9):
+        primary_area_id = f"{layout_id}-terrain-area-{primary_area_index:02d}"
+        mirror_area_id = f"{layout_id}-terrain-area-{17 - primary_area_index:02d}"
+        primary_by_archetype: dict[str, list[dict[str, Any]]] = {}
+        mirror_by_archetype: dict[str, list[dict[str, Any]]] = {}
+        for component in components_by_area_id[primary_area_id]:
+            primary_by_archetype.setdefault(_component_archetype_id(component), []).append(
+                component
+            )
+        for component in components_by_area_id[mirror_area_id]:
+            mirror_by_archetype.setdefault(_component_archetype_id(component), []).append(component)
+        if primary_by_archetype.keys() != mirror_by_archetype.keys():
+            raise ValueError(
+                f"Mirrored terrain areas {primary_area_id} and {mirror_area_id} must contain "
+                "matching component archetypes."
+            )
+
+        for archetype_id in sorted(primary_by_archetype):
+            primary_components = sorted(
+                primary_by_archetype[archetype_id],
+                key=lambda component: component["component_id"],
+            )
+            mirror_components = sorted(
+                mirror_by_archetype[archetype_id],
+                key=lambda component: component["component_id"],
+            )
+            if len(primary_components) != len(mirror_components):
+                raise ValueError(
+                    f"Mirrored terrain areas {primary_area_id} and {mirror_area_id} must contain "
+                    f"the same number of {archetype_id} source instances."
+                )
+            scored_assignments: list[tuple[float, tuple[str, ...]]] = []
+            for assignment in permutations(primary_components):
+                score = sum(
+                    _point_symmetric_source_distance_squared(primary, mirror)
+                    for primary, mirror in zip(assignment, mirror_components, strict=True)
+                )
+                scored_assignments.append(
+                    (score, tuple(component["component_id"] for component in assignment))
+                )
+            scored_assignments.sort()
+            if len(scored_assignments) > 1 and math.isclose(
+                scored_assignments[0][0],
+                scored_assignments[1][0],
+                rel_tol=0.0,
+                abs_tol=1e-12,
+            ):
+                raise ValueError(
+                    f"Mirrored terrain areas {primary_area_id} and {mirror_area_id} have "
+                    f"ambiguous {archetype_id} source-instance bindings."
+                )
+            for mirror, primary_component_id in zip(
+                mirror_components,
+                scored_assignments[0][1],
+                strict=True,
+            ):
+                bindings[mirror["component_id"]] = primary_component_id
+
+    expected_binding_count = sum(
+        len(components)
+        for area_id, components in components_by_area_id.items()
+        if int(area_id.rsplit("-", maxsplit=1)[-1]) > 8
+    )
+    if len(bindings) != expected_binding_count:
+        raise ValueError("Every mirrored terrain component must have one source-instance binding.")
+    return bindings
 
 
 def _component_row(
@@ -907,8 +1009,8 @@ def _component_row(
     reviewed_local_transform: str | None = None,
 ) -> dict[str, Any]:
     area = area_by_id[raw["terrain_area_id"]]
-    primary_xref = 5486 if raw["source_image"]["xref"] == 5675 else raw["source_image"]["xref"]
-    archetype_id = _ARCHETYPES[primary_xref][0]
+    primary_xref = _component_primary_xref(raw)
+    archetype_id = _component_archetype_id(raw)
     template_anchor_x, template_anchor_y = template_anchor_points[area["footprint_template_id"]]
     area_radians = math.radians(area["rotation_degrees"])
     area_cosine = math.cos(area_radians)
@@ -1018,6 +1120,7 @@ def _layout_row(
     area_rows = [_area_row(layout, raw, template_anchor_points) for raw in layout["terrain_areas"]]
     _apply_reviewed_point_symmetry_to_area_rows(area_rows)
     area_by_id = {area["area_id"]: area for area in area_rows}
+    mirrored_primary_component_ids = _mirrored_primary_component_ids(layout)
     component_rows: list[dict[str, Any]] = []
     component_by_id: dict[str, dict[str, Any]] = {}
     for raw in layout["terrain_components"]:
@@ -1029,10 +1132,7 @@ def _layout_row(
                 template_anchor_points=template_anchor_points,
             )
         else:
-            component_ordinal = raw["component_id"].rsplit("-component-", maxsplit=1)[-1]
-            primary_component_id = (
-                f"{layout_id}-terrain-area-{17 - area_index:02d}-component-{component_ordinal}"
-            )
+            primary_component_id = mirrored_primary_component_ids[raw["component_id"]]
             primary_component = component_by_id[primary_component_id]
             component = _component_row(
                 raw=raw,
@@ -1040,10 +1140,10 @@ def _layout_row(
                 template_anchor_points=template_anchor_points,
                 reviewed_battlefield_center=(
                     _quantize_terrain_coordinate(
-                        44.0 - primary_component["battlefield_center_x_inches"]
+                        _BATTLEFIELD_WIDTH_INCHES - primary_component["battlefield_center_x_inches"]
                     ),
                     _quantize_terrain_coordinate(
-                        60.0 - primary_component["battlefield_center_y_inches"]
+                        _BATTLEFIELD_DEPTH_INCHES - primary_component["battlefield_center_y_inches"]
                     ),
                 ),
                 reviewed_battlefield_rotation=(
@@ -1156,8 +1256,8 @@ def build_artifact(extraction: dict[str, Any]) -> dict[str, Any]:
                 "x1_points": bounds[2],
                 "y1_points": bounds[3],
             },
-            "battlefield_width_inches": 44.0,
-            "battlefield_depth_inches": 60.0,
+            "battlefield_width_inches": _BATTLEFIELD_WIDTH_INCHES,
+            "battlefield_depth_inches": _BATTLEFIELD_DEPTH_INCHES,
             "battlefield_origin": "bottom_left",
             "battlefield_orientation": "x_right_along_44_inch_edge_y_up_along_60_inch_edge",
             "coordinate_precision_decimal_places": 6,

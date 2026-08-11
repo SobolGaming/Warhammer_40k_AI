@@ -8,9 +8,9 @@ import sys
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import replace
-from itertools import pairwise
+from itertools import pairwise, permutations
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import pytest
 
@@ -567,6 +567,26 @@ def test_phase17n_meatgrinder_exact_slice_artifact_is_source_hashed_and_strict()
     with pytest.raises(ValueError, match="local reflection must match its source affine"):
         event_layouts.validate_exact_slice_artifact_bytes(
             json.dumps(unreflected_source_affine_payload).encode()
+        )
+
+    asymmetric_component_payload = json.loads(raw)
+    asymmetric_component = next(
+        component
+        for component in asymmetric_component_payload["layouts"][0]["terrain_components"]
+        if component["component_id"].endswith("terrain-area-11-component-02")
+    )
+    asymmetric_component["battlefield_center_x_inches"] += 0.05
+    asymmetric_component_payload["package_hash"] = ""
+    asymmetric_component_payload["package_hash"] = hashlib.sha256(
+        json.dumps(
+            asymmetric_component_payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+    ).hexdigest()
+    with pytest.raises(ValueError, match="mirror pairs must use exact point symmetry"):
+        event_layouts.validate_exact_slice_artifact_bytes(
+            json.dumps(asymmetric_component_payload).encode()
         )
 
 
@@ -1127,26 +1147,37 @@ def test_phase17n_terrain_placements_use_reviewed_grid_symmetry_and_contacts() -
                 rel_tol=0.0,
                 abs_tol=1e-9,
             )
-            area_index_text, component_ordinal = component.component_id.rsplit(
+            area_index_text, _component_ordinal = component.component_id.rsplit(
                 "-terrain-area-",
                 maxsplit=1,
             )[1].split("-component-", maxsplit=1)
             area_index = int(area_index_text)
             if area_index > 8:
                 continue
-            mirror_component_id = (
-                f"{layout.layout_id}-terrain-area-{17 - area_index:02d}"
-                f"-component-{component_ordinal}"
+            expected_mirror_center = (
+                44.0 - component.battlefield_center_x_inches,
+                60.0 - component.battlefield_center_y_inches,
             )
-            mirror_component = components_by_id[mirror_component_id]
-            assert (
-                component.battlefield_center_x_inches + mirror_component.battlefield_center_x_inches
-                == 44.0
+            mirror_components = tuple(
+                candidate
+                for candidate in components_by_id.values()
+                if candidate.terrain_area_id.endswith(f"area-{17 - area_index:02d}")
+                and candidate.archetype_id == component.archetype_id
+                and math.isclose(
+                    candidate.battlefield_center_x_inches,
+                    expected_mirror_center[0],
+                    rel_tol=0.0,
+                    abs_tol=1e-9,
+                )
+                and math.isclose(
+                    candidate.battlefield_center_y_inches,
+                    expected_mirror_center[1],
+                    rel_tol=0.0,
+                    abs_tol=1e-9,
+                )
             )
-            assert (
-                component.battlefield_center_y_inches + mirror_component.battlefield_center_y_inches
-                == 60.0
-            )
+            assert len(mirror_components) == 1
+            mirror_component = mirror_components[0]
             assert math.isclose(
                 (
                     mirror_component.battlefield_rotation_degrees
@@ -1243,6 +1274,103 @@ def test_phase17n_terrain_placements_use_reviewed_grid_symmetry_and_contacts() -
             )
             assert light_pipe.distance(mixed) <= 0.01
             assert light_pipe.intersection(mixed).is_empty
+
+
+def test_phase17n_component_source_instances_bind_to_nearest_generated_placement() -> None:
+    repository_root = Path(__file__).resolve().parents[2]
+    extraction_payload = json.loads(
+        (
+            repository_root
+            / "data/source_audits/event_companion_2026_06"
+            / "phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json"
+        ).read_text(encoding="utf-8")
+    )
+    artifact_layouts = {
+        layout.layout_id: layout for layout in event_layouts.exact_slice_artifact().layouts
+    }
+    duplicate_source_group_count = 0
+    source_instance_count = 0
+
+    for source_layout in extraction_payload["layouts"]:
+        artifact_components_by_id = {
+            component.component_id: component
+            for component in artifact_layouts[source_layout["layout_id"]].terrain_components
+        }
+        source_groups: dict[tuple[str, int], list[dict[str, Any]]] = {}
+        for source_component in source_layout["terrain_components"]:
+            source_instance_count += 1
+            source_image = source_component["source_image"]
+            artifact_component = artifact_components_by_id[source_component["component_id"]]
+            source_bounds = source_image["pdf_page_bbox_points"]
+            source_affine = source_image["pdf_page_affine_normalized_image_to_points"]
+            assert artifact_component.source_pdf_image_xref == source_image["xref"]
+            assert (
+                artifact_component.source_pdf_bounds.x0_points,
+                artifact_component.source_pdf_bounds.y0_points,
+                artifact_component.source_pdf_bounds.x1_points,
+                artifact_component.source_pdf_bounds.y1_points,
+            ) == tuple(source_bounds)
+            assert (
+                artifact_component.source_pdf_affine.a,
+                artifact_component.source_pdf_affine.b,
+                artifact_component.source_pdf_affine.c,
+                artifact_component.source_pdf_affine.d,
+                artifact_component.source_pdf_affine.e,
+                artifact_component.source_pdf_affine.f,
+            ) == tuple(source_affine)
+            source_groups.setdefault(
+                (
+                    source_component["terrain_area_id"],
+                    source_component["source_image"]["xref"],
+                ),
+                [],
+            ).append(source_component)
+
+        for source_components in source_groups.values():
+            if len(source_components) == 1:
+                continue
+            duplicate_source_group_count += 1
+            ordered_source_components = sorted(
+                source_components,
+                key=lambda component: component["component_id"],
+            )
+            artifact_candidates = tuple(
+                artifact_components_by_id[source_component["component_id"]]
+                for source_component in ordered_source_components
+            )
+            scored_assignments: list[tuple[float, tuple[str, ...]]] = []
+            for assignment in permutations(artifact_candidates):
+                score = sum(
+                    math.dist(
+                        tuple(source_component["source_image"]["battlefield_image_center_inches"]),
+                        (
+                            artifact_component.battlefield_center_x_inches,
+                            artifact_component.battlefield_center_y_inches,
+                        ),
+                    )
+                    ** 2
+                    for source_component, artifact_component in zip(
+                        ordered_source_components,
+                        assignment,
+                        strict=True,
+                    )
+                )
+                scored_assignments.append(
+                    (score, tuple(component.component_id for component in assignment))
+                )
+            scored_assignments.sort()
+            assert scored_assignments[0][1] == tuple(
+                component["component_id"] for component in ordered_source_components
+            )
+            assert not math.isclose(
+                scored_assignments[0][0],
+                scored_assignments[1][0],
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+
+    assert duplicate_source_group_count == 6
+    assert source_instance_count == 90
 
 
 def test_phase17n_meatgrinder_exact_layouts_build_all_source_components() -> None:

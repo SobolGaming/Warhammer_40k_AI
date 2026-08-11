@@ -4958,9 +4958,9 @@ scoring rows retain their separate reviewed Chapter Approved mission-deck
 provenance in the Event Companion source package.
 
 The exact battlefield artifact has package hash
-`1e9f38c315ccad9a09f953fe0f79efcf2094b3f2234bcda93237c0d01418a26f`,
+`c1e796a17bfcd533822dfe6300210a61169348d5273b3fe94bbe540594c0f04e`,
 raw artifact SHA-256
-`c9ab1d92148c31d3c12fd5a5b47797a701137df35a1c99b20d938ec46cc27daa`,
+`b1c487bb4d9da504e730905be3c7beaa6cb0ad59e9e44fd5d54cea7f35e455e5`,
 and reviewed extraction payload hash
 `8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30`.
 The loader pins both artifact hashes, so a structurally valid re-hashed

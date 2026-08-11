@@ -16,8 +16,8 @@ SOURCE_PAGES = (24, 25, 26)
 SOURCE_EXTRACTION_PAYLOAD_SHA256 = (
     "8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30"
 )
-EXPECTED_PACKAGE_HASH = "1e9f38c315ccad9a09f953fe0f79efcf2094b3f2234bcda93237c0d01418a26f"
-EXPECTED_ARTIFACT_SHA256 = "c9ab1d92148c31d3c12fd5a5b47797a701137df35a1c99b20d938ec46cc27daa"
+EXPECTED_PACKAGE_HASH = "c1e796a17bfcd533822dfe6300210a61169348d5273b3fe94bbe540594c0f04e"
+EXPECTED_ARTIFACT_SHA256 = "b1c487bb4d9da504e730905be3c7beaa6cb0ad59e9e44fd5d54cea7f35e455e5"
 PRIMARY_MISSION_ID = "primary-meatgrinder"
 FORCE_DISPOSITION_ID = "purge-the-foe"
 BATTLEFIELD_WIDTH_INCHES = 44.0
@@ -807,48 +807,65 @@ def _validate_component(
 def _validate_component_point_symmetry(
     components_by_id: dict[str, TerrainComponentPlacementArtifact],
 ) -> None:
+    matched_mirror_component_ids: set[str] = set()
     for component in components_by_id.values():
         area_prefix, component_suffix = component.component_id.rsplit(
             "-terrain-area-",
             maxsplit=1,
         )
-        area_index_text, component_ordinal = component_suffix.split(
+        area_index_text, _component_ordinal = component_suffix.split(
             "-component-",
             maxsplit=1,
         )
         area_index = int(area_index_text)
         if area_index > 8:
             continue
-        mirror_component_id = (
-            f"{area_prefix}-terrain-area-{17 - area_index:02d}-component-{component_ordinal}"
-        )
-        mirror = components_by_id.get(mirror_component_id)
-        if mirror is None or (
-            mirror.archetype_id != component.archetype_id
-            or mirror.local_transform != component.local_transform
-            or not math.isclose(
-                component.battlefield_center_x_inches + mirror.battlefield_center_x_inches,
+        mirror_area_id = f"{area_prefix}-terrain-area-{17 - area_index:02d}"
+        matching_mirrors = tuple(
+            candidate
+            for candidate in components_by_id.values()
+            if candidate.terrain_area_id == mirror_area_id
+            and candidate.archetype_id == component.archetype_id
+            and candidate.local_transform == component.local_transform
+            and math.isclose(
+                component.battlefield_center_x_inches + candidate.battlefield_center_x_inches,
                 BATTLEFIELD_WIDTH_INCHES,
                 rel_tol=0.0,
                 abs_tol=1e-9,
             )
-            or not math.isclose(
-                component.battlefield_center_y_inches + mirror.battlefield_center_y_inches,
+            and math.isclose(
+                component.battlefield_center_y_inches + candidate.battlefield_center_y_inches,
                 BATTLEFIELD_DEPTH_INCHES,
                 rel_tol=0.0,
                 abs_tol=1e-9,
             )
-            or not math.isclose(
-                (mirror.battlefield_rotation_degrees - component.battlefield_rotation_degrees)
+            and math.isclose(
+                (candidate.battlefield_rotation_degrees - component.battlefield_rotation_degrees)
                 % 360.0,
                 180.0,
                 rel_tol=0.0,
                 abs_tol=1e-9,
             )
-        ):
+        )
+        if len(matching_mirrors) != 1:
             raise EventCompanionExactSliceArtifactError(
                 "Event Companion terrain-component mirror pairs must use exact point symmetry."
             )
+        mirror_component_id = matching_mirrors[0].component_id
+        if mirror_component_id in matched_mirror_component_ids:
+            raise EventCompanionExactSliceArtifactError(
+                "Event Companion terrain-component mirror pairs must be one-to-one."
+            )
+        matched_mirror_component_ids.add(mirror_component_id)
+
+    mirror_component_count = sum(
+        int(component.component_id.rsplit("-terrain-area-", maxsplit=1)[1].split("-", 1)[0]) > 8
+        for component in components_by_id.values()
+    )
+    if len(matched_mirror_component_ids) != mirror_component_count:
+        raise EventCompanionExactSliceArtifactError(
+            "Every mirrored Event Companion terrain component must have one point-symmetric pair."
+        )
 
 
 def _validate_area_classifications(
