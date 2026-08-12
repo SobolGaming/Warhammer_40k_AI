@@ -88,6 +88,8 @@ from warhammer40k_core.engine.wargear_selections import (
 )
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
+from warhammer40k_core.geometry.terrain_factory import TerrainFactory
 from warhammer40k_core.rules.mission_pack_import import (
     chapter_approved_2026_27_mission_pack,
     warhammer_event_companion_2026_07_mission_pack,
@@ -200,13 +202,36 @@ def test_replay_v4_rejects_partial_logical_objective_bindings(
         ReplayArtifact.from_payload(payload)
 
 
-def test_replay_v4_rejects_runtime_battlefield_drift_from_source_layout() -> None:
-    payload, _event_setup = _event_layout_replay_payload()
+@pytest.mark.parametrize("terrain_mutation", ["injected", "removed", "relocated"])
+def test_replay_v4_rejects_runtime_battlefield_drift_from_source_layout(
+    terrain_mutation: str,
+) -> None:
+    payload, event_setup = _event_layout_replay_payload()
     lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
     state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
     battlefield_payload = cast(dict[str, JsonValue], state_payload["battlefield_state"])
     terrain_features = cast(list[JsonValue], battlefield_payload["terrain_features"])
-    terrain_features.pop()
+    if terrain_mutation == "injected":
+        terrain_features.append(
+            validate_json_value(
+                TerrainFactory.ruins_fixture(
+                    feature_id="phase18b-injected-runtime-wall",
+                    center_x_inches=22.0,
+                    center_y_inches=30.0,
+                )[0].to_payload()
+            )
+        )
+    elif terrain_mutation == "removed":
+        terrain_features.pop()
+    else:
+        source_feature = event_setup.terrain_features[0]
+        terrain_features[0] = validate_json_value(
+            _translated_terrain_feature(
+                source_feature,
+                x_delta=0.05,
+                y_delta=0.0,
+            ).to_payload()
+        )
 
     with pytest.raises(ReplayArtifactError, match="lifecycle payload is invalid") as exc_info:
         ReplayArtifact.from_payload(payload)
@@ -246,7 +271,10 @@ def test_replay_v4_rejects_canonical_layoutless_mission_setup_source_drift() -> 
     assert "canonical layoutless setup drifted from source" in str(exc_info.value.__cause__)
 
 
-def test_replay_v4_rejects_canonical_layoutless_runtime_battlefield_drift() -> None:
+@pytest.mark.parametrize("runtime_mutation", ["dimensions", "injected_terrain"])
+def test_replay_v4_rejects_canonical_layoutless_runtime_battlefield_drift(
+    runtime_mutation: str,
+) -> None:
     payload = _artifact_payload_copy(_setup_to_battle_artifact())
     lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
     config_payload = cast(dict[str, JsonValue], lifecycle_payload["config"])
@@ -254,7 +282,20 @@ def test_replay_v4_rejects_canonical_layoutless_runtime_battlefield_drift() -> N
     assert mission_setup_payload["battlefield_layout_id"] is None
     state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
     battlefield_payload = cast(dict[str, JsonValue], state_payload["battlefield_state"])
-    battlefield_payload["battlefield_width_inches"] = 99.0
+    if runtime_mutation == "dimensions":
+        battlefield_payload["battlefield_width_inches"] = 99.0
+    else:
+        terrain_features = cast(list[JsonValue], battlefield_payload["terrain_features"])
+        assert terrain_features == []
+        terrain_features.append(
+            validate_json_value(
+                TerrainFactory.ruins_fixture(
+                    feature_id="phase18b-layoutless-injected-runtime-wall",
+                    center_x_inches=30.0,
+                    center_y_inches=22.0,
+                )[0].to_payload()
+            )
+        )
 
     with pytest.raises(ReplayArtifactError, match="lifecycle payload is invalid") as exc_info:
         ReplayArtifact.from_payload(payload)
@@ -1052,6 +1093,54 @@ def _event_layout_replay_payload() -> tuple[ReplayArtifactPayload, MissionSetup]
     payload = _artifact_payload_copy(artifact)
     assert ReplayArtifact.from_payload(payload).to_payload() == payload
     return payload, event_setup
+
+
+def _translated_terrain_feature(
+    feature: TerrainFeatureDefinition,
+    *,
+    x_delta: float,
+    y_delta: float,
+) -> TerrainFeatureDefinition:
+    return replace(
+        feature,
+        footprint_center_x_inches=feature.footprint_center_x_inches + x_delta,
+        footprint_center_y_inches=feature.footprint_center_y_inches + y_delta,
+        rules_footprint_polygon=tuple(
+            replace(
+                point,
+                x_inches=point.x_inches + x_delta,
+                y_inches=point.y_inches + y_delta,
+            )
+            for point in feature.rules_footprint_polygon
+        ),
+        display_geometry=replace(
+            feature.display_geometry,
+            footprint_polygon=tuple(
+                replace(
+                    point,
+                    x_inches=point.x_inches + x_delta,
+                    y_inches=point.y_inches + y_delta,
+                )
+                for point in feature.display_geometry.footprint_polygon
+            ),
+        ),
+        walls=tuple(
+            replace(
+                wall,
+                center_x_inches=wall.center_x_inches + x_delta,
+                center_y_inches=wall.center_y_inches + y_delta,
+            )
+            for wall in feature.walls
+        ),
+        floors=tuple(
+            replace(
+                floor,
+                center_x_inches=floor.center_x_inches + x_delta,
+                center_y_inches=floor.center_y_inches + y_delta,
+            )
+            for floor in feature.floors
+        ),
+    )
 
 
 def _mutate_unselected_option_label(

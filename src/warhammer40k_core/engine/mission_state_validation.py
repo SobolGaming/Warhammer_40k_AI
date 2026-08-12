@@ -66,10 +66,7 @@ def validate_battlefield_state_matches_mission_setup(
     if (
         battlefield_state.battlefield_width_inches != mission_setup.battlefield_width_inches
         or battlefield_state.battlefield_depth_inches != mission_setup.battlefield_depth_inches
-        or (
-            mission_setup.battlefield_layout_id is not None
-            and battlefield_state.terrain_features != mission_setup.terrain_features
-        )
+        or battlefield_state.terrain_features != mission_setup.terrain_features
     ):
         raise GameLifecycleError(
             "GameState battlefield runtime geometry drifted from source MissionSetup."

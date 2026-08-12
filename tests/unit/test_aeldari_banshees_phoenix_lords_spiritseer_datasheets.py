@@ -643,7 +643,7 @@ def test_tears_of_isha_heals_or_returns_one_model_and_is_once_per_target(
 
 
 def test_tears_of_isha_revival_rejects_terrain_and_base_crossing_edge() -> None:
-    terrain_fixture = _fixture(phase=BattlePhase.COMMAND)
+    terrain_fixture = _fixture(phase=BattlePhase.COMMAND, custom_layoutless=True)
     terrain_decisions, terrain_request, terrain_effect, terrain_placement = _start_tears_revival(
         fixture=terrain_fixture,
         target_rules_unit_id=terrain_fixture.wraith_construct.unit_instance_id,
@@ -791,7 +791,12 @@ class _Fixture:
     other_enemy: UnitInstance
 
 
-def _fixture(*, phase: BattlePhase, attach_spiritseer: bool = False) -> _Fixture:
+def _fixture(
+    *,
+    phase: BattlePhase,
+    attach_spiritseer: bool = False,
+    custom_layoutless: bool = False,
+) -> _Fixture:
     package = _package()
     catalog = package.army_catalog
     factory = UnitFactory(catalog=catalog, model_geometries=package.model_geometries)
@@ -839,7 +844,7 @@ def _fixture(*, phase: BattlePhase, attach_spiritseer: bool = False) -> _Fixture
         ),
         _army(catalog, "army-b", "player-b", (enemy, other_enemy)),
     )
-    state = _state(armies, phase=phase)
+    state = _state(armies, phase=phase, custom_layoutless=custom_layoutless)
     _move_unit(state, spiritseer.unit_instance_id, x=10.0, y=10.0)
     _move_unit(state, wraith_construct.unit_instance_id, x=13.0, y=10.0)
     _move_unit(state, enemy.unit_instance_id, x=15.0, y=10.0)
@@ -866,9 +871,27 @@ def _fixture(*, phase: BattlePhase, attach_spiritseer: bool = False) -> _Fixture
     )
 
 
-def _state(armies: tuple[ArmyDefinition, ...], *, phase: BattlePhase) -> GameState:
+def _state(
+    armies: tuple[ArmyDefinition, ...],
+    *,
+    phase: BattlePhase,
+    custom_layoutless: bool,
+) -> GameState:
     descriptor = RulesetDescriptor.warhammer_40000_eleventh()
     phases = tuple(descriptor.battle_phase_sequence.phases)
+    mission_setup = MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    if custom_layoutless:
+        mission_setup = replace(
+            mission_setup,
+            deployment_map_id="aeldari-custom-deployment-map",
+            terrain_layout_id="aeldari-custom-terrain-layout",
+        )
     state = GameState(
         game_id=f"aeldari-banshees-phoenix-lords-{phase.value}",
         ruleset_descriptor_hash=descriptor.descriptor_hash,
@@ -882,13 +905,7 @@ def _state(armies: tuple[ArmyDefinition, ...], *, phase: BattlePhase) -> GameSta
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         tactical_secondary_draw_count=2,
-        mission_setup=MissionSetup.from_mission_pack(
-            mission_pack=chapter_approved_2026_27_mission_pack(),
-            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
-            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
-            attacker_player_id="player-a",
-            defender_player_id="player-b",
-        ),
+        mission_setup=mission_setup,
     )
     for army in armies:
         state.record_army_definition(army)

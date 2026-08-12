@@ -904,6 +904,46 @@ def test_canonical_layoutless_setup_rejects_runtime_battlefield_dimension_drift(
         state.record_battlefield_state(drifted_battlefield)
 
 
+@pytest.mark.parametrize("mutation_path", ["record", "replace"])
+def test_canonical_layoutless_setup_rejects_runtime_battlefield_terrain_drift(
+    mutation_path: str,
+) -> None:
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    state = GameState.from_config(_config(mission_setup=setup))
+    battlefield = BattlefieldRuntimeState(
+        battlefield_id="phase11a-canonical-layoutless-runtime-terrain",
+        battlefield_width_inches=setup.battlefield_width_inches,
+        battlefield_depth_inches=setup.battlefield_depth_inches,
+        placed_armies=(),
+        terrain_features=setup.terrain_features,
+    )
+    if mutation_path == "replace":
+        state, _reserve_state = _battle_state_with_mission_setup(
+            attacker_player_id="player-a",
+            defender_player_id="player-b",
+        )
+        assert state.battlefield_state is not None
+        battlefield = state.battlefield_state
+    drifted_battlefield = replace(
+        battlefield,
+        terrain_features=(_blocking_terrain_feature(x=30.0, y=22.0),),
+    )
+    mutate_battlefield = (
+        state.record_battlefield_state
+        if mutation_path == "record"
+        else state.replace_battlefield_state
+    )
+
+    with pytest.raises(GameLifecycleError, match="battlefield runtime geometry drifted"):
+        mutate_battlefield(drifted_battlefield)
+
+
 def test_battlefield_layout_and_mission_setup_reject_orphan_logical_terrain_group() -> None:
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
     layout_id = "purge-the-foe-vs-purge-the-foe-layout-1"
@@ -1156,6 +1196,7 @@ def test_live_reinforcements_use_manifested_battlefield_terrain_for_endpoint_val
         mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
         terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
         reserve_base_diameter_mm=200.0,
+        custom_layoutless=True,
     )
     handler, decisions, selection_request = _enter_reinforcements_choice(
         state=state,
@@ -1214,6 +1255,7 @@ def _battle_state_with_mission_setup(
     mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID,
     terrain_layout_id: str = PHASE16A_BATTLEFIELD_LAYOUT_ID,
     reserve_base_diameter_mm: float = 32.0,
+    custom_layoutless: bool = False,
 ) -> tuple[GameState, ReserveState]:
     mission_setup = MissionSetup.from_mission_pack(
         mission_pack=chapter_approved_2026_27_mission_pack(),
@@ -1222,6 +1264,12 @@ def _battle_state_with_mission_setup(
         attacker_player_id=attacker_player_id,
         defender_player_id=defender_player_id,
     )
+    if custom_layoutless:
+        mission_setup = replace(
+            mission_setup,
+            deployment_map_id="phase11a-custom-deployment-map",
+            terrain_layout_id="phase11a-custom-terrain-layout",
+        )
     config = _config(mission_setup=mission_setup)
     armies = _mustered_armies(config)
     armies = _with_single_model_reserve_unit(
