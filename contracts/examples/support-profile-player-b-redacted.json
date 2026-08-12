@@ -735,7 +735,7 @@
         }
       ],
       "terrain_layout": {
-        "identity_hash": "a53314b3a2bcf5c203de7b0119052d749cf35239ea69614661fb73bbbd77e4be",
+        "identity_hash": "4b85ea92f163d476fc4db93900b09846057c523fc43f5bfd89d975cf58c3ce6a",
         "identity_id": "take-and-hold-vs-purge-the-foe-layout-3"
       }
     },
@@ -754,7 +754,7 @@
       "roster_construction",
       "weapon_allocation_matrix"
     ],
-    "manifest_id": "capability-manifest:d73d226a5c6a07c2c844b8beffa55d8d1ea95085e8359000dd1888a59c41b2fc",
+    "manifest_id": "capability-manifest:b7585de3ca25030cdd247f7daa091d1cd5a56b1b76838dd848dda6f18fa4908f",
     "mission_rows": [
       {
         "capabilities": [
@@ -825,7 +825,7 @@
               "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-15-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
               "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
               "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
-              "mission-setup-sha256:9d01be9066595212bd83a0ce7102d579581325ec07fcfe899140b5c0483d98d9",
+              "mission-setup-sha256:22d3b14bde95573b3b06c8661125f5fb06c67d4c780921996172c25f4c2855c8",
               "take-and-hold-vs-purge-the-foe-layout-3"
             ],
             "reason_code": null,
@@ -839,7 +839,7 @@
             "dimension": "SEMANTICALLY_EXECUTABLE",
             "evidence_refs": [
               "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object",
-              "mission-setup-sha256:9d01be9066595212bd83a0ce7102d579581325ec07fcfe899140b5c0483d98d9",
+              "mission-setup-sha256:22d3b14bde95573b3b06c8661125f5fb06c67d4c780921996172c25f4c2855c8",
               "mission-source-package-hash:edaf4c6328cf738f8ee405854549af00a785d671fbe9ead6df908f880687857e"
             ],
             "reason_code": null,
@@ -887,7 +887,7 @@
         "metadata": {
           "battlefield_layout_id": "take-and-hold-vs-purge-the-foe-layout-3",
           "mission_pack_id": "11e-warhammer-event-companion-2026-07",
-          "mission_setup_hash": "9d01be9066595212bd83a0ce7102d579581325ec07fcfe899140b5c0483d98d9",
+          "mission_setup_hash": "22d3b14bde95573b3b06c8661125f5fb06c67d4c780921996172c25f4c2855c8",
           "mission_source_package_hash": "edaf4c6328cf738f8ee405854549af00a785d671fbe9ead6df908f880687857e",
           "primary_mission_id": "primary-immovable-object",
           "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
@@ -1015,7 +1015,7 @@
           "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "keyword:infantry_or_character",
-          "mission-setup-sha256:9d01be9066595212bd83a0ce7102d579581325ec07fcfe899140b5c0483d98d9",
+          "mission-setup-sha256:22d3b14bde95573b3b06c8661125f5fb06c67d4c780921996172c25f4c2855c8",
           "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-b:army-beta",
           "take-and-hold-vs-purge-the-foe-layout-3",
@@ -1038,7 +1038,7 @@
           "core-combined-arms",
           "core-marine-force",
           "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object",
-          "mission-setup-sha256:9d01be9066595212bd83a0ce7102d579581325ec07fcfe899140b5c0483d98d9",
+          "mission-setup-sha256:22d3b14bde95573b3b06c8661125f5fb06c67d4c780921996172c25f4c2855c8",
           "mission-source-package-hash:edaf4c6328cf738f8ee405854549af00a785d671fbe9ead6df908f880687857e",
           "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "phase9a-canonical/core-intercessor-like-infantry/core/core-scouts/none",
@@ -1605,7 +1605,7 @@
       }
     ],
     "schema_version": "capability-manifest-v1",
-    "selection_hash": "88ba35af2a1488ed661bf33f009bc0416d8cc758f5136a9ed29a13943f530f42",
+    "selection_hash": "bf852907b7ec0592dc60f2074c82b46abd5ebbb31ba88807141e46dc6edb4506",
     "unit_rows": [
       {
         "capabilities": [

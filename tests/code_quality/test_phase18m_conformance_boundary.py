@@ -49,6 +49,16 @@ def test_phase18m_package_pins_generation_typecheck_and_live_conformance() -> No
     assert "$defs:" not in generated
 
 
+def test_external_contract_check_regenerates_into_an_isolated_tree_before_validation() -> None:
+    builder = (REPO_ROOT / "scripts" / "build_external_contract.py").read_text(encoding="utf-8")
+
+    assert "if args.check:\n        _verify_regenerated_contract_bundle()" in builder
+    assert "tempfile.TemporaryDirectory" in builder
+    assert "shutil.copytree(CONTRACT_ROOT, regenerated_contract_root)" in builder
+    assert "_contract_tree_drift(" in builder
+    assert "External contract generated files drifted" in builder
+
+
 def test_phase18m_executable_client_is_operation_bound_without_identifier_conventions() -> None:
     contract = (CLIENT_ROOT / "src" / "contract.ts").read_text(encoding="utf-8")
     client = (CLIENT_ROOT / "src" / "client.ts").read_text(encoding="utf-8")

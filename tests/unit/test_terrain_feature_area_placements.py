@@ -13,7 +13,10 @@ from warhammer40k_core.core.missions import (
     MissionPackError,
 )
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
-from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+from warhammer40k_core.core.terrain_display import (
+    TerrainDisplayGeometry,
+    canonical_terrain_transform_coordinate,
+)
 from warhammer40k_core.core.terrain_layouts import (
     TerrainFeatureAreaPlacement,
     TerrainFeatureLocalTransform,
@@ -89,6 +92,36 @@ def test_event_companion_area_placed_terrain_features_resolve_from_source_data()
         Point3(solid_body.center_x_inches - 2.0, solid_body.center_y_inches, 1.0),
         Point3(solid_body.center_x_inches + 2.0, solid_body.center_y_inches, 1.0),
     )
+
+
+def test_source_terrain_transforms_publish_six_decimal_canonical_coordinates() -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    layout_id = "take-and-hold-vs-purge-the-foe-layout-3"
+    mission_pool_entry = next(
+        entry
+        for entry in mission_pack.mission_pool_entries
+        if layout_id in entry.terrain_layout_ids
+    )
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id=mission_pool_entry.mission_pool_entry_id,
+        terrain_layout_id=layout_id,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    feature = next(
+        terrain_feature
+        for terrain_feature in setup.terrain_features
+        if terrain_feature.feature_id
+        == "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-03-component-01"
+    )
+    wall = next(candidate for candidate in feature.walls if candidate.wall_id == "long-solid-arm")
+
+    assert wall.center_x_inches == 31.088806
+    assert wall.center_y_inches == 46.891621
+    assert canonical_terrain_transform_coordinate(31.088806397420253) == 31.088806
+    assert canonical_terrain_transform_coordinate(31.08880639742025) == 31.088806
+    assert canonical_terrain_transform_coordinate(-1e-15) == 0.0
 
 
 def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -> None:
@@ -197,7 +230,19 @@ def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -
     mirror_anchor_x = footprint_template.polygon_vertices_inches[0].x_inches
     mirrored_local_x = (2.0 * mirror_anchor_x) - custom_preset.walls[0].center_x_inches
 
-    assert feature.display_geometry.footprint_polygon == area.footprint_polygon
+    assert tuple(
+        (
+            point.x_inches,
+            point.y_inches,
+        )
+        for point in feature.display_geometry.footprint_polygon
+    ) == tuple(
+        (
+            canonical_terrain_transform_coordinate(point.x_inches),
+            canonical_terrain_transform_coordinate(point.y_inches),
+        )
+        for point in area.footprint_polygon
+    )
     assert math.isclose(
         wall.center_x_inches,
         area.center_x_inches + mirrored_local_x,

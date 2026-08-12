@@ -1,8 +1,8 @@
 {
   "accepted": true,
   "checkpoint": {
-    "event_cursor": "1-VjWuA9jcPMGJoMa8cN0O3dEyUB_Fy3W351jOhq4R4lzKTuK521i_QnZ2cDnxGe",
-    "projection_state_hash": "ffbcda688e1598cffa8219f2e29239867687bcbca7475dbab06f143643a34bd5",
+    "event_cursor": "EmL5jKi_BkztNyzdCGjgMBbXEOyjY5SSN55urhQ0Dd6vhnGrB84bp5EUXHjjZO39",
+    "projection_state_hash": "d007b00874f3d8d8afb7af84b93691d8aabc802712a7b9ae1e4d89a29d805574",
     "session_revision": 1,
     "viewer_player_id": null,
     "visibility_role": "administrator"
@@ -10,8 +10,8 @@
   "command_id": "phase18g-contract-start-000001",
   "committed": true,
   "event_range": {
-    "from_cursor": "mraY0elJx2V8jTZ5P_UMbSLbIyL2dQzmeoVpxQNSSyA8tCzmX_N8zLBYtegV2H_1",
-    "to_cursor": "1-VjWuA9jcPMGJoMa8cN0O3dEyUB_Fy3W351jOhq4R4lzKTuK521i_QnZ2cDnxGe"
+    "from_cursor": "Pb5qi5Kh5juwL7UHzf0mfK_zfhfgDbxzkFf4ukTPYZcB_HBUft1PE_lqecDfQnHr",
+    "to_cursor": "EmL5jKi_BkztNyzdCGjgMBbXEOyjY5SSN55urhQ0Dd6vhnGrB84bp5EUXHjjZO39"
   },
   "operation": "start_session",
   "outcome_code": "command_committed",
@@ -21,7 +21,7 @@
     "created_at": "2026-07-18T20:00:00Z",
     "engine_build_id": "warhammer40k-core-v2:0.1.0",
     "engine_version": "0.1.0",
-    "event_cursor": "1-VjWuA9jcPMGJoMa8cN0O3dEyUB_Fy3W351jOhq4R4lzKTuK521i_QnZ2cDnxGe",
+    "event_cursor": "EmL5jKi_BkztNyzdCGjgMBbXEOyjY5SSN55urhQ0Dd6vhnGrB84bp5EUXHjjZO39",
     "game_id": "phase18e-contract-session",
     "last_activity_at": "2026-07-18T20:00:00Z",
     "lifecycle_status": {
@@ -33,7 +33,7 @@
       "stage": "setup",
       "status_kind": "waiting_for_decision"
     },
-    "projection_state_hash": "ffbcda688e1598cffa8219f2e29239867687bcbca7475dbab06f143643a34bd5",
+    "projection_state_hash": "d007b00874f3d8d8afb7af84b93691d8aabc802712a7b9ae1e4d89a29d805574",
     "rules_overlay_ids": [],
     "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
     "ruleset_id": {

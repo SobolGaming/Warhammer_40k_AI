@@ -8,6 +8,7 @@ from typing import Self, TypedDict, cast
 from warhammer40k_core.core.terrain_display import (
     TerrainDisplayPoint,
     TerrainDisplayPointPayload,
+    canonical_terrain_transform_coordinate,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.geometry.polygons import (
@@ -618,13 +619,17 @@ def transform_terrain_area_local_point(
         x_inches = (2.0 * anchor_x_inches) - x_inches
     elif area.local_transform is not TerrainAreaLocalTransform.IDENTITY:
         raise TerrainAreaError("Unsupported terrain-area local point transform.")
-    return translate_point(
+    transformed = translate_point(
         rotate_point(
             TerrainDisplayPoint(x_inches=x_inches, y_inches=point.y_inches),
             area.rotation_degrees,
         ),
         dx_inches=area.center_x_inches,
         dy_inches=area.center_y_inches,
+    )
+    return TerrainDisplayPoint(
+        x_inches=canonical_terrain_transform_coordinate(transformed.x_inches),
+        y_inches=canonical_terrain_transform_coordinate(transformed.y_inches),
     )
 
 

@@ -4,7 +4,11 @@ import argparse
 import ast
 import hashlib
 import json
+import os
+import shutil
 import subprocess
+import sys
+import tempfile
 from pathlib import Path
 from typing import cast
 
@@ -84,7 +88,9 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.weapon_abilities import WEAPON_ABILITY_SELECTION_DECISION_TYPE
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTRACT_ROOT = ROOT / "contracts"
+_GENERATED_OUTPUT_ROOT_ENV = "_WARHAMMER40K_EXTERNAL_CONTRACT_OUTPUT_ROOT"
+GENERATED_OUTPUT_ROOT = Path(os.environ.get(_GENERATED_OUTPUT_ROOT_ENV, ROOT)).resolve()
+CONTRACT_ROOT = GENERATED_OUTPUT_ROOT / "contracts"
 SCHEMA_DIR = CONTRACT_ROOT / "schemas"
 EXAMPLE_DIR = CONTRACT_ROOT / "examples"
 PROJECTION_EXAMPLE_DIR = EXAMPLE_DIR / "projections"
@@ -208,6 +214,7 @@ def main() -> int:
     if args.check and args.write_baseline:
         raise ExternalContractError("--check and --write-baseline are mutually exclusive.")
     if args.check:
+        _verify_regenerated_contract_bundle()
         verify_contract_bundle(base_ref=args.base_ref)
         return 0
     if args.write_baseline:
@@ -222,7 +229,7 @@ def main() -> int:
 
 def write_contract_examples() -> None:
     audit_tacoma_2026_sources(ROOT)
-    export_ui_contract_files(output_root=ROOT)
+    export_ui_contract_files(output_root=GENERATED_OUTPUT_ROOT)
     _write_missing_proposal_examples()
 
     config = canonical_setup_prebattle_smoke_config(game_id="phase18d-contract-session")
@@ -323,6 +330,67 @@ def verify_contract_bundle(*, base_ref: str | None = None) -> None:
     _verify_compatibility(schemas)
     _verify_base_contract_compatibility(schemas=schemas, base_ref=base_ref)
     _verify_released_baselines_immutable(base_ref=base_ref)
+
+
+def _verify_regenerated_contract_bundle() -> None:
+    with tempfile.TemporaryDirectory(prefix="warhammer40k-external-contract-") as temporary:
+        regenerated_output_root = Path(temporary)
+        regenerated_contract_root = regenerated_output_root / "contracts"
+        shutil.copytree(CONTRACT_ROOT, regenerated_contract_root)
+        environment = os.environ.copy()
+        environment[_GENERATED_OUTPUT_ROOT_ENV] = str(regenerated_output_root)
+        completed = subprocess.run(
+            (sys.executable, str(Path(__file__).resolve())),
+            cwd=ROOT,
+            env=environment,
+            check=False,
+            capture_output=True,
+            encoding="utf-8",
+        )
+        if completed.returncode != 0:
+            detail = completed.stderr.strip() or completed.stdout.strip()
+            raise ExternalContractError(
+                "External contract regeneration failed during --check."
+                + (f"\n{detail}" if detail else "")
+            )
+        drift = _contract_tree_drift(
+            committed_root=CONTRACT_ROOT,
+            regenerated_root=regenerated_contract_root,
+        )
+    if drift:
+        raise ExternalContractError(
+            "External contract generated files drifted; run "
+            "scripts/build_external_contract.py.\n" + "\n".join(drift)
+        )
+
+
+def _contract_tree_drift(
+    *,
+    committed_root: Path,
+    regenerated_root: Path,
+) -> tuple[str, ...]:
+    committed = _contract_tree_snapshot(committed_root)
+    regenerated = _contract_tree_snapshot(regenerated_root)
+    paths = sorted(set(committed) | set(regenerated))
+    drift: list[str] = []
+    for path in paths:
+        committed_content = committed.get(path)
+        regenerated_content = regenerated.get(path)
+        if committed_content is None:
+            drift.append(f"added: contracts/{path}")
+        elif regenerated_content is None:
+            drift.append(f"removed: contracts/{path}")
+        elif committed_content != regenerated_content:
+            drift.append(f"changed: contracts/{path}")
+    return tuple(drift)
+
+
+def _contract_tree_snapshot(root: Path) -> dict[str, bytes]:
+    return {
+        path.relative_to(root).as_posix(): path.read_bytes()
+        for path in sorted(root.rglob("*"))
+        if path.is_file()
+    }
 
 
 def _verify_python_schema_versions(schemas: dict[str, Schema]) -> None:

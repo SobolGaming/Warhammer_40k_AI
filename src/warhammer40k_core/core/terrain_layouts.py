@@ -22,6 +22,7 @@ from warhammer40k_core.core.terrain_display import (
     TerrainDisplayGeometryPayload,
     TerrainDisplayPoint,
     TerrainDisplayPointPayload,
+    canonical_terrain_transform_coordinate,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.geometry.polygons import polygon_bounds as geometry_polygon_bounds
@@ -1176,8 +1177,12 @@ def transform_terrain_feature_local_point(
     cosine = math.cos(radians)
     sine = math.sin(radians)
     return TerrainDisplayPoint(
-        x_inches=(x_inches * cosine) - (point.y_inches * sine) + placement.local_offset_x_inches,
-        y_inches=(x_inches * sine) + (point.y_inches * cosine) + placement.local_offset_y_inches,
+        x_inches=canonical_terrain_transform_coordinate(
+            (x_inches * cosine) - (point.y_inches * sine) + placement.local_offset_x_inches
+        ),
+        y_inches=canonical_terrain_transform_coordinate(
+            (x_inches * sine) + (point.y_inches * cosine) + placement.local_offset_y_inches
+        ),
     )
 
 

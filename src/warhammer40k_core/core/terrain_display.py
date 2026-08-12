@@ -7,6 +7,7 @@ from typing import Self, TypedDict, cast
 TERRAIN_DISPLAY_SCHEMA_VERSION = "terrain-display-v1"
 TERRAIN_DISPLAY_COORDINATE_SPACE = "battlefield_inches"
 TERRAIN_DISPLAY_FOOTPRINT_KIND = "polygon"
+TERRAIN_TRANSFORM_COORDINATE_DECIMAL_PLACES = 6
 _AREA_EPSILON = 1e-9
 
 
@@ -25,6 +26,14 @@ class TerrainDisplayGeometryPayload(TypedDict):
     display_template_id: str | None
     footprint_kind: str
     footprint_polygon: list[TerrainDisplayPointPayload]
+
+
+def canonical_terrain_transform_coordinate(value: object) -> float:
+    """Quantize derived terrain coordinates before they enter authoritative state."""
+
+    number = _validate_finite_number("terrain transform coordinate", value)
+    quantized = round(number, TERRAIN_TRANSFORM_COORDINATE_DECIMAL_PLACES)
+    return 0.0 if quantized == 0.0 else quantized
 
 
 @dataclass(frozen=True, slots=True)
