@@ -98,12 +98,15 @@ Secondary status:
   `eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf`, whose
   SHA-256 is
   `97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20`.
+  Territory boundaries are reviewed against the attacker/defender triangle
+  glyphs on all 45 pages rather than inferred from the horizontal or vertical
+  battlefield middle guides.
   The reviewed page-8 key plus pages-9-53 layout extraction SHA-256 is
   `a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f`,
   the generated artifact SHA-256 is
-  `88ba6d7390eab060d6b0c53eb60afbfb1a6813dd80715e3d42562dd0c89128d9`,
+  `028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f`,
   and its canonical package hash is
-  `e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924`.
+  `44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972`.
   The generator separately pins the stable runtime identity map at
   `742ab841d1ec1e696f4a5c0e3f2e8c251203d510bf1da85fb30af88023cb64f3`.
   The generated `event-companion-battlefields.json` artifact records source

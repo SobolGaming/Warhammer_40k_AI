@@ -3080,7 +3080,7 @@
               "y_inches": 49.275000000000006
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-01-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-01-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -3176,7 +3176,7 @@
               "y_inches": 46.6
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-01-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-01-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 3.0,
@@ -3271,7 +3271,7 @@
               "y_inches": 47.70474802462141
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-02-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-02-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -3352,11 +3352,11 @@
               "y_inches": 46.922506775947134
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-03-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-03-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
-              "center_x_inches": 31.08880639742025,
+              "center_x_inches": 31.088806397420253,
               "center_y_inches": 46.89162131830992,
               "depth_inches": 0.43499999999999994,
               "height_inches": 2.0,
@@ -3443,7 +3443,7 @@
               "y_inches": 51.02148275439235
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-03-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-03-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -3518,7 +3518,7 @@
               "y_inches": 41.690155600181264
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -3583,7 +3583,7 @@
               "y_inches": 42.14036113877571
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -3648,7 +3648,7 @@
               "y_inches": 42.19036163885107
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -3713,7 +3713,7 @@
               "y_inches": 40.375
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-05-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-05-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -3778,7 +3778,7 @@
               "y_inches": 36.85
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-05-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-05-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -3874,7 +3874,7 @@
               "y_inches": 39.099999999999994
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-06-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-06-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 3.0,
@@ -4010,7 +4010,7 @@
               "y_inches": 34.599999999999994
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-06-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-06-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 3.0,
@@ -4105,7 +4105,7 @@
               "y_inches": 34.55
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-07-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-07-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -4186,7 +4186,7 @@
               "y_inches": 35.94015451722304
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-08-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-08-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -4292,7 +4292,7 @@
               "y_inches": 36.422538674746924
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-08-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-08-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 3.0,
@@ -4423,7 +4423,7 @@
               "y_inches": 24.093119665505988
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-09-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-09-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -4529,7 +4529,7 @@
               "y_inches": 23.691047476885142
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-09-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-09-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 3.0,
@@ -4644,7 +4644,7 @@
               "y_inches": 25.45
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-10-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-10-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-long-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -4740,7 +4740,7 @@
               "y_inches": 21.0
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-11-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-11-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ef:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 3.0,
@@ -4876,7 +4876,7 @@
               "y_inches": 25.500000000000004
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-11-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-11-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-gh:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 3.0,
@@ -4971,7 +4971,7 @@
               "y_inches": 19.625
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-12-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-12-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-downed-hovercraft:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -5036,7 +5036,7 @@
               "y_inches": 23.150000000000002
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-12-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-12-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-tall-crates:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -5101,7 +5101,7 @@
               "y_inches": 18.25984451622094
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -5166,7 +5166,7 @@
               "y_inches": 17.809638361148924
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -5231,7 +5231,7 @@
               "y_inches": 17.859638861224287
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -5312,7 +5312,7 @@
               "y_inches": 13.077493034575873
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-14-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-14-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -5403,7 +5403,7 @@
               "y_inches": 8.928517195298415
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-14-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-14-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -5478,7 +5478,7 @@
               "y_inches": 12.195252465854981
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-15-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-15-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -5559,7 +5559,7 @@
               "y_inches": 10.725
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 0.0,
@@ -5655,7 +5655,7 @@
               "y_inches": 13.6
             }
           ],
-          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924",
+          "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "walls": [
             {
               "bottom_z_inches": 3.0,

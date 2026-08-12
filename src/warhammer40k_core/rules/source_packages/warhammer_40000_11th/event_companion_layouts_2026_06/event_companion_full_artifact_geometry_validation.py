@@ -8,6 +8,7 @@ from warhammer40k_core.geometry import shapely_backend
 from .event_companion_full_artifact_errors import EventCompanionBattlefieldArtifactError
 from .event_companion_full_artifact_types import (
     BattlefieldLayoutArtifact,
+    BattlefieldShapeArtifact,
     PdfAffineArtifact,
     PointArtifact,
     TerrainAreaArtifact,
@@ -139,6 +140,32 @@ _REVIEWED_COMPONENT_CONTAINMENT_ADJUSTMENTS = {
 _PAGE_9_UNPAIRED_SOURCE_COMPONENT_ID = (
     "take-and-hold-vs-take-and-hold-layout-1-terrain-area-11-component-02"
 )
+_EXPECTED_TERRITORY_POLYGONS_BY_TEMPLATE = {
+    1: {
+        "attacker_territory": (((0.0, 26.0), (44.0, 34.0), (44.0, 60.0), (0.0, 60.0)),),
+        "defender_territory": (((0.0, 0.0), (44.0, 0.0), (44.0, 34.0), (0.0, 26.0)),),
+    },
+    2: {
+        "attacker_territory": (((0.0, 0.0), (22.0, 0.0), (22.0, 60.0), (0.0, 60.0)),),
+        "defender_territory": (((22.0, 0.0), (44.0, 0.0), (44.0, 60.0), (22.0, 60.0)),),
+    },
+    3: {
+        "attacker_territory": (((0.0, 0.0), (44.0, 60.0), (0.0, 60.0)),),
+        "defender_territory": (((0.0, 0.0), (44.0, 0.0), (44.0, 60.0)),),
+    },
+    4: {
+        "attacker_territory": (((0.0, 0.0), (19.0, 0.0), (25.0, 60.0), (0.0, 60.0)),),
+        "defender_territory": (((19.0, 0.0), (44.0, 0.0), (44.0, 60.0), (25.0, 60.0)),),
+    },
+    5: {
+        "attacker_territory": (((0.0, 30.0), (44.0, 30.0), (44.0, 60.0), (0.0, 60.0)),),
+        "defender_territory": (((0.0, 0.0), (44.0, 0.0), (44.0, 30.0), (0.0, 30.0)),),
+    },
+    6: {
+        "attacker_territory": (((0.0, 15.0), (44.0, 45.0), (44.0, 60.0), (0.0, 60.0)),),
+        "defender_territory": (((0.0, 0.0), (44.0, 0.0), (44.0, 45.0), (0.0, 15.0)),),
+    },
+}
 
 
 def validate_artifact_polygon(
@@ -177,6 +204,24 @@ def validate_artifact_polygon(
     ):
         raise EventCompanionBattlefieldArtifactError(
             "Event Companion battlefield-region polygon is outside the battlefield."
+        )
+
+
+def validate_territory_geometry(
+    *,
+    template_number: int,
+    territories_by_role: dict[str, BattlefieldShapeArtifact],
+) -> None:
+    actual_polygons = {
+        role: tuple(
+            tuple((point.x_inches, point.y_inches) for point in polygon)
+            for polygon in territory.polygons
+        )
+        for role, territory in territories_by_role.items()
+    }
+    if actual_polygons != _EXPECTED_TERRITORY_POLYGONS_BY_TEMPLATE[template_number]:
+        raise EventCompanionBattlefieldArtifactError(
+            "Event Companion territory geometry drifted from its source template."
         )
 
 
@@ -1007,4 +1052,5 @@ __all__ = (
     "validate_component_pose_witness",
     "validate_component_runtime_pose",
     "validate_contact_pairs",
+    "validate_territory_geometry",
 )

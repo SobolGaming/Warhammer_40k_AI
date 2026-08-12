@@ -83,10 +83,16 @@ diagram contains one source-backed exception: it has 29 components because one
 downed hovercraft has no tall-crate companion. Every other layout has 30
 components.
 
+Territory geometry is reviewed against the attacker/defender triangle glyphs
+on every layout page, independently of the battlefield's horizontal and
+vertical middle guides. The six source template dividers are `(0,26)-(44,34)`,
+`x=22`, `(0,0)-(44,60)`, `(19,0)-(25,60)`, `y=30`, and
+`(0,15)-(44,45)` respectively.
+
 The canonical generated artifact has SHA-256
-`88ba6d7390eab060d6b0c53eb60afbfb1a6813dd80715e3d42562dd0c89128d9`
+`028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f`
 and package hash
-`e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924`.
+`44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972`.
 Its reviewed page-8 key plus pages-9-53 layout extraction has SHA-256
 `a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f`;
 the generator also pins the stable runtime identity map at

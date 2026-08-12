@@ -4,15 +4,15 @@
   "from_revision": 1,
   "game_id": "phase18d-contract-session",
   "has_more": false,
-  "next_cursor": "VbBStxCt1pLvtnSSgJ-cZ4a8Luvx0AqScwf-FdSOPsuPJbSUjy-wHwmobZ9-PjGE",
-  "projection_state_hash": "6d56766cace014e1c241b888c39c2b0b43289f652b0beff4828ddc6ce7825465",
+  "next_cursor": "Yaje3jgAB7L5MhxuyXxLZvGcd_2IQo_lrdYaEIl5bkRaXhx8yetHW5U_jhQxFEah",
+  "projection_state_hash": "4e3adfe2b3e61540765fb8c41a901f321c7f79620497d6441415ce15d586b568",
   "resync_reason": null,
   "resync_required": false,
   "retention_limit": 4096,
   "revision_retention_limit": 128,
   "schema_version": "event-delta-v2",
   "session_id": "session-phase18d-contract-session",
-  "supplied_cursor": "VbBStxCt1pLvtnSSgJ-cZ4a8Luvx0AqScwf-FdSOPsuPJbSUjy-wHwmobZ9-PjGE",
+  "supplied_cursor": "Yaje3jgAB7L5MhxuyXxLZvGcd_2IQo_lrdYaEIl5bkRaXhx8yetHW5U_jhQxFEah",
   "to_revision": 1,
   "visibility_role": "player"
 }
