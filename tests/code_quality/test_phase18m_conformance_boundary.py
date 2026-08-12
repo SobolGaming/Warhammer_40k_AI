@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import json
+import os
 import runpy
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 from typing import Protocol, cast
@@ -64,6 +67,7 @@ def test_external_contract_check_regenerates_into_an_isolated_tree_before_valida
     builder = (REPO_ROOT / "scripts" / "build_external_contract.py").read_text(encoding="utf-8")
 
     assert "if args.check:\n        _verify_regenerated_contract_bundle()" in builder
+    assert "_clean_generated_contract_outputs(contract_root=CONTRACT_ROOT)" in builder
     assert "tempfile.TemporaryDirectory" in builder
     assert "_prepare_regenerated_contract_root(" in builder
     assert "_contract_tree_drift(" in builder
@@ -102,6 +106,47 @@ def test_external_contract_regeneration_discards_orphan_generated_fixtures(
         committed_root=committed_root,
         regenerated_root=regenerated_root,
     )
+
+
+def test_external_contract_write_mode_removes_orphan_generated_fixture(
+    tmp_path: Path,
+) -> None:
+    output_root = tmp_path / "write-mode-output"
+    contract_root = output_root / "contracts"
+    shutil.copytree(REPO_ROOT / "contracts", contract_root)
+    orphan_relative_path = Path("examples/projections/retired-orphan.json")
+    orphan = contract_root / orphan_relative_path
+    shutil.copyfile(
+        contract_root / "examples/projections/initial_setup_view_player1.json",
+        orphan,
+    )
+    environment = os.environ.copy()
+    environment["_WARHAMMER40K_EXTERNAL_CONTRACT_OUTPUT_ROOT"] = str(output_root)
+
+    completed = subprocess.run(
+        (sys.executable, str(REPO_ROOT / "scripts/build_external_contract.py")),
+        cwd=REPO_ROOT,
+        env=environment,
+        check=False,
+        capture_output=True,
+        encoding="utf-8",
+    )
+
+    assert completed.returncode == 0, completed.stderr or completed.stdout
+    assert not orphan.exists()
+    manifest = json.loads((contract_root / "manifest.json").read_text(encoding="utf-8"))
+    orphan_manifest_path = orphan_relative_path.as_posix()
+    assert orphan_manifest_path not in manifest["example_schema_by_path"]
+    assert orphan_manifest_path not in manifest["file_sha256"]
+    verified = subprocess.run(
+        (sys.executable, str(REPO_ROOT / "scripts/build_external_contract.py"), "--check"),
+        cwd=REPO_ROOT,
+        env=environment,
+        check=False,
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert verified.returncode == 0, verified.stderr or verified.stdout
 
 
 def test_phase18m_executable_client_is_operation_bound_without_identifier_conventions() -> None:

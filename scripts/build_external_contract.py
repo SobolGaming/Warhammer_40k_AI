@@ -222,6 +222,7 @@ def main() -> int:
         return 0
     if args.write_baseline:
         _new_compatibility_baseline_target(base_ref=args.base_ref)
+    _clean_generated_contract_outputs(contract_root=CONTRACT_ROOT)
     write_contract_examples()
     if args.write_baseline:
         _write_new_compatibility_baseline(base_ref=args.base_ref)
@@ -378,12 +379,18 @@ def _prepare_regenerated_contract_root(
     """Copy contract inputs while clearing every generator-owned output path."""
 
     shutil.copytree(committed_root, regenerated_root)
+    _clean_generated_contract_outputs(contract_root=regenerated_root)
+
+
+def _clean_generated_contract_outputs(*, contract_root: Path) -> None:
+    """Remove generator-owned outputs before emitting the current inventory."""
+
     for relative_path in _GENERATED_CONTRACT_SUBTREES:
-        generated_subtree = regenerated_root / relative_path
+        generated_subtree = contract_root / relative_path
         if generated_subtree.exists():
             shutil.rmtree(generated_subtree)
     for relative_path in _GENERATED_CONTRACT_FILES:
-        generated_file = regenerated_root / relative_path
+        generated_file = contract_root / relative_path
         if generated_file.exists():
             generated_file.unlink()
 
