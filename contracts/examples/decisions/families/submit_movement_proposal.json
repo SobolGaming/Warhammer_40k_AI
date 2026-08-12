@@ -76,7 +76,7 @@
       "request_id": "decision-request-000009",
       "source_decision_request_id": "decision-request-000008",
       "source_decision_result_id": "phase18d-family-select-normal-move",
-      "spatial_context_hash": "7903f56671d7a8b4b7e4c591d61f79caed83b18a8804d1774edff1bc01b79b6d",
+      "spatial_context_hash": "e41240f49d3f1ce504a6dc9a06a47bd0a8e2db5fbad0e815b182188c2d012a85",
       "unit_instance_id": "army-alpha:intercessor-unit-1"
     }
   },

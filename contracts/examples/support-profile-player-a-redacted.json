@@ -935,7 +935,7 @@
         "identity_id": "warhammer40k-core-v2:0.1.0"
       },
       "mission_pack": {
-        "identity_hash": "149cf768d1e94b6e39acbd5045da70055bd3f85bd77a738c66e6a1838a410b70",
+        "identity_hash": "c001c2d30201c113b0e6994c9500020640b3e42459a250d6ddb24e067a892761",
         "identity_id": "11e-warhammer-event-companion-2026-07"
       },
       "ruleset": {
@@ -949,13 +949,13 @@
           "source_kind": "army_catalog"
         },
         {
-          "identity_hash": "d7ba3c0f113ac0857e535b871b18d202222fdf45337f16e655b0c3a072eba066",
+          "identity_hash": "ee3c4fb22f8e1cb27b956aede94666d5f71d365615522e8c6f18d90b546eb841",
           "identity_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
           "source_kind": "mission_pack"
         }
       ],
       "terrain_layout": {
-        "identity_hash": "2dbb0b22f98926707a1a93ff767281331c4f982f0879656c2b6fe9560d128d9f",
+        "identity_hash": "0d4266de50e9992a1667c1c262ff788e968602c5d85df4b719ad111669a9c109",
         "identity_id": "take-and-hold-vs-purge-the-foe-layout-3"
       }
     },
@@ -974,7 +974,7 @@
       "roster_construction",
       "weapon_allocation_matrix"
     ],
-    "manifest_id": "capability-manifest:194a7f5eab7a201cf065af06e5cfdeddec2efd0010a6fac736e8e66f2d2c3748",
+    "manifest_id": "capability-manifest:3e09d3c13b11ee8daf52966f197a6996105e06400f3e9a6e9c695cb9391c3093",
     "mission_rows": [
       {
         "capabilities": [
@@ -1045,7 +1045,7 @@
               "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-15-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
               "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ef:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
               "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
-              "mission-setup-sha256:a037f60c0044a8bb088be0bc42e162f675eb7699eb7dfe2f3308a3b530cc2946",
+              "mission-setup-sha256:a5a44a0f02424734a74334895653696744bffb953b5375bf0d2babcded21d65d",
               "take-and-hold-vs-purge-the-foe-layout-3"
             ],
             "reason_code": null,
@@ -1059,8 +1059,8 @@
             "dimension": "SEMANTICALLY_EXECUTABLE",
             "evidence_refs": [
               "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object",
-              "mission-setup-sha256:a037f60c0044a8bb088be0bc42e162f675eb7699eb7dfe2f3308a3b530cc2946",
-              "mission-source-package-hash:d7ba3c0f113ac0857e535b871b18d202222fdf45337f16e655b0c3a072eba066"
+              "mission-setup-sha256:a5a44a0f02424734a74334895653696744bffb953b5375bf0d2babcded21d65d",
+              "mission-source-package-hash:ee3c4fb22f8e1cb27b956aede94666d5f71d365615522e8c6f18d90b546eb841"
             ],
             "reason_code": null,
             "source_ids": [
@@ -1107,8 +1107,8 @@
         "metadata": {
           "battlefield_layout_id": "take-and-hold-vs-purge-the-foe-layout-3",
           "mission_pack_id": "11e-warhammer-event-companion-2026-07",
-          "mission_setup_hash": "a037f60c0044a8bb088be0bc42e162f675eb7699eb7dfe2f3308a3b530cc2946",
-          "mission_source_package_hash": "d7ba3c0f113ac0857e535b871b18d202222fdf45337f16e655b0c3a072eba066",
+          "mission_setup_hash": "a5a44a0f02424734a74334895653696744bffb953b5375bf0d2babcded21d65d",
+          "mission_source_package_hash": "ee3c4fb22f8e1cb27b956aede94666d5f71d365615522e8c6f18d90b546eb841",
           "primary_mission_id": "primary-immovable-object",
           "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
         },
@@ -1276,7 +1276,7 @@
           "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-16-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-cd:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
           "keyword:infantry_or_character",
           "keyword:monster_or_walker",
-          "mission-setup-sha256:a037f60c0044a8bb088be0bc42e162f675eb7699eb7dfe2f3308a3b530cc2946",
+          "mission-setup-sha256:a5a44a0f02424734a74334895653696744bffb953b5375bf0d2babcded21d65d",
           "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "roster:player-a:army-alpha",
           "take-and-hold-vs-purge-the-foe-layout-3",
@@ -1308,8 +1308,8 @@
           "descriptor:movement:deep-strike-placement",
           "descriptor:reserve-declaration:deep-strike",
           "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object",
-          "mission-setup-sha256:a037f60c0044a8bb088be0bc42e162f675eb7699eb7dfe2f3308a3b530cc2946",
-          "mission-source-package-hash:d7ba3c0f113ac0857e535b871b18d202222fdf45337f16e655b0c3a072eba066",
+          "mission-setup-sha256:a5a44a0f02424734a74334895653696744bffb953b5375bf0d2babcded21d65d",
+          "mission-source-package-hash:ee3c4fb22f8e1cb27b956aede94666d5f71d365615522e8c6f18d90b546eb841",
           "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3",
           "phase9a-canonical/core-deep-strike-unit/core/core-deep-strike/none",
           "phase9a-canonical/core-intercessor-like-infantry/core/core-scouts/none",
@@ -2063,7 +2063,7 @@
       }
     ],
     "schema_version": "capability-manifest-v1",
-    "selection_hash": "68a80c05e6d01f950e8f320e3773b16c0dd16775bca0a3c5c88c4a452590c5bb",
+    "selection_hash": "636c4493acd4bfe61319106b17bd150694ba9c91582f2b01a968e9fb558d799f",
     "unit_rows": [
       {
         "capabilities": [
