@@ -407,6 +407,7 @@ def test_area_factory_composes_mixed_dense_ruins_and_light_obstacle_features() -
         area=area,
         footprint_template=footprint_template,
         preset=ruins_preset,
+        terrain_area_group=(area,),
         placement=_component_placement(
             area=area,
             preset=ruins_preset,
@@ -417,6 +418,7 @@ def test_area_factory_composes_mixed_dense_ruins_and_light_obstacle_features() -
         area=area,
         footprint_template=footprint_template,
         preset=light_preset,
+        terrain_area_group=(area,),
         placement=_component_placement(
             area=area,
             preset=light_preset,
@@ -502,6 +504,7 @@ def test_area_factory_rotates_and_mirrors_asymmetric_component_geometry() -> Non
         area=area,
         footprint_template=footprint_template,
         preset=preset,
+        terrain_area_group=(area,),
         placement=_component_placement(
             area=area,
             preset=preset,
@@ -531,6 +534,7 @@ def test_area_factory_applies_source_component_offset_rotation_and_mirror() -> N
         area=area,
         footprint_template=footprint_template,
         preset=preset,
+        terrain_area_group=(area,),
         placement=_component_placement(
             area=area,
             preset=preset,
@@ -577,6 +581,7 @@ def test_area_factory_rejects_component_outside_area_and_reference_drift() -> No
             area=area,
             footprint_template=footprint_template,
             preset=preset,
+            terrain_area_group=(area,),
             placement=TerrainFeatureAreaPlacement(
                 feature_id=placement.feature_id,
                 terrain_area_id="drifted-area",
@@ -629,6 +634,7 @@ def test_area_factory_rejects_component_outside_area_and_reference_drift() -> No
             area=area,
             footprint_template=footprint_template,
             preset=outside_preset,
+            terrain_area_group=(area,),
             placement=_component_placement(
                 area=area,
                 preset=outside_preset,
@@ -636,6 +642,56 @@ def test_area_factory_rejects_component_outside_area_and_reference_drift() -> No
                 local_offset_x_inches=5.5,
             ),
         )
+
+
+def test_area_factory_accepts_component_across_one_logical_terrain_area_seam() -> None:
+    footprint_template = _component_area_template()
+    logical_area_id = "event-logical-component-area"
+    first_area = PlacedTerrainArea.from_template(
+        terrain_area_id="event-component-area-west",
+        logical_terrain_area_id=logical_area_id,
+        template=footprint_template,
+        terrain_feature_kind="ruins",
+        classification=TerrainAreaClassification.MIXED,
+        center_x_inches=16.0,
+        center_y_inches=30.0,
+        rotation_degrees=0.0,
+        source_layout_id="event-layout-a",
+        source_id="test:event-companion:event-layout-a:component-area-west",
+    )
+    second_area = PlacedTerrainArea.from_template(
+        terrain_area_id="event-component-area-east",
+        logical_terrain_area_id=logical_area_id,
+        template=footprint_template,
+        terrain_feature_kind="ruins",
+        classification=TerrainAreaClassification.MIXED,
+        center_x_inches=28.0,
+        center_y_inches=30.0,
+        rotation_degrees=0.0,
+        source_layout_id="event-layout-a",
+        source_id="test:event-companion:event-layout-a:component-area-east",
+    )
+    preset = _light_obstacle_component_preset(footprint_template)
+
+    feature = TerrainFeatureFactory.from_area_placement(
+        area=first_area,
+        footprint_template=footprint_template,
+        preset=preset,
+        placement=_component_placement(
+            area=first_area,
+            preset=preset,
+            feature_id="seam-spanning-light-obstacle",
+            local_offset_x_inches=6.0,
+        ),
+        terrain_area_group=(first_area, second_area),
+    )
+
+    assert feature.rules_footprint_points() == (
+        (20.0, 29.0),
+        (24.0, 29.0),
+        (24.0, 31.0),
+        (20.0, 31.0),
+    )
 
 
 def _display_geometry(
@@ -683,6 +739,7 @@ def _component_area(
 ) -> PlacedTerrainArea:
     return PlacedTerrainArea.from_template(
         terrain_area_id="event-component-area",
+        logical_terrain_area_id="event-component-area",
         template=template,
         terrain_feature_kind="ruins",
         classification=classification,

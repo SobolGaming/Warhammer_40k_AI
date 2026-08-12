@@ -16,8 +16,8 @@
             "degrees": 180.0
           },
           "position": {
-            "x": 57.0,
-            "y": 3.0,
+            "x": 2.0,
+            "y": 2.0,
             "z": 0.0
           }
         },
@@ -32,8 +32,8 @@
             "degrees": 180.0
           },
           "position": {
-            "x": 57.0,
-            "y": 4.8,
+            "x": 2.0,
+            "y": 3.8,
             "z": 0.0
           }
         },
@@ -48,8 +48,8 @@
             "degrees": 180.0
           },
           "position": {
-            "x": 57.0,
-            "y": 6.6,
+            "x": 2.0,
+            "y": 5.6,
             "z": 0.0
           }
         },
@@ -64,8 +64,8 @@
             "degrees": 180.0
           },
           "position": {
-            "x": 55.2,
-            "y": 3.0,
+            "x": 3.8,
+            "y": 2.0,
             "z": 0.0
           }
         },
@@ -80,8 +80,8 @@
             "degrees": 180.0
           },
           "position": {
-            "x": 55.2,
-            "y": 4.8,
+            "x": 3.8,
+            "y": 3.8,
             "z": 0.0
           }
         },
@@ -92,7 +92,7 @@
     "player_id": "player-b",
     "proposal_kind": "deployment_placement",
     "proposal_request_id": "decision-request-000004",
-    "ruleset_descriptor_hash": "322775bf3ce334a27c7e81f32a312f78c61af094e704b0cd57ff64a292f9067d",
+    "ruleset_descriptor_hash": "e5b956c255d83ebbd470d4dec422db062153ce940e7737533603ed5696205ecd",
     "setup_step": "deploy_armies",
     "unit_instance_id": "army-beta:intercessor-unit-2"
   },

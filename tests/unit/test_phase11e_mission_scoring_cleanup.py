@@ -7580,7 +7580,10 @@ def _mission_setup_for_primary(
     *,
     objective_terrain_feature_id: str | None = None,
 ) -> MissionSetup:
-    mission_setup = replace(_mission_setup(), primary_mission_id=primary_mission_id)
+    mission_setup = replace(
+        _explicit_custom_mission_setup(_mission_setup()),
+        primary_mission_id=primary_mission_id,
+    )
     if objective_terrain_feature_id is None:
         return mission_setup
     mission_setup = _with_scoring_terrain_feature(
@@ -7606,22 +7609,37 @@ def _mission_setup_with_scoring_terrain_feature(
     *,
     feature_id: str = SCORING_TERRAIN_FEATURE_ID,
 ) -> MissionSetup:
-    return _with_scoring_terrain_feature(_mission_setup(), feature_id=feature_id)
+    return _with_scoring_terrain_feature(
+        _explicit_custom_mission_setup(_mission_setup()),
+        feature_id=feature_id,
+    )
 
 
 def _event_companion_mission_setup_with_scoring_terrain_feature(
     *,
     feature_id: str = SCORING_TERRAIN_FEATURE_ID,
 ) -> MissionSetup:
+    source_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-1",
+        terrain_layout_id="take-and-hold-vs-take-and-hold-layout-1",
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
     return _with_scoring_terrain_feature(
-        MissionSetup.from_mission_pack(
-            mission_pack=warhammer_event_companion_2026_07_mission_pack(),
-            mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-1",
-            terrain_layout_id="take-and-hold-vs-take-and-hold-layout-1",
-            attacker_player_id="player-a",
-            defender_player_id="player-b",
-        ),
+        _explicit_custom_mission_setup(source_setup),
         feature_id=feature_id,
+    )
+
+
+def _explicit_custom_mission_setup(mission_setup: MissionSetup) -> MissionSetup:
+    return replace(
+        mission_setup,
+        battlefield_layout_id=None,
+        deployment_map_id="phase11e-custom-deployment-map",
+        terrain_layout_id="phase11e-custom-terrain-layout",
+        terrain_areas=(),
+        objective_terrain_areas=(),
     )
 
 

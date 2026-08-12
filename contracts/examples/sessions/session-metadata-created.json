@@ -3,7 +3,7 @@
   "created_at": "2026-07-18T20:00:00Z",
   "engine_build_id": "warhammer40k-core-v2:0.1.0",
   "engine_version": "0.1.0",
-  "event_cursor": "1LFAvoHjgDCF3OGIOviUtfJ-8UAqULf5bWedySBndZo2hYXNIQWo-bONV1i2cqdg",
+  "event_cursor": "iBfhROPXRtRtNDEs68DL7oJXgLJlB97JVegrBSibW-NtOAtdjnsN_OdNix9hxDbu",
   "game_id": "phase18e-contract-session",
   "last_activity_at": "2026-07-18T20:00:00Z",
   "lifecycle_status": {
@@ -15,16 +15,16 @@
     "stage": "setup",
     "status_kind": "advanced"
   },
-  "projection_state_hash": "8063c9878e3573b6319c407f0f33a7b66cc43e548a381bd88b35ee4baad2423d",
+  "projection_state_hash": "f1b9f4d60efd3c59dacbcb951984ab3e8b33ae2a2a8664de850fdb070baf4085",
   "rules_overlay_ids": [],
-  "ruleset_descriptor_hash": "1bae8f585a14e1deac3d2107e06e350d26192fd30261987c183f705101aeb787",
+  "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
   "ruleset_id": {
     "edition": "11e",
     "game": "warhammer_40000",
     "version": "core-v2-setup-prebattle-ui-smoke"
   },
-  "schema_version": "session-metadata-v5-contract",
-  "server_contract_version": "5.0.0",
+  "schema_version": "session-metadata-v6-contract",
+  "server_contract_version": "6.0.0",
   "session_id": "session-phase18e-contract-session",
   "session_revision": 0,
   "session_state": "created",

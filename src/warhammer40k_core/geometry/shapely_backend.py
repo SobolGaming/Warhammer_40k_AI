@@ -32,6 +32,9 @@ _cached_affinity_module: _AffinityModule | None = None
 
 class _Geometry(Protocol):
     @property
+    def area(self) -> float: ...
+
+    @property
     def bounds(self) -> tuple[float, float, float, float]: ...
 
     @property
@@ -44,6 +47,8 @@ class _Geometry(Protocol):
     def intersection(self, other: _Geometry) -> _Geometry: ...
 
     def intersects(self, other: _Geometry) -> bool: ...
+
+    def symmetric_difference(self, other: _Geometry) -> _Geometry: ...
 
     def covers(self, other: _Geometry) -> bool: ...
 
@@ -171,6 +176,21 @@ def footprint_for_polygon(polygon: tuple[Point2D, ...]) -> _Geometry:
     return _geometry_module().Polygon(_validate_polygon("polygon", polygon))
 
 
+def footprint_for_polygon_union(
+    polygons: tuple[tuple[Point2D, ...], ...],
+) -> _Geometry:
+    if type(polygons) is not tuple or not polygons:
+        raise GeometryError("polygon union must be a non-empty tuple.")
+    footprints = tuple(
+        footprint_for_polygon(_validate_polygon(f"polygon union member {index}", polygon))
+        for index, polygon in enumerate(cast(tuple[object, ...], polygons))
+    )
+    footprint = footprints[0]
+    for member in footprints[1:]:
+        footprint = footprint.union(member)
+    return footprint
+
+
 def deployment_zone_shapes_cover_bounds(
     *,
     shapes: tuple[DeploymentZoneShape, ...],
@@ -228,12 +248,28 @@ def base_footprint_within_polygon(
     return footprint_for_polygon(polygon).covers(footprint_for_base(base, pose))
 
 
+def base_footprint_within_polygon_union(
+    base: BaseShape,
+    pose: Pose,
+    polygons: tuple[tuple[Point2D, ...], ...],
+) -> bool:
+    return footprint_for_polygon_union(polygons).covers(footprint_for_base(base, pose))
+
+
 def base_footprint_intersects_polygon(
     base: BaseShape,
     pose: Pose,
     polygon: tuple[Point2D, ...],
 ) -> bool:
     return footprint_for_polygon(polygon).intersects(footprint_for_base(base, pose))
+
+
+def base_footprint_intersects_polygon_union(
+    base: BaseShape,
+    pose: Pose,
+    polygons: tuple[tuple[Point2D, ...], ...],
+) -> bool:
+    return footprint_for_polygon_union(polygons).intersects(footprint_for_base(base, pose))
 
 
 def base_footprint_intersects_deployment_zone(
@@ -326,6 +362,16 @@ def point_intersects_polygon(
     return _geometry_module().Point(valid_x, valid_y).intersects(footprint_for_polygon(polygon))
 
 
+def point_distance_to_polygon(
+    x: float,
+    y: float,
+    polygon: tuple[Point2D, ...],
+) -> float:
+    valid_x = validate_finite_number("point x", x)
+    valid_y = validate_finite_number("point y", y)
+    return _geometry_module().Point(valid_x, valid_y).distance(footprint_for_polygon(polygon))
+
+
 def segment_intersects_polygon(
     start: Point3,
     end: Point3,
@@ -339,11 +385,31 @@ def segment_intersects_polygon(
     return line.intersects(footprint_for_polygon(polygon))
 
 
+def segment_intersects_polygon_union(
+    start: Point3,
+    end: Point3,
+    polygons: tuple[tuple[Point2D, ...], ...],
+) -> bool:
+    valid_start = validate_point3("start", start)
+    valid_end = validate_point3("end", end)
+    line = _geometry_module().LineString(
+        ((valid_start.x, valid_start.y), (valid_end.x, valid_end.y))
+    )
+    return line.intersects(footprint_for_polygon_union(polygons))
+
+
 def polygon_within_polygon(
     inner: tuple[Point2D, ...],
     outer: tuple[Point2D, ...],
 ) -> bool:
     return footprint_for_polygon(outer).covers(footprint_for_polygon(inner))
+
+
+def polygon_within_polygon_union(
+    inner: tuple[Point2D, ...],
+    outers: tuple[tuple[Point2D, ...], ...],
+) -> bool:
+    return footprint_for_polygon_union(outers).covers(footprint_for_polygon(inner))
 
 
 def base_footprint_distance(

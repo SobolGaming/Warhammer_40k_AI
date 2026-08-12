@@ -342,6 +342,7 @@
           ],
           "width_inches": null
         },
+        "logical_terrain_area_id": "geometry-conformance-area",
         "source_id": "geometry-conformance-area-source",
         "terrain_area_id": "geometry-conformance-area"
       }
@@ -396,7 +397,7 @@
       }
     }
   },
-  "authoritative_geometry_hash": "fc0a8fc117dc2aeb73658cb9dae50e9f2848d6af6659d2bfd8f62dfb8f1c9e77",
+  "authoritative_geometry_hash": "ea06cd82008b2f2d2d349f34966924f40eda02594b6a8352510019ed81e704c2",
   "battlefield_id": "geometry-conformance-battlefield",
   "bounds": {
     "max_x_inches": 60.0,
@@ -520,5 +521,5 @@
       }
     }
   },
-  "schema_version": "battlefield-view-v2-phase17n"
+  "schema_version": "battlefield-view-v3-phase17n"
 }

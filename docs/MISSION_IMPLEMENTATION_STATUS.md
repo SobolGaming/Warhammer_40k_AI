@@ -81,52 +81,96 @@ Secondary status:
   (`A Grievous Blow`, `Assassination`, `Bring It Down`,
   `Engage on All Fronts`).
 
-## Exact Battlefield Coverage
+## Battlefield Coverage
 
-- Phase 17N now has one complete Event Companion pairing slice:
-  `purge-the-foe` versus `purge-the-foe`, Primary Mission `primary-meatgrinder`,
-  and its A/B/C layout variants. These are the first three source-hashed exact
-  layouts. Together with six older coordinate-extracted layouts, 9 of 45 are
-  executable; the other 36 layout identities remain explicit pending work.
-- The local [Event Companion Battlefield Viewer](BATTLEFIELD_VIEWER.md) now
-  consumes `battlefield-view-v2-phase17n` directly. It provides an orbitable
-  3D schematic of classifications, component footprints, walls, floors,
-  source-linked objective terrain-area footprints, deployment zones,
-  territories, and No Man's Land. Objective identity records remain labels;
-  missing footprint bindings are labelled pending and never become inferred
-  marker disks or selectable solids. Layouts without runtime terrain geometry
-  are likewise labelled pending and never fall back to legacy source-row
-  rectangles or inferred geometry.
-- The three layouts are extracted from pages 24-26 of
+- Phase 17N has source-hashed executable battlefield packages for all 45 Event
+  Companion layouts: all 15 Force Disposition pairings and each pairing's A/B/C
+  variants. No layout identity remains geometry-pending.
+- The local [Event Companion Battlefield Viewer](BATTLEFIELD_VIEWER.md)
+  consumes `battlefield-view-v3-phase17n` directly for every layout. It provides
+  an orbitable 3D schematic of classifications, component footprints, walls,
+  floors, source-linked objective terrain-area footprints, deployment zones,
+  territories, and No Man's Land. Objective identity records remain labels and
+  never become inferred marker disks or selectable solids. The viewer never
+  falls back to legacy source-row rectangles or image-derived guesses.
+- The battlefield contact semantics come from the page-8 Layouts Key, and the
+  45 layout diagrams and coordinates are extracted from pages 9-53 of
   `eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf`, whose
   SHA-256 is
   `97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20`.
-  Strict, source-hashed JSON records the source affines, objective coordinates,
-  deployment zones, territories, and No Man's Land regions used at runtime; a
-  strict loader validates the package before runtime consumption. Pages 24-26
-  are authoritative only for those battlefield and layout facts; they contain
-  no Meatgrinder scoring clauses. Meatgrinder's four scoring rows retain their
-  separate reviewed Chapter Approved mission-deck provenance in the Event
-  Companion source package.
-- The exact battlefield artifact has package hash
-  `c1e796a17bfcd533822dfe6300210a61169348d5273b3fe94bbe540594c0f04e`
-  and raw artifact SHA-256
-  `b1c487bb4d9da504e730905be3c7beaa6cb0ad59e9e44fd5d54cea7f35e455e5`.
-  Its reviewed extraction payload is pinned as
-  `8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30`.
-  The loader rejects structurally valid re-hashed coordinate drift as well as
-  malformed or stale content.
-  All 12 orientation-reversing terrain-area source affines are preserved as typed
-  local reflections with transformed-vertex anchors derived from the reviewed
-  registration anchors. Orientation-reversing registrations of source asset
-  xref 5506 additionally apply its reviewed intrinsic half-turn about the placed
-  footprint bounds, so the asymmetric bump-outs remain on the source-image edges.
-  Terrain-area anchors and component battlefield centers use a 0.05-inch
-  placement grid; every second-half placement is derived by exact point symmetry
-  from its reviewed first-half counterpart. Layout A also pins its reviewed
-  0.5-inch central-footprint correction and the contact-preserving corner/pipe
-  and angled-obstacle adjustments. Layouts B and C pin their corresponding
-  reviewed contact-pair adjustments on the same grid.
+  The reviewed page-8 key plus pages-9-53 layout extraction SHA-256 is
+  `a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f`,
+  the generated artifact SHA-256 is
+  `88ba6d7390eab060d6b0c53eb60afbfb1a6813dd80715e3d42562dd0c89128d9`,
+  and its canonical package hash is
+  `e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924`.
+  The generator separately pins the stable runtime identity map at
+  `742ab841d1ec1e696f4a5c0e3f2e8c251203d510bf1da85fb30af88023cb64f3`.
+  The generated `event-companion-battlefields.json` artifact records source
+  affines, objective coordinates and bindings, deployment zones, territories,
+  No Man's Land, typed Single/Separate terrain-area contacts, and component
+  contacts. Its strict loader pins source, extraction, package, and artifact
+  hashes and rejects malformed, stale, or re-hashed coordinate drift.
+- The package contains 720 physical terrain-area footprint pieces representing
+  608 logical rules areas, plus 1,349 individually placed physical components.
+  Every layout has 16 footprint pieces. The page-8 key makes 112 two-piece pairs
+  into Single logical areas; the remaining 496 pieces are singletons. Page 9,
+  Take and Hold versus Take and Hold Layout A, has the source-backed 29-component
+  exception because one downed hovercraft has no tall-crate companion; every
+  other layout has 30 components. Fourteen shared archetypes define recurring
+  component footprints and wall/floor geometry once for reuse throughout the
+  package.
+- Source terrain-area anchors and component battlefield centers use a
+  0.05-inch placement grid. Reviewed mirror placements, asymmetric local
+  transforms, and source-indicated area/component contacts remain explicit
+  structured data.
+  Objective centers retain the source vector extraction's finer 0.01-inch
+  precision rather than discarding source accuracy at the terrain-placement
+  boundary.
+  Every declared contact retains at most one 0.05-inch placement quantum of
+  source-fit gap and at most `0.000001` square inches of numerical overlap. Of
+  224 declared contacts, 43 have zero recorded gap and 181 retain a source-fit
+  open sliver no wider than 0.05 inches: 80 Single and 101 Separate. Of those
+  43 zero-gap contacts, 41 also have zero overlap. Two page-12 Single pairs
+  have `0.00000087` square inches of overlap after six-decimal geometry
+  quantization; every other pair has zero recorded overlap. Single
+  contacts share one logical rules identity; Separate contacts remain distinct.
+  Neither identity fills source-drawn open board between physical polygons. The
+  artifact records every measured runtime gap and overlap.
+- Page 29's two paired contacts are the only terrain-area pose witnesses that
+  require either adjustment axis to exceed the usual +/-0.20-inch
+  canonical-footprint bound. Exhaustive
+  evaluation of all four source-pose candidates on the 0.05-inch grid found no
+  non-overlapping contact solution through +/-0.30 inches; +/-0.35 inches is
+  the first feasible bound. The committed minimum-total corrections are area
+  02 `(+0.10, -0.35)`, area 04 `(-0.10, +0.30)`, area 13
+  `(+0.05, -0.35)`, and area 15 `(-0.05, +0.30)` inches. The loader permits
+  exactly those four reviewed witnesses and retains the 0.20-inch bound for
+  every other non-Meatgrinder area.
+- Seven component rasters land across their rules-area boundary after source
+  quantization. Exhaustive 0.05-inch-grid searches pin only the minimum
+  containment corrections: page 23 areas 08 component 03 `(0, -0.05)` and 09
+  component 02 `(0, +0.05)`; page 29 areas 04 component 01 `(-0.10, 0)`, 07
+  component 01 `(0, +0.05)`, and 13 component 01 `(+0.05, -0.05)`; page 38 area
+  02 component 01 `(0, -0.05)`; and page 45 area 02 component 01 `(0, -0.05)`
+  inches. Source centers and rotations remain separate provenance fields. All
+  84 non-Meatgrinder long-pipe rules proxies use the nearest feasible 0.05-inch
+  grid center of their parent footprint because the source raster intentionally
+  overhangs that rules area.
+- Pages 36 and 46 repeat one Single-area ruin join whose shared rules proxies
+  cannot close on the 0.05-inch grid. Exhaustive searches through +/-0.30
+  inches prove the minimum exact normal correction is
+  `(+0.005440361094, +0.010510105572)` inches, magnitude
+  `0.011834688335` inches, applied only to area 10 after its reviewed grid
+  placement. The source 0.05-inch anchors remain unchanged in provenance. Four
+  source-ID-bound area-pose witnesses form two paired joins: page 36
+  `disruption-vs-disruption-layout-1` areas 07 and 10, and page 46
+  `reconnaissance-vs-reconnaissance-layout-2` areas 07 and 10. Only the two
+  area-10 rows carry the sub-grid delta from `(-0.20, +0.10)`, so their effective
+  runtime anchors use 12-decimal precision. This closes both Single joins with
+  zero gap and zero overlap without weakening geometry tolerances.
+  Intentional clearance between physical terrain and terrain-area edges is
+  preserved, as required by the source, rather than treated as missing geometry.
 - Meatgrinder's canonical scoring text, source timing, VP values, and structured
   condition tokens are committed separately in
   `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-meatgrinder-scoring.json`.
@@ -139,31 +183,21 @@ Secondary status:
   commit `35b9ddaf5`. The GDMissions transcription and card image fetched on
   2026-08-09 are recorded only as non-official secondary corroboration, never as
   GW source authority.
-- The reviewed extraction input is committed at
-  `data/source_audits/event_companion_2026_06/phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json`.
-  Verify that it still reproduces the runtime artifact without writing files
-  with
-  `uv run python tools/build_phase17n_event_companion_exact_slice.py --check`.
-- Each variant contains 16 source terrain areas and 30 individually placed
-  terrain components: 8 ruins, 8 dense non-ruin components, and 14 light
-  components. Terrain-area and component source-image placement and orientation
-  come from the reviewed source-page affine records. Recurring component
-  geometry is defined once per source archetype and reused across all three
-  layouts. Ruin and non-ruin envelopes use dimensions rounded to the 0.05-inch
-  grid and validated against the reviewed source-image axis spans, with each
-  schematic L-wall joint registered to the source image's lower-left corner.
-  Shared ruin floors are corner-anchored and capped at 3.5 inches per axis so
-  longer wall arms retain their source-visible wall-only tails. Component rules
-  polygons and physical wall/floor primitives remain engine models rather than
-  traced raster silhouettes.
-  Project-owner-supplied semantics establish
-  three-inch floor spacing, solid three-inch walls below every upper floor,
-  approximately two-inch top-floor walls, and approximately two-inch Light
-  terrain. The reviewed AB/EF three-floor versus CD/GH two-floor assignment,
-  wall thickness, simplified solid shapes, and 3.5-inch Dense non-ruin height
-  are explicit engine modeling assumptions;
-  the PDF does not prescribe them. All of those choices are committed and
-  reviewable for later placement/model tweaks.
+- Verify that the committed battlefield artifact still matches its reviewed
+  inputs without writing files with
+  `uv run python tools/build_event_companion_battlefields.py --check`.
+- Completing all battlefield packages does not promote Primary Mission scoring
+  semantics. Every non-Meatgrinder mission already recorded as
+  `source_known_engine_pending` remains fail-closed until its engine-owned
+  choices, marker state, actions, and scoring conditions exist. Battlefield
+  pages are authority for layout facts, not mission-card scoring clauses.
+- Component source-image placement and orientation come from reviewed
+  source-page affine records. Ruin and non-ruin envelopes use dimensions rounded
+  to the 0.05-inch grid and checked against the reviewed source-image spans.
+  Component rules polygons and physical wall/floor primitives remain explicit
+  engine models rather than traced raster silhouettes. Floor spacing, wall
+  heights and thickness, simplified solids, and Dense non-ruin heights remain
+  documented engine modeling assumptions; the PDF does not prescribe them.
 - Rendering images remain non-authoritative. Runtime setup, movement, collision,
   visibility, and scoring consume the validated structured package, not a page
   image or a renderer-derived measurement.
@@ -235,10 +269,9 @@ Secondary status:
 ## Runtime Caveats
 
 - Event Companion primary matrix identities and all layout IDs are implemented.
-  Nine layouts have executable coordinate packages: three are source-hashed
-  exact layouts and six retain the older coordinate-extracted status. The
-  remaining 36 continue to advertise pending extraction through their layout
-  descriptor source statuses.
+  All 45 layout descriptors reference source-hashed executable battlefield
+  packages. Geometry completion does not change the independently tracked
+  Primary Mission scoring status.
 - Meatgrinder's four source scoring rows are state-backed, including the
   comparison of enemy units lost during the current scoring player's turn
   against that player's friendly units lost during the opponent's immediately

@@ -25,7 +25,9 @@ from warhammer40k_core.core.objective_terrain_area_references import (
 from warhammer40k_core.core.terrain_areas import (
     PlacedTerrainArea,
     PlacedTerrainAreaPayload,
+    TerrainAreaError,
     TerrainAreaFootprintTemplate,
+    validate_placed_terrain_area_logical_groups,
 )
 from warhammer40k_core.core.terrain_layouts import (
     TerrainFeatureAreaPlacement,
@@ -162,6 +164,10 @@ class MissionSetup:
         terrain_areas = _validate_terrain_areas(self.terrain_areas)
         features = _validate_terrain_features(self.terrain_features)
         objective_terrain_areas = _validate_objective_terrain_areas(self.objective_terrain_areas)
+        if self.battlefield_layout_id is None and (terrain_areas or objective_terrain_areas):
+            raise MissionSetupError(
+                "MissionSetup source-backed battlefield geometry requires battlefield_layout_id."
+            )
         _validate_markers_within_battlefield(
             markers=markers,
             width=self.battlefield_width_inches,
@@ -209,6 +215,7 @@ class MissionSetup:
             terrain_areas=tuple(
                 (
                     area.terrain_area_id,
+                    area.logical_terrain_area_id,
                     tuple((point.x_inches, point.y_inches) for point in area.footprint_polygon),
                 )
                 for area in terrain_areas
@@ -433,7 +440,7 @@ class MissionSetup:
                 BattlefieldRegion.from_payload(region) for region in payload["battlefield_regions"]
             ),
             terrain_areas=tuple(
-                PlacedTerrainArea.from_payload(area) for area in payload["terrain_areas"]
+                _placed_terrain_area_from_payload(area) for area in payload["terrain_areas"]
             ),
             objective_terrain_areas=tuple(
                 ObjectiveTerrainAreaDefinition.from_payload(objective_terrain_area)
@@ -444,6 +451,60 @@ class MissionSetup:
                 for feature in payload["terrain_features"]
             ),
         )
+
+
+def validate_mission_setup_source_layout_identity(
+    mission_setup: MissionSetup,
+    *,
+    battlefield_layout: BattlefieldLayoutDefinition,
+    source_terrain_features: tuple[TerrainFeatureDefinition, ...],
+) -> None:
+    if type(mission_setup) is not MissionSetup:
+        raise MissionSetupError("Source-layout validation requires MissionSetup.")
+    if type(battlefield_layout) is not BattlefieldLayoutDefinition:
+        raise MissionSetupError("Source-layout validation requires BattlefieldLayoutDefinition.")
+    canonical_terrain_features = _validate_terrain_features(source_terrain_features)
+    actual_source_geometry = (
+        mission_setup.battlefield_layout_id,
+        mission_setup.deployment_map_id,
+        mission_setup.terrain_layout_id,
+        mission_setup.battlefield_width_inches,
+        mission_setup.battlefield_depth_inches,
+        mission_setup.objective_markers,
+        mission_setup.deployment_zones,
+        mission_setup.battlefield_regions,
+        mission_setup.terrain_areas,
+        mission_setup.objective_terrain_areas,
+        mission_setup.terrain_features,
+    )
+    canonical_source_geometry = (
+        battlefield_layout.battlefield_layout_id,
+        battlefield_layout.deployment_map_id,
+        battlefield_layout.terrain_layout_id,
+        battlefield_layout.battlefield_width_inches,
+        battlefield_layout.battlefield_depth_inches,
+        battlefield_layout.objective_markers,
+        _deployment_zones_for_players(
+            battlefield_layout.deployment_zones,
+            attacker_player_id=mission_setup.attacker_player_id,
+            defender_player_id=mission_setup.defender_player_id,
+        ),
+        battlefield_layout.battlefield_regions,
+        battlefield_layout.terrain_areas,
+        battlefield_layout.objective_terrain_areas,
+        canonical_terrain_features,
+    )
+    if actual_source_geometry != canonical_source_geometry:
+        raise MissionSetupError("MissionSetup battlefield geometry drifted from source layout.")
+
+
+def _placed_terrain_area_from_payload(
+    payload: PlacedTerrainAreaPayload,
+) -> PlacedTerrainArea:
+    try:
+        return PlacedTerrainArea.from_payload(payload)
+    except TerrainAreaError as exc:
+        raise MissionSetupError("MissionSetup terrain-area payload is invalid.") from exc
 
 
 def instantiate_terrain_layout_template(
@@ -492,6 +553,9 @@ def _terrain_features_from_area_placements(
     presets = _validate_terrain_feature_presets(terrain_feature_presets)
     placements = _validate_terrain_feature_area_placements(terrain_feature_placements)
     areas_by_id = {area.terrain_area_id: area for area in areas}
+    areas_by_logical_id: dict[str, list[PlacedTerrainArea]] = {}
+    for member_area in areas:
+        areas_by_logical_id.setdefault(member_area.logical_terrain_area_id, []).append(member_area)
     footprint_templates_by_id = {
         template.footprint_template_id: template for template in footprint_templates
     }
@@ -519,6 +583,7 @@ def _terrain_features_from_area_placements(
                 footprint_template=footprint_template,
                 preset=preset,
                 placement=placement,
+                terrain_area_group=tuple(areas_by_logical_id[area.logical_terrain_area_id]),
             )
         )
     return tuple(sorted(features, key=lambda feature: feature.feature_id))
@@ -817,7 +882,13 @@ def _validate_terrain_areas(values: object) -> tuple[PlacedTerrainArea, ...]:
             raise MissionSetupError("MissionSetup terrain_areas must not contain duplicates.")
         seen.add(value.terrain_area_id)
         terrain_areas.append(value)
-    return tuple(sorted(terrain_areas, key=lambda area: area.terrain_area_id))
+    try:
+        return validate_placed_terrain_area_logical_groups(
+            "MissionSetup terrain_areas",
+            tuple(terrain_areas),
+        )
+    except TerrainAreaError as exc:
+        raise MissionSetupError(str(exc)) from exc
 
 
 def _validate_terrain_area_footprint_templates(

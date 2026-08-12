@@ -164,13 +164,13 @@ def _config() -> GameConfig:
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
-        mission_setup=replace(_mission_setup(), terrain_features=()),
+        mission_setup=_mission_setup(),
     )
 
 
 def _mission_setup() -> MissionSetup:
     mission_pack = chapter_approved_2026_27_mission_pack()
-    implemented_setup = MissionSetup.from_mission_pack(
+    source_setup = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
@@ -180,10 +180,10 @@ def _mission_setup() -> MissionSetup:
     typed_layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-3")
     typed_deployment_map = mission_pack.deployment_map(typed_layout.deployment_map_id)
     return replace(
-        implemented_setup,
-        battlefield_layout_id=typed_layout.battlefield_layout_id,
-        deployment_map_id=typed_layout.deployment_map_id,
-        terrain_layout_id=typed_layout.terrain_layout_id,
+        source_setup,
+        battlefield_layout_id=None,
+        deployment_map_id="movement-mission-geometry-map",
+        terrain_layout_id="movement-mission-geometry-layout",
         battlefield_width_inches=typed_layout.battlefield_width_inches,
         battlefield_depth_inches=typed_layout.battlefield_depth_inches,
         objective_markers=typed_layout.objective_markers,
@@ -191,10 +191,10 @@ def _mission_setup() -> MissionSetup:
             attacker_player_id="player-a",
             defender_player_id="player-b",
         ),
-        battlefield_regions=typed_layout.battlefield_regions,
-        terrain_areas=typed_layout.terrain_areas,
+        battlefield_regions=(),
+        terrain_areas=(),
         terrain_features=(),
-        objective_terrain_areas=typed_layout.objective_terrain_areas,
+        objective_terrain_areas=(),
     )
 
 

@@ -28,6 +28,7 @@ from warhammer40k_core.engine.battlefield_state import (
 )
 from warhammer40k_core.engine.objective_control_sources import (
     resolve_objective_control_sources,
+    source_linked_terrain_objectives_supported,
     validate_objective_control_source_references,
     validate_objective_marker_tuple,
     validate_objective_terrain_area_tuple,
@@ -516,6 +517,73 @@ class ObjectiveControlContext:
         )
         if self.state is not None and type(self.state) is not GameState:
             raise GameLifecycleError("ObjectiveControlContext state must be GameState.")
+        if self.state is not None:
+            if self.state.mission_setup is None:
+                raise GameLifecycleError(
+                    "State-backed ObjectiveControlContext requires MissionSetup."
+                )
+            if self.state.battlefield_state is None:
+                raise GameLifecycleError(
+                    "State-backed ObjectiveControlContext requires battlefield_state."
+                )
+            if (
+                self.game_id != self.state.game_id
+                or self.scenario.armies != tuple(self.state.army_definitions)
+                or self.scenario.battlefield_state != self.state.battlefield_state
+                or self.battle_round != self.state.battle_round
+                or self.active_player_id != self.state.active_player_id
+                or self.terrain_features != self.state.battlefield_state.terrain_features
+            ):
+                raise GameLifecycleError(
+                    "ObjectiveControlContext runtime state drifted from GameState."
+                )
+            if self.terrain_areas != self.state.mission_setup.terrain_areas:
+                raise GameLifecycleError(
+                    "ObjectiveControlContext terrain areas drifted from MissionSetup."
+                )
+            mission_markers_by_id = {
+                marker.objective_marker_id: marker.to_objective_marker()
+                for marker in self.state.mission_setup.objective_markers
+            }
+            if any(
+                mission_markers_by_id.get(marker.objective_marker_id) != marker
+                for marker in self.objective_markers
+            ):
+                raise GameLifecycleError(
+                    "ObjectiveControlContext point objective markers drifted from MissionSetup."
+                )
+            expected_source_links = (
+                self.state.mission_setup.objective_terrain_areas
+                if source_linked_terrain_objectives_supported(self.ruleset_descriptor)
+                else ()
+            )
+            if self.objective_terrain_areas != expected_source_links:
+                raise GameLifecycleError(
+                    "ObjectiveControlContext objective terrain-area membership drifted "
+                    "from MissionSetup."
+                )
+            expected_linked_marker_ids = {
+                definition.objective_marker_id for definition in expected_source_links
+            }
+            expected_linked_markers = tuple(
+                marker.to_objective_marker()
+                for marker in self.state.mission_setup.objective_markers
+                if marker.objective_marker_id in expected_linked_marker_ids
+            )
+            if self.objective_terrain_area_markers != expected_linked_markers:
+                raise GameLifecycleError(
+                    "ObjectiveControlContext objective terrain-area markers drifted "
+                    "from MissionSetup."
+                )
+            represented_mission_marker_ids = (
+                {marker.objective_marker_id for marker in self.objective_markers}
+                | {objective.objective_id for objective in self.terrain_objectives}
+                | expected_linked_marker_ids
+            )
+            if not set(mission_markers_by_id).issubset(represented_mission_marker_ids):
+                raise GameLifecycleError(
+                    "ObjectiveControlContext objective source inventory drifted from MissionSetup."
+                )
         if type(self.runtime_modifier_registry) is not RuntimeModifierRegistry:
             raise GameLifecycleError(
                 "ObjectiveControlContext runtime_modifier_registry must be a registry."

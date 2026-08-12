@@ -62,23 +62,32 @@ def test_event_companion_area_placed_terrain_features_resolve_from_source_data()
         attacker_player_id="player-a",
         defender_player_id="player-b",
     )
+    area_placements = tuple(
+        placement
+        for placement in layout.terrain_feature_placements
+        if placement.terrain_area_id == area.terrain_area_id
+    )
     feature = next(
         terrain_feature
         for terrain_feature in setup.terrain_features
-        if terrain_feature.feature_id == area.terrain_area_id
+        if terrain_feature.feature_id == f"{area.terrain_area_id}-component-01"
     )
-    center_wall = next(wall for wall in feature.walls if wall.wall_id == "center-wall")
+    solid_body = next(wall for wall in feature.walls if wall.wall_id == "solid-body")
 
-    assert len(layout.terrain_feature_placements) == len(layout.terrain_areas)
-    assert len(setup.terrain_features) == len(layout.terrain_areas)
-    assert feature.feature_kind is TerrainFeatureKind.RUINS
-    assert feature.display_geometry.footprint_polygon == area.footprint_polygon
-    assert math.isclose(center_wall.center_x_inches, area.center_x_inches, abs_tol=1e-9)
-    assert math.isclose(center_wall.center_y_inches, area.center_y_inches, abs_tol=1e-9)
-    assert center_wall.rotation_degrees == 270.0
+    assert len(layout.terrain_feature_placements) == 29
+    assert len(setup.terrain_features) == len(layout.terrain_feature_placements)
+    assert len(area_placements) == 2
+    assert feature.feature_kind is TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY
+    assert feature.display_geometry.footprint_polygon == feature.rules_footprint_polygon
+    assert feature.display_geometry.footprint_polygon != area.footprint_polygon
+    assert math.isclose(solid_body.center_x_inches, 34.3, abs_tol=1e-9)
+    assert math.isclose(solid_body.center_y_inches, 25.0, abs_tol=1e-9)
+    assert math.isclose(feature.footprint_width_inches, 1.4, abs_tol=1e-9)
+    assert math.isclose(feature.footprint_depth_inches, 4.25, abs_tol=1e-9)
+    assert solid_body.rotation_degrees == 90.0
     assert feature.wall_volumes()[0].blocks_line_segment(
-        Point3(center_wall.center_x_inches - 2.0, center_wall.center_y_inches, 1.0),
-        Point3(center_wall.center_x_inches + 2.0, center_wall.center_y_inches, 1.0),
+        Point3(solid_body.center_x_inches - 2.0, solid_body.center_y_inches, 1.0),
+        Point3(solid_body.center_x_inches + 2.0, solid_body.center_y_inches, 1.0),
     )
 
 
@@ -101,13 +110,9 @@ def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -
         for placement in layout.terrain_feature_placements
         if placement.terrain_area_id == area.terrain_area_id
     )
-    source_preset = next(
-        preset
-        for preset in base_pack.terrain_feature_presets
-        if preset.terrain_feature_preset_id == source_placement.terrain_feature_preset_id
-    )
+    custom_preset_id = "test-asymmetric-6x2"
     custom_preset = TerrainFeaturePreset(
-        terrain_feature_preset_id=source_preset.terrain_feature_preset_id,
+        terrain_feature_preset_id=custom_preset_id,
         feature_kind=TerrainFeatureKind.RUINS,
         footprint_template_id=footprint_template.footprint_template_id,
         footprint_center_x_inches=0.0,
@@ -144,13 +149,30 @@ def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -
         ),
         source_id="test:terrain-feature-preset:asymmetric-6x2",
     )
+    custom_placement = replace(
+        source_placement,
+        terrain_feature_preset_id=custom_preset_id,
+        local_offset_x_inches=0.0,
+        local_offset_y_inches=0.0,
+        local_rotation_degrees=0.0,
+        local_transform=TerrainFeatureLocalTransform.IDENTITY,
+        source_id="test:terrain-feature-placement:asymmetric-6x2",
+    )
+    custom_layout = replace(
+        layout,
+        terrain_feature_placements=tuple(
+            custom_placement if placement.feature_id == source_placement.feature_id else placement
+            for placement in layout.terrain_feature_placements
+        ),
+    )
     mission_pack = replace(
         base_pack,
-        terrain_feature_presets=tuple(
-            custom_preset
-            if preset.terrain_feature_preset_id == custom_preset.terrain_feature_preset_id
-            else preset
-            for preset in base_pack.terrain_feature_presets
+        terrain_feature_presets=(*base_pack.terrain_feature_presets, custom_preset),
+        battlefield_layouts=tuple(
+            custom_layout
+            if candidate.battlefield_layout_id == custom_layout.battlefield_layout_id
+            else candidate
+            for candidate in base_pack.battlefield_layouts
         ),
     )
     mission_pool_entry = next(
@@ -169,7 +191,7 @@ def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -
     feature = next(
         terrain_feature
         for terrain_feature in setup.terrain_features
-        if terrain_feature.feature_id == area.terrain_area_id
+        if terrain_feature.feature_id == source_placement.feature_id
     )
     wall = feature.walls[0]
     mirror_anchor_x = footprint_template.polygon_vertices_inches[0].x_inches
@@ -357,7 +379,7 @@ def test_area_placed_terrain_feature_payloads_round_trip_and_preserve_rotation()
     rotated_feature = next(
         feature
         for feature in round_tripped_setup.terrain_features
-        if feature.feature_id == f"{layout_id}-6x4-east-midfield"
+        if feature.feature_id == f"{layout_id}-8x11-5-polygon-central-north-component-02"
     )
     wall_rotations = tuple(wall.rotation_degrees for wall in rotated_feature.walls)
     floor_rotations = tuple(floor.rotation_degrees for floor in rotated_feature.floors)
@@ -371,10 +393,10 @@ def test_area_placed_terrain_feature_payloads_round_trip_and_preserve_rotation()
 
     assert round_tripped_pack.to_payload() == mission_pack.to_payload()
     assert round_tripped_setup.to_payload() == setup.to_payload()
-    assert wall_rotations == (270.0,)
-    assert floor_rotations == (270.0, 270.0)
-    assert volume_rotations == (270.0, 270.0, 270.0)
-    assert surface_rotations == (270.0, 270.0)
+    assert wall_rotations == (270.0, 0.0, 270.0, 0.0, 270.0, 0.0)
+    assert floor_rotations == (270.0, 270.0, 270.0)
+    assert volume_rotations == (270.0, 270.0, 0.0, 270.0, 270.0, 0.0, 270.0, 270.0, 0.0)
+    assert surface_rotations == (270.0, 270.0, 270.0)
 
 
 def test_rotation_payload_fields_are_required_with_typed_errors() -> None:

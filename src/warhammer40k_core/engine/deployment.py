@@ -431,7 +431,7 @@ class DeploymentPlacementRequest:
 
     @classmethod
     def from_payload(cls, payload: DeploymentPlacementRequestPayload) -> Self:
-        return cls(
+        request = cls(
             request_id=payload["request_id"],
             actor_id=payload["actor_id"],
             game_id=payload["game_id"],
@@ -450,6 +450,20 @@ class DeploymentPlacementRequest:
             proposal_kind=payload["proposal_kind"],
             context=payload["context"],
         )
+        if (
+            payload["decision_type"] != SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE
+            or payload["setup_step"] != SetupStep.DEPLOY_ARMIES.value
+            or tuple(payload["deployment_zone_ids"])
+            != tuple(zone.deployment_zone_id for zone in request.deployment_zones)
+            or payload["mission_pack_id"] != request.mission_setup.mission_pack_id
+            or payload["source_id"] != request.mission_setup.source_id
+            or payload["deployment_map_id"] != request.mission_setup.deployment_map_id
+            or payload["terrain_layout_id"] != request.mission_setup.terrain_layout_id
+        ):
+            raise GameLifecycleError(
+                "DeploymentPlacementRequest duplicated source identity fields drifted."
+            )
+        return request
 
     @classmethod
     def from_decision_request_payload(cls, payload: object) -> Self:
@@ -460,26 +474,7 @@ class DeploymentPlacementRequest:
         if not isinstance(request_payload, dict):
             raise GameLifecycleError("Deployment DecisionRequest payload missing request.")
         typed_payload = cast(DeploymentPlacementRequestPayload, request_payload)
-        return cls(
-            request_id=typed_payload["request_id"],
-            actor_id=typed_payload["actor_id"],
-            game_id=typed_payload["game_id"],
-            player_id=typed_payload["player_id"],
-            unit_instance_id=typed_payload["unit_instance_id"],
-            component_unit_instance_ids=tuple(typed_payload["component_unit_instance_ids"]),
-            model_instance_ids=tuple(typed_payload["model_instance_ids"]),
-            deployment_zones=tuple(
-                DeploymentZone.from_payload(zone)
-                for zone in typed_payload["legal_deployment_zones"]
-            ),
-            mission_setup=MissionSetup.from_payload(typed_payload["mission_setup"]),
-            ruleset_descriptor_hash=typed_payload["ruleset_descriptor_hash"],
-            source_decision_request_id=typed_payload["source_decision_request_id"],
-            source_decision_result_id=typed_payload["source_decision_result_id"],
-            placement_kind=battlefield_placement_kind_from_token(typed_payload["placement_kind"]),
-            proposal_kind=typed_payload["proposal_kind"],
-            context=typed_payload["context"],
-        )
+        return cls.from_payload(typed_payload)
 
 
 @dataclass(frozen=True, slots=True)

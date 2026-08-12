@@ -12,11 +12,10 @@ from itertools import pairwise, permutations
 from pathlib import Path
 from typing import Any, cast
 
+import msgspec
 import pytest
 
 from warhammer40k_core.core.deployment_zones import (
-    DeploymentZone,
-    DeploymentZoneCircleCutout,
     DeploymentZonePoint,
     DeploymentZonePolygon,
     DeploymentZoneShape,
@@ -38,11 +37,12 @@ from warhammer40k_core.core.terrain_areas import (
     TerrainAreaLocalTransform,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
-from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mission_setup import MissionSetup, MissionSetupError
 from warhammer40k_core.engine.missions import (
     deterministic_tactical_secondary_draw,
     mission_pack_for_id,
     mission_scoring_policy_from_setup,
+    validate_mission_setup_source_layout,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.scoring import (
@@ -85,6 +85,12 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     event_companion_primary_scoring_2026_06 as event_primary_scoring,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_layout_geometry_2026_06 import (  # noqa: E501
+    event_no_mans_land_shape,
+    event_territory_vertices,
+    terrain_area_classifications_by_suffix,
+    terrain_feature_placements_from_specs,
 )
 
 
@@ -140,56 +146,6 @@ def test_phase17j_v1_1_layout_revisions_preserve_deployment_zone_templates() -> 
     }
     assert all(row.terrain_changed for row in rows)
     assert all(not row.deployment_zones_changed for row in rows)
-    assert {
-        row.layout_id for row in rows if row.layout_id in event_layouts.EXTRACTED_LAYOUT_IDS
-    } == {
-        "disruption-vs-reconnaissance-layout-1",
-        "disruption-vs-reconnaissance-layout-3",
-    }
-
-
-def test_phase17j_v1_1_extracted_layouts_use_revised_terrain_transforms() -> None:
-    layout_a = event_layouts.EXTRACTED_LAYOUTS_BY_ID["disruption-vs-reconnaissance-layout-1"]
-    layout_c = event_layouts.EXTRACTED_LAYOUTS_BY_ID["disruption-vs-reconnaissance-layout-3"]
-    layout_a_specs = {spec[0]: spec[1:] for spec in layout_a.terrain_area_specs}
-    layout_c_specs = {spec[0]: spec[1:] for spec in layout_c.terrain_area_specs}
-
-    assert layout_a_specs["7x11-5-attacker-home"] == (
-        "FOOTPRINT_7X11_5",
-        21.09,
-        42.59,
-        180.0,
-    )
-    assert layout_a_specs["6x2-east-midfield"] == (
-        "FOOTPRINT_6X2",
-        32.74,
-        31.55,
-        -8.0,
-    )
-    assert layout_a_specs["6x4-east-midfield"] == (
-        "FOOTPRINT_6X4",
-        29.08,
-        22.14,
-        82.0,
-    )
-    assert layout_a_specs["8x11-5-polygon-north-center"] == (
-        "FOOTPRINT_8X11_5_POLYGON",
-        30.8,
-        39.5,
-        -125.0,
-    )
-    assert layout_c_specs["8x11-5-polygon-north-east"] == (
-        "FOOTPRINT_8X11_5_POLYGON",
-        34.09,
-        43.83,
-        142.0,
-    )
-    assert layout_c_specs["6x4-south-west-midfield"] == (
-        "FOOTPRINT_6X4",
-        9.52,
-        24.32,
-        -37.5,
-    )
 
 
 def test_phase17j_event_sequence_and_secondary_procedure_are_explicit() -> None:
@@ -269,28 +225,14 @@ def test_phase17j_mission_card_scoring_grammar_records_official_rules() -> None:
 
 def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    artifact_layouts_by_id = {
+        layout.layout_id: layout for layout in event_layouts.battlefield_artifact().layouts
+    }
     layout_ids = {layout.terrain_layout_id for layout in mission_pack.terrain_layout_templates}
     deployment_map_ids = {
         deployment.deployment_map_id for deployment in mission_pack.deployment_maps
     }
     pool_layout_ids = {entry.terrain_layout_ids[0] for entry in mission_pack.mission_pool_entries}
-    extracted_layout_ids = {
-        "take-and-hold-vs-take-and-hold-layout-1",
-        "take-and-hold-vs-take-and-hold-layout-2",
-        "take-and-hold-vs-take-and-hold-layout-3",
-        "disruption-vs-reconnaissance-layout-1",
-        "disruption-vs-reconnaissance-layout-2",
-        "disruption-vs-reconnaissance-layout-3",
-        "purge-the-foe-vs-purge-the-foe-layout-1",
-        "purge-the-foe-vs-purge-the-foe-layout-2",
-        "purge-the-foe-vs-purge-the-foe-layout-3",
-    }
-    disruption_reconnaissance_layout_ids = {
-        "disruption-vs-reconnaissance-layout-1",
-        "disruption-vs-reconnaissance-layout-2",
-        "disruption-vs-reconnaissance-layout-3",
-    }
-    exact_slice_layout_ids = set(event_layouts.EXACT_SLICE_LAYOUT_IDS)
 
     assert len(mission_pack.primary_missions) == 25
     assert len(mission_pack.primary_mission_matrix_cells) == 25
@@ -299,9 +241,16 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
         for cell in mission_pack.primary_mission_matrix_cells
     )
     assert len(layout_ids) == 45
-    assert len(mission_pack.battlefield_layouts) == 9
+    assert layout_ids == event_layouts.BATTLEFIELD_LAYOUT_IDS
+    assert len(mission_pack.battlefield_layouts) == 45
     assert len(mission_pack.terrain_area_footprint_templates) == 5
-    assert len(mission_pack.terrain_feature_presets) == 19
+    assert len(mission_pack.terrain_feature_presets) == 14
+    assert {
+        preset.terrain_feature_preset_id for preset in mission_pack.terrain_feature_presets
+    } == {
+        f"event-companion-exact-{archetype.archetype_id}"
+        for archetype in event_layouts.battlefield_artifact().feature_archetypes
+    }
     assert len(deployment_map_ids) == 45
     assert len(mission_pack.mission_pool_entries) == 45
     assert pool_layout_ids == layout_ids
@@ -324,25 +273,41 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
         assert setup.battlefield_width_inches == 44.0
         assert setup.battlefield_depth_inches == 60.0
         terrain_layout_id = entry.terrain_layout_ids[0]
-        if terrain_layout_id in extracted_layout_ids:
-            assert setup.battlefield_layout_id == entry.terrain_layout_ids[0]
-            assert len(setup.terrain_features) == (
-                30 if terrain_layout_id in exact_slice_layout_ids else 16
-            )
-            assert len(setup.terrain_areas) == 16
-            assert len(setup.battlefield_regions) == 5
-        else:
-            assert setup.battlefield_layout_id is None
-            assert setup.terrain_areas == ()
-            assert setup.battlefield_regions == ()
-            assert setup.terrain_features == ()
-        expected_objective_count = (
-            6
-            if terrain_layout_id in disruption_reconnaissance_layout_ids | exact_slice_layout_ids
-            else 5
-        )
-        assert len(setup.objective_markers) == expected_objective_count
+        artifact_layout = artifact_layouts_by_id[terrain_layout_id]
+        assert setup.battlefield_layout_id == terrain_layout_id
+        assert len(setup.terrain_features) == len(artifact_layout.terrain_components)
+        assert len(setup.terrain_areas) == 16
+        assert len(setup.battlefield_regions) == 5
+        assert len(setup.objective_markers) == len(artifact_layout.objectives)
         assert len(setup.deployment_zones) == 2
+
+    assert Counter(row.source_status for row in event_source.battlefield_layout_rows()) == Counter(
+        {"event_companion_source_hashed_battlefield_artifact": 45}
+    )
+    assert Counter(
+        descriptor.geometry_extraction_status
+        for descriptor in event_source.layout_descriptor_rows()
+    ) == Counter({"source_hashed_battlefield_artifact_geometry": 45})
+
+
+def test_phase17n_event_layout_rejects_missing_component_placements() -> None:
+    with pytest.raises(MissionPackError, match="requires explicit terrain component placements"):
+        terrain_feature_placements_from_specs(
+            layout_id="event-layout",
+            source_layout_id="source-layout",
+            source_package_id="source-package",
+            terrain_areas=(),
+            specs=(),
+        )
+    with pytest.raises(MissionPackError, match="requires polygons"):
+        event_no_mans_land_shape(explicit_polygons=())
+    with pytest.raises(MissionPackError, match="require source polygons"):
+        event_territory_vertices(explicit_specs=())
+    with pytest.raises(MissionPackError, match="must cover every explicit area"):
+        terrain_area_classifications_by_suffix(
+            explicit_specs=(("terrain-area", "FOOTPRINT_6X4", 0.0, 0.0, 0.0),),
+            classification_specs=(),
+        )
 
 
 def test_phase17n_meatgrinder_scoring_artifact_is_source_hashed_strict_and_consumed() -> None:
@@ -435,14 +400,14 @@ def test_phase17n_meatgrinder_scoring_artifact_is_source_hashed_strict_and_consu
         )
 
 
-def test_phase17n_meatgrinder_exact_slice_artifact_is_source_hashed_and_strict() -> None:
-    artifact = event_layouts.exact_slice_artifact()
+def test_phase17n_battlefield_artifact_is_source_hashed_and_strict() -> None:
+    artifact = event_layouts.battlefield_artifact()
     repository_root = Path(__file__).resolve().parents[2]
     artifact_path = (
         repository_root
         / "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th"
         / "event_companion_layouts_2026_06/artifacts"
-        / "purge-the-foe-vs-purge-the-foe-meatgrinder.json"
+        / "event-companion-battlefields.json"
     )
     source_pdf_path = (
         repository_root
@@ -451,22 +416,79 @@ def test_phase17n_meatgrinder_exact_slice_artifact_is_source_hashed_and_strict()
     )
     raw = artifact_path.read_bytes()
 
-    assert artifact.source_pages == (24, 25, 26)
-    assert artifact.source_extraction_payload_sha256 == (
-        "8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30"
-    )
+    assert artifact.source_pages == tuple(range(8, 54))
+    assert len(artifact.source_extraction_payload_sha256) == 64
     assert artifact.source_pdf_sha256 == (
         "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20"
     )
     assert hashlib.sha256(source_pdf_path.read_bytes()).hexdigest() == artifact.source_pdf_sha256
-    assert hashlib.sha256(raw).hexdigest() == event_layouts.EXACT_SLICE_ARTIFACT_SHA256
-    assert artifact.package_hash == event_layouts.EXACT_SLICE_PACKAGE_HASH
+    assert artifact.source_pdf_sha256 == event_layouts.BATTLEFIELD_SOURCE_PDF_SHA256
+    assert hashlib.sha256(raw).hexdigest() == event_layouts.BATTLEFIELD_ARTIFACT_SHA256
+    assert artifact.package_hash == event_layouts.BATTLEFIELD_PACKAGE_HASH
     assert len(artifact.feature_archetypes) == 14
-    assert tuple(len(layout.terrain_areas) for layout in artifact.layouts) == (16, 16, 16)
-    assert tuple(len(layout.terrain_components) for layout in artifact.layouts) == (30, 30, 30)
+    assert len(artifact.layouts) == 45
+    assert frozenset(layout.layout_id for layout in artifact.layouts) == (
+        event_layouts.BATTLEFIELD_LAYOUT_IDS
+    )
+    assert sum(len(layout.terrain_areas) for layout in artifact.layouts) == 720
+    assert sum(len(layout.terrain_components) for layout in artifact.layouts) == 1_349
+    page_9_layout_id = "take-and-hold-vs-take-and-hold-layout-1"
+    assert {layout.layout_id: len(layout.terrain_components) for layout in artifact.layouts}[
+        page_9_layout_id
+    ] == 29
+    assert all(
+        len(layout.terrain_areas) == 16
+        and len(layout.terrain_components) == (29 if layout.layout_id == page_9_layout_id else 30)
+        for layout in artifact.layouts
+    )
+
+    increment = artifact.source_coordinate_frame.terrain_placement_increment_inches
+    assert increment == 0.05
+    assert (
+        artifact.source_coordinate_frame.runtime_exact_seam_closure_precision_decimal_places == 12
+    )
+    assert all(
+        math.isclose(
+            coordinate / increment,
+            round(coordinate / increment),
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+        for layout in artifact.layouts
+        for area in layout.terrain_areas
+        if area.pose_basis != "reviewed_source_pose_with_exact_seam_closure"
+        for coordinate in (area.anchor_x_inches, area.anchor_y_inches)
+    )
+    assert all(
+        math.isclose(
+            coordinate / increment,
+            round(coordinate / increment),
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+        for layout in artifact.layouts
+        for area in layout.terrain_areas
+        for coordinate in (area.source_anchor_x_inches, area.source_anchor_y_inches)
+    )
+    assert all(
+        math.isclose(
+            coordinate / increment,
+            round(coordinate / increment),
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+        for layout in artifact.layouts
+        for component in layout.terrain_components
+        for coordinate in (
+            component.battlefield_center_x_inches,
+            component.battlefield_center_y_inches,
+        )
+    )
+
+    meatgrinder_layouts = _meatgrinder_artifact_layouts()
     assert {
         area.area_id: (area.anchor_x_inches, area.anchor_y_inches)
-        for layout in artifact.layouts
+        for layout in meatgrinder_layouts
         for area in layout.terrain_areas
         if area.footprint_template_id == "FOOTPRINT_8X11_5_POLYGON"
     } == {
@@ -495,32 +517,262 @@ def test_phase17n_meatgrinder_exact_slice_artifact_is_source_hashed_and_strict()
             17.0,
         ),
     }
-    assert {
+    assert tuple(
         asset.source_pdf_image_xref
         for archetype in artifact.feature_archetypes
         if archetype.archetype_id == "dense-tall-crates"
         for asset in archetype.source_assets
-    } == {5486, 5675}
-    event_layouts.validate_exact_slice_artifact_bytes(raw)
+    ) == (
+        5486,
+        5675,
+        5519,
+        5558,
+        5678,
+        5680,
+        1014,
+        1556,
+        2073,
+        3151,
+        3153,
+        3415,
+        3417,
+        3835,
+        3968,
+        4648,
+        4900,
+    )
+    event_layouts.validate_battlefield_artifact_bytes(raw)
 
     unknown_field_payload = json.loads(raw)
     unknown_field_payload["unexpected"] = True
     with pytest.raises(ValueError, match="artifact is invalid"):
-        event_layouts.validate_exact_slice_artifact_bytes(
+        event_layouts.validate_battlefield_artifact_bytes(
             json.dumps(unknown_field_payload).encode()
         )
 
     missing_source_assets_payload = json.loads(raw)
     missing_source_assets_payload["feature_archetypes"][0]["source_assets"] = []
-    with pytest.raises(ValueError, match="require source-image assets"):
-        event_layouts.validate_exact_slice_artifact_bytes(
+    with pytest.raises(ValueError, match="feature-archetype identity or semantics drifted"):
+        event_layouts.validate_battlefield_artifact_bytes(
             json.dumps(missing_source_assets_payload).encode()
+        )
+
+    duplicate_logical_member_payload = json.loads(raw)
+    single_contacts = [
+        contact
+        for contact in duplicate_logical_member_payload["layouts"][0]["terrain_area_contacts"]
+        if contact["kind"] == "single"
+    ]
+    single_contacts[1]["terrain_area_ids"][0] = single_contacts[0]["terrain_area_ids"][0]
+    single_contacts[1]["source_terrain_area_ids"][0] = single_contacts[0][
+        "source_terrain_area_ids"
+    ][0]
+    with pytest.raises(ValueError, match="belongs to multiple logical areas"):
+        event_layouts.validate_battlefield_artifact_bytes(
+            json.dumps(duplicate_logical_member_payload).encode()
+        )
+
+    open_runtime_seam_payload = json.loads(raw)
+    open_single_contact = next(
+        contact
+        for layout in open_runtime_seam_payload["layouts"]
+        for contact in layout["terrain_area_contacts"]
+        if contact["kind"] == "single"
+    )
+    open_single_contact["runtime_pair_gap_inches"] = 0.05001
+    with pytest.raises(ValueError, match="source-contact record is invalid"):
+        event_layouts.validate_battlefield_artifact_bytes(
+            json.dumps(open_runtime_seam_payload).encode()
+        )
+
+    open_separate_seam_payload = json.loads(raw)
+    open_separate_contact = next(
+        contact
+        for layout in open_separate_seam_payload["layouts"]
+        for contact in layout["terrain_area_contacts"]
+        if contact["kind"] == "separate"
+    )
+    open_separate_contact["runtime_pair_gap_inches"] = 0.05001
+    with pytest.raises(ValueError, match="source-contact record is invalid"):
+        event_layouts.validate_battlefield_artifact_bytes(
+            json.dumps(open_separate_seam_payload).encode()
+        )
+
+    overlapping_runtime_seam_payload = json.loads(raw)
+    overlapping_runtime_seam_payload["layouts"][0]["terrain_area_contacts"][0][
+        "runtime_pair_overlap_square_inches"
+    ] = 0.000002
+    with pytest.raises(ValueError, match="source-contact record is invalid"):
+        event_layouts.validate_battlefield_artifact_bytes(
+            json.dumps(overlapping_runtime_seam_payload).encode()
+        )
+
+    reviewed_adjustment_drift_payload = json.loads(raw)
+    page_29_payload = next(
+        layout
+        for layout in reviewed_adjustment_drift_payload["layouts"]
+        if layout["source_page"] == 29
+    )
+    reviewed_adjustment_area = next(
+        area
+        for area in page_29_payload["terrain_areas"]
+        if area["source_area_id"].endswith("terrain-area-04")
+    )
+    reviewed_adjustment_area["runtime_adjustment_y_inches"] = 0.35
+    reviewed_adjustment_area["anchor_y_inches"] = (
+        reviewed_adjustment_area["source_anchor_y_inches"] + 0.35
+    )
+    with pytest.raises(ValueError, match="source adjustment exceeds its reviewed bound"):
+        event_layouts.validate_battlefield_artifact_bytes(
+            json.dumps(reviewed_adjustment_drift_payload).encode()
+        )
+
+    reviewed_candidate_drift_payload = json.loads(raw)
+    reviewed_candidate_area = next(
+        area
+        for layout in reviewed_candidate_drift_payload["layouts"]
+        for area in layout["terrain_areas"]
+        if area["source_area_id"] == "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-02"
+    )
+    reviewed_candidate_area["source_pose_candidate_index"] = 0
+    reviewed_candidate_drift_payload["package_hash"] = ""
+    reviewed_candidate_drift_payload["package_hash"] = hashlib.sha256(
+        json.dumps(
+            reviewed_candidate_drift_payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+    ).hexdigest()
+    with pytest.raises(ValueError, match="source adjustment exceeds its reviewed bound"):
+        event_layouts.validate_battlefield_artifact_bytes(
+            json.dumps(reviewed_candidate_drift_payload).encode()
+        )
+
+    exact_seam_drift_payload = json.loads(raw)
+    exact_seam_area = next(
+        area
+        for layout in exact_seam_drift_payload["layouts"]
+        for area in layout["terrain_areas"]
+        if area["source_area_id"] == "disruption-vs-disruption-layout-1-terrain-area-10"
+    )
+    exact_seam_area["runtime_adjustment_x_inches"] += 0.000001
+    exact_seam_area["anchor_x_inches"] += 0.000001
+    with pytest.raises(ValueError, match="source adjustment exceeds its reviewed bound"):
+        event_layouts.validate_battlefield_artifact_bytes(
+            json.dumps(exact_seam_drift_payload).encode()
+        )
+
+    component_adjustment_drift_payload = json.loads(raw)
+    component_adjustment = next(
+        component
+        for layout in component_adjustment_drift_payload["layouts"]
+        for component in layout["terrain_components"]
+        if component["source_component_id"]
+        == "purge-the-foe-vs-disruption-layout-3-terrain-area-04-component-01"
+    )
+    component_adjustment["runtime_adjustment_x_inches"] = -0.05
+    component_adjustment["battlefield_center_x_inches"] = (
+        component_adjustment["source_battlefield_center_x_inches"] - 0.05
+    )
+    with pytest.raises(ValueError, match="component containment adjustment drifted"):
+        event_layouts.validate_battlefield_artifact_bytes(
+            json.dumps(component_adjustment_drift_payload).encode()
+        )
+
+    pipe_basis_drift_payload = json.loads(raw)
+    pipe_component = next(
+        component
+        for layout in pipe_basis_drift_payload["layouts"]
+        if layout["source_page"] not in {24, 25, 26}
+        for component in layout["terrain_components"]
+        if component["archetype_id"] == "dense-long-pipes"
+    )
+    pipe_component["pose_basis"] = "reviewed_source_quantized_pose"
+    with pytest.raises(ValueError, match="component pose basis drifted"):
+        event_layouts.validate_battlefield_artifact_bytes(
+            json.dumps(pipe_basis_drift_payload).encode()
+        )
+
+    pipe_pose_drift_payload = json.loads(raw)
+    pipe_layout = next(
+        layout
+        for layout in pipe_pose_drift_payload["layouts"]
+        if layout["source_page"] not in {24, 25, 26}
+        and any(
+            component["pose_basis"] == "reviewed_parent_footprint_centered_pipe_pose"
+            for component in layout["terrain_components"]
+        )
+    )
+    pipe_component = next(
+        component
+        for component in pipe_layout["terrain_components"]
+        if component["pose_basis"] == "reviewed_parent_footprint_centered_pipe_pose"
+    )
+    pipe_area = next(
+        area
+        for area in pipe_layout["terrain_areas"]
+        if area["area_id"] == pipe_component["terrain_area_id"]
+    )
+    first_vertex_x, first_vertex_y = (-3.05, 1.15)
+    area_radians = math.radians(pipe_area["rotation_degrees"])
+    area_cosine = math.cos(area_radians)
+    area_sine = math.sin(area_radians)
+    area_center_x = pipe_area["anchor_x_inches"] - (
+        first_vertex_x * area_cosine - first_vertex_y * area_sine
+    )
+    area_center_y = pipe_area["anchor_y_inches"] - (
+        first_vertex_x * area_sine + first_vertex_y * area_cosine
+    )
+    mirrored_center_x = (
+        2.0 * first_vertex_x if pipe_area["local_transform"] == "mirror_y_axis" else 0.0
+    )
+    centered_x = round(
+        round(
+            (area_center_x + mirrored_center_x * area_cosine) / 0.05,
+        )
+        * 0.05,
+        6,
+    )
+    current_center_x = pipe_component["battlefield_center_x_inches"]
+    alternative_center_x = round(
+        current_center_x + (-0.05 if current_center_x - centered_x >= 0.05 else 0.05),
+        6,
+    )
+    pipe_component["battlefield_center_x_inches"] = alternative_center_x
+    pipe_component["runtime_adjustment_x_inches"] = round(
+        alternative_center_x - pipe_component["source_battlefield_center_x_inches"],
+        6,
+    )
+    delta_x = alternative_center_x - area_center_x
+    delta_y = pipe_component["battlefield_center_y_inches"] - area_center_y
+    transformed_x = delta_x * area_cosine + delta_y * area_sine
+    pipe_component["local_offset_y_inches"] = round(
+        -delta_x * area_sine + delta_y * area_cosine,
+        6,
+    )
+    pipe_component["local_offset_x_inches"] = round(
+        2.0 * first_vertex_x - transformed_x
+        if pipe_area["local_transform"] == "mirror_y_axis"
+        else transformed_x,
+        6,
+    )
+    pipe_pose_drift_payload["package_hash"] = ""
+    pipe_pose_drift_payload["package_hash"] = hashlib.sha256(
+        json.dumps(
+            pipe_pose_drift_payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+    ).hexdigest()
+    with pytest.raises(ValueError, match="parent-centered pipe pose drifted"):
+        event_layouts.validate_battlefield_artifact_bytes(
+            json.dumps(pipe_pose_drift_payload).encode()
         )
 
     stale_hash_payload = json.loads(raw)
     stale_hash_payload["layouts"][0]["objectives"][0]["x_inches"] = 8.59
     with pytest.raises(ValueError, match="package hash is stale"):
-        event_layouts.validate_exact_slice_artifact_bytes(json.dumps(stale_hash_payload).encode())
+        event_layouts.validate_battlefield_artifact_bytes(json.dumps(stale_hash_payload).encode())
 
     rehashed_coordinate_payload = json.loads(raw)
     rehashed_coordinate_payload["layouts"][0]["objectives"][0]["x_inches"] = 8.59
@@ -533,29 +785,17 @@ def test_phase17n_meatgrinder_exact_slice_artifact_is_source_hashed_and_strict()
         ).encode()
     ).hexdigest()
     with pytest.raises(ValueError, match="drifted from its reviewed pin"):
-        event_layouts.validate_exact_slice_artifact_bytes(
+        event_layouts.validate_battlefield_artifact_bytes(
             json.dumps(rehashed_coordinate_payload).encode()
         )
 
-    wrong_area_payload = json.loads(raw)
-    wrong_area_payload["layouts"][2]["objectives"][4]["terrain_area_ids"] = [
-        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-05"
-    ]
-    wrong_area_payload["package_hash"] = ""
-    wrong_area_payload["package_hash"] = hashlib.sha256(
-        json.dumps(
-            wrong_area_payload,
-            sort_keys=True,
-            separators=(",", ":"),
-        ).encode()
-    ).hexdigest()
-    with pytest.raises(ValueError, match="objective terrain-area mapping drifted"):
-        event_layouts.validate_exact_slice_artifact_bytes(json.dumps(wrong_area_payload).encode())
-
     unreflected_source_affine_payload = json.loads(raw)
-    unreflected_source_affine_payload["layouts"][0]["terrain_areas"][3]["local_transform"] = (
-        "identity"
+    meatgrinder_a_payload = next(
+        layout
+        for layout in unreflected_source_affine_payload["layouts"]
+        if layout["source_page"] == 24
     )
+    meatgrinder_a_payload["terrain_areas"][3]["local_transform"] = "identity"
     unreflected_source_affine_payload["package_hash"] = ""
     unreflected_source_affine_payload["package_hash"] = hashlib.sha256(
         json.dumps(
@@ -564,18 +804,23 @@ def test_phase17n_meatgrinder_exact_slice_artifact_is_source_hashed_and_strict()
             separators=(",", ":"),
         ).encode()
     ).hexdigest()
-    with pytest.raises(ValueError, match="local reflection must match its source affine"):
-        event_layouts.validate_exact_slice_artifact_bytes(
+    with pytest.raises(ValueError, match="reflection must match its source affine"):
+        event_layouts.validate_battlefield_artifact_bytes(
             json.dumps(unreflected_source_affine_payload).encode()
         )
 
     asymmetric_component_payload = json.loads(raw)
+    meatgrinder_a_payload = next(
+        layout for layout in asymmetric_component_payload["layouts"] if layout["source_page"] == 24
+    )
     asymmetric_component = next(
         component
-        for component in asymmetric_component_payload["layouts"][0]["terrain_components"]
+        for component in meatgrinder_a_payload["terrain_components"]
         if component["component_id"].endswith("terrain-area-11-component-02")
     )
-    asymmetric_component["battlefield_center_x_inches"] += 0.05
+    asymmetric_component["battlefield_rotation_degrees"] += 1.0
+    asymmetric_component["runtime_rotation_adjustment_degrees"] += 1.0
+    asymmetric_component["local_rotation_degrees"] += 1.0
     asymmetric_component_payload["package_hash"] = ""
     asymmetric_component_payload["package_hash"] = hashlib.sha256(
         json.dumps(
@@ -584,10 +829,651 @@ def test_phase17n_meatgrinder_exact_slice_artifact_is_source_hashed_and_strict()
             separators=(",", ":"),
         ).encode()
     ).hexdigest()
-    with pytest.raises(ValueError, match="mirror pairs must use exact point symmetry"):
-        event_layouts.validate_exact_slice_artifact_bytes(
+    with pytest.raises(ValueError, match="point symmetry"):
+        event_layouts.validate_battlefield_artifact_bytes(
             json.dumps(asymmetric_component_payload).encode()
         )
+
+
+def test_phase17n_all_layout_geometry_closes_declared_seams_and_region_holes() -> None:
+    artifact = event_layouts.battlefield_artifact()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    board = shapely_backend.footprint_for_polygon(
+        ((0.0, 0.0), (44.0, 0.0), (44.0, 60.0), (0.0, 60.0))
+    )
+    checked_area_contacts = 0
+    checked_component_contacts = 0
+    checked_component_containment = 0
+    checked_objective_bindings = 0
+    area_contact_kinds: Counter[str] = Counter()
+    logical_terrain_area_ids: set[str] = set()
+
+    def shape_footprint(shape: DeploymentZoneShape) -> Any:
+        polygons = tuple(
+            shapely_backend.footprint_for_polygon(polygon) for polygon in _shape_polygons(shape)
+        )
+        result = polygons[0]
+        for polygon in polygons[1:]:
+            result = result.union(polygon)
+        return result
+
+    for source_layout in artifact.layouts:
+        setup = MissionSetup.from_mission_pack(
+            mission_pack=mission_pack,
+            mission_pool_entry_id=f"mission-{source_layout.layout_id}",
+            attacker_player_id="player-alpha",
+            defender_player_id="player-beta",
+        )
+        areas_by_id = {area.terrain_area_id: area for area in setup.terrain_areas}
+        features_by_id = {feature.feature_id: feature for feature in setup.terrain_features}
+        objectives_by_id = {
+            objective.objective_marker_id: objective for objective in setup.objective_markers
+        }
+
+        for contact in source_layout.terrain_area_contacts:
+            first_id, second_id = contact.terrain_area_ids
+            first_points = _terrain_display_points(areas_by_id[first_id].footprint_polygon)
+            second_points = _terrain_display_points(areas_by_id[second_id].footprint_polygon)
+            first = shapely_backend.footprint_for_polygon(first_points)
+            second = shapely_backend.footprint_for_polygon(second_points)
+            runtime_overlap = first.intersection(second).area
+            runtime_gap = first.distance(second)
+            assert runtime_overlap <= 1e-6
+            assert runtime_gap <= 0.05 + 1e-6
+            assert math.isclose(
+                contact.runtime_pair_overlap_square_inches,
+                runtime_overlap,
+                rel_tol=0.0,
+                abs_tol=1e-6,
+            )
+            assert math.isclose(
+                contact.runtime_pair_gap_inches,
+                runtime_gap,
+                rel_tol=0.0,
+                abs_tol=1e-6,
+            )
+            first_group_id = areas_by_id[first_id].logical_terrain_area_id
+            second_group_id = areas_by_id[second_id].logical_terrain_area_id
+            assert (first_group_id == second_group_id) is (contact.kind == "single")
+            checked_area_contacts += 1
+            area_contact_kinds[contact.kind] += 1
+
+        for first_id, second_id in source_layout.terrain_component_contact_pairs:
+            first_points = _terrain_display_points(features_by_id[first_id].rules_footprint_polygon)
+            second_points = _terrain_display_points(
+                features_by_id[second_id].rules_footprint_polygon
+            )
+            first = shapely_backend.footprint_for_polygon(first_points)
+            second = shapely_backend.footprint_for_polygon(second_points)
+            assert first.distance(second) <= 1e-9
+            checked_component_contacts += 1
+
+        areas_by_logical_id: dict[str, list[Any]] = {}
+        for area in setup.terrain_areas:
+            areas_by_logical_id.setdefault(area.logical_terrain_area_id, []).append(area)
+        for component in source_layout.terrain_components:
+            parent = areas_by_id[component.terrain_area_id]
+            logical_members = areas_by_logical_id[parent.logical_terrain_area_id]
+            logical_footprint = shapely_backend.footprint_for_polygon(
+                _terrain_display_points(logical_members[0].footprint_polygon)
+            )
+            for member in logical_members[1:]:
+                logical_footprint = logical_footprint.union(
+                    shapely_backend.footprint_for_polygon(
+                        _terrain_display_points(member.footprint_polygon)
+                    )
+                )
+            component_footprint = shapely_backend.footprint_for_polygon(
+                _terrain_display_points(
+                    features_by_id[component.component_id].rules_footprint_polygon
+                )
+            )
+            assert component_footprint.difference(logical_footprint).area <= 1e-6
+            checked_component_containment += 1
+
+        layout_logical_ids = {area.logical_terrain_area_id for area in setup.terrain_areas}
+        assert len(layout_logical_ids) == 16 - sum(
+            contact.kind == "single" for contact in source_layout.terrain_area_contacts
+        )
+        logical_terrain_area_ids.update(layout_logical_ids)
+
+        assert {binding.objective_marker_id for binding in setup.objective_terrain_areas} == {
+            objective.objective_id
+            for objective in source_layout.objectives
+            if objective.terrain_area_ids
+        }
+        source_objectives_by_id = {
+            objective.objective_id: objective for objective in source_layout.objectives
+        }
+        for binding in setup.objective_terrain_areas:
+            objective = objectives_by_id[binding.objective_marker_id]
+            source_objective = source_objectives_by_id[binding.objective_marker_id]
+            expected_logical_ids = {
+                areas_by_id[area_id].logical_terrain_area_id
+                for area_id in source_objective.terrain_area_ids
+            }
+            assert binding.terrain_area_ids == tuple(
+                sorted(
+                    area.terrain_area_id
+                    for logical_area_id in expected_logical_ids
+                    for area in areas_by_logical_id[logical_area_id]
+                )
+            )
+            assert binding.terrain_area_ids
+            checked_objective_bindings += len(binding.terrain_area_ids)
+            for area_id in source_objective.terrain_area_ids:
+                area_polygon = tuple(
+                    (point.x_inches, point.y_inches)
+                    for point in areas_by_id[area_id].footprint_polygon
+                )
+                assert (
+                    shapely_backend.point_distance_to_polygon(
+                        objective.x_inches,
+                        objective.y_inches,
+                        area_polygon,
+                    )
+                    <= 0.05 + 1e-9
+                )
+
+        regions_by_suffix = {
+            region.region_id.removeprefix(f"{source_layout.layout_id}-"): region
+            for region in setup.battlefield_regions
+        }
+        attacker_zone = shape_footprint(regions_by_suffix["attacker-deployment-region"].shape)
+        defender_zone = shape_footprint(regions_by_suffix["defender-deployment-region"].shape)
+        no_mans_land = shape_footprint(regions_by_suffix["no-mans-land"].shape)
+        attacker_territory = shape_footprint(regions_by_suffix["attacker-territory"].shape)
+        defender_territory = shape_footprint(regions_by_suffix["defender-territory"].shape)
+
+        assert attacker_zone.intersection(defender_zone).area <= 1e-6
+        assert attacker_zone.intersection(no_mans_land).area <= 1e-6
+        assert defender_zone.intersection(no_mans_land).area <= 1e-6
+        assert (
+            board.symmetric_difference(attacker_zone.union(defender_zone).union(no_mans_land)).area
+            <= 1e-6
+        )
+        assert attacker_territory.intersection(defender_territory).area <= 1e-6
+        assert board.symmetric_difference(attacker_territory.union(defender_territory)).area <= 1e-6
+        assert attacker_territory.covers(attacker_zone)
+        assert defender_territory.covers(defender_zone)
+
+    assert checked_area_contacts == 224
+    assert area_contact_kinds == Counter({"single": 112, "separate": 112})
+    assert checked_component_contacts == 269
+    assert checked_component_containment == 1_349
+    assert checked_objective_bindings == 264
+    assert len(logical_terrain_area_ids) == 608
+
+
+def test_phase17n_runtime_layout_names_preserve_canonical_source_metadata() -> None:
+    repository_root = Path(__file__).resolve().parents[2]
+    extraction = json.loads(
+        (
+            repository_root
+            / "data/source_audits/event_companion_2026_06"
+            / "phase17n_event_companion_battlefields_pages_9_53_extraction.json"
+        ).read_text(encoding="utf-8")
+    )
+    artifact_layouts = {
+        layout.layout_id: layout for layout in event_layouts.battlefield_artifact().layouts
+    }
+    runtime_layouts = event_layouts.BATTLEFIELD_LAYOUTS_BY_ID
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    expected_names_by_id: dict[str, str] = {}
+
+    for source_layout in extraction["layouts"]:
+        layout_id = source_layout["layout_id"]
+        variant = source_layout["variant"].upper()
+        force_names = tuple(source_layout["force_disposition_pair"])
+        mission_names = tuple(source_layout["primary_missions"])
+        printed_metadata = source_layout["source_printed_left_to_right"]
+        printed_force_names = tuple(printed_metadata["force_dispositions"])
+        printed_mission_names = tuple(printed_metadata["primary_missions"])
+        printed_label = printed_metadata["layout_label"]
+
+        assert printed_force_names == force_names
+        assert printed_mission_names == mission_names
+        assert printed_label == f"Layout {variant}"
+        assert source_layout["printed_title"] == (
+            f"{printed_force_names[0]} vs {printed_force_names[1]} | "
+            f"{printed_mission_names[0]} / {printed_mission_names[1]} | "
+            f"{printed_label}"
+        )
+
+        expected_name = (
+            f"{force_names[0]} vs {force_names[1]} - "
+            f"{mission_names[0]} / {mission_names[1]} - "
+            f"Layout {variant}"
+        )
+        expected_names_by_id[layout_id] = expected_name
+        assert artifact_layouts[layout_id].name == expected_name
+        assert runtime_layouts[layout_id].name == expected_name
+        assert mission_pack.battlefield_layout(layout_id).name == expected_name
+
+    assert expected_names_by_id["purge-the-foe-vs-priority-assets-layout-1"] == (
+        "Purge the Foe vs Priority Assets - Destroyer's Wrath / Vital Link - Layout A"
+    )
+    assert expected_names_by_id["disruption-vs-disruption-layout-1"] == (
+        "Disruption vs Disruption - Outmanoeuvre / Outmanoeuvre - Layout A"
+    )
+
+
+def test_phase17n_full_artifact_preserves_all_source_extraction_records() -> None:
+    repository_root = Path(__file__).resolve().parents[2]
+    extraction_path = (
+        repository_root
+        / "data/source_audits/event_companion_2026_06"
+        / "phase17n_event_companion_battlefields_pages_9_53_extraction.json"
+    )
+    extraction_raw = extraction_path.read_bytes()
+    extraction = json.loads(extraction_raw)
+    stable_identity_map = json.loads(
+        (
+            repository_root
+            / "data/source_audits/event_companion_2026_06"
+            / "phase17n_event_companion_stable_runtime_identity_map.json"
+        ).read_text(encoding="utf-8")
+    )
+    terrain_area_id_map = stable_identity_map["terrain_area_id_map"]
+    objective_id_map = stable_identity_map["objective_id_map"]
+    source_layout_id_map = stable_identity_map["source_layout_id_map"]
+    artifact = event_layouts.battlefield_artifact()
+    artifact_layouts = {layout.layout_id: layout for layout in artifact.layouts}
+
+    assert hashlib.sha256(extraction_raw).hexdigest() == (artifact.source_extraction_payload_sha256)
+    assert (
+        json.loads(msgspec.json.encode(artifact.feature_archetypes))
+        == extraction["reviewed_feature_archetypes"]
+    )
+    assert len(extraction["layouts"]) == 45
+    checked_area_count = 0
+    checked_component_count = 0
+    checked_objective_count = 0
+    reviewed_alternate_candidate_count = 0
+    reviewed_area_pose_witnesses: dict[str, tuple[int, float, float]] = {}
+    extended_area_adjustments: dict[str, tuple[float, float]] = {}
+    exact_seam_adjustments: dict[str, tuple[float, float]] = {}
+    component_containment_adjustments: dict[str, tuple[float, float]] = {}
+    parent_centered_pipe_count = 0
+    expected_component_containment_adjustments = {
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-04-component-01": (-0.1, 0.0),
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-07-component-01": (0.0, 0.05),
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-13-component-01": (0.05, -0.05),
+        "disruption-vs-disruption-layout-3-terrain-area-02-component-01": (0.0, -0.05),
+        "reconnaissance-vs-reconnaissance-layout-1-terrain-area-02-component-01": (0.0, -0.05),
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-08-component-03": (
+            0.0,
+            -0.05,
+        ),
+        "take-and-hold-vs-priority-assets-layout-3-terrain-area-09-component-02": (
+            0.0,
+            0.05,
+        ),
+    }
+    expected_reviewed_area_pose_witnesses = {
+        "disruption-vs-disruption-layout-1-terrain-area-07": (2, 0.15, -0.1),
+        "disruption-vs-disruption-layout-1-terrain-area-10": (
+            2,
+            -0.194559638906,
+            0.110510105572,
+        ),
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-02": (1, 0.1, -0.35),
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-04": (2, -0.1, 0.3),
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-13": (2, 0.05, -0.35),
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-15": (1, -0.05, 0.3),
+        "purge-the-foe-vs-reconnaissance-layout-1-terrain-area-13": (0, 0.0, 0.05),
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-07": (2, 0.15, -0.1),
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10": (
+            2,
+            -0.194559638906,
+            0.110510105572,
+        ),
+        "disruption-vs-disruption-layout-2-terrain-area-06": (2, 0.0, 0.1),
+        "disruption-vs-disruption-layout-2-terrain-area-11": (2, -0.2, 0.05),
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-06": (2, 0.0, 0.1),
+        "reconnaissance-vs-reconnaissance-layout-3-terrain-area-11": (2, -0.2, 0.05),
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-02": (1, 0.2, -0.05),
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-04": (2, -0.2, 0.0),
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-13": (2, 0.2, -0.05),
+        "take-and-hold-vs-purge-the-foe-layout-1-terrain-area-15": (1, -0.2, 0.05),
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-08": (2, 0.1, 0.0),
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-09": (2, -0.15, 0.0),
+        "take-and-hold-vs-take-and-hold-layout-3-terrain-area-11": (1, 0.0, -0.05),
+    }
+
+    for source_layout in extraction["layouts"]:
+        layout = artifact_layouts[source_layout["layout_id"]]
+        areas_by_source_id = {area.source_area_id: area for area in layout.terrain_areas}
+        components_by_source_id = {
+            component.source_component_id: component for component in layout.terrain_components
+        }
+        objectives_by_source_id = {
+            objective.source_objective_id: objective for objective in layout.objectives
+        }
+        assert layout.source_page == source_layout["source_pdf_page_number"]
+        if source_layout["layout_id"] in source_layout_id_map:
+            assert layout.source_layout_id == source_layout_id_map[source_layout["layout_id"]]
+        elif source_layout["layout_id"].startswith("purge-the-foe-vs-purge-the-foe"):
+            assert layout.source_layout_id == (
+                "gw_event_companion_v1_purge_the_foe_vs_purge_the_foe_meatgrinder_"
+                f"layout_{'abc'[int(source_layout['layout_id'][-1]) - 1]}"
+            )
+        else:
+            assert layout.source_layout_id == (
+                f"gw_event_companion_v1_{source_layout['layout_id'].replace('-', '_')}"
+            )
+        icons_by_id = {icon["icon_id"]: icon for icon in source_layout["eye_contact_icons"]}
+        assert len(layout.terrain_area_contacts) == len(source_layout["source_contact_pairs"])
+        for contact, source_pair in zip(
+            layout.terrain_area_contacts,
+            source_layout["source_contact_pairs"],
+            strict=True,
+        ):
+            assert contact.source_terrain_area_ids == tuple(source_pair["area_ids"])
+            assert contact.terrain_area_ids == tuple(
+                terrain_area_id_map.get(area_id, area_id) for area_id in source_pair["area_ids"]
+            )
+            assert contact.kind == source_pair["kinds"][0]
+            assert contact.source_icon_ids == tuple(source_pair["icon_ids"])
+            assert contact.source_pair_gap_inches == source_pair["source_pair_gap_inches"]
+            source_icon = icons_by_id[contact.source_icon_ids[0]]
+            assert contact.source_pdf_drawing_indices_zero_based == tuple(
+                source_icon["source_drawing_indices_zero_based"]
+            )
+            assert contact.source_pdf_seqnos == tuple(source_icon["source_seqnos"])
+            assert (
+                contact.source_icon_x_inches,
+                contact.source_icon_y_inches,
+            ) == tuple(source_icon["battlefield_center_quantized_0_05_inches"])
+
+        for source_area in source_layout["terrain_areas"]:
+            area = areas_by_source_id[source_area["area_id"]]
+            vector_path = source_area["source_vector_path"]
+            source_image = source_area["source_area_image"]
+            source_pose = source_area["pose_recipe"]
+            assert area.area_id == terrain_area_id_map.get(
+                source_area["area_id"], source_area["area_id"]
+            )
+            assert area.source_area_id == source_area["area_id"]
+            assert area.footprint_template_id == source_area["footprint_template_id"]
+            assert area.classification == source_area["classification"]
+            assert (
+                area.local_transform == source_area["runtime_orientation_review"]["local_transform"]
+            )
+            assert (
+                area.local_transform_basis
+                == source_area["runtime_orientation_review"]["local_transform_basis"]
+            )
+            assert area.source_mirror_area_id == source_area["point_symmetry_partner_area_id"]
+            assert area.mirror_area_id == terrain_area_id_map.get(
+                source_area["point_symmetry_partner_area_id"],
+                source_area["point_symmetry_partner_area_id"],
+            )
+            source_candidate = next(
+                candidate
+                for candidate in source_pose["candidates"]
+                if candidate["candidate_index"] == area.source_pose_candidate_index
+            )
+            assert (
+                area.source_anchor_x_inches,
+                area.source_anchor_y_inches,
+                area.source_rotation_degrees,
+                area.source_pose_fit_residual_inches,
+            ) == (
+                source_candidate["anchor_x_inches"],
+                source_candidate["anchor_y_inches"],
+                source_candidate["rotation_degrees"],
+                source_candidate["fit_residual_inches"],
+            )
+            if area.source_pose_candidate_index != source_pose["selected_candidate_index"]:
+                reviewed_alternate_candidate_count += 1
+                assert area.pose_basis in {
+                    "reviewed_source_pose_candidate_with_bounded_seam_adjustment",
+                    "reviewed_source_pose_with_exact_seam_closure",
+                }
+            assert math.isclose(
+                area.anchor_x_inches,
+                area.source_anchor_x_inches + area.runtime_adjustment_x_inches,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                area.anchor_y_inches,
+                area.source_anchor_y_inches + area.runtime_adjustment_y_inches,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                (area.rotation_degrees - area.source_rotation_degrees + 180.0) % 360.0 - 180.0,
+                area.runtime_rotation_adjustment_degrees,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            if (
+                abs(area.runtime_adjustment_x_inches) > 0.2
+                or abs(area.runtime_adjustment_y_inches) > 0.2
+            ):
+                extended_area_adjustments[area.source_area_id] = (
+                    area.runtime_adjustment_x_inches,
+                    area.runtime_adjustment_y_inches,
+                )
+            if area.pose_basis == "reviewed_source_pose_with_exact_seam_closure":
+                exact_seam_adjustments[area.source_area_id] = (
+                    area.runtime_adjustment_x_inches,
+                    area.runtime_adjustment_y_inches,
+                )
+            if area.source_area_id in expected_reviewed_area_pose_witnesses:
+                reviewed_area_pose_witnesses[area.source_area_id] = (
+                    area.source_pose_candidate_index,
+                    area.runtime_adjustment_x_inches,
+                    area.runtime_adjustment_y_inches,
+                )
+            assert (
+                area.source_pdf_extended_drawing_index_zero_based
+                == (vector_path["extended_drawing_index_zero_based"])
+            )
+            assert area.source_pdf_seqno == vector_path["seqno"]
+            assert area.source_pdf_vector_item_count == vector_path["item_count"]
+            assert area.source_pdf_image_xref == source_image["xref"]
+            assert area.source_image_sha256 == source_image["source_image_sha256"]
+            assert area.source_soft_mask_sha256 == source_image["source_soft_mask_sha256"]
+            assert (
+                area.source_pdf_bounds.x0_points,
+                area.source_pdf_bounds.y0_points,
+                area.source_pdf_bounds.x1_points,
+                area.source_pdf_bounds.y1_points,
+            ) == tuple(source_image["bbox_points"])
+            assert (
+                area.source_pdf_affine.a,
+                area.source_pdf_affine.b,
+                area.source_pdf_affine.c,
+                area.source_pdf_affine.d,
+                area.source_pdf_affine.e,
+                area.source_pdf_affine.f,
+            ) == tuple(source_image["affine_normalized_image_to_points"])
+            checked_area_count += 1
+
+        for source_component in source_layout["terrain_components"]:
+            component = components_by_source_id[source_component["component_id"]]
+            assert not source_component["inferred"]
+            expected_parent_id = terrain_area_id_map.get(
+                source_component["parent_area_id"], source_component["parent_area_id"]
+            )
+            component_ordinal = source_component["component_id"].rsplit("-component-", 1)[1]
+            assert component.component_id == f"{expected_parent_id}-component-{component_ordinal}"
+            assert component.source_component_id == source_component["component_id"]
+            assert component.terrain_area_id == expected_parent_id
+            assert component.archetype_id == source_component["archetype_id"]
+            assert (
+                component.source_mirror_component_id
+                == source_component["point_symmetry_partner_component_id"]
+            )
+            expected_mirror_source_id = source_component["point_symmetry_partner_component_id"]
+            if expected_mirror_source_id is None:
+                assert component.mirror_component_id is None
+            else:
+                expected_mirror_parent = terrain_area_id_map.get(
+                    expected_mirror_source_id.rsplit("-component-", 1)[0],
+                    expected_mirror_source_id.rsplit("-component-", 1)[0],
+                )
+                expected_mirror_ordinal = expected_mirror_source_id.rsplit("-component-", 1)[1]
+                assert component.mirror_component_id == (
+                    f"{expected_mirror_parent}-component-{expected_mirror_ordinal}"
+                )
+            assert (
+                component.local_transform
+                == source_component["local_orientation_relative_to_parent"]["local_transform"]
+            )
+            assert (
+                component.local_transform_basis
+                == source_component["local_orientation_relative_to_parent"]["local_transform_basis"]
+            )
+            assert component.source_pdf_image_xref == source_component["source_xref"]
+            assert (
+                component.source_battlefield_center_x_inches,
+                component.source_battlefield_center_y_inches,
+            ) == tuple(source_component["battlefield_center_quantized_0_05_inches"])
+            assert (
+                component.source_battlefield_rotation_degrees
+                == source_component["battlefield_image_x_axis_rotation_degrees"]
+            )
+            assert math.isclose(
+                component.battlefield_center_x_inches,
+                component.source_battlefield_center_x_inches
+                + component.runtime_adjustment_x_inches,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                component.battlefield_center_y_inches,
+                component.source_battlefield_center_y_inches
+                + component.runtime_adjustment_y_inches,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                (
+                    component.battlefield_rotation_degrees
+                    - component.source_battlefield_rotation_degrees
+                    + 180.0
+                )
+                % 360.0
+                - 180.0,
+                component.runtime_rotation_adjustment_degrees,
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            if layout.source_page not in {24, 25, 26}:
+                if component.archetype_id == "dense-long-pipes":
+                    assert component.pose_basis == "reviewed_parent_footprint_centered_pipe_pose"
+                    assert math.isclose(
+                        component.runtime_rotation_adjustment_degrees,
+                        (
+                            component.battlefield_rotation_degrees
+                            - component.source_battlefield_rotation_degrees
+                            + 180.0
+                        )
+                        % 360.0
+                        - 180.0,
+                        rel_tol=0.0,
+                        abs_tol=1e-9,
+                    )
+                    parent_centered_pipe_count += 1
+                elif component.source_component_id in expected_component_containment_adjustments:
+                    assert (
+                        component.pose_basis
+                        == "reviewed_source_quantization_containment_adjustment"
+                    )
+                    component_containment_adjustments[component.source_component_id] = (
+                        component.runtime_adjustment_x_inches,
+                        component.runtime_adjustment_y_inches,
+                    )
+                    assert component.runtime_rotation_adjustment_degrees == 0.0
+                else:
+                    assert (
+                        component.battlefield_center_x_inches,
+                        component.battlefield_center_y_inches,
+                        component.battlefield_rotation_degrees,
+                    ) == (
+                        component.source_battlefield_center_x_inches,
+                        component.source_battlefield_center_y_inches,
+                        component.source_battlefield_rotation_degrees,
+                    )
+                    assert (
+                        component.runtime_adjustment_x_inches,
+                        component.runtime_adjustment_y_inches,
+                        component.runtime_rotation_adjustment_degrees,
+                    ) == (0.0, 0.0, 0.0)
+            assert (
+                component.source_pdf_bounds.x0_points,
+                component.source_pdf_bounds.y0_points,
+                component.source_pdf_bounds.x1_points,
+                component.source_pdf_bounds.y1_points,
+            ) == tuple(source_component["source_bbox_points"])
+            assert (
+                component.source_pdf_affine.a,
+                component.source_pdf_affine.b,
+                component.source_pdf_affine.c,
+                component.source_pdf_affine.d,
+                component.source_pdf_affine.e,
+                component.source_pdf_affine.f,
+            ) == tuple(source_component["source_affine_normalized_image_to_points"])
+            checked_component_count += 1
+
+        for source_objective in source_layout["objectives"]:
+            objective = objectives_by_source_id[source_objective["objective_id"]]
+            assert objective.objective_id == objective_id_map.get(
+                source_objective["objective_id"], source_objective["objective_id"]
+            )
+            assert objective.source_objective_id == source_objective["objective_id"]
+            assert objective.role == source_objective["role"]
+            assert (objective.x_inches, objective.y_inches) == tuple(
+                source_objective["battlefield_center_quantized_0_01_inches"]
+            )
+            source_distances = source_objective["distances_to_area_polygons_inches"]
+            source_nearby_area_ids = (
+                set(source_objective["nearest_area_ids"])
+                if not source_distances
+                else {
+                    area_id
+                    for area_id, distance in zip(
+                        source_objective["nearest_area_ids"],
+                        source_distances,
+                        strict=True,
+                    )
+                    if distance <= 0.05
+                }
+            )
+            assert set(objective.terrain_area_ids) == {
+                terrain_area_id_map.get(area_id, area_id) for area_id in source_nearby_area_ids
+            }
+            checked_objective_count += 1
+
+    assert checked_area_count == 720
+    assert checked_component_count == 1_349
+    assert checked_objective_count == 246
+    assert reviewed_alternate_candidate_count > 0
+    assert reviewed_area_pose_witnesses == expected_reviewed_area_pose_witnesses
+    assert parent_centered_pipe_count == 84
+    assert component_containment_adjustments == expected_component_containment_adjustments
+    assert exact_seam_adjustments == {
+        "disruption-vs-disruption-layout-1-terrain-area-07": (0.15, -0.1),
+        "disruption-vs-disruption-layout-1-terrain-area-10": (
+            -0.194559638906,
+            0.110510105572,
+        ),
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-07": (0.15, -0.1),
+        "reconnaissance-vs-reconnaissance-layout-2-terrain-area-10": (
+            -0.194559638906,
+            0.110510105572,
+        ),
+    }
+    assert extended_area_adjustments == {
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-02": (0.1, -0.35),
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-04": (-0.1, 0.3),
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-13": (0.05, -0.35),
+        "purge-the-foe-vs-disruption-layout-3-terrain-area-15": (-0.05, 0.3),
+    }
 
 
 def test_phase17n_ruin_wall_joints_follow_source_image_registration() -> None:
@@ -599,7 +1485,7 @@ def test_phase17n_ruin_wall_joints_follow_source_image_registration() -> None:
             / "phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json"
         ).read_text(encoding="utf-8")
     )
-    artifact = event_layouts.exact_slice_artifact()
+    artifact = event_layouts.battlefield_artifact()
     archetypes_by_xref = {
         archetype.source_assets[0].source_pdf_image_xref: archetype
         for archetype in artifact.feature_archetypes
@@ -607,7 +1493,7 @@ def test_phase17n_ruin_wall_joints_follow_source_image_registration() -> None:
     }
     placements_by_id = {
         component.component_id: component
-        for layout in artifact.layouts
+        for layout in _meatgrinder_artifact_layouts()
         for component in layout.terrain_components
     }
 
@@ -673,7 +1559,7 @@ def test_phase17n_ruin_wall_joints_follow_source_image_registration() -> None:
 
 
 def test_phase17n_ruin_floors_preserve_source_visible_wall_only_tails() -> None:
-    artifact = event_layouts.exact_slice_artifact()
+    artifact = event_layouts.battlefield_artifact()
     expected_geometry = {
         "ruins-cd": (3.5, 2.96, 2.48, 0.02),
         "ruins-gh": (2.96, 3.5, 0.02, 2.48),
@@ -723,7 +1609,8 @@ def test_phase17n_ruin_floors_preserve_source_visible_wall_only_tails() -> None:
 
 
 def test_phase17n_shared_non_ruin_archetypes_expand_to_legal_source_proportions_and_touch() -> None:
-    artifact = event_layouts.exact_slice_artifact()
+    artifact = event_layouts.battlefield_artifact()
+    meatgrinder_layouts = _meatgrinder_artifact_layouts()
     expected_axis_spans = {
         "dense-downed-hovercraft": (4.25, 1.4),
         "light-long-barricade": (4.8, 1.0),
@@ -758,9 +1645,10 @@ def test_phase17n_shared_non_ruin_archetypes_expand_to_legal_source_proportions_
 
     assert Counter(
         component.archetype_id
-        for layout in artifact.layouts
+        for layout in meatgrinder_layouts
         for component in layout.terrain_components
     ) == Counter(expected_usage_counts)
+    assert sum(len(layout.terrain_component_contact_pairs) for layout in meatgrinder_layouts) == 18
     for archetype_id, expected_span in expected_axis_spans.items():
         polygon = archetypes_by_id[archetype_id].rules_footprint_polygon
         assert (
@@ -772,7 +1660,7 @@ def test_phase17n_shared_non_ruin_archetypes_expand_to_legal_source_proportions_
     reviewed_multi_piece_xrefs = {5462, 5466, 5468, 5486, 5675}
     primary_xrefs = {5462, 5466}
     checked_companion_count = 0
-    for layout in artifact.layouts:
+    for layout in meatgrinder_layouts:
         setup = MissionSetup.from_mission_pack(
             mission_pack=mission_pack,
             mission_pool_entry_id=f"mission-{layout.layout_id}",
@@ -828,7 +1716,7 @@ def test_phase17n_light_corner_wall_joints_follow_source_image_registration() ->
             / "phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json"
         ).read_text(encoding="utf-8")
     )
-    artifact = event_layouts.exact_slice_artifact()
+    artifact = event_layouts.battlefield_artifact()
     archetypes_by_xref = {
         archetype.source_assets[0].source_pdf_image_xref: archetype
         for archetype in artifact.feature_archetypes
@@ -892,54 +1780,27 @@ def test_phase17n_light_corner_wall_joints_follow_source_image_registration() ->
     assert len(checked_component_ids) == 12
 
 
-def test_phase17n_meatgrinder_exact_slice_builder_reproduces_committed_artifact(
+def test_phase17n_battlefield_builder_reproduces_committed_artifact(
     tmp_path: Path,
 ) -> None:
     repository_root = Path(__file__).resolve().parents[2]
+    builder_path = repository_root / "tools/build_event_companion_battlefields.py"
     extraction_path = (
         repository_root
         / "data/source_audits/event_companion_2026_06"
-        / "phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json"
+        / "phase17n_event_companion_battlefields_pages_9_53_extraction.json"
     )
     artifact_path = (
         repository_root
         / "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th"
         / "event_companion_layouts_2026_06/artifacts"
-        / "purge-the-foe-vs-purge-the-foe-meatgrinder.json"
+        / "event-companion-battlefields.json"
     )
-    extraction_payload = json.loads(extraction_path.read_text(encoding="utf-8"))
-    pose_reviews = tuple(
-        area["accepted_pose_review"]
-        for layout in extraction_payload["layouts"]
-        for area in layout["terrain_areas"]
-    )
-    assert extraction_payload["status"] == ("reviewed_source_registration_ready_for_exact_runtime")
-    assert extraction_payload["placement_pose_review"] == {
-        "accepted_area_count": 48,
-        "rendered_overlays_authoritative": False,
-        "reviewed_on": "2026-08-09",
-        "reviewed_source_pdf_pages": [24, 25, 26],
-        "reviewed_source_pdf_sha256": (
-            "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20"
-        ),
-        "source_page_raster_overlay_registration_review_count": 42,
-        "status": "accepted_for_exact_runtime",
-        "vector_edge_correction_plus_raster_review_count": 6,
-    }
-    assert len(pose_reviews) == 48
-    assert Counter(review["method"] for review in pose_reviews) == Counter(
-        {
-            "source_page_raster_overlay_registration_review": 42,
-            "pdf_vector_edge_correction_plus_source_page_raster_overlay_review": 6,
-        }
-    )
-    assert all(review["status"] == "accepted_for_exact_runtime" for review in pose_reviews)
-    assert all(not review["rendered_overlay_authoritative"] for review in pose_reviews)
     modified_at_before_check = artifact_path.stat().st_mtime_ns
     result = subprocess.run(
         [
             sys.executable,
-            str(repository_root / "tools/build_phase17n_event_companion_exact_slice.py"),
+            str(builder_path),
             "--check",
         ],
         cwd=repository_root,
@@ -951,15 +1812,15 @@ def test_phase17n_meatgrinder_exact_slice_builder_reproduces_committed_artifact(
     assert result.returncode == 0, result.stdout + result.stderr
     assert artifact_path.stat().st_mtime_ns == modified_at_before_check
 
-    stale_output_path = tmp_path / "stale-phase17n-artifact.json"
-    stale_output_path.write_text("{}\n", encoding="utf-8")
-    stale_bytes = stale_output_path.read_bytes()
+    stale_output = tmp_path / "stale-battlefields.json"
+    stale_output.write_bytes(artifact_path.read_bytes() + b"\n")
+    stale_bytes = stale_output.read_bytes()
     stale_result = subprocess.run(
         [
             sys.executable,
-            str(repository_root / "tools/build_phase17n_event_companion_exact_slice.py"),
+            str(builder_path),
             str(extraction_path),
-            str(stale_output_path),
+            str(stale_output),
             "--check",
         ],
         cwd=repository_root,
@@ -967,60 +1828,28 @@ def test_phase17n_meatgrinder_exact_slice_builder_reproduces_committed_artifact(
         capture_output=True,
         text=True,
     )
-
     assert stale_result.returncode != 0
-    assert "exact-slice artifact is stale" in stale_result.stderr
-    assert stale_output_path.read_bytes() == stale_bytes
+    assert "battlefield artifact is stale" in stale_result.stderr
+    assert stale_output.read_bytes() == stale_bytes
 
-    unreviewed_payload = json.loads(extraction_path.read_text(encoding="utf-8"))
-    unreviewed_payload["layouts"][0]["terrain_areas"][0]["accepted_pose_review"]["status"] = (
-        "pending_source_page_review"
-    )
-    unreviewed_extraction_path = tmp_path / "unreviewed-phase17n-extraction.json"
-    unreviewed_extraction_path.write_text(
-        json.dumps(unreviewed_payload, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    unreviewed_result = subprocess.run(
+    modified_extraction = tmp_path / "modified-extraction.json"
+    modified_extraction.write_bytes(extraction_path.read_bytes() + b"\n")
+    guarded_output = tmp_path / "must-not-be-written.json"
+    extraction_result = subprocess.run(
         [
             sys.executable,
-            str(repository_root / "tools/build_phase17n_event_companion_exact_slice.py"),
-            str(unreviewed_extraction_path),
-            str(tmp_path / "unreviewed-output.json"),
+            str(builder_path),
+            str(modified_extraction),
+            str(guarded_output),
         ],
         cwd=repository_root,
         check=False,
         capture_output=True,
         text=True,
     )
-
-    assert unreviewed_result.returncode != 0
-    assert "pose review is not accepted for exact runtime use" in unreviewed_result.stderr
-
-    drifted_raster_payload = json.loads(extraction_path.read_text(encoding="utf-8"))
-    drifted_raster_payload["layouts"][0]["terrain_areas"][0]["accepted_pose_review"][
-        "accepted_anchor_inches"
-    ][0] += 0.25
-    drifted_raster_path = tmp_path / "drifted-raster-phase17n-extraction.json"
-    drifted_raster_path.write_text(
-        json.dumps(drifted_raster_payload, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    drifted_raster_result = subprocess.run(
-        [
-            sys.executable,
-            str(repository_root / "tools/build_phase17n_event_companion_exact_slice.py"),
-            str(drifted_raster_path),
-            str(tmp_path / "drifted-raster-output.json"),
-        ],
-        cwd=repository_root,
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-
-    assert drifted_raster_result.returncode != 0
-    assert "raster-reviewed pose must pin the reviewed estimate" in (drifted_raster_result.stderr)
+    assert extraction_result.returncode != 0
+    assert "source extraction bytes drifted" in extraction_result.stderr
+    assert not guarded_output.exists()
 
 
 def test_phase17n_exact_terrain_area_reflections_follow_source_affine_orientation() -> None:
@@ -1046,27 +1875,25 @@ def test_phase17n_exact_terrain_area_reflections_follow_source_affine_orientatio
         )
         < 0.0
     }
-    artifact = event_layouts.exact_slice_artifact()
     artifact_mirrored_ids = {
         area.area_id
-        for layout in artifact.layouts
+        for layout in _meatgrinder_artifact_layouts()
         for area in layout.terrain_areas
         if area.local_transform == "mirror_y_axis"
     }
 
     assert len(source_orientation_reversing_ids) == 12
     assert artifact_mirrored_ids == source_orientation_reversing_ids
-    assert {
-        area.area_id
-        for layout in artifact.layouts
+    assert Counter(
+        area.pose_basis
+        for layout in _meatgrinder_artifact_layouts()
         for area in layout.terrain_areas
-        if "_and_reviewed_half_turn" in area.pose_basis
-    } == {
-        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04",
-        "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-13",
-        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-01",
-        "purge-the-foe-vs-purge-the-foe-layout-3-terrain-area-16",
-    }
+    ) == Counter(
+        {
+            "accepted_meatgrinder_exemplar_source_pose": 24,
+            "accepted_meatgrinder_exemplar_exact_point_symmetry": 24,
+        }
+    )
 
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
     setup = MissionSetup.from_mission_pack(
@@ -1104,11 +1931,12 @@ def test_phase17n_exact_terrain_area_reflections_follow_source_affine_orientatio
 
 
 def test_phase17n_terrain_placements_use_reviewed_grid_symmetry_and_contacts() -> None:
-    artifact = event_layouts.exact_slice_artifact()
+    artifact = event_layouts.battlefield_artifact()
+    meatgrinder_layouts = _meatgrinder_artifact_layouts()
     increment = artifact.source_coordinate_frame.terrain_placement_increment_inches
 
     assert increment == 0.05
-    for layout in artifact.layouts:
+    for layout in meatgrinder_layouts:
         areas_by_id = {area.area_id: area for area in layout.terrain_areas}
         components_by_id = {
             component.component_id: component for component in layout.terrain_components
@@ -1206,9 +2034,9 @@ def test_phase17n_terrain_placements_use_reviewed_grid_symmetry_and_contacts() -
     }
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
     for layout_number, reviewed_anchors in reviewed_anchors_by_layout.items():
+        source_layout = meatgrinder_layouts[layout_number - 1]
         artifact_areas = {
-            area.area_id.rsplit("-", maxsplit=1)[-1]: area
-            for area in artifact.layouts[layout_number - 1].terrain_areas
+            area.area_id.rsplit("-", maxsplit=1)[-1]: area for area in source_layout.terrain_areas
         }
         assert {
             area_suffix: (
@@ -1217,6 +2045,10 @@ def test_phase17n_terrain_placements_use_reviewed_grid_symmetry_and_contacts() -
             )
             for area_suffix in reviewed_anchors
         } == reviewed_anchors
+        assert {
+            frozenset(area_id.rsplit("-", maxsplit=1)[-1] for area_id in contact.terrain_area_ids)
+            for contact in source_layout.terrain_area_contacts
+        } == {frozenset(contact_pair) for contact_pair in contact_pairs_by_layout[layout_number]}
 
         setup = MissionSetup.from_mission_pack(
             mission_pack=mission_pack,
@@ -1285,9 +2117,7 @@ def test_phase17n_component_source_instances_bind_to_nearest_generated_placement
             / "phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json"
         ).read_text(encoding="utf-8")
     )
-    artifact_layouts = {
-        layout.layout_id: layout for layout in event_layouts.exact_slice_artifact().layouts
-    }
+    artifact_layouts = {layout.layout_id: layout for layout in _meatgrinder_artifact_layouts()}
     duplicate_source_group_count = 0
     source_instance_count = 0
 
@@ -1375,8 +2205,8 @@ def test_phase17n_component_source_instances_bind_to_nearest_generated_placement
 
 def test_phase17n_meatgrinder_exact_layouts_build_all_source_components() -> None:
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
-    artifact = event_layouts.exact_slice_artifact()
-    artifact_layouts = {layout.layout_id: layout for layout in artifact.layouts}
+    artifact = event_layouts.battlefield_artifact()
+    artifact_layouts = {layout.layout_id: layout for layout in _meatgrinder_artifact_layouts()}
     archetypes_by_id = {
         archetype.archetype_id: archetype for archetype in artifact.feature_archetypes
     }
@@ -1546,8 +2376,8 @@ def test_phase17n_meatgrinder_exact_layouts_build_all_source_components() -> Non
                 f"terrain-feature-placement:"
                 f"{source_component.component_id.removeprefix(f'{layout_id}-')}"
             ) in feature.source_id
-            assert event_layouts.EXACT_SLICE_PACKAGE_HASH in feature.source_id
-            assert feature.source_id.endswith(f":{event_layouts.EXACT_SLICE_PACKAGE_HASH}")
+            assert event_layouts.BATTLEFIELD_PACKAGE_HASH in feature.source_id
+            assert feature.source_id.endswith(f":{event_layouts.BATTLEFIELD_PACKAGE_HASH}")
 
 
 def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence() -> None:
@@ -1564,14 +2394,14 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
     areas = {area.terrain_area_id: area for area in setup.terrain_areas}
     dense_area = areas["purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-01"]
     mixed_area = areas["purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-02"]
-    light_area = areas["purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04"]
+    light_area = areas["purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-08"]
     visibility_areas = {
         area.terrain_area_id: area
         for area in terrain_visibility_areas_from_placements(setup.terrain_areas)
     }
-    dense_visibility_area = visibility_areas[dense_area.terrain_area_id]
-    mixed_visibility_area = visibility_areas[mixed_area.terrain_area_id]
-    light_visibility_area = visibility_areas[light_area.terrain_area_id]
+    dense_visibility_area = visibility_areas[dense_area.logical_terrain_area_id]
+    mixed_visibility_area = visibility_areas[mixed_area.logical_terrain_area_id]
+    light_visibility_area = visibility_areas[light_area.logical_terrain_area_id]
 
     def model(model_id: str, x: float, y: float) -> Model:
         return Model(
@@ -1662,8 +2492,8 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
     light_context = TerrainVisibilityContext.from_ruleset_descriptor(
         ruleset_descriptor=ruleset,
         los_cache_key="los:phase17n-light",
-        observer_model=model("observer", 32.0, 43.0),
-        target_models=(model("target", 36.0, 43.0),),
+        observer_model=model("observer", 2.0, 33.0),
+        target_models=(model("target", 7.0, 33.0),),
         target_model_keywords=(("target", ("INFANTRY",)),),
         terrain_areas=(light_visibility_area,),
     )
@@ -1681,8 +2511,8 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
     blocked_through_light = TerrainVisibilityContext.from_ruleset_descriptor(
         ruleset_descriptor=ruleset,
         los_cache_key="los:phase17n-through-light",
-        observer_model=model("observer", 32.0, 43.0),
-        target_models=(model("target", 43.0, 43.0),),
+        observer_model=model("observer", 2.0, 33.0),
+        target_models=(model("target", 13.0, 33.0),),
         target_model_keywords=(("target", ("INFANTRY",)),),
         terrain_areas=(light_visibility_area,),
     ).resolve_line_of_sight()
@@ -1707,7 +2537,7 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
     )
     assert not model_within_solid_terrain(
         ruleset_descriptor=ruleset,
-        model=model("light-model", 36.0, 43.0),
+        model=model("light-model", 7.0, 33.0),
         terrain_features=(),
         terrain_areas=(light_area,),
     )
@@ -1721,10 +2551,15 @@ def test_phase17n_unknown_terrain_area_classification_does_not_gate_membership_c
         attacker_player_id="player-alpha",
         defender_player_id="player-beta",
     )
+    physical_light_area = next(
+        area
+        for area in setup.terrain_areas
+        if area.terrain_area_id == "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-08"
+    )
     exact_light_area = next(
         area
         for area in terrain_visibility_areas_from_placements(setup.terrain_areas)
-        if area.terrain_area_id == "purge-the-foe-vs-purge-the-foe-layout-1-terrain-area-04"
+        if area.terrain_area_id == physical_light_area.logical_terrain_area_id
     )
     unknown_area = replace(
         exact_light_area,
@@ -1737,14 +2572,14 @@ def test_phase17n_unknown_terrain_area_classification_does_not_gate_membership_c
         los_cache_key="los:phase17n-unknown-area-membership-cover",
         observer_model=Model(
             model_id="observer",
-            pose=Pose.at(x=32.0, y=43.0),
+            pose=Pose.at(x=2.0, y=33.0),
             base=CircularBase(radius=0.35),
             volume=ModelVolume(height=2.0),
         ),
         target_models=(
             Model(
                 model_id="target",
-                pose=Pose.at(x=36.0, y=43.0),
+                pose=Pose.at(x=7.0, y=33.0),
                 base=CircularBase(radius=0.35),
                 volume=ModelVolume(height=2.0),
             ),
@@ -1793,21 +2628,21 @@ def test_phase17n_visibility_resolves_feature_area_associations_once_per_query(
     )
     visibility_areas = terrain_visibility_areas_from_placements(setup.terrain_areas)
     terrain_features = setup.terrain_features[:2]
-    original_polygon_within_polygon = shapely_backend.polygon_within_polygon
+    original_polygon_within_polygon_union = shapely_backend.polygon_within_polygon_union
     association_check_count = 0
 
-    def counting_polygon_within_polygon(
+    def counting_polygon_within_polygon_union(
         inner: tuple[tuple[float, float], ...],
-        outer: tuple[tuple[float, float], ...],
+        outers: tuple[tuple[tuple[float, float], ...], ...],
     ) -> bool:
         nonlocal association_check_count
         association_check_count += 1
-        return original_polygon_within_polygon(inner, outer)
+        return original_polygon_within_polygon_union(inner, outers)
 
     monkeypatch.setattr(
         shapely_backend,
-        "polygon_within_polygon",
-        counting_polygon_within_polygon,
+        "polygon_within_polygon_union",
+        counting_polygon_within_polygon_union,
     )
 
     witness = TerrainVisibilityContext.from_ruleset_descriptor(
@@ -1956,307 +2791,6 @@ def test_phase17j_terrain_area_footprint_templates_match_source_polygons() -> No
         assert _terrain_display_points(template.polygon_vertices_inches) == expected_vertices
 
 
-def test_phase17j_take_and_hold_layout_a_terrain_area_specs_are_corner_anchored() -> None:
-    source = cast(
-        event_layouts.EventBattlefieldLayoutSource,
-        _source_extracted_layout_source("take-and-hold-vs-take-and-hold-layout-1"),
-    )
-    expected_anchors = {
-        "7x11-5-upper-right": ("FOOTPRINT_7X11_5", 40.0, 35.5, 180.0),
-        "7x11-5-upper-left": ("FOOTPRINT_7X11_5", 14.0, 54.0, 0.0),
-        "10x2-5-upper-left": ("FOOTPRINT_10X2_5", 12.0, 43.5, 180.0),
-        "6x2-upper-center": ("FOOTPRINT_6X2", 27.0, 42.5, 0.0),
-        "6x2-east-midfield": ("FOOTPRINT_6X2", 40.0, 28.0, 180.0),
-        "6x4-lower-left": ("FOOTPRINT_6X4", 11.0, 13.0, 0.0),
-        "6x4-east-midfield": ("FOOTPRINT_6X4", 36.0, 28.0, -90.0),
-        "8x11-5-polygon-central-north": (
-            "FOOTPRINT_8X11_5_POLYGON",
-            16.25,
-            35.0,
-            0.0,
-        ),
-    }
-    source_anchors = {
-        area_id: (template_id, anchor_x, anchor_y, rotation)
-        for area_id, template_id, anchor_x, anchor_y, rotation in (source.terrain_area_specs)
-    }
-    layout = warhammer_event_companion_2026_07_mission_pack().battlefield_layout(
-        "take-and-hold-vs-take-and-hold-layout-1"
-    )
-    placed_areas = {
-        area.terrain_area_id.removeprefix("take-and-hold-vs-take-and-hold-layout-1-"): area
-        for area in layout.terrain_areas
-        if area.source_transform == "explicit"
-    }
-
-    assert source_anchors == expected_anchors
-    assert source.terrain_area_local_transform_specs == (
-        ("6x2-upper-center", TerrainAreaLocalTransform.MIRROR_Y_AXIS),
-    )
-    assert source.objective_terrain_area_specs == (
-        (
-            "attacker-home",
-            "Attacker Home Objective",
-            "attacker_home",
-            16.49,
-            49.82,
-            ("7x11-5-upper-left",),
-        ),
-        (
-            "defender-home",
-            "Defender Home Objective",
-            "defender_home",
-            25.76,
-            12.72,
-            ("7x11-5-lower-right",),
-        ),
-        (
-            "central",
-            "Central Objective",
-            "central",
-            22.02,
-            30.0,
-            (
-                "8x11-5-polygon-central-north",
-                "8x11-5-polygon-central-south",
-            ),
-        ),
-        (
-            "expansion-west",
-            "West Expansion Objective",
-            "expansion",
-            7.4,
-            19.16,
-            ("7x11-5-lower-left",),
-        ),
-        (
-            "expansion-east",
-            "East Expansion Objective",
-            "expansion",
-            36.72,
-            41.87,
-            ("7x11-5-upper-right",),
-        ),
-    )
-    assert set(placed_areas) == set(expected_anchors)
-    for area_id, (_, anchor_x, anchor_y, _) in expected_anchors.items():
-        first_point = placed_areas[area_id].footprint_polygon[0]
-        assert _rounded_terrain_display_point(first_point) == (anchor_x, anchor_y)
-    assert placed_areas["6x2-upper-center"].local_transform.value == "mirror_y_axis"
-
-
-def test_phase17j_take_and_hold_layout_b_terrain_area_specs_are_corner_anchored() -> None:
-    source = cast(
-        event_layouts.EventBattlefieldLayoutSource,
-        _source_extracted_layout_source("take-and-hold-vs-take-and-hold-layout-2"),
-    )
-    expected_anchors = {
-        "7x11-5-left-home": ("FOOTPRINT_7X11_5", 11.0, 24.0, 180.0),
-        "8x11-5-polygon-central-north": (
-            "FOOTPRINT_8X11_5_POLYGON",
-            17.0,
-            24.25,
-            90.0,
-        ),
-        "7x11-5-north-expansion": (
-            "FOOTPRINT_7X11_5",
-            19.5,
-            46.0,
-            90.0,
-        ),
-        "10x2-5-north-west": (
-            "FOOTPRINT_10X2_5",
-            12.5,
-            48.75,
-            246.0,
-        ),
-        "6x4-north-east": ("FOOTPRINT_6X4", 41.0, 50.0, 210.0),
-        "6x4-north-west": ("FOOTPRINT_6X4", 29.75, 17.0, 210.0),
-        "6x2-north-east": ("FOOTPRINT_6X2", 37.5, 41.0, 125.0),
-        "6x2-north-west": ("FOOTPRINT_6X2", 10.25, 49.75, 145.0),
-    }
-    source_anchors = {
-        area_id: (template_id, anchor_x, anchor_y, rotation)
-        for area_id, template_id, anchor_x, anchor_y, rotation in (source.terrain_area_specs)
-    }
-    layout = warhammer_event_companion_2026_07_mission_pack().battlefield_layout(
-        "take-and-hold-vs-take-and-hold-layout-2"
-    )
-    placed_areas = {
-        area.terrain_area_id.removeprefix("take-and-hold-vs-take-and-hold-layout-2-"): area
-        for area in layout.terrain_areas
-        if area.source_transform == "explicit"
-    }
-
-    assert source_anchors == expected_anchors
-    assert source.objective_terrain_area_specs == (
-        (
-            "attacker-home",
-            "Attacker Home Objective",
-            "attacker_home",
-            6.76,
-            31.2,
-            ("7x11-5-left-home",),
-        ),
-        (
-            "defender-home",
-            "Defender Home Objective",
-            "defender_home",
-            37.24,
-            28.67,
-            ("7x11-5-right-home",),
-        ),
-        (
-            "central",
-            "Central Objective",
-            "central",
-            22.16,
-            30.04,
-            (
-                "8x11-5-polygon-central-north",
-                "8x11-5-polygon-central-south",
-            ),
-        ),
-        (
-            "expansion-south",
-            "South Expansion Objective",
-            "expansion",
-            19.2,
-            10.28,
-            ("7x11-5-south-expansion",),
-        ),
-        (
-            "expansion-north",
-            "North Expansion Objective",
-            "expansion",
-            24.92,
-            50.61,
-            ("7x11-5-north-expansion",),
-        ),
-    )
-    assert set(placed_areas) == set(expected_anchors)
-    for area_id, (_, anchor_x, anchor_y, _) in expected_anchors.items():
-        first_point = placed_areas[area_id].footprint_polygon[0]
-        assert _rounded_terrain_display_point(first_point) == (anchor_x, anchor_y)
-
-
-def test_phase17j_take_and_hold_layout_c_terrain_area_specs_are_corner_anchored() -> None:
-    source = cast(
-        event_layouts.EventBattlefieldLayoutSource,
-        _source_extracted_layout_source("take-and-hold-vs-take-and-hold-layout-3"),
-    )
-    expected_anchors = {
-        "7x11-5-north-west": ("FOOTPRINT_7X11_5", 11.25, 56.75, 315.0),
-        "7x11-5-south-west": ("FOOTPRINT_7X11_5", 6.0, 16.5, 0.0),
-        "8x11-5-polygon-central-north-west": (
-            "FOOTPRINT_8X11_5_POLYGON",
-            16.25,
-            35.0,
-            0.0,
-        ),
-        "10x2-5-north-center": (
-            "FOOTPRINT_10X2_5",
-            15.75,
-            44.25,
-            35.0,
-        ),
-        "6x4-north-west": ("FOOTPRINT_6X4", 11.0, 37.25, 90.0),
-        "6x4-central-east": ("FOOTPRINT_6X4", 31.0, 30.75, 90.0),
-        "6x2-west-midfield": ("FOOTPRINT_6X2", 2.75, 37.25, 0.0),
-        "6x2-south-west": ("FOOTPRINT_6X2", 4.25, 24.5, 0.0),
-    }
-    source_anchors = {
-        area_id: (template_id, anchor_x, anchor_y, rotation)
-        for area_id, template_id, anchor_x, anchor_y, rotation in (source.terrain_area_specs)
-    }
-    layout = warhammer_event_companion_2026_07_mission_pack().battlefield_layout(
-        "take-and-hold-vs-take-and-hold-layout-3"
-    )
-    placed_areas = {
-        area.terrain_area_id.removeprefix("take-and-hold-vs-take-and-hold-layout-3-"): area
-        for area in layout.terrain_areas
-        if area.source_transform == "explicit"
-    }
-
-    assert source_anchors == expected_anchors
-    assert source.objective_terrain_area_specs == (
-        (
-            "attacker-home",
-            "Attacker Home Objective",
-            "attacker_home",
-            9.45,
-            50.3,
-            ("7x11-5-north-west",),
-        ),
-        (
-            "defender-home",
-            "Defender Home Objective",
-            "defender_home",
-            34.55,
-            9.7,
-            ("7x11-5-south-east",),
-        ),
-        (
-            "central",
-            "Central Objective",
-            "central",
-            22.0,
-            30.0,
-            (
-                "8x11-5-polygon-central-north-west",
-                "8x11-5-polygon-central-south-east",
-            ),
-        ),
-        (
-            "expansion-south-west",
-            "South-west Expansion Objective",
-            "expansion",
-            9.7,
-            10.55,
-            ("7x11-5-south-west",),
-        ),
-        (
-            "expansion-north-east",
-            "North-east Expansion Objective",
-            "expansion",
-            34.3,
-            49.45,
-            ("7x11-5-north-east",),
-        ),
-    )
-    assert set(placed_areas) == set(expected_anchors)
-    for area_id, (_, anchor_x, anchor_y, _) in expected_anchors.items():
-        first_point = placed_areas[area_id].footprint_polygon[0]
-        assert _rounded_terrain_display_point(first_point) == (anchor_x, anchor_y)
-
-
-def test_phase17j_extracted_terrain_area_specs_anchor_first_vertices() -> None:
-    mission_pack = warhammer_event_companion_2026_07_mission_pack()
-    for source in event_layouts.EXTRACTED_LAYOUTS:
-        assert not any(
-            area_id.startswith(("dense-", "light-")) for area_id, *_ in source.terrain_area_specs
-        )
-        assert not any(
-            terrain_area_id.startswith(("dense-", "light-"))
-            for objective_spec in source.objective_terrain_area_specs
-            for terrain_area_id in objective_spec[-1]
-        )
-        layout = mission_pack.battlefield_layout(source.layout_id)
-        placed_areas = {
-            area.terrain_area_id.removeprefix(f"{source.layout_id}-"): area
-            for area in layout.terrain_areas
-            if area.source_transform == "explicit"
-        }
-
-        assert len(placed_areas) == len(source.terrain_area_specs)
-        for area_id, _, anchor_x, anchor_y, _ in source.terrain_area_specs:
-            first_point = placed_areas[area_id].footprint_polygon[0]
-            assert _rounded_terrain_display_point(first_point) == (
-                round(anchor_x, 6),
-                round(anchor_y, 6),
-            )
-
-
 def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_order() -> None:
     source_rows = event_source.event_primary_mission_matrix_source_rows()
     matrix = {
@@ -2347,185 +2881,28 @@ def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_ord
     assert "<" not in json.dumps(source_row_payload, sort_keys=True)
 
 
-def test_phase17j_layout_descriptors_cover_source_pages_and_geometry_roles() -> None:
+def test_phase17j_layout_descriptors_cover_all_source_hashed_battlefields() -> None:
     descriptors = event_source.layout_descriptor_rows()
-    layout_a = _layout_descriptor("take-and-hold", "take-and-hold", "a")
-    layout_b = _layout_descriptor("take-and-hold", "take-and-hold", "b")
-    layout_c = _layout_descriptor("take-and-hold", "take-and-hold", "c")
-    disruption_layout_a = _layout_descriptor("disruption", "reconnaissance", "a")
-    disruption_layout_b = _layout_descriptor("disruption", "reconnaissance", "b")
-    disruption_layout_c = _layout_descriptor("disruption", "reconnaissance", "c")
-    meatgrinder_layouts = tuple(
-        _layout_descriptor("purge-the-foe", "purge-the-foe", variant) for variant in ("a", "b", "c")
-    )
-    extracted_layout_ids = {
-        layout_a.layout_id,
-        layout_b.layout_id,
-        layout_c.layout_id,
-        disruption_layout_a.layout_id,
-        disruption_layout_b.layout_id,
-        disruption_layout_c.layout_id,
-        *(layout.layout_id for layout in meatgrinder_layouts),
+    artifact_layouts_by_id = {
+        layout.layout_id: layout for layout in event_layouts.battlefield_artifact().layouts
     }
-    pending_descriptors = tuple(
-        descriptor for descriptor in descriptors if descriptor.layout_id not in extracted_layout_ids
-    )
 
     assert len(descriptors) == 45
     assert {descriptor.layout_variant for descriptor in descriptors} == {"a", "b", "c"}
     assert {descriptor.source_page for descriptor in descriptors} == set(range(9, 54))
-    assert layout_a.battlefield_width_inches == 44.0
-    assert layout_a.battlefield_depth_inches == 60.0
-    assert layout_a.attacker_edge == "north"
-    assert layout_a.defender_edge == "south"
-    assert layout_b.battlefield_width_inches == 44.0
-    assert layout_b.battlefield_depth_inches == 60.0
-    assert layout_b.attacker_edge == "west"
-    assert layout_b.defender_edge == "east"
-    assert layout_c.battlefield_width_inches == 44.0
-    assert layout_c.battlefield_depth_inches == 60.0
-    assert layout_c.attacker_edge == "west"
-    assert layout_c.defender_edge == "east"
-    assert disruption_layout_a.battlefield_width_inches == 44.0
-    assert disruption_layout_a.battlefield_depth_inches == 60.0
-    assert disruption_layout_a.attacker_edge == "north"
-    assert disruption_layout_a.defender_edge == "south"
-    assert disruption_layout_b.battlefield_width_inches == 44.0
-    assert disruption_layout_b.battlefield_depth_inches == 60.0
-    assert disruption_layout_b.attacker_edge == "west"
-    assert disruption_layout_b.defender_edge == "east"
-    assert disruption_layout_c.battlefield_width_inches == 44.0
-    assert disruption_layout_c.battlefield_depth_inches == 60.0
-    assert disruption_layout_c.attacker_edge == "west"
-    assert disruption_layout_c.defender_edge == "east"
-    assert all(descriptor.battlefield_width_inches == 44.0 for descriptor in pending_descriptors)
-    assert all(descriptor.battlefield_depth_inches == 60.0 for descriptor in pending_descriptors)
-    assert all(len(descriptor.deployment_zone_shapes) == 2 for descriptor in descriptors)
-    assert all(len(descriptor.player_territory_shapes) == 2 for descriptor in descriptors)
     assert all(
-        len(shape.polygons) == 1
+        descriptor.geometry_extraction_status == "source_hashed_battlefield_artifact_geometry"
         for descriptor in descriptors
-        for shape in (*descriptor.deployment_zone_shapes, *descriptor.player_territory_shapes)
     )
-    for extracted_layout_c in (layout_c, disruption_layout_c):
-        assert len(extracted_layout_c.no_mans_land_shape.polygons) == 4
-        layout_c_payload = extracted_layout_c.to_payload()
-        assert "no_mans_land_polygon" not in layout_c_payload
-        assert cast(dict[str, object], layout_c_payload["no_mans_land_shape"])["polygons"] == [
-            [[x, y] for x, y in polygon]
-            for polygon in extracted_layout_c.no_mans_land_shape.polygons
-        ]
-    assert len(pending_descriptors) == 36
-    assert all(len(descriptor.objective_points) == 5 for descriptor in pending_descriptors)
-    assert all(
-        len(descriptor.objective_points) == 5 for descriptor in (layout_a, layout_b, layout_c)
-    )
-    assert all(
-        len(descriptor.objective_points) == 6
-        for descriptor in (
-            disruption_layout_a,
-            disruption_layout_b,
-            disruption_layout_c,
-            *meatgrinder_layouts,
-        )
-    )
-    assert all(
-        {"dense", "light"} <= {feature.density for feature in descriptor.terrain_features}
-        for descriptor in (
-            layout_a,
-            layout_b,
-            layout_c,
-            disruption_layout_a,
-            disruption_layout_b,
-            disruption_layout_c,
-            *meatgrinder_layouts,
-        )
-    )
-    assert all(descriptor.terrain_features == () for descriptor in pending_descriptors)
-    assert all(
-        objective.objective_kind
-        in {"attacker_home", "defender_home", "center", "central", "expansion"}
-        for descriptor in descriptors
-        for objective in descriptor.objective_points
-    )
-    assert layout_a.geometry_extraction_status == "layout_geometry_extracted"
-    assert layout_b.geometry_extraction_status == "layout_geometry_extracted"
-    assert layout_c.geometry_extraction_status == "layout_geometry_extracted"
-    assert disruption_layout_a.geometry_extraction_status == "layout_geometry_extracted"
-    assert disruption_layout_b.geometry_extraction_status == "layout_geometry_extracted"
-    assert disruption_layout_c.geometry_extraction_status == "layout_geometry_extracted"
-    assert all(
-        descriptor.geometry_extraction_status == "source_hashed_exact_layout_geometry"
-        for descriptor in meatgrinder_layouts
-    )
-    assert all(
-        descriptor.geometry_extraction_status
-        == "layout_identity_source_page_bound_coordinates_pending"
-        for descriptor in pending_descriptors
-    )
-    assert _layout_descriptor("take-and-hold", "disruption", "a").source_page == 15
-    assert _layout_descriptor("take-and-hold", "reconnaissance", "a").source_page == 18
-    assert _layout_descriptor("take-and-hold", "priority-assets", "a").source_page == 21
-    assert _layout_descriptor("disruption", "reconnaissance", "a").source_page == 39
-    assert _layout_descriptor("disruption", "priority-assets", "a").source_page == 42
-    assert _layout_descriptor("reconnaissance", "priority-assets", "a").source_page == 48
-    assert all(
-        next(
-            row
-            for row in event_source.battlefield_layout_rows()
-            if row.battlefield_layout_id == layout_id
-        ).source_status
-        == "event_companion_layout_geometry_extracted"
-        for layout_id in extracted_layout_ids - set(event_layouts.EXACT_SLICE_LAYOUT_IDS)
-    )
-    assert all(
-        next(
-            row
-            for row in event_source.battlefield_layout_rows()
-            if row.battlefield_layout_id == layout_id
-        ).source_status
-        == "event_companion_source_hashed_exact_slice"
-        for layout_id in event_layouts.EXACT_SLICE_LAYOUT_IDS
-    )
-    assert all(
-        row.source_status.endswith("layout_identity_coordinate_extraction_pending")
-        for row in event_source.battlefield_layout_rows()
-        if row.battlefield_layout_id not in extracted_layout_ids
-    )
-
-
-def test_phase17j_deployment_zone_layout_templates_match_source_shapes() -> None:
-    template_shapes = dict(event_source.deployment_zone_layout_template_shapes())
-
-    assert set(template_shapes) == {
-        event_source.DEPLOYMENT_ZONE_LAYOUT_1_STAGGERED,
-        event_source.DEPLOYMENT_ZONE_LAYOUT_2_LONG_EDGE_STRIP,
-        event_source.DEPLOYMENT_ZONE_LAYOUT_3_QUARTER_CIRCLE_CUTOUT,
-        event_source.DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE,
-        event_source.DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP,
-        event_source.DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE,
-    }
-    assert _shape_polygons(template_shapes[event_source.DEPLOYMENT_ZONE_LAYOUT_1_STAGGERED]) == (
-        ((0.0, 0.0), (44.0, 0.0), (44.0, 12.0), (22.0, 12.0), (22.0, 20.0), (0.0, 20.0)),
-    )
-    assert _shape_polygons(
-        template_shapes[event_source.DEPLOYMENT_ZONE_LAYOUT_2_LONG_EDGE_STRIP]
-    ) == (((0.0, 0.0), (12.0, 0.0), (12.0, 60.0), (0.0, 60.0)),)
-    assert _shape_polygons(
-        template_shapes[event_source.DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE]
-    ) == (((0.0, 0.0), (8.0, 0.0), (8.0, 30.0), (14.0, 30.0), (14.0, 60.0), (0.0, 60.0)),)
-    assert _shape_polygons(
-        template_shapes[event_source.DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP]
-    ) == (((0.0, 0.0), (44.0, 0.0), (44.0, 18.0), (0.0, 18.0)),)
-    assert _shape_polygons(template_shapes[event_source.DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE]) == (
-        ((0.0, 60.0), (44.0, 60.0), (0.0, 30.0)),
-    )
-
-    quarter_cutout = template_shapes[event_source.DEPLOYMENT_ZONE_LAYOUT_3_QUARTER_CIRCLE_CUTOUT]
-    assert quarter_cutout.contains_point(8.0, 8.0)
-    assert not quarter_cutout.contains_point(22.0, 30.0)
-    assert not quarter_cutout.contains_point(18.0, 28.0)
-    assert len(quarter_cutout.polygons[0].vertices) > 4
+    for descriptor in descriptors:
+        source_layout = artifact_layouts_by_id[descriptor.layout_id]
+        assert descriptor.source_page == source_layout.source_page
+        assert descriptor.battlefield_width_inches == 44.0
+        assert descriptor.battlefield_depth_inches == 60.0
+        assert descriptor.attacker_edge == source_layout.attacker_edge
+        assert descriptor.defender_edge == source_layout.defender_edge
+        assert len(descriptor.terrain_features) == len(source_layout.terrain_components)
+        assert len(descriptor.objective_points) == len(source_layout.objectives)
 
 
 def test_phase17j_deployment_zone_layout_matrix_matches_event_companion_source() -> None:
@@ -2579,16 +2956,16 @@ def test_phase17j_known_layouts_use_canonical_deployment_zone_helpers() -> None:
     take_vs_priority_a = rows["take-and-hold-vs-priority-assets-layout-1"]
 
     assert _shape_polygons(layout_a.deployment_zones[0].shape) == (
-        ((0.0, 40.0), (22.0, 40.0), (22.0, 48.0), (44.0, 48.0), (44.0, 60.0), (0.0, 60.0)),
+        ((0.0, 60.0), (44.0, 60.0), (44.0, 48.0), (22.0, 48.0), (22.0, 40.0), (0.0, 40.0)),
     )
     assert _shape_polygons(layout_a.deployment_zones[1].shape) == (
-        ((44.0, 20.0), (22.0, 20.0), (22.0, 12.0), (0.0, 12.0), (0.0, 0.0), (44.0, 0.0)),
+        ((44.0, 0.0), (0.0, 0.0), (0.0, 12.0), (22.0, 12.0), (22.0, 20.0), (44.0, 20.0)),
     )
     assert _shape_polygons(layout_b.deployment_zones[0].shape) == (
         ((0.0, 0.0), (12.0, 0.0), (12.0, 60.0), (0.0, 60.0)),
     )
     assert _shape_polygons(layout_b.deployment_zones[1].shape) == (
-        ((44.0, 0.0), (32.0, 0.0), (32.0, 60.0), (44.0, 60.0)),
+        ((32.0, 0.0), (44.0, 0.0), (44.0, 60.0), (32.0, 60.0)),
     )
     assert not layout_c.deployment_zones[0].shape.contains_point(22.0, 30.0)
     assert not layout_c.deployment_zones[1].shape.contains_point(22.0, 30.0)
@@ -2596,81 +2973,29 @@ def test_phase17j_known_layouts_use_canonical_deployment_zone_helpers() -> None:
         ((0.0, 0.0), (8.0, 0.0), (8.0, 30.0), (14.0, 30.0), (14.0, 60.0), (0.0, 60.0)),
     )
     assert _shape_polygons(take_vs_purge_a.deployment_zones[1].shape) == (
-        ((44.0, 0.0), (30.0, 0.0), (30.0, 30.0), (36.0, 30.0), (36.0, 60.0), (44.0, 60.0)),
+        ((44.0, 60.0), (36.0, 60.0), (36.0, 30.0), (30.0, 30.0), (30.0, 0.0), (44.0, 0.0)),
     )
     assert _shape_polygons(take_vs_purge_c.deployment_zones[0].shape) == (
-        ((0.0, 0.0), (44.0, 0.0), (44.0, 18.0), (0.0, 18.0)),
+        ((0.0, 42.0), (44.0, 42.0), (44.0, 60.0), (0.0, 60.0)),
     )
     assert _shape_polygons(take_vs_purge_c.deployment_zones[1].shape) == (
-        ((44.0, 42.0), (0.0, 42.0), (0.0, 60.0), (44.0, 60.0)),
+        ((0.0, 0.0), (44.0, 0.0), (44.0, 18.0), (0.0, 18.0)),
     )
     assert _shape_polygons(take_vs_priority_a.deployment_zones[0].shape) == (
         ((0.0, 60.0), (44.0, 60.0), (0.0, 30.0)),
     )
     assert _shape_polygons(take_vs_priority_a.deployment_zones[1].shape) == (
-        ((44.0, 30.0), (0.0, 0.0), (44.0, 0.0)),
+        ((44.0, 0.0), (0.0, 0.0), (44.0, 30.0)),
     )
-    assert take_vs_purge_c.terrain_features == ()
-
     descriptor = _layout_descriptor("take-and-hold", "purge-the-foe", "c")
-    assert descriptor.attacker_edge == "south"
-    assert descriptor.defender_edge == "north"
-
-
-def test_phase17j_unmapped_deployment_zone_templates_keep_canonical_edges() -> None:
-    assert _source_deployment_zone_layout_edges(
-        event_source.DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE
-    ) == ("west", "east")
-    assert _source_deployment_zone_layout_edges(event_source.DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE) == (
-        "north_west_corner",
-        "south_east_corner",
-    )
-
-    stepped_shape = _source_deployment_zone_template_base_shape(
-        event_source.DEPLOYMENT_ZONE_LAYOUT_4_STEPPED_LONG_EDGE
-    )
-    triangle_shape = _source_deployment_zone_template_base_shape(
-        event_source.DEPLOYMENT_ZONE_LAYOUT_6_TRIANGLE
-    )
-
-    assert _shape_polygons(
-        _source_transform_deployment_zone_shape(
-            stepped_shape,
-            "point_reflection",
-        )
-    ) == (
-        (
-            (44.0, 0.0),
-            (30.0, 0.0),
-            (30.0, 30.0),
-            (36.0, 30.0),
-            (36.0, 60.0),
-            (44.0, 60.0),
-        ),
-    )
-    assert _shape_polygons(
-        _source_transform_deployment_zone_shape(
-            triangle_shape,
-            "point_reflection",
-        )
-    ) == (((44.0, 30.0), (0.0, 0.0), (44.0, 0.0)),)
+    assert descriptor.attacker_edge == "north"
+    assert descriptor.defender_edge == "south"
 
 
 def test_phase17j_deployment_zone_helpers_fail_closed_for_unknown_shapes() -> None:
     unsupported_template = cast(
         event_source.DeploymentZoneLayoutTemplateId,
         "deployment-zone-layout-unsupported",
-    )
-    unsupported_transform = cast(
-        event_source.DeploymentZoneShapeTransform,
-        "diagonal_reflection",
-    )
-    base_shape = _source_deployment_zone_template_base_shape(
-        event_source.DEPLOYMENT_ZONE_LAYOUT_5_SHORT_EDGE_STRIP
-    )
-    cutout_shape = DeploymentZoneShape(
-        polygons=base_shape.polygons,
-        cutouts=(DeploymentZoneCircleCutout(center_x=1.0, center_y=1.0, radius=0.5),),
     )
 
     with pytest.raises(MissionPackError, match="Unsupported battlefield layout number"):
@@ -2700,28 +3025,11 @@ def test_phase17j_deployment_zone_helpers_fail_closed_for_unknown_shapes() -> No
             layout_number=1,
         )
     with pytest.raises(MissionPackError, match="Unsupported deployment-zone layout template"):
-        _source_deployment_zone_shape_transforms(unsupported_template)
-    with pytest.raises(MissionPackError, match="Unsupported deployment-zone layout template"):
         _source_deployment_zone_template_base_shape(unsupported_template)
     with pytest.raises(MissionPackError, match="Unsupported deployment-zone layout template"):
         _source_deployment_zone_layout_edges(unsupported_template)
-    with pytest.raises(MissionPackError, match="Unsupported deployment-zone shape transform"):
-        _source_transform_deployment_zone_shape(
-            base_shape,
-            unsupported_transform,
-        )
     with pytest.raises(MissionPackError, match="Battlefield layout ID must end in layout number"):
         _source_layout_number_from_layout_id("take-and-hold-vs-purge-the-foe-layout-z")
-    with pytest.raises(MissionPackError, match="Unsupported extracted battlefield layout ID"):
-        _source_extracted_deployment_zones(layout_id="take-and-hold-vs-purge-the-foe-layout-1")
-    with pytest.raises(
-        MissionPackError,
-        match="Deployment-zone layout template transforms require polygons",
-    ):
-        _source_map_deployment_zone_shape(
-            cutout_shape,
-            lambda x, y: (x, y),
-        )
 
 
 def test_phase17j_quarter_circle_cutout_vertices_cover_supported_corners() -> None:
@@ -2794,143 +3102,33 @@ def test_phase17j_unmapped_primary_missions_remain_source_descriptor_only(
 
 
 def test_phase17j_source_lookup_helpers_fail_closed_for_unknown_ids() -> None:
-    with pytest.raises(MissionPackError, match="Unsupported extracted battlefield layout ID"):
-        _source_extracted_layout_source("unknown-layout")
     with pytest.raises(MissionPackError, match="Event Companion matrix row was not found"):
         _source_matrix_row(
             player_force_disposition_id="unknown-force",
             opponent_force_disposition_id="take-and-hold",
         )
-    with pytest.raises(MissionPackError, match="Event Companion force disposition was not found"):
-        _source_force_disposition_name("unknown-force")
+    with pytest.raises(
+        MissionPackError,
+        match="MissionPackDefinition does not contain force_disposition_id",
+    ):
+        warhammer_event_companion_2026_07_mission_pack().force_disposition("unknown-force")
 
 
-def test_phase17j_take_and_hold_layout_a_encodes_terrain_areas_and_regions() -> None:
+@pytest.mark.parametrize(
+    ("layout_number", "expected_feature_count", "expects_multi_polygon_region"),
+    [(1, 29, False), (3, 30, True)],
+)
+def test_phase17j_mission_setup_components_resolve_matching_battlefield_layout(
+    layout_number: int,
+    expected_feature_count: int,
+    expects_multi_polygon_region: bool,
+) -> None:
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
-    layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-1")
-    terrain_layout = mission_pack.terrain_layout_template(layout.terrain_layout_id)
-    deployment_map = mission_pack.deployment_map(layout.deployment_map_id)
-    setup = MissionSetup.from_mission_pack(
-        mission_pack=mission_pack,
-        mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-1",
-        attacker_player_id="player-alpha",
-        defender_player_id="player-beta",
-    )
-
-    assert layout.name == "Take and Hold vs Take and Hold - Battlefield Dominance - Layout A"
-    assert layout.battlefield_width_inches == 44.0
-    assert layout.battlefield_depth_inches == 60.0
-    assert layout.coordinate_origin == "bottom_left"
-    assert layout.attacker_edge == "north"
-    assert layout.defender_edge == "south"
-    assert terrain_layout.terrain_features == ()
-    assert setup.battlefield_layout_id == layout.battlefield_layout_id
-    assert len(layout.terrain_feature_placements) == 16
-    assert len(setup.terrain_features) == 16
-    assert len(setup.terrain_areas) == 16
-    assert len(setup.battlefield_regions) == 5
-    assert setup.objective_markers == layout.objective_markers
-    assert setup.objective_terrain_areas == layout.objective_terrain_areas
-    assert (
-        MissionSetup.from_payload(setup.to_payload()).objective_terrain_areas
-        == setup.objective_terrain_areas
-    )
-    assert setup.deployment_zones == _deployment_zones_for_players(
-        layout,
-        attacker_player_id="player-alpha",
-        defender_player_id="player-beta",
-    )
-    assert deployment_map.battlefield_width_inches == layout.battlefield_width_inches
-    assert deployment_map.battlefield_depth_inches == layout.battlefield_depth_inches
-
-    assert Counter(area.footprint_template_id for area in layout.terrain_areas) == {
-        "FOOTPRINT_6X4": 4,
-        "FOOTPRINT_10X2_5": 2,
-        "FOOTPRINT_6X2": 4,
-        "FOOTPRINT_7X11_5": 4,
-        "FOOTPRINT_8X11_5_POLYGON": 2,
-    }
-    assert len(layout.terrain_areas) == 16
-    assert sum(area.source_transform == "explicit" for area in layout.terrain_areas) == 8
-    assert (
-        sum(area.source_transform.startswith("mirrored_from:") for area in layout.terrain_areas)
-        == 8
-    )
-    assert all(
-        0.0 <= point.x_inches <= 44.0 and 0.0 <= point.y_inches <= 60.0
-        for area in layout.terrain_areas
-        for point in area.footprint_polygon
-    )
-
-    assert Counter(marker.objective_role.value for marker in layout.objective_markers) == {
-        "attacker_home": 1,
-        "defender_home": 1,
-        "central": 1,
-        "expansion": 2,
-    }
-    objective_terrain_by_suffix = {
-        objective_terrain_area.objective_marker_id.removeprefix(
-            "take-and-hold-vs-take-and-hold-layout-1-"
-        ): (
-            objective_terrain_area.objective_role.value,
-            tuple(
-                terrain_area_id.removeprefix("take-and-hold-vs-take-and-hold-layout-1-")
-                for terrain_area_id in objective_terrain_area.terrain_area_ids
-            ),
-        )
-        for objective_terrain_area in layout.objective_terrain_areas
-    }
-    assert objective_terrain_by_suffix == {
-        "attacker-home": ("attacker_home", ("7x11-5-upper-left",)),
-        "defender-home": ("defender_home", ("7x11-5-lower-right",)),
-        "central": (
-            "central",
-            (
-                "8x11-5-polygon-central-north",
-                "8x11-5-polygon-central-south",
-            ),
-        ),
-        "expansion-west": ("expansion", ("7x11-5-lower-left",)),
-        "expansion-east": ("expansion", ("7x11-5-upper-right",)),
-    }
-    objective_by_role = {marker.objective_role.value: marker for marker in layout.objective_markers}
-    attacker_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "attacker")
-    defender_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "defender")
-    assert attacker_zone.contains_point(
-        objective_by_role["attacker_home"].x_inches,
-        objective_by_role["attacker_home"].y_inches,
-    )
-    assert defender_zone.contains_point(
-        objective_by_role["defender_home"].x_inches,
-        objective_by_role["defender_home"].y_inches,
-    )
-
-    regions = {region.region_id: region for region in layout.battlefield_regions}
-    attacker_territory = regions["take-and-hold-vs-take-and-hold-layout-1-attacker-territory"]
-    defender_territory = regions["take-and-hold-vs-take-and-hold-layout-1-defender-territory"]
-    no_mans_land = regions["take-and-hold-vs-take-and-hold-layout-1-no-mans-land"]
-    assert attacker_territory.contains_point(22.0, 45.0)
-    assert not attacker_territory.contains_point(22.0, 15.0)
-    assert defender_territory.contains_point(22.0, 15.0)
-    assert not defender_territory.contains_point(22.0, 45.0)
-    assert no_mans_land.contains_point(objective_by_role["central"].x_inches, 30.0)
-    assert (
-        _shape_area(attacker_zone.shape)
-        + _shape_area(defender_zone.shape)
-        + _shape_area(no_mans_land.shape)
-        == 44.0 * 60.0
-    )
-    assert _shape_area(attacker_territory.shape) + _shape_area(defender_territory.shape) == (
-        44.0 * 60.0
-    )
-
-
-def test_phase17j_mission_setup_components_resolve_matching_battlefield_layout() -> None:
-    mission_pack = warhammer_event_companion_2026_07_mission_pack()
-    layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-1")
+    layout_id = f"take-and-hold-vs-take-and-hold-layout-{layout_number}"
+    layout = mission_pack.battlefield_layout(layout_id)
     setup = MissionSetup.from_components(
         mission_pack=mission_pack,
-        mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-1",
+        mission_pool_entry_id=f"mission-{layout_id}",
         primary_mission_id="primary-battlefield-dominance",
         deployment_map=mission_pack.deployment_map(layout.deployment_map_id),
         terrain_layout=mission_pack.terrain_layout_template(layout.terrain_layout_id),
@@ -2939,460 +3137,179 @@ def test_phase17j_mission_setup_components_resolve_matching_battlefield_layout()
     )
 
     assert setup.battlefield_layout_id == layout.battlefield_layout_id
-    assert len(setup.terrain_features) == 16
+    assert len(setup.terrain_features) == expected_feature_count
     assert len(setup.terrain_areas) == 16
     assert len(setup.battlefield_regions) == 5
+    assert any(len(region.shape.polygons) > 1 for region in setup.battlefield_regions) is (
+        expects_multi_polygon_region
+    )
+    assert {
+        (binding.objective_marker_id, binding.terrain_area_ids)
+        for binding in setup.objective_terrain_areas
+    } == {
+        (binding.objective_marker_id, binding.terrain_area_ids)
+        for binding in layout.objective_terrain_areas
+    }
 
 
-def test_phase17j_take_and_hold_layout_b_encodes_terrain_areas_and_regions() -> None:
+def test_phase17n_objective_bindings_require_complete_logical_terrain_areas() -> None:
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
-    layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-2")
-    terrain_layout = mission_pack.terrain_layout_template(layout.terrain_layout_id)
-    deployment_map = mission_pack.deployment_map(layout.deployment_map_id)
-    setup = MissionSetup.from_mission_pack(
-        mission_pack=mission_pack,
-        mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-2",
-        attacker_player_id="player-alpha",
-        defender_player_id="player-beta",
-    )
-
-    assert layout.name == "Take and Hold vs Take and Hold - Battlefield Dominance - Layout B"
-    assert layout.battlefield_width_inches == 44.0
-    assert layout.battlefield_depth_inches == 60.0
-    assert layout.coordinate_origin == "bottom_left"
-    assert layout.attacker_edge == "west"
-    assert layout.defender_edge == "east"
-    assert terrain_layout.terrain_features == ()
-    assert setup.battlefield_layout_id == layout.battlefield_layout_id
-    assert len(layout.terrain_feature_placements) == 16
-    assert len(setup.terrain_features) == 16
-    assert len(setup.terrain_areas) == 16
-    assert len(setup.battlefield_regions) == 5
-    assert setup.objective_markers == layout.objective_markers
-    assert setup.objective_terrain_areas == layout.objective_terrain_areas
-    assert (
-        MissionSetup.from_payload(setup.to_payload()).objective_terrain_areas
-        == setup.objective_terrain_areas
-    )
-    assert setup.deployment_zones == _deployment_zones_for_players(
-        layout,
-        attacker_player_id="player-alpha",
-        defender_player_id="player-beta",
-    )
-    assert deployment_map.battlefield_width_inches == layout.battlefield_width_inches
-    assert deployment_map.battlefield_depth_inches == layout.battlefield_depth_inches
-
-    assert Counter(area.footprint_template_id for area in layout.terrain_areas) == {
-        "FOOTPRINT_6X4": 4,
-        "FOOTPRINT_10X2_5": 2,
-        "FOOTPRINT_6X2": 4,
-        "FOOTPRINT_7X11_5": 4,
-        "FOOTPRINT_8X11_5_POLYGON": 2,
-    }
-    assert len(layout.terrain_areas) == 16
-    assert sum(area.source_transform == "explicit" for area in layout.terrain_areas) == 8
-    assert (
-        sum(area.source_transform.startswith("mirrored_from:") for area in layout.terrain_areas)
-        == 8
-    )
-    assert all(
-        0.0 <= point.x_inches <= 44.0 and 0.0 <= point.y_inches <= 60.0
-        for area in layout.terrain_areas
-        for point in area.footprint_polygon
-    )
-
-    assert Counter(marker.objective_role.value for marker in layout.objective_markers) == {
-        "attacker_home": 1,
-        "defender_home": 1,
-        "central": 1,
-        "expansion": 2,
-    }
-    objective_terrain_by_suffix = {
-        objective_terrain_area.objective_marker_id.removeprefix(
-            "take-and-hold-vs-take-and-hold-layout-2-"
-        ): (
-            objective_terrain_area.objective_role.value,
-            tuple(
-                terrain_area_id.removeprefix("take-and-hold-vs-take-and-hold-layout-2-")
-                for terrain_area_id in objective_terrain_area.terrain_area_ids
-            ),
-        )
-        for objective_terrain_area in layout.objective_terrain_areas
-    }
-    assert objective_terrain_by_suffix == {
-        "attacker-home": ("attacker_home", ("7x11-5-left-home",)),
-        "defender-home": ("defender_home", ("7x11-5-right-home",)),
-        "central": (
-            "central",
-            (
-                "8x11-5-polygon-central-north",
-                "8x11-5-polygon-central-south",
-            ),
-        ),
-        "expansion-south": ("expansion", ("7x11-5-south-expansion",)),
-        "expansion-north": ("expansion", ("7x11-5-north-expansion",)),
-    }
-    objective_by_role = {marker.objective_role.value: marker for marker in layout.objective_markers}
-    attacker_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "attacker")
-    defender_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "defender")
-    assert attacker_zone.contains_point(
-        objective_by_role["attacker_home"].x_inches,
-        objective_by_role["attacker_home"].y_inches,
-    )
-    assert defender_zone.contains_point(
-        objective_by_role["defender_home"].x_inches,
-        objective_by_role["defender_home"].y_inches,
-    )
-
-    regions = {region.region_id: region for region in layout.battlefield_regions}
-    attacker_territory = regions["take-and-hold-vs-take-and-hold-layout-2-attacker-territory"]
-    defender_territory = regions["take-and-hold-vs-take-and-hold-layout-2-defender-territory"]
-    no_mans_land = regions["take-and-hold-vs-take-and-hold-layout-2-no-mans-land"]
-    assert attacker_territory.contains_point(11.0, 30.0)
-    assert not attacker_territory.contains_point(33.0, 30.0)
-    assert defender_territory.contains_point(33.0, 30.0)
-    assert not defender_territory.contains_point(11.0, 30.0)
-    assert no_mans_land.contains_point(objective_by_role["central"].x_inches, 30.0)
-    assert (
-        _shape_area(attacker_zone.shape)
-        + _shape_area(defender_zone.shape)
-        + _shape_area(no_mans_land.shape)
-        == 44.0 * 60.0
-    )
-    assert _shape_area(attacker_territory.shape) + _shape_area(defender_territory.shape) == (
-        44.0 * 60.0
-    )
-
-
-def test_phase17j_take_and_hold_layout_c_encodes_cutout_deployments_and_terrain_areas() -> None:
-    mission_pack = warhammer_event_companion_2026_07_mission_pack()
-    layout = mission_pack.battlefield_layout("take-and-hold-vs-take-and-hold-layout-3")
-    terrain_layout = mission_pack.terrain_layout_template(layout.terrain_layout_id)
-    setup = MissionSetup.from_mission_pack(
-        mission_pack=mission_pack,
-        mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-3",
-        attacker_player_id="player-alpha",
-        defender_player_id="player-beta",
-    )
-    direct_setup = MissionSetup.from_components(
-        mission_pack=mission_pack,
-        mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-3",
-        primary_mission_id="primary-battlefield-dominance",
-        deployment_map=mission_pack.deployment_map(layout.deployment_map_id),
-        terrain_layout=terrain_layout,
-        attacker_player_id="player-alpha",
-        defender_player_id="player-beta",
-    )
-
-    assert layout.name == "Take and Hold vs Take and Hold - Battlefield Dominance - Layout C"
-    assert layout.battlefield_width_inches == 44.0
-    assert layout.battlefield_depth_inches == 60.0
-    assert layout.coordinate_origin == "bottom_left"
-    assert layout.attacker_edge == "west"
-    assert layout.defender_edge == "east"
-    assert terrain_layout.terrain_features == ()
-    assert setup.battlefield_layout_id == layout.battlefield_layout_id
-    assert direct_setup.battlefield_layout_id == layout.battlefield_layout_id
-    assert len(layout.terrain_feature_placements) == 16
-    assert len(setup.terrain_features) == 16
-    assert len(direct_setup.terrain_features) == 16
-    assert len(setup.terrain_areas) == 16
-    assert len(direct_setup.terrain_areas) == 16
-    assert len(setup.battlefield_regions) == 5
-    assert len(direct_setup.battlefield_regions) == 5
-    assert setup.objective_markers == layout.objective_markers
-    assert setup.objective_terrain_areas == layout.objective_terrain_areas
-    assert direct_setup.objective_terrain_areas == layout.objective_terrain_areas
-    assert (
-        MissionSetup.from_payload(setup.to_payload()).objective_terrain_areas
-        == setup.objective_terrain_areas
-    )
-    assert setup.deployment_zones == _deployment_zones_for_players(
-        layout,
-        attacker_player_id="player-alpha",
-        defender_player_id="player-beta",
-    )
-
-    assert Counter(area.footprint_template_id for area in layout.terrain_areas) == {
-        "FOOTPRINT_6X4": 4,
-        "FOOTPRINT_10X2_5": 2,
-        "FOOTPRINT_6X2": 4,
-        "FOOTPRINT_7X11_5": 4,
-        "FOOTPRINT_8X11_5_POLYGON": 2,
-    }
-    assert sum(area.source_transform == "explicit" for area in layout.terrain_areas) == 8
-    assert (
-        sum(area.source_transform.startswith("mirrored_from:") for area in layout.terrain_areas)
-        == 8
-    )
-    assert all(
-        0.0 <= point.x_inches <= 44.0 and 0.0 <= point.y_inches <= 60.0
-        for area in layout.terrain_areas
-        for point in area.footprint_polygon
-    )
-
-    objective_terrain_by_suffix = {
-        objective_terrain_area.objective_marker_id.removeprefix(
-            "take-and-hold-vs-take-and-hold-layout-3-"
-        ): (
-            objective_terrain_area.objective_role.value,
-            tuple(
-                terrain_area_id.removeprefix("take-and-hold-vs-take-and-hold-layout-3-")
-                for terrain_area_id in objective_terrain_area.terrain_area_ids
-            ),
-        )
-        for objective_terrain_area in layout.objective_terrain_areas
-    }
-    assert objective_terrain_by_suffix == {
-        "attacker-home": ("attacker_home", ("7x11-5-north-west",)),
-        "defender-home": ("defender_home", ("7x11-5-south-east",)),
-        "central": (
-            "central",
-            (
-                "8x11-5-polygon-central-north-west",
-                "8x11-5-polygon-central-south-east",
-            ),
-        ),
-        "expansion-south-west": ("expansion", ("7x11-5-south-west",)),
-        "expansion-north-east": ("expansion", ("7x11-5-north-east",)),
-    }
-    objective_by_role = {marker.objective_role.value: marker for marker in layout.objective_markers}
-    attacker_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "attacker")
-    defender_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "defender")
-    assert len(attacker_zone.shape.polygons[0].vertices) > 4
-    assert len(defender_zone.shape.polygons[0].vertices) > 4
-    assert attacker_zone.contains_point(
-        objective_by_role["attacker_home"].x_inches,
-        objective_by_role["attacker_home"].y_inches,
-    )
-    assert defender_zone.contains_point(
-        objective_by_role["defender_home"].x_inches,
-        objective_by_role["defender_home"].y_inches,
-    )
-    assert not attacker_zone.contains_point(18.0, 34.0)
-    assert not defender_zone.contains_point(26.0, 26.0)
-    assert not attacker_zone.contains_point(22.0, 30.0)
-    assert not defender_zone.contains_point(22.0, 30.0)
-
-    regions = {region.region_id: region for region in layout.battlefield_regions}
-    attacker_territory = regions["take-and-hold-vs-take-and-hold-layout-3-attacker-territory"]
-    defender_territory = regions["take-and-hold-vs-take-and-hold-layout-3-defender-territory"]
-    no_mans_land = regions["take-and-hold-vs-take-and-hold-layout-3-no-mans-land"]
-    assert attacker_territory.derived_from == ("attacker_edge_west",)
-    assert defender_territory.derived_from == ("defender_edge_east",)
-    assert len(no_mans_land.shape.polygons) == 4
-    assert attacker_territory.contains_point(10.0, 50.0)
-    assert not attacker_territory.contains_point(34.0, 10.0)
-    assert defender_territory.contains_point(34.0, 10.0)
-    assert not defender_territory.contains_point(10.0, 50.0)
-    assert no_mans_land.contains_point(objective_by_role["central"].x_inches, 30.0)
-    assert no_mans_land.contains_point(18.0, 34.0)
-    assert no_mans_land.contains_point(26.0, 26.0)
-    assert math.isclose(
-        _shape_area(attacker_zone.shape)
-        + _shape_area(defender_zone.shape)
-        + _shape_area(no_mans_land.shape),
-        44.0 * 60.0,
-        rel_tol=0.0,
-        abs_tol=2e-6,
-    )
-    assert math.isclose(
-        _shape_area(attacker_territory.shape) + _shape_area(defender_territory.shape),
-        44.0 * 60.0,
-        rel_tol=0.0,
-        abs_tol=1e-6,
-    )
-
-
-@pytest.mark.parametrize(
-    ("layout_id", "layout_name", "attacker_edge", "defender_edge", "no_mans_land_polygons"),
-    [
-        (
-            "disruption-vs-reconnaissance-layout-1",
-            "Disruption vs Reconnaissance - Smoke and Mirrors / Surveil the Foe - Layout A",
-            "north",
-            "south",
-            1,
-        ),
-        (
-            "disruption-vs-reconnaissance-layout-2",
-            "Disruption vs Reconnaissance - Smoke and Mirrors / Surveil the Foe - Layout B",
-            "west",
-            "east",
-            1,
-        ),
-        (
-            "disruption-vs-reconnaissance-layout-3",
-            "Disruption vs Reconnaissance - Smoke and Mirrors / Surveil the Foe - Layout C",
-            "west",
-            "east",
-            4,
-        ),
-    ],
-)
-def test_phase17j_disruption_vs_reconnaissance_layouts_encode_geometry(
-    layout_id: str,
-    layout_name: str,
-    attacker_edge: str,
-    defender_edge: str,
-    no_mans_land_polygons: int,
-) -> None:
-    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    layout_id = "take-and-hold-vs-take-and-hold-layout-2"
     layout = mission_pack.battlefield_layout(layout_id)
-    terrain_layout = mission_pack.terrain_layout_template(layout.terrain_layout_id)
-    deployment_map = mission_pack.deployment_map(layout.deployment_map_id)
+    complete_binding = next(
+        binding for binding in layout.objective_terrain_areas if len(binding.terrain_area_ids) > 1
+    )
+    partial_binding = replace(
+        complete_binding,
+        terrain_area_ids=complete_binding.terrain_area_ids[1:],
+    )
+    partial_layout_bindings = tuple(
+        partial_binding if binding == complete_binding else binding
+        for binding in layout.objective_terrain_areas
+    )
+
+    with pytest.raises(MissionPackError, match="every physical member"):
+        replace(layout, objective_terrain_areas=partial_layout_bindings)
+
     setup = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
         mission_pool_entry_id=f"mission-{layout_id}",
         attacker_player_id="player-alpha",
         defender_player_id="player-beta",
     )
-    direct_setup = MissionSetup.from_components(
-        mission_pack=mission_pack,
-        mission_pool_entry_id=f"mission-{layout_id}",
-        primary_mission_id="primary-smoke-and-mirrors",
-        deployment_map=deployment_map,
-        terrain_layout=terrain_layout,
-        attacker_player_id="player-alpha",
-        defender_player_id="player-beta",
-    )
-    expected_objectives = {
-        "disruption-vs-reconnaissance-layout-1": {
-            "attacker-home": ("attacker_home", 17.25, 49.25),
-            "defender-home": ("defender_home", 26.75, 10.75),
-            "central-south": ("central", 17.7, 23.6),
-            "central-north": ("central", 26.3, 36.4),
-            "expansion-east": ("expansion", 37.65, 41.4),
-            "expansion-west": ("expansion", 6.35, 18.6),
-        },
-        "disruption-vs-reconnaissance-layout-2": {
-            "attacker-home": ("attacker_home", 7.55, 44.17),
-            "defender-home": ("defender_home", 36.53, 16.02),
-            "central-west": ("central", 14.31, 28.95),
-            "central-east": ("central", 29.24, 31.45),
-            "expansion-north": ("expansion", 24.0, 51.43),
-            "expansion-south": ("expansion", 20.05, 8.6),
-        },
-        "disruption-vs-reconnaissance-layout-3": {
-            "attacker-home": ("attacker_home", 6.45, 45.39),
-            "defender-home": ("defender_home", 37.55, 14.61),
-            "central-north-west": ("central", 20.15, 34.65),
-            "central-south-east": ("central", 23.85, 25.35),
-            "expansion-north-east": ("expansion", 31.9, 50.9),
-            "expansion-south-west": ("expansion", 12.1, 9.1),
-        },
-    }
-
-    assert layout.name == layout_name
-    assert layout.battlefield_width_inches == 44.0
-    assert layout.battlefield_depth_inches == 60.0
-    assert layout.coordinate_origin == "bottom_left"
-    assert layout.attacker_edge == attacker_edge
-    assert layout.defender_edge == defender_edge
-    assert terrain_layout.terrain_features == ()
-    assert setup.battlefield_layout_id == layout.battlefield_layout_id
-    assert direct_setup.battlefield_layout_id == layout.battlefield_layout_id
-    assert len(layout.terrain_feature_placements) == 16
-    assert len(setup.terrain_features) == 16
-    assert len(direct_setup.terrain_features) == 16
-    assert len(setup.terrain_areas) == 16
-    assert len(direct_setup.terrain_areas) == 16
-    assert len(setup.battlefield_regions) == 5
-    assert len(direct_setup.battlefield_regions) == 5
-    assert setup.objective_markers == layout.objective_markers
-    assert setup.deployment_zones == _deployment_zones_for_players(
-        layout,
-        attacker_player_id="player-alpha",
-        defender_player_id="player-beta",
-    )
-
-    assert Counter(area.footprint_template_id for area in layout.terrain_areas) == {
-        "FOOTPRINT_6X4": 4,
-        "FOOTPRINT_10X2_5": 2,
-        "FOOTPRINT_6X2": 4,
-        "FOOTPRINT_7X11_5": 4,
-        "FOOTPRINT_8X11_5_POLYGON": 2,
-    }
-    assert sum(area.source_transform == "explicit" for area in layout.terrain_areas) == 8
-    assert (
-        sum(area.source_transform.startswith("mirrored_from:") for area in layout.terrain_areas)
-        == 8
-    )
-    assert all(
-        0.0 <= point.x_inches <= 44.0 and 0.0 <= point.y_inches <= 60.0
-        for area in layout.terrain_areas
-        for point in area.footprint_polygon
-    )
-
-    assert dict(layout.objective_role_counts) == {
-        ObjectiveMarkerRole.ATTACKER_HOME: 1,
-        ObjectiveMarkerRole.DEFENDER_HOME: 1,
-        ObjectiveMarkerRole.CENTRAL: 2,
-        ObjectiveMarkerRole.EXPANSION: 2,
-    }
-    assert Counter(marker.objective_role.value for marker in layout.objective_markers) == {
-        "attacker_home": 1,
-        "defender_home": 1,
-        "central": 2,
-        "expansion": 2,
-    }
-    actual_objectives = {
-        marker.objective_marker_id.removeprefix(f"{layout_id}-"): (
-            marker.objective_role.value,
-            round(marker.x_inches, 2),
-            round(marker.y_inches, 2),
+    with pytest.raises(MissionSetupError, match="every physical member"):
+        replace(
+            setup,
+            objective_terrain_areas=tuple(
+                partial_binding if binding == complete_binding else binding
+                for binding in setup.objective_terrain_areas
+            ),
         )
-        for marker in layout.objective_markers
+
+    retained_area_id = complete_binding.terrain_area_ids[-1]
+    relabelled_setup = replace(
+        setup,
+        terrain_areas=tuple(
+            replace(area, logical_terrain_area_id=retained_area_id)
+            if area.terrain_area_id == retained_area_id
+            else area
+            for area in setup.terrain_areas
+            if area.terrain_area_id not in complete_binding.terrain_area_ids[:-1]
+        ),
+        objective_terrain_areas=tuple(
+            replace(binding, terrain_area_ids=(retained_area_id,))
+            if binding.objective_marker_id == complete_binding.objective_marker_id
+            else binding
+            for binding in setup.objective_terrain_areas
+        ),
+    )
+    with pytest.raises(MissionSetupError, match="battlefield geometry drifted from source"):
+        validate_mission_setup_source_layout(relabelled_setup)
+
+    with pytest.raises(MissionSetupError, match="requires battlefield_layout_id"):
+        replace(setup, battlefield_layout_id=None)
+
+    layoutless_source_components = replace(
+        setup,
+        battlefield_layout_id=None,
+        battlefield_regions=(),
+        terrain_areas=(),
+        terrain_features=(),
+        objective_terrain_areas=(),
+    )
+    with pytest.raises(GameLifecycleError, match="component identities require"):
+        validate_mission_setup_source_layout(layoutless_source_components)
+
+    with pytest.raises(GameLifecycleError, match="primary mission drifted"):
+        validate_mission_setup_source_layout(
+            replace(setup, primary_mission_id="primary-meatgrinder")
+        )
+
+    bound_area_ids = {
+        terrain_area_id
+        for binding in setup.objective_terrain_areas
+        for terrain_area_id in binding.terrain_area_ids
     }
-    assert actual_objectives == expected_objectives[layout_id]
+    unbound_area = next(
+        area for area in setup.terrain_areas if area.terrain_area_id not in bound_area_ids
+    )
+    x_shift = 0.05 if unbound_area.center_x_inches < 22.0 else -0.05
+    shifted_area = replace(
+        unbound_area,
+        center_x_inches=unbound_area.center_x_inches + x_shift,
+        footprint_polygon=tuple(
+            replace(point, x_inches=point.x_inches + x_shift)
+            for point in unbound_area.footprint_polygon
+        ),
+    )
+    shifted_setup = replace(
+        setup,
+        terrain_areas=tuple(
+            shifted_area if area == unbound_area else area for area in setup.terrain_areas
+        ),
+    )
+    with pytest.raises(MissionSetupError, match="battlefield geometry drifted from source"):
+        validate_mission_setup_source_layout(shifted_setup)
 
-    objective_by_role = {marker.objective_role: marker for marker in layout.objective_markers}
-    central_objectives = tuple(
-        marker
-        for marker in layout.objective_markers
-        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+    with pytest.raises(MissionSetupError, match="battlefield geometry drifted from source"):
+        validate_mission_setup_source_layout(replace(setup, terrain_features=()))
+
+    canonical_feature = setup.terrain_features[0]
+    custom_setup = replace(
+        setup,
+        battlefield_layout_id=None,
+        deployment_map_id="custom-event-companion-deployment-map",
+        terrain_layout_id="custom-event-companion-terrain-layout",
+        terrain_areas=(),
+        objective_terrain_areas=(),
+        terrain_features=(canonical_feature,),
     )
-    attacker_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "attacker")
-    defender_zone = next(zone for zone in layout.deployment_zones if zone.player_id == "defender")
-    assert attacker_zone.contains_point(
-        objective_by_role[ObjectiveMarkerRole.ATTACKER_HOME].x_inches,
-        objective_by_role[ObjectiveMarkerRole.ATTACKER_HOME].y_inches,
-    )
-    assert defender_zone.contains_point(
-        objective_by_role[ObjectiveMarkerRole.DEFENDER_HOME].x_inches,
-        objective_by_role[ObjectiveMarkerRole.DEFENDER_HOME].y_inches,
+    validate_mission_setup_source_layout(custom_setup)
+    validate_mission_setup_source_layout(
+        replace(custom_setup, primary_mission_id="primary-meatgrinder")
     )
 
-    regions = {region.region_id: region for region in layout.battlefield_regions}
-    attacker_territory = regions[f"{layout_id}-attacker-territory"]
-    defender_territory = regions[f"{layout_id}-defender-territory"]
-    no_mans_land = regions[f"{layout_id}-no-mans-land"]
-    assert attacker_territory.derived_from == (f"attacker_edge_{attacker_edge}",)
-    assert defender_territory.derived_from == (f"defender_edge_{defender_edge}",)
-    assert len(no_mans_land.shape.polygons) == no_mans_land_polygons
-    assert all(
-        no_mans_land.contains_point(marker.x_inches, marker.y_inches)
-        for marker in central_objectives
-    )
-    if no_mans_land_polygons == 4:
-        assert len(attacker_zone.shape.polygons[0].vertices) > 4
-        assert len(defender_zone.shape.polygons[0].vertices) > 4
-        assert not attacker_zone.contains_point(22.0, 30.0)
-        assert not defender_zone.contains_point(22.0, 30.0)
-    assert math.isclose(
-        _shape_area(attacker_zone.shape)
-        + _shape_area(defender_zone.shape)
-        + _shape_area(no_mans_land.shape),
-        44.0 * 60.0,
-        rel_tol=0.0,
-        abs_tol=2e-6,
-    )
-    assert math.isclose(
-        _shape_area(attacker_territory.shape) + _shape_area(defender_territory.shape),
-        44.0 * 60.0,
-        rel_tol=0.0,
-        abs_tol=1e-6,
-    )
+    with pytest.raises(GameLifecycleError, match="canonical battlefield region identity drifted"):
+        validate_mission_setup_source_layout(
+            replace(
+                custom_setup,
+                battlefield_regions=(
+                    replace(
+                        custom_setup.battlefield_regions[0],
+                        source_id="test:drifted-event-companion-region",
+                    ),
+                    *custom_setup.battlefield_regions[1:],
+                ),
+            )
+        )
+
+    with pytest.raises(GameLifecycleError, match="canonical terrain feature identity drifted"):
+        validate_mission_setup_source_layout(
+            replace(
+                custom_setup,
+                terrain_features=(
+                    replace(
+                        canonical_feature,
+                        classification=TerrainAreaClassification.UNKNOWN,
+                    ),
+                ),
+            )
+        )
+
+    with pytest.raises(GameLifecycleError, match="must not reuse source-backed provenance"):
+        validate_mission_setup_source_layout(
+            replace(
+                custom_setup,
+                terrain_features=(
+                    replace(
+                        canonical_feature,
+                        feature_id="custom-event-companion-feature",
+                        classification=TerrainAreaClassification.UNKNOWN,
+                        source_id=mission_pack.terrain_feature_presets[0].source_id,
+                    ),
+                ),
+            )
+        )
 
 
 def test_phase17j_objective_role_payload_is_required() -> None:
@@ -4079,6 +3996,16 @@ def test_phase17j_final_scoring_uses_event_caps_battle_ready_and_draw_rules() ->
     assert audit["battle_ready_vp_cap"] == 10
 
 
+def _meatgrinder_artifact_layouts() -> tuple[Any, ...]:
+    layouts = tuple(
+        layout
+        for layout in event_layouts.battlefield_artifact().layouts
+        if layout.source_page in {24, 25, 26}
+    )
+    assert tuple(layout.source_page for layout in layouts) == (24, 25, 26)
+    return layouts
+
+
 def _source_deployment_zone_layout_template_id(
     *,
     layout_id: str,
@@ -4115,22 +4042,6 @@ def _source_deployment_zone_layout_template_id_from_number(
     return template_ids_by_number[template_number]
 
 
-def _source_deployment_zone_shape_transforms(
-    template_id: event_source.DeploymentZoneLayoutTemplateId,
-) -> tuple[event_source.DeploymentZoneShapeTransform, event_source.DeploymentZoneShapeTransform]:
-    function = cast(
-        Callable[
-            [event_source.DeploymentZoneLayoutTemplateId],
-            tuple[
-                event_source.DeploymentZoneShapeTransform,
-                event_source.DeploymentZoneShapeTransform,
-            ],
-        ],
-        vars(event_source)["_deployment_zone_shape_transforms"],
-    )
-    return function(template_id)
-
-
 def _source_deployment_zone_template_base_shape(
     template_id: event_source.DeploymentZoneLayoutTemplateId,
 ) -> DeploymentZoneShape:
@@ -4141,50 +4052,12 @@ def _source_deployment_zone_template_base_shape(
     return function(template_id)
 
 
-def _source_transform_deployment_zone_shape(
-    shape: DeploymentZoneShape,
-    transform: event_source.DeploymentZoneShapeTransform,
-) -> DeploymentZoneShape:
-    function = cast(
-        Callable[
-            [DeploymentZoneShape, event_source.DeploymentZoneShapeTransform], DeploymentZoneShape
-        ],
-        vars(event_source)["_transform_deployment_zone_shape"],
-    )
-    return function(shape, transform)
-
-
 def _source_layout_number_from_layout_id(layout_id: str) -> int:
     function = cast(
         Callable[[str], int],
         vars(event_source)["_layout_number_from_layout_id"],
     )
     return function(layout_id)
-
-
-def _source_extracted_deployment_zones(
-    *,
-    layout_id: str,
-) -> tuple[object, ...]:
-    function = cast(
-        Callable[..., tuple[object, ...]],
-        vars(event_source)["_extracted_deployment_zones"],
-    )
-    return function(layout_id=layout_id)
-
-
-def _source_map_deployment_zone_shape(
-    shape: DeploymentZoneShape,
-    transform: Callable[[float, float], tuple[float, float]],
-) -> DeploymentZoneShape:
-    function = cast(
-        Callable[
-            [DeploymentZoneShape, Callable[[float, float], tuple[float, float]]],
-            DeploymentZoneShape,
-        ],
-        vars(event_source)["_map_deployment_zone_shape"],
-    )
-    return function(shape, transform)
 
 
 def _source_rectangle_with_quarter_circle_cutout_vertices(
@@ -4220,14 +4093,6 @@ def _source_base_source_kind_and_geometry(
     return function(base_text)
 
 
-def _source_extracted_layout_source(layout_id: str) -> object:
-    function = cast(
-        Callable[[str], object],
-        vars(event_source)["_extracted_layout_source"],
-    )
-    return function(layout_id)
-
-
 def _source_matrix_row(
     *,
     player_force_disposition_id: str,
@@ -4241,14 +4106,6 @@ def _source_matrix_row(
         player_force_disposition_id=player_force_disposition_id,
         opponent_force_disposition_id=opponent_force_disposition_id,
     )
-
-
-def _source_force_disposition_name(force_disposition_id: str) -> str:
-    function = cast(
-        Callable[[str], str],
-        vars(event_source)["_force_disposition_name"],
-    )
-    return function(force_disposition_id)
 
 
 def _layout_descriptor(
@@ -4266,19 +4123,6 @@ def _layout_descriptor(
     raise AssertionError("Layout descriptor was not found.")
 
 
-def _shape_area(shape: DeploymentZoneShape) -> float:
-    total = 0.0
-    for polygon in shape.polygons:
-        vertices = polygon.vertices
-        previous = vertices[-1]
-        area = 0.0
-        for current in vertices:
-            area += previous.x * current.y - current.x * previous.y
-            previous = current
-        total += abs(area) / 2.0
-    return round(total, 6)
-
-
 def _shape_polygons(shape: DeploymentZoneShape) -> tuple[tuple[tuple[float, float], ...], ...]:
     return tuple(
         tuple((point.x, point.y) for point in polygon.vertices) for polygon in shape.polygons
@@ -4289,27 +4133,6 @@ def _terrain_display_points(
     points: tuple[TerrainDisplayPoint, ...],
 ) -> tuple[tuple[float, float], ...]:
     return tuple((point.x_inches, point.y_inches) for point in points)
-
-
-def _rounded_terrain_display_point(point: TerrainDisplayPoint) -> tuple[float, float]:
-    return (round(point.x_inches, 6), round(point.y_inches, 6))
-
-
-def _deployment_zones_for_players(
-    layout: BattlefieldLayoutDefinition,
-    *,
-    attacker_player_id: str,
-    defender_player_id: str,
-) -> tuple[DeploymentZone, ...]:
-    zones: list[DeploymentZone] = []
-    for zone in layout.deployment_zones:
-        if zone.player_id == "attacker":
-            zones.append(zone.with_player_id(attacker_player_id))
-        elif zone.player_id == "defender":
-            zones.append(zone.with_player_id(defender_player_id))
-        else:
-            zones.append(zone)
-    return tuple(sorted(zones, key=lambda item: item.deployment_zone_id))
 
 
 def _event_final_scoring_windows(

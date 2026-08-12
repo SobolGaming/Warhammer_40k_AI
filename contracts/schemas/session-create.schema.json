@@ -1,12 +1,12 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v2/session-create.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v3/session-create.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
     "config": {
-      "$ref": "https://warhammer40k-core.local/contracts/v1/create-session.schema.json#/properties/config"
+      "$ref": "https://warhammer40k-core.local/contracts/v2/create-session.schema.json#/properties/config"
     },
-    "schema_version": {"const": "session-create-v2", "type": "string"}
+    "schema_version": {"const": "session-create-v3", "type": "string"}
   },
   "required": ["schema_version", "config"],
   "title": "CORE V2 Authenticated SessionCreatePayload",

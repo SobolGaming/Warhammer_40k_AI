@@ -511,6 +511,40 @@ def test_phase16a_replay_restore_preserves_pending_deployment_request() -> None:
     assert GameLifecycle.from_payload(payload).to_payload() == payload
 
 
+@pytest.mark.parametrize("drift_target", ["mission_setup", "deployment_zone"])
+def test_phase16a_replay_restore_rejects_pending_deployment_geometry_drift(
+    drift_target: str,
+) -> None:
+    lifecycle, _placement_request = _advance_to_first_deployment_placement()
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    decisions = cast(dict[str, JsonValue], payload["decisions"])
+    queue = cast(dict[str, JsonValue], decisions["queue"])
+    pending_requests = cast(list[JsonValue], queue["pending_requests"])
+    pending_request = cast(dict[str, JsonValue], pending_requests[0])
+    request_payload = cast(dict[str, JsonValue], pending_request["payload"])
+    proposal_request = cast(dict[str, JsonValue], request_payload["proposal_request"])
+    if drift_target == "mission_setup":
+        mission_setup = cast(dict[str, JsonValue], proposal_request["mission_setup"])
+        mission_setup["mission_pool_entry_id"] = "phase16a-drifted-mission-entry"
+        expected_error = "mission_setup drifted from state"
+    else:
+        zones = cast(list[JsonValue], proposal_request["legal_deployment_zones"])
+        zone = cast(dict[str, JsonValue], zones[0])
+        shape = cast(dict[str, JsonValue], zone["shape"])
+        polygons = cast(list[JsonValue], shape["polygons"])
+        polygon = cast(dict[str, JsonValue], polygons[0])
+        vertices = cast(list[JsonValue], polygon["vertices"])
+        vertex = cast(dict[str, JsonValue], vertices[0])
+        vertex["x"] = cast(float, vertex["x"]) + 0.05
+        expected_error = "deployment zones drifted from state"
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        GameLifecycle.from_payload(payload)
+
+
 def test_phase16a_deployment_payload_round_trips_and_reports_request_drift() -> None:
     lifecycle, placement_request = _advance_to_first_deployment_placement()
     assert lifecycle.state is not None
@@ -982,6 +1016,8 @@ def _config_with_blocking_objective_marker() -> GameConfig:
     )
     mission_setup = replace(
         base.mission_setup,
+        deployment_map_id="phase16a-blocking-objective-custom-deployment",
+        terrain_layout_id="phase16a-blocking-objective-custom-terrain",
         objective_markers=(*base.mission_setup.objective_markers, blocking_marker),
     )
     return replace(base, mission_setup=mission_setup)
@@ -992,6 +1028,8 @@ def _config_with_terrain_endpoint_feature() -> GameConfig:
     assert base.mission_setup is not None
     mission_setup = replace(
         base.mission_setup,
+        deployment_map_id="phase16a-terrain-endpoint-custom-deployment",
+        terrain_layout_id="phase16a-terrain-endpoint-custom-terrain",
         terrain_features=(
             _terrain_endpoint_feature(
                 feature_id="phase16a-terrain-endpoint-hill",

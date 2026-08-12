@@ -4,15 +4,23 @@ import hashlib
 import json
 from typing import cast
 
+from warhammer40k_core.core.battlefield_regions import BattlefieldRegion
 from warhammer40k_core.core.missions import (
+    BattlefieldLayoutDefinition,
     MissionPackDefinition,
+    MissionPoolEntry,
     MissionScoringRuleDefinition,
     PrimaryMissionDefinition,
     SecondaryMissionAvailability,
 )
 from warhammer40k_core.core.ruleset_descriptor import reserve_destruction_timing_kind_from_token
+from warhammer40k_core.core.terrain_layouts import TerrainLayoutTemplate
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mission_setup import (
+    MissionSetup,
+    instantiate_terrain_layout_template,
+    validate_mission_setup_source_layout_identity,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.reserves import ReserveDestructionTimingPolicy
 from warhammer40k_core.engine.scoring import (
@@ -24,6 +32,7 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
     objective_control_timing_from_token,
 )
+from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.rules.mission_pack_import import (
     chapter_approved_2026_27_mission_pack,
     warhammer_event_companion_2026_07_mission_pack,
@@ -118,6 +127,249 @@ def mission_pack_for_id(mission_pack_id: str) -> MissionPackDefinition:
         if mission_pack.mission_pack_id == requested_pack_id:
             return mission_pack
     raise GameLifecycleError("Unsupported mission pack.")
+
+
+def validate_mission_setup_source_layout(mission_setup: MissionSetup) -> None:
+    if type(mission_setup) is not MissionSetup:
+        raise GameLifecycleError("Source-layout validation requires MissionSetup.")
+    mission_pack = mission_pack_for_id(mission_setup.mission_pack_id)
+    if mission_setup.battlefield_layout_id is None:
+        if any(
+            layout.deployment_map_id == mission_setup.deployment_map_id
+            and layout.terrain_layout_id == mission_setup.terrain_layout_id
+            for layout in mission_pack.battlefield_layouts
+        ):
+            raise GameLifecycleError(
+                "MissionSetup source-layout component identities require battlefield_layout_id."
+            )
+        canonical_setup = canonical_layoutless_mission_setup_from_source(
+            mission_setup,
+            mission_pack=mission_pack,
+        )
+        if canonical_setup is not None:
+            if mission_setup != canonical_setup:
+                raise GameLifecycleError(
+                    "MissionSetup canonical layoutless setup drifted from source."
+                )
+            return
+        known_deployment_map_ids = {
+            deployment_map.deployment_map_id for deployment_map in mission_pack.deployment_maps
+        }
+        known_terrain_layout_ids = {
+            terrain_layout.terrain_layout_id
+            for terrain_layout in mission_pack.terrain_layout_templates
+        }
+        if (
+            mission_setup.deployment_map_id in known_deployment_map_ids
+            or mission_setup.terrain_layout_id in known_terrain_layout_ids
+        ):
+            raise GameLifecycleError(
+                "MissionSetup custom component identities must not reuse source-backed IDs."
+            )
+        _validate_custom_battlefield_region_provenance(
+            mission_setup=mission_setup,
+            mission_pack=mission_pack,
+        )
+        _validate_custom_terrain_feature_provenance(
+            mission_setup=mission_setup,
+            mission_pack=mission_pack,
+        )
+        return
+    pool_entry = _source_mission_pool_entry(
+        mission_setup=mission_setup,
+        mission_pack=mission_pack,
+    )
+    matching_layouts = tuple(
+        layout
+        for layout in mission_pack.battlefield_layouts
+        if layout.battlefield_layout_id == mission_setup.battlefield_layout_id
+    )
+    if len(matching_layouts) != 1:
+        raise GameLifecycleError("MissionSetup battlefield layout is missing from mission pack.")
+    battlefield_layout = matching_layouts[0]
+    if (
+        pool_entry.deployment_map_id != battlefield_layout.deployment_map_id
+        or battlefield_layout.terrain_layout_id not in pool_entry.terrain_layout_ids
+    ):
+        raise GameLifecycleError("MissionSetup battlefield layout drifted from mission pool entry.")
+    source_terrain_layout = mission_pack.terrain_layout_template(
+        battlefield_layout.terrain_layout_id
+    )
+    source_terrain_features = instantiate_terrain_layout_template(
+        source_terrain_layout,
+        terrain_areas=battlefield_layout.terrain_areas,
+        terrain_area_footprint_templates=mission_pack.terrain_area_footprint_templates,
+        terrain_feature_presets=mission_pack.terrain_feature_presets,
+        terrain_feature_placements=battlefield_layout.terrain_feature_placements,
+    )
+    validate_mission_setup_source_layout_identity(
+        mission_setup,
+        battlefield_layout=battlefield_layout,
+        source_terrain_features=source_terrain_features,
+    )
+
+
+def canonical_layoutless_mission_setup_from_source(
+    mission_setup: MissionSetup,
+    *,
+    mission_pack: MissionPackDefinition | None = None,
+) -> MissionSetup | None:
+    if type(mission_setup) is not MissionSetup:
+        raise GameLifecycleError("Canonical setup reconstruction requires MissionSetup.")
+    source_pack = (
+        mission_pack_for_id(mission_setup.mission_pack_id) if mission_pack is None else mission_pack
+    )
+    if type(source_pack) is not MissionPackDefinition:
+        raise GameLifecycleError("Canonical setup reconstruction requires MissionPackDefinition.")
+    matching_pool_entries = tuple(
+        entry
+        for entry in source_pack.mission_pool_entries
+        if entry.mission_pool_entry_id == mission_setup.mission_pool_entry_id
+    )
+    if len(matching_pool_entries) != 1:
+        return None
+    pool_entry = matching_pool_entries[0]
+    if (
+        mission_setup.deployment_map_id != pool_entry.deployment_map_id
+        or mission_setup.terrain_layout_id not in pool_entry.terrain_layout_ids
+    ):
+        return None
+    return MissionSetup.from_mission_pack(
+        mission_pack=source_pack,
+        mission_pool_entry_id=pool_entry.mission_pool_entry_id,
+        terrain_layout_id=mission_setup.terrain_layout_id,
+        attacker_player_id=mission_setup.attacker_player_id,
+        defender_player_id=mission_setup.defender_player_id,
+    )
+
+
+def _source_mission_pool_entry(
+    *,
+    mission_setup: MissionSetup,
+    mission_pack: MissionPackDefinition,
+) -> MissionPoolEntry:
+    matching_pool_entries = tuple(
+        entry
+        for entry in mission_pack.mission_pool_entries
+        if entry.mission_pool_entry_id == mission_setup.mission_pool_entry_id
+    )
+    if len(matching_pool_entries) != 1:
+        raise GameLifecycleError("MissionSetup mission pool entry is missing from mission pack.")
+    pool_entry = matching_pool_entries[0]
+    _validate_source_mission_identity(
+        mission_setup=mission_setup,
+        mission_pack=mission_pack,
+        pool_entry=pool_entry,
+    )
+    return pool_entry
+
+
+def _validate_source_mission_identity(
+    *,
+    mission_setup: MissionSetup,
+    mission_pack: MissionPackDefinition,
+    pool_entry: MissionPoolEntry,
+) -> None:
+    if (
+        mission_setup.source_id != mission_pack.source_id
+        or mission_setup.source_version != mission_pack.source_version
+    ):
+        raise GameLifecycleError("MissionSetup source package identity drifted.")
+    if mission_setup.primary_mission_id != pool_entry.primary_mission_id:
+        raise GameLifecycleError("MissionSetup primary mission drifted from mission pool entry.")
+
+
+def _validate_custom_battlefield_region_provenance(
+    *,
+    mission_setup: MissionSetup,
+    mission_pack: MissionPackDefinition,
+) -> None:
+    canonical_regions_by_id: dict[str, list[BattlefieldRegion]] = {}
+    source_namespace_roots = {mission_pack.source_id}
+    for layout in mission_pack.battlefield_layouts:
+        source_namespace_roots.add(layout.source_id)
+        for region in layout.battlefield_regions:
+            canonical_regions_by_id.setdefault(region.region_id, []).append(region)
+            source_namespace_roots.add(region.source_id)
+
+    for region in mission_setup.battlefield_regions:
+        canonical_regions = canonical_regions_by_id.get(region.region_id, ())
+        if canonical_regions:
+            if region not in canonical_regions:
+                raise GameLifecycleError(
+                    "MissionSetup canonical battlefield region identity drifted from source."
+                )
+            continue
+        if any(
+            region.source_id == source_root or region.source_id.startswith(f"{source_root}:")
+            for source_root in source_namespace_roots
+        ):
+            raise GameLifecycleError(
+                "MissionSetup custom battlefield region must not reuse source-backed provenance."
+            )
+
+
+def _validate_custom_terrain_feature_provenance(
+    *,
+    mission_setup: MissionSetup,
+    mission_pack: MissionPackDefinition,
+) -> None:
+    placement_layouts_by_feature_id: dict[str, list[BattlefieldLayoutDefinition]] = {}
+    source_namespace_roots = {mission_pack.source_id}
+    for layout in mission_pack.battlefield_layouts:
+        source_namespace_roots.add(layout.source_id)
+        for placement in layout.terrain_feature_placements:
+            placement_layouts_by_feature_id.setdefault(placement.feature_id, []).append(layout)
+            source_namespace_roots.add(placement.source_id)
+
+    static_layouts_by_feature_id: dict[str, list[TerrainLayoutTemplate]] = {}
+    for terrain_layout in mission_pack.terrain_layout_templates:
+        source_namespace_roots.add(terrain_layout.source_id)
+        for template in terrain_layout.terrain_features:
+            static_layouts_by_feature_id.setdefault(template.feature_id, []).append(terrain_layout)
+            source_namespace_roots.add(template.source_id)
+    source_namespace_roots.update(
+        preset.source_id for preset in mission_pack.terrain_feature_presets
+    )
+
+    for feature in mission_setup.terrain_features:
+        canonical_features: list[TerrainFeatureDefinition] = []
+        for layout in placement_layouts_by_feature_id.get(feature.feature_id, ()):
+            source_features = instantiate_terrain_layout_template(
+                mission_pack.terrain_layout_template(layout.terrain_layout_id),
+                terrain_areas=layout.terrain_areas,
+                terrain_area_footprint_templates=(mission_pack.terrain_area_footprint_templates),
+                terrain_feature_presets=mission_pack.terrain_feature_presets,
+                terrain_feature_placements=layout.terrain_feature_placements,
+            )
+            canonical_features.extend(
+                candidate
+                for candidate in source_features
+                if candidate.feature_id == feature.feature_id
+            )
+        for terrain_layout in static_layouts_by_feature_id.get(feature.feature_id, ()):
+            canonical_features.extend(
+                candidate
+                for candidate in instantiate_terrain_layout_template(terrain_layout)
+                if candidate.feature_id == feature.feature_id
+            )
+        if canonical_features:
+            if feature not in canonical_features:
+                raise GameLifecycleError(
+                    "MissionSetup canonical terrain feature identity drifted from source."
+                )
+            continue
+
+        source_id = feature.source_id
+        if source_id is None:
+            continue
+        if any(
+            source_id == source_root or source_id.startswith(f"{source_root}:")
+            for source_root in source_namespace_roots
+        ):
+            raise GameLifecycleError(
+                "MissionSetup custom terrain feature must not reuse source-backed provenance."
+            )
 
 
 def supported_mission_packs() -> tuple[MissionPackDefinition, ...]:

@@ -462,13 +462,125 @@ def test_source_linked_and_explicit_terrain_objectives_are_mutually_exclusive() 
 
 def test_source_linked_objective_context_requires_exact_area_and_marker_containment() -> None:
     state = _phase17n_linked_objective_state(1)
+    runtime_ruleset = state.ruleset_descriptor_for_runtime_policy()
+    assert runtime_ruleset.mission_policy.terrain_objective_missions_supported
     context = ObjectiveControlContext.from_game_state(
         state,
         timing=ObjectiveControlTiming.PHASE_END,
         phase=BattlePhase.COMMAND,
-        ruleset_descriptor=_ruleset(),
+        ruleset_descriptor=runtime_ruleset,
     )
     first_link = context.objective_terrain_areas[0]
+    areas_by_logical_id: dict[str, list[str]] = {}
+    for area in context.terrain_areas:
+        areas_by_logical_id.setdefault(area.logical_terrain_area_id, []).append(
+            area.terrain_area_id
+        )
+    grouped_area_ids = next(
+        tuple(sorted(area_ids)) for area_ids in areas_by_logical_id.values() if len(area_ids) > 1
+    )
+
+    with pytest.raises(GameLifecycleError, match="every physical member"):
+        replace(
+            context,
+            objective_terrain_areas=tuple(
+                replace(link, terrain_area_ids=(grouped_area_ids[0],))
+                if link == first_link
+                else link
+                for link in context.objective_terrain_areas
+            ),
+        )
+
+    omitted_group_member_id = grouped_area_ids[0]
+    with pytest.raises(GameLifecycleError, match="must group at least two physical areas"):
+        replace(
+            context,
+            terrain_areas=tuple(
+                area
+                for area in context.terrain_areas
+                if area.terrain_area_id != omitted_group_member_id
+            ),
+        )
+
+    retained_group_member_id = grouped_area_ids[-1]
+    with pytest.raises(GameLifecycleError, match="terrain areas drifted from MissionSetup"):
+        replace(
+            context,
+            terrain_areas=tuple(
+                replace(area, logical_terrain_area_id=retained_group_member_id)
+                if area.terrain_area_id == retained_group_member_id
+                else area
+                for area in context.terrain_areas
+                if area.terrain_area_id not in grouped_area_ids[:-1]
+            ),
+        )
+
+    omitted_link = context.objective_terrain_areas[0]
+    with pytest.raises(
+        GameLifecycleError,
+        match="objective terrain-area membership drifted from MissionSetup",
+    ):
+        replace(
+            context,
+            objective_terrain_areas=context.objective_terrain_areas[1:],
+            objective_terrain_area_markers=tuple(
+                marker
+                for marker in context.objective_terrain_area_markers
+                if marker.objective_marker_id != omitted_link.objective_marker_id
+            ),
+        )
+
+    mixed_state = _phase17n_layout_state("priority-assets-vs-priority-assets-layout-1")
+    mixed_context = ObjectiveControlContext.from_game_state(
+        mixed_state,
+        timing=ObjectiveControlTiming.PHASE_END,
+        phase=BattlePhase.COMMAND,
+        ruleset_descriptor=mixed_state.ruleset_descriptor_for_runtime_policy(),
+    )
+    assert mixed_context.objective_markers
+    with pytest.raises(GameLifecycleError, match="objective source inventory drifted"):
+        replace(mixed_context, objective_markers=mixed_context.objective_markers[1:])
+
+    supported_ruleset = _ruleset()
+    unsupported_ruleset = replace(
+        supported_ruleset,
+        objective_policy=replace(
+            supported_ruleset.objective_policy,
+            terrain_objective_control_policy=TerrainObjectiveControlPolicy.UNSUPPORTED,
+        ),
+        descriptor_hash="",
+    )
+    with pytest.raises(GameLifecycleError, match="objective source inventory drifted"):
+        replace(
+            context,
+            ruleset_descriptor=unsupported_ruleset,
+            objective_terrain_areas=(),
+            objective_terrain_area_markers=(),
+        )
+
+    with pytest.raises(GameLifecycleError, match="mutually exclusive"):
+        replace(
+            context,
+            terrain_objectives=(
+                Objective.terrain(
+                    "injected-extra-objective",
+                    "Injected Extra Objective",
+                    context.terrain_features[0].feature_id,
+                ),
+            ),
+        )
+
+    with pytest.raises(GameLifecycleError, match="runtime state drifted"):
+        replace(
+            context,
+            scenario=replace(
+                context.scenario,
+                battlefield_state=replace(
+                    context.scenario.battlefield_state,
+                    terrain_features=(),
+                ),
+            ),
+        )
 
     with pytest.raises(GameLifecycleError, match="unknown terrain area"):
         replace(
@@ -851,9 +963,13 @@ def test_objective_control_validation_is_fail_fast() -> None:
 
 
 def _phase17n_linked_objective_state(layout_number: int) -> GameState:
+    return _phase17n_layout_state(f"purge-the-foe-vs-purge-the-foe-layout-{layout_number}")
+
+
+def _phase17n_layout_state(layout_id: str) -> GameState:
     mission_setup = MissionSetup.from_mission_pack(
         mission_pack=warhammer_event_companion_2026_07_mission_pack(),
-        mission_pool_entry_id=(f"mission-purge-the-foe-vs-purge-the-foe-layout-{layout_number}"),
+        mission_pool_entry_id=f"mission-{layout_id}",
         attacker_player_id="player-a",
         defender_player_id="player-b",
     )
@@ -863,7 +979,7 @@ def _phase17n_linked_objective_state(layout_number: int) -> GameState:
     for army in armies:
         state.record_army_definition(army)
     scenario = create_deterministic_battlefield_scenario(
-        battlefield_id=f"phase17n-linked-objective-layout-{layout_number}",
+        battlefield_id=f"phase17n-linked-objective-{layout_id}",
         armies=armies,
         battlefield_width_inches=mission_setup.battlefield_width_inches,
         battlefield_depth_inches=mission_setup.battlefield_depth_inches,

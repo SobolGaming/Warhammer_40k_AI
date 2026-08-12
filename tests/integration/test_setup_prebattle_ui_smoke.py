@@ -186,7 +186,7 @@ def test_setup_prebattle_ui_smoke_projects_real_requests_and_typed_terrain() -> 
         payload=_scout_move_payload(
             state=_state(session),
             request=scout_request,
-            dx=-1.0,
+            dx=1.0,
         ),
         result_id="setup-smoke-submit-scout-b",
     )
@@ -332,18 +332,23 @@ def _assert_pending_layout_has_typed_terrain_geometry(view: GameViewPayload) -> 
 
 
 def _assert_typed_terrain_geometry_payload(mission_setup: dict[str, JsonValue]) -> None:
-    assert mission_setup["mission_pack_id"] == "11e-chapter-approved-2026-27"
+    assert mission_setup["mission_pack_id"] == "11e-warhammer-event-companion-2026-07"
     assert mission_setup["primary_mission_id"] == "primary-immovable-object"
-    assert mission_setup["battlefield_layout_id"] == "take-and-hold-vs-take-and-hold-layout-3"
+    assert mission_setup["battlefield_layout_id"] == "take-and-hold-vs-purge-the-foe-layout-3"
     assert (
-        mission_setup["deployment_map_id"] == "take-and-hold-vs-take-and-hold-layout-3-deployment"
+        mission_setup["deployment_map_id"] == "take-and-hold-vs-purge-the-foe-layout-3-deployment"
     )
-    assert mission_setup["terrain_layout_id"] == "take-and-hold-vs-take-and-hold-layout-3"
+    assert mission_setup["terrain_layout_id"] == "take-and-hold-vs-purge-the-foe-layout-3"
     assert mission_setup["battlefield_width_inches"] == 44.0
     assert mission_setup["battlefield_depth_inches"] == 60.0
     terrain_features = mission_setup["terrain_features"]
     assert isinstance(terrain_features, list)
-    assert terrain_features == []
+    assert len(terrain_features) == 30
+    for feature in terrain_features:
+        assert isinstance(feature, dict)
+        assert _payload_string(feature, "source_id").startswith(
+            "gw-11e-warhammer-event-companion-v1-1-2026-07:"
+        )
     terrain_areas = mission_setup["terrain_areas"]
     assert isinstance(terrain_areas, list)
     assert len(terrain_areas) == 16
@@ -360,7 +365,7 @@ def _assert_typed_terrain_geometry_payload(mission_setup: dict[str, JsonValue]) 
     }
     objective_terrain_areas = mission_setup["objective_terrain_areas"]
     assert isinstance(objective_terrain_areas, list)
-    assert len(objective_terrain_areas) == 5
+    assert len(objective_terrain_areas) == 6
     objective_roles: set[str] = set()
     for area in objective_terrain_areas:
         assert isinstance(area, dict)
@@ -380,7 +385,7 @@ def _assert_typed_terrain_geometry_payload(mission_setup: dict[str, JsonValue]) 
     }
     objective_markers = mission_setup["objective_markers"]
     assert isinstance(objective_markers, list)
-    assert len(objective_markers) == 5
+    assert len(objective_markers) == 6
 
 
 def _assert_pending_proposal(view: GameViewPayload, proposal_kind: str) -> None:
@@ -460,13 +465,13 @@ def _event_companion_prebattle_pose(index: int, player_id: str) -> Pose:
     if player_id == "player-b":
         return Pose.at(
             40.0 - (row * 1.8),
-            18.0 + (column * 1.8),
+            8.0 + (column * 1.8),
             0.0,
             facing_degrees=180.0,
         )
     return Pose.at(
-        4.0 + (row * 1.8),
-        36.0 + (column * 1.8),
+        2.0 + (row * 1.8),
+        50.0 + (column * 1.8),
         0.0,
         facing_degrees=0.0,
     )

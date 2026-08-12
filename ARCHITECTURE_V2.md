@@ -1,6 +1,6 @@
 # CORE V2 Architecture Build Order
 
-This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, the Phase 17C rule-language IR implementation, the Phase 17D generic rule execution implementation, the Phase 17E faction coverage implementation, the Phase 17F faction execution dispatch implementation, the Phase 17J Warhammer Event Companion mission-pack implementation, the 11th Edition Core Rules source drop, and the Warhammer Event Companion v1.0 source drop.
+This document is the build-order roadmap for reconstructing the Warhammer 40,000 CORE V2 engine after the completed Phase 1-14D work, the completed Phase 14E attack sequence/allocation cutover, the Phase 14F shooting-type cutover, the Phase 14G Charge/Fight source contract, the Phase 14I Core Stratagem and ability source-contract closeout, the Phase 14J mission/catalog replacement slice, the Phase 14K cutover hardening audits, the Phase 14L ranged attack grouping layer, the Phase 15A charge declaration/roll implementation, the Phase 15B charge movement implementation, the Phase 15C fight activation/pass/interrupt implementation, the Phase 15D Pile In/melee/Consolidate implementation, the Phase 15E Charge/Fight Core Stratagem implementation, the Phase 15F Charge/Fight completion gate hardening, the Phase 16A deployment setup implementation, the Phase 16B pre-battle abilities implementation, the Phase 16C reserve declaration implementation, the Phase 16D army construction completion, the Phase 16E setup completion gate implementation, the Phase 17A bridge source mirror implementation, the Phase 17A.1 transition patch package implementation, the Phase 17B canonical catalog generation implementation, the Phase 17C rule-language IR implementation, the Phase 17D generic rule execution implementation, the Phase 17E faction coverage implementation, the Phase 17F faction execution dispatch implementation, the Phase 17J Warhammer Event Companion mission-pack implementation, the 11th Edition Core Rules source drop, and the Warhammer Event Companion v1.1 source drop.
 
 The roadmap is intentionally rules-engine first:
 
@@ -13,7 +13,7 @@ The roadmap is intentionally rules-engine first:
 Primary references for roadmap coverage:
 
 - Warhammer 40,000 11th Edition Core Rules source PDF: [docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf](docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf)
-- Warhammer Event Companion v1.0 source PDF: [docs/source_rules/eng_12-06_warhammer40000_event_companion-s3bfb5f9s1-ivswuij3fo.pdf](docs/source_rules/eng_12-06_warhammer40000_event_companion-s3bfb5f9s1-ivswuij3fo.pdf)
+- Warhammer Event Companion v1.1 source PDF: [docs/source_rules/eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf](docs/source_rules/eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf)
 - 11th Edition app/codex/mission-pack source imports as they are added to CORE V2 source packages.
 - 11th Edition Digital App/community clarification supplement provided by project owner for this cutover plan.
 - CORE V1 reference implementation: <https://github.com/SobolGaming/Warhammer40k_AI>
@@ -105,11 +105,14 @@ import, scoring/draw pack resolution, separate empty card-amendment and FAQ
 patch records, Base Size Guide source rows with geometry-resolution statuses,
 deployment remainder-drain coverage, and a static audit preventing runtime
 Event Companion PDF parsing.
-**Phase 17N is partial**: one complete Purge the Foe versus Purge the Foe /
-Meatgrinder pairing slice supplies exact executable A/B/C battlefield packages,
-bringing executable coordinate coverage to 9 of 45 layouts. Three are
-source-hashed exact, six retain the older coordinate-extracted status, and the
-other 36 remain explicit pending work.
+**Phase 17N is partial overall, with its battlefield-geometry scope complete**:
+all 15 Event Companion Force Disposition pairings and all A/B/C variants supply
+45 of 45 source-hashed executable battlefield packages. They contain 720
+physical terrain-area footprint pieces forming 608 logical rules areas and
+1,349 physical components, including the reviewed page 9
+29-component source exception. Completing geometry does not promote the
+non-Meatgrinder Primary Mission scoring semantics that remain
+source-known engine-pending.
 **Phase 18A is complete** for local CLI/human decision entry and viewer-safe
 hybrid datacard projections: `interfaces/cli.py` renders pending finite and
 parameterized requests, submits normal lifecycle `DecisionResult`s, and
@@ -386,8 +389,8 @@ Implemented foundation and partial integration baselines:
 | 17D | Complete | Generic RuleIR execution handlers, source-linked events, Aura recomputation, and ability/Stratagem IR bridges |
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
-| 17J | Complete | Warhammer Event Companion v1.0 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with explicit extraction status, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
-| 17N | Partial | One complete Purge the Foe versus Purge the Foe / Meatgrinder A/B/C slice; 9 of 45 executable coordinate layouts (3 source-hashed exact and 6 older coordinate-extracted), with 36 still pending |
+| 17J | Complete | Warhammer Event Companion v1.1 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with explicit extraction status, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
+| 17N | Partial | Battlefield geometry complete for 45 of 45 source-hashed executable Event Companion layouts; non-Meatgrinder Primary Mission scoring semantics remain source-known engine-pending |
 | 17O | Complete | Viewer-scoped eight-axis capability manifest with selected roster/unit/rule/mission/geometry rows, evidence, blockers, identities, and mechanically derived certification claims |
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
@@ -4705,7 +4708,7 @@ Required outputs:
 
 Status: Complete.
 
-Phase 17J turns the Warhammer Event Companion v1.0 into a source-backed CORE V2
+Phase 17J turns the Warhammer Event Companion v1.1 into a source-backed CORE V2
 package. It owns Event Mission Sequence ordering, Force Disposition roster
 binding, per-player Primary Mission selection, layout A/B/C source-page
 identity, deterministic battlefield creation from layout descriptors,
@@ -4737,10 +4740,12 @@ Implemented coverage:
   status: 4 of 25 missions are engine-implemented, 21 are source-known but
   require engine implementation, and 0 still await source scoring text.
 - All 45 source-page layout identities instantiate as 44" x 60" mission setups
-  with deterministic layout descriptors. Nine layouts have executable
-  coordinates: 3 source-hashed exact and 6 with the older coordinate-extracted
-  status. The other 36 remain explicitly marked pending.
-- Event Companion v1.0 card amendments are explicitly empty and distinct from
+  with deterministic, source-hashed executable battlefield packages. The
+  complete geometry inventory contains 720 physical terrain-area footprint
+  pieces representing 608 logical rules areas, and 1,349 physical components;
+  page 9 is the reviewed 29-component source exception and every other layout
+  contains 30.
+- Event Companion v1.1 card amendments are explicitly empty and distinct from
   source-linked FAQ patch records.
 - Base Size Guide source rows record round, oval, Hull, Small Flying Base, Large
   Flying Base, and Unique source kinds with geometry-resolution statuses.
@@ -4758,7 +4763,7 @@ Implemented coverage:
 Package identity:
 
 - `source_kind = "warhammer_event_companion"`
-- `document_version = "1.0"`
+- `document_version = "1.1"`
 - `event_mode = "warhammer_event"`
 - `battlefield_size = "44x60_inches"`
 - `excludes_deployment_cards = true`
@@ -4827,7 +4832,7 @@ Invariants:
   `when_drawn_tactical_only`, and `leaves_battlefield_event` semantics. Runtime
   card-specific paths must either implement those semantics through structured
   evidence or fail closed.
-- Event Companion v1.0 has an empty Chapter Approved Mission Deck
+- Event Companion v1.1 has an empty Chapter Approved Mission Deck
   card-amendment set; FAQ behavior is represented as source-linked patch
   operations separately.
 - Event Companion FAQ behavior for operation marker removal, Death Trap,
@@ -4938,47 +4943,71 @@ Completion gate:
 
 Priority: required before certifying a visual matched-play slice.
 
-Status: Partial. One complete pairing slice is executable: Purge the Foe versus
-Purge the Foe, Primary Mission Meatgrinder, and layout variants A/B/C. These
-three variants are the first source-hashed exact layouts. Together with six
-older coordinate-extracted layouts, 9 of 45 are executable; the other 36 remain
-pending and must not be represented as complete or source-hashed exact.
+Status: Partial overall; battlefield geometry is complete. All 15 Event
+Companion Force Disposition pairings and every A/B/C variant have source-hashed
+executable battlefield packages, for 45 of 45 layouts. The remaining Phase 17N
+work is mission semantics: completing battlefield packages does not promote
+non-Meatgrinder Primary Missions whose scoring remains source-known and
+engine-pending.
 
-The slice's battlefield facts come from pages 24-26 of
+The battlefield Single/Separate logical-area semantics come from the page-8
+Layouts Key, while coordinates and layout facts come from pages 9-53 of
 [`eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf`](docs/source_rules/eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf),
 SHA-256
 `97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20`.
-Each variant commits 16 terrain areas and 30 separately placed components:
-8 ruins, 8 dense non-ruins, and 14 light components. Strict source-hashed JSON
-records the source affines, objective coordinates, deployment-zone polygons,
-territories, and No Man's Land regions; a strict loader validates the package
-before runtime consumption. Those pages are authoritative only for battlefield
-and layout facts and contain no Meatgrinder scoring clauses. Meatgrinder's four
-scoring rows retain their separate reviewed Chapter Approved mission-deck
-provenance in the Event Companion source package.
+Every layout commits 16 physical terrain-area footprint pieces, for 720 total.
+The page-8 key's 112 two-piece Single joins produce 608 logical rules areas: 112
+two-piece groups and 496 singletons. The package contains 1,349 separately
+placed physical components: page 9, Take and Hold versus Take
+and Hold Layout A, has the source-backed 29-component exception because one
+downed hovercraft has no tall-crate companion; each other layout contains 30.
+Strict source-hashed JSON records source affines, objective coordinates and
+terrain-area bindings, deployment-zone polygons, territories, No Man's Land,
+and reviewed terrain-area/component contacts. A strict loader pins source,
+extraction, package, and artifact hashes and rejects malformed, stale, or
+re-hashed coordinate drift.
 
-The exact battlefield artifact has package hash
-`c1e796a17bfcd533822dfe6300210a61169348d5273b3fe94bbe540594c0f04e`,
-raw artifact SHA-256
-`b1c487bb4d9da504e730905be3c7beaa6cb0ad59e9e44fd5d54cea7f35e455e5`,
-and reviewed extraction payload hash
-`8d0082df6516b8927cf8666042a9a679863b81205d41377a85c1823cf8e35b30`.
-The loader pins both artifact hashes, so a structurally valid re-hashed
-coordinate mutation remains rejected.
-The builder preserves all 12 orientation-reversing terrain-area source affines
-as a typed local reflection; its transformed-vertex anchor is derived
-deterministically from the reviewed registration anchor. Orientation-reversing
-registrations of source asset xref 5506 also apply its reviewed intrinsic
-half-turn about the placed footprint bounds, preserving those bounds while
-placing the asymmetric bump-outs on the source-image edges. Terrain-area
-anchors and component battlefield centers use a 0.05-inch placement grid, and
-the second half of each layout is derived by exact point symmetry from the
-reviewed first half. Layout A additionally records the reviewed 0.5-inch
-central-footprint correction and the contact-preserving corner/pipe and angled
-obstacle adjustments; Layouts B and C record their corresponding reviewed
-contact-pair adjustments on the same grid.
+The reviewed page-8 key plus pages-9-53 layout extraction SHA-256 is
+`a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f`,
+the generated artifact SHA-256 is
+`88ba6d7390eab060d6b0c53eb60afbfb1a6813dd80715e3d42562dd0c89128d9`,
+and the canonical package hash is
+`e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924`.
+The generator pins the stable runtime identity map at
+`742ab841d1ec1e696f4a5c0e3f2e8c251203d510bf1da85fb30af88023cb64f3`.
+Before emission it validates each extraction row's page identity, canonical
+force and mission display pairs, exact printed left-to-right order, and printed
+title. Runtime layout names preserve those validated source spellings and
+punctuation rather than reconstructing labels from slugs.
 
-Those four rows are loaded from the strict, versioned JSON artifact at
+Source terrain-area anchors and component battlefield centers use a 0.05-inch
+placement grid. Reviewed point symmetry, asymmetric local transforms, and
+contact-preserving adjustments remain structured artifact data. Final runtime
+footprints retain at most one 0.05-inch quantum of source-drawn open board and
+at most `0.000001` square inches of numerical overlap. Of 224 declared
+contacts, 43 have zero recorded gap and 181 retain an open sliver no wider than
+0.05 inches: 80 Single and 101 Separate. Of those 43 zero-gap contacts, 41 also
+have zero overlap. Two page-12 Single pairs have `0.00000087` square inches of
+overlap after six-decimal geometry quantization; every other pair has zero
+recorded overlap. Single joins share one rules identity without filling that
+open board, while Separate joins remain distinct. The identical ruin joins on
+pages 36 and 46 each use the same source-ID-bound 0.011834688335-inch exact
+normal correction after grid placement because exhaustive +/-0.30-inch grid
+searches found no exact closure. Their source anchors remain separately preserved
+and the runtime exception uses a pinned 12-decimal witness rather than a wider
+geometry tolerance; those joins have zero gap and zero overlap. Measured runtime
+gaps and overlaps remain in the artifact;
+the 112 Single and 112 Separate kinds control logical-area grouping. Seven
+source-quantized component poses use pinned minimum 0.05-inch containment
+adjustments: two on page 23, three on page 29, one on page 38, and one on page
+45. The 14 shared physical terrain archetypes define recurring component rules
+polygons and wall/floor primitives once for reuse by all 45 layouts. Intentional
+clearance between a physical feature and its terrain-area edge is source-required
+and is not treated as incomplete geometry.
+
+Meatgrinder's four scoring rows retain their separate reviewed Chapter Approved
+mission-deck provenance. Those rows are loaded from the strict, versioned JSON
+artifact at
 `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-meatgrinder-scoring.json`,
 with package hash
 `21b3fabcb585ee33b2295a888963d666a42f85d3f09200e973dd7de8253bd39c`
@@ -4991,16 +5020,14 @@ source authority. Runtime mission rows are constructed from this artifact; the
 loader rejects unknown fields, malformed rows, stale content hashes, and drift
 from the reviewed artifact pin.
 
-The reviewed extraction input is committed at
-`data/source_audits/event_companion_2026_06/phase17n_purge_the_foe_meatgrinder_pages_24_26_extraction.json`.
-`uv run python tools/build_phase17n_event_companion_exact_slice.py --check`
-rebuilds the package in memory from that versioned input, verifies the pinned
-source PDF hash, and fails without writing if the committed runtime artifact
+`uv run python tools/build_event_companion_battlefields.py --check` rebuilds the
+complete battlefield package in memory from its reviewed inputs, verifies its
+pinned provenance, and fails without writing if the committed runtime artifact
 has drifted.
 
 Terrain-area and component source-image affines and battlefield regions are
 source-extracted facts. Recurring component geometry is defined once per shared
-source archetype and reused by all three layouts. Ruin envelopes and all
+source archetype and reused by all 45 layouts. Ruin envelopes and all
 non-ruin component envelopes use grid-aligned dimensions validated against the
 reviewed source-image axis spans, and each schematic L-wall joint is registered
 to the source image's lower-left corner. The shared ruin floor plate is anchored
@@ -5156,7 +5183,7 @@ Completion gate:
 
 Status: Complete. The implemented adapter contract currently uses
 `RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"` for the static
-catalog projection and `PROJECTION_SCHEMA_VERSION = "game-view-v7-phase17n"`
+catalog projection and `PROJECTION_SCHEMA_VERSION = "game-view-v8-phase17n"`
 for live game views. Live views expose `rules_catalog`,
 `projection_state_hash`, `unit_display_by_id`, and `model_display_by_id`.
 
@@ -5939,8 +5966,8 @@ Required tests:
 Completion gate:
 
 `battlefield-view-v1` was first published in Contract 4.0. The current shared
-viewer projection emits `battlefield-view-v2-phase17n` under Contract 5.0 so
-strict clients can distinguish the added terrain-classification fields. The family defines one right-handed inches-based world frame,
+viewer projection emits `battlefield-view-v3-phase17n` under Contract 6.0 so
+strict clients can distinguish the required logical terrain-area identity. The family defines one right-handed inches-based world frame,
 stable external entities for the required battlefield concepts, explicit model
 physical states, typed model/support/terrain/zone/path geometry, and a hash over
 viewer-visible authoritative geometry. The canonical geometry-conformance

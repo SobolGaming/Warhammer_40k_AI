@@ -21,7 +21,6 @@ from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _moveme
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
-from warhammer40k_core.engine.army_muster_consistency import validate_mustered_army_consistency
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence import (
     SELECT_ATTACK_WEAPON_GROUP_DECISION_TYPE,
@@ -172,6 +171,10 @@ from warhammer40k_core.engine.lifecycle_battlefield_requirements import (
 )
 from warhammer40k_core.engine.lifecycle_heroic_intervention import (
     apply_heroic_intervention_charge_move_lifecycle_decision,
+)
+from warhammer40k_core.engine.lifecycle_payload_consistency import (
+    validate_config_state_payload_consistency,
+    validate_pending_battlefield_request_consistency,
 )
 from warhammer40k_core.engine.lifecycle_reaction_queue import (
     validate_reaction_queue_consistency,
@@ -894,6 +897,10 @@ class GameLifecycle:
             ),
         )
         _validate_payload_consistency(state=lifecycle._require_state(), config=lifecycle._config)
+        validate_pending_battlefield_request_consistency(
+            state=lifecycle._require_state(),
+            pending_request=lifecycle._pending_decision_request(),
+        )
         validate_reaction_queue_consistency(
             state=lifecycle._require_state(),
             reaction_queue=lifecycle.reaction_queue,
@@ -3415,34 +3422,9 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     _validate_advanced_unit_state_consistency(state=state)
     _validate_fell_back_unit_state_consistency(state=state)
     _validate_normal_move_state_consistency(state=state)
-    if config is None:
-        return
-    if state.game_id != config.game_id:
-        raise GameLifecycleError("Lifecycle state game_id does not match config.")
-    if state.player_ids != config.player_ids:
-        raise GameLifecycleError("Lifecycle state player_ids do not match config.")
-    if state.turn_order != config.turn_order:
-        raise GameLifecycleError("Lifecycle state turn_order does not match config.")
-    if state.tactical_secondary_draw_count != config.tactical_secondary_draw_count:
-        raise GameLifecycleError(
-            "Lifecycle state tactical secondary draw count does not match config."
-        )
-    expected_hash = config.ruleset_descriptor.descriptor_hash
-    if state.ruleset_descriptor_hash != expected_hash:
-        raise GameLifecycleError("Lifecycle state ruleset hash does not match config.")
-    if state.rules_overlay_ids != config.ruleset_descriptor.rules_overlay_ids:
-        raise GameLifecycleError("Lifecycle state rules overlays do not match config.")
-    expected_setup = tuple(config.ruleset_descriptor.setup_sequence.steps)
-    if state.setup_sequence != expected_setup:
-        raise GameLifecycleError("Lifecycle state setup sequence does not match config.")
-    expected_battle = tuple(config.ruleset_descriptor.battle_phase_sequence.phases)
-    if state.battle_phase_sequence != expected_battle:
-        raise GameLifecycleError("Lifecycle state battle phase sequence does not match config.")
-    validate_mustered_army_consistency(
+    validate_config_state_payload_consistency(
         state=state,
-        catalog=config.army_catalog,
-        muster_requests=config.army_muster_requests,
-        model_geometries=config.model_geometries,
+        config=config,
     )
 
 

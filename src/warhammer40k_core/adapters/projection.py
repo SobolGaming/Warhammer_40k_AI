@@ -50,7 +50,7 @@ from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_total,
 )
 
-PROJECTION_SCHEMA_VERSION = "game-view-v7-phase17n"
+PROJECTION_SCHEMA_VERSION = "game-view-v8-phase17n"
 RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"
 
 _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (

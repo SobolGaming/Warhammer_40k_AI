@@ -27,53 +27,97 @@ class TerrainVisibilityAreaPointPayload(TypedDict):
 
 class TerrainVisibilityAreaPayload(TypedDict):
     terrain_area_id: str
+    member_terrain_area_ids: list[str]
     classification: str
-    footprint_polygon: list[TerrainVisibilityAreaPointPayload]
+    footprint_polygons: list[list[TerrainVisibilityAreaPointPayload]]
 
 
 @dataclass(frozen=True, slots=True)
 class TerrainVisibilityArea:
     terrain_area_id: str
+    member_terrain_area_ids: tuple[str, ...]
     classification: TerrainAreaClassification
-    footprint_polygon: tuple[Point2D, ...]
+    footprint_polygons: tuple[tuple[Point2D, ...], ...]
 
     def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "terrain_area_id",
-            _validate_identifier("TerrainVisibilityArea terrain_area_id", self.terrain_area_id),
+        terrain_area_id = _validate_identifier(
+            "TerrainVisibilityArea terrain_area_id",
+            self.terrain_area_id,
         )
+        object.__setattr__(self, "terrain_area_id", terrain_area_id)
+        member_ids = _validate_member_terrain_area_ids(self.member_terrain_area_ids)
         try:
             classification = terrain_area_classification_from_token(self.classification)
         except TerrainClassificationError as exc:
             raise GeometryError("TerrainVisibilityArea classification is invalid.") from exc
         object.__setattr__(self, "classification", classification)
+        footprint_polygons = _validate_footprint_polygons(
+            "TerrainVisibilityArea footprint_polygons",
+            self.footprint_polygons,
+        )
+        if len(member_ids) != len(footprint_polygons):
+            raise GeometryError(
+                "TerrainVisibilityArea member IDs and footprint polygons must have equal length."
+            )
+        if len(member_ids) == 1 and terrain_area_id != member_ids[0]:
+            raise GeometryError(
+                "A single-member TerrainVisibilityArea must use its physical member ID."
+            )
+        if len(member_ids) > 1 and terrain_area_id in member_ids:
+            raise GeometryError(
+                "A grouped TerrainVisibilityArea logical ID must differ from every member ID."
+            )
+        ordered_members = tuple(
+            sorted(
+                zip(member_ids, footprint_polygons, strict=True),
+                key=lambda member: member[0],
+            )
+        )
         object.__setattr__(
             self,
-            "footprint_polygon",
-            _validate_polygon(
-                "TerrainVisibilityArea footprint_polygon",
-                self.footprint_polygon,
-            ),
+            "member_terrain_area_ids",
+            tuple(member_id for member_id, _polygon in ordered_members),
+        )
+        object.__setattr__(
+            self,
+            "footprint_polygons",
+            tuple(polygon for _member_id, polygon in ordered_members),
         )
 
     def to_payload(self) -> TerrainVisibilityAreaPayload:
         return {
             "terrain_area_id": self.terrain_area_id,
+            "member_terrain_area_ids": list(self.member_terrain_area_ids),
             "classification": self.classification.value,
-            "footprint_polygon": [
-                {"x_inches": point[0], "y_inches": point[1]} for point in self.footprint_polygon
+            "footprint_polygons": [
+                [{"x_inches": point[0], "y_inches": point[1]} for point in footprint_polygon]
+                for footprint_polygon in self.footprint_polygons
             ],
         }
 
     @classmethod
-    def from_payload(cls, payload: TerrainVisibilityAreaPayload) -> Self:
-        return cls(
-            terrain_area_id=payload["terrain_area_id"],
-            classification=terrain_area_classification_from_token(payload["classification"]),
-            footprint_polygon=tuple(
-                (point["x_inches"], point["y_inches"]) for point in payload["footprint_polygon"]
+    def from_payload(cls, payload: object) -> Self:
+        if not isinstance(payload, dict):
+            raise GeometryError("TerrainVisibilityArea payload must be a mapping.")
+        raw_payload = cast(TerrainVisibilityAreaPayload, payload)
+        _require_payload_keys(
+            "TerrainVisibilityArea payload",
+            raw_payload,
+            (
+                "terrain_area_id",
+                "member_terrain_area_ids",
+                "classification",
+                "footprint_polygons",
             ),
+        )
+        raw_member_ids = raw_payload["member_terrain_area_ids"]
+        if type(raw_member_ids) is not list:
+            raise GeometryError("TerrainVisibilityArea payload member IDs must be a list.")
+        return cls(
+            terrain_area_id=raw_payload["terrain_area_id"],
+            member_terrain_area_ids=tuple(raw_member_ids),
+            classification=_classification_from_token(raw_payload["classification"]),
+            footprint_polygons=_footprint_polygons_from_payload(raw_payload["footprint_polygons"]),
         )
 
 
@@ -85,12 +129,19 @@ def validate_terrain_visibility_areas(
         raise GeometryError(f"{field_name} must be a tuple.")
     areas: list[TerrainVisibilityArea] = []
     seen: set[str] = set()
+    seen_member_ids: set[str] = set()
     for value in cast(tuple[object, ...], values):
         if type(value) is not TerrainVisibilityArea:
             raise GeometryError(f"{field_name} must contain TerrainVisibilityArea values.")
         if value.terrain_area_id in seen:
             raise GeometryError(f"{field_name} must not contain duplicate IDs.")
+        duplicate_member_ids = seen_member_ids.intersection(value.member_terrain_area_ids)
+        if duplicate_member_ids:
+            raise GeometryError(
+                f"{field_name} must not assign one physical member to multiple visibility areas."
+            )
         seen.add(value.terrain_area_id)
+        seen_member_ids.update(value.member_terrain_area_ids)
         areas.append(value)
     return tuple(sorted(areas, key=lambda area: area.terrain_area_id))
 
@@ -114,19 +165,19 @@ def classification_is_solid(classification: TerrainAreaClassification) -> bool:
 
 def model_intersects_terrain_area(model: Model, area: TerrainVisibilityArea) -> bool:
     _validate_model_and_area(model, area)
-    return shapely_backend.base_footprint_intersects_polygon(
+    return shapely_backend.base_footprint_intersects_polygon_union(
         model.base,
         model.pose,
-        area.footprint_polygon,
+        area.footprint_polygons,
     )
 
 
 def model_wholly_within_terrain_area(model: Model, area: TerrainVisibilityArea) -> bool:
     _validate_model_and_area(model, area)
-    return shapely_backend.base_footprint_within_polygon(
+    return shapely_backend.base_footprint_within_polygon_union(
         model.base,
         model.pose,
-        area.footprint_polygon,
+        area.footprint_polygons,
     )
 
 
@@ -137,7 +188,7 @@ def ray_intersects_terrain_area(
 ) -> bool:
     if type(area) is not TerrainVisibilityArea:
         raise GeometryError("ray terrain area must be TerrainVisibilityArea.")
-    return shapely_backend.segment_intersects_polygon(start, end, area.footprint_polygon)
+    return shapely_backend.segment_intersects_polygon_union(start, end, area.footprint_polygons)
 
 
 def feature_is_associated_with_terrain_area(
@@ -164,9 +215,9 @@ def feature_ids_associated_with_terrain_areas(
             )
         feature_footprint = feature.rules_footprint_points()
         if any(
-            shapely_backend.polygon_within_polygon(
+            shapely_backend.polygon_within_polygon_union(
                 feature_footprint,
-                area.footprint_polygon,
+                area.footprint_polygons,
             )
             for area in validated_areas
         ):
@@ -182,6 +233,91 @@ def _validate_model_and_area(model: Model, area: TerrainVisibilityArea) -> None:
 
 
 _validate_identifier = IdentifierValidator(GeometryError)
+
+
+def _classification_from_token(token: object) -> TerrainAreaClassification:
+    try:
+        return terrain_area_classification_from_token(token)
+    except TerrainClassificationError as exc:
+        raise GeometryError("TerrainVisibilityArea classification is invalid.") from exc
+
+
+def _validate_member_terrain_area_ids(value: object) -> tuple[str, ...]:
+    if type(value) is not tuple or not value:
+        raise GeometryError(
+            "TerrainVisibilityArea member_terrain_area_ids must be non-empty tuple."
+        )
+    member_ids = tuple(
+        _validate_identifier("TerrainVisibilityArea member terrain_area_id", raw_member_id)
+        for raw_member_id in cast(tuple[object, ...], value)
+    )
+    if len(set(member_ids)) != len(member_ids):
+        raise GeometryError("TerrainVisibilityArea member IDs must not contain duplicates.")
+    return member_ids
+
+
+def _validate_footprint_polygons(
+    field_name: str,
+    value: object,
+) -> tuple[tuple[Point2D, ...], ...]:
+    if type(value) is not tuple or not value:
+        raise GeometryError(f"{field_name} must be a non-empty tuple.")
+    return tuple(
+        _validate_polygon(f"{field_name} member {index}", raw_polygon)
+        for index, raw_polygon in enumerate(cast(tuple[object, ...], value))
+    )
+
+
+def _footprint_polygons_from_payload(value: object) -> tuple[tuple[Point2D, ...], ...]:
+    if type(value) is not list or not value:
+        raise GeometryError("TerrainVisibilityArea payload footprint_polygons must be a list.")
+    polygons: list[tuple[Point2D, ...]] = []
+    for polygon_index, raw_polygon in enumerate(cast(list[object], value)):
+        if type(raw_polygon) is not list:
+            raise GeometryError(
+                "TerrainVisibilityArea payload footprint_polygons members must be lists."
+            )
+        points: list[Point2D] = []
+        for point_index, raw_point in enumerate(cast(list[object], raw_polygon)):
+            if not isinstance(raw_point, dict):
+                raise GeometryError(
+                    "TerrainVisibilityArea payload footprint polygon points must be mappings."
+                )
+            point_payload = cast(dict[str, object], raw_point)
+            _require_payload_keys(
+                (
+                    "TerrainVisibilityArea payload footprint polygon "
+                    f"{polygon_index} point {point_index}"
+                ),
+                point_payload,
+                ("x_inches", "y_inches"),
+            )
+            points.append(
+                (
+                    validate_finite_number(
+                        "TerrainVisibilityArea payload footprint polygon x_inches",
+                        point_payload["x_inches"],
+                    ),
+                    validate_finite_number(
+                        "TerrainVisibilityArea payload footprint polygon y_inches",
+                        point_payload["y_inches"],
+                    ),
+                )
+            )
+        polygons.append(tuple(points))
+    return tuple(polygons)
+
+
+def _require_payload_keys(
+    field_name: str,
+    payload: object,
+    required_keys: tuple[str, ...],
+) -> None:
+    if not isinstance(payload, dict):
+        raise GeometryError(f"{field_name} must be a mapping.")
+    missing_keys = tuple(key for key in required_keys if key not in payload)
+    if missing_keys:
+        raise GeometryError(f"{field_name} missing required fields: {', '.join(missing_keys)}.")
 
 
 def _validate_polygon(field_name: str, value: object) -> tuple[Point2D, ...]:

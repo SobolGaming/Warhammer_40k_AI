@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v4/battlefield-view.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v5/battlefield-view.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -34,7 +34,7 @@
       "$ref": "#/$defs/render"
     },
     "schema_version": {
-      "const": "battlefield-view-v2-phase17n",
+      "const": "battlefield-view-v3-phase17n",
       "type": "string"
     }
   },
@@ -842,6 +842,10 @@
         "footprint": {
           "$ref": "#/$defs/shape"
         },
+        "logical_terrain_area_id": {
+          "minLength": 1,
+          "type": "string"
+        },
         "source_id": {
           "minLength": 1,
           "type": "string"
@@ -854,6 +858,7 @@
       "required": [
         "entity_kind",
         "terrain_area_id",
+        "logical_terrain_area_id",
         "classification",
         "footprint",
         "source_id"

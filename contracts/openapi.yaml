@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Warhammer 40,000 CORE V2 Adapter Contract",
-    "version": "5.0.0",
-    "description": "Phase 17O viewer-scoped capability manifests and the authenticated Phase 18G/18H session protocol with Phase 18I typed interactions and the Phase 18J battlefield coordinate/geometry contract, Phase 17N viewer-scoped terrain evidence and terrain classifications, mandatory engine-owned spatial context on physical proposal requests, mandatory rules-overlay source identity, replay artifact v3 with explicit replay-v2 migration, server-owned role bindings, opaque role-bound cursors, deterministic pagination, and explicit projection resynchronization."
+    "version": "6.0.0",
+    "description": "Phase 17O viewer-scoped capability manifests and the authenticated Phase 18G/18H session protocol with Phase 18I typed interactions and the Phase 18J battlefield coordinate/geometry contract, explicit logical terrain-area identity, Phase 17N viewer-scoped terrain evidence and terrain classifications, mandatory engine-owned spatial context on physical proposal requests, mandatory rules-overlay source identity, exact replay artifact v4 loading without inferred legacy terrain grouping, server-owned role bindings, opaque role-bound cursors, deterministic pagination, and explicit projection resynchronization."
   },
   "servers": [{"url": "http://127.0.0.1:8000"}],
   "security": [{"bearerAuth": []}],
@@ -78,7 +78,7 @@
         "parameters": [{"$ref": "#/components/parameters/GameId"}],
         "responses": {
           "200": {
-            "description": "Replay artifact v3 with mandatory ruleset descriptor, overlay source identity, and Phase 17N turn-start terrain evidence for an authorized replay role.",
+            "description": "Replay artifact v4 with mandatory ruleset descriptor, overlay source identity, explicit logical terrain-area identity, and Phase 17N turn-start terrain evidence for an authorized replay role.",
             "content": {"application/json": {"schema": {"$ref": "./schemas/replay-metadata.schema.json"}}}
           },
           "default": {"$ref": "#/components/responses/Error"}
@@ -222,7 +222,7 @@
         "parameters": [{"$ref": "#/components/parameters/SessionId"}],
         "responses": {
           "200": {
-            "description": "Replay artifact v3 with mandatory ruleset descriptor, overlay source identity, and Phase 17N turn-start terrain evidence for an administrator, or for a replay viewer after the session is terminal or closed.",
+            "description": "Replay artifact v4 with mandatory ruleset descriptor, overlay source identity, explicit logical terrain-area identity, and Phase 17N turn-start terrain evidence for an administrator, or for a replay viewer after the session is terminal or closed.",
             "content": {"application/json": {"schema": {"$ref": "./schemas/replay-metadata.schema.json"}}}
           },
           "default": {"$ref": "#/components/responses/Error"}

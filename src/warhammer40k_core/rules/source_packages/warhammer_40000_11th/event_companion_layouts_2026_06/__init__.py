@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Final
+
 from .common import (
     FOOTPRINT_6X2,
     FOOTPRINT_6X4,
@@ -13,42 +15,32 @@ from .common import (
     EventShapePolygonSpec,
     EventShapePolygonsSpec,
     EventTerrainAreaClassificationSpec,
+    EventTerrainAreaGroupSpec,
     EventTerrainAreaLocalTransformSpec,
     EventTerrainAreaMirrorPair,
     EventTerrainAreaSpec,
     EventTerrainFeaturePlacementSpec,
     EventTerritoryShapeSpec,
 )
-from .disruption_vs_reconnaissance import (
-    LAYOUTS as DISRUPTION_VS_RECONNAISSANCE_LAYOUTS,
+from .event_companion_full_artifact_catalog import (
+    event_companion_battlefield_artifact,
+    event_companion_battlefield_layouts,
+    event_companion_terrain_feature_presets,
 )
-from .purge_the_foe_vs_purge_the_foe import (
-    EXACT_SLICE_ARTIFACT_SHA256,
-    EXACT_SLICE_LAYOUT_IDS,
-    EXACT_SLICE_PACKAGE_HASH,
-    EXACT_SLICE_SOURCE_PDF_SHA256,
-    exact_slice_artifact,
-    validate_exact_slice_artifact_bytes,
-)
-from .purge_the_foe_vs_purge_the_foe import (
-    LAYOUTS as PURGE_THE_FOE_VS_PURGE_THE_FOE_LAYOUTS,
-)
-from .purge_the_foe_vs_purge_the_foe import (
-    TERRAIN_FEATURE_PRESETS as EXACT_SLICE_TERRAIN_FEATURE_PRESETS,
-)
-from .take_and_hold_vs_take_and_hold import (
-    LAYOUTS as TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUTS,
+from .event_companion_full_artifact_types import EventCompanionBattlefieldArtifact
+from .event_companion_full_artifact_validation import (
+    EXPECTED_ARTIFACT_SHA256,
+    event_companion_battlefield_artifact_from_json_bytes,
 )
 
 __all__ = (
-    "EXACT_SLICE_ARTIFACT_SHA256",
-    "EXACT_SLICE_LAYOUT_IDS",
-    "EXACT_SLICE_PACKAGE_HASH",
-    "EXACT_SLICE_SOURCE_PDF_SHA256",
-    "EXACT_SLICE_TERRAIN_FEATURE_PRESETS",
-    "EXTRACTED_LAYOUTS",
-    "EXTRACTED_LAYOUTS_BY_ID",
-    "EXTRACTED_LAYOUT_IDS",
+    "BATTLEFIELD_ARTIFACT_SHA256",
+    "BATTLEFIELD_LAYOUTS",
+    "BATTLEFIELD_LAYOUTS_BY_ID",
+    "BATTLEFIELD_LAYOUT_IDS",
+    "BATTLEFIELD_PACKAGE_HASH",
+    "BATTLEFIELD_SOURCE_PDF_SHA256",
+    "BATTLEFIELD_TERRAIN_FEATURE_PRESETS",
     "FOOTPRINT_6X2",
     "FOOTPRINT_6X4",
     "FOOTPRINT_7X11_5",
@@ -61,19 +53,14 @@ __all__ = (
     "EventShapePolygonSpec",
     "EventShapePolygonsSpec",
     "EventTerrainAreaClassificationSpec",
+    "EventTerrainAreaGroupSpec",
     "EventTerrainAreaLocalTransformSpec",
     "EventTerrainAreaMirrorPair",
     "EventTerrainAreaSpec",
     "EventTerrainFeaturePlacementSpec",
     "EventTerritoryShapeSpec",
-    "exact_slice_artifact",
-    "validate_exact_slice_artifact_bytes",
-)
-
-EXTRACTED_LAYOUTS: tuple[EventBattlefieldLayoutSource, ...] = (
-    *TAKE_AND_HOLD_VS_TAKE_AND_HOLD_LAYOUTS,
-    *DISRUPTION_VS_RECONNAISSANCE_LAYOUTS,
-    *PURGE_THE_FOE_VS_PURGE_THE_FOE_LAYOUTS,
+    "battlefield_artifact",
+    "validate_battlefield_artifact_bytes",
 )
 
 
@@ -88,5 +75,19 @@ def _index_layouts(
     return indexed
 
 
-EXTRACTED_LAYOUTS_BY_ID = _index_layouts(EXTRACTED_LAYOUTS)
-EXTRACTED_LAYOUT_IDS = frozenset(EXTRACTED_LAYOUTS_BY_ID)
+_BATTLEFIELD_ARTIFACT: Final = event_companion_battlefield_artifact()
+BATTLEFIELD_ARTIFACT_SHA256: Final = EXPECTED_ARTIFACT_SHA256
+BATTLEFIELD_PACKAGE_HASH: Final = _BATTLEFIELD_ARTIFACT.package_hash
+BATTLEFIELD_SOURCE_PDF_SHA256: Final = _BATTLEFIELD_ARTIFACT.source_pdf_sha256
+BATTLEFIELD_TERRAIN_FEATURE_PRESETS: Final = event_companion_terrain_feature_presets()
+BATTLEFIELD_LAYOUTS: Final = event_companion_battlefield_layouts()
+BATTLEFIELD_LAYOUTS_BY_ID: Final = _index_layouts(BATTLEFIELD_LAYOUTS)
+BATTLEFIELD_LAYOUT_IDS: Final = frozenset(BATTLEFIELD_LAYOUTS_BY_ID)
+
+
+def battlefield_artifact() -> EventCompanionBattlefieldArtifact:
+    return _BATTLEFIELD_ARTIFACT
+
+
+def validate_battlefield_artifact_bytes(raw: bytes) -> None:
+    event_companion_battlefield_artifact_from_json_bytes(raw)

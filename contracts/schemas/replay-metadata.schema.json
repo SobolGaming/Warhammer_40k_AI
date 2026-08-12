@@ -1,18 +1,26 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v3/replay-metadata.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v4/replay-metadata.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
     "artifact_id": {"minLength": 1, "type": "string"},
     "decision_records": {"items": {"type": "object"}, "type": "array"},
     "event_records": {"items": {"type": "object"}, "type": "array"},
-    "initial_lifecycle": {"type": "object"},
+    "initial_lifecycle": {
+      "properties": {
+        "config": {
+          "$ref": "https://warhammer40k-core.local/contracts/v2/create-session.schema.json#/properties/config"
+        }
+      },
+      "required": ["config"],
+      "type": "object"
+    },
     "initial_rng_state": {"type": "object"},
     "projection_checkpoints": {
       "items": {"$ref": "#/$defs/projection_checkpoint"},
       "type": "array"
     },
-    "schema_version": {"const": "replay-artifact-v3-phase17n", "type": "string"},
+    "schema_version": {"const": "replay-artifact-v4-phase17n", "type": "string"},
     "source_identity": {"$ref": "#/$defs/source_identity"}
   },
   "required": [

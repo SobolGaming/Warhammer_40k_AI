@@ -76,7 +76,7 @@ from warhammer40k_core.engine.faction_content.runtime import (
     build_runtime_content_bundle_for_armies,
     runtime_content_manifest_for_ruleset,
 )
-from warhammer40k_core.engine.game_state import GameConfig
+from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
@@ -296,7 +296,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     identities = _field_object(capability_manifest, "identities")
     assert _field_object(identities, "mission_pack")
     assert _field_object(identities, "terrain_layout")
-    assert _field_object(identities, "contract_schema")["contract_version"] == "5.0.0"
+    assert _field_object(identities, "contract_schema")["contract_version"] == "6.0.0"
 
     player_a_support = _request(
         server,
@@ -345,6 +345,7 @@ def test_phase17n_exact_event_companion_mission_has_hashed_runtime_evidence() ->
     config = replace(
         _config(game_id="phase17n-exact-event-companion-capability"),
         mission_setup=mission_setup,
+        ruleset_descriptor=_event_companion_ruleset(),
         model_geometries=(accepted_model_geometry(),),
     )
     armies = tuple(
@@ -411,7 +412,7 @@ def test_phase17n_exact_event_companion_mission_has_hashed_runtime_evidence() ->
     assert mission_source_package_evidence_id in semantic["evidence_refs"]
     assert terrain_source_ids.issubset(set(physical["evidence_refs"]))
     assert any(
-        event_companion_layouts_2026_06.EXACT_SLICE_PACKAGE_HASH in evidence_ref
+        event_companion_layouts_2026_06.BATTLEFIELD_PACKAGE_HASH in evidence_ref
         for evidence_ref in physical["evidence_refs"]
     )
     assert mission_row["metadata"]["mission_setup_hash"] == mission_setup_hash
@@ -1008,7 +1009,7 @@ def test_phase18e_command_result_schema_requires_accepted_commands_to_be_committ
     )
     example.pop("command_id")
     example.pop("outcome_code")
-    example["schema_version"] = "session-command-result-v5-contract"
+    example["schema_version"] = "session-command-result-v6-contract"
     for committed, accepted in ((True, True), (True, False), (False, False)):
         payload = {**example, "committed": committed, "accepted": accepted}
         validator.validate(payload)
@@ -1587,6 +1588,219 @@ def test_phase18d_canonical_request_schemas_fail_before_session_mutation() -> No
     assert _request_id(_field_object(unchanged_payload_view, "pending_decision")) == _request_id(
         placement_request
     )
+
+
+@pytest.mark.parametrize(
+    ("path", "schema_version", "game_id"),
+    [
+        ("/games", CREATE_SESSION_SCHEMA_VERSION, "contract6-canonical-layoutless-game"),
+        (
+            "/sessions",
+            SESSION_CREATE_SCHEMA_VERSION,
+            "contract6-canonical-layoutless-session",
+        ),
+    ],
+)
+def test_contract6_create_routes_reject_canonical_layoutless_source_drift(
+    path: str,
+    schema_version: str,
+    game_id: str,
+) -> None:
+    server = AdapterGameServer()
+    config = _config(game_id=game_id)
+    body = {
+        "schema_version": schema_version,
+        "config": validate_json_value(cast(JsonValue, config.to_payload())),
+    }
+    mission_setup_payload = _field_object(_field_object(body, "config"), "mission_setup")
+    assert mission_setup_payload["battlefield_layout_id"] is None
+    mission_setup_payload["source_id"] = "substituted-source"
+    mission_setup_payload["source_version"] = "substituted-version"
+    mission_setup_payload["primary_mission_id"] = "take-and-hold"
+    central_marker = next(
+        _json_object(marker)
+        for marker in _field_list(mission_setup_payload, "objective_markers")
+        if _field_string(_json_object(marker), "objective_marker_id").endswith("center-central")
+    )
+    central_marker["x_inches"] = 35.0
+
+    response = _request_raw(server, "POST", path, body=body)
+
+    assert response.status_code == 409
+    assert _error_code(response) == "session_contract_rejected"
+
+
+def test_contract6_create_routes_reject_missing_logical_terrain_identity() -> None:
+    server = AdapterGameServer()
+    event_mission_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+        terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-1",
+        attacker_player_id=PLAYER_A,
+        defender_player_id=PLAYER_B,
+    )
+    with pytest.raises(GameLifecycleError, match="does not support source-linked"):
+        replace(
+            _config(game_id="contract6-incompatible-event-ruleset"),
+            mission_setup=event_mission_setup,
+        )
+    late_binding_state = GameState.from_config(
+        replace(
+            _config(game_id="contract6-late-event-layout-binding"),
+            mission_setup=None,
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="configured before GameState creation"):
+        late_binding_state.record_mission_setup(event_mission_setup)
+    game_config = replace(
+        _config(game_id="contract6-logical-area-game"),
+        mission_setup=event_mission_setup,
+        ruleset_descriptor=_event_companion_ruleset(),
+    )
+    session_config = replace(
+        _config(game_id="contract6-logical-area-session"),
+        mission_setup=event_mission_setup,
+        ruleset_descriptor=_event_companion_ruleset(),
+    )
+    requests = (
+        (
+            "/games",
+            {
+                "schema_version": CREATE_SESSION_SCHEMA_VERSION,
+                "config": validate_json_value(cast(JsonValue, game_config.to_payload())),
+            },
+        ),
+        (
+            "/sessions",
+            {
+                "schema_version": SESSION_CREATE_SCHEMA_VERSION,
+                "config": validate_json_value(cast(JsonValue, session_config.to_payload())),
+            },
+        ),
+    )
+
+    for path, body in requests:
+        config = _field_object(body, "config")
+        mission_setup_payload = _field_object(config, "mission_setup")
+        first_area = _json_object(_field_list(mission_setup_payload, "terrain_areas")[0])
+        first_area.pop("logical_terrain_area_id")
+
+        response = _request_raw(server, "POST", path, body=body)
+
+        assert response.status_code == 400
+        assert _error_code(response) == "canonical_schema_invalid"
+
+
+@pytest.mark.parametrize(
+    ("path", "schema_version", "game_id"),
+    [
+        ("/games", CREATE_SESSION_SCHEMA_VERSION, "contract6-partial-logical-area-game"),
+        ("/sessions", SESSION_CREATE_SCHEMA_VERSION, "contract6-partial-logical-area-session"),
+    ],
+)
+def test_contract6_create_routes_reject_partial_logical_objective_bindings(
+    path: str,
+    schema_version: str,
+    game_id: str,
+) -> None:
+    server = AdapterGameServer()
+    layout_id = "take-and-hold-vs-take-and-hold-layout-2"
+    event_mission_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id=f"mission-{layout_id}",
+        terrain_layout_id=layout_id,
+        attacker_player_id=PLAYER_A,
+        defender_player_id=PLAYER_B,
+    )
+    config = replace(
+        _config(game_id=game_id),
+        mission_setup=event_mission_setup,
+        ruleset_descriptor=_event_companion_ruleset(),
+    )
+    body = {
+        "schema_version": schema_version,
+        "config": validate_json_value(cast(JsonValue, config.to_payload())),
+    }
+    mission_setup_payload = _field_object(_field_object(body, "config"), "mission_setup")
+    binding = next(
+        _json_object(candidate)
+        for candidate in _field_list(mission_setup_payload, "objective_terrain_areas")
+        if len(_field_list(_json_object(candidate), "terrain_area_ids")) > 1
+    )
+    complete_ids = _field_list(binding, "terrain_area_ids")
+    binding["terrain_area_ids"] = complete_ids[1:]
+
+    response = _request_raw(server, "POST", path, body=body)
+
+    assert response.status_code == 409
+    assert _error_code(response) == "session_contract_rejected"
+
+
+@pytest.mark.parametrize(
+    ("path", "schema_version", "game_id"),
+    [
+        ("/games", CREATE_SESSION_SCHEMA_VERSION, "contract6-relabelled-logical-area-game"),
+        (
+            "/sessions",
+            SESSION_CREATE_SCHEMA_VERSION,
+            "contract6-relabelled-logical-area-session",
+        ),
+    ],
+)
+@pytest.mark.parametrize("drop_layout_identity", [False, True])
+def test_contract6_create_routes_reject_removed_and_relabelled_logical_members(
+    path: str,
+    schema_version: str,
+    game_id: str,
+    drop_layout_identity: bool,
+) -> None:
+    server = AdapterGameServer()
+    layout_id = "take-and-hold-vs-take-and-hold-layout-2"
+    event_mission_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id=f"mission-{layout_id}",
+        terrain_layout_id=layout_id,
+        attacker_player_id=PLAYER_A,
+        defender_player_id=PLAYER_B,
+    )
+    config = replace(
+        _config(game_id=game_id),
+        mission_setup=event_mission_setup,
+        ruleset_descriptor=_event_companion_ruleset(),
+    )
+    body = {
+        "schema_version": schema_version,
+        "config": validate_json_value(cast(JsonValue, config.to_payload())),
+    }
+    mission_setup_payload = _field_object(_field_object(body, "config"), "mission_setup")
+    binding = next(
+        _json_object(candidate)
+        for candidate in _field_list(mission_setup_payload, "objective_terrain_areas")
+        if len(_field_list(_json_object(candidate), "terrain_area_ids")) > 1
+    )
+    complete_ids = _field_list(binding, "terrain_area_ids")
+    retained_id = cast(str, complete_ids[-1])
+    binding["terrain_area_ids"] = [retained_id]
+    terrain_areas = _field_list(mission_setup_payload, "terrain_areas")
+    terrain_areas[:] = [
+        candidate
+        for candidate in terrain_areas
+        if _json_object(candidate)["terrain_area_id"] == retained_id
+        or _json_object(candidate)["terrain_area_id"] not in complete_ids
+    ]
+    retained_area = next(
+        _json_object(candidate)
+        for candidate in terrain_areas
+        if _json_object(candidate)["terrain_area_id"] == retained_id
+    )
+    retained_area["logical_terrain_area_id"] = retained_id
+    if drop_layout_identity:
+        mission_setup_payload["battlefield_layout_id"] = None
+
+    response = _request_raw(server, "POST", path, body=body)
+
+    assert response.status_code == 409
+    assert _error_code(response) == "session_contract_rejected"
 
 
 def test_phase18e_server_route_errors_are_typed() -> None:
@@ -2598,6 +2812,12 @@ def _config(
             attacker_player_id=attacker_player_id,
             defender_player_id=(PLAYER_B if attacker_player_id == PLAYER_A else PLAYER_A),
         ),
+    )
+
+
+def _event_companion_ruleset() -> RulesetDescriptor:
+    return RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
+        descriptor_version="core-v2-phase18e-server-event-companion-test"
     )
 
 
