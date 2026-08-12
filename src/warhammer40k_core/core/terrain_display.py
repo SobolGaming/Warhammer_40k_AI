@@ -7,7 +7,8 @@ from typing import Self, TypedDict, cast
 TERRAIN_DISPLAY_SCHEMA_VERSION = "terrain-display-v1"
 TERRAIN_DISPLAY_COORDINATE_SPACE = "battlefield_inches"
 TERRAIN_DISPLAY_FOOTPRINT_KIND = "polygon"
-TERRAIN_TRANSFORM_COORDINATE_DECIMAL_PLACES = 6
+TERRAIN_AREA_TRANSFORM_COORDINATE_DECIMAL_PLACES = 12
+TERRAIN_FEATURE_TRANSFORM_COORDINATE_DECIMAL_PLACES = 6
 _AREA_EPSILON = 1e-9
 
 
@@ -28,11 +29,31 @@ class TerrainDisplayGeometryPayload(TypedDict):
     footprint_polygon: list[TerrainDisplayPointPayload]
 
 
-def canonical_terrain_transform_coordinate(value: object) -> float:
+def canonical_terrain_area_transform_coordinate(value: object) -> float:
+    """Quantize derived terrain-area coordinates without changing polygon topology."""
+
+    return _canonical_terrain_transform_coordinate(
+        value,
+        decimal_places=TERRAIN_AREA_TRANSFORM_COORDINATE_DECIMAL_PLACES,
+    )
+
+
+def canonical_terrain_feature_transform_coordinate(value: object) -> float:
     """Quantize derived terrain coordinates before they enter authoritative state."""
 
+    return _canonical_terrain_transform_coordinate(
+        value,
+        decimal_places=TERRAIN_FEATURE_TRANSFORM_COORDINATE_DECIMAL_PLACES,
+    )
+
+
+def _canonical_terrain_transform_coordinate(
+    value: object,
+    *,
+    decimal_places: int,
+) -> float:
     number = _validate_finite_number("terrain transform coordinate", value)
-    quantized = round(number, TERRAIN_TRANSFORM_COORDINATE_DECIMAL_PLACES)
+    quantized = round(number, decimal_places)
     return 0.0 if quantized == 0.0 else quantized
 
 

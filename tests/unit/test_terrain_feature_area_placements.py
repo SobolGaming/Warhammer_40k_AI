@@ -15,7 +15,8 @@ from warhammer40k_core.core.missions import (
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
 from warhammer40k_core.core.terrain_display import (
     TerrainDisplayGeometry,
-    canonical_terrain_transform_coordinate,
+    canonical_terrain_area_transform_coordinate,
+    canonical_terrain_feature_transform_coordinate,
 )
 from warhammer40k_core.core.terrain_layouts import (
     TerrainFeatureAreaPlacement,
@@ -119,9 +120,18 @@ def test_source_terrain_transforms_publish_six_decimal_canonical_coordinates() -
 
     assert wall.center_x_inches == 31.088806
     assert wall.center_y_inches == 46.891621
-    assert canonical_terrain_transform_coordinate(31.088806397420253) == 31.088806
-    assert canonical_terrain_transform_coordinate(31.08880639742025) == 31.088806
-    assert canonical_terrain_transform_coordinate(-1e-15) == 0.0
+    assert canonical_terrain_feature_transform_coordinate(31.088806397420253) == 31.088806
+    assert canonical_terrain_feature_transform_coordinate(31.08880639742025) == 31.088806
+    assert canonical_terrain_feature_transform_coordinate(-1e-15) == 0.0
+    assert canonical_terrain_area_transform_coordinate(31.088806397420253) == 31.08880639742
+    assert canonical_terrain_area_transform_coordinate(31.08880639742025) == 31.08880639742
+    assert all(
+        coordinate == round(coordinate, 12)
+        for layout in mission_pack.battlefield_layouts
+        for area in layout.terrain_areas
+        for point in area.footprint_polygon
+        for coordinate in (point.x_inches, point.y_inches)
+    )
 
 
 def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -> None:
@@ -238,8 +248,8 @@ def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -
         for point in feature.display_geometry.footprint_polygon
     ) == tuple(
         (
-            canonical_terrain_transform_coordinate(point.x_inches),
-            canonical_terrain_transform_coordinate(point.y_inches),
+            canonical_terrain_feature_transform_coordinate(point.x_inches),
+            canonical_terrain_feature_transform_coordinate(point.y_inches),
         )
         for point in area.footprint_polygon
     )

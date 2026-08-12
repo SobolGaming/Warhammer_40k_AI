@@ -8,7 +8,8 @@ from typing import Self, TypedDict, cast
 from warhammer40k_core.core.terrain_display import (
     TerrainDisplayPoint,
     TerrainDisplayPointPayload,
-    canonical_terrain_transform_coordinate,
+    canonical_terrain_area_transform_coordinate,
+    canonical_terrain_feature_transform_coordinate,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.geometry.polygons import (
@@ -304,12 +305,18 @@ class PlacedTerrainArea:
             center_y_inches=center_y_inches,
             rotation_degrees=rotation_degrees,
             local_transform=local_transform,
-            footprint_polygon=transform_polygon(
-                template.polygon_vertices_inches,
-                center_x_inches=center_x_inches,
-                center_y_inches=center_y_inches,
-                rotation_degrees=rotation_degrees,
-                local_transform=local_transform,
+            footprint_polygon=tuple(
+                TerrainDisplayPoint(
+                    x_inches=canonical_terrain_area_transform_coordinate(point.x_inches),
+                    y_inches=canonical_terrain_area_transform_coordinate(point.y_inches),
+                )
+                for point in transform_polygon(
+                    template.polygon_vertices_inches,
+                    center_x_inches=center_x_inches,
+                    center_y_inches=center_y_inches,
+                    rotation_degrees=rotation_degrees,
+                    local_transform=local_transform,
+                )
             ),
             source_layout_id=source_layout_id,
             source_id=source_id,
@@ -628,8 +635,8 @@ def transform_terrain_area_local_point(
         dy_inches=area.center_y_inches,
     )
     return TerrainDisplayPoint(
-        x_inches=canonical_terrain_transform_coordinate(transformed.x_inches),
-        y_inches=canonical_terrain_transform_coordinate(transformed.y_inches),
+        x_inches=canonical_terrain_feature_transform_coordinate(transformed.x_inches),
+        y_inches=canonical_terrain_feature_transform_coordinate(transformed.y_inches),
     )
 
 
