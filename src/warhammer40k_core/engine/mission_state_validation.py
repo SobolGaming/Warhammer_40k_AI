@@ -5,7 +5,10 @@ from dataclasses import replace
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.missions import validate_mission_setup_source_layout
+from warhammer40k_core.engine.missions import (
+    canonical_layoutless_mission_setup_from_source,
+    validate_mission_setup_source_layout,
+)
 from warhammer40k_core.engine.objective_control_sources import (
     source_linked_terrain_objectives_supported,
 )
@@ -52,16 +55,21 @@ def validate_battlefield_state_matches_mission_setup(
     battlefield_state: BattlefieldRuntimeState | None,
     mission_setup: MissionSetup | None,
 ) -> None:
-    if (
-        battlefield_state is None
-        or mission_setup is None
-        or mission_setup.battlefield_layout_id is None
-    ):
+    if battlefield_state is None or mission_setup is None:
+        return
+    has_source_geometry = (
+        mission_setup.battlefield_layout_id is not None
+        or canonical_layoutless_mission_setup_from_source(mission_setup) is not None
+    )
+    if not has_source_geometry:
         return
     if (
         battlefield_state.battlefield_width_inches != mission_setup.battlefield_width_inches
         or battlefield_state.battlefield_depth_inches != mission_setup.battlefield_depth_inches
-        or battlefield_state.terrain_features != mission_setup.terrain_features
+        or (
+            mission_setup.battlefield_layout_id is not None
+            and battlefield_state.terrain_features != mission_setup.terrain_features
+        )
     ):
         raise GameLifecycleError(
             "GameState battlefield runtime geometry drifted from source MissionSetup."

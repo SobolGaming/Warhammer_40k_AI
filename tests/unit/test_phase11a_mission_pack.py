@@ -23,6 +23,7 @@ from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
+    BattlefieldRuntimeState,
     ModelPlacement,
     UnitPlacement,
 )
@@ -42,7 +43,11 @@ from warhammer40k_core.engine.mission_setup import (
     MissionSetup,
     MissionSetupError,
 )
-from warhammer40k_core.engine.missions import mission_pack_for_id, supported_mission_packs
+from warhammer40k_core.engine.missions import (
+    mission_pack_for_id,
+    supported_mission_packs,
+    validate_mission_setup_source_layout,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     PlacementProposalPayload,
@@ -819,6 +824,84 @@ def test_mission_setup_payload_preserves_mission_pool_entry_id() -> None:
 
     assert setup.mission_pool_entry_id == PHASE16A_MISSION_POOL_ENTRY_ID
     assert MissionSetup.from_payload(setup.to_payload()).to_payload() == setup.to_payload()
+
+
+@pytest.mark.parametrize(
+    "mutation_kind",
+    [
+        "source_identity",
+        "primary_mission",
+        "dimensions",
+        "objective_markers",
+        "deployment_zones",
+        "terrain_features",
+    ],
+)
+def test_canonical_layoutless_mission_setup_rejects_complete_source_drift(
+    mutation_kind: str,
+) -> None:
+    mission_pack = chapter_approved_2026_27_mission_pack()
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    assert setup.battlefield_layout_id is None
+    validate_mission_setup_source_layout(setup)
+    payload = _config(mission_setup=setup).to_payload()
+    setup_payload = payload["mission_setup"]
+    assert setup_payload is not None
+
+    if mutation_kind == "source_identity":
+        setup_payload["source_id"] = "substituted-source"
+        setup_payload["source_version"] = "substituted-version"
+    elif mutation_kind == "primary_mission":
+        setup_payload["primary_mission_id"] = "take-and-hold"
+    elif mutation_kind == "dimensions":
+        setup_payload["battlefield_width_inches"] = 65.0
+    elif mutation_kind == "objective_markers":
+        central_marker = next(
+            marker
+            for marker in setup_payload["objective_markers"]
+            if marker["objective_marker_id"].endswith("center-central")
+        )
+        central_marker["x_inches"] = 35.0
+    elif mutation_kind == "deployment_zones":
+        setup_payload["deployment_zones"].pop()
+    else:
+        setup_payload["terrain_features"].append(
+            _blocking_terrain_feature(x=30.0, y=22.0).to_payload()
+        )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="canonical layoutless setup drifted from source",
+    ):
+        GameConfig.from_payload(payload)
+
+
+def test_canonical_layoutless_setup_rejects_runtime_battlefield_dimension_drift() -> None:
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    state = GameState.from_config(_config(mission_setup=setup))
+    battlefield = BattlefieldRuntimeState(
+        battlefield_id="phase11a-canonical-layoutless-runtime",
+        battlefield_width_inches=setup.battlefield_width_inches,
+        battlefield_depth_inches=setup.battlefield_depth_inches,
+        placed_armies=(),
+        terrain_features=setup.terrain_features,
+    )
+    drifted_battlefield = replace(battlefield, battlefield_width_inches=99.0)
+
+    with pytest.raises(GameLifecycleError, match="battlefield runtime geometry drifted"):
+        state.record_battlefield_state(drifted_battlefield)
 
 
 def test_battlefield_layout_and_mission_setup_reject_orphan_logical_terrain_group() -> None:

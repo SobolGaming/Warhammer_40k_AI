@@ -1590,6 +1590,46 @@ def test_phase18d_canonical_request_schemas_fail_before_session_mutation() -> No
     )
 
 
+@pytest.mark.parametrize(
+    ("path", "schema_version", "game_id"),
+    [
+        ("/games", CREATE_SESSION_SCHEMA_VERSION, "contract6-canonical-layoutless-game"),
+        (
+            "/sessions",
+            SESSION_CREATE_SCHEMA_VERSION,
+            "contract6-canonical-layoutless-session",
+        ),
+    ],
+)
+def test_contract6_create_routes_reject_canonical_layoutless_source_drift(
+    path: str,
+    schema_version: str,
+    game_id: str,
+) -> None:
+    server = AdapterGameServer()
+    config = _config(game_id=game_id)
+    body = {
+        "schema_version": schema_version,
+        "config": validate_json_value(cast(JsonValue, config.to_payload())),
+    }
+    mission_setup_payload = _field_object(_field_object(body, "config"), "mission_setup")
+    assert mission_setup_payload["battlefield_layout_id"] is None
+    mission_setup_payload["source_id"] = "substituted-source"
+    mission_setup_payload["source_version"] = "substituted-version"
+    mission_setup_payload["primary_mission_id"] = "take-and-hold"
+    central_marker = next(
+        _json_object(marker)
+        for marker in _field_list(mission_setup_payload, "objective_markers")
+        if _field_string(_json_object(marker), "objective_marker_id").endswith("center-central")
+    )
+    central_marker["x_inches"] = 35.0
+
+    response = _request_raw(server, "POST", path, body=body)
+
+    assert response.status_code == 409
+    assert _error_code(response) == "session_contract_rejected"
+
+
 def test_contract6_create_routes_reject_missing_logical_terrain_identity() -> None:
     server = AdapterGameServer()
     event_mission_setup = MissionSetup.from_mission_pack(

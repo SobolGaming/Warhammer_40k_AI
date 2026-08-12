@@ -2171,6 +2171,8 @@ def _mission_setup() -> MissionSetup:
 def _mission_setup_with_terrain_endpoint_feature() -> MissionSetup:
     return replace(
         _mission_setup(),
+        deployment_map_id="phase16b-terrain-endpoint-custom-deployment",
+        terrain_layout_id="phase16b-terrain-endpoint-custom-terrain",
         terrain_features=(
             _terrain_endpoint_feature(
                 feature_id="phase16b-redeploy-terrain-endpoint-hill",

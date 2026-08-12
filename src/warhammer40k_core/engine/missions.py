@@ -142,17 +142,15 @@ def validate_mission_setup_source_layout(mission_setup: MissionSetup) -> None:
             raise GameLifecycleError(
                 "MissionSetup source-layout component identities require battlefield_layout_id."
             )
-        matching_pool_entries = tuple(
-            entry
-            for entry in mission_pack.mission_pool_entries
-            if entry.mission_pool_entry_id == mission_setup.mission_pool_entry_id
+        canonical_setup = canonical_layoutless_mission_setup_from_source(
+            mission_setup,
+            mission_pack=mission_pack,
         )
-        pool_entry = matching_pool_entries[0] if len(matching_pool_entries) == 1 else None
-        if (
-            pool_entry is not None
-            and mission_setup.deployment_map_id == pool_entry.deployment_map_id
-            and mission_setup.terrain_layout_id in pool_entry.terrain_layout_ids
-        ):
+        if canonical_setup is not None:
+            if mission_setup != canonical_setup:
+                raise GameLifecycleError(
+                    "MissionSetup canonical layoutless setup drifted from source."
+                )
             return
         known_deployment_map_ids = {
             deployment_map.deployment_map_id for deployment_map in mission_pack.deployment_maps
@@ -208,6 +206,40 @@ def validate_mission_setup_source_layout(mission_setup: MissionSetup) -> None:
         mission_setup,
         battlefield_layout=battlefield_layout,
         source_terrain_features=source_terrain_features,
+    )
+
+
+def canonical_layoutless_mission_setup_from_source(
+    mission_setup: MissionSetup,
+    *,
+    mission_pack: MissionPackDefinition | None = None,
+) -> MissionSetup | None:
+    if type(mission_setup) is not MissionSetup:
+        raise GameLifecycleError("Canonical setup reconstruction requires MissionSetup.")
+    source_pack = (
+        mission_pack_for_id(mission_setup.mission_pack_id) if mission_pack is None else mission_pack
+    )
+    if type(source_pack) is not MissionPackDefinition:
+        raise GameLifecycleError("Canonical setup reconstruction requires MissionPackDefinition.")
+    matching_pool_entries = tuple(
+        entry
+        for entry in source_pack.mission_pool_entries
+        if entry.mission_pool_entry_id == mission_setup.mission_pool_entry_id
+    )
+    if len(matching_pool_entries) != 1:
+        return None
+    pool_entry = matching_pool_entries[0]
+    if (
+        mission_setup.deployment_map_id != pool_entry.deployment_map_id
+        or mission_setup.terrain_layout_id not in pool_entry.terrain_layout_ids
+    ):
+        return None
+    return MissionSetup.from_mission_pack(
+        mission_pack=source_pack,
+        mission_pool_entry_id=pool_entry.mission_pool_entry_id,
+        terrain_layout_id=mission_setup.terrain_layout_id,
+        attacker_player_id=mission_setup.attacker_player_id,
+        defender_player_id=mission_setup.defender_player_id,
     )
 
 

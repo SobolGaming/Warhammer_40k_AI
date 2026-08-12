@@ -2091,12 +2091,16 @@ def _battle_state(
 
 
 def _mission_setup() -> MissionSetup:
-    return MissionSetup.from_mission_pack(
-        mission_pack=chapter_approved_2026_27_mission_pack(),
-        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
-        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
-        attacker_player_id=GSC_PLAYER_ID,
-        defender_player_id=ENEMY_PLAYER_ID,
+    return replace(
+        MissionSetup.from_mission_pack(
+            mission_pack=chapter_approved_2026_27_mission_pack(),
+            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+            attacker_player_id=GSC_PLAYER_ID,
+            defender_player_id=ENEMY_PLAYER_ID,
+        ),
+        deployment_map_id="phase17g-gsc-custom-deployment",
+        terrain_layout_id="phase17g-gsc-custom-terrain",
     )
 
 

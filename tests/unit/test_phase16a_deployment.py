@@ -1016,6 +1016,8 @@ def _config_with_blocking_objective_marker() -> GameConfig:
     )
     mission_setup = replace(
         base.mission_setup,
+        deployment_map_id="phase16a-blocking-objective-custom-deployment",
+        terrain_layout_id="phase16a-blocking-objective-custom-terrain",
         objective_markers=(*base.mission_setup.objective_markers, blocking_marker),
     )
     return replace(base, mission_setup=mission_setup)
@@ -1026,6 +1028,8 @@ def _config_with_terrain_endpoint_feature() -> GameConfig:
     assert base.mission_setup is not None
     mission_setup = replace(
         base.mission_setup,
+        deployment_map_id="phase16a-terrain-endpoint-custom-deployment",
+        terrain_layout_id="phase16a-terrain-endpoint-custom-terrain",
         terrain_features=(
             _terrain_endpoint_feature(
                 feature_id="phase16a-terrain-endpoint-hill",

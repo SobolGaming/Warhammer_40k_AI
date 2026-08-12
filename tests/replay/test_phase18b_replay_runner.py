@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 # pyright: reportPrivateUsage=false
+import hashlib
 import json
 import re
 from dataclasses import replace
@@ -206,6 +207,54 @@ def test_replay_v4_rejects_runtime_battlefield_drift_from_source_layout() -> Non
     battlefield_payload = cast(dict[str, JsonValue], state_payload["battlefield_state"])
     terrain_features = cast(list[JsonValue], battlefield_payload["terrain_features"])
     terrain_features.pop()
+
+    with pytest.raises(ReplayArtifactError, match="lifecycle payload is invalid") as exc_info:
+        ReplayArtifact.from_payload(payload)
+
+    assert isinstance(exc_info.value.__cause__, GameLifecycleError)
+    assert "battlefield runtime geometry drifted" in str(exc_info.value.__cause__)
+
+
+def test_replay_v4_rejects_canonical_layoutless_mission_setup_source_drift() -> None:
+    payload = _artifact_payload_copy(_setup_to_battle_artifact())
+    lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
+    config_payload = cast(dict[str, JsonValue], lifecycle_payload["config"])
+    state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
+    for owner_payload in (config_payload, state_payload):
+        mission_setup_payload = cast(dict[str, JsonValue], owner_payload["mission_setup"])
+        assert mission_setup_payload["battlefield_layout_id"] is None
+        mission_setup_payload["source_id"] = "substituted-source"
+        mission_setup_payload["source_version"] = "substituted-version"
+        mission_setup_payload["primary_mission_id"] = "take-and-hold"
+        objective_markers = cast(list[JsonValue], mission_setup_payload["objective_markers"])
+        central_marker = next(
+            cast(dict[str, JsonValue], marker)
+            for marker in objective_markers
+            if cast(dict[str, JsonValue], marker)["objective_marker_id"]
+            == "take-and-hold-vs-purge-the-foe-layout-3-center-central"
+        )
+        central_marker["x_inches"] = 35.0
+    source_identity_payload = cast(dict[str, JsonValue], payload["source_identity"])
+    source_identity_payload["game_config_hash"] = hashlib.sha256(
+        canonical_json(validate_json_value(config_payload)).encode("utf-8")
+    ).hexdigest()
+
+    with pytest.raises(ReplayArtifactError, match="lifecycle payload is invalid") as exc_info:
+        ReplayArtifact.from_payload(payload)
+
+    assert isinstance(exc_info.value.__cause__, GameLifecycleError)
+    assert "canonical layoutless setup drifted from source" in str(exc_info.value.__cause__)
+
+
+def test_replay_v4_rejects_canonical_layoutless_runtime_battlefield_drift() -> None:
+    payload = _artifact_payload_copy(_setup_to_battle_artifact())
+    lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
+    config_payload = cast(dict[str, JsonValue], lifecycle_payload["config"])
+    mission_setup_payload = cast(dict[str, JsonValue], config_payload["mission_setup"])
+    assert mission_setup_payload["battlefield_layout_id"] is None
+    state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
+    battlefield_payload = cast(dict[str, JsonValue], state_payload["battlefield_state"])
+    battlefield_payload["battlefield_width_inches"] = 99.0
 
     with pytest.raises(ReplayArtifactError, match="lifecycle payload is invalid") as exc_info:
         ReplayArtifact.from_payload(payload)
