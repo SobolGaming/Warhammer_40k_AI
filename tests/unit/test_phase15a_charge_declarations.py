@@ -2043,9 +2043,13 @@ def _charge_lifecycle(
             replace(army, attached_units=(formation,)) if army.player_id == "player-b" else army
             for army in armies
         )
+    mission_setup = config.mission_setup
+    assert mission_setup is not None
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase15a-battlefield",
         armies=armies,
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
     )
     units = {
         unit.unit_instance_id.split(":", maxsplit=1)[1]: unit

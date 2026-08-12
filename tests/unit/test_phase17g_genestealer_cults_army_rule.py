@@ -707,15 +707,8 @@ def test_spending_resurgence_without_legal_marker_records_no_marker_event() -> N
         active_player_id=ENEMY_PLAYER_ID,
         enemy_x=0.5,
         enemy_y=0.5,
-    )
-    battlefield_state = state.battlefield_state
-    assert battlefield_state is not None
-    state.replace_battlefield_state(
-        replace(
-            battlefield_state,
-            battlefield_width_inches=1.0,
-            battlefield_depth_inches=1.0,
-        )
+        battlefield_width_inches=1.0,
+        battlefield_depth_inches=1.0,
     )
     decisions = DecisionController()
     request = _request_resurgence_for_destroyed_unit(
@@ -847,15 +840,16 @@ def test_no_marker_submission_records_when_no_legal_position_exists() -> None:
         enemy_y=0.5,
     )
     _assert_cult_ambush_submission_variants(marker_request)
-    battlefield_state = state.battlefield_state
-    assert battlefield_state is not None
-    state.replace_battlefield_state(
-        replace(
-            battlefield_state,
-            battlefield_width_inches=1.0,
-            battlefield_depth_inches=1.0,
-        )
-    )
+    payload = state.to_payload()
+    payload["mission_setup"] = _mission_setup(
+        battlefield_width_inches=1.0,
+        battlefield_depth_inches=1.0,
+    ).to_payload()
+    battlefield_payload = payload["battlefield_state"]
+    assert battlefield_payload is not None
+    battlefield_payload["battlefield_width_inches"] = 1.0
+    battlefield_payload["battlefield_depth_inches"] = 1.0
+    state = GameState.from_payload(payload)
     no_marker_result = _no_marker_result(
         request=marker_request,
         result_id="phase17g-gsc-no-marker",
@@ -1983,6 +1977,8 @@ def _battle_state(
     gsc_has_cult_ambush: bool = True,
     attach_character_without_cult_ambush: bool = False,
     tacoma_overlay: bool = False,
+    battlefield_width_inches: float = 60.0,
+    battlefield_depth_inches: float = 44.0,
 ) -> tuple[GameState, UnitInstance, UnitInstance]:
     descriptor = _ruleset_descriptor(tacoma_overlay=tacoma_overlay)
     battle_phase_sequence = tuple(descriptor.battle_phase_sequence.phases)
@@ -2057,29 +2053,34 @@ def _battle_state(
         battle_phase_index=battle_phase_sequence.index(phase),
         battle_round=1,
         active_player_id=active_player_id,
-        mission_setup=_mission_setup(),
+        mission_setup=_mission_setup(
+            battlefield_width_inches=battlefield_width_inches,
+            battlefield_depth_inches=battlefield_depth_inches,
+        ),
     )
     state.record_army_definition(gsc_army)
     state.record_army_definition(enemy_army)
-    state.battlefield_state = BattlefieldRuntimeState(
-        battlefield_id="phase17g-genestealer-cults-battlefield",
-        battlefield_width_inches=60.0,
-        battlefield_depth_inches=44.0,
-        placed_armies=(
-            PlacedArmy(
-                army_id=ENEMY_ARMY_ID,
-                player_id=ENEMY_PLAYER_ID,
-                unit_placements=(
-                    _unit_placement(
-                        army_id=ENEMY_ARMY_ID,
-                        player_id=ENEMY_PLAYER_ID,
-                        unit=enemy_unit,
-                        x_inches=enemy_x,
-                        y_inches=enemy_y,
+    state.record_battlefield_state(
+        BattlefieldRuntimeState(
+            battlefield_id="phase17g-genestealer-cults-battlefield",
+            battlefield_width_inches=battlefield_width_inches,
+            battlefield_depth_inches=battlefield_depth_inches,
+            placed_armies=(
+                PlacedArmy(
+                    army_id=ENEMY_ARMY_ID,
+                    player_id=ENEMY_PLAYER_ID,
+                    unit_placements=(
+                        _unit_placement(
+                            army_id=ENEMY_ARMY_ID,
+                            player_id=ENEMY_PLAYER_ID,
+                            unit=enemy_unit,
+                            x_inches=enemy_x,
+                            y_inches=enemy_y,
+                        ),
                     ),
                 ),
             ),
-        ),
+        )
     )
     state.gain_faction_resource(
         player_id=GSC_PLAYER_ID,
@@ -2090,7 +2091,11 @@ def _battle_state(
     return state, gsc_unit, enemy_unit
 
 
-def _mission_setup() -> MissionSetup:
+def _mission_setup(
+    *,
+    battlefield_width_inches: float,
+    battlefield_depth_inches: float,
+) -> MissionSetup:
     return replace(
         MissionSetup.from_mission_pack(
             mission_pack=chapter_approved_2026_27_mission_pack(),
@@ -2101,6 +2106,14 @@ def _mission_setup() -> MissionSetup:
         ),
         deployment_map_id="phase17g-gsc-custom-deployment",
         terrain_layout_id="phase17g-gsc-custom-terrain",
+        battlefield_width_inches=battlefield_width_inches,
+        battlefield_depth_inches=battlefield_depth_inches,
+        objective_markers=(),
+        deployment_zones=(),
+        battlefield_regions=(),
+        terrain_areas=(),
+        objective_terrain_areas=(),
+        terrain_features=(),
     )
 
 

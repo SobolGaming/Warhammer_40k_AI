@@ -905,6 +905,41 @@ def test_canonical_layoutless_setup_rejects_runtime_battlefield_dimension_drift(
 
 
 @pytest.mark.parametrize("mutation_path", ["record", "replace"])
+def test_custom_layoutless_setup_rejects_runtime_battlefield_dimension_drift(
+    mutation_path: str,
+) -> None:
+    state, battlefield = _custom_layoutless_state_and_battlefield()
+    if mutation_path == "replace":
+        state.record_battlefield_state(battlefield)
+    drifted_battlefield = replace(
+        battlefield,
+        battlefield_width_inches=99.0,
+        battlefield_depth_inches=77.0,
+    )
+    mutate_battlefield = (
+        state.record_battlefield_state
+        if mutation_path == "record"
+        else state.replace_battlefield_state
+    )
+
+    with pytest.raises(GameLifecycleError, match="battlefield runtime geometry drifted"):
+        mutate_battlefield(drifted_battlefield)
+
+
+def test_custom_layoutless_setup_rejects_runtime_battlefield_dimension_drift_from_payload() -> None:
+    state, battlefield = _custom_layoutless_state_and_battlefield()
+    state.record_battlefield_state(battlefield)
+    payload = state.to_payload()
+    battlefield_payload = payload["battlefield_state"]
+    assert battlefield_payload is not None
+    battlefield_payload["battlefield_width_inches"] = 99.0
+    battlefield_payload["battlefield_depth_inches"] = 77.0
+
+    with pytest.raises(GameLifecycleError, match="battlefield runtime geometry drifted"):
+        GameState.from_payload(payload)
+
+
+@pytest.mark.parametrize("mutation_path", ["record", "replace"])
 def test_canonical_layoutless_setup_rejects_runtime_battlefield_terrain_drift(
     mutation_path: str,
 ) -> None:
@@ -1599,6 +1634,46 @@ def _config(*, mission_setup: MissionSetup | None) -> GameConfig:
         fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
         mission_setup=mission_setup,
     )
+
+
+def _custom_layoutless_mission_setup() -> MissionSetup:
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    return replace(
+        setup,
+        deployment_map_id="phase11a-custom-deployment-map",
+        terrain_layout_id="phase11a-custom-terrain-layout",
+        battlefield_width_inches=60.0,
+        battlefield_depth_inches=44.0,
+        objective_markers=(),
+        deployment_zones=(),
+        battlefield_regions=(),
+        terrain_areas=(),
+        objective_terrain_areas=(),
+        terrain_features=(),
+    )
+
+
+def _custom_layoutless_state_and_battlefield() -> tuple[GameState, BattlefieldRuntimeState]:
+    setup = _custom_layoutless_mission_setup()
+    config = _config(mission_setup=setup)
+    armies = _mustered_armies(config)
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase11a-custom-layoutless-runtime-dimensions",
+        armies=armies,
+        battlefield_width_inches=setup.battlefield_width_inches,
+        battlefield_depth_inches=setup.battlefield_depth_inches,
+        terrain_features=(_blocking_terrain_feature(x=30.0, y=22.0),),
+    )
+    return state, scenario.battlefield_state
 
 
 def _ruleset() -> RulesetDescriptor:
