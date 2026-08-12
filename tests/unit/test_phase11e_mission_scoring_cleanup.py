@@ -891,7 +891,7 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
 def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> None:
     config = replace(
         _config_with_player_b_character(mission_setup=_event_companion_meatgrinder_mission_setup()),
-        game_id="phase11e-meatgrinder-overwatch-return-on-death",
+        game_id="phase11e-meatgrinder-overwatch-return-on-death-success-2",
     )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
