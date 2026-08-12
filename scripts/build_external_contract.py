@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import difflib
 import hashlib
 import json
 import os
@@ -382,7 +383,36 @@ def _contract_tree_drift(
             drift.append(f"removed: contracts/{path}")
         elif committed_content != regenerated_content:
             drift.append(f"changed: contracts/{path}")
+            drift.extend(
+                _bounded_unified_diff(
+                    path=path,
+                    committed_content=committed_content,
+                    regenerated_content=regenerated_content,
+                )
+            )
     return tuple(drift)
+
+
+def _bounded_unified_diff(
+    *,
+    path: str,
+    committed_content: bytes,
+    regenerated_content: bytes,
+) -> tuple[str, ...]:
+    line_limit = 80
+    diff = tuple(
+        difflib.unified_diff(
+            committed_content.decode("utf-8").splitlines(),
+            regenerated_content.decode("utf-8").splitlines(),
+            fromfile=f"committed/contracts/{path}",
+            tofile=f"regenerated/contracts/{path}",
+            n=1,
+            lineterm="",
+        )
+    )
+    if len(diff) <= line_limit:
+        return diff
+    return (*diff[:line_limit], f"... diff truncated after {line_limit} lines")
 
 
 def _contract_tree_snapshot(root: Path) -> dict[str, bytes]:
