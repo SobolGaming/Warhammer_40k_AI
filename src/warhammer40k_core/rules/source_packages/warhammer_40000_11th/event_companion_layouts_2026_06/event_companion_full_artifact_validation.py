@@ -23,6 +23,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companio
     validate_component_pose_witness,
     validate_component_runtime_pose,
     validate_contact_pairs,
+    validate_territory_geometry,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_layouts_2026_06.event_companion_full_artifact_types import (  # noqa: E501
     ARTIFACT_SCHEMA,
@@ -54,8 +55,8 @@ TERRAIN_PLACEMENT_INCREMENT_INCHES = 0.05
 EXPECTED_SOURCE_EXTRACTION_PAYLOAD_SHA256 = (
     "a3e9392adeb52696902a016e3c3529933d1e99f3bfd67069d607410d8e1c137f"
 )
-EXPECTED_PACKAGE_HASH = "e6671232c7c298befccaf6c6f3000dfc21353830f6ae1a6ca5d10140b344a924"
-EXPECTED_ARTIFACT_SHA256 = "88ba6d7390eab060d6b0c53eb60afbfb1a6813dd80715e3d42562dd0c89128d9"
+EXPECTED_PACKAGE_HASH = "44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972"
+EXPECTED_ARTIFACT_SHA256 = "028670e0b1d965b7be90a95ba76f6bc74e7e26d3d1fd93b3dbf9e76e105d9b7f"
 _PENDING_REVIEWED_PIN_PREFIX = "PENDING_REVIEWED_"
 
 _LAYOUT_FAMILIES = (
@@ -1254,6 +1255,10 @@ def _validate_regions(layout: BattlefieldLayoutArtifact) -> None:
         raise EventCompanionBattlefieldArtifactError(
             "Event Companion territory role inventory drifted."
         )
+    validate_territory_geometry(
+        template_number=layout.deployment_zone_template_number,
+        territories_by_role=territory_by_role,
+    )
     if layout.no_mans_land.role != "no_mans_land" or (layout.no_mans_land.owner_role is not None):
         raise EventCompanionBattlefieldArtifactError(
             "Event Companion No Man's Land identity drifted."

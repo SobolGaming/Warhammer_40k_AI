@@ -1058,6 +1058,58 @@ def test_phase17n_runtime_layout_names_preserve_canonical_source_metadata() -> N
     )
 
 
+def test_phase17n_territory_dividers_match_all_45_source_layout_pages() -> None:
+    expected_polygons_by_template = {
+        1: {
+            "attacker_territory": (((0.0, 26.0), (44.0, 34.0), (44.0, 60.0), (0.0, 60.0)),),
+            "defender_territory": (((0.0, 0.0), (44.0, 0.0), (44.0, 34.0), (0.0, 26.0)),),
+        },
+        2: {
+            "attacker_territory": (((0.0, 0.0), (22.0, 0.0), (22.0, 60.0), (0.0, 60.0)),),
+            "defender_territory": (((22.0, 0.0), (44.0, 0.0), (44.0, 60.0), (22.0, 60.0)),),
+        },
+        3: {
+            "attacker_territory": (((0.0, 0.0), (44.0, 60.0), (0.0, 60.0)),),
+            "defender_territory": (((0.0, 0.0), (44.0, 0.0), (44.0, 60.0)),),
+        },
+        4: {
+            "attacker_territory": (((0.0, 0.0), (19.0, 0.0), (25.0, 60.0), (0.0, 60.0)),),
+            "defender_territory": (((19.0, 0.0), (44.0, 0.0), (44.0, 60.0), (25.0, 60.0)),),
+        },
+        5: {
+            "attacker_territory": (((0.0, 30.0), (44.0, 30.0), (44.0, 60.0), (0.0, 60.0)),),
+            "defender_territory": (((0.0, 0.0), (44.0, 0.0), (44.0, 30.0), (0.0, 30.0)),),
+        },
+        6: {
+            "attacker_territory": (((0.0, 15.0), (44.0, 45.0), (44.0, 60.0), (0.0, 60.0)),),
+            "defender_territory": (((0.0, 0.0), (44.0, 0.0), (44.0, 45.0), (0.0, 15.0)),),
+        },
+    }
+    layouts = event_layouts.battlefield_artifact().layouts
+
+    assert len(layouts) == 45
+    assert Counter(layout.deployment_zone_template_number for layout in layouts) == Counter(
+        {1: 10, 2: 6, 3: 8, 4: 9, 5: 5, 6: 7}
+    )
+    for layout in layouts:
+        actual_polygons_by_role = {
+            territory.role: tuple(
+                tuple((point.x_inches, point.y_inches) for point in polygon)
+                for polygon in territory.polygons
+            )
+            for territory in layout.territories
+        }
+
+        assert (
+            actual_polygons_by_role
+            == expected_polygons_by_template[layout.deployment_zone_template_number]
+        )
+        assert all(
+            territory.source_kind == "source_page_territory_boundary"
+            for territory in layout.territories
+        )
+
+
 def test_phase17n_full_artifact_preserves_all_source_extraction_records() -> None:
     repository_root = Path(__file__).resolve().parents[2]
     extraction_path = (

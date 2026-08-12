@@ -1176,20 +1176,35 @@ def _deployment_geometry(
 def _territory_geometry(
     template_number: int,
 ) -> tuple[list[tuple[float, float]], list[tuple[float, float]]]:
-    if template_number in {1, 5}:
+    if template_number == 1:
         return (
-            [(0, 30), (44, 30), (44, 60), (0, 60)],
-            [(0, 0), (44, 0), (44, 30), (0, 30)],
+            [(0, 26), (44, 34), (44, 60), (0, 60)],
+            [(0, 0), (44, 0), (44, 34), (0, 26)],
         )
-    if template_number in {2, 4}:
+    if template_number == 2:
         return (
             [(0, 0), (22, 0), (22, 60), (0, 60)],
             [(22, 0), (44, 0), (44, 60), (22, 60)],
         )
-    if template_number in {3, 6}:
+    if template_number == 3:
         return (
             [(0, 0), (44, 60), (0, 60)],
             [(0, 0), (44, 0), (44, 60)],
+        )
+    if template_number == 4:
+        return (
+            [(0, 0), (19, 0), (25, 60), (0, 60)],
+            [(19, 0), (44, 0), (44, 60), (25, 60)],
+        )
+    if template_number == 5:
+        return (
+            [(0, 30), (44, 30), (44, 60), (0, 60)],
+            [(0, 0), (44, 0), (44, 30), (0, 30)],
+        )
+    if template_number == 6:
+        return (
+            [(0, 15), (44, 45), (44, 60), (0, 60)],
+            [(0, 0), (44, 0), (44, 45), (0, 15)],
         )
     raise ValueError("Unsupported Event Companion territory geometry.")
 

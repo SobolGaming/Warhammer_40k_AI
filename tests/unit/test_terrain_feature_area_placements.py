@@ -13,7 +13,19 @@ from warhammer40k_core.core.missions import (
     MissionPackError,
 )
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
-from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
+from warhammer40k_core.core.terrain_areas import (
+    PlacedTerrainArea,
+    SymmetryAxis,
+    TerrainAreaFootprintTemplate,
+    TerrainAreaLocalTransform,
+    logical_terrain_area_group_contains_polygon,
+    mirror_placed_terrain_area,
+)
+from warhammer40k_core.core.terrain_display import (
+    TerrainDisplayGeometry,
+    TerrainDisplayPoint,
+    canonical_terrain_transform_coordinate,
+)
 from warhammer40k_core.core.terrain_layouts import (
     TerrainFeatureAreaPlacement,
     TerrainFeatureLocalTransform,
@@ -24,6 +36,7 @@ from warhammer40k_core.core.terrain_layouts import (
     TerrainWallTemplate,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.terrain_feature_factory import TerrainFeatureFactory
 from warhammer40k_core.geometry.pose import GeometryError, Point3
 from warhammer40k_core.geometry.terrain import (
     ObstacleVolume,
@@ -35,6 +48,7 @@ from warhammer40k_core.geometry.terrain import (
     TerrainWallDefinition,
     TerrainWallDefinitionPayload,
 )
+from warhammer40k_core.geometry.terrain_classification import TerrainAreaClassification
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
 )
@@ -88,6 +102,49 @@ def test_event_companion_area_placed_terrain_features_resolve_from_source_data()
     assert feature.wall_volumes()[0].blocks_line_segment(
         Point3(solid_body.center_x_inches - 2.0, solid_body.center_y_inches, 1.0),
         Point3(solid_body.center_x_inches + 2.0, solid_body.center_y_inches, 1.0),
+    )
+
+
+def test_source_terrain_transforms_publish_canonical_coordinates() -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    layout_id = "take-and-hold-vs-purge-the-foe-layout-3"
+    mission_pool_entry = next(
+        entry
+        for entry in mission_pack.mission_pool_entries
+        if layout_id in entry.terrain_layout_ids
+    )
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id=mission_pool_entry.mission_pool_entry_id,
+        terrain_layout_id=layout_id,
+        attacker_player_id="player-a",
+        defender_player_id="player-b",
+    )
+    feature = next(
+        terrain_feature
+        for terrain_feature in setup.terrain_features
+        if terrain_feature.feature_id
+        == "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-03-component-01"
+    )
+    wall = next(candidate for candidate in feature.walls if candidate.wall_id == "long-solid-arm")
+
+    assert wall.center_x_inches == 31.088806397421
+    assert wall.center_y_inches == 46.891621318309
+    assert canonical_terrain_transform_coordinate(31.088806397420253) == 31.08880639742
+    assert canonical_terrain_transform_coordinate(31.08880639742025) == 31.08880639742
+    assert canonical_terrain_transform_coordinate(-1e-15) == 0.0
+    assert all(
+        coordinate == round(coordinate, 12)
+        for layout in mission_pack.battlefield_layouts
+        for area in layout.terrain_areas
+        for point in area.footprint_polygon
+        for coordinate in (point.x_inches, point.y_inches)
+    )
+    assert all(
+        coordinate == round(coordinate, 12)
+        for layout in mission_pack.battlefield_layouts
+        for area in layout.terrain_areas
+        for coordinate in (area.center_x_inches, area.center_y_inches)
     )
 
 
@@ -197,7 +254,19 @@ def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -
     mirror_anchor_x = footprint_template.polygon_vertices_inches[0].x_inches
     mirrored_local_x = (2.0 * mirror_anchor_x) - custom_preset.walls[0].center_x_inches
 
-    assert feature.display_geometry.footprint_polygon == area.footprint_polygon
+    assert tuple(
+        (
+            point.x_inches,
+            point.y_inches,
+        )
+        for point in feature.display_geometry.footprint_polygon
+    ) == tuple(
+        (
+            canonical_terrain_transform_coordinate(point.x_inches),
+            canonical_terrain_transform_coordinate(point.y_inches),
+        )
+        for point in area.footprint_polygon
+    )
     assert math.isclose(
         wall.center_x_inches,
         area.center_x_inches + mirrored_local_x,
@@ -209,6 +278,92 @@ def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -
         abs_tol=1e-9,
     )
     assert wall.rotation_degrees == 150.0
+
+
+@pytest.mark.parametrize("mirrored", [False, True])
+def test_rotated_full_footprint_feature_matches_its_parent_area(mirrored: bool) -> None:
+    footprint = (
+        TerrainDisplayPoint(-3.0, -2.0),
+        TerrainDisplayPoint(3.0, -2.0),
+        TerrainDisplayPoint(3.0, 2.0),
+        TerrainDisplayPoint(-3.0, 2.0),
+    )
+    template = TerrainAreaFootprintTemplate(
+        footprint_template_id="test-6x4-full-footprint",
+        name="Test 6x4 Full Footprint",
+        bounding_width_inches=6.0,
+        bounding_depth_inches=4.0,
+        polygon_vertices_inches=footprint,
+        source_id="test:terrain-area-footprint:6x4",
+    )
+    source_area = PlacedTerrainArea.from_template(
+        terrain_area_id="test-rotated-area",
+        logical_terrain_area_id="test-rotated-area",
+        template=template,
+        terrain_feature_kind=TerrainFeatureKind.WOODS.value,
+        classification=TerrainAreaClassification.DENSE,
+        center_x_inches=10.0,
+        center_y_inches=12.0,
+        rotation_degrees=0.2,
+        local_transform=TerrainAreaLocalTransform.IDENTITY,
+        source_layout_id="test-layout",
+        source_id="test:terrain-area:rotated",
+    )
+    area = (
+        mirror_placed_terrain_area(
+            source_area,
+            battlefield_width_inches=44.0,
+            battlefield_depth_inches=60.0,
+            terrain_area_id="test-rotated-area-mirrored",
+            logical_terrain_area_id="test-rotated-area-mirrored",
+            source_id="test:terrain-area:rotated-mirrored",
+            symmetry_axis=SymmetryAxis.POINT_CENTER,
+        )
+        if mirrored
+        else source_area
+    )
+    preset = TerrainFeaturePreset(
+        terrain_feature_preset_id="test-6x4-full-footprint-preset",
+        feature_kind=TerrainFeatureKind.WOODS,
+        classification=TerrainAreaClassification.DENSE,
+        footprint_template_id=template.footprint_template_id,
+        footprint_center_x_inches=0.0,
+        footprint_center_y_inches=0.0,
+        footprint_width_inches=6.0,
+        footprint_depth_inches=4.0,
+        local_rules_footprint_polygon=footprint,
+        local_display_geometry=TerrainDisplayGeometry(
+            display_template_id="test-6x4-full-footprint-display",
+            footprint_polygon=footprint,
+        ),
+        source_id="test:terrain-feature-preset:6x4-full-footprint",
+    )
+    placement = TerrainFeatureAreaPlacement(
+        feature_id="test-6x4-full-footprint-feature",
+        terrain_area_id=area.terrain_area_id,
+        terrain_feature_preset_id=preset.terrain_feature_preset_id,
+        local_offset_x_inches=0.0,
+        local_offset_y_inches=0.0,
+        local_rotation_degrees=0.0,
+        local_transform=TerrainFeatureLocalTransform.IDENTITY,
+        source_id="test:terrain-feature-placement:6x4-full-footprint",
+    )
+
+    feature = TerrainFeatureFactory.from_area_placement(
+        area=area,
+        footprint_template=template,
+        preset=preset,
+        placement=placement,
+        terrain_area_group=(area,),
+    )
+
+    assert logical_terrain_area_group_contains_polygon(
+        "rotated full-footprint feature",
+        feature.rules_footprint_polygon,
+        terrain_areas=(area,),
+    )
+    assert feature.rules_footprint_polygon == area.footprint_polygon
+    assert feature.display_geometry.footprint_polygon == area.footprint_polygon
 
 
 def test_mission_pack_uses_component_kind_independently_of_coarse_area_kind() -> None:

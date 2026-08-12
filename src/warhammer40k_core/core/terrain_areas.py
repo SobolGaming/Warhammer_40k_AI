@@ -8,6 +8,7 @@ from typing import Self, TypedDict, cast
 from warhammer40k_core.core.terrain_display import (
     TerrainDisplayPoint,
     TerrainDisplayPointPayload,
+    canonical_terrain_transform_coordinate,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.geometry.polygons import (
@@ -293,22 +294,30 @@ class PlacedTerrainArea:
     ) -> Self:
         if type(template) is not TerrainAreaFootprintTemplate:
             raise TerrainAreaError("PlacedTerrainArea template must be a footprint template.")
+        canonical_center_x = canonical_terrain_transform_coordinate(center_x_inches)
+        canonical_center_y = canonical_terrain_transform_coordinate(center_y_inches)
         return cls(
             terrain_area_id=terrain_area_id,
             logical_terrain_area_id=logical_terrain_area_id,
             footprint_template_id=template.footprint_template_id,
             terrain_feature_kind=terrain_feature_kind,
             classification=classification,
-            center_x_inches=center_x_inches,
-            center_y_inches=center_y_inches,
+            center_x_inches=canonical_center_x,
+            center_y_inches=canonical_center_y,
             rotation_degrees=rotation_degrees,
             local_transform=local_transform,
-            footprint_polygon=transform_polygon(
-                template.polygon_vertices_inches,
-                center_x_inches=center_x_inches,
-                center_y_inches=center_y_inches,
-                rotation_degrees=rotation_degrees,
-                local_transform=local_transform,
+            footprint_polygon=tuple(
+                TerrainDisplayPoint(
+                    x_inches=canonical_terrain_transform_coordinate(point.x_inches),
+                    y_inches=canonical_terrain_transform_coordinate(point.y_inches),
+                )
+                for point in transform_polygon(
+                    template.polygon_vertices_inches,
+                    center_x_inches=canonical_center_x,
+                    center_y_inches=canonical_center_y,
+                    rotation_degrees=rotation_degrees,
+                    local_transform=local_transform,
+                )
             ),
             source_layout_id=source_layout_id,
             source_id=source_id,
@@ -618,13 +627,17 @@ def transform_terrain_area_local_point(
         x_inches = (2.0 * anchor_x_inches) - x_inches
     elif area.local_transform is not TerrainAreaLocalTransform.IDENTITY:
         raise TerrainAreaError("Unsupported terrain-area local point transform.")
-    return translate_point(
+    transformed = translate_point(
         rotate_point(
             TerrainDisplayPoint(x_inches=x_inches, y_inches=point.y_inches),
             area.rotation_degrees,
         ),
         dx_inches=area.center_x_inches,
         dy_inches=area.center_y_inches,
+    )
+    return TerrainDisplayPoint(
+        x_inches=canonical_terrain_transform_coordinate(transformed.x_inches),
+        y_inches=canonical_terrain_transform_coordinate(transformed.y_inches),
     )
 
 
@@ -659,18 +672,24 @@ def mirror_placed_terrain_area(
         footprint_template_id=area.footprint_template_id,
         terrain_feature_kind=area.terrain_feature_kind,
         classification=area.classification,
-        center_x_inches=center_x,
-        center_y_inches=center_y,
+        center_x_inches=canonical_terrain_transform_coordinate(center_x),
+        center_y_inches=canonical_terrain_transform_coordinate(center_y),
         rotation_degrees=rotation,
         local_transform=area.local_transform,
         footprint_polygon=tuple(
-            _mirror_point(
-                point,
-                battlefield_width=width,
-                battlefield_depth=depth,
-                symmetry_axis=axis,
+            TerrainDisplayPoint(
+                x_inches=canonical_terrain_transform_coordinate(mirrored.x_inches),
+                y_inches=canonical_terrain_transform_coordinate(mirrored.y_inches),
             )
             for point in area.footprint_polygon
+            for mirrored in (
+                _mirror_point(
+                    point,
+                    battlefield_width=width,
+                    battlefield_depth=depth,
+                    symmetry_axis=axis,
+                ),
+            )
         ),
         source_layout_id=area.source_layout_id,
         source_id=source_id,
