@@ -295,14 +295,16 @@ class PlacedTerrainArea:
     ) -> Self:
         if type(template) is not TerrainAreaFootprintTemplate:
             raise TerrainAreaError("PlacedTerrainArea template must be a footprint template.")
+        canonical_center_x = canonical_terrain_area_transform_coordinate(center_x_inches)
+        canonical_center_y = canonical_terrain_area_transform_coordinate(center_y_inches)
         return cls(
             terrain_area_id=terrain_area_id,
             logical_terrain_area_id=logical_terrain_area_id,
             footprint_template_id=template.footprint_template_id,
             terrain_feature_kind=terrain_feature_kind,
             classification=classification,
-            center_x_inches=center_x_inches,
-            center_y_inches=center_y_inches,
+            center_x_inches=canonical_center_x,
+            center_y_inches=canonical_center_y,
             rotation_degrees=rotation_degrees,
             local_transform=local_transform,
             footprint_polygon=tuple(
@@ -312,8 +314,8 @@ class PlacedTerrainArea:
                 )
                 for point in transform_polygon(
                     template.polygon_vertices_inches,
-                    center_x_inches=center_x_inches,
-                    center_y_inches=center_y_inches,
+                    center_x_inches=canonical_center_x,
+                    center_y_inches=canonical_center_y,
                     rotation_degrees=rotation_degrees,
                     local_transform=local_transform,
                 )

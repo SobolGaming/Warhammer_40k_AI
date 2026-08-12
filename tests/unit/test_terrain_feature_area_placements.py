@@ -123,14 +123,20 @@ def test_source_terrain_transforms_publish_six_decimal_canonical_coordinates() -
     assert canonical_terrain_feature_transform_coordinate(31.088806397420253) == 31.088806
     assert canonical_terrain_feature_transform_coordinate(31.08880639742025) == 31.088806
     assert canonical_terrain_feature_transform_coordinate(-1e-15) == 0.0
-    assert canonical_terrain_area_transform_coordinate(31.088806397420253) == 31.0888064
-    assert canonical_terrain_area_transform_coordinate(31.08880639742025) == 31.0888064
+    assert canonical_terrain_area_transform_coordinate(31.088806397420253) == 31.08880639742
+    assert canonical_terrain_area_transform_coordinate(31.08880639742025) == 31.08880639742
     assert all(
-        coordinate == round(coordinate, 7)
+        coordinate == round(coordinate, 12)
         for layout in mission_pack.battlefield_layouts
         for area in layout.terrain_areas
         for point in area.footprint_polygon
         for coordinate in (point.x_inches, point.y_inches)
+    )
+    assert all(
+        coordinate == round(coordinate, 12)
+        for layout in mission_pack.battlefield_layouts
+        for area in layout.terrain_areas
+        for coordinate in (area.center_x_inches, area.center_y_inches)
     )
 
 
