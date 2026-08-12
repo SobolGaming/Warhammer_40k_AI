@@ -90,6 +90,8 @@ from warhammer40k_core.engine.weapon_abilities import WEAPON_ABILITY_SELECTION_D
 
 ROOT = Path(__file__).resolve().parents[1]
 _GENERATED_OUTPUT_ROOT_ENV = "_WARHAMMER40K_EXTERNAL_CONTRACT_OUTPUT_ROOT"
+_GENERATED_CONTRACT_SUBTREES = (Path("examples"),)
+_GENERATED_CONTRACT_FILES = (Path("manifest.json"),)
 GENERATED_OUTPUT_ROOT = Path(os.environ.get(_GENERATED_OUTPUT_ROOT_ENV, ROOT)).resolve()
 CONTRACT_ROOT = GENERATED_OUTPUT_ROOT / "contracts"
 SCHEMA_DIR = CONTRACT_ROOT / "schemas"
@@ -337,7 +339,10 @@ def _verify_regenerated_contract_bundle() -> None:
     with tempfile.TemporaryDirectory(prefix="warhammer40k-external-contract-") as temporary:
         regenerated_output_root = Path(temporary)
         regenerated_contract_root = regenerated_output_root / "contracts"
-        shutil.copytree(CONTRACT_ROOT, regenerated_contract_root)
+        _prepare_regenerated_contract_root(
+            committed_root=CONTRACT_ROOT,
+            regenerated_root=regenerated_contract_root,
+        )
         environment = os.environ.copy()
         environment[_GENERATED_OUTPUT_ROOT_ENV] = str(regenerated_output_root)
         completed = subprocess.run(
@@ -363,6 +368,24 @@ def _verify_regenerated_contract_bundle() -> None:
             "External contract generated files drifted; run "
             "scripts/build_external_contract.py.\n" + "\n".join(drift)
         )
+
+
+def _prepare_regenerated_contract_root(
+    *,
+    committed_root: Path,
+    regenerated_root: Path,
+) -> None:
+    """Copy contract inputs while clearing every generator-owned output path."""
+
+    shutil.copytree(committed_root, regenerated_root)
+    for relative_path in _GENERATED_CONTRACT_SUBTREES:
+        generated_subtree = regenerated_root / relative_path
+        if generated_subtree.exists():
+            shutil.rmtree(generated_subtree)
+    for relative_path in _GENERATED_CONTRACT_FILES:
+        generated_file = regenerated_root / relative_path
+        if generated_file.exists():
+            generated_file.unlink()
 
 
 def _contract_tree_drift(
@@ -913,6 +936,36 @@ def _supplemental_proposal_examples() -> dict[str, JsonValue]:
             "unit_instance_id": "army-alpha:unit-1",
             "placement_kind": "return_to_battlefield",
             "attempted_placement": placement,
+        },
+        "model_materialization_placement": {
+            "proposal_request_id": "contract-model-materialization-request-000001",
+            "proposal_kind": "model_materialization_placement",
+            "unit_instance_id": "army-alpha:horrors-1",
+            "placement_kind": "split_unit",
+            "attempted_placement": {
+                "army_id": "army-alpha",
+                "player_id": "player-a",
+                "unit_instance_id": "army-alpha:horrors-1",
+                "model_placements": [
+                    {
+                        "army_id": "army-alpha",
+                        "player_id": "player-a",
+                        "unit_instance_id": "army-alpha:horrors-1",
+                        "model_instance_id": "army-alpha:horrors-1:materialized:model-1",
+                        "pose": pose,
+                    },
+                    {
+                        "army_id": "army-alpha",
+                        "player_id": "player-a",
+                        "unit_instance_id": "army-alpha:horrors-1",
+                        "model_instance_id": "army-alpha:horrors-1:materialized:model-2",
+                        "pose": {
+                            "position": {"x": 13.0, "y": 18.0, "z": 0.0},
+                            "facing": {"degrees": 0.0},
+                        },
+                    },
+                ],
+            },
         },
         "pile_in": {
             "proposal_request_id": "contract-pile-in-request-000001",

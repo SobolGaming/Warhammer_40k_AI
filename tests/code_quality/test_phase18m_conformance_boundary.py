@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import json
+import runpy
+import sys
 from pathlib import Path
+from typing import Protocol, cast
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CLIENT_ROOT = REPO_ROOT / "conformance" / "typescript"
@@ -11,6 +14,14 @@ FORBIDDEN_CLIENT_TOKENS = (
     "GameLifecycle",
     "DecisionController",
 )
+
+
+class _ContractRootPreparer(Protocol):
+    def __call__(self, *, committed_root: Path, regenerated_root: Path) -> None: ...
+
+
+class _ContractTreeDrift(Protocol):
+    def __call__(self, *, committed_root: Path, regenerated_root: Path) -> tuple[str, ...]: ...
 
 
 def test_phase18m_typescript_client_does_not_import_engine_internals() -> None:
@@ -54,9 +65,43 @@ def test_external_contract_check_regenerates_into_an_isolated_tree_before_valida
 
     assert "if args.check:\n        _verify_regenerated_contract_bundle()" in builder
     assert "tempfile.TemporaryDirectory" in builder
-    assert "shutil.copytree(CONTRACT_ROOT, regenerated_contract_root)" in builder
+    assert "_prepare_regenerated_contract_root(" in builder
     assert "_contract_tree_drift(" in builder
     assert "External contract generated files drifted" in builder
+
+
+def test_external_contract_regeneration_discards_orphan_generated_fixtures(
+    tmp_path: Path,
+) -> None:
+    committed_root = tmp_path / "committed" / "contracts"
+    orphan = committed_root / "examples" / "projections" / "retired-orphan.json"
+    orphan.parent.mkdir(parents=True)
+    orphan.write_text('{"retired": true}\n', encoding="utf-8")
+    manual_contract = committed_root / "README.md"
+    manual_contract.write_text("manual contract input\n", encoding="utf-8")
+    manifest = committed_root / "manifest.json"
+    manifest.write_text('{"stale": true}\n', encoding="utf-8")
+    regenerated_root = tmp_path / "regenerated" / "contracts"
+    scripts_directory = REPO_ROOT / "scripts"
+    sys.path.insert(0, str(scripts_directory))
+    try:
+        namespace = runpy.run_path(str(scripts_directory / "build_external_contract.py"))
+    finally:
+        sys.path.remove(str(scripts_directory))
+    prepare = cast(_ContractRootPreparer, namespace["_prepare_regenerated_contract_root"])
+    contract_tree_drift = cast(_ContractTreeDrift, namespace["_contract_tree_drift"])
+
+    prepare(committed_root=committed_root, regenerated_root=regenerated_root)
+
+    assert not (regenerated_root / "examples").exists()
+    assert not (regenerated_root / "manifest.json").exists()
+    assert (regenerated_root / "README.md").read_text(encoding="utf-8") == (
+        "manual contract input\n"
+    )
+    assert "removed: contracts/examples/projections/retired-orphan.json" in contract_tree_drift(
+        committed_root=committed_root,
+        regenerated_root=regenerated_root,
+    )
 
 
 def test_phase18m_executable_client_is_operation_bound_without_identifier_conventions() -> None:

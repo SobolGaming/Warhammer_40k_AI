@@ -223,20 +223,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 34.360767,
-              "y_inches": 46.429124
+              "x_inches": 34.360767183585,
+              "y_inches": 46.429124057313
             },
             {
-              "x_inches": 38.862969,
-              "y_inches": 50.395253
+              "x_inches": 38.862969421145,
+              "y_inches": 50.395252523728
             },
             {
-              "x_inches": 37.739233,
-              "y_inches": 51.670876
+              "x_inches": 37.739233022327,
+              "y_inches": 51.670876491037
             },
             {
-              "x_inches": 33.237031,
-              "y_inches": 47.704748
+              "x_inches": 33.237030784767,
+              "y_inches": 47.704748024621
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -244,34 +244,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-02-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 36.05,
-        "footprint_center_y_inches": 49.05,
-        "footprint_depth_inches": 5.241751999999998,
-        "footprint_width_inches": 5.625937999999998,
+        "footprint_center_x_inches": 36.050000102956005,
+        "footprint_center_y_inches": 49.050000274175,
+        "footprint_depth_inches": 5.2417524337240025,
+        "footprint_width_inches": 5.625938636378002,
         "rules_footprint_polygon": [
           {
-            "x_inches": 34.360767,
-            "y_inches": 46.429124
+            "x_inches": 34.360767183585,
+            "y_inches": 46.429124057313
           },
           {
-            "x_inches": 38.862969,
-            "y_inches": 50.395253
+            "x_inches": 38.862969421145,
+            "y_inches": 50.395252523728
           },
           {
-            "x_inches": 37.739233,
-            "y_inches": 51.670876
+            "x_inches": 37.739233022327,
+            "y_inches": 51.670876491037
           },
           {
-            "x_inches": 33.237031,
-            "y_inches": 47.704748
+            "x_inches": 33.237030784767,
+            "y_inches": 47.704748024621
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-02-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 36.05,
-            "center_y_inches": 49.05,
+            "center_x_inches": 36.050000102956,
+            "center_y_inches": 49.050000274175,
             "depth_inches": 1.68,
             "height_inches": 3.5,
             "rotation_degrees": 41.377818,
@@ -288,28 +288,28 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 30.441438,
-              "y_inches": 45.97365
+              "x_inches": 30.441438639112,
+              "y_inches": 45.973650057593
             },
             {
-              "x_inches": 32.047196,
-              "y_inches": 47.477493
+              "x_inches": 32.047196162481,
+              "y_inches": 47.477492727603
             },
             {
-              "x_inches": 31.736174,
-              "y_inches": 47.809593
+              "x_inches": 31.736174155729,
+              "y_inches": 47.809592579027
             },
             {
-              "x_inches": 30.462517,
-              "y_inches": 46.616772
+              "x_inches": 30.462516483784,
+              "y_inches": 46.616771915769
             },
             {
-              "x_inches": 29.884904,
-              "y_inches": 47.233529
+              "x_inches": 29.88490418553,
+              "y_inches": 47.233528782699
             },
             {
-              "x_inches": 29.552804,
-              "y_inches": 46.922507
+              "x_inches": 29.552804334106,
+              "y_inches": 46.922506775947
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -317,42 +317,42 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-03-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 30.799999999999997,
-        "footprint_center_y_inches": 46.8916215,
-        "footprint_depth_inches": 1.8359430000000003,
-        "footprint_width_inches": 2.4943920000000013,
+        "footprint_center_x_inches": 30.8000002482935,
+        "footprint_center_y_inches": 46.89162131831,
+        "footprint_depth_inches": 1.8359425214339993,
+        "footprint_width_inches": 2.494391828375001,
         "rules_footprint_polygon": [
           {
-            "x_inches": 30.441438,
-            "y_inches": 45.97365
+            "x_inches": 30.441438639112,
+            "y_inches": 45.973650057593
           },
           {
-            "x_inches": 32.047196,
-            "y_inches": 47.477493
+            "x_inches": 32.047196162481,
+            "y_inches": 47.477492727603
           },
           {
-            "x_inches": 31.736174,
-            "y_inches": 47.809593
+            "x_inches": 31.736174155729,
+            "y_inches": 47.809592579027
           },
           {
-            "x_inches": 30.462517,
-            "y_inches": 46.616772
+            "x_inches": 30.462516483784,
+            "y_inches": 46.616771915769
           },
           {
-            "x_inches": 29.884904,
-            "y_inches": 47.233529
+            "x_inches": 29.88490418553,
+            "y_inches": 47.233528782699
           },
           {
-            "x_inches": 29.552804,
-            "y_inches": 46.922507
+            "x_inches": 29.552804334106,
+            "y_inches": 46.922506775947
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-03-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 31.088806,
-            "center_y_inches": 46.891621,
+            "center_x_inches": 31.088806397421,
+            "center_y_inches": 46.891621318309,
             "depth_inches": 0.43499999999999994,
             "height_inches": 2.0,
             "rotation_degrees": 43.122844999999984,
@@ -361,8 +361,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 30.163171,
-            "center_y_inches": 46.603589,
+            "center_x_inches": 30.163171412321,
+            "center_y_inches": 46.603589420146,
             "depth_inches": 0.43499999999999994,
             "height_inches": 2.0,
             "rotation_degrees": 133.12284499999998,
@@ -379,28 +379,28 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 29.265289,
-              "y_inches": 51.860856
+              "x_inches": 29.265289829776,
+              "y_inches": 51.860855922924
             },
             {
-              "x_inches": 27.148609,
-              "y_inches": 49.878518
+              "x_inches": 27.148609665653,
+              "y_inches": 49.878517636253
             },
             {
-              "x_inches": 27.423745,
-              "y_inches": 49.584737
+              "x_inches": 27.423744548544,
+              "y_inches": 49.584737027266
             },
             {
-              "x_inches": 29.246644,
-              "y_inches": 51.291941
+              "x_inches": 29.246644103682,
+              "y_inches": 51.291940431046
             },
             {
-              "x_inches": 29.757609,
-              "y_inches": 50.746348
+              "x_inches": 29.757608886194,
+              "y_inches": 50.746347871501
             },
             {
-              "x_inches": 30.05139,
-              "y_inches": 51.021482
+              "x_inches": 30.051389495181,
+              "y_inches": 51.021482754392
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -408,42 +408,42 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-03-component-02",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 28.599999500000003,
-        "footprint_center_y_inches": 50.7227965,
-        "footprint_depth_inches": 2.2761190000000013,
-        "footprint_width_inches": 2.902781000000001,
+        "footprint_center_x_inches": 28.599999580417,
+        "footprint_center_y_inches": 50.722796475095,
+        "footprint_depth_inches": 2.2761188956580014,
+        "footprint_width_inches": 2.902779829527997,
         "rules_footprint_polygon": [
           {
-            "x_inches": 29.265289,
-            "y_inches": 51.860856
+            "x_inches": 29.265289829776,
+            "y_inches": 51.860855922924
           },
           {
-            "x_inches": 27.148609,
-            "y_inches": 49.878518
+            "x_inches": 27.148609665653,
+            "y_inches": 49.878517636253
           },
           {
-            "x_inches": 27.423745,
-            "y_inches": 49.584737
+            "x_inches": 27.423744548544,
+            "y_inches": 49.584737027266
           },
           {
-            "x_inches": 29.246644,
-            "y_inches": 51.291941
+            "x_inches": 29.246644103682,
+            "y_inches": 51.291940431046
           },
           {
-            "x_inches": 29.757609,
-            "y_inches": 50.746348
+            "x_inches": 29.757608886194,
+            "y_inches": 50.746347871501
           },
           {
-            "x_inches": 30.05139,
-            "y_inches": 51.021482
+            "x_inches": 30.051389495181,
+            "y_inches": 51.021482754392
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-03-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 28.344517,
-            "center_y_inches": 50.722796,
+            "center_x_inches": 28.34451718916,
+            "center_y_inches": 50.722796475095,
             "depth_inches": 0.38249999999999995,
             "height_inches": 2.0,
             "rotation_degrees": 223.122851,
@@ -452,8 +452,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 29.51145,
-            "center_y_inches": 51.303602,
+            "center_x_inches": 29.511449357986,
+            "center_y_inches": 51.303601897213,
             "depth_inches": 0.38249999999999995,
             "height_inches": 2.0,
             "rotation_degrees": 313.12285099999997,
@@ -470,20 +470,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 23.666389,
-              "y_inches": 43.64008
+              "x_inches": 23.666389165312,
+              "y_inches": 43.640080709044
             },
             {
-              "x_inches": 20.216522,
-              "y_inches": 43.609845
+              "x_inches": 20.216521665016,
+              "y_inches": 43.609844465882
             },
             {
-              "x_inches": 20.233612,
-              "y_inches": 41.65992
+              "x_inches": 20.233611715499,
+              "y_inches": 41.659919357019
             },
             {
-              "x_inches": 23.683479,
-              "y_inches": 41.690155
+              "x_inches": 23.683479215794,
+              "y_inches": 41.690155600182
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -491,34 +491,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-04-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 21.9500005,
-        "footprint_center_y_inches": 42.65,
-        "footprint_depth_inches": 1.980159999999998,
-        "footprint_width_inches": 3.466956999999997,
+        "footprint_center_x_inches": 21.950000440405,
+        "footprint_center_y_inches": 42.6500000330315,
+        "footprint_depth_inches": 1.980161352025,
+        "footprint_width_inches": 3.4669575507780017,
         "rules_footprint_polygon": [
           {
-            "x_inches": 23.666389,
-            "y_inches": 43.64008
+            "x_inches": 23.666389165312,
+            "y_inches": 43.640080709044
           },
           {
-            "x_inches": 20.216522,
-            "y_inches": 43.609845
+            "x_inches": 20.216521665016,
+            "y_inches": 43.609844465882
           },
           {
-            "x_inches": 20.233612,
-            "y_inches": 41.65992
+            "x_inches": 20.233611715499,
+            "y_inches": 41.659919357019
           },
           {
-            "x_inches": 23.683479,
-            "y_inches": 41.690155
+            "x_inches": 23.683479215794,
+            "y_inches": 41.690155600182
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 21.95,
-            "center_y_inches": 42.65,
+            "center_x_inches": 21.950000440405,
+            "center_y_inches": 42.650000033032,
             "depth_inches": 1.93,
             "height_inches": 3.5,
             "rotation_degrees": 180.50215400000002,
@@ -535,20 +535,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 20.744455,
-              "y_inches": 43.390313
+              "x_inches": 20.744455373761,
+              "y_inches": 43.390313131636
             },
             {
-              "x_inches": 17.24459,
-              "y_inches": 43.359639
+              "x_inches": 17.244589793751,
+              "y_inches": 43.359638682052
             },
             {
-              "x_inches": 17.255545,
-              "y_inches": 42.109687
+              "x_inches": 17.255544954317,
+              "y_inches": 42.109686689191
             },
             {
-              "x_inches": 20.755411,
-              "y_inches": 42.140361
+              "x_inches": 20.755410534327,
+              "y_inches": 42.140361138776
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -556,34 +556,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-04-component-02",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 19.0000005,
-        "footprint_center_y_inches": 42.75,
-        "footprint_depth_inches": 1.280625999999998,
-        "footprint_width_inches": 3.510821,
+        "footprint_center_x_inches": 19.000000164039,
+        "footprint_center_y_inches": 42.7499999104135,
+        "footprint_depth_inches": 1.2806264424449978,
+        "footprint_width_inches": 3.5108207405760012,
         "rules_footprint_polygon": [
           {
-            "x_inches": 20.744455,
-            "y_inches": 43.390313
+            "x_inches": 20.744455373761,
+            "y_inches": 43.390313131636
           },
           {
-            "x_inches": 17.24459,
-            "y_inches": 43.359639
+            "x_inches": 17.244589793751,
+            "y_inches": 43.359638682052
           },
           {
-            "x_inches": 17.255545,
-            "y_inches": 42.109687
+            "x_inches": 17.255544954317,
+            "y_inches": 42.109686689191
           },
           {
-            "x_inches": 20.755411,
-            "y_inches": 42.140361
+            "x_inches": 20.755410534327,
+            "y_inches": 42.140361138776
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 19.0,
-            "center_y_inches": 42.75,
+            "center_x_inches": 19.000000164039,
+            "center_y_inches": 42.749999910414,
             "depth_inches": 1.23,
             "height_inches": 2.0,
             "rotation_degrees": 180.50215400000002,
@@ -600,20 +600,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 26.844455,
-              "y_inches": 43.440313
+              "x_inches": 26.844455195206,
+              "y_inches": 43.440313631712
             },
             {
-              "x_inches": 23.344589,
-              "y_inches": 43.409639
+              "x_inches": 23.344589615196,
+              "y_inches": 43.409639182127
             },
             {
-              "x_inches": 23.355545,
-              "y_inches": 42.159687
+              "x_inches": 23.355544775762,
+              "y_inches": 42.159687189266
             },
             {
-              "x_inches": 26.85541,
-              "y_inches": 42.190361
+              "x_inches": 26.855410355772,
+              "y_inches": 42.190361638851
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -621,34 +621,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-04-component-03",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 25.0999995,
-        "footprint_center_y_inches": 42.8,
-        "footprint_depth_inches": 1.2806260000000051,
-        "footprint_width_inches": 3.510821,
+        "footprint_center_x_inches": 25.099999985484,
+        "footprint_center_y_inches": 42.800000410489005,
+        "footprint_depth_inches": 1.2806264424459997,
+        "footprint_width_inches": 3.5108207405760012,
         "rules_footprint_polygon": [
           {
-            "x_inches": 26.844455,
-            "y_inches": 43.440313
+            "x_inches": 26.844455195206,
+            "y_inches": 43.440313631712
           },
           {
-            "x_inches": 23.344589,
-            "y_inches": 43.409639
+            "x_inches": 23.344589615196,
+            "y_inches": 43.409639182127
           },
           {
-            "x_inches": 23.355545,
-            "y_inches": 42.159687
+            "x_inches": 23.355544775762,
+            "y_inches": 42.159687189266
           },
           {
-            "x_inches": 26.85541,
-            "y_inches": 42.190361
+            "x_inches": 26.855410355772,
+            "y_inches": 42.190361638851
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 25.1,
-            "center_y_inches": 42.8,
+            "center_x_inches": 25.099999985484,
+            "center_y_inches": 42.800000410489,
             "depth_inches": 1.23,
             "height_inches": 2.0,
             "rotation_degrees": 180.50215400000002,
@@ -1122,28 +1122,28 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 26.281229,
-              "y_inches": 37.619047
+              "x_inches": 26.281228673516,
+              "y_inches": 37.619047362529
             },
             {
-              "x_inches": 24.651715,
-              "y_inches": 37.359846
+              "x_inches": 24.651715029543,
+              "y_inches": 37.359846120044
             },
             {
-              "x_inches": 24.742435,
-              "y_inches": 36.789516
+              "x_inches": 24.742435464412,
+              "y_inches": 36.789516344653
             },
             {
-              "x_inches": 25.801619,
-              "y_inches": 36.957997
+              "x_inches": 25.801619332995,
+              "y_inches": 36.957997152269
             },
             {
-              "x_inches": 25.977955,
-              "y_inches": 35.849434
+              "x_inches": 25.977954723715,
+              "y_inches": 35.849434082354
             },
             {
-              "x_inches": 26.548285,
-              "y_inches": 35.940155
+              "x_inches": 26.548284499106,
+              "y_inches": 35.940154517223
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -1151,42 +1151,42 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-08-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 25.6,
-        "footprint_center_y_inches": 36.7342405,
-        "footprint_depth_inches": 1.7696129999999997,
-        "footprint_width_inches": 1.8965700000000005,
+        "footprint_center_x_inches": 25.5999997643245,
+        "footprint_center_y_inches": 36.7342407224415,
+        "footprint_depth_inches": 1.769613280175001,
+        "footprint_width_inches": 1.8965694695630013,
         "rules_footprint_polygon": [
           {
-            "x_inches": 26.281229,
-            "y_inches": 37.619047
+            "x_inches": 26.281228673516,
+            "y_inches": 37.619047362529
           },
           {
-            "x_inches": 24.651715,
-            "y_inches": 37.359846
+            "x_inches": 24.651715029543,
+            "y_inches": 37.359846120044
           },
           {
-            "x_inches": 24.742435,
-            "y_inches": 36.789516
+            "x_inches": 24.742435464412,
+            "y_inches": 36.789516344653
           },
           {
-            "x_inches": 25.801619,
-            "y_inches": 36.957997
+            "x_inches": 25.801619332995,
+            "y_inches": 36.957997152269
           },
           {
-            "x_inches": 25.977955,
-            "y_inches": 35.849434
+            "x_inches": 25.977954723715,
+            "y_inches": 35.849434082354
           },
           {
-            "x_inches": 26.548285,
-            "y_inches": 35.940155
+            "x_inches": 26.548284499106,
+            "y_inches": 35.940154517223
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-08-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 25.511832,
-            "center_y_inches": 37.204282,
+            "center_x_inches": 25.511832068964,
+            "center_y_inches": 37.204281853591,
             "depth_inches": 0.5574999999999999,
             "height_inches": 2.0,
             "rotation_degrees": 189.038126,
@@ -1195,8 +1195,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 26.129592,
-            "center_y_inches": 36.734241,
+            "center_x_inches": 26.129591698616,
+            "center_y_inches": 36.734240722441,
             "depth_inches": 0.5574999999999999,
             "height_inches": 2.0,
             "rotation_degrees": 279.03812600000003,
@@ -1213,20 +1213,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 15.484644,
-              "y_inches": 35.490776
+              "x_inches": 15.484643954379,
+              "y_inches": 35.490776292235
             },
             {
-              "x_inches": 16.312877,
-              "y_inches": 31.577462
+              "x_inches": 16.31287718328,
+              "y_inches": 31.577461876225
             },
             {
-              "x_inches": 20.715356,
-              "y_inches": 32.509224
+              "x_inches": 20.71535590129,
+              "y_inches": 32.509224258738
             },
             {
-              "x_inches": 19.887123,
-              "y_inches": 36.422539
+              "x_inches": 19.887122672389,
+              "y_inches": 36.422538674747
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -1236,8 +1236,8 @@
         "floors": [
           {
             "bottom_z_inches": 3.0,
-            "center_x_inches": 17.582779,
-            "center_y_inches": 34.125628,
+            "center_x_inches": 17.582778787252,
+            "center_y_inches": 34.125627866939,
             "depth_inches": 3.5,
             "floor_id": "first-floor",
             "rotation_degrees": 281.950017,
@@ -1246,8 +1246,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 17.582779,
-            "center_y_inches": 34.125628,
+            "center_x_inches": 17.582778787252,
+            "center_y_inches": 34.125627866939,
             "depth_inches": 3.5,
             "floor_id": "ground-floor",
             "rotation_degrees": 281.950017,
@@ -1256,8 +1256,8 @@
           },
           {
             "bottom_z_inches": 6.0,
-            "center_x_inches": 17.582779,
-            "center_y_inches": 34.125628,
+            "center_x_inches": 17.582778787252,
+            "center_y_inches": 34.125627866939,
             "depth_inches": 3.5,
             "floor_id": "second-floor",
             "rotation_degrees": 281.950017,
@@ -1265,34 +1265,34 @@
             "width_inches": 3.5
           }
         ],
-        "footprint_center_x_inches": 18.1,
-        "footprint_center_y_inches": 34.0000005,
-        "footprint_depth_inches": 4.845077,
-        "footprint_width_inches": 5.2307120000000005,
+        "footprint_center_x_inches": 18.0999999278345,
+        "footprint_center_y_inches": 34.000000275486,
+        "footprint_depth_inches": 4.845076798522001,
+        "footprint_width_inches": 5.230711946910999,
         "rules_footprint_polygon": [
           {
-            "x_inches": 15.484644,
-            "y_inches": 35.490776
+            "x_inches": 15.484643954379,
+            "y_inches": 35.490776292235
           },
           {
-            "x_inches": 16.312877,
-            "y_inches": 31.577462
+            "x_inches": 16.31287718328,
+            "y_inches": 31.577461876225
           },
           {
-            "x_inches": 20.715356,
-            "y_inches": 32.509224
+            "x_inches": 20.71535590129,
+            "y_inches": 32.509224258738
           },
           {
-            "x_inches": 19.887123,
-            "y_inches": 36.422539
+            "x_inches": 19.887122672389,
+            "y_inches": 36.422538674747
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-08-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 3.0,
-            "center_x_inches": 15.967244,
-            "center_y_inches": 33.548614,
+            "center_x_inches": 15.967243571109,
+            "center_y_inches": 33.548613165736,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 281.950017,
@@ -1301,8 +1301,8 @@
           },
           {
             "bottom_z_inches": 3.0,
-            "center_x_inches": 17.700378,
-            "center_y_inches": 35.888174,
+            "center_x_inches": 17.70037739489,
+            "center_y_inches": 35.888174481211,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 11.950016999999974,
@@ -1311,8 +1311,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 15.967244,
-            "center_y_inches": 33.548614,
+            "center_x_inches": 15.967243571109,
+            "center_y_inches": 33.548613165736,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 281.950017,
@@ -1321,8 +1321,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 17.700378,
-            "center_y_inches": 35.888174,
+            "center_x_inches": 17.70037739489,
+            "center_y_inches": 35.888174481211,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 11.950016999999974,
@@ -1331,8 +1331,8 @@
           },
           {
             "bottom_z_inches": 6.0,
-            "center_x_inches": 15.967244,
-            "center_y_inches": 33.548614,
+            "center_x_inches": 15.967243571109,
+            "center_y_inches": 33.548613165736,
             "depth_inches": 0.12,
             "height_inches": 2.0,
             "rotation_degrees": 281.950017,
@@ -1341,8 +1341,8 @@
           },
           {
             "bottom_z_inches": 6.0,
-            "center_x_inches": 17.700378,
-            "center_y_inches": 35.888174,
+            "center_x_inches": 17.70037739489,
+            "center_y_inches": 35.888174481211,
             "depth_inches": 0.12,
             "height_inches": 2.0,
             "rotation_degrees": 11.950016999999974,
@@ -1359,28 +1359,28 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 17.735857,
-              "y_inches": 22.419165
+              "x_inches": 17.73585714111,
+              "y_inches": 22.419164353862
             },
             {
-              "x_inches": 19.360578,
-              "y_inches": 22.70688
+              "x_inches": 19.360578473,
+              "y_inches": 22.706880522509
             },
             {
-              "x_inches": 19.259877,
-              "y_inches": 23.275533
+              "x_inches": 19.259877813973,
+              "y_inches": 23.275532988671
             },
             {
-              "x_inches": 18.203809,
-              "y_inches": 23.088518
+              "x_inches": 18.203808948245,
+              "y_inches": 23.08851747905
             },
             {
-              "x_inches": 18.008075,
-              "y_inches": 24.19382
+              "x_inches": 18.008074766846,
+              "y_inches": 24.193820324533
             },
             {
-              "x_inches": 17.439422,
-              "y_inches": 24.09312
+              "x_inches": 17.439422300685,
+              "y_inches": 24.093119665506
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -1388,42 +1388,42 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-09-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 18.4,
-        "footprint_center_y_inches": 23.306492499999997,
-        "footprint_depth_inches": 1.7746549999999992,
-        "footprint_width_inches": 1.9211559999999999,
+        "footprint_center_x_inches": 18.4000003868425,
+        "footprint_center_y_inches": 23.3064923391975,
+        "footprint_depth_inches": 1.7746559706709988,
+        "footprint_width_inches": 1.9211561723150012,
         "rules_footprint_polygon": [
           {
-            "x_inches": 17.735857,
-            "y_inches": 22.419165
+            "x_inches": 17.73585714111,
+            "y_inches": 22.419164353862
           },
           {
-            "x_inches": 19.360578,
-            "y_inches": 22.70688
+            "x_inches": 19.360578473,
+            "y_inches": 22.706880522509
           },
           {
-            "x_inches": 19.259877,
-            "y_inches": 23.275533
+            "x_inches": 19.259877813973,
+            "y_inches": 23.275532988671
           },
           {
-            "x_inches": 18.203809,
-            "y_inches": 23.088518
+            "x_inches": 18.203808948245,
+            "y_inches": 23.08851747905
           },
           {
-            "x_inches": 18.008075,
-            "y_inches": 24.19382
+            "x_inches": 18.008074766846,
+            "y_inches": 24.193820324533
           },
           {
-            "x_inches": 17.439422,
-            "y_inches": 24.09312
+            "x_inches": 17.439422300685,
+            "y_inches": 24.093119665506
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-09-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 18.497867,
-            "center_y_inches": 22.847348,
+            "center_x_inches": 18.497867477542,
+            "center_y_inches": 22.847348671267,
             "depth_inches": 0.5574999999999999,
             "height_inches": 2.0,
             "rotation_degrees": 10.042197999999985,
@@ -1432,8 +1432,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 17.871966,
-            "center_y_inches": 23.306492,
+            "center_x_inches": 17.871965953978,
+            "center_y_inches": 23.306492339197,
             "depth_inches": 0.5574999999999999,
             "height_inches": 2.0,
             "rotation_degrees": 100.04219799999998,
@@ -1450,20 +1450,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 28.461955,
-              "y_inches": 24.469213
+              "x_inches": 28.461955162533,
+              "y_inches": 24.469213342705
             },
             {
-              "x_inches": 27.770252,
-              "y_inches": 28.408953
+              "x_inches": 27.770252170692,
+              "y_inches": 28.408952797425
             },
             {
-              "x_inches": 23.338046,
-              "y_inches": 27.630787
+              "x_inches": 23.338045284132,
+              "y_inches": 27.630786931605
             },
             {
-              "x_inches": 24.029748,
-              "y_inches": 23.691047
+              "x_inches": 24.029748275972,
+              "y_inches": 23.691047476885
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -1473,8 +1473,8 @@
         "floors": [
           {
             "bottom_z_inches": 3.0,
-            "center_x_inches": 26.412541,
-            "center_y_inches": 25.906469,
+            "center_x_inches": 26.412541879929,
+            "center_y_inches": 25.90646947753,
             "depth_inches": 3.5,
             "floor_id": "first-floor",
             "rotation_degrees": 99.95797200000004,
@@ -1483,8 +1483,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 26.412541,
-            "center_y_inches": 25.906469,
+            "center_x_inches": 26.412541879929,
+            "center_y_inches": 25.90646947753,
             "depth_inches": 3.5,
             "floor_id": "ground-floor",
             "rotation_degrees": 99.95797200000004,
@@ -1493,8 +1493,8 @@
           },
           {
             "bottom_z_inches": 6.0,
-            "center_x_inches": 26.412541,
-            "center_y_inches": 25.906469,
+            "center_x_inches": 26.412541879929,
+            "center_y_inches": 25.90646947753,
             "depth_inches": 3.5,
             "floor_id": "second-floor",
             "rotation_degrees": 99.95797200000004,
@@ -1502,34 +1502,34 @@
             "width_inches": 3.5
           }
         ],
-        "footprint_center_x_inches": 25.900000499999997,
-        "footprint_center_y_inches": 26.05,
-        "footprint_depth_inches": 4.717905999999999,
-        "footprint_width_inches": 5.123909000000001,
+        "footprint_center_x_inches": 25.900000223332498,
+        "footprint_center_y_inches": 26.050000137155,
+        "footprint_depth_inches": 4.717905320539998,
+        "footprint_width_inches": 5.1239098784009975,
         "rules_footprint_polygon": [
           {
-            "x_inches": 28.461955,
-            "y_inches": 24.469213
+            "x_inches": 28.461955162533,
+            "y_inches": 24.469213342705
           },
           {
-            "x_inches": 27.770252,
-            "y_inches": 28.408953
+            "x_inches": 27.770252170692,
+            "y_inches": 28.408952797425
           },
           {
-            "x_inches": 23.338046,
-            "y_inches": 27.630787
+            "x_inches": 23.338045284132,
+            "y_inches": 27.630786931605
           },
           {
-            "x_inches": 24.029748,
-            "y_inches": 23.691047
+            "x_inches": 24.029748275972,
+            "y_inches": 23.691047476885
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-09-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 3.0,
-            "center_x_inches": 28.047158,
-            "center_y_inches": 26.426978,
+            "center_x_inches": 28.047158226155,
+            "center_y_inches": 26.426978267708,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 99.95797200000004,
@@ -1538,8 +1538,8 @@
           },
           {
             "bottom_z_inches": 3.0,
-            "center_x_inches": 26.233746,
-            "center_y_inches": 24.149076,
+            "center_x_inches": 26.233746916895,
+            "center_y_inches": 24.149075850253,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 189.957972,
@@ -1548,8 +1548,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 28.047158,
-            "center_y_inches": 26.426978,
+            "center_x_inches": 28.047158226155,
+            "center_y_inches": 26.426978267708,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 99.95797200000004,
@@ -1558,8 +1558,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 26.233746,
-            "center_y_inches": 24.149076,
+            "center_x_inches": 26.233746916895,
+            "center_y_inches": 24.149075850253,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 189.957972,
@@ -1568,8 +1568,8 @@
           },
           {
             "bottom_z_inches": 6.0,
-            "center_x_inches": 28.047158,
-            "center_y_inches": 26.426978,
+            "center_x_inches": 28.047158226155,
+            "center_y_inches": 26.426978267708,
             "depth_inches": 0.12,
             "height_inches": 2.0,
             "rotation_degrees": 99.95797200000004,
@@ -1578,8 +1578,8 @@
           },
           {
             "bottom_z_inches": 6.0,
-            "center_x_inches": 26.233746,
-            "center_y_inches": 24.149076,
+            "center_x_inches": 26.233746916895,
+            "center_y_inches": 24.149075850253,
             "depth_inches": 0.12,
             "height_inches": 2.0,
             "rotation_degrees": 189.957972,
@@ -2053,20 +2053,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 20.333611,
-              "y_inches": 16.30992
+              "x_inches": 20.333611289546,
+              "y_inches": 16.309919407358
             },
             {
-              "x_inches": 23.783479,
-              "y_inches": 16.340155
+              "x_inches": 23.783478789842,
+              "y_inches": 16.340155650521
             },
             {
-              "x_inches": 23.766389,
-              "y_inches": 18.29008
+              "x_inches": 23.76638873936,
+              "y_inches": 18.290080759383
             },
             {
-              "x_inches": 20.316521,
-              "y_inches": 18.259845
+              "x_inches": 20.316521239064,
+              "y_inches": 18.259844516221
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -2074,34 +2074,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-13-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 22.05,
-        "footprint_center_y_inches": 17.3,
-        "footprint_depth_inches": 1.980159999999998,
-        "footprint_width_inches": 3.466957999999998,
+        "footprint_center_x_inches": 22.050000014452998,
+        "footprint_center_y_inches": 17.3000000833705,
+        "footprint_depth_inches": 1.980161352025,
+        "footprint_width_inches": 3.4669575507780017,
         "rules_footprint_polygon": [
           {
-            "x_inches": 20.333611,
-            "y_inches": 16.30992
+            "x_inches": 20.333611289546,
+            "y_inches": 16.309919407358
           },
           {
-            "x_inches": 23.783479,
-            "y_inches": 16.340155
+            "x_inches": 23.783478789842,
+            "y_inches": 16.340155650521
           },
           {
-            "x_inches": 23.766389,
-            "y_inches": 18.29008
+            "x_inches": 23.76638873936,
+            "y_inches": 18.290080759383
           },
           {
-            "x_inches": 20.316521,
-            "y_inches": 18.259845
+            "x_inches": 20.316521239064,
+            "y_inches": 18.259844516221
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 22.05,
-            "center_y_inches": 17.3,
+            "center_x_inches": 22.050000014453,
+            "center_y_inches": 17.300000083371,
             "depth_inches": 1.93,
             "height_inches": 3.5,
             "rotation_degrees": 0.502154,
@@ -2118,20 +2118,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 17.155545,
-              "y_inches": 16.559687
+              "x_inches": 17.155544804794,
+              "y_inches": 16.559686368288
             },
             {
-              "x_inches": 20.655411,
-              "y_inches": 16.590361
+              "x_inches": 20.655410384804,
+              "y_inches": 16.590360817873
             },
             {
-              "x_inches": 20.644455,
-              "y_inches": 17.840313
+              "x_inches": 20.644455224238,
+              "y_inches": 17.840312810734
             },
             {
-              "x_inches": 17.14459,
-              "y_inches": 17.809639
+              "x_inches": 17.144589644228,
+              "y_inches": 17.809638361149
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -2139,34 +2139,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-13-component-02",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 18.9000005,
-        "footprint_center_y_inches": 17.2,
-        "footprint_depth_inches": 1.280625999999998,
-        "footprint_width_inches": 3.510821,
+        "footprint_center_x_inches": 18.900000014516,
+        "footprint_center_y_inches": 17.199999589511002,
+        "footprint_depth_inches": 1.2806264424460032,
+        "footprint_width_inches": 3.5108207405760012,
         "rules_footprint_polygon": [
           {
-            "x_inches": 17.155545,
-            "y_inches": 16.559687
+            "x_inches": 17.155544804794,
+            "y_inches": 16.559686368288
           },
           {
-            "x_inches": 20.655411,
-            "y_inches": 16.590361
+            "x_inches": 20.655410384804,
+            "y_inches": 16.590360817873
           },
           {
-            "x_inches": 20.644455,
-            "y_inches": 17.840313
+            "x_inches": 20.644455224238,
+            "y_inches": 17.840312810734
           },
           {
-            "x_inches": 17.14459,
-            "y_inches": 17.809639
+            "x_inches": 17.144589644228,
+            "y_inches": 17.809638361149
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 18.9,
-            "center_y_inches": 17.2,
+            "center_x_inches": 18.900000014516,
+            "center_y_inches": 17.199999589511,
             "depth_inches": 1.23,
             "height_inches": 2.0,
             "rotation_degrees": 0.502154,
@@ -2183,20 +2183,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 23.255545,
-              "y_inches": 16.609687
+              "x_inches": 23.255544626239,
+              "y_inches": 16.609686868364
             },
             {
-              "x_inches": 26.75541,
-              "y_inches": 16.640361
+              "x_inches": 26.755410206249,
+              "y_inches": 16.640361317948
             },
             {
-              "x_inches": 26.744455,
-              "y_inches": 17.890313
+              "x_inches": 26.744455045683,
+              "y_inches": 17.890313310809
             },
             {
-              "x_inches": 23.244589,
-              "y_inches": 17.859639
+              "x_inches": 23.244589465673,
+              "y_inches": 17.859638861224
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -2204,34 +2204,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-13-component-03",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 24.9999995,
-        "footprint_center_y_inches": 17.25,
-        "footprint_depth_inches": 1.280625999999998,
-        "footprint_width_inches": 3.510821,
+        "footprint_center_x_inches": 24.999999835961,
+        "footprint_center_y_inches": 17.2500000895865,
+        "footprint_depth_inches": 1.2806264424449978,
+        "footprint_width_inches": 3.5108207405760012,
         "rules_footprint_polygon": [
           {
-            "x_inches": 23.255545,
-            "y_inches": 16.609687
+            "x_inches": 23.255544626239,
+            "y_inches": 16.609686868364
           },
           {
-            "x_inches": 26.75541,
-            "y_inches": 16.640361
+            "x_inches": 26.755410206249,
+            "y_inches": 16.640361317948
           },
           {
-            "x_inches": 26.744455,
-            "y_inches": 17.890313
+            "x_inches": 26.744455045683,
+            "y_inches": 17.890313310809
           },
           {
-            "x_inches": 23.244589,
-            "y_inches": 17.859639
+            "x_inches": 23.244589465673,
+            "y_inches": 17.859638861224
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 25.0,
-            "center_y_inches": 17.25,
+            "center_x_inches": 24.999999835961,
+            "center_y_inches": 17.250000089586,
             "depth_inches": 1.23,
             "height_inches": 2.0,
             "rotation_degrees": 0.502154,
@@ -2248,28 +2248,28 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 13.558562,
-              "y_inches": 14.02635
+              "x_inches": 13.558561954534,
+              "y_inches": 14.02634975293
             },
             {
-              "x_inches": 11.952804,
-              "y_inches": 12.522507
+              "x_inches": 11.952804431165,
+              "y_inches": 12.52250708292
             },
             {
-              "x_inches": 12.263826,
-              "y_inches": 12.190407
+              "x_inches": 12.263826437917,
+              "y_inches": 12.190407231496
             },
             {
-              "x_inches": 13.537484,
-              "y_inches": 13.383228
+              "x_inches": 13.537484109862,
+              "y_inches": 13.383227894754
             },
             {
-              "x_inches": 14.115097,
-              "y_inches": 12.766471
+              "x_inches": 14.115096408116,
+              "y_inches": 12.766471027824
             },
             {
-              "x_inches": 14.447197,
-              "y_inches": 13.077493
+              "x_inches": 14.44719625954,
+              "y_inches": 13.077493034576
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -2277,42 +2277,42 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-14-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 13.2000005,
-        "footprint_center_y_inches": 13.1083785,
-        "footprint_depth_inches": 1.8359430000000003,
-        "footprint_width_inches": 2.4943929999999988,
+        "footprint_center_x_inches": 13.2000003453525,
+        "footprint_center_y_inches": 13.108378492213,
+        "footprint_depth_inches": 1.835942521434001,
+        "footprint_width_inches": 2.494391828375001,
         "rules_footprint_polygon": [
           {
-            "x_inches": 13.558562,
-            "y_inches": 14.02635
+            "x_inches": 13.558561954534,
+            "y_inches": 14.02634975293
           },
           {
-            "x_inches": 11.952804,
-            "y_inches": 12.522507
+            "x_inches": 11.952804431165,
+            "y_inches": 12.52250708292
           },
           {
-            "x_inches": 12.263826,
-            "y_inches": 12.190407
+            "x_inches": 12.263826437917,
+            "y_inches": 12.190407231496
           },
           {
-            "x_inches": 13.537484,
-            "y_inches": 13.383228
+            "x_inches": 13.537484109862,
+            "y_inches": 13.383227894754
           },
           {
-            "x_inches": 14.115097,
-            "y_inches": 12.766471
+            "x_inches": 14.115096408116,
+            "y_inches": 12.766471027824
           },
           {
-            "x_inches": 14.447197,
-            "y_inches": 13.077493
+            "x_inches": 14.44719625954,
+            "y_inches": 13.077493034576
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-14-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 12.911195,
-            "center_y_inches": 13.108379,
+            "center_x_inches": 12.911194196226,
+            "center_y_inches": 13.108378492214,
             "depth_inches": 0.43499999999999994,
             "height_inches": 2.0,
             "rotation_degrees": 223.12284499999998,
@@ -2321,8 +2321,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 13.836829,
-            "center_y_inches": 13.396411,
+            "center_x_inches": 13.836829181325,
+            "center_y_inches": 13.396410390377,
             "depth_inches": 0.43499999999999994,
             "height_inches": 2.0,
             "rotation_degrees": 313.122845,
@@ -2339,28 +2339,28 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 14.73471,
-              "y_inches": 8.089144
+              "x_inches": 14.734709893964,
+              "y_inches": 8.089144026767
             },
             {
-              "x_inches": 16.85139,
-              "y_inches": 10.071482
+              "x_inches": 16.851390058087,
+              "y_inches": 10.071482313438
             },
             {
-              "x_inches": 16.576255,
-              "y_inches": 10.365263
+              "x_inches": 16.576255175196,
+              "y_inches": 10.365262922424
             },
             {
-              "x_inches": 14.753356,
-              "y_inches": 8.658059
+              "x_inches": 14.753355620058,
+              "y_inches": 8.658059518645
             },
             {
-              "x_inches": 14.242391,
-              "y_inches": 9.203652
+              "x_inches": 14.242390837546,
+              "y_inches": 9.20365207819
             },
             {
-              "x_inches": 13.94861,
-              "y_inches": 8.928517
+              "x_inches": 13.948610228559,
+              "y_inches": 8.928517195299
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -2368,42 +2368,42 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-14-component-02",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 15.399999999999999,
-        "footprint_center_y_inches": 9.2272035,
-        "footprint_depth_inches": 2.2761190000000013,
-        "footprint_width_inches": 2.902779999999998,
+        "footprint_center_x_inches": 15.400000143322998,
+        "footprint_center_y_inches": 9.2272034745955,
+        "footprint_depth_inches": 2.2761188956569995,
+        "footprint_width_inches": 2.902779829527999,
         "rules_footprint_polygon": [
           {
-            "x_inches": 14.73471,
-            "y_inches": 8.089144
+            "x_inches": 14.734709893964,
+            "y_inches": 8.089144026767
           },
           {
-            "x_inches": 16.85139,
-            "y_inches": 10.071482
+            "x_inches": 16.851390058087,
+            "y_inches": 10.071482313438
           },
           {
-            "x_inches": 16.576255,
-            "y_inches": 10.365263
+            "x_inches": 16.576255175196,
+            "y_inches": 10.365262922424
           },
           {
-            "x_inches": 14.753356,
-            "y_inches": 8.658059
+            "x_inches": 14.753355620058,
+            "y_inches": 8.658059518645
           },
           {
-            "x_inches": 14.242391,
-            "y_inches": 9.203652
+            "x_inches": 14.242390837546,
+            "y_inches": 9.20365207819
           },
           {
-            "x_inches": 13.94861,
-            "y_inches": 8.928517
+            "x_inches": 13.948610228559,
+            "y_inches": 8.928517195299
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-14-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 15.655483,
-            "center_y_inches": 9.227203,
+            "center_x_inches": 15.65548253458,
+            "center_y_inches": 9.227203474596,
             "depth_inches": 0.38249999999999995,
             "height_inches": 2.0,
             "rotation_degrees": 43.12285099999997,
@@ -2412,8 +2412,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 14.48855,
-            "center_y_inches": 8.646398,
+            "center_x_inches": 14.488550365754,
+            "center_y_inches": 8.646398052478,
             "depth_inches": 0.38249999999999995,
             "height_inches": 2.0,
             "rotation_degrees": 133.12285099999997,
@@ -2430,20 +2430,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 9.589233,
-              "y_inches": 13.470876
+              "x_inches": 9.589232947441,
+              "y_inches": 13.470876433164
             },
             {
-              "x_inches": 5.087031,
-              "y_inches": 9.504748
+              "x_inches": 5.087030709881,
+              "y_inches": 9.504747966748
             },
             {
-              "x_inches": 6.210767,
-              "y_inches": 8.229124
+              "x_inches": 6.210767108699,
+              "y_inches": 8.229123999439
             },
             {
-              "x_inches": 10.712969,
-              "y_inches": 12.195252
+              "x_inches": 10.712969346259,
+              "y_inches": 12.195252465855
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -2451,34 +2451,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-15-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 7.8999999999999995,
-        "footprint_center_y_inches": 10.850000000000001,
-        "footprint_depth_inches": 5.241752,
-        "footprint_width_inches": 5.625938,
+        "footprint_center_x_inches": 7.90000002807,
+        "footprint_center_y_inches": 10.850000216301499,
+        "footprint_depth_inches": 5.241752433724999,
+        "footprint_width_inches": 5.625938636378,
         "rules_footprint_polygon": [
           {
-            "x_inches": 9.589233,
-            "y_inches": 13.470876
+            "x_inches": 9.589232947441,
+            "y_inches": 13.470876433164
           },
           {
-            "x_inches": 5.087031,
-            "y_inches": 9.504748
+            "x_inches": 5.087030709881,
+            "y_inches": 9.504747966748
           },
           {
-            "x_inches": 6.210767,
-            "y_inches": 8.229124
+            "x_inches": 6.210767108699,
+            "y_inches": 8.229123999439
           },
           {
-            "x_inches": 10.712969,
-            "y_inches": 12.195252
+            "x_inches": 10.712969346259,
+            "y_inches": 12.195252465855
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-15-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 7.9,
-            "center_y_inches": 10.85,
+            "center_x_inches": 7.90000002807,
+            "center_y_inches": 10.850000216301,
             "depth_inches": 1.68,
             "height_inches": 3.5,
             "rotation_degrees": 221.377818,
@@ -4511,20 +4511,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 34.360767,
-                "y_inches": 46.429124
+                "x_inches": 34.360767183585,
+                "y_inches": 46.429124057313
               },
               {
-                "x_inches": 38.862969,
-                "y_inches": 50.395253
+                "x_inches": 38.862969421145,
+                "y_inches": 50.395252523728
               },
               {
-                "x_inches": 37.739233,
-                "y_inches": 51.670876
+                "x_inches": 37.739233022327,
+                "y_inches": 51.670876491037
               },
               {
-                "x_inches": 33.237031,
-                "y_inches": 47.704748
+                "x_inches": 33.237030784767,
+                "y_inches": 47.704748024621
               }
             ],
             "width_inches": null
@@ -4535,8 +4535,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 36.05,
-                "y_inches": 49.05,
+                "x_inches": 36.050000102956,
+                "y_inches": 49.050000274175,
                 "z_inches": 0.0
               },
               "depth_inches": 1.68,
@@ -4559,28 +4559,28 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 30.441438,
-                "y_inches": 45.97365
+                "x_inches": 30.441438639112,
+                "y_inches": 45.973650057593
               },
               {
-                "x_inches": 32.047196,
-                "y_inches": 47.477493
+                "x_inches": 32.047196162481,
+                "y_inches": 47.477492727603
               },
               {
-                "x_inches": 31.736174,
-                "y_inches": 47.809593
+                "x_inches": 31.736174155729,
+                "y_inches": 47.809592579027
               },
               {
-                "x_inches": 30.462517,
-                "y_inches": 46.616772
+                "x_inches": 30.462516483784,
+                "y_inches": 46.616771915769
               },
               {
-                "x_inches": 29.884904,
-                "y_inches": 47.233529
+                "x_inches": 29.88490418553,
+                "y_inches": 47.233528782699
               },
               {
-                "x_inches": 29.552804,
-                "y_inches": 46.922507
+                "x_inches": 29.552804334106,
+                "y_inches": 46.922506775947
               }
             ],
             "width_inches": null
@@ -4591,8 +4591,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 31.088806,
-                "y_inches": 46.891621,
+                "x_inches": 31.088806397421,
+                "y_inches": 46.891621318309,
                 "z_inches": 0.0
               },
               "depth_inches": 0.43499999999999994,
@@ -4604,8 +4604,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 30.163171,
-                "y_inches": 46.603589,
+                "x_inches": 30.163171412321,
+                "y_inches": 46.603589420146,
                 "z_inches": 0.0
               },
               "depth_inches": 0.43499999999999994,
@@ -4628,28 +4628,28 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 29.265289,
-                "y_inches": 51.860856
+                "x_inches": 29.265289829776,
+                "y_inches": 51.860855922924
               },
               {
-                "x_inches": 27.148609,
-                "y_inches": 49.878518
+                "x_inches": 27.148609665653,
+                "y_inches": 49.878517636253
               },
               {
-                "x_inches": 27.423745,
-                "y_inches": 49.584737
+                "x_inches": 27.423744548544,
+                "y_inches": 49.584737027266
               },
               {
-                "x_inches": 29.246644,
-                "y_inches": 51.291941
+                "x_inches": 29.246644103682,
+                "y_inches": 51.291940431046
               },
               {
-                "x_inches": 29.757609,
-                "y_inches": 50.746348
+                "x_inches": 29.757608886194,
+                "y_inches": 50.746347871501
               },
               {
-                "x_inches": 30.05139,
-                "y_inches": 51.021482
+                "x_inches": 30.051389495181,
+                "y_inches": 51.021482754392
               }
             ],
             "width_inches": null
@@ -4660,8 +4660,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 28.344517,
-                "y_inches": 50.722796,
+                "x_inches": 28.34451718916,
+                "y_inches": 50.722796475095,
                 "z_inches": 0.0
               },
               "depth_inches": 0.38249999999999995,
@@ -4673,8 +4673,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 29.51145,
-                "y_inches": 51.303602,
+                "x_inches": 29.511449357986,
+                "y_inches": 51.303601897213,
                 "z_inches": 0.0
               },
               "depth_inches": 0.38249999999999995,
@@ -4697,20 +4697,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 23.666389,
-                "y_inches": 43.64008
+                "x_inches": 23.666389165312,
+                "y_inches": 43.640080709044
               },
               {
-                "x_inches": 20.216522,
-                "y_inches": 43.609845
+                "x_inches": 20.216521665016,
+                "y_inches": 43.609844465882
               },
               {
-                "x_inches": 20.233612,
-                "y_inches": 41.65992
+                "x_inches": 20.233611715499,
+                "y_inches": 41.659919357019
               },
               {
-                "x_inches": 23.683479,
-                "y_inches": 41.690155
+                "x_inches": 23.683479215794,
+                "y_inches": 41.690155600182
               }
             ],
             "width_inches": null
@@ -4721,8 +4721,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 21.95,
-                "y_inches": 42.65,
+                "x_inches": 21.950000440405,
+                "y_inches": 42.650000033032,
                 "z_inches": 0.0
               },
               "depth_inches": 1.93,
@@ -4745,20 +4745,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 20.744455,
-                "y_inches": 43.390313
+                "x_inches": 20.744455373761,
+                "y_inches": 43.390313131636
               },
               {
-                "x_inches": 17.24459,
-                "y_inches": 43.359639
+                "x_inches": 17.244589793751,
+                "y_inches": 43.359638682052
               },
               {
-                "x_inches": 17.255545,
-                "y_inches": 42.109687
+                "x_inches": 17.255544954317,
+                "y_inches": 42.109686689191
               },
               {
-                "x_inches": 20.755411,
-                "y_inches": 42.140361
+                "x_inches": 20.755410534327,
+                "y_inches": 42.140361138776
               }
             ],
             "width_inches": null
@@ -4769,8 +4769,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 19.0,
-                "y_inches": 42.75,
+                "x_inches": 19.000000164039,
+                "y_inches": 42.749999910414,
                 "z_inches": 0.0
               },
               "depth_inches": 1.23,
@@ -4793,20 +4793,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 26.844455,
-                "y_inches": 43.440313
+                "x_inches": 26.844455195206,
+                "y_inches": 43.440313631712
               },
               {
-                "x_inches": 23.344589,
-                "y_inches": 43.409639
+                "x_inches": 23.344589615196,
+                "y_inches": 43.409639182127
               },
               {
-                "x_inches": 23.355545,
-                "y_inches": 42.159687
+                "x_inches": 23.355544775762,
+                "y_inches": 42.159687189266
               },
               {
-                "x_inches": 26.85541,
-                "y_inches": 42.190361
+                "x_inches": 26.855410355772,
+                "y_inches": 42.190361638851
               }
             ],
             "width_inches": null
@@ -4817,8 +4817,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 25.1,
-                "y_inches": 42.8,
+                "x_inches": 25.099999985484,
+                "y_inches": 42.800000410489,
                 "z_inches": 0.0
               },
               "depth_inches": 1.23,
@@ -5250,28 +5250,28 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 26.281229,
-                "y_inches": 37.619047
+                "x_inches": 26.281228673516,
+                "y_inches": 37.619047362529
               },
               {
-                "x_inches": 24.651715,
-                "y_inches": 37.359846
+                "x_inches": 24.651715029543,
+                "y_inches": 37.359846120044
               },
               {
-                "x_inches": 24.742435,
-                "y_inches": 36.789516
+                "x_inches": 24.742435464412,
+                "y_inches": 36.789516344653
               },
               {
-                "x_inches": 25.801619,
-                "y_inches": 36.957997
+                "x_inches": 25.801619332995,
+                "y_inches": 36.957997152269
               },
               {
-                "x_inches": 25.977955,
-                "y_inches": 35.849434
+                "x_inches": 25.977954723715,
+                "y_inches": 35.849434082354
               },
               {
-                "x_inches": 26.548285,
-                "y_inches": 35.940155
+                "x_inches": 26.548284499106,
+                "y_inches": 35.940154517223
               }
             ],
             "width_inches": null
@@ -5282,8 +5282,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 25.511832,
-                "y_inches": 37.204282,
+                "x_inches": 25.511832068964,
+                "y_inches": 37.204281853591,
                 "z_inches": 0.0
               },
               "depth_inches": 0.5574999999999999,
@@ -5295,8 +5295,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 26.129592,
-                "y_inches": 36.734241,
+                "x_inches": 26.129591698616,
+                "y_inches": 36.734240722441,
                 "z_inches": 0.0
               },
               "depth_inches": 0.5574999999999999,
@@ -5319,20 +5319,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 15.484644,
-                "y_inches": 35.490776
+                "x_inches": 15.484643954379,
+                "y_inches": 35.490776292235
               },
               {
-                "x_inches": 16.312877,
-                "y_inches": 31.577462
+                "x_inches": 16.31287718328,
+                "y_inches": 31.577461876225
               },
               {
-                "x_inches": 20.715356,
-                "y_inches": 32.509224
+                "x_inches": 20.71535590129,
+                "y_inches": 32.509224258738
               },
               {
-                "x_inches": 19.887123,
-                "y_inches": 36.422539
+                "x_inches": 19.887122672389,
+                "y_inches": 36.422538674747
               }
             ],
             "width_inches": null
@@ -5343,8 +5343,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 17.582779,
-                "y_inches": 34.125628,
+                "x_inches": 17.582778787252,
+                "y_inches": 34.125627866939,
                 "z_inches": 3.0
               },
               "depth_inches": 3.5,
@@ -5356,8 +5356,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 17.582779,
-                "y_inches": 34.125628,
+                "x_inches": 17.582778787252,
+                "y_inches": 34.125627866939,
                 "z_inches": 0.0
               },
               "depth_inches": 3.5,
@@ -5369,8 +5369,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 17.582779,
-                "y_inches": 34.125628,
+                "x_inches": 17.582778787252,
+                "y_inches": 34.125627866939,
                 "z_inches": 6.0
               },
               "depth_inches": 3.5,
@@ -5382,8 +5382,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 15.967244,
-                "y_inches": 33.548614,
+                "x_inches": 15.967243571109,
+                "y_inches": 33.548613165736,
                 "z_inches": 3.0
               },
               "depth_inches": 0.12,
@@ -5395,8 +5395,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 17.700378,
-                "y_inches": 35.888174,
+                "x_inches": 17.70037739489,
+                "y_inches": 35.888174481211,
                 "z_inches": 3.0
               },
               "depth_inches": 0.12,
@@ -5408,8 +5408,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 15.967244,
-                "y_inches": 33.548614,
+                "x_inches": 15.967243571109,
+                "y_inches": 33.548613165736,
                 "z_inches": 0.0
               },
               "depth_inches": 0.12,
@@ -5421,8 +5421,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 17.700378,
-                "y_inches": 35.888174,
+                "x_inches": 17.70037739489,
+                "y_inches": 35.888174481211,
                 "z_inches": 0.0
               },
               "depth_inches": 0.12,
@@ -5434,8 +5434,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 15.967244,
-                "y_inches": 33.548614,
+                "x_inches": 15.967243571109,
+                "y_inches": 33.548613165736,
                 "z_inches": 6.0
               },
               "depth_inches": 0.12,
@@ -5447,8 +5447,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 17.700378,
-                "y_inches": 35.888174,
+                "x_inches": 17.70037739489,
+                "y_inches": 35.888174481211,
                 "z_inches": 6.0
               },
               "depth_inches": 0.12,
@@ -5471,28 +5471,28 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 17.735857,
-                "y_inches": 22.419165
+                "x_inches": 17.73585714111,
+                "y_inches": 22.419164353862
               },
               {
-                "x_inches": 19.360578,
-                "y_inches": 22.70688
+                "x_inches": 19.360578473,
+                "y_inches": 22.706880522509
               },
               {
-                "x_inches": 19.259877,
-                "y_inches": 23.275533
+                "x_inches": 19.259877813973,
+                "y_inches": 23.275532988671
               },
               {
-                "x_inches": 18.203809,
-                "y_inches": 23.088518
+                "x_inches": 18.203808948245,
+                "y_inches": 23.08851747905
               },
               {
-                "x_inches": 18.008075,
-                "y_inches": 24.19382
+                "x_inches": 18.008074766846,
+                "y_inches": 24.193820324533
               },
               {
-                "x_inches": 17.439422,
-                "y_inches": 24.09312
+                "x_inches": 17.439422300685,
+                "y_inches": 24.093119665506
               }
             ],
             "width_inches": null
@@ -5503,8 +5503,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 18.497867,
-                "y_inches": 22.847348,
+                "x_inches": 18.497867477542,
+                "y_inches": 22.847348671267,
                 "z_inches": 0.0
               },
               "depth_inches": 0.5574999999999999,
@@ -5516,8 +5516,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 17.871966,
-                "y_inches": 23.306492,
+                "x_inches": 17.871965953978,
+                "y_inches": 23.306492339197,
                 "z_inches": 0.0
               },
               "depth_inches": 0.5574999999999999,
@@ -5540,20 +5540,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 28.461955,
-                "y_inches": 24.469213
+                "x_inches": 28.461955162533,
+                "y_inches": 24.469213342705
               },
               {
-                "x_inches": 27.770252,
-                "y_inches": 28.408953
+                "x_inches": 27.770252170692,
+                "y_inches": 28.408952797425
               },
               {
-                "x_inches": 23.338046,
-                "y_inches": 27.630787
+                "x_inches": 23.338045284132,
+                "y_inches": 27.630786931605
               },
               {
-                "x_inches": 24.029748,
-                "y_inches": 23.691047
+                "x_inches": 24.029748275972,
+                "y_inches": 23.691047476885
               }
             ],
             "width_inches": null
@@ -5564,8 +5564,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 26.412541,
-                "y_inches": 25.906469,
+                "x_inches": 26.412541879929,
+                "y_inches": 25.90646947753,
                 "z_inches": 3.0
               },
               "depth_inches": 3.5,
@@ -5577,8 +5577,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 26.412541,
-                "y_inches": 25.906469,
+                "x_inches": 26.412541879929,
+                "y_inches": 25.90646947753,
                 "z_inches": 0.0
               },
               "depth_inches": 3.5,
@@ -5590,8 +5590,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 26.412541,
-                "y_inches": 25.906469,
+                "x_inches": 26.412541879929,
+                "y_inches": 25.90646947753,
                 "z_inches": 6.0
               },
               "depth_inches": 3.5,
@@ -5603,8 +5603,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 28.047158,
-                "y_inches": 26.426978,
+                "x_inches": 28.047158226155,
+                "y_inches": 26.426978267708,
                 "z_inches": 3.0
               },
               "depth_inches": 0.12,
@@ -5616,8 +5616,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 26.233746,
-                "y_inches": 24.149076,
+                "x_inches": 26.233746916895,
+                "y_inches": 24.149075850253,
                 "z_inches": 3.0
               },
               "depth_inches": 0.12,
@@ -5629,8 +5629,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 28.047158,
-                "y_inches": 26.426978,
+                "x_inches": 28.047158226155,
+                "y_inches": 26.426978267708,
                 "z_inches": 0.0
               },
               "depth_inches": 0.12,
@@ -5642,8 +5642,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 26.233746,
-                "y_inches": 24.149076,
+                "x_inches": 26.233746916895,
+                "y_inches": 24.149075850253,
                 "z_inches": 0.0
               },
               "depth_inches": 0.12,
@@ -5655,8 +5655,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 28.047158,
-                "y_inches": 26.426978,
+                "x_inches": 28.047158226155,
+                "y_inches": 26.426978267708,
                 "z_inches": 6.0
               },
               "depth_inches": 0.12,
@@ -5668,8 +5668,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 26.233746,
-                "y_inches": 24.149076,
+                "x_inches": 26.233746916895,
+                "y_inches": 24.149075850253,
                 "z_inches": 6.0
               },
               "depth_inches": 0.12,
@@ -6101,20 +6101,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 20.333611,
-                "y_inches": 16.30992
+                "x_inches": 20.333611289546,
+                "y_inches": 16.309919407358
               },
               {
-                "x_inches": 23.783479,
-                "y_inches": 16.340155
+                "x_inches": 23.783478789842,
+                "y_inches": 16.340155650521
               },
               {
-                "x_inches": 23.766389,
-                "y_inches": 18.29008
+                "x_inches": 23.76638873936,
+                "y_inches": 18.290080759383
               },
               {
-                "x_inches": 20.316521,
-                "y_inches": 18.259845
+                "x_inches": 20.316521239064,
+                "y_inches": 18.259844516221
               }
             ],
             "width_inches": null
@@ -6125,8 +6125,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 22.05,
-                "y_inches": 17.3,
+                "x_inches": 22.050000014453,
+                "y_inches": 17.300000083371,
                 "z_inches": 0.0
               },
               "depth_inches": 1.93,
@@ -6149,20 +6149,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 17.155545,
-                "y_inches": 16.559687
+                "x_inches": 17.155544804794,
+                "y_inches": 16.559686368288
               },
               {
-                "x_inches": 20.655411,
-                "y_inches": 16.590361
+                "x_inches": 20.655410384804,
+                "y_inches": 16.590360817873
               },
               {
-                "x_inches": 20.644455,
-                "y_inches": 17.840313
+                "x_inches": 20.644455224238,
+                "y_inches": 17.840312810734
               },
               {
-                "x_inches": 17.14459,
-                "y_inches": 17.809639
+                "x_inches": 17.144589644228,
+                "y_inches": 17.809638361149
               }
             ],
             "width_inches": null
@@ -6173,8 +6173,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 18.9,
-                "y_inches": 17.2,
+                "x_inches": 18.900000014516,
+                "y_inches": 17.199999589511,
                 "z_inches": 0.0
               },
               "depth_inches": 1.23,
@@ -6197,20 +6197,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 23.255545,
-                "y_inches": 16.609687
+                "x_inches": 23.255544626239,
+                "y_inches": 16.609686868364
               },
               {
-                "x_inches": 26.75541,
-                "y_inches": 16.640361
+                "x_inches": 26.755410206249,
+                "y_inches": 16.640361317948
               },
               {
-                "x_inches": 26.744455,
-                "y_inches": 17.890313
+                "x_inches": 26.744455045683,
+                "y_inches": 17.890313310809
               },
               {
-                "x_inches": 23.244589,
-                "y_inches": 17.859639
+                "x_inches": 23.244589465673,
+                "y_inches": 17.859638861224
               }
             ],
             "width_inches": null
@@ -6221,8 +6221,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 25.0,
-                "y_inches": 17.25,
+                "x_inches": 24.999999835961,
+                "y_inches": 17.250000089586,
                 "z_inches": 0.0
               },
               "depth_inches": 1.23,
@@ -6245,28 +6245,28 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 13.558562,
-                "y_inches": 14.02635
+                "x_inches": 13.558561954534,
+                "y_inches": 14.02634975293
               },
               {
-                "x_inches": 11.952804,
-                "y_inches": 12.522507
+                "x_inches": 11.952804431165,
+                "y_inches": 12.52250708292
               },
               {
-                "x_inches": 12.263826,
-                "y_inches": 12.190407
+                "x_inches": 12.263826437917,
+                "y_inches": 12.190407231496
               },
               {
-                "x_inches": 13.537484,
-                "y_inches": 13.383228
+                "x_inches": 13.537484109862,
+                "y_inches": 13.383227894754
               },
               {
-                "x_inches": 14.115097,
-                "y_inches": 12.766471
+                "x_inches": 14.115096408116,
+                "y_inches": 12.766471027824
               },
               {
-                "x_inches": 14.447197,
-                "y_inches": 13.077493
+                "x_inches": 14.44719625954,
+                "y_inches": 13.077493034576
               }
             ],
             "width_inches": null
@@ -6277,8 +6277,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 12.911195,
-                "y_inches": 13.108379,
+                "x_inches": 12.911194196226,
+                "y_inches": 13.108378492214,
                 "z_inches": 0.0
               },
               "depth_inches": 0.43499999999999994,
@@ -6290,8 +6290,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 13.836829,
-                "y_inches": 13.396411,
+                "x_inches": 13.836829181325,
+                "y_inches": 13.396410390377,
                 "z_inches": 0.0
               },
               "depth_inches": 0.43499999999999994,
@@ -6314,28 +6314,28 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 14.73471,
-                "y_inches": 8.089144
+                "x_inches": 14.734709893964,
+                "y_inches": 8.089144026767
               },
               {
-                "x_inches": 16.85139,
-                "y_inches": 10.071482
+                "x_inches": 16.851390058087,
+                "y_inches": 10.071482313438
               },
               {
-                "x_inches": 16.576255,
-                "y_inches": 10.365263
+                "x_inches": 16.576255175196,
+                "y_inches": 10.365262922424
               },
               {
-                "x_inches": 14.753356,
-                "y_inches": 8.658059
+                "x_inches": 14.753355620058,
+                "y_inches": 8.658059518645
               },
               {
-                "x_inches": 14.242391,
-                "y_inches": 9.203652
+                "x_inches": 14.242390837546,
+                "y_inches": 9.20365207819
               },
               {
-                "x_inches": 13.94861,
-                "y_inches": 8.928517
+                "x_inches": 13.948610228559,
+                "y_inches": 8.928517195299
               }
             ],
             "width_inches": null
@@ -6346,8 +6346,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 15.655483,
-                "y_inches": 9.227203,
+                "x_inches": 15.65548253458,
+                "y_inches": 9.227203474596,
                 "z_inches": 0.0
               },
               "depth_inches": 0.38249999999999995,
@@ -6359,8 +6359,8 @@
             },
             {
               "bottom_center": {
-                "x_inches": 14.48855,
-                "y_inches": 8.646398,
+                "x_inches": 14.488550365754,
+                "y_inches": 8.646398052478,
                 "z_inches": 0.0
               },
               "depth_inches": 0.38249999999999995,
@@ -6383,20 +6383,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 9.589233,
-                "y_inches": 13.470876
+                "x_inches": 9.589232947441,
+                "y_inches": 13.470876433164
               },
               {
-                "x_inches": 5.087031,
-                "y_inches": 9.504748
+                "x_inches": 5.087030709881,
+                "y_inches": 9.504747966748
               },
               {
-                "x_inches": 6.210767,
-                "y_inches": 8.229124
+                "x_inches": 6.210767108699,
+                "y_inches": 8.229123999439
               },
               {
-                "x_inches": 10.712969,
-                "y_inches": 12.195252
+                "x_inches": 10.712969346259,
+                "y_inches": 12.195252465855
               }
             ],
             "width_inches": null
@@ -6407,8 +6407,8 @@
           "volumes": [
             {
               "bottom_center": {
-                "x_inches": 7.9,
-                "y_inches": 10.85,
+                "x_inches": 7.90000002807,
+                "y_inches": 10.850000216301,
                 "z_inches": 0.0
               },
               "depth_inches": 1.68,
@@ -6604,7 +6604,7 @@
         }
       }
     },
-    "authoritative_geometry_hash": "72503f7fa7a871fe63cd90fd915ee715c0114cbfa679b5463efcf3a39e835836",
+    "authoritative_geometry_hash": "e7a2b9e02ccddb944abfed47bc4d1bc6e4015bb0312304ff709218461c370e5f",
     "battlefield_id": "ui-contract-hidden-redaction:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
     "bounds": {
       "max_x_inches": 44.0,
@@ -6822,20 +6822,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 34.360767,
-                "y_inches": 46.429124
+                "x_inches": 34.360767183585,
+                "y_inches": 46.429124057313
               },
               {
-                "x_inches": 38.862969,
-                "y_inches": 50.395253
+                "x_inches": 38.862969421145,
+                "y_inches": 50.395252523728
               },
               {
-                "x_inches": 37.739233,
-                "y_inches": 51.670876
+                "x_inches": 37.739233022327,
+                "y_inches": 51.670876491037
               },
               {
-                "x_inches": 33.237031,
-                "y_inches": 47.704748
+                "x_inches": 33.237030784767,
+                "y_inches": 47.704748024621
               }
             ],
             "width_inches": null
@@ -6851,28 +6851,28 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 30.441438,
-                "y_inches": 45.97365
+                "x_inches": 30.441438639112,
+                "y_inches": 45.973650057593
               },
               {
-                "x_inches": 32.047196,
-                "y_inches": 47.477493
+                "x_inches": 32.047196162481,
+                "y_inches": 47.477492727603
               },
               {
-                "x_inches": 31.736174,
-                "y_inches": 47.809593
+                "x_inches": 31.736174155729,
+                "y_inches": 47.809592579027
               },
               {
-                "x_inches": 30.462517,
-                "y_inches": 46.616772
+                "x_inches": 30.462516483784,
+                "y_inches": 46.616771915769
               },
               {
-                "x_inches": 29.884904,
-                "y_inches": 47.233529
+                "x_inches": 29.88490418553,
+                "y_inches": 47.233528782699
               },
               {
-                "x_inches": 29.552804,
-                "y_inches": 46.922507
+                "x_inches": 29.552804334106,
+                "y_inches": 46.922506775947
               }
             ],
             "width_inches": null
@@ -6888,28 +6888,28 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 29.265289,
-                "y_inches": 51.860856
+                "x_inches": 29.265289829776,
+                "y_inches": 51.860855922924
               },
               {
-                "x_inches": 27.148609,
-                "y_inches": 49.878518
+                "x_inches": 27.148609665653,
+                "y_inches": 49.878517636253
               },
               {
-                "x_inches": 27.423745,
-                "y_inches": 49.584737
+                "x_inches": 27.423744548544,
+                "y_inches": 49.584737027266
               },
               {
-                "x_inches": 29.246644,
-                "y_inches": 51.291941
+                "x_inches": 29.246644103682,
+                "y_inches": 51.291940431046
               },
               {
-                "x_inches": 29.757609,
-                "y_inches": 50.746348
+                "x_inches": 29.757608886194,
+                "y_inches": 50.746347871501
               },
               {
-                "x_inches": 30.05139,
-                "y_inches": 51.021482
+                "x_inches": 30.051389495181,
+                "y_inches": 51.021482754392
               }
             ],
             "width_inches": null
@@ -6925,20 +6925,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 23.666389,
-                "y_inches": 43.64008
+                "x_inches": 23.666389165312,
+                "y_inches": 43.640080709044
               },
               {
-                "x_inches": 20.216522,
-                "y_inches": 43.609845
+                "x_inches": 20.216521665016,
+                "y_inches": 43.609844465882
               },
               {
-                "x_inches": 20.233612,
-                "y_inches": 41.65992
+                "x_inches": 20.233611715499,
+                "y_inches": 41.659919357019
               },
               {
-                "x_inches": 23.683479,
-                "y_inches": 41.690155
+                "x_inches": 23.683479215794,
+                "y_inches": 41.690155600182
               }
             ],
             "width_inches": null
@@ -6954,20 +6954,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 20.744455,
-                "y_inches": 43.390313
+                "x_inches": 20.744455373761,
+                "y_inches": 43.390313131636
               },
               {
-                "x_inches": 17.24459,
-                "y_inches": 43.359639
+                "x_inches": 17.244589793751,
+                "y_inches": 43.359638682052
               },
               {
-                "x_inches": 17.255545,
-                "y_inches": 42.109687
+                "x_inches": 17.255544954317,
+                "y_inches": 42.109686689191
               },
               {
-                "x_inches": 20.755411,
-                "y_inches": 42.140361
+                "x_inches": 20.755410534327,
+                "y_inches": 42.140361138776
               }
             ],
             "width_inches": null
@@ -6983,20 +6983,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 26.844455,
-                "y_inches": 43.440313
+                "x_inches": 26.844455195206,
+                "y_inches": 43.440313631712
               },
               {
-                "x_inches": 23.344589,
-                "y_inches": 43.409639
+                "x_inches": 23.344589615196,
+                "y_inches": 43.409639182127
               },
               {
-                "x_inches": 23.355545,
-                "y_inches": 42.159687
+                "x_inches": 23.355544775762,
+                "y_inches": 42.159687189266
               },
               {
-                "x_inches": 26.85541,
-                "y_inches": 42.190361
+                "x_inches": 26.855410355772,
+                "y_inches": 42.190361638851
               }
             ],
             "width_inches": null
@@ -7157,28 +7157,28 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 26.281229,
-                "y_inches": 37.619047
+                "x_inches": 26.281228673516,
+                "y_inches": 37.619047362529
               },
               {
-                "x_inches": 24.651715,
-                "y_inches": 37.359846
+                "x_inches": 24.651715029543,
+                "y_inches": 37.359846120044
               },
               {
-                "x_inches": 24.742435,
-                "y_inches": 36.789516
+                "x_inches": 24.742435464412,
+                "y_inches": 36.789516344653
               },
               {
-                "x_inches": 25.801619,
-                "y_inches": 36.957997
+                "x_inches": 25.801619332995,
+                "y_inches": 36.957997152269
               },
               {
-                "x_inches": 25.977955,
-                "y_inches": 35.849434
+                "x_inches": 25.977954723715,
+                "y_inches": 35.849434082354
               },
               {
-                "x_inches": 26.548285,
-                "y_inches": 35.940155
+                "x_inches": 26.548284499106,
+                "y_inches": 35.940154517223
               }
             ],
             "width_inches": null
@@ -7194,20 +7194,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 15.484644,
-                "y_inches": 35.490776
+                "x_inches": 15.484643954379,
+                "y_inches": 35.490776292235
               },
               {
-                "x_inches": 16.312877,
-                "y_inches": 31.577462
+                "x_inches": 16.31287718328,
+                "y_inches": 31.577461876225
               },
               {
-                "x_inches": 20.715356,
-                "y_inches": 32.509224
+                "x_inches": 20.71535590129,
+                "y_inches": 32.509224258738
               },
               {
-                "x_inches": 19.887123,
-                "y_inches": 36.422539
+                "x_inches": 19.887122672389,
+                "y_inches": 36.422538674747
               }
             ],
             "width_inches": null
@@ -7223,28 +7223,28 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 17.735857,
-                "y_inches": 22.419165
+                "x_inches": 17.73585714111,
+                "y_inches": 22.419164353862
               },
               {
-                "x_inches": 19.360578,
-                "y_inches": 22.70688
+                "x_inches": 19.360578473,
+                "y_inches": 22.706880522509
               },
               {
-                "x_inches": 19.259877,
-                "y_inches": 23.275533
+                "x_inches": 19.259877813973,
+                "y_inches": 23.275532988671
               },
               {
-                "x_inches": 18.203809,
-                "y_inches": 23.088518
+                "x_inches": 18.203808948245,
+                "y_inches": 23.08851747905
               },
               {
-                "x_inches": 18.008075,
-                "y_inches": 24.19382
+                "x_inches": 18.008074766846,
+                "y_inches": 24.193820324533
               },
               {
-                "x_inches": 17.439422,
-                "y_inches": 24.09312
+                "x_inches": 17.439422300685,
+                "y_inches": 24.093119665506
               }
             ],
             "width_inches": null
@@ -7260,20 +7260,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 28.461955,
-                "y_inches": 24.469213
+                "x_inches": 28.461955162533,
+                "y_inches": 24.469213342705
               },
               {
-                "x_inches": 27.770252,
-                "y_inches": 28.408953
+                "x_inches": 27.770252170692,
+                "y_inches": 28.408952797425
               },
               {
-                "x_inches": 23.338046,
-                "y_inches": 27.630787
+                "x_inches": 23.338045284132,
+                "y_inches": 27.630786931605
               },
               {
-                "x_inches": 24.029748,
-                "y_inches": 23.691047
+                "x_inches": 24.029748275972,
+                "y_inches": 23.691047476885
               }
             ],
             "width_inches": null
@@ -7434,20 +7434,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 20.333611,
-                "y_inches": 16.30992
+                "x_inches": 20.333611289546,
+                "y_inches": 16.309919407358
               },
               {
-                "x_inches": 23.783479,
-                "y_inches": 16.340155
+                "x_inches": 23.783478789842,
+                "y_inches": 16.340155650521
               },
               {
-                "x_inches": 23.766389,
-                "y_inches": 18.29008
+                "x_inches": 23.76638873936,
+                "y_inches": 18.290080759383
               },
               {
-                "x_inches": 20.316521,
-                "y_inches": 18.259845
+                "x_inches": 20.316521239064,
+                "y_inches": 18.259844516221
               }
             ],
             "width_inches": null
@@ -7463,20 +7463,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 17.155545,
-                "y_inches": 16.559687
+                "x_inches": 17.155544804794,
+                "y_inches": 16.559686368288
               },
               {
-                "x_inches": 20.655411,
-                "y_inches": 16.590361
+                "x_inches": 20.655410384804,
+                "y_inches": 16.590360817873
               },
               {
-                "x_inches": 20.644455,
-                "y_inches": 17.840313
+                "x_inches": 20.644455224238,
+                "y_inches": 17.840312810734
               },
               {
-                "x_inches": 17.14459,
-                "y_inches": 17.809639
+                "x_inches": 17.144589644228,
+                "y_inches": 17.809638361149
               }
             ],
             "width_inches": null
@@ -7492,20 +7492,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 23.255545,
-                "y_inches": 16.609687
+                "x_inches": 23.255544626239,
+                "y_inches": 16.609686868364
               },
               {
-                "x_inches": 26.75541,
-                "y_inches": 16.640361
+                "x_inches": 26.755410206249,
+                "y_inches": 16.640361317948
               },
               {
-                "x_inches": 26.744455,
-                "y_inches": 17.890313
+                "x_inches": 26.744455045683,
+                "y_inches": 17.890313310809
               },
               {
-                "x_inches": 23.244589,
-                "y_inches": 17.859639
+                "x_inches": 23.244589465673,
+                "y_inches": 17.859638861224
               }
             ],
             "width_inches": null
@@ -7521,28 +7521,28 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 13.558562,
-                "y_inches": 14.02635
+                "x_inches": 13.558561954534,
+                "y_inches": 14.02634975293
               },
               {
-                "x_inches": 11.952804,
-                "y_inches": 12.522507
+                "x_inches": 11.952804431165,
+                "y_inches": 12.52250708292
               },
               {
-                "x_inches": 12.263826,
-                "y_inches": 12.190407
+                "x_inches": 12.263826437917,
+                "y_inches": 12.190407231496
               },
               {
-                "x_inches": 13.537484,
-                "y_inches": 13.383228
+                "x_inches": 13.537484109862,
+                "y_inches": 13.383227894754
               },
               {
-                "x_inches": 14.115097,
-                "y_inches": 12.766471
+                "x_inches": 14.115096408116,
+                "y_inches": 12.766471027824
               },
               {
-                "x_inches": 14.447197,
-                "y_inches": 13.077493
+                "x_inches": 14.44719625954,
+                "y_inches": 13.077493034576
               }
             ],
             "width_inches": null
@@ -7558,28 +7558,28 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 14.73471,
-                "y_inches": 8.089144
+                "x_inches": 14.734709893964,
+                "y_inches": 8.089144026767
               },
               {
-                "x_inches": 16.85139,
-                "y_inches": 10.071482
+                "x_inches": 16.851390058087,
+                "y_inches": 10.071482313438
               },
               {
-                "x_inches": 16.576255,
-                "y_inches": 10.365263
+                "x_inches": 16.576255175196,
+                "y_inches": 10.365262922424
               },
               {
-                "x_inches": 14.753356,
-                "y_inches": 8.658059
+                "x_inches": 14.753355620058,
+                "y_inches": 8.658059518645
               },
               {
-                "x_inches": 14.242391,
-                "y_inches": 9.203652
+                "x_inches": 14.242390837546,
+                "y_inches": 9.20365207819
               },
               {
-                "x_inches": 13.94861,
-                "y_inches": 8.928517
+                "x_inches": 13.948610228559,
+                "y_inches": 8.928517195299
               }
             ],
             "width_inches": null
@@ -7595,20 +7595,20 @@
             "rotation_degrees": 0.0,
             "vertices": [
               {
-                "x_inches": 9.589233,
-                "y_inches": 13.470876
+                "x_inches": 9.589232947441,
+                "y_inches": 13.470876433164
               },
               {
-                "x_inches": 5.087031,
-                "y_inches": 9.504748
+                "x_inches": 5.087030709881,
+                "y_inches": 9.504747966748
               },
               {
-                "x_inches": 6.210767,
-                "y_inches": 8.229124
+                "x_inches": 6.210767108699,
+                "y_inches": 8.229123999439
               },
               {
-                "x_inches": 10.712969,
-                "y_inches": 12.195252
+                "x_inches": 10.712969346259,
+                "y_inches": 12.195252465855
               }
             ],
             "width_inches": null
@@ -9374,20 +9374,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 34.360767,
-              "y_inches": 46.429124
+              "x_inches": 34.360767183585,
+              "y_inches": 46.429124057313
             },
             {
-              "x_inches": 38.862969,
-              "y_inches": 50.395253
+              "x_inches": 38.862969421145,
+              "y_inches": 50.395252523728
             },
             {
-              "x_inches": 37.739233,
-              "y_inches": 51.670876
+              "x_inches": 37.739233022327,
+              "y_inches": 51.670876491037
             },
             {
-              "x_inches": 33.237031,
-              "y_inches": 47.704748
+              "x_inches": 33.237030784767,
+              "y_inches": 47.704748024621
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -9395,34 +9395,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-02-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 36.05,
-        "footprint_center_y_inches": 49.05,
-        "footprint_depth_inches": 5.241751999999998,
-        "footprint_width_inches": 5.625937999999998,
+        "footprint_center_x_inches": 36.050000102956005,
+        "footprint_center_y_inches": 49.050000274175,
+        "footprint_depth_inches": 5.2417524337240025,
+        "footprint_width_inches": 5.625938636378002,
         "rules_footprint_polygon": [
           {
-            "x_inches": 34.360767,
-            "y_inches": 46.429124
+            "x_inches": 34.360767183585,
+            "y_inches": 46.429124057313
           },
           {
-            "x_inches": 38.862969,
-            "y_inches": 50.395253
+            "x_inches": 38.862969421145,
+            "y_inches": 50.395252523728
           },
           {
-            "x_inches": 37.739233,
-            "y_inches": 51.670876
+            "x_inches": 37.739233022327,
+            "y_inches": 51.670876491037
           },
           {
-            "x_inches": 33.237031,
-            "y_inches": 47.704748
+            "x_inches": 33.237030784767,
+            "y_inches": 47.704748024621
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-02-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 36.05,
-            "center_y_inches": 49.05,
+            "center_x_inches": 36.050000102956,
+            "center_y_inches": 49.050000274175,
             "depth_inches": 1.68,
             "height_inches": 3.5,
             "rotation_degrees": 41.377818,
@@ -9439,28 +9439,28 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 30.441438,
-              "y_inches": 45.97365
+              "x_inches": 30.441438639112,
+              "y_inches": 45.973650057593
             },
             {
-              "x_inches": 32.047196,
-              "y_inches": 47.477493
+              "x_inches": 32.047196162481,
+              "y_inches": 47.477492727603
             },
             {
-              "x_inches": 31.736174,
-              "y_inches": 47.809593
+              "x_inches": 31.736174155729,
+              "y_inches": 47.809592579027
             },
             {
-              "x_inches": 30.462517,
-              "y_inches": 46.616772
+              "x_inches": 30.462516483784,
+              "y_inches": 46.616771915769
             },
             {
-              "x_inches": 29.884904,
-              "y_inches": 47.233529
+              "x_inches": 29.88490418553,
+              "y_inches": 47.233528782699
             },
             {
-              "x_inches": 29.552804,
-              "y_inches": 46.922507
+              "x_inches": 29.552804334106,
+              "y_inches": 46.922506775947
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -9468,42 +9468,42 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-03-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 30.799999999999997,
-        "footprint_center_y_inches": 46.8916215,
-        "footprint_depth_inches": 1.8359430000000003,
-        "footprint_width_inches": 2.4943920000000013,
+        "footprint_center_x_inches": 30.8000002482935,
+        "footprint_center_y_inches": 46.89162131831,
+        "footprint_depth_inches": 1.8359425214339993,
+        "footprint_width_inches": 2.494391828375001,
         "rules_footprint_polygon": [
           {
-            "x_inches": 30.441438,
-            "y_inches": 45.97365
+            "x_inches": 30.441438639112,
+            "y_inches": 45.973650057593
           },
           {
-            "x_inches": 32.047196,
-            "y_inches": 47.477493
+            "x_inches": 32.047196162481,
+            "y_inches": 47.477492727603
           },
           {
-            "x_inches": 31.736174,
-            "y_inches": 47.809593
+            "x_inches": 31.736174155729,
+            "y_inches": 47.809592579027
           },
           {
-            "x_inches": 30.462517,
-            "y_inches": 46.616772
+            "x_inches": 30.462516483784,
+            "y_inches": 46.616771915769
           },
           {
-            "x_inches": 29.884904,
-            "y_inches": 47.233529
+            "x_inches": 29.88490418553,
+            "y_inches": 47.233528782699
           },
           {
-            "x_inches": 29.552804,
-            "y_inches": 46.922507
+            "x_inches": 29.552804334106,
+            "y_inches": 46.922506775947
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-03-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 31.088806,
-            "center_y_inches": 46.891621,
+            "center_x_inches": 31.088806397421,
+            "center_y_inches": 46.891621318309,
             "depth_inches": 0.43499999999999994,
             "height_inches": 2.0,
             "rotation_degrees": 43.122844999999984,
@@ -9512,8 +9512,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 30.163171,
-            "center_y_inches": 46.603589,
+            "center_x_inches": 30.163171412321,
+            "center_y_inches": 46.603589420146,
             "depth_inches": 0.43499999999999994,
             "height_inches": 2.0,
             "rotation_degrees": 133.12284499999998,
@@ -9530,28 +9530,28 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 29.265289,
-              "y_inches": 51.860856
+              "x_inches": 29.265289829776,
+              "y_inches": 51.860855922924
             },
             {
-              "x_inches": 27.148609,
-              "y_inches": 49.878518
+              "x_inches": 27.148609665653,
+              "y_inches": 49.878517636253
             },
             {
-              "x_inches": 27.423745,
-              "y_inches": 49.584737
+              "x_inches": 27.423744548544,
+              "y_inches": 49.584737027266
             },
             {
-              "x_inches": 29.246644,
-              "y_inches": 51.291941
+              "x_inches": 29.246644103682,
+              "y_inches": 51.291940431046
             },
             {
-              "x_inches": 29.757609,
-              "y_inches": 50.746348
+              "x_inches": 29.757608886194,
+              "y_inches": 50.746347871501
             },
             {
-              "x_inches": 30.05139,
-              "y_inches": 51.021482
+              "x_inches": 30.051389495181,
+              "y_inches": 51.021482754392
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -9559,42 +9559,42 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-03-component-02",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 28.599999500000003,
-        "footprint_center_y_inches": 50.7227965,
-        "footprint_depth_inches": 2.2761190000000013,
-        "footprint_width_inches": 2.902781000000001,
+        "footprint_center_x_inches": 28.599999580417,
+        "footprint_center_y_inches": 50.722796475095,
+        "footprint_depth_inches": 2.2761188956580014,
+        "footprint_width_inches": 2.902779829527997,
         "rules_footprint_polygon": [
           {
-            "x_inches": 29.265289,
-            "y_inches": 51.860856
+            "x_inches": 29.265289829776,
+            "y_inches": 51.860855922924
           },
           {
-            "x_inches": 27.148609,
-            "y_inches": 49.878518
+            "x_inches": 27.148609665653,
+            "y_inches": 49.878517636253
           },
           {
-            "x_inches": 27.423745,
-            "y_inches": 49.584737
+            "x_inches": 27.423744548544,
+            "y_inches": 49.584737027266
           },
           {
-            "x_inches": 29.246644,
-            "y_inches": 51.291941
+            "x_inches": 29.246644103682,
+            "y_inches": 51.291940431046
           },
           {
-            "x_inches": 29.757609,
-            "y_inches": 50.746348
+            "x_inches": 29.757608886194,
+            "y_inches": 50.746347871501
           },
           {
-            "x_inches": 30.05139,
-            "y_inches": 51.021482
+            "x_inches": 30.051389495181,
+            "y_inches": 51.021482754392
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-03-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 28.344517,
-            "center_y_inches": 50.722796,
+            "center_x_inches": 28.34451718916,
+            "center_y_inches": 50.722796475095,
             "depth_inches": 0.38249999999999995,
             "height_inches": 2.0,
             "rotation_degrees": 223.122851,
@@ -9603,8 +9603,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 29.51145,
-            "center_y_inches": 51.303602,
+            "center_x_inches": 29.511449357986,
+            "center_y_inches": 51.303601897213,
             "depth_inches": 0.38249999999999995,
             "height_inches": 2.0,
             "rotation_degrees": 313.12285099999997,
@@ -9621,20 +9621,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 23.666389,
-              "y_inches": 43.64008
+              "x_inches": 23.666389165312,
+              "y_inches": 43.640080709044
             },
             {
-              "x_inches": 20.216522,
-              "y_inches": 43.609845
+              "x_inches": 20.216521665016,
+              "y_inches": 43.609844465882
             },
             {
-              "x_inches": 20.233612,
-              "y_inches": 41.65992
+              "x_inches": 20.233611715499,
+              "y_inches": 41.659919357019
             },
             {
-              "x_inches": 23.683479,
-              "y_inches": 41.690155
+              "x_inches": 23.683479215794,
+              "y_inches": 41.690155600182
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -9642,34 +9642,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-04-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 21.9500005,
-        "footprint_center_y_inches": 42.65,
-        "footprint_depth_inches": 1.980159999999998,
-        "footprint_width_inches": 3.466956999999997,
+        "footprint_center_x_inches": 21.950000440405,
+        "footprint_center_y_inches": 42.6500000330315,
+        "footprint_depth_inches": 1.980161352025,
+        "footprint_width_inches": 3.4669575507780017,
         "rules_footprint_polygon": [
           {
-            "x_inches": 23.666389,
-            "y_inches": 43.64008
+            "x_inches": 23.666389165312,
+            "y_inches": 43.640080709044
           },
           {
-            "x_inches": 20.216522,
-            "y_inches": 43.609845
+            "x_inches": 20.216521665016,
+            "y_inches": 43.609844465882
           },
           {
-            "x_inches": 20.233612,
-            "y_inches": 41.65992
+            "x_inches": 20.233611715499,
+            "y_inches": 41.659919357019
           },
           {
-            "x_inches": 23.683479,
-            "y_inches": 41.690155
+            "x_inches": 23.683479215794,
+            "y_inches": 41.690155600182
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 21.95,
-            "center_y_inches": 42.65,
+            "center_x_inches": 21.950000440405,
+            "center_y_inches": 42.650000033032,
             "depth_inches": 1.93,
             "height_inches": 3.5,
             "rotation_degrees": 180.50215400000002,
@@ -9686,20 +9686,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 20.744455,
-              "y_inches": 43.390313
+              "x_inches": 20.744455373761,
+              "y_inches": 43.390313131636
             },
             {
-              "x_inches": 17.24459,
-              "y_inches": 43.359639
+              "x_inches": 17.244589793751,
+              "y_inches": 43.359638682052
             },
             {
-              "x_inches": 17.255545,
-              "y_inches": 42.109687
+              "x_inches": 17.255544954317,
+              "y_inches": 42.109686689191
             },
             {
-              "x_inches": 20.755411,
-              "y_inches": 42.140361
+              "x_inches": 20.755410534327,
+              "y_inches": 42.140361138776
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -9707,34 +9707,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-04-component-02",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 19.0000005,
-        "footprint_center_y_inches": 42.75,
-        "footprint_depth_inches": 1.280625999999998,
-        "footprint_width_inches": 3.510821,
+        "footprint_center_x_inches": 19.000000164039,
+        "footprint_center_y_inches": 42.7499999104135,
+        "footprint_depth_inches": 1.2806264424449978,
+        "footprint_width_inches": 3.5108207405760012,
         "rules_footprint_polygon": [
           {
-            "x_inches": 20.744455,
-            "y_inches": 43.390313
+            "x_inches": 20.744455373761,
+            "y_inches": 43.390313131636
           },
           {
-            "x_inches": 17.24459,
-            "y_inches": 43.359639
+            "x_inches": 17.244589793751,
+            "y_inches": 43.359638682052
           },
           {
-            "x_inches": 17.255545,
-            "y_inches": 42.109687
+            "x_inches": 17.255544954317,
+            "y_inches": 42.109686689191
           },
           {
-            "x_inches": 20.755411,
-            "y_inches": 42.140361
+            "x_inches": 20.755410534327,
+            "y_inches": 42.140361138776
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 19.0,
-            "center_y_inches": 42.75,
+            "center_x_inches": 19.000000164039,
+            "center_y_inches": 42.749999910414,
             "depth_inches": 1.23,
             "height_inches": 2.0,
             "rotation_degrees": 180.50215400000002,
@@ -9751,20 +9751,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 26.844455,
-              "y_inches": 43.440313
+              "x_inches": 26.844455195206,
+              "y_inches": 43.440313631712
             },
             {
-              "x_inches": 23.344589,
-              "y_inches": 43.409639
+              "x_inches": 23.344589615196,
+              "y_inches": 43.409639182127
             },
             {
-              "x_inches": 23.355545,
-              "y_inches": 42.159687
+              "x_inches": 23.355544775762,
+              "y_inches": 42.159687189266
             },
             {
-              "x_inches": 26.85541,
-              "y_inches": 42.190361
+              "x_inches": 26.855410355772,
+              "y_inches": 42.190361638851
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -9772,34 +9772,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-04-component-03",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 25.0999995,
-        "footprint_center_y_inches": 42.8,
-        "footprint_depth_inches": 1.2806260000000051,
-        "footprint_width_inches": 3.510821,
+        "footprint_center_x_inches": 25.099999985484,
+        "footprint_center_y_inches": 42.800000410489005,
+        "footprint_depth_inches": 1.2806264424459997,
+        "footprint_width_inches": 3.5108207405760012,
         "rules_footprint_polygon": [
           {
-            "x_inches": 26.844455,
-            "y_inches": 43.440313
+            "x_inches": 26.844455195206,
+            "y_inches": 43.440313631712
           },
           {
-            "x_inches": 23.344589,
-            "y_inches": 43.409639
+            "x_inches": 23.344589615196,
+            "y_inches": 43.409639182127
           },
           {
-            "x_inches": 23.355545,
-            "y_inches": 42.159687
+            "x_inches": 23.355544775762,
+            "y_inches": 42.159687189266
           },
           {
-            "x_inches": 26.85541,
-            "y_inches": 42.190361
+            "x_inches": 26.855410355772,
+            "y_inches": 42.190361638851
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-04-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 25.1,
-            "center_y_inches": 42.8,
+            "center_x_inches": 25.099999985484,
+            "center_y_inches": 42.800000410489,
             "depth_inches": 1.23,
             "height_inches": 2.0,
             "rotation_degrees": 180.50215400000002,
@@ -10273,28 +10273,28 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 26.281229,
-              "y_inches": 37.619047
+              "x_inches": 26.281228673516,
+              "y_inches": 37.619047362529
             },
             {
-              "x_inches": 24.651715,
-              "y_inches": 37.359846
+              "x_inches": 24.651715029543,
+              "y_inches": 37.359846120044
             },
             {
-              "x_inches": 24.742435,
-              "y_inches": 36.789516
+              "x_inches": 24.742435464412,
+              "y_inches": 36.789516344653
             },
             {
-              "x_inches": 25.801619,
-              "y_inches": 36.957997
+              "x_inches": 25.801619332995,
+              "y_inches": 36.957997152269
             },
             {
-              "x_inches": 25.977955,
-              "y_inches": 35.849434
+              "x_inches": 25.977954723715,
+              "y_inches": 35.849434082354
             },
             {
-              "x_inches": 26.548285,
-              "y_inches": 35.940155
+              "x_inches": 26.548284499106,
+              "y_inches": 35.940154517223
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -10302,42 +10302,42 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-08-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 25.6,
-        "footprint_center_y_inches": 36.7342405,
-        "footprint_depth_inches": 1.7696129999999997,
-        "footprint_width_inches": 1.8965700000000005,
+        "footprint_center_x_inches": 25.5999997643245,
+        "footprint_center_y_inches": 36.7342407224415,
+        "footprint_depth_inches": 1.769613280175001,
+        "footprint_width_inches": 1.8965694695630013,
         "rules_footprint_polygon": [
           {
-            "x_inches": 26.281229,
-            "y_inches": 37.619047
+            "x_inches": 26.281228673516,
+            "y_inches": 37.619047362529
           },
           {
-            "x_inches": 24.651715,
-            "y_inches": 37.359846
+            "x_inches": 24.651715029543,
+            "y_inches": 37.359846120044
           },
           {
-            "x_inches": 24.742435,
-            "y_inches": 36.789516
+            "x_inches": 24.742435464412,
+            "y_inches": 36.789516344653
           },
           {
-            "x_inches": 25.801619,
-            "y_inches": 36.957997
+            "x_inches": 25.801619332995,
+            "y_inches": 36.957997152269
           },
           {
-            "x_inches": 25.977955,
-            "y_inches": 35.849434
+            "x_inches": 25.977954723715,
+            "y_inches": 35.849434082354
           },
           {
-            "x_inches": 26.548285,
-            "y_inches": 35.940155
+            "x_inches": 26.548284499106,
+            "y_inches": 35.940154517223
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-08-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 25.511832,
-            "center_y_inches": 37.204282,
+            "center_x_inches": 25.511832068964,
+            "center_y_inches": 37.204281853591,
             "depth_inches": 0.5574999999999999,
             "height_inches": 2.0,
             "rotation_degrees": 189.038126,
@@ -10346,8 +10346,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 26.129592,
-            "center_y_inches": 36.734241,
+            "center_x_inches": 26.129591698616,
+            "center_y_inches": 36.734240722441,
             "depth_inches": 0.5574999999999999,
             "height_inches": 2.0,
             "rotation_degrees": 279.03812600000003,
@@ -10364,20 +10364,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 15.484644,
-              "y_inches": 35.490776
+              "x_inches": 15.484643954379,
+              "y_inches": 35.490776292235
             },
             {
-              "x_inches": 16.312877,
-              "y_inches": 31.577462
+              "x_inches": 16.31287718328,
+              "y_inches": 31.577461876225
             },
             {
-              "x_inches": 20.715356,
-              "y_inches": 32.509224
+              "x_inches": 20.71535590129,
+              "y_inches": 32.509224258738
             },
             {
-              "x_inches": 19.887123,
-              "y_inches": 36.422539
+              "x_inches": 19.887122672389,
+              "y_inches": 36.422538674747
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -10387,8 +10387,8 @@
         "floors": [
           {
             "bottom_z_inches": 3.0,
-            "center_x_inches": 17.582779,
-            "center_y_inches": 34.125628,
+            "center_x_inches": 17.582778787252,
+            "center_y_inches": 34.125627866939,
             "depth_inches": 3.5,
             "floor_id": "first-floor",
             "rotation_degrees": 281.950017,
@@ -10397,8 +10397,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 17.582779,
-            "center_y_inches": 34.125628,
+            "center_x_inches": 17.582778787252,
+            "center_y_inches": 34.125627866939,
             "depth_inches": 3.5,
             "floor_id": "ground-floor",
             "rotation_degrees": 281.950017,
@@ -10407,8 +10407,8 @@
           },
           {
             "bottom_z_inches": 6.0,
-            "center_x_inches": 17.582779,
-            "center_y_inches": 34.125628,
+            "center_x_inches": 17.582778787252,
+            "center_y_inches": 34.125627866939,
             "depth_inches": 3.5,
             "floor_id": "second-floor",
             "rotation_degrees": 281.950017,
@@ -10416,34 +10416,34 @@
             "width_inches": 3.5
           }
         ],
-        "footprint_center_x_inches": 18.1,
-        "footprint_center_y_inches": 34.0000005,
-        "footprint_depth_inches": 4.845077,
-        "footprint_width_inches": 5.2307120000000005,
+        "footprint_center_x_inches": 18.0999999278345,
+        "footprint_center_y_inches": 34.000000275486,
+        "footprint_depth_inches": 4.845076798522001,
+        "footprint_width_inches": 5.230711946910999,
         "rules_footprint_polygon": [
           {
-            "x_inches": 15.484644,
-            "y_inches": 35.490776
+            "x_inches": 15.484643954379,
+            "y_inches": 35.490776292235
           },
           {
-            "x_inches": 16.312877,
-            "y_inches": 31.577462
+            "x_inches": 16.31287718328,
+            "y_inches": 31.577461876225
           },
           {
-            "x_inches": 20.715356,
-            "y_inches": 32.509224
+            "x_inches": 20.71535590129,
+            "y_inches": 32.509224258738
           },
           {
-            "x_inches": 19.887123,
-            "y_inches": 36.422539
+            "x_inches": 19.887122672389,
+            "y_inches": 36.422538674747
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-08-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 3.0,
-            "center_x_inches": 15.967244,
-            "center_y_inches": 33.548614,
+            "center_x_inches": 15.967243571109,
+            "center_y_inches": 33.548613165736,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 281.950017,
@@ -10452,8 +10452,8 @@
           },
           {
             "bottom_z_inches": 3.0,
-            "center_x_inches": 17.700378,
-            "center_y_inches": 35.888174,
+            "center_x_inches": 17.70037739489,
+            "center_y_inches": 35.888174481211,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 11.950016999999974,
@@ -10462,8 +10462,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 15.967244,
-            "center_y_inches": 33.548614,
+            "center_x_inches": 15.967243571109,
+            "center_y_inches": 33.548613165736,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 281.950017,
@@ -10472,8 +10472,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 17.700378,
-            "center_y_inches": 35.888174,
+            "center_x_inches": 17.70037739489,
+            "center_y_inches": 35.888174481211,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 11.950016999999974,
@@ -10482,8 +10482,8 @@
           },
           {
             "bottom_z_inches": 6.0,
-            "center_x_inches": 15.967244,
-            "center_y_inches": 33.548614,
+            "center_x_inches": 15.967243571109,
+            "center_y_inches": 33.548613165736,
             "depth_inches": 0.12,
             "height_inches": 2.0,
             "rotation_degrees": 281.950017,
@@ -10492,8 +10492,8 @@
           },
           {
             "bottom_z_inches": 6.0,
-            "center_x_inches": 17.700378,
-            "center_y_inches": 35.888174,
+            "center_x_inches": 17.70037739489,
+            "center_y_inches": 35.888174481211,
             "depth_inches": 0.12,
             "height_inches": 2.0,
             "rotation_degrees": 11.950016999999974,
@@ -10510,28 +10510,28 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 17.735857,
-              "y_inches": 22.419165
+              "x_inches": 17.73585714111,
+              "y_inches": 22.419164353862
             },
             {
-              "x_inches": 19.360578,
-              "y_inches": 22.70688
+              "x_inches": 19.360578473,
+              "y_inches": 22.706880522509
             },
             {
-              "x_inches": 19.259877,
-              "y_inches": 23.275533
+              "x_inches": 19.259877813973,
+              "y_inches": 23.275532988671
             },
             {
-              "x_inches": 18.203809,
-              "y_inches": 23.088518
+              "x_inches": 18.203808948245,
+              "y_inches": 23.08851747905
             },
             {
-              "x_inches": 18.008075,
-              "y_inches": 24.19382
+              "x_inches": 18.008074766846,
+              "y_inches": 24.193820324533
             },
             {
-              "x_inches": 17.439422,
-              "y_inches": 24.09312
+              "x_inches": 17.439422300685,
+              "y_inches": 24.093119665506
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -10539,42 +10539,42 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-09-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 18.4,
-        "footprint_center_y_inches": 23.306492499999997,
-        "footprint_depth_inches": 1.7746549999999992,
-        "footprint_width_inches": 1.9211559999999999,
+        "footprint_center_x_inches": 18.4000003868425,
+        "footprint_center_y_inches": 23.3064923391975,
+        "footprint_depth_inches": 1.7746559706709988,
+        "footprint_width_inches": 1.9211561723150012,
         "rules_footprint_polygon": [
           {
-            "x_inches": 17.735857,
-            "y_inches": 22.419165
+            "x_inches": 17.73585714111,
+            "y_inches": 22.419164353862
           },
           {
-            "x_inches": 19.360578,
-            "y_inches": 22.70688
+            "x_inches": 19.360578473,
+            "y_inches": 22.706880522509
           },
           {
-            "x_inches": 19.259877,
-            "y_inches": 23.275533
+            "x_inches": 19.259877813973,
+            "y_inches": 23.275532988671
           },
           {
-            "x_inches": 18.203809,
-            "y_inches": 23.088518
+            "x_inches": 18.203808948245,
+            "y_inches": 23.08851747905
           },
           {
-            "x_inches": 18.008075,
-            "y_inches": 24.19382
+            "x_inches": 18.008074766846,
+            "y_inches": 24.193820324533
           },
           {
-            "x_inches": 17.439422,
-            "y_inches": 24.09312
+            "x_inches": 17.439422300685,
+            "y_inches": 24.093119665506
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-09-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-ab:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 18.497867,
-            "center_y_inches": 22.847348,
+            "center_x_inches": 18.497867477542,
+            "center_y_inches": 22.847348671267,
             "depth_inches": 0.5574999999999999,
             "height_inches": 2.0,
             "rotation_degrees": 10.042197999999985,
@@ -10583,8 +10583,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 17.871966,
-            "center_y_inches": 23.306492,
+            "center_x_inches": 17.871965953978,
+            "center_y_inches": 23.306492339197,
             "depth_inches": 0.5574999999999999,
             "height_inches": 2.0,
             "rotation_degrees": 100.04219799999998,
@@ -10601,20 +10601,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 28.461955,
-              "y_inches": 24.469213
+              "x_inches": 28.461955162533,
+              "y_inches": 24.469213342705
             },
             {
-              "x_inches": 27.770252,
-              "y_inches": 28.408953
+              "x_inches": 27.770252170692,
+              "y_inches": 28.408952797425
             },
             {
-              "x_inches": 23.338046,
-              "y_inches": 27.630787
+              "x_inches": 23.338045284132,
+              "y_inches": 27.630786931605
             },
             {
-              "x_inches": 24.029748,
-              "y_inches": 23.691047
+              "x_inches": 24.029748275972,
+              "y_inches": 23.691047476885
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -10624,8 +10624,8 @@
         "floors": [
           {
             "bottom_z_inches": 3.0,
-            "center_x_inches": 26.412541,
-            "center_y_inches": 25.906469,
+            "center_x_inches": 26.412541879929,
+            "center_y_inches": 25.90646947753,
             "depth_inches": 3.5,
             "floor_id": "first-floor",
             "rotation_degrees": 99.95797200000004,
@@ -10634,8 +10634,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 26.412541,
-            "center_y_inches": 25.906469,
+            "center_x_inches": 26.412541879929,
+            "center_y_inches": 25.90646947753,
             "depth_inches": 3.5,
             "floor_id": "ground-floor",
             "rotation_degrees": 99.95797200000004,
@@ -10644,8 +10644,8 @@
           },
           {
             "bottom_z_inches": 6.0,
-            "center_x_inches": 26.412541,
-            "center_y_inches": 25.906469,
+            "center_x_inches": 26.412541879929,
+            "center_y_inches": 25.90646947753,
             "depth_inches": 3.5,
             "floor_id": "second-floor",
             "rotation_degrees": 99.95797200000004,
@@ -10653,34 +10653,34 @@
             "width_inches": 3.5
           }
         ],
-        "footprint_center_x_inches": 25.900000499999997,
-        "footprint_center_y_inches": 26.05,
-        "footprint_depth_inches": 4.717905999999999,
-        "footprint_width_inches": 5.123909000000001,
+        "footprint_center_x_inches": 25.900000223332498,
+        "footprint_center_y_inches": 26.050000137155,
+        "footprint_depth_inches": 4.717905320539998,
+        "footprint_width_inches": 5.1239098784009975,
         "rules_footprint_polygon": [
           {
-            "x_inches": 28.461955,
-            "y_inches": 24.469213
+            "x_inches": 28.461955162533,
+            "y_inches": 24.469213342705
           },
           {
-            "x_inches": 27.770252,
-            "y_inches": 28.408953
+            "x_inches": 27.770252170692,
+            "y_inches": 28.408952797425
           },
           {
-            "x_inches": 23.338046,
-            "y_inches": 27.630787
+            "x_inches": 23.338045284132,
+            "y_inches": 27.630786931605
           },
           {
-            "x_inches": 24.029748,
-            "y_inches": 23.691047
+            "x_inches": 24.029748275972,
+            "y_inches": 23.691047476885
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-09-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:ruins-ab:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 3.0,
-            "center_x_inches": 28.047158,
-            "center_y_inches": 26.426978,
+            "center_x_inches": 28.047158226155,
+            "center_y_inches": 26.426978267708,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 99.95797200000004,
@@ -10689,8 +10689,8 @@
           },
           {
             "bottom_z_inches": 3.0,
-            "center_x_inches": 26.233746,
-            "center_y_inches": 24.149076,
+            "center_x_inches": 26.233746916895,
+            "center_y_inches": 24.149075850253,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 189.957972,
@@ -10699,8 +10699,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 28.047158,
-            "center_y_inches": 26.426978,
+            "center_x_inches": 28.047158226155,
+            "center_y_inches": 26.426978267708,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 99.95797200000004,
@@ -10709,8 +10709,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 26.233746,
-            "center_y_inches": 24.149076,
+            "center_x_inches": 26.233746916895,
+            "center_y_inches": 24.149075850253,
             "depth_inches": 0.12,
             "height_inches": 3.0,
             "rotation_degrees": 189.957972,
@@ -10719,8 +10719,8 @@
           },
           {
             "bottom_z_inches": 6.0,
-            "center_x_inches": 28.047158,
-            "center_y_inches": 26.426978,
+            "center_x_inches": 28.047158226155,
+            "center_y_inches": 26.426978267708,
             "depth_inches": 0.12,
             "height_inches": 2.0,
             "rotation_degrees": 99.95797200000004,
@@ -10729,8 +10729,8 @@
           },
           {
             "bottom_z_inches": 6.0,
-            "center_x_inches": 26.233746,
-            "center_y_inches": 24.149076,
+            "center_x_inches": 26.233746916895,
+            "center_y_inches": 24.149075850253,
             "depth_inches": 0.12,
             "height_inches": 2.0,
             "rotation_degrees": 189.957972,
@@ -11204,20 +11204,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 20.333611,
-              "y_inches": 16.30992
+              "x_inches": 20.333611289546,
+              "y_inches": 16.309919407358
             },
             {
-              "x_inches": 23.783479,
-              "y_inches": 16.340155
+              "x_inches": 23.783478789842,
+              "y_inches": 16.340155650521
             },
             {
-              "x_inches": 23.766389,
-              "y_inches": 18.29008
+              "x_inches": 23.76638873936,
+              "y_inches": 18.290080759383
             },
             {
-              "x_inches": 20.316521,
-              "y_inches": 18.259845
+              "x_inches": 20.316521239064,
+              "y_inches": 18.259844516221
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -11225,34 +11225,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-13-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 22.05,
-        "footprint_center_y_inches": 17.3,
-        "footprint_depth_inches": 1.980159999999998,
-        "footprint_width_inches": 3.466957999999998,
+        "footprint_center_x_inches": 22.050000014452998,
+        "footprint_center_y_inches": 17.3000000833705,
+        "footprint_depth_inches": 1.980161352025,
+        "footprint_width_inches": 3.4669575507780017,
         "rules_footprint_polygon": [
           {
-            "x_inches": 20.333611,
-            "y_inches": 16.30992
+            "x_inches": 20.333611289546,
+            "y_inches": 16.309919407358
           },
           {
-            "x_inches": 23.783479,
-            "y_inches": 16.340155
+            "x_inches": 23.783478789842,
+            "y_inches": 16.340155650521
           },
           {
-            "x_inches": 23.766389,
-            "y_inches": 18.29008
+            "x_inches": 23.76638873936,
+            "y_inches": 18.290080759383
           },
           {
-            "x_inches": 20.316521,
-            "y_inches": 18.259845
+            "x_inches": 20.316521239064,
+            "y_inches": 18.259844516221
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-industrial-crates:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 22.05,
-            "center_y_inches": 17.3,
+            "center_x_inches": 22.050000014453,
+            "center_y_inches": 17.300000083371,
             "depth_inches": 1.93,
             "height_inches": 3.5,
             "rotation_degrees": 0.502154,
@@ -11269,20 +11269,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 17.155545,
-              "y_inches": 16.559687
+              "x_inches": 17.155544804794,
+              "y_inches": 16.559686368288
             },
             {
-              "x_inches": 20.655411,
-              "y_inches": 16.590361
+              "x_inches": 20.655410384804,
+              "y_inches": 16.590360817873
             },
             {
-              "x_inches": 20.644455,
-              "y_inches": 17.840313
+              "x_inches": 20.644455224238,
+              "y_inches": 17.840312810734
             },
             {
-              "x_inches": 17.14459,
-              "y_inches": 17.809639
+              "x_inches": 17.144589644228,
+              "y_inches": 17.809638361149
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -11290,34 +11290,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-13-component-02",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 18.9000005,
-        "footprint_center_y_inches": 17.2,
-        "footprint_depth_inches": 1.280625999999998,
-        "footprint_width_inches": 3.510821,
+        "footprint_center_x_inches": 18.900000014516,
+        "footprint_center_y_inches": 17.199999589511002,
+        "footprint_depth_inches": 1.2806264424460032,
+        "footprint_width_inches": 3.5108207405760012,
         "rules_footprint_polygon": [
           {
-            "x_inches": 17.155545,
-            "y_inches": 16.559687
+            "x_inches": 17.155544804794,
+            "y_inches": 16.559686368288
           },
           {
-            "x_inches": 20.655411,
-            "y_inches": 16.590361
+            "x_inches": 20.655410384804,
+            "y_inches": 16.590360817873
           },
           {
-            "x_inches": 20.644455,
-            "y_inches": 17.840313
+            "x_inches": 20.644455224238,
+            "y_inches": 17.840312810734
           },
           {
-            "x_inches": 17.14459,
-            "y_inches": 17.809639
+            "x_inches": 17.144589644228,
+            "y_inches": 17.809638361149
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 18.9,
-            "center_y_inches": 17.2,
+            "center_x_inches": 18.900000014516,
+            "center_y_inches": 17.199999589511,
             "depth_inches": 1.23,
             "height_inches": 2.0,
             "rotation_degrees": 0.502154,
@@ -11334,20 +11334,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 23.255545,
-              "y_inches": 16.609687
+              "x_inches": 23.255544626239,
+              "y_inches": 16.609686868364
             },
             {
-              "x_inches": 26.75541,
-              "y_inches": 16.640361
+              "x_inches": 26.755410206249,
+              "y_inches": 16.640361317948
             },
             {
-              "x_inches": 26.744455,
-              "y_inches": 17.890313
+              "x_inches": 26.744455045683,
+              "y_inches": 17.890313310809
             },
             {
-              "x_inches": 23.244589,
-              "y_inches": 17.859639
+              "x_inches": 23.244589465673,
+              "y_inches": 17.859638861224
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -11355,34 +11355,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-13-component-03",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 24.9999995,
-        "footprint_center_y_inches": 17.25,
-        "footprint_depth_inches": 1.280625999999998,
-        "footprint_width_inches": 3.510821,
+        "footprint_center_x_inches": 24.999999835961,
+        "footprint_center_y_inches": 17.2500000895865,
+        "footprint_depth_inches": 1.2806264424449978,
+        "footprint_width_inches": 3.5108207405760012,
         "rules_footprint_polygon": [
           {
-            "x_inches": 23.255545,
-            "y_inches": 16.609687
+            "x_inches": 23.255544626239,
+            "y_inches": 16.609686868364
           },
           {
-            "x_inches": 26.75541,
-            "y_inches": 16.640361
+            "x_inches": 26.755410206249,
+            "y_inches": 16.640361317948
           },
           {
-            "x_inches": 26.744455,
-            "y_inches": 17.890313
+            "x_inches": 26.744455045683,
+            "y_inches": 17.890313310809
           },
           {
-            "x_inches": 23.244589,
-            "y_inches": 17.859639
+            "x_inches": 23.244589465673,
+            "y_inches": 17.859638861224
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-13-component-03:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-end-barricade:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 25.0,
-            "center_y_inches": 17.25,
+            "center_x_inches": 24.999999835961,
+            "center_y_inches": 17.250000089586,
             "depth_inches": 1.23,
             "height_inches": 2.0,
             "rotation_degrees": 0.502154,
@@ -11399,28 +11399,28 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 13.558562,
-              "y_inches": 14.02635
+              "x_inches": 13.558561954534,
+              "y_inches": 14.02634975293
             },
             {
-              "x_inches": 11.952804,
-              "y_inches": 12.522507
+              "x_inches": 11.952804431165,
+              "y_inches": 12.52250708292
             },
             {
-              "x_inches": 12.263826,
-              "y_inches": 12.190407
+              "x_inches": 12.263826437917,
+              "y_inches": 12.190407231496
             },
             {
-              "x_inches": 13.537484,
-              "y_inches": 13.383228
+              "x_inches": 13.537484109862,
+              "y_inches": 13.383227894754
             },
             {
-              "x_inches": 14.115097,
-              "y_inches": 12.766471
+              "x_inches": 14.115096408116,
+              "y_inches": 12.766471027824
             },
             {
-              "x_inches": 14.447197,
-              "y_inches": 13.077493
+              "x_inches": 14.44719625954,
+              "y_inches": 13.077493034576
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -11428,42 +11428,42 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-14-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 13.2000005,
-        "footprint_center_y_inches": 13.1083785,
-        "footprint_depth_inches": 1.8359430000000003,
-        "footprint_width_inches": 2.4943929999999988,
+        "footprint_center_x_inches": 13.2000003453525,
+        "footprint_center_y_inches": 13.108378492213,
+        "footprint_depth_inches": 1.835942521434001,
+        "footprint_width_inches": 2.494391828375001,
         "rules_footprint_polygon": [
           {
-            "x_inches": 13.558562,
-            "y_inches": 14.02635
+            "x_inches": 13.558561954534,
+            "y_inches": 14.02634975293
           },
           {
-            "x_inches": 11.952804,
-            "y_inches": 12.522507
+            "x_inches": 11.952804431165,
+            "y_inches": 12.52250708292
           },
           {
-            "x_inches": 12.263826,
-            "y_inches": 12.190407
+            "x_inches": 12.263826437917,
+            "y_inches": 12.190407231496
           },
           {
-            "x_inches": 13.537484,
-            "y_inches": 13.383228
+            "x_inches": 13.537484109862,
+            "y_inches": 13.383227894754
           },
           {
-            "x_inches": 14.115097,
-            "y_inches": 12.766471
+            "x_inches": 14.115096408116,
+            "y_inches": 12.766471027824
           },
           {
-            "x_inches": 14.447197,
-            "y_inches": 13.077493
+            "x_inches": 14.44719625954,
+            "y_inches": 13.077493034576
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-14-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-cd:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 12.911195,
-            "center_y_inches": 13.108379,
+            "center_x_inches": 12.911194196226,
+            "center_y_inches": 13.108378492214,
             "depth_inches": 0.43499999999999994,
             "height_inches": 2.0,
             "rotation_degrees": 223.12284499999998,
@@ -11472,8 +11472,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 13.836829,
-            "center_y_inches": 13.396411,
+            "center_x_inches": 13.836829181325,
+            "center_y_inches": 13.396410390377,
             "depth_inches": 0.43499999999999994,
             "height_inches": 2.0,
             "rotation_degrees": 313.122845,
@@ -11490,28 +11490,28 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 14.73471,
-              "y_inches": 8.089144
+              "x_inches": 14.734709893964,
+              "y_inches": 8.089144026767
             },
             {
-              "x_inches": 16.85139,
-              "y_inches": 10.071482
+              "x_inches": 16.851390058087,
+              "y_inches": 10.071482313438
             },
             {
-              "x_inches": 16.576255,
-              "y_inches": 10.365263
+              "x_inches": 16.576255175196,
+              "y_inches": 10.365262922424
             },
             {
-              "x_inches": 14.753356,
-              "y_inches": 8.658059
+              "x_inches": 14.753355620058,
+              "y_inches": 8.658059518645
             },
             {
-              "x_inches": 14.242391,
-              "y_inches": 9.203652
+              "x_inches": 14.242390837546,
+              "y_inches": 9.20365207819
             },
             {
-              "x_inches": 13.94861,
-              "y_inches": 8.928517
+              "x_inches": 13.948610228559,
+              "y_inches": 8.928517195299
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -11519,42 +11519,42 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-14-component-02",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 15.399999999999999,
-        "footprint_center_y_inches": 9.2272035,
-        "footprint_depth_inches": 2.2761190000000013,
-        "footprint_width_inches": 2.902779999999998,
+        "footprint_center_x_inches": 15.400000143322998,
+        "footprint_center_y_inches": 9.2272034745955,
+        "footprint_depth_inches": 2.2761188956569995,
+        "footprint_width_inches": 2.902779829527999,
         "rules_footprint_polygon": [
           {
-            "x_inches": 14.73471,
-            "y_inches": 8.089144
+            "x_inches": 14.734709893964,
+            "y_inches": 8.089144026767
           },
           {
-            "x_inches": 16.85139,
-            "y_inches": 10.071482
+            "x_inches": 16.851390058087,
+            "y_inches": 10.071482313438
           },
           {
-            "x_inches": 16.576255,
-            "y_inches": 10.365263
+            "x_inches": 16.576255175196,
+            "y_inches": 10.365262922424
           },
           {
-            "x_inches": 14.753356,
-            "y_inches": 8.658059
+            "x_inches": 14.753355620058,
+            "y_inches": 8.658059518645
           },
           {
-            "x_inches": 14.242391,
-            "y_inches": 9.203652
+            "x_inches": 14.242390837546,
+            "y_inches": 9.20365207819
           },
           {
-            "x_inches": 13.94861,
-            "y_inches": 8.928517
+            "x_inches": 13.948610228559,
+            "y_inches": 8.928517195299
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-14-component-02:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:light-corner-gh:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 15.655483,
-            "center_y_inches": 9.227203,
+            "center_x_inches": 15.65548253458,
+            "center_y_inches": 9.227203474596,
             "depth_inches": 0.38249999999999995,
             "height_inches": 2.0,
             "rotation_degrees": 43.12285099999997,
@@ -11563,8 +11563,8 @@
           },
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 14.48855,
-            "center_y_inches": 8.646398,
+            "center_x_inches": 14.488550365754,
+            "center_y_inches": 8.646398052478,
             "depth_inches": 0.38249999999999995,
             "height_inches": 2.0,
             "rotation_degrees": 133.12285099999997,
@@ -11581,20 +11581,20 @@
           "footprint_kind": "polygon",
           "footprint_polygon": [
             {
-              "x_inches": 9.589233,
-              "y_inches": 13.470876
+              "x_inches": 9.589232947441,
+              "y_inches": 13.470876433164
             },
             {
-              "x_inches": 5.087031,
-              "y_inches": 9.504748
+              "x_inches": 5.087030709881,
+              "y_inches": 9.504747966748
             },
             {
-              "x_inches": 6.210767,
-              "y_inches": 8.229124
+              "x_inches": 6.210767108699,
+              "y_inches": 8.229123999439
             },
             {
-              "x_inches": 10.712969,
-              "y_inches": 12.195252
+              "x_inches": 10.712969346259,
+              "y_inches": 12.195252465855
             }
           ],
           "schema_version": "terrain-display-v1"
@@ -11602,34 +11602,34 @@
         "feature_id": "take-and-hold-vs-purge-the-foe-layout-3-terrain-area-15-component-01",
         "feature_kind": "battlefield_debris_and_statuary",
         "floors": [],
-        "footprint_center_x_inches": 7.8999999999999995,
-        "footprint_center_y_inches": 10.850000000000001,
-        "footprint_depth_inches": 5.241752,
-        "footprint_width_inches": 5.625938,
+        "footprint_center_x_inches": 7.90000002807,
+        "footprint_center_y_inches": 10.850000216301499,
+        "footprint_depth_inches": 5.241752433724999,
+        "footprint_width_inches": 5.625938636378,
         "rules_footprint_polygon": [
           {
-            "x_inches": 9.589233,
-            "y_inches": 13.470876
+            "x_inches": 9.589232947441,
+            "y_inches": 13.470876433164
           },
           {
-            "x_inches": 5.087031,
-            "y_inches": 9.504748
+            "x_inches": 5.087030709881,
+            "y_inches": 9.504747966748
           },
           {
-            "x_inches": 6.210767,
-            "y_inches": 8.229124
+            "x_inches": 6.210767108699,
+            "y_inches": 8.229123999439
           },
           {
-            "x_inches": 10.712969,
-            "y_inches": 12.195252
+            "x_inches": 10.712969346259,
+            "y_inches": 12.195252465855
           }
         ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:battlefield-layout:gw_event_companion_v1_take_and_hold_vs_purge_the_foe_layout_3:terrain-feature-placement:terrain-area-15-component-01:terrain-feature-preset-source:gw-11e-warhammer-event-companion-v1-1-2026-07:full-battlefield-layouts:terrain-archetype:dense-long-pipes:44ed73534435ab9fc10062024ecb92222898f8aeb0bdf54bd434582a58357972",
         "walls": [
           {
             "bottom_z_inches": 0.0,
-            "center_x_inches": 7.9,
-            "center_y_inches": 10.85,
+            "center_x_inches": 7.90000002807,
+            "center_y_inches": 10.850000216301,
             "depth_inches": 1.68,
             "height_inches": 3.5,
             "rotation_degrees": 221.377818,
@@ -13218,7 +13218,7 @@
   ],
   "primary_unit_terrain_turn_start_snapshots": [],
   "projection_schema": "game-view-v8-phase17n",
-  "projection_state_hash": "a2025102c3ad617b6afbc5dc6ee36b3f3f9894cc39278e549bc6132f69571313",
+  "projection_state_hash": "127ee181d16be1f12bdd041d55eaec9696c18b790c0be7a7c29fbf7e30f8c0ac",
   "public_command_point_ledgers": [
     {
       "command_points": 0,
