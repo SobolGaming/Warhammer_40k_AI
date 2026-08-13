@@ -1350,7 +1350,7 @@ def _emperors_children_config(
                     faction_id=army_rule.EMPERORS_CHILDREN_FACTION_ID,
                     detachment_ids=("frenzied-host",),
                 ),
-                force_disposition_id="phase17g-force",
+                force_disposition_id="take-and-hold",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="noise-marine",
@@ -1407,7 +1407,7 @@ def _emperors_children_defiler_config() -> GameConfig:
                     faction_id=army_rule.EMPERORS_CHILDREN_FACTION_ID,
                     detachment_ids=(EMPERORS_CHILDREN_DEFILER_DETACHMENT_ID,),
                 ),
-                force_disposition_id="phase17g-force",
+                force_disposition_id="take-and-hold",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="defiler",
@@ -1455,7 +1455,9 @@ def _emperors_children_mission_setup() -> MissionSetup:
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id="player-a",
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         ),
         terrain_features=(),
         terrain_areas=(),
@@ -1487,7 +1489,7 @@ def _emperors_children_catalog() -> ArmyCatalog:
                 faction_id=army_rule.EMPERORS_CHILDREN_FACTION_ID,
                 detachment_point_cost=1,
                 unit_datasheet_ids=(EMPERORS_CHILDREN_TEST_DATASHEET_ID,),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:emperors-children:frenzied-host",
                 ),
@@ -1527,7 +1529,7 @@ def _emperors_children_defiler_catalog() -> ArmyCatalog:
                 faction_id=army_rule.EMPERORS_CHILDREN_FACTION_ID,
                 detachment_point_cost=1,
                 unit_datasheet_ids=(datasheet_id,),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=("phase17g:test:emperors-children:defiler-runtime",),
             ),
         ),

@@ -1,0 +1,1586 @@
+{
+  "artifact_schema": "core-v2-phase17n-event-companion-primary-scoring-v2",
+  "source_package_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
+  "authoritative_source": {
+    "source_kind": "project_owner_supplied_official_source_transcription",
+    "source_title": "Warhammer 40,000 Chapter Approved 2026-27 Primary Mission cards",
+    "source_scope": "All 25 Primary mission scoring records and 10 source-only Primary Mission Action descriptors",
+    "official_source_binary_status": "not_committed_transcription_review_only",
+    "structured_transcription_scope": "all_primary_scoring_and_source_only_action_descriptors",
+    "verbatim_text_scope": "meatgrinder_scoring_clauses_only",
+    "review_status": "reviewed_and_merged",
+    "review_records": [
+      {
+        "pull_request": 134,
+        "commit": "35b9ddaf5a49ad947177712a883fd0c76e3db224"
+      },
+      {
+        "pull_request": 136,
+        "commit": "34e05f19886c8c483fb0fa7c3e1ba86626bb89f1"
+      },
+      {
+        "pull_request": 379,
+        "commit": "15af220739679f5aa84dd16981ae3e7dbaa93520"
+      }
+    ]
+  },
+  "secondary_corroborations": [
+    {
+      "primary_mission_id": "primary-meatgrinder",
+      "provider": "GDMissions",
+      "authority_status": "secondary_corroboration_not_official_gw_source",
+      "transcription_url": "https://gdmissions.app/11th/primary-missions/purge-the-foe/meatgrinder",
+      "card_image_url": "https://gdmissions.app/assets/11th/primary-missions/purge-the-foe/meatgrinder.png",
+      "retrieved_date": "2026-08-09",
+      "card_image_sha256": "d4bcc1dfde2d72fb2fc31b095964d1ea7721dcd082967b0063bcfd77c9965c24"
+    }
+  ],
+  "layout_source_boundary": {
+    "source_pdf_filename": "eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf",
+    "source_pdf_sha256": "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20",
+    "source_pages": [
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53
+    ],
+    "authority_scope": "battlefield_and_layout_facts_only",
+    "contains_primary_mission_card_scoring_clauses": false
+  },
+  "primary_missions": [
+    {
+      "primary_mission_id": "primary-battlefield-dominance",
+      "mission_name": "Battlefield Dominance",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "battlefield-dominance-control-more-turn-end-rounds-one-two",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "first_and_second_battle_round_turn_end",
+          "source_kind": "primary",
+          "victory_points": 2,
+          "cap": null,
+          "condition": "control_more_objectives_than_opponent_first_and_second_battle_round"
+        },
+        {
+          "rule_id": "battlefield-dominance-each-objective",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "each_objective_controlled_from_battle_round_two"
+        },
+        {
+          "rule_id": "battlefield-dominance-home-controlled-non-home-bonus",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 2,
+          "cap": null,
+          "condition": "each_non_home_objective_controlled_if_home_objective_controlled"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-consecrate",
+      "mission_name": "Consecrate",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "consecrate-one-or-two-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "one_or_two_objectives_consecrated"
+        },
+        {
+          "rule_id": "consecrate-three-or-more-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 6,
+          "cap": null,
+          "condition": "three_or_more_objectives_consecrated"
+        },
+        {
+          "rule_id": "consecrate-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "consecrate-control-more-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_more_objectives_than_opponent_from_battle_round_two"
+        },
+        {
+          "rule_id": "consecrate-enemy-home-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "enemy_home_objective_consecrated_end_of_battle"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-death-trap",
+      "mission_name": "Death Trap",
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "death_trap",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "death-trap-terrain-trapped-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 2,
+          "cap": null,
+          "condition": "each_terrain_area_trapped_this_turn"
+        },
+        {
+          "rule_id": "death-trap-objective-terrain-bonus-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "each_trapped_objective_terrain_area_this_turn"
+        },
+        {
+          "rule_id": "death-trap-destroyed-in-trapped-terrain-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "one_or_more_enemy_units_destroyed_after_starting_turn_in_trapped_terrain"
+        },
+        {
+          "rule_id": "death-trap-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-delaying-action",
+      "mission_name": "Delaying Action",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "delaying-action-each-enemy-destroyed",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 2,
+          "cap": null,
+          "condition": "each_enemy_unit_destroyed_this_turn"
+        },
+        {
+          "rule_id": "delaying-action-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "delaying-action-central-expansion-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end_from_battle_round_two",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "control_central_and_expansion_objectives"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-destroyers-wrath",
+      "mission_name": "Destroyer's Wrath",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "destroyers-wrath-enemy-destroyed-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "one_or_more_enemy_units_destroyed_this_turn"
+        },
+        {
+          "rule_id": "destroyers-wrath-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "destroyers-wrath-control-more-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 6,
+          "cap": null,
+          "condition": "control_more_objectives_than_opponent_from_battle_round_two"
+        },
+        {
+          "rule_id": "destroyers-wrath-more-destroyed-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end_from_battle_round_two",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "more_enemy_units_destroyed_than_friendly_previous_turn"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-determined-acquisition",
+      "mission_name": "Determined Acquisition",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "determined-acquisition-new-objectives-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 2,
+          "cap": null,
+          "condition": "each_newly_controlled_non_home_objective_this_turn"
+        },
+        {
+          "rule_id": "determined-acquisition-each-objective",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "each_objective_controlled_from_battle_round_two"
+        },
+        {
+          "rule_id": "determined-acquisition-opponent-territory-bonus",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "each_controlled_objective_in_opponent_territory"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-extract-relic",
+      "mission_name": "Extract Relic",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "extract-relic-sensor-sweep-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "friendly_unit_performed_sensor_sweep_this_turn"
+        },
+        {
+          "rule_id": "extract-relic-started-objective-destroyed-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn"
+        },
+        {
+          "rule_id": "extract-relic-one-opponent-marker-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "only_one_opponent_operation_marker_remains_with_friendly_unit_and_no_enemy_in_terrain_area"
+        },
+        {
+          "rule_id": "extract-relic-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "extract-relic-one-opponent-marker-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "only_one_opponent_operation_marker_remains_with_friendly_unit_and_no_enemy_in_terrain_area_end_of_battle"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-gather-intel",
+      "mission_name": "Gather Intel",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "gather-intel-central-first-round-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "first_battle_round_turn_end",
+          "source_kind": "primary",
+          "victory_points": 6,
+          "cap": null,
+          "condition": "control_one_or_more_central_objectives_first_battle_round"
+        },
+        {
+          "rule_id": "gather-intel-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "gather-intel-extracted-intelligence-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end_from_battle_round_two",
+          "source_kind": "primary",
+          "victory_points": 7,
+          "cap": null,
+          "condition": "each_friendly_unit_extracted_intelligence_this_turn"
+        },
+        {
+          "rule_id": "gather-intel-three-markers-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "three_or_more_friendly_operation_markers_on_battlefield_end_of_battle"
+        },
+        {
+          "rule_id": "gather-intel-opponent-home-marker-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "friendly_operation_marker_within_opponent_home_objective_range_end_of_battle"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-immovable-object",
+      "mission_name": "Immovable Object",
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "immovable_object",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "immovable-object-central-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "control_one_or_more_central_objectives"
+        },
+        {
+          "rule_id": "immovable-object-rounds-two-to-four-command",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "each_non_home_objective_controlled_battle_rounds_two_to_four"
+        },
+        {
+          "rule_id": "immovable-object-round-five-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "each_non_home_objective_controlled_round_five"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-inescapable-dominion",
+      "mission_name": "Inescapable Dominion",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "inescapable-dominion-three-objectives-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_three_or_more_objectives"
+        },
+        {
+          "rule_id": "inescapable-dominion-two-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "control_two_or_more_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "inescapable-dominion-control-more",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_more_objectives_than_opponent_from_battle_round_two"
+        },
+        {
+          "rule_id": "inescapable-dominion-opponent-home-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "control_opponent_home_objective_end_of_battle"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-locate-and-deny",
+      "mission_name": "Locate and Deny",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "locate-and-deny-enemy-started-objective-destroyed",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn"
+        },
+        {
+          "rule_id": "locate-and-deny-one-marker-remains-terrain",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "only_one_friendly_operation_marker_remains_with_friendly_unit_and_no_enemy_in_terrain_area"
+        },
+        {
+          "rule_id": "locate-and-deny-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "locate-and-deny-one-marker-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "only_one_friendly_operation_marker_remains_with_friendly_unit_and_no_enemy_in_terrain_area_end_of_battle"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-meatgrinder",
+      "mission_name": "Meatgrinder",
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "meatgrinder",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "meatgrinder-enemy-destroyed-turn-end",
+          "battle_round_window_text": "ANY BATTLE ROUND",
+          "trigger_text": "End of your turn",
+          "canonical_text": "One or more enemy units were destroyed this turn.",
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "one_or_more_enemy_units_destroyed_this_turn"
+        },
+        {
+          "rule_id": "meatgrinder-objective-control",
+          "battle_round_window_text": "SECOND BATTLE ROUND ONWARDS",
+          "trigger_text": "End of your Command phase (or the end of your turn in the fifth battle round)",
+          "canonical_text": "You control one or more objectives (excluding your home objective).",
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "meatgrinder-more-destroyed-turn-end",
+          "battle_round_window_text": "SECOND BATTLE ROUND ONWARDS",
+          "trigger_text": "End of your turn",
+          "canonical_text": "More enemy units were destroyed this turn than friendly units were destroyed in the previous turn.",
+          "timing": "turn_end_from_battle_round_two",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "more_enemy_units_destroyed_than_friendly_previous_turn"
+        },
+        {
+          "rule_id": "meatgrinder-opponent-home-turn-end",
+          "battle_round_window_text": "SECOND BATTLE ROUND ONWARDS",
+          "trigger_text": "End of your turn",
+          "canonical_text": "You control your opponent's home objective.",
+          "timing": "turn_end_from_battle_round_two",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "control_opponent_home_objective"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-outmaneuver",
+      "mission_name": "Outmanoeuvre",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "outmaneuver-enemy-home-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 10,
+          "cap": null,
+          "condition": "control_enemy_home_objective"
+        },
+        {
+          "rule_id": "outmaneuver-first-round-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "first_battle_round_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "each_non_home_objective_controlled_first_battle_round"
+        },
+        {
+          "rule_id": "outmaneuver-rounds-two-three-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "battle_rounds_two_and_three_command_phase",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "each_non_home_objective_controlled_battle_rounds_two_and_three"
+        },
+        {
+          "rule_id": "outmaneuver-round-four-onwards-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "battle_round_four_onwards_turn_end",
+          "source_kind": "primary",
+          "victory_points": 6,
+          "cap": null,
+          "condition": "each_non_home_objective_controlled_battle_round_four_onwards"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-punishment",
+      "mission_name": "Punishment",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "punishment-condemned-left-battlefield",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "one_or_more_condemned_enemy_units_left_battlefield_this_turn"
+        },
+        {
+          "rule_id": "punishment-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "punishment-control-more-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "control_more_objectives_than_opponent_from_battle_round_two"
+        },
+        {
+          "rule_id": "punishment-opponent-home-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 8,
+          "cap": null,
+          "condition": "control_opponent_home_objective_end_of_battle"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-purge-and-secure",
+      "mission_name": "Purge and Secure",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "purge-and-secure-destroyed-by-objective-unit-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "one_or_more_enemy_units_destroyed_by_friendly_unit_on_objective_this_turn"
+        },
+        {
+          "rule_id": "purge-and-secure-started-objective-destroyed-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn"
+        },
+        {
+          "rule_id": "purge-and-secure-each-objective",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "each_non_home_objective_controlled_from_battle_round_two"
+        },
+        {
+          "rule_id": "purge-and-secure-new-objective-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end_from_battle_round_two",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "control_one_or_more_new_non_home_objectives"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-reconnaissance-sweep",
+      "mission_name": "Reconnaissance Sweep",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "reconnaissance-sweep-three-quarters-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "three_or_more_friendly_units_wholly_within_three_different_table_quarters_not_within_six_of_center"
+        },
+        {
+          "rule_id": "reconnaissance-sweep-four-quarters-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 6,
+          "cap": null,
+          "condition": "four_or_more_friendly_units_wholly_within_four_different_table_quarters_not_within_six_of_center"
+        },
+        {
+          "rule_id": "reconnaissance-sweep-enemy-destroyed-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 1,
+          "cap": null,
+          "condition": "each_enemy_unit_destroyed_this_turn"
+        },
+        {
+          "rule_id": "reconnaissance-sweep-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-sabotage",
+      "mission_name": "Sabotage",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "sabotage-each-unit-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "each_friendly_unit_committed_sabotage_this_turn"
+        },
+        {
+          "rule_id": "sabotage-opponent-territory-bonus-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 2,
+          "cap": null,
+          "condition": "each_sabotage_unit_within_objective_range_in_opponent_territory_this_turn"
+        },
+        {
+          "rule_id": "sabotage-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-search-and-scour",
+      "mission_name": "Search and Scour",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "search-and-scour-central-objective-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "control_one_or_more_central_objectives"
+        },
+        {
+          "rule_id": "search-and-scour-enemy-terrain-destroyed-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 2,
+          "cap": null,
+          "condition": "one_or_more_enemy_units_started_turn_in_terrain_area_destroyed_this_turn"
+        },
+        {
+          "rule_id": "search-and-scour-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "each_non_home_objective_controlled_from_battle_round_two"
+        },
+        {
+          "rule_id": "search-and-scour-no-enemy-in-territory-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "no_enemy_units_wholly_within_own_territory_end_of_battle"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-secure-asset",
+      "mission_name": "Secure Asset",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "secure-asset-action-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "friendly_unit_secured_asset_this_turn"
+        },
+        {
+          "rule_id": "secure-asset-central-objective-enemy-destroyed",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 2,
+          "cap": null,
+          "condition": "one_or_more_enemy_units_started_turn_within_central_objective_range_destroyed_this_turn"
+        },
+        {
+          "rule_id": "secure-asset-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "secure-asset-three-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_three_or_more_objectives_from_battle_round_two"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-smoke-and-mirrors",
+      "mission_name": "Smoke and Mirrors",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "smoke-and-mirrors-each-decoy-objective",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 2,
+          "cap": null,
+          "condition": "each_decoy_objective"
+        },
+        {
+          "rule_id": "smoke-and-mirrors-opponent-territory-decoy-bonus",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 2,
+          "cap": null,
+          "condition": "each_decoy_objective_in_opponent_territory_bonus"
+        },
+        {
+          "rule_id": "smoke-and-mirrors-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "smoke-and-mirrors-four-decoys-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 10,
+          "cap": null,
+          "condition": "four_or_more_decoy_objectives_end_of_battle"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-surveil-the-foe",
+      "mission_name": "Surveil the Foe",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "surveil-the-foe-enemy-units-surveilled-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "one_or_more_enemy_units_surveilled_this_turn_unless_all_within_range_of_objectives_with_operation_markers"
+        },
+        {
+          "rule_id": "surveil-the-foe-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "surveil-the-foe-control-more-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_more_objectives_than_opponent_from_battle_round_two"
+        },
+        {
+          "rule_id": "surveil-the-foe-no-enemy-operation-markers",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end_from_battle_round_two",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "no_enemy_operation_markers_on_battlefield"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-triangulation",
+      "mission_name": "Triangulation",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "triangulation-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "triangulation-one-objective",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end_from_battle_round_two",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "exactly_one_triangulated_objective"
+        },
+        {
+          "rule_id": "triangulation-two-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end_from_battle_round_two",
+          "source_kind": "primary",
+          "victory_points": 6,
+          "cap": null,
+          "condition": "exactly_two_triangulated_objectives"
+        },
+        {
+          "rule_id": "triangulation-three-or-more-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end_from_battle_round_two",
+          "source_kind": "primary",
+          "victory_points": 10,
+          "cap": null,
+          "condition": "three_or_more_triangulated_objectives"
+        },
+        {
+          "rule_id": "triangulation-four-objectives-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 10,
+          "cap": null,
+          "condition": "control_four_or_more_objectives_end_of_battle"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-unstoppable-force",
+      "mission_name": "Unstoppable Force",
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "unstoppable_force",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "unstoppable-force-enemy-destroyed-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "one_or_more_enemy_units_destroyed_this_turn"
+        },
+        {
+          "rule_id": "unstoppable-force-objectives",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "each_non_home_objective_controlled_from_battle_round_two"
+        },
+        {
+          "rule_id": "unstoppable-force-new-objective-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 3,
+          "cap": null,
+          "condition": "control_one_or_more_new_non_home_objectives"
+        },
+        {
+          "rule_id": "unstoppable-force-central-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 5,
+          "cap": null,
+          "condition": "control_one_or_more_central_objectives_end_of_battle"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-vanguard-operation",
+      "mission_name": "Vanguard Operation",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "vanguard-operation-action-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "friendly_unit_performed_vanguard_operation_this_turn"
+        },
+        {
+          "rule_id": "vanguard-operation-enemy-destroyed-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 2,
+          "cap": null,
+          "condition": "one_or_more_enemy_units_destroyed_this_turn"
+        },
+        {
+          "rule_id": "vanguard-operation-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "vanguard-operation-opponent-home-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 10,
+          "cap": null,
+          "condition": "control_opponent_home_objective_end_of_battle"
+        }
+      ]
+    },
+    {
+      "primary_mission_id": "primary-vital-link",
+      "mission_name": "Vital Link",
+      "engine_support_status": "source_known_engine_pending",
+      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "max_vp_per_turn": null,
+      "vp_per_controlled_objective": null,
+      "scoring_rules": [
+        {
+          "rule_id": "vital-link-central-objective-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 2,
+          "cap": null,
+          "condition": "control_one_or_more_central_objectives"
+        },
+        {
+          "rule_id": "vital-link-operation-marker-central-bonus-turn-end",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "turn_end",
+          "source_kind": "primary",
+          "victory_points": 1,
+          "cap": null,
+          "condition": "each_friendly_operation_marker_within_range_of_controlled_central_objective"
+        },
+        {
+          "rule_id": "vital-link-objective-control",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+        },
+        {
+          "rule_id": "vital-link-central-objective-bonus",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "command_phase_or_round_five_turn_end",
+          "source_kind": "primary",
+          "victory_points": 4,
+          "cap": null,
+          "condition": "one_or_more_controlled_non_home_objectives_is_central_objective"
+        },
+        {
+          "rule_id": "vital-link-opponent-home-end-battle",
+          "battle_round_window_text": null,
+          "trigger_text": null,
+          "canonical_text": null,
+          "timing": "end_of_battle",
+          "source_kind": "primary",
+          "victory_points": 10,
+          "cap": null,
+          "condition": "control_opponent_home_objective_end_of_battle"
+        }
+      ]
+    }
+  ],
+  "source_only_primary_actions": [
+    {
+      "mission_action_id": "commit-sabotage",
+      "primary_mission_id": "primary-sabotage",
+      "name": "Sabotage",
+      "start_phase": "shooting",
+      "start_timing": "shooting_phase_action_start",
+      "completion_timing": "turn_end",
+      "eligible_unit_policy": "active_player_unit_within_range_of_non_home_objective",
+      "target_policy": "objective_marker_excluding_home",
+      "use_limit": "unlimited_different_objective_per_unit_this_phase",
+      "effect_descriptor": "unit_commits_sabotage_if_action_unit_controls_target_at_turn_end",
+      "engine_exposure_status": "source_known_engine_pending",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:commit-sabotage"
+    },
+    {
+      "mission_action_id": "decoy-objective",
+      "primary_mission_id": "primary-smoke-and-mirrors",
+      "name": "Decoy",
+      "start_phase": "shooting",
+      "start_timing": "shooting_phase_action_start",
+      "completion_timing": "turn_end",
+      "eligible_unit_policy": "active_player_unit",
+      "target_policy": "objective_marker_excluding_home_not_decoy",
+      "use_limit": "unlimited_different_objective_per_unit_this_phase",
+      "effect_descriptor": "objective_becomes_decoy_if_action_unit_controls_target_at_turn_end",
+      "engine_exposure_status": "source_known_engine_pending",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:decoy-objective"
+    },
+    {
+      "mission_action_id": "extract-intelligence",
+      "primary_mission_id": "primary-gather-intel",
+      "name": "Extract Intelligence",
+      "start_phase": "shooting",
+      "start_timing": "shooting_phase_action_start_from_battle_round_two",
+      "completion_timing": "turn_end",
+      "eligible_unit_policy": "active_player_unit",
+      "target_policy": "objective_marker_excluding_home_without_friendly_operation_marker",
+      "use_limit": "unlimited_different_objective_per_unit_this_phase",
+      "effect_descriptor": "objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end",
+      "engine_exposure_status": "source_known_engine_pending",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:extract-intelligence"
+    },
+    {
+      "mission_action_id": "maintain-control",
+      "primary_mission_id": "primary-vital-link",
+      "name": "Maintain Control",
+      "start_phase": "shooting",
+      "start_timing": "shooting_phase_action_start",
+      "completion_timing": "turn_end",
+      "eligible_unit_policy": "active_player_unit_within_range_of_central_objective",
+      "target_policy": "central_objective_marker",
+      "use_limit": "once_per_turn",
+      "effect_descriptor": "central_objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end",
+      "engine_exposure_status": "source_known_engine_pending",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:maintain-control"
+    },
+    {
+      "mission_action_id": "secure-asset",
+      "primary_mission_id": "primary-secure-asset",
+      "name": "Secure Asset",
+      "start_phase": "shooting",
+      "start_timing": "shooting_phase_action_start",
+      "completion_timing": "turn_end",
+      "eligible_unit_policy": "active_player_unit_within_range_of_non_home_objective",
+      "target_policy": "objective_marker_excluding_home",
+      "use_limit": "once_per_turn",
+      "effect_descriptor": "unit_secures_asset_if_action_unit_controls_target_at_turn_end",
+      "engine_exposure_status": "source_known_engine_pending",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:secure-asset"
+    },
+    {
+      "mission_action_id": "sensor-sweep-extract-relic",
+      "primary_mission_id": "primary-extract-relic",
+      "name": "Sensor Sweep",
+      "start_phase": "shooting",
+      "start_timing": "shooting_phase_action_start",
+      "completion_timing": "turn_end",
+      "eligible_unit_policy": "active_player_unit_within_range_of_central_objective",
+      "target_policy": "opponent_operation_marker_requires_more_than_one_marker_remaining",
+      "use_limit": "once_per_turn",
+      "effect_descriptor": "remove_one_opponent_operation_marker_if_action_unit_controls_central_objective_at_turn_end",
+      "engine_exposure_status": "source_known_engine_pending",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:sensor-sweep-extract-relic"
+    },
+    {
+      "mission_action_id": "sensor-sweep-locate-and-deny",
+      "primary_mission_id": "primary-locate-and-deny",
+      "name": "Sensor Sweep",
+      "start_phase": "shooting",
+      "start_timing": "shooting_phase_action_start",
+      "completion_timing": "turn_end",
+      "eligible_unit_policy": "active_player_unit_within_range_of_central_objective",
+      "target_policy": "operation_marker_requires_more_than_one_marker_remaining",
+      "use_limit": "once_per_turn",
+      "effect_descriptor": "remove_one_operation_marker_if_action_unit_controls_central_objective_at_turn_end",
+      "engine_exposure_status": "source_known_engine_pending",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:sensor-sweep-locate-and-deny"
+    },
+    {
+      "mission_action_id": "surveil-enemy-unit",
+      "primary_mission_id": "primary-surveil-the-foe",
+      "name": "Surveil the Foe",
+      "start_phase": "shooting",
+      "start_timing": "shooting_phase_action_start",
+      "completion_timing": "immediate",
+      "eligible_unit_policy": "active_player_unit",
+      "target_policy": "visible_enemy_unit_within_18_not_surveilled_this_turn",
+      "use_limit": "unlimited",
+      "effect_descriptor": "enemy_unit_becomes_surveilled_until_turn_end",
+      "engine_exposure_status": "source_known_engine_pending",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:surveil-enemy-unit"
+    },
+    {
+      "mission_action_id": "triangulate-objective",
+      "primary_mission_id": "primary-triangulation",
+      "name": "Triangulate",
+      "start_phase": "shooting",
+      "start_timing": "shooting_phase_action_start_from_battle_round_two",
+      "completion_timing": "turn_end",
+      "eligible_unit_policy": "active_player_unit",
+      "target_policy": "objective_marker_excluding_home",
+      "use_limit": "once_per_turn",
+      "effect_descriptor": "objective_becomes_triangulated_if_action_unit_controls_target_at_turn_end",
+      "engine_exposure_status": "source_known_engine_pending",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:triangulate-objective"
+    },
+    {
+      "mission_action_id": "vanguard-operation",
+      "primary_mission_id": "primary-vanguard-operation",
+      "name": "Vanguard Operation",
+      "start_phase": "shooting",
+      "start_timing": "shooting_phase_action_start",
+      "completion_timing": "turn_end",
+      "eligible_unit_policy": "active_player_unit_within_terrain_area_in_enemy_territory",
+      "target_policy": "terrain_area_in_enemy_territory",
+      "use_limit": "once_per_turn",
+      "effect_descriptor": "unit_performs_vanguard_operation_if_no_enemy_units_in_terrain_area_at_turn_end",
+      "engine_exposure_status": "source_known_engine_pending",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:vanguard-operation"
+    }
+  ],
+  "package_hash": "e96c461ec66f7b4d71bbd6f2b9b12899b0fc1a8bd3dae8fe60597d6dcc793e0f"
+}

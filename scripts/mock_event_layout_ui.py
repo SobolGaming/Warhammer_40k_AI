@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 from collections.abc import Sequence
+from dataclasses import replace
 from html import escape
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -109,7 +110,7 @@ def _build_data_payload() -> dict[str, object]:
         layout.layout_id: layout for layout in event_layouts.battlefield_artifact().layouts
     }
     mission_pool_entry_by_layout_id = _mission_pool_entry_by_layout_id(mission_pack)
-    ruleset, catalog, muster_requests, armies = _preview_projection_dependencies()
+    ruleset, catalog = _preview_projection_dependencies()
 
     layouts: dict[str, object] = {}
     for row in event_source.battlefield_layout_rows():
@@ -123,12 +124,36 @@ def _build_data_payload() -> dict[str, object]:
         mission_pool_entry_id = mission_pool_entry_by_layout_id.get(layout_id)
         if mission_pool_entry_id is None:
             raise GameLifecycleError("Viewer mission-pool entry is missing.")
+        mission_pool_entry = next(
+            entry
+            for entry in mission_pack.mission_pool_entries
+            if entry.mission_pool_entry_id == mission_pool_entry_id
+        )
         mission_setup = MissionSetup.from_mission_pack(
             mission_pack=mission_pack,
             mission_pool_entry_id=mission_pool_entry_id,
             attacker_player_id=_ATTACKER_PLAYER_ID,
+            attacker_force_disposition_id=mission_pool_entry.player_force_disposition_id,
             defender_player_id=_DEFENDER_PLAYER_ID,
+            defender_force_disposition_id=mission_pool_entry.opponent_force_disposition_id,
         )
+        muster_requests = (
+            _preview_muster_request(
+                catalog=catalog,
+                player_id=_ATTACKER_PLAYER_ID,
+                army_id="viewer-attacker-army",
+                unit_selection_id="viewer-attacker-unit",
+                force_disposition_id=mission_pool_entry.player_force_disposition_id,
+            ),
+            _preview_muster_request(
+                catalog=catalog,
+                player_id=_DEFENDER_PLAYER_ID,
+                army_id="viewer-defender-army",
+                unit_selection_id="viewer-defender-unit",
+                force_disposition_id=mission_pool_entry.opponent_force_disposition_id,
+            ),
+        )
+        armies = tuple(muster_army(catalog=catalog, request=request) for request in muster_requests)
         battlefield_view = _battlefield_view_payload(
             mission_setup=mission_setup,
             ruleset=ruleset,
@@ -248,29 +273,24 @@ def _mission_pool_entry_by_layout_id(mission_pack: MissionPackDefinition) -> dic
 def _preview_projection_dependencies() -> tuple[
     RulesetDescriptor,
     ArmyCatalog,
-    tuple[ArmyMusterRequest, ...],
-    tuple[ArmyDefinition, ...],
 ]:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    source_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    event_force_disposition_ids = tuple(
+        row.force_disposition_id for row in event_source.force_disposition_rows()
+    )
+    catalog = replace(
+        source_catalog,
+        detachments=tuple(
+            replace(detachment, force_disposition_ids=event_force_disposition_ids)
+            if detachment.detachment_id == "core-combined-arms"
+            else detachment
+            for detachment in source_catalog.detachments
+        ),
+    )
     ruleset = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
         descriptor_version="event-companion-battlefield-viewer-v3"
     )
-    muster_requests = (
-        _preview_muster_request(
-            catalog=catalog,
-            player_id=_ATTACKER_PLAYER_ID,
-            army_id="viewer-attacker-army",
-            unit_selection_id="viewer-attacker-unit",
-        ),
-        _preview_muster_request(
-            catalog=catalog,
-            player_id=_DEFENDER_PLAYER_ID,
-            army_id="viewer-defender-army",
-            unit_selection_id="viewer-defender-unit",
-        ),
-    )
-    armies = tuple(muster_army(catalog=catalog, request=request) for request in muster_requests)
-    return ruleset, catalog, muster_requests, armies
+    return ruleset, catalog
 
 
 def _preview_muster_request(
@@ -279,6 +299,7 @@ def _preview_muster_request(
     player_id: str,
     army_id: str,
     unit_selection_id: str,
+    force_disposition_id: str,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -290,7 +311,7 @@ def _preview_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=force_disposition_id,
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

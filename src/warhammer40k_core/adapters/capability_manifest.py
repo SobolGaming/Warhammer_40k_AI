@@ -63,13 +63,13 @@ from warhammer40k_core.geometry.model_geometry import (
     HeightSourceKind,
 )
 
-CAPABILITY_MANIFEST_SCHEMA_VERSION = "capability-manifest-v1"
+CAPABILITY_MANIFEST_SCHEMA_VERSION = "capability-manifest-v2-directed-primary"
 CAPABILITY_MANIFEST_SCHEMA_ID = (
-    "https://warhammer40k-core.local/contracts/v4/capability-manifest.schema.json"
+    "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"
 )
 # Updated with the canonical schema file hash by the Phase 18D contract change.
 CAPABILITY_MANIFEST_SCHEMA_SHA256 = (
-    "320d31af5048139c3543d094d0e271f29ecd23cc65e634a034bc8e97442ff281"
+    "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d"
 )
 ENGINE_BUILD_ID = f"warhammer40k-core-v2:{ENGINE_VERSION}"
 
@@ -784,38 +784,6 @@ def _mission_rows(
         ),
         None,
     )
-    if mission_pack is None:
-        executable = False
-        primary = None
-        semantic_reason = "mission_pack_not_supported"
-        source_ids: tuple[str, ...] = (setup.source_id,)
-    else:
-        primary = next(
-            (
-                candidate
-                for candidate in mission_pack.primary_missions
-                if candidate.primary_mission_id == setup.primary_mission_id
-            ),
-            None,
-        )
-        executable = primary is not None and _primary_mission_executable(primary)
-        semantic_reason = (
-            ""
-            if executable
-            else (
-                "primary_mission_not_found"
-                if primary is None
-                else "primary_mission_scoring_pending"
-            )
-        )
-        source_ids = tuple(
-            sorted(
-                {
-                    setup.source_id,
-                    *(name for name in (() if primary is None else (primary.source_id,))),
-                }
-            )
-        )
     physical = setup.battlefield_layout_id is not None and bool(
         setup.deployment_zones and setup.battlefield_regions and setup.terrain_features
     )
@@ -829,69 +797,116 @@ def _mission_rows(
     mission_source_package_hash = (
         None if mission_pack is None else mission_pack.source_package.source_commit_or_import_hash
     )
-    semantic_evidence_refs = (
-        ()
-        if primary is None or mission_source_package_hash is None
-        else (
-            primary.source_id,
-            mission_setup_evidence_id,
-            f"mission-source-package-hash:{mission_source_package_hash}",
-        )
-    )
-    row = _row(
-        row_id=f"mission:{setup.mission_pack_id}:{setup.mission_pool_entry_id}",
-        row_kind="mission",
-        player_id=None,
-        owner_id=setup.mission_pool_entry_id,
-        display_name=setup.primary_mission_id,
-        source_ids=source_ids,
-        load_support=("engine_loaded" if mission_pack is not None else "unsupported"),
-        semantic_execution=("executable" if executable else "incomplete"),
-        applicable={
-            CapabilityDimension.LOADABLE: (
-                mission_pack is not None,
-                "mission_pack_not_supported",
-                (setup.source_id,),
-            ),
-            CapabilityDimension.DISPLAYABLE: (
-                True,
-                "",
-                (f"mission-setup:{setup.mission_pool_entry_id}",),
-            ),
-            CapabilityDimension.PHYSICALLY_PLAYABLE: (
-                physical,
-                "battlefield_layout_geometry_incomplete",
+    rows: list[CapabilityRowPayload] = []
+    for assignment in setup.primary_mission_assignments:
+        primary = (
+            None
+            if mission_pack is None
+            else next(
                 (
-                    mission_setup_evidence_id,
-                    *terrain_source_evidence_refs,
-                    *(
-                        item
-                        for item in (setup.battlefield_layout_id, setup.terrain_layout_id)
-                        if item is not None
-                    ),
+                    candidate
+                    for candidate in mission_pack.primary_missions
+                    if candidate.primary_mission_id == assignment.primary_mission_id
                 ),
-            ),
-            CapabilityDimension.SEMANTICALLY_EXECUTABLE: (
-                executable,
-                semantic_reason,
-                semantic_evidence_refs,
-            ),
-            CapabilityDimension.NETWORK_SAFE: (
-                True,
-                "",
-                ("adapter:redaction:capability_manifest",),
-            ),
-        },
-        metadata={
-            "mission_setup_hash": mission_setup_hash,
-            "mission_source_package_hash": mission_source_package_hash,
-            "mission_pack_id": setup.mission_pack_id,
-            "primary_mission_id": setup.primary_mission_id,
-            "battlefield_layout_id": setup.battlefield_layout_id,
-            "terrain_layout_id": setup.terrain_layout_id,
-        },
-    )
-    return [row], mission_pack
+                None,
+            )
+        )
+        executable = primary is not None and _primary_mission_executable(primary)
+        semantic_reason = (
+            ""
+            if executable
+            else (
+                "mission_pack_not_supported"
+                if mission_pack is None
+                else (
+                    "primary_mission_not_found"
+                    if primary is None
+                    else "primary_mission_scoring_pending"
+                )
+            )
+        )
+        source_ids = tuple(
+            sorted(
+                {
+                    setup.source_id,
+                    *(name for name in (() if primary is None else (primary.source_id,))),
+                }
+            )
+        )
+        semantic_evidence_refs = (
+            ()
+            if primary is None or mission_source_package_hash is None
+            else (
+                primary.source_id,
+                mission_setup_evidence_id,
+                f"mission-source-package-hash:{mission_source_package_hash}",
+            )
+        )
+        rows.append(
+            _row(
+                row_id=(
+                    f"mission:{setup.mission_pack_id}:{setup.mission_pool_entry_id}:"
+                    f"{assignment.player_id}:{assignment.primary_mission_id}"
+                ),
+                row_kind="mission",
+                # Primary assignments are public game data, including in player projections.
+                player_id=None,
+                owner_id=setup.mission_pool_entry_id,
+                display_name=assignment.primary_mission_id,
+                source_ids=source_ids,
+                load_support=("engine_loaded" if mission_pack is not None else "unsupported"),
+                semantic_execution=("executable" if executable else "incomplete"),
+                applicable={
+                    CapabilityDimension.LOADABLE: (
+                        mission_pack is not None,
+                        "mission_pack_not_supported",
+                        (setup.source_id,),
+                    ),
+                    CapabilityDimension.DISPLAYABLE: (
+                        True,
+                        "",
+                        (f"mission-setup:{setup.mission_pool_entry_id}",),
+                    ),
+                    CapabilityDimension.PHYSICALLY_PLAYABLE: (
+                        physical,
+                        "battlefield_layout_geometry_incomplete",
+                        (
+                            mission_setup_evidence_id,
+                            *terrain_source_evidence_refs,
+                            *(
+                                item
+                                for item in (
+                                    setup.battlefield_layout_id,
+                                    setup.terrain_layout_id,
+                                )
+                                if item is not None
+                            ),
+                        ),
+                    ),
+                    CapabilityDimension.SEMANTICALLY_EXECUTABLE: (
+                        executable,
+                        semantic_reason,
+                        semantic_evidence_refs,
+                    ),
+                    CapabilityDimension.NETWORK_SAFE: (
+                        True,
+                        "",
+                        ("adapter:redaction:capability_manifest",),
+                    ),
+                },
+                metadata={
+                    "mission_setup_hash": mission_setup_hash,
+                    "mission_source_package_hash": mission_source_package_hash,
+                    "mission_pack_id": setup.mission_pack_id,
+                    "assigned_player_id": assignment.player_id,
+                    "force_disposition_id": assignment.force_disposition_id,
+                    "primary_mission_id": assignment.primary_mission_id,
+                    "battlefield_layout_id": setup.battlefield_layout_id,
+                    "terrain_layout_id": setup.terrain_layout_id,
+                },
+            )
+        )
+    return rows, mission_pack
 
 
 def _geometry_rows(*, armies: tuple[ArmyDefinition, ...]) -> list[CapabilityRowPayload]:

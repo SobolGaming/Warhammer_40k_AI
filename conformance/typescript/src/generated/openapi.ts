@@ -325,6 +325,11 @@ export interface components {
             game_id: string;
             max_lifecycle_transitions: number;
             mission_setup: {
+                primary_mission_assignments: {
+                    force_disposition_id: string;
+                    player_id: string;
+                    primary_mission_id: string;
+                }[];
                 terrain_areas: {
                     logical_terrain_area_id: string;
                 }[];
@@ -340,7 +345,7 @@ export interface components {
         "session-create.schema": {
             config: components["schemas"]["config"];
             /** @constant */
-            schema_version: "session-create-v3";
+            schema_version: "session-create-v4";
         };
         "lifecycle-status--json_value.schema": null | boolean | number | string | components["schemas"]["lifecycle-status--json_value.schema"][] | {
             [key: string]: components["schemas"]["lifecycle-status--json_value.schema"];
@@ -387,7 +392,7 @@ export interface components {
             ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v6-contract";
+            schema_version: "session-metadata-v7-contract";
             server_contract_version: string;
             session_id: string;
             session_revision: number;
@@ -685,7 +690,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v6-contract";
+            schema_version: "session-command-outcome-v7-contract";
             session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
@@ -911,6 +916,11 @@ export interface components {
             schema_version: "battlefield-view-v3-phase17n";
         };
         mission_setup: {
+            primary_mission_assignments: {
+                force_disposition_id: string;
+                player_id: string;
+                primary_mission_id: string;
+            }[];
             terrain_areas: {
                 logical_terrain_area_id: string;
             }[];
@@ -1003,7 +1013,7 @@ export interface components {
         /** CORE V2 DecisionRequestViewPayload */
         "decision-request-view.schema": {
             /** @constant */
-            schema_version: "decision-request-view-v2-interaction";
+            schema_version: "decision-request-view-v3-primary-assignments";
             actor_id: string | null;
             decision_type: string;
             is_parameterized: boolean;
@@ -1030,7 +1040,7 @@ export interface components {
             payload: components["schemas"]["annotated-decision-request--json_value.schema"];
             request_id: string;
             /** @constant */
-            schema_version: "annotated-decision-request-v1";
+            schema_version: "annotated-decision-request-v2-primary-assignments";
         };
         "game-view--primary_unit_terrain_membership.schema": {
             terrain_feature_ids: string[];
@@ -1079,7 +1089,7 @@ export interface components {
             nested_interaction_requests: components["schemas"]["annotated-decision-request.schema"][];
             player_ids: string[];
             /** @constant */
-            projection_schema: "game-view-v8-phase17n";
+            projection_schema: "game-view-v9-phase17n";
             projection_state_hash: string;
             public_command_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_card_states: components["schemas"]["game-view--json_value.schema"][];
@@ -1105,7 +1115,7 @@ export interface components {
             retention_limit: number;
             revision_retention_limit: number;
             /** @constant */
-            schema_version: "session-projection-v4-phase17n";
+            schema_version: "session-projection-v5-phase17n";
             session_id: string;
             session_revision: number;
             /** @enum {string} */
@@ -1135,7 +1145,7 @@ export interface components {
             retention_limit: number;
             revision_retention_limit: number;
             /** @constant */
-            schema_version: "event-delta-v2";
+            schema_version: "event-delta-v3-primary-assignments";
             session_id: string;
             supplied_cursor: string;
             to_revision: number;
@@ -1160,7 +1170,15 @@ export interface components {
             rules_overlay_ids: string[];
             source_ids: string[];
             source_package_id: string;
-        };
+            mission_pack_id: string | null;
+            mission_source_package_hash: string | null;
+        } & ({
+            mission_pack_id?: null;
+            mission_source_package_hash?: null;
+        } | {
+            mission_pack_id?: string;
+            mission_source_package_hash?: string;
+        });
         /** CORE V2 ReplayArtifactMetadataPayload */
         "replay-metadata.schema": {
             artifact_id: string;
@@ -1172,7 +1190,7 @@ export interface components {
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v4-phase17n";
+            schema_version: "replay-artifact-v5-phase17n";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
         };
         /** CORE V2 FiniteOptionSubmissionPayload */
@@ -1193,7 +1211,7 @@ export interface components {
         "interaction-conformance.schema": {
             cases: components["schemas"]["interaction-conformance--case.schema"][];
             /** @constant */
-            schema_version: "interaction-conformance-v1";
+            schema_version: "interaction-conformance-v2-primary-assignments";
         };
         /** CORE V2 ParameterizedSubmissionPayload */
         "parameterized-submission.schema": {
@@ -1417,7 +1435,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Replay artifact v4 with mandatory ruleset descriptor, overlay source identity, explicit logical terrain-area identity, and Phase 17N turn-start terrain evidence for an administrator, or for a replay viewer after the session is terminal or closed. */
+            /** @description Replay artifact v5 with directed player Primary Mission assignments, mandatory ruleset descriptor, overlay source identity, explicit logical terrain-area identity, and Phase 17N turn-start terrain evidence for an administrator, or for a replay viewer after the session is terminal or closed. */
             200: {
                 headers: {
                     [name: string]: unknown;

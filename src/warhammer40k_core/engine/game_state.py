@@ -14,8 +14,13 @@ from warhammer40k_core.core.ruleset_descriptor import (
     setup_step_kind_from_token,
 )
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import game_config_validation as _config_validation
 from warhammer40k_core.engine import game_state_queries as _queries
 from warhammer40k_core.engine import mission_action_history as _action_history
+from warhammer40k_core.engine import (
+    mission_scoring_evidence_validation as _scoring_evidence_validation,
+)
+from warhammer40k_core.engine import mission_terrain as _mission_terrain
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine import reserve_arrival_requirements as _arrival
 from warhammer40k_core.engine.actions import MissionActionState
@@ -82,15 +87,10 @@ from warhammer40k_core.engine.faction_rule_states import (
     FactionRuleState,
 )
 from warhammer40k_core.engine.fight_order import FightPhaseState
+from warhammer40k_core.engine.final_scoring import FinalScoringResult
 from warhammer40k_core.engine.game_config_geometry import (
     game_config_model_geometries_from_payload,
     validate_optional_game_config_model_geometries,
-)
-from warhammer40k_core.engine.game_config_validation import (
-    validate_army_muster_requests as _validate_army_muster_requests,
-)
-from warhammer40k_core.engine.game_config_validation import (
-    validate_strict_roster_legality_requests as _validate_strict_roster_legality_requests,
 )
 from warhammer40k_core.engine.game_state_payloads import (
     DedicatedTransportSetupConsequencePayload as DedicatedTransportSetupConsequencePayload,
@@ -126,7 +126,7 @@ from warhammer40k_core.engine.mission_state_validation import (
 )
 from warhammer40k_core.engine.missions import (
     deterministic_tactical_secondary_draw,
-    mission_scoring_policy_from_setup,
+    mission_scoring_policies_from_setup,
     reserve_destruction_policy_from_scoring_policy,
 )
 from warhammer40k_core.engine.normal_move_history import NormalMoveState
@@ -208,7 +208,6 @@ from warhammer40k_core.engine.rules_unit_placement import RulesUnitPlacement
 from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
-    FinalScoringResult,
     PrimaryObjectiveTurnStartState,
     PrimaryTerrainTrapState,
     PrimaryUnitDestructionState,
@@ -275,6 +274,10 @@ from warhammer40k_core.engine.unit_resource_state import (
 from warhammer40k_core.engine.unit_resources import UnitResourceLedger
 from warhammer40k_core.engine.unit_state import (
     StartingStrengthRecord,
+)
+from warhammer40k_core.engine.victory_point_policy_validation import (
+    validate_victory_point_ledger_policy_sources,
+    validate_victory_point_ledgers,
 )
 from warhammer40k_core.geometry import shapely_backend
 
@@ -642,7 +645,7 @@ class GameConfig:
         object.__setattr__(
             self,
             "army_muster_requests",
-            _validate_army_muster_requests(
+            _config_validation.validate_army_muster_requests(
                 self.army_muster_requests,
                 player_ids=self.player_ids,
             ),
@@ -656,7 +659,7 @@ class GameConfig:
             ),
         )
         if not self.allow_legacy_non_strict_rosters:
-            _validate_strict_roster_legality_requests(self.army_muster_requests)
+            _config_validation.validate_strict_roster_legality_requests(self.army_muster_requests)
         object.__setattr__(
             self,
             "turn_order",
@@ -695,6 +698,10 @@ class GameConfig:
         validate_game_config_mission_setup(
             mission_setup,
             ruleset_descriptor=self.ruleset_descriptor,
+        )
+        _config_validation.validate_mission_setup_muster_dispositions(
+            mission_setup,
+            army_muster_requests=self.army_muster_requests,
         )
         object.__setattr__(self, "mission_setup", mission_setup)
         object.__setattr__(
@@ -1324,7 +1331,7 @@ class GameState:
             self.command_point_ledgers,
             player_ids=self.player_ids,
         )
-        self.victory_point_ledgers = _validate_victory_point_ledgers(
+        self.victory_point_ledgers = validate_victory_point_ledgers(
             self.victory_point_ledgers,
             player_ids=self.player_ids,
         )
@@ -1340,7 +1347,7 @@ class GameState:
             self.faction_rule_states,
             player_ids=self.player_ids,
         )
-        self.army_definitions = _validate_army_definitions(
+        self.army_definitions = _config_validation.validate_army_definitions(
             self.army_definitions,
             player_ids=self.player_ids,
         )
@@ -1367,6 +1374,19 @@ class GameState:
         validate_game_state_mission_setup(
             self.mission_setup,
             battlefield_state=self.battlefield_state,
+        )
+        _config_validation.validate_mission_setup_army_dispositions(
+            self.mission_setup,
+            army_definitions=self.army_definitions,
+        )
+        validate_victory_point_ledger_policy_sources(
+            self.victory_point_ledgers,
+            mission_setup=self.mission_setup,
+            policies=(
+                None
+                if self.mission_setup is None
+                else mission_scoring_policies_from_setup(self.mission_setup)
+            ),
         )
         self.movement_phase_state = _validate_optional_movement_phase_state(
             self.movement_phase_state
@@ -1483,20 +1503,28 @@ class GameState:
                 known_unit_instance_ids=tuple(
                     unit.unit_instance_id for army in self.army_definitions for unit in army.units
                 ),
-                known_terrain_feature_ids=tuple(
-                    feature.feature_id
-                    for feature in (
+                known_logical_terrain_area_ids=tuple(
+                    area.logical_terrain_area_id
+                    for area in (
                         ()
-                        if self.battlefield_state is None
-                        else self.battlefield_state.terrain_features
+                        if self.mission_setup is None
+                        else _mission_terrain.mission_logical_terrain_areas(self.mission_setup)
                     )
                 ),
             )
         )
-        self.primary_terrain_trap_states = _validate_primary_terrain_trap_states(
-            self.primary_terrain_trap_states,
-            game_id=self.game_id,
+        self.mission_action_states = _validate_mission_action_states(
+            self.mission_action_states,
             player_ids=self.player_ids,
+        )
+        self.primary_terrain_trap_states = (
+            _scoring_evidence_validation.validate_primary_terrain_trap_states(
+                self.primary_terrain_trap_states,
+                game_id=self.game_id,
+                player_ids=self.player_ids,
+                mission_setup=self.mission_setup,
+                mission_action_states=self.mission_action_states,
+            )
         )
         self.primary_unit_destruction_states = _validate_primary_unit_destruction_states(
             self.primary_unit_destruction_states,
@@ -1513,19 +1541,23 @@ class GameState:
             game_id=self.game_id,
             player_ids=self.player_ids,
         )
-        self.secondary_objective_cleanse_states = _validate_secondary_objective_cleanse_states(
-            self.secondary_objective_cleanse_states,
-            game_id=self.game_id,
-            player_ids=self.player_ids,
+        self.secondary_objective_cleanse_states = (
+            _scoring_evidence_validation.validate_secondary_objective_cleanse_states(
+                self.secondary_objective_cleanse_states,
+                game_id=self.game_id,
+                player_ids=self.player_ids,
+                mission_setup=self.mission_setup,
+                mission_action_states=self.mission_action_states,
+            )
         )
-        self.secondary_terrain_plunder_states = _validate_secondary_terrain_plunder_states(
-            self.secondary_terrain_plunder_states,
-            game_id=self.game_id,
-            player_ids=self.player_ids,
-        )
-        self.mission_action_states = _validate_mission_action_states(
-            self.mission_action_states,
-            player_ids=self.player_ids,
+        self.secondary_terrain_plunder_states = (
+            _scoring_evidence_validation.validate_secondary_terrain_plunder_states(
+                self.secondary_terrain_plunder_states,
+                game_id=self.game_id,
+                player_ids=self.player_ids,
+                mission_setup=self.mission_setup,
+                mission_action_states=self.mission_action_states,
+            )
         )
         self.end_turn_cleanup_states = _validate_end_turn_cleanup_states(
             self.end_turn_cleanup_states,
@@ -2088,6 +2120,10 @@ class GameState:
             raise GameLifecycleError("ArmyDefinition player_id is not in this game.")
         if self.army_definition_for_player(army_definition.player_id) is not None:
             raise GameLifecycleError("ArmyDefinition already exists for player.")
+        _config_validation.validate_mission_setup_army_dispositions(
+            self.mission_setup,
+            army_definitions=(army_definition,),
+        )
         resource_initializations = unit_resource_initializations_for_army(army_definition)
         self.army_definitions.append(army_definition)
         self.army_definitions.sort(key=lambda stored: stored.player_id)
@@ -2101,10 +2137,15 @@ class GameState:
         self._record_static_core_ability_sources_for_army(army_definition)
 
     def replace_army_definitions(self, army_definitions: list[ArmyDefinition]) -> None:
-        self.army_definitions = _validate_army_definitions(
+        validated_armies = _config_validation.validate_army_definitions(
             army_definitions,
             player_ids=self.player_ids,
         )
+        _config_validation.validate_mission_setup_army_dispositions(
+            self.mission_setup,
+            army_definitions=validated_armies,
+        )
+        self.army_definitions = validated_armies
 
     def replace_unit_resource_ledgers(self, ledgers: list[UnitResourceLedger]) -> None:
         self.unit_resource_ledgers = validate_unit_resource_ledgers(
@@ -2668,7 +2709,7 @@ class GameState:
         applied_amount = award.amount
         transaction_metadata = award.metadata
         if self.mission_setup is not None:
-            policy = mission_scoring_policy_from_setup(self.mission_setup)
+            policy = mission_scoring_policies_from_setup(self.mission_setup)
             applied_amount, transaction_metadata = policy.capped_award_for_ledger(
                 ledger=ledger,
                 award=award,
@@ -2736,15 +2777,22 @@ class GameState:
             )
             self.replace_mission_action_state(completed_without_award)
             if completed_without_award.scoring_source_id == "cleanse":
+                cleanse_source = _scoring_evidence_validation.source_action_for_mission_identity(
+                    mission_setup=self.mission_setup,
+                    mission_id=completed_without_award.mission_id,
+                    expected_target_policy="objective_marker",
+                    expected_mission_kind="secondary",
+                    evidence_kind="SecondaryObjectiveCleanseState",
+                )
                 self.record_secondary_objective_cleanse(
                     player_id=completed_without_award.player_id,
                     objective_marker_id=completed_without_award.target_id,
                     action_id=completed_without_award.action_id,
                     phase=completion_phase,
-                    source_id=completed_without_award.scoring_source_id,
+                    source_id=cleanse_source.source_id,
                 )
             return completed_without_award
-        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        policy = mission_scoring_policies_from_setup(self.mission_setup)
         award = policy.mission_action_award(
             player_id=action_state.player_id,
             battle_round=self.battle_round,
@@ -2853,31 +2901,36 @@ class GameState:
         requested_player_id = _validate_player_id(player_id, player_ids=self.player_ids)
         if requested_player_id != self.active_player_id:
             raise GameLifecycleError("Primary terrain trap must be recorded during owner's turn.")
-        requested_feature_id = _validate_identifier("terrain_feature_id", terrain_feature_id)
-        if requested_feature_id not in {
-            feature.feature_id for feature in self.mission_setup.terrain_features
-        }:
-            raise GameLifecycleError("Primary terrain trap references an unknown terrain feature.")
+        requested_area_id = _validate_identifier("terrain_feature_id", terrain_feature_id)
+        logical_area = _mission_terrain.mission_logical_terrain_area_by_id(
+            self.mission_setup, logical_terrain_area_id=requested_area_id
+        )
         if any(
-            state.player_id == requested_player_id
-            and state.terrain_feature_id == requested_feature_id
+            state.player_id == requested_player_id and state.terrain_feature_id == requested_area_id
             for state in self.primary_terrain_trap_states
         ):
             raise GameLifecycleError("Primary terrain trap already exists for this player.")
         state = PrimaryTerrainTrapState(
             trap_id=(
                 f"primary-terrain-trap:{self.game_id}:round-{self.battle_round:02d}:"
-                f"{requested_player_id}:{requested_feature_id}"
+                f"{requested_player_id}:{requested_area_id}"
             ),
             game_id=self.game_id,
             player_id=requested_player_id,
             active_player_id=self.active_player_id,
             battle_round=self.battle_round,
             phase=phase.value,
-            terrain_feature_id=requested_feature_id,
-            is_objective=self._terrain_feature_contains_objective_marker(requested_feature_id),
+            terrain_feature_id=requested_area_id,
+            is_objective=_mission_terrain.logical_terrain_area_is_objective(
+                logical_area, mission_setup=self.mission_setup
+            ),
             action_id=_validate_identifier("action_id", action_id),
             source_id=_validate_identifier("source_id", source_id),
+        )
+        _scoring_evidence_validation.validate_primary_terrain_trap_action_link(
+            state,
+            mission_setup=self.mission_setup,
+            mission_action_states=self.mission_action_states,
         )
         self.primary_terrain_trap_states.append(state)
         self.primary_terrain_trap_states.sort(key=lambda stored: stored.trap_id)
@@ -3088,6 +3141,11 @@ class GameState:
             action_id=requested_action,
             source_id=_validate_identifier("source_id", source_id),
         )
+        _scoring_evidence_validation.validate_secondary_objective_cleanse_action_link(
+            state,
+            mission_setup=self.mission_setup,
+            mission_action_states=self.mission_action_states,
+        )
         self.secondary_objective_cleanse_states.append(state)
         self.secondary_objective_cleanse_states.sort(key=lambda stored: stored.cleanse_id)
         return state
@@ -3112,13 +3170,10 @@ class GameState:
         requested_player = _validate_player_id(player_id, player_ids=self.player_ids)
         if requested_player != self.active_player_id:
             raise GameLifecycleError("Secondary terrain plunder must happen on owner's turn.")
-        requested_feature = _validate_identifier("terrain_feature_id", terrain_feature_id)
-        if requested_feature not in {
-            feature.feature_id for feature in self.mission_setup.terrain_features
-        }:
-            raise GameLifecycleError(
-                "Secondary terrain plunder references an unknown terrain area."
-            )
+        requested_area_id = _validate_identifier("terrain_feature_id", terrain_feature_id)
+        _mission_terrain.mission_logical_terrain_area_by_id(
+            self.mission_setup, logical_terrain_area_id=requested_area_id
+        )
         if any(
             state.player_id == requested_player
             and state.battle_round == self.battle_round
@@ -3131,16 +3186,21 @@ class GameState:
         state = SecondaryTerrainPlunderState(
             plunder_id=(
                 f"secondary-terrain-plunder:{self.game_id}:round-{self.battle_round:02d}:"
-                f"{requested_player}:{requested_feature}"
+                f"{requested_player}:{requested_area_id}"
             ),
             game_id=self.game_id,
             player_id=requested_player,
             active_player_id=self.active_player_id,
             battle_round=self.battle_round,
             phase=phase.value,
-            terrain_feature_id=requested_feature,
+            terrain_feature_id=requested_area_id,
             action_id=_validate_identifier("action_id", action_id),
             source_id=_validate_identifier("source_id", source_id),
+        )
+        _scoring_evidence_validation.validate_secondary_terrain_plunder_action_link(
+            state,
+            mission_setup=self.mission_setup,
+            mission_action_states=self.mission_action_states,
         )
         self.secondary_terrain_plunder_states.append(state)
         self.secondary_terrain_plunder_states.sort(key=lambda stored: stored.plunder_id)
@@ -3646,6 +3706,15 @@ class GameState:
             validated_setup,
             battlefield_state=self.battlefield_state,
         )
+        _config_validation.validate_mission_setup_army_dispositions(
+            validated_setup,
+            army_definitions=self.army_definitions,
+        )
+        validate_victory_point_ledger_policy_sources(
+            self.victory_point_ledgers,
+            mission_setup=validated_setup,
+            policies=mission_scoring_policies_from_setup(validated_setup),
+        )
         self.mission_setup = validated_setup
 
     def record_tactical_secondary_draw(self, draw: TacticalSecondaryDraw) -> None:
@@ -3840,7 +3909,7 @@ class GameState:
         )
         if card_state is None:
             raise GameLifecycleError("Secondary mission card is not active.")
-        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        policy = mission_scoring_policies_from_setup(self.mission_setup)
         source_kind = (
             VictoryPointSourceKind.FIXED_SECONDARY
             if requested_mode is SecondaryMissionCardMode.FIXED
@@ -3891,7 +3960,7 @@ class GameState:
             )
         )
         self._record_objective_control_record_if_absent(record)
-        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        policy = mission_scoring_policies_from_setup(self.mission_setup)
         source_kind = (
             VictoryPointSourceKind.FIXED_SECONDARY
             if requested_mode is SecondaryMissionCardMode.FIXED
@@ -4017,7 +4086,7 @@ class GameState:
             raise GameLifecycleError(
                 "Tactical secondary achievement context requires MissionSetup."
             )
-        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        policy = mission_scoring_policies_from_setup(self.mission_setup)
         award = policy.secondary_award(
             player_id=context.player_id,
             battle_round=self.battle_round,
@@ -5311,7 +5380,7 @@ class GameState:
     def _score_objective_control_boundary(self, record: ObjectiveControlRecord) -> None:
         if self.mission_setup is None:
             raise GameLifecycleError("Mission scoring requires MissionSetup.")
-        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        policy = mission_scoring_policies_from_setup(self.mission_setup)
         for award in policy.primary_awards_from_objective_control(
             record=record,
             mission_setup=self.mission_setup,
@@ -5325,7 +5394,7 @@ class GameState:
     def _score_end_of_battle_primary_boundary(self, record: ObjectiveControlRecord) -> None:
         if self.mission_setup is None:
             raise GameLifecycleError("Mission scoring requires MissionSetup.")
-        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        policy = mission_scoring_policies_from_setup(self.mission_setup)
         for award in policy.primary_awards_from_objective_control(
             record=record,
             mission_setup=self.mission_setup,
@@ -5337,23 +5406,6 @@ class GameState:
             end_of_battle=True,
         ):
             self.award_victory_points(award)
-
-    def _terrain_feature_contains_objective_marker(self, terrain_feature_id: str) -> bool:
-        if self.mission_setup is None:
-            raise GameLifecycleError("Terrain objective lookup requires MissionSetup.")
-        requested_feature_id = _validate_identifier("terrain_feature_id", terrain_feature_id)
-        for feature in self.mission_setup.terrain_features:
-            if feature.feature_id != requested_feature_id:
-                continue
-            return any(
-                shapely_backend.point_intersects_polygon(
-                    marker.x_inches,
-                    marker.y_inches,
-                    feature.rules_footprint_points(),
-                )
-                for marker in self.mission_setup.objective_markers
-            )
-        raise GameLifecycleError("Terrain objective lookup references an unknown terrain feature.")
 
     def _enemy_unit_ids_in_player_deployment_zone(self, player_id: str) -> tuple[str, ...]:
         if self.mission_setup is None:
@@ -5424,7 +5476,7 @@ class GameState:
         if self.battlefield_state is None:
             raise GameLifecycleError("Reserve destruction requires battlefield_state.")
         policy = reserve_destruction_policy_from_scoring_policy(
-            mission_scoring_policy_from_setup(self.mission_setup)
+            mission_scoring_policies_from_setup(self.mission_setup).common_policy
         )
         destruction = resolve_unarrived_reserve_destruction(
             reserve_states=tuple(self.reserve_states),
@@ -5456,7 +5508,7 @@ class GameState:
         requested_round = _validate_positive_int("battle_round", battle_round)
         if self.mission_setup is None:
             raise GameLifecycleError("Game-end policy requires MissionSetup.")
-        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        policy = mission_scoring_policies_from_setup(self.mission_setup)
         return requested_round >= policy.game_length_battle_rounds
 
     def game_result_payload(self) -> dict[str, JsonValue]:
@@ -5464,13 +5516,17 @@ class GameState:
             raise GameLifecycleError("Game result requires complete stage.")
         if self.mission_setup is None:
             raise GameLifecycleError("Game result requires MissionSetup.")
-        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        policies = mission_scoring_policies_from_setup(self.mission_setup)
         result = FinalScoringResult.from_ledgers(
             game_id=self.game_id,
             battle_round=self.battle_round,
-            policy=policy,
+            policies=policies,
             ledgers=tuple(self.victory_point_ledgers),
-            scoring_windows=tuple(self.scoring_window_states),
+            scoring_windows=tuple(
+                window
+                for window in self.scoring_window_states
+                if window.battle_round == self.battle_round
+            ),
         )
         return cast(dict[str, JsonValue], result.to_payload())
 
@@ -5478,7 +5534,7 @@ class GameState:
         if self.mission_setup is None:
             raise GameLifecycleError("Scoring windows require MissionSetup.")
         kind = ScoringWindowKind(window_kind)
-        policy = mission_scoring_policy_from_setup(self.mission_setup)
+        policy = mission_scoring_policies_from_setup(self.mission_setup)
         windows = (
             policy.end_of_round_scoring_windows
             if kind is ScoringWindowKind.END_OF_ROUND
@@ -5652,29 +5708,6 @@ def _validate_reserve_unit_points(
     return tuple(sorted(validated, key=lambda entry: entry.unit_instance_id))
 
 
-def _validate_army_definitions(
-    values: object,
-    *,
-    player_ids: tuple[str, ...],
-) -> list[ArmyDefinition]:
-    if not isinstance(values, list):
-        raise GameLifecycleError("GameState army_definitions must be a list.")
-    validated: list[ArmyDefinition] = []
-    seen: set[str] = set()
-    for value in cast(list[object], values):
-        if type(value) is not ArmyDefinition:
-            raise GameLifecycleError(
-                "GameState army_definitions must contain ArmyDefinition values."
-            )
-        if value.player_id not in player_ids:
-            raise GameLifecycleError("ArmyDefinition player_id is not in this game.")
-        if value.player_id in seen:
-            raise GameLifecycleError("GameState army_definitions must be unique by player.")
-        seen.add(value.player_id)
-        validated.append(value)
-    return sorted(validated, key=lambda stored: stored.player_id)
-
-
 def _validate_optional_battlefield_state(
     value: object | None,
 ) -> BattlefieldRuntimeState | None:
@@ -5698,6 +5731,10 @@ def _validate_optional_mission_setup(
         raise GameLifecycleError("mission_setup attacker_player_id is not in this game.")
     if value.defender_player_id not in player_ids:
         raise GameLifecycleError("mission_setup defender_player_id is not in this game.")
+    if {value.attacker_player_id, value.defender_player_id} != set(player_ids):
+        raise GameLifecycleError(
+            "mission_setup players must exactly match the players in this game."
+        )
     return value
 
 
@@ -5980,33 +6017,6 @@ def _validate_command_point_ledgers(
         validated.append(value)
     if set(seen) != set(player_ids):
         raise GameLifecycleError("GameState command_point_ledgers must include every player.")
-    return sorted(validated, key=lambda ledger: ledger.player_id)
-
-
-def _validate_victory_point_ledgers(
-    values: object,
-    *,
-    player_ids: tuple[str, ...],
-) -> list[VictoryPointLedger]:
-    if not isinstance(values, list):
-        raise GameLifecycleError("GameState victory_point_ledgers must be a list.")
-    if not values:
-        return initial_victory_point_ledgers(player_ids)
-    validated: list[VictoryPointLedger] = []
-    seen: set[str] = set()
-    for value in cast(list[object], values):
-        if type(value) is not VictoryPointLedger:
-            raise GameLifecycleError(
-                "GameState victory_point_ledgers must contain VictoryPointLedger values."
-            )
-        if value.player_id not in player_ids:
-            raise GameLifecycleError("VictoryPointLedger player_id is not in this game.")
-        if value.player_id in seen:
-            raise GameLifecycleError("GameState victory_point_ledgers must be unique.")
-        seen.add(value.player_id)
-        validated.append(value)
-    if set(seen) != set(player_ids):
-        raise GameLifecycleError("GameState victory_point_ledgers must include every player.")
     return sorted(validated, key=lambda ledger: ledger.player_id)
 
 
@@ -6782,39 +6792,6 @@ def _validate_sticky_objective_control_states(
     return sorted(validated, key=lambda stored: stored.state_id)
 
 
-def _validate_primary_terrain_trap_states(
-    states: object,
-    *,
-    game_id: str,
-    player_ids: tuple[str, ...],
-) -> list[PrimaryTerrainTrapState]:
-    if not isinstance(states, list):
-        raise GameLifecycleError("GameState primary terrain trap states must be a list.")
-    validated: list[PrimaryTerrainTrapState] = []
-    seen_ids: set[str] = set()
-    seen_traps: set[tuple[str, str]] = set()
-    for state in cast(list[object], states):
-        if type(state) is not PrimaryTerrainTrapState:
-            raise GameLifecycleError(
-                "GameState primary terrain trap states must contain state values."
-            )
-        if state.game_id != game_id:
-            raise GameLifecycleError("PrimaryTerrainTrapState game_id drift.")
-        if state.player_id not in player_ids or state.active_player_id not in player_ids:
-            raise GameLifecycleError("PrimaryTerrainTrapState player_id is not in this game.")
-        if state.trap_id in seen_ids:
-            raise GameLifecycleError("GameState primary terrain trap states must be unique.")
-        trap_key = (state.player_id, state.terrain_feature_id)
-        if trap_key in seen_traps:
-            raise GameLifecycleError(
-                "GameState primary terrain trap states must be unique per player and terrain."
-            )
-        seen_ids.add(state.trap_id)
-        seen_traps.add(trap_key)
-        validated.append(state)
-    return sorted(validated, key=lambda state: state.trap_id)
-
-
 def _validate_secondary_unit_destruction_states(
     states: object,
     *,
@@ -6849,91 +6826,6 @@ def _validate_secondary_unit_destruction_states(
         seen_units.add(state.destroyed_unit_instance_id)
         validated.append(state)
     return sorted(validated, key=lambda state: state.destruction_id)
-
-
-def _validate_secondary_objective_cleanse_states(
-    states: object,
-    *,
-    game_id: str,
-    player_ids: tuple[str, ...],
-) -> list[SecondaryObjectiveCleanseState]:
-    if not isinstance(states, list):
-        raise GameLifecycleError("GameState secondary objective cleanse states must be a list.")
-    validated: list[SecondaryObjectiveCleanseState] = []
-    seen_ids: set[str] = set()
-    seen_actions: set[str] = set()
-    seen_objective_turns: set[tuple[str, int, str, str]] = set()
-    for state in cast(list[object], states):
-        if type(state) is not SecondaryObjectiveCleanseState:
-            raise GameLifecycleError(
-                "GameState secondary objective cleanse states must contain state values."
-            )
-        if state.game_id != game_id:
-            raise GameLifecycleError("SecondaryObjectiveCleanseState game_id drift.")
-        if state.player_id not in player_ids or state.active_player_id not in player_ids:
-            raise GameLifecycleError(
-                "SecondaryObjectiveCleanseState player_id is not in this game."
-            )
-        if state.cleanse_id in seen_ids:
-            raise GameLifecycleError("GameState secondary objective cleanse states must be unique.")
-        if state.action_id in seen_actions:
-            raise GameLifecycleError(
-                "GameState secondary objective cleanse states must be unique per action."
-            )
-        objective_key = (
-            state.player_id,
-            state.battle_round,
-            state.active_player_id,
-            state.objective_marker_id,
-        )
-        if objective_key in seen_objective_turns:
-            raise GameLifecycleError(
-                "GameState secondary objective cleanse states must be unique per objective turn."
-            )
-        seen_ids.add(state.cleanse_id)
-        seen_actions.add(state.action_id)
-        seen_objective_turns.add(objective_key)
-        validated.append(state)
-    return sorted(validated, key=lambda state: state.cleanse_id)
-
-
-def _validate_secondary_terrain_plunder_states(
-    states: object,
-    *,
-    game_id: str,
-    player_ids: tuple[str, ...],
-) -> list[SecondaryTerrainPlunderState]:
-    if not isinstance(states, list):
-        raise GameLifecycleError("GameState secondary terrain plunder states must be a list.")
-    validated: list[SecondaryTerrainPlunderState] = []
-    seen_ids: set[str] = set()
-    seen_actions: set[str] = set()
-    seen_player_turns: set[tuple[str, int, str]] = set()
-    for state in cast(list[object], states):
-        if type(state) is not SecondaryTerrainPlunderState:
-            raise GameLifecycleError(
-                "GameState secondary terrain plunder states must contain state values."
-            )
-        if state.game_id != game_id:
-            raise GameLifecycleError("SecondaryTerrainPlunderState game_id drift.")
-        if state.player_id not in player_ids or state.active_player_id not in player_ids:
-            raise GameLifecycleError("SecondaryTerrainPlunderState player_id is not in this game.")
-        if state.plunder_id in seen_ids:
-            raise GameLifecycleError("GameState secondary terrain plunder states must be unique.")
-        if state.action_id in seen_actions:
-            raise GameLifecycleError(
-                "GameState secondary terrain plunder states must be unique per action."
-            )
-        player_turn_key = (state.player_id, state.battle_round, state.active_player_id)
-        if player_turn_key in seen_player_turns:
-            raise GameLifecycleError(
-                "GameState secondary terrain plunder states must be unique per player turn."
-            )
-        seen_ids.add(state.plunder_id)
-        seen_actions.add(state.action_id)
-        seen_player_turns.add(player_turn_key)
-        validated.append(state)
-    return sorted(validated, key=lambda state: state.plunder_id)
 
 
 def _validate_mission_action_states(

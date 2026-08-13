@@ -1067,7 +1067,7 @@ def _quicksilver_grace_config(*, detachment_id: str) -> GameConfig:
                     faction_id="emperors-children",
                     detachment_ids=(detachment_id,),
                 ),
-                force_disposition_id="phase10n-quicksilver-force",
+                force_disposition_id="take-and-hold",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="quicksilver-unit",
@@ -1146,7 +1146,7 @@ def _quicksilver_grace_catalog() -> ArmyCatalog:
                     faction_id="emperors-children",
                     detachment_point_cost=1,
                     unit_datasheet_ids=detachment_datasheet_ids,
-                    force_disposition_ids=("phase10n-quicksilver-force",),
+                    force_disposition_ids=("phase10n-quicksilver-force", "take-and-hold"),
                     source_ids=(
                         "gw-11e-faction-detachments-2026-27:detachment:"
                         f"emperors-children:{detachment_id}",
@@ -1215,7 +1215,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 
@@ -1236,7 +1238,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=("take-and-hold" if player_id == "player-a" else "purge-the-foe"),
         unit_selections=tuple(
             _unit_selection(unit_selection_id=unit_selection_id)
             for unit_selection_id in unit_selection_ids

@@ -59,7 +59,9 @@ from warhammer40k_core.engine.player_army_list import (
 )
 from warhammer40k_core.geometry.model_geometry import GeometrySourceKind, HeightSourceKind
 from warhammer40k_core.rules.catalog_package import CanonicalCatalogPackage
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    warhammer_event_companion_2026_07_mission_pack,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     chaos_daemons_roster_2026_07,
     mfm_2026_07,
@@ -119,7 +121,7 @@ def exact_roster_runtime() -> _ExactRosterRuntime:
     )
     config = GameConfig(
         game_id="chaos-daemons-exact-roster-runtime-proof",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
             descriptor_version="phase17o-chaos-daemons-exact-roster-runtime-proof"
         ),
         army_catalog=package.army_catalog,
@@ -128,11 +130,13 @@ def exact_roster_runtime() -> _ExactRosterRuntime:
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
         mission_setup=MissionSetup.from_mission_pack(
-            mission_pack=chapter_approved_2026_27_mission_pack(),
-            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
-            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+            mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+            mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
+            terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-1",
             attacker_player_id="player-a",
+            attacker_force_disposition_id="purge-the-foe",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         ),
         model_geometries=package.model_geometries,
     )

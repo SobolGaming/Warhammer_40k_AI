@@ -106,7 +106,9 @@ from warhammer40k_core.engine.wargear_selections import (
 from warhammer40k_core.geometry.model_geometry import GeometrySourceKind
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    warhammer_event_companion_2026_07_mission_pack,
+)
 
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
@@ -1400,14 +1402,33 @@ def test_projection_submission_helpers_and_event_cursor_are_viewer_scoped() -> N
     }
     mission_setup = view["mission_setup"]
     assert isinstance(mission_setup, dict)
-    assert mission_setup["terrain_features"] == []
-    assert mission_setup["terrain_areas"] == []
+    terrain_features = mission_setup["terrain_features"]
+    terrain_areas = mission_setup["terrain_areas"]
+    assert isinstance(terrain_features, list)
+    assert isinstance(terrain_areas, list)
+    assert len(terrain_features) == 30
+    assert len(terrain_areas) == 16
     assert event_delta["cursor"] == 0
     assert event_delta["viewer_player_id"] == "player-b"
     assert event_delta["next_cursor"] == len(
         session.lifecycle.decision_controller.event_log.records
     )
     assert event_delta["events"]
+    deployment_payloads = [
+        event["payload"]
+        for event in event_delta["events"]
+        if event["event_type"] == "decision_requested"
+        and isinstance(event["payload"], dict)
+        and event["payload"].get("decision_type") == "submit_deployment_placement"
+    ]
+    assert deployment_payloads
+    proposal_request = cast(
+        dict[str, object], cast(dict[str, object], deployment_payloads[0])["payload"]
+    )["proposal_request"]
+    assert isinstance(proposal_request, dict)
+    event_mission_setup = cast(dict[str, object], proposal_request["mission_setup"])
+    assignments = cast(list[object], event_mission_setup["primary_mission_assignments"])
+    assert len(assignments) == 2
     assert "<" not in json.dumps(view, sort_keys=True)
     assert "object at 0x" not in json.dumps(view, sort_keys=True)
 
@@ -1724,6 +1745,7 @@ def _local_session_at_movement_unit_selection(
     game_id: str = "phase11d-game",
     pose_factory: DeploymentPoseFactory | None = None,
 ) -> tuple[LocalGameSession, LifecycleStatus]:
+    deployment_pose_factory = _event_deployment_pose if pose_factory is None else pose_factory
     session = LocalGameSession()
     session.start(_config(game_id=game_id))
     first_status = session.advance_until_decision_or_terminal()
@@ -1745,10 +1767,27 @@ def _local_session_at_movement_unit_selection(
         session.lifecycle,
         movement_status,
         result_id_prefix="phase11d-deploy",
-        pose_factory=pose_factory,
+        pose_factory=deployment_pose_factory,
     )
     assert _decision_request(movement_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     return session, movement_status
+
+
+def _event_deployment_pose(
+    index: int,
+    player_id: str,
+    model_instance_id: str,
+) -> Pose:
+    unit_instance_id = model_instance_id.rsplit(":", 2)[0]
+    row = index // 3
+    column = index % 3
+    if unit_instance_id == "army-alpha:intercessor-unit-1":
+        return Pose.at(2.0 + (row * 1.8), 35.0 + (column * 1.8), facing_degrees=0.0)
+    if unit_instance_id == "army-alpha:intercessor-unit-2":
+        return Pose.at(2.0 + (row * 1.8), 1.0 + (column * 1.8), facing_degrees=0.0)
+    if unit_instance_id == "army-beta:intercessor-unit-3":
+        return Pose.at(42.0 - (row * 1.8), 18.0 + (column * 1.8), facing_degrees=180.0)
+    return default_deployment_pose(index, player_id, model_instance_id)
 
 
 def _submit_handler_decision(
@@ -1861,7 +1900,7 @@ def _config(*, game_id: str = "phase11d-game") -> GameConfig:
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
             descriptor_version="core-v2-phase11d-test"
         ),
         army_catalog=catalog,
@@ -1883,11 +1922,13 @@ def _config(*, game_id: str = "phase11d-game") -> GameConfig:
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
         mission_setup=MissionSetup.from_mission_pack(
-            mission_pack=chapter_approved_2026_27_mission_pack(),
-            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
-            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+            mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+            mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-3",
+            terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-3",
             attacker_player_id="player-a",
+            attacker_force_disposition_id="purge-the-foe",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         ),
     )
 
@@ -1968,10 +2009,10 @@ def _fall_back_deployment_pose(
 ) -> Pose:
     unit_instance_id = model_instance_id.rsplit(":", 2)[0]
     if unit_instance_id == "army-alpha:intercessor-unit-1":
-        return Pose.at(3.0 + (index * 1.8), 24.0, 0.0, facing_degrees=0.0)
+        return Pose.at(2.0 + (index * 1.8), 35.0, 0.0, facing_degrees=0.0)
     if unit_instance_id == "army-beta:intercessor-unit-3":
-        return Pose.at(43.5 + (index * 1.8), 24.0, 0.0, facing_degrees=180.0)
-    return default_deployment_pose(index, player_id, model_instance_id)
+        return Pose.at(42.0 - (index * 1.8), 18.0, 0.0, facing_degrees=180.0)
+    return _event_deployment_pose(index, player_id, model_instance_id)
 
 
 def _battle_state_with_reserve() -> tuple[GameState, ReserveState, UnitInstance]:
@@ -1980,9 +2021,13 @@ def _battle_state_with_reserve() -> tuple[GameState, ReserveState, UnitInstance]
     state = GameState.from_config(config)
     for army in armies:
         state.record_army_definition(army)
+    assert config.mission_setup is not None
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase11d-reserve-battlefield",
         armies=armies,
+        battlefield_width_inches=config.mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=config.mission_setup.battlefield_depth_inches,
+        terrain_features=config.mission_setup.terrain_features,
     )
     reserve_unit = armies[0].unit_by_id("army-alpha:intercessor-unit-1")
     state.record_battlefield_state(
@@ -2081,14 +2126,26 @@ def _battle_state_with_embarked_passenger() -> tuple[GameState, UnitInstance, Un
             ),
         ),
     )
+    mission_setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-3",
+        terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-3",
+        attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
+        defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
+    )
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase11d-disembark-battlefield",
         armies=armies,
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+        terrain_features=mission_setup.terrain_features,
     )
     passenger = armies[0].unit_by_id("army-alpha:passenger-unit")
     transport = armies[0].unit_by_id("army-alpha:transport-1")
     battlefield = scenario.battlefield_state.without_unit_placement(passenger.unit_instance_id)
-    ruleset = RulesetDescriptor.warhammer_40000_eleventh()
+    ruleset = RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27()
     state = GameState(
         game_id="phase11d-disembark-game",
         ruleset_descriptor_hash=ruleset.descriptor_hash,
@@ -2104,13 +2161,7 @@ def _battle_state_with_embarked_passenger() -> tuple[GameState, UnitInstance, Un
         active_player_id="player-a",
         army_definitions=list(armies),
         battlefield_state=battlefield,
-        mission_setup=MissionSetup.from_mission_pack(
-            mission_pack=chapter_approved_2026_27_mission_pack(),
-            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
-            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
-            attacker_player_id="player-a",
-            defender_player_id="player-b",
-        ),
+        mission_setup=mission_setup,
         movement_phase_state=MovementPhaseState(
             battle_round=1,
             active_player_id="player-a",

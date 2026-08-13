@@ -1,9 +1,9 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v4/capability-manifest.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
-    "schema_version": {"const": "capability-manifest-v1", "type": "string"},
+    "schema_version": {"const": "capability-manifest-v2-directed-primary", "type": "string"},
     "manifest_id": {"minLength": 1, "type": "string"},
     "viewer_scope": {"minLength": 1, "type": "string"},
     "selection_hash": {"minLength": 64, "maxLength": 64, "type": "string"},
@@ -300,7 +300,7 @@
     "contract_identity": {
       "additionalProperties": false,
       "properties": {
-        "identity_id": {"const": "https://warhammer40k-core.local/contracts/v4/capability-manifest.schema.json"},
+        "identity_id": {"const": "https://warhammer40k-core.local/contracts/v5/capability-manifest.schema.json"},
         "identity_hash": {"minLength": 64, "maxLength": 64, "type": "string"},
         "contract_version": {"minLength": 1, "type": "string"}
       },

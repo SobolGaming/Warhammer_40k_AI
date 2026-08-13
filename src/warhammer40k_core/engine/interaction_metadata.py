@@ -13,7 +13,7 @@ from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 
 INTERACTION_DESCRIPTOR_SCHEMA_VERSION = "interaction-descriptor-v2-variants"
-INTERACTION_ANNOTATED_REQUEST_SCHEMA_VERSION = "annotated-decision-request-v1"
+INTERACTION_ANNOTATED_REQUEST_SCHEMA_VERSION = "annotated-decision-request-v2-primary-assignments"
 NESTED_INTERACTION_REQUESTS_KEY = "nested_interaction_requests"
 
 

@@ -1331,7 +1331,7 @@ def _catalog_with_non_astra_auxiliary_detachment(catalog: ArmyCatalog) -> ArmyCa
                     SQUADRON_DATASHEET_ID,
                     UNORDERABLE_DATASHEET_ID,
                 ),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=("phase17g:astra:non-astra:detachment",),
             ),
         ),
@@ -1365,7 +1365,7 @@ def _astra_config(
                     faction_id=army_rule.ASTRA_MILITARUM_FACTION_ID,
                     detachment_ids=("combined-regiment",),
                 ),
-                force_disposition_id="phase17g-force",
+                force_disposition_id="take-and-hold",
                 unit_selections=(
                     _unit_selection("castellan", OFFICER_DATASHEET_ID),
                     _unit_selection("infantry", INFANTRY_DATASHEET_ID),
@@ -1462,7 +1462,7 @@ def _astra_lifecycle_catalog(
                     SQUADRON_DATASHEET_ID,
                     UNORDERABLE_DATASHEET_ID,
                 ),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=("phase17g:astra:detachment:combined-regiment",),
             ),
         ),
@@ -1577,7 +1577,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 

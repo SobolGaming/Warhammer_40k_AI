@@ -1188,7 +1188,7 @@ def _tyranids_config(*, game_id: str) -> GameConfig:
                     faction_id=army_rule.TYRANIDS_FACTION_ID,
                     detachment_ids=(TYRANIDS_DETACHMENT_ID,),
                 ),
-                force_disposition_id="phase17g-force",
+                force_disposition_id="take-and-hold",
                 unit_selections=(
                     _unit_selection("warriors", TYRANIDS_WARRIORS_DATASHEET_ID),
                     _unit_selection("gaunts", TYRANIDS_GAUNTS_DATASHEET_ID),
@@ -1257,7 +1257,7 @@ def _tyranids_lifecycle_catalog() -> ArmyCatalog:
                     TYRANIDS_WARRIORS_DATASHEET_ID,
                     TYRANIDS_GAUNTS_DATASHEET_ID,
                 ),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=("phase17g:tyranids:detachment:synaptic-test",),
             ),
         ),
@@ -1329,7 +1329,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 

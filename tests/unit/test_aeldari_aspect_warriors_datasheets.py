@@ -1060,7 +1060,9 @@ def _state(armies: tuple[ArmyDefinition, ...], *, phase: BattlePhase) -> GameSta
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id="player-a",
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         ),
     )
     for army in armies:
@@ -1090,7 +1092,7 @@ def _army(
             faction_id="AE",
             detachment_ids=("aspect-host",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=("take-and-hold" if player_id == "player-a" else "purge-the-foe"),
         units=units,
         attached_units=attached_units,
     )

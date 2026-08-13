@@ -98,6 +98,9 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    record_primary_turn_start_evidence,
+)
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.reserves import (
     ReserveDestructionTimingPolicy,
@@ -3404,6 +3407,7 @@ def test_phase13d_smokescreen_registers_defensive_effects() -> None:
     smoke_state = _state(smoke_lifecycle)
     _set_current_battle_phase(smoke_state, BattlePhase.SHOOTING)
     smoke_state.active_player_id = "player-b"
+    record_primary_turn_start_evidence(state=smoke_state)
     _replace_unit_keywords(
         smoke_state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -5257,7 +5261,9 @@ def _config(
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id="player-a",
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         ),
     )
 
@@ -5325,7 +5331,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=("take-and-hold" if player_id == "player-a" else "purge-the-foe"),
         unit_selections=(
             *(
                 UnitMusterSelection(

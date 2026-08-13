@@ -471,7 +471,7 @@ def _orks_config() -> GameConfig:
                     faction_id=army_rule.ORKS_FACTION_ID,
                     detachment_ids=("war-horde",),
                 ),
-                force_disposition_id="phase17g-force",
+                force_disposition_id="take-and-hold",
                 unit_selections=(_unit_selection("boyz", ORKS_DATASHEET_ID),),
             ),
             ArmyMusterRequest(
@@ -527,7 +527,7 @@ def _orks_lifecycle_catalog() -> ArmyCatalog:
                 faction_id=army_rule.ORKS_FACTION_ID,
                 detachment_point_cost=1,
                 unit_datasheet_ids=(ORKS_DATASHEET_ID,),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=("phase17g:orks:detachment:war-horde",),
             ),
         ),
@@ -599,7 +599,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 

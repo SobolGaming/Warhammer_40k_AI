@@ -47,6 +47,7 @@ def canonical_setup_prebattle_smoke_config(
                 catalog=catalog,
                 player_id="player-a",
                 army_id="army-alpha",
+                force_disposition_id="take-and-hold",
                 unit_selections=(
                     _unit_selection(unit_selection_id="scout-redeploy-unit"),
                     _unit_selection(
@@ -67,6 +68,7 @@ def canonical_setup_prebattle_smoke_config(
                 catalog=catalog,
                 player_id="player-b",
                 army_id="army-beta",
+                force_disposition_id="purge-the-foe",
                 unit_selections=(_unit_selection(unit_selection_id="scout-redeploy-unit"),),
             ),
         ),
@@ -91,19 +93,31 @@ def _setup_prebattle_smoke_mission_setup() -> MissionSetup:
         mission_pool_entry_id=f"mission-{_SMOKE_TYPED_BATTLEFIELD_LAYOUT_ID}",
         terrain_layout_id=_SMOKE_TYPED_BATTLEFIELD_LAYOUT_ID,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 
 def _setup_prebattle_smoke_catalog() -> ArmyCatalog:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    event_force_disposition_ids = tuple(
+        disposition.force_disposition_id
+        for disposition in warhammer_event_companion_2026_07_mission_pack().force_dispositions
+    )
     datasheets = tuple(
         _setup_smoke_datasheet(datasheet)
         if datasheet.datasheet_id == "core-intercessor-like-infantry"
         else datasheet
         for datasheet in catalog.datasheets
     )
-    return replace(catalog, datasheets=datasheets)
+    detachments = tuple(
+        replace(detachment, force_disposition_ids=event_force_disposition_ids)
+        if detachment.detachment_id == "core-combined-arms"
+        else detachment
+        for detachment in catalog.detachments
+    )
+    return replace(catalog, datasheets=datasheets, detachments=detachments)
 
 
 def _setup_smoke_datasheet(datasheet: DatasheetDefinition) -> DatasheetDefinition:
@@ -154,6 +168,7 @@ def _army_muster_request(
     catalog: ArmyCatalog,
     player_id: str,
     army_id: str,
+    force_disposition_id: str,
     unit_selections: tuple[UnitMusterSelection, ...],
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
@@ -166,7 +181,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=force_disposition_id,
         unit_selections=unit_selections,
     )
 

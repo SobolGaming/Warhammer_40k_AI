@@ -86,5 +86,5 @@
     "unit_instance_id": "army-alpha:intercessor-unit-1"
   },
   "request_id": "decision-request-000008",
-  "schema_version": "decision-request-view-v2-interaction"
+  "schema_version": "decision-request-view-v3-primary-assignments"
 }

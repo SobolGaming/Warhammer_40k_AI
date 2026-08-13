@@ -18,6 +18,29 @@ from warhammer40k_core.core.deployment_zones import (
     DeploymentZonePayload,
     DeploymentZoneShape,
 )
+from warhammer40k_core.core.mission_errors import MissionPackError as MissionPackError
+from warhammer40k_core.core.mission_matrix import (
+    ForceDispositionDefinition as ForceDispositionDefinition,
+)
+from warhammer40k_core.core.mission_matrix import (
+    ForceDispositionDefinitionPayload as ForceDispositionDefinitionPayload,
+)
+from warhammer40k_core.core.mission_matrix import MissionSourceStatus as MissionSourceStatus
+from warhammer40k_core.core.mission_matrix import (
+    PrimaryMissionMatrixCell as PrimaryMissionMatrixCell,
+)
+from warhammer40k_core.core.mission_matrix import (
+    PrimaryMissionMatrixCellPayload as PrimaryMissionMatrixCellPayload,
+)
+from warhammer40k_core.core.mission_matrix import (
+    mission_source_status_from_token as mission_source_status_from_token,
+)
+from warhammer40k_core.core.mission_pool import (
+    MissionPoolEntry as MissionPoolEntry,
+)
+from warhammer40k_core.core.mission_pool import (
+    MissionPoolEntryPayload as MissionPoolEntryPayload,
+)
 from warhammer40k_core.core.objective_terrain_area_references import (
     validate_objective_terrain_area_references,
 )
@@ -60,20 +83,10 @@ from warhammer40k_core.geometry.polygons import (
 from warhammer40k_core.geometry.pose import GeometryError
 
 
-class MissionPackError(ValueError):
-    """Raised when mission pack data violates CORE V2 invariants."""
-
-
 class SecondaryMissionAvailability(StrEnum):
     TACTICAL = "tactical"
     FIXED = "fixed"
     BOTH = "both"
-
-
-class MissionSourceStatus(StrEnum):
-    IMPLEMENTED = "implemented"
-    UNSUPPORTED = "unsupported"
-    AWAITING_SOURCE = "awaiting_source"
 
 
 class ObjectiveMarkerRole(StrEnum):
@@ -218,29 +231,6 @@ class MissionDeckDefinitionPayload(TypedDict):
     source_id: str
 
 
-class ForceDispositionDefinitionPayload(TypedDict):
-    force_disposition_id: str
-    name: str
-    source_id: str
-
-
-class PrimaryMissionMatrixCellPayload(TypedDict):
-    player_force_disposition_id: str
-    opponent_force_disposition_id: str
-    primary_mission_id: str
-    battlefield_layout_ids: list[str]
-    source_status: str
-    source_id: str
-
-
-class MissionPoolEntryPayload(TypedDict):
-    mission_pool_entry_id: str
-    primary_mission_id: str
-    deployment_map_id: str
-    terrain_layout_ids: list[str]
-    source_id: str
-
-
 class TournamentScoringCapsPayload(TypedDict):
     primary_vp_cap: int
     secondary_vp_cap: int
@@ -272,6 +262,7 @@ class MissionPackDefinitionPayload(TypedDict):
     name: str
     source_version: str
     source_id: str
+    requires_complete_battlefield_graph: bool
     source_package: MissionSourcePackageDefinitionPayload
     sequence: ChapterApprovedMissionSequencePayload
     deployment_maps: list[DeploymentMapDefinitionPayload]
@@ -1562,191 +1553,6 @@ class MissionDeckDefinition:
 
 
 @dataclass(frozen=True, slots=True)
-class ForceDispositionDefinition:
-    force_disposition_id: str
-    name: str
-    source_id: str
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "force_disposition_id",
-            _validate_unprefixed_identifier(
-                "ForceDispositionDefinition force_disposition_id",
-                self.force_disposition_id,
-                reserved_prefix="force-disposition:",
-            ),
-        )
-        object.__setattr__(
-            self,
-            "name",
-            _validate_identifier("ForceDispositionDefinition name", self.name),
-        )
-        object.__setattr__(
-            self,
-            "source_id",
-            _validate_identifier("ForceDispositionDefinition source_id", self.source_id),
-        )
-
-    def to_payload(self) -> ForceDispositionDefinitionPayload:
-        return {
-            "force_disposition_id": self.force_disposition_id,
-            "name": self.name,
-            "source_id": self.source_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: ForceDispositionDefinitionPayload) -> Self:
-        return cls(
-            force_disposition_id=payload["force_disposition_id"],
-            name=payload["name"],
-            source_id=payload["source_id"],
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class PrimaryMissionMatrixCell:
-    player_force_disposition_id: str
-    opponent_force_disposition_id: str
-    primary_mission_id: str
-    battlefield_layout_ids: tuple[str, ...]
-    source_status: MissionSourceStatus
-    source_id: str
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "player_force_disposition_id",
-            _validate_identifier(
-                "PrimaryMissionMatrixCell player_force_disposition_id",
-                self.player_force_disposition_id,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "opponent_force_disposition_id",
-            _validate_identifier(
-                "PrimaryMissionMatrixCell opponent_force_disposition_id",
-                self.opponent_force_disposition_id,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "primary_mission_id",
-            _validate_identifier(
-                "PrimaryMissionMatrixCell primary_mission_id", self.primary_mission_id
-            ),
-        )
-        object.__setattr__(
-            self,
-            "battlefield_layout_ids",
-            _validate_identifier_tuple(
-                "PrimaryMissionMatrixCell battlefield_layout_ids",
-                self.battlefield_layout_ids,
-                min_length=3,
-                sort_values=False,
-            ),
-        )
-        if len(self.battlefield_layout_ids) != 3:
-            raise MissionPackError("PrimaryMissionMatrixCell requires exactly three layouts.")
-        object.__setattr__(
-            self,
-            "source_status",
-            mission_source_status_from_token(self.source_status),
-        )
-        object.__setattr__(
-            self,
-            "source_id",
-            _validate_identifier("PrimaryMissionMatrixCell source_id", self.source_id),
-        )
-
-    def to_payload(self) -> PrimaryMissionMatrixCellPayload:
-        return {
-            "player_force_disposition_id": self.player_force_disposition_id,
-            "opponent_force_disposition_id": self.opponent_force_disposition_id,
-            "primary_mission_id": self.primary_mission_id,
-            "battlefield_layout_ids": list(self.battlefield_layout_ids),
-            "source_status": self.source_status.value,
-            "source_id": self.source_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: PrimaryMissionMatrixCellPayload) -> Self:
-        return cls(
-            player_force_disposition_id=payload["player_force_disposition_id"],
-            opponent_force_disposition_id=payload["opponent_force_disposition_id"],
-            primary_mission_id=payload["primary_mission_id"],
-            battlefield_layout_ids=tuple(payload["battlefield_layout_ids"]),
-            source_status=mission_source_status_from_token(payload["source_status"]),
-            source_id=payload["source_id"],
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class MissionPoolEntry:
-    mission_pool_entry_id: str
-    primary_mission_id: str
-    deployment_map_id: str
-    terrain_layout_ids: tuple[str, ...]
-    source_id: str
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "mission_pool_entry_id",
-            _validate_unprefixed_identifier(
-                "MissionPoolEntry mission_pool_entry_id",
-                self.mission_pool_entry_id,
-                reserved_prefix="mission-pool-entry:",
-            ),
-        )
-        object.__setattr__(
-            self,
-            "primary_mission_id",
-            _validate_identifier("MissionPoolEntry primary_mission_id", self.primary_mission_id),
-        )
-        object.__setattr__(
-            self,
-            "deployment_map_id",
-            _validate_identifier("MissionPoolEntry deployment_map_id", self.deployment_map_id),
-        )
-        object.__setattr__(
-            self,
-            "terrain_layout_ids",
-            _validate_identifier_tuple(
-                "MissionPoolEntry terrain_layout_ids",
-                self.terrain_layout_ids,
-                min_length=1,
-                sort_values=False,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "source_id",
-            _validate_identifier("MissionPoolEntry source_id", self.source_id),
-        )
-
-    def to_payload(self) -> MissionPoolEntryPayload:
-        return {
-            "mission_pool_entry_id": self.mission_pool_entry_id,
-            "primary_mission_id": self.primary_mission_id,
-            "deployment_map_id": self.deployment_map_id,
-            "terrain_layout_ids": list(self.terrain_layout_ids),
-            "source_id": self.source_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: MissionPoolEntryPayload) -> Self:
-        return cls(
-            mission_pool_entry_id=payload["mission_pool_entry_id"],
-            primary_mission_id=payload["primary_mission_id"],
-            deployment_map_id=payload["deployment_map_id"],
-            terrain_layout_ids=tuple(payload["terrain_layout_ids"]),
-            source_id=payload["source_id"],
-        )
-
-
-@dataclass(frozen=True, slots=True)
 class TournamentScoringCaps:
     primary_vp_cap: int
     secondary_vp_cap: int
@@ -2005,6 +1811,7 @@ class MissionPackDefinition:
     name: str
     source_version: str
     source_id: str
+    requires_complete_battlefield_graph: bool
     source_package: MissionSourcePackageDefinition
     sequence: ChapterApprovedMissionSequence
     deployment_maps: tuple[DeploymentMapDefinition, ...]
@@ -2045,6 +1852,14 @@ class MissionPackDefinition:
             self,
             "source_id",
             _validate_identifier("MissionPackDefinition source_id", self.source_id),
+        )
+        object.__setattr__(
+            self,
+            "requires_complete_battlefield_graph",
+            _validate_bool(
+                "MissionPackDefinition requires_complete_battlefield_graph",
+                self.requires_complete_battlefield_graph,
+            ),
         )
         if type(self.source_package) is not MissionSourcePackageDefinition:
             raise MissionPackError("MissionPackDefinition source_package must be source package.")
@@ -2089,12 +1904,18 @@ class MissionPackDefinition:
             force_dispositions=force_dispositions,
             primary_mission_matrix_cells=primary_mission_matrix_cells,
             primary_missions=primary_missions,
+            battlefield_layouts=battlefield_layouts,
+            exact_battlefield_graph_required=self.requires_complete_battlefield_graph,
         )
         _validate_mission_pool_references(
             mission_pool_entries=mission_pool_entries,
             deployment_maps=deployment_maps,
+            force_dispositions=force_dispositions,
+            primary_mission_matrix_cells=primary_mission_matrix_cells,
             primary_missions=primary_missions,
             terrain_layouts=terrain_layouts,
+            battlefield_layouts=battlefield_layouts,
+            exact_battlefield_graph_required=self.requires_complete_battlefield_graph,
         )
         _validate_battlefield_layout_references(
             battlefield_layouts=battlefield_layouts,
@@ -2215,6 +2036,7 @@ class MissionPackDefinition:
             "name": self.name,
             "source_version": self.source_version,
             "source_id": self.source_id,
+            "requires_complete_battlefield_graph": self.requires_complete_battlefield_graph,
             "source_package": self.source_package.to_payload(),
             "sequence": self.sequence.to_payload(),
             "deployment_maps": [
@@ -2253,6 +2075,7 @@ class MissionPackDefinition:
             name=payload["name"],
             source_version=payload["source_version"],
             source_id=payload["source_id"],
+            requires_complete_battlefield_graph=payload["requires_complete_battlefield_graph"],
             source_package=MissionSourcePackageDefinition.from_payload(payload["source_package"]),
             sequence=ChapterApprovedMissionSequence.from_payload(payload["sequence"]),
             deployment_maps=tuple(
@@ -2316,17 +2139,6 @@ def secondary_mission_availability_from_token(token: object) -> SecondaryMission
         return SecondaryMissionAvailability(token)
     except ValueError as exc:
         raise MissionPackError(f"Unsupported SecondaryMissionAvailability token: {token}.") from exc
-
-
-def mission_source_status_from_token(token: object) -> MissionSourceStatus:
-    if type(token) is MissionSourceStatus:
-        return token
-    if type(token) is not str:
-        raise MissionPackError("MissionSourceStatus token must be a string.")
-    try:
-        return MissionSourceStatus(token)
-    except ValueError as exc:
-        raise MissionPackError(f"Unsupported MissionSourceStatus token: {token}.") from exc
 
 
 def objective_marker_role_from_token(token: object) -> ObjectiveMarkerRole:
@@ -2817,9 +2629,12 @@ def _validate_primary_mission_matrix_references(
     force_dispositions: tuple[ForceDispositionDefinition, ...],
     primary_mission_matrix_cells: tuple[PrimaryMissionMatrixCell, ...],
     primary_missions: tuple[PrimaryMissionDefinition, ...],
+    battlefield_layouts: tuple[BattlefieldLayoutDefinition, ...],
+    exact_battlefield_graph_required: bool,
 ) -> None:
     disposition_ids = {disposition.force_disposition_id for disposition in force_dispositions}
     primary_mission_ids = {mission.primary_mission_id for mission in primary_missions}
+    battlefield_layout_ids = {layout.battlefield_layout_id for layout in battlefield_layouts}
     expected_cells = {
         (player_disposition_id, opponent_disposition_id)
         for player_disposition_id in disposition_ids
@@ -2856,27 +2671,80 @@ def _validate_primary_mission_matrix_references(
         )
         raise MissionPackError(f"Primary mission matrix has unexpected cells: {extra_text}.")
     for cell in primary_mission_matrix_cells:
+        if exact_battlefield_graph_required:
+            _validate_known_ids(
+                "PrimaryMissionMatrixCell battlefield_layout_ids",
+                cell.battlefield_layout_ids,
+                battlefield_layout_ids,
+            )
         if (
             cell.source_status is MissionSourceStatus.IMPLEMENTED
             and cell.primary_mission_id not in primary_mission_ids
         ):
             raise MissionPackError("Implemented matrix cell must reference a primary mission.")
+    cells_by_disposition_pair = {
+        (cell.player_force_disposition_id, cell.opponent_force_disposition_id): cell
+        for cell in primary_mission_matrix_cells
+    }
+    for cell in primary_mission_matrix_cells:
+        reverse = cells_by_disposition_pair[
+            (cell.opponent_force_disposition_id, cell.player_force_disposition_id)
+        ]
+        if cell.battlefield_layout_ids != reverse.battlefield_layout_ids:
+            raise MissionPackError(
+                "Opposite PrimaryMissionMatrixCell directions must reference identical layouts."
+            )
 
 
 def _validate_mission_pool_references(
     *,
     mission_pool_entries: tuple[MissionPoolEntry, ...],
     deployment_maps: tuple[DeploymentMapDefinition, ...],
+    force_dispositions: tuple[ForceDispositionDefinition, ...],
+    primary_mission_matrix_cells: tuple[PrimaryMissionMatrixCell, ...],
     primary_missions: tuple[PrimaryMissionDefinition, ...],
     terrain_layouts: tuple[TerrainLayoutTemplate, ...],
+    battlefield_layouts: tuple[BattlefieldLayoutDefinition, ...],
+    exact_battlefield_graph_required: bool,
 ) -> None:
     deployment_map_ids = {deployment_map.deployment_map_id for deployment_map in deployment_maps}
+    force_disposition_ids = {disposition.force_disposition_id for disposition in force_dispositions}
     primary_mission_ids = {mission.primary_mission_id for mission in primary_missions}
     terrain_layout_ids = {layout.terrain_layout_id for layout in terrain_layouts}
+    battlefield_layout_ids = {layout.battlefield_layout_id for layout in battlefield_layouts}
+    matrix_cells_by_pair = {
+        (cell.player_force_disposition_id, cell.opponent_force_disposition_id): cell
+        for cell in primary_mission_matrix_cells
+    }
+    battlefield_layouts_by_components = {
+        (layout.deployment_map_id, layout.terrain_layout_id): layout
+        for layout in battlefield_layouts
+    }
+    expected_pool_identities = {
+        (
+            min(cell.player_force_disposition_id, cell.opponent_force_disposition_id),
+            max(cell.player_force_disposition_id, cell.opponent_force_disposition_id),
+            layout_id,
+        )
+        for cell in primary_mission_matrix_cells
+        for layout_id in cell.battlefield_layout_ids
+    }
+    resolved_pool_identities: set[tuple[str, str, str]] = set()
     for entry in mission_pool_entries:
         _validate_known_ids(
-            "MissionPoolEntry primary_mission_id",
-            (entry.primary_mission_id,),
+            "MissionPoolEntry force disposition IDs",
+            (
+                entry.player_force_disposition_id,
+                entry.opponent_force_disposition_id,
+            ),
+            force_disposition_ids,
+        )
+        _validate_known_ids(
+            "MissionPoolEntry primary mission IDs",
+            (
+                entry.player_primary_mission_id,
+                entry.opponent_primary_mission_id,
+            ),
             primary_mission_ids,
         )
         _validate_known_ids(
@@ -2888,6 +2756,61 @@ def _validate_mission_pool_references(
             "MissionPoolEntry terrain_layout_ids",
             entry.terrain_layout_ids,
             terrain_layout_ids,
+        )
+        player_cell = matrix_cells_by_pair[
+            (entry.player_force_disposition_id, entry.opponent_force_disposition_id)
+        ]
+        opponent_cell = matrix_cells_by_pair[
+            (entry.opponent_force_disposition_id, entry.player_force_disposition_id)
+        ]
+        resolved_layout_ids: set[str] = set()
+        for terrain_layout_id in entry.terrain_layout_ids:
+            layout = battlefield_layouts_by_components.get(
+                (entry.deployment_map_id, terrain_layout_id)
+            )
+            if layout is None:
+                if exact_battlefield_graph_required:
+                    raise MissionPackError(
+                        "MissionPoolEntry deployment and terrain components do not resolve to a "
+                        "battlefield layout."
+                    )
+                continue
+            resolved_layout_ids.add(layout.battlefield_layout_id)
+        legal_layout_ids = set(player_cell.battlefield_layout_ids)
+        if not set(entry.terrain_layout_ids) <= legal_layout_ids:
+            raise MissionPackError(
+                "MissionPoolEntry terrain layout drifted from the directional matrix."
+            )
+        if not resolved_layout_ids <= legal_layout_ids:
+            raise MissionPackError(
+                "MissionPoolEntry battlefield layout drifted from the directional matrix."
+            )
+        for layout_id in entry.terrain_layout_ids:
+            identity = (
+                min(entry.player_force_disposition_id, entry.opponent_force_disposition_id),
+                max(entry.player_force_disposition_id, entry.opponent_force_disposition_id),
+                layout_id,
+            )
+            if identity in resolved_pool_identities:
+                raise MissionPackError("MissionPoolEntry resolved identity is duplicated.")
+            resolved_pool_identities.add(identity)
+        if entry.player_primary_mission_id != player_cell.primary_mission_id:
+            raise MissionPackError(
+                "MissionPoolEntry player Primary mission drifted from the directional matrix."
+            )
+        if entry.opponent_primary_mission_id != opponent_cell.primary_mission_id:
+            raise MissionPackError(
+                "MissionPoolEntry opponent Primary mission drifted from the directional matrix."
+            )
+    expected_supported_identities = {
+        identity for identity in expected_pool_identities if identity[2] in battlefield_layout_ids
+    }
+    if (
+        exact_battlefield_graph_required
+        and resolved_pool_identities != expected_supported_identities
+    ):
+        raise MissionPackError(
+            "MissionPoolEntry rows must cover every directional-matrix battlefield layout."
         )
 
 

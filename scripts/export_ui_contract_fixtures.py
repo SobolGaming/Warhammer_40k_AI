@@ -999,7 +999,20 @@ def _fresh_started_session(*, game_id: str) -> tuple[LocalGameSession, Lifecycle
 
 
 def _config(*, game_id: str) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    source_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    event_force_disposition_ids = tuple(
+        disposition.force_disposition_id
+        for disposition in warhammer_event_companion_2026_07_mission_pack().force_dispositions
+    )
+    catalog = replace(
+        source_catalog,
+        detachments=tuple(
+            replace(detachment, force_disposition_ids=event_force_disposition_ids)
+            if detachment.detachment_id == "core-combined-arms"
+            else detachment
+            for detachment in source_catalog.detachments
+        ),
+    )
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
@@ -1013,12 +1026,14 @@ def _config(*, game_id: str) -> GameConfig:
                 player_id=PLAYER_A,
                 army_id=ARMY_ALPHA,
                 unit_selection_id="intercessor-unit-1",
+                force_disposition_id="take-and-hold",
             ),
             _army_muster_request(
                 catalog=catalog,
                 player_id=PLAYER_B,
                 army_id=ARMY_BETA,
                 unit_selection_id="intercessor-unit-2",
+                force_disposition_id="purge-the-foe",
             ),
         ),
         player_ids=(PLAYER_A, PLAYER_B),
@@ -1029,7 +1044,9 @@ def _config(*, game_id: str) -> GameConfig:
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id=PLAYER_A,
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id=PLAYER_B,
+            defender_force_disposition_id="purge-the-foe",
         ),
     )
 
@@ -1040,6 +1057,7 @@ def _army_muster_request(
     player_id: str,
     army_id: str,
     unit_selection_id: str,
+    force_disposition_id: str,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -1051,7 +1069,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=force_disposition_id,
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

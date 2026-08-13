@@ -1043,7 +1043,11 @@
           "enhancement_ids": [],
           "faction_id": "core-marine-force",
           "force_disposition_ids": [
-            "purge-the-foe"
+            "disruption",
+            "priority-assets",
+            "purge-the-foe",
+            "reconnaissance",
+            "take-and-hold"
           ],
           "name": "CORE Combined Arms",
           "rule_source_ids": [],
@@ -1439,7 +1443,7 @@
         },
         "enhancement_assignments": [],
         "enhancement_point_values": [],
-        "force_disposition_id": "purge-the-foe",
+        "force_disposition_id": "take-and-hold",
         "player_id": "player-a",
         "points_source_package_id": null,
         "roster_legality_required": false,
@@ -1919,7 +1923,18 @@
           ]
         }
       ],
-      "primary_mission_id": "primary-immovable-object",
+      "primary_mission_assignments": [
+        {
+          "force_disposition_id": "take-and-hold",
+          "player_id": "player-a",
+          "primary_mission_id": "primary-immovable-object"
+        },
+        {
+          "force_disposition_id": "purge-the-foe",
+          "player_id": "player-b",
+          "primary_mission_id": "primary-unstoppable-force"
+        }
+      ],
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
       "source_version": "1.1",
       "terrain_areas": [
@@ -6298,5 +6313,5 @@
       "player-b"
     ]
   },
-  "schema_version": "create-session-v2"
+  "schema_version": "create-session-v3"
 }

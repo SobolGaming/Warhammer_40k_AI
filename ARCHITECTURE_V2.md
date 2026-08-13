@@ -5008,20 +5008,23 @@ polygons and wall/floor primitives once for reuse by all 45 layouts. Intentional
 clearance between a physical feature and its terrain-area edge is source-required
 and is not treated as incomplete geometry.
 
-Meatgrinder's four scoring rows retain their separate reviewed Chapter Approved
-mission-deck provenance. Those rows are loaded from the strict, versioned JSON
-artifact at
-`src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-meatgrinder-scoring.json`,
+All 25 Primary missions' 100 scoring rows and the ten source-only Primary
+Mission Action descriptors retain reviewed Chapter Approved mission-deck
+provenance in the strict, versioned JSON artifact at
+`src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-scoring.json`,
 with package hash
-`21b3fabcb585ee33b2295a888963d666a42f85d3f09200e973dd7de8253bd39c`
+`e96c461ec66f7b4d71bbd6f2b9b12899b0fc1a8bd3dae8fe60597d6dcc793e0f`
 and raw artifact SHA-256
-`5e892581956e2b3c81bac893caef6b04f71cf19c1c3e2590ea33256b1a786342`.
-It records the project-owner-supplied official Chapter Approved 2026-27 card
-transcription reviewed in PR #134 at commit `35b9ddaf5`. Its GDMissions page and
-card-image checks are explicitly non-official secondary corroboration, not GW
-source authority. Runtime mission rows are constructed from this artifact; the
-loader rejects unknown fields, malformed rows, stale content hashes, and drift
-from the reviewed artifact pin.
+`0751341279c5c823a7e847b1f2db98a69cd6d29c39c4cd1682cc9fce0e8c1486`.
+The artifact pins the reviewed transcriptions from PRs #134, #136, and #379,
+including the four executable versus 21 engine-pending status boundary. Only
+Meatgrinder retains canonical scoring prose; the remaining cards retain their
+structured transcriptions and no official card binary is committed. The
+GDMissions Meatgrinder page and card-image checks remain explicitly non-official
+secondary corroboration. Runtime mission and source-only action rows are built
+from this artifact; its loader rejects unknown fields, malformed inventories,
+unsupported status promotion, stale content hashes, and drift from the reviewed
+artifact pin.
 
 `uv run python tools/build_event_companion_battlefields.py --check` rebuilds the
 complete battlefield package in memory from its reviewed inputs, verifies its
@@ -5097,8 +5100,9 @@ Completion gate:
 Priority: required for external contract and certification claims.
 
 Status: Complete. `adapters.capability_manifest` builds
-`capability-manifest-v1` for the exact selected configuration and nests it in
-the existing `support_profile()` response. The Phase 18D schema is
+`capability-manifest-v2-directed-primary` for the exact selected configuration
+and nests it in `support_profile()`, whose envelope is
+`support-profile-v4-directed-primary`. The Phase 18D schema is
 `contracts/schemas/capability-manifest.schema.json`; generated administrator
 and player-scoped fixtures prove both unredacted and redacted shapes. The
 manifest records all eight dimensions independently on roster, unit, rule,
@@ -5186,7 +5190,7 @@ Completion gate:
 
 Status: Complete. The implemented adapter contract currently uses
 `RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"` for the static
-catalog projection and `PROJECTION_SCHEMA_VERSION = "game-view-v8-phase17n"`
+catalog projection and `PROJECTION_SCHEMA_VERSION = "game-view-v9-phase17n"`
 for live game views. Live views expose `rules_catalog`,
 `projection_state_hash`, `unit_display_by_id`, and `model_display_by_id`.
 
@@ -5968,9 +5972,11 @@ Required tests:
 
 Completion gate:
 
-`battlefield-view-v1` was first published in Contract 4.0. The current shared
-viewer projection emits `battlefield-view-v3-phase17n` under Contract 6.0 so
-strict clients can distinguish the required logical terrain-area identity. The family defines one right-handed inches-based world frame,
+`battlefield-view-v1` was first published in Contract 4.0. The
+`battlefield-view-v3-phase17n` family introduced under Contract 6.0 remains
+unchanged under Contract 7.0; strict clients can distinguish the required
+logical terrain-area identity. The family defines one right-handed inches-based
+world frame,
 stable external entities for the required battlefield concepts, explicit model
 physical states, typed model/support/terrain/zone/path geometry, and a hash over
 viewer-visible authoritative geometry. The canonical geometry-conformance

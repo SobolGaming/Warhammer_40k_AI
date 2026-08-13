@@ -1047,7 +1047,11 @@
             "enhancement_ids": [],
             "faction_id": "core-marine-force",
             "force_disposition_ids": [
-              "purge-the-foe"
+              "disruption",
+              "priority-assets",
+              "purge-the-foe",
+              "reconnaissance",
+              "take-and-hold"
             ],
             "name": "CORE Combined Arms",
             "rule_source_ids": [],
@@ -1443,7 +1447,7 @@
           },
           "enhancement_assignments": [],
           "enhancement_point_values": [],
-          "force_disposition_id": "purge-the-foe",
+          "force_disposition_id": "take-and-hold",
           "player_id": "player-a",
           "points_source_package_id": null,
           "roster_legality_required": false,
@@ -1923,7 +1927,18 @@
             ]
           }
         ],
-        "primary_mission_id": "primary-immovable-object",
+        "primary_mission_assignments": [
+          {
+            "force_disposition_id": "take-and-hold",
+            "player_id": "player-a",
+            "primary_mission_id": "primary-immovable-object"
+          },
+          {
+            "force_disposition_id": "purge-the-foe",
+            "player_id": "player-b",
+            "primary_mission_id": "primary-unstoppable-force"
+          }
+        ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
         "source_version": "1.1",
         "terrain_areas": [
@@ -6761,7 +6776,7 @@
           },
           "enhancement_assignments": [],
           "enhancement_point_values": [],
-          "force_disposition_id": "purge-the-foe",
+          "force_disposition_id": "take-and-hold",
           "player_id": "player-a",
           "points_source_package_id": null,
           "roster_legality_report": {
@@ -11739,7 +11754,18 @@
             ]
           }
         ],
-        "primary_mission_id": "primary-immovable-object",
+        "primary_mission_assignments": [
+          {
+            "force_disposition_id": "take-and-hold",
+            "player_id": "player-a",
+            "primary_mission_id": "primary-immovable-object"
+          },
+          {
+            "force_disposition_id": "purge-the-foe",
+            "player_id": "player-b",
+            "primary_mission_id": "primary-unstoppable-force"
+          }
+        ],
         "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
         "source_version": "1.1",
         "terrain_areas": [
@@ -15640,12 +15666,14 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v4-phase17n",
+  "schema_version": "replay-artifact-v5-phase17n",
   "source_identity": {
-    "catalog_hash": "24846bc075bda480343623eeaeec61238d52bae950b069a3a24336c5aef3955d",
+    "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
     "catalog_id": "phase9a-canonical",
-    "game_config_hash": "95f718157e06bff662425ae62cba64324a27cd93aa7840ca1a1e2129745d901b",
+    "game_config_hash": "0f4bea564150afae66c86c23b8289a04bfe2bde2bae0463752717825e9a62291",
     "game_id": "phase18d-contract-session",
+    "mission_pack_id": "11e-warhammer-event-companion-2026-07",
+    "mission_source_package_hash": "29f9c556e4ed0d6e56349227a6a2d7a06b6ea27659026d25da726268dab9f319",
     "rules_overlay_ids": [],
     "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
     "source_ids": [

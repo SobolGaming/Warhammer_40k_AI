@@ -214,7 +214,7 @@ def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
     rules_catalog_validator.validate(session.rules_catalog_view())
     assert (
         session.events_since(EventStreamCursor(0), viewer_player_id=PLAYER_A)["schema_version"]
-        == "event-delta-v1"
+        == "event-delta-v2-primary-assignments"
     )
 
 
@@ -235,7 +235,7 @@ def test_phase17n_projection_family_versions_cover_the_new_closed_shapes() -> No
     assert (
         _json_object(game_view_properties["projection_schema"])["const"]
         == PROJECTION_SCHEMA_VERSION
-        == "game-view-v8-phase17n"
+        == "game-view-v9-phase17n"
     )
     assert "primary_unit_terrain_turn_start_snapshots" in game_view_required
     assert (
@@ -314,14 +314,14 @@ def test_live_movement_proposal_schema_requires_spatial_context_hash() -> None:
         validator.validate(without_spatial_context)
 
 
-def test_session_metadata_contract_version_accepts_compatible_major_six_releases() -> None:
+def test_session_metadata_contract_version_accepts_compatible_major_seven_releases() -> None:
     registry = _schema_registry()
     validator = _schema_validator("session-metadata.schema.json", registry=registry)
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "6.1.0"}
-    incompatible = {**_json_object(metadata), "server_contract_version": "5.3.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "7.1.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "6.3.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):
@@ -345,7 +345,7 @@ def test_replay_metadata_schema_rejects_missing_rules_overlay_identity() -> None
         _read_json(REPO_ROOT / Path("contracts/schemas/replay-metadata.schema.json"))
     )
     assert replay_schema["$id"] == (
-        "https://warhammer40k-core.local/contracts/v4/replay-metadata.schema.json"
+        "https://warhammer40k-core.local/contracts/v5/replay-metadata.schema.json"
     )
     validator = _schema_validator("replay-metadata.schema.json", registry=_schema_registry())
     replay = _json_object(_read_json(REPO_ROOT / Path("contracts/examples/replay-metadata.json")))
@@ -354,6 +354,34 @@ def test_replay_metadata_schema_rejects_missing_rules_overlay_identity() -> None
 
     with pytest.raises(ValidationError):
         validator.validate(replay)
+
+
+@pytest.mark.parametrize(
+    "nulled_field",
+    ["mission_pack_id", "mission_source_package_hash"],
+)
+def test_replay_metadata_schema_rejects_partial_mission_source_identity(
+    nulled_field: str,
+) -> None:
+    validator = _schema_validator("replay-metadata.schema.json", registry=_schema_registry())
+    replay = _json_object(_read_json(REPO_ROOT / Path("contracts/examples/replay-metadata.json")))
+    source_identity = _json_object(replay["source_identity"])
+    assert source_identity["mission_pack_id"] is not None
+    assert source_identity["mission_source_package_hash"] is not None
+    source_identity[nulled_field] = None
+
+    with pytest.raises(ValidationError):
+        validator.validate(replay)
+
+
+def test_replay_metadata_schema_accepts_absent_mission_source_identity_pair() -> None:
+    validator = _schema_validator("replay-metadata.schema.json", registry=_schema_registry())
+    replay = _json_object(_read_json(REPO_ROOT / Path("contracts/examples/replay-metadata.json")))
+    source_identity = _json_object(replay["source_identity"])
+    source_identity["mission_pack_id"] = None
+    source_identity["mission_source_package_hash"] = None
+
+    validator.validate(replay)
 
 
 def test_replay_metadata_schema_requires_logical_terrain_area_identity() -> None:

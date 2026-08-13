@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.phase import LifecycleStatus
 
-PHYSICAL_PROPOSAL_CONTEXT_VERSION = "physical-proposal-context-v1"
+PHYSICAL_PROPOSAL_CONTEXT_VERSION = "physical-proposal-context-v2"
 
 
 class PhysicalModelContextPayload(TypedDict):
@@ -105,7 +105,9 @@ def physical_proposal_context_hash(
             "source_version": mission_setup.source_version,
             "source_id": mission_setup.source_id,
             "mission_pool_entry_id": mission_setup.mission_pool_entry_id,
-            "primary_mission_id": mission_setup.primary_mission_id,
+            "primary_mission_assignments": [
+                assignment.to_payload() for assignment in mission_setup.primary_mission_assignments
+            ],
             "battlefield_layout_id": mission_setup.battlefield_layout_id,
             "deployment_map_id": mission_setup.deployment_map_id,
             "terrain_layout_id": mission_setup.terrain_layout_id,

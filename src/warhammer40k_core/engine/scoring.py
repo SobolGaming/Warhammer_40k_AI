@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
+from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -111,8 +112,11 @@ class VictoryPointAwardPayload(TypedDict):
 
 
 class MissionScoringPolicyPayload(TypedDict):
+    player_id: str
+    force_disposition_id: str
     mission_pack_id: str
     primary_mission_id: str
+    primary_scoring_supported: bool
     game_length_battle_rounds: int
     primary_scoring_phase: str
     primary_scoring_timing: str
@@ -286,49 +290,6 @@ class ScoringWindowStatePayload(TypedDict):
     window_kind: str
     window: str
     source_id: str
-
-
-class FinalScorePayload(TypedDict):
-    player_id: str
-    victory_points: int
-
-
-class FinalScoreLinePayload(TypedDict):
-    player_id: str
-    victory_points: int
-    raw_victory_points: int
-    raw_primary_vp: int
-    raw_secondary_vp: int
-    raw_battle_ready_vp: int
-    raw_other_vp: int
-    capped_primary_vp: int
-    capped_secondary_vp: int
-    capped_battle_ready_vp: int
-    capped_other_vp: int
-    cap_adjustment: int
-
-
-class FinalScoringAuditPayload(TypedDict):
-    policy_source_id: str
-    primary_vp_cap: int
-    secondary_vp_cap: int
-    battle_ready_vp_cap: int
-    total_vp_cap: int
-    scoring_windows: list[ScoringWindowStatePayload]
-    player_scores: list[FinalScoreLinePayload]
-
-
-class FinalScoringResultPayload(TypedDict):
-    result_id: str
-    game_id: str
-    battle_round: int
-    mission_pack_id: str
-    primary_mission_id: str
-    game_length_battle_rounds: int
-    final_scores: list[FinalScorePayload]
-    winner_player_ids: list[str]
-    is_draw: bool
-    scoring_audit: FinalScoringAuditPayload
 
 
 @dataclass(frozen=True, slots=True)
@@ -1603,401 +1564,12 @@ class ScoringWindowState:
 
 
 @dataclass(frozen=True, slots=True)
-class FinalScoreLine:
-    player_id: str
-    victory_points: int
-    raw_victory_points: int
-    raw_primary_vp: int
-    raw_secondary_vp: int
-    raw_battle_ready_vp: int
-    raw_other_vp: int
-    capped_primary_vp: int
-    capped_secondary_vp: int
-    capped_battle_ready_vp: int
-    capped_other_vp: int
-    cap_adjustment: int
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "player_id",
-            _validate_identifier("FinalScoreLine player_id", self.player_id),
-        )
-        object.__setattr__(
-            self,
-            "victory_points",
-            _validate_non_negative_int("FinalScoreLine victory_points", self.victory_points),
-        )
-        object.__setattr__(
-            self,
-            "raw_victory_points",
-            _validate_non_negative_int(
-                "FinalScoreLine raw_victory_points", self.raw_victory_points
-            ),
-        )
-        object.__setattr__(
-            self,
-            "raw_primary_vp",
-            _validate_non_negative_int("FinalScoreLine raw_primary_vp", self.raw_primary_vp),
-        )
-        object.__setattr__(
-            self,
-            "raw_secondary_vp",
-            _validate_non_negative_int("FinalScoreLine raw_secondary_vp", self.raw_secondary_vp),
-        )
-        object.__setattr__(
-            self,
-            "raw_battle_ready_vp",
-            _validate_non_negative_int(
-                "FinalScoreLine raw_battle_ready_vp", self.raw_battle_ready_vp
-            ),
-        )
-        object.__setattr__(
-            self,
-            "raw_other_vp",
-            _validate_non_negative_int("FinalScoreLine raw_other_vp", self.raw_other_vp),
-        )
-        object.__setattr__(
-            self,
-            "capped_primary_vp",
-            _validate_non_negative_int("FinalScoreLine capped_primary_vp", self.capped_primary_vp),
-        )
-        object.__setattr__(
-            self,
-            "capped_secondary_vp",
-            _validate_non_negative_int(
-                "FinalScoreLine capped_secondary_vp", self.capped_secondary_vp
-            ),
-        )
-        object.__setattr__(
-            self,
-            "capped_battle_ready_vp",
-            _validate_non_negative_int(
-                "FinalScoreLine capped_battle_ready_vp", self.capped_battle_ready_vp
-            ),
-        )
-        object.__setattr__(
-            self,
-            "capped_other_vp",
-            _validate_non_negative_int("FinalScoreLine capped_other_vp", self.capped_other_vp),
-        )
-        object.__setattr__(
-            self,
-            "cap_adjustment",
-            _validate_non_negative_int("FinalScoreLine cap_adjustment", self.cap_adjustment),
-        )
-        capped_total = (
-            self.capped_primary_vp
-            + self.capped_secondary_vp
-            + self.capped_battle_ready_vp
-            + self.capped_other_vp
-        )
-        if capped_total != self.victory_points:
-            raise GameLifecycleError("FinalScoreLine victory_points must match capped totals.")
-        if self.raw_victory_points < self.victory_points:
-            raise GameLifecycleError("FinalScoreLine raw_victory_points cannot be capped upward.")
-        if self.raw_victory_points - self.victory_points != self.cap_adjustment:
-            raise GameLifecycleError("FinalScoreLine cap_adjustment drift.")
-
-    @classmethod
-    def from_ledger(cls, *, ledger: VictoryPointLedger, policy: MissionScoringPolicy) -> Self:
-        if type(ledger) is not VictoryPointLedger:
-            raise GameLifecycleError("FinalScoreLine requires a VictoryPointLedger.")
-        if type(policy) is not MissionScoringPolicy:
-            raise GameLifecycleError("FinalScoreLine requires a MissionScoringPolicy.")
-        raw_primary = policy.ledger_points_from_cap_bucket(
-            ledger=ledger,
-            cap_bucket=VictoryPointCapBucket.PRIMARY,
-        )
-        raw_secondary = policy.ledger_points_from_cap_bucket(
-            ledger=ledger,
-            cap_bucket=VictoryPointCapBucket.SECONDARY,
-        )
-        raw_battle_ready = policy.ledger_points_from_cap_bucket(
-            ledger=ledger,
-            cap_bucket=VictoryPointCapBucket.BATTLE_READY,
-        )
-        raw_other = ledger.victory_points - raw_primary - raw_secondary - raw_battle_ready
-        if raw_other < 0:
-            raise GameLifecycleError("FinalScoreLine source totals exceed raw ledger total.")
-        capped_primary = min(raw_primary, policy.primary_vp_cap)
-        capped_secondary = min(raw_secondary, policy.secondary_vp_cap)
-        capped_battle_ready = min(raw_battle_ready, policy.battle_ready_vp)
-        capped_pre_total = capped_primary + capped_secondary + capped_battle_ready + raw_other
-        capped_total = min(capped_pre_total, policy.total_vp_cap)
-        capped_other = capped_total - capped_primary - capped_secondary - capped_battle_ready
-        if capped_other < 0:
-            raise GameLifecycleError("FinalScoreLine total cap is below source-capped score.")
-        return cls(
-            player_id=ledger.player_id,
-            victory_points=capped_total,
-            raw_victory_points=ledger.victory_points,
-            raw_primary_vp=raw_primary,
-            raw_secondary_vp=raw_secondary,
-            raw_battle_ready_vp=raw_battle_ready,
-            raw_other_vp=raw_other,
-            capped_primary_vp=capped_primary,
-            capped_secondary_vp=capped_secondary,
-            capped_battle_ready_vp=capped_battle_ready,
-            capped_other_vp=capped_other,
-            cap_adjustment=ledger.victory_points - capped_total,
-        )
-
-    def to_public_score_payload(self) -> FinalScorePayload:
-        return {
-            "player_id": self.player_id,
-            "victory_points": self.victory_points,
-        }
-
-    def to_payload(self) -> FinalScoreLinePayload:
-        return {
-            "player_id": self.player_id,
-            "victory_points": self.victory_points,
-            "raw_victory_points": self.raw_victory_points,
-            "raw_primary_vp": self.raw_primary_vp,
-            "raw_secondary_vp": self.raw_secondary_vp,
-            "raw_battle_ready_vp": self.raw_battle_ready_vp,
-            "raw_other_vp": self.raw_other_vp,
-            "capped_primary_vp": self.capped_primary_vp,
-            "capped_secondary_vp": self.capped_secondary_vp,
-            "capped_battle_ready_vp": self.capped_battle_ready_vp,
-            "capped_other_vp": self.capped_other_vp,
-            "cap_adjustment": self.cap_adjustment,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: FinalScoreLinePayload) -> Self:
-        return cls(
-            player_id=payload["player_id"],
-            victory_points=payload["victory_points"],
-            raw_victory_points=payload["raw_victory_points"],
-            raw_primary_vp=payload["raw_primary_vp"],
-            raw_secondary_vp=payload["raw_secondary_vp"],
-            raw_battle_ready_vp=payload["raw_battle_ready_vp"],
-            raw_other_vp=payload["raw_other_vp"],
-            capped_primary_vp=payload["capped_primary_vp"],
-            capped_secondary_vp=payload["capped_secondary_vp"],
-            capped_battle_ready_vp=payload["capped_battle_ready_vp"],
-            capped_other_vp=payload["capped_other_vp"],
-            cap_adjustment=payload["cap_adjustment"],
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class FinalScoringResult:
-    result_id: str
-    game_id: str
-    battle_round: int
-    mission_pack_id: str
-    primary_mission_id: str
-    game_length_battle_rounds: int
-    final_scores: tuple[FinalScoreLine, ...]
-    winner_player_ids: tuple[str, ...]
-    is_draw: bool
-    policy_source_id: str
-    primary_vp_cap: int
-    secondary_vp_cap: int
-    battle_ready_vp_cap: int
-    total_vp_cap: int
-    scoring_windows: tuple[ScoringWindowState, ...]
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "result_id",
-            _validate_identifier("FinalScoringResult result_id", self.result_id),
-        )
-        object.__setattr__(
-            self,
-            "game_id",
-            _validate_identifier("FinalScoringResult game_id", self.game_id),
-        )
-        object.__setattr__(
-            self,
-            "battle_round",
-            _validate_positive_int("FinalScoringResult battle_round", self.battle_round),
-        )
-        object.__setattr__(
-            self,
-            "mission_pack_id",
-            _validate_identifier("FinalScoringResult mission_pack_id", self.mission_pack_id),
-        )
-        object.__setattr__(
-            self,
-            "primary_mission_id",
-            _validate_identifier("FinalScoringResult primary_mission_id", self.primary_mission_id),
-        )
-        object.__setattr__(
-            self,
-            "game_length_battle_rounds",
-            _validate_positive_int(
-                "FinalScoringResult game_length_battle_rounds",
-                self.game_length_battle_rounds,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "final_scores",
-            _validate_final_score_tuple(self.final_scores),
-        )
-        object.__setattr__(
-            self,
-            "winner_player_ids",
-            _validate_identifier_tuple_ordered(
-                "FinalScoringResult winner_player_ids",
-                self.winner_player_ids,
-                min_length=1,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "is_draw",
-            _validate_bool("FinalScoringResult is_draw", self.is_draw),
-        )
-        object.__setattr__(
-            self,
-            "policy_source_id",
-            _validate_identifier("FinalScoringResult policy_source_id", self.policy_source_id),
-        )
-        object.__setattr__(
-            self,
-            "primary_vp_cap",
-            _validate_positive_int("FinalScoringResult primary_vp_cap", self.primary_vp_cap),
-        )
-        object.__setattr__(
-            self,
-            "secondary_vp_cap",
-            _validate_positive_int("FinalScoringResult secondary_vp_cap", self.secondary_vp_cap),
-        )
-        object.__setattr__(
-            self,
-            "battle_ready_vp_cap",
-            _validate_non_negative_int(
-                "FinalScoringResult battle_ready_vp_cap", self.battle_ready_vp_cap
-            ),
-        )
-        object.__setattr__(
-            self,
-            "total_vp_cap",
-            _validate_positive_int("FinalScoringResult total_vp_cap", self.total_vp_cap),
-        )
-        object.__setattr__(
-            self,
-            "scoring_windows",
-            _validate_scoring_window_tuple(self.scoring_windows, game_id=self.game_id),
-        )
-        expected_winners = _winner_player_ids_from_scores(self.final_scores)
-        if self.winner_player_ids != expected_winners:
-            raise GameLifecycleError("FinalScoringResult winner_player_ids drift.")
-        if self.is_draw != (len(expected_winners) != 1):
-            raise GameLifecycleError("FinalScoringResult is_draw drift.")
-        if self.battle_round != self.game_length_battle_rounds:
-            raise GameLifecycleError("FinalScoringResult battle_round must match game length.")
-
-    @classmethod
-    def from_ledgers(
-        cls,
-        *,
-        game_id: str,
-        battle_round: int,
-        policy: MissionScoringPolicy,
-        ledgers: tuple[VictoryPointLedger, ...],
-        scoring_windows: tuple[ScoringWindowState, ...],
-    ) -> Self:
-        if type(policy) is not MissionScoringPolicy:
-            raise GameLifecycleError("Final scoring requires a MissionScoringPolicy.")
-        requested_game_id = _validate_identifier("game_id", game_id)
-        requested_round = _validate_positive_int("battle_round", battle_round)
-        validated_windows = _validate_required_final_scoring_windows(
-            scoring_windows=scoring_windows,
-            policy=policy,
-            game_id=requested_game_id,
-            battle_round=requested_round,
-        )
-        final_scores = tuple(
-            sorted(
-                (FinalScoreLine.from_ledger(ledger=ledger, policy=policy) for ledger in ledgers),
-                key=lambda score: score.player_id,
-            )
-        )
-        if not final_scores:
-            raise GameLifecycleError("Final scoring requires at least one player score.")
-        winner_ids = _winner_player_ids_from_scores(final_scores)
-        return cls(
-            result_id=f"final-scoring:{requested_game_id}:round-{requested_round:02d}",
-            game_id=requested_game_id,
-            battle_round=requested_round,
-            mission_pack_id=policy.mission_pack_id,
-            primary_mission_id=policy.primary_mission_id,
-            game_length_battle_rounds=policy.game_length_battle_rounds,
-            final_scores=final_scores,
-            winner_player_ids=winner_ids,
-            is_draw=len(winner_ids) != 1,
-            policy_source_id=policy.source_id,
-            primary_vp_cap=policy.primary_vp_cap,
-            secondary_vp_cap=policy.secondary_vp_cap,
-            battle_ready_vp_cap=policy.battle_ready_vp,
-            total_vp_cap=policy.total_vp_cap,
-            scoring_windows=validated_windows,
-        )
-
-    def to_payload(self) -> FinalScoringResultPayload:
-        return {
-            "result_id": self.result_id,
-            "game_id": self.game_id,
-            "battle_round": self.battle_round,
-            "mission_pack_id": self.mission_pack_id,
-            "primary_mission_id": self.primary_mission_id,
-            "game_length_battle_rounds": self.game_length_battle_rounds,
-            "final_scores": [score.to_public_score_payload() for score in self.final_scores],
-            "winner_player_ids": list(self.winner_player_ids),
-            "is_draw": self.is_draw,
-            "scoring_audit": {
-                "policy_source_id": self.policy_source_id,
-                "primary_vp_cap": self.primary_vp_cap,
-                "secondary_vp_cap": self.secondary_vp_cap,
-                "battle_ready_vp_cap": self.battle_ready_vp_cap,
-                "total_vp_cap": self.total_vp_cap,
-                "scoring_windows": [window.to_payload() for window in self.scoring_windows],
-                "player_scores": [score.to_payload() for score in self.final_scores],
-            },
-        }
-
-    @classmethod
-    def from_payload(cls, payload: FinalScoringResultPayload) -> Self:
-        audit = payload["scoring_audit"]
-        result = cls(
-            result_id=payload["result_id"],
-            game_id=payload["game_id"],
-            battle_round=payload["battle_round"],
-            mission_pack_id=payload["mission_pack_id"],
-            primary_mission_id=payload["primary_mission_id"],
-            game_length_battle_rounds=payload["game_length_battle_rounds"],
-            final_scores=tuple(
-                FinalScoreLine.from_payload(score) for score in audit["player_scores"]
-            ),
-            winner_player_ids=tuple(payload["winner_player_ids"]),
-            is_draw=payload["is_draw"],
-            policy_source_id=audit["policy_source_id"],
-            primary_vp_cap=audit["primary_vp_cap"],
-            secondary_vp_cap=audit["secondary_vp_cap"],
-            battle_ready_vp_cap=audit["battle_ready_vp_cap"],
-            total_vp_cap=audit["total_vp_cap"],
-            scoring_windows=tuple(
-                ScoringWindowState.from_payload(window) for window in audit["scoring_windows"]
-            ),
-        )
-        if [score.to_public_score_payload() for score in result.final_scores] != payload[
-            "final_scores"
-        ]:
-            raise GameLifecycleError("FinalScoringResult final_scores drift from scoring audit.")
-        return result
-
-
-@dataclass(frozen=True, slots=True)
 class MissionScoringPolicy:
+    player_id: str
+    force_disposition_id: str
     mission_pack_id: str
     primary_mission_id: str
+    primary_scoring_supported: bool
     game_length_battle_rounds: int
     primary_scoring_phase: str
     primary_scoring_timing: ObjectiveControlTiming
@@ -2026,6 +1598,18 @@ class MissionScoringPolicy:
     def __post_init__(self) -> None:
         object.__setattr__(
             self,
+            "player_id",
+            _validate_identifier("MissionScoringPolicy player_id", self.player_id),
+        )
+        object.__setattr__(
+            self,
+            "force_disposition_id",
+            _validate_identifier(
+                "MissionScoringPolicy force_disposition_id", self.force_disposition_id
+            ),
+        )
+        object.__setattr__(
+            self,
             "mission_pack_id",
             _validate_identifier("MissionScoringPolicy mission_pack_id", self.mission_pack_id),
         )
@@ -2035,6 +1619,14 @@ class MissionScoringPolicy:
             _validate_identifier(
                 "MissionScoringPolicy primary_mission_id",
                 self.primary_mission_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "primary_scoring_supported",
+            _validate_bool(
+                "MissionScoringPolicy primary_scoring_supported",
+                self.primary_scoring_supported,
             ),
         )
         object.__setattr__(
@@ -2098,10 +1690,15 @@ class MissionScoringPolicy:
                 self.primary_max_vp_per_turn,
             ),
         )
+        primary_scoring_rules = _validate_primary_scoring_rule_tuple(self.primary_scoring_rules)
+        if self.primary_scoring_supported != bool(primary_scoring_rules):
+            raise GameLifecycleError(
+                "MissionScoringPolicy Primary support status must match scoring rules."
+            )
         object.__setattr__(
             self,
             "primary_scoring_rules",
-            _validate_primary_scoring_rule_tuple(self.primary_scoring_rules),
+            primary_scoring_rules,
         )
         object.__setattr__(
             self,
@@ -2227,6 +1824,30 @@ class MissionScoringPolicy:
             raise GameLifecycleError("Primary scoring requires an ObjectiveControlRecord.")
         if type(mission_setup) is not MissionSetup:
             raise GameLifecycleError("Primary scoring requires MissionSetup.")
+        from warhammer40k_core.engine.missions import validate_mission_setup_source_layout
+
+        validate_mission_setup_source_layout(mission_setup)
+        if mission_setup.mission_pack_id != self.mission_pack_id:
+            raise GameLifecycleError("Primary scoring policy mission pack drifted from setup.")
+        assignment = next(
+            (
+                candidate
+                for candidate in mission_setup.primary_mission_assignments
+                if candidate.player_id == self.player_id
+            ),
+            None,
+        )
+        if assignment is None:
+            raise GameLifecycleError("Primary scoring player is missing from MissionSetup.")
+        if (
+            assignment.force_disposition_id != self.force_disposition_id
+            or assignment.primary_mission_id != self.primary_mission_id
+        ):
+            raise GameLifecycleError("Primary scoring policy drifted from MissionSetup assignment.")
+        if not self.primary_scoring_supported:
+            raise GameLifecycleError(
+                "Primary mission scoring source is known but engine implementation is pending."
+            )
         ordered_players = _validate_identifier_tuple_ordered(
             "Primary scoring turn_order",
             turn_order,
@@ -2234,6 +1855,10 @@ class MissionScoringPolicy:
         )
         if record.active_player_id not in ordered_players:
             raise GameLifecycleError("Primary scoring active player is missing from turn_order.")
+        if not end_of_battle and record.active_player_id != self.player_id:
+            raise GameLifecycleError(
+                "Ordinary Primary scoring must use the active player's policy."
+            )
         starts = _validate_primary_turn_start_state_tuple(turn_start_states)
         traps = _validate_primary_terrain_trap_state_tuple(terrain_trap_states)
         destructions = _validate_primary_unit_destruction_state_tuple(unit_destruction_states)
@@ -2244,6 +1869,8 @@ class MissionScoringPolicy:
         )
         if any(player_id not in ordered_players for player_id in player_ids):
             raise GameLifecycleError("Primary scoring player is missing from turn_order.")
+        if player_ids != (self.player_id,):
+            raise GameLifecycleError("Primary scoring policy may score only its assigned player.")
         awards: list[VictoryPointAward] = []
         for rule in self.primary_scoring_rules:
             if not self._primary_rule_applies_at_record(
@@ -2566,8 +2193,11 @@ class MissionScoringPolicy:
             secondary_mission_id=requested_secondary_id,
             source_kind=kind,
         )
+        requested_player_id = _validate_identifier("player_id", player_id)
+        if requested_player_id != self.player_id:
+            raise GameLifecycleError("Secondary scoring policy may score only its assigned player.")
         return VictoryPointAward(
-            player_id=_validate_identifier("player_id", player_id),
+            player_id=requested_player_id,
             battle_round=_validate_positive_int("battle_round", battle_round),
             phase=_validate_identifier("phase", phase),
             amount=rule.victory_points,
@@ -2604,7 +2234,14 @@ class MissionScoringPolicy:
             raise GameLifecycleError("State-backed secondary scoring requires objective record.")
         if type(mission_setup) is not MissionSetup:
             raise GameLifecycleError("State-backed secondary scoring requires MissionSetup.")
+        from warhammer40k_core.engine.missions import validate_mission_setup_source_layout
+
+        validate_mission_setup_source_layout(mission_setup)
+        if mission_setup.mission_pack_id != self.mission_pack_id:
+            raise GameLifecycleError("Secondary scoring policy mission pack drifted from setup.")
         requested_player = _validate_identifier("player_id", player_id)
+        if requested_player != self.player_id:
+            raise GameLifecycleError("Secondary scoring policy may score only its assigned player.")
         requested_round = _validate_positive_int("battle_round", battle_round)
         requested_phase = _validate_identifier("phase", phase)
         requested_secondary = _validate_identifier("secondary_mission_id", secondary_mission_id)
@@ -2899,8 +2536,13 @@ class MissionScoringPolicy:
             if amount is None
             else _validate_positive_int("amount", amount)
         )
+        requested_player_id = _validate_identifier("player_id", player_id)
+        if requested_player_id != self.player_id:
+            raise GameLifecycleError(
+                "Mission Action scoring policy may score only its assigned player."
+            )
         return VictoryPointAward(
-            player_id=_validate_identifier("player_id", player_id),
+            player_id=requested_player_id,
             battle_round=_validate_positive_int("battle_round", battle_round),
             phase=_validate_identifier("phase", phase),
             amount=requested_amount,
@@ -2923,6 +2565,8 @@ class MissionScoringPolicy:
             raise GameLifecycleError("VP cap resolution requires a VictoryPointAward.")
         if ledger.player_id != award.player_id:
             raise GameLifecycleError("VP cap resolution player_id drift.")
+        if ledger.player_id != self.player_id:
+            raise GameLifecycleError("VP cap policy does not belong to this player.")
 
         cap_bucket = self.cap_bucket_for_victory_point_source(
             source_kind=award.source_kind,
@@ -3020,8 +2664,11 @@ class MissionScoringPolicy:
 
     def to_payload(self) -> MissionScoringPolicyPayload:
         return {
+            "player_id": self.player_id,
+            "force_disposition_id": self.force_disposition_id,
             "mission_pack_id": self.mission_pack_id,
             "primary_mission_id": self.primary_mission_id,
+            "primary_scoring_supported": self.primary_scoring_supported,
             "game_length_battle_rounds": self.game_length_battle_rounds,
             "primary_scoring_phase": self.primary_scoring_phase,
             "primary_scoring_timing": self.primary_scoring_timing.value,
@@ -3056,9 +2703,44 @@ class MissionScoringPolicy:
 
     @classmethod
     def from_payload(cls, payload: MissionScoringPolicyPayload) -> Self:
+        if set(payload) != {
+            "player_id",
+            "force_disposition_id",
+            "mission_pack_id",
+            "primary_mission_id",
+            "primary_scoring_supported",
+            "game_length_battle_rounds",
+            "primary_scoring_phase",
+            "primary_scoring_timing",
+            "primary_scoring_rule_id",
+            "primary_scoring_rule_condition",
+            "primary_scoring_rule_source_id",
+            "primary_vp_per_controlled_objective",
+            "primary_max_vp_per_turn",
+            "primary_scoring_rules",
+            "secondary_vp_per_score",
+            "secondary_scoring_rules",
+            "mission_action_scoring_rules",
+            "mission_action_vp",
+            "reserve_destruction_timing",
+            "reserve_destruction_battle_round",
+            "reserve_destruction_excludes_during_battle_strategic_reserves",
+            "reserve_destruction_only_declare_battle_formations",
+            "primary_vp_cap",
+            "secondary_vp_cap",
+            "battle_ready_vp",
+            "total_vp_cap",
+            "end_of_round_scoring_windows",
+            "end_of_game_scoring_windows",
+            "source_id",
+        }:
+            raise GameLifecycleError("MissionScoringPolicy payload fields are invalid.")
         return cls(
+            player_id=payload["player_id"],
+            force_disposition_id=payload["force_disposition_id"],
             mission_pack_id=payload["mission_pack_id"],
             primary_mission_id=payload["primary_mission_id"],
+            primary_scoring_supported=payload["primary_scoring_supported"],
             game_length_battle_rounds=payload["game_length_battle_rounds"],
             primary_scoring_phase=payload["primary_scoring_phase"],
             primary_scoring_timing=objective_control_timing_from_token(
@@ -3108,6 +2790,14 @@ class MissionScoringPolicy:
     ) -> VictoryPointCapBucket:
         kind = victory_point_source_kind_from_token(source_kind)
         if kind is VictoryPointSourceKind.PRIMARY:
+            if not self.primary_scoring_supported:
+                raise GameLifecycleError(
+                    "Primary mission scoring source is known but engine implementation is pending."
+                )
+            if _validate_identifier("source_id", source_id) != self.primary_mission_id:
+                raise GameLifecycleError(
+                    "Primary VP source does not match the player's assigned Primary mission."
+                )
             return VictoryPointCapBucket.PRIMARY
         if kind in {
             VictoryPointSourceKind.FIXED_SECONDARY,
@@ -3629,10 +3319,7 @@ def _central_objective_ids(mission_setup: MissionSetup) -> tuple[str, ...]:
         sorted(
             marker.objective_marker_id
             for marker in mission_setup.objective_markers
-            if not any(
-                zone.contains_point(marker.x_inches, marker.y_inches)
-                for zone in mission_setup.deployment_zones
-            )
+            if marker.objective_role is ObjectiveMarkerRole.CENTRAL
         )
     )
 
@@ -3866,8 +3553,6 @@ def _validate_primary_scoring_rule_tuple(
             )
         seen.add(value.rule_id)
         validated.append(value)
-    if not validated:
-        raise GameLifecycleError("MissionScoringPolicy primary_scoring_rules must not be empty.")
     return tuple(sorted(validated, key=lambda rule: rule.rule_id))
 
 
@@ -4053,86 +3738,6 @@ def _validate_mission_action_scoring_rule_tuple(
             key=lambda rule: rule.mission_action_id,
         )
     )
-
-
-def _validate_scoring_window_tuple(
-    values: object,
-    *,
-    game_id: str,
-) -> tuple[ScoringWindowState, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("FinalScoringResult scoring_windows must be a tuple.")
-    requested_game_id = _validate_identifier("game_id", game_id)
-    validated: list[ScoringWindowState] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not ScoringWindowState:
-            raise GameLifecycleError("FinalScoringResult scoring_windows must contain states.")
-        if value.game_id != requested_game_id:
-            raise GameLifecycleError("ScoringWindowState game_id drift.")
-        if value.window_id in seen:
-            raise GameLifecycleError("FinalScoringResult scoring_windows must not duplicate IDs.")
-        seen.add(value.window_id)
-        validated.append(value)
-    return tuple(sorted(validated, key=lambda window: window.window_id))
-
-
-def _validate_final_score_tuple(values: object) -> tuple[FinalScoreLine, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("FinalScoringResult final_scores must be a tuple.")
-    validated: list[FinalScoreLine] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not FinalScoreLine:
-            raise GameLifecycleError("FinalScoringResult final_scores must contain score lines.")
-        if value.player_id in seen:
-            raise GameLifecycleError("FinalScoringResult final_scores must be unique by player.")
-        seen.add(value.player_id)
-        validated.append(value)
-    if not validated:
-        raise GameLifecycleError("FinalScoringResult final_scores must not be empty.")
-    return tuple(sorted(validated, key=lambda score: score.player_id))
-
-
-def _winner_player_ids_from_scores(scores: tuple[FinalScoreLine, ...]) -> tuple[str, ...]:
-    final_scores = _validate_final_score_tuple(scores)
-    max_score = max(score.victory_points for score in final_scores)
-    return tuple(score.player_id for score in final_scores if score.victory_points == max_score)
-
-
-def _validate_required_final_scoring_windows(
-    *,
-    scoring_windows: tuple[ScoringWindowState, ...],
-    policy: MissionScoringPolicy,
-    game_id: str,
-    battle_round: int,
-) -> tuple[ScoringWindowState, ...]:
-    if type(policy) is not MissionScoringPolicy:
-        raise GameLifecycleError("Final scoring window validation requires MissionScoringPolicy.")
-    requested_game_id = _validate_identifier("game_id", game_id)
-    requested_round = _validate_positive_int("battle_round", battle_round)
-    validated_windows = _validate_scoring_window_tuple(
-        scoring_windows,
-        game_id=requested_game_id,
-    )
-    recorded = {
-        (window.window_kind, window.window, window.battle_round) for window in validated_windows
-    }
-    required = {
-        (ScoringWindowKind.END_OF_ROUND, window, requested_round)
-        for window in policy.end_of_round_scoring_windows
-    } | {
-        (ScoringWindowKind.END_OF_GAME, window, requested_round)
-        for window in policy.end_of_game_scoring_windows
-    }
-    missing = tuple(sorted(required - recorded, key=lambda item: (item[0].value, item[1], item[2])))
-    if missing:
-        missing_text = ", ".join(
-            f"{kind.value}:{window}:round-{round_number:02d}"
-            for kind, window, round_number in missing
-        )
-        raise GameLifecycleError(f"Final scoring requires recorded policy windows: {missing_text}.")
-    return validated_windows
 
 
 def _ledger_points_from_source(

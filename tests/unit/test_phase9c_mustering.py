@@ -89,7 +89,9 @@ from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
     WargearSelection,
 )
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    warhammer_event_companion_2026_07_mission_pack,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_detachments_2026_27 as faction_detachment_source,
 )
@@ -1372,11 +1374,13 @@ def _transport_capacity(*, max_model_count: int) -> DedicatedTransportCapacityPr
 
 def _phase16d_mission_setup() -> MissionSetup:
     return MissionSetup.from_mission_pack(
-        mission_pack=chapter_approved_2026_27_mission_pack(),
-        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
-        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-3",
+        terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 
@@ -4051,7 +4055,7 @@ def test_phase16d_setup_records_starting_transport_cargo_from_manifest() -> None
     catalog = _phase16d_catalog()
     config = GameConfig(
         game_id="phase16d-setup-cargo",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        ruleset_descriptor=(RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27()),
         army_catalog=catalog,
         army_muster_requests=(
             _phase16d_transport_roster_request(catalog),
@@ -4116,7 +4120,7 @@ def test_phase16d_empty_dedicated_transport_manifest_records_setup_consequence()
     )
     config = GameConfig(
         game_id="phase16d-empty-transport",
-        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        ruleset_descriptor=(RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27()),
         army_catalog=catalog,
         army_muster_requests=(
             empty_transport_request,

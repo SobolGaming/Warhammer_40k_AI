@@ -4,7 +4,7 @@ This document tracks the repository's current source and engine status for the
 Warhammer Event Companion primary mission matrix and the 11th Edition secondary
 missions. It is a tracker, not a source of rules text.
 
-Canonical data lives in code:
+Canonical structured source data lives in versioned artifacts and typed source loaders:
 
 - Primary mission matrix cells:
   [`event_primary_mission_matrix_source_rows()`](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py)
@@ -12,6 +12,11 @@ Canonical data lives in code:
   [`primary_mission_matrix_rows()`](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py)
 - Primary scoring coverage:
   [`primary_mission_scoring_coverage_rows()`](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py)
+- All 25 Primary scoring records and the ten source-only Primary Mission Action
+  descriptors:
+  [`primary-scoring.json`](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-scoring.json),
+  loaded by
+  [`event_companion_primary_scoring_2026_06.py`](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_primary_scoring_2026_06.py)
 - Mission-card scoring grammar:
   [`mission_card_scoring_grammar()`](../src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06.py)
 - Secondary mission source rows:
@@ -174,18 +179,19 @@ Secondary status:
   zero gap and zero overlap without weakening geometry tolerances.
   Intentional clearance between physical terrain and terrain-area edges is
   preserved, as required by the source, rather than treated as missing geometry.
-- Meatgrinder's canonical scoring text, source timing, VP values, and structured
-  condition tokens are committed separately in
-  `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-meatgrinder-scoring.json`.
-  Its package hash is
-  `21b3fabcb585ee33b2295a888963d666a42f85d3f09200e973dd7de8253bd39c`
+- All 25 Primary missions' source timing, VP values, structured condition
+  tokens, current engine-support status, and the ten source-only Primary Mission
+  Action descriptors are committed in `primary-scoring.json`. Its package hash
+  is `e96c461ec66f7b4d71bbd6f2b9b12899b0fc1a8bd3dae8fe60597d6dcc793e0f`
   and its raw artifact SHA-256 is
-  `5e892581956e2b3c81bac893caef6b04f71cf19c1c3e2590ea33256b1a786342`.
-  The strict loader pins both hashes and records the project-owner-supplied
-  official Chapter Approved 2026-27 card transcription reviewed in PR #134 at
-  commit `35b9ddaf5`. The GDMissions transcription and card image fetched on
-  2026-08-09 are recorded only as non-official secondary corroboration, never as
-  GW source authority.
+  `0751341279c5c823a7e847b1f2db98a69cd6d29c39c4cd1682cc9fce0e8c1486`.
+  The typed loader pins both hashes, the exact 25-mission/100-rule/10-action
+  inventory, and the honest four `engine_implemented` versus 21
+  `source_known_engine_pending` boundary. Repository reviews are pinned to PRs
+  #134, #136, and #379. Only Meatgrinder currently retains canonical scoring
+  prose; the other cards retain reviewed structured transcriptions, and the
+  official card binaries are not committed. The GDMissions Meatgrinder
+  transcription and image remain non-official secondary corroboration only.
 - Verify that the committed battlefield artifact still matches its reviewed
   inputs without writing files with
   `uv run python tools/build_event_companion_battlefields.py --check`.

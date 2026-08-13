@@ -4,7 +4,7 @@ import hashlib
 import json
 import math
 from collections.abc import Mapping
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from enum import StrEnum
 from typing import Literal
 
@@ -57,8 +57,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companio
     terrain_feature_placements_from_specs,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_primary_scoring_2026_06 import (  # noqa: E501
-    MEATGRINDER_SCORING_PACKAGE_HASH,
-    meatgrinder_primary_scoring_artifact,
+    PRIMARY_SCORING_PACKAGE_HASH,
+    engine_implemented_primary_mission_ids,
+    event_companion_primary_scoring_artifact,
 )
 
 EDITION_ID = "warhammer_40000_11th"
@@ -837,161 +838,23 @@ def event_primary_mission_matrix_source_rows() -> tuple[EventPrimaryMissionMatri
 
 
 def primary_mission_action_source_rows() -> tuple[EventPrimaryMissionActionSourceRow, ...]:
-    return (
+    artifact = event_companion_primary_scoring_artifact()
+    return tuple(
         EventPrimaryMissionActionSourceRow(
-            mission_action_id="decoy-objective",
-            primary_mission_id="primary-smoke-and-mirrors",
-            name="Decoy",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start",
-            completion_timing="turn_end",
-            eligible_unit_policy="active_player_unit",
-            target_policy="objective_marker_excluding_home_not_decoy",
-            use_limit="unlimited_different_objective_per_unit_this_phase",
-            effect_descriptor="objective_becomes_decoy_if_action_unit_controls_target_at_turn_end",
-            engine_exposure_status="source_known_engine_pending",
-            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:decoy-objective",
-        ),
-        EventPrimaryMissionActionSourceRow(
-            mission_action_id="triangulate-objective",
-            primary_mission_id="primary-triangulation",
-            name="Triangulate",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start_from_battle_round_two",
-            completion_timing="turn_end",
-            eligible_unit_policy="active_player_unit",
-            target_policy="objective_marker_excluding_home",
-            use_limit="once_per_turn",
-            effect_descriptor=(
-                "objective_becomes_triangulated_if_action_unit_controls_target_at_turn_end"
-            ),
-            engine_exposure_status="source_known_engine_pending",
-            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:triangulate-objective",
-        ),
-        EventPrimaryMissionActionSourceRow(
-            mission_action_id="extract-intelligence",
-            primary_mission_id="primary-gather-intel",
-            name="Extract Intelligence",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start_from_battle_round_two",
-            completion_timing="turn_end",
-            eligible_unit_policy="active_player_unit",
-            target_policy="objective_marker_excluding_home_without_friendly_operation_marker",
-            use_limit="unlimited_different_objective_per_unit_this_phase",
-            effect_descriptor=(
-                "objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end"
-            ),
-            engine_exposure_status="source_known_engine_pending",
-            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:extract-intelligence",
-        ),
-        EventPrimaryMissionActionSourceRow(
-            mission_action_id="surveil-enemy-unit",
-            primary_mission_id="primary-surveil-the-foe",
-            name="Surveil the Foe",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start",
-            completion_timing="immediate",
-            eligible_unit_policy="active_player_unit",
-            target_policy="visible_enemy_unit_within_18_not_surveilled_this_turn",
-            use_limit="unlimited",
-            effect_descriptor="enemy_unit_becomes_surveilled_until_turn_end",
-            engine_exposure_status="source_known_engine_pending",
-            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:surveil-enemy-unit",
-        ),
-        EventPrimaryMissionActionSourceRow(
-            mission_action_id="sensor-sweep-locate-and-deny",
-            primary_mission_id="primary-locate-and-deny",
-            name="Sensor Sweep",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start",
-            completion_timing="turn_end",
-            eligible_unit_policy="active_player_unit_within_range_of_central_objective",
-            target_policy="operation_marker_requires_more_than_one_marker_remaining",
-            use_limit="once_per_turn",
-            effect_descriptor=(
-                "remove_one_operation_marker_if_action_unit_controls_central_objective_at_turn_end"
-            ),
-            engine_exposure_status="source_known_engine_pending",
-            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:sensor-sweep-locate-and-deny",
-        ),
-        EventPrimaryMissionActionSourceRow(
-            mission_action_id="sensor-sweep-extract-relic",
-            primary_mission_id="primary-extract-relic",
-            name="Sensor Sweep",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start",
-            completion_timing="turn_end",
-            eligible_unit_policy="active_player_unit_within_range_of_central_objective",
-            target_policy="opponent_operation_marker_requires_more_than_one_marker_remaining",
-            use_limit="once_per_turn",
-            effect_descriptor=(
-                "remove_one_opponent_operation_marker_if_action_unit_controls_central_objective"
-                "_at_turn_end"
-            ),
-            engine_exposure_status="source_known_engine_pending",
-            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:sensor-sweep-extract-relic",
-        ),
-        EventPrimaryMissionActionSourceRow(
-            mission_action_id="commit-sabotage",
-            primary_mission_id="primary-sabotage",
-            name="Sabotage",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start",
-            completion_timing="turn_end",
-            eligible_unit_policy="active_player_unit_within_range_of_non_home_objective",
-            target_policy="objective_marker_excluding_home",
-            use_limit="unlimited_different_objective_per_unit_this_phase",
-            effect_descriptor="unit_commits_sabotage_if_action_unit_controls_target_at_turn_end",
-            engine_exposure_status="source_known_engine_pending",
-            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:commit-sabotage",
-        ),
-        EventPrimaryMissionActionSourceRow(
-            mission_action_id="secure-asset",
-            primary_mission_id="primary-secure-asset",
-            name="Secure Asset",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start",
-            completion_timing="turn_end",
-            eligible_unit_policy="active_player_unit_within_range_of_non_home_objective",
-            target_policy="objective_marker_excluding_home",
-            use_limit="once_per_turn",
-            effect_descriptor="unit_secures_asset_if_action_unit_controls_target_at_turn_end",
-            engine_exposure_status="source_known_engine_pending",
-            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:secure-asset",
-        ),
-        EventPrimaryMissionActionSourceRow(
-            mission_action_id="vanguard-operation",
-            primary_mission_id="primary-vanguard-operation",
-            name="Vanguard Operation",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start",
-            completion_timing="turn_end",
-            eligible_unit_policy="active_player_unit_within_terrain_area_in_enemy_territory",
-            target_policy="terrain_area_in_enemy_territory",
-            use_limit="once_per_turn",
-            effect_descriptor=(
-                "unit_performs_vanguard_operation_if_no_enemy_units_in_terrain_area_at_turn_end"
-            ),
-            engine_exposure_status="source_known_engine_pending",
-            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:vanguard-operation",
-        ),
-        EventPrimaryMissionActionSourceRow(
-            mission_action_id="maintain-control",
-            primary_mission_id="primary-vital-link",
-            name="Maintain Control",
-            start_phase="shooting",
-            start_timing="shooting_phase_action_start",
-            completion_timing="turn_end",
-            eligible_unit_policy="active_player_unit_within_range_of_central_objective",
-            target_policy="central_objective_marker",
-            use_limit="once_per_turn",
-            effect_descriptor=(
-                "central_objective_gains_operation_marker_if_action_unit_controls_target"
-                "_at_turn_end"
-            ),
-            engine_exposure_status="source_known_engine_pending",
-            source_id=f"{SOURCE_PACKAGE_ID}:primary-action:maintain-control",
-        ),
+            mission_action_id=row.mission_action_id,
+            primary_mission_id=row.primary_mission_id,
+            name=row.name,
+            start_phase=row.start_phase,
+            start_timing=row.start_timing,
+            completion_timing=row.completion_timing,
+            eligible_unit_policy=row.eligible_unit_policy,
+            target_policy=row.target_policy,
+            use_limit=row.use_limit,
+            effect_descriptor=row.effect_descriptor,
+            engine_exposure_status=row.engine_exposure_status,
+            source_id=row.source_id,
+        )
+        for row in artifact.source_only_primary_actions
     )
 
 
@@ -1038,28 +901,30 @@ def primary_mission_scoring_coverage_rows() -> tuple[EventPrimaryMissionScoringC
 
 
 def primary_mission_rows() -> tuple[chapter_approved.SourcePrimaryMissionRow, ...]:
-    implemented_rows = {
-        row.primary_mission_id: row for row in chapter_approved.primary_mission_rows()
-    }
-    source_known_rows = _source_known_event_primary_mission_rows_by_id()
-    rows: list[chapter_approved.SourcePrimaryMissionRow] = []
-    for mission_id, mission_name in _event_primary_mission_names():
-        existing_row = source_known_rows.get(mission_id)
-        if existing_row is None:
-            existing_row = implemented_rows.get(mission_id)
-        if existing_row is not None:
-            rows.append(replace(existing_row, name=mission_name))
-            continue
-        rows.append(
-            chapter_approved.SourcePrimaryMissionRow(
-                primary_mission_id=mission_id,
-                name=mission_name,
-                max_vp_per_turn=None,
-                scoring_kind="event_companion_primary_source_descriptor_only",
-                vp_per_controlled_objective=None,
-                scoring_rules=(),
-            )
+    return _validated_primary_mission_rows(
+        artifact_rows=_event_primary_mission_rows_by_id(),
+        matrix_names=_event_primary_mission_names(),
+    )
+
+
+def _validated_primary_mission_rows(
+    *,
+    artifact_rows: Mapping[str, chapter_approved.SourcePrimaryMissionRow],
+    matrix_names: tuple[tuple[str, str], ...],
+) -> tuple[chapter_approved.SourcePrimaryMissionRow, ...]:
+    matrix_ids = tuple(mission_id for mission_id, _mission_name in matrix_names)
+    if set(artifact_rows) != set(matrix_ids):
+        raise MissionPackError(
+            "Event Companion Primary scoring artifact inventory drifted from the matrix."
         )
+    rows: list[chapter_approved.SourcePrimaryMissionRow] = []
+    for mission_id, mission_name in matrix_names:
+        artifact_row = artifact_rows[mission_id]
+        if artifact_row.name != mission_name:
+            raise MissionPackError(
+                "Event Companion Primary scoring artifact name drifted from the matrix."
+            )
+        rows.append(artifact_row)
     return tuple(rows)
 
 
@@ -1111,14 +976,7 @@ def mission_pack_scoring_row() -> chapter_approved.SourceMissionPackScoringRow:
     )
 
 
-_ENGINE_IMPLEMENTED_PRIMARY_MISSION_IDS = frozenset(
-    (
-        "primary-death-trap",
-        "primary-immovable-object",
-        "primary-meatgrinder",
-        "primary-unstoppable-force",
-    )
-)
+_ENGINE_IMPLEMENTED_PRIMARY_MISSION_IDS = engine_implemented_primary_mission_ids()
 
 
 _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
@@ -1250,17 +1108,15 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
 }
 
 
-def _source_known_event_primary_mission_rows_by_id() -> dict[
-    str, chapter_approved.SourcePrimaryMissionRow
-]:
-    meatgrinder = meatgrinder_primary_scoring_artifact()
-    rows = (
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id=meatgrinder.primary_mission_id,
-            name=meatgrinder.mission_name,
-            max_vp_per_turn=meatgrinder.max_vp_per_turn,
-            scoring_kind=meatgrinder.scoring_kind,
-            vp_per_controlled_objective=meatgrinder.vp_per_controlled_objective,
+def _event_primary_mission_rows_by_id() -> dict[str, chapter_approved.SourcePrimaryMissionRow]:
+    artifact = event_companion_primary_scoring_artifact()
+    return {
+        mission.primary_mission_id: chapter_approved.SourcePrimaryMissionRow(
+            primary_mission_id=mission.primary_mission_id,
+            name=mission.mission_name,
+            max_vp_per_turn=mission.max_vp_per_turn,
+            scoring_kind=mission.scoring_kind,
+            vp_per_controlled_objective=mission.vp_per_controlled_objective,
             scoring_rules=tuple(
                 _event_primary_rule(
                     rule.rule_id,
@@ -1268,734 +1124,11 @@ def _source_known_event_primary_mission_rows_by_id() -> dict[
                     rule.victory_points,
                     rule.condition,
                 )
-                for rule in meatgrinder.scoring_rules
+                for rule in mission.scoring_rules
             ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-punishment",
-            name="Punishment",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "punishment-condemned-left-battlefield",
-                    "turn_end",
-                    5,
-                    "one_or_more_condemned_enemy_units_left_battlefield_this_turn",
-                ),
-                _event_primary_rule(
-                    "punishment-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "punishment-control-more-objectives",
-                    "command_phase_or_round_five_turn_end",
-                    5,
-                    "control_more_objectives_than_opponent_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "punishment-opponent-home-end-battle",
-                    "end_of_battle",
-                    8,
-                    "control_opponent_home_objective_end_of_battle",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-consecrate",
-            name="Consecrate",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "consecrate-one-or-two-objectives",
-                    "turn_end",
-                    3,
-                    "one_or_two_objectives_consecrated",
-                ),
-                _event_primary_rule(
-                    "consecrate-three-or-more-objectives",
-                    "turn_end",
-                    6,
-                    "three_or_more_objectives_consecrated",
-                ),
-                _event_primary_rule(
-                    "consecrate-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "consecrate-control-more-objectives",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_more_objectives_than_opponent_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "consecrate-enemy-home-end-battle",
-                    "end_of_battle",
-                    5,
-                    "enemy_home_objective_consecrated_end_of_battle",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-destroyers-wrath",
-            name="Destroyer's Wrath",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "destroyers-wrath-enemy-destroyed-turn-end",
-                    "turn_end",
-                    3,
-                    "one_or_more_enemy_units_destroyed_this_turn",
-                ),
-                _event_primary_rule(
-                    "destroyers-wrath-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "destroyers-wrath-control-more-objectives",
-                    "command_phase_or_round_five_turn_end",
-                    6,
-                    "control_more_objectives_than_opponent_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "destroyers-wrath-more-destroyed-turn-end",
-                    "turn_end_from_battle_round_two",
-                    4,
-                    "more_enemy_units_destroyed_than_friendly_previous_turn",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-outmaneuver",
-            name="Outmanoeuvre",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "outmaneuver-enemy-home-turn-end",
-                    "turn_end",
-                    10,
-                    "control_enemy_home_objective",
-                ),
-                _event_primary_rule(
-                    "outmaneuver-first-round-objectives",
-                    "first_battle_round_turn_end",
-                    4,
-                    "each_non_home_objective_controlled_first_battle_round",
-                ),
-                _event_primary_rule(
-                    "outmaneuver-rounds-two-three-objectives",
-                    "battle_rounds_two_and_three_command_phase",
-                    5,
-                    "each_non_home_objective_controlled_battle_rounds_two_and_three",
-                ),
-                _event_primary_rule(
-                    "outmaneuver-round-four-onwards-objectives",
-                    "battle_round_four_onwards_turn_end",
-                    6,
-                    "each_non_home_objective_controlled_battle_round_four_onwards",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-delaying-action",
-            name="Delaying Action",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "delaying-action-each-enemy-destroyed",
-                    "turn_end",
-                    2,
-                    "each_enemy_unit_destroyed_this_turn",
-                ),
-                _event_primary_rule(
-                    "delaying-action-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "delaying-action-central-expansion-turn-end",
-                    "turn_end_from_battle_round_two",
-                    3,
-                    "control_central_and_expansion_objectives",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-smoke-and-mirrors",
-            name="Smoke and Mirrors",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "smoke-and-mirrors-each-decoy-objective",
-                    "turn_end",
-                    2,
-                    "each_decoy_objective",
-                ),
-                _event_primary_rule(
-                    "smoke-and-mirrors-opponent-territory-decoy-bonus",
-                    "turn_end",
-                    2,
-                    "each_decoy_objective_in_opponent_territory_bonus",
-                ),
-                _event_primary_rule(
-                    "smoke-and-mirrors-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "smoke-and-mirrors-four-decoys-end-battle",
-                    "end_of_battle",
-                    10,
-                    "four_or_more_decoy_objectives_end_of_battle",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-triangulation",
-            name="Triangulation",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "triangulation-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "triangulation-one-objective",
-                    "turn_end_from_battle_round_two",
-                    3,
-                    "exactly_one_triangulated_objective",
-                ),
-                _event_primary_rule(
-                    "triangulation-two-objectives",
-                    "turn_end_from_battle_round_two",
-                    6,
-                    "exactly_two_triangulated_objectives",
-                ),
-                _event_primary_rule(
-                    "triangulation-three-or-more-objectives",
-                    "turn_end_from_battle_round_two",
-                    10,
-                    "three_or_more_triangulated_objectives",
-                ),
-                _event_primary_rule(
-                    "triangulation-four-objectives-end-battle",
-                    "end_of_battle",
-                    10,
-                    "control_four_or_more_objectives_end_of_battle",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-gather-intel",
-            name="Gather Intel",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "gather-intel-central-first-round-turn-end",
-                    "first_battle_round_turn_end",
-                    6,
-                    "control_one_or_more_central_objectives_first_battle_round",
-                ),
-                _event_primary_rule(
-                    "gather-intel-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "gather-intel-extracted-intelligence-turn-end",
-                    "turn_end_from_battle_round_two",
-                    7,
-                    "each_friendly_unit_extracted_intelligence_this_turn",
-                ),
-                _event_primary_rule(
-                    "gather-intel-three-markers-end-battle",
-                    "end_of_battle",
-                    5,
-                    "three_or_more_friendly_operation_markers_on_battlefield_end_of_battle",
-                ),
-                _event_primary_rule(
-                    "gather-intel-opponent-home-marker-end-battle",
-                    "end_of_battle",
-                    5,
-                    "friendly_operation_marker_within_opponent_home_objective_range_end_of_battle",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-surveil-the-foe",
-            name="Surveil the Foe",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "surveil-the-foe-enemy-units-surveilled-turn-end",
-                    "turn_end",
-                    4,
-                    (
-                        "one_or_more_enemy_units_surveilled_this_turn_unless_all_within_range"
-                        "_of_objectives_with_operation_markers"
-                    ),
-                ),
-                _event_primary_rule(
-                    "surveil-the-foe-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "surveil-the-foe-control-more-objectives",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_more_objectives_than_opponent_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "surveil-the-foe-no-enemy-operation-markers",
-                    "turn_end_from_battle_round_two",
-                    5,
-                    "no_enemy_operation_markers_on_battlefield",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-search-and-scour",
-            name="Search and Scour",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "search-and-scour-central-objective-turn-end",
-                    "turn_end",
-                    3,
-                    "control_one_or_more_central_objectives",
-                ),
-                _event_primary_rule(
-                    "search-and-scour-enemy-terrain-destroyed-turn-end",
-                    "turn_end",
-                    2,
-                    "one_or_more_enemy_units_started_turn_in_terrain_area_destroyed_this_turn",
-                ),
-                _event_primary_rule(
-                    "search-and-scour-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "each_non_home_objective_controlled_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "search-and-scour-no-enemy-in-territory-end-battle",
-                    "end_of_battle",
-                    5,
-                    "no_enemy_units_wholly_within_own_territory_end_of_battle",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-reconnaissance-sweep",
-            name="Reconnaissance Sweep",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "reconnaissance-sweep-three-quarters-turn-end",
-                    "turn_end",
-                    3,
-                    (
-                        "three_or_more_friendly_units_wholly_within_three_different_table"
-                        "_quarters_not_within_six_of_center"
-                    ),
-                ),
-                _event_primary_rule(
-                    "reconnaissance-sweep-four-quarters-turn-end",
-                    "turn_end",
-                    6,
-                    (
-                        "four_or_more_friendly_units_wholly_within_four_different_table"
-                        "_quarters_not_within_six_of_center"
-                    ),
-                ),
-                _event_primary_rule(
-                    "reconnaissance-sweep-enemy-destroyed-turn-end",
-                    "turn_end",
-                    1,
-                    "each_enemy_unit_destroyed_this_turn",
-                ),
-                _event_primary_rule(
-                    "reconnaissance-sweep-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    3,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-locate-and-deny",
-            name="Locate and Deny",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "locate-and-deny-enemy-started-objective-destroyed",
-                    "turn_end",
-                    4,
-                    "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn",
-                ),
-                _event_primary_rule(
-                    "locate-and-deny-one-marker-remains-terrain",
-                    "turn_end",
-                    4,
-                    (
-                        "only_one_friendly_operation_marker_remains_with_friendly_unit_and_no"
-                        "_enemy_in_terrain_area"
-                    ),
-                ),
-                _event_primary_rule(
-                    "locate-and-deny-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "locate-and-deny-one-marker-end-battle",
-                    "end_of_battle",
-                    5,
-                    (
-                        "only_one_friendly_operation_marker_remains_with_friendly_unit_and_no"
-                        "_enemy_in_terrain_area_end_of_battle"
-                    ),
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-battlefield-dominance",
-            name="Battlefield Dominance",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "battlefield-dominance-control-more-turn-end-rounds-one-two",
-                    "first_and_second_battle_round_turn_end",
-                    2,
-                    "control_more_objectives_than_opponent_first_and_second_battle_round",
-                ),
-                _event_primary_rule(
-                    "battlefield-dominance-each-objective",
-                    "command_phase_or_round_five_turn_end",
-                    3,
-                    "each_objective_controlled_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "battlefield-dominance-home-controlled-non-home-bonus",
-                    "command_phase_or_round_five_turn_end",
-                    2,
-                    "each_non_home_objective_controlled_if_home_objective_controlled",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-determined-acquisition",
-            name="Determined Acquisition",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "determined-acquisition-new-objectives-turn-end",
-                    "turn_end",
-                    2,
-                    "each_newly_controlled_non_home_objective_this_turn",
-                ),
-                _event_primary_rule(
-                    "determined-acquisition-each-objective",
-                    "command_phase_or_round_five_turn_end",
-                    3,
-                    "each_objective_controlled_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "determined-acquisition-opponent-territory-bonus",
-                    "command_phase_or_round_five_turn_end",
-                    3,
-                    "each_controlled_objective_in_opponent_territory",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-inescapable-dominion",
-            name="Inescapable Dominion",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "inescapable-dominion-three-objectives-turn-end",
-                    "turn_end",
-                    4,
-                    "control_three_or_more_objectives",
-                ),
-                _event_primary_rule(
-                    "inescapable-dominion-two-objectives",
-                    "command_phase_or_round_five_turn_end",
-                    5,
-                    "control_two_or_more_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "inescapable-dominion-control-more",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_more_objectives_than_opponent_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "inescapable-dominion-opponent-home-end-battle",
-                    "end_of_battle",
-                    5,
-                    "control_opponent_home_objective_end_of_battle",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-purge-and-secure",
-            name="Purge and Secure",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "purge-and-secure-destroyed-by-objective-unit-turn-end",
-                    "turn_end",
-                    3,
-                    "one_or_more_enemy_units_destroyed_by_friendly_unit_on_objective_this_turn",
-                ),
-                _event_primary_rule(
-                    "purge-and-secure-started-objective-destroyed-turn-end",
-                    "turn_end",
-                    3,
-                    "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn",
-                ),
-                _event_primary_rule(
-                    "purge-and-secure-each-objective",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "each_non_home_objective_controlled_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "purge-and-secure-new-objective-turn-end",
-                    "turn_end_from_battle_round_two",
-                    3,
-                    "control_one_or_more_new_non_home_objectives",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-extract-relic",
-            name="Extract Relic",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "extract-relic-sensor-sweep-turn-end",
-                    "turn_end",
-                    4,
-                    "friendly_unit_performed_sensor_sweep_this_turn",
-                ),
-                _event_primary_rule(
-                    "extract-relic-started-objective-destroyed-turn-end",
-                    "turn_end",
-                    3,
-                    "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn",
-                ),
-                _event_primary_rule(
-                    "extract-relic-one-opponent-marker-turn-end",
-                    "turn_end",
-                    4,
-                    (
-                        "only_one_opponent_operation_marker_remains_with_friendly_unit_and_no"
-                        "_enemy_in_terrain_area"
-                    ),
-                ),
-                _event_primary_rule(
-                    "extract-relic-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "extract-relic-one-opponent-marker-end-battle",
-                    "end_of_battle",
-                    5,
-                    (
-                        "only_one_opponent_operation_marker_remains_with_friendly_unit_and_no"
-                        "_enemy_in_terrain_area_end_of_battle"
-                    ),
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-sabotage",
-            name="Sabotage",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "sabotage-each-unit-turn-end",
-                    "turn_end",
-                    3,
-                    "each_friendly_unit_committed_sabotage_this_turn",
-                ),
-                _event_primary_rule(
-                    "sabotage-opponent-territory-bonus-turn-end",
-                    "turn_end",
-                    2,
-                    "each_sabotage_unit_within_objective_range_in_opponent_territory_this_turn",
-                ),
-                _event_primary_rule(
-                    "sabotage-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-secure-asset",
-            name="Secure Asset",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "secure-asset-action-turn-end",
-                    "turn_end",
-                    4,
-                    "friendly_unit_secured_asset_this_turn",
-                ),
-                _event_primary_rule(
-                    "secure-asset-central-objective-enemy-destroyed",
-                    "turn_end",
-                    2,
-                    (
-                        "one_or_more_enemy_units_started_turn_within_central_objective_range"
-                        "_destroyed_this_turn"
-                    ),
-                ),
-                _event_primary_rule(
-                    "secure-asset-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "secure-asset-three-objectives",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_three_or_more_objectives_from_battle_round_two",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-vanguard-operation",
-            name="Vanguard Operation",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "vanguard-operation-action-turn-end",
-                    "turn_end",
-                    4,
-                    "friendly_unit_performed_vanguard_operation_this_turn",
-                ),
-                _event_primary_rule(
-                    "vanguard-operation-enemy-destroyed-turn-end",
-                    "turn_end",
-                    2,
-                    "one_or_more_enemy_units_destroyed_this_turn",
-                ),
-                _event_primary_rule(
-                    "vanguard-operation-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "vanguard-operation-opponent-home-end-battle",
-                    "end_of_battle",
-                    10,
-                    "control_opponent_home_objective_end_of_battle",
-                ),
-            ),
-        ),
-        chapter_approved.SourcePrimaryMissionRow(
-            primary_mission_id="primary-vital-link",
-            name="Vital Link",
-            max_vp_per_turn=None,
-            scoring_kind="event_companion_primary_source_known_engine_pending",
-            vp_per_controlled_objective=None,
-            scoring_rules=(
-                _event_primary_rule(
-                    "vital-link-central-objective-turn-end",
-                    "turn_end",
-                    2,
-                    "control_one_or_more_central_objectives",
-                ),
-                _event_primary_rule(
-                    "vital-link-operation-marker-central-bonus-turn-end",
-                    "turn_end",
-                    1,
-                    ("each_friendly_operation_marker_within_range_of_controlled_central_objective"),
-                ),
-                _event_primary_rule(
-                    "vital-link-objective-control",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "control_one_or_more_non_home_objectives_from_battle_round_two",
-                ),
-                _event_primary_rule(
-                    "vital-link-central-objective-bonus",
-                    "command_phase_or_round_five_turn_end",
-                    4,
-                    "one_or_more_controlled_non_home_objectives_is_central_objective",
-                ),
-                _event_primary_rule(
-                    "vital-link-opponent-home-end-battle",
-                    "end_of_battle",
-                    10,
-                    "control_opponent_home_objective_end_of_battle",
-                ),
-            ),
-        ),
-    )
-    return {row.primary_mission_id: row for row in rows}
+        )
+        for mission in artifact.primary_missions
+    }
 
 
 def _event_primary_rule(
@@ -3196,7 +2329,7 @@ def _import_hash() -> str:
         "mission_sequence": mission_sequence_descriptor().to_payload(),
         "primary_missions": [row.to_payload() for row in primary_mission_rows()],
         "primary_scoring_artifact_hashes": {
-            "primary-meatgrinder": MEATGRINDER_SCORING_PACKAGE_HASH,
+            "all-primary-missions-and-source-only-actions": PRIMARY_SCORING_PACKAGE_HASH,
         },
         "primary_mission_action_sources": [
             row.to_payload() for row in primary_mission_action_source_rows()

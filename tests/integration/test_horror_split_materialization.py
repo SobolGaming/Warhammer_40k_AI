@@ -2004,6 +2004,7 @@ def _split_scenario(
         package=package,
         army_id="army-horrors",
         player_id="player-horrors",
+        force_disposition_id="take-and-hold",
         units=(bodyguard, leader),
         attached_units=(() if formation is None else (formation,)),
     )
@@ -2011,6 +2012,7 @@ def _split_scenario(
         package=package,
         army_id="army-enemy",
         player_id="player-enemy",
+        force_disposition_id="purge-the-foe",
         units=(attacker,),
     )
     battlefield = BattlefieldRuntimeState(
@@ -2291,6 +2293,7 @@ def _army(
     package: CanonicalCatalogPackage,
     army_id: str,
     player_id: str,
+    force_disposition_id: str,
     units: tuple[UnitInstance, ...],
     attached_units: tuple[AttachedUnitFormation, ...] = (),
 ) -> ArmyDefinition:
@@ -2304,7 +2307,7 @@ def _army(
             faction_id=package.army_catalog.factions[0].faction_id,
             detachment_ids=("test:horrors:detachment",),
         ),
-        force_disposition_id="test:horrors:force",
+        force_disposition_id=force_disposition_id,
         units=units,
         attached_units=attached_units,
     )

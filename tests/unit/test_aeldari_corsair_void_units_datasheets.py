@@ -1501,7 +1501,9 @@ def test_reavers_of_the_void_full_reroll_checks_all_attached_target_models() -> 
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     marker = state.mission_setup.objective_markers[0]
     assert state.battlefield_state is not None
@@ -1771,7 +1773,7 @@ def _piratical_raiders_config() -> GameConfig:
                     faction_id="AE",
                     detachment_ids=(PIRATICAL_TEST_DETACHMENT_ID,),
                 ),
-                force_disposition_id="purge-the-foe",
+                force_disposition_id="take-and-hold",
                 unit_selections=(voidscarred_selection, support_selection),
             ),
             ArmyMusterRequest(
@@ -1796,7 +1798,9 @@ def _piratical_raiders_config() -> GameConfig:
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id="player-a",
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         ),
     )
 
@@ -1841,7 +1845,7 @@ def _piratical_raiders_lifecycle_catalog() -> ArmyCatalog:
                 faction_id="AE",
                 detachment_point_cost=1,
                 unit_datasheet_ids=(VOIDREAVERS_ID, VOIDSCARRED_ID),
-                force_disposition_ids=("purge-the-foe",),
+                force_disposition_ids=("purge-the-foe", "take-and-hold"),
                 source_ids=("source:aeldari-piratical-raiders-test",),
             ),
         ),
