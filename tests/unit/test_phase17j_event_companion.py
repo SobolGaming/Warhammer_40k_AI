@@ -336,6 +336,7 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
         (review.pull_request, review.commit)
         for review in artifact.authoritative_source.review_records
     ) == (
+        (107, "c0fe665249a4a39e5bf5ca19c38bb18b4a9dc56a"),
         (134, "35b9ddaf5a49ad947177712a883fd0c76e3db224"),
         (136, "34e05f19886c8c483fb0fa7c3e1ba86626bb89f1"),
         (379, "15af220739679f5aa84dd16981ae3e7dbaa93520"),

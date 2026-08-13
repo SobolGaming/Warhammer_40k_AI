@@ -5013,11 +5013,15 @@ Mission Action descriptors retain reviewed Chapter Approved mission-deck
 provenance in the strict, versioned JSON artifact at
 `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-scoring.json`,
 with package hash
-`e96c461ec66f7b4d71bbd6f2b9b12899b0fc1a8bd3dae8fe60597d6dcc793e0f`
+`b87dea149c6325bc0553243260065508b8b3d97880172173425d370335b8715e`
 and raw artifact SHA-256
-`0751341279c5c823a7e847b1f2db98a69cd6d29c39c4cd1682cc9fce0e8c1486`.
-The artifact pins the reviewed transcriptions from PRs #134, #136, and #379,
-including the four executable versus 21 engine-pending status boundary. Only
+`be74e5272b2f64e6e78b6fa24971d42dbb97bc2c7a6c048c9a47521c36fc0f71`.
+The artifact pins the reviewed transcriptions from PRs #107, #134, #136, and
+#379, including the four executable versus 21 engine-pending status boundary.
+PR #107 is the source-backed origin for Death Trap, Immovable Object, and
+Unstoppable Force; PRs #134 and #136 complete the remaining mission/action
+transcription inventory, and PR #379 supplies the later exact Meatgrinder
+review. Only
 Meatgrinder retains canonical scoring prose; the remaining cards retain their
 structured transcriptions and no official card binary is committed. The
 GDMissions Meatgrinder page and card-image checks remain explicitly non-official

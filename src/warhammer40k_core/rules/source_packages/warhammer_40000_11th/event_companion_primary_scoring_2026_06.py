@@ -14,8 +14,8 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 
 ARTIFACT_SCHEMA: Final = "core-v2-phase17n-event-companion-primary-scoring-v2"
 SOURCE_PACKAGE_ID: Final = "gw-11e-warhammer-event-companion-v1-1-2026-07"
-EXPECTED_PACKAGE_HASH: Final = "e96c461ec66f7b4d71bbd6f2b9b12899b0fc1a8bd3dae8fe60597d6dcc793e0f"
-EXPECTED_ARTIFACT_SHA256: Final = "0751341279c5c823a7e847b1f2db98a69cd6d29c39c4cd1682cc9fce0e8c1486"
+EXPECTED_PACKAGE_HASH: Final = "b87dea149c6325bc0553243260065508b8b3d97880172173425d370335b8715e"
+EXPECTED_ARTIFACT_SHA256: Final = "be74e5272b2f64e6e78b6fa24971d42dbb97bc2c7a6c048c9a47521c36fc0f71"
 _ARTIFACT_PACKAGE: Final = "warhammer40k_core.rules.source_packages.warhammer_40000_11th"
 _ARTIFACT_PATH: Final = "event_companion_2026_06_artifacts/primary-scoring.json"
 _PENDING_SCORING_KIND: Final = "event_companion_primary_source_known_engine_pending"
@@ -303,6 +303,7 @@ def _validate_authoritative_source(source: AuthoritativeScoringSourceArtifact) -
             "Event Companion primary-scoring authoritative provenance drifted."
         )
     expected_reviews = (
+        (107, "c0fe665249a4a39e5bf5ca19c38bb18b4a9dc56a"),
         (134, "35b9ddaf5a49ad947177712a883fd0c76e3db224"),
         (136, "34e05f19886c8c483fb0fa7c3e1ba86626bb89f1"),
         (379, "15af220739679f5aa84dd16981ae3e7dbaa93520"),

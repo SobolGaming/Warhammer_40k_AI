@@ -182,16 +182,18 @@ Secondary status:
 - All 25 Primary missions' source timing, VP values, structured condition
   tokens, current engine-support status, and the ten source-only Primary Mission
   Action descriptors are committed in `primary-scoring.json`. Its package hash
-  is `e96c461ec66f7b4d71bbd6f2b9b12899b0fc1a8bd3dae8fe60597d6dcc793e0f`
+  is `b87dea149c6325bc0553243260065508b8b3d97880172173425d370335b8715e`
   and its raw artifact SHA-256 is
-  `0751341279c5c823a7e847b1f2db98a69cd6d29c39c4cd1682cc9fce0e8c1486`.
+  `be74e5272b2f64e6e78b6fa24971d42dbb97bc2c7a6c048c9a47521c36fc0f71`.
   The typed loader pins both hashes, the exact 25-mission/100-rule/10-action
   inventory, and the honest four `engine_implemented` versus 21
   `source_known_engine_pending` boundary. Repository reviews are pinned to PRs
-  #134, #136, and #379. Only Meatgrinder currently retains canonical scoring
-  prose; the other cards retain reviewed structured transcriptions, and the
-  official card binaries are not committed. The GDMissions Meatgrinder
-  transcription and image remain non-official secondary corroboration only.
+  #107, #134, #136, and #379. PR #107 is the source-backed origin for Death
+  Trap, Immovable Object, and Unstoppable Force. Only Meatgrinder currently
+  retains canonical scoring prose; the other cards retain reviewed structured
+  transcriptions, and the official card binaries are not committed. The
+  GDMissions Meatgrinder transcription and image remain non-official secondary
+  corroboration only.
 - Verify that the committed battlefield artifact still matches its reviewed
   inputs without writing files with
   `uv run python tools/build_event_companion_battlefields.py --check`.

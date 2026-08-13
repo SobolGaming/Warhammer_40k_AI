@@ -11,6 +11,10 @@
     "review_status": "reviewed_and_merged",
     "review_records": [
       {
+        "pull_request": 107,
+        "commit": "c0fe665249a4a39e5bf5ca19c38bb18b4a9dc56a"
+      },
+      {
         "pull_request": 134,
         "commit": "35b9ddaf5a49ad947177712a883fd0c76e3db224"
       },
@@ -1582,5 +1586,5 @@
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:vanguard-operation"
     }
   ],
-  "package_hash": "e96c461ec66f7b4d71bbd6f2b9b12899b0fc1a8bd3dae8fe60597d6dcc793e0f"
+  "package_hash": "b87dea149c6325bc0553243260065508b8b3d97880172173425d370335b8715e"
 }
