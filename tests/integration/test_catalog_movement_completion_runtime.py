@@ -74,12 +74,17 @@ def test_phase17k_charge_end_catalog_mortal_wounds_selects_target_and_rolls_per_
         army_id="army-opponent",
         unit_selection_id="enemy-flesh-hounds-1",
     )
-    army = flesh_hounds_army(package=package, unit=unit)
+    army = flesh_hounds_army(
+        package=package,
+        unit=unit,
+        force_disposition_id="take-and-hold",
+    )
     enemy_army = flesh_hounds_army(
         package=package,
         unit=target_unit,
         army_id="army-opponent",
         player_id="player-opponent",
+        force_disposition_id="purge-the-foe",
     )
     rule_ir = charge_end_mortal_wounds_rule_ir()
     clause = rule_ir.clauses[0]
@@ -482,12 +487,17 @@ def test_phase17k_charge_end_catalog_mortal_wounds_runtime_noops_and_fail_fast()
         army_id="army-opponent",
         unit_selection_id="enemy-flesh-hounds-1",
     )
-    army = flesh_hounds_army(package=package, unit=unit)
+    army = flesh_hounds_army(
+        package=package,
+        unit=unit,
+        force_disposition_id="take-and-hold",
+    )
     enemy_army = flesh_hounds_army(
         package=package,
         unit=target_unit,
         army_id="army-opponent",
         player_id="player-opponent",
+        force_disposition_id="purge-the-foe",
     )
     rule_ir = charge_end_mortal_wounds_rule_ir()
     record = charge_end_mortal_wounds_record(rule_ir=rule_ir, datasheet_id=unit.datasheet_id)

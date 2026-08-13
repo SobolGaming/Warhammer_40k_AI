@@ -22,7 +22,7 @@ from warhammer40k_core.engine.game_state import GameConfig
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
 
-REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v4-phase17n"
+REPLAY_ARTIFACT_SCHEMA_VERSION = "replay-artifact-v5-phase17n"
 
 
 class ReplayArtifactError(ValueError):
@@ -62,6 +62,8 @@ class ReplaySourceIdentityPayload(TypedDict):
     catalog_hash: str
     source_package_id: str
     source_ids: list[str]
+    mission_pack_id: str | None
+    mission_source_package_hash: str | None
 
 
 class ReplayProjectionCheckpointPayload(TypedDict):
@@ -125,6 +127,8 @@ class ReplaySourceIdentity:
     catalog_hash: str
     source_package_id: str
     source_ids: tuple[str, ...]
+    mission_pack_id: str | None
+    mission_source_package_hash: str | None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "game_id", _validate_identifier("game_id", self.game_id))
@@ -159,12 +163,35 @@ class ReplaySourceIdentity:
             "source_ids",
             _validate_identifier_tuple("source_ids", self.source_ids),
         )
+        if (self.mission_pack_id is None) != (self.mission_source_package_hash is None):
+            raise ReplayArtifactError(
+                "Replay mission pack identity fields must be present or absent together."
+            )
+        if self.mission_pack_id is not None:
+            object.__setattr__(
+                self,
+                "mission_pack_id",
+                _validate_identifier("mission_pack_id", self.mission_pack_id),
+            )
+            object.__setattr__(
+                self,
+                "mission_source_package_hash",
+                _validate_sha256("mission_source_package_hash", self.mission_source_package_hash),
+            )
 
     @classmethod
     def from_config(cls, config: GameConfig) -> Self:
         if type(config) is not GameConfig:
             raise ReplayArtifactError("Replay source identity requires a GameConfig.")
         catalog = config.army_catalog
+        mission_pack_id: str | None = None
+        mission_source_package_hash: str | None = None
+        if config.mission_setup is not None:
+            from warhammer40k_core.engine.missions import mission_pack_for_id
+
+            mission_pack = mission_pack_for_id(config.mission_setup.mission_pack_id)
+            mission_pack_id = mission_pack.mission_pack_id
+            mission_source_package_hash = mission_pack.source_package.source_commit_or_import_hash
         return cls(
             game_id=config.game_id,
             game_config_hash=_payload_hash(config.to_payload()),
@@ -174,6 +201,39 @@ class ReplaySourceIdentity:
             catalog_hash=_payload_hash(catalog.to_payload()),
             source_package_id=catalog.source_package_id,
             source_ids=catalog.source_ids,
+            mission_pack_id=mission_pack_id,
+            mission_source_package_hash=mission_source_package_hash,
+        )
+
+    @classmethod
+    def from_lifecycle(cls, lifecycle: GameLifecycle) -> Self:
+        if type(lifecycle) is not GameLifecycle:
+            raise ReplayArtifactError("Replay source identity requires a GameLifecycle.")
+        if lifecycle.state is None:
+            raise ReplayArtifactError("Replay source identity requires a started lifecycle.")
+        config = lifecycle.config
+        mission_setup = lifecycle.state.mission_setup
+        if config.mission_setup is not None:
+            if mission_setup != config.mission_setup:
+                raise ReplayArtifactError("Replay lifecycle mission setup drifted from GameConfig.")
+            return cls.from_config(config)
+        identity = cls.from_config(config)
+        if mission_setup is None:
+            return identity
+        from warhammer40k_core.engine.missions import mission_pack_for_id
+
+        mission_pack = mission_pack_for_id(mission_setup.mission_pack_id)
+        return cls(
+            game_id=identity.game_id,
+            game_config_hash=identity.game_config_hash,
+            ruleset_descriptor_hash=identity.ruleset_descriptor_hash,
+            rules_overlay_ids=identity.rules_overlay_ids,
+            catalog_id=identity.catalog_id,
+            catalog_hash=identity.catalog_hash,
+            source_package_id=identity.source_package_id,
+            source_ids=identity.source_ids,
+            mission_pack_id=mission_pack.mission_pack_id,
+            mission_source_package_hash=(mission_pack.source_package.source_commit_or_import_hash),
         )
 
     def to_payload(self) -> ReplaySourceIdentityPayload:
@@ -186,10 +246,25 @@ class ReplaySourceIdentity:
             "catalog_hash": self.catalog_hash,
             "source_package_id": self.source_package_id,
             "source_ids": list(self.source_ids),
+            "mission_pack_id": self.mission_pack_id,
+            "mission_source_package_hash": self.mission_source_package_hash,
         }
 
     @classmethod
     def from_payload(cls, payload: ReplaySourceIdentityPayload) -> Self:
+        if set(payload) != {
+            "game_id",
+            "game_config_hash",
+            "ruleset_descriptor_hash",
+            "rules_overlay_ids",
+            "catalog_id",
+            "catalog_hash",
+            "source_package_id",
+            "source_ids",
+            "mission_pack_id",
+            "mission_source_package_hash",
+        }:
+            raise ReplayArtifactError("Replay source identity payload fields are invalid.")
         return cls(
             game_id=payload["game_id"],
             game_config_hash=payload["game_config_hash"],
@@ -199,6 +274,8 @@ class ReplaySourceIdentity:
             catalog_hash=payload["catalog_hash"],
             source_package_id=payload["source_package_id"],
             source_ids=tuple(payload["source_ids"]),
+            mission_pack_id=payload["mission_pack_id"],
+            mission_source_package_hash=payload["mission_source_package_hash"],
         )
 
 
@@ -368,7 +445,7 @@ class ReplayArtifact:
             raise ReplayArtifactError("ReplayArtifact source_identity is invalid.")
         initial_payload = _lifecycle_payload(self.initial_lifecycle_payload)
         initial_lifecycle = GameLifecycle.from_payload(initial_payload)
-        if ReplaySourceIdentity.from_config(initial_lifecycle.config) != self.source_identity:
+        if ReplaySourceIdentity.from_lifecycle(initial_lifecycle) != self.source_identity:
             raise ReplayArtifactError("ReplayArtifact source identity drifted from snapshot.")
         object.__setattr__(self, "initial_lifecycle_payload", initial_payload)
 
@@ -408,8 +485,8 @@ class ReplayArtifact:
             raise ReplayArtifactError("ReplayArtifact capture requires a final GameLifecycle.")
         initial_payload = _lifecycle_payload(initial_lifecycle_payload)
         initial_lifecycle = GameLifecycle.from_payload(initial_payload)
-        source_identity = ReplaySourceIdentity.from_config(initial_lifecycle.config)
-        if ReplaySourceIdentity.from_config(final_lifecycle.config) != source_identity:
+        source_identity = ReplaySourceIdentity.from_lifecycle(initial_lifecycle)
+        if ReplaySourceIdentity.from_lifecycle(final_lifecycle) != source_identity:
             raise ReplayArtifactError("ReplayArtifact final lifecycle source identity drifted.")
         initial_record_count = len(initial_lifecycle.decision_controller.records)
         initial_event_count = len(initial_lifecycle.decision_controller.event_log.records)

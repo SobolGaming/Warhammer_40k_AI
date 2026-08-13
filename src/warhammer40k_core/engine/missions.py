@@ -16,12 +16,16 @@ from warhammer40k_core.core.missions import (
 from warhammer40k_core.core.ruleset_descriptor import reserve_destruction_timing_kind_from_token
 from warhammer40k_core.core.terrain_layouts import TerrainLayoutTemplate
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.mission_scoring_policies import MissionScoringPolicies
 from warhammer40k_core.engine.mission_setup import (
     MissionSetup,
     instantiate_terrain_layout_template,
     validate_mission_setup_source_layout_identity,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_scoring_condition_evaluator import (
+    SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS,
+)
 from warhammer40k_core.engine.reserves import ReserveDestructionTimingPolicy
 from warhammer40k_core.engine.scoring import (
     MissionActionScoringRule,
@@ -44,80 +48,91 @@ _SUPPORTED_CONTROL_OBJECTIVE_PRIMARY_CONDITIONS = frozenset(
         "each_controlled_objective_from_battle_round_two",
     )
 )
-_SUPPORTED_STRUCTURED_PRIMARY_CONDITIONS = (
-    _SUPPORTED_CONTROL_OBJECTIVE_PRIMARY_CONDITIONS
-    | frozenset(
-        (
-            "control_one_or_more_central_objectives",
-            "control_one_or_more_central_objectives_end_of_battle",
-            "control_one_or_more_new_non_home_objectives",
-            "control_one_or_more_non_home_objectives_from_battle_round_two",
-            "each_non_home_objective_controlled_battle_rounds_two_to_four",
-            "each_non_home_objective_controlled_from_battle_round_two",
-            "each_non_home_objective_controlled_round_five",
-            "each_terrain_area_trapped_this_turn",
-            "each_trapped_objective_terrain_area_this_turn",
-            "more_enemy_units_destroyed_than_friendly_previous_turn",
-            "one_or_more_enemy_units_destroyed_after_starting_turn_in_trapped_terrain",
-            "one_or_more_enemy_units_destroyed_this_turn",
-            "control_opponent_home_objective",
-        )
+_SUPPORTED_STRUCTURED_PRIMARY_CONDITIONS = SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS | frozenset(
+    (
+        "each_terrain_area_trapped_this_turn",
+        "each_trapped_objective_terrain_area_this_turn",
+        "one_or_more_enemy_units_destroyed_after_starting_turn_in_trapped_terrain",
     )
 )
 
 
-def mission_scoring_policy_from_setup(mission_setup: MissionSetup) -> MissionScoringPolicy:
+def mission_scoring_policies_from_setup(mission_setup: MissionSetup) -> MissionScoringPolicies:
     if type(mission_setup) is not MissionSetup:
-        raise GameLifecycleError("Mission scoring policy requires MissionSetup.")
+        raise GameLifecycleError("Mission scoring policies require MissionSetup.")
     mission_pack = mission_pack_for_id(mission_setup.mission_pack_id)
-    primary = None
-    for mission in mission_pack.primary_missions:
-        if mission.primary_mission_id == mission_setup.primary_mission_id:
-            primary = mission
-            break
-    if primary is None:
-        raise GameLifecycleError("Primary mission is missing from mission pack.")
-    primary_rules = _primary_scoring_rules_from_primary(primary)
-    legacy_primary_rule = _legacy_control_objective_primary_rule(primary)
+    _source_mission_pool_entry(mission_setup=mission_setup, mission_pack=mission_pack)
     scoring = mission_pack.scoring
     caps = mission_pack.scoring_caps
-    return MissionScoringPolicy(
-        mission_pack_id=mission_setup.mission_pack_id,
-        primary_mission_id=mission_setup.primary_mission_id,
-        game_length_battle_rounds=scoring.game_length_battle_rounds,
-        primary_scoring_phase=scoring.primary_scoring_phase,
-        primary_scoring_timing=objective_control_timing_from_token(scoring.primary_scoring_timing),
-        primary_scoring_rule_id=(
-            None if legacy_primary_rule is None else legacy_primary_rule.rule_id
-        ),
-        primary_scoring_rule_condition=(
-            None if legacy_primary_rule is None else legacy_primary_rule.condition
-        ),
-        primary_scoring_rule_source_id=(
-            None if legacy_primary_rule is None else legacy_primary_rule.source_id
-        ),
-        primary_vp_per_controlled_objective=primary.vp_per_controlled_objective,
-        primary_max_vp_per_turn=primary.max_vp_per_turn,
-        primary_scoring_rules=primary_rules,
-        secondary_vp_per_score=scoring.secondary_vp_per_score,
-        secondary_scoring_rules=_secondary_scoring_rules_from_mission_pack(mission_pack),
-        mission_action_scoring_rules=_mission_action_scoring_rules_from_mission_pack(mission_pack),
-        mission_action_vp=scoring.mission_action_vp,
-        reserve_destruction_timing=scoring.reserve_destruction_timing,
-        reserve_destruction_battle_round=scoring.reserve_destruction_battle_round,
-        reserve_destruction_excludes_during_battle_strategic_reserves=(
-            scoring.reserve_destruction_excludes_during_battle_strategic_reserves
-        ),
-        reserve_destruction_only_declare_battle_formations=(
-            scoring.reserve_destruction_only_declare_battle_formations
-        ),
-        primary_vp_cap=scoring.primary_vp_cap,
-        secondary_vp_cap=scoring.secondary_vp_cap,
-        battle_ready_vp=caps.battle_ready_vp,
-        total_vp_cap=scoring.total_vp_cap,
-        end_of_round_scoring_windows=scoring.end_of_round_scoring_windows,
-        end_of_game_scoring_windows=scoring.end_of_game_scoring_windows,
-        source_id=f"{mission_setup.source_id}:scoring:{mission_setup.primary_mission_id}",
+    primary_by_id = {
+        primary.primary_mission_id: primary for primary in mission_pack.primary_missions
+    }
+    player_policies: list[MissionScoringPolicy] = []
+    for assignment in mission_setup.primary_mission_assignments:
+        primary = primary_by_id.get(assignment.primary_mission_id)
+        if primary is None:
+            raise GameLifecycleError("Primary mission is missing from mission pack.")
+        primary_rules = primary_scoring_rules_from_definition(
+            primary,
+            require_supported=False,
+        )
+        legacy_primary_rule = _legacy_control_objective_primary_rule(primary)
+        player_policies.append(
+            MissionScoringPolicy(
+                player_id=assignment.player_id,
+                force_disposition_id=assignment.force_disposition_id,
+                mission_pack_id=mission_setup.mission_pack_id,
+                primary_mission_id=assignment.primary_mission_id,
+                primary_scoring_supported=bool(primary_rules),
+                game_length_battle_rounds=scoring.game_length_battle_rounds,
+                primary_scoring_phase=scoring.primary_scoring_phase,
+                primary_scoring_timing=objective_control_timing_from_token(
+                    scoring.primary_scoring_timing
+                ),
+                primary_scoring_rule_id=(
+                    None if legacy_primary_rule is None else legacy_primary_rule.rule_id
+                ),
+                primary_scoring_rule_condition=(
+                    None if legacy_primary_rule is None else legacy_primary_rule.condition
+                ),
+                primary_scoring_rule_source_id=(
+                    None if legacy_primary_rule is None else legacy_primary_rule.source_id
+                ),
+                primary_vp_per_controlled_objective=primary.vp_per_controlled_objective,
+                primary_max_vp_per_turn=primary.max_vp_per_turn,
+                primary_scoring_rules=primary_rules,
+                secondary_vp_per_score=scoring.secondary_vp_per_score,
+                secondary_scoring_rules=_secondary_scoring_rules_from_mission_pack(mission_pack),
+                mission_action_scoring_rules=_mission_action_scoring_rules_from_mission_pack(
+                    mission_pack
+                ),
+                mission_action_vp=scoring.mission_action_vp,
+                reserve_destruction_timing=scoring.reserve_destruction_timing,
+                reserve_destruction_battle_round=scoring.reserve_destruction_battle_round,
+                reserve_destruction_excludes_during_battle_strategic_reserves=(
+                    scoring.reserve_destruction_excludes_during_battle_strategic_reserves
+                ),
+                reserve_destruction_only_declare_battle_formations=(
+                    scoring.reserve_destruction_only_declare_battle_formations
+                ),
+                primary_vp_cap=scoring.primary_vp_cap,
+                secondary_vp_cap=scoring.secondary_vp_cap,
+                battle_ready_vp=caps.battle_ready_vp,
+                total_vp_cap=scoring.total_vp_cap,
+                end_of_round_scoring_windows=scoring.end_of_round_scoring_windows,
+                end_of_game_scoring_windows=scoring.end_of_game_scoring_windows,
+                source_id=(
+                    f"{mission_setup.source_id}:scoring:{assignment.player_id}:"
+                    f"{assignment.primary_mission_id}"
+                ),
+            )
+        )
+    return MissionScoringPolicies(
+        source_id=f"{mission_setup.source_id}:scoring",
+        mission_setup_source_id=mission_setup.source_id,
+        mission_pool_entry_id=mission_setup.mission_pool_entry_id,
+        primary_mission_assignments=mission_setup.primary_mission_assignments,
+        player_policies=tuple(player_policies),
     )
 
 
@@ -133,6 +148,10 @@ def validate_mission_setup_source_layout(mission_setup: MissionSetup) -> None:
     if type(mission_setup) is not MissionSetup:
         raise GameLifecycleError("Source-layout validation requires MissionSetup.")
     mission_pack = mission_pack_for_id(mission_setup.mission_pack_id)
+    pool_entry = _source_mission_pool_entry(
+        mission_setup=mission_setup,
+        mission_pack=mission_pack,
+    )
     if mission_setup.battlefield_layout_id is None:
         if any(
             layout.deployment_map_id == mission_setup.deployment_map_id
@@ -175,10 +194,6 @@ def validate_mission_setup_source_layout(mission_setup: MissionSetup) -> None:
             mission_pack=mission_pack,
         )
         return
-    pool_entry = _source_mission_pool_entry(
-        mission_setup=mission_setup,
-        mission_pack=mission_pack,
-    )
     matching_layouts = tuple(
         layout
         for layout in mission_pack.battlefield_layouts
@@ -239,7 +254,13 @@ def canonical_layoutless_mission_setup_from_source(
         mission_pool_entry_id=pool_entry.mission_pool_entry_id,
         terrain_layout_id=mission_setup.terrain_layout_id,
         attacker_player_id=mission_setup.attacker_player_id,
+        attacker_force_disposition_id=mission_setup.force_disposition_id_for_player(
+            mission_setup.attacker_player_id
+        ),
         defender_player_id=mission_setup.defender_player_id,
+        defender_force_disposition_id=mission_setup.force_disposition_id_for_player(
+            mission_setup.defender_player_id
+        ),
     )
 
 
@@ -275,8 +296,56 @@ def _validate_source_mission_identity(
         or mission_setup.source_version != mission_pack.source_version
     ):
         raise GameLifecycleError("MissionSetup source package identity drifted.")
-    if mission_setup.primary_mission_id != pool_entry.primary_mission_id:
-        raise GameLifecycleError("MissionSetup primary mission drifted from mission pool entry.")
+    _validate_source_primary_assignments(
+        mission_setup=mission_setup,
+        mission_pack=mission_pack,
+        pool_entry=pool_entry,
+        battlefield_layout_id=mission_setup.battlefield_layout_id,
+    )
+
+
+def _validate_source_primary_assignments(
+    *,
+    mission_setup: MissionSetup,
+    mission_pack: MissionPackDefinition,
+    pool_entry: MissionPoolEntry,
+    battlefield_layout_id: str | None,
+) -> None:
+    attacker_disposition_id = mission_setup.force_disposition_id_for_player(
+        mission_setup.attacker_player_id
+    )
+    defender_disposition_id = mission_setup.force_disposition_id_for_player(
+        mission_setup.defender_player_id
+    )
+    entry_dispositions_match = (
+        pool_entry.player_force_disposition_id == attacker_disposition_id
+        and pool_entry.opponent_force_disposition_id == defender_disposition_id
+    ) or (
+        pool_entry.player_force_disposition_id == defender_disposition_id
+        and pool_entry.opponent_force_disposition_id == attacker_disposition_id
+    )
+    if not entry_dispositions_match:
+        raise GameLifecycleError("MissionSetup Force Dispositions drifted from mission pool entry.")
+    assignments = mission_setup.primary_mission_assignments
+    for assignment in assignments:
+        opponent = next(
+            candidate for candidate in assignments if candidate.player_id != assignment.player_id
+        )
+        matrix_cell = mission_pack.primary_mission_matrix_cell(
+            player_force_disposition_id=assignment.force_disposition_id,
+            opponent_force_disposition_id=opponent.force_disposition_id,
+        )
+        if assignment.primary_mission_id != matrix_cell.primary_mission_id:
+            raise GameLifecycleError(
+                "MissionSetup Primary mission assignment drifted from directional matrix."
+            )
+        if (
+            battlefield_layout_id is not None
+            and battlefield_layout_id not in matrix_cell.battlefield_layout_ids
+        ):
+            raise GameLifecycleError(
+                "MissionSetup battlefield layout is not legal for a directional Primary mission."
+            )
 
 
 def _validate_custom_battlefield_region_provenance(
@@ -402,15 +471,19 @@ def _legacy_control_objective_primary_rule(
     return rules[0]
 
 
-def _primary_scoring_rules_from_primary(
+def primary_scoring_rules_from_definition(
     primary: PrimaryMissionDefinition,
+    *,
+    require_supported: bool = True,
 ) -> tuple[PrimaryMissionScoringRule, ...]:
     if type(primary) is not PrimaryMissionDefinition:
         raise GameLifecycleError("Primary scoring rules require PrimaryMissionDefinition.")
     if primary.scoring_kind == "event_companion_primary_source_known_engine_pending":
-        raise GameLifecycleError(
-            "Primary mission scoring source is known but engine implementation is pending."
-        )
+        if require_supported:
+            raise GameLifecycleError(
+                "Primary mission scoring source is known but engine implementation is pending."
+            )
+        return ()
     rules: list[PrimaryMissionScoringRule] = []
     for rule in primary.scoring_rules:
         if rule.source_kind != VictoryPointSourceKind.PRIMARY.value:
@@ -427,6 +500,8 @@ def _primary_scoring_rules_from_primary(
                 victory_points=rule.victory_points,
                 cap=rule.cap,
                 condition=rule.condition,
+                resolution_mode=rule.resolution_mode,
+                resolution_group_id=rule.resolution_group_id,
                 source_id=rule.source_id,
             )
         )

@@ -1012,7 +1012,9 @@ def _compact_terminal_config(*, game_id: str) -> GameConfig:
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id=PLAYER_A,
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id=PLAYER_B,
+            defender_force_disposition_id="purge-the-foe",
         ),
     )
 
@@ -1034,7 +1036,7 @@ def _compact_army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=("take-and-hold" if player_id == "player-a" else "purge-the-foe"),
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

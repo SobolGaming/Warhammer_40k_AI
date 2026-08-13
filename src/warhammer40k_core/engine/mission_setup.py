@@ -43,12 +43,18 @@ from warhammer40k_core.geometry.terrain import (
 )
 
 
+class PlayerPrimaryMissionAssignmentPayload(TypedDict):
+    player_id: str
+    force_disposition_id: str
+    primary_mission_id: str
+
+
 class MissionSetupPayload(TypedDict):
     mission_pack_id: str
     source_version: str
     source_id: str
     mission_pool_entry_id: str
-    primary_mission_id: str
+    primary_mission_assignments: list[PlayerPrimaryMissionAssignmentPayload]
     battlefield_layout_id: str | None
     deployment_map_id: str
     terrain_layout_id: str
@@ -69,12 +75,62 @@ class MissionSetupError(GameLifecycleError):
 
 
 @dataclass(frozen=True, slots=True)
+class PlayerPrimaryMissionAssignment:
+    player_id: str
+    force_disposition_id: str
+    primary_mission_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "player_id",
+            _validate_identifier(
+                "PlayerPrimaryMissionAssignment player_id",
+                self.player_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "force_disposition_id",
+            _validate_identifier(
+                "PlayerPrimaryMissionAssignment force_disposition_id",
+                self.force_disposition_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "primary_mission_id",
+            _validate_identifier(
+                "PlayerPrimaryMissionAssignment primary_mission_id",
+                self.primary_mission_id,
+            ),
+        )
+
+    def to_payload(self) -> PlayerPrimaryMissionAssignmentPayload:
+        return {
+            "player_id": self.player_id,
+            "force_disposition_id": self.force_disposition_id,
+            "primary_mission_id": self.primary_mission_id,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: PlayerPrimaryMissionAssignmentPayload) -> Self:
+        if set(payload) != {"player_id", "force_disposition_id", "primary_mission_id"}:
+            raise MissionSetupError("PlayerPrimaryMissionAssignment payload fields are invalid.")
+        return cls(
+            player_id=payload["player_id"],
+            force_disposition_id=payload["force_disposition_id"],
+            primary_mission_id=payload["primary_mission_id"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class MissionSetup:
     mission_pack_id: str
     source_version: str
     source_id: str
     mission_pool_entry_id: str
-    primary_mission_id: str
+    primary_mission_assignments: tuple[PlayerPrimaryMissionAssignment, ...]
     battlefield_layout_id: str | None
     deployment_map_id: str
     terrain_layout_id: str
@@ -115,11 +171,6 @@ class MissionSetup:
         )
         object.__setattr__(
             self,
-            "primary_mission_id",
-            _validate_identifier("MissionSetup primary_mission_id", self.primary_mission_id),
-        )
-        object.__setattr__(
-            self,
             "battlefield_layout_id",
             _validate_optional_identifier(
                 "MissionSetup battlefield_layout_id",
@@ -142,6 +193,14 @@ class MissionSetup:
             raise MissionSetupError("MissionSetup attacker and defender must differ.")
         object.__setattr__(self, "attacker_player_id", attacker)
         object.__setattr__(self, "defender_player_id", defender)
+        object.__setattr__(
+            self,
+            "primary_mission_assignments",
+            _validate_player_primary_mission_assignments(
+                self.primary_mission_assignments,
+                player_ids=(attacker, defender),
+            ),
+        )
         object.__setattr__(
             self,
             "battlefield_width_inches",
@@ -237,7 +296,9 @@ class MissionSetup:
         mission_pool_entry_id: str,
         terrain_layout_id: str | None = None,
         attacker_player_id: str,
+        attacker_force_disposition_id: str,
         defender_player_id: str,
+        defender_force_disposition_id: str,
     ) -> Self:
         if type(mission_pack) is not MissionPackDefinition:
             raise MissionSetupError("mission_pack must be a MissionPackDefinition.")
@@ -267,12 +328,13 @@ class MissionSetup:
         return cls.from_components(
             mission_pack=mission_pack,
             mission_pool_entry_id=pool_entry.mission_pool_entry_id,
-            primary_mission_id=pool_entry.primary_mission_id,
             deployment_map=deployment_map,
             terrain_layout=terrain_layout,
             battlefield_layout=battlefield_layout,
             attacker_player_id=attacker_player_id,
+            attacker_force_disposition_id=attacker_force_disposition_id,
             defender_player_id=defender_player_id,
+            defender_force_disposition_id=defender_force_disposition_id,
         )
 
     @classmethod
@@ -281,12 +343,13 @@ class MissionSetup:
         *,
         mission_pack: MissionPackDefinition,
         mission_pool_entry_id: str | None = None,
-        primary_mission_id: str,
         deployment_map: DeploymentMapDefinition,
         terrain_layout: TerrainLayoutTemplate,
         battlefield_layout: BattlefieldLayoutDefinition | None = None,
         attacker_player_id: str,
+        attacker_force_disposition_id: str,
         defender_player_id: str,
+        defender_force_disposition_id: str,
     ) -> Self:
         if type(mission_pack) is not MissionPackDefinition:
             raise MissionSetupError("mission_pack must be a MissionPackDefinition.")
@@ -304,9 +367,17 @@ class MissionSetup:
         pool_entry = _mission_pool_entry_for_components(
             mission_pack=mission_pack,
             mission_pool_entry_id=mission_pool_entry_id,
-            primary_mission_id=primary_mission_id,
+            attacker_force_disposition_id=attacker_force_disposition_id,
+            defender_force_disposition_id=defender_force_disposition_id,
             deployment_map=deployment_map,
             terrain_layout=terrain_layout,
+        )
+        primary_assignments = _player_primary_mission_assignments(
+            mission_pack=mission_pack,
+            attacker_player_id=attacker_player_id,
+            attacker_force_disposition_id=attacker_force_disposition_id,
+            defender_player_id=defender_player_id,
+            defender_force_disposition_id=defender_force_disposition_id,
         )
         if deployment_map.battlefield_width_inches != terrain_layout.battlefield_width_inches:
             raise MissionSetupError("Deployment map and terrain layout battlefield widths differ.")
@@ -324,6 +395,12 @@ class MissionSetup:
                 battlefield_layout=battlefield_layout,
                 deployment_map=deployment_map,
                 terrain_layout=terrain_layout,
+            )
+            _validate_battlefield_layout_matches_force_dispositions(
+                mission_pack=mission_pack,
+                battlefield_layout=battlefield_layout,
+                attacker_force_disposition_id=attacker_force_disposition_id,
+                defender_force_disposition_id=defender_force_disposition_id,
             )
         objective_markers = (
             deployment_map.objective_markers
@@ -347,7 +424,7 @@ class MissionSetup:
             source_version=mission_pack.source_version,
             source_id=mission_pack.source_id,
             mission_pool_entry_id=pool_entry.mission_pool_entry_id,
-            primary_mission_id=pool_entry.primary_mission_id,
+            primary_mission_assignments=primary_assignments,
             battlefield_layout_id=(
                 None if battlefield_layout is None else battlefield_layout.battlefield_layout_id
             ),
@@ -389,13 +466,31 @@ class MissionSetup:
             zone for zone in self.deployment_zones if zone.player_id != requested_player_id
         )
 
+    def primary_mission_assignment_for_player(
+        self,
+        player_id: str,
+    ) -> PlayerPrimaryMissionAssignment:
+        requested_player_id = _validate_identifier("player_id", player_id)
+        for assignment in self.primary_mission_assignments:
+            if assignment.player_id == requested_player_id:
+                return assignment
+        raise MissionSetupError("player_id is not part of this mission setup.")
+
+    def primary_mission_id_for_player(self, player_id: str) -> str:
+        return self.primary_mission_assignment_for_player(player_id).primary_mission_id
+
+    def force_disposition_id_for_player(self, player_id: str) -> str:
+        return self.primary_mission_assignment_for_player(player_id).force_disposition_id
+
     def to_payload(self) -> MissionSetupPayload:
         return {
             "mission_pack_id": self.mission_pack_id,
             "source_version": self.source_version,
             "source_id": self.source_id,
             "mission_pool_entry_id": self.mission_pool_entry_id,
-            "primary_mission_id": self.primary_mission_id,
+            "primary_mission_assignments": [
+                assignment.to_payload() for assignment in self.primary_mission_assignments
+            ],
             "battlefield_layout_id": self.battlefield_layout_id,
             "deployment_map_id": self.deployment_map_id,
             "terrain_layout_id": self.terrain_layout_id,
@@ -416,12 +511,36 @@ class MissionSetup:
 
     @classmethod
     def from_payload(cls, payload: MissionSetupPayload) -> Self:
+        if set(payload) != {
+            "mission_pack_id",
+            "source_version",
+            "source_id",
+            "mission_pool_entry_id",
+            "primary_mission_assignments",
+            "battlefield_layout_id",
+            "deployment_map_id",
+            "terrain_layout_id",
+            "attacker_player_id",
+            "defender_player_id",
+            "battlefield_width_inches",
+            "battlefield_depth_inches",
+            "objective_markers",
+            "deployment_zones",
+            "battlefield_regions",
+            "terrain_areas",
+            "objective_terrain_areas",
+            "terrain_features",
+        }:
+            raise MissionSetupError("MissionSetup payload fields are invalid.")
         return cls(
             mission_pack_id=payload["mission_pack_id"],
             source_version=payload["source_version"],
             source_id=payload["source_id"],
             mission_pool_entry_id=payload["mission_pool_entry_id"],
-            primary_mission_id=payload["primary_mission_id"],
+            primary_mission_assignments=tuple(
+                PlayerPrimaryMissionAssignment.from_payload(assignment)
+                for assignment in payload["primary_mission_assignments"]
+            ),
             battlefield_layout_id=payload["battlefield_layout_id"],
             deployment_map_id=payload["deployment_map_id"],
             terrain_layout_id=payload["terrain_layout_id"],
@@ -589,18 +708,80 @@ def _terrain_features_from_area_placements(
     return tuple(sorted(features, key=lambda feature: feature.feature_id))
 
 
+def _player_primary_mission_assignments(
+    *,
+    mission_pack: MissionPackDefinition,
+    attacker_player_id: str,
+    attacker_force_disposition_id: str,
+    defender_player_id: str,
+    defender_force_disposition_id: str,
+) -> tuple[PlayerPrimaryMissionAssignment, ...]:
+    attacker = _validate_identifier("attacker_player_id", attacker_player_id)
+    defender = _validate_identifier("defender_player_id", defender_player_id)
+    if attacker == defender:
+        raise MissionSetupError("Attacker and defender player IDs must differ.")
+    attacker_disposition = _validate_identifier(
+        "attacker_force_disposition_id",
+        attacker_force_disposition_id,
+    )
+    defender_disposition = _validate_identifier(
+        "defender_force_disposition_id",
+        defender_force_disposition_id,
+    )
+    known_disposition_ids = {
+        disposition.force_disposition_id for disposition in mission_pack.force_dispositions
+    }
+    if attacker_disposition not in known_disposition_ids:
+        raise MissionSetupError("Attacker Force Disposition is not present in the mission pack.")
+    if defender_disposition not in known_disposition_ids:
+        raise MissionSetupError("Defender Force Disposition is not present in the mission pack.")
+    attacker_primary = mission_pack.primary_mission_matrix_cell(
+        player_force_disposition_id=attacker_disposition,
+        opponent_force_disposition_id=defender_disposition,
+    ).primary_mission_id
+    defender_primary = mission_pack.primary_mission_matrix_cell(
+        player_force_disposition_id=defender_disposition,
+        opponent_force_disposition_id=attacker_disposition,
+    ).primary_mission_id
+    return tuple(
+        sorted(
+            (
+                PlayerPrimaryMissionAssignment(
+                    player_id=attacker,
+                    force_disposition_id=attacker_disposition,
+                    primary_mission_id=attacker_primary,
+                ),
+                PlayerPrimaryMissionAssignment(
+                    player_id=defender,
+                    force_disposition_id=defender_disposition,
+                    primary_mission_id=defender_primary,
+                ),
+            ),
+            key=lambda assignment: assignment.player_id,
+        )
+    )
+
+
 def _mission_pool_entry_for_components(
     *,
     mission_pack: MissionPackDefinition,
     mission_pool_entry_id: str | None,
-    primary_mission_id: str,
+    attacker_force_disposition_id: str,
+    defender_force_disposition_id: str,
     deployment_map: DeploymentMapDefinition,
     terrain_layout: TerrainLayoutTemplate,
 ) -> MissionPoolEntry:
-    primary_id = _validate_identifier("primary_mission_id", primary_mission_id)
+    attacker_disposition_id = _validate_identifier(
+        "attacker_force_disposition_id",
+        attacker_force_disposition_id,
+    )
+    defender_disposition_id = _validate_identifier(
+        "defender_force_disposition_id",
+        defender_force_disposition_id,
+    )
     _validate_component_belongs_to_mission_pack(
         mission_pack=mission_pack,
-        primary_mission_id=primary_id,
+        force_disposition_ids=(attacker_disposition_id, defender_disposition_id),
         deployment_map=deployment_map,
         terrain_layout=terrain_layout,
     )
@@ -613,7 +794,8 @@ def _mission_pool_entry_for_components(
             if entry.mission_pool_entry_id == requested_entry_id:
                 if not _mission_pool_entry_matches_components(
                     entry=entry,
-                    primary_mission_id=primary_id,
+                    attacker_force_disposition_id=attacker_disposition_id,
+                    defender_force_disposition_id=defender_disposition_id,
                     deployment_map=deployment_map,
                     terrain_layout=terrain_layout,
                 ):
@@ -628,7 +810,8 @@ def _mission_pool_entry_for_components(
         for entry in mission_pack.mission_pool_entries
         if _mission_pool_entry_matches_components(
             entry=entry,
-            primary_mission_id=primary_id,
+            attacker_force_disposition_id=attacker_disposition_id,
+            defender_force_disposition_id=defender_disposition_id,
             deployment_map=deployment_map,
             terrain_layout=terrain_layout,
         )
@@ -645,14 +828,18 @@ def _mission_pool_entry_for_components(
 def _validate_component_belongs_to_mission_pack(
     *,
     mission_pack: MissionPackDefinition,
-    primary_mission_id: str,
+    force_disposition_ids: tuple[str, str],
     deployment_map: DeploymentMapDefinition,
     terrain_layout: TerrainLayoutTemplate,
 ) -> None:
-    if primary_mission_id not in {
-        mission.primary_mission_id for mission in mission_pack.primary_missions
-    }:
-        raise MissionSetupError("Primary mission is not present in the mission pack.")
+    known_force_disposition_ids = {
+        disposition.force_disposition_id for disposition in mission_pack.force_dispositions
+    }
+    if any(
+        force_disposition_id not in known_force_disposition_ids
+        for force_disposition_id in force_disposition_ids
+    ):
+        raise MissionSetupError("Force disposition is not present in the mission pack.")
     source_deployment_map = next(
         (
             candidate
@@ -745,18 +932,79 @@ def _validate_battlefield_layout_matches_components(
         )
 
 
+def _validate_battlefield_layout_matches_force_dispositions(
+    *,
+    mission_pack: MissionPackDefinition,
+    battlefield_layout: BattlefieldLayoutDefinition,
+    attacker_force_disposition_id: str,
+    defender_force_disposition_id: str,
+) -> None:
+    attacker_cell = mission_pack.primary_mission_matrix_cell(
+        player_force_disposition_id=attacker_force_disposition_id,
+        opponent_force_disposition_id=defender_force_disposition_id,
+    )
+    defender_cell = mission_pack.primary_mission_matrix_cell(
+        player_force_disposition_id=defender_force_disposition_id,
+        opponent_force_disposition_id=attacker_force_disposition_id,
+    )
+    if battlefield_layout.battlefield_layout_id not in attacker_cell.battlefield_layout_ids:
+        raise MissionSetupError(
+            "Battlefield layout is not legal for the attacker Force Disposition matchup."
+        )
+    if battlefield_layout.battlefield_layout_id not in defender_cell.battlefield_layout_ids:
+        raise MissionSetupError(
+            "Battlefield layout is not legal for the defender Force Disposition matchup."
+        )
+
+
 def _mission_pool_entry_matches_components(
     *,
     entry: MissionPoolEntry,
-    primary_mission_id: str,
+    attacker_force_disposition_id: str,
+    defender_force_disposition_id: str,
     deployment_map: DeploymentMapDefinition,
     terrain_layout: TerrainLayoutTemplate,
 ) -> bool:
+    dispositions_match = (
+        entry.player_force_disposition_id == attacker_force_disposition_id
+        and entry.opponent_force_disposition_id == defender_force_disposition_id
+    ) or (
+        entry.player_force_disposition_id == defender_force_disposition_id
+        and entry.opponent_force_disposition_id == attacker_force_disposition_id
+    )
     return (
-        entry.primary_mission_id == primary_mission_id
+        dispositions_match
         and entry.deployment_map_id == deployment_map.deployment_map_id
         and terrain_layout.terrain_layout_id in entry.terrain_layout_ids
     )
+
+
+def _validate_player_primary_mission_assignments(
+    values: object,
+    *,
+    player_ids: tuple[str, str],
+) -> tuple[PlayerPrimaryMissionAssignment, ...]:
+    if type(values) is not tuple:
+        raise MissionSetupError("MissionSetup primary_mission_assignments must be a tuple.")
+    assignments: list[PlayerPrimaryMissionAssignment] = []
+    seen_player_ids: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not PlayerPrimaryMissionAssignment:
+            raise MissionSetupError(
+                "MissionSetup primary_mission_assignments must contain "
+                "PlayerPrimaryMissionAssignment values."
+            )
+        if value.player_id in seen_player_ids:
+            raise MissionSetupError(
+                "MissionSetup primary_mission_assignments must be unique by player."
+            )
+        seen_player_ids.add(value.player_id)
+        assignments.append(value)
+    if seen_player_ids != set(player_ids):
+        raise MissionSetupError(
+            "MissionSetup primary_mission_assignments must match attacker and defender."
+        )
+    return tuple(sorted(assignments, key=lambda assignment: assignment.player_id))
 
 
 def _validate_objective_markers(

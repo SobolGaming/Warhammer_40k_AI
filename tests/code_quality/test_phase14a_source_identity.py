@@ -47,7 +47,7 @@ RAW_BYTE_HASHED_JSON_ARTIFACTS = (
     / "source_packages"
     / "warhammer_40000_11th"
     / "event_companion_2026_06_artifacts"
-    / "primary-meatgrinder-scoring.json",
+    / "primary-scoring.json",
     ROOT
     / "src"
     / "warhammer40k_core"

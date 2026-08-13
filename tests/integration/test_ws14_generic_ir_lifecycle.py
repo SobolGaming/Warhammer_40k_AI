@@ -1279,7 +1279,7 @@ def _more_dakka_catalog() -> ArmyCatalog:
                 faction_id="orks",
                 detachment_point_cost=1,
                 unit_datasheet_ids=("ws14-orks-boyz", "ws14-orks-walker"),
-                force_disposition_ids=("purge-the-foe",),
+                force_disposition_ids=("purge-the-foe", "take-and-hold"),
                 rule_source_ids=("phase17e:orks:more-dakka:rule",),
                 enhancement_ids=(
                     "000009991002",
@@ -1451,7 +1451,7 @@ def _spectacle_catalog() -> ArmyCatalog:
                 faction_id="emperors-children",
                 detachment_point_cost=1,
                 unit_datasheet_ids=("ws14-emperors-children-flawless-blades",),
-                force_disposition_ids=("purge-the-foe",),
+                force_disposition_ids=("purge-the-foe", "take-and-hold"),
                 rule_source_ids=("phase17e:emperors-children:spectacle-of-slaughter:rule",),
                 enhancement_ids=("000010900002", "000010900003"),
                 stratagem_ids=("000010901002", "000010901003", "000010901004"),
@@ -1514,7 +1514,7 @@ def _spectacle_muster_request(
             detachment_ids=("spectacle-of-slaughter",),
             enhancement_ids=("000010900002", "000010900003"),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=("take-and-hold" if player_id == "player-a" else "purge-the-foe"),
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,
@@ -1714,7 +1714,7 @@ def _court_catalog() -> ArmyCatalog:
                     "ws14-court-infantry",
                     "ws14-court-enemy-character",
                 ),
-                force_disposition_ids=("purge-the-foe",),
+                force_disposition_ids=("purge-the-foe", "take-and-hold"),
                 rule_source_ids=("phase17e:emperors-children:court-of-the-phoenician:rule",),
                 enhancement_ids=(
                     "000010654002",
@@ -1813,7 +1813,7 @@ def _court_muster_request(
                 "000010654005",
             ),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=("take-and-hold" if player_id == "player-a" else "purge-the-foe"),
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,
@@ -1897,7 +1897,7 @@ def _more_dakka_muster_request(
             detachment_ids=("more-dakka",),
             enhancement_ids=("000009991003", "000009991004", "000009991005"),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=("take-and-hold" if player_id == "player-a" else "purge-the-foe"),
         unit_selections=tuple(unit_selections),
         enhancement_assignments=(
             EnhancementAssignment(
@@ -1916,7 +1916,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 

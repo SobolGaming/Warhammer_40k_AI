@@ -74,7 +74,9 @@ def test_event_companion_area_placed_terrain_features_resolve_from_source_data()
         mission_pool_entry_id=mission_pool_entry.mission_pool_entry_id,
         terrain_layout_id=layout_id,
         attacker_player_id="player-a",
+        attacker_force_disposition_id=mission_pool_entry.player_force_disposition_id,
         defender_player_id="player-b",
+        defender_force_disposition_id=mission_pool_entry.opponent_force_disposition_id,
     )
     area_placements = tuple(
         placement
@@ -118,7 +120,9 @@ def test_source_terrain_transforms_publish_canonical_coordinates() -> None:
         mission_pool_entry_id=mission_pool_entry.mission_pool_entry_id,
         terrain_layout_id=layout_id,
         attacker_player_id="player-a",
+        attacker_force_disposition_id=mission_pool_entry.player_force_disposition_id,
         defender_player_id="player-b",
+        defender_force_disposition_id=mission_pool_entry.opponent_force_disposition_id,
     )
     feature = next(
         terrain_feature
@@ -243,7 +247,9 @@ def test_mirrored_asymmetric_preset_uses_terrain_area_local_transform_anchor() -
         mission_pool_entry_id=mission_pool_entry.mission_pool_entry_id,
         terrain_layout_id=layout_id,
         attacker_player_id="player-a",
+        attacker_force_disposition_id=mission_pool_entry.player_force_disposition_id,
         defender_player_id="player-b",
+        defender_force_disposition_id=mission_pool_entry.opponent_force_disposition_id,
     )
     feature = next(
         terrain_feature
@@ -402,7 +408,9 @@ def test_mission_pack_uses_component_kind_independently_of_coarse_area_kind() ->
         mission_pool_entry_id=mission_pool_entry.mission_pool_entry_id,
         terrain_layout_id=layout.terrain_layout_id,
         attacker_player_id="player-a",
+        attacker_force_disposition_id=mission_pool_entry.player_force_disposition_id,
         defender_player_id="player-b",
+        defender_force_disposition_id=mission_pool_entry.opponent_force_disposition_id,
     )
 
     feature = next(
@@ -528,7 +536,9 @@ def test_area_placed_terrain_feature_payloads_round_trip_and_preserve_rotation()
         mission_pool_entry_id=mission_pool_entry.mission_pool_entry_id,
         terrain_layout_id=layout_id,
         attacker_player_id="player-a",
+        attacker_force_disposition_id=mission_pool_entry.player_force_disposition_id,
         defender_player_id="player-b",
+        defender_force_disposition_id=mission_pool_entry.opponent_force_disposition_id,
     )
     round_tripped_setup = MissionSetup.from_payload(setup.to_payload())
     rotated_feature = next(

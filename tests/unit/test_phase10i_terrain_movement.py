@@ -967,7 +967,9 @@ def _exact_event_companion_meatgrinder_setup() -> MissionSetup:
         mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
         terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-1",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 

@@ -37,16 +37,16 @@ from warhammer40k_core.core.terrain_areas import (
     TerrainAreaLocalTransform,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
+from warhammer40k_core.engine.final_scoring import FinalScoringResult
 from warhammer40k_core.engine.mission_setup import MissionSetup, MissionSetupError
 from warhammer40k_core.engine.missions import (
     deterministic_tactical_secondary_draw,
     mission_pack_for_id,
-    mission_scoring_policy_from_setup,
+    mission_scoring_policies_from_setup,
     validate_mission_setup_source_layout,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.scoring import (
-    FinalScoringResult,
     ScoringWindowKind,
     ScoringWindowState,
     VictoryPointAward,
@@ -102,6 +102,9 @@ def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> N
     decoded = cast(MissionPackDefinitionPayload, json.loads(encoded))
 
     assert mission_pack.mission_pack_id == "11e-warhammer-event-companion-2026-07"
+    assert source_package.source_commit_or_import_hash == (
+        "aa272b8234ca02b2ac5b62b2bc7299998d14a386e4e9a5f9b90aaaf4ed5422a3"
+    )
     assert source_package.to_payload() == {
         "edition_id": "warhammer_40000_11th",
         "mission_pack_id": "11e-warhammer-event-companion-2026-07",
@@ -268,7 +271,9 @@ def test_phase17j_matrix_layouts_and_setups_are_complete() -> None:
             mission_pack=mission_pack,
             mission_pool_entry_id=entry.mission_pool_entry_id,
             attacker_player_id="player-alpha",
+            attacker_force_disposition_id=entry.player_force_disposition_id,
             defender_player_id="player-beta",
+            defender_force_disposition_id=entry.opponent_force_disposition_id,
         )
         assert setup.battlefield_width_inches == 44.0
         assert setup.battlefield_depth_inches == 60.0
@@ -310,35 +315,142 @@ def test_phase17n_event_layout_rejects_missing_component_placements() -> None:
         )
 
 
-def test_phase17n_meatgrinder_scoring_artifact_is_source_hashed_strict_and_consumed() -> None:
-    artifact = event_primary_scoring.meatgrinder_primary_scoring_artifact()
+def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed() -> None:
+    artifact = event_primary_scoring.event_companion_primary_scoring_artifact()
     repository_root = Path(__file__).resolve().parents[2]
     artifact_path = (
         repository_root
         / "src/warhammer40k_core/rules/source_packages/warhammer_40000_11th"
-        / "event_companion_2026_06_artifacts/primary-meatgrinder-scoring.json"
+        / "event_companion_2026_06_artifacts/primary-scoring.json"
     )
     raw = artifact_path.read_bytes()
 
     assert hashlib.sha256(raw).hexdigest() == (
-        event_primary_scoring.MEATGRINDER_SCORING_ARTIFACT_SHA256
+        event_primary_scoring.PRIMARY_SCORING_ARTIFACT_SHA256
     )
-    assert artifact.package_hash == event_primary_scoring.MEATGRINDER_SCORING_PACKAGE_HASH
+    assert artifact.package_hash == event_primary_scoring.PRIMARY_SCORING_PACKAGE_HASH
     assert artifact.authoritative_source.source_kind == (
         "project_owner_supplied_official_source_transcription"
     )
-    assert artifact.authoritative_source.review_pull_request == 134
-    assert artifact.authoritative_source.review_commit == "35b9ddaf5"
-    assert artifact.secondary_corroboration.authority_status == (
+    assert artifact.authoritative_source.official_source_binary_status == (
+        "not_committed_transcription_review_only"
+    )
+    assert tuple(
+        (review.pull_request, review.commit)
+        for review in artifact.authoritative_source.review_records
+    ) == (
+        (107, "c0fe665249a4a39e5bf5ca19c38bb18b4a9dc56a"),
+        (134, "35b9ddaf5a49ad947177712a883fd0c76e3db224"),
+        (136, "34e05f19886c8c483fb0fa7c3e1ba86626bb89f1"),
+        (379, "15af220739679f5aa84dd16981ae3e7dbaa93520"),
+    )
+    assert artifact.secondary_corroborations[0].authority_status == (
         "secondary_corroboration_not_official_gw_source"
     )
-    assert artifact.secondary_corroboration.card_image_sha256 == (
+    assert artifact.secondary_corroborations[0].card_image_sha256 == (
         "d4bcc1dfde2d72fb2fc31b095964d1ea7721dcd082967b0063bcfd77c9965c24"
     )
-    assert artifact.layout_source_boundary.source_pages == (24, 25, 26)
+    assert artifact.layout_source_boundary.source_pages == tuple(range(9, 54))
     assert artifact.layout_source_boundary.authority_scope == ("battlefield_and_layout_facts_only")
-    assert not artifact.layout_source_boundary.contains_meatgrinder_scoring_clauses
-    assert tuple(rule.canonical_text for rule in artifact.scoring_rules) == (
+    assert not artifact.layout_source_boundary.contains_primary_mission_card_scoring_clauses
+    assert artifact.scoring_limit_source.source_pdf_filename == (
+        "eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf"
+    )
+    assert artifact.scoring_limit_source.source_pdf_sha256 == (
+        "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20"
+    )
+    assert artifact.scoring_limit_source.source_pages == (2, 4)
+    assert artifact.scoring_limit_source.primary_max_vp_per_battle_round == 15
+    assert artifact.scoring_limit_source.end_of_battle_primary_vp_exempt
+    assert len(artifact.primary_missions) == 25
+    assert {mission.max_vp_per_turn for mission in artifact.primary_missions} == {15}
+    assert sum(len(mission.scoring_rules) for mission in artifact.primary_missions) == 100
+    assert len(artifact.source_only_primary_actions) == 10
+    assert Counter(
+        mission.engine_support_status for mission in artifact.primary_missions
+    ) == Counter({"engine_implemented": 12, "source_known_engine_pending": 13})
+    all_scoring_rules = tuple(
+        rule for mission in artifact.primary_missions for rule in mission.scoring_rules
+    )
+    assert {rule.timing for rule in all_scoring_rules} == {
+        "battle_round_four_onwards_turn_end",
+        "battle_rounds_two_and_three_command_phase",
+        "command_phase",
+        "command_phase_or_round_five_turn_end",
+        "end_of_battle",
+        "first_and_second_battle_round_turn_end",
+        "first_battle_round_turn_end",
+        "turn_end",
+        "turn_end_from_battle_round_two",
+    }
+    assert Counter(rule.resolution_mode for rule in all_scoring_rules) == Counter(
+        {"independent": 86, "cumulative": 10, "exclusive_highest": 4}
+    )
+    assert {
+        mission.primary_mission_id
+        for mission in artifact.primary_missions
+        if mission.engine_support_status == "engine_implemented"
+    } == {
+        "primary-battlefield-dominance",
+        "primary-death-trap",
+        "primary-delaying-action",
+        "primary-destroyers-wrath",
+        "primary-determined-acquisition",
+        "primary-immovable-object",
+        "primary-inescapable-dominion",
+        "primary-meatgrinder",
+        "primary-outmaneuver",
+        "primary-reconnaissance-sweep",
+        "primary-search-and-scour",
+        "primary-unstoppable-force",
+    }
+    grouped_rule_ids: dict[str, tuple[str, ...]] = {}
+    for group_id in sorted(
+        {
+            rule.resolution_group_id
+            for rule in all_scoring_rules
+            if rule.resolution_group_id is not None
+        }
+    ):
+        grouped_rule_ids[group_id] = tuple(
+            rule.rule_id for rule in all_scoring_rules if rule.resolution_group_id == group_id
+        )
+    assert grouped_rule_ids == {
+        "battlefield-dominance-command-primary": (
+            "battlefield-dominance-each-objective",
+            "battlefield-dominance-home-controlled-non-home-bonus",
+        ),
+        "determined-acquisition-command-primary": (
+            "determined-acquisition-each-objective",
+            "determined-acquisition-opponent-territory-bonus",
+        ),
+        "purge-and-secure-destruction-primary": (
+            "purge-and-secure-destroyed-by-objective-unit-turn-end",
+            "purge-and-secure-started-objective-destroyed-turn-end",
+        ),
+        "reconnaissance-sweep-quarters-primary": (
+            "reconnaissance-sweep-three-quarters-turn-end",
+            "reconnaissance-sweep-four-quarters-turn-end",
+        ),
+        "sabotage-turn-end-primary": (
+            "sabotage-each-unit-turn-end",
+            "sabotage-opponent-territory-bonus-turn-end",
+        ),
+        "vital-link-command-primary": (
+            "vital-link-objective-control",
+            "vital-link-central-objective-bonus",
+        ),
+        "vital-link-turn-end-primary": (
+            "vital-link-central-objective-turn-end",
+            "vital-link-operation-marker-central-bonus-turn-end",
+        ),
+    }
+
+    artifact_missions = {
+        mission.primary_mission_id: mission for mission in artifact.primary_missions
+    }
+    meatgrinder = artifact_missions["primary-meatgrinder"]
+    assert tuple(rule.canonical_text for rule in meatgrinder.scoring_rules) == (
         "One or more enemy units were destroyed this turn.",
         "You control one or more objectives (excluding your home objective).",
         (
@@ -347,39 +459,97 @@ def test_phase17n_meatgrinder_scoring_artifact_is_source_hashed_strict_and_consu
         ),
         "You control your opponent's home objective.",
     )
+    assert {
+        mission.primary_mission_id
+        for mission in artifact.primary_missions
+        if any(rule.canonical_text is not None for rule in mission.scoring_rules)
+    } == {"primary-meatgrinder"}
 
-    runtime_row = next(
-        row
-        for row in event_source.primary_mission_rows()
-        if row.primary_mission_id == artifact.primary_mission_id
-    )
-    assert runtime_row.name == artifact.mission_name
-    assert runtime_row.scoring_kind == artifact.scoring_kind
-    assert tuple(rule.to_payload() for rule in runtime_row.scoring_rules) == tuple(
-        {
-            "rule_id": rule.rule_id,
-            "timing": rule.timing,
-            "source_kind": rule.source_kind,
-            "victory_points": rule.victory_points,
-            "cap": rule.cap,
-            "condition": rule.condition,
-        }
-        for rule in artifact.scoring_rules
-    )
-    event_primary_scoring.validate_meatgrinder_primary_scoring_artifact_bytes(raw)
+    runtime_rows = {row.primary_mission_id: row for row in event_source.primary_mission_rows()}
+    assert set(runtime_rows) == set(artifact_missions)
+    for mission_id, artifact_mission in artifact_missions.items():
+        runtime_row = runtime_rows[mission_id]
+        assert runtime_row.name == artifact_mission.mission_name
+        assert runtime_row.scoring_kind == artifact_mission.scoring_kind
+        assert runtime_row.max_vp_per_turn == artifact_mission.max_vp_per_turn == 15
+        assert tuple(rule.to_payload() for rule in runtime_row.scoring_rules) == tuple(
+            {
+                "rule_id": rule.rule_id,
+                "timing": rule.timing,
+                "source_kind": rule.source_kind,
+                "victory_points": rule.victory_points,
+                "cap": rule.cap,
+                "condition": rule.condition,
+                "resolution_mode": rule.resolution_mode,
+                "resolution_group_id": rule.resolution_group_id,
+            }
+            for rule in artifact_mission.scoring_rules
+        )
+    assert tuple(
+        row.to_payload() for row in event_source.primary_mission_action_source_rows()
+    ) == tuple(msgspec.to_builtins(row) for row in artifact.source_only_primary_actions)
+    event_primary_scoring.validate_event_companion_primary_scoring_artifact_bytes(raw)
 
     with pytest.raises(ValueError, match="artifact bytes drifted"):
-        event_primary_scoring.validate_meatgrinder_primary_scoring_artifact_bytes(raw + b"\n")
+        event_primary_scoring.validate_event_companion_primary_scoring_artifact_bytes(raw + b"\n")
 
     unknown_field_payload = json.loads(raw)
-    unknown_field_payload["scoring_rules"][0]["unexpected"] = True
+    unknown_field_payload["primary_missions"][0]["scoring_rules"][0]["unexpected"] = True
     with pytest.raises(ValueError, match="artifact is invalid"):
         event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
             json.dumps(unknown_field_payload).encode()
         )
 
+    missing_resolution_payload = json.loads(raw)
+    del missing_resolution_payload["primary_missions"][0]["scoring_rules"][0]["resolution_mode"]
+    with pytest.raises(ValueError, match="artifact is invalid"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(missing_resolution_payload).encode()
+        )
+
+    unsupported_timing_payload = json.loads(raw)
+    unsupported_timing_payload["primary_missions"][0]["scoring_rules"][0]["timing"] = (
+        "forged_timing"
+    )
+    with pytest.raises(ValueError, match="timing grammar is unsupported"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(unsupported_timing_payload).encode()
+        )
+
+    scoring_limit_drift_payload = json.loads(raw)
+    scoring_limit_drift_payload["scoring_limit_source"]["primary_max_vp_per_battle_round"] = 16
+    with pytest.raises(ValueError, match="scoring-limit provenance drifted"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(scoring_limit_drift_payload).encode()
+        )
+
+    mission_limit_drift_payload = json.loads(raw)
+    mission_limit_drift_payload["primary_missions"][0]["max_vp_per_turn"] = 16
+    with pytest.raises(ValueError, match="source-backed 15VP per-battle-round cap"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(mission_limit_drift_payload).encode()
+        )
+
+    independent_group_payload = json.loads(raw)
+    independent_group_payload["primary_missions"][0]["scoring_rules"][0]["resolution_group_id"] = (
+        "forged-resolution-group"
+    )
+    with pytest.raises(ValueError, match=r"Independent .* cannot declare a resolution group"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(independent_group_payload).encode()
+        )
+
+    unsupported_resolution_payload = json.loads(raw)
+    unsupported_resolution_payload["primary_missions"][0]["scoring_rules"][0]["resolution_mode"] = (
+        "forged_resolution"
+    )
+    with pytest.raises(ValueError, match="resolution mode is unsupported"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(unsupported_resolution_payload).encode()
+        )
+
     stale_hash_payload = json.loads(raw)
-    stale_hash_payload["scoring_rules"][2]["canonical_text"] += " Drift."
+    stale_hash_payload["primary_missions"][11]["scoring_rules"][2]["canonical_text"] += " Drift."
     with pytest.raises(ValueError, match="package hash is stale"):
         event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
             json.dumps(stale_hash_payload).encode()
@@ -398,6 +568,45 @@ def test_phase17n_meatgrinder_scoring_artifact_is_source_hashed_strict_and_consu
         event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
             json.dumps(rehashed_drift_payload).encode()
         )
+
+    promoted_status_payload = json.loads(raw)
+    promoted_status_payload["primary_missions"][1]["engine_support_status"] = "engine_implemented"
+    with pytest.raises(ValueError, match="engine support truth drifted"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(promoted_status_payload).encode()
+        )
+
+    grammar_drift_payload = json.loads(raw)
+    grammar_drift_payload["primary_missions"][0]["scoring_rules"][1]["resolution_group_id"] = (
+        "forged-resolution-group"
+    )
+    with pytest.raises(ValueError, match="resolution group"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(grammar_drift_payload).encode()
+        )
+
+    promoted_action_payload = json.loads(raw)
+    promoted_action_payload["source_only_primary_actions"][0]["engine_exposure_status"] = (
+        "engine_implemented"
+    )
+    with pytest.raises(ValueError, match="must remain engine-pending"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(promoted_action_payload).encode()
+        )
+
+
+def test_phase17n_primary_scoring_artifact_names_cannot_drift_from_matrix(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rows = event_source.primary_mission_rows()
+    artifact_rows = {row.primary_mission_id: row for row in rows}
+    first = rows[0]
+    artifact_rows[first.primary_mission_id] = replace(first, name="Drifted Primary Name")
+
+    monkeypatch.setattr(event_source, "_event_primary_mission_rows_by_id", lambda: artifact_rows)
+
+    with pytest.raises(MissionPackError, match="artifact name drifted from the matrix"):
+        event_source.primary_mission_rows()
 
 
 def test_phase17n_battlefield_artifact_is_source_hashed_and_strict() -> None:
@@ -862,7 +1071,9 @@ def test_phase17n_all_layout_geometry_closes_declared_seams_and_region_holes() -
             mission_pack=mission_pack,
             mission_pool_entry_id=f"mission-{source_layout.layout_id}",
             attacker_player_id="player-alpha",
+            attacker_force_disposition_id=source_layout.force_disposition_pair[0],
             defender_player_id="player-beta",
+            defender_force_disposition_id=source_layout.force_disposition_pair[1],
         )
         areas_by_id = {area.terrain_area_id: area for area in setup.terrain_areas}
         features_by_id = {feature.feature_id: feature for feature in setup.terrain_features}
@@ -1717,7 +1928,9 @@ def test_phase17n_shared_non_ruin_archetypes_expand_to_legal_source_proportions_
             mission_pack=mission_pack,
             mission_pool_entry_id=f"mission-{layout.layout_id}",
             attacker_player_id="player-alpha",
+            attacker_force_disposition_id=layout.force_disposition_pair[0],
             defender_player_id="player-beta",
+            defender_force_disposition_id=layout.force_disposition_pair[1],
         )
         features_by_id = {feature.feature_id: feature for feature in setup.terrain_features}
         components_by_area = {
@@ -1800,11 +2013,18 @@ def test_phase17n_light_corner_wall_joints_follow_source_image_registration() ->
     checked_component_ids: set[str] = set()
     for source_layout in extraction_payload["layouts"]:
         layout_id = source_layout["layout_id"]
+        mission_pool_entry = next(
+            entry
+            for entry in mission_pack.mission_pool_entries
+            if layout_id in entry.terrain_layout_ids
+        )
         setup = MissionSetup.from_mission_pack(
             mission_pack=mission_pack,
-            mission_pool_entry_id=f"mission-{layout_id}",
+            mission_pool_entry_id=mission_pool_entry.mission_pool_entry_id,
             attacker_player_id="player-alpha",
+            attacker_force_disposition_id=mission_pool_entry.player_force_disposition_id,
             defender_player_id="player-beta",
+            defender_force_disposition_id=mission_pool_entry.opponent_force_disposition_id,
         )
         features_by_id = {feature.feature_id: feature for feature in setup.terrain_features}
         for source_component in source_layout["terrain_components"]:
@@ -1952,7 +2172,9 @@ def test_phase17n_exact_terrain_area_reflections_follow_source_affine_orientatio
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
         attacker_player_id="player-alpha",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-beta",
+        defender_force_disposition_id="purge-the-foe",
     )
     layout_a_area_04 = next(
         area
@@ -2108,7 +2330,9 @@ def test_phase17n_terrain_placements_use_reviewed_grid_symmetry_and_contacts() -
                 f"mission-purge-the-foe-vs-purge-the-foe-layout-{layout_number}"
             ),
             attacker_player_id="player-alpha",
+            attacker_force_disposition_id="purge-the-foe",
             defender_player_id="player-beta",
+            defender_force_disposition_id="purge-the-foe",
         )
         runtime_areas = {
             area.terrain_area_id.rsplit("-", maxsplit=1)[-1]: area for area in setup.terrain_areas
@@ -2299,7 +2523,9 @@ def test_phase17n_meatgrinder_exact_layouts_build_all_source_components() -> Non
             mission_pack=mission_pack,
             mission_pool_entry_id=f"mission-{layout_id}",
             attacker_player_id="player-alpha",
+            attacker_force_disposition_id="purge-the-foe",
             defender_player_id="player-beta",
+            defender_force_disposition_id="purge-the-foe",
         )
         source_layout = artifact_layouts[layout_id]
         battlefield_layout = mission_pack.battlefield_layout(layout_id)
@@ -2438,7 +2664,9 @@ def test_phase17n_exact_terrain_areas_drive_visibility_cover_and_typed_evidence(
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
         attacker_player_id="player-alpha",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-beta",
+        defender_force_disposition_id="purge-the-foe",
     )
     ruleset = RulesetDescriptor.warhammer_40000_eleventh(
         descriptor_version="phase17n-exact-terrain-visibility",
@@ -2601,7 +2829,9 @@ def test_phase17n_unknown_terrain_area_classification_does_not_gate_membership_c
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
         attacker_player_id="player-alpha",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-beta",
+        defender_force_disposition_id="purge-the-foe",
     )
     physical_light_area = next(
         area
@@ -2676,7 +2906,9 @@ def test_phase17n_visibility_resolves_feature_area_associations_once_per_query(
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
         attacker_player_id="player-alpha",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-beta",
+        defender_force_disposition_id="purge-the-foe",
     )
     visibility_areas = terrain_visibility_areas_from_placements(setup.terrain_areas)
     terrain_features = setup.terrain_features[:2]
@@ -3136,7 +3368,7 @@ def test_phase17j_base_size_source_kinds_cover_noncanonical_entries() -> None:
     )
 
 
-def test_phase17j_unmapped_primary_missions_remain_source_descriptor_only(
+def test_phase17j_primary_matrix_inventory_drift_fails_closed(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def unknown_primary_names() -> tuple[tuple[str, str], ...]:
@@ -3144,13 +3376,8 @@ def test_phase17j_unmapped_primary_missions_remain_source_descriptor_only(
 
     monkeypatch.setattr(event_source, "_event_primary_mission_names", unknown_primary_names)
 
-    primary_row = event_source.primary_mission_rows()[0]
-    coverage_row = event_source.primary_mission_scoring_coverage_rows()[0]
-
-    assert primary_row.primary_mission_id == "primary-source-pending"
-    assert primary_row.scoring_kind == "event_companion_primary_source_descriptor_only"
-    assert coverage_row.status is event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE
-    assert coverage_row.needed_work == ("source_primary_scoring_text",)
+    with pytest.raises(MissionPackError, match="artifact inventory drifted from the matrix"):
+        event_source.primary_mission_rows()
 
 
 def test_phase17j_source_lookup_helpers_fail_closed_for_unknown_ids() -> None:
@@ -3181,11 +3408,12 @@ def test_phase17j_mission_setup_components_resolve_matching_battlefield_layout(
     setup = MissionSetup.from_components(
         mission_pack=mission_pack,
         mission_pool_entry_id=f"mission-{layout_id}",
-        primary_mission_id="primary-battlefield-dominance",
         deployment_map=mission_pack.deployment_map(layout.deployment_map_id),
         terrain_layout=mission_pack.terrain_layout_template(layout.terrain_layout_id),
         attacker_player_id="player-alpha",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-beta",
+        defender_force_disposition_id="take-and-hold",
     )
 
     assert setup.battlefield_layout_id == layout.battlefield_layout_id
@@ -3227,7 +3455,9 @@ def test_phase17n_objective_bindings_require_complete_logical_terrain_areas() ->
         mission_pack=mission_pack,
         mission_pool_entry_id=f"mission-{layout_id}",
         attacker_player_id="player-alpha",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-beta",
+        defender_force_disposition_id="take-and-hold",
     )
     with pytest.raises(MissionSetupError, match="every physical member"):
         replace(
@@ -3272,9 +3502,15 @@ def test_phase17n_objective_bindings_require_complete_logical_terrain_areas() ->
     with pytest.raises(GameLifecycleError, match="component identities require"):
         validate_mission_setup_source_layout(layoutless_source_components)
 
-    with pytest.raises(GameLifecycleError, match="primary mission drifted"):
+    drifted_assignments = tuple(
+        replace(assignment, primary_mission_id="primary-meatgrinder")
+        if assignment.player_id == setup.attacker_player_id
+        else assignment
+        for assignment in setup.primary_mission_assignments
+    )
+    with pytest.raises(GameLifecycleError, match="Primary mission assignment drifted"):
         validate_mission_setup_source_layout(
-            replace(setup, primary_mission_id="primary-meatgrinder")
+            replace(setup, primary_mission_assignments=drifted_assignments)
         )
 
     bound_area_ids = {
@@ -3317,9 +3553,31 @@ def test_phase17n_objective_bindings_require_complete_logical_terrain_areas() ->
         terrain_features=(canonical_feature,),
     )
     validate_mission_setup_source_layout(custom_setup)
-    validate_mission_setup_source_layout(
-        replace(custom_setup, primary_mission_id="primary-meatgrinder")
+    with pytest.raises(GameLifecycleError, match="Primary mission assignment drifted"):
+        validate_mission_setup_source_layout(
+            replace(
+                custom_setup,
+                primary_mission_assignments=tuple(
+                    replace(assignment, primary_mission_id="primary-death-trap")
+                    for assignment in custom_setup.primary_mission_assignments
+                ),
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="source package identity drifted"):
+        validate_mission_setup_source_layout(replace(custom_setup, source_version="drifted"))
+    custom_meatgrinder_setup = replace(
+        custom_setup,
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-2",
+        primary_mission_assignments=tuple(
+            replace(
+                assignment,
+                force_disposition_id="purge-the-foe",
+                primary_mission_id="primary-meatgrinder",
+            )
+            for assignment in custom_setup.primary_mission_assignments
+        ),
     )
+    validate_mission_setup_source_layout(custom_meatgrinder_setup)
 
     with pytest.raises(GameLifecycleError, match="canonical battlefield region identity drifted"):
         validate_mission_setup_source_layout(
@@ -3653,8 +3911,8 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
 
     assert len(coverage_rows) == 25
     assert status_counts == {
-        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 4,
-        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 21,
+        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 12,
+        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 13,
         event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 0,
     }
     assert {
@@ -3662,6 +3920,26 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         for row in coverage_rows.values()
         if row.status is event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE
     } == set()
+    assert {
+        row.primary_mission_id
+        for row in coverage_rows.values()
+        if row.status
+        is event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
+    } == {
+        "primary-consecrate",
+        "primary-extract-relic",
+        "primary-gather-intel",
+        "primary-locate-and-deny",
+        "primary-punishment",
+        "primary-purge-and-secure",
+        "primary-sabotage",
+        "primary-secure-asset",
+        "primary-smoke-and-mirrors",
+        "primary-surveil-the-foe",
+        "primary-triangulation",
+        "primary-vanguard-operation",
+        "primary-vital-link",
+    }
     assert {
         mission_id: len(primary_rows[mission_id].scoring_rules)
         for mission_id in (
@@ -3715,9 +3993,7 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         "primary-vital-link": 5,
     }
     assert primary_rows["primary-meatgrinder"].scoring_kind == ("meatgrinder")
-    assert primary_rows["primary-battlefield-dominance"].scoring_kind == (
-        "event_companion_primary_source_known_engine_pending"
-    )
+    assert primary_rows["primary-battlefield-dominance"].scoring_kind == ("battlefield_dominance")
     assert coverage_rows["primary-unstoppable-force"].needed_work == ()
     assert coverage_rows["primary-meatgrinder"].needed_work == ()
     assert coverage_rows["primary-death-trap"].mission_action_count == 1
@@ -3739,27 +4015,23 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     assert "engine_primary_action:surveil-enemy-unit" in (
         coverage_rows["primary-surveil-the-foe"].needed_work
     )
-    assert "engine_primary_scoring_grammar:cumulative_condition" in (
-        coverage_rows["primary-battlefield-dominance"].needed_work
-    )
+    for implemented_mission_id in (
+        "primary-battlefield-dominance",
+        "primary-delaying-action",
+        "primary-destroyers-wrath",
+        "primary-determined-acquisition",
+        "primary-inescapable-dominion",
+        "primary-outmaneuver",
+        "primary-reconnaissance-sweep",
+        "primary-search-and-scour",
+    ):
+        assert coverage_rows[implemented_mission_id].needed_work == ()
     assert "engine_primary_action:maintain-control" in (
         coverage_rows["primary-vital-link"].needed_work
-    )
-    assert "source_objective_role:expansion_objective" in (
-        coverage_rows["primary-delaying-action"].needed_work
-    )
-    assert coverage_rows["primary-destroyers-wrath"].needed_work == (
-        "engine_primary_condition:control_more_objectives_than_opponent",
     )
     assert coverage_rows["primary-punishment"].needed_work == (
         "engine_primary_start_turn_choice:condemned_enemy_units",
         "engine_primary_condition:condemned_enemy_units_left_battlefield",
-        "engine_primary_condition:control_more_objectives_than_opponent",
-        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
-    )
-    assert coverage_rows["primary-inescapable-dominion"].needed_work == (
-        "engine_primary_condition:control_three_or_more_objectives",
-        "engine_primary_condition:control_two_or_more_objectives_from_battle_round_two",
         "engine_primary_condition:control_more_objectives_than_opponent",
         "engine_primary_condition:control_opponent_home_objective_end_of_battle",
     )
@@ -3876,20 +4148,34 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
             mission_pack.mission_action(action_id)
 
 
-def test_phase17j_source_known_engine_pending_primary_scoring_fails_closed() -> None:
+def test_phase17j_source_known_engine_pending_primary_scoring_fails_on_primary_path() -> None:
     mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-07")
     setup = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-purge-the-foe-vs-disruption-layout-1",
         attacker_player_id="player-alpha",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-beta",
+        defender_force_disposition_id="disruption",
     )
 
+    policies = mission_scoring_policies_from_setup(setup)
+
+    attacker_policy = policies.policy_for_player("player-alpha")
+    defender_policy = policies.policy_for_player("player-beta")
+
+    assert attacker_policy.primary_mission_id == "primary-punishment"
+    assert not attacker_policy.primary_scoring_supported
+    assert defender_policy.primary_mission_id == "primary-delaying-action"
+    assert defender_policy.primary_scoring_supported
     with pytest.raises(
         GameLifecycleError,
         match="Primary mission scoring source is known but engine implementation is pending",
     ):
-        mission_scoring_policy_from_setup(setup)
+        attacker_policy.cap_bucket_for_victory_point_source(
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            source_id=attacker_policy.primary_mission_id,
+        )
 
 
 def test_phase17j_event_pack_resolves_scoring_and_tactical_draw_by_pack_id() -> None:
@@ -3898,9 +4184,12 @@ def test_phase17j_event_pack_resolves_scoring_and_tactical_draw_by_pack_id() -> 
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
         attacker_player_id="player-alpha",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-beta",
+        defender_force_disposition_id="purge-the-foe",
     )
-    policy = mission_scoring_policy_from_setup(setup)
+    policies = mission_scoring_policies_from_setup(setup)
+    policy = policies.common_policy
     tactical_draw = deterministic_tactical_secondary_draw(
         mission_setup=setup,
         player_id="player-alpha",
@@ -3919,63 +4208,17 @@ def test_phase17j_event_pack_resolves_scoring_and_tactical_draw_by_pack_id() -> 
         mission_pack_for_id("unsupported-pack")
 
 
-def test_phase17j_end_of_battle_vp_is_exempt_from_round_five_primary_cap() -> None:
-    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-07")
-    setup = MissionSetup.from_mission_pack(
-        mission_pack=mission_pack,
-        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
-        attacker_player_id="player-alpha",
-        defender_player_id="player-beta",
-    )
-    policy = mission_scoring_policy_from_setup(setup)
-    ledger = VictoryPointLedger.initial(player_id="player-alpha")
-    round_five_award = VictoryPointAward(
-        player_id="player-alpha",
-        battle_round=5,
-        phase="command",
-        amount=15,
-        source_kind=VictoryPointSourceKind.PRIMARY,
-        source_id=setup.primary_mission_id,
-        scoring_timing="phase_end",
-        metadata={"scoring_rule_id": "phase17j-round-five-primary"},
-    )
-    applied_amount, metadata = policy.capped_award_for_ledger(
-        ledger=ledger,
-        award=round_five_award,
-    )
-    ledger, _ = ledger.award(
-        round_five_award,
-        applied_amount=applied_amount,
-        metadata=metadata,
-    )
-    end_of_battle_award = VictoryPointAward(
-        player_id="player-alpha",
-        battle_round=5,
-        phase="battle_end",
-        amount=10,
-        source_kind=VictoryPointSourceKind.PRIMARY,
-        source_id=setup.primary_mission_id,
-        scoring_timing="end_of_battle",
-        metadata={"scoring_rule_id": "phase17j-end-of-battle-primary"},
-    )
-
-    applied_amount, _ = policy.capped_award_for_ledger(
-        ledger=ledger,
-        award=end_of_battle_award,
-    )
-
-    assert applied_amount == 10
-
-
 def test_phase17j_final_scoring_uses_event_caps_battle_ready_and_draw_rules() -> None:
     mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-07")
     setup = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
         attacker_player_id="player-alpha",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-beta",
+        defender_force_disposition_id="purge-the-foe",
     )
-    policy = mission_scoring_policy_from_setup(setup)
+    policies = mission_scoring_policies_from_setup(setup)
     player_alpha_ledger, _ = VictoryPointLedger.initial(player_id="player-alpha").award(
         VictoryPointAward(
             player_id="player-alpha",
@@ -3983,7 +4226,7 @@ def test_phase17j_final_scoring_uses_event_caps_battle_ready_and_draw_rules() ->
             phase="command",
             amount=55,
             source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id=setup.primary_mission_id,
+            source_id=setup.primary_mission_id_for_player("player-alpha"),
             scoring_timing="phase_end",
             metadata={"scoring_rule_id": "phase17j-primary-cap"},
         )
@@ -4007,7 +4250,7 @@ def test_phase17j_final_scoring_uses_event_caps_battle_ready_and_draw_rules() ->
             phase="command",
             amount=45,
             source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id=setup.primary_mission_id,
+            source_id=setup.primary_mission_id_for_player("player-beta"),
             scoring_timing="phase_end",
             metadata={"scoring_rule_id": "phase17j-opponent-primary"},
         )
@@ -4027,12 +4270,12 @@ def test_phase17j_final_scoring_uses_event_caps_battle_ready_and_draw_rules() ->
     result = FinalScoringResult.from_ledgers(
         game_id="phase17j-event-final-scoring",
         battle_round=5,
-        policy=policy,
+        policies=policies,
         ledgers=(player_alpha_ledger, player_beta_ledger),
         scoring_windows=_event_final_scoring_windows(
             game_id="phase17j-event-final-scoring",
             battle_round=5,
-            policy_source_id=policy.source_id,
+            policy_source_id=policies.source_id,
         ),
     )
 
@@ -4195,27 +4438,34 @@ def _event_final_scoring_windows(
 ) -> tuple[ScoringWindowState, ...]:
     return (
         ScoringWindowState(
-            window_id="phase17j-event-final-round",
+            window_id=(
+                f"scoring-window:{game_id}:round-{battle_round:02d}:end_of_round:battle_round_end"
+            ),
             game_id=game_id,
             battle_round=battle_round,
             window_kind=ScoringWindowKind.END_OF_ROUND,
             window="battle_round_end",
-            source_id=f"{policy_source_id}:end-of-round",
+            source_id=f"{policy_source_id}:window:end_of_round:battle_round_end",
         ),
         ScoringWindowState(
-            window_id="phase17j-event-final-turn-end",
+            window_id=(
+                f"scoring-window:{game_id}:round-{battle_round:02d}:"
+                "end_of_game:turn_end_round_five_going_second"
+            ),
             game_id=game_id,
             battle_round=battle_round,
             window_kind=ScoringWindowKind.END_OF_GAME,
             window="turn_end_round_five_going_second",
-            source_id=f"{policy_source_id}:turn-end-round-five",
+            source_id=(f"{policy_source_id}:window:end_of_game:turn_end_round_five_going_second"),
         ),
         ScoringWindowState(
-            window_id="phase17j-event-final-end-battle",
+            window_id=(
+                f"scoring-window:{game_id}:round-{battle_round:02d}:end_of_game:end_of_battle"
+            ),
             game_id=game_id,
             battle_round=battle_round,
             window_kind=ScoringWindowKind.END_OF_GAME,
             window="end_of_battle",
-            source_id=f"{policy_source_id}:end-of-battle",
+            source_id=f"{policy_source_id}:window:end_of_game:end_of_battle",
         ),
     )

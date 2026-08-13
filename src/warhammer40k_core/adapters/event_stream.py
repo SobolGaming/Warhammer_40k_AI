@@ -8,7 +8,7 @@ from warhammer40k_core.adapters.redaction import public_event_record_payload
 from warhammer40k_core.engine.event_log import EventLog, EventRecordPayload
 from warhammer40k_core.engine.phase import GameLifecycleError
 
-ADAPTER_EVENT_STREAM_DELTA_SCHEMA_VERSION = "event-delta-v1"
+ADAPTER_EVENT_STREAM_DELTA_SCHEMA_VERSION = "event-delta-v2-primary-assignments"
 
 
 class EventStreamDeltaPayload(TypedDict):

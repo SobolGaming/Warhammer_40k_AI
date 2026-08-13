@@ -23,6 +23,7 @@ from warhammer40k_core.core.missions import (
     SecondaryMissionAvailability,
     SecondaryMissionDefinition,
     TournamentScoringCaps,
+    mission_scoring_resolution_mode_from_token,
     objective_marker_role_from_token,
 )
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
@@ -108,6 +109,7 @@ def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
         name="Chapter Approved 2026-27",
         source_version=CHAPTER_APPROVED_2026_27_SOURCE_VERSION,
         source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
+        requires_complete_battlefield_graph=False,
         source_package=source_data.source_package_definition(),
         sequence=ChapterApprovedMissionSequence(
             sequence_id="chapter-approved-tournament-sequence",
@@ -156,6 +158,7 @@ def chapter_approved_2026_27_mission_pack() -> MissionPackDefinition:
         ),
         mission_pool_entries=_mission_pool_entries(
             rows=chapter_approved_rows,
+            matrix_rows=source_data.primary_mission_matrix_rows(),
             source_id=CHAPTER_APPROVED_2026_27_SOURCE_ID,
         ),
         scoring_caps=TournamentScoringCaps(
@@ -224,6 +227,7 @@ def warhammer_event_companion_2026_07_mission_pack() -> MissionPackDefinition:
         name="Warhammer Event Companion v1.1",
         source_version=EVENT_COMPANION_2026_07_SOURCE_VERSION,
         source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
+        requires_complete_battlefield_graph=True,
         source_package=event_source_data.source_package_definition(),
         sequence=ChapterApprovedMissionSequence(
             sequence_id="warhammer-event-mission-sequence",
@@ -261,6 +265,7 @@ def warhammer_event_companion_2026_07_mission_pack() -> MissionPackDefinition:
         ),
         mission_pool_entries=_mission_pool_entries(
             rows=event_source_data.battlefield_layout_rows(),
+            matrix_rows=event_source_data.primary_mission_matrix_rows(),
             source_id=EVENT_COMPANION_2026_07_SOURCE_ID,
         ),
         scoring_caps=TournamentScoringCaps(
@@ -662,6 +667,8 @@ def _scoring_rules(
             victory_points=row.victory_points,
             cap=row.cap,
             condition=row.condition,
+            resolution_mode=mission_scoring_resolution_mode_from_token(row.resolution_mode),
+            resolution_group_id=row.resolution_group_id,
             source_id=f"{source_prefix}:scoring-rule:{row.rule_id}",
         )
         for row in rows
@@ -693,15 +700,43 @@ def _challenger_cards(*, source_id: str) -> tuple[ChallengerCardDefinition, ...]
 def _mission_pool_entries(
     *,
     rows: tuple[source_data.SourceBattlefieldLayoutRow, ...],
+    matrix_rows: tuple[source_data.SourcePrimaryMissionMatrixCellRow, ...],
     source_id: str,
 ) -> tuple[MissionPoolEntry, ...]:
-    return tuple(
-        MissionPoolEntry(
-            mission_pool_entry_id=f"mission-{row.battlefield_layout_id}",
-            primary_mission_id=row.primary_mission_id,
-            deployment_map_id=row.deployment_map_id,
-            terrain_layout_ids=(row.terrain_layout_id,),
-            source_id=(f"{source_id}:battlefield-layout:{row.battlefield_layout_id}:mission-pool"),
+    matrix_by_pair = {
+        (row.player_force_disposition_id, row.opponent_force_disposition_id): row
+        for row in matrix_rows
+    }
+    if len(matrix_by_pair) != len(matrix_rows):
+        raise MissionPackError("Primary mission matrix rows must not duplicate directions.")
+    entries: list[MissionPoolEntry] = []
+    for row in rows:
+        player_matrix_row = matrix_by_pair.get(
+            (row.player_force_disposition_id, row.opponent_force_disposition_id)
         )
-        for row in rows
-    )
+        opponent_matrix_row = matrix_by_pair.get(
+            (row.opponent_force_disposition_id, row.player_force_disposition_id)
+        )
+        if player_matrix_row is None or opponent_matrix_row is None:
+            raise MissionPackError(
+                "Battlefield layout row is missing a directional Primary mission matrix row."
+            )
+        if row.primary_mission_id != player_matrix_row.primary_mission_id:
+            raise MissionPackError(
+                "Battlefield layout row Primary mission drifted from the directional matrix."
+            )
+        entries.append(
+            MissionPoolEntry(
+                mission_pool_entry_id=f"mission-{row.battlefield_layout_id}",
+                player_force_disposition_id=row.player_force_disposition_id,
+                opponent_force_disposition_id=row.opponent_force_disposition_id,
+                player_primary_mission_id=player_matrix_row.primary_mission_id,
+                opponent_primary_mission_id=opponent_matrix_row.primary_mission_id,
+                deployment_map_id=row.deployment_map_id,
+                terrain_layout_ids=(row.terrain_layout_id,),
+                source_id=(
+                    f"{source_id}:battlefield-layout:{row.battlefield_layout_id}:mission-pool"
+                ),
+            )
+        )
+    return tuple(sorted(entries, key=lambda entry: entry.mission_pool_entry_id))

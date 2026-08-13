@@ -17,6 +17,7 @@ class PrimaryUnitDestructionEvidence:
     active_player_id: str
     destroyed_player_id: str
     destroyed_unit_instance_id: str
+    started_turn_terrain_feature_ids: tuple[str, ...]
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -54,6 +55,14 @@ class PrimaryUnitDestructionEvidence:
             _validate_identifier(
                 "Primary destruction evidence destroyed_unit_instance_id",
                 self.destroyed_unit_instance_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "started_turn_terrain_feature_ids",
+            _validate_identifier_tuple(
+                "Primary destruction evidence started_turn_terrain_feature_ids",
+                self.started_turn_terrain_feature_ids,
             ),
         )
 

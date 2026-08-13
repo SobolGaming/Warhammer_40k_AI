@@ -1248,7 +1248,7 @@ def _aeldari_catalog(*, include_aspect_shrine_token: bool = False) -> ArmyCatalo
                     _AELDARI_FIGHT_DATASHEET_ID,
                     *((_AELDARI_ASPECT_DATASHEET_ID,) if include_aspect_shrine_token else ()),
                 ),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=("gw-11e-faction-detachments-2026-27:detachment:aeldari:warhost",),
             ),
             DetachmentDefinition(
@@ -1261,7 +1261,7 @@ def _aeldari_catalog(*, include_aspect_shrine_token: bool = False) -> ArmyCatalo
                     _AELDARI_FIGHT_DATASHEET_ID,
                     *((_AELDARI_ASPECT_DATASHEET_ID,) if include_aspect_shrine_token else ()),
                 ),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:aeldari:guardian-battlehost",
                 ),
@@ -1350,7 +1350,7 @@ def _army_muster_request(
             detachment_ids=(detachment_id,),
         ),
         force_disposition_id=(
-            "purge-the-foe" if faction_id == "core-marine-force" else "phase17g-force"
+            "purge-the-foe" if faction_id == "core-marine-force" else "take-and-hold"
         ),
         unit_selections=(
             UnitMusterSelection(
@@ -1418,7 +1418,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 

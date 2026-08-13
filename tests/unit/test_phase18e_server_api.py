@@ -169,6 +169,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
         query={"viewer_player_id": PLAYER_B, "cursor": "0"},
     )
     _schema_validator("event-delta.schema.json").validate(initial_events)
+    assert initial_events["schema_version"] == "event-delta-v3-primary-assignments"
 
     status_payload = _submit_option(
         server,
@@ -275,7 +276,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
             assert _field_string(row, "status") != "full"
 
     capability_manifest = _field_object(support_profile, "capability_manifest")
-    assert capability_manifest["schema_version"] == "capability-manifest-v1"
+    assert capability_manifest["schema_version"] == "capability-manifest-v2-directed-primary"
     assert [
         _field_string(_json_object(result), "dimension")
         for result in _field_list(capability_manifest, "mode_capabilities")
@@ -296,7 +297,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     identities = _field_object(capability_manifest, "identities")
     assert _field_object(identities, "mission_pack")
     assert _field_object(identities, "terrain_layout")
-    assert _field_object(identities, "contract_schema")["contract_version"] == "6.0.0"
+    assert _field_object(identities, "contract_schema")["contract_version"] == "7.0.0"
 
     player_a_support = _request(
         server,
@@ -340,12 +341,16 @@ def test_phase17n_exact_event_companion_mission_has_hashed_runtime_evidence() ->
         mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
         terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-1",
         attacker_player_id=PLAYER_A,
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id=PLAYER_B,
+        defender_force_disposition_id="purge-the-foe",
     )
     config = replace(
-        _config(game_id="phase17n-exact-event-companion-capability"),
-        mission_setup=mission_setup,
-        ruleset_descriptor=_event_companion_ruleset(),
+        _config_with_mission_setup(
+            game_id="phase17n-exact-event-companion-capability",
+            mission_setup=mission_setup,
+            ruleset_descriptor=_event_companion_ruleset(),
+        ),
         model_geometries=(accepted_model_geometry(),),
     )
     armies = tuple(
@@ -369,21 +374,11 @@ def test_phase17n_exact_event_companion_mission_has_hashed_runtime_evidence() ->
         ),
     )
 
-    mission_row = next(
+    mission_rows = [
         row
         for row in manifest["mission_rows"]
         if row["owner_id"] == "mission-purge-the-foe-vs-purge-the-foe-layout-1"
-    )
-    physical = next(
-        result
-        for result in mission_row["capabilities"]
-        if result["dimension"] == "PHYSICALLY_PLAYABLE"
-    )
-    semantic = next(
-        result
-        for result in mission_row["capabilities"]
-        if result["dimension"] == "SEMANTICALLY_EXECUTABLE"
-    )
+    ]
     mission_setup_hash = hashlib.sha256(
         json.dumps(
             mission_setup.to_payload(),
@@ -403,20 +398,37 @@ def test_phase17n_exact_event_companion_mission_has_hashed_runtime_evidence() ->
         if feature.source_id is not None
     }
 
-    assert physical["status"] == "supported"
-    assert physical["reason_code"] is None
-    assert semantic["status"] == "supported"
-    assert semantic["reason_code"] is None
-    assert mission_setup_evidence_id in physical["evidence_refs"]
-    assert mission_setup_evidence_id in semantic["evidence_refs"]
-    assert mission_source_package_evidence_id in semantic["evidence_refs"]
-    assert terrain_source_ids.issubset(set(physical["evidence_refs"]))
-    assert any(
-        event_companion_layouts_2026_06.BATTLEFIELD_PACKAGE_HASH in evidence_ref
-        for evidence_ref in physical["evidence_refs"]
-    )
-    assert mission_row["metadata"]["mission_setup_hash"] == mission_setup_hash
-    assert mission_row["metadata"]["mission_source_package_hash"] == mission_source_package_hash
+    assert len(mission_rows) == 2
+    assert {
+        (row["metadata"]["assigned_player_id"], row["metadata"]["force_disposition_id"])
+        for row in mission_rows
+    } == {(PLAYER_A, "purge-the-foe"), (PLAYER_B, "purge-the-foe")}
+    for mission_row in mission_rows:
+        physical = next(
+            result
+            for result in mission_row["capabilities"]
+            if result["dimension"] == "PHYSICALLY_PLAYABLE"
+        )
+        semantic = next(
+            result
+            for result in mission_row["capabilities"]
+            if result["dimension"] == "SEMANTICALLY_EXECUTABLE"
+        )
+        assert physical["status"] == "supported"
+        assert physical["reason_code"] is None
+        assert semantic["status"] == "supported"
+        assert semantic["reason_code"] is None
+        assert mission_setup_evidence_id in physical["evidence_refs"]
+        assert mission_setup_evidence_id in semantic["evidence_refs"]
+        assert mission_source_package_evidence_id in semantic["evidence_refs"]
+        assert terrain_source_ids.issubset(set(physical["evidence_refs"]))
+        assert any(
+            event_companion_layouts_2026_06.BATTLEFIELD_PACKAGE_HASH in evidence_ref
+            for evidence_ref in physical["evidence_refs"]
+        )
+        assert mission_row["metadata"]["primary_mission_id"] == "primary-meatgrinder"
+        assert mission_row["metadata"]["mission_setup_hash"] == mission_setup_hash
+        assert mission_row["metadata"]["mission_source_package_hash"] == mission_source_package_hash
 
 
 def test_phase17o_player_selection_hash_covers_only_owned_roster_and_public_mission() -> None:
@@ -1009,7 +1021,7 @@ def test_phase18e_command_result_schema_requires_accepted_commands_to_be_committ
     )
     example.pop("command_id")
     example.pop("outcome_code")
-    example["schema_version"] = "session-command-result-v6-contract"
+    example["schema_version"] = "session-command-result-v7-contract"
     for committed, accepted in ((True, True), (True, False), (False, False)):
         payload = {**example, "committed": committed, "accepted": accepted}
         validator.validate(payload)
@@ -1287,7 +1299,8 @@ def test_phase17o_capability_manifest_rejects_unregistered_selected_runtime_evid
     catalog = _catalog_with_selected_engine_consumed_ability()
     config = _config(game_id="phase17o-selected-runtime-rules", catalog=catalog)
     armies = tuple(
-        muster_army(catalog=catalog, request=request) for request in config.army_muster_requests
+        muster_army(catalog=config.army_catalog, request=request)
+        for request in config.army_muster_requests
     )
     runtime_bundle = build_runtime_content_bundle_for_armies(
         config=config,
@@ -1325,7 +1338,7 @@ def test_phase17o_capability_manifest_rejects_unregistered_selected_runtime_evid
     )
 
     runtime_manifest = RuntimeContentManifest.from_catalog(
-        catalog=catalog,
+        catalog=config.army_catalog,
         generated_rows=(faction_row, detachment_row),
     )
     with pytest.raises(
@@ -1616,7 +1629,8 @@ def test_contract6_create_routes_reject_canonical_layoutless_source_drift(
     assert mission_setup_payload["battlefield_layout_id"] is None
     mission_setup_payload["source_id"] = "substituted-source"
     mission_setup_payload["source_version"] = "substituted-version"
-    mission_setup_payload["primary_mission_id"] = "take-and-hold"
+    assignments = _field_list(mission_setup_payload, "primary_mission_assignments")
+    _json_object(assignments[0])["primary_mission_id"] = "primary-meatgrinder"
     central_marker = next(
         _json_object(marker)
         for marker in _field_list(mission_setup_payload, "objective_markers")
@@ -1637,11 +1651,13 @@ def test_contract6_create_routes_reject_missing_logical_terrain_identity() -> No
         mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
         terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-1",
         attacker_player_id=PLAYER_A,
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id=PLAYER_B,
+        defender_force_disposition_id="purge-the-foe",
     )
     with pytest.raises(GameLifecycleError, match="does not support source-linked"):
-        replace(
-            _config(game_id="contract6-incompatible-event-ruleset"),
+        _config_with_mission_setup(
+            game_id="contract6-incompatible-event-ruleset",
             mission_setup=event_mission_setup,
         )
     late_binding_state = GameState.from_config(
@@ -1652,13 +1668,13 @@ def test_contract6_create_routes_reject_missing_logical_terrain_identity() -> No
     )
     with pytest.raises(GameLifecycleError, match="configured before GameState creation"):
         late_binding_state.record_mission_setup(event_mission_setup)
-    game_config = replace(
-        _config(game_id="contract6-logical-area-game"),
+    game_config = _config_with_mission_setup(
+        game_id="contract6-logical-area-game",
         mission_setup=event_mission_setup,
         ruleset_descriptor=_event_companion_ruleset(),
     )
-    session_config = replace(
-        _config(game_id="contract6-logical-area-session"),
+    session_config = _config_with_mission_setup(
+        game_id="contract6-logical-area-session",
         mission_setup=event_mission_setup,
         ruleset_descriptor=_event_companion_ruleset(),
     )
@@ -1710,10 +1726,12 @@ def test_contract6_create_routes_reject_partial_logical_objective_bindings(
         mission_pool_entry_id=f"mission-{layout_id}",
         terrain_layout_id=layout_id,
         attacker_player_id=PLAYER_A,
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id=PLAYER_B,
+        defender_force_disposition_id="take-and-hold",
     )
-    config = replace(
-        _config(game_id=game_id),
+    config = _config_with_mission_setup(
+        game_id=game_id,
         mission_setup=event_mission_setup,
         ruleset_descriptor=_event_companion_ruleset(),
     )
@@ -1761,10 +1779,12 @@ def test_contract6_create_routes_reject_removed_and_relabelled_logical_members(
         mission_pool_entry_id=f"mission-{layout_id}",
         terrain_layout_id=layout_id,
         attacker_player_id=PLAYER_A,
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id=PLAYER_B,
+        defender_force_disposition_id="take-and-hold",
     )
-    config = replace(
-        _config(game_id=game_id),
+    config = _config_with_mission_setup(
+        game_id=game_id,
         mission_setup=event_mission_setup,
         ruleset_descriptor=_event_companion_ruleset(),
     )
@@ -2778,7 +2798,19 @@ def _config(
     player_b_model_count: int = 5,
     attacker_player_id: str = PLAYER_A,
 ) -> GameConfig:
-    army_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
+    source_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
+    army_catalog = replace(
+        source_catalog,
+        detachments=tuple(
+            replace(
+                detachment,
+                force_disposition_ids=("purge-the-foe", "take-and-hold"),
+            )
+            if detachment.detachment_id == "core-combined-arms"
+            else detachment
+            for detachment in source_catalog.detachments
+        ),
+    )
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
@@ -2793,6 +2825,9 @@ def _config(
                 army_id="army-alpha",
                 unit_selection_id="intercessor-unit-1",
                 model_count=player_a_model_count,
+                force_disposition_id=(
+                    "take-and-hold" if attacker_player_id == PLAYER_A else "purge-the-foe"
+                ),
             ),
             _army_muster_request(
                 catalog=army_catalog,
@@ -2800,6 +2835,9 @@ def _config(
                 army_id="army-beta",
                 unit_selection_id="intercessor-unit-2",
                 model_count=player_b_model_count,
+                force_disposition_id=(
+                    "take-and-hold" if attacker_player_id == PLAYER_B else "purge-the-foe"
+                ),
             ),
         ),
         player_ids=(PLAYER_A, PLAYER_B),
@@ -2810,7 +2848,9 @@ def _config(
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id=attacker_player_id,
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id=(PLAYER_B if attacker_player_id == PLAYER_A else PLAYER_A),
+            defender_force_disposition_id="purge-the-foe",
         ),
     )
 
@@ -2821,6 +2861,31 @@ def _event_companion_ruleset() -> RulesetDescriptor:
     )
 
 
+def _config_with_mission_setup(
+    *,
+    game_id: str,
+    mission_setup: MissionSetup,
+    ruleset_descriptor: RulesetDescriptor | None = None,
+) -> GameConfig:
+    config = _config(game_id=game_id)
+    return replace(
+        config,
+        ruleset_descriptor=(
+            config.ruleset_descriptor if ruleset_descriptor is None else ruleset_descriptor
+        ),
+        army_muster_requests=tuple(
+            replace(
+                request,
+                force_disposition_id=mission_setup.force_disposition_id_for_player(
+                    request.player_id
+                ),
+            )
+            for request in config.army_muster_requests
+        ),
+        mission_setup=mission_setup,
+    )
+
+
 def _army_muster_request(
     *,
     catalog: ArmyCatalog,
@@ -2828,6 +2893,7 @@ def _army_muster_request(
     army_id: str,
     unit_selection_id: str,
     model_count: int = 5,
+    force_disposition_id: str,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -2839,7 +2905,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=force_disposition_id,
         unit_selections=(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

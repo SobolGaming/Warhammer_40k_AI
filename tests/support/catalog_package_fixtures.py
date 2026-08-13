@@ -491,6 +491,7 @@ def flesh_hounds_army(
     unit: UnitInstance,
     army_id: str = "army-daemons",
     player_id: str = "player-daemons",
+    force_disposition_id: str = "phase17k-force",
 ) -> ArmyDefinition:
     return ArmyDefinition(
         army_id=army_id,
@@ -502,6 +503,6 @@ def flesh_hounds_army(
             faction_id=package.army_catalog.factions[0].faction_id,
             detachment_ids=("phase17k-daemons",),
         ),
-        force_disposition_id="phase17k-force",
+        force_disposition_id=force_disposition_id,
         units=(unit,),
     )

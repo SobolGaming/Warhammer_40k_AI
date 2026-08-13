@@ -352,6 +352,19 @@ def base_footprint_distance_to_polygon(
     return footprint_for_polygon(polygon).distance(footprint_for_base(base, pose))
 
 
+def base_footprint_distance_to_point(
+    base: BaseShape,
+    pose: Pose,
+    *,
+    x: float,
+    y: float,
+) -> float:
+    """Return the horizontal distance from a complete base footprint to a point."""
+    valid_x = validate_finite_number("point x", x)
+    valid_y = validate_finite_number("point y", y)
+    return footprint_for_base(base, pose).distance(_geometry_module().Point(valid_x, valid_y))
+
+
 def point_intersects_polygon(
     x: float,
     y: float,

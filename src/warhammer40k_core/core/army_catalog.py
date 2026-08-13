@@ -271,7 +271,7 @@ class ArmyCatalog:
                 "core-transport",
                 "core-vehicle-monster",
             ),
-            force_disposition_ids=("purge-the-foe",),
+            force_disposition_ids=("purge-the-foe", "take-and-hold"),
             source_ids=("detachment:core-combined-arms",),
         )
         return cls(

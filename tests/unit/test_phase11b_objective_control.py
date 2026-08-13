@@ -795,7 +795,7 @@ def test_objective_control_records_update_at_phase_and_turn_end() -> None:
 def test_end_boundary_control_is_fixed_before_later_end_of_phase_mutation() -> None:
     state = _battle_state_with_center_objective_positions(player_a_offsets=((2.0, 0.0),))
 
-    determined = state.determine_current_end_objective_control()
+    determined = state.determine_current_phase_end_objective_control()
     marker = _center_marker_definition(state)
     battlefield = state.battlefield_state
     assert battlefield is not None
@@ -808,10 +808,9 @@ def test_end_boundary_control_is_fixed_before_later_end_of_phase_mutation() -> N
 
     state.advance_to_next_battle_phase()
 
-    assert len(determined) == 1
     assert len(state.objective_control_records) == 1
-    assert state.objective_control_records[0] == determined[0]
-    assert determined[0].results[0].controlled_by_player_id == "player-a"
+    assert state.objective_control_records[0] == determined
+    assert determined.results[0].controlled_by_player_id == "player-a"
 
 
 def test_objective_control_boundary_requires_mission_setup() -> None:
@@ -967,11 +966,19 @@ def _phase17n_linked_objective_state(layout_number: int) -> GameState:
 
 
 def _phase17n_layout_state(layout_id: str) -> GameState:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    mission_pool_entry = next(
+        entry
+        for entry in mission_pack.mission_pool_entries
+        if layout_id in entry.terrain_layout_ids
+    )
     mission_setup = MissionSetup.from_mission_pack(
-        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
-        mission_pool_entry_id=f"mission-{layout_id}",
+        mission_pack=mission_pack,
+        mission_pool_entry_id=mission_pool_entry.mission_pool_entry_id,
         attacker_player_id="player-a",
+        attacker_force_disposition_id=mission_pool_entry.player_force_disposition_id,
         defender_player_id="player-b",
+        defender_force_disposition_id=mission_pool_entry.opponent_force_disposition_id,
     )
     config = _config(mission_setup=mission_setup)
     armies = _mustered_armies(config)
@@ -1080,7 +1087,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 
@@ -1130,7 +1139,38 @@ def _scenario_from_state(state: GameState) -> BattlefieldScenario:
 
 
 def _config(*, mission_setup: MissionSetup | None) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    mission_force_disposition_ids = (
+        ()
+        if mission_setup is None
+        else tuple(
+            sorted(
+                {
+                    assignment.force_disposition_id
+                    for assignment in mission_setup.primary_mission_assignments
+                }
+            )
+        )
+    )
+    catalog = replace(
+        base_catalog,
+        detachments=tuple(
+            replace(
+                detachment,
+                force_disposition_ids=(
+                    *detachment.force_disposition_ids,
+                    *(
+                        force_disposition_id
+                        for force_disposition_id in mission_force_disposition_ids
+                        if force_disposition_id not in detachment.force_disposition_ids
+                    ),
+                ),
+            )
+            if detachment.detachment_id == "core-combined-arms"
+            else detachment
+            for detachment in base_catalog.detachments
+        ),
+    )
     return GameConfig(
         game_id="phase11b-game",
         allow_legacy_non_strict_rosters=True,
@@ -1142,12 +1182,14 @@ def _config(*, mission_setup: MissionSetup | None) -> GameConfig:
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_ids=("intercessor-unit-1",),
+                mission_setup=mission_setup,
             ),
             _army_muster_request(
                 catalog=catalog,
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=("intercessor-unit-3",),
+                mission_setup=mission_setup,
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -1169,6 +1211,7 @@ def _army_muster_request(
     player_id: str,
     army_id: str,
     unit_selection_ids: tuple[str, ...],
+    mission_setup: MissionSetup | None,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -1180,7 +1223,11 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=(
+            mission_setup.force_disposition_id_for_player(player_id)
+            if mission_setup is not None
+            else ("take-and-hold" if player_id == "player-a" else "purge-the-foe")
+        ),
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

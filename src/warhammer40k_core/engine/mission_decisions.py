@@ -33,7 +33,7 @@ from warhammer40k_core.engine.mission_action_options import (
 from warhammer40k_core.engine.mission_action_options import (
     mission_action_start_options as _mission_action_start_options,
 )
-from warhammer40k_core.engine.missions import mission_scoring_policy_from_setup
+from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -389,7 +389,9 @@ def request_mission_action_start(
                 "player_id": requested_player,
                 "mission_action_id": mission_action.mission_action_id,
                 "mission_id": mission_action.mission_id,
-                "active_primary_mission_id": mission_setup.primary_mission_id,
+                "active_primary_mission_id": mission_setup.primary_mission_id_for_player(
+                    requested_player
+                ),
             },
         )
     if mission_action.target_policy not in _SUPPORTED_MISSION_ACTION_TARGET_POLICIES:
@@ -1118,7 +1120,7 @@ def _tactical_secondary_achievement_context_drift_reason(
         return "card_battle_round_drift"
     if state.mission_setup is None:
         raise GameLifecycleError("Tactical secondary achievement context requires MissionSetup.")
-    policy = mission_scoring_policy_from_setup(state.mission_setup)
+    policy = mission_scoring_policies_from_setup(state.mission_setup)
     award = policy.secondary_award(
         player_id=context.player_id,
         battle_round=state.battle_round,

@@ -42,9 +42,11 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_setup import (
     MissionSetup,
     MissionSetupError,
+    MissionSetupPayload,
 )
 from warhammer40k_core.engine.missions import (
     mission_pack_for_id,
+    mission_scoring_policies_from_setup,
     supported_mission_packs,
     validate_mission_setup_source_layout,
 )
@@ -69,6 +71,7 @@ from warhammer40k_core.engine.reserves import (
     ReservePlacementViolationCode,
     ReserveState,
 )
+from warhammer40k_core.engine.scoring import VictoryPointSourceKind
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
@@ -279,6 +282,11 @@ def test_phase14j_force_disposition_primary_matrix_is_source_tracked() -> None:
     assert hold_into_purge.primary_mission_id == "primary-immovable-object"
     assert purge_into_hold.primary_mission_id != hold_into_purge.primary_mission_id
     assert mirror.primary_mission_id == "primary-gather-intel"
+    pool_entry = mission_pack.mission_pool_entries[0]
+    assert pool_entry.player_force_disposition_id == "take-and-hold"
+    assert pool_entry.opponent_force_disposition_id == "purge-the-foe"
+    assert pool_entry.player_primary_mission_id == "primary-immovable-object"
+    assert pool_entry.opponent_primary_mission_id == "primary-unstoppable-force"
     assert purge_into_hold.source_status is MissionSourceStatus.IMPLEMENTED
     assert hold_into_purge.source_status is MissionSourceStatus.IMPLEMENTED
     assert (
@@ -373,6 +381,42 @@ def test_phase14j_primary_matrix_lookup_and_references_are_strict() -> None:
         )
 
 
+def test_phase17n_battlefield_graph_completeness_is_explicit_and_fail_closed() -> None:
+    chapter_pack = chapter_approved_2026_27_mission_pack()
+    event_pack = warhammer_event_companion_2026_07_mission_pack()
+
+    assert chapter_pack.requires_complete_battlefield_graph is False
+    assert event_pack.requires_complete_battlefield_graph is True
+
+    with pytest.raises(MissionPackError, match="unknown IDs"):
+        replace(event_pack, battlefield_layouts=event_pack.battlefield_layouts[:-1])
+    with pytest.raises(MissionPackError, match="cover every directional-matrix"):
+        replace(event_pack, mission_pool_entries=event_pack.mission_pool_entries[:-1])
+
+    first_entry = event_pack.mission_pool_entries[0]
+    with pytest.raises(MissionPackError, match="resolved identity is duplicated"):
+        replace(
+            event_pack,
+            mission_pool_entries=(
+                first_entry,
+                replace(first_entry, mission_pool_entry_id="duplicate-source-row"),
+                *event_pack.mission_pool_entries[1:],
+            ),
+        )
+
+    chapter_entry = chapter_pack.mission_pool_entries[0]
+    with pytest.raises(MissionPackError, match="terrain layout drifted"):
+        replace(
+            chapter_pack,
+            mission_pool_entries=(
+                replace(
+                    chapter_entry,
+                    terrain_layout_ids=("disruption-vs-reconnaissance-layout-1",),
+                ),
+            ),
+        )
+
+
 def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
     mission_pack = chapter_approved_2026_27_mission_pack()
     take_and_hold = next(
@@ -417,6 +461,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
         "victory_points": 5,
         "cap": 15,
         "condition": "each_controlled_objective_from_battle_round_two",
+        "resolution_mode": "independent",
+        "resolution_group_id": None,
         "source_id": (
             "gw-11e-chapter-approved-2026-27:primary:take-and-hold:"
             "scoring-rule:take-and-hold-control"
@@ -430,6 +476,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "victory_points": 4,
             "cap": 5,
             "condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
+            "resolution_mode": "independent",
+            "resolution_group_id": None,
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
                 "scoring-rule:bring-it-down-fixed"
@@ -442,6 +490,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "victory_points": 5,
             "cap": 5,
             "condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
+            "resolution_mode": "independent",
+            "resolution_group_id": None,
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
                 "scoring-rule:bring-it-down-tactical"
@@ -454,6 +504,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "victory_points": None,
             "cap": None,
             "condition": "may_discard_if_no_enemy_models_w10_or_more_on_battlefield",
+            "resolution_mode": "independent",
+            "resolution_group_id": None,
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
                 "scoring-rule:bring-it-down-when-drawn"
@@ -515,6 +567,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "victory_points": 3,
             "cap": None,
             "condition": "control_one_or_more_central_objectives",
+            "resolution_mode": "independent",
+            "resolution_group_id": None,
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:"
                 "scoring-rule:immovable-object-central-turn-end"
@@ -527,6 +581,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "victory_points": 5,
             "cap": None,
             "condition": "each_non_home_objective_controlled_battle_rounds_two_to_four",
+            "resolution_mode": "independent",
+            "resolution_group_id": None,
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:"
                 "scoring-rule:immovable-object-rounds-two-to-four-command"
@@ -539,6 +595,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "victory_points": 5,
             "cap": None,
             "condition": "each_non_home_objective_controlled_round_five",
+            "resolution_mode": "independent",
+            "resolution_group_id": None,
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:"
                 "scoring-rule:immovable-object-round-five-turn-end"
@@ -642,14 +700,18 @@ def test_typed_event_layout_instantiates_source_area_placements() -> None:
         mission_pool_entry_id=mission_pool_entry_id,
         terrain_layout_id=layout_id,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     second = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
         mission_pool_entry_id=mission_pool_entry_id,
         terrain_layout_id=layout_id,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
     assert first.to_payload() == second.to_payload()
@@ -712,7 +774,9 @@ def test_phase16a_battlefield_layout_template_matches_source_snapshot() -> None:
         mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
         terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     assert setup.terrain_features == ()
     assert setup.terrain_areas == ()
@@ -766,34 +830,37 @@ def test_mission_setup_from_components_rejects_source_inconsistent_components() 
     deployment_map = mission_pack.deployment_map(PHASE16A_DEPLOYMENT_MAP_ID)
     terrain_layout = mission_pack.terrain_layout_template(PHASE16A_BATTLEFIELD_LAYOUT_ID)
 
-    with pytest.raises(MissionSetupError, match="Primary mission is not present"):
+    with pytest.raises(MissionSetupError, match="Force disposition is not present"):
         MissionSetup.from_components(
             mission_pack=mission_pack,
-            primary_mission_id="not-a-primary",
             deployment_map=deployment_map,
             terrain_layout=terrain_layout,
             attacker_player_id="player-a",
+            attacker_force_disposition_id="not-a-disposition",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         )
 
     with pytest.raises(MissionSetupError, match="Deployment map is not present"):
         MissionSetup.from_components(
             mission_pack=mission_pack,
-            primary_mission_id="primary-immovable-object",
             deployment_map=replace(deployment_map, deployment_map_id="foreign-map"),
             terrain_layout=terrain_layout,
             attacker_player_id="player-a",
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         )
 
     with pytest.raises(MissionSetupError, match="Terrain layout is not present"):
         MissionSetup.from_components(
             mission_pack=mission_pack,
-            primary_mission_id="primary-immovable-object",
             deployment_map=deployment_map,
             terrain_layout=replace(terrain_layout, terrain_layout_id="layout-99"),
             attacker_player_id="player-a",
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         )
 
 
@@ -803,11 +870,12 @@ def test_mission_setup_from_components_rejects_illegal_pool_combination() -> Non
     with pytest.raises(MissionSetupError, match="not a legal Chapter Approved mission pool row"):
         MissionSetup.from_components(
             mission_pack=mission_pack,
-            primary_mission_id="primary-unstoppable-force",
             deployment_map=mission_pack.deployment_map(PHASE16A_DEPLOYMENT_MAP_ID),
             terrain_layout=mission_pack.terrain_layout_template(PHASE16A_BATTLEFIELD_LAYOUT_ID),
             attacker_player_id="player-a",
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id="player-b",
+            defender_force_disposition_id="take-and-hold",
         )
 
 
@@ -815,15 +883,184 @@ def test_mission_setup_payload_preserves_mission_pool_entry_id() -> None:
     mission_pack = chapter_approved_2026_27_mission_pack()
     setup = MissionSetup.from_components(
         mission_pack=mission_pack,
-        primary_mission_id="primary-immovable-object",
         deployment_map=mission_pack.deployment_map(PHASE16A_DEPLOYMENT_MAP_ID),
         terrain_layout=mission_pack.terrain_layout_template(PHASE16A_BATTLEFIELD_LAYOUT_ID),
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
     assert setup.mission_pool_entry_id == PHASE16A_MISSION_POOL_ENTRY_ID
+    assert setup.primary_mission_id_for_player("player-a") == "primary-immovable-object"
+    assert setup.primary_mission_id_for_player("player-b") == "primary-unstoppable-force"
     assert MissionSetup.from_payload(setup.to_payload()).to_payload() == setup.to_payload()
+    legacy_payload = cast(dict[str, object], setup.to_payload())
+    legacy_payload["primary_mission_id"] = "primary-immovable-object"
+    legacy_payload.pop("primary_mission_assignments")
+    with pytest.raises(MissionSetupError, match="payload fields are invalid"):
+        MissionSetup.from_payload(cast(MissionSetupPayload, legacy_payload))
+
+
+def test_game_config_rejects_mission_assignment_muster_disposition_drift() -> None:
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
+        attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
+        defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
+    )
+    config_without_setup = _config(mission_setup=None)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match=("mission Primary assignment Force Disposition does not match ArmyMusterRequest"),
+    ):
+        replace(config_without_setup, mission_setup=setup)
+
+
+def test_game_state_rejects_mustered_army_disposition_drift_at_every_boundary() -> None:
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
+        terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
+        attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
+        defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
+    )
+    config = _config(mission_setup=setup)
+    player_a_request = next(
+        request for request in config.army_muster_requests if request.player_id == "player-a"
+    )
+    player_a_army = muster_army(catalog=config.army_catalog, request=player_a_request)
+    drifted_army = replace(player_a_army, force_disposition_id="purge-the-foe")
+    expected_error = "mission Primary assignment Force Disposition does not match ArmyDefinition"
+
+    state = GameState.from_config(config)
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        state.record_army_definition(drifted_army)
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        state.replace_army_definitions([drifted_army])
+
+    payload = state.to_payload()
+    payload["army_definitions"] = [drifted_army.to_payload()]
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        GameState.from_payload(payload)
+
+    state_without_setup = GameState.from_config(_config(mission_setup=None))
+    state_without_setup.record_army_definition(drifted_army)
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        state_without_setup.record_mission_setup(setup)
+
+
+def test_mission_setup_assigns_directional_primaries_independently_of_battlefield_roles() -> None:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=mission_pack,
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
+        defender_player_id="player-b",
+        defender_force_disposition_id="take-and-hold",
+    )
+
+    assert setup.primary_mission_id_for_player("player-a") == "primary-unstoppable-force"
+    assert setup.primary_mission_id_for_player("player-b") == "primary-immovable-object"
+    validate_mission_setup_source_layout(setup)
+
+
+def test_mission_scoring_policies_resolve_asymmetric_player_primaries() -> None:
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
+        attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
+        defender_player_id="player-b",
+        defender_force_disposition_id="take-and-hold",
+    )
+
+    policies = mission_scoring_policies_from_setup(setup)
+
+    assert policies.source_id == f"{setup.source_id}:scoring"
+    assert policies.policy_for_player("player-a").primary_mission_id == (
+        "primary-unstoppable-force"
+    )
+    assert policies.policy_for_player("player-b").primary_mission_id == ("primary-immovable-object")
+    assert frozenset(
+        rule.rule_id for rule in policies.policy_for_player("player-a").primary_scoring_rules
+    ) == frozenset(
+        (
+            "unstoppable-force-enemy-destroyed-turn-end",
+            "unstoppable-force-objectives",
+            "unstoppable-force-new-objective-turn-end",
+            "unstoppable-force-central-end-battle",
+        )
+    )
+    assert frozenset(
+        rule.rule_id for rule in policies.policy_for_player("player-b").primary_scoring_rules
+    ) == frozenset(
+        (
+            "immovable-object-central-turn-end",
+            "immovable-object-rounds-two-to-four-command",
+            "immovable-object-round-five-turn-end",
+        )
+    )
+    assert policies.policy_for_player("player-a").source_id == (
+        f"{setup.source_id}:scoring:player-a:primary-unstoppable-force"
+    )
+    assert policies.policy_for_player("player-b").source_id == (
+        f"{setup.source_id}:scoring:player-b:primary-immovable-object"
+    )
+
+
+@pytest.mark.parametrize(
+    ("attacker_force_disposition_id", "defender_force_disposition_id"),
+    [
+        ("purge-the-foe", "disruption"),
+        ("disruption", "purge-the-foe"),
+    ],
+)
+def test_mission_scoring_policies_defer_pending_primary_failure_to_owning_path(
+    attacker_force_disposition_id: str,
+    defender_force_disposition_id: str,
+) -> None:
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-disruption-layout-1",
+        attacker_player_id="player-a",
+        attacker_force_disposition_id=attacker_force_disposition_id,
+        defender_player_id="player-b",
+        defender_force_disposition_id=defender_force_disposition_id,
+    )
+
+    policies = mission_scoring_policies_from_setup(setup)
+    implemented = next(
+        policy for policy in policies.player_policies if policy.primary_scoring_supported
+    )
+    pending = next(
+        policy for policy in policies.player_policies if not policy.primary_scoring_supported
+    )
+
+    assert implemented.primary_mission_id == "primary-delaying-action"
+    assert pending.primary_mission_id == "primary-punishment"
+    assert (
+        implemented.cap_bucket_for_victory_point_source(
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            source_id=implemented.primary_mission_id,
+        ).value
+        == "primary"
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Primary mission scoring source is known but engine implementation is pending",
+    ):
+        pending.cap_bucket_for_victory_point_source(
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            source_id=pending.primary_mission_id,
+        )
 
 
 @pytest.mark.parametrize(
@@ -846,7 +1083,9 @@ def test_canonical_layoutless_mission_setup_rejects_complete_source_drift(
         mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
         terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     assert setup.battlefield_layout_id is None
     validate_mission_setup_source_layout(setup)
@@ -858,7 +1097,9 @@ def test_canonical_layoutless_mission_setup_rejects_complete_source_drift(
         setup_payload["source_id"] = "substituted-source"
         setup_payload["source_version"] = "substituted-version"
     elif mutation_kind == "primary_mission":
-        setup_payload["primary_mission_id"] = "take-and-hold"
+        setup_payload["primary_mission_assignments"][0]["primary_mission_id"] = (
+            "primary-meatgrinder"
+        )
     elif mutation_kind == "dimensions":
         setup_payload["battlefield_width_inches"] = 65.0
     elif mutation_kind == "objective_markers":
@@ -875,10 +1116,11 @@ def test_canonical_layoutless_mission_setup_rejects_complete_source_drift(
             _blocking_terrain_feature(x=30.0, y=22.0).to_payload()
         )
 
-    with pytest.raises(
-        GameLifecycleError,
-        match="canonical layoutless setup drifted from source",
-    ):
+    expected_error = {
+        "source_identity": "source package identity drifted",
+        "primary_mission": "Primary mission assignment drifted",
+    }.get(mutation_kind, "canonical layoutless setup drifted from source")
+    with pytest.raises(GameLifecycleError, match=expected_error):
         GameConfig.from_payload(payload)
 
 
@@ -888,7 +1130,9 @@ def test_canonical_layoutless_setup_rejects_runtime_battlefield_dimension_drift(
         mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
         terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     state = GameState.from_config(_config(mission_setup=setup))
     battlefield = BattlefieldRuntimeState(
@@ -948,7 +1192,9 @@ def test_canonical_layoutless_setup_rejects_runtime_battlefield_terrain_drift(
         mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
         terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     state = GameState.from_config(_config(mission_setup=setup))
     battlefield = BattlefieldRuntimeState(
@@ -1005,7 +1251,9 @@ def test_battlefield_layout_and_mission_setup_reject_orphan_logical_terrain_grou
         mission_pool_entry_id=f"mission-{layout_id}",
         terrain_layout_id=layout_id,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     invalid_setup_areas = (
         *(
@@ -1027,7 +1275,9 @@ def test_mission_setup_from_payload_rejects_out_of_bounds_terrain() -> None:
         mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
         terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     setup = replace(setup, terrain_features=(_blocking_terrain_feature(x=30.0, y=22.0),))
     payload = setup.to_payload()
@@ -1050,7 +1300,9 @@ def test_mission_setup_from_payload_wraps_invalid_logical_terrain_identity() -> 
         mission_pool_entry_id=f"mission-{layout_id}",
         terrain_layout_id=layout_id,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     payload = setup.to_payload()
     cast(dict[str, object], payload["terrain_areas"][0]).pop("logical_terrain_area_id")
@@ -1065,7 +1317,9 @@ def test_game_state_round_trips_populated_mission_setup() -> None:
         mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
         terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     state = GameState.from_config(_config(mission_setup=mission_setup))
 
@@ -1077,7 +1331,9 @@ def test_phase17n_battlefield_provenance_survives_config_and_projection() -> Non
         mission_pack=warhammer_event_companion_2026_07_mission_pack(),
         mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     config = _config(mission_setup=mission_setup)
     round_tripped = GameConfig.from_payload(config.to_payload())
@@ -1297,7 +1553,9 @@ def _battle_state_with_mission_setup(
         mission_pool_entry_id=mission_pool_entry_id,
         terrain_layout_id=terrain_layout_id,
         attacker_player_id=attacker_player_id,
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id=defender_player_id,
+        defender_force_disposition_id="purge-the-foe",
     )
     if custom_layoutless:
         mission_setup = replace(
@@ -1609,7 +1867,29 @@ def _objective_coordinate_snapshot(
 
 
 def _config(*, mission_setup: MissionSetup | None) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    source_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = replace(
+        source_catalog,
+        detachments=tuple(
+            replace(
+                detachment,
+                force_disposition_ids=("purge-the-foe", "take-and-hold"),
+            )
+            if detachment.detachment_id == "core-combined-arms"
+            else detachment
+            for detachment in source_catalog.detachments
+        ),
+    )
+    player_a_force_disposition_id = (
+        "purge-the-foe"
+        if mission_setup is None
+        else mission_setup.force_disposition_id_for_player("player-a")
+    )
+    player_b_force_disposition_id = (
+        "purge-the-foe"
+        if mission_setup is None
+        else mission_setup.force_disposition_id_for_player("player-b")
+    )
     return GameConfig(
         game_id="phase11a-game",
         allow_legacy_non_strict_rosters=True,
@@ -1621,12 +1901,14 @@ def _config(*, mission_setup: MissionSetup | None) -> GameConfig:
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_ids=("intercessor-unit-1", "intercessor-unit-2"),
+                force_disposition_id=player_a_force_disposition_id,
             ),
             _army_muster_request(
                 catalog=catalog,
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=("intercessor-unit-3",),
+                force_disposition_id=player_b_force_disposition_id,
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -1642,7 +1924,9 @@ def _custom_layoutless_mission_setup() -> MissionSetup:
         mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID,
         terrain_layout_id=PHASE16A_BATTLEFIELD_LAYOUT_ID,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     return replace(
         setup,
@@ -1688,6 +1972,7 @@ def _army_muster_request(
     player_id: str,
     army_id: str,
     unit_selection_ids: tuple[str, ...],
+    force_disposition_id: str,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -1699,7 +1984,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=force_disposition_id,
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

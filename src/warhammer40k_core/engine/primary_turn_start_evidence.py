@@ -5,6 +5,10 @@ from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
+from warhammer40k_core.engine.mission_terrain import (
+    mission_logical_terrain_areas,
+    model_intersects_logical_terrain_area,
+)
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlTiming,
@@ -15,7 +19,6 @@ from warhammer40k_core.engine.scoring import (
     PrimaryObjectiveTurnStartState,
     PrimaryUnitDestructionState,
 )
-from warhammer40k_core.geometry import shapely_backend
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -38,6 +41,12 @@ class PrimaryUnitTerrainTurnStartSnapshotPayload(TypedDict):
 
 @dataclass(frozen=True, slots=True)
 class PrimaryUnitTerrainMembership:
+    """Turn-start logical terrain-area membership.
+
+    ``terrain_feature_ids`` remains the serialized field name for payload-family
+    continuity; every value is an authoritative logical terrain-area ID.
+    """
+
     unit_instance_id: str
     terrain_feature_ids: tuple[str, ...]
 
@@ -284,10 +293,11 @@ def build_primary_unit_terrain_turn_start_snapshot(
             "Primary terrain turn-start tracking requires mission and battlefield terrain parity."
         )
     removed_model_ids = set(battlefield.removed_model_ids)
+    logical_terrain_areas = mission_logical_terrain_areas(mission_setup)
     memberships: list[PrimaryUnitTerrainMembership] = []
     for army in state.army_definitions:
         for unit in army.units:
-            terrain_feature_ids: set[str] = set()
+            logical_terrain_area_ids: set[str] = set()
             for model in unit.own_models:
                 placement = battlefield.model_placement_or_none(model.model_instance_id)
                 if (
@@ -297,19 +307,15 @@ def build_primary_unit_terrain_turn_start_snapshot(
                 ):
                     continue
                 geometry_model = geometry_model_for_placement(model=model, placement=placement)
-                terrain_feature_ids.update(
-                    feature.feature_id
-                    for feature in battlefield.terrain_features
-                    if shapely_backend.base_footprint_intersects_polygon(
-                        geometry_model.base,
-                        geometry_model.pose,
-                        feature.rules_footprint_points(),
-                    )
+                logical_terrain_area_ids.update(
+                    area.logical_terrain_area_id
+                    for area in logical_terrain_areas
+                    if model_intersects_logical_terrain_area(geometry_model, area=area)
                 )
             memberships.append(
                 PrimaryUnitTerrainMembership(
                     unit_instance_id=unit.unit_instance_id,
-                    terrain_feature_ids=tuple(sorted(terrain_feature_ids)),
+                    terrain_feature_ids=tuple(sorted(logical_terrain_area_ids)),
                 )
             )
     return PrimaryUnitTerrainTurnStartSnapshot(
@@ -381,15 +387,17 @@ def record_primary_unit_terrain_turn_start_snapshot(
         raise GameLifecycleError(
             "PrimaryUnitTerrainTurnStartSnapshot must contain every physical unit."
         )
-    if state.battlefield_state is None:
-        raise GameLifecycleError("PrimaryUnitTerrainTurnStartSnapshot requires battlefield state.")
-    known_feature_ids = {feature.feature_id for feature in state.battlefield_state.terrain_features}
+    known_logical_area_ids = {
+        area.logical_terrain_area_id for area in mission_logical_terrain_areas(state.mission_setup)
+    }
     if any(
-        feature_id not in known_feature_ids
+        area_id not in known_logical_area_ids
         for membership in snapshot.unit_memberships
-        for feature_id in membership.terrain_feature_ids
+        for area_id in membership.terrain_feature_ids
     ):
-        raise GameLifecycleError("PrimaryUnitTerrainTurnStartSnapshot references unknown terrain.")
+        raise GameLifecycleError(
+            "PrimaryUnitTerrainTurnStartSnapshot references an unknown logical terrain area."
+        )
     if any(
         stored.snapshot_id == snapshot.snapshot_id
         or (stored.active_player_id, stored.battle_round)
@@ -481,12 +489,12 @@ def validate_primary_unit_terrain_turn_start_snapshots(
     game_id: str,
     player_ids: tuple[str, ...],
     known_unit_instance_ids: tuple[str, ...],
-    known_terrain_feature_ids: tuple[str, ...],
+    known_logical_terrain_area_ids: tuple[str, ...],
 ) -> list[PrimaryUnitTerrainTurnStartSnapshot]:
     if not isinstance(snapshots, list):
         raise GameLifecycleError("GameState primary terrain turn-start snapshots must be a list.")
     known_units = set(known_unit_instance_ids)
-    known_features = set(known_terrain_feature_ids)
+    known_areas = set(known_logical_terrain_area_ids)
     validated: list[PrimaryUnitTerrainTurnStartSnapshot] = []
     seen_ids: set[str] = set()
     seen_turns: set[tuple[str, int]] = set()
@@ -515,11 +523,10 @@ def validate_primary_unit_terrain_turn_start_snapshots(
                 raise GameLifecycleError(
                     "Primary terrain turn-start snapshot references an unknown unit."
                 )
-            if any(
-                feature_id not in known_features for feature_id in membership.terrain_feature_ids
-            ):
+            if any(area_id not in known_areas for area_id in membership.terrain_feature_ids):
                 raise GameLifecycleError(
-                    "Primary terrain turn-start snapshot references an unknown terrain feature."
+                    "Primary terrain turn-start snapshot references an unknown logical "
+                    "terrain area."
                 )
         if {membership.unit_instance_id for membership in snapshot.unit_memberships} != known_units:
             raise GameLifecycleError(

@@ -826,7 +826,9 @@ def _config() -> GameConfig:
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id="player-a",
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         ),
     )
 
@@ -848,7 +850,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=("take-and-hold" if player_id == "player-a" else "purge-the-foe"),
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,

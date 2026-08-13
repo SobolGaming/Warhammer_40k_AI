@@ -100,7 +100,10 @@ from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mission_setup import (
+    MissionSetup,
+    PlayerPrimaryMissionAssignment,
+)
 from warhammer40k_core.engine.movement_proposals import (
     PLACEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -168,10 +171,8 @@ from warhammer40k_core.geometry.visibility import (
     CoverSourceReason,
     CoverSourceRecord,
 )
-from warhammer40k_core.rules.source_packages.warhammer_40000_11th.chapter_approved_2026_27 import (
-    MISSION_PACK_ID,
-    SOURCE_PACKAGE_ID,
-    SOURCE_VERSION,
+from warhammer40k_core.rules.mission_pack_import import (
+    warhammer_event_companion_2026_07_mission_pack,
 )
 
 __all__ = (
@@ -1043,12 +1044,24 @@ def _alpha_unit_spec(
 
 @cache
 def _mission_setup() -> MissionSetup:
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     return MissionSetup(
-        mission_pack_id=MISSION_PACK_ID,
-        source_version=SOURCE_VERSION,
-        source_id=SOURCE_PACKAGE_ID,
-        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
-        primary_mission_id="take-and-hold",
+        mission_pack_id=mission_pack.mission_pack_id,
+        source_version=mission_pack.source_version,
+        source_id=mission_pack.source_id,
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-3",
+        primary_mission_assignments=(
+            PlayerPrimaryMissionAssignment(
+                player_id="player-a",
+                force_disposition_id="purge-the-foe",
+                primary_mission_id="primary-meatgrinder",
+            ),
+            PlayerPrimaryMissionAssignment(
+                player_id="player-b",
+                force_disposition_id="purge-the-foe",
+                primary_mission_id="primary-meatgrinder",
+            ),
+        ),
         battlefield_layout_id=None,
         deployment_map_id="phase13b-open-map",
         terrain_layout_id="phase13b-open-layout",

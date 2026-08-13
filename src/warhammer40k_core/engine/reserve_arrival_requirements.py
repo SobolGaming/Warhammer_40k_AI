@@ -91,7 +91,7 @@ def reposition_destruction_policy(
     destruction_deadline_policy: object,
 ) -> ReserveDestructionTimingPolicy:
     from warhammer40k_core.engine.missions import (
-        mission_scoring_policy_from_setup,
+        mission_scoring_policies_from_setup,
         reserve_destruction_policy_from_scoring_policy,
     )
     from warhammer40k_core.engine.reserves import ReserveDestructionTimingPolicy
@@ -100,7 +100,7 @@ def reposition_destruction_policy(
         if mission_setup is None:
             return ReserveDestructionTimingPolicy.core_rules_default()
         return reserve_destruction_policy_from_scoring_policy(
-            mission_scoring_policy_from_setup(mission_setup)
+            mission_scoring_policies_from_setup(mission_setup).common_policy
         )
     if type(destruction_deadline_policy) is not ReserveDestructionTimingPolicy:
         raise GameLifecycleError("Repositioned unit destruction_deadline_policy must be a policy.")

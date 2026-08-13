@@ -530,7 +530,7 @@ def _thousand_sons_config(*, game_id: str) -> GameConfig:
                     faction_id=army_rule.THOUSAND_SONS_FACTION_ID,
                     detachment_ids=(THOUSAND_SONS_DETACHMENT_ID,),
                 ),
-                force_disposition_id="phase17g-thousand-sons-force",
+                force_disposition_id="take-and-hold",
                 unit_selections=(
                     _unit_selection("rubric-marines", MANIFESTER_DATASHEET_ID),
                     _unit_selection("scarab-occult", FRIENDLY_TARGET_DATASHEET_ID),
@@ -546,7 +546,7 @@ def _thousand_sons_config(*, game_id: str) -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=(OPFOR_DETACHMENT_ID,),
                 ),
-                force_disposition_id="phase17g-thousand-sons-opfor",
+                force_disposition_id="purge-the-foe",
                 unit_selections=(
                     _unit_selection("enemy-unit", "core-intercessor-like-infantry"),
                     _unit_selection("enemy-unit-2", "core-intercessor-like-infantry"),
@@ -610,7 +610,7 @@ def _thousand_sons_catalog() -> ArmyCatalog:
                 faction_id=army_rule.THOUSAND_SONS_FACTION_ID,
                 detachment_point_cost=1,
                 unit_datasheet_ids=(MANIFESTER_DATASHEET_ID, FRIENDLY_TARGET_DATASHEET_ID),
-                force_disposition_ids=("phase17g-thousand-sons-force",),
+                force_disposition_ids=("phase17g-thousand-sons-force", "take-and-hold"),
                 source_ids=("phase17g:thousand-sons:detachment:grand-coven",),
             ),
             DetachmentDefinition(
@@ -622,7 +622,7 @@ def _thousand_sons_catalog() -> ArmyCatalog:
                     "core-intercessor-like-infantry",
                     ENEMY_LONE_OPERATIVE_DATASHEET_ID,
                 ),
-                force_disposition_ids=("phase17g-thousand-sons-opfor",),
+                force_disposition_ids=("phase17g-thousand-sons-opfor", "purge-the-foe"),
                 source_ids=("phase17g:thousand-sons:detachment:opfor",),
             ),
         ),
@@ -891,7 +891,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 

@@ -847,7 +847,7 @@ def _tau_config(*, non_tau_selected: bool) -> GameConfig:
                     faction_id=player_a_faction_id,
                     detachment_ids=(player_a_detachment_id,),
                 ),
-                force_disposition_id="phase17g-force",
+                force_disposition_id="take-and-hold",
                 unit_selections=(
                     _unit_selection("pathfinders", MARKER_OBSERVER_DATASHEET_ID),
                     _unit_selection("strike-team", OBSERVER_DATASHEET_ID),
@@ -952,7 +952,7 @@ def _tau_lifecycle_catalog() -> ArmyCatalog:
                     FORTIFICATION_DATASHEET_ID,
                     BATTLE_SHOCKED_DATASHEET_ID,
                 ),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=("phase17g:tau:detachment:kauyon",),
             ),
             DetachmentDefinition(
@@ -967,7 +967,7 @@ def _tau_lifecycle_catalog() -> ArmyCatalog:
                     FORTIFICATION_DATASHEET_ID,
                     BATTLE_SHOCKED_DATASHEET_ID,
                 ),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=("phase17g:tau:non-tau:detachment",),
             ),
         ),
@@ -1071,7 +1071,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 

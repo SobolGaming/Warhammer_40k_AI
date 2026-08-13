@@ -1605,7 +1605,7 @@ def _death_guard_config() -> GameConfig:
                     faction_id=army_rule.DEATH_GUARD_FACTION_ID,
                     detachment_ids=("plague-company",),
                 ),
-                force_disposition_id="phase17g-force",
+                force_disposition_id="take-and-hold",
                 unit_selections=(
                     UnitMusterSelection(
                         unit_selection_id="plague-marine",
@@ -1641,7 +1641,9 @@ def _death_guard_config() -> GameConfig:
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id="player-a",
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         ),
     )
 
@@ -1670,7 +1672,7 @@ def _death_guard_catalog() -> ArmyCatalog:
                 faction_id=army_rule.DEATH_GUARD_FACTION_ID,
                 detachment_point_cost=1,
                 unit_datasheet_ids=(DEATH_GUARD_TEST_DATASHEET_ID,),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:death-guard:plague-company",
                 ),

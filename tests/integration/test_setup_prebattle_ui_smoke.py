@@ -333,7 +333,18 @@ def _assert_pending_layout_has_typed_terrain_geometry(view: GameViewPayload) -> 
 
 def _assert_typed_terrain_geometry_payload(mission_setup: dict[str, JsonValue]) -> None:
     assert mission_setup["mission_pack_id"] == "11e-warhammer-event-companion-2026-07"
-    assert mission_setup["primary_mission_id"] == "primary-immovable-object"
+    assert mission_setup["primary_mission_assignments"] == [
+        {
+            "player_id": "player-a",
+            "force_disposition_id": "take-and-hold",
+            "primary_mission_id": "primary-immovable-object",
+        },
+        {
+            "player_id": "player-b",
+            "force_disposition_id": "purge-the-foe",
+            "primary_mission_id": "primary-unstoppable-force",
+        },
+    ]
     assert mission_setup["battlefield_layout_id"] == "take-and-hold-vs-purge-the-foe-layout-3"
     assert (
         mission_setup["deployment_map_id"] == "take-and-hold-vs-purge-the-foe-layout-3-deployment"

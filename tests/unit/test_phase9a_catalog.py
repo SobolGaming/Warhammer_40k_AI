@@ -187,7 +187,10 @@ def test_army_catalog_round_trips_canonical_phase9a_content_pack() -> None:
     assert len(catalog.datasheets) == 7
     assert catalog.faction_by_id("core-marine-force").faction_keywords == ("CORE MARINES",)
     assert catalog.detachments[0].detachment_point_cost == 1
-    assert catalog.detachments[0].force_disposition_ids == ("purge-the-foe",)
+    assert catalog.detachments[0].force_disposition_ids == (
+        "purge-the-foe",
+        "take-and-hold",
+    )
     assert "core-intercessor-like-infantry" in catalog.detachments[0].unit_datasheet_ids
     assert infantry_profile.characteristic(Characteristic.MOVEMENT).final == 6
     assert deep_strike.abilities[0].support is CatalogAbilitySupport.UNSUPPORTED

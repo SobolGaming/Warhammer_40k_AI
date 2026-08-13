@@ -312,7 +312,7 @@ def _rangers_facade_catalog() -> ArmyCatalog:
         faction_id=detachment_row.faction_id,
         detachment_point_cost=detachment_row.detachment_point_cost,
         unit_datasheet_ids=(_RANGERS_DATASHEET_ID,),
-        force_disposition_ids=(detachment_row.force_disposition_id,),
+        force_disposition_ids=(detachment_row.force_disposition_id, "take-and-hold"),
         source_ids=detachment_row.source_ids,
     )
     return ArmyCatalog(
@@ -366,7 +366,9 @@ def _rangers_movement_session(
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id="player-a",
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         ),
     )
     armies = tuple(
@@ -420,7 +422,7 @@ def _rangers_muster_request(
             faction_id=_AELDARI_FACTION_ID,
             detachment_ids=(_AELDARI_DETACHMENT_ID,),
         ),
-        force_disposition_id="reconnaissance",
+        force_disposition_id="take-and-hold",
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=selection_id,

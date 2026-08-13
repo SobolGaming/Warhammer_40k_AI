@@ -16,8 +16,11 @@ from warhammer40k_core.engine.mission_action_eligibility import (
     mission_action_unit_ineligibility_reason,
 )
 from warhammer40k_core.engine.mission_terrain import (
-    terrain_feature_within_player_deployment_zone,
-    terrain_feature_within_player_territory,
+    logical_terrain_area_within_player_deployment_zone,
+    logical_terrain_area_within_player_territory,
+    mission_logical_terrain_area_by_id,
+    mission_logical_terrain_areas,
+    model_intersects_logical_terrain_area,
 )
 from warhammer40k_core.engine.missions import mission_pack_for_id
 from warhammer40k_core.engine.objective_control import (
@@ -26,6 +29,9 @@ from warhammer40k_core.engine.objective_control import (
     resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.primary_scoring_conditions import (
+    home_objective_ids as _home_objective_ids,
+)
 from warhammer40k_core.engine.rules_units import (
     rules_unit_display_name,
     rules_unit_id_for_unit_id,
@@ -34,8 +40,6 @@ from warhammer40k_core.engine.rules_units import (
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import SecondaryMissionCardStatus
-from warhammer40k_core.geometry import shapely_backend
-from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
 SUPPORTED_MISSION_ACTION_TARGET_POLICIES = frozenset(
     ("objective_marker", "trappable_terrain_area", "plunderable_terrain_area")
@@ -200,9 +204,12 @@ def available_mission_actions_for_state(
         if card.player_id == requested_player and card.status is SecondaryMissionCardStatus.ACTIVE
     }
     available: list[MissionActionDefinition] = []
+    assigned_primary_mission_id = state.mission_setup.primary_mission_id_for_player(
+        requested_player
+    )
     for action in mission_pack.mission_actions:
         if action.mission_kind == "primary":
-            if action.mission_id == state.mission_setup.primary_mission_id:
+            if action.mission_id == assigned_primary_mission_id:
                 available.append(action)
             continue
         if action.mission_kind == "secondary":
@@ -322,6 +329,9 @@ def _objective_marker_target_ids_by_unit(
     action: MissionActionDefinition,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> dict[str, tuple[str, ...]]:
+    mission_setup = state.mission_setup
+    if mission_setup is None:
+        raise GameLifecycleError("Objective Mission Action requires MissionSetup.")
     record = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
             state,
@@ -334,9 +344,11 @@ def _objective_marker_target_ids_by_unit(
     home_objective_ids: frozenset[str]
     already_actioned_objective_ids: set[str]
     if action.mission_action_id == "cleanse-objective":
-        home_objective_ids = _home_objective_ids_for_player(
-            state=state,
-            player_id=player_id,
+        home_objective_ids = frozenset(
+            _home_objective_ids(
+                mission_setup,
+                player_id=player_id,
+            )
         )
         already_actioned_objective_ids = {
             action_state.target_id
@@ -389,22 +401,22 @@ def _trappable_terrain_target_ids_by_unit(
             sort_values=True,
         )
     )
-    trapped_feature_ids = {
+    trapped_area_ids = {
         trap.terrain_feature_id
         for trap in state.primary_terrain_trap_states
         if trap.player_id == requested_player
     }
-    candidate_features = tuple(
-        feature
-        for feature in state.mission_setup.terrain_features
-        if feature.feature_id not in trapped_feature_ids
-        and not terrain_feature_within_player_deployment_zone(
-            feature,
+    candidate_areas = tuple(
+        area
+        for area in mission_logical_terrain_areas(state.mission_setup)
+        if area.logical_terrain_area_id not in trapped_area_ids
+        and not logical_terrain_area_within_player_deployment_zone(
+            area,
             mission_setup=state.mission_setup,
             player_id=requested_player,
         )
     )
-    if not candidate_features:
+    if not candidate_areas:
         return {}
     placed_army = battlefield_state.placed_army_for_player_or_none(requested_player)
     if placed_army is None:
@@ -422,9 +434,11 @@ def _trappable_terrain_target_ids_by_unit(
                 model=scenario.model_instance_for_placement(model_placement),
                 placement=model_placement,
             )
-            for feature in candidate_features:
-                if _model_is_within_terrain_area(model=model, feature=feature):
-                    targets_by_unit.setdefault(rules_unit_id, set()).add(feature.feature_id)
+            for area in candidate_areas:
+                if model_intersects_logical_terrain_area(model, area=area):
+                    targets_by_unit.setdefault(rules_unit_id, set()).add(
+                        area.logical_terrain_area_id
+                    )
     return {
         unit_id: tuple(sorted(target_ids))
         for unit_id, target_ids in sorted(targets_by_unit.items(), key=lambda item: item[0])
@@ -450,7 +464,7 @@ def _plunderable_terrain_target_ids_by_unit(
         player_id=player_id,
         scenario=scenario,
         placed_unit_ids=placed_unit_ids,
-        excluded_feature_ids=(),
+        excluded_logical_terrain_area_ids=(),
     )
 
 
@@ -460,7 +474,7 @@ def _terrain_area_target_ids_by_unit(
     player_id: str,
     scenario: BattlefieldScenario,
     placed_unit_ids: tuple[str, ...],
-    excluded_feature_ids: tuple[str, ...],
+    excluded_logical_terrain_area_ids: tuple[str, ...],
 ) -> dict[str, tuple[str, ...]]:
     if state.mission_setup is None:
         raise GameLifecycleError("Terrain area Mission Action requires MissionSetup.")
@@ -478,23 +492,23 @@ def _terrain_area_target_ids_by_unit(
     )
     excluded_ids = set(
         _validate_identifier_tuple(
-            "excluded_feature_ids",
-            excluded_feature_ids,
+            "excluded_logical_terrain_area_ids",
+            excluded_logical_terrain_area_ids,
             min_length=0,
             sort_values=True,
         )
     )
-    candidate_features = tuple(
-        feature
-        for feature in state.mission_setup.terrain_features
-        if feature.feature_id not in excluded_ids
-        and not terrain_feature_within_player_territory(
-            feature,
+    candidate_areas = tuple(
+        area
+        for area in mission_logical_terrain_areas(state.mission_setup)
+        if area.logical_terrain_area_id not in excluded_ids
+        and not logical_terrain_area_within_player_territory(
+            area,
             mission_setup=state.mission_setup,
             player_id=requested_player,
         )
     )
-    if not candidate_features:
+    if not candidate_areas:
         return {}
     placed_army = battlefield_state.placed_army_for_player_or_none(requested_player)
     if placed_army is None:
@@ -512,52 +526,15 @@ def _terrain_area_target_ids_by_unit(
                 model=scenario.model_instance_for_placement(model_placement),
                 placement=model_placement,
             )
-            for feature in candidate_features:
-                if _model_is_within_terrain_area(model=model, feature=feature):
-                    targets_by_unit.setdefault(rules_unit_id, set()).add(feature.feature_id)
+            for area in candidate_areas:
+                if model_intersects_logical_terrain_area(model, area=area):
+                    targets_by_unit.setdefault(rules_unit_id, set()).add(
+                        area.logical_terrain_area_id
+                    )
     return {
         unit_id: tuple(sorted(target_ids))
         for unit_id, target_ids in sorted(targets_by_unit.items(), key=lambda item: item[0])
     }
-
-
-def _home_objective_ids_for_player(
-    *,
-    state: GameState,
-    player_id: str,
-) -> frozenset[str]:
-    if state.mission_setup is None:
-        raise GameLifecycleError("Home objective lookup requires MissionSetup.")
-    requested_player = _validate_player_id(state=state, player_id=player_id)
-    zones = tuple(
-        zone for zone in state.mission_setup.deployment_zones if zone.player_id == requested_player
-    )
-    return frozenset(
-        marker.objective_marker_id
-        for marker in state.mission_setup.objective_markers
-        if any(zone.contains_point(marker.x_inches, marker.y_inches) for zone in zones)
-    )
-
-
-def _model_is_within_terrain_area(
-    *,
-    model: object,
-    feature: TerrainFeatureDefinition,
-) -> bool:
-    from warhammer40k_core.geometry.volume import Model as GeometryModel
-
-    if type(model) is not GeometryModel:
-        raise GameLifecycleError("terrain target check requires a GeometryModel.")
-    if type(feature) is not TerrainFeatureDefinition:
-        raise GameLifecycleError("terrain target check requires TerrainFeatureDefinition.")
-    return (
-        shapely_backend.base_footprint_distance_to_polygon(
-            model.base,
-            model.pose,
-            feature.rules_footprint_points(),
-        )
-        == 0.0
-    )
 
 
 def _target_kind_for_policy(target_policy: str) -> str:
@@ -565,7 +542,7 @@ def _target_kind_for_policy(target_policy: str) -> str:
     if policy == "objective_marker":
         return "objective_marker"
     if policy in {"trappable_terrain_area", "plunderable_terrain_area"}:
-        return "terrain_feature"
+        return "terrain_area"
     raise GameLifecycleError("Unsupported Mission Action target policy.")
 
 
@@ -575,10 +552,11 @@ def _target_display_name(*, state: GameState, target_id: str) -> str:
     for marker in state.mission_setup.objective_markers:
         if marker.objective_marker_id == target_id:
             return marker.name
-    for feature in state.mission_setup.terrain_features:
-        if feature.feature_id == target_id:
-            return f"{feature.feature_kind.value.replace('_', ' ').title()} terrain"
-    raise GameLifecycleError("Mission Action target display identity is unknown.")
+    mission_logical_terrain_area_by_id(
+        state.mission_setup,
+        logical_terrain_area_id=target_id,
+    )
+    return "Terrain area"
 
 
 def _canonical_keyword(keyword: str) -> str:

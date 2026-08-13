@@ -484,7 +484,7 @@ def _black_templars_config(
                     faction_id=army_rule.BLACK_TEMPLARS_FACTION_ID,
                     detachment_ids=("marshals-household",),
                 ),
-                force_disposition_id="phase17g-force",
+                force_disposition_id="take-and-hold",
                 unit_selections=(_unit_selection("crusader-squad", BLACK_TEMPLARS_DATASHEET_ID),),
             ),
             ArmyMusterRequest(
@@ -497,7 +497,7 @@ def _black_templars_config(
                     faction_id="core-marine-force",
                     detachment_ids=("phase17g-black-templars-enemy-force",),
                 ),
-                force_disposition_id="phase17g-force",
+                force_disposition_id="purge-the-foe",
                 unit_selections=(
                     _unit_selection("enemy-psyker", ENEMY_PSYKER_DATASHEET_ID),
                     _unit_selection("enemy-non-psyker", ENEMY_NON_PSYKER_DATASHEET_ID),
@@ -557,7 +557,7 @@ def _black_templars_lifecycle_catalog() -> ArmyCatalog:
                 faction_id=army_rule.BLACK_TEMPLARS_FACTION_ID,
                 detachment_point_cost=1,
                 unit_datasheet_ids=(BLACK_TEMPLARS_DATASHEET_ID,),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=("phase17g:black-templars:detachment:marshals-household",),
             ),
             DetachmentDefinition(
@@ -569,7 +569,7 @@ def _black_templars_lifecycle_catalog() -> ArmyCatalog:
                     ENEMY_PSYKER_DATASHEET_ID,
                     ENEMY_NON_PSYKER_DATASHEET_ID,
                 ),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "purge-the-foe"),
                 source_ids=("phase17g:black-templars:detachment:enemy-force",),
             ),
         ),
@@ -795,7 +795,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 

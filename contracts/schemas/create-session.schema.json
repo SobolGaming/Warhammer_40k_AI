@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v2/create-session.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v3/create-session.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -297,7 +297,28 @@
           "oneOf": [
             {
               "minProperties": 1,
+              "not": {"required": ["primary_mission_id"]},
               "properties": {
+                "primary_mission_assignments": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "force_disposition_id": {"minLength": 1, "type": "string"},
+                      "player_id": {"minLength": 1, "type": "string"},
+                      "primary_mission_id": {"minLength": 1, "type": "string"}
+                    },
+                    "required": [
+                      "player_id",
+                      "force_disposition_id",
+                      "primary_mission_id"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array",
+                  "uniqueItems": true
+                },
                 "terrain_areas": {
                   "items": {
                     "properties": {
@@ -309,7 +330,7 @@
                   "type": "array"
                 }
               },
-              "required": ["terrain_areas"],
+              "required": ["primary_mission_assignments", "terrain_areas"],
               "type": "object"
             },
             {"type": "null"}
@@ -358,7 +379,7 @@
       "type": "object"
     },
     "schema_version": {
-      "const": "create-session-v2",
+      "const": "create-session-v3",
       "type": "string"
     }
   },

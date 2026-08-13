@@ -8065,7 +8065,18 @@
         ]
       }
     ],
-    "primary_mission_id": "primary-immovable-object",
+    "primary_mission_assignments": [
+      {
+        "force_disposition_id": "take-and-hold",
+        "player_id": "player-a",
+        "primary_mission_id": "primary-immovable-object"
+      },
+      {
+        "force_disposition_id": "purge-the-foe",
+        "player_id": "player-b",
+        "primary_mission_id": "primary-unstoppable-force"
+      }
+    ],
     "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
     "source_version": "1.1",
     "terrain_areas": [
@@ -13209,7 +13220,7 @@
       "setup_step": "select_secondary_missions"
     },
     "request_id": "decision-request-000002",
-    "schema_version": "decision-request-view-v2-interaction"
+    "schema_version": "decision-request-view-v3-primary-assignments"
   },
   "pending_proposal": null,
   "player_ids": [
@@ -13217,8 +13228,8 @@
     "player-b"
   ],
   "primary_unit_terrain_turn_start_snapshots": [],
-  "projection_schema": "game-view-v8-phase17n",
-  "projection_state_hash": "127ee181d16be1f12bdd041d55eaec9696c18b790c0be7a7c29fbf7e30f8c0ac",
+  "projection_schema": "game-view-v9-phase17n",
+  "projection_state_hash": "25253c0b8455ec188818097c6aa8619ddba960b532ebbec5902ea27c809b5466",
   "public_command_point_ledgers": [
     {
       "command_points": 0,
@@ -13260,7 +13271,7 @@
       "game": "warhammer_40000",
       "version": "core-v2-phase9a"
     },
-    "source_hash": "867152e5e5856a1d37d8993a333fa5b733e1e4aa1352072cbd56d03c86711e04",
+    "source_hash": "775a6d117a0cfe36b5434a44008f361223ff968057faa13c9d4941ba04551655",
     "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
   },
   "stage": "setup",

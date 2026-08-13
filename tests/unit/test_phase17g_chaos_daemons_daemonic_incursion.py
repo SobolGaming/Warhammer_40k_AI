@@ -3001,7 +3001,7 @@ def _daemonic_incursion_catalog() -> ArmyCatalog:
                 faction_id=rule.CHAOS_DAEMONS_FACTION_ID,
                 detachment_point_cost=1,
                 unit_datasheet_ids=(_DAEMONIC_INCURSION_DATASHEET_ID,),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:"
                     "chaos-daemons:daemonic-incursion",
@@ -3013,7 +3013,7 @@ def _daemonic_incursion_catalog() -> ArmyCatalog:
                 faction_id=rule.CHAOS_DAEMONS_FACTION_ID,
                 detachment_point_cost=1,
                 unit_datasheet_ids=(_DAEMONIC_INCURSION_DATASHEET_ID,),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=(
                     "gw-11e-faction-detachments-2026-27:detachment:chaos-daemons:warptide",
                 ),
@@ -3043,7 +3043,7 @@ def _army_muster_request(
             detachment_ids=(detachment_id,),
         ),
         force_disposition_id=(
-            "purge-the-foe" if faction_id == "core-marine-force" else "phase17g-force"
+            "purge-the-foe" if faction_id == "core-marine-force" else "take-and-hold"
         ),
         unit_selections=(
             UnitMusterSelection(
@@ -3066,7 +3066,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 

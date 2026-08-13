@@ -61,7 +61,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:discard_tactical_secondary_mission",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -126,7 +126,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:draw_tactical_secondary_missions",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -191,7 +191,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:replace_tactical_secondary_mission",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -256,7 +256,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:resolve_fight_interrupt",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -321,7 +321,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:resolve_reaction_window",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -386,7 +386,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:resolve_sequencing_order",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -451,7 +451,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:score_tactical_secondary_mission",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -516,7 +516,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_allocation_order",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -585,7 +585,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_attack_weapon_group",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -650,7 +650,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_catalog_any_phase_once_per_battle_ability",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -717,7 +717,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_catalog_movement_end_target_effect",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -782,7 +782,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_catalog_movement_target_pair",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -849,7 +849,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_catalog_post_fight_hit_target_effect",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -916,7 +916,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_catalog_post_shoot_hit_target_effect",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -983,7 +983,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_catalog_post_shoot_hit_target_status",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1048,7 +1048,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_catalog_setup_reactive_shoot_charge",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1115,7 +1115,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_catalog_unit_move_completed_mortal_wounds_target",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1180,7 +1180,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_charge_declaration_grant",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1247,7 +1247,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_charging_unit",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1312,7 +1312,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_cult_ambush_resurgence",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1379,7 +1379,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_damage_allocation_model",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1446,7 +1446,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_deployment_unit",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1513,7 +1513,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_desperate_escape_model",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1578,7 +1578,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_destruction_reaction",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1645,7 +1645,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_dice_reroll",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1712,7 +1712,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_dice_result_override",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1779,7 +1779,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_disembark_unit",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1846,7 +1846,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_embark_transport",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1911,7 +1911,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_faction_rule_battle_round_option",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -1976,7 +1976,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_faction_rule_command_phase_start_option",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2041,7 +2041,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_faction_rule_fight_phase_end_option",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2106,7 +2106,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_faction_rule_fight_phase_start_option",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2171,7 +2171,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_faction_rule_setup_option",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2236,7 +2236,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_faction_rule_shooting_phase_start_option",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2301,7 +2301,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_faction_rule_turn_end_option",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2366,7 +2366,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_feel_no_pain",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2433,7 +2433,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_fight_activation",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2498,7 +2498,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_fight_activation_ability",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2563,7 +2563,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_fight_unit_grant",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2630,7 +2630,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_healing_model",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2695,7 +2695,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_movement_action",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2760,7 +2760,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_movement_action_grant",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2827,7 +2827,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_movement_unit",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2894,7 +2894,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_post_roll_attack_pool",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -2959,7 +2959,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_prebattle_action",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3026,7 +3026,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_precision_allocation",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3091,7 +3091,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_psychic_attack_modifier_ignores",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3158,7 +3158,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_redeploy_unit",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3225,7 +3225,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_reinforcement_unit",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3290,7 +3290,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_reserve_declaration",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3357,7 +3357,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_resolve_target_unit",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3422,7 +3422,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_secondary_missions",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3487,7 +3487,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_shooting_type",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3554,7 +3554,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_shooting_unit",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3619,7 +3619,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_shooting_unit_grant",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3684,7 +3684,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_stratagem_cost_modifier_option",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3751,7 +3751,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_tracked_target",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3816,7 +3816,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_triggered_movement",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3881,7 +3881,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:start_mission_action",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -3946,7 +3946,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:use_stratagem",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -4011,7 +4011,7 @@
           "contract_fixture": true
         },
         "request_id": "interaction-conformance:select_weapon_ability_instance",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "finite_option"
     },
@@ -4092,7 +4092,7 @@
           }
         },
         "request_id": "interaction-conformance:advance",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "advance"
     },
@@ -4202,7 +4202,7 @@
           }
         },
         "request_id": "interaction-conformance:charge_move",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "charge_move"
     },
@@ -4281,7 +4281,7 @@
           }
         },
         "request_id": "interaction-conformance:consolidate",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "consolidate"
     },
@@ -4364,7 +4364,7 @@
           }
         },
         "request_id": "interaction-conformance:cult_ambush_marker_placement",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "place_marker"
     },
@@ -4446,7 +4446,7 @@
           }
         },
         "request_id": "interaction-conformance:cult_ambush_no_marker",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "no_marker"
     },
@@ -4544,7 +4544,7 @@
           }
         },
         "request_id": "interaction-conformance:cult_ambush_placement",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "cult_ambush_placement"
     },
@@ -4642,7 +4642,7 @@
           }
         },
         "request_id": "interaction-conformance:deep_strike_placement",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "deep_strike_placement"
     },
@@ -4807,7 +4807,7 @@
           }
         },
         "request_id": "interaction-conformance:deployment_placement",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "deployment_placement"
     },
@@ -4907,7 +4907,7 @@
           }
         },
         "request_id": "interaction-conformance:disembark_placement",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "disembark_placement"
     },
@@ -4988,7 +4988,7 @@
           }
         },
         "request_id": "interaction-conformance:fall_back",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "fall_back"
     },
@@ -5085,7 +5085,7 @@
           }
         },
         "request_id": "interaction-conformance:healing_revival_placement",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "healing_revival_placement"
     },
@@ -5177,7 +5177,7 @@
           }
         },
         "request_id": "interaction-conformance:melee_declaration",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "melee_declaration"
     },
@@ -5291,7 +5291,7 @@
           }
         },
         "request_id": "interaction-conformance:model_materialization_placement",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "model_materialization_placement"
     },
@@ -5498,7 +5498,7 @@
           }
         },
         "request_id": "interaction-conformance:normal_move",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "normal_move"
     },
@@ -5577,7 +5577,7 @@
           }
         },
         "request_id": "interaction-conformance:pile_in",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "pile_in"
     },
@@ -5679,7 +5679,7 @@
           }
         },
         "request_id": "interaction-conformance:redeploy_placement",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "redeploy_placement"
     },
@@ -5777,7 +5777,7 @@
           }
         },
         "request_id": "interaction-conformance:reinforcement_placement",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "reinforcement_placement"
     },
@@ -5866,7 +5866,7 @@
           }
         },
         "request_id": "interaction-conformance:scout_move",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "scout_move"
     },
@@ -5968,7 +5968,7 @@
           }
         },
         "request_id": "interaction-conformance:scout_reserve_setup",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "scout_reserve_setup"
     },
@@ -6062,7 +6062,7 @@
           }
         },
         "request_id": "interaction-conformance:shooting_declaration",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "shooting_declaration"
     },
@@ -6187,7 +6187,7 @@
           }
         },
         "request_id": "interaction-conformance:stratagem_target_binding",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "stratagem_target_binding"
     },
@@ -6285,7 +6285,7 @@
           }
         },
         "request_id": "interaction-conformance:strategic_reserves_placement",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "strategic_reserves_placement"
     },
@@ -6379,7 +6379,7 @@
           }
         },
         "request_id": "interaction-conformance:submit_return_on_death_placement",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "return_on_death_placement"
     },
@@ -6460,10 +6460,10 @@
           }
         },
         "request_id": "interaction-conformance:surge_move",
-        "schema_version": "annotated-decision-request-v1"
+        "schema_version": "annotated-decision-request-v2-primary-assignments"
       },
       "submission_variant_id": "surge_move"
     }
   ],
-  "schema_version": "interaction-conformance-v1"
+  "schema_version": "interaction-conformance-v2-primary-assignments"
 }

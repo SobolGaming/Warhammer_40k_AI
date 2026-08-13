@@ -1867,7 +1867,9 @@ def _phase17n_exact_meatgrinder_setup() -> MissionSetup:
         mission_pack=warhammer_event_companion_2026_07_mission_pack(),
         mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 
@@ -2989,7 +2991,9 @@ def test_duplicate_anti_selection_flows_from_declaration_into_wound_resolution()
         anti_infantry.ability_id,
     }
     assert anti_selection_request in nested_requests
-    assert anti_selection_request["schema_version"] == "annotated-decision-request-v1"
+    assert anti_selection_request["schema_version"] == (
+        "annotated-decision-request-v2-primary-assignments"
+    )
     assert anti_interaction["schema_version"] == "interaction-descriptor-v2-variants"
     assert anti_interaction["interaction_kind"] == "finite_option_list"
     assert (

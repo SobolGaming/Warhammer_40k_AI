@@ -118,12 +118,17 @@ def test_phase17k_post_shoot_hit_target_cover_denial_records_and_applies_effect(
         army_id="army-opponent",
         unit_selection_id="enemy-lord-of-change-1",
     )
-    army = flesh_hounds_army(package=package, unit=unit)
+    army = flesh_hounds_army(
+        package=package,
+        unit=unit,
+        force_disposition_id="take-and-hold",
+    )
     enemy_army = flesh_hounds_army(
         package=package,
         unit=target_unit,
         army_id="army-opponent",
         player_id="player-opponent",
+        force_disposition_id="purge-the-foe",
     )
     player_index = player_ability_index(package=package, army=army)
     enemy_player_index = player_ability_index(package=package, army=enemy_army)
@@ -505,12 +510,17 @@ def test_phase17k_post_shoot_selected_target_effect_records_generic_rule_effect(
         army_id="army-opponent",
         unit_selection_id="enemy-lord-of-change-1",
     )
-    army = flesh_hounds_army(package=package, unit=unit)
+    army = flesh_hounds_army(
+        package=package,
+        unit=unit,
+        force_disposition_id="take-and-hold",
+    )
     enemy_army = flesh_hounds_army(
         package=package,
         unit=target_unit,
         army_id="army-opponent",
         player_id="player-opponent",
+        force_disposition_id="purge-the-foe",
     )
     player_index = player_ability_index(package=package, army=army)
     enemy_player_index = player_ability_index(package=package, army=enemy_army)
@@ -709,12 +719,17 @@ def test_chaos_terminator_lethal_obsession_marks_required_charge_target() -> Non
         army_id="army-opponent",
         unit_selection_id="enemy-lord-of-change-1",
     )
-    army = flesh_hounds_army(package=package, unit=unit)
+    army = flesh_hounds_army(
+        package=package,
+        unit=unit,
+        force_disposition_id="take-and-hold",
+    )
     enemy_army = flesh_hounds_army(
         package=package,
         unit=target_unit,
         army_id="army-opponent",
         player_id="player-opponent",
+        force_disposition_id="purge-the-foe",
     )
     player_index = player_ability_index(package=package, army=army)
     enemy_index = player_ability_index(package=package, army=enemy_army)
@@ -877,12 +892,17 @@ def test_phase17k_datasheet_post_shoot_cover_denial_suppresses_save_cover() -> N
         ),
     )
     target_unit = replace(target_unit_with_invulnerable, own_models=(target_model,))
-    army = flesh_hounds_army(package=package, unit=unit)
+    army = flesh_hounds_army(
+        package=package,
+        unit=unit,
+        force_disposition_id="take-and-hold",
+    )
     enemy_army = flesh_hounds_army(
         package=package,
         unit=target_unit,
         army_id="army-opponent",
         player_id="player-opponent",
+        force_disposition_id="purge-the-foe",
     )
     player_index = player_ability_index(package=package, army=army)
     enemy_player_index = player_ability_index(package=package, army=enemy_army)
@@ -1096,12 +1116,17 @@ def test_phase17k_post_shoot_hit_target_status_requires_successful_hit_not_wound
         army_id="army-opponent",
         unit_selection_id="enemy-lord-of-change-1",
     )
-    army = flesh_hounds_army(package=package, unit=unit)
+    army = flesh_hounds_army(
+        package=package,
+        unit=unit,
+        force_disposition_id="take-and-hold",
+    )
     enemy_army = flesh_hounds_army(
         package=package,
         unit=target_unit,
         army_id="army-opponent",
         player_id="player-opponent",
+        force_disposition_id="purge-the-foe",
     )
     player_index = player_ability_index(package=package, army=army)
     enemy_player_index = player_ability_index(package=package, army=enemy_army)
@@ -1228,12 +1253,17 @@ def test_phase17k_post_shoot_hit_target_status_processes_all_source_groups() -> 
         army_id="army-opponent",
         unit_selection_id="enemy-lord-of-change-1",
     )
-    army = flesh_hounds_army(package=package, unit=unit)
+    army = flesh_hounds_army(
+        package=package,
+        unit=unit,
+        force_disposition_id="take-and-hold",
+    )
     enemy_army = flesh_hounds_army(
         package=package,
         unit=target_unit,
         army_id="army-opponent",
         player_id="player-opponent",
+        force_disposition_id="purge-the-foe",
     )
     player_index = player_ability_index(package=package, army=army)
     enemy_player_index = player_ability_index(package=package, army=enemy_army)
@@ -1366,12 +1396,17 @@ def test_phase17k_post_shoot_hit_target_status_uses_runtime_clause_scoped_record
         army_id="army-opponent",
         unit_selection_id="enemy-lord-of-change-1",
     )
-    army = flesh_hounds_army(package=package, unit=unit)
+    army = flesh_hounds_army(
+        package=package,
+        unit=unit,
+        force_disposition_id="take-and-hold",
+    )
     enemy_army = flesh_hounds_army(
         package=package,
         unit=target_unit,
         army_id="army-opponent",
         player_id="player-opponent",
+        force_disposition_id="purge-the-foe",
     )
     rule_ir = multi_clause_post_shoot_cover_denial_rule_ir()
     clause_001_record = multi_clause_post_shoot_cover_denial_record(

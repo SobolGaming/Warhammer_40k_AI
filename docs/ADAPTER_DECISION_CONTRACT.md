@@ -32,9 +32,10 @@ Adapters are producers of answers. The engine remains the owner of validation, m
 
 ## Phase 17O capability manifest
 
-`LocalGameSession.support_profile()` retains the existing
-`support-profile-v3-interactions` payload family and includes the
-versioned `capability_manifest` member. Its canonical language-neutral schema is
+`LocalGameSession.support_profile()` emits the
+`support-profile-v4-directed-primary` payload family and includes the versioned
+`capability-manifest-v2-directed-primary` member. Its canonical
+language-neutral schema is
 `contracts/schemas/capability-manifest.schema.json`. Clients
 may use this manifest to disable or explain UI flows, but it never grants roster
 legality, accepts a proposal, or mutates authoritative state.
@@ -127,6 +128,9 @@ dispatch registry, the documented nested family, and every parameterized
 proposal fixture. The TypeScript test consumes the generated request and
 submission models, constructs every case, and validates the wrapper plus exact
 proposal schema without importing Python or switching on decision type.
+Because Contract 7 changes the nested annotated-request family, this wrapper is
+also versioned as `interaction-conformance-v2-primary-assignments`; strict
+Contract 6 consumers must not accept it as the former v1 wrapper.
 
 Interaction descriptors are part of viewer projection hashes and replay
 checkpoints. The same pending engine request therefore selects the same renderer
@@ -395,31 +399,46 @@ alternate schema authorities.
 Every external request or response declares its payload-family version. The
 reference server currently requires:
 
-- `create-session-v2` for create-session requests whose embedded mission setup
-  requires explicit logical terrain-area identities;
+- `create-session-v3` for create-session requests whose embedded mission setup
+  requires exactly two public, directed `primary_mission_assignments` and
+  explicit logical terrain-area identities;
 - `finite-submission-v1` for finite option submissions;
 - `parameterized-submission-v1` for proposal submissions;
-- `lifecycle-status-v1` for server lifecycle responses;
-- `decision-request-view-v2-interaction` for visible or redacted pending decisions;
-- `event-delta-v1` for the in-process integer-cursor adapter delta only;
-- `event-delta-v2` for authenticated role-bound HTTP event deltas;
-- `game-view-v8-phase17n` for role-scoped game projections whose turn-start terrain
-  evidence contains exactly the units visible in `unit_display_by_id`;
+- `lifecycle-status-v2-primary-assignments` for server lifecycle responses;
+- `decision-request-view-v3-primary-assignments` for visible or redacted
+  pending decisions;
+- `annotated-decision-request-v2-primary-assignments` for nested interaction
+  requests;
+- `event-delta-v2-primary-assignments` for the in-process integer-cursor adapter delta only;
+- `event-delta-v3-primary-assignments` for authenticated role-bound HTTP event deltas;
+- `game-view-v9-phase17n` for role-scoped game projections whose public mission
+  state contains both directed Primary Mission assignments and whose turn-start
+  terrain evidence contains exactly the units visible in `unit_display_by_id`;
 - `battlefield-view-v3-phase17n` for authoritative battlefield geometry with explicit
   terrain-area logical identity and terrain area and feature classifications;
-- `session-projection-v4-phase17n` for full role-scoped reconnect projections;
-- `session-create-v3`, `session-metadata-v6-contract`,
-  `session-command-result-v6-contract`, and `session-command-outcome-v6-contract` for the
+- `session-projection-v5-phase17n` for full role-scoped reconnect projections;
+- `session-create-v4`, `session-metadata-v7-contract`,
+  `session-command-result-v7-contract`, and `session-command-outcome-v7-contract` for the
   authenticated formal session protocol;
-- `replay-artifact-v4-phase17n` for replay artifacts whose required source identity includes
-  `ruleset_descriptor_hash`, `rules_overlay_ids`, Phase 17N engine-state evidence, and
-  explicit logical terrain-area identities in embedded mission setup;
+- `capability-manifest-v2-directed-primary` inside
+  `support-profile-v4-directed-primary` for viewer-scoped capability evidence
+  whose public mission identity includes both assignments;
+- `physical-proposal-context-v2` for engine-owned physical proposal context;
+- `replay-artifact-v5-phase17n` for replay artifacts whose required source
+  identity includes `ruleset_descriptor_hash`, `rules_overlay_ids`, and the
+  atomic `mission_pack_id` / `mission_source_package_hash` pair, while the
+  embedded mission setup includes both directed Primary Mission assignments,
+  Phase 17N engine-state evidence, and explicit logical terrain-area identities;
 - `error-envelope-v1` for typed transport errors.
 
-The Contract 6 replay loader accepts only `replay-artifact-v4-phase17n`; v2 and
-v3 artifacts require the retained 5.x deployment. It never infers missing
-logical terrain-area grouping. A mismatched request version fails before queue
-consumption or engine mutation. External error and status payloads are
+The Contract 7 replay loader accepts only `replay-artifact-v5-phase17n`; v4
+artifacts require the retained 6.x deployment. It never infers directed Primary
+Mission assignments, missing logical terrain-area grouping, or mission source
+identity. Mission identity fields are both non-null when the configured or
+late-bound lifecycle has a mission setup and both null otherwise; canonical
+mission source-package hash drift is rejected. A mismatched
+request version fails before queue consumption or engine mutation. External
+error and status payloads are
 viewer-scoped by the same shared redaction policy as game projections and
 events.
 
@@ -2799,7 +2818,7 @@ terrain areas as the objective footprint and treat the objective marker as
 stable objective identity/label metadata. Adapters must submit complete logical
 membership: referencing any physical terrain area requires listing every
 mission-setup terrain area with the same `logical_terrain_area_id`. Layout,
-mission-setup, Contract 6 create, replay, and objective-control validation
+mission-setup, Contract 7 create, replay, and objective-control validation
 reject partial logical groups. Removing a physical member, relabelling the
 survivor, or clearing `battlefield_layout_id` does not bypass the canonical
 source-layout reconciliation. Replay state must retain the same mission setup
@@ -2851,7 +2870,7 @@ hybrid projection model:
    `LocalGameSession.view(...)`.
 2. Live viewer-safe unit/model projection. Phase 18A introduced
    `projection_schema: "game-view-v3-phase18a"`; the current `GameViewPayload`
-   uses `game-view-v8-phase17n`, includes
+   uses `game-view-v9-phase17n`, includes
    `projection_state_hash`, references the static catalog through
    `rules_catalog`, and exposes read-only `unit_display_by_id` and
    `model_display_by_id` maps keyed by stable `unit_instance_id` and
@@ -3318,7 +3337,7 @@ role-scoped projection hash. The wire token contains no readable cursor state;
 the client treats it as an indivisible string.
 
 `GET /sessions/{session_id}/events?cursor=...&limit=...` returns deterministic
-`event-delta-v2` pages. `sequence_number` is one-based and contiguous within a
+`event-delta-v3-primary-assignments` pages. `sequence_number` is one-based and contiguous within a
 viewer scope. Hidden records are omitted while pagination advances the
 protected authoritative offset; they create no projection count, placeholder,
 sequence gap, extra page, or `has_more` oracle. Page size defaults to 100 and is

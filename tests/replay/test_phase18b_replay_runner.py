@@ -36,7 +36,10 @@ from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mission_setup import (
+    MissionSetup,
+    PlayerPrimaryMissionAssignment,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalRequest,
@@ -131,13 +134,58 @@ def test_setup_to_battle_replay_reproduces_exactly() -> None:
     assert payload["event_records"]
     assert payload["projection_checkpoints"]
     assert payload["schema_version"] == REPLAY_ARTIFACT_SCHEMA_VERSION
-    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v4-phase17n"
+    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v5-phase17n"
+
+
+def test_replay_source_identity_binds_canonical_mission_package_hash() -> None:
+    artifact = _setup_to_battle_artifact()
+    payload = _artifact_payload_copy(artifact)
+    mission_pack = chapter_approved_2026_27_mission_pack()
+    source_identity = payload["source_identity"]
+
+    assert source_identity["mission_pack_id"] == mission_pack.mission_pack_id
+    assert (
+        source_identity["mission_source_package_hash"]
+        == mission_pack.source_package.source_commit_or_import_hash
+    )
+
+    source_identity["mission_source_package_hash"] = "f" * 64
+    if mission_pack.source_package.source_commit_or_import_hash == "f" * 64:
+        source_identity["mission_source_package_hash"] = "e" * 64
+    with pytest.raises(ReplayArtifactError, match="source identity drifted from snapshot"):
+        ReplayArtifact.from_payload(payload)
+
+
+def test_replay_source_identity_binds_late_bound_layoutless_mission_package() -> None:
+    config = replace(
+        _combat_config(game_id="phase18b-late-bound-replay-source"), mission_setup=None
+    )
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    state = _state(lifecycle)
+    for army in _mustered_armies(config):
+        state.record_army_definition(army)
+    state.record_mission_setup(_open_mission_setup())
+    artifact = ReplayArtifact.capture(
+        artifact_id="phase18b-late-bound-replay-source",
+        initial_lifecycle_payload=_lifecycle_payload_copy(lifecycle),
+        final_lifecycle=lifecycle,
+    )
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
+
+    assert artifact.source_identity.mission_pack_id == mission_pack.mission_pack_id
+    assert (
+        artifact.source_identity.mission_source_package_hash
+        == mission_pack.source_package.source_commit_or_import_hash
+    )
+    assert ReplayArtifact.from_payload(_artifact_payload_copy(artifact)) == artifact
 
 
 def test_legacy_replay_versions_are_rejected_without_shape_inference() -> None:
     for legacy_schema_version in (
         "replay-artifact-v2-phase18i",
         "replay-artifact-v3-phase17n",
+        "replay-artifact-v4-phase17n",
     ):
         legacy_payload = _artifact_payload_copy(_setup_to_battle_artifact())
         legacy_payload["schema_version"] = legacy_schema_version
@@ -148,7 +196,7 @@ def test_legacy_replay_versions_are_rejected_without_shape_inference() -> None:
             ReplayArtifact.from_payload(legacy_payload)
 
 
-def test_replay_v4_missing_phase17n_terrain_snapshot_fails_with_typed_error() -> None:
+def test_replay_v5_missing_phase17n_terrain_snapshot_fails_with_typed_error() -> None:
     payload = _artifact_payload_copy(_setup_to_battle_artifact())
     state = cast(dict[str, JsonValue], payload["initial_lifecycle"]["state"])
     state.pop("primary_unit_terrain_turn_start_snapshots")
@@ -162,7 +210,7 @@ def test_replay_v4_missing_phase17n_terrain_snapshot_fails_with_typed_error() ->
 
 @pytest.mark.parametrize("remove_and_relabel_member", [False, True])
 @pytest.mark.parametrize("mutation_target", ["config", "state"])
-def test_replay_v4_rejects_partial_logical_objective_bindings(
+def test_replay_v5_rejects_partial_logical_objective_bindings(
     remove_and_relabel_member: bool,
     mutation_target: str,
 ) -> None:
@@ -175,15 +223,18 @@ def test_replay_v4_rejects_partial_logical_objective_bindings(
         (config_payload if mutation_target == "config" else state_payload)["mission_setup"],
     )
     bindings = cast(list[JsonValue], mission_setup_payload["objective_terrain_areas"])
-    binding = next(
-        cast(dict[str, JsonValue], candidate)
-        for candidate in bindings
-        if len(cast(list[JsonValue], cast(dict[str, JsonValue], candidate)["terrain_area_ids"])) > 1
+    binding = cast(dict[str, JsonValue], bindings[0])
+    terrain_areas = cast(list[JsonValue], mission_setup_payload["terrain_areas"])
+    area_ids_by_logical_id: dict[str, list[JsonValue]] = {}
+    for candidate in terrain_areas:
+        area = cast(dict[str, JsonValue], candidate)
+        logical_id = cast(str, area["logical_terrain_area_id"])
+        area_ids_by_logical_id.setdefault(logical_id, []).append(area["terrain_area_id"])
+    complete_ids = next(
+        area_ids for area_ids in area_ids_by_logical_id.values() if len(area_ids) > 1
     )
-    complete_ids = cast(list[JsonValue], binding["terrain_area_ids"])
     retained_id = cast(str, complete_ids[-1])
     binding["terrain_area_ids"] = [retained_id]
-    terrain_areas = cast(list[JsonValue], mission_setup_payload["terrain_areas"])
     if remove_and_relabel_member:
         terrain_areas[:] = [
             candidate
@@ -203,7 +254,7 @@ def test_replay_v4_rejects_partial_logical_objective_bindings(
 
 
 @pytest.mark.parametrize("terrain_mutation", ["injected", "removed", "relocated"])
-def test_replay_v4_rejects_runtime_battlefield_drift_from_source_layout(
+def test_replay_v5_rejects_runtime_battlefield_drift_from_source_layout(
     terrain_mutation: str,
 ) -> None:
     payload, event_setup = _event_layout_replay_payload()
@@ -240,7 +291,7 @@ def test_replay_v4_rejects_runtime_battlefield_drift_from_source_layout(
     assert "battlefield runtime geometry drifted" in str(exc_info.value.__cause__)
 
 
-def test_replay_v4_rejects_canonical_layoutless_mission_setup_source_drift() -> None:
+def test_replay_v5_rejects_canonical_layoutless_mission_setup_source_drift() -> None:
     payload = _artifact_payload_copy(_setup_to_battle_artifact())
     lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
     config_payload = cast(dict[str, JsonValue], lifecycle_payload["config"])
@@ -250,7 +301,11 @@ def test_replay_v4_rejects_canonical_layoutless_mission_setup_source_drift() -> 
         assert mission_setup_payload["battlefield_layout_id"] is None
         mission_setup_payload["source_id"] = "substituted-source"
         mission_setup_payload["source_version"] = "substituted-version"
-        mission_setup_payload["primary_mission_id"] = "take-and-hold"
+        assignments = cast(
+            list[JsonValue],
+            mission_setup_payload["primary_mission_assignments"],
+        )
+        cast(dict[str, JsonValue], assignments[0])["primary_mission_id"] = "primary-meatgrinder"
         objective_markers = cast(list[JsonValue], mission_setup_payload["objective_markers"])
         central_marker = next(
             cast(dict[str, JsonValue], marker)
@@ -268,11 +323,11 @@ def test_replay_v4_rejects_canonical_layoutless_mission_setup_source_drift() -> 
         ReplayArtifact.from_payload(payload)
 
     assert isinstance(exc_info.value.__cause__, GameLifecycleError)
-    assert "canonical layoutless setup drifted from source" in str(exc_info.value.__cause__)
+    assert "source package identity drifted" in str(exc_info.value.__cause__)
 
 
 @pytest.mark.parametrize("runtime_mutation", ["dimensions", "injected_terrain"])
-def test_replay_v4_rejects_canonical_layoutless_runtime_battlefield_drift(
+def test_replay_v5_rejects_canonical_layoutless_runtime_battlefield_drift(
     runtime_mutation: str,
 ) -> None:
     payload = _artifact_payload_copy(_setup_to_battle_artifact())
@@ -304,7 +359,7 @@ def test_replay_v4_rejects_canonical_layoutless_runtime_battlefield_drift(
     assert "battlefield runtime geometry drifted" in str(exc_info.value.__cause__)
 
 
-def test_replay_v4_rejects_custom_layoutless_runtime_battlefield_dimension_drift() -> None:
+def test_replay_v5_rejects_custom_layoutless_runtime_battlefield_dimension_drift() -> None:
     payload = _artifact_payload_copy(_setup_to_battle_artifact())
     lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
     config_payload = cast(dict[str, JsonValue], lifecycle_payload["config"])
@@ -337,7 +392,7 @@ def test_replay_v4_rejects_custom_layoutless_runtime_battlefield_dimension_drift
     assert "battlefield runtime geometry drifted" in str(exc_info.value.__cause__)
 
 
-def test_replay_v4_rejects_state_mission_setup_drift_from_config() -> None:
+def test_replay_v5_rejects_state_mission_setup_drift_from_config() -> None:
     payload = _artifact_payload_copy(_setup_to_battle_artifact())
     lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
     state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
@@ -348,7 +403,9 @@ def test_replay_v4_rejects_state_mission_setup_drift_from_config() -> None:
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id="player-b",
+            attacker_force_disposition_id="purge-the-foe",
             defender_player_id="player-a",
+            defender_force_disposition_id="take-and-hold",
         ).to_payload(),
     )
 
@@ -359,7 +416,7 @@ def test_replay_v4_rejects_state_mission_setup_drift_from_config() -> None:
     assert "state mission_setup does not match config" in str(exc_info.value.__cause__)
 
 
-def test_replay_v4_rejects_missing_state_mission_setup_with_config() -> None:
+def test_replay_v5_rejects_missing_state_mission_setup_with_config() -> None:
     payload = _artifact_payload_copy(_setup_to_battle_artifact())
     lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
     state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
@@ -372,7 +429,7 @@ def test_replay_v4_rejects_missing_state_mission_setup_with_config() -> None:
     assert "state mission_setup does not match config" in str(exc_info.value.__cause__)
 
 
-def test_replay_v4_rejects_source_linked_state_setup_missing_from_config() -> None:
+def test_replay_v5_rejects_source_linked_state_setup_missing_from_config() -> None:
     payload, _event_setup = _event_layout_replay_payload()
     lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
     config_payload = cast(dict[str, JsonValue], lifecycle_payload["config"])
@@ -829,7 +886,19 @@ def _movement_phase_lifecycle(
 
 
 def _setup_config(*, game_id: str) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    source_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = replace(
+        source_catalog,
+        detachments=tuple(
+            replace(
+                detachment,
+                force_disposition_ids=("purge-the-foe", "take-and-hold"),
+            )
+            if detachment.detachment_id == "core-combined-arms"
+            else detachment
+            for detachment in source_catalog.detachments
+        ),
+    )
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
@@ -843,12 +912,14 @@ def _setup_config(*, game_id: str) -> GameConfig:
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_ids=("intercessor-unit-1",),
+                force_disposition_id="take-and-hold",
             ),
             _army_muster_request(
                 catalog=catalog,
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=("intercessor-unit-2",),
+                force_disposition_id="purge-the-foe",
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -859,7 +930,9 @@ def _setup_config(*, game_id: str) -> GameConfig:
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id="player-a",
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
         ),
     )
 
@@ -879,12 +952,14 @@ def _combat_config(*, game_id: str) -> GameConfig:
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_ids=("attacker",),
+                force_disposition_id="purge-the-foe",
             ),
             _army_muster_request(
                 catalog=catalog,
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=("target",),
+                force_disposition_id="purge-the-foe",
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -895,13 +970,24 @@ def _combat_config(*, game_id: str) -> GameConfig:
 
 
 def _open_mission_setup() -> MissionSetup:
-    mission_pack = chapter_approved_2026_27_mission_pack()
+    mission_pack = warhammer_event_companion_2026_07_mission_pack()
     return MissionSetup(
         mission_pack_id=mission_pack.mission_pack_id,
         source_version=mission_pack.source_version,
         source_id=mission_pack.source_id,
-        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
-        primary_mission_id="take-and-hold",
+        mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-3",
+        primary_mission_assignments=(
+            PlayerPrimaryMissionAssignment(
+                player_id="player-a",
+                force_disposition_id="purge-the-foe",
+                primary_mission_id="primary-meatgrinder",
+            ),
+            PlayerPrimaryMissionAssignment(
+                player_id="player-b",
+                force_disposition_id="purge-the-foe",
+                primary_mission_id="primary-meatgrinder",
+            ),
+        ),
         battlefield_layout_id=None,
         deployment_map_id="phase18b-open-map",
         terrain_layout_id="phase18b-open-layout",
@@ -932,6 +1018,7 @@ def _army_muster_request(
     player_id: str,
     army_id: str,
     unit_selection_ids: tuple[str, ...],
+    force_disposition_id: str,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -943,7 +1030,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=force_disposition_id,
         unit_selections=tuple(_unit_selection(unit_id) for unit_id in unit_selection_ids),
     )
 
@@ -1098,20 +1185,27 @@ def _artifact_payload_copy(artifact: ReplayArtifact) -> ReplayArtifactPayload:
 
 
 def _event_layout_replay_payload() -> tuple[ReplayArtifactPayload, MissionSetup]:
-    layout_id = "take-and-hold-vs-take-and-hold-layout-2"
+    layout_id = "purge-the-foe-vs-purge-the-foe-layout-2"
     event_setup = MissionSetup.from_mission_pack(
         mission_pack=warhammer_event_companion_2026_07_mission_pack(),
         mission_pool_entry_id=f"mission-{layout_id}",
         terrain_layout_id=layout_id,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
+    base_config = _setup_config(game_id="phase18b-event-layout-drift")
     config = replace(
-        _setup_config(game_id="phase18b-event-layout-drift"),
+        base_config,
         ruleset_descriptor=(
             RulesetDescriptor.warhammer_40000_eleventh_chapter_approved_2026_27(
                 descriptor_version="core-v2-phase18b-event-layout-test"
             )
+        ),
+        army_muster_requests=tuple(
+            replace(request, force_disposition_id="purge-the-foe")
+            for request in base_config.army_muster_requests
         ),
         mission_setup=event_setup,
     )

@@ -31,6 +31,10 @@ placeholder entries, sequence gaps, extra pages, or `has_more` changes. Secret
 secondary information and similar source-backed state remain hidden until the
 engine records their reveal.
 
+Both entries in `primary_mission_assignments` are public mission data. Viewer
+projection and redaction preserve the complete directed pair; neither player's
+Primary Mission or Force Disposition binding is removed from a player view.
+
 Errors must not echo an opponent's submitted body or hidden current request.
 Status payloads may include request/actor details only when the corresponding
 request is visible to that viewer. Catalog projections contain static public

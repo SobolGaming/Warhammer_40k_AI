@@ -3820,7 +3820,7 @@ def _fulgrim_opponent_turn_fight_session(
                 faction_id="EC",
                 detachment_point_cost=1,
                 unit_datasheet_ids=(_FULGRIM_ID,),
-                force_disposition_ids=("purge-the-foe",),
+                force_disposition_ids=("take-and-hold", "purge-the-foe"),
                 source_ids=("test:fulgrim-lifecycle:detachment:emperors-children",),
             ),
             DetachmentDefinition(
@@ -3846,7 +3846,7 @@ def _fulgrim_opponent_turn_fight_session(
                 faction_id="EC",
                 detachment_ids=("fulgrim-lifecycle-test",),
             ),
-            force_disposition_id="purge-the-foe",
+            force_disposition_id="take-and-hold",
             unit_selections=(
                 _unit_muster_selection(
                     catalog=catalog,
@@ -4586,7 +4586,7 @@ def _configured_kakophonist_fixture(
                         else ()
                     ),
                 ),
-                force_disposition_ids=("purge-the-foe",),
+                force_disposition_ids=("take-and-hold", "purge-the-foe"),
                 source_ids=("test:kakophonist-sequencing:detachment",),
             ),
         ),
@@ -4659,7 +4659,7 @@ def _configured_kakophonist_fixture(
                 faction_id="EC",
                 detachment_ids=("kakophonist-sequencing-test",),
             ),
-            force_disposition_id="purge-the-foe",
+            force_disposition_id="take-and-hold",
             unit_selections=source_selections,
             attachment_declarations=(
                 AttachmentDeclaration(
@@ -5184,7 +5184,7 @@ def _battleline_lifecycle_session(
                     "000004080",
                     *(("000004083",) if attached_source else ()),
                 ),
-                force_disposition_ids=("purge-the-foe",),
+                force_disposition_ids=("take-and-hold", "purge-the-foe"),
                 source_ids=("test:emperors-children:battleline-lifecycle",),
             ),
         ),
@@ -5309,7 +5309,7 @@ def _battleline_lifecycle_session(
                 faction_id="EC",
                 detachment_ids=("battleline-lifecycle-test",),
             ),
-            force_disposition_id="purge-the-foe",
+            force_disposition_id="take-and-hold",
             unit_selections=(
                 source_selection,
                 *(
@@ -5852,7 +5852,7 @@ def _army(
             faction_id=faction_id,
             detachment_ids=(f"{faction_id}-fulgrim-test",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=("take-and-hold" if player_id == "player-a" else "purge-the-foe"),
         units=units,
         attached_units=attached_units,
     )
@@ -5897,7 +5897,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 

@@ -117,6 +117,7 @@ def attached_selected_to_fight_risk_fixture(
             unit=bodyguard,
             player_id="player-source",
             army_id="army-source",
+            force_disposition_id="take-and-hold",
         ),
         units=(bodyguard, leader),
         attached_units=(formation,),
@@ -126,6 +127,7 @@ def attached_selected_to_fight_risk_fixture(
         unit=enemy,
         player_id="player-enemy",
         army_id="army-enemy",
+        force_disposition_id="purge-the-foe",
     )
     battlefield = BattlefieldRuntimeState(
         battlefield_id="attached-risk-battlefield",

@@ -96,5 +96,5 @@
     "setup_step": "select_secondary_missions"
   },
   "request_id": "decision-request-000001",
-  "schema_version": "decision-request-view-v2-interaction"
+  "schema_version": "decision-request-view-v3-primary-assignments"
 }

@@ -128,7 +128,9 @@ def battle_state_with_armies(
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
             terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
             attacker_player_id=armies[0].player_id,
+            attacker_force_disposition_id="take-and-hold",
             defender_player_id=armies[1].player_id,
+            defender_force_disposition_id="purge-the-foe",
         ),
     )
     for army in armies:

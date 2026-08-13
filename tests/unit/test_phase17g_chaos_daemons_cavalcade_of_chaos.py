@@ -1609,7 +1609,11 @@ def _cavalcade_catalog(
                 faction_id=rule.CHAOS_DAEMONS_FACTION_ID,
                 detachment_point_cost=1,
                 unit_datasheet_ids=(_CAVALCADE_TEST_DATASHEET_ID,),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=(
+                    "phase17g-force",
+                    "take-and-hold",
+                    "purge-the-foe",
+                ),
                 enhancement_ids=(
                     enhancements.ENHANCEMENT_ID,
                     enhancements.SOUL_SHATTERING_CHARGE_ENHANCEMENT_ID,
@@ -1684,7 +1688,7 @@ def _catalog_with_other_daemon_detachment(catalog: ArmyCatalog) -> ArmyCatalog:
                 faction_id=rule.CHAOS_DAEMONS_FACTION_ID,
                 detachment_point_cost=1,
                 unit_datasheet_ids=(_CAVALCADE_TEST_DATASHEET_ID,),
-                force_disposition_ids=("phase17g-force",),
+                force_disposition_ids=("phase17g-force", "take-and-hold"),
                 source_ids=("phase17g:test:other-daemon-detachment",),
             ),
         ),
@@ -1726,7 +1730,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 
@@ -1760,9 +1766,7 @@ def _army_muster_request(
             detachment_ids=(detachment_id,),
             enhancement_ids=selected_enhancement_ids,
         ),
-        force_disposition_id=(
-            "purge-the-foe" if faction_id == "core-marine-force" else "phase17g-force"
-        ),
+        force_disposition_id=("take-and-hold" if player_id == "player-a" else "purge-the-foe"),
         unit_selections=(
             _unit_muster_selection(
                 unit_selection_id=unit_selection_id,
@@ -1904,7 +1908,9 @@ def _exact_phase17n_warp_riders_ruin(
         mission_pack=warhammer_event_companion_2026_07_mission_pack(),
         mission_pool_entry_id=_PHASE17N_EXACT_POOL_ENTRY_ID,
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
     matching_ruins = tuple(
         feature

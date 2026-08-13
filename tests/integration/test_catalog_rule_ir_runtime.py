@@ -811,7 +811,11 @@ def test_phase17k_unholy_vigour_submits_through_local_game_session() -> None:
                 faction_id=package.army_catalog.factions[0].faction_id,
                 detachment_point_cost=1,
                 unit_datasheet_ids=("000001149", "000002758"),
-                force_disposition_ids=("phase17k-force",),
+                force_disposition_ids=(
+                    "phase17k-force",
+                    "take-and-hold",
+                    "purge-the-foe",
+                ),
                 source_ids=("test:phase17k-daemons",),
             ),
         ),
@@ -853,7 +857,7 @@ def test_phase17k_unholy_vigour_submits_through_local_game_session() -> None:
             source_package_id=catalog.source_package_id,
             ruleset_id=catalog.ruleset_id,
             detachment_selection=detachment_selection,
-            force_disposition_id="phase17k-force",
+            force_disposition_id="take-and-hold",
             unit_selections=(source_selection,),
         ),
         ArmyMusterRequest(
@@ -863,7 +867,7 @@ def test_phase17k_unholy_vigour_submits_through_local_game_session() -> None:
             source_package_id=catalog.source_package_id,
             ruleset_id=catalog.ruleset_id,
             detachment_selection=detachment_selection,
-            force_disposition_id="phase17k-force",
+            force_disposition_id="purge-the-foe",
             unit_selections=(enemy_selection,),
         ),
     )
@@ -973,7 +977,11 @@ def test_phase17k_daemonic_lord_and_stealth_aura_use_group_aware_generic_queries
         army_id="army-enemy",
     )
     friendly_army = replace(
-        flesh_hounds_army(package=package, unit=source),
+        flesh_hounds_army(
+            package=package,
+            unit=source,
+            force_disposition_id="take-and-hold",
+        ),
         units=(source, support),
     )
     enemy_army = flesh_hounds_army(
@@ -981,6 +989,7 @@ def test_phase17k_daemonic_lord_and_stealth_aura_use_group_aware_generic_queries
         unit=attacker,
         army_id="army-enemy",
         player_id="player-enemy",
+        force_disposition_id="purge-the-foe",
     )
 
     def battlefield(support_x: float) -> BattlefieldRuntimeState:
@@ -1679,12 +1688,14 @@ def _daemonic_patrons_runtime_fixture(
         unit=source,
         player_id="player-source",
         army_id="army-source",
+        force_disposition_id="take-and-hold",
     )
     enemy_army = flesh_hounds_army(
         package=package,
         unit=enemy,
         player_id="player-enemy",
         army_id="army-enemy",
+        force_disposition_id="purge-the-foe",
     )
     battlefield = BattlefieldRuntimeState(
         battlefield_id="daemonic-patrons-battlefield",

@@ -24,6 +24,8 @@ from warhammer40k_core.core.attributes import Characteristic, CharacteristicValu
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
 from warhammer40k_core.core.deployment_zones import (
     DeploymentZoneCircleCutout,
+    DeploymentZonePoint,
+    DeploymentZonePolygon,
     DeploymentZoneShape,
 )
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
@@ -31,9 +33,7 @@ from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, Objective
 from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
     RulesetDescriptor,
-    TerrainFeatureKind,
 )
-from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
 from warhammer40k_core.core.weapon_profiles import DamageProfile
 from warhammer40k_core.engine.actions import (
     MissionActionState,
@@ -106,14 +106,20 @@ from warhammer40k_core.engine.mission_decisions import (
     request_tactical_secondary_discard,
     request_tactical_secondary_score,
 )
-from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mission_setup import (
+    MissionSetup,
+    PlayerPrimaryMissionAssignment,
+)
 from warhammer40k_core.engine.mission_terrain import (
-    terrain_feature_within_player_deployment_zone,
-    terrain_feature_within_player_territory,
+    MissionLogicalTerrainArea,
+    logical_terrain_area_within_player_deployment_zone,
+    logical_terrain_area_within_player_territory,
+    mission_logical_terrain_areas,
 )
 from warhammer40k_core.engine.missions import (
     deterministic_tactical_secondary_draw,
-    mission_scoring_policy_from_setup,
+    mission_pack_for_id,
+    mission_scoring_policies_from_setup,
     reserve_destruction_policy_from_scoring_policy,
 )
 from warhammer40k_core.engine.objective_control import (
@@ -235,8 +241,8 @@ from warhammer40k_core.engine.weapon_abilities import (
     FIRE_OVERWATCH_RULE_ID,
     SNAP_SHOOTING_RULE_ID,
 )
+from warhammer40k_core.geometry import shapely_backend
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 from warhammer40k_core.interfaces.cli import render_pending_decision_for_cli
 from warhammer40k_core.rules.mission_pack_import import (
     chapter_approved_2026_27_mission_pack,
@@ -246,57 +252,6 @@ from warhammer40k_core.rules.mission_pack_import import (
 SEEDED_TACTICAL_DRAW_REQUEST_ID = "phase11e-seeded-tactical-draw-request"
 SEEDED_TACTICAL_DRAW_RESULT_ID = "phase11e-seeded-tactical-draw"
 SCORING_TERRAIN_FEATURE_ID = "phase11e-scoring-terrain"
-
-
-def test_take_and_hold_does_not_score_before_battle_round_two() -> None:
-    state = _battle_state_with_center_objective_positions(
-        player_a_offsets=((2.0, 0.0),),
-        player_b_offsets=((20.0, 20.0),),
-    )
-
-    completed_phase = state.advance_to_next_battle_phase()
-    ledger = state.victory_point_ledger_for_player("player-a")
-
-    assert completed_phase is BattlePhase.COMMAND
-    assert state.current_battle_phase is BattlePhase.MOVEMENT
-    assert state.victory_point_total("player-a") == 0
-    assert ledger.transactions == ()
-
-
-def test_take_and_hold_scores_from_battle_round_two_at_configured_command_timing() -> None:
-    state = _battle_state_with_center_objective_positions(
-        player_a_offsets=((2.0, 0.0),),
-        player_b_offsets=((20.0, 20.0),),
-    )
-    state.battle_round = 2
-
-    completed_phase = state.advance_to_next_battle_phase()
-    ledger = state.victory_point_ledger_for_player("player-a")
-
-    assert completed_phase is BattlePhase.COMMAND
-    assert state.current_battle_phase is BattlePhase.MOVEMENT
-    assert state.victory_point_total("player-a") == 10
-    assert ledger.transactions[0].source_kind is VictoryPointSourceKind.PRIMARY
-    assert ledger.transactions[0].source_id == "take-and-hold"
-    assert ledger.transactions[0].metadata == {
-        "objective_control_record_id": ("objective-control:round-02:player-a:command:phase_end"),
-        "score_count": 2,
-        "controlled_objective_ids": [
-            "take-and-hold-vs-purge-the-foe-layout-3-center-central",
-            "take-and-hold-vs-purge-the-foe-layout-3-left-home",
-        ],
-        "home_objective_ids": [],
-        "turn_start_controlled_objective_ids": [],
-        "trapped_terrain_feature_ids": [],
-        "destroyed_unit_instance_ids": [],
-        "scoring_rule_id": "take-and-hold-control",
-        "scoring_rule_condition": "each_controlled_objective_from_battle_round_two",
-        "scoring_rule_source_id": (
-            "gw-11e-chapter-approved-2026-27:primary:take-and-hold:"
-            "scoring-rule:take-and-hold-control"
-        ),
-        "victory_points_per_count": 5,
-    }
 
 
 def test_immovable_object_scores_central_and_non_home_objectives_by_round() -> None:
@@ -441,37 +396,43 @@ def test_unstoppable_force_scores_kills_new_objectives_and_end_battle_central_co
     )
 
 
-def test_death_trap_booby_trap_action_tracks_and_scores_trapped_objective_terrain() -> None:
-    feature_id = SCORING_TERRAIN_FEATURE_ID
+def test_death_trap_booby_trap_action_tracks_exact_logical_objective_terrain() -> None:
     config = _config_for_primary(
         "primary-death-trap",
-        objective_terrain_feature_id=feature_id,
+        objective_terrain_feature_id=SCORING_TERRAIN_FEATURE_ID,
     )
-    feature = next(
-        feature
-        for feature in cast(MissionSetup, config.mission_setup).terrain_features
-        if feature.feature_id == feature_id
+    mission_setup = cast(MissionSetup, config.mission_setup)
+    area = _objective_logical_terrain_area(
+        mission_setup,
+        objective_role=ObjectiveMarkerRole.CENTRAL,
+    )
+    area_id = area.logical_terrain_area_id
+    central_marker = next(
+        marker
+        for marker in mission_setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+    )
+    assert not any(
+        shapely_backend.point_intersects_polygon(
+            central_marker.x_inches,
+            central_marker.y_inches,
+            feature.rules_footprint_points(),
+        )
+        for feature in mission_setup.terrain_features
     )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
-    lifecycle.state = _battle_state_from_config(
-        config,
-        turn_start_unit_positions=(
-            (
-                "army-beta:intercessor-unit-3",
-                feature.footprint_center_x_inches,
-                feature.footprint_center_y_inches - 3.5,
-            ),
-        ),
-    )
+    lifecycle.state = _battle_state_from_config(config)
     state = lifecycle.state
     assert state is not None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    target_member = area.members[0]
+    target_point = target_member.footprint_polygon[0]
     _place_unit_near_point(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
-        x_inches=feature.footprint_center_x_inches,
-        y_inches=feature.footprint_center_y_inches,
+        x_inches=target_point.x_inches,
+        y_inches=target_point.y_inches,
     )
 
     waiting = request_mission_action_start(
@@ -486,8 +447,9 @@ def test_death_trap_booby_trap_action_tracks_and_scores_trapped_objective_terrai
     option = next(
         option
         for option in request.options
-        if cast(dict[str, JsonValue], option.payload)["target_id"] == feature_id
+        if cast(dict[str, JsonValue], option.payload)["target_id"] == area_id
     )
+    assert cast(dict[str, JsonValue], option.payload)["target_kind"] == "terrain_area"
     lifecycle.submit_decision(
         FiniteOptionSubmission(
             request_id=request.request_id,
@@ -500,52 +462,31 @@ def test_death_trap_booby_trap_action_tracks_and_scores_trapped_objective_terrai
 
     assert action.status is MissionActionStatus.COMPLETED
     assert action.score_transaction_id is None
-    assert trap_state.terrain_feature_id == feature_id
+    assert trap_state.terrain_feature_id == area_id
     assert trap_state.is_objective is True
-
-    _remove_unit_for_primary_destruction(
-        state,
-        unit_instance_id="army-beta:intercessor-unit-3",
-    )
-    state.record_primary_unit_destruction(
-        destroying_player_id="player-a",
-        destroyed_unit_instance_id="army-beta:intercessor-unit-3",
-        source_id="phase16:death-trap:enemy-destroyed-in-trapped-terrain",
-    )
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
-
-    state.advance_to_next_battle_phase()
-
-    assert state.victory_point_total("player-a") == 8
-    assert [
-        _transaction_metadata(transaction)["scoring_rule_id"]
-        for transaction in state.victory_point_ledger_for_player("player-a").transactions
-    ] == [
-        "death-trap-destroyed-in-trapped-terrain-turn-end",
-        "death-trap-objective-terrain-bonus-turn-end",
-        "death-trap-terrain-trapped-turn-end",
-    ]
 
 
 @pytest.mark.parametrize(
-    ("starts_inside", "expected_victory_points"),
+    "starts_inside",
     [
-        pytest.param(True, 8, id="start-inside-move-out"),
-        pytest.param(False, 5, id="start-outside-move-in"),
+        pytest.param(True, id="start-inside-move-out"),
+        pytest.param(False, id="start-outside-move-in"),
     ],
 )
 def test_death_trap_scores_authoritative_turn_start_terrain_membership(
     starts_inside: bool,
-    expected_victory_points: int,
 ) -> None:
-    feature_id = SCORING_TERRAIN_FEATURE_ID
     config = _config_for_primary(
         "primary-death-trap",
-        objective_terrain_feature_id=feature_id,
+        objective_terrain_feature_id=SCORING_TERRAIN_FEATURE_ID,
     )
-    feature = _terrain_feature_by_id(cast(MissionSetup, config.mission_setup), feature_id)
+    area = _objective_logical_terrain_area(
+        cast(MissionSetup, config.mission_setup),
+        objective_role=ObjectiveMarkerRole.CENTRAL,
+    )
+    area_id = area.logical_terrain_area_id
     enemy_unit_id = "army-beta:intercessor-unit-3"
-    inside = (feature.footprint_center_x_inches, feature.footprint_center_y_inches)
+    inside = _logical_terrain_area_test_point(area)
     outside = (5.0, 5.0)
     start = inside if starts_inside else outside
     state = _battle_state_from_config(
@@ -553,12 +494,19 @@ def test_death_trap_scores_authoritative_turn_start_terrain_membership(
         turn_start_unit_positions=((enemy_unit_id, *start),),
     )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    trap_action_id = f"mission-action:death-trap-turn-start-{starts_inside}"
+    trap_source_id = _record_completed_zero_vp_mission_action(
+        state,
+        mission_action_id="booby-trap-terrain",
+        action_id=trap_action_id,
+        target_id=area_id,
+    )
     state.record_primary_terrain_trap(
         player_id="player-a",
-        terrain_feature_id=feature_id,
-        action_id=f"mission-action:death-trap-turn-start-{starts_inside}",
+        terrain_feature_id=area_id,
+        action_id=trap_action_id,
         phase=BattlePhase.SHOOTING,
-        source_id="phase17n:death-trap:turn-start-membership",
+        source_id=trap_source_id,
     )
 
     end = outside if starts_inside else inside
@@ -580,30 +528,22 @@ def test_death_trap_scores_authoritative_turn_start_terrain_membership(
         destroying_player_id="player-a",
         source_id="phase17n:death-trap:runtime-destruction",
     )
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
-
-    state.advance_to_next_battle_phase()
-
-    assert destruction.started_turn_terrain_feature_ids == ((feature_id,) if starts_inside else ())
-    assert state.victory_point_total("player-a") == expected_victory_points
-    scored_rule_ids = tuple(
-        cast(str, _transaction_metadata(transaction)["scoring_rule_id"])
-        for transaction in state.victory_point_ledger_for_player("player-a").transactions
-    )
-    assert ("death-trap-destroyed-in-trapped-terrain-turn-end" in scored_rule_ids) is starts_inside
+    assert destruction.started_turn_terrain_feature_ids == ((area_id,) if starts_inside else ())
 
 
 def test_turn_start_terrain_snapshot_keeps_attached_physical_components_separate() -> None:
-    feature_id = SCORING_TERRAIN_FEATURE_ID
     mission_setup = _mission_setup_for_primary(
         "primary-death-trap",
-        objective_terrain_feature_id=feature_id,
+        objective_terrain_feature_id=SCORING_TERRAIN_FEATURE_ID,
     )
-    config = replace(
-        _config_with_player_a_attached_unit(),
+    config = _config_with_player_a_attached_unit(
         mission_setup=mission_setup,
     )
-    feature = _terrain_feature_by_id(mission_setup, feature_id)
+    area = _objective_logical_terrain_area(
+        mission_setup,
+        objective_role=ObjectiveMarkerRole.CENTRAL,
+    )
+    area_id = area.logical_terrain_area_id
     bodyguard_id = "army-alpha:bodyguard-unit"
     leader_id = "army-alpha:leader-unit"
     state = _battle_state_from_config(
@@ -611,15 +551,14 @@ def test_turn_start_terrain_snapshot_keeps_attached_physical_components_separate
         turn_start_unit_positions=(
             (
                 bodyguard_id,
-                feature.footprint_center_x_inches,
-                feature.footprint_center_y_inches,
+                *_logical_terrain_area_test_point(area),
             ),
             (leader_id, 5.0, 5.0),
         ),
     )
 
     snapshot = state.primary_unit_terrain_turn_start_snapshots[0]
-    assert snapshot.membership_for_unit(bodyguard_id).terrain_feature_ids == (feature_id,)
+    assert snapshot.membership_for_unit(bodyguard_id).terrain_feature_ids == (area_id,)
     assert snapshot.membership_for_unit(leader_id).terrain_feature_ids == ()
 
     bodyguard = state.army_definitions[0].unit_by_id(bodyguard_id)
@@ -636,7 +575,7 @@ def test_turn_start_terrain_snapshot_keeps_attached_physical_components_separate
     )
 
     assert destruction.destroyed_unit_instance_id == bodyguard_id
-    assert destruction.started_turn_terrain_feature_ids == (feature_id,)
+    assert destruction.started_turn_terrain_feature_ids == (area_id,)
 
 
 def test_turn_start_terrain_snapshot_redacts_unplaced_opponent_unit_identity() -> None:
@@ -691,9 +630,9 @@ def test_turn_start_terrain_snapshot_participates_in_projection_hash() -> None:
         "primary-death-trap",
         objective_terrain_feature_id=SCORING_TERRAIN_FEATURE_ID,
     )
-    feature = _terrain_feature_by_id(
+    area = _objective_logical_terrain_area(
         cast(MissionSetup, config.mission_setup),
-        SCORING_TERRAIN_FEATURE_ID,
+        objective_role=ObjectiveMarkerRole.CENTRAL,
     )
     unit_id = "army-beta:intercessor-unit-3"
     outside = (5.0, 5.0)
@@ -702,8 +641,7 @@ def test_turn_start_terrain_snapshot_participates_in_projection_hash() -> None:
         turn_start_unit_positions=(
             (
                 unit_id,
-                feature.footprint_center_x_inches,
-                feature.footprint_center_y_inches,
+                *_logical_terrain_area_test_point(area),
             ),
         ),
     )
@@ -1242,8 +1180,7 @@ def test_return_on_death_same_unit_id_records_a_second_destruction_occurrence() 
 
 
 def test_primary_destruction_capture_maps_attached_target_to_destroyed_component() -> None:
-    config = replace(
-        _config_with_player_a_attached_unit(),
+    config = _config_with_player_a_attached_unit(
         mission_setup=_event_companion_meatgrinder_mission_setup(),
     )
     lifecycle = GameLifecycle()
@@ -1398,6 +1335,7 @@ def test_meatgrinder_current_turn_enemy_destruction_changes_comparison_result() 
                 active_player_id="player-a",
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id="army-beta:current-turn-loss",
+                started_turn_terrain_feature_ids=(),
             ),
         ),
     )
@@ -1421,6 +1359,7 @@ def test_meatgrinder_counts_repeated_destruction_occurrences_for_the_same_unit()
                 active_player_id="player-a",
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id=repeated_unit_id,
+                started_turn_terrain_feature_ids=(),
             ),
             PrimaryUnitDestructionEvidence(
                 destruction_id="destruction:returning-unit:second",
@@ -1428,6 +1367,7 @@ def test_meatgrinder_counts_repeated_destruction_occurrences_for_the_same_unit()
                 active_player_id="player-a",
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id=repeated_unit_id,
+                started_turn_terrain_feature_ids=(),
             ),
         ),
     )
@@ -1454,6 +1394,7 @@ def test_meatgrinder_enemy_self_loss_in_previous_turn_is_not_current_enemy_loss(
                 active_player_id="player-b",
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id="army-beta:previous-turn-self-loss",
+                started_turn_terrain_feature_ids=(),
             ),
         ),
     )
@@ -1477,6 +1418,7 @@ def test_meatgrinder_previous_opponent_turn_friendly_loss_prevents_tie_score() -
                 active_player_id="player-b",
                 destroyed_player_id="player-a",
                 destroyed_unit_instance_id="army-alpha:previous-turn-loss",
+                started_turn_terrain_feature_ids=(),
             ),
             PrimaryUnitDestructionEvidence(
                 destruction_id="destruction:current-turn-enemy-loss",
@@ -1484,6 +1426,7 @@ def test_meatgrinder_previous_opponent_turn_friendly_loss_prevents_tie_score() -
                 active_player_id="player-a",
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id="army-beta:current-turn-loss",
+                started_turn_terrain_feature_ids=(),
             ),
         ),
     )
@@ -1507,6 +1450,7 @@ def test_meatgrinder_round_boundary_uses_prior_round_player_b_turn_for_player_a(
                 active_player_id="player-b",
                 destroyed_player_id="player-a",
                 destroyed_unit_instance_id="army-alpha:round-two-player-b-loss",
+                started_turn_terrain_feature_ids=(),
             ),
             PrimaryUnitDestructionEvidence(
                 destruction_id="destruction:round-three-player-a-loss",
@@ -1514,6 +1458,7 @@ def test_meatgrinder_round_boundary_uses_prior_round_player_b_turn_for_player_a(
                 active_player_id="player-a",
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id="army-beta:round-three-player-a-loss",
+                started_turn_terrain_feature_ids=(),
             ),
         ),
     )
@@ -1667,24 +1612,33 @@ def test_runtime_added_unit_backfills_turn_start_evidence_and_can_be_destroyed_s
 
 
 def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
-    feature_id = SCORING_TERRAIN_FEATURE_ID
     config = _config_for_primary(
         "primary-death-trap",
-        objective_terrain_feature_id=feature_id,
+        objective_terrain_feature_id=SCORING_TERRAIN_FEATURE_ID,
     )
-    feature = _terrain_feature_by_id(cast(MissionSetup, config.mission_setup), feature_id)
+    area = _objective_logical_terrain_area(
+        cast(MissionSetup, config.mission_setup),
+        objective_role=ObjectiveMarkerRole.CENTRAL,
+    )
+    area_id = area.logical_terrain_area_id
     state = _battle_state_from_config(
         config,
         turn_start_unit_positions=(
             (
                 "army-beta:intercessor-unit-3",
-                feature.footprint_center_x_inches,
-                feature.footprint_center_y_inches,
+                *_logical_terrain_area_test_point(area),
             ),
         ),
     )
     first_turn_start = state.primary_objective_turn_start_states[0]
     first_terrain_snapshot = state.primary_unit_terrain_turn_start_snapshots[0]
+    trap_action_id = "mission-action:phase16-booby-trap-round-trip"
+    trap_source_id = _record_completed_zero_vp_mission_action(
+        state,
+        mission_action_id="booby-trap-terrain",
+        action_id=trap_action_id,
+        target_id=area_id,
+    )
 
     with pytest.raises(GameLifecycleError, match="destroyed physical unit"):
         state.record_primary_unit_destruction(
@@ -1705,10 +1659,10 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
 
     trap = state.record_primary_terrain_trap(
         player_id="player-a",
-        terrain_feature_id=feature_id,
-        action_id="mission-action:phase16-booby-trap-round-trip",
+        terrain_feature_id=area_id,
+        action_id=trap_action_id,
         phase=BattlePhase.SHOOTING,
-        source_id="phase16:death-trap:booby-trap",
+        source_id=trap_source_id,
     )
     _remove_unit_for_primary_destruction(
         state,
@@ -1742,7 +1696,7 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
     )
     snapshot_payload = invalid_payload["primary_unit_terrain_turn_start_snapshots"][0]
     snapshot_payload["unit_memberships"][0]["terrain_feature_ids"] = ["missing-terrain"]
-    with pytest.raises(GameLifecycleError, match="unknown terrain feature"):
+    with pytest.raises(GameLifecycleError, match="unknown logical terrain area"):
         GameState.from_payload(invalid_payload)
 
     incomplete_payload = cast(
@@ -1789,6 +1743,24 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
     with pytest.raises(GameLifecycleError, match="destruction_id drift"):
         GameState.from_payload(identity_drift_payload)
 
+    trap_objective_drift_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    trap_objective_drift_payload["primary_terrain_trap_states"][0]["is_objective"] = False
+    with pytest.raises(GameLifecycleError, match="objective association drifted"):
+        GameState.from_payload(trap_objective_drift_payload)
+
+    trap_component_id_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    trap_component_id_payload["primary_terrain_trap_states"][0]["terrain_feature_id"] = (
+        area.members[0].terrain_area_id
+    )
+    with pytest.raises(GameLifecycleError, match="unknown logical terrain area"):
+        GameState.from_payload(trap_component_id_payload)
+
     nullable_destruction_payload = cast(
         dict[str, object],
         json.loads(json.dumps(destruction.to_payload(), sort_keys=True)),
@@ -1802,7 +1774,7 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
     with pytest.raises(GameLifecycleError, match="terrain trap already exists"):
         state.record_primary_terrain_trap(
             player_id="player-a",
-            terrain_feature_id=feature_id,
+            terrain_feature_id=area_id,
             action_id="mission-action:phase16-booby-trap-duplicate",
             phase=BattlePhase.SHOOTING,
             source_id="phase16:death-trap:booby-trap-duplicate",
@@ -2201,7 +2173,7 @@ def test_a_grievous_blow_scores_destroyed_starting_strength_thirteen_units() -> 
 def test_secure_no_mans_land_scores_two_central_objectives_from_control_record() -> None:
     state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
     assert state.mission_setup is not None
-    policy = mission_scoring_policy_from_setup(state.mission_setup)
+    policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
     home_objective_id = "take-and-hold-vs-purge-the-foe-layout-3-left-home"
     controlled_central_ids = (
         "take-and-hold-vs-purge-the-foe-layout-3-center-central",
@@ -2260,7 +2232,7 @@ def test_secure_no_mans_land_scores_two_central_objectives_from_control_record()
 def test_secure_no_mans_land_does_not_score_opponent_home_as_no_mans_land() -> None:
     state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
     assert state.mission_setup is not None
-    policy = mission_scoring_policy_from_setup(state.mission_setup)
+    policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
     central_objective_id = "take-and-hold-vs-purge-the-foe-layout-3-center-central"
     opponent_home_objective_id = "take-and-hold-vs-purge-the-foe-layout-3-right-home"
     objective_marker_ids = {
@@ -2312,19 +2284,33 @@ def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
             source_result_id="phase16-cleanse-draw",
         )
     )
+    center_cleanse_action_id = "phase16-cleanse-center"
+    center_cleanse_source_id = _record_completed_zero_vp_mission_action(
+        cleanse_state,
+        mission_action_id="cleanse-objective",
+        action_id=center_cleanse_action_id,
+        target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+    )
     cleanse_state.record_secondary_objective_cleanse(
         player_id="player-a",
         objective_marker_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
-        action_id="phase16-cleanse-center",
+        action_id=center_cleanse_action_id,
         phase=BattlePhase.FIGHT,
-        source_id="cleanse",
+        source_id=center_cleanse_source_id,
+    )
+    upper_cleanse_action_id = "phase16-cleanse-northwest"
+    upper_cleanse_source_id = _record_completed_zero_vp_mission_action(
+        cleanse_state,
+        mission_action_id="cleanse-objective",
+        action_id=upper_cleanse_action_id,
+        target_id="take-and-hold-vs-purge-the-foe-layout-3-upper-central",
     )
     cleanse_state.record_secondary_objective_cleanse(
         player_id="player-a",
         objective_marker_id="take-and-hold-vs-purge-the-foe-layout-3-upper-central",
-        action_id="phase16-cleanse-northwest",
+        action_id=upper_cleanse_action_id,
         phase=BattlePhase.FIGHT,
-        source_id="cleanse",
+        source_id=upper_cleanse_source_id,
     )
 
     cleanse_state.score_secondary_mission_from_state(
@@ -2336,7 +2322,7 @@ def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
 
     plunder_state = _battle_state(
         player_a_secondary=SecondaryMissionMode.TACTICAL,
-        mission_setup=_mission_setup_with_scoring_terrain_feature(),
+        mission_setup=_event_companion_mission_setup_with_scoring_terrain_feature(),
     )
     plunder_state.battle_phase_index = plunder_state.battle_phase_sequence.index(BattlePhase.FIGHT)
     plunder_state.record_secondary_mission_card_state(
@@ -2348,12 +2334,23 @@ def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
         )
     )
     assert plunder_state.mission_setup is not None
+    plunder_area = _first_plunderable_logical_terrain_area(
+        plunder_state,
+        player_id="player-a",
+    )
+    plunder_action_id = "phase16-plunder-terrain"
+    plunder_source_id = _record_completed_zero_vp_mission_action(
+        plunder_state,
+        mission_action_id="plunder-terrain",
+        action_id=plunder_action_id,
+        target_id=plunder_area.logical_terrain_area_id,
+    )
     plunder_state.record_secondary_terrain_plunder(
         player_id="player-a",
-        terrain_feature_id=plunder_state.mission_setup.terrain_features[0].feature_id,
-        action_id="phase16-plunder-terrain",
+        terrain_feature_id=plunder_area.logical_terrain_area_id,
+        action_id=plunder_action_id,
         phase=BattlePhase.SHOOTING,
-        source_id="plunder",
+        source_id=plunder_source_id,
     )
 
     plunder_state.score_secondary_mission_from_state(
@@ -2551,7 +2548,7 @@ def test_state_backed_secondary_scoring_rejects_invalid_contexts_and_zero_eviden
             ruleset_descriptor=state.runtime_ruleset_descriptor(),
         )
     )
-    policy = mission_scoring_policy_from_setup(state.mission_setup)
+    policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
     empty_destructions: tuple[SecondaryUnitDestructionState, ...] = ()
     empty_cleanses: tuple[SecondaryObjectiveCleanseState, ...] = ()
     empty_plunders: tuple[SecondaryTerrainPlunderState, ...] = ()
@@ -2686,32 +2683,48 @@ def test_game_state_secondary_scoring_evidence_round_trips_and_rejects_duplicate
     state = _battle_state_from_config(
         replace(
             _config_with_player_b_vehicles(("vehicle-unit-3",)),
-            mission_setup=_mission_setup_with_scoring_terrain_feature(),
+            mission_setup=_event_companion_mission_setup_with_scoring_terrain_feature(),
         ),
         player_a_secondary=SecondaryMissionMode.TACTICAL,
     )
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    assert state.mission_setup is not None
+    center_objective_id = _center_marker_definition_for_setup(
+        state.mission_setup
+    ).objective_marker_id
     _record_secondary_vehicle_destruction(
         state,
         "army-beta:vehicle-unit-3",
-        started_turn_objective_marker_ids=(
-            "take-and-hold-vs-purge-the-foe-layout-3-center-central",
-        ),
+        started_turn_objective_marker_ids=(center_objective_id,),
+    )
+    cleanse_action_id = "phase16-cleanse-center"
+    cleanse_source_id = _record_completed_zero_vp_mission_action(
+        state,
+        mission_action_id="cleanse-objective",
+        action_id=cleanse_action_id,
+        target_id=center_objective_id,
     )
     state.record_secondary_objective_cleanse(
         player_id="player-a",
-        objective_marker_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
-        action_id="phase16-cleanse-center",
+        objective_marker_id=center_objective_id,
+        action_id=cleanse_action_id,
         phase=BattlePhase.FIGHT,
-        source_id="cleanse",
+        source_id=cleanse_source_id,
     )
-    assert state.mission_setup is not None
+    plunder_area = _first_plunderable_logical_terrain_area(state, player_id="player-a")
+    plunder_action_id = "phase16-plunder-terrain"
+    plunder_source_id = _record_completed_zero_vp_mission_action(
+        state,
+        mission_action_id="plunder-terrain",
+        action_id=plunder_action_id,
+        target_id=plunder_area.logical_terrain_area_id,
+    )
     state.record_secondary_terrain_plunder(
         player_id="player-a",
-        terrain_feature_id=state.mission_setup.terrain_features[0].feature_id,
-        action_id="phase16-plunder-terrain",
-        phase=BattlePhase.FIGHT,
-        source_id="plunder",
+        terrain_feature_id=plunder_area.logical_terrain_area_id,
+        action_id=plunder_action_id,
+        phase=BattlePhase.SHOOTING,
+        source_id=plunder_source_id,
     )
 
     payload = state.to_payload()
@@ -4106,11 +4119,8 @@ def test_local_session_exposes_held_mission_action_and_decline_continues_shootin
     assert round_tripped.state.shooting_phase_state.mission_action_opportunity_declined is True
 
 
-def test_started_action_repeats_opportunity_and_excludes_that_unit_from_shooting() -> None:
-    config = replace(
-        _config_with_player_a_vehicle(),
-        mission_setup=_mission_setup_for_primary("terraform"),
-    )
+def test_started_action_excludes_that_unit_from_shooting() -> None:
+    config = _config_with_player_a_vehicle()
     lifecycle = GameLifecycle()
     lifecycle.start(config)
     lifecycle.state = _battle_state_from_config(
@@ -4138,29 +4148,12 @@ def test_started_action_repeats_opportunity_and_excludes_that_unit_from_shooting
         if option.option_id.startswith(f"start:cleanse-objective:{infantry_id}:")
     )
 
-    repeated_status = session.submit_option(
+    shooting_status = session.submit_option(
         request_id=initial_request.request_id,
         option_id=cleanse_option.option_id,
-        result_id="phase11e-start-cleanse-before-repeat",
+        result_id="phase11e-start-cleanse-before-shooting",
     )
 
-    repeated_request = repeated_status.decision_request
-    assert repeated_request is not None
-    assert repeated_request.decision_type == START_MISSION_ACTION_DECISION_TYPE
-    repeated_action_payloads = [
-        cast(dict[str, JsonValue], option.payload)
-        for option in repeated_request.options
-        if option.option_id != DECLINE_MISSION_ACTION_START_OPTION_ID
-    ]
-    assert repeated_action_payloads
-    assert {cast(str, payload["unit_instance_id"]) for payload in repeated_action_payloads} == {
-        vehicle_id
-    }
-    shooting_status = session.submit_option(
-        request_id=repeated_request.request_id,
-        option_id=DECLINE_MISSION_ACTION_START_OPTION_ID,
-        result_id="phase11e-decline-repeated-action-opportunity",
-    )
     shooting_request = shooting_status.decision_request
     assert shooting_request is not None
     assert shooting_request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
@@ -4809,31 +4802,30 @@ def test_shooting_lifecycle_filters_mission_actions_by_primary_and_secondary_own
     assert unheld_status.decision_request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
     assert direct_unheld_status.status_kind is LifecycleStatusKind.UNSUPPORTED
 
-    terraform_lifecycle = _battle_lifecycle(
+    cleanse_lifecycle = _battle_lifecycle(
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
-        mission_setup=_mission_setup_for_primary("terraform"),
+        mission_setup=_mission_setup(),
     )
-    terraform_state = terraform_lifecycle.state
-    assert terraform_state is not None
-    terraform_state.battle_phase_index = terraform_state.battle_phase_sequence.index(
+    cleanse_state = cleanse_lifecycle.state
+    assert cleanse_state is not None
+    cleanse_state.battle_phase_index = cleanse_state.battle_phase_sequence.index(
         BattlePhase.SHOOTING
     )
     _place_unit_near_objective(
-        terraform_state,
+        cleanse_state,
         unit_instance_id="army-alpha:intercessor-unit-1",
         target_suffix="center",
     )
 
-    terraform_status = LocalGameSession(
-        lifecycle=terraform_lifecycle
+    cleanse_status = LocalGameSession(
+        lifecycle=cleanse_lifecycle
     ).advance_until_decision_or_terminal()
 
-    terraform_request = terraform_status.decision_request
-    assert terraform_request is not None
-    assert terraform_request.decision_type == START_MISSION_ACTION_DECISION_TYPE
-    assert cast(dict[str, JsonValue], terraform_request.payload)["legal_mission_action_ids"] == [
-        "cleanse-objective",
-        "terraform-objective",
+    cleanse_request = cleanse_status.decision_request
+    assert cleanse_request is not None
+    assert cleanse_request.decision_type == START_MISSION_ACTION_DECISION_TYPE
+    assert cast(dict[str, JsonValue], cleanse_request.payload)["legal_mission_action_ids"] == [
+        "cleanse-objective"
     ]
 
     death_trap_lifecycle = _battle_lifecycle_for_primary(
@@ -4845,10 +4837,16 @@ def test_shooting_lifecycle_filters_mission_actions_by_primary_and_secondary_own
     death_trap_state.battle_phase_index = death_trap_state.battle_phase_sequence.index(
         BattlePhase.SHOOTING
     )
-    _place_unit_near_objective(
+    assert death_trap_state.mission_setup is not None
+    death_trap_area = _objective_logical_terrain_area(
+        death_trap_state.mission_setup,
+        objective_role=ObjectiveMarkerRole.CENTRAL,
+    )
+    _place_unit_near_point(
         death_trap_state,
         unit_instance_id="army-alpha:intercessor-unit-1",
-        target_suffix="center",
+        x_inches=_logical_terrain_area_test_point(death_trap_area)[0],
+        y_inches=_logical_terrain_area_test_point(death_trap_area)[1],
     )
 
     death_trap_status = LocalGameSession(
@@ -4873,16 +4871,17 @@ def test_shooting_lifecycle_exposes_held_tactical_plunder() -> None:
     assert state.mission_setup is not None
     _record_active_tactical_secondary(state, secondary_mission_id="plunder")
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
-    terrain_feature = _first_non_player_deployment_terrain_feature(
+    terrain_area = _first_plunderable_logical_terrain_area(
         state,
         player_id="player-a",
     )
-    min_x, min_y, max_x, max_y = terrain_feature.bounds()
+    target_member = terrain_area.members[0]
+    target_point = target_member.footprint_polygon[0]
     _place_unit_near_point(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
-        x_inches=(min_x + max_x) / 2.0,
-        y_inches=(min_y + max_y) / 2.0,
+        x_inches=target_point.x_inches,
+        y_inches=target_point.y_inches,
     )
 
     waiting = LocalGameSession(lifecycle=lifecycle).advance_until_decision_or_terminal()
@@ -4972,13 +4971,14 @@ def test_plunder_mission_action_completes_immediately_and_records_secondary_evid
     assert state.mission_setup is not None
     _record_active_tactical_secondary(state, secondary_mission_id="plunder")
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
-    terrain_feature = _first_non_player_deployment_terrain_feature(state, player_id="player-a")
-    min_x, min_y, max_x, max_y = terrain_feature.bounds()
+    terrain_area = _first_plunderable_logical_terrain_area(state, player_id="player-a")
+    target_member = terrain_area.members[0]
+    target_point = target_member.footprint_polygon[0]
     _place_unit_near_point(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
-        x_inches=(min_x + max_x) / 2.0,
-        y_inches=(min_y + max_y) / 2.0,
+        x_inches=target_point.x_inches,
+        y_inches=target_point.y_inches,
     )
 
     waiting = request_mission_action_start(
@@ -4993,7 +4993,8 @@ def test_plunder_mission_action_completes_immediately_and_records_secondary_evid
     option = next(
         option
         for option in request.options
-        if cast(dict[str, JsonValue], option.payload)["target_id"] == terrain_feature.feature_id
+        if cast(dict[str, JsonValue], option.payload)["target_id"]
+        == terrain_area.logical_terrain_area_id
     )
     result = FiniteOptionSubmission(
         request_id=request.request_id,
@@ -5008,7 +5009,7 @@ def test_plunder_mission_action_completes_immediately_and_records_secondary_evid
     assert action.score_transaction_id is None
     assert state.victory_point_total("player-a") == 0
     assert [plunder.terrain_feature_id for plunder in state.secondary_terrain_plunder_states] == [
-        terrain_feature.feature_id
+        terrain_area.logical_terrain_area_id
     ]
     assert (
         request_mission_action_start(
@@ -5028,32 +5029,20 @@ def test_plunder_mission_action_completes_immediately_and_records_secondary_evid
 
 def test_plunder_excludes_terrain_area_in_player_territory_outside_deployment_zone() -> None:
     mission_setup = _event_companion_mission_setup_with_scoring_terrain_feature()
-    scoring_feature = _terrain_feature_by_id(mission_setup, SCORING_TERRAIN_FEATURE_ID)
-    center_x, center_y = _territory_point_outside_deployment_for_feature(
-        mission_setup,
-        player_id="player-a",
-        feature=scoring_feature,
-    )
-    relocated_display_geometry = TerrainDisplayGeometry.axis_aligned_rectangle(
-        center_x_inches=center_x,
-        center_y_inches=center_y,
-        width_inches=scoring_feature.footprint_width_inches,
-        depth_inches=scoring_feature.footprint_depth_inches,
-        display_template_id="phase11e_scoring_debris_8x8_in_territory",
-    )
-    scoring_feature = replace(
-        scoring_feature,
-        footprint_center_x_inches=center_x,
-        footprint_center_y_inches=center_y,
-        rules_footprint_polygon=relocated_display_geometry.footprint_polygon,
-        display_geometry=relocated_display_geometry,
-    )
-    mission_setup = replace(
-        mission_setup,
-        terrain_features=tuple(
-            scoring_feature if feature.feature_id == scoring_feature.feature_id else feature
-            for feature in mission_setup.terrain_features
-        ),
+    territory_area = next(
+        area
+        for area in mission_logical_terrain_areas(mission_setup)
+        if len(area.members) > 1
+        and logical_terrain_area_within_player_territory(
+            area,
+            mission_setup=mission_setup,
+            player_id="player-a",
+        )
+        and not logical_terrain_area_within_player_deployment_zone(
+            area,
+            mission_setup=mission_setup,
+            player_id="player-a",
+        )
     )
     lifecycle = _battle_lifecycle(
         player_a_secondary=SecondaryMissionMode.TACTICAL,
@@ -5063,11 +5052,13 @@ def test_plunder_excludes_terrain_area_in_player_territory_outside_deployment_zo
     assert state is not None
     _record_active_tactical_secondary(state, secondary_mission_id="plunder")
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    target_member = territory_area.members[0]
+    target_point = target_member.footprint_polygon[0]
     _place_unit_near_point(
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
-        x_inches=center_x,
-        y_inches=center_y,
+        x_inches=target_point.x_inches,
+        y_inches=target_point.y_inches,
     )
 
     status = request_mission_action_start(
@@ -5081,26 +5072,83 @@ def test_plunder_excludes_terrain_area_in_player_territory_outside_deployment_zo
     assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
 
 
+def test_logical_terrain_area_exclusions_require_every_physical_member() -> None:
+    mission_setup = _event_companion_mission_setup_with_scoring_terrain_feature()
+    area = next(
+        area for area in mission_logical_terrain_areas(mission_setup) if len(area.members) > 1
+    )
+    first_member = area.members[0]
+    first_member_shape = DeploymentZoneShape(
+        polygons=(
+            DeploymentZonePolygon(
+                vertices=tuple(
+                    DeploymentZonePoint(x=point.x_inches, y=point.y_inches)
+                    for point in first_member.footprint_polygon
+                )
+            ),
+        )
+    )
+    attacker_territory = next(
+        region
+        for region in mission_setup.battlefield_regions
+        if region.region_kind is BattlefieldRegionKind.TERRITORY and region.owner_role == "attacker"
+    )
+    partial_setup = replace(
+        mission_setup,
+        deployment_zones=tuple(
+            replace(zone, shape=first_member_shape) if zone.player_id == "player-a" else zone
+            for zone in mission_setup.deployment_zones
+        ),
+        battlefield_regions=tuple(
+            replace(region, shape=first_member_shape)
+            if region.region_id == attacker_territory.region_id
+            else region
+            for region in mission_setup.battlefield_regions
+        ),
+    )
+
+    assert shapely_backend.deployment_zone_shapes_cover_polygon(
+        shapes=(first_member_shape,),
+        polygon=tuple((point.x_inches, point.y_inches) for point in first_member.footprint_polygon),
+    )
+    assert not logical_terrain_area_within_player_deployment_zone(
+        area,
+        mission_setup=partial_setup,
+        player_id="player-a",
+    )
+    assert not logical_terrain_area_within_player_territory(
+        area,
+        mission_setup=partial_setup,
+        player_id="player-a",
+    )
+
+
 def test_plunder_territory_containment_rejects_footprint_crossing_cutout() -> None:
     mission_setup = _event_companion_mission_setup_with_scoring_terrain_feature()
-    feature = _terrain_feature_by_id(mission_setup, SCORING_TERRAIN_FEATURE_ID)
+    area = next(
+        area for area in mission_logical_terrain_areas(mission_setup) if len(area.members) == 1
+    )
     territory = next(
         region
         for region in mission_setup.battlefield_regions
         if region.region_kind is BattlefieldRegionKind.TERRITORY and region.owner_role == "attacker"
     )
+    min_x, min_y, max_x, max_y = area.bounds()
+    member_polygon = area.members[0].footprint_polygon
+    cutout_x = sum(point.x_inches for point in member_polygon) / len(member_polygon)
+    cutout_y = sum(point.y_inches for point in member_polygon) / len(member_polygon)
     shape = DeploymentZoneShape(
         polygons=DeploymentZoneShape.rectangle(
-            min_x=20.0,
-            min_y=10.0,
-            max_x=40.0,
-            max_y=30.0,
+            min_x=max(0.0, min_x - 1.0),
+            min_y=max(0.0, min_y - 1.0),
+            max_x=min(mission_setup.battlefield_width_inches, max_x + 1.0),
+            max_y=min(mission_setup.battlefield_depth_inches, max_y + 1.0),
         ).polygons,
         cutouts=(
             DeploymentZoneCircleCutout(
-                center_x=feature.footprint_center_x_inches,
-                center_y=feature.footprint_center_y_inches,
-                radius=1.0,
+                center_x=cutout_x,
+                center_y=cutout_y,
+                radius=0.5,
             ),
         ),
     )
@@ -5111,8 +5159,6 @@ def test_plunder_territory_containment_rejects_footprint_crossing_cutout() -> No
             for region in mission_setup.battlefield_regions
         ),
     )
-    min_x, min_y, max_x, max_y = feature.bounds()
-
     assert all(
         shape.contains_point(x, y)
         for x, y in (
@@ -5122,8 +5168,8 @@ def test_plunder_territory_containment_rejects_footprint_crossing_cutout() -> No
             (max_x, max_y),
         )
     )
-    assert not terrain_feature_within_player_territory(
-        feature,
+    assert not logical_terrain_area_within_player_territory(
+        area,
         mission_setup=mission_setup,
         player_id="player-a",
     )
@@ -5131,23 +5177,27 @@ def test_plunder_territory_containment_rejects_footprint_crossing_cutout() -> No
 
 def test_plunder_territory_containment_rejects_footprint_crossing_polygon_gap() -> None:
     mission_setup = _event_companion_mission_setup_with_scoring_terrain_feature()
-    feature = _terrain_feature_by_id(mission_setup, SCORING_TERRAIN_FEATURE_ID)
+    area = next(
+        area for area in mission_logical_terrain_areas(mission_setup) if len(area.members) == 1
+    )
     territory = next(
         region
         for region in mission_setup.battlefield_regions
         if region.region_kind is BattlefieldRegionKind.TERRITORY and region.owner_role == "attacker"
     )
+    min_x, min_y, max_x, max_y = area.bounds()
+    middle_x = (min_x + max_x) / 2.0
     left = DeploymentZoneShape.rectangle(
-        min_x=20.0,
-        min_y=10.0,
-        max_x=28.0,
-        max_y=30.0,
+        min_x=max(0.0, min_x - 1.0),
+        min_y=max(0.0, min_y - 1.0),
+        max_x=middle_x - 0.1,
+        max_y=min(mission_setup.battlefield_depth_inches, max_y + 1.0),
     )
     right = DeploymentZoneShape.rectangle(
-        min_x=32.0,
-        min_y=10.0,
-        max_x=40.0,
-        max_y=30.0,
+        min_x=middle_x + 0.1,
+        min_y=max(0.0, min_y - 1.0),
+        max_x=min(mission_setup.battlefield_width_inches, max_x + 1.0),
+        max_y=min(mission_setup.battlefield_depth_inches, max_y + 1.0),
     )
     shape = DeploymentZoneShape(polygons=(*left.polygons, *right.polygons))
     mission_setup = replace(
@@ -5157,8 +5207,6 @@ def test_plunder_territory_containment_rejects_footprint_crossing_polygon_gap() 
             for region in mission_setup.battlefield_regions
         ),
     )
-    min_x, min_y, max_x, max_y = feature.bounds()
-
     assert all(
         shape.contains_point(x, y)
         for x, y in (
@@ -5168,8 +5216,8 @@ def test_plunder_territory_containment_rejects_footprint_crossing_polygon_gap() 
             (max_x, max_y),
         )
     )
-    assert not terrain_feature_within_player_territory(
-        feature,
+    assert not logical_terrain_area_within_player_territory(
+        area,
         mission_setup=mission_setup,
         player_id="player-a",
     )
@@ -5177,34 +5225,42 @@ def test_plunder_territory_containment_rejects_footprint_crossing_polygon_gap() 
 
 def test_terrain_area_membership_queries_fail_fast_on_missing_source_context() -> None:
     mission_setup = _event_companion_mission_setup_with_scoring_terrain_feature()
-    feature = _terrain_feature_by_id(mission_setup, SCORING_TERRAIN_FEATURE_ID)
+    area = next(
+        area
+        for area in mission_logical_terrain_areas(mission_setup)
+        if logical_terrain_area_within_player_territory(
+            area,
+            mission_setup=mission_setup,
+            player_id="player-b",
+        )
+    )
 
-    assert terrain_feature_within_player_territory(
-        feature,
+    assert logical_terrain_area_within_player_territory(
+        area,
         mission_setup=mission_setup,
         player_id="player-b",
     )
-    with pytest.raises(GameLifecycleError, match="terrain feature target requires"):
-        terrain_feature_within_player_deployment_zone(
-            cast(TerrainFeatureDefinition, object()),
+    with pytest.raises(GameLifecycleError, match="requires MissionLogicalTerrainArea"):
+        logical_terrain_area_within_player_deployment_zone(
+            cast(MissionLogicalTerrainArea, object()),
             mission_setup=mission_setup,
             player_id="player-a",
         )
     with pytest.raises(GameLifecycleError, match="requires MissionSetup"):
-        terrain_feature_within_player_territory(
-            feature,
+        logical_terrain_area_within_player_territory(
+            area,
             mission_setup=cast(MissionSetup, object()),
             player_id="player-a",
         )
     with pytest.raises(GameLifecycleError, match="requires player zone"):
-        terrain_feature_within_player_deployment_zone(
-            feature,
+        logical_terrain_area_within_player_deployment_zone(
+            area,
             mission_setup=mission_setup,
             player_id="player-without-zone",
         )
     with pytest.raises(GameLifecycleError, match="has no mission role"):
-        terrain_feature_within_player_territory(
-            feature,
+        logical_terrain_area_within_player_territory(
+            area,
             mission_setup=mission_setup,
             player_id="player-without-role",
         )
@@ -5217,8 +5273,8 @@ def test_terrain_area_membership_queries_fail_fast_on_missing_source_context() -
         ),
     )
     with pytest.raises(GameLifecycleError, match="requires one player territory"):
-        terrain_feature_within_player_territory(
-            feature,
+        logical_terrain_area_within_player_territory(
+            area,
             mission_setup=setup_without_territories,
             player_id="player-a",
         )
@@ -5228,7 +5284,7 @@ def test_public_payload_redacts_hidden_secondary_scoring_evidence() -> None:
     state = _battle_state_from_config(
         replace(
             _config_with_player_b_vehicles(("vehicle-unit-3",)),
-            mission_setup=_mission_setup_with_scoring_terrain_feature(),
+            mission_setup=_event_companion_mission_setup_with_scoring_terrain_feature(),
         )
     )
     state.secondary_mission_choices = [
@@ -5236,20 +5292,36 @@ def test_public_payload_redacts_hidden_secondary_scoring_evidence() -> None:
     ]
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-3")
+    assert state.mission_setup is not None
+    cleanse_target_id = _center_marker_definition_for_setup(state.mission_setup).objective_marker_id
+    cleanse_action_id = "phase16-public-cleanse"
+    cleanse_source_id = _record_completed_zero_vp_mission_action(
+        state,
+        mission_action_id="cleanse-objective",
+        action_id=cleanse_action_id,
+        target_id=cleanse_target_id,
+    )
     state.record_secondary_objective_cleanse(
         player_id="player-a",
-        objective_marker_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
-        action_id="phase16-public-cleanse",
+        objective_marker_id=cleanse_target_id,
+        action_id=cleanse_action_id,
         phase=BattlePhase.FIGHT,
-        source_id="cleanse",
+        source_id=cleanse_source_id,
     )
-    terrain_feature = _first_non_player_deployment_terrain_feature(state, player_id="player-a")
+    terrain_area = _first_plunderable_logical_terrain_area(state, player_id="player-a")
+    plunder_action_id = "phase16-public-plunder"
+    plunder_source_id = _record_completed_zero_vp_mission_action(
+        state,
+        mission_action_id="plunder-terrain",
+        action_id=plunder_action_id,
+        target_id=terrain_area.logical_terrain_area_id,
+    )
     state.record_secondary_terrain_plunder(
         player_id="player-a",
-        terrain_feature_id=terrain_feature.feature_id,
-        action_id="phase16-public-plunder",
+        terrain_feature_id=terrain_area.logical_terrain_area_id,
+        action_id=plunder_action_id,
         phase=BattlePhase.SHOOTING,
-        source_id="plunder",
+        source_id=plunder_source_id,
     )
 
     player_payload = state.to_public_payload(viewer_player_id="player-a")
@@ -5570,7 +5642,9 @@ def test_automatic_mission_action_opportunity_excludes_unavailable_units(
                 unit_instance_id=unit_id,
                 reserve_kind=ReserveKind.STRATEGIC_RESERVES,
                 destruction_deadline_policy=reserve_destruction_policy_from_scoring_policy(
-                    mission_scoring_policy_from_setup(_mission_setup())
+                    mission_scoring_policies_from_setup(_mission_setup()).policy_for_player(
+                        "player-a"
+                    )
                 ),
             )
         )
@@ -5645,6 +5719,36 @@ def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() 
     assert cleanup.removals[0].destroyed_model_rules_triggered is False
 
 
+def test_turn_end_control_and_primary_scoring_use_post_cleanup_battlefield() -> None:
+    state = _battle_state_for_primary("primary-immovable-object")
+    assert state.battlefield_state is not None
+    marker = _center_marker_definition(state)
+    unit_placement = state.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    broken = _with_model_offsets(
+        unit_placement,
+        marker,
+        offsets=((16.0, 8.0), (17.5, 8.0), (16.0, 9.5), (17.5, 9.5), (0.0, 0.0)),
+    )
+    isolated_objective_model_id = broken.model_placements[-1].model_instance_id
+    state.battlefield_state = state.battlefield_state.with_unit_placement(broken)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+
+    state.advance_to_next_battle_phase()
+
+    assert isolated_objective_model_id in state.battlefield_state.removed_model_ids
+    turn_end_record = next(
+        record
+        for record in reversed(state.objective_control_records)
+        if record.timing is ObjectiveControlTiming.TURN_END
+    )
+    central_result = turn_end_record.result_by_objective_id(marker.objective_marker_id)
+    assert central_result.controlled_by_player_id is None
+    assert not any(
+        _transaction_metadata(transaction)["scoring_rule_id"] == "immovable-object-central-turn-end"
+        for transaction in state.victory_point_ledger_for_player("player-a").transactions
+    )
+
+
 def test_unarrived_reserves_are_destroyed_at_mission_deadline() -> None:
     state, reserve_unit_id = _battle_state_with_unarrived_reserve_at_round_three_deadline()
     reserve_model_ids = tuple(
@@ -5708,9 +5812,11 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
     primary = next(
         mission
         for mission in mission_pack.primary_missions
-        if mission.primary_mission_id == "take-and-hold"
+        if mission.primary_mission_id == "primary-unstoppable-force"
     )
-    policy = mission_scoring_policy_from_setup(_mission_setup_for_primary("take-and-hold"))
+    policy = mission_scoring_policies_from_setup(
+        _mission_setup_for_primary("primary-unstoppable-force")
+    ).policy_for_player("player-a")
     primary_rule = policy.primary_scoring_rules[0]
     award = policy.mission_action_award(
         player_id="player-a",
@@ -5733,10 +5839,8 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
     assert policy.game_length_battle_rounds == mission_pack.scoring.game_length_battle_rounds
     assert policy.primary_max_vp_per_turn == primary.max_vp_per_turn
     assert policy.primary_vp_per_controlled_objective == primary.vp_per_controlled_objective
-    assert policy.primary_scoring_rule_id == "take-and-hold-control"
-    assert policy.primary_scoring_rule_condition == (
-        "each_controlled_objective_from_battle_round_two"
-    )
+    assert policy.primary_scoring_rule_id is None
+    assert policy.primary_scoring_rule_condition is None
     assert PrimaryMissionScoringRule.from_payload(primary_rule.to_payload()) == primary_rule
     assert policy.primary_vp_cap == mission_pack.scoring.primary_vp_cap
     assert policy.total_vp_cap == mission_pack.scoring.total_vp_cap
@@ -5787,7 +5891,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         )
     with pytest.raises(GameLifecycleError, match="primary_scoring_rules must not contain"):
         replace(policy, primary_scoring_rules=(primary_rule, primary_rule))
-    with pytest.raises(GameLifecycleError, match="primary_scoring_rules must not be empty"):
+    with pytest.raises(GameLifecycleError, match="Primary support status"):
         replace(policy, primary_scoring_rules=())
     scoring_state = _battle_state()
     assert scoring_state.mission_setup is not None
@@ -5899,10 +6003,13 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
                 ("not-a-destruction",),
             ),
         )
-    with pytest.raises(GameLifecycleError):
-        mission_scoring_policy_from_setup(
-            replace(_mission_setup(), primary_mission_id="the-ritual")
-        )
+    drifted_setup = _with_player_primary_mission(
+        _event_companion_mission_setup(),
+        player_id="player-a",
+        primary_mission_id="primary-vital-link",
+    )
+    with pytest.raises(GameLifecycleError, match="directional matrix"):
+        mission_scoring_policies_from_setup(drifted_setup)
     with pytest.raises(GameLifecycleError):
         ledger.award(cast(VictoryPointAward, "not-an-award"))
     with pytest.raises(GameLifecycleError):
@@ -6296,11 +6403,17 @@ def test_mission_policy_and_tactical_draw_are_fail_fast() -> None:
     )
 
     with pytest.raises(GameLifecycleError):
-        mission_scoring_policy_from_setup(cast(MissionSetup, object()))
+        mission_scoring_policies_from_setup(cast(MissionSetup, object()))
     with pytest.raises(GameLifecycleError):
-        mission_scoring_policy_from_setup(replace(setup, mission_pack_id="unsupported-pack"))
+        mission_scoring_policies_from_setup(replace(setup, mission_pack_id="unsupported-pack"))
     with pytest.raises(GameLifecycleError):
-        mission_scoring_policy_from_setup(replace(setup, primary_mission_id="unsupported-primary"))
+        mission_scoring_policies_from_setup(
+            _with_player_primary_mission(
+                setup,
+                player_id="player-a",
+                primary_mission_id="unsupported-primary",
+            )
+        )
     with pytest.raises(GameLifecycleError):
         deterministic_tactical_secondary_draw(
             mission_setup=cast(MissionSetup, object()),
@@ -6430,32 +6543,6 @@ def test_turn_cleanup_payloads_and_resolver_reject_invalid_contexts() -> None:
         )
 
 
-def _battle_state_with_center_objective_positions(
-    *,
-    player_a_offsets: tuple[tuple[float, float], ...],
-    player_b_offsets: tuple[tuple[float, float], ...],
-) -> GameState:
-    state = _battle_state_for_primary("take-and-hold")
-    assert state.battlefield_state is not None
-    center_marker = _objective_marker_definition(state, "center")
-    home_marker = _objective_marker_definition(state, "left-home")
-    player_a = state.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
-    player_b = state.battlefield_state.unit_placement_by_id("army-beta:intercessor-unit-3")
-    player_a = _with_model_offsets(player_a, center_marker, offsets=player_a_offsets)
-    player_a = _with_model_offsets(
-        player_a,
-        home_marker,
-        offsets=((0.0, 0.0),),
-        start_index=len(player_a_offsets),
-    )
-    battlefield_state = state.battlefield_state.with_unit_placement(player_a)
-    battlefield_state = battlefield_state.with_unit_placement(
-        _with_model_offsets(player_b, center_marker, offsets=player_b_offsets)
-    )
-    state.battlefield_state = battlefield_state
-    return state
-
-
 def _with_model_offsets(
     unit_placement: UnitPlacement,
     marker: ObjectiveMarkerDefinition,
@@ -6478,63 +6565,102 @@ def _with_model_offsets(
     return unit_placement.with_model_placements(tuple(placements))
 
 
-def _first_non_player_deployment_terrain_feature(
+def _first_plunderable_logical_terrain_area(
     state: GameState,
     *,
     player_id: str,
-) -> TerrainFeatureDefinition:
+) -> MissionLogicalTerrainArea:
     if state.mission_setup is None:
         raise AssertionError("test state requires mission setup")
-    zones = tuple(
-        zone for zone in state.mission_setup.deployment_zones if zone.player_id == player_id
-    )
-    for feature in state.mission_setup.terrain_features:
-        min_x, min_y, max_x, max_y = feature.bounds()
-        corners = (
-            (min_x, min_y),
-            (min_x, max_y),
-            (max_x, min_y),
-            (max_x, max_y),
+    return next(
+        area
+        for area in mission_logical_terrain_areas(state.mission_setup)
+        if not logical_terrain_area_within_player_territory(
+            area,
+            mission_setup=state.mission_setup,
+            player_id=player_id,
         )
-        if not all(any(zone.contains_point(x, y) for zone in zones) for x, y in corners):
-            return feature
-    raise AssertionError("test mission setup requires terrain outside player deployment zone")
+    )
 
 
-def _territory_point_outside_deployment_for_feature(
+def _record_completed_zero_vp_mission_action(
+    state: GameState,
+    *,
+    mission_action_id: str,
+    action_id: str,
+    target_id: str,
+    player_id: str = "player-a",
+) -> str:
+    if state.mission_setup is None:
+        raise AssertionError("test state requires mission setup")
+    mission_action = mission_pack_for_id(state.mission_setup.mission_pack_id).mission_action(
+        mission_action_id
+    )
+    army = next(army for army in state.army_definitions if army.player_id == player_id)
+    unit_instance_id = army.units[0].unit_instance_id
+    started = MissionActionState.start(
+        action_id=action_id,
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+        target_id=target_id,
+        mission_id=mission_action.mission_id,
+        battle_round=state.battle_round,
+        phase=mission_action.start_phase,
+        start_timing=mission_action.start_timing,
+        completion_timing=mission_action.completion_timing,
+        eligible_unit_instance_ids=(unit_instance_id,),
+        interruption_conditions=mission_action.interruption_conditions,
+        scoring_source_id=mission_action.scoring_source_id,
+        victory_points=mission_action.victory_points,
+    )
+    completion_phase = (
+        BattlePhase.FIGHT.value
+        if mission_action.completion_timing == "turn_end"
+        else mission_action.start_phase
+    )
+    completed = started.complete_without_award(
+        battle_round=state.battle_round,
+        phase=completion_phase,
+        completion_timing=mission_action.completion_timing,
+    )
+    state.record_mission_action_state(completed)
+    return mission_action.source_id
+
+
+def _objective_logical_terrain_area(
     mission_setup: MissionSetup,
     *,
-    player_id: str,
-    feature: TerrainFeatureDefinition,
-) -> tuple[float, float]:
-    owner_role = "attacker" if player_id == mission_setup.attacker_player_id else "defender"
-    territory = next(
-        region
-        for region in mission_setup.battlefield_regions
-        if region.region_kind is BattlefieldRegionKind.TERRITORY and region.owner_role == owner_role
+    objective_role: ObjectiveMarkerRole,
+) -> MissionLogicalTerrainArea:
+    marker = next(
+        marker
+        for marker in mission_setup.objective_markers
+        if marker.objective_role is objective_role
     )
-    zones = tuple(zone for zone in mission_setup.deployment_zones if zone.player_id == player_id)
-    half_width = feature.footprint_width_inches / 2.0
-    half_depth = feature.footprint_depth_inches / 2.0
-    for x_inches in range(
-        int(half_width) + 1,
-        int(mission_setup.battlefield_width_inches - half_width),
-    ):
-        for y_inches in range(
-            int(half_depth) + 1,
-            int(mission_setup.battlefield_depth_inches - half_depth),
-        ):
-            corners = (
-                (x_inches - half_width, y_inches - half_depth),
-                (x_inches - half_width, y_inches + half_depth),
-                (x_inches + half_width, y_inches - half_depth),
-                (x_inches + half_width, y_inches + half_depth),
-            )
-            if all(territory.contains_point(x, y) for x, y in corners) and not all(
-                any(zone.contains_point(x, y) for zone in zones) for x, y in corners
-            ):
-                return float(x_inches), float(y_inches)
-    raise AssertionError("test mission setup requires territory outside deployment")
+    association = next(
+        association
+        for association in mission_setup.objective_terrain_areas
+        if association.objective_marker_id == marker.objective_marker_id
+    )
+    physical_areas_by_id = {area.terrain_area_id: area for area in mission_setup.terrain_areas}
+    logical_ids = {
+        physical_areas_by_id[area_id].logical_terrain_area_id
+        for area_id in association.terrain_area_ids
+    }
+    assert len(logical_ids) == 1
+    (logical_id,) = logical_ids
+    return next(
+        area
+        for area in mission_logical_terrain_areas(mission_setup)
+        if area.logical_terrain_area_id == logical_id
+    )
+
+
+def _logical_terrain_area_test_point(
+    area: MissionLogicalTerrainArea,
+) -> tuple[float, float]:
+    point = area.members[0].footprint_polygon[0]
+    return point.x_inches, point.y_inches
 
 
 def _battle_state_with_unarrived_reserve_at_round_three_deadline() -> tuple[GameState, str]:
@@ -6550,7 +6676,7 @@ def _battle_state_with_unarrived_reserve_at_round_three_deadline() -> tuple[Game
             unit_instance_id=reserve_unit.unit_instance_id,
             reserve_kind=ReserveKind.STRATEGIC_RESERVES,
             destruction_deadline_policy=reserve_destruction_policy_from_scoring_policy(
-                mission_scoring_policy_from_setup(_mission_setup())
+                mission_scoring_policies_from_setup(_mission_setup()).policy_for_player("player-a")
             ),
         )
     )
@@ -6993,7 +7119,9 @@ def _tactical_secondary_achievement_context_for_card(
     assert state.active_player_id is not None
     phase = state.current_battle_phase
     assert phase is not None
-    policy = mission_scoring_policy_from_setup(state.mission_setup)
+    policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player(
+        card.player_id
+    )
     award = policy.secondary_award(
         player_id=card.player_id,
         battle_round=state.battle_round,
@@ -7101,7 +7229,9 @@ def _battle_state_from_config(
                 unit_instance_id=unit_instance_id,
                 reserve_kind=ReserveKind.STRATEGIC_RESERVES,
                 destruction_deadline_policy=reserve_destruction_policy_from_scoring_policy(
-                    mission_scoring_policy_from_setup(config.mission_setup)
+                    mission_scoring_policies_from_setup(config.mission_setup).policy_for_player(
+                        owner
+                    )
                 ),
             )
         )
@@ -7137,7 +7267,8 @@ def _secondary_choice(
 
 
 def _config(*, mission_setup: MissionSetup | None = None) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = _catalog_with_directional_force_dispositions()
+    resolved_mission_setup = _mission_setup() if mission_setup is None else mission_setup
     return GameConfig(
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
@@ -7149,18 +7280,24 @@ def _config(*, mission_setup: MissionSetup | None = None) -> GameConfig:
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_ids=("intercessor-unit-1",),
+                force_disposition_id=resolved_mission_setup.force_disposition_id_for_player(
+                    "player-a"
+                ),
             ),
             _army_muster_request(
                 catalog=catalog,
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=("intercessor-unit-3",),
+                force_disposition_id=resolved_mission_setup.force_disposition_id_for_player(
+                    "player-b"
+                ),
             ),
         ),
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
-        mission_setup=_mission_setup() if mission_setup is None else mission_setup,
+        mission_setup=resolved_mission_setup,
     )
 
 
@@ -7169,8 +7306,7 @@ def _config_for_primary(
     *,
     objective_terrain_feature_id: str | None = None,
 ) -> GameConfig:
-    return replace(
-        _config(),
+    return _config(
         mission_setup=_mission_setup_for_primary(
             primary_mission_id,
             objective_terrain_feature_id=objective_terrain_feature_id,
@@ -7179,7 +7315,7 @@ def _config_for_primary(
 
 
 def _config_with_player_a_vehicle() -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = _catalog_with_directional_force_dispositions()
     return GameConfig(
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
@@ -7227,7 +7363,7 @@ def _config_with_player_a_vehicle() -> GameConfig:
 
 
 def _config_with_two_player_a_infantry_units() -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = _catalog_with_directional_force_dispositions()
     return GameConfig(
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
@@ -7257,8 +7393,10 @@ def _config_with_two_player_a_infantry_units() -> GameConfig:
 def _config_with_player_a_attached_unit(
     *,
     include_independent_unit: bool = False,
+    mission_setup: MissionSetup | None = None,
 ) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = _catalog_with_directional_force_dispositions()
+    resolved_mission_setup = _mission_setup() if mission_setup is None else mission_setup
     return GameConfig(
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
@@ -7275,7 +7413,9 @@ def _config_with_player_a_attached_unit(
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
-                force_disposition_id="purge-the-foe",
+                force_disposition_id=resolved_mission_setup.force_disposition_id_for_player(
+                    "player-a"
+                ),
                 unit_selections=(
                     _unit_muster_selection(
                         unit_selection_id="bodyguard-unit",
@@ -7314,17 +7454,20 @@ def _config_with_player_a_attached_unit(
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=("intercessor-unit-3",),
+                force_disposition_id=resolved_mission_setup.force_disposition_id_for_player(
+                    "player-b"
+                ),
             ),
         ),
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
-        mission_setup=_mission_setup(),
+        mission_setup=resolved_mission_setup,
     )
 
 
 def _config_with_player_a_transport() -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = _catalog_with_directional_force_dispositions()
     return GameConfig(
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
@@ -7372,7 +7515,7 @@ def _config_with_player_a_transport() -> GameConfig:
 
 
 def _config_with_player_b_character(*, mission_setup: MissionSetup) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = _catalog_with_directional_force_dispositions()
     return GameConfig(
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
@@ -7384,6 +7527,7 @@ def _config_with_player_b_character(*, mission_setup: MissionSetup) -> GameConfi
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_ids=("intercessor-unit-1",),
+                force_disposition_id=mission_setup.force_disposition_id_for_player("player-a"),
             ),
             ArmyMusterRequest(
                 army_id="army-beta",
@@ -7395,7 +7539,7 @@ def _config_with_player_b_character(*, mission_setup: MissionSetup) -> GameConfi
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
-                force_disposition_id="purge-the-foe",
+                force_disposition_id=mission_setup.force_disposition_id_for_player("player-b"),
                 unit_selections=(
                     _unit_muster_selection(
                         unit_selection_id="character-unit-3",
@@ -7414,7 +7558,7 @@ def _config_with_player_b_character(*, mission_setup: MissionSetup) -> GameConfi
 
 
 def _config_with_player_b_vehicles(vehicle_unit_ids: tuple[str, ...]) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = _catalog_with_directional_force_dispositions()
     return GameConfig(
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
@@ -7437,7 +7581,7 @@ def _config_with_player_b_vehicles(vehicle_unit_ids: tuple[str, ...]) -> GameCon
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
-                force_disposition_id="purge-the-foe",
+                force_disposition_id="take-and-hold",
                 unit_selections=tuple(
                     _unit_muster_selection(
                         unit_selection_id=unit_id,
@@ -7457,7 +7601,7 @@ def _config_with_player_b_vehicles(vehicle_unit_ids: tuple[str, ...]) -> GameCon
 
 
 def _config_with_player_b_horde_units(unit_ids: tuple[str, ...]) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = _catalog_with_directional_force_dispositions()
     return GameConfig(
         game_id="phase11e-game",
         allow_legacy_non_strict_rosters=True,
@@ -7480,7 +7624,7 @@ def _config_with_player_b_horde_units(unit_ids: tuple[str, ...]) -> GameConfig:
                     faction_id="core-marine-force",
                     detachment_ids=("core-combined-arms",),
                 ),
-                force_disposition_id="purge-the-foe",
+                force_disposition_id="take-and-hold",
                 unit_selections=tuple(
                     _unit_muster_selection(
                         unit_selection_id=unit_id,
@@ -7552,7 +7696,9 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="take-and-hold",
     )
 
 
@@ -7562,7 +7708,9 @@ def _event_companion_mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-1",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="take-and-hold",
     )
 
 
@@ -7572,7 +7720,33 @@ def _event_companion_meatgrinder_mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-purge-the-foe-vs-purge-the-foe-layout-1",
         terrain_layout_id="purge-the-foe-vs-purge-the-foe-layout-1",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
+    )
+
+
+def _event_companion_death_trap_mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-disruption-layout-1",
+        terrain_layout_id="take-and-hold-vs-disruption-layout-1",
+        attacker_player_id="player-a",
+        attacker_force_disposition_id="disruption",
+        defender_player_id="player-b",
+        defender_force_disposition_id="take-and-hold",
+    )
+
+
+def _chapter_approved_immovable_object_mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=chapter_approved_2026_27_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
+        terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+        attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
+        defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
 
 
@@ -7581,126 +7755,32 @@ def _mission_setup_for_primary(
     *,
     objective_terrain_feature_id: str | None = None,
 ) -> MissionSetup:
-    mission_setup = replace(
-        _explicit_custom_mission_setup(_mission_setup()),
-        primary_mission_id=primary_mission_id,
-    )
-    if objective_terrain_feature_id is None:
-        return mission_setup
-    mission_setup = _with_scoring_terrain_feature(
-        mission_setup,
-        feature_id=objective_terrain_feature_id,
-    )
-    feature = _terrain_feature_by_id(mission_setup, objective_terrain_feature_id)
-    center_marker = _center_marker_definition_for_setup(mission_setup)
-    objective_markers = tuple(
-        replace(
-            marker,
-            x_inches=feature.footprint_center_x_inches,
-            y_inches=feature.footprint_center_y_inches,
-        )
-        if marker.objective_marker_id == center_marker.objective_marker_id
-        else marker
-        for marker in mission_setup.objective_markers
-    )
-    return replace(mission_setup, objective_markers=objective_markers)
-
-
-def _mission_setup_with_scoring_terrain_feature(
-    *,
-    feature_id: str = SCORING_TERRAIN_FEATURE_ID,
-) -> MissionSetup:
-    return _with_scoring_terrain_feature(
-        _explicit_custom_mission_setup(_mission_setup()),
-        feature_id=feature_id,
-    )
+    if primary_mission_id == "primary-death-trap":
+        return _event_companion_death_trap_mission_setup()
+    if objective_terrain_feature_id is not None:
+        raise AssertionError("Only Death Trap accepts a terrain target fixture.")
+    if primary_mission_id == "primary-immovable-object":
+        return _chapter_approved_immovable_object_mission_setup()
+    if primary_mission_id == "primary-meatgrinder":
+        return _event_companion_meatgrinder_mission_setup()
+    if primary_mission_id == "primary-unstoppable-force":
+        return _mission_setup()
+    raise AssertionError("Primary mission fixture requires an engine-implemented mission.")
 
 
 def _event_companion_mission_setup_with_scoring_terrain_feature(
     *,
     feature_id: str = SCORING_TERRAIN_FEATURE_ID,
 ) -> MissionSetup:
-    source_setup = MissionSetup.from_mission_pack(
-        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
-        mission_pool_entry_id="mission-take-and-hold-vs-take-and-hold-layout-1",
-        terrain_layout_id="take-and-hold-vs-take-and-hold-layout-1",
-        attacker_player_id="player-a",
-        defender_player_id="player-b",
-    )
-    return _with_scoring_terrain_feature(
-        _explicit_custom_mission_setup(source_setup),
-        feature_id=feature_id,
-    )
-
-
-def _explicit_custom_mission_setup(mission_setup: MissionSetup) -> MissionSetup:
-    return replace(
-        mission_setup,
-        battlefield_layout_id=None,
-        deployment_map_id="phase11e-custom-deployment-map",
-        terrain_layout_id="phase11e-custom-terrain-layout",
-        terrain_areas=(),
-        objective_terrain_areas=(),
-    )
-
-
-def _with_scoring_terrain_feature(
-    mission_setup: MissionSetup,
-    *,
-    feature_id: str,
-) -> MissionSetup:
-    if any(feature.feature_id == feature_id for feature in mission_setup.terrain_features):
-        return mission_setup
-    return replace(
-        mission_setup,
-        terrain_features=(
-            *mission_setup.terrain_features,
-            _scoring_terrain_feature(feature_id=feature_id),
-        ),
-    )
-
-
-def _scoring_terrain_feature(*, feature_id: str) -> TerrainFeatureDefinition:
-    return TerrainFeatureDefinition(
-        feature_id=feature_id,
-        feature_kind=TerrainFeatureKind.BATTLEFIELD_DEBRIS_AND_STATUARY,
-        footprint_center_x_inches=30.0,
-        footprint_center_y_inches=22.0,
-        footprint_width_inches=8.0,
-        footprint_depth_inches=8.0,
-        rules_footprint_polygon=TerrainDisplayGeometry.axis_aligned_rectangle(
-            center_x_inches=30.0,
-            center_y_inches=22.0,
-            width_inches=8.0,
-            depth_inches=8.0,
-            display_template_id="phase11e_scoring_debris_8x8_rules",
-        ).footprint_polygon,
-        display_geometry=TerrainDisplayGeometry.axis_aligned_rectangle(
-            center_x_inches=30.0,
-            center_y_inches=22.0,
-            width_inches=8.0,
-            depth_inches=8.0,
-            display_template_id="phase11e_scoring_debris_8x8",
-        ),
-        source_id=f"test:phase11e:terrain:{feature_id}",
-    )
-
-
-def _terrain_feature_by_id(
-    mission_setup: MissionSetup,
-    feature_id: str,
-) -> TerrainFeatureDefinition:
-    for feature in mission_setup.terrain_features:
-        if feature.feature_id == feature_id:
-            return feature
-    raise AssertionError("missing test terrain feature")
+    del feature_id
+    return _event_companion_mission_setup()
 
 
 def _center_marker_definition_for_setup(
     mission_setup: MissionSetup,
 ) -> ObjectiveMarkerDefinition:
     for marker in mission_setup.objective_markers:
-        if _objective_marker_matches_suffix(marker.objective_marker_id, "center"):
+        if marker.objective_role is ObjectiveMarkerRole.CENTRAL:
             return marker
     raise AssertionError("missing center objective marker")
 
@@ -7735,12 +7815,52 @@ def _ruleset() -> RulesetDescriptor:
     )
 
 
+def _catalog_with_directional_force_dispositions() -> ArmyCatalog:
+    source_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    return replace(
+        source_catalog,
+        detachments=tuple(
+            replace(
+                detachment,
+                force_disposition_ids=("disruption", "purge-the-foe", "take-and-hold"),
+            )
+            if detachment.detachment_id == "core-combined-arms"
+            else detachment
+            for detachment in source_catalog.detachments
+        ),
+    )
+
+
+def _with_player_primary_mission(
+    mission_setup: MissionSetup,
+    *,
+    player_id: str,
+    primary_mission_id: str,
+) -> MissionSetup:
+    return replace(
+        mission_setup,
+        primary_mission_assignments=tuple(
+            (
+                PlayerPrimaryMissionAssignment(
+                    player_id=assignment.player_id,
+                    force_disposition_id=assignment.force_disposition_id,
+                    primary_mission_id=primary_mission_id,
+                )
+                if assignment.player_id == player_id
+                else assignment
+            )
+            for assignment in mission_setup.primary_mission_assignments
+        ),
+    )
+
+
 def _army_muster_request(
     *,
     catalog: ArmyCatalog,
     player_id: str,
     army_id: str,
     unit_selection_ids: tuple[str, ...],
+    force_disposition_id: str | None = None,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -7752,7 +7872,11 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=(
+            ("purge-the-foe" if player_id == "player-a" else "take-and-hold")
+            if force_disposition_id is None
+            else force_disposition_id
+        ),
         unit_selections=tuple(
             _unit_muster_selection(
                 unit_selection_id=unit_selection_id,

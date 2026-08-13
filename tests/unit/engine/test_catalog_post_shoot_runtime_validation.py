@@ -75,12 +75,17 @@ def test_phase17k_post_shoot_hit_target_status_fail_fast_validation_paths() -> N
         army_id="army-opponent",
         unit_selection_id="enemy-lord-of-change-1",
     )
-    army = flesh_hounds_army(package=package, unit=unit)
+    army = flesh_hounds_army(
+        package=package,
+        unit=unit,
+        force_disposition_id="take-and-hold",
+    )
     enemy_army = flesh_hounds_army(
         package=package,
         unit=target_unit,
         army_id="army-opponent",
         player_id="player-opponent",
+        force_disposition_id="purge-the-foe",
     )
     player_index = player_ability_index(package=package, army=army)
     enemy_player_index = player_ability_index(package=package, army=enemy_army)

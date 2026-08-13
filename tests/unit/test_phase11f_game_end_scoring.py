@@ -11,6 +11,11 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.final_scoring import (
+    FinalScoreLine,
+    FinalScoringResult,
+    FinalScoringResultPayload,
+)
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -21,13 +26,21 @@ from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
-from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.missions import mission_scoring_policy_from_setup
+from warhammer40k_core.engine.mission_setup import (
+    MissionSetup,
+)
+from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
+from warhammer40k_core.engine.objective_control import (
+    ObjectiveControlRecord,
+    ObjectiveControlResult,
+    ObjectiveControlScore,
+    ObjectiveControlStatus,
+    ObjectiveControlTiming,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.scoring import (
-    FinalScoringResult,
-    FinalScoringResultPayload,
+    PrimaryObjectiveTurnStartState,
     VictoryPointAward,
     VictoryPointSourceKind,
     VictoryPointTransaction,
@@ -36,16 +49,30 @@ from warhammer40k_core.engine.scoring_cap_audit import metadata_with_vp_cap_audi
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
+)
 
 PHASE16A_MISSION_POOL_ENTRY_ID = "mission-take-and-hold-vs-purge-the-foe-layout-3"
 
 
+def test_phase11f_final_scoring_requires_the_owning_player_policy() -> None:
+    state = _battle_state()
+    assert state.mission_setup is not None
+    policies = mission_scoring_policies_from_setup(state.mission_setup)
+    player_b_ledger = state.victory_point_ledger_for_player("player-b")
+
+    with pytest.raises(GameLifecycleError, match="ledger and MissionScoringPolicy players"):
+        FinalScoreLine.from_ledger(
+            ledger=player_b_ledger,
+            policy=policies.policy_for_player("player-a"),
+        )
+
+
 def test_phase11f_game_end_windows_fire_once_and_final_payload_round_trips() -> None:
     state = _battle_state()
-    state.battle_round = 5
-    state.active_player_id = "player-b"
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    _set_round_five_going_second_fight(state)
 
     completed_phase = state.advance_to_next_battle_phase()
     first_payload = state.game_result_payload()
@@ -62,6 +89,18 @@ def test_phase11f_game_end_windows_fire_once_and_final_payload_round_trips() -> 
     assert first_payload == second_payload
     assert round_tripped == decoded
     assert first_payload["game_length_battle_rounds"] == 5
+    assert first_payload["primary_mission_assignments"] == [
+        {
+            "player_id": "player-a",
+            "force_disposition_id": "take-and-hold",
+            "primary_mission_id": "primary-immovable-object",
+        },
+        {
+            "player_id": "player-b",
+            "force_disposition_id": "purge-the-foe",
+            "primary_mission_id": "primary-unstoppable-force",
+        },
+    ]
     assert first_payload["winner_player_ids"] == ["player-a", "player-b"]
     assert first_payload["is_draw"] is True
     assert {(window["window_kind"], window["window"]) for window in windows} == {
@@ -75,23 +114,36 @@ def test_phase11f_game_end_windows_fire_once_and_final_payload_round_trips() -> 
 
 
 def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
-    state = _battle_state()
-    primary_transaction = state.award_victory_points(
-        VictoryPointAward(
+    state = _battle_state(mission_setup=_event_death_trap_setup())
+    assert state.mission_setup is not None
+    policies = mission_scoring_policies_from_setup(state.mission_setup)
+    for battle_round in (1, 2, 3):
+        state.battle_round = battle_round
+        state.award_victory_points(
+            policies.mission_action_award(
+                player_id="player-a",
+                battle_round=battle_round,
+                phase=BattlePhase.COMMAND.value,
+                action_id=f"phase11f:player-a:death-trap:round-{battle_round}",
+                source_id="primary-death-trap",
+                amount=15,
+            )
+        )
+    state.battle_round = 4
+    primary_cap_transaction = state.award_victory_points(
+        policies.mission_action_award(
             player_id="player-a",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.COMMAND.value,
-            amount=60,
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id="take-and-hold",
-            scoring_timing="end_of_battle",
-            metadata={"scoring_rule_id": "phase11f-primary-cap"},
+            action_id="phase11f:player-a:death-trap:cap-probe",
+            source_id="primary-death-trap",
+            amount=15,
         )
     )
     secondary_transaction = state.award_victory_points(
         VictoryPointAward(
             player_id="player-a",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.COMMAND.value,
             amount=46,
             source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
@@ -103,7 +155,7 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
     battle_ready_transaction = state.award_victory_points(
         VictoryPointAward(
             player_id="player-a",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.COMMAND.value,
             amount=15,
             source_kind=VictoryPointSourceKind.BATTLE_READY,
@@ -115,18 +167,16 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
     state.award_victory_points(
         VictoryPointAward(
             player_id="player-b",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.COMMAND.value,
             amount=60,
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id="take-and-hold",
-            scoring_timing="end_of_battle",
-            metadata={"scoring_rule_id": "phase11f-opponent-primary-cap"},
+            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+            source_id="assassination",
+            scoring_timing="secondary_mission_score",
+            metadata={"scoring_rule_id": "phase11f-opponent-secondary-cap"},
         )
     )
-    state.battle_round = 5
-    state.active_player_id = "player-b"
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    _set_round_five_going_second_fight(state)
 
     state.advance_to_next_battle_phase()
     result = state.game_result_payload()
@@ -135,7 +185,7 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
     player_a_score = next(score for score in player_scores if score["player_id"] == "player-a")
     player_b_score = next(score for score in player_scores if score["player_id"] == "player-b")
 
-    assert primary_transaction.amount == 45
+    assert primary_cap_transaction.amount == 0
     assert secondary_transaction.amount == 45
     assert battle_ready_transaction.amount == 10
     assert state.victory_point_total("player-a") == 100
@@ -148,34 +198,33 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
     assert result["is_draw"] is False
     assert player_a_score["raw_victory_points"] == 100
     assert player_a_score["cap_adjustment"] == 0
-    assert player_b_score["raw_primary_vp"] == 45
-    assert _cap_reasons(primary_transaction) == ["primary_vp_cap"]
+    assert player_b_score["raw_secondary_vp"] == 45
+    assert _cap_reasons(primary_cap_transaction) == ["primary_vp_cap"]
     assert _cap_reasons(secondary_transaction) == ["secondary_vp_cap"]
     assert _cap_reasons(battle_ready_transaction) == ["battle_ready_vp_cap", "total_vp_cap"]
 
 
 def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
-    state = _battle_state(mission_pool_entry_id=PHASE16A_MISSION_POOL_ENTRY_ID)
+    state = _battle_state(mission_setup=_event_death_trap_setup())
     assert state.mission_setup is not None
-    state.mission_setup = replace(state.mission_setup, primary_mission_id="primary-death-trap")
-    policy = mission_scoring_policy_from_setup(state.mission_setup)
+    policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
     for battle_round, amount in ((1, 15), (2, 15), (3, 14)):
+        state.battle_round = battle_round
         state.award_victory_points(
-            VictoryPointAward(
+            policy.mission_action_award(
                 player_id="player-a",
                 battle_round=battle_round,
                 phase=BattlePhase.COMMAND.value,
-                amount=amount,
-                source_kind=VictoryPointSourceKind.PRIMARY,
+                action_id=f"phase11f:death-trap-base:round-{battle_round}",
                 source_id="primary-death-trap",
-                scoring_timing="phase_end",
-                metadata={"scoring_rule_id": "phase11f-primary-action-base"},
+                amount=amount,
             )
         )
+    state.battle_round = 4
     state.award_victory_points(
         VictoryPointAward(
             player_id="player-a",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.COMMAND.value,
             amount=44,
             source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
@@ -198,22 +247,17 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
     cleanse_transaction = state.award_victory_points(
         policy.mission_action_award(
             player_id="player-a",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.SHOOTING.value,
             action_id="cleanse:center:player-a",
             source_id="cleanse",
             amount=5,
         )
     )
-    state.battle_round = 5
-    state.active_player_id = "player-b"
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
-
-    state.advance_to_next_battle_phase()
-    result = state.game_result_payload()
-    audit = cast(dict[str, object], result["scoring_audit"])
-    player_scores = cast(list[dict[str, object]], audit["player_scores"])
-    player_a_score = next(score for score in player_scores if score["player_id"] == "player-a")
+    player_a_score = FinalScoreLine.from_ledger(
+        ledger=state.victory_point_ledger_for_player("player-a"),
+        policy=policy,
+    ).to_payload()
 
     assert death_trap_transaction.amount == 1
     assert cleanse_transaction.amount == 1
@@ -227,55 +271,8 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
         state.victory_point_ledger_for_player("player-a").points_from_source_kind(
             VictoryPointSourceKind.MISSION_ACTION
         )
-        == 2
+        == 46
     )
-
-
-def test_phase11f_end_of_battle_primary_vp_is_exempt_from_battle_round_cap() -> None:
-    state = _battle_state()
-    assert state.mission_setup is not None
-    state.mission_setup = replace(state.mission_setup, primary_mission_id="take-and-hold")
-    state.award_victory_points(
-        VictoryPointAward(
-            player_id="player-a",
-            battle_round=5,
-            phase=BattlePhase.FIGHT.value,
-            amount=15,
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id="take-and-hold",
-            scoring_timing="phase_end",
-            metadata={"scoring_rule_id": "phase11f-round-five-primary"},
-        )
-    )
-    round_capped = state.award_victory_points(
-        VictoryPointAward(
-            player_id="player-a",
-            battle_round=5,
-            phase=BattlePhase.FIGHT.value,
-            amount=5,
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id="take-and-hold",
-            scoring_timing="phase_end",
-            metadata={"scoring_rule_id": "phase11f-round-five-primary-extra"},
-        )
-    )
-    end_of_battle = state.award_victory_points(
-        VictoryPointAward(
-            player_id="player-a",
-            battle_round=5,
-            phase=BattlePhase.FIGHT.value,
-            amount=5,
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id="take-and-hold",
-            scoring_timing="end_of_battle",
-            metadata={"scoring_rule_id": "phase11f-end-of-battle-primary"},
-        )
-    )
-
-    assert round_capped.amount == 0
-    assert _cap_reasons(round_capped) == ["primary_battle_round_vp_cap"]
-    assert end_of_battle.amount == 5
-    assert state.victory_point_total("player-a") == 20
 
 
 def test_phase11f_vp_cap_audit_metadata_shapes_and_validation_are_explicit() -> None:
@@ -330,9 +327,7 @@ def test_phase11f_vp_cap_audit_metadata_shapes_and_validation_are_explicit() -> 
 
 def test_phase11f_final_result_requires_policy_scoring_windows() -> None:
     state = _battle_state()
-    state.battle_round = 5
-    state.active_player_id = "player-b"
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    _set_round_five_going_second_fight(state)
 
     state.advance_to_next_battle_phase()
     state.scoring_window_states = [
@@ -341,6 +336,184 @@ def test_phase11f_final_result_requires_policy_scoring_windows() -> None:
 
     with pytest.raises(GameLifecycleError, match="Final scoring requires recorded policy windows"):
         state.game_result_payload()
+
+
+def test_phase11f_primary_vp_rejects_opponent_and_forged_source_ids() -> None:
+    state = _battle_state()
+    assert state.mission_setup is not None
+    opponent_primary = state.mission_setup.primary_mission_id_for_player("player-b")
+
+    for source_id in (opponent_primary, "primary-forged-source"):
+        with pytest.raises(
+            GameLifecycleError,
+            match="Primary VP source does not match the player's assigned Primary mission",
+        ):
+            state.award_victory_points(
+                VictoryPointAward(
+                    player_id="player-a",
+                    battle_round=1,
+                    phase=BattlePhase.COMMAND.value,
+                    amount=5,
+                    source_kind=VictoryPointSourceKind.PRIMARY,
+                    source_id=source_id,
+                    scoring_timing="phase_end",
+                )
+            )
+
+
+@pytest.mark.parametrize("source_kind", ["opponent", "forged"])
+def test_phase11f_state_restore_rejects_primary_ledger_source_drift(
+    source_kind: str,
+) -> None:
+    state = _battle_state()
+    assert state.mission_setup is not None
+    opponent_primary = state.mission_setup.primary_mission_id_for_player("player-b")
+    policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
+    state.battle_round = 2
+    controlled_objective_id = state.mission_setup.objective_markers[0].objective_marker_id
+    record = ObjectiveControlRecord(
+        record_id="objective-control:round-02:player-a:command:phase_end",
+        game_id=state.game_id,
+        battle_round=2,
+        active_player_id="player-a",
+        timing=ObjectiveControlTiming.PHASE_END,
+        phase=BattlePhase.COMMAND.value,
+        battlefield_id="phase11f-battlefield",
+        results=tuple(
+            ObjectiveControlResult(
+                objective_id=marker.objective_marker_id,
+                status=(
+                    ObjectiveControlStatus.CONTROLLED
+                    if marker.objective_marker_id == controlled_objective_id
+                    else ObjectiveControlStatus.UNCONTROLLED
+                ),
+                controlled_by_player_id=(
+                    "player-a" if marker.objective_marker_id == controlled_objective_id else None
+                ),
+                scores=(
+                    (ObjectiveControlScore(player_id="player-a", score=1),)
+                    if marker.objective_marker_id == controlled_objective_id
+                    else ()
+                ),
+            )
+            for marker in state.mission_setup.objective_markers
+        ),
+    )
+    state.record_objective_control_record(record)
+    awards = policy.primary_awards_from_objective_control(
+        record=record,
+        mission_setup=state.mission_setup,
+        turn_order=state.turn_order,
+        turn_start_states=tuple(state.primary_objective_turn_start_states),
+        terrain_trap_states=tuple(state.primary_terrain_trap_states),
+        unit_destruction_states=tuple(state.primary_unit_destruction_states),
+    )
+    if len(awards) != 1:
+        raise AssertionError("Primary source-drift test requires one generated award")
+    state.award_victory_points(awards[0])
+    payload = state.to_payload()
+    player_a_ledger = next(
+        ledger for ledger in payload["victory_point_ledgers"] if ledger["player_id"] == "player-a"
+    )
+    player_a_ledger["transactions"][0]["source_id"] = (
+        opponent_primary if source_kind == "opponent" else "primary-forged-source"
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Primary VP source does not match the player's assigned Primary mission",
+    ):
+        GameState.from_payload(payload)
+
+
+def test_phase11f_scoring_policy_rejects_source_geometry_drift() -> None:
+    state = _battle_state()
+    assert state.mission_setup is not None
+    policies = mission_scoring_policies_from_setup(state.mission_setup)
+    first_marker = state.mission_setup.objective_markers[0]
+    drifted_setup = replace(
+        state.mission_setup,
+        objective_markers=(
+            replace(first_marker, x_inches=first_marker.x_inches + 0.25),
+            *state.mission_setup.objective_markers[1:],
+        ),
+    )
+
+    with pytest.raises(GameLifecycleError, match="canonical layoutless setup drifted from source"):
+        policies.validate_mission_setup(drifted_setup)
+
+
+def test_phase11f_final_result_payload_rejects_policy_and_score_tampering() -> None:
+    state = _battle_state()
+    _set_round_five_going_second_fight(state)
+    state.advance_to_next_battle_phase()
+    baseline = state.game_result_payload()
+
+    def payload_copy() -> dict[str, object]:
+        return cast(dict[str, object], json.loads(json.dumps(baseline, sort_keys=True)))
+
+    result_id_drift = payload_copy()
+    result_id_drift["result_id"] = "forged-final-result"
+    _assert_final_payload_rejected(result_id_drift, "result_id drifted")
+
+    policy_drift = payload_copy()
+    cast(dict[str, object], policy_drift["scoring_audit"])["policy_source_id"] = "forged-policy"
+    _assert_final_payload_rejected(policy_drift, "policy_source_id drifted")
+
+    missing_windows = payload_copy()
+    cast(dict[str, object], missing_windows["scoring_audit"])["scoring_windows"] = []
+    _assert_final_payload_rejected(missing_windows, "recorded policy windows exactly")
+
+    extra_windows = payload_copy()
+    extra_audit = cast(dict[str, object], extra_windows["scoring_audit"])
+    extra_window_rows = cast(list[dict[str, object]], extra_audit["scoring_windows"])
+    extra_window_rows.append(
+        {
+            "window_id": "scoring-window:phase11f-game:round-05:end_of_round:forged",
+            "game_id": "phase11f-game",
+            "battle_round": 5,
+            "window_kind": "end_of_round",
+            "window": "forged",
+            "source_id": f"{extra_audit['policy_source_id']}:window:end_of_round:forged",
+        }
+    )
+    _assert_final_payload_rejected(extra_windows, "recorded policy windows exactly")
+
+    raw_total_drift = payload_copy()
+    raw_total_score = cast(
+        list[dict[str, object]],
+        cast(dict[str, object], raw_total_drift["scoring_audit"])["player_scores"],
+    )[0]
+    raw_total_score["raw_victory_points"] = 10
+    raw_total_score["cap_adjustment"] = 10
+    _assert_final_payload_rejected(raw_total_drift, "raw_victory_points must match raw totals")
+
+    capped_downward = payload_copy()
+    downward_audit = cast(dict[str, object], capped_downward["scoring_audit"])
+    downward_score = cast(list[dict[str, object]], downward_audit["player_scores"])[0]
+    downward_score.update(
+        {
+            "raw_victory_points": 10,
+            "raw_primary_vp": 10,
+            "victory_points": 1,
+            "capped_primary_vp": 1,
+            "cap_adjustment": 9,
+        }
+    )
+    cast(list[dict[str, object]], capped_downward["final_scores"])[0]["victory_points"] = 1
+    capped_downward["winner_player_ids"] = ["player-a"]
+    capped_downward["is_draw"] = False
+    _assert_final_payload_rejected(capped_downward, "cap transform drifted")
+
+    assignment_drift = payload_copy()
+    assignments = cast(list[dict[str, object]], assignment_drift["primary_mission_assignments"])
+    assignments[0]["primary_mission_id"] = assignments[1]["primary_mission_id"]
+    _assert_final_payload_rejected(assignment_drift, "directional matrix")
+
+
+def _assert_final_payload_rejected(payload: dict[str, object], message: str) -> None:
+    with pytest.raises(GameLifecycleError, match=message):
+        FinalScoringResult.from_payload(cast(FinalScoringResultPayload, payload))
 
 
 def _cap_reasons(transaction: VictoryPointTransaction) -> list[str]:
@@ -353,14 +526,42 @@ def _cap_reasons(transaction: VictoryPointTransaction) -> list[str]:
     return [str(reason) for reason in reasons]
 
 
-def _battle_state(*, mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID) -> GameState:
-    config = _config(mission_pool_entry_id=mission_pool_entry_id)
+def _set_round_five_going_second_fight(state: GameState) -> None:
+    state.battle_round = 5
+    state.active_player_id = "player-b"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.record_primary_objective_turn_start_state(
+        PrimaryObjectiveTurnStartState(
+            state_id="phase11f-round-five-player-b-turn-start",
+            game_id=state.game_id,
+            player_id="player-b",
+            active_player_id="player-b",
+            battle_round=5,
+            controlled_objective_ids=(),
+            source_id="phase11f:round-five:player-b:turn-start",
+        )
+    )
+
+
+def _battle_state(
+    *,
+    mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID,
+    mission_setup: MissionSetup | None = None,
+) -> GameState:
+    config = _config(
+        mission_pool_entry_id=mission_pool_entry_id,
+        mission_setup=mission_setup,
+    )
     state = GameState.from_config(config)
+    assert config.mission_setup is not None
     for army in _mustered_armies(config):
         state.record_army_definition(army)
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id="phase11f-battlefield",
         armies=tuple(state.army_definitions),
+        battlefield_width_inches=config.mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=config.mission_setup.battlefield_depth_inches,
+        terrain_features=config.mission_setup.terrain_features,
     )
     state.record_battlefield_state(scenario.battlefield_state)
     state.record_secondary_mission_choice(
@@ -382,8 +583,37 @@ def _battle_state(*, mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID
     return GameState.from_payload(state.to_payload())
 
 
-def _config(*, mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID) -> GameConfig:
-    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+def _config(
+    *,
+    mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID,
+    mission_setup: MissionSetup | None = None,
+) -> GameConfig:
+    source_catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    catalog = replace(
+        source_catalog,
+        detachments=tuple(
+            replace(
+                detachment,
+                force_disposition_ids=("disruption", "purge-the-foe", "take-and-hold"),
+            )
+            if detachment.detachment_id == "core-combined-arms"
+            else detachment
+            for detachment in source_catalog.detachments
+        ),
+    )
+    resolved_mission_setup = (
+        MissionSetup.from_mission_pack(
+            mission_pack=chapter_approved_2026_27_mission_pack(),
+            mission_pool_entry_id=mission_pool_entry_id,
+            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
+            attacker_player_id="player-a",
+            attacker_force_disposition_id="take-and-hold",
+            defender_player_id="player-b",
+            defender_force_disposition_id="purge-the-foe",
+        )
+        if mission_setup is None
+        else mission_setup
+    )
     return GameConfig(
         game_id="phase11f-game",
         allow_legacy_non_strict_rosters=True,
@@ -395,24 +625,24 @@ def _config(*, mission_pool_entry_id: str = PHASE16A_MISSION_POOL_ENTRY_ID) -> G
                 player_id="player-a",
                 army_id="army-alpha",
                 unit_selection_ids=("intercessor-unit-1",),
+                force_disposition_id=resolved_mission_setup.force_disposition_id_for_player(
+                    "player-a"
+                ),
             ),
             _army_muster_request(
                 catalog=catalog,
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=("intercessor-unit-3",),
+                force_disposition_id=resolved_mission_setup.force_disposition_id_for_player(
+                    "player-b"
+                ),
             ),
         ),
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
         fixed_secondary_mission_ids=("assassination", "bring-it-down", "cleanse"),
-        mission_setup=MissionSetup.from_mission_pack(
-            mission_pack=chapter_approved_2026_27_mission_pack(),
-            mission_pool_entry_id=mission_pool_entry_id,
-            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
-            attacker_player_id="player-a",
-            defender_player_id="player-b",
-        ),
+        mission_setup=resolved_mission_setup,
     )
 
 
@@ -428,6 +658,7 @@ def _army_muster_request(
     player_id: str,
     army_id: str,
     unit_selection_ids: tuple[str, ...],
+    force_disposition_id: str,
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -439,7 +670,7 @@ def _army_muster_request(
             faction_id="core-marine-force",
             detachment_ids=("core-combined-arms",),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=force_disposition_id,
         unit_selections=tuple(
             UnitMusterSelection(
                 unit_selection_id=unit_selection_id,
@@ -460,4 +691,16 @@ def _mustered_armies(config: GameConfig) -> tuple[ArmyDefinition, ...]:
     return tuple(
         muster_army(catalog=config.army_catalog, request=request)
         for request in config.army_muster_requests
+    )
+
+
+def _event_death_trap_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-disruption-layout-1",
+        terrain_layout_id="take-and-hold-vs-disruption-layout-1",
+        attacker_player_id="player-a",
+        attacker_force_disposition_id="disruption",
+        defender_player_id="player-b",
+        defender_force_disposition_id="take-and-hold",
     )

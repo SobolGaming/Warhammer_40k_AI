@@ -103,12 +103,17 @@ def test_phase17k_flesh_hounds_hunters_from_the_warp_uses_generic_turn_end_reser
         army_id="army-opponent",
         unit_selection_id="enemy-flesh-hounds-1",
     )
-    army = flesh_hounds_army(package=package, unit=unit)
+    army = flesh_hounds_army(
+        package=package,
+        unit=unit,
+        force_disposition_id="take-and-hold",
+    )
     enemy_army = flesh_hounds_army(
         package=package,
         unit=enemy_unit,
         army_id="army-opponent",
         player_id="player-opponent",
+        force_disposition_id="purge-the-foe",
     )
     player_index = player_ability_index(package=package, army=army)
     enemy_index = player_ability_index(package=package, army=enemy_army)

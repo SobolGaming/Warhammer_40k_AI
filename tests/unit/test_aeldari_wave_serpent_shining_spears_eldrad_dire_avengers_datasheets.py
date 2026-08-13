@@ -690,7 +690,7 @@ def _package() -> Any:
                     faction_id="AE",
                     detachment_point_cost=1,
                     unit_datasheet_ids=aeldari_datasheet_ids,
-                    force_disposition_ids=("purge-the-foe",),
+                    force_disposition_ids=("purge-the-foe", "take-and-hold"),
                     source_ids=("test:aeldari-four-datasheets-detachment",),
                 ),
             ),
@@ -777,7 +777,7 @@ def _muster_request(
             faction_id="AE",
             detachment_ids=(TEST_DETACHMENT_ID,),
         ),
-        force_disposition_id="purge-the-foe",
+        force_disposition_id=("take-and-hold" if player_id == "player-a" else "purge-the-foe"),
         unit_selections=selections,
     )
 
@@ -976,5 +976,7 @@ def _mission_setup() -> MissionSetup:
         mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",
         terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-3",
         attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
+        defender_force_disposition_id="purge-the-foe",
     )
