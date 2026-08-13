@@ -12,7 +12,12 @@ from warhammer40k_core.core.missions import (
 )
 from warhammer40k_core.engine.mission_scoring_policies import MissionScoringPolicies
 from warhammer40k_core.engine.mission_setup import PlayerPrimaryMissionAssignment
-from warhammer40k_core.engine.objective_control import ObjectiveControlTiming
+from warhammer40k_core.engine.objective_control import (
+    ObjectiveControlRecord,
+    ObjectiveControlResult,
+    ObjectiveControlStatus,
+    ObjectiveControlTiming,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_scoring_resolution import (
     PrimaryScoringResolutionCandidate,
@@ -372,10 +377,12 @@ def test_phase17n_cumulative_primary_awards_share_the_source_backed_round_cap() 
         (
             _runtime_rule(
                 rule_id="determined-acquisition-each-objective",
+                timing="command_phase",
                 group_id="determined-acquisition-command-primary",
             ),
             _runtime_rule(
                 rule_id="determined-acquisition-opponent-territory-bonus",
+                timing="command_phase",
                 group_id="determined-acquisition-command-primary",
             ),
         )
@@ -399,9 +406,31 @@ def test_phase17n_cumulative_primary_awards_share_the_source_backed_round_cap() 
     )
     assert sum(result.candidate.amount for result in resolved) == 18
 
+    record = ObjectiveControlRecord(
+        record_id="objective-control:round-02:player-a:command:phase_end",
+        game_id="phase17n-primary-round-cap",
+        battle_round=2,
+        active_player_id="player-a",
+        timing=ObjectiveControlTiming.PHASE_END,
+        phase="command",
+        battlefield_id="phase17n-primary-round-cap-battlefield",
+        results=(
+            ObjectiveControlResult(
+                objective_id="objective-a",
+                status=ObjectiveControlStatus.UNCONTROLLED,
+                controlled_by_player_id=None,
+                scores=(),
+            ),
+        ),
+    )
     ledger = VictoryPointLedger.initial(player_id="player-a")
     transactions: list[VictoryPointTransaction] = []
     for result in resolved:
+        rule = next(
+            rule
+            for rule in policy.primary_scoring_rules
+            if rule.rule_id == result.candidate.rule_id
+        )
         award = VictoryPointAward(
             player_id="player-a",
             battle_round=2,
@@ -410,11 +439,22 @@ def test_phase17n_cumulative_primary_awards_share_the_source_backed_round_cap() 
             source_kind=VictoryPointSourceKind.PRIMARY,
             source_id=policy.primary_mission_id,
             scoring_timing="phase_end",
-            metadata=result.metadata(),
+            metadata={
+                **result.metadata(),
+                "objective_control_record_id": record.record_id,
+                "score_count": result.candidate.amount // rule.victory_points,
+                "scoring_rule_condition": rule.condition,
+                "scoring_rule_id": rule.rule_id,
+                "scoring_rule_source_id": rule.source_id,
+                "victory_points_per_count": rule.victory_points,
+            },
         )
         applied_amount, metadata = policy.capped_award_for_ledger(
             ledger=ledger,
             award=award,
+            objective_control_records=(record,),
+            turn_order=("player-a", "player-b"),
+            current_active_player_id="player-a",
         )
         ledger, transaction = ledger.award(
             award,
@@ -442,29 +482,58 @@ def test_phase17n_cumulative_primary_awards_share_the_source_backed_round_cap() 
         "primary_battle_round_points_after": 15,
     }
 
-    end_of_battle_award = VictoryPointAward(
+
+def test_phase17n_round_two_primary_cannot_impersonate_end_of_battle_scoring() -> None:
+    rule = _runtime_rule(
+        rule_id="assigned-end-of-battle-primary",
+        timing="end_of_battle",
+        mode=MissionScoringResolutionMode.INDEPENDENT,
+        group_id=None,
+    )
+    policy = _runtime_policy((rule,))
+    record = ObjectiveControlRecord(
+        record_id="objective-control:round-02:player-b:fight:turn_end",
+        game_id="phase17n-primary-eob-spoof",
+        battle_round=2,
+        active_player_id="player-b",
+        timing=ObjectiveControlTiming.TURN_END,
+        phase="fight",
+        battlefield_id="phase17n-primary-eob-spoof-battlefield",
+        results=(
+            ObjectiveControlResult(
+                objective_id="objective-a",
+                status=ObjectiveControlStatus.UNCONTROLLED,
+                controlled_by_player_id=None,
+                scores=(),
+            ),
+        ),
+    )
+    award = VictoryPointAward(
         player_id="player-a",
         battle_round=2,
         phase="fight",
-        amount=5,
+        amount=2,
         source_kind=VictoryPointSourceKind.PRIMARY,
         source_id=policy.primary_mission_id,
         scoring_timing="end_of_battle",
-        metadata={"scoring_rule_id": "end-of-battle-primary"},
-    )
-    applied_amount, metadata = policy.capped_award_for_ledger(
-        ledger=ledger,
-        award=end_of_battle_award,
-    )
-    ledger, end_of_battle_transaction = ledger.award(
-        end_of_battle_award,
-        applied_amount=applied_amount,
-        metadata=metadata,
+        metadata={
+            "objective_control_record_id": record.record_id,
+            "score_count": 1,
+            "scoring_rule_condition": rule.condition,
+            "scoring_rule_id": rule.rule_id,
+            "scoring_rule_source_id": rule.source_id,
+            "victory_points_per_count": rule.victory_points,
+        },
     )
 
-    assert end_of_battle_transaction.amount == 5
-    assert end_of_battle_transaction.metadata == {"scoring_rule_id": "end-of-battle-primary"}
-    assert ledger.victory_points == 20
+    with pytest.raises(GameLifecycleError, match="final Fight-phase TURN_END boundary"):
+        policy.capped_award_for_ledger(
+            ledger=VictoryPointLedger.initial(player_id="player-a"),
+            award=award,
+            objective_control_records=(record,),
+            turn_order=("player-a", "player-b"),
+            current_active_player_id="player-b",
+        )
 
 
 def test_phase17n_exclusive_primary_rules_select_only_the_highest_vp_branch() -> None:

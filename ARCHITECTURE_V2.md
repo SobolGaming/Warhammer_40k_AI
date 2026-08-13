@@ -5038,9 +5038,13 @@ Mission scoring to 15VP per battle round, so all 25 Event Companion Primary rows
 carry `max_vp_per_turn: 15`; that legacy field name represents a battle-round
 ledger cap, not an individual player-turn cap. Printed page 4 explicitly exempts
 end-of-battle VP from that limit. Cumulative and independent awards therefore
-share one 15VP ledger bucket for their battle round, while awards whose typed
-scoring timing is `end_of_battle` remain exempt. The resulting complete mission
-source identity is pinned as
+share one 15VP ledger bucket for their battle round. An award is exempt only
+when its assigned, source-backed scoring-rule ID declares `end_of_battle` and
+the award is bound to the final-round Fight-phase `TURN_END` objective-control
+record; the free-form timing field alone cannot claim the exemption. Live
+awards and restored ledgers use the same policy validator, and restore rejects
+ordinary Primary totals above 15VP in one battle round. The resulting complete
+mission source identity is pinned as
 `aa272b8234ca02b2ac5b62b2bc7299998d14a386e4e9a5f9b90aaaf4ed5422a3`.
 
 The Phase 17N scoring schema has exactly nine source timing tokens and requires

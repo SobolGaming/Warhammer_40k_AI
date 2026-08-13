@@ -30,6 +30,13 @@ from warhammer40k_core.engine.mission_setup import (
     MissionSetup,
 )
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
+from warhammer40k_core.engine.objective_control import (
+    ObjectiveControlRecord,
+    ObjectiveControlResult,
+    ObjectiveControlScore,
+    ObjectiveControlStatus,
+    ObjectiveControlTiming,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.scoring import (
@@ -107,24 +114,36 @@ def test_phase11f_game_end_windows_fire_once_and_final_payload_round_trips() -> 
 
 
 def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
-    state = _battle_state()
+    state = _battle_state(mission_setup=_event_death_trap_setup())
     assert state.mission_setup is not None
-    primary_transaction = state.award_victory_points(
-        VictoryPointAward(
+    policies = mission_scoring_policies_from_setup(state.mission_setup)
+    for battle_round in (1, 2, 3):
+        state.battle_round = battle_round
+        state.award_victory_points(
+            policies.mission_action_award(
+                player_id="player-a",
+                battle_round=battle_round,
+                phase=BattlePhase.COMMAND.value,
+                action_id=f"phase11f:player-a:death-trap:round-{battle_round}",
+                source_id="primary-death-trap",
+                amount=15,
+            )
+        )
+    state.battle_round = 4
+    primary_cap_transaction = state.award_victory_points(
+        policies.mission_action_award(
             player_id="player-a",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.COMMAND.value,
-            amount=60,
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id=state.mission_setup.primary_mission_id_for_player("player-a"),
-            scoring_timing="end_of_battle",
-            metadata={"scoring_rule_id": "phase11f-primary-cap"},
+            action_id="phase11f:player-a:death-trap:cap-probe",
+            source_id="primary-death-trap",
+            amount=15,
         )
     )
     secondary_transaction = state.award_victory_points(
         VictoryPointAward(
             player_id="player-a",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.COMMAND.value,
             amount=46,
             source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
@@ -136,7 +155,7 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
     battle_ready_transaction = state.award_victory_points(
         VictoryPointAward(
             player_id="player-a",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.COMMAND.value,
             amount=15,
             source_kind=VictoryPointSourceKind.BATTLE_READY,
@@ -148,13 +167,13 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
     state.award_victory_points(
         VictoryPointAward(
             player_id="player-b",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.COMMAND.value,
             amount=60,
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id=state.mission_setup.primary_mission_id_for_player("player-b"),
-            scoring_timing="end_of_battle",
-            metadata={"scoring_rule_id": "phase11f-opponent-primary-cap"},
+            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+            source_id="assassination",
+            scoring_timing="secondary_mission_score",
+            metadata={"scoring_rule_id": "phase11f-opponent-secondary-cap"},
         )
     )
     _set_round_five_going_second_fight(state)
@@ -166,7 +185,7 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
     player_a_score = next(score for score in player_scores if score["player_id"] == "player-a")
     player_b_score = next(score for score in player_scores if score["player_id"] == "player-b")
 
-    assert primary_transaction.amount == 45
+    assert primary_cap_transaction.amount == 0
     assert secondary_transaction.amount == 45
     assert battle_ready_transaction.amount == 10
     assert state.victory_point_total("player-a") == 100
@@ -179,8 +198,8 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
     assert result["is_draw"] is False
     assert player_a_score["raw_victory_points"] == 100
     assert player_a_score["cap_adjustment"] == 0
-    assert player_b_score["raw_primary_vp"] == 45
-    assert _cap_reasons(primary_transaction) == ["primary_vp_cap"]
+    assert player_b_score["raw_secondary_vp"] == 45
+    assert _cap_reasons(primary_cap_transaction) == ["primary_vp_cap"]
     assert _cap_reasons(secondary_transaction) == ["secondary_vp_cap"]
     assert _cap_reasons(battle_ready_transaction) == ["battle_ready_vp_cap", "total_vp_cap"]
 
@@ -190,22 +209,22 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
     assert state.mission_setup is not None
     policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
     for battle_round, amount in ((1, 15), (2, 15), (3, 14)):
+        state.battle_round = battle_round
         state.award_victory_points(
-            VictoryPointAward(
+            policy.mission_action_award(
                 player_id="player-a",
                 battle_round=battle_round,
                 phase=BattlePhase.COMMAND.value,
-                amount=amount,
-                source_kind=VictoryPointSourceKind.PRIMARY,
+                action_id=f"phase11f:death-trap-base:round-{battle_round}",
                 source_id="primary-death-trap",
-                scoring_timing="phase_end",
-                metadata={"scoring_rule_id": "phase11f-primary-action-base"},
+                amount=amount,
             )
         )
+    state.battle_round = 4
     state.award_victory_points(
         VictoryPointAward(
             player_id="player-a",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.COMMAND.value,
             amount=44,
             source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
@@ -228,7 +247,7 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
     cleanse_transaction = state.award_victory_points(
         policy.mission_action_award(
             player_id="player-a",
-            battle_round=1,
+            battle_round=4,
             phase=BattlePhase.SHOOTING.value,
             action_id="cleanse:center:player-a",
             source_id="cleanse",
@@ -252,55 +271,8 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
         state.victory_point_ledger_for_player("player-a").points_from_source_kind(
             VictoryPointSourceKind.MISSION_ACTION
         )
-        == 2
+        == 46
     )
-
-
-def test_phase11f_event_primary_round_cap_exempts_end_of_battle_scoring() -> None:
-    state = _battle_state(mission_setup=_event_death_trap_setup())
-    assert state.mission_setup is not None
-    primary_mission_id = state.mission_setup.primary_mission_id_for_player("player-a")
-    state.award_victory_points(
-        VictoryPointAward(
-            player_id="player-a",
-            battle_round=5,
-            phase=BattlePhase.FIGHT.value,
-            amount=15,
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id=primary_mission_id,
-            scoring_timing="phase_end",
-            metadata={"scoring_rule_id": "phase11f-round-five-primary"},
-        )
-    )
-    round_capped = state.award_victory_points(
-        VictoryPointAward(
-            player_id="player-a",
-            battle_round=5,
-            phase=BattlePhase.FIGHT.value,
-            amount=5,
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id=primary_mission_id,
-            scoring_timing="phase_end",
-            metadata={"scoring_rule_id": "phase11f-round-five-primary-extra"},
-        )
-    )
-    end_of_battle = state.award_victory_points(
-        VictoryPointAward(
-            player_id="player-a",
-            battle_round=5,
-            phase=BattlePhase.FIGHT.value,
-            amount=5,
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id=primary_mission_id,
-            scoring_timing="end_of_battle",
-            metadata={"scoring_rule_id": "phase11f-end-of-battle-primary"},
-        )
-    )
-
-    assert round_capped.amount == 0
-    assert _cap_reasons(round_capped) == ["primary_battle_round_vp_cap"]
-    assert end_of_battle.amount == 5
-    assert state.victory_point_total("player-a") == 20
 
 
 def test_phase11f_vp_cap_audit_metadata_shapes_and_validation_are_explicit() -> None:
@@ -395,19 +367,50 @@ def test_phase11f_state_restore_rejects_primary_ledger_source_drift(
 ) -> None:
     state = _battle_state()
     assert state.mission_setup is not None
-    own_primary = state.mission_setup.primary_mission_id_for_player("player-a")
     opponent_primary = state.mission_setup.primary_mission_id_for_player("player-b")
-    state.award_victory_points(
-        VictoryPointAward(
-            player_id="player-a",
-            battle_round=1,
-            phase=BattlePhase.COMMAND.value,
-            amount=5,
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id=own_primary,
-            scoring_timing="phase_end",
-        )
+    policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
+    state.battle_round = 2
+    controlled_objective_id = state.mission_setup.objective_markers[0].objective_marker_id
+    record = ObjectiveControlRecord(
+        record_id="objective-control:round-02:player-a:command:phase_end",
+        game_id=state.game_id,
+        battle_round=2,
+        active_player_id="player-a",
+        timing=ObjectiveControlTiming.PHASE_END,
+        phase=BattlePhase.COMMAND.value,
+        battlefield_id="phase11f-battlefield",
+        results=tuple(
+            ObjectiveControlResult(
+                objective_id=marker.objective_marker_id,
+                status=(
+                    ObjectiveControlStatus.CONTROLLED
+                    if marker.objective_marker_id == controlled_objective_id
+                    else ObjectiveControlStatus.UNCONTROLLED
+                ),
+                controlled_by_player_id=(
+                    "player-a" if marker.objective_marker_id == controlled_objective_id else None
+                ),
+                scores=(
+                    (ObjectiveControlScore(player_id="player-a", score=1),)
+                    if marker.objective_marker_id == controlled_objective_id
+                    else ()
+                ),
+            )
+            for marker in state.mission_setup.objective_markers
+        ),
     )
+    state.record_objective_control_record(record)
+    awards = policy.primary_awards_from_objective_control(
+        record=record,
+        mission_setup=state.mission_setup,
+        turn_order=state.turn_order,
+        turn_start_states=tuple(state.primary_objective_turn_start_states),
+        terrain_trap_states=tuple(state.primary_terrain_trap_states),
+        unit_destruction_states=tuple(state.primary_unit_destruction_states),
+    )
+    if len(awards) != 1:
+        raise AssertionError("Primary source-drift test requires one generated award")
+    state.award_victory_points(awards[0])
     payload = state.to_payload()
     player_a_ledger = next(
         ledger for ledger in payload["victory_point_ledgers"] if ledger["player_id"] == "player-a"

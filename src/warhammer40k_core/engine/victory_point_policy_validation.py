@@ -4,9 +4,14 @@ from typing import cast
 
 from warhammer40k_core.engine.mission_scoring_policies import MissionScoringPolicies
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.objective_control import ObjectiveControlRecord
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_victory_point_policy import (
+    validate_victory_point_ledger_policy,
+)
 from warhammer40k_core.engine.scoring import (
     VictoryPointLedger,
+    VictoryPointSourceKind,
     initial_victory_point_ledgers,
 )
 
@@ -42,17 +47,37 @@ def validate_victory_point_ledger_policy_sources(
     ledgers: list[VictoryPointLedger],
     *,
     mission_setup: MissionSetup | None,
+    objective_control_records: tuple[ObjectiveControlRecord, ...],
+    turn_order: tuple[str, ...],
+    current_battle_round: int,
     policies: MissionScoringPolicies | None = None,
 ) -> None:
     if mission_setup is None:
+        if any(
+            transaction.source_kind is VictoryPointSourceKind.PRIMARY
+            for ledger in ledgers
+            for transaction in ledger.transactions
+        ):
+            raise GameLifecycleError(
+                "Primary VP ledger source validation requires a mission setup."
+            )
         return
     if policies is None:
         raise GameLifecycleError("Victory Point ledger source validation requires policies.")
     policies.validate_mission_setup(mission_setup)
     for ledger in ledgers:
         policy = policies.policy_for_player(ledger.player_id)
-        for transaction in ledger.transactions:
-            policy.cap_bucket_for_victory_point_source(
-                source_kind=transaction.source_kind,
-                source_id=transaction.source_id,
+        if any(
+            transaction.source_kind is VictoryPointSourceKind.PRIMARY
+            and transaction.battle_round > current_battle_round
+            for transaction in ledger.transactions
+        ):
+            raise GameLifecycleError(
+                "Primary VP transaction battle_round is later than the game state."
             )
+        validate_victory_point_ledger_policy(
+            policy=policy,
+            ledger=ledger,
+            objective_control_records=objective_control_records,
+            turn_order=turn_order,
+        )

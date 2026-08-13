@@ -4208,57 +4208,6 @@ def test_phase17j_event_pack_resolves_scoring_and_tactical_draw_by_pack_id() -> 
         mission_pack_for_id("unsupported-pack")
 
 
-def test_phase17j_end_of_battle_vp_is_exempt_from_round_five_primary_cap() -> None:
-    mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-07")
-    setup = MissionSetup.from_mission_pack(
-        mission_pack=mission_pack,
-        mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
-        attacker_player_id="player-alpha",
-        attacker_force_disposition_id="take-and-hold",
-        defender_player_id="player-beta",
-        defender_force_disposition_id="purge-the-foe",
-    )
-    policies = mission_scoring_policies_from_setup(setup)
-    policy = policies.policy_for_player("player-alpha")
-    ledger = VictoryPointLedger.initial(player_id="player-alpha")
-    round_five_award = VictoryPointAward(
-        player_id="player-alpha",
-        battle_round=5,
-        phase="command",
-        amount=15,
-        source_kind=VictoryPointSourceKind.PRIMARY,
-        source_id=setup.primary_mission_id_for_player("player-alpha"),
-        scoring_timing="phase_end",
-        metadata={"scoring_rule_id": "phase17j-round-five-primary"},
-    )
-    applied_amount, metadata = policy.capped_award_for_ledger(
-        ledger=ledger,
-        award=round_five_award,
-    )
-    ledger, _ = ledger.award(
-        round_five_award,
-        applied_amount=applied_amount,
-        metadata=metadata,
-    )
-    end_of_battle_award = VictoryPointAward(
-        player_id="player-alpha",
-        battle_round=5,
-        phase="battle_end",
-        amount=10,
-        source_kind=VictoryPointSourceKind.PRIMARY,
-        source_id=setup.primary_mission_id_for_player("player-alpha"),
-        scoring_timing="end_of_battle",
-        metadata={"scoring_rule_id": "phase17j-end-of-battle-primary"},
-    )
-
-    applied_amount, _ = policy.capped_award_for_ledger(
-        ledger=ledger,
-        award=end_of_battle_award,
-    )
-
-    assert applied_amount == 10
-
-
 def test_phase17j_final_scoring_uses_event_caps_battle_ready_and_draw_rules() -> None:
     mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-07")
     setup = MissionSetup.from_mission_pack(

@@ -231,10 +231,16 @@ class MissionScoringPolicies:
         *,
         ledger: VictoryPointLedger,
         award: VictoryPointAward,
+        objective_control_records: tuple[ObjectiveControlRecord, ...],
+        turn_order: tuple[str, ...],
+        current_active_player_id: str | None,
     ) -> tuple[int, JsonValue]:
         return self.policy_for_player(ledger.player_id).capped_award_for_ledger(
             ledger=ledger,
             award=award,
+            objective_control_records=objective_control_records,
+            turn_order=turn_order,
+            current_active_player_id=current_active_player_id,
         )
 
     def to_payload(self) -> MissionScoringPoliciesPayload:

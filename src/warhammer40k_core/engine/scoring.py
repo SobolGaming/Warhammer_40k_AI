@@ -47,6 +47,11 @@ from warhammer40k_core.engine.primary_scoring_timing import (
     SUPPORTED_PRIMARY_SCORING_TIMINGS,
     primary_scoring_timing_applies,
 )
+from warhammer40k_core.engine.primary_victory_point_policy import (
+    PrimaryVictoryPointCapTreatment,
+    validate_primary_victory_point_award,
+    validate_victory_point_ledger_policy,
+)
 from warhammer40k_core.engine.scoring_cap_audit import metadata_with_vp_cap_audit
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 
@@ -2599,6 +2604,9 @@ class MissionScoringPolicy:
         *,
         ledger: VictoryPointLedger,
         award: VictoryPointAward,
+        objective_control_records: tuple[ObjectiveControlRecord, ...],
+        turn_order: tuple[str, ...],
+        current_active_player_id: str | None,
     ) -> tuple[int, JsonValue]:
         if type(ledger) is not VictoryPointLedger:
             raise GameLifecycleError("VP cap resolution requires a VictoryPointLedger.")
@@ -2609,9 +2617,42 @@ class MissionScoringPolicy:
         if ledger.player_id != self.player_id:
             raise GameLifecycleError("VP cap policy does not belong to this player.")
 
+        ledger_policy = validate_victory_point_ledger_policy(
+            policy=self,
+            ledger=ledger,
+            objective_control_records=objective_control_records,
+            turn_order=turn_order,
+        )
+
         cap_bucket = self.cap_bucket_for_victory_point_source(
             source_kind=award.source_kind,
             source_id=award.source_id,
+        )
+        primary_binding = None
+        if award.source_kind is VictoryPointSourceKind.PRIMARY:
+            if current_active_player_id is None:
+                raise GameLifecycleError("Primary VP award validation requires an active player.")
+            primary_binding = validate_primary_victory_point_award(
+                policy=self,
+                award=award,
+                objective_control_records=objective_control_records,
+                turn_order=turn_order,
+                expected_boundary_active_player_id=current_active_player_id,
+            )
+            if primary_binding.identity in ledger_policy.primary_binding_identities:
+                raise GameLifecycleError(
+                    "Primary VP ledger must not repeat a scoring rule at one boundary."
+                )
+        elif (
+            cap_bucket is VictoryPointCapBucket.PRIMARY and award.scoring_timing == "end_of_battle"
+        ):
+            raise GameLifecycleError(
+                "Only a source-backed Primary scoring rule may claim end-of-battle exemption."
+            )
+        end_of_battle_exempt = (
+            primary_binding is not None
+            and primary_binding.cap_treatment
+            is PrimaryVictoryPointCapTreatment.END_OF_BATTLE_EXEMPT
         )
         source_points_before = self.ledger_points_from_cap_bucket(
             ledger=ledger,
@@ -2639,14 +2680,14 @@ class MissionScoringPolicy:
         if (
             cap_bucket is VictoryPointCapBucket.PRIMARY
             and self.primary_max_vp_per_turn is not None
-            and award.scoring_timing != "end_of_battle"
+            and not end_of_battle_exempt
         ):
             primary_battle_round_cap = self.primary_max_vp_per_turn
             primary_battle_round_points_before = sum(
                 transaction.amount
                 for transaction in ledger.transactions
                 if transaction.battle_round == award.battle_round
-                and transaction.scoring_timing != "end_of_battle"
+                and transaction.transaction_id not in ledger_policy.end_of_battle_transaction_ids
                 and self.cap_bucket_for_victory_point_source(
                     source_kind=transaction.source_kind,
                     source_id=transaction.source_id,

@@ -201,9 +201,13 @@ Secondary status:
   battle round to every Event Companion Primary mission; printed page 4 states
   that end-of-battle VP is outside that limit. Accordingly, every one of the 25
   Primary rows carries `max_vp_per_turn: 15` (the historical field name is a
-  battle-round cap), cumulative awards share that round bucket, and typed
-  `end_of_battle` awards are exempt. The derived Event Companion source identity
-  is `aa272b8234ca02b2ac5b62b2bc7299998d14a386e4e9a5f9b90aaaf4ed5422a3`.
+  battle-round cap), and cumulative awards share that round bucket. The
+  end-of-battle exemption requires a matching assigned scoring-rule ID and the
+  final-round Fight-phase `TURN_END` objective-control record; a caller-provided
+  timing string is insufficient. The same validator runs for live awards and
+  restored ledgers, including ordinary per-round Primary-total validation. The
+  derived Event Companion source identity is
+  `aa272b8234ca02b2ac5b62b2bc7299998d14a386e4e9a5f9b90aaaf4ed5422a3`.
 - Verify that the committed battlefield artifact still matches its reviewed
   inputs without writing files with
   `uv run python tools/build_event_companion_battlefields.py --check`.

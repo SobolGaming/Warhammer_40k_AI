@@ -1382,15 +1382,6 @@ class GameState:
             self.mission_setup,
             army_definitions=self.army_definitions,
         )
-        validate_victory_point_ledger_policy_sources(
-            self.victory_point_ledgers,
-            mission_setup=self.mission_setup,
-            policies=(
-                None
-                if self.mission_setup is None
-                else mission_scoring_policies_from_setup(self.mission_setup)
-            ),
-        )
         self.movement_phase_state = _validate_optional_movement_phase_state(
             self.movement_phase_state
         )
@@ -1487,6 +1478,18 @@ class GameState:
             self.objective_control_records,
             game_id=self.game_id,
             player_ids=self.player_ids,
+        )
+        validate_victory_point_ledger_policy_sources(
+            self.victory_point_ledgers,
+            mission_setup=self.mission_setup,
+            objective_control_records=tuple(self.objective_control_records),
+            turn_order=self.turn_order,
+            current_battle_round=self.battle_round,
+            policies=(
+                None
+                if self.mission_setup is None
+                else mission_scoring_policies_from_setup(self.mission_setup)
+            ),
         )
         self.sticky_objective_control_states = _validate_sticky_objective_control_states(
             self.sticky_objective_control_states,
@@ -2709,6 +2712,17 @@ class GameState:
         if type(award) is not VictoryPointAward:
             raise GameLifecycleError("GameState award must be a VictoryPointAward.")
         requested_player_id = _validate_player_id(award.player_id, player_ids=self.player_ids)
+        if award.source_kind is VictoryPointSourceKind.PRIMARY:
+            if self.mission_setup is None:
+                raise GameLifecycleError("Primary VP awards require a mission setup.")
+            if self.stage is not GameLifecycleStage.BATTLE:
+                raise GameLifecycleError("Primary VP awards may be recorded only during battle.")
+            if award.battle_round != self.battle_round:
+                raise GameLifecycleError("Primary VP award battle_round drift.")
+            if self.current_battle_phase is None or award.phase != self.current_battle_phase.value:
+                raise GameLifecycleError("Primary VP award phase drift.")
+            if self.active_player_id is None:
+                raise GameLifecycleError("Primary VP award requires an active player.")
         ledger = self.victory_point_ledger_for_player(requested_player_id)
         applied_amount = award.amount
         transaction_metadata = award.metadata
@@ -2717,6 +2731,9 @@ class GameState:
             applied_amount, transaction_metadata = policy.capped_award_for_ledger(
                 ledger=ledger,
                 award=award,
+                objective_control_records=tuple(self.objective_control_records),
+                turn_order=self.turn_order,
+                current_active_player_id=self.active_player_id,
             )
         updated, transaction = ledger.award(
             award,
@@ -3717,6 +3734,9 @@ class GameState:
         validate_victory_point_ledger_policy_sources(
             self.victory_point_ledgers,
             mission_setup=validated_setup,
+            objective_control_records=tuple(self.objective_control_records),
+            turn_order=self.turn_order,
+            current_battle_round=self.battle_round,
             policies=mission_scoring_policies_from_setup(validated_setup),
         )
         self.mission_setup = validated_setup
