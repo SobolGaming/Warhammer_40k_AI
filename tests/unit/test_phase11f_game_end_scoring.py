@@ -256,8 +256,8 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
     )
 
 
-def test_phase11f_structured_primary_has_no_legacy_implicit_battle_round_cap() -> None:
-    state = _battle_state()
+def test_phase11f_event_primary_round_cap_exempts_end_of_battle_scoring() -> None:
+    state = _battle_state(mission_setup=_event_death_trap_setup())
     assert state.mission_setup is not None
     primary_mission_id = state.mission_setup.primary_mission_id_for_player("player-a")
     state.award_victory_points(
@@ -297,9 +297,10 @@ def test_phase11f_structured_primary_has_no_legacy_implicit_battle_round_cap() -
         )
     )
 
-    assert round_capped.amount == 5
+    assert round_capped.amount == 0
+    assert _cap_reasons(round_capped) == ["primary_battle_round_vp_cap"]
     assert end_of_battle.amount == 5
-    assert state.victory_point_total("player-a") == 25
+    assert state.victory_point_total("player-a") == 20
 
 
 def test_phase11f_vp_cap_audit_metadata_shapes_and_validation_are_explicit() -> None:

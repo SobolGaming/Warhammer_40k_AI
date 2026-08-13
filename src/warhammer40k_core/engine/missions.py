@@ -23,6 +23,9 @@ from warhammer40k_core.engine.mission_setup import (
     validate_mission_setup_source_layout_identity,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_scoring_condition_evaluator import (
+    SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS,
+)
 from warhammer40k_core.engine.reserves import ReserveDestructionTimingPolicy
 from warhammer40k_core.engine.scoring import (
     MissionActionScoringRule,
@@ -45,24 +48,11 @@ _SUPPORTED_CONTROL_OBJECTIVE_PRIMARY_CONDITIONS = frozenset(
         "each_controlled_objective_from_battle_round_two",
     )
 )
-_SUPPORTED_STRUCTURED_PRIMARY_CONDITIONS = (
-    _SUPPORTED_CONTROL_OBJECTIVE_PRIMARY_CONDITIONS
-    | frozenset(
-        (
-            "control_one_or_more_central_objectives",
-            "control_one_or_more_central_objectives_end_of_battle",
-            "control_one_or_more_new_non_home_objectives",
-            "control_one_or_more_non_home_objectives_from_battle_round_two",
-            "each_non_home_objective_controlled_battle_rounds_two_to_four",
-            "each_non_home_objective_controlled_from_battle_round_two",
-            "each_non_home_objective_controlled_round_five",
-            "each_terrain_area_trapped_this_turn",
-            "each_trapped_objective_terrain_area_this_turn",
-            "more_enemy_units_destroyed_than_friendly_previous_turn",
-            "one_or_more_enemy_units_destroyed_after_starting_turn_in_trapped_terrain",
-            "one_or_more_enemy_units_destroyed_this_turn",
-            "control_opponent_home_objective",
-        )
+_SUPPORTED_STRUCTURED_PRIMARY_CONDITIONS = SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS | frozenset(
+    (
+        "each_terrain_area_trapped_this_turn",
+        "each_trapped_objective_terrain_area_this_turn",
+        "one_or_more_enemy_units_destroyed_after_starting_turn_in_trapped_terrain",
     )
 )
 
@@ -510,6 +500,8 @@ def primary_scoring_rules_from_definition(
                 victory_points=rule.victory_points,
                 cap=rule.cap,
                 condition=rule.condition,
+                resolution_mode=rule.resolution_mode,
+                resolution_group_id=rule.resolution_group_id,
                 source_id=rule.source_id,
             )
         )

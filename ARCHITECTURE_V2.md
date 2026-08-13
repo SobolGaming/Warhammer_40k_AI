@@ -105,14 +105,15 @@ import, scoring/draw pack resolution, separate empty card-amendment and FAQ
 patch records, Base Size Guide source rows with geometry-resolution statuses,
 deployment remainder-drain coverage, and a static audit preventing runtime
 Event Companion PDF parsing.
-**Phase 17N is partial overall, with its battlefield-geometry scope complete**:
-all 15 Event Companion Force Disposition pairings and all A/B/C variants supply
-45 of 45 source-hashed executable battlefield packages. They contain 720
-physical terrain-area footprint pieces forming 608 logical rules areas and
-1,349 physical components, including the reviewed page 9
-29-component source exception. Completing geometry does not promote the
-non-Meatgrinder Primary Mission scoring semantics that remain
-source-known engine-pending.
+**Phase 17N is partial overall, with its battlefield-geometry scope complete and
+12 of 25 Primary Missions executable**: all 15 Event Companion Force
+Disposition pairings and all A/B/C variants supply 45 of 45 source-hashed
+executable battlefield packages. They contain 720 physical terrain-area
+footprint pieces forming 608 logical rules areas and 1,349 physical components,
+including the reviewed page 9 29-component source exception. The generic
+timing, cumulative/exclusive resolution, objective, territory, and table-quarter
+scoring slice promotes eight additional evidence-complete Primaries; the other
+13 remain source-known and engine-pending.
 **Phase 18A is complete** for local CLI/human decision entry and viewer-safe
 hybrid datacard projections: `interfaces/cli.py` renders pending finite and
 parameterized requests, submits normal lifecycle `DecisionResult`s, and
@@ -390,7 +391,7 @@ Implemented foundation and partial integration baselines:
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
 | 17J | Complete | Warhammer Event Companion v1.1 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with explicit extraction status, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
-| 17N | Partial | Battlefield geometry complete for 45 of 45 source-hashed executable Event Companion layouts; non-Meatgrinder Primary Mission scoring semantics remain source-known engine-pending |
+| 17N | Partial | Battlefield geometry complete for all 45 source-hashed Event Companion layouts; generic timing/resolution and objective, territory, and table-quarter evidence make 12 of 25 Primaries executable while 13 remain source-known engine-pending |
 | 17O | Complete | Viewer-scoped eight-axis capability manifest with selected roster/unit/rule/mission/geometry rows, evidence, blockers, identities, and mechanically derived certification claims |
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
@@ -4736,9 +4737,9 @@ Implemented coverage:
 - Event Companion mission-pack import builds 25 Primary Mission descriptors, 25
   implemented matrix cells, 45 deployment maps, 45 terrain layout templates, and
   45 mission-pool entries.
-- `primary_mission_scoring_coverage_rows()` tracks Primary Mission scoring
-  status: 4 of 25 missions are engine-implemented, 21 are source-known but
-  require engine implementation, and 0 still await source scoring text.
+- `primary_mission_scoring_coverage_rows()` tracks current Primary Mission
+  scoring status: 12 of 25 missions are engine-implemented, 13 are source-known
+  but still require engine implementation, and 0 await source scoring text.
 - All 45 source-page layout identities instantiate as 44" x 60" mission setups
   with deterministic, source-hashed executable battlefield packages. The
   complete geometry inventory contains 720 physical terrain-area footprint
@@ -4943,12 +4944,12 @@ Completion gate:
 
 Priority: required before certifying a visual matched-play slice.
 
-Status: Partial overall; battlefield geometry is complete. All 15 Event
-Companion Force Disposition pairings and every A/B/C variant have source-hashed
-executable battlefield packages, for 45 of 45 layouts. The remaining Phase 17N
-work is mission semantics: completing battlefield packages does not promote
-non-Meatgrinder Primary Missions whose scoring remains source-known and
-engine-pending.
+Status: Partial overall; battlefield geometry is complete and Primary scoring
+is executable for 12 of 25 missions. All 15 Event Companion Force Disposition
+pairings and every A/B/C variant have source-hashed executable battlefield
+packages, for 45 of 45 layouts. The remaining 13 Primaries stay source-known
+and engine-pending until their mission actions, choices, or persistent marker
+state have engine-owned semantics.
 
 The battlefield Single/Separate logical-area semantics come from the page-8
 Layouts Key, while coordinates and layout facts come from pages 9-53 of
@@ -5013,11 +5014,11 @@ Mission Action descriptors retain reviewed Chapter Approved mission-deck
 provenance in the strict, versioned JSON artifact at
 `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-scoring.json`,
 with package hash
-`b87dea149c6325bc0553243260065508b8b3d97880172173425d370335b8715e`
+`5449d260c90c9a5a798dad0fa3dbba0c7c7b56e28e726a94ce6694654cc7afbe`
 and raw artifact SHA-256
-`be74e5272b2f64e6e78b6fa24971d42dbb97bc2c7a6c048c9a47521c36fc0f71`.
+`162f28bbdbd34ffcf78918abc6e85dc7e1fef9785ce2dc6f31129e7664666e80`.
 The artifact pins the reviewed transcriptions from PRs #107, #134, #136, and
-#379, including the four executable versus 21 engine-pending status boundary.
+#379, including the exact 12 executable versus 13 engine-pending status boundary.
 PR #107 is the source-backed origin for Death Trap, Immovable Object, and
 Unstoppable Force; PRs #134 and #136 complete the remaining mission/action
 transcription inventory, and PR #379 supplies the later exact Meatgrinder
@@ -5029,6 +5030,40 @@ secondary corroboration. Runtime mission and source-only action rows are built
 from this artifact; its loader rejects unknown fields, malformed inventories,
 unsupported status promotion, stale content hashes, and drift from the reviewed
 artifact pin.
+
+The same artifact separately pins the committed official Event Companion v1.1
+PDF (`97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20`)
+as authority for the event-wide scoring limit. Printed page 2 limits Primary
+Mission scoring to 15VP per battle round, so all 25 Event Companion Primary rows
+carry `max_vp_per_turn: 15`; that legacy field name represents a battle-round
+ledger cap, not an individual player-turn cap. Printed page 4 explicitly exempts
+end-of-battle VP from that limit. Cumulative and independent awards therefore
+share one 15VP ledger bucket for their battle round, while awards whose typed
+scoring timing is `end_of_battle` remain exempt. The resulting complete mission
+source identity is pinned as
+`aa272b8234ca02b2ac5b62b2bc7299998d14a386e4e9a5f9b90aaaf4ed5422a3`.
+
+The Phase 17N scoring schema has exactly nine source timing tokens and requires
+every scoring row to declare one of `independent`, `cumulative`, or
+`exclusive_highest`. Non-independent rows carry a source-pinned resolution
+group; a strict loader rejects singleton groups, mixed missions, mixed timings,
+mixed modes, or any group inventory drift. Runtime timing and resolution are
+generic and content-neutral: achieved cumulative branches all score, while an
+exclusive group emits only its highest-VP achieved branch with deterministic
+rule-ID tie-breaking and auditable selected/suppressed evidence.
+
+Battlefield Dominance, Delaying Action, Destroyer's Wrath, Determined
+Acquisition, Inescapable Dominion, Outmanoeuvre, Reconnaissance Sweep, and
+Search and Scour are the eight newly executable Primaries. Their condition
+evidence covers objective-control comparisons and history, home/central/
+expansion objective roles, objective centers inside directed territory,
+full-model rules-unit placement in table quarters outside the central exclusion,
+turn-scoped destruction with start-of-turn terrain occupancy, and enemy absence
+from the scoring player's territory at battle end. Objective-control inputs are
+validated against the exact mission objective inventory; missing or unsupported
+evidence fails closed. Purge and Secure, Sabotage, and Vital Link retain their
+source resolution grammar but remain engine-pending because the associated
+destruction/action/marker semantics are not complete.
 
 `uv run python tools/build_event_companion_battlefields.py --check` rebuilds the
 complete battlefield package in memory from its reviewed inputs, verifies its

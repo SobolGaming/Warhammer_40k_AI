@@ -1335,6 +1335,7 @@ def test_meatgrinder_current_turn_enemy_destruction_changes_comparison_result() 
                 active_player_id="player-a",
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id="army-beta:current-turn-loss",
+                started_turn_terrain_feature_ids=(),
             ),
         ),
     )
@@ -1358,6 +1359,7 @@ def test_meatgrinder_counts_repeated_destruction_occurrences_for_the_same_unit()
                 active_player_id="player-a",
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id=repeated_unit_id,
+                started_turn_terrain_feature_ids=(),
             ),
             PrimaryUnitDestructionEvidence(
                 destruction_id="destruction:returning-unit:second",
@@ -1365,6 +1367,7 @@ def test_meatgrinder_counts_repeated_destruction_occurrences_for_the_same_unit()
                 active_player_id="player-a",
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id=repeated_unit_id,
+                started_turn_terrain_feature_ids=(),
             ),
         ),
     )
@@ -1391,6 +1394,7 @@ def test_meatgrinder_enemy_self_loss_in_previous_turn_is_not_current_enemy_loss(
                 active_player_id="player-b",
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id="army-beta:previous-turn-self-loss",
+                started_turn_terrain_feature_ids=(),
             ),
         ),
     )
@@ -1414,6 +1418,7 @@ def test_meatgrinder_previous_opponent_turn_friendly_loss_prevents_tie_score() -
                 active_player_id="player-b",
                 destroyed_player_id="player-a",
                 destroyed_unit_instance_id="army-alpha:previous-turn-loss",
+                started_turn_terrain_feature_ids=(),
             ),
             PrimaryUnitDestructionEvidence(
                 destruction_id="destruction:current-turn-enemy-loss",
@@ -1421,6 +1426,7 @@ def test_meatgrinder_previous_opponent_turn_friendly_loss_prevents_tie_score() -
                 active_player_id="player-a",
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id="army-beta:current-turn-loss",
+                started_turn_terrain_feature_ids=(),
             ),
         ),
     )
@@ -1444,6 +1450,7 @@ def test_meatgrinder_round_boundary_uses_prior_round_player_b_turn_for_player_a(
                 active_player_id="player-b",
                 destroyed_player_id="player-a",
                 destroyed_unit_instance_id="army-alpha:round-two-player-b-loss",
+                started_turn_terrain_feature_ids=(),
             ),
             PrimaryUnitDestructionEvidence(
                 destruction_id="destruction:round-three-player-a-loss",
@@ -1451,6 +1458,7 @@ def test_meatgrinder_round_boundary_uses_prior_round_player_b_turn_for_player_a(
                 active_player_id="player-a",
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id="army-beta:round-three-player-a-loss",
+                started_turn_terrain_feature_ids=(),
             ),
         ),
     )
@@ -5709,6 +5717,36 @@ def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() 
     assert cleanup.removed_model_instance_ids == (removed_model_id,)
     assert cleanup.removals[0].removal_kind.value == "destroyed"
     assert cleanup.removals[0].destroyed_model_rules_triggered is False
+
+
+def test_turn_end_control_and_primary_scoring_use_post_cleanup_battlefield() -> None:
+    state = _battle_state_for_primary("primary-immovable-object")
+    assert state.battlefield_state is not None
+    marker = _center_marker_definition(state)
+    unit_placement = state.battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    broken = _with_model_offsets(
+        unit_placement,
+        marker,
+        offsets=((16.0, 8.0), (17.5, 8.0), (16.0, 9.5), (17.5, 9.5), (0.0, 0.0)),
+    )
+    isolated_objective_model_id = broken.model_placements[-1].model_instance_id
+    state.battlefield_state = state.battlefield_state.with_unit_placement(broken)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+
+    state.advance_to_next_battle_phase()
+
+    assert isolated_objective_model_id in state.battlefield_state.removed_model_ids
+    turn_end_record = next(
+        record
+        for record in reversed(state.objective_control_records)
+        if record.timing is ObjectiveControlTiming.TURN_END
+    )
+    central_result = turn_end_record.result_by_objective_id(marker.objective_marker_id)
+    assert central_result.controlled_by_player_id is None
+    assert not any(
+        _transaction_metadata(transaction)["scoring_rule_id"] == "immovable-object-central-turn-end"
+        for transaction in state.victory_point_ledger_for_player("player-a").transactions
+    )
 
 
 def test_unarrived_reserves_are_destroyed_at_mission_deadline() -> None:

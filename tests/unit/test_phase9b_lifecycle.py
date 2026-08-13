@@ -42,6 +42,7 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.objective_control import ObjectiveControlTiming
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -793,6 +794,46 @@ def test_phase_wrap_switches_active_player() -> None:
     assert state.battle_round == 1
     assert state.active_player_id == "player-b"
     assert state.current_battle_phase is BattlePhase.COMMAND
+
+
+def test_turn_end_objective_control_audit_follows_post_cleanup_capture() -> None:
+    state = _battle_state()
+    flow = _battle_flow()
+    decisions = DecisionController()
+
+    for _ in range(5):
+        flow.advance(state=state, decisions=decisions)
+
+    fight_boundary_events = tuple(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "end_boundary_objective_control_determined"
+        and isinstance(event.payload, dict)
+        and event.payload.get("phase") == BattlePhase.FIGHT.value
+    )
+    assert len(fight_boundary_events) == 2
+    phase_end_record = next(
+        record
+        for record in state.objective_control_records
+        if record.phase == BattlePhase.FIGHT.value
+        and record.timing is ObjectiveControlTiming.PHASE_END
+    )
+    turn_end_record = next(
+        record
+        for record in state.objective_control_records
+        if record.phase == BattlePhase.FIGHT.value
+        and record.timing is ObjectiveControlTiming.TURN_END
+    )
+    fight_boundary_payloads = tuple(
+        cast(dict[str, JsonValue], event.payload) for event in fight_boundary_events
+    )
+    assert [payload["record_ids"] for payload in fight_boundary_payloads] == [
+        [phase_end_record.record_id],
+        [turn_end_record.record_id],
+    ]
+    event_types = tuple(event.event_type for event in decisions.event_log.records)
+    turn_end_audit_index = decisions.event_log.records.index(fight_boundary_events[-1])
+    assert event_types[turn_end_audit_index + 1] == "battle_phase_completed"
 
 
 def test_battle_round_increments_after_all_players_complete_fight_phase() -> None:

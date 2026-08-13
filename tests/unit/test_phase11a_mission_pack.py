@@ -461,6 +461,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
         "victory_points": 5,
         "cap": 15,
         "condition": "each_controlled_objective_from_battle_round_two",
+        "resolution_mode": "independent",
+        "resolution_group_id": None,
         "source_id": (
             "gw-11e-chapter-approved-2026-27:primary:take-and-hold:"
             "scoring-rule:take-and-hold-control"
@@ -474,6 +476,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "victory_points": 4,
             "cap": 5,
             "condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
+            "resolution_mode": "independent",
+            "resolution_group_id": None,
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
                 "scoring-rule:bring-it-down-fixed"
@@ -486,6 +490,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "victory_points": 5,
             "cap": 5,
             "condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
+            "resolution_mode": "independent",
+            "resolution_group_id": None,
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
                 "scoring-rule:bring-it-down-tactical"
@@ -498,6 +504,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "victory_points": None,
             "cap": None,
             "condition": "may_discard_if_no_enemy_models_w10_or_more_on_battlefield",
+            "resolution_mode": "independent",
+            "resolution_group_id": None,
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
                 "scoring-rule:bring-it-down-when-drawn"
@@ -559,6 +567,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "victory_points": 3,
             "cap": None,
             "condition": "control_one_or_more_central_objectives",
+            "resolution_mode": "independent",
+            "resolution_group_id": None,
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:"
                 "scoring-rule:immovable-object-central-turn-end"
@@ -571,6 +581,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "victory_points": 5,
             "cap": None,
             "condition": "each_non_home_objective_controlled_battle_rounds_two_to_four",
+            "resolution_mode": "independent",
+            "resolution_group_id": None,
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:"
                 "scoring-rule:immovable-object-rounds-two-to-four-command"
@@ -583,6 +595,8 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "victory_points": 5,
             "cap": None,
             "condition": "each_non_home_objective_controlled_round_five",
+            "resolution_mode": "independent",
+            "resolution_group_id": None,
             "source_id": (
                 "gw-11e-chapter-approved-2026-27:primary:primary-immovable-object:"
                 "scoring-rule:immovable-object-round-five-turn-end"
@@ -1005,8 +1019,8 @@ def test_mission_scoring_policies_resolve_asymmetric_player_primaries() -> None:
 @pytest.mark.parametrize(
     ("attacker_force_disposition_id", "defender_force_disposition_id"),
     [
-        ("take-and-hold", "disruption"),
-        ("disruption", "take-and-hold"),
+        ("purge-the-foe", "disruption"),
+        ("disruption", "purge-the-foe"),
     ],
 )
 def test_mission_scoring_policies_defer_pending_primary_failure_to_owning_path(
@@ -1015,7 +1029,7 @@ def test_mission_scoring_policies_defer_pending_primary_failure_to_owning_path(
 ) -> None:
     setup = MissionSetup.from_mission_pack(
         mission_pack=warhammer_event_companion_2026_07_mission_pack(),
-        mission_pool_entry_id="mission-take-and-hold-vs-disruption-layout-1",
+        mission_pool_entry_id="mission-purge-the-foe-vs-disruption-layout-1",
         attacker_player_id="player-a",
         attacker_force_disposition_id=attacker_force_disposition_id,
         defender_player_id="player-b",
@@ -1030,8 +1044,8 @@ def test_mission_scoring_policies_defer_pending_primary_failure_to_owning_path(
         policy for policy in policies.player_policies if not policy.primary_scoring_supported
     )
 
-    assert implemented.primary_mission_id == "primary-death-trap"
-    assert pending.primary_mission_id == "primary-determined-acquisition"
+    assert implemented.primary_mission_id == "primary-delaying-action"
+    assert pending.primary_mission_id == "primary-punishment"
     assert (
         implemented.cap_bucket_for_victory_point_source(
             source_kind=VictoryPointSourceKind.PRIMARY,

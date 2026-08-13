@@ -71,6 +71,7 @@ DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
+EXPECTED_SOURCE_IMPORT_HASH = "aa272b8234ca02b2ac5b62b2bc7299998d14a386e4e9a5f9b90aaaf4ed5422a3"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -522,13 +523,18 @@ class BaseSizeSourceRecord:
 
 
 def source_package_definition() -> MissionSourcePackageDefinition:
+    source_import_hash = _import_hash()
+    if source_import_hash != EXPECTED_SOURCE_IMPORT_HASH:
+        raise MissionPackError(
+            "Event Companion mission source import hash drifted from its reviewed pin."
+        )
     return MissionSourcePackageDefinition(
         edition_id=EDITION_ID,
         mission_pack_id=MISSION_PACK_ID,
         source_package_id=SOURCE_PACKAGE_ID,
         source_title=SOURCE_TITLE,
         source_version=SOURCE_VERSION,
-        source_commit_or_import_hash=_import_hash(),
+        source_commit_or_import_hash=source_import_hash,
         imported_at_schema_version=IMPORTED_AT_SCHEMA_VERSION,
     )
 
@@ -980,28 +986,11 @@ _ENGINE_IMPLEMENTED_PRIMARY_MISSION_IDS = engine_implemented_primary_mission_ids
 
 
 _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
-    "primary-battlefield-dominance": (
-        "engine_primary_condition:control_more_objectives_than_opponent_first_second_rounds",
-        "engine_primary_condition:each_objective_controlled_from_battle_round_two",
-        "engine_primary_condition:home_objective_controlled_non_home_objective_bonus",
-        "engine_primary_scoring_grammar:cumulative_condition",
-    ),
     "primary-consecrate": (
         "engine_primary_marker_state:consecrated_objective",
         "engine_primary_condition:consecrated_objective_thresholds",
         "engine_primary_condition:control_more_objectives_than_opponent",
         "engine_primary_condition:enemy_home_objective_consecrated",
-    ),
-    "primary-delaying-action": (
-        "engine_primary_condition:each_enemy_unit_destroyed_this_turn",
-        "engine_primary_condition:control_central_and_expansion_objectives",
-        "source_objective_role:expansion_objective",
-    ),
-    "primary-determined-acquisition": (
-        "engine_primary_condition:each_newly_controlled_non_home_objective_this_turn",
-        "engine_primary_condition:each_objective_controlled_from_battle_round_two",
-        "engine_primary_condition:controlled_objective_in_opponent_territory_bonus",
-        "engine_primary_scoring_grammar:cumulative_condition",
     ),
     "primary-extract-relic": (
         "engine_primary_action:sensor-sweep-extract-relic",
@@ -1017,24 +1006,12 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_condition:each_friendly_unit_extracted_intelligence_this_turn",
         "engine_primary_condition:gather_intel_operation_marker_end_of_battle",
     ),
-    "primary-destroyers-wrath": ("engine_primary_condition:control_more_objectives_than_opponent",),
-    "primary-inescapable-dominion": (
-        "engine_primary_condition:control_three_or_more_objectives",
-        "engine_primary_condition:control_two_or_more_objectives_from_battle_round_two",
-        "engine_primary_condition:control_more_objectives_than_opponent",
-        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
-    ),
     "primary-locate-and-deny": (
         "engine_primary_start_battle_setup:locate_and_deny_operation_markers",
         "engine_primary_action:sensor-sweep-locate-and-deny",
         "engine_primary_marker_state:operation_marker_terrain_area",
         "engine_primary_condition:enemy_started_turn_on_objective_destroyed",
         "engine_primary_condition:single_friendly_operation_marker_terrain_area_state",
-    ),
-    "primary-outmaneuver": (
-        "engine_primary_condition:control_enemy_home_objective",
-        "engine_primary_condition:round_band_objective_control",
-        "engine_primary_name_alias:outmaneuver_outmanoeuvre",
     ),
     "primary-punishment": (
         "engine_primary_start_turn_choice:condemned_enemy_units",
@@ -1049,12 +1026,6 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_condition:control_one_or_more_new_non_home_objectives",
         "engine_primary_scoring_grammar:exclusive_or_condition",
     ),
-    "primary-reconnaissance-sweep": (
-        "engine_primary_condition:table_quarter_unit_distribution",
-        "engine_primary_condition:each_enemy_unit_destroyed_this_turn",
-        "engine_primary_condition:control_one_or_more_non_home_objectives",
-        "engine_primary_scoring_grammar:exclusive_or_condition",
-    ),
     "primary-sabotage": (
         "engine_primary_action:commit-sabotage",
         "engine_primary_condition:each_friendly_unit_committed_sabotage_this_turn",
@@ -1066,12 +1037,6 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_condition:friendly_unit_secured_asset_this_turn",
         "engine_primary_condition:enemy_started_turn_near_central_objective_destroyed",
         "engine_primary_condition:control_three_or_more_objectives",
-    ),
-    "primary-search-and-scour": (
-        "engine_primary_condition:control_one_or_more_central_objectives",
-        "engine_primary_condition:enemy_started_turn_in_terrain_destroyed",
-        "engine_primary_condition:each_non_home_objective_controlled_from_battle_round_two",
-        "engine_primary_condition:no_enemy_units_wholly_within_own_territory",
     ),
     "primary-smoke-and-mirrors": (
         "engine_primary_action:decoy-objective",
@@ -1123,6 +1088,8 @@ def _event_primary_mission_rows_by_id() -> dict[str, chapter_approved.SourcePrim
                     rule.timing,
                     rule.victory_points,
                     rule.condition,
+                    rule.resolution_mode,
+                    rule.resolution_group_id,
                 )
                 for rule in mission.scoring_rules
             ),
@@ -1136,6 +1103,8 @@ def _event_primary_rule(
     timing: str,
     victory_points: int,
     condition: str,
+    resolution_mode: str,
+    resolution_group_id: str | None,
 ) -> chapter_approved.SourceScoringRuleRow:
     return chapter_approved.SourceScoringRuleRow(
         rule_id=rule_id,
@@ -1144,6 +1113,8 @@ def _event_primary_rule(
         victory_points=victory_points,
         cap=None,
         condition=condition,
+        resolution_mode=resolution_mode,
+        resolution_group_id=resolution_group_id,
     )
 
 

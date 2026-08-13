@@ -12,6 +12,9 @@ from warhammer40k_core.engine.mission_setup import (
 )
 from warhammer40k_core.engine.objective_control import ObjectiveControlRecord
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
+    PrimaryScoringSpatialEvidence,
+)
 from warhammer40k_core.engine.scoring import (
     MissionScoringPolicy,
     MissionScoringPolicyPayload,
@@ -68,6 +71,7 @@ class MissionScoringPolicies:
         policies = _validate_player_policies(self.player_policies)
         _validate_common_policy_fields(policies)
         _validate_policy_assignments(policies=policies, assignments=assignments)
+        _validate_primary_resolution_group_ownership(policies)
         object.__setattr__(self, "primary_mission_assignments", assignments)
         object.__setattr__(self, "player_policies", policies)
 
@@ -107,6 +111,7 @@ class MissionScoringPolicies:
         turn_start_states: tuple[PrimaryObjectiveTurnStartState, ...],
         terrain_trap_states: tuple[PrimaryTerrainTrapState, ...],
         unit_destruction_states: tuple[PrimaryUnitDestructionState, ...],
+        spatial_evidence_by_player_id: tuple[PrimaryScoringSpatialEvidence, ...] = (),
         scoring_player_ids: tuple[str, ...] = (),
         end_of_battle: bool = False,
     ) -> tuple[VictoryPointAward, ...]:
@@ -120,6 +125,10 @@ class MissionScoringPolicies:
             raise GameLifecycleError(
                 "Ordinary Primary scoring must use the active player's policy."
             )
+        spatial_evidence = _validate_spatial_evidence(
+            spatial_evidence_by_player_id,
+            scoring_player_ids=player_ids,
+        )
         awards: list[VictoryPointAward] = []
         for player_id in player_ids:
             policy = self.policy_for_player(player_id)
@@ -131,6 +140,14 @@ class MissionScoringPolicies:
                     turn_start_states=turn_start_states,
                     terrain_trap_states=terrain_trap_states,
                     unit_destruction_states=unit_destruction_states,
+                    spatial_evidence=next(
+                        (
+                            evidence
+                            for evidence in spatial_evidence
+                            if evidence.player_id == player_id
+                        ),
+                        None,
+                    ),
                     scoring_player_ids=(policy.player_id,),
                     end_of_battle=end_of_battle,
                 )
@@ -319,6 +336,23 @@ def _validate_common_policy_fields(policies: tuple[MissionScoringPolicy, ...]) -
             raise GameLifecycleError(f"MissionScoringPolicies shared field drifted: {field_name}.")
 
 
+def _validate_primary_resolution_group_ownership(
+    policies: tuple[MissionScoringPolicy, ...],
+) -> None:
+    mission_id_by_group_id: dict[str, str] = {}
+    for policy in policies:
+        for rule in policy.primary_scoring_rules:
+            group_id = rule.resolution_group_id
+            if group_id is None:
+                continue
+            existing_mission_id = mission_id_by_group_id.get(group_id)
+            if existing_mission_id is not None and existing_mission_id != policy.primary_mission_id:
+                raise GameLifecycleError(
+                    "Primary scoring resolution groups must not span mission cards."
+                )
+            mission_id_by_group_id[group_id] = policy.primary_mission_id
+
+
 def _validate_assignments(
     values: object,
 ) -> tuple[PlayerPrimaryMissionAssignment, ...]:
@@ -382,6 +416,31 @@ def _validate_scoring_player_ids(
         seen.add(player_id)
         player_ids.append(player_id)
     return tuple(player_ids)
+
+
+def _validate_spatial_evidence(
+    values: object,
+    *,
+    scoring_player_ids: tuple[str, ...],
+) -> tuple[PrimaryScoringSpatialEvidence, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("Primary scoring spatial evidence must be a tuple.")
+    evidence_rows: list[PrimaryScoringSpatialEvidence] = []
+    seen_player_ids: set[str] = set()
+    for value in cast(tuple[object, ...], values):
+        if type(value) is not PrimaryScoringSpatialEvidence:
+            raise GameLifecycleError(
+                "Primary scoring spatial evidence must contain typed evidence."
+            )
+        if value.player_id not in scoring_player_ids:
+            raise GameLifecycleError(
+                "Primary scoring spatial evidence belongs to a non-scoring player."
+            )
+        if value.player_id in seen_player_ids:
+            raise GameLifecycleError("Primary scoring spatial evidence must not duplicate players.")
+        seen_player_ids.add(value.player_id)
+        evidence_rows.append(value)
+    return tuple(sorted(evidence_rows, key=lambda evidence: evidence.player_id))
 
 
 _identifier = IdentifierValidator(GameLifecycleError)

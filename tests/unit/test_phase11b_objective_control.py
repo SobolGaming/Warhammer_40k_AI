@@ -795,7 +795,7 @@ def test_objective_control_records_update_at_phase_and_turn_end() -> None:
 def test_end_boundary_control_is_fixed_before_later_end_of_phase_mutation() -> None:
     state = _battle_state_with_center_objective_positions(player_a_offsets=((2.0, 0.0),))
 
-    determined = state.determine_current_end_objective_control()
+    determined = state.determine_current_phase_end_objective_control()
     marker = _center_marker_definition(state)
     battlefield = state.battlefield_state
     assert battlefield is not None
@@ -808,10 +808,9 @@ def test_end_boundary_control_is_fixed_before_later_end_of_phase_mutation() -> N
 
     state.advance_to_next_battle_phase()
 
-    assert len(determined) == 1
     assert len(state.objective_control_records) == 1
-    assert state.objective_control_records[0] == determined[0]
-    assert determined[0].results[0].controlled_by_player_id == "player-a"
+    assert state.objective_control_records[0] == determined
+    assert determined.results[0].controlled_by_player_id == "player-a"
 
 
 def test_objective_control_boundary_requires_mission_setup() -> None:

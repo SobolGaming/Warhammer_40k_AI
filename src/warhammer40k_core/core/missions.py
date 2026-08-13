@@ -41,6 +41,16 @@ from warhammer40k_core.core.mission_pool import (
 from warhammer40k_core.core.mission_pool import (
     MissionPoolEntryPayload as MissionPoolEntryPayload,
 )
+from warhammer40k_core.core.mission_scoring_resolution import (
+    MissionScoringResolutionMode as MissionScoringResolutionMode,
+)
+from warhammer40k_core.core.mission_scoring_resolution import (
+    mission_scoring_resolution_mode_from_token as mission_scoring_resolution_mode_from_token,
+)
+from warhammer40k_core.core.mission_scoring_resolution import (
+    validate_mission_scoring_resolution_group_ownership,
+    validate_mission_scoring_resolution_groups,
+)
 from warhammer40k_core.core.objective_terrain_area_references import (
     validate_objective_terrain_area_references,
 )
@@ -197,6 +207,8 @@ class MissionScoringRuleDefinitionPayload(TypedDict):
     victory_points: int | None
     cap: int | None
     condition: str
+    resolution_mode: str
+    resolution_group_id: str | None
     source_id: str
 
 
@@ -1006,6 +1018,8 @@ class MissionScoringRuleDefinition:
     victory_points: int | None
     cap: int | None
     condition: str
+    resolution_mode: MissionScoringResolutionMode
+    resolution_group_id: str | None
     source_id: str
 
     def __post_init__(self) -> None:
@@ -1042,6 +1056,24 @@ class MissionScoringRuleDefinition:
             "condition",
             _validate_identifier("MissionScoringRuleDefinition condition", self.condition),
         )
+        if type(self.resolution_mode) is not MissionScoringResolutionMode:
+            raise MissionPackError(
+                "MissionScoringRuleDefinition resolution_mode must be canonical."
+            )
+        if self.resolution_mode is MissionScoringResolutionMode.INDEPENDENT:
+            if self.resolution_group_id is not None:
+                raise MissionPackError(
+                    "Independent Mission scoring rules cannot declare a resolution group."
+                )
+        else:
+            object.__setattr__(
+                self,
+                "resolution_group_id",
+                _validate_identifier(
+                    "MissionScoringRuleDefinition resolution_group_id",
+                    self.resolution_group_id,
+                ),
+            )
         object.__setattr__(
             self,
             "source_id",
@@ -1056,19 +1088,42 @@ class MissionScoringRuleDefinition:
             "victory_points": self.victory_points,
             "cap": self.cap,
             "condition": self.condition,
+            "resolution_mode": self.resolution_mode.value,
+            "resolution_group_id": self.resolution_group_id,
             "source_id": self.source_id,
         }
 
     @classmethod
-    def from_payload(cls, payload: MissionScoringRuleDefinitionPayload) -> Self:
+    def from_payload(cls, payload: object) -> Self:
+        expected_fields = {
+            "rule_id",
+            "timing",
+            "source_kind",
+            "victory_points",
+            "cap",
+            "condition",
+            "resolution_mode",
+            "resolution_group_id",
+            "source_id",
+        }
+        if type(payload) is not dict:
+            raise MissionPackError("MissionScoringRuleDefinition payload fields are invalid.")
+        payload_mapping = cast(dict[str, object], payload)
+        if set(payload_mapping) != expected_fields:
+            raise MissionPackError("MissionScoringRuleDefinition payload fields are invalid.")
+        raw_payload = cast(MissionScoringRuleDefinitionPayload, payload_mapping)
         return cls(
-            rule_id=payload["rule_id"],
-            timing=payload["timing"],
-            source_kind=payload["source_kind"],
-            victory_points=payload["victory_points"],
-            cap=payload["cap"],
-            condition=payload["condition"],
-            source_id=payload["source_id"],
+            rule_id=raw_payload["rule_id"],
+            timing=raw_payload["timing"],
+            source_kind=raw_payload["source_kind"],
+            victory_points=raw_payload["victory_points"],
+            cap=raw_payload["cap"],
+            condition=raw_payload["condition"],
+            resolution_mode=mission_scoring_resolution_mode_from_token(
+                raw_payload["resolution_mode"]
+            ),
+            resolution_group_id=raw_payload["resolution_group_id"],
+            source_id=raw_payload["source_id"],
         )
 
 
@@ -1882,6 +1937,19 @@ class MissionPackDefinition:
             raise MissionPackError("MissionPackDefinition mission_deck must be a deck.")
         primary_missions = _validate_primary_missions(self.primary_missions)
         secondary_missions = _validate_secondary_missions(self.secondary_missions)
+        validate_mission_scoring_resolution_group_ownership(
+            bindings=tuple(
+                (f"primary:{mission.primary_mission_id}", rule.resolution_group_id)
+                for mission in primary_missions
+                for rule in mission.scoring_rules
+            )
+            + tuple(
+                (f"secondary:{mission.secondary_mission_id}", rule.resolution_group_id)
+                for mission in secondary_missions
+                for rule in mission.scoring_rules
+            ),
+            error_factory=MissionPackError,
+        )
         mission_actions = _validate_mission_actions(self.mission_actions)
         challenger_cards = _validate_challenger_cards(self.challenger_cards)
         force_dispositions = _validate_force_dispositions(self.force_dispositions)
@@ -2494,6 +2562,20 @@ def _validate_scoring_rule_tuple(
             raise MissionPackError(f"{field_name} must not contain duplicate rule IDs.")
         seen.add(value.rule_id)
         entries.append(value)
+    validate_mission_scoring_resolution_groups(
+        field_name=field_name,
+        bindings=tuple(
+            (
+                entry.rule_id,
+                entry.timing,
+                entry.source_kind,
+                entry.resolution_mode,
+                entry.resolution_group_id,
+            )
+            for entry in entries
+        ),
+        error_factory=MissionPackError,
+    )
     return tuple(sorted(entries, key=lambda item: item.rule_id))
 
 

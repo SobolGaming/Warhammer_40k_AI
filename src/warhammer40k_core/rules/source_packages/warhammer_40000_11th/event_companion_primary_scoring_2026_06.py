@@ -12,13 +12,26 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
     package_artifact_bytes,
 )
 
-ARTIFACT_SCHEMA: Final = "core-v2-phase17n-event-companion-primary-scoring-v2"
+ARTIFACT_SCHEMA: Final = "core-v2-phase17n-event-companion-primary-scoring-v4"
 SOURCE_PACKAGE_ID: Final = "gw-11e-warhammer-event-companion-v1-1-2026-07"
-EXPECTED_PACKAGE_HASH: Final = "b87dea149c6325bc0553243260065508b8b3d97880172173425d370335b8715e"
-EXPECTED_ARTIFACT_SHA256: Final = "be74e5272b2f64e6e78b6fa24971d42dbb97bc2c7a6c048c9a47521c36fc0f71"
+EXPECTED_PACKAGE_HASH: Final = "5449d260c90c9a5a798dad0fa3dbba0c7c7b56e28e726a94ce6694654cc7afbe"
+EXPECTED_ARTIFACT_SHA256: Final = "162f28bbdbd34ffcf78918abc6e85dc7e1fef9785ce2dc6f31129e7664666e80"
 _ARTIFACT_PACKAGE: Final = "warhammer40k_core.rules.source_packages.warhammer_40000_11th"
 _ARTIFACT_PATH: Final = "event_companion_2026_06_artifacts/primary-scoring.json"
 _PENDING_SCORING_KIND: Final = "event_companion_primary_source_known_engine_pending"
+_EXPECTED_TIMINGS: Final = frozenset(
+    {
+        "battle_round_four_onwards_turn_end",
+        "battle_rounds_two_and_three_command_phase",
+        "command_phase",
+        "command_phase_or_round_five_turn_end",
+        "end_of_battle",
+        "first_and_second_battle_round_turn_end",
+        "first_battle_round_turn_end",
+        "turn_end",
+        "turn_end_from_battle_round_two",
+    }
+)
 _EXPECTED_PRIMARY_MISSION_IDS: Final = (
     "primary-battlefield-dominance",
     "primary-consecrate",
@@ -47,10 +60,69 @@ _EXPECTED_PRIMARY_MISSION_IDS: Final = (
     "primary-vital-link",
 )
 _EXPECTED_ENGINE_IMPLEMENTED_SCORING_KINDS: Final = {
+    "primary-battlefield-dominance": "battlefield_dominance",
     "primary-death-trap": "death_trap",
+    "primary-delaying-action": "delaying_action",
+    "primary-destroyers-wrath": "destroyers_wrath",
+    "primary-determined-acquisition": "determined_acquisition",
     "primary-immovable-object": "immovable_object",
+    "primary-inescapable-dominion": "inescapable_dominion",
     "primary-meatgrinder": "meatgrinder",
+    "primary-outmaneuver": "outmaneuver",
+    "primary-reconnaissance-sweep": "reconnaissance_sweep",
+    "primary-search-and-scour": "search_and_scour",
     "primary-unstoppable-force": "unstoppable_force",
+}
+_EXPECTED_RESOLUTION_GROUPS: Final = {
+    "battlefield-dominance-command-primary": (
+        "cumulative",
+        (
+            "battlefield-dominance-each-objective",
+            "battlefield-dominance-home-controlled-non-home-bonus",
+        ),
+    ),
+    "determined-acquisition-command-primary": (
+        "cumulative",
+        (
+            "determined-acquisition-each-objective",
+            "determined-acquisition-opponent-territory-bonus",
+        ),
+    ),
+    "sabotage-turn-end-primary": (
+        "cumulative",
+        (
+            "sabotage-each-unit-turn-end",
+            "sabotage-opponent-territory-bonus-turn-end",
+        ),
+    ),
+    "vital-link-turn-end-primary": (
+        "cumulative",
+        (
+            "vital-link-central-objective-turn-end",
+            "vital-link-operation-marker-central-bonus-turn-end",
+        ),
+    ),
+    "vital-link-command-primary": (
+        "cumulative",
+        (
+            "vital-link-objective-control",
+            "vital-link-central-objective-bonus",
+        ),
+    ),
+    "purge-and-secure-destruction-primary": (
+        "exclusive_highest",
+        (
+            "purge-and-secure-destroyed-by-objective-unit-turn-end",
+            "purge-and-secure-started-objective-destroyed-turn-end",
+        ),
+    ),
+    "reconnaissance-sweep-quarters-primary": (
+        "exclusive_highest",
+        (
+            "reconnaissance-sweep-three-quarters-turn-end",
+            "reconnaissance-sweep-four-quarters-turn-end",
+        ),
+    ),
 }
 _EXPECTED_RULE_COUNTS: Final = {
     "primary-battlefield-dominance": 3,
@@ -147,6 +219,19 @@ class LayoutSourceBoundaryArtifact(
     contains_primary_mission_card_scoring_clauses: bool
 
 
+class EventCompanionScoringLimitSourceArtifact(
+    msgspec.Struct,
+    frozen=True,
+    forbid_unknown_fields=True,
+):
+    source_pdf_filename: str
+    source_pdf_sha256: str
+    source_pages: tuple[int, ...]
+    authority_scope: str
+    primary_max_vp_per_battle_round: int
+    end_of_battle_primary_vp_exempt: bool
+
+
 class PrimaryScoringRuleArtifact(
     msgspec.Struct,
     frozen=True,
@@ -161,6 +246,8 @@ class PrimaryScoringRuleArtifact(
     victory_points: int
     cap: None
     condition: str
+    resolution_mode: str
+    resolution_group_id: str | None
 
 
 class PrimaryMissionScoringArtifact(
@@ -172,7 +259,7 @@ class PrimaryMissionScoringArtifact(
     mission_name: str
     engine_support_status: str
     scoring_kind: str
-    max_vp_per_turn: None
+    max_vp_per_turn: int
     vp_per_controlled_objective: None
     scoring_rules: tuple[PrimaryScoringRuleArtifact, ...]
 
@@ -206,6 +293,7 @@ class EventCompanionPrimaryScoringArtifact(
     authoritative_source: AuthoritativeScoringSourceArtifact
     secondary_corroborations: tuple[SecondaryScoringCorroborationArtifact, ...]
     layout_source_boundary: LayoutSourceBoundaryArtifact
+    scoring_limit_source: EventCompanionScoringLimitSourceArtifact
     primary_missions: tuple[PrimaryMissionScoringArtifact, ...]
     source_only_primary_actions: tuple[PrimaryMissionActionSourceArtifact, ...]
     package_hash: str
@@ -222,7 +310,13 @@ class EventCompanionPrimaryScoringArtifact(
         _validate_authoritative_source(self.authoritative_source)
         _validate_secondary_corroborations(self.secondary_corroborations)
         _validate_layout_source_boundary(self.layout_source_boundary)
-        _validate_primary_missions(self.primary_missions)
+        _validate_scoring_limit_source(self.scoring_limit_source)
+        _validate_primary_missions(
+            self.primary_missions,
+            primary_max_vp_per_battle_round=(
+                self.scoring_limit_source.primary_max_vp_per_battle_round
+            ),
+        )
         _validate_source_only_primary_actions(
             self.source_only_primary_actions,
             primary_mission_ids=frozenset(
@@ -369,7 +463,32 @@ def _validate_layout_source_boundary(source: LayoutSourceBoundaryArtifact) -> No
         )
 
 
-def _validate_primary_missions(missions: tuple[PrimaryMissionScoringArtifact, ...]) -> None:
+def _validate_scoring_limit_source(source: EventCompanionScoringLimitSourceArtifact) -> None:
+    if (
+        source.source_pdf_filename,
+        source.source_pdf_sha256,
+        source.source_pages,
+        source.authority_scope,
+        source.primary_max_vp_per_battle_round,
+        source.end_of_battle_primary_vp_exempt,
+    ) != (
+        "eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf",
+        "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20",
+        (2, 4),
+        "primary_battle_round_vp_cap_and_end_of_battle_exemption",
+        15,
+        True,
+    ):
+        raise EventCompanionPrimaryScoringArtifactError(
+            "Event Companion Primary scoring-limit provenance drifted."
+        )
+
+
+def _validate_primary_missions(
+    missions: tuple[PrimaryMissionScoringArtifact, ...],
+    *,
+    primary_max_vp_per_battle_round: int,
+) -> None:
     mission_ids = tuple(mission.primary_mission_id for mission in missions)
     if mission_ids != _EXPECTED_PRIMARY_MISSION_IDS:
         raise EventCompanionPrimaryScoringArtifactError(
@@ -381,10 +500,16 @@ def _validate_primary_missions(missions: tuple[PrimaryMissionScoringArtifact, ..
     )
     seen_rule_ids: set[str] = set()
     canonical_text_missions: set[str] = set()
+    grouped_rules: dict[str, list[tuple[str, PrimaryScoringRuleArtifact]]] = {}
     total_rule_count = 0
     for mission in missions:
         identifiers("primary_mission_id", mission.primary_mission_id)
         _validate_canonical_text("mission_name", mission.mission_name)
+        if mission.max_vp_per_turn != primary_max_vp_per_battle_round:
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion Primary missions must use the source-backed 15VP "
+                "per-battle-round cap."
+            )
         expected_scoring_kind = _EXPECTED_ENGINE_IMPLEMENTED_SCORING_KINDS.get(
             mission.primary_mission_id
         )
@@ -408,6 +533,10 @@ def _validate_primary_missions(missions: tuple[PrimaryMissionScoringArtifact, ..
         total_rule_count += len(mission.scoring_rules)
         for rule in mission.scoring_rules:
             _validate_primary_scoring_rule(rule, identifiers=identifiers)
+            if rule.resolution_group_id is not None:
+                grouped_rules.setdefault(rule.resolution_group_id, []).append(
+                    (mission.primary_mission_id, rule)
+                )
             if rule.rule_id in seen_rule_ids:
                 raise EventCompanionPrimaryScoringArtifactError(
                     "Event Companion primary-scoring rule IDs must be globally unique."
@@ -438,6 +567,7 @@ def _validate_primary_missions(missions: tuple[PrimaryMissionScoringArtifact, ..
         raise EventCompanionPrimaryScoringArtifactError(
             "Event Companion primary-scoring verbatim-text scope drifted."
         )
+    _validate_resolution_groups(grouped_rules)
 
 
 def _validate_primary_scoring_rule(
@@ -447,6 +577,10 @@ def _validate_primary_scoring_rule(
 ) -> None:
     identifiers("rule_id", rule.rule_id)
     identifiers("timing", rule.timing)
+    if rule.timing not in _EXPECTED_TIMINGS:
+        raise EventCompanionPrimaryScoringArtifactError(
+            "Event Companion primary-scoring timing grammar is unsupported."
+        )
     identifiers("condition", rule.condition)
     if rule.source_kind != "primary":
         raise EventCompanionPrimaryScoringArtifactError(
@@ -455,6 +589,45 @@ def _validate_primary_scoring_rule(
     if type(rule.victory_points) is not int or rule.victory_points <= 0:
         raise EventCompanionPrimaryScoringArtifactError(
             "Event Companion primary-scoring victory_points must be a positive integer."
+        )
+    if rule.resolution_mode == "independent":
+        if rule.resolution_group_id is not None:
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Independent Event Companion scoring rules cannot declare a resolution group."
+            )
+        return
+    if rule.resolution_mode not in {"cumulative", "exclusive_highest"}:
+        raise EventCompanionPrimaryScoringArtifactError(
+            "Event Companion primary-scoring resolution mode is unsupported."
+        )
+    identifiers("resolution_group_id", rule.resolution_group_id)
+
+
+def _validate_resolution_groups(
+    grouped_rules: dict[str, list[tuple[str, PrimaryScoringRuleArtifact]]],
+) -> None:
+    actual: dict[str, tuple[str, tuple[str, ...]]] = {}
+    for group_id, entries in grouped_rules.items():
+        if len(entries) < 2:
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion primary-scoring resolution groups require at least two rules."
+            )
+        mission_ids = {mission_id for mission_id, _rule in entries}
+        timings = {rule.timing for _mission_id, rule in entries}
+        source_kinds = {rule.source_kind for _mission_id, rule in entries}
+        modes = {rule.resolution_mode for _mission_id, rule in entries}
+        if any(len(values) != 1 for values in (mission_ids, timings, source_kinds, modes)):
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion primary-scoring resolution groups must share mission, timing, "
+                "source kind, and mode."
+            )
+        actual[group_id] = (
+            entries[0][1].resolution_mode,
+            tuple(rule.rule_id for _mission_id, rule in entries),
+        )
+    if actual != _EXPECTED_RESOLUTION_GROUPS:
+        raise EventCompanionPrimaryScoringArtifactError(
+            "Event Companion primary-scoring resolution grammar drifted."
         )
 
 
@@ -561,6 +734,7 @@ __all__ = (
     "PRIMARY_SCORING_PACKAGE_HASH",
     "EventCompanionPrimaryScoringArtifact",
     "EventCompanionPrimaryScoringArtifactError",
+    "EventCompanionScoringLimitSourceArtifact",
     "PrimaryMissionActionSourceArtifact",
     "PrimaryMissionScoringArtifact",
     "PrimaryScoringRuleArtifact",

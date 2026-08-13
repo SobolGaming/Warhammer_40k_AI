@@ -102,6 +102,9 @@ def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> N
     decoded = cast(MissionPackDefinitionPayload, json.loads(encoded))
 
     assert mission_pack.mission_pack_id == "11e-warhammer-event-companion-2026-07"
+    assert source_package.source_commit_or_import_hash == (
+        "aa272b8234ca02b2ac5b62b2bc7299998d14a386e4e9a5f9b90aaaf4ed5422a3"
+    )
     assert source_package.to_payload() == {
         "edition_id": "warhammer_40000_11th",
         "mission_pack_id": "11e-warhammer-event-companion-2026-07",
@@ -350,12 +353,98 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
     assert artifact.layout_source_boundary.source_pages == tuple(range(9, 54))
     assert artifact.layout_source_boundary.authority_scope == ("battlefield_and_layout_facts_only")
     assert not artifact.layout_source_boundary.contains_primary_mission_card_scoring_clauses
+    assert artifact.scoring_limit_source.source_pdf_filename == (
+        "eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf"
+    )
+    assert artifact.scoring_limit_source.source_pdf_sha256 == (
+        "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20"
+    )
+    assert artifact.scoring_limit_source.source_pages == (2, 4)
+    assert artifact.scoring_limit_source.primary_max_vp_per_battle_round == 15
+    assert artifact.scoring_limit_source.end_of_battle_primary_vp_exempt
     assert len(artifact.primary_missions) == 25
+    assert {mission.max_vp_per_turn for mission in artifact.primary_missions} == {15}
     assert sum(len(mission.scoring_rules) for mission in artifact.primary_missions) == 100
     assert len(artifact.source_only_primary_actions) == 10
     assert Counter(
         mission.engine_support_status for mission in artifact.primary_missions
-    ) == Counter({"engine_implemented": 4, "source_known_engine_pending": 21})
+    ) == Counter({"engine_implemented": 12, "source_known_engine_pending": 13})
+    all_scoring_rules = tuple(
+        rule for mission in artifact.primary_missions for rule in mission.scoring_rules
+    )
+    assert {rule.timing for rule in all_scoring_rules} == {
+        "battle_round_four_onwards_turn_end",
+        "battle_rounds_two_and_three_command_phase",
+        "command_phase",
+        "command_phase_or_round_five_turn_end",
+        "end_of_battle",
+        "first_and_second_battle_round_turn_end",
+        "first_battle_round_turn_end",
+        "turn_end",
+        "turn_end_from_battle_round_two",
+    }
+    assert Counter(rule.resolution_mode for rule in all_scoring_rules) == Counter(
+        {"independent": 86, "cumulative": 10, "exclusive_highest": 4}
+    )
+    assert {
+        mission.primary_mission_id
+        for mission in artifact.primary_missions
+        if mission.engine_support_status == "engine_implemented"
+    } == {
+        "primary-battlefield-dominance",
+        "primary-death-trap",
+        "primary-delaying-action",
+        "primary-destroyers-wrath",
+        "primary-determined-acquisition",
+        "primary-immovable-object",
+        "primary-inescapable-dominion",
+        "primary-meatgrinder",
+        "primary-outmaneuver",
+        "primary-reconnaissance-sweep",
+        "primary-search-and-scour",
+        "primary-unstoppable-force",
+    }
+    grouped_rule_ids: dict[str, tuple[str, ...]] = {}
+    for group_id in sorted(
+        {
+            rule.resolution_group_id
+            for rule in all_scoring_rules
+            if rule.resolution_group_id is not None
+        }
+    ):
+        grouped_rule_ids[group_id] = tuple(
+            rule.rule_id for rule in all_scoring_rules if rule.resolution_group_id == group_id
+        )
+    assert grouped_rule_ids == {
+        "battlefield-dominance-command-primary": (
+            "battlefield-dominance-each-objective",
+            "battlefield-dominance-home-controlled-non-home-bonus",
+        ),
+        "determined-acquisition-command-primary": (
+            "determined-acquisition-each-objective",
+            "determined-acquisition-opponent-territory-bonus",
+        ),
+        "purge-and-secure-destruction-primary": (
+            "purge-and-secure-destroyed-by-objective-unit-turn-end",
+            "purge-and-secure-started-objective-destroyed-turn-end",
+        ),
+        "reconnaissance-sweep-quarters-primary": (
+            "reconnaissance-sweep-three-quarters-turn-end",
+            "reconnaissance-sweep-four-quarters-turn-end",
+        ),
+        "sabotage-turn-end-primary": (
+            "sabotage-each-unit-turn-end",
+            "sabotage-opponent-territory-bonus-turn-end",
+        ),
+        "vital-link-command-primary": (
+            "vital-link-objective-control",
+            "vital-link-central-objective-bonus",
+        ),
+        "vital-link-turn-end-primary": (
+            "vital-link-central-objective-turn-end",
+            "vital-link-operation-marker-central-bonus-turn-end",
+        ),
+    }
 
     artifact_missions = {
         mission.primary_mission_id: mission for mission in artifact.primary_missions
@@ -382,6 +471,7 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
         runtime_row = runtime_rows[mission_id]
         assert runtime_row.name == artifact_mission.mission_name
         assert runtime_row.scoring_kind == artifact_mission.scoring_kind
+        assert runtime_row.max_vp_per_turn == artifact_mission.max_vp_per_turn == 15
         assert tuple(rule.to_payload() for rule in runtime_row.scoring_rules) == tuple(
             {
                 "rule_id": rule.rule_id,
@@ -390,6 +480,8 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
                 "victory_points": rule.victory_points,
                 "cap": rule.cap,
                 "condition": rule.condition,
+                "resolution_mode": rule.resolution_mode,
+                "resolution_group_id": rule.resolution_group_id,
             }
             for rule in artifact_mission.scoring_rules
         )
@@ -406,6 +498,54 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
     with pytest.raises(ValueError, match="artifact is invalid"):
         event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
             json.dumps(unknown_field_payload).encode()
+        )
+
+    missing_resolution_payload = json.loads(raw)
+    del missing_resolution_payload["primary_missions"][0]["scoring_rules"][0]["resolution_mode"]
+    with pytest.raises(ValueError, match="artifact is invalid"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(missing_resolution_payload).encode()
+        )
+
+    unsupported_timing_payload = json.loads(raw)
+    unsupported_timing_payload["primary_missions"][0]["scoring_rules"][0]["timing"] = (
+        "forged_timing"
+    )
+    with pytest.raises(ValueError, match="timing grammar is unsupported"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(unsupported_timing_payload).encode()
+        )
+
+    scoring_limit_drift_payload = json.loads(raw)
+    scoring_limit_drift_payload["scoring_limit_source"]["primary_max_vp_per_battle_round"] = 16
+    with pytest.raises(ValueError, match="scoring-limit provenance drifted"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(scoring_limit_drift_payload).encode()
+        )
+
+    mission_limit_drift_payload = json.loads(raw)
+    mission_limit_drift_payload["primary_missions"][0]["max_vp_per_turn"] = 16
+    with pytest.raises(ValueError, match="source-backed 15VP per-battle-round cap"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(mission_limit_drift_payload).encode()
+        )
+
+    independent_group_payload = json.loads(raw)
+    independent_group_payload["primary_missions"][0]["scoring_rules"][0]["resolution_group_id"] = (
+        "forged-resolution-group"
+    )
+    with pytest.raises(ValueError, match=r"Independent .* cannot declare a resolution group"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(independent_group_payload).encode()
+        )
+
+    unsupported_resolution_payload = json.loads(raw)
+    unsupported_resolution_payload["primary_missions"][0]["scoring_rules"][0]["resolution_mode"] = (
+        "forged_resolution"
+    )
+    with pytest.raises(ValueError, match="resolution mode is unsupported"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(unsupported_resolution_payload).encode()
         )
 
     stale_hash_payload = json.loads(raw)
@@ -430,10 +570,19 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
         )
 
     promoted_status_payload = json.loads(raw)
-    promoted_status_payload["primary_missions"][0]["engine_support_status"] = "engine_implemented"
+    promoted_status_payload["primary_missions"][1]["engine_support_status"] = "engine_implemented"
     with pytest.raises(ValueError, match="engine support truth drifted"):
         event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
             json.dumps(promoted_status_payload).encode()
+        )
+
+    grammar_drift_payload = json.loads(raw)
+    grammar_drift_payload["primary_missions"][0]["scoring_rules"][1]["resolution_group_id"] = (
+        "forged-resolution-group"
+    )
+    with pytest.raises(ValueError, match="resolution group"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(grammar_drift_payload).encode()
         )
 
     promoted_action_payload = json.loads(raw)
@@ -3762,8 +3911,8 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
 
     assert len(coverage_rows) == 25
     assert status_counts == {
-        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 4,
-        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 21,
+        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 12,
+        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 13,
         event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 0,
     }
     assert {
@@ -3771,6 +3920,26 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         for row in coverage_rows.values()
         if row.status is event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE
     } == set()
+    assert {
+        row.primary_mission_id
+        for row in coverage_rows.values()
+        if row.status
+        is event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
+    } == {
+        "primary-consecrate",
+        "primary-extract-relic",
+        "primary-gather-intel",
+        "primary-locate-and-deny",
+        "primary-punishment",
+        "primary-purge-and-secure",
+        "primary-sabotage",
+        "primary-secure-asset",
+        "primary-smoke-and-mirrors",
+        "primary-surveil-the-foe",
+        "primary-triangulation",
+        "primary-vanguard-operation",
+        "primary-vital-link",
+    }
     assert {
         mission_id: len(primary_rows[mission_id].scoring_rules)
         for mission_id in (
@@ -3824,9 +3993,7 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         "primary-vital-link": 5,
     }
     assert primary_rows["primary-meatgrinder"].scoring_kind == ("meatgrinder")
-    assert primary_rows["primary-battlefield-dominance"].scoring_kind == (
-        "event_companion_primary_source_known_engine_pending"
-    )
+    assert primary_rows["primary-battlefield-dominance"].scoring_kind == ("battlefield_dominance")
     assert coverage_rows["primary-unstoppable-force"].needed_work == ()
     assert coverage_rows["primary-meatgrinder"].needed_work == ()
     assert coverage_rows["primary-death-trap"].mission_action_count == 1
@@ -3848,27 +4015,23 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     assert "engine_primary_action:surveil-enemy-unit" in (
         coverage_rows["primary-surveil-the-foe"].needed_work
     )
-    assert "engine_primary_scoring_grammar:cumulative_condition" in (
-        coverage_rows["primary-battlefield-dominance"].needed_work
-    )
+    for implemented_mission_id in (
+        "primary-battlefield-dominance",
+        "primary-delaying-action",
+        "primary-destroyers-wrath",
+        "primary-determined-acquisition",
+        "primary-inescapable-dominion",
+        "primary-outmaneuver",
+        "primary-reconnaissance-sweep",
+        "primary-search-and-scour",
+    ):
+        assert coverage_rows[implemented_mission_id].needed_work == ()
     assert "engine_primary_action:maintain-control" in (
         coverage_rows["primary-vital-link"].needed_work
-    )
-    assert "source_objective_role:expansion_objective" in (
-        coverage_rows["primary-delaying-action"].needed_work
-    )
-    assert coverage_rows["primary-destroyers-wrath"].needed_work == (
-        "engine_primary_condition:control_more_objectives_than_opponent",
     )
     assert coverage_rows["primary-punishment"].needed_work == (
         "engine_primary_start_turn_choice:condemned_enemy_units",
         "engine_primary_condition:condemned_enemy_units_left_battlefield",
-        "engine_primary_condition:control_more_objectives_than_opponent",
-        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
-    )
-    assert coverage_rows["primary-inescapable-dominion"].needed_work == (
-        "engine_primary_condition:control_three_or_more_objectives",
-        "engine_primary_condition:control_two_or_more_objectives_from_battle_round_two",
         "engine_primary_condition:control_more_objectives_than_opponent",
         "engine_primary_condition:control_opponent_home_objective_end_of_battle",
     )
@@ -3998,16 +4161,21 @@ def test_phase17j_source_known_engine_pending_primary_scoring_fails_on_primary_p
 
     policies = mission_scoring_policies_from_setup(setup)
 
-    assert all(not policy.primary_scoring_supported for policy in policies.player_policies)
-    for policy in policies.player_policies:
-        with pytest.raises(
-            GameLifecycleError,
-            match="Primary mission scoring source is known but engine implementation is pending",
-        ):
-            policy.cap_bucket_for_victory_point_source(
-                source_kind=VictoryPointSourceKind.PRIMARY,
-                source_id=policy.primary_mission_id,
-            )
+    attacker_policy = policies.policy_for_player("player-alpha")
+    defender_policy = policies.policy_for_player("player-beta")
+
+    assert attacker_policy.primary_mission_id == "primary-punishment"
+    assert not attacker_policy.primary_scoring_supported
+    assert defender_policy.primary_mission_id == "primary-delaying-action"
+    assert defender_policy.primary_scoring_supported
+    with pytest.raises(
+        GameLifecycleError,
+        match="Primary mission scoring source is known but engine implementation is pending",
+    ):
+        attacker_policy.cap_bucket_for_victory_point_source(
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            source_id=attacker_policy.primary_mission_id,
+        )
 
 
 def test_phase17j_event_pack_resolves_scoring_and_tactical_draw_by_pack_id() -> None:

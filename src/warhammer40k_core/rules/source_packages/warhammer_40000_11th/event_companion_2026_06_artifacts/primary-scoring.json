@@ -1,5 +1,5 @@
 {
-  "artifact_schema": "core-v2-phase17n-event-companion-primary-scoring-v2",
+  "artifact_schema": "core-v2-phase17n-event-companion-primary-scoring-v4",
   "source_package_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
   "authoritative_source": {
     "source_kind": "project_owner_supplied_official_source_transcription",
@@ -92,13 +92,24 @@
     "authority_scope": "battlefield_and_layout_facts_only",
     "contains_primary_mission_card_scoring_clauses": false
   },
+  "scoring_limit_source": {
+    "source_pdf_filename": "eng_22-07_warhammer40000_event_companion-alyapl19us-b2drgwkji4.pdf",
+    "source_pdf_sha256": "97ae5591be2e58bdb636e97127eac0877f9bf28b29fc607ed4ead4d377fb8f20",
+    "source_pages": [
+      2,
+      4
+    ],
+    "authority_scope": "primary_battle_round_vp_cap_and_end_of_battle_exemption",
+    "primary_max_vp_per_battle_round": 15,
+    "end_of_battle_primary_vp_exempt": true
+  },
   "primary_missions": [
     {
       "primary_mission_id": "primary-battlefield-dominance",
       "mission_name": "Battlefield Dominance",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "battlefield_dominance",
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -110,7 +121,9 @@
           "source_kind": "primary",
           "victory_points": 2,
           "cap": null,
-          "condition": "control_more_objectives_than_opponent_first_and_second_battle_round"
+          "condition": "control_more_objectives_than_opponent_first_and_second_battle_round",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "battlefield-dominance-each-objective",
@@ -121,7 +134,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "each_objective_controlled_from_battle_round_two"
+          "condition": "each_objective_controlled_from_battle_round_two",
+          "resolution_mode": "cumulative",
+          "resolution_group_id": "battlefield-dominance-command-primary"
         },
         {
           "rule_id": "battlefield-dominance-home-controlled-non-home-bonus",
@@ -132,7 +147,9 @@
           "source_kind": "primary",
           "victory_points": 2,
           "cap": null,
-          "condition": "each_non_home_objective_controlled_if_home_objective_controlled"
+          "condition": "each_non_home_objective_controlled_if_home_objective_controlled",
+          "resolution_mode": "cumulative",
+          "resolution_group_id": "battlefield-dominance-command-primary"
         }
       ]
     },
@@ -141,7 +158,7 @@
       "mission_name": "Consecrate",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -153,7 +170,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "one_or_two_objectives_consecrated"
+          "condition": "one_or_two_objectives_consecrated",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "consecrate-three-or-more-objectives",
@@ -164,7 +183,9 @@
           "source_kind": "primary",
           "victory_points": 6,
           "cap": null,
-          "condition": "three_or_more_objectives_consecrated"
+          "condition": "three_or_more_objectives_consecrated",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "consecrate-objective-control",
@@ -175,7 +196,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "consecrate-control-more-objectives",
@@ -186,7 +209,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_more_objectives_than_opponent_from_battle_round_two"
+          "condition": "control_more_objectives_than_opponent_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "consecrate-enemy-home-end-battle",
@@ -197,7 +222,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "enemy_home_objective_consecrated_end_of_battle"
+          "condition": "enemy_home_objective_consecrated_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -206,7 +233,7 @@
       "mission_name": "Death Trap",
       "engine_support_status": "engine_implemented",
       "scoring_kind": "death_trap",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -218,7 +245,9 @@
           "source_kind": "primary",
           "victory_points": 2,
           "cap": null,
-          "condition": "each_terrain_area_trapped_this_turn"
+          "condition": "each_terrain_area_trapped_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "death-trap-objective-terrain-bonus-turn-end",
@@ -229,7 +258,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "each_trapped_objective_terrain_area_this_turn"
+          "condition": "each_trapped_objective_terrain_area_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "death-trap-destroyed-in-trapped-terrain-turn-end",
@@ -240,7 +271,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "one_or_more_enemy_units_destroyed_after_starting_turn_in_trapped_terrain"
+          "condition": "one_or_more_enemy_units_destroyed_after_starting_turn_in_trapped_terrain",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "death-trap-objective-control",
@@ -251,16 +284,18 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
     {
       "primary_mission_id": "primary-delaying-action",
       "mission_name": "Delaying Action",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "delaying_action",
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -272,7 +307,9 @@
           "source_kind": "primary",
           "victory_points": 2,
           "cap": null,
-          "condition": "each_enemy_unit_destroyed_this_turn"
+          "condition": "each_enemy_unit_destroyed_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "delaying-action-objective-control",
@@ -283,7 +320,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "delaying-action-central-expansion-turn-end",
@@ -294,16 +333,18 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "control_central_and_expansion_objectives"
+          "condition": "control_central_and_expansion_objectives",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
     {
       "primary_mission_id": "primary-destroyers-wrath",
       "mission_name": "Destroyer's Wrath",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "destroyers_wrath",
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -315,7 +356,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "one_or_more_enemy_units_destroyed_this_turn"
+          "condition": "one_or_more_enemy_units_destroyed_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "destroyers-wrath-objective-control",
@@ -326,7 +369,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "destroyers-wrath-control-more-objectives",
@@ -337,7 +382,9 @@
           "source_kind": "primary",
           "victory_points": 6,
           "cap": null,
-          "condition": "control_more_objectives_than_opponent_from_battle_round_two"
+          "condition": "control_more_objectives_than_opponent_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "destroyers-wrath-more-destroyed-turn-end",
@@ -348,16 +395,18 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "more_enemy_units_destroyed_than_friendly_previous_turn"
+          "condition": "more_enemy_units_destroyed_than_friendly_previous_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
     {
       "primary_mission_id": "primary-determined-acquisition",
       "mission_name": "Determined Acquisition",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "determined_acquisition",
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -369,7 +418,9 @@
           "source_kind": "primary",
           "victory_points": 2,
           "cap": null,
-          "condition": "each_newly_controlled_non_home_objective_this_turn"
+          "condition": "each_newly_controlled_non_home_objective_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "determined-acquisition-each-objective",
@@ -380,7 +431,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "each_objective_controlled_from_battle_round_two"
+          "condition": "each_objective_controlled_from_battle_round_two",
+          "resolution_mode": "cumulative",
+          "resolution_group_id": "determined-acquisition-command-primary"
         },
         {
           "rule_id": "determined-acquisition-opponent-territory-bonus",
@@ -391,7 +444,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "each_controlled_objective_in_opponent_territory"
+          "condition": "each_controlled_objective_in_opponent_territory",
+          "resolution_mode": "cumulative",
+          "resolution_group_id": "determined-acquisition-command-primary"
         }
       ]
     },
@@ -400,7 +455,7 @@
       "mission_name": "Extract Relic",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -412,7 +467,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "friendly_unit_performed_sensor_sweep_this_turn"
+          "condition": "friendly_unit_performed_sensor_sweep_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "extract-relic-started-objective-destroyed-turn-end",
@@ -423,7 +480,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn"
+          "condition": "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "extract-relic-one-opponent-marker-turn-end",
@@ -434,7 +493,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "only_one_opponent_operation_marker_remains_with_friendly_unit_and_no_enemy_in_terrain_area"
+          "condition": "only_one_opponent_operation_marker_remains_with_friendly_unit_and_no_enemy_in_terrain_area",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "extract-relic-objective-control",
@@ -445,7 +506,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "extract-relic-one-opponent-marker-end-battle",
@@ -456,7 +519,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "only_one_opponent_operation_marker_remains_with_friendly_unit_and_no_enemy_in_terrain_area_end_of_battle"
+          "condition": "only_one_opponent_operation_marker_remains_with_friendly_unit_and_no_enemy_in_terrain_area_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -465,7 +530,7 @@
       "mission_name": "Gather Intel",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -477,7 +542,9 @@
           "source_kind": "primary",
           "victory_points": 6,
           "cap": null,
-          "condition": "control_one_or_more_central_objectives_first_battle_round"
+          "condition": "control_one_or_more_central_objectives_first_battle_round",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "gather-intel-objective-control",
@@ -488,7 +555,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "gather-intel-extracted-intelligence-turn-end",
@@ -499,7 +568,9 @@
           "source_kind": "primary",
           "victory_points": 7,
           "cap": null,
-          "condition": "each_friendly_unit_extracted_intelligence_this_turn"
+          "condition": "each_friendly_unit_extracted_intelligence_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "gather-intel-three-markers-end-battle",
@@ -510,7 +581,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "three_or_more_friendly_operation_markers_on_battlefield_end_of_battle"
+          "condition": "three_or_more_friendly_operation_markers_on_battlefield_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "gather-intel-opponent-home-marker-end-battle",
@@ -521,7 +594,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "friendly_operation_marker_within_opponent_home_objective_range_end_of_battle"
+          "condition": "friendly_operation_marker_within_opponent_home_objective_range_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -530,7 +605,7 @@
       "mission_name": "Immovable Object",
       "engine_support_status": "engine_implemented",
       "scoring_kind": "immovable_object",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -542,7 +617,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "control_one_or_more_central_objectives"
+          "condition": "control_one_or_more_central_objectives",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "immovable-object-rounds-two-to-four-command",
@@ -553,7 +630,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "each_non_home_objective_controlled_battle_rounds_two_to_four"
+          "condition": "each_non_home_objective_controlled_battle_rounds_two_to_four",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "immovable-object-round-five-turn-end",
@@ -564,16 +643,18 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "each_non_home_objective_controlled_round_five"
+          "condition": "each_non_home_objective_controlled_round_five",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
     {
       "primary_mission_id": "primary-inescapable-dominion",
       "mission_name": "Inescapable Dominion",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "inescapable_dominion",
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -585,7 +666,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_three_or_more_objectives"
+          "condition": "control_three_or_more_objectives",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "inescapable-dominion-two-objectives",
@@ -596,7 +679,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "control_two_or_more_objectives_from_battle_round_two"
+          "condition": "control_two_or_more_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "inescapable-dominion-control-more",
@@ -607,7 +692,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_more_objectives_than_opponent_from_battle_round_two"
+          "condition": "control_more_objectives_than_opponent_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "inescapable-dominion-opponent-home-end-battle",
@@ -618,7 +705,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "control_opponent_home_objective_end_of_battle"
+          "condition": "control_opponent_home_objective_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -627,7 +716,7 @@
       "mission_name": "Locate and Deny",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -639,7 +728,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn"
+          "condition": "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "locate-and-deny-one-marker-remains-terrain",
@@ -650,7 +741,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "only_one_friendly_operation_marker_remains_with_friendly_unit_and_no_enemy_in_terrain_area"
+          "condition": "only_one_friendly_operation_marker_remains_with_friendly_unit_and_no_enemy_in_terrain_area",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "locate-and-deny-objective-control",
@@ -661,7 +754,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "locate-and-deny-one-marker-end-battle",
@@ -672,7 +767,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "only_one_friendly_operation_marker_remains_with_friendly_unit_and_no_enemy_in_terrain_area_end_of_battle"
+          "condition": "only_one_friendly_operation_marker_remains_with_friendly_unit_and_no_enemy_in_terrain_area_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -681,7 +778,7 @@
       "mission_name": "Meatgrinder",
       "engine_support_status": "engine_implemented",
       "scoring_kind": "meatgrinder",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -693,7 +790,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "one_or_more_enemy_units_destroyed_this_turn"
+          "condition": "one_or_more_enemy_units_destroyed_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "meatgrinder-objective-control",
@@ -704,7 +803,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "meatgrinder-more-destroyed-turn-end",
@@ -715,7 +816,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "more_enemy_units_destroyed_than_friendly_previous_turn"
+          "condition": "more_enemy_units_destroyed_than_friendly_previous_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "meatgrinder-opponent-home-turn-end",
@@ -726,16 +829,18 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "control_opponent_home_objective"
+          "condition": "control_opponent_home_objective",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
     {
       "primary_mission_id": "primary-outmaneuver",
       "mission_name": "Outmanoeuvre",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "outmaneuver",
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -747,7 +852,9 @@
           "source_kind": "primary",
           "victory_points": 10,
           "cap": null,
-          "condition": "control_enemy_home_objective"
+          "condition": "control_enemy_home_objective",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "outmaneuver-first-round-objectives",
@@ -758,7 +865,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "each_non_home_objective_controlled_first_battle_round"
+          "condition": "each_non_home_objective_controlled_first_battle_round",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "outmaneuver-rounds-two-three-objectives",
@@ -769,7 +878,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "each_non_home_objective_controlled_battle_rounds_two_and_three"
+          "condition": "each_non_home_objective_controlled_battle_rounds_two_and_three",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "outmaneuver-round-four-onwards-objectives",
@@ -780,7 +891,9 @@
           "source_kind": "primary",
           "victory_points": 6,
           "cap": null,
-          "condition": "each_non_home_objective_controlled_battle_round_four_onwards"
+          "condition": "each_non_home_objective_controlled_battle_round_four_onwards",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -789,7 +902,7 @@
       "mission_name": "Punishment",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -801,7 +914,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "one_or_more_condemned_enemy_units_left_battlefield_this_turn"
+          "condition": "one_or_more_condemned_enemy_units_left_battlefield_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "punishment-objective-control",
@@ -812,7 +927,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "punishment-control-more-objectives",
@@ -823,7 +940,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "control_more_objectives_than_opponent_from_battle_round_two"
+          "condition": "control_more_objectives_than_opponent_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "punishment-opponent-home-end-battle",
@@ -834,7 +953,9 @@
           "source_kind": "primary",
           "victory_points": 8,
           "cap": null,
-          "condition": "control_opponent_home_objective_end_of_battle"
+          "condition": "control_opponent_home_objective_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -843,7 +964,7 @@
       "mission_name": "Purge and Secure",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -855,7 +976,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "one_or_more_enemy_units_destroyed_by_friendly_unit_on_objective_this_turn"
+          "condition": "one_or_more_enemy_units_destroyed_by_friendly_unit_on_objective_this_turn",
+          "resolution_mode": "exclusive_highest",
+          "resolution_group_id": "purge-and-secure-destruction-primary"
         },
         {
           "rule_id": "purge-and-secure-started-objective-destroyed-turn-end",
@@ -866,7 +989,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn"
+          "condition": "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn",
+          "resolution_mode": "exclusive_highest",
+          "resolution_group_id": "purge-and-secure-destruction-primary"
         },
         {
           "rule_id": "purge-and-secure-each-objective",
@@ -877,7 +1002,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "each_non_home_objective_controlled_from_battle_round_two"
+          "condition": "each_non_home_objective_controlled_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "purge-and-secure-new-objective-turn-end",
@@ -888,16 +1015,18 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "control_one_or_more_new_non_home_objectives"
+          "condition": "control_one_or_more_new_non_home_objectives",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
     {
       "primary_mission_id": "primary-reconnaissance-sweep",
       "mission_name": "Reconnaissance Sweep",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "reconnaissance_sweep",
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -909,7 +1038,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "three_or_more_friendly_units_wholly_within_three_different_table_quarters_not_within_six_of_center"
+          "condition": "three_or_more_friendly_units_wholly_within_three_different_table_quarters_not_within_six_of_center",
+          "resolution_mode": "exclusive_highest",
+          "resolution_group_id": "reconnaissance-sweep-quarters-primary"
         },
         {
           "rule_id": "reconnaissance-sweep-four-quarters-turn-end",
@@ -920,7 +1051,9 @@
           "source_kind": "primary",
           "victory_points": 6,
           "cap": null,
-          "condition": "four_or_more_friendly_units_wholly_within_four_different_table_quarters_not_within_six_of_center"
+          "condition": "four_or_more_friendly_units_wholly_within_four_different_table_quarters_not_within_six_of_center",
+          "resolution_mode": "exclusive_highest",
+          "resolution_group_id": "reconnaissance-sweep-quarters-primary"
         },
         {
           "rule_id": "reconnaissance-sweep-enemy-destroyed-turn-end",
@@ -931,7 +1064,9 @@
           "source_kind": "primary",
           "victory_points": 1,
           "cap": null,
-          "condition": "each_enemy_unit_destroyed_this_turn"
+          "condition": "each_enemy_unit_destroyed_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "reconnaissance-sweep-objective-control",
@@ -942,7 +1077,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -951,7 +1088,7 @@
       "mission_name": "Sabotage",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -963,7 +1100,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "each_friendly_unit_committed_sabotage_this_turn"
+          "condition": "each_friendly_unit_committed_sabotage_this_turn",
+          "resolution_mode": "cumulative",
+          "resolution_group_id": "sabotage-turn-end-primary"
         },
         {
           "rule_id": "sabotage-opponent-territory-bonus-turn-end",
@@ -974,7 +1113,9 @@
           "source_kind": "primary",
           "victory_points": 2,
           "cap": null,
-          "condition": "each_sabotage_unit_within_objective_range_in_opponent_territory_this_turn"
+          "condition": "each_sabotage_unit_within_objective_range_in_opponent_territory_this_turn",
+          "resolution_mode": "cumulative",
+          "resolution_group_id": "sabotage-turn-end-primary"
         },
         {
           "rule_id": "sabotage-objective-control",
@@ -985,16 +1126,18 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
     {
       "primary_mission_id": "primary-search-and-scour",
       "mission_name": "Search and Scour",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "search_and_scour",
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -1006,7 +1149,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "control_one_or_more_central_objectives"
+          "condition": "control_one_or_more_central_objectives",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "search-and-scour-enemy-terrain-destroyed-turn-end",
@@ -1017,7 +1162,9 @@
           "source_kind": "primary",
           "victory_points": 2,
           "cap": null,
-          "condition": "one_or_more_enemy_units_started_turn_in_terrain_area_destroyed_this_turn"
+          "condition": "one_or_more_enemy_units_started_turn_in_terrain_area_destroyed_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "search-and-scour-objective-control",
@@ -1028,7 +1175,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "each_non_home_objective_controlled_from_battle_round_two"
+          "condition": "each_non_home_objective_controlled_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "search-and-scour-no-enemy-in-territory-end-battle",
@@ -1039,7 +1188,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "no_enemy_units_wholly_within_own_territory_end_of_battle"
+          "condition": "no_enemy_units_wholly_within_own_territory_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -1048,7 +1199,7 @@
       "mission_name": "Secure Asset",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -1060,7 +1211,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "friendly_unit_secured_asset_this_turn"
+          "condition": "friendly_unit_secured_asset_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "secure-asset-central-objective-enemy-destroyed",
@@ -1071,7 +1224,9 @@
           "source_kind": "primary",
           "victory_points": 2,
           "cap": null,
-          "condition": "one_or_more_enemy_units_started_turn_within_central_objective_range_destroyed_this_turn"
+          "condition": "one_or_more_enemy_units_started_turn_within_central_objective_range_destroyed_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "secure-asset-objective-control",
@@ -1082,7 +1237,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "secure-asset-three-objectives",
@@ -1093,7 +1250,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_three_or_more_objectives_from_battle_round_two"
+          "condition": "control_three_or_more_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -1102,7 +1261,7 @@
       "mission_name": "Smoke and Mirrors",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -1114,7 +1273,9 @@
           "source_kind": "primary",
           "victory_points": 2,
           "cap": null,
-          "condition": "each_decoy_objective"
+          "condition": "each_decoy_objective",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "smoke-and-mirrors-opponent-territory-decoy-bonus",
@@ -1125,7 +1286,9 @@
           "source_kind": "primary",
           "victory_points": 2,
           "cap": null,
-          "condition": "each_decoy_objective_in_opponent_territory_bonus"
+          "condition": "each_decoy_objective_in_opponent_territory_bonus",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "smoke-and-mirrors-objective-control",
@@ -1136,7 +1299,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "smoke-and-mirrors-four-decoys-end-battle",
@@ -1147,7 +1312,9 @@
           "source_kind": "primary",
           "victory_points": 10,
           "cap": null,
-          "condition": "four_or_more_decoy_objectives_end_of_battle"
+          "condition": "four_or_more_decoy_objectives_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -1156,7 +1323,7 @@
       "mission_name": "Surveil the Foe",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -1168,7 +1335,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "one_or_more_enemy_units_surveilled_this_turn_unless_all_within_range_of_objectives_with_operation_markers"
+          "condition": "one_or_more_enemy_units_surveilled_this_turn_unless_all_within_range_of_objectives_with_operation_markers",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "surveil-the-foe-objective-control",
@@ -1179,7 +1348,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "surveil-the-foe-control-more-objectives",
@@ -1190,7 +1361,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_more_objectives_than_opponent_from_battle_round_two"
+          "condition": "control_more_objectives_than_opponent_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "surveil-the-foe-no-enemy-operation-markers",
@@ -1201,7 +1374,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "no_enemy_operation_markers_on_battlefield"
+          "condition": "no_enemy_operation_markers_on_battlefield",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -1210,7 +1385,7 @@
       "mission_name": "Triangulation",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -1222,7 +1397,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "triangulation-one-objective",
@@ -1233,7 +1410,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "exactly_one_triangulated_objective"
+          "condition": "exactly_one_triangulated_objective",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "triangulation-two-objectives",
@@ -1244,7 +1423,9 @@
           "source_kind": "primary",
           "victory_points": 6,
           "cap": null,
-          "condition": "exactly_two_triangulated_objectives"
+          "condition": "exactly_two_triangulated_objectives",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "triangulation-three-or-more-objectives",
@@ -1255,7 +1436,9 @@
           "source_kind": "primary",
           "victory_points": 10,
           "cap": null,
-          "condition": "three_or_more_triangulated_objectives"
+          "condition": "three_or_more_triangulated_objectives",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "triangulation-four-objectives-end-battle",
@@ -1266,7 +1449,9 @@
           "source_kind": "primary",
           "victory_points": 10,
           "cap": null,
-          "condition": "control_four_or_more_objectives_end_of_battle"
+          "condition": "control_four_or_more_objectives_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -1275,7 +1460,7 @@
       "mission_name": "Unstoppable Force",
       "engine_support_status": "engine_implemented",
       "scoring_kind": "unstoppable_force",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -1287,7 +1472,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "one_or_more_enemy_units_destroyed_this_turn"
+          "condition": "one_or_more_enemy_units_destroyed_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "unstoppable-force-objectives",
@@ -1298,7 +1485,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "each_non_home_objective_controlled_from_battle_round_two"
+          "condition": "each_non_home_objective_controlled_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "unstoppable-force-new-objective-turn-end",
@@ -1309,7 +1498,9 @@
           "source_kind": "primary",
           "victory_points": 3,
           "cap": null,
-          "condition": "control_one_or_more_new_non_home_objectives"
+          "condition": "control_one_or_more_new_non_home_objectives",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "unstoppable-force-central-end-battle",
@@ -1320,7 +1511,9 @@
           "source_kind": "primary",
           "victory_points": 5,
           "cap": null,
-          "condition": "control_one_or_more_central_objectives_end_of_battle"
+          "condition": "control_one_or_more_central_objectives_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -1329,7 +1522,7 @@
       "mission_name": "Vanguard Operation",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -1341,7 +1534,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "friendly_unit_performed_vanguard_operation_this_turn"
+          "condition": "friendly_unit_performed_vanguard_operation_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "vanguard-operation-enemy-destroyed-turn-end",
@@ -1352,7 +1547,9 @@
           "source_kind": "primary",
           "victory_points": 2,
           "cap": null,
-          "condition": "one_or_more_enemy_units_destroyed_this_turn"
+          "condition": "one_or_more_enemy_units_destroyed_this_turn",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "vanguard-operation-objective-control",
@@ -1363,7 +1560,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         },
         {
           "rule_id": "vanguard-operation-opponent-home-end-battle",
@@ -1374,7 +1573,9 @@
           "source_kind": "primary",
           "victory_points": 10,
           "cap": null,
-          "condition": "control_opponent_home_objective_end_of_battle"
+          "condition": "control_opponent_home_objective_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     },
@@ -1383,7 +1584,7 @@
       "mission_name": "Vital Link",
       "engine_support_status": "source_known_engine_pending",
       "scoring_kind": "event_companion_primary_source_known_engine_pending",
-      "max_vp_per_turn": null,
+      "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
         {
@@ -1395,7 +1596,9 @@
           "source_kind": "primary",
           "victory_points": 2,
           "cap": null,
-          "condition": "control_one_or_more_central_objectives"
+          "condition": "control_one_or_more_central_objectives",
+          "resolution_mode": "cumulative",
+          "resolution_group_id": "vital-link-turn-end-primary"
         },
         {
           "rule_id": "vital-link-operation-marker-central-bonus-turn-end",
@@ -1406,7 +1609,9 @@
           "source_kind": "primary",
           "victory_points": 1,
           "cap": null,
-          "condition": "each_friendly_operation_marker_within_range_of_controlled_central_objective"
+          "condition": "each_friendly_operation_marker_within_range_of_controlled_central_objective",
+          "resolution_mode": "cumulative",
+          "resolution_group_id": "vital-link-turn-end-primary"
         },
         {
           "rule_id": "vital-link-objective-control",
@@ -1417,7 +1622,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two"
+          "condition": "control_one_or_more_non_home_objectives_from_battle_round_two",
+          "resolution_mode": "cumulative",
+          "resolution_group_id": "vital-link-command-primary"
         },
         {
           "rule_id": "vital-link-central-objective-bonus",
@@ -1428,7 +1635,9 @@
           "source_kind": "primary",
           "victory_points": 4,
           "cap": null,
-          "condition": "one_or_more_controlled_non_home_objectives_is_central_objective"
+          "condition": "one_or_more_controlled_non_home_objectives_is_central_objective",
+          "resolution_mode": "cumulative",
+          "resolution_group_id": "vital-link-command-primary"
         },
         {
           "rule_id": "vital-link-opponent-home-end-battle",
@@ -1439,7 +1648,9 @@
           "source_kind": "primary",
           "victory_points": 10,
           "cap": null,
-          "condition": "control_opponent_home_objective_end_of_battle"
+          "condition": "control_opponent_home_objective_end_of_battle",
+          "resolution_mode": "independent",
+          "resolution_group_id": null
         }
       ]
     }
@@ -1586,5 +1797,5 @@
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:vanguard-operation"
     }
   ],
-  "package_hash": "b87dea149c6325bc0553243260065508b8b3d97880172173425d370335b8715e"
+  "package_hash": "5449d260c90c9a5a798dad0fa3dbba0c7c7b56e28e726a94ce6694654cc7afbe"
 }

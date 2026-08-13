@@ -158,6 +158,9 @@ from warhammer40k_core.engine.phases.shooting import (
 from warhammer40k_core.engine.prebattle_records import (
     PreBattleActionRecord,
 )
+from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
+    build_primary_scoring_spatial_evidence,
+)
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryUnitTerrainTurnStartSnapshot,
     current_primary_unit_terrain_membership,
@@ -1990,10 +1993,9 @@ class GameState:
         completed_player_id = self.active_player_id
         if completed_player_id is None:
             raise GameLifecycleError("GameState active player is required during battle.")
-        end_boundary_records = self.determine_current_end_objective_control(
+        phase_end_record = self.determine_current_phase_end_objective_control(
             runtime_modifier_registry=runtime_modifier_registry,
         )
-        phase_end_record = end_boundary_records[0]
         self.expire_persisting_effects_at_boundary(
             EffectExpirationBoundary.phase_end(
                 battle_round=self.battle_round,
@@ -2022,15 +2024,17 @@ class GameState:
             battle_round=self.battle_round,
         )
         self._resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)
+        turn_end_record = self.record_objective_control_boundary(
+            completed_phase=completed_phase,
+            timing=ObjectiveControlTiming.TURN_END,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
         self.expire_persisting_effects_at_boundary(
             EffectExpirationBoundary.turn_end(
                 battle_round=self.battle_round,
                 player_id=completed_player_id,
             )
         )
-        if len(end_boundary_records) != 2:
-            raise GameLifecycleError("Final phase requires phase-end and turn-end control records.")
-        turn_end_record = end_boundary_records[1]
         self._score_objective_control_boundary(turn_end_record)
         if completed_phase is BattlePhase.COMMAND:
             self.command_step_state = None
@@ -2077,12 +2081,12 @@ class GameState:
         self._expire_persisting_effects_at_current_phase_start()
         return completed_phase
 
-    def determine_current_end_objective_control(
+    def determine_current_phase_end_objective_control(
         self,
         *,
         runtime_modifier_registry: RuntimeModifierRegistry | None = None,
-    ) -> tuple[ObjectiveControlRecord, ...]:
-        return _queries.determine_current_end_objective_control(
+    ) -> ObjectiveControlRecord:
+        return _queries.determine_current_phase_end_objective_control(
             state=self,
             runtime_modifier_registry=runtime_modifier_registry,
         )
@@ -5381,6 +5385,22 @@ class GameState:
         if self.mission_setup is None:
             raise GameLifecycleError("Mission scoring requires MissionSetup.")
         policy = mission_scoring_policies_from_setup(self.mission_setup)
+        scoring_player_id = record.active_player_id
+        required_spatial_conditions = policy.policy_for_player(
+            scoring_player_id
+        ).required_primary_spatial_conditions(record=record)
+        spatial_evidence = (
+            (
+                build_primary_scoring_spatial_evidence(
+                    state=self,
+                    player_id=scoring_player_id,
+                    record=record,
+                    requested_condition_ids=required_spatial_conditions,
+                ),
+            )
+            if required_spatial_conditions
+            else ()
+        )
         for award in policy.primary_awards_from_objective_control(
             record=record,
             mission_setup=self.mission_setup,
@@ -5388,6 +5408,7 @@ class GameState:
             turn_start_states=tuple(self.primary_objective_turn_start_states),
             terrain_trap_states=tuple(self.primary_terrain_trap_states),
             unit_destruction_states=tuple(self.primary_unit_destruction_states),
+            spatial_evidence_by_player_id=spatial_evidence,
         ):
             self.award_victory_points(award)
 
@@ -5395,6 +5416,23 @@ class GameState:
         if self.mission_setup is None:
             raise GameLifecycleError("Mission scoring requires MissionSetup.")
         policy = mission_scoring_policies_from_setup(self.mission_setup)
+        scoring_player_ids = tuple(self.player_ids)
+        spatial_evidence = tuple(
+            build_primary_scoring_spatial_evidence(
+                state=self,
+                player_id=player_id,
+                record=record,
+                requested_condition_ids=required_conditions,
+            )
+            for player_id in scoring_player_ids
+            for required_conditions in (
+                policy.policy_for_player(player_id).required_primary_spatial_conditions(
+                    record=record,
+                    end_of_battle=True,
+                ),
+            )
+            if required_conditions
+        )
         for award in policy.primary_awards_from_objective_control(
             record=record,
             mission_setup=self.mission_setup,
@@ -5402,7 +5440,8 @@ class GameState:
             turn_start_states=tuple(self.primary_objective_turn_start_states),
             terrain_trap_states=tuple(self.primary_terrain_trap_states),
             unit_destruction_states=tuple(self.primary_unit_destruction_states),
-            scoring_player_ids=self.player_ids,
+            spatial_evidence_by_player_id=spatial_evidence,
+            scoring_player_ids=scoring_player_ids,
             end_of_battle=True,
         ):
             self.award_victory_points(award)

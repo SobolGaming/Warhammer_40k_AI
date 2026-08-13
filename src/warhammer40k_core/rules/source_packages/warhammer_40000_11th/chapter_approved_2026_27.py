@@ -27,6 +27,8 @@ class SourceScoringRuleRow:
     victory_points: int | None
     cap: int | None
     condition: str
+    resolution_mode: str
+    resolution_group_id: str | None
 
     def to_payload(self) -> dict[str, int | str | None]:
         return {
@@ -36,6 +38,8 @@ class SourceScoringRuleRow:
             "victory_points": self.victory_points,
             "cap": self.cap,
             "condition": self.condition,
+            "resolution_mode": self.resolution_mode,
+            "resolution_group_id": self.resolution_group_id,
         }
 
 
@@ -1554,6 +1558,8 @@ def _rule(
         victory_points=victory_points,
         cap=cap,
         condition=condition,
+        resolution_mode="independent",
+        resolution_group_id=None,
     )
 
 

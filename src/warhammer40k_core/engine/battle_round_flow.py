@@ -231,14 +231,13 @@ class BattleRoundFlow:
         ):
             return status
 
-        objective_control_records = state.determine_current_end_objective_control(
+        phase_end_objective_control_record = state.determine_current_phase_end_objective_control(
             runtime_modifier_registry=self._runtime_modifier_registry,
         )
         if not any(
             event.event_type == "end_boundary_objective_control_determined"
             and isinstance(event.payload, dict)
-            and event.payload.get("record_ids")
-            == [record.record_id for record in objective_control_records]
+            and event.payload.get("record_ids") == [phase_end_objective_control_record.record_id]
             for event in decisions.event_log.records
         ):
             decisions.event_log.append(
@@ -247,7 +246,7 @@ class BattleRoundFlow:
                     "game_id": state.game_id,
                     "battle_round": state.battle_round,
                     "phase": current_phase.value,
-                    "record_ids": [record.record_id for record in objective_control_records],
+                    "record_ids": [phase_end_objective_control_record.record_id],
                     "source_rule_id": (
                         "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
                         "14.02.01-control-first"
@@ -351,9 +350,37 @@ class BattleRoundFlow:
                         }
                     ),
                 )
+        objective_control_record_ids_before_advance = {
+            record.record_id for record in state.objective_control_records
+        }
         completed_phase = state.advance_to_next_battle_phase(
             runtime_modifier_registry=self._runtime_modifier_registry
         )
+        turn_end_records = tuple(
+            record
+            for record in state.objective_control_records
+            if record.record_id not in objective_control_record_ids_before_advance
+            and record.timing is ObjectiveControlTiming.TURN_END
+        )
+        if len(turn_end_records) > 1:
+            raise GameLifecycleError(
+                "Battle phase advance produced multiple turn-end objective-control records."
+            )
+        if turn_end_records:
+            turn_end_record = turn_end_records[0]
+            decisions.event_log.append(
+                "end_boundary_objective_control_determined",
+                {
+                    "game_id": turn_end_record.game_id,
+                    "battle_round": turn_end_record.battle_round,
+                    "phase": turn_end_record.phase,
+                    "record_ids": [turn_end_record.record_id],
+                    "source_rule_id": (
+                        "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
+                        "14.02.01-control-first"
+                    ),
+                },
+            )
         decisions.event_log.append(
             "battle_phase_completed",
             {

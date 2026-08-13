@@ -50,32 +50,21 @@ def transport_cargo_state_for_embarked_unit(
     return None if not matches else matches[0]
 
 
-def determine_current_end_objective_control(
+def determine_current_phase_end_objective_control(
     *,
     state: GameState,
     runtime_modifier_registry: RuntimeModifierRegistry | None,
-) -> tuple[ObjectiveControlRecord, ...]:
+) -> ObjectiveControlRecord:
     if state.stage is not GameLifecycleStage.BATTLE:
         raise GameLifecycleError("End-boundary objective control requires battle stage.")
     if state.battle_phase_index is None:
         raise GameLifecycleError("End-boundary objective control requires a battle phase.")
     completed_phase = state.battle_phase_sequence[state.battle_phase_index]
-    records = [
-        state.record_objective_control_boundary(
-            completed_phase=completed_phase,
-            timing=ObjectiveControlTiming.PHASE_END,
-            runtime_modifier_registry=runtime_modifier_registry,
-        )
-    ]
-    if state.battle_phase_index + 1 == len(state.battle_phase_sequence):
-        records.append(
-            state.record_objective_control_boundary(
-                completed_phase=completed_phase,
-                timing=ObjectiveControlTiming.TURN_END,
-                runtime_modifier_registry=runtime_modifier_registry,
-            )
-        )
-    return tuple(records)
+    return state.record_objective_control_boundary(
+        completed_phase=completed_phase,
+        timing=ObjectiveControlTiming.PHASE_END,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
 
 
 def record_objective_control_boundary(

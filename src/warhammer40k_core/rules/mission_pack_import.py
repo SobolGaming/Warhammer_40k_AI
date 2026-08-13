@@ -23,6 +23,7 @@ from warhammer40k_core.core.missions import (
     SecondaryMissionAvailability,
     SecondaryMissionDefinition,
     TournamentScoringCaps,
+    mission_scoring_resolution_mode_from_token,
     objective_marker_role_from_token,
 )
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
@@ -666,6 +667,8 @@ def _scoring_rules(
             victory_points=row.victory_points,
             cap=row.cap,
             condition=row.condition,
+            resolution_mode=mission_scoring_resolution_mode_from_token(row.resolution_mode),
+            resolution_group_id=row.resolution_group_id,
             source_id=f"{source_prefix}:scoring-rule:{row.rule_id}",
         )
         for row in rows
