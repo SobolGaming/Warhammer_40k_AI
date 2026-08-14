@@ -257,6 +257,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     MovementDistanceRecord,
     MovementPhaseState,
 )
@@ -11664,6 +11665,7 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
     transport = units["enemy-transport"]
     passenger = units["enemy-passenger"]
     transport_model = transport.own_models[0]
+    emergency_destroyed_model = passenger.own_models[-1]
     battlefield = state.battlefield_state
     assert battlefield is not None
     state.battlefield_state = battlefield.without_unit_placement(passenger.unit_instance_id)
@@ -11805,6 +11807,10 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
             Pose.at(37.8, 35.5),
         ),
     )
+    attempted_placement = replace(
+        attempted_placement,
+        model_placements=attempted_placement.model_placements[:-1],
+    )
     placement_payload = PlacementProposalPayload(
         proposal_request_id=proposal_request.request_id,
         proposal_kind=proposal_request.proposal_kind,
@@ -11816,7 +11822,7 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
         transport_movement_status=TransportMovementStatus.NOT_MOVED,
     ).to_payload()
 
-    _submit_payload(
+    post_disembark_status = _submit_payload(
         lifecycle,
         request=request,
         payload=placement_payload,
@@ -11851,6 +11857,17 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
     )
 
     assert transport_model.model_instance_id not in updated_battlefield.placed_model_ids()
+    assert emergency_destroyed_model.model_instance_id in updated_battlefield.removed_model_ids
+    emergency_departure = next(
+        departure
+        for departure in state.primary_battlefield_departure_states
+        if departure.source_id.startswith(
+            "core-rules:emergency-disembark:phase14h-destroyed-transport-emergency-placement:"
+        )
+    )
+    assert emergency_departure.removed_model_instance_ids == (
+        emergency_destroyed_model.model_instance_id,
+    )
     assert state.transport_cargo_state_for_transport(transport.unit_instance_id) is None
     assert disembarked_state is not None
     assert disembarked_state.disembark_mode is DisembarkModeKind.EMERGENCY_DISEMBARK
@@ -11861,6 +11878,24 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
     assert event_records.index(unit_disembarked_event) < event_records.index(hazard_event)
     assert event_records.index(hazard_event) < event_records.index(deadly_demise_event)
     assert event_records.index(deadly_demise_event) < event_records.index(transport_destroyed_event)
+    assert post_disembark_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    phase_end_request = _decision_request(post_disembark_status)
+    assert phase_end_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    assert state.current_battle_phase is BattlePhase.MOVEMENT
+    assert state.active_player_id == "player-b"
+    phase_end_transport_departure = next(
+        departure
+        for departure in state.primary_battlefield_departure_states
+        if departure.removed_model_instance_ids == (transport_model.model_instance_id,)
+    )
+    assert phase_end_transport_departure.source_id.startswith(
+        "core-rules:primary-unit-destruction-tracking:"
+    )
+    lifecycle_payload = lifecycle.to_payload()
+    restored_lifecycle = GameLifecycle.from_payload(lifecycle_payload)
+    restored_state = _state(restored_lifecycle)
+    assert restored_lifecycle.to_payload() == lifecycle_payload
+    assert emergency_departure in restored_state.primary_battlefield_departure_states
 
 
 @pytest.mark.slow

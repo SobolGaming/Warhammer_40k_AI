@@ -21,6 +21,7 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import DatasheetKeywordSet
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, SetupSequenceDescriptor
 from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
     ArmyMusterRequest,
     DedicatedTransportCapacityProfile,
     DedicatedTransportManifest,
@@ -72,6 +73,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveUnitPointValue,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE, SetupFlow
+from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -1143,6 +1145,266 @@ def test_phase16c_reserve_declaration_payloads_round_trip_through_lifecycle_payl
         GameLifecycle.from_payload(forged_payload)
 
 
+def test_phase16c_restore_rejects_living_reserve_model_marked_removed() -> None:
+    lifecycle, reserve_model_id = _declared_strategic_reserve_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    assert reserve_model_id not in battlefield.placed_model_ids()
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    state_payload = payload["state"]
+    assert isinstance(state_payload, dict)
+    battlefield_payload = state_payload["battlefield_state"]
+    assert isinstance(battlefield_payload, dict)
+    removed_model_ids = battlefield_payload["removed_model_ids"]
+    assert isinstance(removed_model_ids, list)
+    removed_model_ids.append(reserve_model_id)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="living unarrived reserve models must not be removed",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_phase16c_restore_rejects_dead_reserve_model_not_marked_removed() -> None:
+    lifecycle, reserve_model_id = _declared_strategic_reserve_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    _replace_model_wounds_remaining(
+        state=state,
+        model_instance_id=reserve_model_id,
+        wounds_remaining=0,
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    assert reserve_model_id not in battlefield.placed_model_ids()
+    assert reserve_model_id not in battlefield.removed_model_ids
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="destroyed unarrived reserve models must have exact removal state",
+    ):
+        GameLifecycle.from_payload(lifecycle.to_payload())
+
+
+def test_phase16c_embarked_cargo_with_destroyed_model_in_reserves_round_trips() -> None:
+    config = replace(
+        _battle_formation_aggregate_config(),
+        reserve_unit_points=(
+            ReserveUnitPointValue(
+                unit_instance_id="army-alpha:cargo-transport",
+                points=100,
+                source_id="phase16c-reserve-cargo-transport-points",
+            ),
+            ReserveUnitPointValue(
+                unit_instance_id="army-alpha:bodyguard-unit",
+                points=100,
+                source_id="phase16c-reserve-bodyguard-points",
+            ),
+            ReserveUnitPointValue(
+                unit_instance_id="army-alpha:leader-unit",
+                points=100,
+                source_id="phase16c-reserve-leader-points",
+            ),
+        ),
+    )
+    lifecycle, reserve_status = _advance_to_reserve_request(config)
+    state = lifecycle.state
+    assert state is not None
+    owner_army = state.army_definition_for_player("player-a")
+    assert owner_army is not None
+    bodyguard = owner_army.unit_by_id("army-alpha:bodyguard-unit")
+    leader = owner_army.unit_by_id("army-alpha:leader-unit")
+    destroyed_model = bodyguard.own_models[0]
+    surviving_bodyguard_model_ids = tuple(
+        model.model_instance_id for model in bodyguard.own_models[1:]
+    )
+    assert surviving_bodyguard_model_ids
+    _replace_model_wounds_remaining(
+        state=state,
+        model_instance_id=destroyed_model.model_instance_id,
+        wounds_remaining=0,
+    )
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    bodyguard_placement = UnitPlacement(
+        army_id="army-alpha",
+        player_id="player-a",
+        unit_instance_id=bodyguard.unit_instance_id,
+        model_placements=tuple(
+            ModelPlacement(
+                army_id="army-alpha",
+                player_id="player-a",
+                unit_instance_id=bodyguard.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                pose=Pose.at(10.0 + 2.0 * index, 10.0),
+            )
+            for index, model in enumerate(bodyguard.own_models)
+        ),
+    )
+    casualty_battlefield = (
+        battlefield.with_added_unit_placement(bodyguard_placement)
+        .with_removed_models((destroyed_model.model_instance_id,))
+        .without_unit_placement(bodyguard.unit_instance_id)
+    )
+    state.replace_battlefield_state(casualty_battlefield)
+    request = _decision_request(reserve_status)
+    assert _option_ids(request) == (
+        "complete_reserve_declarations",
+        "declare_strategic_reserves:army-alpha:cargo-transport",
+    )
+
+    deployment_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase16c-destroyed-model-reserve-cargo",
+            request=request,
+            selected_option_id="declare_strategic_reserves:army-alpha:cargo-transport",
+        )
+    )
+    submit_all_deployments_if_pending(
+        lifecycle,
+        deployment_status,
+        result_id_prefix="phase16c-destroyed-model-reserve-cargo-deployment",
+    )
+    final_battlefield = state.battlefield_state
+    assert final_battlefield is not None
+    reserve_state = state.reserve_state_for_unit("army-alpha:cargo-transport")
+    assert reserve_state is not None
+    assert reserve_state.status is ReserveStatus.IN_RESERVES
+    assert reserve_state.embarked_unit_instance_ids == (
+        "army-alpha:bodyguard-unit",
+        "army-alpha:leader-unit",
+    )
+    placed_model_ids = set(final_battlefield.placed_model_ids())
+    removed_model_ids = set(final_battlefield.removed_model_ids)
+    assert set(surviving_bodyguard_model_ids).isdisjoint(placed_model_ids | removed_model_ids)
+    assert destroyed_model.model_instance_id not in placed_model_ids
+    assert destroyed_model.model_instance_id in removed_model_ids
+
+    cargo_state = state.transport_cargo_state_for_transport("army-alpha:cargo-transport")
+    assert cargo_state is not None
+    current_owner_army = state.army_definition_for_player("player-a")
+    assert current_owner_army is not None
+    current_bodyguard = current_owner_army.unit_by_id(bodyguard.unit_instance_id)
+    current_leader = current_owner_army.unit_by_id(leader.unit_instance_id)
+    starting_cargo_model_count = len(current_bodyguard.own_models) + len(current_leader.own_models)
+    living_cargo_model_count = sum(
+        model.is_alive for unit in (current_bodyguard, current_leader) for model in unit.own_models
+    )
+    assert starting_cargo_model_count == 6
+    assert living_cargo_model_count == 5
+    assert cargo_state.capacity_profile.max_model_count == starting_cargo_model_count
+    state.replace_transport_cargo_state(
+        replace(
+            cargo_state,
+            capacity_profile=replace(
+                cargo_state.capacity_profile,
+                max_model_count=living_cargo_model_count,
+                source_id="phase16c-damaged-cargo-capacity",
+            ),
+        )
+    )
+
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(payload)
+
+    assert restored.state is not None
+    restored_army = restored.state.army_definition_for_player("player-a")
+    assert restored_army is not None
+    restored_bodyguard = restored_army.unit_by_id(bodyguard.unit_instance_id)
+    restored_destroyed_model = restored_bodyguard.own_models[0]
+    assert restored_destroyed_model.model_instance_id == destroyed_model.model_instance_id
+    assert restored_destroyed_model.wounds_remaining == 0
+    assert (
+        tuple(model.model_instance_id for model in restored_bodyguard.own_models[1:])
+        == surviving_bodyguard_model_ids
+    )
+    restored_battlefield = restored.state.battlefield_state
+    assert restored_battlefield is not None
+    restored_placed_model_ids = set(restored_battlefield.placed_model_ids())
+    restored_removed_model_ids = set(restored_battlefield.removed_model_ids)
+    assert set(surviving_bodyguard_model_ids).isdisjoint(
+        restored_placed_model_ids | restored_removed_model_ids
+    )
+    assert destroyed_model.model_instance_id not in restored_placed_model_ids
+    assert destroyed_model.model_instance_id in restored_removed_model_ids
+
+    cargo_drift_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    cargo_drift_state = cargo_drift_payload["state"]
+    assert isinstance(cargo_drift_state, dict)
+    reserve_payloads = cargo_drift_state["reserve_states"]
+    assert isinstance(reserve_payloads, list)
+    transport_reserve_payload = next(
+        reserve_payload
+        for reserve_payload in reserve_payloads
+        if reserve_payload["unit_instance_id"] == "army-alpha:cargo-transport"
+    )
+    transport_reserve_payload["embarked_unit_instance_ids"] = ["army-alpha:bodyguard-unit"]
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="transport_cargo_states unarrived reserve route cargo drift",
+    ):
+        GameLifecycle.from_payload(cargo_drift_payload)
+
+    missing_cargo_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    missing_cargo_state = missing_cargo_payload["state"]
+    assert isinstance(missing_cargo_state, dict)
+    cargo_payloads = missing_cargo_state["transport_cargo_states"]
+    assert isinstance(cargo_payloads, list)
+    cargo_payloads[:] = [
+        cargo_payload
+        for cargo_payload in cargo_payloads
+        if cargo_payload["transport_unit_instance_id"] != "army-alpha:cargo-transport"
+    ]
+    assert all(
+        cargo_payload["transport_unit_instance_id"] != "army-alpha:cargo-transport"
+        for cargo_payload in cargo_payloads
+    )
+    missing_cargo_reserve_payloads = missing_cargo_state["reserve_states"]
+    assert isinstance(missing_cargo_reserve_payloads, list)
+    missing_cargo_reserve_payload = next(
+        reserve_payload
+        for reserve_payload in missing_cargo_reserve_payloads
+        if reserve_payload["unit_instance_id"] == "army-alpha:cargo-transport"
+    )
+    assert missing_cargo_reserve_payload["embarked_unit_instance_ids"] == [
+        "army-alpha:bodyguard-unit",
+        "army-alpha:leader-unit",
+    ]
+    missing_cargo_game_state = GameState.from_payload(missing_cargo_state)
+    missing_cargo_reserve_state = missing_cargo_game_state.reserve_state_for_unit(
+        "army-alpha:cargo-transport"
+    )
+    assert missing_cargo_reserve_state is not None
+    assert missing_cargo_reserve_state.is_unarrived
+    assert missing_cargo_reserve_state.embarked_unit_instance_ids
+    assert (
+        missing_cargo_game_state.transport_cargo_state_for_transport("army-alpha:cargo-transport")
+        is None
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="transport_cargo_states unarrived reserve route cargo drift",
+    ):
+        GameLifecycle.from_payload(missing_cargo_payload)
+
+
 def test_phase16c_aircraft_and_malformed_submission_errors_are_typed() -> None:
     aircraft_catalog = _catalog_with_datasheet_keywords(
         {
@@ -1250,6 +1512,62 @@ def _advance_to_reserve_request(config: GameConfig) -> tuple[GameLifecycle, Life
     request = _decision_request(status)
     assert request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE
     return lifecycle, status
+
+
+def _declared_strategic_reserve_lifecycle() -> tuple[GameLifecycle, str]:
+    config = _config(
+        player_a_unit_selections=(_unit_selection(unit_selection_id="reserve-unit"),),
+        reserve_unit_points=(
+            ReserveUnitPointValue(
+                unit_instance_id="army-alpha:reserve-unit",
+                points=400,
+                source_id="phase16c-physical-integrity-reserve-points",
+            ),
+        ),
+    )
+    lifecycle, reserve_status = _advance_to_reserve_request(config)
+    request = _decision_request(reserve_status)
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase16c-physical-integrity-declaration",
+            request=request,
+            selected_option_id="declare_strategic_reserves:army-alpha:reserve-unit",
+        )
+    )
+    state = lifecycle.state
+    assert state is not None
+    owner_army = state.army_definition_for_player("player-a")
+    assert owner_army is not None
+    reserve_unit = owner_army.unit_by_id("army-alpha:reserve-unit")
+    return lifecycle, reserve_unit.own_models[0].model_instance_id
+
+
+def _replace_model_wounds_remaining(
+    *,
+    state: GameState,
+    model_instance_id: str,
+    wounds_remaining: int,
+) -> None:
+    matched = False
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            updated_models = tuple(
+                replace(model, wounds_remaining=wounds_remaining)
+                if model.model_instance_id == model_instance_id
+                else model
+                for model in unit.own_models
+            )
+            if updated_models != unit.own_models:
+                matched = True
+                updated_units.append(replace(unit, own_models=updated_models))
+            else:
+                updated_units.append(unit)
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    if not matched:
+        raise AssertionError(f"Missing model {model_instance_id}.")
+    state.replace_army_definitions(updated_armies)
 
 
 def _advance_to_deployment_or_later(config: GameConfig) -> tuple[GameLifecycle, LifecycleStatus]:

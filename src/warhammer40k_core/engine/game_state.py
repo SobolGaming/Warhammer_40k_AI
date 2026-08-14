@@ -4421,23 +4421,25 @@ class GameState:
         unit_by_id = {
             unit.unit_instance_id: unit for army in self.army_definitions for unit in army.units
         }
-        model_ids: list[str] = []
+        model_ids: set[str] = set()
         for cargo_state in self.transport_cargo_states:
             for unit_id in cargo_state.embarked_unit_instance_ids:
                 unit = unit_by_id.get(unit_id)
                 if unit is None:
                     raise GameLifecycleError("TransportCargoState references an unknown unit.")
-                model_ids.extend(model.model_instance_id for model in unit.own_models)
+                model_ids.update(
+                    model.model_instance_id for model in unit.own_models if model.is_alive
+                )
         return tuple(sorted(model_ids))
 
     def unavailable_model_ids(self) -> tuple[str, ...]:
         return tuple(
             sorted(
-                (
+                {
                     *self.unarrived_reserve_model_ids(),
                     *self.embarked_model_ids(),
                     *self.dedicated_transport_setup_consequence_model_ids(),
-                )
+                }
             )
         )
 

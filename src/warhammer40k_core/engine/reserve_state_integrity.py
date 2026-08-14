@@ -68,18 +68,36 @@ def validate_reserve_state_consistency(*, state: GameState) -> None:
             unit_instance_id=reserve_state.unit_instance_id,
         )
         reserve_model_ids = {model.model_instance_id for model in reserve_view.own_models}
-        embarked_model_ids: set[str] = set()
-        for embarked_unit_id in reserve_state.embarked_unit_instance_ids:
-            embarked_view = rules_unit_view_from_armies(
+        embarked_views = tuple(
+            rules_unit_view_from_armies(
                 armies=tuple(state.army_definitions),
                 unit_instance_id=embarked_unit_id,
             )
-            embarked_model_ids.update(model.model_instance_id for model in embarked_view.own_models)
+            for embarked_unit_id in reserve_state.embarked_unit_instance_ids
+        )
+        embarked_model_ids = {
+            model.model_instance_id
+            for embarked_view in embarked_views
+            for model in embarked_view.own_models
+        }
         if reserve_state.status is ReserveStatus.IN_RESERVES:
-            if (reserve_model_ids | embarked_model_ids) & placed_model_ids:
+            route_views = (reserve_view, *embarked_views)
+            route_model_ids = reserve_model_ids | embarked_model_ids
+            unarrived_alive_model_ids = {
+                model.model_instance_id
+                for route_view in route_views
+                for model in route_view.own_models
+                if model.is_alive
+            }
+            unarrived_dead_model_ids = route_model_ids - unarrived_alive_model_ids
+            if route_model_ids & placed_model_ids:
                 raise GameLifecycleError("unarrived reserve models must not be placed.")
-            if (reserve_model_ids | embarked_model_ids) & removed_model_ids:
-                raise GameLifecycleError("unarrived reserve models must not be removed.")
+            if unarrived_alive_model_ids & removed_model_ids:
+                raise GameLifecycleError("living unarrived reserve models must not be removed.")
+            if not unarrived_dead_model_ids <= removed_model_ids:
+                raise GameLifecycleError(
+                    "destroyed unarrived reserve models must have exact removal state."
+                )
         if reserve_state.status is ReserveStatus.ARRIVED:
             alive_model_ids = {
                 model.model_instance_id for model in reserve_view.own_models if model.is_alive

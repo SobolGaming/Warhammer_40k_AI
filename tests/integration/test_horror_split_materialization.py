@@ -52,6 +52,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.catalog_materialization_integrity import (
+    _required_string_list,
     authenticated_catalog_materialized_model_payloads_by_unit_id,
 )
 from warhammer40k_core.engine.catalog_model_materialization_runtime import (
@@ -75,6 +76,7 @@ from warhammer40k_core.engine.damage_allocation import (
     resolve_mortal_wound_feel_no_pain_decision,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
@@ -82,7 +84,7 @@ from warhammer40k_core.engine.destruction_provenance import (
 )
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import (
     RuntimeContentBundle,
@@ -1908,6 +1910,273 @@ def test_restored_split_request_revalidates_authoritative_catalog_and_roll_evide
     assert restored.decision_controller.queue.peek_next() == request
 
 
+@pytest.mark.parametrize(
+    ("tamper_kind", "expected_error"),
+    [
+        ("materialized_game_id", "Catalog materialization game identity drift"),
+        ("missing_request_id", "Catalog materialization request_id must be a string"),
+        (
+            "missing_decision_record",
+            "Catalog materialization lacks one accepted decision record",
+        ),
+        ("malformed_request_payload", "Catalog materialization request payload is malformed"),
+        (
+            "inactive_source",
+            "Catalog materialization does not resolve to one active source provider",
+        ),
+        ("decision_identity", "Catalog materialization decision identity drift"),
+        ("request_payload", "Catalog materialization request payload drift"),
+        ("malformed_result_payload", "Catalog materialization result payload is malformed"),
+        ("accepted_placement", "Catalog materialization accepted placement drift"),
+        ("accepted_model_set", "Catalog materialization accepted model set drift"),
+        ("roll_identity", "Catalog materialization roll identity drift"),
+        ("roll_context", "Catalog materialization roll context drift"),
+        (
+            "completion_sequence",
+            "Catalog materialization attack completion sequence drift",
+        ),
+        ("roll_before_completion", "Catalog materialization roll precedes its attack completion"),
+        ("destroyed_model_source", "Catalog materialization destroyed model source drift"),
+        ("destruction_evidence", "Catalog materialization destruction evidence drift"),
+        ("malformed_roll_payload", "Catalog materialization roll payload is malformed"),
+        ("roll_specification", "Catalog materialization roll specification drift"),
+        ("unsuccessful_roll", "Catalog materialization successful roll result drift"),
+        ("evidence_order", "Catalog materialization evidence order drift"),
+        ("missing_terminal", "Catalog materialization lacks its placement terminal event"),
+        ("terminal_payload", "Catalog materialization placement terminal payload drift"),
+        (
+            "request_provenance",
+            "Catalog materialization decision request provenance drift",
+        ),
+        (
+            "record_provenance",
+            "Catalog materialization decision record provenance drift",
+        ),
+        ("malformed_materialized_event", "catalog materialization event payload is malformed"),
+        (
+            "malformed_completion_event",
+            "catalog materialization attack completion event payload is malformed",
+        ),
+        ("completion_payload", "Catalog materialization completion payload drift"),
+        ("invalid_battle_round", "Catalog materialization battle_round must be an integer"),
+    ],
+)
+def test_authenticated_materialization_rejects_corrupted_evidence_graph(
+    tamper_kind: str,
+    expected_error: str,
+) -> None:
+    scenario, event_records, decision_records = _authenticated_materialization_evidence(
+        destruction_kind="attack"
+    )
+    tampered_events, tampered_records = _corrupt_authenticated_materialization_evidence(
+        scenario=scenario,
+        event_records=event_records,
+        decision_records=decision_records,
+        tamper_kind=tamper_kind,
+    )
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        authenticated_catalog_materialized_model_payloads_by_unit_id(
+            game_id=scenario.state.game_id,
+            catalog=scenario.package.army_catalog,
+            expected_armies=(scenario.source_army, scenario.enemy_army),
+            event_records=tampered_events,
+            decision_records=tampered_records,
+        )
+
+
+@pytest.mark.parametrize(
+    ("tamper_kind", "expected_error"),
+    [
+        (
+            "malformed_application",
+            "Catalog materialization Hazardous evidence is malformed",
+        ),
+        (
+            "malformed_applications",
+            "Catalog materialization Hazardous evidence is malformed",
+        ),
+        (
+            "malformed_application_item",
+            "Catalog materialization Hazardous evidence is malformed",
+        ),
+        (
+            "missing_destroyed_model_id",
+            "Catalog materialization model_instance_id must be a string",
+        ),
+        ("wrong_sequence", "Catalog materialization destruction evidence drift"),
+    ],
+)
+def test_authenticated_hazardous_materialization_rejects_corrupted_provenance(
+    tamper_kind: str,
+    expected_error: str,
+) -> None:
+    scenario, event_records, decision_records = _authenticated_materialization_evidence(
+        destruction_kind="hazardous"
+    )
+    events = list(event_records)
+    hazardous_index = _unique_event_index(events, "hazardous_mortal_wounds_applied")
+    hazardous_payload = copy.deepcopy(cast(dict[str, JsonValue], events[hazardous_index].payload))
+    if tamper_kind == "malformed_application":
+        hazardous_payload["mortal_wound_application"] = None
+    elif tamper_kind == "malformed_applications":
+        application = cast(dict[str, JsonValue], hazardous_payload["mortal_wound_application"])
+        application["applications"] = None
+    elif tamper_kind == "malformed_application_item":
+        application = cast(dict[str, JsonValue], hazardous_payload["mortal_wound_application"])
+        application["applications"] = [None]
+    elif tamper_kind == "missing_destroyed_model_id":
+        application = cast(dict[str, JsonValue], hazardous_payload["mortal_wound_application"])
+        applications = cast(list[JsonValue], application["applications"])
+        cast(dict[str, JsonValue], applications[0])["model_instance_id"] = None
+    elif tamper_kind == "wrong_sequence":
+        hazardous_payload["sequence_id"] = "attack-sequence:unrelated"
+    else:
+        raise AssertionError(f"Unsupported Hazardous evidence tamper: {tamper_kind}")
+    events[hazardous_index] = replace(events[hazardous_index], payload=hazardous_payload)
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        authenticated_catalog_materialized_model_payloads_by_unit_id(
+            game_id=scenario.state.game_id,
+            catalog=scenario.package.army_catalog,
+            expected_armies=(scenario.source_army, scenario.enemy_army),
+            event_records=tuple(events),
+            decision_records=decision_records,
+        )
+
+
+def test_authenticated_materialization_rejects_duplicate_event_identity() -> None:
+    scenario, event_records, decision_records = _authenticated_materialization_evidence(
+        destruction_kind="attack"
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Catalog materialization event identities are duplicated",
+    ):
+        authenticated_catalog_materialized_model_payloads_by_unit_id(
+            game_id=scenario.state.game_id,
+            catalog=scenario.package.army_catalog,
+            expected_armies=(scenario.source_army, scenario.enemy_army),
+            event_records=(*event_records, event_records[0]),
+            decision_records=decision_records,
+        )
+
+
+def test_authenticated_materialization_rejects_reused_roll_and_decision_evidence() -> None:
+    scenario, event_records, decision_records = _authenticated_materialization_evidence(
+        destruction_kind="attack"
+    )
+    events = list(event_records)
+    materialized_index = _unique_event_index(events, CATALOG_MODELS_MATERIALIZED_EVENT)
+    materialized = events[materialized_index]
+    terminal = events[materialized_index + 1]
+    cloned_materialized = replace(
+        materialized,
+        event_id="event:catalog-materialization:reused-evidence",
+    )
+    terminal_payload = copy.deepcopy(cast(dict[str, JsonValue], terminal.payload))
+    terminal_payload["source_event_id"] = cloned_materialized.event_id
+    cloned_terminal = replace(
+        terminal,
+        event_id="event:catalog-materialization:reused-evidence:terminal",
+        payload=terminal_payload,
+    )
+
+    with pytest.raises(GameLifecycleError, match="Catalog materialization evidence is reused"):
+        authenticated_catalog_materialized_model_payloads_by_unit_id(
+            game_id=scenario.state.game_id,
+            catalog=scenario.package.army_catalog,
+            expected_armies=(scenario.source_army, scenario.enemy_army),
+            event_records=(*events, cloned_materialized, cloned_terminal),
+            decision_records=decision_records,
+        )
+
+
+def test_authenticated_materialization_requires_active_provider_binding(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    scenario, event_records, decision_records = _authenticated_materialization_evidence(
+        destruction_kind="attack"
+    )
+
+    def no_bindings(_runtime: CatalogModelMaterializationRuntime) -> tuple[Any, ...]:
+        return ()
+
+    monkeypatch.setattr(CatalogModelMaterializationRuntime, "bindings", no_bindings)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Catalog materialization has no active runtime provider binding",
+    ):
+        authenticated_catalog_materialized_model_payloads_by_unit_id(
+            game_id=scenario.state.game_id,
+            catalog=scenario.package.army_catalog,
+            expected_armies=(scenario.source_army, scenario.enemy_army),
+            event_records=event_records,
+            decision_records=decision_records,
+        )
+
+
+def test_authenticated_second_split_rejects_missing_required_model_source() -> None:
+    scenario, event_records, decision_records = _authenticated_materialization_evidence(
+        destruction_kind="attack",
+        destroyed_horror_kinds=("blue",),
+    )
+    source_model = scenario.source_army.units[0].own_models[0]
+    assert "horror-materialization:blue-horror" in source_model.source_ids
+    tampered_model = replace(
+        source_model,
+        source_ids=tuple(
+            source_id
+            for source_id in source_model.source_ids
+            if source_id != "horror-materialization:blue-horror"
+        ),
+    )
+    tampered_unit = replace(scenario.source_army.units[0], own_models=(tampered_model,))
+    tampered_army = replace(
+        scenario.source_army,
+        units=(tampered_unit, *scenario.source_army.units[1:]),
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Catalog materialization destroyed model source drift",
+    ):
+        authenticated_catalog_materialized_model_payloads_by_unit_id(
+            game_id=scenario.state.game_id,
+            catalog=scenario.package.army_catalog,
+            expected_armies=(tampered_army, scenario.enemy_army),
+            event_records=event_records,
+            decision_records=decision_records,
+        )
+
+
+@pytest.mark.parametrize(
+    ("invalid_model_ids", "expected_error"),
+    [
+        (None, "Catalog materialization model_instance_ids must be a string list"),
+        ([""], "Catalog materialization model_instance_ids must be a string list"),
+        (
+            ["duplicate", "duplicate"],
+            "Catalog materialization model_instance_ids contains duplicates",
+        ),
+    ],
+)
+def test_catalog_materialization_required_model_ids_fail_closed(
+    invalid_model_ids: JsonValue,
+    expected_error: str,
+) -> None:
+    _scenario, _event_records, decision_records = _authenticated_materialization_evidence(
+        destruction_kind="attack"
+    )
+    request_payload = copy.deepcopy(cast(dict[str, JsonValue], decision_records[0].request.payload))
+    request_payload["model_instance_ids"] = invalid_model_ids
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        _required_string_list(request_payload, "model_instance_ids")
+
+
 def test_horror_catalog_keeps_materialized_profiles_out_of_mustering() -> None:
     package = horrors_package()
     for pink_datasheet_id, blue_datasheet_id in (
@@ -1954,6 +2223,7 @@ def _split_scenario(
     attached: bool = True,
     pink_model_count: int = 1,
     roll_values: tuple[int, ...] = (6,),
+    destroyed_horror_kinds: tuple[str, ...] = (),
     retained_horror_kinds: tuple[str, ...] = (),
     event_sequence_matches: bool = False,
     non_attack_source_step: str = "ability_resolution",
@@ -1969,9 +2239,23 @@ def _split_scenario(
         model_profile_id=f"{pink_datasheet_id}:pink-horrors",
         model_count=pink_model_count,
     )
+    models_to_destroy = (
+        tuple(
+            _retained_horror_model(
+                package=package,
+                pink_datasheet_id=pink_datasheet_id,
+                bodyguard=bodyguard,
+                horror_kind=horror_kind,
+                index=index,
+            )
+            for index, horror_kind in enumerate(destroyed_horror_kinds, start=1)
+        )
+        if destroyed_horror_kinds
+        else bodyguard.own_models
+    )
     destroyed_models = tuple(
         replace(model, wounds_remaining=0) if models_start_destroyed else model
-        for model in bodyguard.own_models
+        for model in models_to_destroy
     )
     retained_models = tuple(
         _retained_horror_model(
@@ -1981,7 +2265,10 @@ def _split_scenario(
             horror_kind=horror_kind,
             index=index,
         )
-        for index, horror_kind in enumerate(retained_horror_kinds, start=1)
+        for index, horror_kind in enumerate(
+            retained_horror_kinds,
+            start=len(destroyed_horror_kinds) + 1,
+        )
     )
     bodyguard = replace(bodyguard, own_models=(*destroyed_models, *retained_models))
     leader = _single_model_unit(
@@ -2412,6 +2699,11 @@ def _placement_payload(
 ) -> dict[str, JsonValue]:
     request_payload = cast(dict[str, JsonValue], request.payload)
     model_ids = cast(list[str], request_payload["model_instance_ids"])
+    poses = (
+        Pose.at(10.0, 10.0 + y_offset),
+        Pose.at(11.2, 10.0 + y_offset),
+    )
+    assert 0 < len(model_ids) <= len(poses)
     placements = tuple(
         ModelPlacement(
             army_id=army.army_id,
@@ -2422,10 +2714,7 @@ def _placement_payload(
         )
         for model_id, pose in zip(
             model_ids,
-            (
-                Pose.at(10.0, 10.0 + y_offset),
-                Pose.at(11.2, 10.0 + y_offset),
-            ),
+            poses[: len(model_ids)],
             strict=True,
         )
     )
@@ -2455,6 +2744,194 @@ def _parameterized_result(*, request: Any, payload: JsonValue, result_id: str) -
         selected_option_id=request.options[0].option_id,
         payload=payload,
     )
+
+
+def _authenticated_materialization_evidence(
+    *,
+    destruction_kind: str,
+    destroyed_horror_kinds: tuple[str, ...] = (),
+) -> tuple[_SplitScenario, tuple[EventRecord, ...], tuple[DecisionRecord, ...]]:
+    scenario = _split_scenario(
+        pink_datasheet_id="000002584",
+        blue_datasheet_id="000002583",
+        destruction_kind=destruction_kind,
+        destroyed_horror_kinds=destroyed_horror_kinds,
+    )
+    status = scenario.runtime.resolve_completed_attack_sequence(scenario.context)
+    assert status is not None
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = scenario.decisions.queue.peek_next()
+    result = _parameterized_result(
+        request=request,
+        payload=_placement_payload(
+            request=request,
+            army=scenario.source_army,
+            unit=scenario.bodyguard,
+        ),
+        result_id=f"result:authenticated-materialization:{destruction_kind}",
+    )
+    scenario.decisions.submit_result(result)
+    placements = apply_recorded_catalog_model_materialization_placement(
+        state=scenario.state,
+        decisions=scenario.decisions,
+        request=request,
+        result=result,
+        ability_indexes_by_player_id=scenario.runtime.ability_indexes_by_player_id,
+        ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        army_catalog=scenario.package.army_catalog,
+    )
+    assert placements
+    event_records = scenario.decisions.event_log.records
+    decision_records = scenario.decisions.records
+    authenticated = authenticated_catalog_materialized_model_payloads_by_unit_id(
+        game_id=scenario.state.game_id,
+        catalog=scenario.package.army_catalog,
+        expected_armies=(scenario.source_army, scenario.enemy_army),
+        event_records=event_records,
+        decision_records=decision_records,
+    )
+    assert set(authenticated) == {scenario.bodyguard.unit_instance_id}
+    return scenario, event_records, decision_records
+
+
+def _unique_event_index(events: list[EventRecord], event_type: str) -> int:
+    matches = tuple(index for index, event in enumerate(events) if event.event_type == event_type)
+    assert len(matches) == 1
+    return matches[0]
+
+
+def _corrupt_authenticated_materialization_evidence(
+    *,
+    scenario: _SplitScenario,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    tamper_kind: str,
+) -> tuple[tuple[EventRecord, ...], tuple[DecisionRecord, ...]]:
+    events = list(event_records)
+    records = list(decision_records)
+    materialized_index = _unique_event_index(events, CATALOG_MODELS_MATERIALIZED_EVENT)
+    roll_index = _unique_event_index(events, CATALOG_MODEL_MATERIALIZATION_ROLL_EVENT)
+    completion_index = _unique_event_index(events, "attack_sequence_completed")
+    requested_index = _unique_event_index(events, "decision_requested")
+    recorded_index = _unique_event_index(events, "decision_recorded")
+
+    if tamper_kind == "materialized_game_id":
+        payload = copy.deepcopy(cast(dict[str, JsonValue], events[materialized_index].payload))
+        payload["game_id"] = "game:unrelated"
+        events[materialized_index] = replace(events[materialized_index], payload=payload)
+    elif tamper_kind == "missing_request_id":
+        payload = copy.deepcopy(cast(dict[str, JsonValue], events[materialized_index].payload))
+        payload["request_id"] = None
+        events[materialized_index] = replace(events[materialized_index], payload=payload)
+    elif tamper_kind == "missing_decision_record":
+        payload = copy.deepcopy(cast(dict[str, JsonValue], events[materialized_index].payload))
+        payload["result_id"] = "result:unrelated"
+        events[materialized_index] = replace(events[materialized_index], payload=payload)
+    elif tamper_kind == "malformed_request_payload":
+        record = records[0]
+        records[0] = replace(record, request=replace(record.request, payload=None))
+    elif tamper_kind in {"inactive_source", "request_payload", "roll_identity"}:
+        record = records[0]
+        request_payload = copy.deepcopy(cast(dict[str, JsonValue], record.request.payload))
+        if tamper_kind == "inactive_source":
+            request_payload["catalog_record_id"] = "catalog-record:unrelated"
+        elif tamper_kind == "request_payload":
+            request_payload["submission_kind"] = "submission:unrelated"
+        else:
+            request_payload["roll_event_id"] = events[completion_index].event_id
+        records[0] = replace(record, request=replace(record.request, payload=request_payload))
+    elif tamper_kind == "decision_identity":
+        record = records[0]
+        request = replace(record.request, decision_type="decision:unrelated")
+        result = replace(record.result, decision_type=request.decision_type)
+        records[0] = replace(record, request=request, result=result)
+    elif tamper_kind == "malformed_result_payload":
+        record = records[0]
+        records[0] = replace(record, result=replace(record.result, payload=None))
+    elif tamper_kind in {"accepted_placement", "accepted_model_set"}:
+        record = records[0]
+        result_payload = copy.deepcopy(cast(dict[str, JsonValue], record.result.payload))
+        if tamper_kind == "accepted_placement":
+            result_payload["placement_kind"] = BattlefieldPlacementKind.DEPLOYMENT.value
+        else:
+            placement = cast(dict[str, JsonValue], result_payload["attempted_placement"])
+            model_placements = cast(list[JsonValue], placement["model_placements"])
+            model_placement = cast(dict[str, JsonValue], model_placements[0])
+            model_placement["model_instance_id"] = (
+                f"{scenario.bodyguard.unit_instance_id}:unrelated-model"
+            )
+        records[0] = replace(record, result=replace(record.result, payload=result_payload))
+    elif tamper_kind in {
+        "roll_context",
+        "destroyed_model_source",
+        "malformed_roll_payload",
+        "roll_specification",
+        "unsuccessful_roll",
+        "invalid_battle_round",
+    }:
+        roll_payload = copy.deepcopy(cast(dict[str, JsonValue], events[roll_index].payload))
+        if tamper_kind == "roll_context":
+            roll_payload["result_count"] = 3
+        elif tamper_kind == "destroyed_model_source":
+            roll_payload["destroyed_model_instance_id"] = scenario.leader.own_models[
+                0
+            ].model_instance_id
+        elif tamper_kind == "malformed_roll_payload":
+            roll_payload["roll"] = None
+        elif tamper_kind == "roll_specification":
+            raw_roll = cast(dict[str, JsonValue], roll_payload["roll"])
+            original_result = cast(dict[str, JsonValue], raw_roll["original_result"])
+            spec = cast(dict[str, JsonValue], original_result["spec"])
+            spec["reason"] = "Unrelated roll"
+        elif tamper_kind == "unsuccessful_roll":
+            raw_roll = cast(dict[str, JsonValue], roll_payload["roll"])
+            original_result = cast(dict[str, JsonValue], raw_roll["original_result"])
+            original_result["values"] = [1]
+            original_result["total"] = 1
+            raw_roll["current_values"] = [1]
+            raw_roll["current_total"] = 1
+        else:
+            roll_payload["battle_round"] = "1"
+        events[roll_index] = replace(events[roll_index], payload=roll_payload)
+    elif tamper_kind == "completion_sequence":
+        payload = copy.deepcopy(cast(dict[str, JsonValue], events[completion_index].payload))
+        payload["sequence_id"] = "attack-sequence:unrelated"
+        events[completion_index] = replace(events[completion_index], payload=payload)
+    elif tamper_kind == "roll_before_completion":
+        events[completion_index], events[roll_index] = events[roll_index], events[completion_index]
+    elif tamper_kind == "destruction_evidence":
+        destroyed_index = _unique_event_index(events, "model_destroyed")
+        events.pop(destroyed_index)
+    elif tamper_kind == "evidence_order":
+        events[requested_index], events[recorded_index] = (
+            events[recorded_index],
+            events[requested_index],
+        )
+    elif tamper_kind == "missing_terminal":
+        events.pop(materialized_index + 1)
+    elif tamper_kind == "terminal_payload":
+        terminal_index = materialized_index + 1
+        payload = copy.deepcopy(cast(dict[str, JsonValue], events[terminal_index].payload))
+        payload["source_rule_id"] = "source-rule:unrelated"
+        events[terminal_index] = replace(events[terminal_index], payload=payload)
+    elif tamper_kind in {"request_provenance", "record_provenance"}:
+        provenance_index = (
+            requested_index if tamper_kind == "request_provenance" else recorded_index
+        )
+        payload = copy.deepcopy(cast(dict[str, JsonValue], events[provenance_index].payload))
+        payload["tampered"] = True
+        events[provenance_index] = replace(events[provenance_index], payload=payload)
+    elif tamper_kind == "malformed_materialized_event":
+        events[materialized_index] = replace(events[materialized_index], payload=None)
+    elif tamper_kind == "malformed_completion_event":
+        events[completion_index] = replace(events[completion_index], payload=None)
+    elif tamper_kind == "completion_payload":
+        payload = copy.deepcopy(cast(dict[str, JsonValue], events[materialized_index].payload))
+        payload["action_phase"] = BattlePhase.MOVEMENT.value
+        events[materialized_index] = replace(events[materialized_index], payload=payload)
+    else:
+        raise AssertionError(f"Unsupported authenticated evidence tamper: {tamper_kind}")
+    return tuple(events), tuple(records)
 
 
 def _tamper_materialization_lifecycle_payload(
