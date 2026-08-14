@@ -51,6 +51,9 @@ from warhammer40k_core.engine.battlefield_state import (
     PlacedArmy,
     UnitPlacement,
 )
+from warhammer40k_core.engine.catalog_materialization_integrity import (
+    authenticated_catalog_materialized_model_payloads_by_unit_id,
+)
 from warhammer40k_core.engine.catalog_model_materialization_runtime import (
     CATALOG_MODEL_MATERIALIZATION_ROLL_EVENT,
     CATALOG_MODELS_MATERIALIZED_EVENT,
@@ -324,6 +327,16 @@ def test_split_materializes_models_then_hands_off_attached_unit_datasheet(
     assert {placement.source_phase for placement in restored_transition.placements} == {
         source_phase.value
     }
+    authenticated_models = authenticated_catalog_materialized_model_payloads_by_unit_id(
+        game_id=scenario.state.game_id,
+        catalog=scenario.package.army_catalog,
+        expected_armies=(scenario.source_army, scenario.enemy_army),
+        event_records=scenario.decisions.event_log.records,
+        decision_records=scenario.decisions.records,
+    )
+    assert set(authenticated_models[scenario.bodyguard.unit_instance_id]) == set(
+        cast(list[str], materialized_payload["model_instance_ids"])
+    )
     resolved_lifecycle = GameLifecycle(
         state=scenario.state,
         decision_controller=scenario.decisions,
@@ -1236,7 +1249,7 @@ def test_deadly_demise_collateral_finalizes_horror_composition_handoff() -> None
     attack_sequence = AttackSequence.start(
         sequence_id="deadly-demise:horror-composition-handoff",
         attacker_player_id=scenario.source_army.player_id,
-        attacking_unit_instance_id=scenario.bodyguard.unit_instance_id,
+        attacking_unit_instance_id=scenario.attached_unit_instance_id,
         attack_pools=(lethal_pool,),
         source_phase=BattlePhase.SHOOTING,
     )

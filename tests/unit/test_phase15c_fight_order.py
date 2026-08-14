@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -35,6 +36,7 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     record_core_fights_first_source_for_unit,
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -96,9 +98,6 @@ from warhammer40k_core.engine.phases.fight import (
 )
 from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.primary_turn_start_evidence import (
-    record_primary_turn_start_evidence,
-)
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     STRATAGEM_DECISION_TYPE,
@@ -2127,7 +2126,8 @@ def _fight_lifecycle(
                 fixed_mission_ids=("assassination", "bring_it_down"),
             )
         )
-    record_primary_turn_start_evidence(state=state)
+    decisions = DecisionController()
+    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
     for key in fights_first_unit_keys:
         _record_fights_first_effect(
             state=state,
@@ -2148,7 +2148,7 @@ def _fight_lifecycle(
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": GameLifecycle().decision_controller.to_payload(),
+            "decisions": decisions.to_payload(),
             "reaction_queue": {"frames": []},
         },
     )

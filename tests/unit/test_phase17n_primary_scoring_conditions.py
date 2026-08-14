@@ -6,6 +6,11 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
+from warhammer40k_core.core.missions import ObjectiveMarkerRole
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
 from warhammer40k_core.engine.mission_scoring_policies import MissionScoringPolicies
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.missions import (
@@ -20,6 +25,11 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlTiming,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    ObjectiveMarkerModelWitness,
+    PrimaryUnattributedDestructionCause,
+    RulesUnitObjectiveProximityWitness,
+)
 from warhammer40k_core.engine.primary_scoring_condition_evaluator import (
     PrimaryScoringConditionContext,
     evaluate_primary_scoring_condition,
@@ -56,6 +66,19 @@ def battlefield_dominance_setup() -> MissionSetup:
         attacker_force_disposition_id="take-and-hold",
         defender_player_id="player-b",
         defender_force_disposition_id="take-and-hold",
+    )
+
+
+@pytest.fixture(scope="module")
+def purge_and_secure_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-reconnaissance-layout-1",
+        terrain_layout_id="take-and-hold-vs-reconnaissance-layout-1",
+        attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
+        defender_player_id="player-b",
+        defender_force_disposition_id="reconnaissance",
     )
 
 
@@ -242,6 +265,12 @@ def test_primary_policy_rejects_forged_end_of_battle_and_foreign_evidence(
         player_id="player-a",
         active_player_id="player-a",
         battle_round=2,
+        source_objective_control_record=replace(
+            command_record,
+            record_id="primary-turn-start-control:foreign",
+            game_id="primary-game:foreign",
+            timing=ObjectiveControlTiming.TURN_START,
+        ),
         controlled_objective_ids=(),
         source_id="primary-turn-start:foreign",
     )
@@ -260,13 +289,20 @@ def test_primary_policy_rejects_forged_end_of_battle_and_foreign_evidence(
     foreign_destruction = PrimaryUnitDestructionState(
         destruction_id="primary-destruction:foreign",
         game_id="primary-game:foreign",
-        destroying_player_id="player-a",
+        destroying_player_id=None,
+        destruction_attribution=None,
+        source_model_destroyed_event_id=None,
+        source_rules_unit_objective_proximity_witness=None,
+        source_battlefield_departure_ids=("primary-departure:foreign",),
+        unattributed_cause=PrimaryUnattributedDestructionCause.UNIT_COHERENCY,
+        source_mutation_id="end-turn-cleanup:foreign",
         destroyed_player_id="player-b",
         active_player_id="player-a",
         battle_round=2,
         phase=BattlePhase.SHOOTING.value,
         destroyed_unit_instance_id="enemy-unit:foreign",
         started_turn_terrain_feature_ids=(),
+        started_turn_objective_marker_ids=(),
         source_id="primary-destruction:foreign",
     )
 
@@ -308,6 +344,11 @@ def test_primary_policy_rejects_forged_end_of_battle_and_foreign_evidence(
                     foreign_turn_start,
                     game_id=command_record.game_id,
                     battle_round=3,
+                    source_objective_control_record=replace(
+                        foreign_turn_start.source_objective_control_record,
+                        game_id=command_record.game_id,
+                        battle_round=3,
+                    ),
                 ),
             ),
             terrain_trap_states=(),
@@ -324,13 +365,13 @@ def test_primary_policy_rejects_forged_end_of_battle_and_foreign_evidence(
                 replace(
                     foreign_destruction,
                     game_id=command_record.game_id,
-                    destroying_player_id="player-unknown",
+                    destroyed_player_id="player-unknown",
                 ),
             ),
         )
 
 
-def test_exact_twelve_implemented_primaries_build_typed_runtime_rules() -> None:
+def test_exact_thirteen_implemented_primaries_build_typed_runtime_rules() -> None:
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
     implemented_ids = {
         "primary-battlefield-dominance",
@@ -342,6 +383,7 @@ def test_exact_twelve_implemented_primaries_build_typed_runtime_rules() -> None:
         "primary-inescapable-dominion",
         "primary-meatgrinder",
         "primary-outmaneuver",
+        "primary-purge-and-secure",
         "primary-reconnaissance-sweep",
         "primary-search-and-scour",
         "primary-unstoppable-force",
@@ -375,25 +417,37 @@ def test_promoted_destruction_and_table_quarter_conditions_emit_witnesses(
             destruction_id="destruction:enemy-one",
             battle_round=2,
             active_player_id="player-a",
+            destroying_player_id=None,
             destroyed_player_id="player-b",
             destroyed_unit_instance_id="enemy-unit:one",
+            destruction_attribution=None,
+            source_rules_unit_objective_proximity_witness=None,
             started_turn_terrain_feature_ids=("terrain-area:alpha",),
+            started_turn_objective_marker_ids=(),
         ),
         PrimaryUnitDestructionEvidence(
             destruction_id="destruction:enemy-two",
             battle_round=2,
             active_player_id="player-a",
+            destroying_player_id=None,
             destroyed_player_id="player-b",
             destroyed_unit_instance_id="enemy-unit:two",
+            destruction_attribution=None,
+            source_rules_unit_objective_proximity_witness=None,
             started_turn_terrain_feature_ids=(),
+            started_turn_objective_marker_ids=(),
         ),
         PrimaryUnitDestructionEvidence(
             destruction_id="destruction:friendly-previous",
             battle_round=1,
             active_player_id="player-b",
+            destroying_player_id=None,
             destroyed_player_id="player-a",
             destroyed_unit_instance_id="friendly-unit:previous",
+            destruction_attribution=None,
+            source_rules_unit_objective_proximity_witness=None,
             started_turn_terrain_feature_ids=(),
+            started_turn_objective_marker_ids=(),
         ),
     )
     context = PrimaryScoringConditionContext(
@@ -452,6 +506,264 @@ def test_promoted_destruction_and_table_quarter_conditions_emit_witnesses(
     assert four_quarters["score_count"] == 1
     assert four_quarters["qualifying_table_quarter_ids"] == sorted(TABLE_QUARTER_IDS)
     assert len(cast(list[object], four_quarters["table_quarter_unit_witnesses"])) == 4
+
+
+def test_friendly_attributed_source_on_objective_requires_exact_typed_witness(
+    battlefield_dominance_setup: MissionSetup,
+) -> None:
+    setup = battlefield_dominance_setup
+    central_id = next(
+        marker.objective_marker_id
+        for marker in setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+    )
+    record = _control_record(setup, battle_round=2)
+    source_rules_unit_id = "friendly-rules-unit:source"
+    source_attribution = ModelDestructionAttribution.for_non_attack(
+        destroying_player_id="player-a",
+        source_kind=DestructionSourceKind.ABILITY,
+        source_rules_unit_instance_id=source_rules_unit_id,
+        source_model_instance_id="friendly-model:source",
+    )
+    source_on_objective = RulesUnitObjectiveProximityWitness(
+        rules_unit_instance_id=source_rules_unit_id,
+        component_unit_instance_ids=("friendly-unit:source",),
+        objective_marker_witnesses=(
+            ObjectiveMarkerModelWitness(
+                objective_marker_id=central_id,
+                model_instance_ids=("friendly-model:source",),
+            ),
+        ),
+    )
+    qualifying = PrimaryUnitDestructionEvidence(
+        destruction_id="destruction:attributed-on-objective",
+        battle_round=2,
+        active_player_id="player-a",
+        destroying_player_id="player-a",
+        destroyed_player_id="player-b",
+        destroyed_unit_instance_id="enemy-unit:qualifying",
+        destruction_attribution=source_attribution,
+        source_rules_unit_objective_proximity_witness=source_on_objective,
+        started_turn_terrain_feature_ids=(),
+        started_turn_objective_marker_ids=(),
+    )
+    context = PrimaryScoringConditionContext(
+        record=record,
+        mission_setup=setup,
+        turn_order=("player-a", "player-b"),
+        player_id="player-a",
+        destruction_evidence=(qualifying,),
+    )
+
+    evidence = evaluate_primary_scoring_condition(
+        condition=("one_or_more_enemy_units_destroyed_by_friendly_unit_on_objective_this_turn"),
+        context=context,
+    )
+
+    assert evidence["score_count"] == 1
+    assert evidence["destruction_ids"] == ["destruction:attributed-on-objective"]
+    assert evidence["destroyed_unit_instance_ids"] == ["enemy-unit:qualifying"]
+    assert evidence["source_rules_unit_objective_marker_ids"] == [central_id]
+
+    empty_source_witness = RulesUnitObjectiveProximityWitness(
+        rules_unit_instance_id=source_rules_unit_id,
+        component_unit_instance_ids=("friendly-unit:source",),
+        objective_marker_witnesses=(),
+    )
+    player_only_attribution = ModelDestructionAttribution.for_non_attack(
+        destroying_player_id="player-a",
+        source_kind=DestructionSourceKind.ABILITY,
+        source_rules_unit_instance_id=None,
+        source_model_instance_id=None,
+    )
+    non_qualifying = {
+        "typed-empty-witness": replace(
+            qualifying,
+            destruction_id="destruction:typed-empty-witness",
+            source_rules_unit_objective_proximity_witness=empty_source_witness,
+        ),
+        "player-only-attribution": replace(
+            qualifying,
+            destruction_id="destruction:player-only-attribution",
+            destruction_attribution=player_only_attribution,
+            source_rules_unit_objective_proximity_witness=None,
+        ),
+        "unattributed": replace(
+            qualifying,
+            destruction_id="destruction:unattributed",
+            destroying_player_id=None,
+            destruction_attribution=None,
+            source_rules_unit_objective_proximity_witness=None,
+        ),
+        "self-owned-target": replace(
+            qualifying,
+            destruction_id="destruction:self-owned-target",
+            destroyed_player_id="player-a",
+        ),
+    }
+    for case_id, row in non_qualifying.items():
+        rejected = evaluate_primary_scoring_condition(
+            condition=("one_or_more_enemy_units_destroyed_by_friendly_unit_on_objective_this_turn"),
+            context=replace(context, destruction_evidence=(row,)),
+        )
+        assert rejected["score_count"] == 0, case_id
+        assert rejected["destruction_ids"] == [], case_id
+
+
+def test_started_turn_objective_destruction_is_attribution_independent_and_central_filtered(
+    battlefield_dominance_setup: MissionSetup,
+) -> None:
+    setup = battlefield_dominance_setup
+    central_id = next(
+        marker.objective_marker_id
+        for marker in setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+    )
+    non_central_id = next(
+        marker.objective_marker_id
+        for marker in setup.objective_markers
+        if marker.objective_role is not ObjectiveMarkerRole.CENTRAL
+    )
+    record = _control_record(setup, battle_round=2)
+    central_destruction = PrimaryUnitDestructionEvidence(
+        destruction_id="destruction:started-central",
+        battle_round=2,
+        active_player_id="player-a",
+        destroying_player_id=None,
+        destroyed_player_id="player-b",
+        destroyed_unit_instance_id="enemy-unit:started-central",
+        destruction_attribution=None,
+        source_rules_unit_objective_proximity_witness=None,
+        started_turn_terrain_feature_ids=(),
+        started_turn_objective_marker_ids=(central_id,),
+    )
+    non_central_destruction = replace(
+        central_destruction,
+        destruction_id="destruction:started-non-central",
+        destroyed_unit_instance_id="enemy-unit:started-non-central",
+        started_turn_objective_marker_ids=(non_central_id,),
+    )
+    context = PrimaryScoringConditionContext(
+        record=record,
+        mission_setup=setup,
+        turn_order=("player-a", "player-b"),
+        player_id="player-a",
+        destruction_evidence=(central_destruction, non_central_destruction),
+    )
+
+    any_objective = evaluate_primary_scoring_condition(
+        condition=("one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn"),
+        context=context,
+    )
+    central_only = evaluate_primary_scoring_condition(
+        condition=(
+            "one_or_more_enemy_units_started_turn_within_central_objective_range_"
+            "destroyed_this_turn"
+        ),
+        context=context,
+    )
+
+    assert any_objective["score_count"] == 1
+    assert any_objective["destruction_ids"] == [
+        "destruction:started-central",
+        "destruction:started-non-central",
+    ]
+    assert any_objective["started_turn_objective_marker_ids"] == sorted(
+        (central_id, non_central_id)
+    )
+    assert central_only["score_count"] == 1
+    assert central_only["destruction_ids"] == ["destruction:started-central"]
+    assert central_only["started_turn_objective_marker_ids"] == [central_id]
+    assert central_only["central_objective_marker_ids"] == [central_id]
+
+
+def test_purge_and_secure_equal_destruction_branches_award_one_three_vp_result(
+    purge_and_secure_setup: MissionSetup,
+) -> None:
+    setup = purge_and_secure_setup
+    central_id = next(
+        marker.objective_marker_id
+        for marker in setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+    )
+    record = _control_record(setup, battle_round=2)
+    source_rules_unit_id = "friendly-rules-unit:purge-source"
+    attribution = ModelDestructionAttribution.for_non_attack(
+        destroying_player_id="player-a",
+        source_kind=DestructionSourceKind.ABILITY,
+        source_rules_unit_instance_id=source_rules_unit_id,
+        source_model_instance_id="friendly-model:purge-source",
+    )
+    source_witness = RulesUnitObjectiveProximityWitness(
+        rules_unit_instance_id=source_rules_unit_id,
+        component_unit_instance_ids=("friendly-unit:purge-source",),
+        objective_marker_witnesses=(
+            ObjectiveMarkerModelWitness(
+                objective_marker_id=central_id,
+                model_instance_ids=("friendly-model:purge-source",),
+            ),
+        ),
+    )
+    destruction = PrimaryUnitDestructionState(
+        destruction_id="primary-destruction:purge-both-branches",
+        game_id=record.game_id,
+        destroying_player_id="player-a",
+        destruction_attribution=attribution,
+        source_model_destroyed_event_id="event:model-destroyed:purge-both-branches",
+        source_rules_unit_objective_proximity_witness=source_witness,
+        source_battlefield_departure_ids=("primary-departure:purge-both-branches",),
+        unattributed_cause=None,
+        source_mutation_id=None,
+        destroyed_player_id="player-b",
+        active_player_id="player-a",
+        battle_round=2,
+        phase=BattlePhase.FIGHT.value,
+        destroyed_unit_instance_id="enemy-unit:purge-target",
+        started_turn_terrain_feature_ids=(),
+        started_turn_objective_marker_ids=(central_id,),
+        source_id="primary-destruction:purge-both-branches",
+    )
+    turn_start = PrimaryObjectiveTurnStartState(
+        state_id="primary-turn-start:purge-player-a:round-2",
+        game_id=record.game_id,
+        player_id="player-a",
+        active_player_id="player-a",
+        battle_round=2,
+        source_objective_control_record=replace(
+            record,
+            record_id="primary-turn-start-control:purge-player-a:round-2",
+            timing=ObjectiveControlTiming.TURN_START,
+        ),
+        controlled_objective_ids=(),
+        source_id="primary-turn-start:purge-player-a:round-2",
+    )
+    policies = mission_scoring_policies_from_setup(setup)
+
+    awards = policies.primary_awards_from_objective_control(
+        record=record,
+        mission_setup=setup,
+        turn_order=("player-a", "player-b"),
+        turn_start_states=(turn_start,),
+        terrain_trap_states=(),
+        unit_destruction_states=(destruction,),
+    )
+
+    assert len(awards) == 1
+    (award,) = awards
+    assert award.amount == 3
+    assert award.source_id == "primary-purge-and-secure"
+    metadata = cast(dict[str, object], award.metadata)
+    assert metadata["scoring_rule_id"] == ("purge-and-secure-destroyed-by-objective-unit-turn-end")
+    assert metadata["primary_scoring_achieved_rule_ids"] == [
+        "purge-and-secure-destroyed-by-objective-unit-turn-end",
+        "purge-and-secure-started-objective-destroyed-turn-end",
+    ]
+    assert metadata["primary_scoring_selected_rule_ids"] == [
+        "purge-and-secure-destroyed-by-objective-unit-turn-end"
+    ]
+    assert metadata["primary_scoring_suppressed_rule_ids"] == [
+        "purge-and-secure-started-objective-destroyed-turn-end"
+    ]
 
 
 def test_end_of_battle_territory_condition_is_spatial_and_fail_closed(

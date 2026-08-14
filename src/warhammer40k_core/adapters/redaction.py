@@ -9,10 +9,20 @@ from warhammer40k_core.adapters.external_contract import ERROR_ENVELOPE_SCHEMA_V
 from warhammer40k_core.adapters.support_profile import SupportProfilePayload
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.event_log import EventRecordPayload, JsonValue, validate_json_value
-from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus, LifecycleStatusKind
+from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.phase import (
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+    LifecycleStatusKind,
+    SetupStep,
+)
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    RulesUnitObjectiveProximityWitness,
+)
 from warhammer40k_core.engine.primary_turn_start_evidence import (
-    PrimaryUnitTerrainTurnStartSnapshot,
-    PrimaryUnitTerrainTurnStartSnapshotPayload,
+    PrimaryRulesUnitTurnStartSnapshot,
+    PrimaryRulesUnitTurnStartSnapshotPayload,
 )
 
 HIDDEN_DECISION_TYPE = "hidden_decision"
@@ -30,33 +40,26 @@ class RedactedLifecycleStatusPayload(TypedDict):
     actor_id: str | None
 
 
-def public_primary_unit_terrain_turn_start_snapshots(
-    snapshots: Sequence[PrimaryUnitTerrainTurnStartSnapshot],
-    *,
-    visible_unit_instance_ids: frozenset[str],
-) -> list[PrimaryUnitTerrainTurnStartSnapshotPayload]:
-    """Project turn-start terrain evidence without revealing hidden unit identities."""
-    if any(type(snapshot) is not PrimaryUnitTerrainTurnStartSnapshot for snapshot in snapshots):
-        raise GameLifecycleError("Terrain snapshot redaction requires typed snapshots.")
-    if type(visible_unit_instance_ids) is not frozenset or any(
-        type(unit_id) is not str or not unit_id.strip() for unit_id in visible_unit_instance_ids
-    ):
-        raise GameLifecycleError("Terrain snapshot redaction visible unit IDs are invalid.")
-    return [
-        {
-            "snapshot_id": snapshot.snapshot_id,
-            "game_id": snapshot.game_id,
-            "active_player_id": snapshot.active_player_id,
-            "battle_round": snapshot.battle_round,
-            "unit_memberships": [
-                membership.to_payload()
-                for membership in snapshot.unit_memberships
-                if membership.unit_instance_id in visible_unit_instance_ids
-            ],
-            "source_id": snapshot.source_id,
-        }
-        for snapshot in snapshots
-    ]
+def battle_formation_declarations_are_unresolved(state: GameState) -> bool:
+    """Return whether simultaneous Declare Battle Formations choices remain private."""
+    if type(state) is not GameState:
+        raise GameLifecycleError("Battle-formation redaction requires a GameState.")
+    declaration_step = SetupStep.DECLARE_BATTLE_FORMATIONS
+    if declaration_step not in state.setup_sequence:
+        return False
+    if state.stage is not GameLifecycleStage.SETUP or state.setup_step_index is None:
+        return False
+    declaration_index = state.setup_sequence.index(declaration_step)
+    return state.setup_step_index <= declaration_index
+
+
+def public_primary_rules_unit_turn_start_snapshots(
+    snapshots: Sequence[PrimaryRulesUnitTurnStartSnapshot],
+) -> list[PrimaryRulesUnitTurnStartSnapshotPayload]:
+    """Project complete public rules-unit history without viewer filtering."""
+    if any(type(snapshot) is not PrimaryRulesUnitTurnStartSnapshot for snapshot in snapshots):
+        raise GameLifecycleError("Turn-start snapshot redaction requires typed snapshots.")
+    return [snapshot.to_payload() for snapshot in snapshots]
 
 
 def public_error_envelope(*, code: str, message: str) -> dict[str, JsonValue]:
@@ -300,6 +303,8 @@ def _event_record_hidden_from_context(
     payload: JsonValue,
     viewer: ViewerContext,
 ) -> bool:
+    if _player_owned_secret_event_hidden_from_context(payload=payload, viewer=viewer):
+        return True
     if event_type == "decision_requested":
         request_payload = _json_object("decision_requested payload", payload)
         return decision_request_payload_hidden_from_context(
@@ -340,6 +345,27 @@ def _event_record_hidden_from_context(
     return False
 
 
+def _player_owned_secret_event_hidden_from_context(
+    *,
+    payload: JsonValue,
+    viewer: ViewerContext,
+) -> bool:
+    if not isinstance(payload, dict):
+        return False
+    secret = payload.get("secret")
+    if secret is None:
+        return False
+    if type(secret) is not bool:
+        raise GameLifecycleError("Secret event payload flag must be a bool.")
+    if secret is False:
+        return False
+    player_id = _required_string(payload, key="player_id")
+    visibility_source = _required_string(payload, key="visibility_source")
+    if visibility_source != "declare_battle_formations":
+        raise GameLifecycleError("Secret event visibility source is unsupported.")
+    return not (viewer.policy.omniscient or viewer.owns_player(player_id))
+
+
 def _public_event_payload(
     *,
     event_type: str,
@@ -365,7 +391,32 @@ def _public_event_payload(
             payload,
             viewer=viewer,
         )
+    if event_type == "model_destroyed":
+        return _public_model_destroyed_payload(payload)
     return validate_json_value(payload)
+
+
+def _public_model_destroyed_payload(
+    payload: JsonValue,
+) -> JsonValue:
+    event_payload = _json_object("model_destroyed payload", payload)
+    _required_string(event_payload, key="destroying_player_id")
+    for field_name in (
+        "source_rules_unit_objective_proximity_witness",
+        "destroyed_rules_unit_objective_proximity_witness",
+    ):
+        if field_name not in event_payload:
+            raise GameLifecycleError(f"model_destroyed payload is missing {field_name}.")
+    raw_source_witness = event_payload["source_rules_unit_objective_proximity_witness"]
+    if raw_source_witness is not None:
+        RulesUnitObjectiveProximityWitness.from_payload(raw_source_witness)
+    raw_destroyed_witness = event_payload["destroyed_rules_unit_objective_proximity_witness"]
+    if raw_destroyed_witness is None:
+        raise GameLifecycleError(
+            "model_destroyed payload requires destroyed objective proximity evidence."
+        )
+    RulesUnitObjectiveProximityWitness.from_payload(raw_destroyed_witness)
+    return validate_json_value(event_payload)
 
 
 def _public_decision_request_payload(

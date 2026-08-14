@@ -76,7 +76,7 @@ from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedContext,
     UnitDestroyedHookBinding,
-    model_destroyed_events_for_lifecycle_phase,
+    unit_destruction_completion_events_for_phase,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
@@ -1202,9 +1202,13 @@ def _enemy_unit_destroyed_event_ids_this_battle_round(
         if payload.get("player_id") != player_id:
             continue
         event_ids.add(_payload_string(payload, key="model_destroyed_event_id"))
-    for event_id, payload in _unit_destruction_completion_events_for_current_phase(
+    completed_phase = state.current_battle_phase
+    if completed_phase is None:
+        raise GameLifecycleError("Code Chivalric tally requires a current phase.")
+    for event_id, payload in unit_destruction_completion_events_for_phase(
         state=state,
         event_log=event_log,
+        completed_phase=completed_phase,
     ):
         if _payload_string(payload, key="destroying_player_id") != player_id:
             continue
@@ -1213,36 +1217,6 @@ def _enemy_unit_destroyed_event_ids_this_battle_round(
             continue
         event_ids.add(event_id)
     return tuple(sorted(event_ids))
-
-
-def _unit_destruction_completion_events_for_current_phase(
-    *,
-    state: GameState,
-    event_log: EventLog,
-) -> tuple[tuple[str, dict[str, JsonValue]], ...]:
-    if state.battlefield_state is None:
-        return ()
-    completed_phase = state.current_battle_phase
-    if completed_phase is None:
-        raise GameLifecycleError("Code Chivalric tally requires a current phase.")
-    removed_model_ids = set(state.battlefield_state.removed_model_ids)
-    events_by_unit: dict[str, list[tuple[int, str, dict[str, JsonValue]]]] = {}
-    for event_order, event_id, payload in model_destroyed_events_for_lifecycle_phase(
-        state=state,
-        event_log=event_log,
-        completed_phase=completed_phase,
-    ):
-        target_unit_id = _payload_string(payload, key="target_unit_instance_id")
-        events_by_unit.setdefault(target_unit_id, []).append((event_order, event_id, dict(payload)))
-    completions: list[tuple[int, str, dict[str, JsonValue]]] = []
-    for target_unit_id, events in events_by_unit.items():
-        model_ids = _model_instance_ids_for_unit(state=state, unit_instance_id=target_unit_id)
-        if not model_ids:
-            continue
-        if not model_ids <= removed_model_ids:
-            continue
-        completions.append(sorted(events, key=lambda item: item[0])[-1])
-    return tuple((event_id, payload) for _order, event_id, payload in sorted(completions))
 
 
 def _eligible_lay_low_targets(
@@ -1377,17 +1351,22 @@ def _unit_and_army_by_id(
 
 
 def _unit_owner_player_id(state: GameState, *, unit_instance_id: str) -> str:
-    _unit, army = _unit_and_army_by_id(state, unit_instance_id=unit_instance_id)
-    return army.player_id
-
-
-def _model_instance_ids_for_unit(
-    *,
-    state: GameState,
-    unit_instance_id: str,
-) -> set[str]:
-    unit, _army = _unit_and_army_by_id(state, unit_instance_id=unit_instance_id)
-    return {model.model_instance_id for model in unit.own_models}
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    physical_matches = tuple(
+        army.player_id
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == requested_unit_id
+    )
+    historical_matches = tuple(
+        record.player_id
+        for record in state.starting_attached_unit_records
+        if record.attached_unit_instance_id == requested_unit_id
+    )
+    matches = (*physical_matches, *historical_matches)
+    if len(matches) != 1:
+        raise GameLifecycleError("Unit owner lookup failed for Code Chivalric.")
+    return matches[0]
 
 
 def _unit_has_code_chivalric(unit: UnitInstance) -> bool:

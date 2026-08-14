@@ -426,8 +426,9 @@ def test_mustered_attached_unit_healing_stale_candidates_reject_before_queue_pop
 
 
 def test_lifecycle_submit_healing_model_decision_routes_through_submit_decision() -> None:
-    state = _battle_state()
-    lifecycle = _lifecycle_for_state(state)
+    decisions = DecisionController()
+    state = _battle_state(decisions=decisions)
+    lifecycle = _lifecycle_for_state(state, decisions=decisions)
     lifecycle_state = lifecycle.state
     assert lifecycle_state is not None
     state = lifecycle_state
@@ -483,8 +484,9 @@ def test_lifecycle_submit_healing_model_decision_routes_through_submit_decision(
 
 
 def test_lifecycle_healing_selection_stale_rejects_before_queue_pop() -> None:
-    state = _battle_state()
-    lifecycle = _lifecycle_for_state(state)
+    decisions = DecisionController()
+    state = _battle_state(decisions=decisions)
+    lifecycle = _lifecycle_for_state(state, decisions=decisions)
     lifecycle_state = lifecycle.state
     assert lifecycle_state is not None
     state = lifecycle_state
@@ -527,8 +529,9 @@ def test_lifecycle_healing_selection_stale_rejects_before_queue_pop() -> None:
 
 
 def test_lifecycle_healing_model_decision_returns_follow_up_request_for_next_choice() -> None:
-    state = _battle_state()
-    lifecycle = _lifecycle_for_state(state)
+    decisions = DecisionController()
+    state = _battle_state(decisions=decisions)
+    lifecycle = _lifecycle_for_state(state, decisions=decisions)
     lifecycle_state = lifecycle.state
     assert lifecycle_state is not None
     state = lifecycle_state
@@ -587,8 +590,9 @@ def test_lifecycle_healing_model_decision_returns_follow_up_request_for_next_cho
 
 
 def test_lifecycle_healing_revival_rejects_stale_and_malformed_then_round_trips() -> None:
-    state = _battle_state()
-    lifecycle = _lifecycle_for_state(state)
+    decisions = DecisionController()
+    state = _battle_state(decisions=decisions)
+    lifecycle = _lifecycle_for_state(state, decisions=decisions)
     lifecycle_state = lifecycle.state
     assert lifecycle_state is not None
     state = lifecycle_state
@@ -1712,7 +1716,11 @@ def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
     raise AssertionError(f"missing unit {unit_instance_id}")
 
 
-def _battle_state(*, config: GameConfig | None = None) -> GameState:
+def _battle_state(
+    *,
+    config: GameConfig | None = None,
+    decisions: DecisionController | None = None,
+) -> GameState:
     config = _config() if config is None else config
     state = GameState.from_config(config)
     for army in _mustered_armies(config):
@@ -1728,19 +1736,23 @@ def _battle_state(*, config: GameConfig | None = None) -> GameState:
     state.record_secondary_mission_choice(
         _secondary_choice(player_id="player-b", mode=SecondaryMissionMode.FIXED)
     )
-    enter_battle_for_fixture(state)
+    enter_battle_for_fixture(state, decisions=decisions)
     assert state.stage is GameLifecycleStage.BATTLE
     return state
 
 
-def _lifecycle_for_state(state: GameState) -> GameLifecycle:
+def _lifecycle_for_state(
+    state: GameState,
+    *,
+    decisions: DecisionController,
+) -> GameLifecycle:
     config = _config()
     return GameLifecycle.from_payload(
         {
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": DecisionController().to_payload(),
+            "decisions": decisions.to_payload(),
             "reaction_queue": {"frames": []},
         }
     )

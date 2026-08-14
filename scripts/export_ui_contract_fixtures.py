@@ -180,6 +180,7 @@ def build_ui_contract_bundle() -> UiContractBundle:
         game_id="ui-contract-terrain-snapshot-hidden-reserve"
     )
     _session_state(hidden_reserve_session).reposition_unit_to_strategic_reserves(
+        event_log=hidden_reserve_session.lifecycle.decision_controller.event_log,
         player_id=PLAYER_B,
         unit_instance_id=UNIT_BETA,
         source_rule_ids=("ui-contract:fixture:hidden-reserve",),

@@ -27,6 +27,7 @@ from warhammer40k_core.engine.battle_formation_hooks import (
     BattleFormationRequestContext,
     BattleFormationResultContext,
 )
+from warhammer40k_core.engine.battlefield_state import UnitPlacement
 from warhammer40k_core.engine.command_phase_start_hooks import (
     SELECT_FACTION_RULE_COMMAND_PHASE_START_OPTION_DECISION_TYPE,
     CommandPhaseStartRequestContext,
@@ -37,13 +38,16 @@ from warhammer40k_core.engine.command_points import (
     CommandPointGainResultPayload,
     CommandPointGainStatus,
 )
+from warhammer40k_core.engine.damage_allocation import apply_mortal_wounds_to_unit
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
+    PARAMETERIZED_DECISION_OPTION_ID,
     DecisionError,
     DecisionOption,
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.effects import EffectExpirationBoundary, PersistingEffect
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.events import (
@@ -61,7 +65,19 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedHookRegistry,
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
+from warhammer40k_core.engine.return_on_death import (
+    RETURN_ON_DEATH_PENDING_CREATED_EVENT_TYPE,
+    SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+    PendingReturnOnDeath,
+    ReturnDestroyedTargetScope,
+    ReturnRestoreWoundsMode,
+    apply_return_on_death_placement_decision,
+    resolve_pending_return_on_death_phase_end,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     MovementBudgetModifierContext,
@@ -506,8 +522,11 @@ def test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_unit
     )
     _set_current_phase(state, BattlePhase.FIGHT, active_player_id="player-b")
     decisions = DecisionController()
+    enemy_before_destruction = unit_by_id(state, ENEMY_UNIT_ID)
+    assert state.battlefield_state is not None
+    enemy_placement_before_destruction = state.battlefield_state.unit_placement_by_id(ENEMY_UNIT_ID)
 
-    _record_enemy_unit_destroyed(
+    first_destroyed_event = _record_enemy_unit_destroyed(
         state=state,
         decisions=decisions,
         model_destroyed_event_id_suffix="first-destruction",
@@ -525,6 +544,14 @@ def test_code_chivalric_tally_uses_updated_threshold_and_returned_destroyed_unit
 
     assert not army_rule.army_is_honoured(state, player_id="player-a")
 
+    _restore_enemy_unit_for_code_chivalric_fixture(
+        state=state,
+        decisions=decisions,
+        enemy=enemy_before_destruction,
+        placement=enemy_placement_before_destruction,
+        model_destroyed_event=first_destroyed_event,
+        restoration_suffix="returned-unit",
+    )
     _record_enemy_unit_destroyed(
         state=state,
         decisions=decisions,
@@ -571,32 +598,27 @@ def test_code_chivalric_tally_counts_out_of_phase_unit_completion_evidence() -> 
     )
     _set_current_phase(state, BattlePhase.FIGHT, active_player_id="player-b")
     decisions = DecisionController()
-    _record_enemy_unit_destroyed(
+    enemy_before_destruction = unit_by_id(state, ENEMY_UNIT_ID)
+    assert state.battlefield_state is not None
+    enemy_placement_before_destruction = state.battlefield_state.unit_placement_by_id(ENEMY_UNIT_ID)
+    first_destroyed_event = _record_enemy_unit_destroyed(
         state=state,
         decisions=decisions,
         model_destroyed_event_id_suffix="recorded-hook-destruction",
     )
-    enemy = unit_by_id(state, ENEMY_UNIT_ID)
-    model_id = enemy.own_models[0].model_instance_id
-    decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": BattlePhase.SHOOTING.value,
-            "destroying_player_id": "player-a",
-            "attacking_unit_instance_id": IMPERIAL_KNIGHTS_UNIT_ID,
-            "target_unit_instance_id": ENEMY_UNIT_ID,
-            "model_instance_id": model_id,
-            "damage_kind": "normal",
-            "damage_event_id": "phase17g-imperial-knights-current-phase-damage",
-            "destroyed_model_rules_triggered": True,
-        },
+    _restore_enemy_unit_for_code_chivalric_fixture(
+        state=state,
+        decisions=decisions,
+        enemy=enemy_before_destruction,
+        placement=enemy_placement_before_destruction,
+        model_destroyed_event=first_destroyed_event,
+        restoration_suffix="out-of-phase-return",
     )
-    assert state.battlefield_state is not None
-    state.replace_battlefield_state(
-        state.battlefield_state.with_removed_models(enemy.own_model_ids())
+    _record_enemy_unit_destroyed(
+        state=state,
+        decisions=decisions,
+        model_destroyed_event_id_suffix="current-phase-destruction",
+        action_phase=BattlePhase.SHOOTING,
     )
 
     army_rule.resolve_code_chivalric_end_battle_round(
@@ -1008,7 +1030,10 @@ def test_code_chivalric_unit_destroyed_hook_ignores_non_knights_and_duplicates()
     state = battle_state()
     decisions = DecisionController()
     _set_current_phase(state, BattlePhase.FIGHT, active_player_id="player-b")
-    _record_enemy_unit_destroyed(
+    enemy_before_destruction = unit_by_id(state, ENEMY_UNIT_ID)
+    assert state.battlefield_state is not None
+    enemy_placement_before_destruction = state.battlefield_state.unit_placement_by_id(ENEMY_UNIT_ID)
+    first_destroyed_event = _record_enemy_unit_destroyed(
         state=state,
         decisions=decisions,
         model_destroyed_event_id_suffix="non-knight-destruction",
@@ -1016,6 +1041,14 @@ def test_code_chivalric_unit_destroyed_hook_ignores_non_knights_and_duplicates()
     assert not _event_records_of_type(decisions, army_rule.CODE_CHIVALRIC_ENEMY_DESTROYED_EVENT)
 
     _mark_player_as_imperial_knights(state, player_id="player-a")
+    _restore_enemy_unit_for_code_chivalric_fixture(
+        state=state,
+        decisions=decisions,
+        enemy=enemy_before_destruction,
+        placement=enemy_placement_before_destruction,
+        model_destroyed_event=first_destroyed_event,
+        restoration_suffix="non-knight-destruction-return",
+    )
     destroyed_event = _record_enemy_unit_destroyed(
         state=state,
         decisions=decisions,
@@ -1816,24 +1849,46 @@ def _record_enemy_unit_destroyed(
     state: GameState,
     decisions: DecisionController,
     model_destroyed_event_id_suffix: str,
+    action_phase: BattlePhase = BattlePhase.FIGHT,
 ) -> EventRecord:
     enemy = unit_by_id(state, ENEMY_UNIT_ID)
-    model = enemy.own_models[0]
-    destroyed_event = decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": BattlePhase.FIGHT.value,
-            "destroying_player_id": "player-a",
-            "attacking_unit_instance_id": IMPERIAL_KNIGHTS_UNIT_ID,
-            "target_unit_instance_id": ENEMY_UNIT_ID,
-            "model_instance_id": model.model_instance_id,
-            "damage_kind": "normal",
-            "damage_event_id": f"phase17g-imperial-knights:{model_destroyed_event_id_suffix}",
-            "destroyed_model_rules_triggered": True,
+    expected_destroyed_model_ids = tuple(
+        model.model_instance_id for model in enemy.own_models if model.is_alive
+    )
+    assert expected_destroyed_model_ids
+    source = unit_by_id(state, IMPERIAL_KNIGHTS_UNIT_ID)
+    application = apply_mortal_wounds_to_unit(
+        state=state,
+        decisions=decisions,
+        application_id=f"phase17g-imperial-knights:{model_destroyed_event_id_suffix}",
+        source_rule_id="phase17g-imperial-knights-test-destruction",
+        source_context={
+            "source_kind": "code_chivalric_unit_destruction_fixture",
+            "source_unit_instance_id": source.unit_instance_id,
         },
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+            state=state,
+            destroying_player_id="player-a",
+            source_rules_unit_instance_id=source.unit_instance_id,
+            source_model_instance_id=source.own_models[0].model_instance_id,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=action_phase,
+            source_step="code_chivalric_unit_destruction_fixture",
+        ),
+        target_unit_instance_id=enemy.unit_instance_id,
+        mortal_wounds=sum(model.wounds_remaining for model in enemy.own_models),
+    )
+    destroyed_model_ids = tuple(
+        damage.model_instance_id for damage in application.applications if damage.destroyed
+    )
+    assert destroyed_model_ids == expected_destroyed_model_ids
+    final_destroyed_model_id = destroyed_model_ids[-1]
+    destroyed_event = next(
+        record
+        for record in reversed(decisions.event_log.records)
+        if record.event_type == "model_destroyed"
+        and cast(dict[str, JsonValue], record.payload).get("model_instance_id")
+        == final_destroyed_model_id
     )
     army_rule.record_code_chivalric_enemy_unit_destroyed(
         UnitDestroyedContext(
@@ -1848,6 +1903,98 @@ def _record_enemy_unit_destroyed(
         )
     )
     return destroyed_event
+
+
+def _restore_enemy_unit_for_code_chivalric_fixture(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    enemy: UnitInstance,
+    placement: UnitPlacement,
+    model_destroyed_event: EventRecord,
+    restoration_suffix: str,
+) -> None:
+    destroyed_payload = cast(dict[str, JsonValue], model_destroyed_event.payload)
+    restored_model_id = cast(str, destroyed_payload["model_instance_id"])
+    restored_placement = next(
+        model_placement
+        for model_placement in placement.model_placements
+        if model_placement.model_instance_id == restored_model_id
+    )
+    pending = PendingReturnOnDeath(
+        pending_id=f"phase17g-imperial-knights:{restoration_suffix}:pending",
+        source_rule_id="phase17g-imperial-knights-test-restoration",
+        source_ability_id="phase17g-imperial-knights-test-return-on-death",
+        source_clause_id="phase17g-imperial-knights-test-return-on-death-clause",
+        source_effect_index=0,
+        owner_player_id="player-b",
+        target_scope=ReturnDestroyedTargetScope.DESTROYED_MODEL,
+        destroyed_unit_instance_id=enemy.unit_instance_id,
+        destroyed_model_instance_id=restored_model_id,
+        destroyed_position_payload=validate_json_value(
+            {
+                "source": "model_destroyed_event",
+                "model_destroyed_event_id": model_destroyed_event.event_id,
+                "model_destroyed_payload": destroyed_payload,
+            }
+        ),
+        trigger_battle_round=state.battle_round,
+        trigger_phase=BattlePhase.FIGHT.value,
+        resolution_timing="phase_end",
+        roll_expression="D6",
+        roll_count=1,
+        success_threshold=2,
+        placement_anchor="destroyed_position",
+        placement_preference="as_close_as_possible",
+        engagement_range_restriction=True,
+        restore_wounds_mode=ReturnRestoreWoundsMode.FIXED_REMAINING,
+        wounds_remaining=1,
+        resolved=False,
+    )
+    state.record_pending_return_on_death(pending)
+    decisions.event_log.append(
+        RETURN_ON_DEATH_PENDING_CREATED_EVENT_TYPE,
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.FIGHT.value,
+            "model_destroyed_event_id": model_destroyed_event.event_id,
+            "pending": pending.to_payload(),
+        },
+    )
+    request = resolve_pending_return_on_death_phase_end(
+        state=state,
+        decisions=decisions,
+    )
+    assert request is not None
+    returned_placement = UnitPlacement(
+        army_id=restored_placement.army_id,
+        player_id=restored_placement.player_id,
+        unit_instance_id=restored_placement.unit_instance_id,
+        model_placements=(restored_placement,),
+    )
+    result = DecisionResult(
+        result_id=f"phase17g-imperial-knights:{restoration_suffix}:place-model",
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=validate_json_value(
+            {
+                "submission_kind": SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+                "attempted_placement": returned_placement.to_payload(),
+            }
+        ),
+    )
+    decisions.submit_result(result)
+    resolved = apply_return_on_death_placement_decision(
+        state=state,
+        decisions=decisions,
+        ruleset_descriptor=state.runtime_ruleset_descriptor(),
+        request=request,
+        result=result,
+    )
+    assert resolved.resolved
 
 
 def _event_records_of_type(

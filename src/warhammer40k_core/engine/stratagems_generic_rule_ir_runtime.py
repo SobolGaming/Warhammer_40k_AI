@@ -273,6 +273,7 @@ def apply_generic_rule_ir_reserve_removal(
     reserve_payloads: list[JsonValue] = []
     for unit_id in generic_rule_ir_execution_target_unit_ids(use_record):
         reserve_state = state.reposition_unit_to_strategic_reserves(
+            event_log=decisions.event_log,
             player_id=use_record.player_id,
             unit_instance_id=unit_id,
             reserve_origin=ReserveOrigin.DURING_BATTLE_STRATAGEM,

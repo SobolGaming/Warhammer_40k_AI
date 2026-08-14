@@ -6,6 +6,7 @@ from typing import Any, cast
 
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
+from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import (
@@ -37,7 +38,11 @@ from warhammer40k_core.engine.battle_shock_hooks import (
     BattleShockHookRegistry,
     BattleShockRerollPermissionContext,
 )
-from warhammer40k_core.engine.battlefield_state import PlacementError, UnitPlacement
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRemovalKind,
+    PlacementError,
+    UnitPlacement,
+)
 from warhammer40k_core.engine.command_points import (
     CommandPhaseStep,
     CommandPointGainResult,
@@ -1062,6 +1067,7 @@ def test_setup_declarations_reject_duplicate_and_drift_contexts() -> None:
 
 def test_repositioned_unit_preserves_move_history_and_effects() -> None:
     state = _battle_state()
+    event_log = EventLog()
     state.advance_to_next_battle_phase()
     assert state.current_battle_phase is BattlePhase.MOVEMENT
     unit_id = "army-alpha:intercessor-unit-1"
@@ -1088,6 +1094,7 @@ def test_repositioned_unit_preserves_move_history_and_effects() -> None:
     state.record_persisting_effect(effect)
 
     reserve_state = state.reposition_unit_to_strategic_reserves(
+        event_log=event_log,
         player_id="player-a",
         unit_instance_id=unit_id,
         reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
@@ -1118,6 +1125,16 @@ def test_repositioned_unit_preserves_move_history_and_effects() -> None:
     with pytest.raises(PlacementError, match="unit_instance_id is not placed"):
         state.battlefield_state.unit_placement_by_id(unit_id)
     assert set(state.battlefield_state.removed_model_ids).isdisjoint(unit.own_model_ids())
+    (departure,) = state.primary_battlefield_departure_states
+    assert departure.rules_unit_instance_id == unit_id
+    assert departure.component_unit_instance_ids == (unit_id,)
+    assert departure.departed_component_unit_instance_ids == (unit_id,)
+    assert departure.removed_model_instance_ids == unit.own_model_ids()
+    assert departure.removal_kind is BattlefieldRemovalKind.INTO_RESERVES
+    assert departure.source_id == (
+        f"{state.game_id}:reposition-reserve:round-{state.battle_round:02d}:"
+        f"{BattlePhase.MOVEMENT.value}:{unit_id}"
+    )
     assert GameState.from_payload(_game_state_payload_copy(state)).to_payload() == (
         state.to_payload()
     )
@@ -1125,12 +1142,14 @@ def test_repositioned_unit_preserves_move_history_and_effects() -> None:
 
 def test_repositioned_unit_preserves_advance_history() -> None:
     state = _battle_state()
+    event_log = EventLog()
     state.advance_to_next_battle_phase()
     unit_id = "army-alpha:intercessor-unit-1"
     advanced = _advanced_unit_state(state=state, unit_instance_id=unit_id)
     state.record_advanced_unit_state(advanced)
 
     state.reposition_unit_to_strategic_reserves(
+        event_log=event_log,
         player_id="player-a",
         unit_instance_id=unit_id,
     )
@@ -1160,6 +1179,7 @@ def test_repositioned_unit_preserves_disembark_history() -> None:
             ),
         )
     )
+    event_log = EventLog()
     state.advance_to_next_battle_phase()
     unit_id = "army-alpha:passenger-unit"
     disembarked = DisembarkedUnitState.for_mode(
@@ -1173,6 +1193,7 @@ def test_repositioned_unit_preserves_disembark_history() -> None:
     state.record_disembarked_unit_state(disembarked)
 
     state.reposition_unit_to_strategic_reserves(
+        event_log=event_log,
         player_id="player-a",
         unit_instance_id=unit_id,
     )
@@ -1192,8 +1213,10 @@ def test_repositioned_unit_preserves_disembark_history() -> None:
 
 def test_repositioned_unit_rejects_invalid_contexts_before_mutation() -> None:
     setup_state = GameState.from_config(_config())
+    event_log = EventLog()
     with pytest.raises(GameLifecycleError, match="only enter reserves during battle"):
         setup_state.reposition_unit_to_strategic_reserves(
+            event_log=event_log,
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
         )
@@ -1204,12 +1227,14 @@ def test_repositioned_unit_rejects_invalid_contexts_before_mutation() -> None:
     before_battlefield = state.battlefield_state.to_payload()
     with pytest.raises(GameLifecycleError, match="during-battle reserve origin"):
         state.reposition_unit_to_strategic_reserves(
+            event_log=event_log,
             player_id="player-a",
             unit_instance_id=unit_id,
             reserve_origin=ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
         )
     with pytest.raises(GameLifecycleError, match="player_id drift"):
         state.reposition_unit_to_strategic_reserves(
+            event_log=event_log,
             player_id="player-b",
             unit_instance_id=unit_id,
         )
@@ -1219,6 +1244,7 @@ def test_repositioned_unit_rejects_invalid_contexts_before_mutation() -> None:
     state.advance_to_next_battle_phase()
     with pytest.raises(GameLifecycleError, match="destruction_deadline_policy must be a policy"):
         state.reposition_unit_to_strategic_reserves(
+            event_log=event_log,
             player_id="player-a",
             unit_instance_id=unit_id,
             destruction_deadline_policy=cast(Any, object()),
@@ -1231,15 +1257,18 @@ def test_repositioned_unit_rejects_invalid_contexts_before_mutation() -> None:
     )
     with pytest.raises(GameLifecycleError, match="must be on the battlefield"):
         unplaced_state.reposition_unit_to_strategic_reserves(
+            event_log=event_log,
             player_id="player-a",
             unit_instance_id=unit_id,
         )
     state.reposition_unit_to_strategic_reserves(
+        event_log=event_log,
         player_id="player-a",
         unit_instance_id=unit_id,
     )
     with pytest.raises(GameLifecycleError, match="already has a ReserveState"):
         state.reposition_unit_to_strategic_reserves(
+            event_log=event_log,
             player_id="player-a",
             unit_instance_id=unit_id,
         )
@@ -2356,17 +2385,24 @@ def _battle_state(
     state.record_secondary_mission_choice(
         _secondary_choice(player_id="player-b", mode=player_b_secondary)
     )
-    _complete_setup_through_gate(state=state, config=config)
+    decisions = DecisionController()
+    _complete_setup_through_gate(state=state, decisions=decisions, config=config)
     return state
 
 
-def _complete_setup_through_gate(*, state: GameState, config: GameConfig) -> None:
+def _complete_setup_through_gate(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    config: GameConfig,
+) -> None:
+    ensure_army_mustered_events_for_fixture(state, decisions=decisions)
     final_setup_step = state.setup_sequence[-1]
     while state.current_setup_step is not final_setup_step:
         state.complete_current_setup_step()
     SetupCompletionGate().complete_setup_and_enter_battle(
         state=state,
-        decisions=DecisionController(),
+        decisions=decisions,
         config=config,
     )
 

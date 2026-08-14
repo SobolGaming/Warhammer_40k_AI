@@ -49,6 +49,9 @@ from warhammer40k_core.engine.reserves import (
     ReserveState,
 )
 from warhammer40k_core.engine.scoring import VictoryPointLedger
+from warhammer40k_core.engine.starting_attached_units import (
+    starting_attached_unit_records_for_army,
+)
 from warhammer40k_core.engine.transports import (
     TransportCapacityProfile,
     TransportCargoState,
@@ -657,6 +660,11 @@ def _spatial_evidence_state(
         battle_round=1,
         active_player_id="player-a",
         army_definitions=[player_a, player_b],
+        starting_attached_unit_records=[
+            record
+            for army in (player_a, player_b)
+            for record in starting_attached_unit_records_for_army(army)
+        ],
         battlefield_state=battlefield,
         mission_setup=resolved_mission_setup,
         reserve_states=[

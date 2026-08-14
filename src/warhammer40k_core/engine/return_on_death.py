@@ -438,6 +438,7 @@ def apply_return_on_death_placement_decision(
     result: DecisionResult,
     ruleset_descriptor: RulesetDescriptor,
 ) -> PendingReturnOnDeath:
+    decisions.record_for_result(result)
     pending, submission = _parse_return_on_death_placement_submission(
         state=state,
         request=request,

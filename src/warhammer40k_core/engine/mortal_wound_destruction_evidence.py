@@ -24,6 +24,10 @@ from warhammer40k_core.engine.destruction_source_attribution import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    destruction_source_objective_proximity_witness,
+    rules_unit_objective_proximity_witness,
+)
 from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 
 if TYPE_CHECKING:
@@ -291,6 +295,17 @@ def record_finalized_mortal_wound_model_destructions(
         destroyed_model_placement = placements_by_model[model_id]
         if destroyed_model_placement.unit_instance_id != physical_unit_id:
             raise GameLifecycleError("Mortal wound destroyed-model placement unit drift.")
+        destroyed_rules_unit_objective_witness = rules_unit_objective_proximity_witness(
+            state=state,
+            rules_unit_instance_id=rules_unit_id,
+            included_destroyed_model_placement=destroyed_model_placement,
+        )
+        source_rules_unit_objective_witness = destruction_source_objective_proximity_witness(
+            state=state,
+            event_log=decisions.event_log,
+            attribution=evidence.destruction_attribution,
+            destroyed_model_placement=destroyed_model_placement,
+        )
         transition_batch = BattlefieldTransitionBatch(removals=(removal,))
         destroyed_event = decisions.event_log.append(
             "model_destroyed",
@@ -301,6 +316,14 @@ def record_finalized_mortal_wound_model_destructions(
                     "active_player_id": state.active_player_id,
                     "phase": evidence.parent_battle_phase.value,
                     **evidence.destruction_attribution.to_payload(),
+                    "source_rules_unit_objective_proximity_witness": (
+                        None
+                        if source_rules_unit_objective_witness is None
+                        else source_rules_unit_objective_witness.to_payload()
+                    ),
+                    "destroyed_rules_unit_objective_proximity_witness": (
+                        destroyed_rules_unit_objective_witness.to_payload()
+                    ),
                     "sequence_id": _optional_source_context_identifier(
                         validated_source_context,
                         "sequence_id",

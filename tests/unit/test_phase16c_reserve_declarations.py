@@ -6,15 +6,31 @@ from dataclasses import replace
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 
+from warhammer40k_core.adapters.access_control import (
+    AuthenticatedPrincipal,
+    PrincipalRole,
+    ViewerContext,
+)
+from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.projection import project_game_view
+from warhammer40k_core.adapters.redaction import (
+    battle_formation_declarations_are_unresolved,
+)
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import DatasheetKeywordSet
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
-from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
+from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor, SetupSequenceDescriptor
+from warhammer40k_core.engine.army_mustering import (
+    ArmyMusterRequest,
+    DedicatedTransportCapacityProfile,
+    DedicatedTransportManifest,
+)
+from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.deployment import SELECT_DEPLOYMENT_UNIT_DECISION_TYPE
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -23,6 +39,7 @@ from warhammer40k_core.engine.game_state import (
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
 )
@@ -57,6 +74,7 @@ from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE,
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 
 
@@ -76,6 +94,8 @@ def test_phase16c_strategic_reserve_declaration_uses_lifecycle_decision_path() -
 
     assert request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE
     assert request.actor_id == "player-a"
+    assert isinstance(request.payload, dict)
+    assert request.payload["secret"] is True
     assert _option_ids(request) == (
         "complete_reserve_declarations",
         "declare_strategic_reserves:army-alpha:reserve-unit",
@@ -110,7 +130,6 @@ def test_phase16c_strategic_reserve_declaration_uses_lifecycle_decision_path() -
     assert deployment_request.decision_type == SELECT_DEPLOYMENT_UNIT_DECISION_TYPE
     assert deployment_request.actor_id == "player-b"
     assert _option_ids(deployment_request) == ("deploy:army-beta:intercessor-unit-2",)
-
     terminal_status = submit_all_deployments_if_pending(
         lifecycle,
         deployment_status,
@@ -121,6 +140,446 @@ def test_phase16c_strategic_reserve_declaration_uses_lifecycle_decision_path() -
         LifecycleStatusKind.WAITING_FOR_DECISION,
         LifecycleStatusKind.TERMINAL,
     }
+
+
+def test_phase16c_declarations_are_private_until_public_reveal() -> None:
+    config = _config(
+        player_a_unit_selections=(_unit_selection(unit_selection_id="reserve-unit"),),
+        reserve_unit_points=(
+            ReserveUnitPointValue(
+                unit_instance_id="army-alpha:reserve-unit",
+                points=400,
+                source_id="test-points:army-alpha:reserve-unit",
+            ),
+        ),
+    )
+    lifecycle, reserve_status = _advance_to_reserve_request(config)
+    request = _decision_request(reserve_status)
+
+    assert lifecycle.state is not None
+    reserve_model_id = next(
+        model.model_instance_id
+        for army in lifecycle.state.army_definitions
+        if army.player_id == "player-a"
+        for unit in army.units
+        if unit.unit_instance_id == "army-alpha:reserve-unit"
+        for model in unit.own_models
+    )
+    assert lifecycle.state.battlefield_state is not None
+    pristine_battlefield = lifecycle.state.battlefield_state
+    lifecycle.state.replace_battlefield_state(
+        pristine_battlefield.with_added_unit_placement(
+            UnitPlacement(
+                army_id="army-alpha",
+                player_id="player-a",
+                unit_instance_id="army-alpha:reserve-unit",
+                model_placements=(
+                    ModelPlacement(
+                        army_id="army-alpha",
+                        player_id="player-a",
+                        unit_instance_id="army-alpha:reserve-unit",
+                        model_instance_id=reserve_model_id,
+                        pose=Pose.at(4.0, 5.0),
+                    ),
+                ),
+            )
+        )
+    )
+    player_a_view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-a")
+    player_b_view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-b")
+    administrator = AuthenticatedPrincipal(
+        principal_id="phase16c-admin",
+        role=PrincipalRole.ADMINISTRATOR,
+    ).bind_to_session(player_ids=lifecycle.state.player_ids)
+    admin_view = project_game_view(lifecycle=lifecycle, viewer=administrator)
+    assert "army-alpha:reserve-unit" in player_a_view["unit_display_by_id"]
+    assert "army-alpha:reserve-unit" in player_b_view["unit_display_by_id"]
+    assert player_a_view["pending_decision"] is not None
+    assert player_a_view["pending_decision"]["decision_type"] == (
+        SELECT_RESERVE_DECLARATION_DECISION_TYPE
+    )
+    assert player_b_view["pending_decision"] is not None
+    assert player_b_view["pending_decision"]["decision_type"] == "hidden_decision"
+
+    owner_models = player_a_view["battlefield_view"]
+    opponent_models = player_b_view["battlefield_view"]
+    admin_models = admin_view["battlefield_view"]
+    assert owner_models is not None
+    assert opponent_models is not None
+    assert admin_models is not None
+    assert owner_models["authoritative"]["models_by_id"][reserve_model_id]["state"] == "placed"
+    assert owner_models["authoritative"]["models_by_id"][reserve_model_id]["pose"] is not None
+    assert opponent_models["authoritative"]["models_by_id"][reserve_model_id]["state"] == (
+        "undeployed"
+    )
+    assert opponent_models["authoritative"]["models_by_id"][reserve_model_id]["pose"] is None
+    assert admin_models["authoritative"]["models_by_id"][reserve_model_id]["state"] == "placed"
+    owner_battlefield_state = player_a_view["battlefield_state"]
+    opponent_battlefield_state = player_b_view["battlefield_state"]
+    admin_battlefield_state = admin_view["battlefield_state"]
+    assert isinstance(owner_battlefield_state, dict)
+    assert isinstance(opponent_battlefield_state, dict)
+    assert isinstance(admin_battlefield_state, dict)
+    owner_placed_armies = owner_battlefield_state["placed_armies"]
+    opponent_placed_armies = opponent_battlefield_state["placed_armies"]
+    admin_placed_armies = admin_battlefield_state["placed_armies"]
+    assert isinstance(owner_placed_armies, list)
+    assert isinstance(opponent_placed_armies, list)
+    assert isinstance(admin_placed_armies, list)
+    assert len(owner_placed_armies) == 1
+    assert opponent_placed_armies == []
+    assert len(admin_placed_armies) == 1
+    lifecycle.state.replace_battlefield_state(pristine_battlefield)
+
+    deployment_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase16c-private-declaration",
+            request=request,
+            selected_option_id="declare_strategic_reserves:army-alpha:reserve-unit",
+        )
+    )
+    assert deployment_status.decision_request is not None
+    owner_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-a",
+    )
+    opponent_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-b",
+    )
+    admin_events = EventStreamCursor().events_since_for_context(
+        lifecycle.decision_controller.event_log,
+        viewer=administrator,
+    )
+    assert any(event["event_type"] == "reserve_unit_declared" for event in owner_events["events"])
+    assert not any(
+        event["event_type"] == "reserve_unit_declared" for event in opponent_events["events"]
+    )
+    assert any(event["event_type"] == "reserve_unit_declared" for event in admin_events["events"])
+    reveal_event = next(
+        event
+        for event in opponent_events["events"]
+        if event["event_type"] == "battle_formations_revealed"
+    )
+    reveal_payload = reveal_event["payload"]
+    assert isinstance(reveal_payload, dict)
+    revealed_reserve_state = lifecycle.state.reserve_state_for_unit("army-alpha:reserve-unit")
+    assert revealed_reserve_state is not None
+    assert reveal_payload["reserve_states"] == [revealed_reserve_state.to_payload()]
+
+    player_b_revealed = project_game_view(lifecycle=lifecycle, viewer_player_id="player-b")
+    revealed_battlefield = player_b_revealed["battlefield_view"]
+    assert revealed_battlefield is not None
+    revealed_model = revealed_battlefield["authoritative"]["models_by_id"][reserve_model_id]
+    assert revealed_model["state"] == "reserves"
+    assert revealed_model["state_context"]["reserve_kind"] == "strategic_reserves"
+
+
+def test_phase16c_formation_projection_is_private_from_creation_through_declaration() -> None:
+    config = _battle_formation_aggregate_config()
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    assert lifecycle.state is not None
+    administrator = AuthenticatedPrincipal(
+        principal_id="phase16c-boundary-admin",
+        role=PrincipalRole.ADMINISTRATOR,
+    ).bind_to_session(player_ids=lifecycle.state.player_ids)
+
+    assert battle_formation_declarations_are_unresolved(lifecycle.state) is True
+    pre_muster_views = (
+        project_game_view(lifecycle=lifecycle, viewer_player_id="player-a"),
+        project_game_view(lifecycle=lifecycle, viewer_player_id="player-b"),
+        project_game_view(lifecycle=lifecycle, viewer=administrator),
+    )
+    assert [view["unit_display_by_id"] for view in pre_muster_views] == [{}, {}, {}]
+
+    status = lifecycle.advance_until_decision_or_terminal()
+    _assert_current_setup_step(lifecycle.state, SetupStep.SELECT_SECONDARY_MISSIONS)
+    assert battle_formation_declarations_are_unresolved(lifecycle.state) is True
+    assert lifecycle.state.transport_cargo_states
+    assert lifecycle.state.dedicated_transport_setup_consequences
+    assert lifecycle.state.starting_attached_unit_records
+    expected_attachment_records = [
+        record.to_payload()
+        for record in lifecycle.state.starting_attached_unit_records
+        if record.player_id == "player-a"
+    ]
+    public_muster_attachment_payloads: list[JsonValue] = []
+    for event_view in (
+        EventStreamCursor().events_since(
+            lifecycle.decision_controller.event_log,
+            viewer_player_id="player-a",
+        ),
+        EventStreamCursor().events_since(
+            lifecycle.decision_controller.event_log,
+            viewer_player_id="player-b",
+        ),
+        EventStreamCursor().events_since_for_context(
+            lifecycle.decision_controller.event_log,
+            viewer=administrator,
+        ),
+    ):
+        army_mustered_payload = next(
+            event["payload"]
+            for event in event_view["events"]
+            if event["event_type"] == "army_mustered"
+            and isinstance(event["payload"], dict)
+            and event["payload"]["player_id"] == "player-a"
+        )
+        assert isinstance(army_mustered_payload, dict)
+        public_muster_attachment_payloads.append(
+            army_mustered_payload["starting_attached_unit_records"]
+        )
+    assert public_muster_attachment_payloads == [expected_attachment_records] * 3
+
+    bodyguard_model_id = next(
+        model.model_instance_id
+        for army in lifecycle.state.army_definitions
+        if army.player_id == "player-a"
+        for unit in army.units
+        if unit.unit_instance_id == "army-alpha:bodyguard-unit"
+        for model in unit.own_models
+    )
+    _assert_opponent_formation_state_is_hidden(
+        lifecycle=lifecycle,
+        administrator=administrator,
+        model_instance_id=bodyguard_model_id,
+    )
+    _assert_opponent_premature_placement_is_hidden(
+        lifecycle=lifecycle,
+        administrator=administrator,
+        unit_instance_id="army-alpha:reserve-unit",
+    )
+
+    result_index = 1
+    while (
+        status.decision_request is not None
+        and status.decision_request.decision_type == SECONDARY_MISSION_DECISION_TYPE
+    ):
+        request = status.decision_request
+        status = lifecycle.submit_decision(
+            DecisionResult.for_request(
+                result_id=f"phase16c-boundary-secondary-{result_index:02d}",
+                request=request,
+                selected_option_id="tactical",
+            )
+        )
+        result_index += 1
+
+    request = _decision_request(status)
+    assert request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE
+    _assert_current_setup_step(lifecycle.state, SetupStep.DECLARE_BATTLE_FORMATIONS)
+    assert battle_formation_declarations_are_unresolved(lifecycle.state) is True
+    _assert_opponent_formation_state_is_hidden(
+        lifecycle=lifecycle,
+        administrator=administrator,
+        model_instance_id=bodyguard_model_id,
+    )
+
+    lifecycle.state.record_faction_rule_state(
+        FactionRuleState(
+            state_id="phase16c-battle-formation-choice",
+            player_id="player-a",
+            faction_id="core-marine-force",
+            source_rule_id="phase16c-battle-formation-rule",
+            state_kind="phase16c-test-choice",
+            setup_step=SetupStep.DECLARE_BATTLE_FORMATIONS,
+            request_id="phase16c-battle-formation-request",
+            result_id="phase16c-battle-formation-result",
+            payload={"choice": "alpha"},
+        )
+    )
+    deployment_status = lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase16c-boundary-reserve-result",
+            request=request,
+            selected_option_id="declare_strategic_reserves:army-alpha:reserve-unit",
+        )
+    )
+    assert deployment_status.decision_request is not None
+    assert battle_formation_declarations_are_unresolved(lifecycle.state) is False
+
+    expected_reveal_payload = {
+        "game_id": lifecycle.state.game_id,
+        "setup_step": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
+        "player_ids": list(lifecycle.state.player_ids),
+        "reserve_states": [
+            reserve.to_payload()
+            for reserve in sorted(
+                lifecycle.state.reserve_states,
+                key=lambda reserve: (reserve.player_id, reserve.unit_instance_id),
+            )
+            if reserve.declared_during_step == SetupStep.DECLARE_BATTLE_FORMATIONS.value
+        ],
+        "transport_cargo_states": [
+            cargo.to_payload()
+            for cargo in sorted(
+                lifecycle.state.transport_cargo_states,
+                key=lambda cargo: (cargo.player_id, cargo.transport_unit_instance_id),
+            )
+            if cargo.embarked_unit_instance_ids
+        ],
+        "dedicated_transport_setup_consequences": [
+            consequence.to_payload()
+            for consequence in sorted(
+                lifecycle.state.dedicated_transport_setup_consequences,
+                key=lambda consequence: (
+                    consequence.player_id,
+                    consequence.transport_unit_instance_id,
+                ),
+            )
+        ],
+        "faction_rule_states": [
+            faction_state.to_payload()
+            for faction_state in sorted(
+                lifecycle.state.faction_rule_states,
+                key=lambda faction_state: (faction_state.player_id, faction_state.state_id),
+            )
+            if faction_state.setup_step is SetupStep.DECLARE_BATTLE_FORMATIONS
+        ],
+    }
+    assert all(
+        expected_reveal_payload[field]
+        for field in (
+            "reserve_states",
+            "transport_cargo_states",
+            "dedicated_transport_setup_consequences",
+            "faction_rule_states",
+        )
+    )
+
+    reveal_payloads: list[JsonValue] = []
+    for event_view in (
+        EventStreamCursor().events_since(
+            lifecycle.decision_controller.event_log,
+            viewer_player_id="player-a",
+        ),
+        EventStreamCursor().events_since(
+            lifecycle.decision_controller.event_log,
+            viewer_player_id="player-b",
+        ),
+        EventStreamCursor().events_since_for_context(
+            lifecycle.decision_controller.event_log,
+            viewer=administrator,
+        ),
+    ):
+        reveal_payloads.append(
+            next(
+                event["payload"]
+                for event in event_view["events"]
+                if event["event_type"] == "battle_formations_revealed"
+            )
+        )
+    assert reveal_payloads == [expected_reveal_payload] * 3
+
+    revealed_views = (
+        project_game_view(lifecycle=lifecycle, viewer_player_id="player-a"),
+        project_game_view(lifecycle=lifecycle, viewer_player_id="player-b"),
+        project_game_view(lifecycle=lifecycle, viewer=administrator),
+    )
+    revealed_model_states: list[str] = []
+    for view in revealed_views:
+        battlefield = view["battlefield_view"]
+        assert battlefield is not None
+        revealed_model_states.append(
+            battlefield["authoritative"]["models_by_id"][bodyguard_model_id]["state"]
+        )
+    assert revealed_model_states == ["embarked", "embarked", "embarked"]
+
+    submit_all_deployments_if_pending(
+        lifecycle,
+        deployment_status,
+        result_id_prefix="phase16c-boundary-deployment",
+    )
+    round_tripped = GameLifecycle.from_payload(lifecycle.to_payload())
+    assert round_tripped.state is not None
+    assert [record.to_payload() for record in round_tripped.state.reserve_states] == [
+        record.to_payload() for record in lifecycle.state.reserve_states
+    ]
+    assert [record.to_payload() for record in round_tripped.state.transport_cargo_states] == [
+        record.to_payload() for record in lifecycle.state.transport_cargo_states
+    ]
+    assert [
+        record.to_payload() for record in round_tripped.state.starting_attached_unit_records
+    ] == [record.to_payload() for record in lifecycle.state.starting_attached_unit_records]
+    assert [
+        record.to_payload() for record in round_tripped.state.dedicated_transport_setup_consequences
+    ] == [record.to_payload() for record in lifecycle.state.dedicated_transport_setup_consequences]
+    assert [record.to_payload() for record in round_tripped.state.faction_rule_states] == [
+        record.to_payload() for record in lifecycle.state.faction_rule_states
+    ]
+
+
+def test_phase16c_opponent_projection_hides_mutable_model_wounds_until_reveal() -> None:
+    lifecycle = GameLifecycle()
+    lifecycle.start(_battle_formation_aggregate_config())
+    lifecycle.advance_until_decision_or_terminal()
+    state = lifecycle.state
+    assert state is not None
+    assert battle_formation_declarations_are_unresolved(state) is True
+
+    owner_army = state.army_definition_for_player("player-a")
+    assert owner_army is not None
+    transport = owner_army.unit_by_id("army-alpha:empty-transport")
+    (transport_model,) = transport.own_models
+    current_wounds = transport_model.starting_wounds - 3
+    wounded_transport = replace(
+        transport,
+        own_models=(replace(transport_model, wounds_remaining=current_wounds),),
+    )
+    state.replace_army_definitions(
+        [
+            replace(
+                army,
+                units=tuple(
+                    wounded_transport if unit == transport else unit for unit in army.units
+                ),
+            )
+            if army.player_id == owner_army.player_id
+            else army
+            for army in state.army_definitions
+        ]
+    )
+
+    administrator = AuthenticatedPrincipal(
+        principal_id="phase16c-mutable-state-admin",
+        role=PrincipalRole.ADMINISTRATOR,
+    ).bind_to_session(player_ids=state.player_ids)
+    owner_view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-a")
+    opponent_view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-b")
+    admin_view = project_game_view(lifecycle=lifecycle, viewer=administrator)
+    model_id = transport_model.model_instance_id
+
+    assert owner_view["model_display_by_id"][model_id]["wounds_remaining"] == current_wounds
+    assert admin_view["model_display_by_id"][model_id]["wounds_remaining"] == current_wounds
+    assert opponent_view["model_display_by_id"][model_id]["wounds_remaining"] == (
+        transport_model.starting_wounds
+    )
+    opponent_battlefield = opponent_view["battlefield_view"]
+    assert opponent_battlefield is not None
+    assert opponent_battlefield["authoritative"]["models_by_id"][model_id]["state"] == (
+        "undeployed"
+    )
+
+
+def test_phase16c_absent_declare_battle_formations_step_has_no_secrecy_window() -> None:
+    ruleset = _ruleset()
+    ruleset_without_declarations = replace(
+        ruleset,
+        setup_sequence=SetupSequenceDescriptor(
+            steps=tuple(
+                step
+                for step in ruleset.setup_sequence.steps
+                if step is not SetupStep.DECLARE_BATTLE_FORMATIONS
+            )
+        ),
+        descriptor_hash="",
+    )
+    state = GameState.from_config(
+        replace(_config(), ruleset_descriptor=ruleset_without_declarations)
+    )
+
+    assert battle_formation_declarations_are_unresolved(state) is False
 
 
 def test_phase16c_deep_strike_declaration_creates_deep_strike_reserve_state() -> None:
@@ -553,6 +1012,27 @@ def test_phase16c_aircraft_are_mandatory_source_backed_reserves() -> None:
     assert deployment_request.decision_type == SELECT_DEPLOYMENT_UNIT_DECISION_TYPE
     assert deployment_request.actor_id == "player-b"
     assert _option_ids(deployment_request) == ("deploy:army-beta:intercessor-unit-2",)
+    owner_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-a",
+    )
+    opponent_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-b",
+    )
+    assert any(
+        event["event_type"] == "aircraft_reserve_declared" for event in owner_events["events"]
+    )
+    assert not any(
+        event["event_type"] == "aircraft_reserve_declared" for event in opponent_events["events"]
+    )
+    reveal_payload = next(
+        event["payload"]
+        for event in opponent_events["events"]
+        if event["event_type"] == "battle_formations_revealed"
+    )
+    assert isinstance(reveal_payload, dict)
+    assert reveal_payload["reserve_states"] == [reserve_state.to_payload()]
 
 
 def test_phase16c_reserve_declaration_payloads_round_trip_through_lifecycle_payload() -> None:
@@ -571,9 +1051,10 @@ def test_phase16c_reserve_declaration_payloads_round_trip_through_lifecycle_payl
     pending_payload = lifecycle.to_payload()
     restored_pending = GameLifecycle.from_payload(pending_payload)
 
-    assert (
-        restored_pending.decision_controller.queue.peek_next().to_payload() == request.to_payload()
-    )
+    restored_request = restored_pending.decision_controller.queue.peek_next()
+    assert restored_request.to_payload() == request.to_payload()
+    assert isinstance(restored_request.payload, dict)
+    assert restored_request.payload["secret"] is True
 
     after_declaration = restored_pending.submit_decision(
         DecisionResult.for_request(
@@ -593,6 +1074,19 @@ def test_phase16c_reserve_declaration_payloads_round_trip_through_lifecycle_payl
     assert reserve_state is not None
     assert reserve_state.points_contribution == 400
     assert reserve_state.source_rule_ids == ("strategic_reserves",)
+    restored_event_types = tuple(
+        event.event_type for event in restored_declared.decision_controller.event_log.records
+    )
+    assert "reserve_unit_declared" in restored_event_types
+    assert "battle_formations_revealed" in restored_event_types
+    reserve_event = next(
+        event
+        for event in restored_declared.decision_controller.event_log.records
+        if event.event_type == "reserve_unit_declared"
+    )
+    assert isinstance(reserve_event.payload, dict)
+    assert reserve_event.payload["secret"] is True
+    assert reserve_event.payload["visibility_source"] == (SetupStep.DECLARE_BATTLE_FORMATIONS.value)
 
 
 def test_phase16c_aircraft_and_malformed_submission_errors_are_typed() -> None:
@@ -771,6 +1265,205 @@ def _option_ids(request: DecisionRequest) -> tuple[str, ...]:
 
 def _option_ids_from_options(options: tuple[DecisionOption, ...]) -> tuple[str, ...]:
     return tuple(option.option_id for option in options)
+
+
+def _assert_opponent_formation_state_is_hidden(
+    *,
+    lifecycle: GameLifecycle,
+    administrator: ViewerContext,
+    model_instance_id: str,
+) -> None:
+    owner_view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-a")
+    opponent_view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-b")
+    admin_view = project_game_view(lifecycle=lifecycle, viewer=administrator)
+    owner_battlefield = owner_view["battlefield_view"]
+    opponent_battlefield = opponent_view["battlefield_view"]
+    admin_battlefield = admin_view["battlefield_view"]
+    assert owner_battlefield is not None
+    assert opponent_battlefield is not None
+    assert admin_battlefield is not None
+    owner_model = owner_battlefield["authoritative"]["models_by_id"][model_instance_id]
+    opponent_model = opponent_battlefield["authoritative"]["models_by_id"][model_instance_id]
+    admin_model = admin_battlefield["authoritative"]["models_by_id"][model_instance_id]
+    assert owner_model["state"] == "embarked"
+    assert owner_model["state_context"]["transport_unit_instance_id"] == (
+        "army-alpha:cargo-transport"
+    )
+    assert opponent_model["state"] == "undeployed"
+    assert opponent_model["state_context"] == {
+        "transport_unit_instance_id": None,
+        "reserve_kind": None,
+    }
+    assert admin_model == owner_model
+
+
+def _assert_opponent_premature_placement_is_hidden(
+    *,
+    lifecycle: GameLifecycle,
+    administrator: ViewerContext,
+    unit_instance_id: str,
+) -> None:
+    state = lifecycle.state
+    assert state is not None
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    model_instance_id = next(
+        model.model_instance_id
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == unit_instance_id
+        for model in unit.own_models
+    )
+    state.replace_battlefield_state(
+        battlefield.with_added_unit_placement(
+            UnitPlacement(
+                army_id="army-alpha",
+                player_id="player-a",
+                unit_instance_id=unit_instance_id,
+                model_placements=(
+                    ModelPlacement(
+                        army_id="army-alpha",
+                        player_id="player-a",
+                        unit_instance_id=unit_instance_id,
+                        model_instance_id=model_instance_id,
+                        pose=Pose.at(4.0, 5.0),
+                    ),
+                ),
+            )
+        )
+    )
+    owner_view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-a")
+    opponent_view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-b")
+    admin_view = project_game_view(lifecycle=lifecycle, viewer=administrator)
+    owner_battlefield = owner_view["battlefield_view"]
+    opponent_battlefield = opponent_view["battlefield_view"]
+    admin_battlefield = admin_view["battlefield_view"]
+    assert owner_battlefield is not None
+    assert opponent_battlefield is not None
+    assert admin_battlefield is not None
+    assert owner_battlefield["authoritative"]["models_by_id"][model_instance_id]["state"] == (
+        "placed"
+    )
+    assert (
+        opponent_battlefield["authoritative"]["models_by_id"][model_instance_id]["state"]
+        == "undeployed"
+    )
+    assert admin_battlefield["authoritative"]["models_by_id"][model_instance_id]["state"] == (
+        "placed"
+    )
+    owner_raw = owner_view["battlefield_state"]
+    opponent_raw = opponent_view["battlefield_state"]
+    admin_raw = admin_view["battlefield_state"]
+    assert isinstance(owner_raw, dict)
+    assert isinstance(opponent_raw, dict)
+    assert isinstance(admin_raw, dict)
+    owner_placed_armies = owner_raw["placed_armies"]
+    opponent_placed_armies = opponent_raw["placed_armies"]
+    admin_placed_armies = admin_raw["placed_armies"]
+    assert isinstance(owner_placed_armies, list)
+    assert isinstance(opponent_placed_armies, list)
+    assert isinstance(admin_placed_armies, list)
+    assert len(owner_placed_armies) == 1
+    assert opponent_placed_armies == []
+    assert len(admin_placed_armies) == 1
+    state.replace_battlefield_state(battlefield)
+
+
+def _assert_current_setup_step(state: GameState, expected: SetupStep) -> None:
+    assert state.current_setup_step is expected
+
+
+def _battle_formation_aggregate_config() -> GameConfig:
+    catalog = _catalog_with_datasheet_keywords(
+        {"core-transport": ("Dedicated Transport", "Transport", "Vehicle")}
+    )
+    transport_capacity = DedicatedTransportCapacityProfile(
+        transport_datasheet_id="core-transport",
+        max_model_count=6,
+        allowed_keywords=("Infantry",),
+        excluded_keywords=(),
+        source_id="phase16c-transport-capacity",
+    )
+    player_a_request = ArmyMusterRequest(
+        army_id="army-alpha",
+        player_id="player-a",
+        catalog_id=catalog.catalog_id,
+        source_package_id=catalog.source_package_id,
+        ruleset_id=catalog.ruleset_id,
+        detachment_selection=DetachmentSelection(
+            faction_id="core-marine-force",
+            detachment_ids=("core-combined-arms",),
+        ),
+        force_disposition_id="take-and-hold",
+        unit_selections=(
+            _unit_selection(unit_selection_id="bodyguard-unit"),
+            _unit_selection(
+                unit_selection_id="leader-unit",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="cargo-transport",
+                datasheet_id="core-transport",
+                model_profile_id="core-transport",
+                model_count=1,
+            ),
+            _unit_selection(
+                unit_selection_id="empty-transport",
+                datasheet_id="core-transport",
+                model_profile_id="core-transport",
+                model_count=1,
+            ),
+            _unit_selection(unit_selection_id="reserve-unit"),
+        ),
+        attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader-unit",
+                bodyguard_unit_selection_id="bodyguard-unit",
+            ),
+        ),
+        dedicated_transport_manifests=(
+            DedicatedTransportManifest(
+                transport_unit_selection_id="cargo-transport",
+                embarked_unit_selection_ids=("bodyguard-unit", "leader-unit"),
+                capacity_profile=transport_capacity,
+                source_id="phase16c-cargo-manifest",
+            ),
+            DedicatedTransportManifest(
+                transport_unit_selection_id="empty-transport",
+                embarked_unit_selection_ids=(),
+                capacity_profile=transport_capacity,
+                source_id="phase16c-empty-manifest",
+            ),
+        ),
+    )
+    return GameConfig(
+        game_id="phase16c-aggregate-game",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=_ruleset(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            player_a_request,
+            _army_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selections=(_unit_selection(unit_selection_id="intercessor-unit-2"),),
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
+        mission_setup=_mission_setup(),
+        reserve_unit_points=(
+            ReserveUnitPointValue(
+                unit_instance_id="army-alpha:reserve-unit",
+                points=400,
+                source_id="phase16c-reserve-points",
+            ),
+        ),
+    )
 
 
 def _config(

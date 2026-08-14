@@ -59,6 +59,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _proposal_from_declarations,
     _proposal_from_request,
     _record_parameterized_result_for_apply,
+    _reduce_unit_to_last_model_with_mortal_wounds,
     _replace_enemy_with_attached_character_fixture,
     _replace_unit_instance_in_state,
     _replace_unit_toughness,
@@ -274,6 +275,9 @@ from warhammer40k_core.engine.post_roll_attack_profiles import (
 from warhammer40k_core.engine.post_roll_weapon_profile_modifiers import (
     PostRollWeaponProfileModifierBinding,
     PostRollWeaponProfileModifierContext,
+)
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    rules_unit_objective_proximity_witness,
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.rules_unit_geometry import geometry_models_for_rules_unit
@@ -2161,10 +2165,11 @@ def test_out_of_phase_post_roll_pools_are_ordered_by_active_player() -> None:
     state = _state(lifecycle)
     attacker = units["enemy"]
     defender = units["intercessor-1"]
-    battlefield = state.battlefield_state
-    assert battlefield is not None
-    state.battlefield_state = battlefield.with_removed_models(
-        tuple(model.model_instance_id for model in defender.own_models[1:])
+    _reduce_unit_to_last_model_with_mortal_wounds(
+        lifecycle,
+        target_unit=defender,
+        source_unit=attacker,
+        application_id="phase13d-post-roll-preexisting-casualties",
     )
     base_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
@@ -10979,11 +10984,11 @@ def test_phase13c_optional_feel_no_pain_choice_routes_through_lifecycle() -> Non
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    defender_model = defender.own_models[0]
-    battlefield = state.battlefield_state
-    assert battlefield is not None
-    state.battlefield_state = battlefield.with_removed_models(
-        tuple(model.model_instance_id for model in defender.own_models[1:])
+    defender_model = _reduce_unit_to_last_model_with_mortal_wounds(
+        lifecycle,
+        target_unit=defender,
+        source_unit=attacker,
+        application_id="phase13c-optional-fnp-preexisting-casualties",
     )
     source_a = FeelNoPainSource(source_id="phase13c-fnp-a", threshold=5)
     source_b = FeelNoPainSource(source_id="phase13c-fnp-b", threshold=6)
@@ -11093,11 +11098,13 @@ def test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection(
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    defender_model = defender.own_models[0]
-    battlefield = state.battlefield_state
-    assert battlefield is not None
-    state.battlefield_state = battlefield.with_removed_models(
-        tuple(model.model_instance_id for model in defender.own_models[1:])
+    defender_model = _reduce_unit_to_last_model_with_mortal_wounds(
+        lifecycle,
+        target_unit=defender,
+        source_unit=attacker,
+        application_id=(
+            f"phase13e-destruction-reaction-{selected_source_kind.value}-preexisting-casualties"
+        ),
     )
     shoot_source = DestructionReactionSource(
         source_id="phase13e-shoot-on-death",
@@ -11232,7 +11239,10 @@ def test_phase13e_destroyed_model_reaction_choice_records_removal_and_selection(
 
 
 def test_phase13e_fight_on_death_model_is_present_but_does_not_contribute_keywords() -> None:
-    lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
+    lifecycle, units = _shooting_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_pose=Pose.at(95.0, 55.0),
+    )
     state = _state(lifecycle)
     defender = units["enemy"]
     defender_model = defender.own_models[0]
@@ -11275,10 +11285,25 @@ def test_phase13e_fight_on_death_model_is_present_but_does_not_contribute_keywor
     )
     assert rules_unit.keywords == ()
     assert rules_unit.faction_keywords == ()
+    objective_witness = rules_unit_objective_proximity_witness(
+        state=state,
+        rules_unit_instance_id=defender.unit_instance_id,
+    )
+    assert objective_witness.objective_marker_ids == ("phase13b-remote-objective",)
+    assert objective_witness.objective_marker_witnesses[0].model_instance_ids == (
+        defender_model.model_instance_id,
+    )
     replayed_state = GameState.from_payload(state.to_payload())
     assert model_is_present_on_battlefield(
         state=replayed_state,
         model_instance_id=defender_model.model_instance_id,
+    )
+    assert (
+        rules_unit_objective_proximity_witness(
+            state=replayed_state,
+            rules_unit_instance_id=defender.unit_instance_id,
+        )
+        == objective_witness
     )
 
     removed_model_ids = remove_models_awaiting_fight_on_death(state=state)
@@ -13079,11 +13104,11 @@ def test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal() -> N
     attacker = units["intercessor-1"]
     defender = units["enemy"]
     attacker_model = attacker.own_models[0]
-    defender_model = defender.own_models[0]
-    battlefield = state.battlefield_state
-    assert battlefield is not None
-    state.battlefield_state = battlefield.with_removed_models(
-        tuple(model.model_instance_id for model in defender.own_models[1:])
+    defender_model = _reduce_unit_to_last_model_with_mortal_wounds(
+        lifecycle,
+        target_unit=defender,
+        source_unit=attacker,
+        application_id="phase13e-fnp-deadly-demise-preexisting-casualties",
     )
     state.record_model_feel_no_pain_sources(
         model_instance_id=attacker_model.model_instance_id,
@@ -13204,7 +13229,10 @@ def test_phase13e_deadly_demise_fnp_pauses_before_destroyed_model_removal() -> N
         ).wounds_remaining
         == 0
     )
-    assert _event_payloads(lifecycle, "model_destroyed") == ()
+    assert all(
+        payload["model_instance_id"] != defender_model.model_instance_id
+        for payload in _event_payloads(lifecycle, "model_destroyed")
+    )
 
     final_status = lifecycle.submit_decision(
         DecisionResult.for_request(
@@ -13231,11 +13259,11 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
     attacker = units["intercessor-1"]
     defender = units["enemy"]
     attacker_model = attacker.own_models[0]
-    defender_model = defender.own_models[0]
-    battlefield = state.battlefield_state
-    assert battlefield is not None
-    state.battlefield_state = battlefield.with_removed_models(
-        tuple(model.model_instance_id for model in defender.own_models[1:])
+    defender_model = _reduce_unit_to_last_model_with_mortal_wounds(
+        lifecycle,
+        target_unit=defender,
+        source_unit=attacker,
+        application_id="phase13e-secondary-casualty-preexisting-casualties",
     )
     secondary_reaction_source = DestructionReactionSource(
         source_id="phase13e-secondary-shoot-on-death",
@@ -13372,7 +13400,13 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
     assert secondary_attribution.attacking_model_instance_id is None
     assert attacker_model.model_instance_id not in updated_battlefield.placed_model_ids()
     assert defender_model.model_instance_id in updated_battlefield.placed_model_ids()
-    assert _event_payloads(lifecycle, MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT) == ()
+    assert all(
+        payload["destroyed_model_instance_ids"] != [attacker_model.model_instance_id]
+        for payload in _event_payloads(
+            lifecycle,
+            MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
+        )
+    )
 
     shooting_state = state.shooting_phase_state
     assert shooting_state is not None
@@ -13403,9 +13437,13 @@ def test_phase13e_deadly_demise_secondary_casualty_gets_removal_record_and_react
         if cast(dict[str, object], payload["selected_source"])["source_id"]
         == deadly_demise_source.source_id
     )
-    finalized_payloads = _event_payloads(
-        lifecycle,
-        MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
+    finalized_payloads = tuple(
+        payload
+        for payload in _event_payloads(
+            lifecycle,
+            MORTAL_WOUND_MODEL_DESTRUCTIONS_FINALIZED_EVENT,
+        )
+        if payload["destroyed_model_instance_ids"] == [attacker_model.model_instance_id]
     )
 
     _assert_waiting_for_movement_unit(final_status)
@@ -13633,11 +13671,11 @@ def test_phase13e_destruction_reaction_invalid_submission_does_not_mutate_queue(
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    defender_model = defender.own_models[0]
-    battlefield = state.battlefield_state
-    assert battlefield is not None
-    state.battlefield_state = battlefield.with_removed_models(
-        tuple(model.model_instance_id for model in defender.own_models[1:])
+    defender_model = _reduce_unit_to_last_model_with_mortal_wounds(
+        lifecycle,
+        target_unit=defender,
+        source_unit=attacker,
+        application_id="phase13e-invalid-reaction-preexisting-casualties",
     )
     source = DestructionReactionSource(
         source_id="phase13e-invalid-shoot-on-death",

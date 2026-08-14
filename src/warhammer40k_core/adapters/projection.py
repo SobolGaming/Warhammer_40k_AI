@@ -13,8 +13,9 @@ from warhammer40k_core.adapters.external_contract import (
 )
 from warhammer40k_core.adapters.redaction import (
     HIDDEN_REQUEST_ID,
+    battle_formation_declarations_are_unresolved,
     decision_request_hidden_from_context,
-    public_primary_unit_terrain_turn_start_snapshots,
+    public_primary_rules_unit_turn_start_snapshots,
     redacted_decision_type_for_hidden_viewer,
 )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -42,7 +43,7 @@ from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_turn_start_evidence import (
-    PrimaryUnitTerrainTurnStartSnapshotPayload,
+    PrimaryRulesUnitTurnStartSnapshotPayload,
 )
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_resource_state import (
@@ -50,7 +51,7 @@ from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_total,
 )
 
-PROJECTION_SCHEMA_VERSION = "game-view-v9-phase17n"
+PROJECTION_SCHEMA_VERSION = "game-view-v10-phase17n-step3"
 RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"
 
 _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (
@@ -311,7 +312,7 @@ class GameViewPayload(TypedDict):
     mission_setup: JsonValue
     public_secondary_mission_choices: list[JsonValue]
     public_secondary_mission_card_states: list[JsonValue]
-    primary_unit_terrain_turn_start_snapshots: list[PrimaryUnitTerrainTurnStartSnapshotPayload]
+    primary_rules_unit_turn_start_snapshots: list[PrimaryRulesUnitTurnStartSnapshotPayload]
     public_command_point_ledgers: list[JsonValue]
     public_victory_point_ledgers: list[JsonValue]
     public_stratagem_use_records: list[JsonValue]
@@ -520,9 +521,7 @@ def project_game_view(
     )
     pending_request = _pending_request(lifecycle)
     secondary_mission_choices_revealed = state.secondary_mission_choices_are_revealed()
-    battlefield_payload = (
-        None if state.battlefield_state is None else state.battlefield_state.to_payload()
-    )
+    battlefield_payload = _public_battlefield_state_payload(state=state, viewer=context)
     mission_payload = None if state.mission_setup is None else state.mission_setup.to_payload()
     setup_step = state.current_setup_step
     battle_phase = state.current_battle_phase
@@ -554,6 +553,8 @@ def project_game_view(
             or pending_interaction["interaction_kind"] != InteractionKind.ENTITY_SELECTION.value
             else tuple(option["option_id"] for option in pending_decision_view["options"])
         ),
+        viewer_player_id=context.viewer_player_id,
+        omniscient=context.policy.omniscient,
     )
     payload: GameViewPayload = {
         "projection_schema": PROJECTION_SCHEMA_VERSION,
@@ -590,10 +591,9 @@ def project_game_view(
                 domain_viewer=domain_viewer,
             )
         ],
-        "primary_unit_terrain_turn_start_snapshots": (
-            public_primary_unit_terrain_turn_start_snapshots(
-                state.primary_unit_terrain_turn_start_snapshots,
-                visible_unit_instance_ids=frozenset(unit_display_by_id),
+        "primary_rules_unit_turn_start_snapshots": (
+            public_primary_rules_unit_turn_start_snapshots(
+                state.primary_rules_unit_turn_start_snapshots,
             )
         ),
         "public_command_point_ledgers": [
@@ -635,23 +635,28 @@ def _live_display_maps(
     catalog: ArmyCatalog,
     viewer: ViewerContext,
 ) -> tuple[dict[str, UnitDisplayPayload], dict[str, ModelDisplayPayload]]:
-    placed_unit_ids = _placed_unit_ids(state)
     unit_display_by_id: dict[str, UnitDisplayPayload] = {}
     model_display_by_id: dict[str, ModelDisplayPayload] = {}
+    formation_declarations_unresolved = battle_formation_declarations_are_unresolved(state)
     for army in state.army_definitions:
+        formation_state_visible = (
+            viewer.policy.omniscient
+            or viewer.owns_player(army.player_id)
+            or not formation_declarations_unresolved
+        )
         for unit in army.units:
-            owns_army = viewer.owns_player(army.player_id)
-            visible = (
-                viewer.policy.omniscient or owns_army or unit.unit_instance_id in placed_unit_ids
-            )
-            if not visible:
-                continue
+            # Army lists and datacards are public tabletop information. Declare
+            # Battle Formations secrecy belongs to the declaration choices and
+            # their state/events, not to the roster identities those choices
+            # reference. In particular, entering Strategic Reserves must not
+            # make an opponent's unit disappear from the public roster view.
             unit_display_by_id[unit.unit_instance_id] = _unit_display_payload(
                 state=state,
                 catalog=catalog,
                 army=army,
                 unit=unit,
-                visible=visible,
+                visible=True,
+                formation_state_visible=formation_state_visible,
             )
             for model in unit.own_models:
                 model_display_by_id[model.model_instance_id] = _model_display_payload(
@@ -659,9 +664,45 @@ def _live_display_maps(
                     catalog=catalog,
                     unit=unit,
                     model=model,
-                    visible=visible,
+                    visible=True,
+                    formation_state_visible=formation_state_visible,
                 )
     return unit_display_by_id, model_display_by_id
+
+
+def _public_battlefield_state_payload(
+    *,
+    state: GameState,
+    viewer: ViewerContext,
+) -> JsonValue:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        return None
+    payload = battlefield.to_payload()
+    if viewer.policy.omniscient or not battle_formation_declarations_are_unresolved(state):
+        return cast(JsonValue, payload)
+
+    # Army lists remain public, but a malformed or prematurely populated
+    # battlefield must not turn an unresolved battle-formation declaration
+    # into a placement/state side channel. Keep only the requesting player's
+    # authoritative physical state until the simultaneous declarations reveal.
+    visible_player_id = viewer.viewer_player_id
+    visible_model_ids = {
+        model.model_instance_id
+        for army in state.army_definitions
+        if army.player_id == visible_player_id
+        for unit in army.units
+        for model in unit.own_models
+    }
+    payload["placed_armies"] = [
+        placed_army
+        for placed_army in payload["placed_armies"]
+        if placed_army["player_id"] == visible_player_id
+    ]
+    payload["removed_model_ids"] = [
+        model_id for model_id in payload["removed_model_ids"] if model_id in visible_model_ids
+    ]
+    return cast(JsonValue, payload)
 
 
 def _unit_display_payload(
@@ -671,6 +712,7 @@ def _unit_display_payload(
     army: ArmyDefinition,
     unit: UnitInstance,
     visible: bool,
+    formation_state_visible: bool,
 ) -> UnitDisplayPayload:
     if not visible:
         return {
@@ -706,7 +748,11 @@ def _unit_display_payload(
             for selection in unit.wargear_selections
             for wargear_id in selection.wargear_ids
         ],
-        "resources": _unit_resource_display_payloads(state=state, unit=unit),
+        "resources": _unit_resource_display_payloads(
+            state=state,
+            unit=unit,
+            formation_state_visible=formation_state_visible,
+        ),
         "redaction": _visible_redaction(),
     }
 
@@ -715,28 +761,36 @@ def _unit_resource_display_payloads(
     *,
     state: GameState,
     unit: UnitInstance,
+    formation_state_visible: bool,
 ) -> list[UnitResourceDisplayPayload]:
     resource_kinds = {
         descriptor.resource_kind
         for descriptor in dice_result_override_descriptors_for_abilities(unit.datasheet_abilities)
     }
     resource_kinds.update(allocation.resource_kind for allocation in unit.starting_resources)
-    return [
-        {
-            "resource_kind": resource_kind,
-            "starting_amount": unit_resource_starting_total(
-                state=state,
-                unit_instance_id=unit.unit_instance_id,
-                resource_kind=resource_kind,
-            ),
-            "remaining_amount": unit_resource_total(
-                state=state,
-                unit_instance_id=unit.unit_instance_id,
-                resource_kind=resource_kind,
-            ),
-        }
-        for resource_kind in sorted(resource_kinds)
-    ]
+    rows: list[UnitResourceDisplayPayload] = []
+    for resource_kind in sorted(resource_kinds):
+        starting_amount = unit_resource_starting_total(
+            state=state,
+            unit_instance_id=unit.unit_instance_id,
+            resource_kind=resource_kind,
+        )
+        rows.append(
+            {
+                "resource_kind": resource_kind,
+                "starting_amount": starting_amount,
+                "remaining_amount": (
+                    unit_resource_total(
+                        state=state,
+                        unit_instance_id=unit.unit_instance_id,
+                        resource_kind=resource_kind,
+                    )
+                    if formation_state_visible
+                    else starting_amount
+                ),
+            }
+        )
+    return rows
 
 
 def _model_display_payload(
@@ -746,6 +800,7 @@ def _model_display_payload(
     unit: UnitInstance,
     model: ModelInstance,
     visible: bool,
+    formation_state_visible: bool,
 ) -> ModelDisplayPayload:
     if not visible:
         unknown_characteristics = _unknown_datacard_characteristics(
@@ -776,11 +831,15 @@ def _model_display_payload(
         model=model,
         use_base_values=True,
     )
-    current_characteristics = _model_characteristic_display_map(
-        state=state,
-        unit=unit,
-        model=model,
-        use_base_values=False,
+    current_characteristics = (
+        _model_characteristic_display_map(
+            state=state,
+            unit=unit,
+            model=model,
+            use_base_values=False,
+        )
+        if formation_state_visible
+        else base_characteristics
     )
     return {
         "model_instance_id": model.model_instance_id,
@@ -796,13 +855,19 @@ def _model_display_payload(
             base_size=model.base_size,
         ),
         "geometry": validate_json_value(model.geometry.to_payload()),
-        "wounds_remaining": model.wounds_remaining,
+        "wounds_remaining": (
+            model.wounds_remaining if formation_state_visible else model.starting_wounds
+        ),
         "starting_wounds": model.starting_wounds,
         "base_characteristics": base_characteristics,
         "current_characteristics": current_characteristics,
-        "visible_modifiers": _visible_modifier_traces(
-            model=model,
-            current_characteristics=current_characteristics,
+        "visible_modifiers": (
+            _visible_modifier_traces(
+                model=model,
+                current_characteristics=current_characteristics,
+            )
+            if formation_state_visible
+            else []
         ),
         "source_metadata": _source_metadata(
             state=state, catalog=catalog, source_ids=model.source_ids
@@ -1020,16 +1085,6 @@ def _source_metadata(
         "source_package_id": catalog.source_package_id,
         "source_ids": list(source_ids),
     }
-
-
-def _placed_unit_ids(state: GameState) -> frozenset[str]:
-    if state.battlefield_state is None:
-        return frozenset()
-    return frozenset(
-        unit_placement.unit_instance_id
-        for placed_army in state.battlefield_state.placed_armies
-        for unit_placement in placed_army.unit_placements
-    )
 
 
 def _rules_catalog_reference(catalog: ArmyCatalog) -> RulesCatalogReferencePayload:

@@ -106,14 +106,15 @@ patch records, Base Size Guide source rows with geometry-resolution statuses,
 deployment remainder-drain coverage, and a static audit preventing runtime
 Event Companion PDF parsing.
 **Phase 17N is partial overall, with its battlefield-geometry scope complete and
-12 of 25 Primary Missions executable**: all 15 Event Companion Force
+13 of 25 Primary Missions executable**: all 15 Event Companion Force
 Disposition pairings and all A/B/C variants supply 45 of 45 source-hashed
 executable battlefield packages. They contain 720 physical terrain-area
 footprint pieces forming 608 logical rules areas and 1,349 physical components,
 including the reviewed page 9 29-component source exception. The generic
 timing, cumulative/exclusive resolution, objective, territory, and table-quarter
-scoring slice promotes eight additional evidence-complete Primaries; the other
-13 remain source-known and engine-pending.
+scoring slice promotes eight additional evidence-complete Primaries, and the
+subsequent destruction-attribution slice promotes Purge and Secure; the other
+12 remain source-known and engine-pending.
 **Phase 18A is complete** for local CLI/human decision entry and viewer-safe
 hybrid datacard projections: `interfaces/cli.py` renders pending finite and
 parameterized requests, submits normal lifecycle `DecisionResult`s, and
@@ -391,7 +392,7 @@ Implemented foundation and partial integration baselines:
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
 | 17J | Complete | Warhammer Event Companion v1.1 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with explicit extraction status, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
-| 17N | Partial | Battlefield geometry complete for all 45 source-hashed Event Companion layouts; generic timing/resolution and objective, territory, and table-quarter evidence make 12 of 25 Primaries executable while 13 remain source-known engine-pending |
+| 17N | Partial | Battlefield geometry complete for all 45 source-hashed Event Companion layouts; generic timing/resolution, objective/territory/table-quarter evidence, and Purge and Secure destruction attribution make 13 of 25 Primaries executable while 12 remain source-known engine-pending |
 | 17O | Complete | Viewer-scoped eight-axis capability manifest with selected roster/unit/rule/mission/geometry rows, evidence, blockers, identities, and mechanically derived certification claims |
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
@@ -3713,6 +3714,12 @@ Invariants:
 - reserve declarations are setup player choices and must be replay-facing
   `DecisionRequest`/`DecisionResult` submissions or source-backed engine
   consequences recorded before battle begins;
+- Declare Battle Formations requests, results, and player-owned consequence
+  events are secret from the opponent until both players complete the step;
+  roster identities stay public, raw and structured battlefield projections
+  suppress unrevealed formation state, and one deterministic public reveal
+  event publishes the final reserve, cargo, setup-consequence, and faction-rule
+  state;
 - each mustered runtime rules unit has exactly one initial formation state:
   deployed, declared in Reserves, starting embarked, destroyed by a setup
   legality consequence, or explicitly unsupported with reason;
@@ -3765,6 +3772,9 @@ Required tests:
   reserve declaration submissions reject before queue pop;
 - replay restore before and after Declare Battle Formations preserves identical
   reserve declarations, source context, and arrival restrictions;
+- owner, opponent, and administrator projections/events preserve the secret
+  declaration boundary before reveal and identical public formation state after
+  reveal;
 - setup completion fails if any mustered unit has no legal initial formation
   state.
 
@@ -3906,14 +3916,23 @@ Invariants:
   or enhancement eligibility default;
 - runtime unit instance IDs, model instance IDs, attached-unit IDs, action IDs,
   and setup event IDs are deterministic from the source roster and game seed;
-- Leader and Support attachments are declared on the army list, not in Declare
-  Battle Formations, and mustering turns those declarations into runtime
-  attached rules-unit instances rather than only retaining component units;
+- when the configured setup sequence includes Declare Battle Formations, its
+  simultaneous-choice secrecy boundary spans game creation and mustering through
+  completion of that step; a sequence without that step has no battle-formation
+  secrecy window, and public roster identity plus later battlefield evidence do
+  not become secret merely because formation choices are unresolved;
+- the current `GameConfig` pre-materializes Leader and Support attachment
+  declarations so mustering can build runtime attached rules-unit instances,
+  and the public `army_mustered` event exposes the frozen starting attachment
+  records identically to both players and administrators; those Muster Armies
+  bindings are not Declare Battle Formations secrets;
 - Enhancements are selected after Attached Units are created, so the one-Enhancement-per-squad restriction applies across the attached rules unit;
 - every Dedicated Transport must start the battle with at least one unit embarked or it cannot be deployed and counts as destroyed during the first battle round;
 - Dedicated Transport starting cargo is a source-backed setup manifest and must
   be consistent with transport capacity, datasheet restrictions, component
-  attached-unit state, and Deploy Armies option filtering;
+  attached-unit state, and Deploy Armies option filtering; although the current
+  config pre-materializes that manifest, its binding is opponent-secret until
+  the Declare Battle Formations reveal;
 - missing Dedicated Transport manifest source data is a strict construction
   violation; an explicit empty manifest is a setup consequence, not a roster
   legality failure;
@@ -4738,7 +4757,7 @@ Implemented coverage:
   implemented matrix cells, 45 deployment maps, 45 terrain layout templates, and
   45 mission-pool entries.
 - `primary_mission_scoring_coverage_rows()` tracks current Primary Mission
-  scoring status: 12 of 25 missions are engine-implemented, 13 are source-known
+  scoring status: 13 of 25 missions are engine-implemented, 12 are source-known
   but still require engine implementation, and 0 await source scoring text.
 - All 45 source-page layout identities instantiate as 44" x 60" mission setups
   with deterministic, source-hashed executable battlefield packages. The
@@ -4945,11 +4964,13 @@ Completion gate:
 Priority: required before certifying a visual matched-play slice.
 
 Status: Partial overall; battlefield geometry is complete and Primary scoring
-is executable for 12 of 25 missions. All 15 Event Companion Force Disposition
+is executable for 13 of 25 missions. All 15 Event Companion Force Disposition
 pairings and every A/B/C variant have source-hashed executable battlefield
-packages, for 45 of 45 layouts. The remaining 13 Primaries stay source-known
-and engine-pending until their mission actions, choices, or persistent marker
-state have engine-owned semantics.
+packages, for 45 of 45 layouts. Six of those 15 pairings have executable
+Primaries in both directions, covering 18 of the 45 A/B/C variants with complete
+two-sided Primary scoring. The remaining 12 Primaries stay source-known and
+engine-pending until their mission actions, choices, or persistent marker state
+have engine-owned semantics.
 
 The battlefield Single/Separate logical-area semantics come from the page-8
 Layouts Key, while coordinates and layout facts come from pages 9-53 of
@@ -5014,11 +5035,11 @@ Mission Action descriptors retain reviewed Chapter Approved mission-deck
 provenance in the strict, versioned JSON artifact at
 `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-scoring.json`,
 with package hash
-`5449d260c90c9a5a798dad0fa3dbba0c7c7b56e28e726a94ce6694654cc7afbe`
+`a1f8a91bc8dc01088fdef5d0b9ee2e4e270db93a4b050d3a9b47c8995163dfc5`
 and raw artifact SHA-256
-`162f28bbdbd34ffcf78918abc6e85dc7e1fef9785ce2dc6f31129e7664666e80`.
+`6f2526d2d81d7854db285d2e7969ccef59e7eac3a214588bea37bd982bada8e8`.
 The artifact pins the reviewed transcriptions from PRs #107, #134, #136, and
-#379, including the exact 12 executable versus 13 engine-pending status boundary.
+#379, including the exact 13 executable versus 12 engine-pending status boundary.
 PR #107 is the source-backed origin for Death Trap, Immovable Object, and
 Unstoppable Force; PRs #134 and #136 complete the remaining mission/action
 transcription inventory, and PR #379 supplies the later exact Meatgrinder
@@ -5045,7 +5066,7 @@ record; the free-form timing field alone cannot claim the exemption. Live
 awards and restored ledgers use the same policy validator, and restore rejects
 ordinary Primary totals above 15VP in one battle round. The resulting complete
 mission source identity is pinned as
-`aa272b8234ca02b2ac5b62b2bc7299998d14a386e4e9a5f9b90aaaf4ed5422a3`.
+`68d2214fdd1b3e2e1cc1e97e9b50e959a52acce03d1706c3fda5535fd5bc4d48`.
 
 The Phase 17N scoring schema has exactly nine source timing tokens and requires
 every scoring row to declare one of `independent`, `cumulative`, or
@@ -5058,16 +5079,52 @@ rule-ID tie-breaking and auditable selected/suppressed evidence.
 
 Battlefield Dominance, Delaying Action, Destroyer's Wrath, Determined
 Acquisition, Inescapable Dominion, Outmanoeuvre, Reconnaissance Sweep, and
-Search and Scour are the eight newly executable Primaries. Their condition
+Search and Scour are the eight Step 2 executable Primaries. Their condition
 evidence covers objective-control comparisons and history, home/central/
 expansion objective roles, objective centers inside directed territory,
 full-model rules-unit placement in table quarters outside the central exclusion,
 turn-scoped destruction with start-of-turn terrain occupancy, and enemy absence
 from the scoring player's territory at battle end. Objective-control inputs are
 validated against the exact mission objective inventory; missing or unsupported
-evidence fails closed. Purge and Secure, Sabotage, and Vital Link retain their
-source resolution grammar but remain engine-pending because the associated
-destruction/action/marker semantics are not complete.
+evidence fails closed. Purge and Secure is the thirteenth executable Primary:
+its exclusive destruction group uses the destroyed enemy unit's exact
+start-of-turn objective membership and the friendly destroying rules unit's
+objective membership at the destruction event, then deterministically selects
+only one 3VP branch when both conditions are achieved. Sabotage and Vital Link
+retain their source resolution grammar but remain engine-pending because their
+action and marker semantics are not complete.
+
+Step 3 position history is rules-unit aware. Every player-turn start records one
+authoritative snapshot whose outer rows preserve attached formations as logical
+rules units and whose nested component rows preserve every physical unit, every
+evaluated model, intersected logical terrain areas, and exact per-objective model
+witnesses. Destruction evidence copies the historical terrain and objective
+membership of the destroyed rules unit. Attributed loss records also preserve
+the responsible player, rules-unit/model IDs, typed destruction provenance,
+source `model_destroyed` event ID, and the source rules unit's event-time
+objective witness. Direct loss paths carry an explicit unattributed cause; no
+attacker is inferred. Destruction, Embark, and in-battle reserve transitions
+feed one generic battlefield-departure history for later mission choices, while
+off-battlefield reserve-deadline losses do not claim a battlefield departure.
+Attached-unit destruction completion follows Core Rules 19.02: the logical
+Attached Unit completes only when the last model that began the battle in that
+formation is destroyed. This rule is verified against physical page 66 of
+[`eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf`](docs/source_rules/eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf),
+SHA-256
+`f6a2443a44627ac5f0ef08407d29aa5ec7e97339998f05bc35f3ae37bf276833`.
+The frozen starting-model lineage survives component splits, revival, and later
+model materialization; a newly added model cannot delay or manufacture the
+source-backed destruction trigger.
+Replay payloads retain the complete authority. Army-list unit/model identities
+and battle-time historical groups are public to both players, including
+unplaced Strategic Reserves; Declare Battle Formations secrecy belongs to its
+unrevealed declaration choices/state rather than roster identity. Destruction
+source and objective/model witnesses are public battlefield history and are
+identical in player and administrator event streams.
+These generic primitives are intentionally available to Locate and Deny,
+Extract Relic, Secure Asset, and Punishment without promoting those missions:
+their player choices, Mission Actions, and persistent marker/condemned-unit
+state remain Step 4 work and continue to fail closed.
 
 `uv run python tools/build_event_companion_battlefields.py --check` rebuilds the
 complete battlefield package in memory from its reviewed inputs, verifies its
@@ -5233,8 +5290,9 @@ Completion gate:
 
 Status: Complete. The implemented adapter contract currently uses
 `RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"` for the static
-catalog projection and `PROJECTION_SCHEMA_VERSION = "game-view-v9-phase17n"`
-for live game views. Live views expose `rules_catalog`,
+catalog projection and
+`PROJECTION_SCHEMA_VERSION = "game-view-v10-phase17n-step3"` for live game
+views. Live views expose `rules_catalog`,
 `projection_state_hash`, `unit_display_by_id`, and `model_display_by_id`.
 
 Modules:
@@ -6016,9 +6074,10 @@ Required tests:
 Completion gate:
 
 `battlefield-view-v1` was first published in Contract 4.0. The
-`battlefield-view-v3-phase17n` family introduced under Contract 6.0 remains
-unchanged under Contract 7.0; strict clients can distinguish the required
-logical terrain-area identity. The family defines one right-handed inches-based
+`battlefield-view-v4-phase17n-step3` family replaces the Contract 6
+`battlefield-view-v3-phase17n` discriminator so strict clients can distinguish
+the Contract 8 pre-reveal model-state redaction semantics. The coordinate and
+geometry unions remain unchanged. The family defines one right-handed inches-based
 world frame,
 stable external entities for the required battlefield concepts, explicit model
 physical states, typed model/support/terrain/zone/path geometry, and a hash over

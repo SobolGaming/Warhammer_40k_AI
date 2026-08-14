@@ -427,6 +427,7 @@ def _pre_battle_gate_ready_state() -> GameState:
     payload["active_player_id"] = None
     payload["command_step_state"] = None
     payload["primary_objective_turn_start_states"] = []
+    payload["primary_rules_unit_turn_start_snapshots"] = []
     return GameState.from_payload(payload)
 
 

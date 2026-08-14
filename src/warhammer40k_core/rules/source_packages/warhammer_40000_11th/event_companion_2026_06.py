@@ -71,7 +71,7 @@ DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-EXPECTED_SOURCE_IMPORT_HASH = "aa272b8234ca02b2ac5b62b2bc7299998d14a386e4e9a5f9b90aaaf4ed5422a3"
+EXPECTED_SOURCE_IMPORT_HASH = "68d2214fdd1b3e2e1cc1e97e9b50e959a52acce03d1706c3fda5535fd5bc4d48"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -989,14 +989,12 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
     "primary-consecrate": (
         "engine_primary_marker_state:consecrated_objective",
         "engine_primary_condition:consecrated_objective_thresholds",
-        "engine_primary_condition:control_more_objectives_than_opponent",
         "engine_primary_condition:enemy_home_objective_consecrated",
     ),
     "primary-extract-relic": (
         "engine_primary_action:sensor-sweep-extract-relic",
         "engine_primary_marker_state:opponent_operation_marker",
         "engine_primary_condition:friendly_unit_performed_sensor_sweep_this_turn",
-        "engine_primary_condition:enemy_started_turn_on_objective_destroyed",
         "engine_primary_condition:single_opponent_operation_marker_terrain_area_state",
     ),
     "primary-gather-intel": (
@@ -1010,21 +1008,11 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_start_battle_setup:locate_and_deny_operation_markers",
         "engine_primary_action:sensor-sweep-locate-and-deny",
         "engine_primary_marker_state:operation_marker_terrain_area",
-        "engine_primary_condition:enemy_started_turn_on_objective_destroyed",
         "engine_primary_condition:single_friendly_operation_marker_terrain_area_state",
     ),
     "primary-punishment": (
         "engine_primary_start_turn_choice:condemned_enemy_units",
         "engine_primary_condition:condemned_enemy_units_left_battlefield",
-        "engine_primary_condition:control_more_objectives_than_opponent",
-        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
-    ),
-    "primary-purge-and-secure": (
-        "engine_primary_condition:enemy_destroyed_by_friendly_unit_on_objective",
-        "engine_primary_condition:enemy_started_turn_on_objective_destroyed",
-        "engine_primary_condition:each_non_home_objective_controlled_from_battle_round_two",
-        "engine_primary_condition:control_one_or_more_new_non_home_objectives",
-        "engine_primary_scoring_grammar:exclusive_or_condition",
     ),
     "primary-sabotage": (
         "engine_primary_action:commit-sabotage",
@@ -1035,8 +1023,6 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
     "primary-secure-asset": (
         "engine_primary_action:secure-asset",
         "engine_primary_condition:friendly_unit_secured_asset_this_turn",
-        "engine_primary_condition:enemy_started_turn_near_central_objective_destroyed",
-        "engine_primary_condition:control_three_or_more_objectives",
     ),
     "primary-smoke-and-mirrors": (
         "engine_primary_action:decoy-objective",
@@ -1061,7 +1047,6 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_action:vanguard-operation",
         "engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn",
         "engine_primary_condition:enemy_territory_terrain_area_control",
-        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
     ),
     "primary-vital-link": (
         "engine_primary_action:maintain-control",

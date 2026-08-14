@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
+from hashlib import sha256
+from pathlib import Path
 from typing import cast
 
 import pytest
@@ -16,6 +18,7 @@ from tests.phase13b_shooting_declaration_helpers import (
 )
 from tests.setup_completion_helpers import enter_battle_for_fixture
 
+from warhammer40k_core.adapters.access_control import AuthenticatedPrincipal, PrincipalRole
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -77,6 +80,10 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -159,15 +166,29 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseState,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_battlefield_departure import (
+    record_primary_battlefield_departure,
+)
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    PrimaryUnattributedDestructionCause,
+    RulesUnitObjectiveProximityWitness,
+    destruction_source_objective_proximity_witness,
+    rules_unit_objective_proximity_witness,
+)
+from warhammer40k_core.engine.primary_historical_events import (
+    record_new_primary_turn_start_evidence_events,
+)
 from warhammer40k_core.engine.primary_scoring_conditions import (
     PrimaryUnitDestructionEvidence,
     cross_turn_destruction_comparison_evidence,
     opponent_home_control_evidence,
 )
 from warhammer40k_core.engine.primary_turn_start_evidence import (
-    PrimaryUnitTerrainTurnStartSnapshot,
+    PrimaryRulesUnitTurnStartSnapshot,
+    record_primary_turn_start_evidence,
 )
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+    record_primary_destroyed_model_departures,
     record_primary_unit_destructions_for_destroyed_models,
 )
 from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
@@ -177,6 +198,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveStatus,
 )
 from warhammer40k_core.engine.return_on_death import (
+    RETURN_ON_DEATH_PENDING_CREATED_EVENT_TYPE,
     SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
     PendingReturnOnDeath,
     ReturnDestroyedTargetScope,
@@ -184,7 +206,7 @@ from warhammer40k_core.engine.return_on_death import (
     apply_return_on_death_placement_decision,
     build_return_on_death_placement_request,
 )
-from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked
+from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked, rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierBinding,
     ObjectiveControlModifierContext,
@@ -195,6 +217,7 @@ from warhammer40k_core.engine.scoring import (
     MissionScoringPolicy,
     PrimaryMissionScoringRule,
     PrimaryObjectiveTurnStartState,
+    PrimaryObjectiveTurnStartStatePayload,
     PrimaryTerrainTrapState,
     PrimaryUnitDestructionState,
     PrimaryUnitDestructionStatePayload,
@@ -232,6 +255,11 @@ from warhammer40k_core.engine.turn_cleanup import (
     battlefield_removal_kind_from_token,
     resolve_end_turn_cleanup,
 )
+from warhammer40k_core.engine.unit_destroyed_hooks import (
+    ATTACHED_UNIT_DESTRUCTION_SOURCE_RULE_ID,
+    ATTACHED_UNIT_DESTRUCTION_SOURCE_SHA256,
+    unit_destruction_completion_events_for_interval,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import BelowHalfStrengthContext, StartingStrengthRecord
 from warhammer40k_core.engine.wargear_selections import (
@@ -252,6 +280,18 @@ from warhammer40k_core.rules.mission_pack_import import (
 SEEDED_TACTICAL_DRAW_REQUEST_ID = "phase11e-seeded-tactical-draw-request"
 SEEDED_TACTICAL_DRAW_RESULT_ID = "phase11e-seeded-tactical-draw"
 SCORING_TERRAIN_FEATURE_ID = "phase11e-scoring-terrain"
+
+
+def test_attached_unit_destruction_source_pin_matches_official_core_rules_page_66() -> None:
+    source_pdf = (
+        Path(__file__).resolve().parents[2]
+        / "docs"
+        / "source_rules"
+        / "eng_01-06_warhammer40k_new40k_core_rules-was6fbu1ix-hfewhmxyiy.pdf"
+    )
+
+    assert sha256(source_pdf.read_bytes()).hexdigest() == (ATTACHED_UNIT_DESTRUCTION_SOURCE_SHA256)
+    assert ATTACHED_UNIT_DESTRUCTION_SOURCE_RULE_ID.endswith("19.02-attached-units")
 
 
 def test_immovable_object_scores_central_and_non_home_objectives_by_round() -> None:
@@ -327,7 +367,8 @@ def test_unstoppable_force_scores_kills_new_objectives_and_end_battle_central_co
         turn_state,
         unit_instance_id="army-beta:intercessor-unit-3",
     )
-    turn_state.record_primary_unit_destruction(
+    _record_test_primary_unit_destruction(
+        turn_state,
         destroying_player_id="player-a",
         destroyed_unit_instance_id="army-beta:intercessor-unit-3",
         source_id="phase16:unstoppable-force:enemy-destroyed",
@@ -366,17 +407,7 @@ def test_unstoppable_force_scores_kills_new_objectives_and_end_battle_central_co
     end_state = _battle_state_for_primary("primary-unstoppable-force")
     end_state.battle_round = 5
     end_state.active_player_id = "player-b"
-    end_state.record_primary_objective_turn_start_state(
-        PrimaryObjectiveTurnStartState(
-            state_id="phase16:unstoppable-force:round-05:player-b:turn-start",
-            game_id=end_state.game_id,
-            player_id="player-b",
-            active_player_id="player-b",
-            battle_round=5,
-            controlled_objective_ids=(),
-            source_id="phase16:unstoppable-force:round-05:player-b:turn-start",
-        )
-    )
+    record_primary_turn_start_evidence(state=end_state)
     _place_unit_near_objective(
         end_state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -422,7 +453,10 @@ def test_death_trap_booby_trap_action_tracks_exact_logical_objective_terrain() -
     )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
-    lifecycle.state = _battle_state_from_config(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        decisions=lifecycle.decision_controller,
+    )
     state = lifecycle.state
     assert state is not None
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
@@ -522,8 +556,8 @@ def test_death_trap_scores_authoritative_turn_start_terrain_membership(
     state.replace_battlefield_state(
         state.battlefield_state.with_removed_models(destroyed_model_ids)
     )
-    (destruction,) = record_primary_unit_destructions_for_destroyed_models(
-        state=state,
+    (destruction,) = _record_test_completed_primary_unit_destruction(
+        state,
         destroyed_model_instance_ids=destroyed_model_ids,
         destroying_player_id="player-a",
         source_id="phase17n:death-trap:runtime-destruction",
@@ -531,7 +565,7 @@ def test_death_trap_scores_authoritative_turn_start_terrain_membership(
     assert destruction.started_turn_terrain_feature_ids == ((area_id,) if starts_inside else ())
 
 
-def test_turn_start_terrain_snapshot_keeps_attached_physical_components_separate() -> None:
+def test_turn_start_position_snapshot_groups_attached_unit_without_collapsing_components() -> None:
     mission_setup = _mission_setup_for_primary(
         "primary-death-trap",
         objective_terrain_feature_id=SCORING_TERRAIN_FEATURE_ID,
@@ -543,6 +577,11 @@ def test_turn_start_terrain_snapshot_keeps_attached_physical_components_separate
         mission_setup,
         objective_role=ObjectiveMarkerRole.CENTRAL,
     )
+    central_marker = next(
+        marker
+        for marker in mission_setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+    )
     area_id = area.logical_terrain_area_id
     bodyguard_id = "army-alpha:bodyguard-unit"
     leader_id = "army-alpha:leader-unit"
@@ -551,15 +590,42 @@ def test_turn_start_terrain_snapshot_keeps_attached_physical_components_separate
         turn_start_unit_positions=(
             (
                 bodyguard_id,
-                *_logical_terrain_area_test_point(area),
+                central_marker.x_inches,
+                central_marker.y_inches,
             ),
             (leader_id, 5.0, 5.0),
         ),
     )
 
-    snapshot = state.primary_unit_terrain_turn_start_snapshots[0]
-    assert snapshot.membership_for_unit(bodyguard_id).terrain_feature_ids == (area_id,)
-    assert snapshot.membership_for_unit(leader_id).terrain_feature_ids == ()
+    snapshot = state.primary_rules_unit_turn_start_snapshots[0]
+    (starting_attached_record,) = state.starting_attached_unit_records
+    membership = snapshot.membership_for_rules_unit(
+        starting_attached_record.attached_unit_instance_id
+    )
+    assert membership.component_unit_instance_ids == tuple(sorted((bodyguard_id, leader_id)))
+    assert membership.component_membership_for_unit(bodyguard_id).logical_terrain_area_ids == (
+        area_id,
+    )
+    assert membership.component_membership_for_unit(leader_id).logical_terrain_area_ids == ()
+    assert membership.terrain_feature_ids == (area_id,)
+    bodyguard_model_ids = {
+        model.model_instance_id
+        for model in state.army_definitions[0].unit_by_id(bodyguard_id).own_models
+    }
+    assert set(membership.evaluated_model_instance_ids) == {
+        model.model_instance_id
+        for component_id in (bodyguard_id, leader_id)
+        for model in state.army_definitions[0].unit_by_id(component_id).own_models
+    }
+    assert membership.objective_marker_ids == (central_marker.objective_marker_id,)
+    (outer_witness,) = membership.objective_marker_witnesses
+    assert outer_witness.objective_marker_id == central_marker.objective_marker_id
+    assert set(outer_witness.model_instance_ids) == bodyguard_model_ids
+    (bodyguard_witness,) = membership.component_membership_for_unit(
+        bodyguard_id
+    ).objective_marker_witnesses
+    assert bodyguard_witness == outer_witness
+    assert membership.component_membership_for_unit(leader_id).objective_marker_witnesses == ()
 
     bodyguard = state.army_definitions[0].unit_by_id(bodyguard_id)
     destroyed_model_ids = tuple(model.model_instance_id for model in bodyguard.own_models)
@@ -567,18 +633,31 @@ def test_turn_start_terrain_snapshot_keeps_attached_physical_components_separate
     state.replace_battlefield_state(
         state.battlefield_state.with_removed_models(destroyed_model_ids)
     )
-    (destruction,) = record_primary_unit_destructions_for_destroyed_models(
-        state=state,
+    assert not _record_test_completed_primary_unit_destruction(
+        state,
         destroyed_model_instance_ids=destroyed_model_ids,
         destroying_player_id="player-b",
         source_id="phase17n:death-trap:attached-bodyguard-destruction",
     )
+    assert not state.primary_unit_destruction_states
 
-    assert destruction.destroyed_unit_instance_id == bodyguard_id
+    leader = state.army_definitions[0].unit_by_id(leader_id)
+    leader_model_ids = leader.own_model_ids()
+    state.replace_battlefield_state(state.battlefield_state.with_removed_models(leader_model_ids))
+    (destruction,) = _record_test_completed_primary_unit_destruction(
+        state,
+        destroyed_model_instance_ids=leader_model_ids,
+        destroying_player_id="player-b",
+        source_id="phase17n:death-trap:attached-leader-destruction",
+    )
+
+    assert destruction.destroyed_unit_instance_id == (
+        starting_attached_record.attached_unit_instance_id
+    )
     assert destruction.started_turn_terrain_feature_ids == (area_id,)
 
 
-def test_turn_start_terrain_snapshot_redacts_unplaced_opponent_unit_identity() -> None:
+def test_turn_start_position_snapshot_is_public_for_unplaced_opponent_unit() -> None:
     config = _config_for_primary(
         "primary-death-trap",
         objective_terrain_feature_id=SCORING_TERRAIN_FEATURE_ID,
@@ -588,44 +667,72 @@ def test_turn_start_terrain_snapshot_redacts_unplaced_opponent_unit_identity() -
         config,
         turn_start_unplaced_unit_ids=(reserve_unit_id,),
     )
-    snapshot = state.primary_unit_terrain_turn_start_snapshots[0]
+    snapshot = state.primary_rules_unit_turn_start_snapshots[0]
     session = LocalGameSession()
     session.start(config)
     session.lifecycle.state = state
 
     player_payload = session.view(viewer_player_id="player-a")
     opponent_payload = session.view(viewer_player_id="player-b")
-    assert snapshot.membership_for_unit(reserve_unit_id).terrain_feature_ids == ()
-    player_snapshot = player_payload["primary_unit_terrain_turn_start_snapshots"][0]
-    opponent_snapshot = opponent_payload["primary_unit_terrain_turn_start_snapshots"][0]
-    player_memberships = player_snapshot["unit_memberships"]
-    opponent_memberships = opponent_snapshot["unit_memberships"]
-    assert all(
-        membership["unit_instance_id"] != reserve_unit_id for membership in player_memberships
+    administrator_payload = session.view_for_context(
+        viewer=AuthenticatedPrincipal(
+            principal_id="phase17n-turn-start-administrator",
+            role=PrincipalRole.ADMINISTRATOR,
+        ).bind_to_session(player_ids=state.player_ids)
     )
+    assert snapshot.membership_for_rules_unit(reserve_unit_id).evaluated_model_instance_ids == ()
+    player_snapshot = player_payload["primary_rules_unit_turn_start_snapshots"][0]
+    opponent_snapshot = opponent_payload["primary_rules_unit_turn_start_snapshots"][0]
+    administrator_snapshot = administrator_payload["primary_rules_unit_turn_start_snapshots"][0]
+    player_memberships = player_snapshot["rules_unit_memberships"]
+    opponent_memberships = opponent_snapshot["rules_unit_memberships"]
     assert any(
-        membership["unit_instance_id"] == reserve_unit_id for membership in opponent_memberships
+        membership["rules_unit_instance_id"] == reserve_unit_id for membership in player_memberships
     )
+    assert player_memberships == opponent_memberships
+    assert reserve_unit_id in player_payload["unit_display_by_id"]
+    assert reserve_unit_id in opponent_payload["unit_display_by_id"]
+    assert player_snapshot == snapshot.to_payload()
     assert opponent_snapshot == snapshot.to_payload()
-    assert player_snapshot["snapshot_id"] == opponent_snapshot["snapshot_id"]
-    assert player_snapshot["game_id"] == opponent_snapshot["game_id"]
-    assert player_snapshot["active_player_id"] == opponent_snapshot["active_player_id"]
-    assert player_snapshot["battle_round"] == opponent_snapshot["battle_round"]
-    assert player_snapshot["source_id"] == opponent_snapshot["source_id"]
-    assert set(player_payload["unit_display_by_id"]) == {
-        membership["unit_instance_id"] for membership in player_memberships
-    }
-    assert set(opponent_payload["unit_display_by_id"]) == {
-        membership["unit_instance_id"] for membership in opponent_memberships
-    }
-    assert reserve_unit_id not in json.dumps(
-        player_payload["primary_unit_terrain_turn_start_snapshots"],
-        sort_keys=True,
-    )
+    assert administrator_snapshot == snapshot.to_payload()
     assert json.loads(json.dumps(player_payload, sort_keys=True)) == player_payload
 
 
-def test_turn_start_terrain_snapshot_participates_in_projection_hash() -> None:
+def test_turn_start_position_snapshot_projects_complete_attached_group_to_both_players() -> None:
+    state = _battle_state_from_config(_config_with_player_a_attached_unit())
+    (starting_attached_record,) = state.starting_attached_unit_records
+    bodyguard_id = starting_attached_record.bodyguard_unit_instance_id
+    (leader_id,) = starting_attached_record.leader_unit_instance_ids
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(state.battlefield_state.without_unit_placement(leader_id))
+    session = LocalGameSession()
+    session.start(_config_with_player_a_attached_unit())
+    session.lifecycle.state = state
+
+    opponent_view = session.view(viewer_player_id="player-b")
+    owner_view = session.view(viewer_player_id="player-a")
+    opponent_memberships = opponent_view["primary_rules_unit_turn_start_snapshots"][0][
+        "rules_unit_memberships"
+    ]
+    owner_memberships = owner_view["primary_rules_unit_turn_start_snapshots"][0][
+        "rules_unit_memberships"
+    ]
+
+    assert bodyguard_id in opponent_view["unit_display_by_id"]
+    assert leader_id in opponent_view["unit_display_by_id"]
+    assert opponent_memberships == owner_memberships
+    (attached_membership,) = tuple(
+        membership
+        for membership in opponent_memberships
+        if membership["rules_unit_instance_id"]
+        == starting_attached_record.attached_unit_instance_id
+    )
+    assert {
+        component["unit_instance_id"] for component in attached_membership["component_memberships"]
+    } == {bodyguard_id, leader_id}
+
+
+def test_turn_start_position_snapshot_participates_in_projection_hash() -> None:
     config = _config_for_primary(
         "primary-death-trap",
         objective_terrain_feature_id=SCORING_TERRAIN_FEATURE_ID,
@@ -667,8 +774,8 @@ def test_turn_start_terrain_snapshot_participates_in_projection_hash() -> None:
     outside_view = outside_session.view(viewer_player_id="player-a")
 
     assert (
-        inside_view["primary_unit_terrain_turn_start_snapshots"]
-        != outside_view["primary_unit_terrain_turn_start_snapshots"]
+        inside_view["primary_rules_unit_turn_start_snapshots"]
+        != outside_view["primary_rules_unit_turn_start_snapshots"]
     )
     assert inside_view["projection_state_hash"] != outside_view["projection_state_hash"]
 
@@ -679,7 +786,7 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
     )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
-    state = _battle_state_from_config(config)
+    state = _battle_state_from_config(config, decisions=lifecycle.decision_controller)
     lifecycle.state = state
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     state.advance_to_next_battle_phase()
@@ -823,17 +930,248 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
     assert str(comparison_metadata["scoring_rule_source_id"]).startswith(
         "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-meatgrinder:"
     )
+    _record_missing_turn_start_evidence_events(
+        state=state,
+        decisions=lifecycle.decision_controller,
+    )
     assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+    assert restored.state is not None
+    assert restored.state.to_payload() == state.to_payload()
+
+    forged_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    forged_events = forged_payload["decisions"]["event_log"]
+    forged_events.append(
+        {
+            "event_id": f"event-{len(forged_events) + 1:06d}",
+            "event_type": "healing_step_resolved",
+            "payload": {
+                "effect_id": "phase17n:forged-restoration",
+                "target_unit_instance_id": defender.unit_instance_id,
+                "amount": 1,
+                "source_rule_id": "phase17n:forged-restoration:rule",
+                "source_context": None,
+                "step": {
+                    "step_index": 1,
+                    "step_kind": "revive_model_embarked",
+                    "model_instance_id": defender_model.model_instance_id,
+                    "starting_wounds_remaining": 0,
+                    "final_wounds_remaining": 1,
+                    "request_id": "phase17n:forged-restoration:request",
+                    "result_id": "phase17n:forged-restoration:result",
+                    "transition_batch": None,
+                },
+            },
+        }
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="requires one authoritative decision event",
+    ):
+        GameLifecycle.from_payload(forged_payload)
+
+
+def test_purge_and_secure_real_attack_from_objective_scores_through_lifecycle() -> None:
+    setup = _event_companion_purge_and_secure_mission_setup()
+    config = _config_with_player_b_character(mission_setup=setup)
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    state = _battle_state_from_config(
+        config,
+        turn_start_unit_positions=(("army-beta:character-unit-3", 43.0, 30.0),),
+    )
+    lifecycle.state = state
+    record_new_primary_turn_start_evidence_events(
+        state=state,
+        event_log=lifecycle.decision_controller.event_log,
+        objective_state_ids_before=(),
+        snapshot_ids_before=(),
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    attacker = state.army_definitions[0].unit_by_id("army-alpha:intercessor-unit-1")
+    defender = state.army_definitions[1].unit_by_id("army-beta:character-unit-3")
+    central_marker = next(
+        marker
+        for marker in setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+    )
+    _place_unit_near_point(
+        state,
+        unit_instance_id=attacker.unit_instance_id,
+        x_inches=central_marker.x_inches,
+        y_inches=central_marker.y_inches,
+    )
+    (defender_model,) = defender.own_models
+    weapon_profile = replace(
+        _first_weapon_profile(lifecycle, attacker),
+        damage_profile=DamageProfile.fixed(defender_model.wounds_remaining),
+    )
+    sequence_id = "phase17n-purge-and-secure-runtime-attack"
+    attack_context_id = f"{sequence_id}:pool-001:attack-001"
+
+    remaining, _allocated_model_ids, attack_status = resolve_attack_sequence_until_blocked(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        ruleset_descriptor=config.ruleset_descriptor,
+        attack_sequence=AttackSequence.start(
+            sequence_id=sequence_id,
+            attacker_player_id="player-a",
+            attacking_unit_instance_id=attacker.unit_instance_id,
+            attack_pools=(
+                _attack_pool_for_test(
+                    attacker=attacker,
+                    defender=defender,
+                    weapon_profile=weapon_profile,
+                    attacks=1,
+                ),
+            ),
+        ),
+        already_allocated_model_ids=(),
+        dice_manager=DiceRollManager(
+            sequence_id,
+            event_log=lifecycle.decision_controller.event_log,
+            injected_results=(
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:hit",
+                    spec=attack_sequence_hit_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:wound",
+                    spec=attack_sequence_wound_roll_spec(
+                        weapon_profile_id=weapon_profile.profile_id,
+                        attack_context_id=attack_context_id,
+                        attacker_player_id="player-a",
+                    ),
+                    value=6,
+                ),
+                _fixed_roll_result(
+                    roll_id=f"{sequence_id}:save",
+                    spec=saving_throw_roll_spec(
+                        save_kind=SaveKind.ARMOUR,
+                        player_id="player-b",
+                        allocated_model_id=defender_model.model_instance_id,
+                        attack_context_id=attack_context_id,
+                    ),
+                    value=1,
+                ),
+            ),
+        ),
+    )
+    assert remaining is None
+    assert attack_status is None
+    destroyed_payload = cast(
+        dict[str, JsonValue],
+        next(
+            event.payload
+            for event in lifecycle.decision_controller.event_log.records
+            if event.event_type == "model_destroyed"
+        ),
+    )
+    source_witness = RulesUnitObjectiveProximityWitness.from_payload(
+        destroyed_payload["source_rules_unit_objective_proximity_witness"]
+    )
+    assert source_witness.objective_marker_ids == (central_marker.objective_marker_id,)
+
+    flow = BattleRoundFlow(
+        phase_handlers={
+            BattlePhase.SHOOTING: PlaceholderPhaseHandler(BattlePhase.SHOOTING),
+            BattlePhase.FIGHT: PlaceholderPhaseHandler(BattlePhase.FIGHT),
+        }
+    )
+    flow.advance(state=state, decisions=lifecycle.decision_controller)
+    (destruction,) = state.primary_unit_destruction_states
+    assert destruction.source_rules_unit_objective_proximity_witness == source_witness
+    assert destruction.started_turn_objective_marker_ids == ()
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+
+    flow.advance(state=state, decisions=lifecycle.decision_controller)
+
+    (transaction,) = state.victory_point_ledger_for_player("player-a").transactions
+    metadata = _transaction_metadata(transaction)
+    assert transaction.amount == 3
+    assert transaction.source_id == "primary-purge-and-secure"
+    assert metadata["scoring_rule_id"] == ("purge-and-secure-destroyed-by-objective-unit-turn-end")
+    assert metadata["primary_scoring_achieved_rule_ids"] == [
+        "purge-and-secure-destroyed-by-objective-unit-turn-end"
+    ]
+    session = LocalGameSession(lifecycle=lifecycle)
+    projected_ledgers = session.view(viewer_player_id="player-a")["public_victory_point_ledgers"]
+    assert (
+        next(
+            cast(dict[str, JsonValue], ledger)["victory_points"]
+            for ledger in projected_ledgers
+            if cast(dict[str, JsonValue], ledger)["player_id"] == "player-a"
+        )
+        == 3
+    )
+    evidence_event_types = (
+        "primary_battlefield_departure_recorded",
+        "primary_turn_start_evidence_recorded",
+        "primary_unit_destruction_recorded",
+    )
+    player_a_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-a",
+    )
+    player_b_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-b",
+    )
+    administrator_events = EventStreamCursor().events_since_for_context(
+        lifecycle.decision_controller.event_log,
+        viewer=AuthenticatedPrincipal(
+            principal_id="phase17n-public-evidence-administrator",
+            role=PrincipalRole.ADMINISTRATOR,
+        ).bind_to_session(player_ids=("player-a", "player-b")),
+    )
+
+    def canonical_evidence_payloads(
+        delta: dict[str, JsonValue],
+    ) -> dict[str, tuple[str, ...]]:
+        public_events = cast(list[JsonValue], delta["events"])
+        return {
+            event_type: tuple(
+                json.dumps(
+                    cast(dict[str, JsonValue], event)["payload"],
+                    ensure_ascii=True,
+                    separators=(",", ":"),
+                    sort_keys=True,
+                )
+                for event in public_events
+                if cast(dict[str, JsonValue], event)["event_type"] == event_type
+            )
+            for event_type in evidence_event_types
+        }
+
+    player_a_evidence = canonical_evidence_payloads(cast(dict[str, JsonValue], player_a_events))
+    player_b_evidence = canonical_evidence_payloads(cast(dict[str, JsonValue], player_b_events))
+    administrator_evidence = canonical_evidence_payloads(
+        cast(dict[str, JsonValue], administrator_events)
+    )
+    assert all(player_a_evidence[event_type] for event_type in evidence_event_types)
+    assert player_a_evidence == player_b_evidence == administrator_evidence
+
+    restored_lifecycle = GameLifecycle.from_payload(lifecycle.to_payload())
+    assert restored_lifecycle.state is not None
+    assert restored_lifecycle.state.to_payload() == state.to_payload()
 
 
 def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> None:
     config = replace(
         _config_with_player_b_character(mission_setup=_event_companion_meatgrinder_mission_setup()),
-        game_id="phase11e-meatgrinder-overwatch-return-on-death-success-3",
+        game_id="phase11e-meatgrinder-overwatch-return-auth-0",
     )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
-    state = _battle_state_from_config(config)
+    state = _battle_state_from_config(config, decisions=lifecycle.decision_controller)
     lifecycle.state = state
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     state.advance_to_next_battle_phase()
@@ -920,38 +1258,47 @@ def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> 
     assert destroyed_payload["phase"] == BattlePhase.SHOOTING.value
     assert state.current_battle_phase is BattlePhase.MOVEMENT
 
-    state.record_pending_return_on_death(
-        PendingReturnOnDeath(
-            pending_id="phase17n-meatgrinder-overwatch-return-on-death:pending",
-            source_rule_id="phase17n-meatgrinder-overwatch-return-on-death:rule",
-            source_ability_id="phase17n-meatgrinder-overwatch-return-on-death:ability",
-            source_clause_id="phase17n-meatgrinder-overwatch-return-on-death:clause",
-            source_effect_index=0,
-            owner_player_id="player-b",
-            target_scope=ReturnDestroyedTargetScope.DESTROYED_UNIT,
-            destroyed_unit_instance_id=defender.unit_instance_id,
-            destroyed_model_instance_id=None,
-            destroyed_position_payload=cast(
-                JsonValue,
-                {
-                    "source": "model_destroyed_event",
-                    "model_destroyed_event_id": destroyed_event.event_id,
-                    "model_destroyed_payload": destroyed_payload,
-                },
-            ),
-            trigger_battle_round=state.battle_round,
-            trigger_phase=BattlePhase.MOVEMENT.value,
-            resolution_timing="phase_end",
-            roll_expression="D6",
-            roll_count=1,
-            success_threshold=2,
-            placement_anchor="destroyed_position",
-            placement_preference="as_close_as_possible",
-            engagement_range_restriction=True,
-            restore_wounds_mode=ReturnRestoreWoundsMode.FULL_HEALTH,
-            wounds_remaining=None,
-            resolved=False,
-        )
+    pending = PendingReturnOnDeath(
+        pending_id="phase17n-meatgrinder-overwatch-return-on-death:pending",
+        source_rule_id="phase17n-meatgrinder-overwatch-return-on-death:rule",
+        source_ability_id="phase17n-meatgrinder-overwatch-return-on-death:ability",
+        source_clause_id="phase17n-meatgrinder-overwatch-return-on-death:clause",
+        source_effect_index=0,
+        owner_player_id="player-b",
+        target_scope=ReturnDestroyedTargetScope.DESTROYED_UNIT,
+        destroyed_unit_instance_id=defender.unit_instance_id,
+        destroyed_model_instance_id=None,
+        destroyed_position_payload=cast(
+            JsonValue,
+            {
+                "source": "model_destroyed_event",
+                "model_destroyed_event_id": destroyed_event.event_id,
+                "model_destroyed_payload": destroyed_payload,
+            },
+        ),
+        trigger_battle_round=state.battle_round,
+        trigger_phase=BattlePhase.MOVEMENT.value,
+        resolution_timing="phase_end",
+        roll_expression="D6",
+        roll_count=1,
+        success_threshold=2,
+        placement_anchor="destroyed_position",
+        placement_preference="as_close_as_possible",
+        engagement_range_restriction=True,
+        restore_wounds_mode=ReturnRestoreWoundsMode.FULL_HEALTH,
+        wounds_remaining=None,
+        resolved=False,
+    )
+    state.record_pending_return_on_death(pending)
+    lifecycle.decision_controller.event_log.append(
+        RETURN_ON_DEATH_PENDING_CREATED_EVENT_TYPE,
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.MOVEMENT.value,
+            "model_destroyed_event_id": destroyed_event.event_id,
+            "pending": pending.to_payload(),
+        },
     )
     flow = BattleRoundFlow(
         phase_handlers={
@@ -1015,7 +1362,14 @@ def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> 
         )
         == 1
     )
+    _record_missing_turn_start_evidence_events(
+        state=state,
+        decisions=lifecycle.decision_controller,
+    )
     assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+    assert restored.state is not None
+    assert restored.state.to_payload() == state.to_payload()
 
 
 def test_meatgrinder_round_five_objective_control_scores_only_at_turn_end() -> None:
@@ -1069,8 +1423,8 @@ def test_return_on_death_same_unit_id_records_a_second_destruction_occurrence() 
     state.replace_battlefield_state(
         state.battlefield_state.with_removed_models(unit.own_model_ids())
     )
-    (first_destruction,) = record_primary_unit_destructions_for_destroyed_models(
-        state=state,
+    (first_destruction,) = _record_test_completed_primary_unit_destruction(
+        state,
         destroyed_model_instance_ids=unit.own_model_ids(),
         destroying_player_id="player-a",
         source_id="phase17n:return-on-death:first-destruction",
@@ -1114,24 +1468,27 @@ def test_return_on_death_same_unit_id_records_a_second_destruction_occurrence() 
     state.record_pending_return_on_death(pending)
     request = build_return_on_death_placement_request(state=state, pending=pending)
     decisions = DecisionController()
+    decisions.request_decision(request)
+    result = DecisionResult(
+        result_id="phase17n:return-on-death:placement-result",
+        request_id=request.request_id,
+        decision_type=request.decision_type,
+        actor_id=request.actor_id,
+        selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+        payload=cast(
+            JsonValue,
+            {
+                "submission_kind": SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+                "attempted_placement": original_placement.to_payload(),
+            },
+        ),
+    )
+    decisions.submit_result(result)
     apply_return_on_death_placement_decision(
         state=state,
         decisions=decisions,
         request=request,
-        result=DecisionResult(
-            result_id="phase17n:return-on-death:placement-result",
-            request_id=request.request_id,
-            decision_type=request.decision_type,
-            actor_id=request.actor_id,
-            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
-            payload=cast(
-                JsonValue,
-                {
-                    "submission_kind": SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
-                    "attempted_placement": original_placement.to_payload(),
-                },
-            ),
-        ),
+        result=result,
         ruleset_descriptor=config.ruleset_descriptor,
     )
     returned_unit = state.army_definitions[1].unit_by_id(unit.unit_instance_id)
@@ -1148,8 +1505,8 @@ def test_return_on_death_same_unit_id_records_a_second_destruction_occurrence() 
     state.replace_battlefield_state(
         state.battlefield_state.with_removed_models(unit.own_model_ids())
     )
-    (second_destruction,) = record_primary_unit_destructions_for_destroyed_models(
-        state=state,
+    (second_destruction,) = _record_test_completed_primary_unit_destruction(
+        state,
         destroyed_model_instance_ids=unit.own_model_ids(),
         destroying_player_id="player-a",
         source_id="phase17n:return-on-death:second-destruction",
@@ -1179,7 +1536,7 @@ def test_return_on_death_same_unit_id_records_a_second_destruction_occurrence() 
     )
 
 
-def test_primary_destruction_capture_maps_attached_target_to_destroyed_component() -> None:
+def test_primary_destruction_capture_does_not_complete_attached_unit_for_bodyguard_only() -> None:
     config = _config_with_player_a_attached_unit(
         mission_setup=_event_companion_meatgrinder_mission_setup(),
     )
@@ -1192,6 +1549,16 @@ def test_primary_destruction_capture_maps_attached_target_to_destroyed_component
     assert state.active_player_id == "player-b"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     attacker = state.army_definitions[1].unit_by_id("army-beta:intercessor-unit-3")
+    source_objective_id = next(
+        marker.objective_marker_id
+        for marker in cast(MissionSetup, state.mission_setup).objective_markers
+        if _objective_marker_matches_suffix(marker.objective_marker_id, "central-north")
+    )
+    _place_unit_near_objective(
+        state,
+        unit_instance_id=attacker.unit_instance_id,
+        target_suffix="central-north",
+    )
     bodyguard = state.army_definitions[0].unit_by_id("army-alpha:bodyguard-unit")
     surviving_model_id = bodyguard.own_models[-1].model_instance_id
     pre_destroyed_model_ids = tuple(
@@ -1304,14 +1671,98 @@ def test_primary_destruction_capture_maps_attached_target_to_destroyed_component
     )
     assert remaining is None, attack_status
     assert attack_status is None
+    (destroyed_event,) = tuple(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "model_destroyed"
+    )
+    destroyed_payload = cast(dict[str, JsonValue], destroyed_event.payload)
+    source_witness = RulesUnitObjectiveProximityWitness.from_payload(
+        destroyed_payload["source_rules_unit_objective_proximity_witness"]
+    )
+    destroyed_witness = RulesUnitObjectiveProximityWitness.from_payload(
+        destroyed_payload["destroyed_rules_unit_objective_proximity_witness"]
+    )
+    assert source_witness.rules_unit_instance_id == attacker.unit_instance_id
+    assert source_witness.objective_marker_ids == (source_objective_id,)
+    assert destroyed_witness.rules_unit_instance_id == attached_unit_id
+    source_owner_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-b",
+    )
+    destroyed_owner_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-a",
+    )
+    source_owner_payload = cast(
+        dict[str, JsonValue],
+        next(
+            event["payload"]
+            for event in source_owner_events["events"]
+            if event["event_type"] == "model_destroyed"
+        ),
+    )
+    destroyed_owner_payload = cast(
+        dict[str, JsonValue],
+        next(
+            event["payload"]
+            for event in destroyed_owner_events["events"]
+            if event["event_type"] == "model_destroyed"
+        ),
+    )
+    assert source_owner_payload["source_rules_unit_objective_proximity_witness"] == (
+        source_witness.to_payload()
+    )
+    assert destroyed_owner_payload["source_rules_unit_objective_proximity_witness"] == (
+        source_witness.to_payload()
+    )
+    assert (
+        source_owner_payload["destroyed_rules_unit_objective_proximity_witness"]
+        == (destroyed_owner_payload["destroyed_rules_unit_objective_proximity_witness"])
+    )
+
+    _place_unit_near_point(
+        state,
+        unit_instance_id=attacker.unit_instance_id,
+        x_inches=5.0,
+        y_inches=5.0,
+    )
 
     BattleRoundFlow(
         phase_handlers={BattlePhase.SHOOTING: PlaceholderPhaseHandler(BattlePhase.SHOOTING)}
     ).advance(state=state, decisions=lifecycle.decision_controller)
 
-    (destruction,) = state.primary_unit_destruction_states
-    assert destruction.destroyed_unit_instance_id == bodyguard.unit_instance_id
-    assert destruction.destroying_player_id == "player-b"
+    source_owner_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-b",
+    )
+    destroyed_owner_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-a",
+    )
+    administrator_events = EventStreamCursor().events_since_for_context(
+        lifecycle.decision_controller.event_log,
+        viewer=AuthenticatedPrincipal(
+            principal_id="phase17n-test-administrator",
+            role=PrincipalRole.ADMINISTRATOR,
+        ).bind_to_session(player_ids=("player-a", "player-b")),
+    )
+    administrator_destroyed_payload = cast(
+        dict[str, JsonValue],
+        next(
+            event["payload"]
+            for event in administrator_events["events"]
+            if event["event_type"] == "model_destroyed"
+        ),
+    )
+    assert source_owner_payload == destroyed_owner_payload
+    assert source_owner_payload == administrator_destroyed_payload
+    assert not any(
+        event["event_type"] == "primary_unit_destruction_recorded"
+        for stream in (source_owner_events, destroyed_owner_events, administrator_events)
+        for event in stream["events"]
+    )
+    assert not state.primary_unit_destruction_states
     assert all(
         not model.is_alive
         for model in state.army_definitions[0].unit_by_id(bodyguard.unit_instance_id).own_models
@@ -1319,6 +1770,234 @@ def test_primary_destruction_capture_maps_attached_target_to_destroyed_component
     assert all(
         model.is_alive
         for model in state.army_definitions[0].unit_by_id("army-alpha:leader-unit").own_models
+    )
+    (departure,) = state.primary_battlefield_departure_states
+    attached_record = next(
+        record
+        for record in state.starting_attached_unit_records
+        if record.attached_unit_instance_id == attached_unit_id
+    )
+    assert departure.rules_unit_instance_id == attached_unit_id
+    assert departure.component_unit_instance_ids == tuple(
+        sorted(attached_record.component_unit_instance_ids)
+    )
+    assert departure.affected_component_unit_instance_ids == (bodyguard.unit_instance_id,)
+    assert departure.departed_component_unit_instance_ids == (bodyguard.unit_instance_id,)
+    assert departure.removed_model_instance_ids == (surviving_model_id,)
+    assert departure.removal_kind is BattlefieldRemovalKind.DESTROYED
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+    departure_drift_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    leader = state.army_definitions[0].unit_by_id("army-alpha:leader-unit")
+    departure_drift_payload["primary_battlefield_departure_states"][0][
+        "removed_model_instance_ids"
+    ] = [leader.own_models[0].model_instance_id]
+    with pytest.raises(GameLifecycleError, match="outside its affected components"):
+        GameState.from_payload(departure_drift_payload)
+
+
+def test_public_model_destroyed_event_evidence_is_validated_for_every_viewer() -> None:
+    malformed = EventLog()
+    malformed.append(
+        "model_destroyed",
+        {
+            "destroying_player_id": "player-a",
+        },
+    )
+
+    for viewer_player_id in ("player-a", "player-b"):
+        with pytest.raises(
+            GameLifecycleError,
+            match="missing source_rules_unit_objective_proximity_witness",
+        ):
+            EventStreamCursor().events_since(
+                malformed,
+                viewer_player_id=viewer_player_id,
+            )
+
+
+def test_primary_battlefield_departure_rejects_models_still_on_battlefield() -> None:
+    state = _battle_state_for_primary("primary-unstoppable-force")
+    unit = state.army_definitions[0].unit_by_id("army-alpha:intercessor-unit-1")
+
+    with pytest.raises(GameLifecycleError, match="must have left the battlefield"):
+        record_primary_battlefield_departure(
+            state=state,
+            rules_unit_instance_id=unit.unit_instance_id,
+            affected_component_unit_instance_ids=(unit.unit_instance_id,),
+            departed_component_unit_instance_ids=(unit.unit_instance_id,),
+            removed_model_instance_ids=unit.own_model_ids(),
+            removal_kind=BattlefieldRemovalKind.DESTROYED,
+            occurrence_id="phase17n:test:still-placed-departure:occurrence",
+            source_id="phase17n:test:still-placed-departure",
+        )
+
+
+def test_primary_departure_leave_return_leave_uses_fresh_occurrence_identity() -> None:
+    state = _battle_state_from_config(
+        _config_with_player_b_character(mission_setup=_event_companion_meatgrinder_mission_setup())
+    )
+    unit = state.army_definitions[1].unit_by_id("army-beta:character-unit-3")
+    (model_id,) = unit.own_model_ids()
+    assert state.battlefield_state is not None
+    original_placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    state.replace_battlefield_state(state.battlefield_state.with_removed_models((model_id,)))
+    (first,) = record_primary_destroyed_model_departures(
+        state=state,
+        destroyed_model_instance_ids=(model_id,),
+        source_id="phase17n:test:repeat-departure",
+        occurrence_id="phase17n:test:repeat-departure:first",
+    )
+
+    returned = state.battlefield_state.with_returned_unplaced_model(model_id)
+    state.replace_battlefield_state(returned.with_added_unit_placement(original_placement))
+    state.replace_battlefield_state(state.battlefield_state.with_removed_models((model_id,)))
+    (second,) = record_primary_destroyed_model_departures(
+        state=state,
+        destroyed_model_instance_ids=(model_id,),
+        source_id="phase17n:test:repeat-departure",
+        occurrence_id="phase17n:test:repeat-departure:second",
+    )
+
+    assert first.departure_id != second.departure_id
+    assert first.source_id == second.source_id
+    assert first.removed_model_instance_ids == second.removed_model_instance_ids == (model_id,)
+    assert first.departed_component_unit_instance_ids == (unit.unit_instance_id,)
+    assert second.departed_component_unit_instance_ids == (unit.unit_instance_id,)
+
+
+def test_unit_completion_rejects_duplicate_destruction_without_restoration() -> None:
+    state = _battle_state_from_config(
+        _config_with_player_b_character(mission_setup=_event_companion_meatgrinder_mission_setup())
+    )
+    unit = state.army_definitions[1].unit_by_id("army-beta:character-unit-3")
+    (model_id,) = unit.own_model_ids()
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(state.battlefield_state.with_removed_models((model_id,)))
+    payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "target_unit_instance_id": unit.unit_instance_id,
+        "model_instance_id": model_id,
+    }
+
+    with pytest.raises(GameLifecycleError, match="requires a living model transition"):
+        unit_destruction_completion_events_for_interval(
+            state=state,
+            model_destroyed_events=(
+                (0, "event:model-destroyed:first", payload),
+                (1, "event:model-destroyed:forged-duplicate", payload),
+            ),
+        )
+
+
+def test_attached_frozen_completion_does_not_claim_materialized_survivor_departed() -> None:
+    state = _battle_state_from_config(
+        _config_with_player_a_attached_unit(
+            mission_setup=_event_companion_meatgrinder_mission_setup()
+        )
+    )
+    (starting_record,) = state.starting_attached_unit_records
+    bodyguard = state.army_definitions[0].unit_by_id(starting_record.bodyguard_unit_instance_id)
+    survivor_model_id = bodyguard.own_model_ids()[-1]
+    frozen_mapping = tuple(
+        (
+            component_id,
+            tuple(model_id for model_id in model_ids if model_id != survivor_model_id),
+        )
+        for component_id, model_ids in starting_record.starting_model_instance_ids_by_component
+    )
+    materialized_shape_record = replace(
+        starting_record,
+        starting_model_instance_ids_by_component=frozen_mapping,
+        starting_model_count=starting_record.starting_model_count - 1,
+    )
+    state.starting_attached_unit_records = [materialized_shape_record]
+    frozen_model_ids = materialized_shape_record.starting_model_instance_ids()
+    assert state.battlefield_state is not None
+    state.replace_battlefield_state(state.battlefield_state.with_removed_models(frozen_model_ids))
+
+    (destruction,) = _record_test_completed_primary_unit_destruction(
+        state,
+        destroyed_model_instance_ids=frozen_model_ids,
+        destroying_player_id="player-b",
+        source_id="phase17n:test:materialized-survivor:frozen-completion",
+    )
+
+    bodyguard_departure = next(
+        departure
+        for departure in state.primary_battlefield_departure_states
+        if departure.affected_component_unit_instance_ids == (bodyguard.unit_instance_id,)
+    )
+    assert bodyguard_departure.departed_component_unit_instance_ids == ()
+    assert bodyguard_departure.removed_model_instance_ids == (
+        materialized_shape_record.starting_model_instance_ids_for_component(
+            bodyguard.unit_instance_id
+        )
+    )
+    assert destruction.destroyed_unit_instance_id == (
+        materialized_shape_record.attached_unit_instance_id
+    )
+
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models((survivor_model_id,))
+    )
+    assert not _record_test_completed_primary_unit_destruction(
+        state,
+        destroyed_model_instance_ids=(survivor_model_id,),
+        destroying_player_id="player-b",
+        source_id="phase17n:test:materialized-survivor:later-added-model",
+    )
+    assert len(state.primary_unit_destruction_states) == 1
+
+
+def test_hazardous_source_witness_keeps_destroyed_model_pre_removal_position() -> None:
+    state = _battle_state_from_config(
+        _config_with_player_b_character(mission_setup=_event_companion_meatgrinder_mission_setup())
+    )
+    source_unit = state.army_definitions[1].unit_by_id("army-beta:character-unit-3")
+    (source_model,) = source_unit.own_models
+    _place_unit_near_objective(
+        state,
+        unit_instance_id=source_unit.unit_instance_id,
+        target_suffix="central-north",
+    )
+    assert state.battlefield_state is not None
+    source_placement = state.battlefield_state.model_placement_by_id(source_model.model_instance_id)
+    source_objective_id = next(
+        marker.objective_marker_id
+        for marker in cast(MissionSetup, state.mission_setup).objective_markers
+        if _objective_marker_matches_suffix(marker.objective_marker_id, "central-north")
+    )
+    _set_unit_wounds_remaining(
+        state,
+        unit_instance_id=source_unit.unit_instance_id,
+        wounds_remaining=0,
+    )
+    state.replace_battlefield_state(
+        state.battlefield_state.with_removed_models((source_model.model_instance_id,))
+    )
+    attribution = ModelDestructionAttribution.for_non_attack(
+        destroying_player_id="player-b",
+        source_kind=DestructionSourceKind.HAZARDOUS,
+        source_rules_unit_instance_id=source_unit.unit_instance_id,
+        source_model_instance_id=source_model.model_instance_id,
+    )
+
+    witness = destruction_source_objective_proximity_witness(
+        state=state,
+        event_log=EventLog(),
+        attribution=attribution,
+        destroyed_model_placement=source_placement,
+    )
+
+    assert witness is not None
+    assert witness.rules_unit_instance_id == source_unit.unit_instance_id
+    assert witness.objective_marker_ids == (source_objective_id,)
+    assert witness.objective_marker_witnesses[0].model_instance_ids == (
+        source_model.model_instance_id,
     )
 
 
@@ -1333,9 +2012,13 @@ def test_meatgrinder_current_turn_enemy_destruction_changes_comparison_result() 
                 destruction_id="destruction:current-turn-loss",
                 battle_round=2,
                 active_player_id="player-a",
+                destroying_player_id=None,
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id="army-beta:current-turn-loss",
+                destruction_attribution=None,
+                source_rules_unit_objective_proximity_witness=None,
                 started_turn_terrain_feature_ids=(),
+                started_turn_objective_marker_ids=(),
             ),
         ),
     )
@@ -1357,17 +2040,25 @@ def test_meatgrinder_counts_repeated_destruction_occurrences_for_the_same_unit()
                 destruction_id="destruction:returning-unit:first",
                 battle_round=2,
                 active_player_id="player-a",
+                destroying_player_id=None,
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id=repeated_unit_id,
+                destruction_attribution=None,
+                source_rules_unit_objective_proximity_witness=None,
                 started_turn_terrain_feature_ids=(),
+                started_turn_objective_marker_ids=(),
             ),
             PrimaryUnitDestructionEvidence(
                 destruction_id="destruction:returning-unit:second",
                 battle_round=2,
                 active_player_id="player-a",
+                destroying_player_id=None,
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id=repeated_unit_id,
+                destruction_attribution=None,
+                source_rules_unit_objective_proximity_witness=None,
                 started_turn_terrain_feature_ids=(),
+                started_turn_objective_marker_ids=(),
             ),
         ),
     )
@@ -1392,9 +2083,13 @@ def test_meatgrinder_enemy_self_loss_in_previous_turn_is_not_current_enemy_loss(
                 destruction_id="destruction:previous-turn-self-loss",
                 battle_round=1,
                 active_player_id="player-b",
+                destroying_player_id=None,
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id="army-beta:previous-turn-self-loss",
+                destruction_attribution=None,
+                source_rules_unit_objective_proximity_witness=None,
                 started_turn_terrain_feature_ids=(),
+                started_turn_objective_marker_ids=(),
             ),
         ),
     )
@@ -1416,17 +2111,25 @@ def test_meatgrinder_previous_opponent_turn_friendly_loss_prevents_tie_score() -
                 destruction_id="destruction:previous-turn-friendly-loss",
                 battle_round=1,
                 active_player_id="player-b",
+                destroying_player_id=None,
                 destroyed_player_id="player-a",
                 destroyed_unit_instance_id="army-alpha:previous-turn-loss",
+                destruction_attribution=None,
+                source_rules_unit_objective_proximity_witness=None,
                 started_turn_terrain_feature_ids=(),
+                started_turn_objective_marker_ids=(),
             ),
             PrimaryUnitDestructionEvidence(
                 destruction_id="destruction:current-turn-enemy-loss",
                 battle_round=2,
                 active_player_id="player-a",
+                destroying_player_id=None,
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id="army-beta:current-turn-loss",
+                destruction_attribution=None,
+                source_rules_unit_objective_proximity_witness=None,
                 started_turn_terrain_feature_ids=(),
+                started_turn_objective_marker_ids=(),
             ),
         ),
     )
@@ -1448,17 +2151,25 @@ def test_meatgrinder_round_boundary_uses_prior_round_player_b_turn_for_player_a(
                 destruction_id="destruction:round-two-player-b-loss",
                 battle_round=2,
                 active_player_id="player-b",
+                destroying_player_id=None,
                 destroyed_player_id="player-a",
                 destroyed_unit_instance_id="army-alpha:round-two-player-b-loss",
+                destruction_attribution=None,
+                source_rules_unit_objective_proximity_witness=None,
                 started_turn_terrain_feature_ids=(),
+                started_turn_objective_marker_ids=(),
             ),
             PrimaryUnitDestructionEvidence(
                 destruction_id="destruction:round-three-player-a-loss",
                 battle_round=3,
                 active_player_id="player-a",
+                destroying_player_id=None,
                 destroyed_player_id="player-b",
                 destroyed_unit_instance_id="army-beta:round-three-player-a-loss",
+                destruction_attribution=None,
+                source_rules_unit_objective_proximity_witness=None,
                 started_turn_terrain_feature_ids=(),
+                started_turn_objective_marker_ids=(),
             ),
         ),
     )
@@ -1523,8 +2234,8 @@ def test_primary_destruction_tracking_counts_transition_only_enemy_loss() -> Non
         state.battlefield_state.with_removed_models(destroyed_model_ids)
     )
 
-    (destruction,) = record_primary_unit_destructions_for_destroyed_models(
-        state=state,
+    (destruction,) = _record_test_completed_primary_unit_destruction(
+        state,
         destroyed_model_instance_ids=destroyed_model_ids,
         destroying_player_id=None,
         source_id="core-rules:test-transition-only-destruction",
@@ -1570,10 +2281,10 @@ def test_runtime_added_unit_backfills_turn_start_evidence_and_can_be_destroyed_s
         source_id="phase17n:test:created-unit",
     )
 
-    assert state.primary_unit_terrain_turn_start_snapshots
+    assert state.primary_rules_unit_turn_start_snapshots
     assert all(
-        snapshot.membership_for_unit(added_unit_id).terrain_feature_ids == ()
-        for snapshot in state.primary_unit_terrain_turn_start_snapshots
+        snapshot.membership_for_rules_unit(added_unit_id).evaluated_model_instance_ids == ()
+        for snapshot in state.primary_rules_unit_turn_start_snapshots
     )
     assert state.battlefield_state is not None
     added_placement = UnitPlacement(
@@ -1599,8 +2310,8 @@ def test_runtime_added_unit_backfills_turn_start_evidence_and_can_be_destroyed_s
     state.replace_battlefield_state(
         state.battlefield_state.with_removed_models(added_unit.own_model_ids())
     )
-    (destruction,) = record_primary_unit_destructions_for_destroyed_models(
-        state=state,
+    (destruction,) = _record_test_completed_primary_unit_destruction(
+        state,
         destroyed_model_instance_ids=added_unit.own_model_ids(),
         destroying_player_id="player-a",
         source_id="phase17n:test:created-unit-destruction",
@@ -1631,7 +2342,7 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
         ),
     )
     first_turn_start = state.primary_objective_turn_start_states[0]
-    first_terrain_snapshot = state.primary_unit_terrain_turn_start_snapshots[0]
+    first_position_snapshot = state.primary_rules_unit_turn_start_snapshots[0]
     trap_action_id = "mission-action:phase16-booby-trap-round-trip"
     trap_source_id = _record_completed_zero_vp_mission_action(
         state,
@@ -1640,9 +2351,20 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
         target_id=area_id,
     )
 
-    with pytest.raises(GameLifecycleError, match="destroyed physical unit"):
+    attribution, source_witness = _test_primary_destruction_attribution(
+        state,
+        destroying_player_id="player-a",
+    )
+    with pytest.raises(GameLifecycleError, match="destroyed rules unit"):
         state.record_primary_unit_destruction(
-            destroying_player_id="player-a",
+            destruction_attribution=attribution,
+            source_model_destroyed_event_id=(
+                "phase16:death-trap:alive-unit-rejected:model-destroyed-event"
+            ),
+            source_rules_unit_objective_proximity_witness=source_witness,
+            source_battlefield_departure_ids=(),
+            unattributed_cause=None,
+            source_mutation_id=None,
             destroyed_unit_instance_id="army-alpha:intercessor-unit-1",
             source_id="phase16:death-trap:alive-unit-rejected",
         )
@@ -1650,7 +2372,8 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
         state,
         unit_instance_id="army-alpha:intercessor-unit-1",
     )
-    friendly_destruction = state.record_primary_unit_destruction(
+    friendly_destruction = _record_test_primary_unit_destruction(
+        state,
         destroying_player_id="player-a",
         destroyed_unit_instance_id="army-alpha:intercessor-unit-1",
         source_id="phase16:death-trap:friendly-unit",
@@ -1668,7 +2391,29 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
         state,
         unit_instance_id="army-beta:intercessor-unit-3",
     )
-    destruction = state.record_primary_unit_destruction(
+    attribution, source_witness = _test_primary_destruction_attribution(
+        state,
+        destroying_player_id="player-a",
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="source witness component identity drift",
+    ):
+        state.record_primary_unit_destruction(
+            destruction_attribution=attribution,
+            source_model_destroyed_event_id="event:model-destroyed:forged-witness",
+            source_rules_unit_objective_proximity_witness=replace(
+                source_witness,
+                component_unit_instance_ids=("army-beta:intercessor-unit-3",),
+            ),
+            source_battlefield_departure_ids=("departure:forged-witness",),
+            unattributed_cause=None,
+            source_mutation_id=None,
+            destroyed_unit_instance_id="army-beta:intercessor-unit-3",
+            source_id="phase17n:death-trap:forged-witness",
+        )
+    destruction = _record_test_primary_unit_destruction(
+        state,
         destroying_player_id="player-a",
         destroyed_unit_instance_id="army-beta:intercessor-unit-3",
         source_id="phase16:death-trap:enemy-destroyed",
@@ -1679,8 +2424,8 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
         first_turn_start
     )
     assert (
-        PrimaryUnitTerrainTurnStartSnapshot.from_payload(first_terrain_snapshot.to_payload())
-        == first_terrain_snapshot
+        PrimaryRulesUnitTurnStartSnapshot.from_payload(first_position_snapshot.to_payload())
+        == first_position_snapshot
     )
     assert PrimaryTerrainTrapState.from_payload(trap.to_payload()) == trap
     assert PrimaryUnitDestructionState.from_payload(destruction.to_payload()) == destruction
@@ -1690,12 +2435,89 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
     )
     assert GameState.from_payload(payload).to_payload() == state.to_payload()
 
+    missing_objective_history_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    missing_objective_history_payload["primary_objective_turn_start_states"].pop()
+    with pytest.raises(GameLifecycleError, match="turn keys must match exactly"):
+        GameState.from_payload(missing_objective_history_payload)
+
+    missing_position_history_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    missing_position_history_payload["primary_rules_unit_turn_start_snapshots"].pop()
+    with pytest.raises(GameLifecycleError, match="turn keys must match exactly"):
+        GameState.from_payload(missing_position_history_payload)
+
+    unknown_controlled_objective_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    unknown_controlled_objective_payload["primary_objective_turn_start_states"][0][
+        "controlled_objective_ids"
+    ] = ["objective:unknown"]
+    controlled_objective_source = unknown_controlled_objective_payload[
+        "primary_objective_turn_start_states"
+    ][0]["source_objective_control_record"]
+    controlled_objective_result = next(
+        result
+        for result in controlled_objective_source["results"]
+        if result["controlled_by_player_id"] == "player-a"
+    )
+    controlled_objective_result["objective_id"] = "objective:unknown"
+    with pytest.raises(GameLifecycleError, match="unknown objective marker"):
+        GameState.from_payload(unknown_controlled_objective_payload)
+
+    objective_identity_drift_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    objective_identity_drift_payload["primary_objective_turn_start_states"][0]["state_id"] = (
+        "primary-turn-start:tampered"
+    )
+    with pytest.raises(GameLifecycleError, match="state_id drift"):
+        GameState.from_payload(objective_identity_drift_payload)
+
+    objective_source_drift_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    objective_source_drift_payload["primary_objective_turn_start_states"][0]["source_id"] = (
+        "primary-turn-start-source:tampered"
+    )
+    with pytest.raises(GameLifecycleError, match="source_id drift"):
+        GameState.from_payload(objective_source_drift_payload)
+
+    position_identity_drift_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    position_identity_drift_payload["primary_rules_unit_turn_start_snapshots"][0]["snapshot_id"] = (
+        "primary-rules-unit-turn-start:tampered"
+    )
+    with pytest.raises(GameLifecycleError, match="snapshot_id drift"):
+        GameState.from_payload(position_identity_drift_payload)
+
+    unexpected_objective_history_payload = cast(
+        dict[str, object],
+        json.loads(json.dumps(first_turn_start.to_payload(), sort_keys=True)),
+    )
+    unexpected_objective_history_payload["unexpected_step3_field"] = True
+    with pytest.raises(GameLifecycleError, match="payload fields are invalid"):
+        PrimaryObjectiveTurnStartState.from_payload(
+            cast(PrimaryObjectiveTurnStartStatePayload, unexpected_objective_history_payload)
+        )
+
     invalid_payload = cast(
         GameStatePayload,
         json.loads(json.dumps(state.to_payload(), sort_keys=True)),
     )
-    snapshot_payload = invalid_payload["primary_unit_terrain_turn_start_snapshots"][0]
-    snapshot_payload["unit_memberships"][0]["terrain_feature_ids"] = ["missing-terrain"]
+    snapshot_payload = invalid_payload["primary_rules_unit_turn_start_snapshots"][0]
+    snapshot_payload["rules_unit_memberships"][0]["component_memberships"][0][
+        "logical_terrain_area_ids"
+    ] = ["missing-terrain"]
     with pytest.raises(GameLifecycleError, match="unknown logical terrain area"):
         GameState.from_payload(invalid_payload)
 
@@ -1703,7 +2525,7 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
         GameStatePayload,
         json.loads(json.dumps(state.to_payload(), sort_keys=True)),
     )
-    incomplete_payload["primary_unit_terrain_turn_start_snapshots"][0]["unit_memberships"].pop()
+    incomplete_payload["primary_rules_unit_turn_start_snapshots"][0]["rules_unit_memberships"].pop()
     with pytest.raises(GameLifecycleError, match="every physical unit"):
         GameState.from_payload(incomplete_payload)
 
@@ -1732,6 +2554,62 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
     owner_drift_row["destroyed_player_id"] = "player-a"
     with pytest.raises(GameLifecycleError, match="destroyed player drift"):
         GameState.from_payload(owner_drift_payload)
+
+    source_component_drift_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    source_component_drift_row = next(
+        row
+        for row in source_component_drift_payload["primary_unit_destruction_states"]
+        if row["destroyed_unit_instance_id"] == "army-beta:intercessor-unit-3"
+    )
+    source_witness_payload = source_component_drift_row[
+        "source_rules_unit_objective_proximity_witness"
+    ]
+    assert source_witness_payload is not None
+    source_witness_payload["component_unit_instance_ids"] = ["army-beta:intercessor-unit-3"]
+    with pytest.raises(GameLifecycleError, match="source witness component identity drift"):
+        GameState.from_payload(source_component_drift_payload)
+
+    source_marker_drift_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    source_marker_drift_row = next(
+        row
+        for row in source_marker_drift_payload["primary_unit_destruction_states"]
+        if row["destroyed_unit_instance_id"] == "army-beta:intercessor-unit-3"
+    )
+    source_marker_witness = source_marker_drift_row["source_rules_unit_objective_proximity_witness"]
+    assert source_marker_witness is not None
+    source_marker_witness["objective_marker_witnesses"] = [
+        {
+            "objective_marker_id": "objective:unknown",
+            "model_instance_ids": ["army-alpha:intercessor-unit-1:model-001"],
+        }
+    ]
+    with pytest.raises(GameLifecycleError, match="unknown objective marker"):
+        GameState.from_payload(source_marker_drift_payload)
+
+    source_owner_drift_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    source_owner_drift_row = next(
+        row
+        for row in source_owner_drift_payload["primary_unit_destruction_states"]
+        if row["destroyed_unit_instance_id"] == "army-beta:intercessor-unit-3"
+    )
+    source_owner_drift_row["destroying_player_id"] = "player-b"
+    source_attribution = source_owner_drift_row["destruction_attribution"]
+    assert source_attribution is not None
+    source_attribution["destroying_player_id"] = "player-b"
+    with pytest.raises(
+        GameLifecycleError,
+        match="source rules unit must belong to the destroying player",
+    ):
+        GameState.from_payload(source_owner_drift_payload)
 
     identity_drift_payload = cast(
         GameStatePayload,
@@ -1770,6 +2648,15 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
         PrimaryUnitDestructionState.from_payload(
             cast(PrimaryUnitDestructionStatePayload, nullable_destruction_payload)
         )
+    unexpected_destruction_payload = cast(
+        dict[str, object],
+        json.loads(json.dumps(destruction.to_payload(), sort_keys=True)),
+    )
+    unexpected_destruction_payload["unexpected_step3_field"] = True
+    with pytest.raises(GameLifecycleError, match="payload fields are invalid"):
+        PrimaryUnitDestructionState.from_payload(
+            cast(PrimaryUnitDestructionStatePayload, unexpected_destruction_payload)
+        )
 
     with pytest.raises(GameLifecycleError, match="terrain trap already exists"):
         state.record_primary_terrain_trap(
@@ -1780,7 +2667,8 @@ def test_phase16_primary_scoring_states_round_trip_and_fail_fast() -> None:
             source_id="phase16:death-trap:booby-trap-duplicate",
         )
     with pytest.raises(GameLifecycleError, match="destruction already exists"):
-        state.record_primary_unit_destruction(
+        _record_test_primary_unit_destruction(
+            state,
             destroying_player_id="player-a",
             destroyed_unit_instance_id="army-beta:intercessor-unit-3",
             source_id="phase16:death-trap:enemy-destroyed",
@@ -4126,6 +5014,7 @@ def test_started_action_excludes_that_unit_from_shooting() -> None:
     lifecycle.state = _battle_state_from_config(
         config,
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+        decisions=lifecycle.decision_controller,
     )
     state = lifecycle.state
     assert state is not None
@@ -4345,6 +5234,7 @@ def test_attached_rules_unit_has_one_canonical_action_option_and_state_identity(
     lifecycle.state = _battle_state_from_config(
         config,
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+        decisions=lifecycle.decision_controller,
     )
     state = lifecycle.state
     assert state is not None
@@ -4401,6 +5291,7 @@ def test_attached_rules_unit_canonical_shot_state_blocks_all_component_action_op
     lifecycle.state = _battle_state_from_config(
         config,
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+        decisions=lifecycle.decision_controller,
     )
     state = lifecycle.state
     assert state is not None
@@ -4434,6 +5325,7 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
     lifecycle.state = _battle_state_from_config(
         config,
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+        decisions=lifecycle.decision_controller,
     )
     state = lifecycle.state
     assert state is not None
@@ -4552,7 +5444,7 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
     assert cast(dict[str, JsonValue], replay_events[0].payload)["action_id"] == action.action_id
     terminal_replay_result = ReplayRunner(terminal_artifact).run()
     assert terminal_replay_result.status is ReplayRunStatus.REPRODUCED
-    assert terminal_replay_result.reproduced_event_count == 2
+    assert terminal_replay_result.reproduced_event_count == 4
 
 
 def test_attached_action_cannot_complete_after_component_fails_battle_shock() -> None:
@@ -4705,6 +5597,7 @@ def test_cli_and_projection_expose_unique_human_action_option_labels() -> None:
     lifecycle.state = _battle_state_from_config(
         config,
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+        decisions=lifecycle.decision_controller,
     )
     state = lifecycle.state
     assert state is not None
@@ -5664,6 +6557,7 @@ def test_automatic_mission_action_opportunity_excludes_embarked_units() -> None:
     lifecycle.state = _battle_state_from_config(
         config,
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+        decisions=lifecycle.decision_controller,
     )
     state = lifecycle.state
     assert state is not None
@@ -5766,6 +6660,16 @@ def test_unarrived_reserves_are_destroyed_at_mission_deadline() -> None:
     assert reserve_state.status is ReserveStatus.DESTROYED
     assert state.battlefield_state is not None
     assert set(reserve_model_ids) <= set(state.battlefield_state.removed_model_ids)
+    (destruction,) = tuple(
+        row
+        for row in state.primary_unit_destruction_states
+        if row.destroyed_unit_instance_id == reserve_unit_id
+    )
+    assert destruction.unattributed_cause is (PrimaryUnattributedDestructionCause.RESERVE_DEADLINE)
+    assert all(
+        reserve_unit_id not in departure.departed_component_unit_instance_ids
+        for departure in state.primary_battlefield_departure_states
+    )
 
 
 def test_victory_point_ledger_round_trips_without_object_reprs() -> None:
@@ -6683,6 +7587,7 @@ def _battle_state_with_unarrived_reserve_at_round_three_deadline() -> tuple[Game
     state.battle_round = 3
     state.active_player_id = "player-b"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    record_primary_turn_start_evidence(state=state)
     return state, reserve_unit.unit_instance_id
 
 
@@ -6946,6 +7851,134 @@ def _remove_unit_for_primary_destruction(
     )
 
 
+def _record_test_primary_unit_destruction(
+    state: GameState,
+    *,
+    destroying_player_id: str,
+    destroyed_unit_instance_id: str,
+    source_id: str,
+) -> PrimaryUnitDestructionState:
+    attribution, witness = _test_primary_destruction_attribution(
+        state,
+        destroying_player_id=destroying_player_id,
+    )
+    destroyed_unit = next(
+        unit
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == destroyed_unit_instance_id
+    )
+    departures = record_primary_destroyed_model_departures(
+        state=state,
+        destroyed_model_instance_ids=destroyed_unit.own_model_ids(),
+        source_id=source_id,
+    )
+    return state.record_primary_unit_destruction(
+        destruction_attribution=attribution,
+        source_model_destroyed_event_id=f"{source_id}:model-destroyed-event",
+        source_rules_unit_objective_proximity_witness=witness,
+        source_battlefield_departure_ids=tuple(departure.departure_id for departure in departures),
+        unattributed_cause=None,
+        source_mutation_id=None,
+        destroyed_unit_instance_id=destroyed_unit_instance_id,
+        source_id=source_id,
+    )
+
+
+def _record_missing_turn_start_evidence_events(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+) -> None:
+    recorded_occurrences = {
+        (
+            event.payload.get("game_id"),
+            event.payload.get("active_player_id"),
+            event.payload.get("battle_round"),
+        )
+        for event in decisions.event_log.records
+        if event.event_type == "primary_turn_start_evidence_recorded"
+        and isinstance(event.payload, dict)
+    }
+    record_new_primary_turn_start_evidence_events(
+        state=state,
+        event_log=decisions.event_log,
+        objective_state_ids_before=tuple(
+            value.state_id
+            for value in state.primary_objective_turn_start_states
+            if (value.game_id, value.active_player_id, value.battle_round) in recorded_occurrences
+        ),
+        snapshot_ids_before=tuple(
+            value.snapshot_id
+            for value in state.primary_rules_unit_turn_start_snapshots
+            if (value.game_id, value.active_player_id, value.battle_round) in recorded_occurrences
+        ),
+    )
+
+
+def _record_test_completed_primary_unit_destruction(
+    state: GameState,
+    *,
+    destroyed_model_instance_ids: tuple[str, ...],
+    destroying_player_id: str | None,
+    source_id: str,
+    left_battlefield: bool = True,
+) -> tuple[PrimaryUnitDestructionState, ...]:
+    if destroying_player_id is None:
+        attribution = None
+        event_id = None
+        source_witness = None
+        cause = PrimaryUnattributedDestructionCause.UNIT_COHERENCY
+        source_mutation_id = source_id
+    else:
+        attribution, source_witness = _test_primary_destruction_attribution(
+            state,
+            destroying_player_id=destroying_player_id,
+        )
+        event_id = f"{source_id}:model-destroyed-event"
+        cause = None
+        source_mutation_id = None
+    return record_primary_unit_destructions_for_destroyed_models(
+        state=state,
+        destroyed_model_instance_ids=destroyed_model_instance_ids,
+        destruction_attribution=attribution,
+        source_model_destroyed_event_id=event_id,
+        source_rules_unit_objective_proximity_witness=source_witness,
+        destroyed_rules_unit_objective_proximity_witness=None,
+        unattributed_cause=cause,
+        source_mutation_id=source_mutation_id,
+        left_battlefield=left_battlefield,
+        source_id=source_id,
+    )
+
+
+def _test_primary_destruction_attribution(
+    state: GameState,
+    *,
+    destroying_player_id: str,
+) -> tuple[ModelDestructionAttribution, RulesUnitObjectiveProximityWitness]:
+    source_army = next(
+        army for army in state.army_definitions if army.player_id == destroying_player_id
+    )
+    source_rules_unit_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=source_army.units[0].unit_instance_id,
+    ).unit_instance_id
+    attribution = ModelDestructionAttribution.for_non_attack(
+        destroying_player_id=destroying_player_id,
+        source_kind=DestructionSourceKind.ABILITY,
+        source_rules_unit_instance_id=source_rules_unit_id,
+        source_model_instance_id=None,
+    )
+    return (
+        attribution,
+        rules_unit_objective_proximity_witness(
+            state=state,
+            rules_unit_instance_id=source_rules_unit_id,
+        ),
+    )
+
+
 def _set_unit_wounds_remaining(
     state: GameState,
     *,
@@ -7007,6 +8040,7 @@ def _battle_lifecycle(
         player_b_secondary=player_b_secondary,
         player_a_fixed_mission_ids=player_a_fixed_mission_ids,
         mission_setup=mission_setup,
+        decisions=lifecycle.decision_controller,
     )
     return lifecycle
 
@@ -7022,7 +8056,10 @@ def _battle_lifecycle_for_primary(
     )
     lifecycle = GameLifecycle()
     lifecycle.start(config)
-    lifecycle.state = _battle_state_from_config(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        decisions=lifecycle.decision_controller,
+    )
     return lifecycle
 
 
@@ -7161,6 +8198,7 @@ def _battle_lifecycle_with_player_a_vehicle() -> GameLifecycle:
     lifecycle.state = _battle_state_from_config(
         config,
         player_a_fixed_mission_ids=("bring-it-down", "cleanse"),
+        decisions=lifecycle.decision_controller,
     )
     return lifecycle
 
@@ -7171,6 +8209,7 @@ def _battle_state(
     player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_a_fixed_mission_ids: tuple[str, str] = ("assassination", "bring-it-down"),
     mission_setup: MissionSetup | None = None,
+    decisions: DecisionController | None = None,
 ) -> GameState:
     config = _config(mission_setup=mission_setup)
     return _battle_state_from_config(
@@ -7178,6 +8217,7 @@ def _battle_state(
         player_a_secondary=player_a_secondary,
         player_b_secondary=player_b_secondary,
         player_a_fixed_mission_ids=player_a_fixed_mission_ids,
+        decisions=decisions,
     )
 
 
@@ -7193,6 +8233,7 @@ def _battle_state_from_config(
     player_a_fixed_mission_ids: tuple[str, str] = ("assassination", "bring-it-down"),
     turn_start_unit_positions: tuple[tuple[str, float, float], ...] = (),
     turn_start_unplaced_unit_ids: tuple[str, ...] = (),
+    decisions: DecisionController | None = None,
 ) -> GameState:
     state = GameState.from_config(config)
     for army in _mustered_armies(config):
@@ -7245,7 +8286,7 @@ def _battle_state_from_config(
     state.record_secondary_mission_choice(
         _secondary_choice(player_id="player-b", mode=player_b_secondary)
     )
-    enter_battle_for_fixture(state)
+    enter_battle_for_fixture(state, decisions=decisions)
     assert state.stage is GameLifecycleStage.BATTLE
     assert state.current_battle_phase is BattlePhase.COMMAND
     return state
@@ -7726,6 +8767,18 @@ def _event_companion_meatgrinder_mission_setup() -> MissionSetup:
     )
 
 
+def _event_companion_purge_and_secure_mission_setup() -> MissionSetup:
+    return MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-take-and-hold-vs-reconnaissance-layout-1",
+        terrain_layout_id="take-and-hold-vs-reconnaissance-layout-1",
+        attacker_player_id="player-a",
+        attacker_force_disposition_id="take-and-hold",
+        defender_player_id="player-b",
+        defender_force_disposition_id="reconnaissance",
+    )
+
+
 def _event_companion_death_trap_mission_setup() -> MissionSetup:
     return MissionSetup.from_mission_pack(
         mission_pack=warhammer_event_companion_2026_07_mission_pack(),
@@ -7822,7 +8875,12 @@ def _catalog_with_directional_force_dispositions() -> ArmyCatalog:
         detachments=tuple(
             replace(
                 detachment,
-                force_disposition_ids=("disruption", "purge-the-foe", "take-and-hold"),
+                force_disposition_ids=(
+                    "disruption",
+                    "purge-the-foe",
+                    "reconnaissance",
+                    "take-and-hold",
+                ),
             )
             if detachment.detachment_id == "core-combined-arms"
             else detachment

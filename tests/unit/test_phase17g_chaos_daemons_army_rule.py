@@ -1057,7 +1057,11 @@ def _record_lifecycle_battle_state(
     state.record_secondary_mission_choice(
         _fixed_secondary_choice(player_id="player-b"),
     )
-    complete_setup_through_gate(state=state, config=config)
+    complete_setup_through_gate(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        config=config,
+    )
     return state
 
 
@@ -1650,7 +1654,7 @@ def _july_manifestation_revival_session() -> tuple[
 ]:
     config = replace(
         _chaos_daemons_lifecycle_config(battleline=True),
-        game_id="phase17g-config-seed-3",
+        game_id="phase17g-config-seed-1",
     )
     session = LocalGameSession()
     session.start(config)

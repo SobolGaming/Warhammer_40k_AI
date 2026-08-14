@@ -39,8 +39,10 @@ from warhammer40k_core.engine.objective_control import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    record_primary_turn_start_evidence,
+)
 from warhammer40k_core.engine.scoring import (
-    PrimaryObjectiveTurnStartState,
     VictoryPointAward,
     VictoryPointSourceKind,
     VictoryPointTransaction,
@@ -529,18 +531,8 @@ def _cap_reasons(transaction: VictoryPointTransaction) -> list[str]:
 def _set_round_five_going_second_fight(state: GameState) -> None:
     state.battle_round = 5
     state.active_player_id = "player-b"
+    record_primary_turn_start_evidence(state=state)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
-    state.record_primary_objective_turn_start_state(
-        PrimaryObjectiveTurnStartState(
-            state_id="phase11f-round-five-player-b-turn-start",
-            game_id=state.game_id,
-            player_id="player-b",
-            active_player_id="player-b",
-            battle_round=5,
-            controlled_objective_ids=(),
-            source_id="phase11f:round-five:player-b:turn-start",
-        )
-    )
 
 
 def _battle_state(

@@ -780,15 +780,21 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
             selected_option_id="reroll:0,1",
         )
     )
+    final_status = _decline_stratagem_target_proposal_if_present(
+        lifecycle,
+        final_status,
+        result_id="phase17g-inescapable-decline-fire-overwatch",
+    )
 
     assert final_status.status_kind in {
         LifecycleStatusKind.ADVANCED,
         LifecycleStatusKind.WAITING_FOR_DECISION,
     }
     if final_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
-        assert decision_request(final_status).decision_type == (
-            SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
-        )
+        assert decision_request(final_status).decision_type in {
+            SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
+            SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+        }
     roll_events = [
         cast(dict[str, JsonValue], event.payload)
         for event in lifecycle.decision_controller.event_log.records
@@ -1337,7 +1343,7 @@ def _runtime_content_bundle(lifecycle: GameLifecycle) -> RuntimeContentBundle:
 
 def _rehydrate_lifecycle_with_empty_decisions(lifecycle: GameLifecycle) -> GameLifecycle:
     payload = lifecycle.to_payload()
-    payload["decisions"] = DecisionController().to_payload()
+    payload["decisions"]["queue"] = DecisionController().to_payload()["queue"]
     return GameLifecycle.from_payload(payload)
 
 

@@ -109,7 +109,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-muster-one-0009"
-_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-muster-two-0001"
+_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-coherency-fail-001-003-0071"
 _MULTI_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-02-0001"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
@@ -982,6 +982,17 @@ def test_fall_back_desperate_escape_can_destroy_failed_model_set_without_replay_
     assert {placement.model_instance_id for placement in surviving_placement.model_placements} == (
         set(all_unit_model_ids) - set(destroyed_model_ids)
     )
+    (departure,) = state.primary_battlefield_departure_states
+    expected_source_id = (
+        "core-rules:desperate-escape:phase10o-result-000009:army-alpha:intercessor-unit-1"
+    )
+    assert departure.removal_kind is BattlefieldRemovalKind.DESTROYED
+    assert departure.affected_component_unit_instance_ids == ("army-alpha:intercessor-unit-1",)
+    assert departure.departed_component_unit_instance_ids == ()
+    assert departure.removed_model_instance_ids == tuple(sorted(destroyed_model_ids))
+    assert departure.source_id == expected_source_id
+    assert departure.occurrence_id == expected_source_id
+    assert not state.primary_unit_destruction_states
     assert (
         state.fell_back_unit_state_for_unit(
             player_id="player-a",
@@ -990,6 +1001,16 @@ def test_fall_back_desperate_escape_can_destroy_failed_model_set_without_replay_
         )
         is not None
     )
+    completion_payload = cast(
+        dict[str, JsonValue],
+        next(
+            event.payload
+            for event in reversed(lifecycle.decision_controller.event_log.records)
+            if event.event_type == "movement_activation_completed"
+        ),
+    )
+    assert completion_payload["destroyed_model_ids"] == list(destroyed_model_ids)
+    assert completion_payload["desperate_escape_source_mutation_id"] == "phase10o-result-000009"
 
     payload = cast(
         GameLifecyclePayload,

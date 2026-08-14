@@ -49,6 +49,10 @@ from warhammer40k_core.adapters.battlefield_projection import (
     authoritative_geometry_hash,
 )
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.external_contract import (
+    DECISION_REQUEST_VIEW_SCHEMA_VERSION,
+    LIFECYCLE_STATUS_SCHEMA_VERSION,
+)
 from warhammer40k_core.adapters.projection import (
     PROJECTION_SCHEMA_VERSION,
     GameViewPayload,
@@ -214,7 +218,7 @@ def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
     rules_catalog_validator.validate(session.rules_catalog_view())
     assert (
         session.events_since(EventStreamCursor(0), viewer_player_id=PLAYER_A)["schema_version"]
-        == "event-delta-v2-primary-assignments"
+        == "event-delta-v3-phase17n-step3"
     )
 
 
@@ -235,14 +239,24 @@ def test_phase17n_projection_family_versions_cover_the_new_closed_shapes() -> No
     assert (
         _json_object(game_view_properties["projection_schema"])["const"]
         == PROJECTION_SCHEMA_VERSION
-        == "game-view-v9-phase17n"
+        == "game-view-v10-phase17n-step3"
     )
-    assert "primary_unit_terrain_turn_start_snapshots" in game_view_required
+    assert "primary_rules_unit_turn_start_snapshots" in game_view_required
     assert (
         _json_object(battlefield_properties["schema_version"])["const"]
         == BATTLEFIELD_VIEW_SCHEMA_VERSION
-        == "battlefield-view-v3-phase17n"
+        == "battlefield-view-v4-phase17n-step3"
     )
+    assert battlefield_schema["$id"] == (
+        "https://warhammer40k-core.local/contracts/v6/battlefield-view.schema.json"
+    )
+    battlefield_view_schema = _json_object(game_view_properties["battlefield_view"])
+    battlefield_view_options = _json_list(battlefield_view_schema["oneOf"])
+    assert {
+        _json_string(option["$ref"])
+        for option in map(_json_object, battlefield_view_options)
+        if "$ref" in option
+    } == {"https://warhammer40k-core.local/contracts/v6/battlefield-view.schema.json"}
     assert "classification" in {
         _json_string(value) for value in _json_list(terrain_feature["required"])
     }
@@ -251,11 +265,75 @@ def test_phase17n_projection_family_versions_cover_the_new_closed_shapes() -> No
     }
 
 
-def test_phase17n_hidden_reserve_snapshot_examples_are_viewer_scoped() -> None:
+def test_phase17n_unresolved_formation_redaction_versions_nested_payload_families() -> None:
+    decision_request_schema = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/decision-request-view.schema.json"))
+    )
+    lifecycle_status_schema = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/lifecycle-status.schema.json"))
+    )
+    game_view_schema = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/game-view.schema.json"))
+    )
+    session_metadata_schema = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/session-metadata.schema.json"))
+    )
+    decision_family_schema = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/decision-family-live.schema.json"))
+    )
+
+    decision_request_uri = (
+        "https://warhammer40k-core.local/contracts/v5/decision-request-view.schema.json"
+    )
+    lifecycle_status_uri = (
+        "https://warhammer40k-core.local/contracts/v3/lifecycle-status.schema.json"
+    )
+    assert decision_request_schema["$id"] == decision_request_uri
+    assert (
+        _json_object(_json_object(decision_request_schema["properties"])["schema_version"])["const"]
+        == DECISION_REQUEST_VIEW_SCHEMA_VERSION
+        == "decision-request-view-v4-phase17n-step3"
+    )
+    assert lifecycle_status_schema["$id"] == lifecycle_status_uri
+    assert (
+        _json_object(_json_object(lifecycle_status_schema["properties"])["schema_version"])["const"]
+        == LIFECYCLE_STATUS_SCHEMA_VERSION
+        == "lifecycle-status-v3-phase17n-step3"
+    )
+
+    pending_decision_schema = _json_object(
+        _json_object(game_view_schema["properties"])["pending_decision"]
+    )
+    assert {
+        _json_string(option["$ref"])
+        for option in map(_json_object, _json_list(pending_decision_schema["oneOf"]))
+        if "$ref" in option
+    } == {decision_request_uri}
+    lifecycle_status_ref = _json_object(
+        _json_object(session_metadata_schema["properties"])["lifecycle_status"]
+    )
+    assert lifecycle_status_ref["$ref"] == f"{lifecycle_status_uri}#/$defs/status"
+
+    assert decision_family_schema["$id"] == (
+        "https://warhammer40k-core.local/contracts/v6/decision-family-live.schema.json"
+    )
+    decision_family_defs = _json_object(decision_family_schema["$defs"])
+    for family_name in (
+        "select_secondary_missions",
+        "select_movement_unit",
+        "select_movement_action",
+        "submit_movement_proposal",
+    ):
+        family = _json_object(decision_family_defs[family_name])
+        inherited_request = _json_object(_json_list(family["allOf"])[0])
+        assert inherited_request["$ref"] == decision_request_uri
+
+
+def test_phase17n_post_reveal_reserve_and_snapshot_history_are_public() -> None:
     opponent_view = _fixture("terrain_snapshot_hidden_reserve_view_player_a.json")
     owner_view = _fixture("terrain_snapshot_hidden_reserve_view_player_b.json")
-    opponent_snapshots = _json_list(opponent_view["primary_unit_terrain_turn_start_snapshots"])
-    owner_snapshots = _json_list(owner_view["primary_unit_terrain_turn_start_snapshots"])
+    opponent_snapshots = _json_list(opponent_view["primary_rules_unit_turn_start_snapshots"])
+    owner_snapshots = _json_list(owner_view["primary_rules_unit_turn_start_snapshots"])
 
     assert len(opponent_snapshots) == len(owner_snapshots) == 1
     opponent_snapshot = _json_object(opponent_snapshots[0])
@@ -270,18 +348,23 @@ def test_phase17n_hidden_reserve_snapshot_examples_are_viewer_scoped() -> None:
         assert opponent_snapshot[metadata_key] == owner_snapshot[metadata_key]
 
     opponent_membership_ids = {
-        _json_string(_json_object(value)["unit_instance_id"])
-        for value in _json_list(opponent_snapshot["unit_memberships"])
+        _json_string(_json_object(component)["unit_instance_id"])
+        for membership in _json_list(opponent_snapshot["rules_unit_memberships"])
+        for component in _json_list(_json_object(membership)["component_memberships"])
     }
     owner_membership_ids = {
-        _json_string(_json_object(value)["unit_instance_id"])
-        for value in _json_list(owner_snapshot["unit_memberships"])
+        _json_string(_json_object(component)["unit_instance_id"])
+        for membership in _json_list(owner_snapshot["rules_unit_memberships"])
+        for component in _json_list(_json_object(membership)["component_memberships"])
     }
     assert opponent_membership_ids == set(_json_object(opponent_view["unit_display_by_id"]))
     assert owner_membership_ids == set(_json_object(owner_view["unit_display_by_id"]))
-    assert UNIT_BETA not in opponent_membership_ids
+    assert opponent_membership_ids == owner_membership_ids
+    assert UNIT_BETA in opponent_membership_ids
     assert UNIT_BETA in owner_membership_ids
-    assert UNIT_BETA not in json.dumps(opponent_snapshots, sort_keys=True)
+    assert UNIT_BETA in _json_object(opponent_view["unit_display_by_id"])
+    assert UNIT_BETA in _json_object(owner_view["unit_display_by_id"])
+    assert UNIT_BETA in json.dumps(opponent_snapshots, sort_keys=True)
     assert UNIT_BETA in json.dumps(owner_snapshots, sort_keys=True)
 
 
@@ -314,14 +397,14 @@ def test_live_movement_proposal_schema_requires_spatial_context_hash() -> None:
         validator.validate(without_spatial_context)
 
 
-def test_session_metadata_contract_version_accepts_compatible_major_seven_releases() -> None:
+def test_session_metadata_contract_version_accepts_compatible_major_eight_releases() -> None:
     registry = _schema_registry()
     validator = _schema_validator("session-metadata.schema.json", registry=registry)
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "7.1.0"}
-    incompatible = {**_json_object(metadata), "server_contract_version": "6.3.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "8.1.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "7.3.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):
@@ -345,7 +428,7 @@ def test_replay_metadata_schema_rejects_missing_rules_overlay_identity() -> None
         _read_json(REPO_ROOT / Path("contracts/schemas/replay-metadata.schema.json"))
     )
     assert replay_schema["$id"] == (
-        "https://warhammer40k-core.local/contracts/v5/replay-metadata.schema.json"
+        "https://warhammer40k-core.local/contracts/v6/replay-metadata.schema.json"
     )
     validator = _schema_validator("replay-metadata.schema.json", registry=_schema_registry())
     replay = _json_object(_read_json(REPO_ROOT / Path("contracts/examples/replay-metadata.json")))
@@ -396,6 +479,98 @@ def test_replay_metadata_schema_requires_logical_terrain_area_identity() -> None
     first_area = _json_object(terrain_areas[0])
     assert first_area.pop("logical_terrain_area_id")
 
+    with pytest.raises(ValidationError):
+        validator.validate(replay)
+
+
+@pytest.mark.parametrize(
+    "state_field",
+    [
+        None,
+        "primary_rules_unit_turn_start_snapshots",
+        "primary_unit_destruction_states",
+        "primary_battlefield_departure_states",
+    ],
+    ids=("state", "turn-start-snapshots", "destructions", "departures"),
+)
+def test_replay_v6_schema_requires_step3_state_slice(state_field: str | None) -> None:
+    validator = _schema_validator("replay-metadata.schema.json", registry=_schema_registry())
+    replay = _json_object(_read_json(REPO_ROOT / Path("contracts/examples/replay-metadata.json")))
+    initial_lifecycle = _json_object(replay["initial_lifecycle"])
+    if state_field is None:
+        initial_lifecycle.pop("state")
+    else:
+        state = _json_object(initial_lifecycle["state"])
+        state.pop(state_field)
+
+    with pytest.raises(ValidationError):
+        validator.validate(replay)
+
+
+def test_replay_v6_schema_closes_step3_destruction_and_departure_rows() -> None:
+    validator = _schema_validator("replay-metadata.schema.json", registry=_schema_registry())
+    replay = _json_object(_read_json(REPO_ROOT / Path("contracts/examples/replay-metadata.json")))
+    state = _json_object(_json_object(replay["initial_lifecycle"])["state"])
+    destruction: dict[str, JsonValue] = {
+        "destruction_id": "phase17n-destruction",
+        "game_id": "phase18d-contract-session",
+        "destroying_player_id": "player-a",
+        "destruction_attribution": {
+            "destroying_player_id": "player-a",
+            "source_rules_unit_instance_id": "army-alpha:unit-a",
+            "source_model_instance_id": "army-alpha:unit-a:model-001",
+            "attacking_unit_instance_id": None,
+            "attacking_model_instance_id": None,
+            "destruction_provenance": {
+                "destruction_source_kind": "ability",
+                "attack_kind": "none",
+                "source_weapon_profile": None,
+                "attack_context_id": None,
+            },
+        },
+        "source_model_destroyed_event_id": "event-000001",
+        "source_rules_unit_objective_proximity_witness": {
+            "rules_unit_instance_id": "army-alpha:unit-a",
+            "component_unit_instance_ids": ["army-alpha:unit-a"],
+            "objective_marker_witnesses": [],
+        },
+        "source_battlefield_departure_ids": ["phase17n-departure"],
+        "unattributed_cause": None,
+        "source_mutation_id": None,
+        "destroyed_player_id": "player-b",
+        "active_player_id": "player-a",
+        "battle_round": 1,
+        "phase": "shooting",
+        "destroyed_unit_instance_id": "army-beta:unit-b",
+        "started_turn_terrain_feature_ids": [],
+        "started_turn_objective_marker_ids": [],
+        "source_id": "core-rules:primary-unit-destruction-tracking:event-000001",
+    }
+    departure: dict[str, JsonValue] = {
+        "departure_id": "phase17n-departure",
+        "game_id": "phase18d-contract-session",
+        "owner_player_id": "player-b",
+        "rules_unit_instance_id": "army-beta:unit-b",
+        "component_unit_instance_ids": ["army-beta:unit-b"],
+        "affected_component_unit_instance_ids": ["army-beta:unit-b"],
+        "departed_component_unit_instance_ids": ["army-beta:unit-b"],
+        "removed_model_instance_ids": ["army-beta:unit-b:model-001"],
+        "battle_round": 1,
+        "active_player_id": "player-a",
+        "phase": "shooting",
+        "removal_kind": "destroyed",
+        "occurrence_id": "event-000001",
+        "source_id": "core-rules:primary-unit-destruction-tracking:event-000001",
+    }
+    state["primary_unit_destruction_states"] = [destruction]
+    state["primary_battlefield_departure_states"] = [departure]
+    validator.validate(replay)
+
+    destruction["unexpected"] = True
+    with pytest.raises(ValidationError):
+        validator.validate(replay)
+    destruction.pop("unexpected")
+    departure["unexpected"] = True
     with pytest.raises(ValidationError):
         validator.validate(replay)
 
@@ -545,14 +720,25 @@ def test_phase18j_battlefield_projection_is_typed_joinable_and_viewer_scoped() -
         option["option_id"] for option in pending["options"]
     ]
 
-    hidden_view = cast(GameViewPayload, _fixture("initial_setup_view_player2.json"))
-    hidden_battlefield = hidden_view["battlefield_view"]
-    assert hidden_battlefield is not None
-    assert set(hidden_battlefield["authoritative"]["models_by_id"]) == set(
-        hidden_view["model_display_by_id"]
-    )
-    assert MODEL_ALPHA_1 not in hidden_battlefield["authoritative"]["models_by_id"]
-    assert hidden_battlefield["interaction"]["legal_candidate_refs"] == []
+    opponent_view = cast(GameViewPayload, _fixture("initial_setup_view_player2.json"))
+    opponent_battlefield = opponent_view["battlefield_view"]
+    assert opponent_battlefield is not None
+    opponent_models = opponent_battlefield["authoritative"]["models_by_id"]
+    assert set(opponent_models) == set(opponent_view["model_display_by_id"])
+
+    # Roster identity is public. Until Declare Battle Formations resolves, the
+    # opponent receives no placement, reserve-kind, or transport-cargo state.
+    opponent_model = opponent_models[MODEL_ALPHA_1]
+    assert opponent_model["model_instance_id"] == MODEL_ALPHA_1
+    assert opponent_model["unit_instance_id"] == UNIT_ALPHA
+    assert opponent_model["owner_player_id"] == PLAYER_A
+    assert opponent_model["state"] == "undeployed"
+    assert opponent_model["pose"] is None
+    assert opponent_model["state_context"] == {
+        "reserve_kind": None,
+        "transport_unit_instance_id": None,
+    }
+    assert opponent_battlefield["interaction"]["legal_candidate_refs"] == []
 
 
 def test_phase18j_geometry_maps_round_oval_hull_support_and_terrain() -> None:

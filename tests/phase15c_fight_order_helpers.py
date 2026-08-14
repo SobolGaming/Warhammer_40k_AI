@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import cast
 
+from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
@@ -15,6 +16,7 @@ from warhammer40k_core.engine.attack_sequence import (
     ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
 )
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
@@ -53,9 +55,6 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.primary_turn_start_evidence import (
-    record_primary_turn_start_evidence,
-)
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
@@ -151,7 +150,8 @@ def fight_lifecycle(
                 fixed_mission_ids=("assassination", "bring_it_down"),
             )
         )
-    record_primary_turn_start_evidence(state=state)
+    decisions = DecisionController()
+    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
     for key in fights_first_unit_keys:
         record_fights_first_effect(
             state=state,
@@ -172,7 +172,7 @@ def fight_lifecycle(
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": GameLifecycle().decision_controller.to_payload(),
+            "decisions": decisions.to_payload(),
             "reaction_queue": {"frames": []},
         },
     )

@@ -179,6 +179,7 @@ class CatalogTurnEndReserveRuntime:
         ):
             raise GameLifecycleError("Catalog turn-end reserve unit is no longer eligible.")
         reserve_state = context.state.reposition_unit_to_strategic_reserves(
+            event_log=context.decisions.event_log,
             player_id=player_id,
             unit_instance_id=unit_instance_id,
             reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,

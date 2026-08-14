@@ -3,12 +3,14 @@ from __future__ import annotations
 from warhammer40k_core.engine.army_muster_consistency import (
     validate_mustered_army_consistency,
 )
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.deployment import (
     SUBMIT_DEPLOYMENT_PLACEMENT_DECISION_TYPE,
     DeploymentPlacementRequest,
     is_deployment_placement_request,
 )
+from warhammer40k_core.engine.event_log import EventRecord
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.phase import GameLifecycleError, SetupStep
 from warhammer40k_core.engine.prebattle import (
@@ -21,6 +23,8 @@ def validate_config_state_payload_consistency(
     *,
     state: GameState,
     config: GameConfig | None,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
 ) -> None:
     if config is None:
         return
@@ -57,6 +61,8 @@ def validate_config_state_payload_consistency(
         catalog=config.army_catalog,
         muster_requests=config.army_muster_requests,
         model_geometries=config.model_geometries,
+        event_records=event_records,
+        decision_records=decision_records,
     )
 
 

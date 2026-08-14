@@ -12,6 +12,8 @@ from warhammer40k_core.engine.attached_unit_reconciliation import (
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldRemovalKind,
     BattlefieldTransitionBatch,
+    ModelPlacement,
+    ModelPlacementPayload,
     ModelRemovalRecord,
     PlacementError,
 )
@@ -63,6 +65,10 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
+)
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    destruction_source_objective_proximity_witness,
+    rules_unit_objective_proximity_witness,
 )
 from warhammer40k_core.engine.rule_deadly_demise_continuation import (
     RULE_MODEL_DESTRUCTION_COLLATERAL_COMPLETION_KIND,
@@ -651,6 +657,28 @@ def _remove_rule_destroyed_model_and_continue(
         attacking_model_instance_id=None,
         destruction_provenance=provenance,
     )
+    raw_destroyed_placement = root_context.get("destroyed_model_placement")
+    if not isinstance(raw_destroyed_placement, dict):
+        raise GameLifecycleError("Rule destruction requires exact pre-removal placement evidence.")
+    destroyed_model_placement = ModelPlacement.from_payload(
+        cast(ModelPlacementPayload, raw_destroyed_placement)
+    )
+    if (
+        destroyed_model_placement.model_instance_id != model_id
+        or destroyed_model_placement.unit_instance_id != physical_unit_id
+    ):
+        raise GameLifecycleError("Rule destruction placement identity drift.")
+    destroyed_rules_unit_objective_witness = rules_unit_objective_proximity_witness(
+        state=state,
+        rules_unit_instance_id=rules_unit_id,
+        included_destroyed_model_placement=destroyed_model_placement,
+    )
+    source_rules_unit_objective_witness = destruction_source_objective_proximity_witness(
+        state=state,
+        event_log=decisions.event_log,
+        attribution=attribution,
+        destroyed_model_placement=destroyed_model_placement,
+    )
     destroyed_event = decisions.event_log.append(
         "model_destroyed",
         validate_json_value(
@@ -660,6 +688,14 @@ def _remove_rule_destroyed_model_and_continue(
                 "active_player_id": _payload_string(root_context, "active_player_id"),
                 "phase": _payload_string(root_context, "phase"),
                 **attribution.to_payload(),
+                "source_rules_unit_objective_proximity_witness": (
+                    None
+                    if source_rules_unit_objective_witness is None
+                    else source_rules_unit_objective_witness.to_payload()
+                ),
+                "destroyed_rules_unit_objective_proximity_witness": (
+                    destroyed_rules_unit_objective_witness.to_payload()
+                ),
                 "target_unit_instance_id": physical_unit_id,
                 "rules_unit_instance_id": rules_unit_id,
                 "model_instance_id": model_id,

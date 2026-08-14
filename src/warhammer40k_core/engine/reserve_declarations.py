@@ -330,7 +330,10 @@ class ReserveDeclarationRequest:
             request_id=self.request_id,
             decision_type=SELECT_RESERVE_DECLARATION_DECISION_TYPE,
             actor_id=self.actor_id,
-            payload={"reserve_declaration_request": validate_json_value(self.to_payload())},
+            payload={
+                "reserve_declaration_request": validate_json_value(self.to_payload()),
+                "secret": True,
+            },
             options=options,
         )
 
@@ -627,6 +630,8 @@ def apply_mandatory_aircraft_reserve_declarations(
                     "game_id": state.game_id,
                     "setup_step": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
                     "player_id": army.player_id,
+                    "secret": True,
+                    "visibility_source": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
                     "unit_instance_id": unit.unit_instance_id,
                     "declaration": declaration.to_payload(),
                     "reserve_state": reserve_state.to_payload(),

@@ -5,9 +5,13 @@ from typing import cast
 
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    RulesUnitObjectiveProximityWitness,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -15,9 +19,13 @@ class PrimaryUnitDestructionEvidence:
     destruction_id: str
     battle_round: int
     active_player_id: str
+    destroying_player_id: str | None
     destroyed_player_id: str
     destroyed_unit_instance_id: str
+    destruction_attribution: ModelDestructionAttribution | None
+    source_rules_unit_objective_proximity_witness: RulesUnitObjectiveProximityWitness | None
     started_turn_terrain_feature_ids: tuple[str, ...]
+    started_turn_objective_marker_ids: tuple[str, ...]
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -43,6 +51,14 @@ class PrimaryUnitDestructionEvidence:
         )
         object.__setattr__(
             self,
+            "destroying_player_id",
+            _validate_optional_identifier(
+                "Primary destruction evidence destroying_player_id",
+                self.destroying_player_id,
+            ),
+        )
+        object.__setattr__(
+            self,
             "destroyed_player_id",
             _validate_identifier(
                 "Primary destruction evidence destroyed_player_id",
@@ -59,12 +75,55 @@ class PrimaryUnitDestructionEvidence:
         )
         object.__setattr__(
             self,
+            "destruction_attribution",
+            _validate_destruction_attribution(self.destruction_attribution),
+        )
+        object.__setattr__(
+            self,
+            "source_rules_unit_objective_proximity_witness",
+            _validate_source_objective_witness(self.source_rules_unit_objective_proximity_witness),
+        )
+        object.__setattr__(
+            self,
             "started_turn_terrain_feature_ids",
             _validate_identifier_tuple(
                 "Primary destruction evidence started_turn_terrain_feature_ids",
                 self.started_turn_terrain_feature_ids,
             ),
         )
+        object.__setattr__(
+            self,
+            "started_turn_objective_marker_ids",
+            _validate_identifier_tuple(
+                "Primary destruction evidence started_turn_objective_marker_ids",
+                self.started_turn_objective_marker_ids,
+            ),
+        )
+        attribution = self.destruction_attribution
+        source_witness = self.source_rules_unit_objective_proximity_witness
+        if attribution is None:
+            if self.destroying_player_id is not None or source_witness is not None:
+                raise GameLifecycleError(
+                    "Unattributed Primary destruction evidence cannot identify a destroyer."
+                )
+            return
+        if attribution.destroying_player_id != self.destroying_player_id:
+            raise GameLifecycleError(
+                "Primary destruction evidence destroying-player attribution drift."
+            )
+        source_rules_unit_id = attribution.source_rules_unit_instance_id
+        if source_rules_unit_id is None:
+            if source_witness is not None:
+                raise GameLifecycleError(
+                    "Player-only Primary destruction attribution cannot carry a source-unit "
+                    "objective witness."
+                )
+            return
+        if source_witness is None or source_witness.rules_unit_instance_id != source_rules_unit_id:
+            raise GameLifecycleError(
+                "Source-unit Primary destruction attribution requires its exact objective "
+                "proximity witness."
+            )
 
 
 def primary_score_count_evidence(
@@ -329,6 +388,36 @@ def _validate_identifier_tuple(
     if len(identifiers) < min_length:
         raise GameLifecycleError(f"{field_name} must contain at least {min_length} values.")
     return tuple(identifiers if preserve_order else sorted(identifiers))
+
+
+def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)
+
+
+def _validate_destruction_attribution(
+    value: object | None,
+) -> ModelDestructionAttribution | None:
+    if value is None:
+        return None
+    if type(value) is not ModelDestructionAttribution:
+        raise GameLifecycleError(
+            "Primary destruction evidence attribution must be ModelDestructionAttribution."
+        )
+    return value
+
+
+def _validate_source_objective_witness(
+    value: object | None,
+) -> RulesUnitObjectiveProximityWitness | None:
+    if value is None:
+        return None
+    if type(value) is not RulesUnitObjectiveProximityWitness:
+        raise GameLifecycleError(
+            "Primary destruction evidence source objective witness must be typed."
+        )
+    return value
 
 
 def _validate_positive_int(field_name: str, value: object) -> int:

@@ -19,6 +19,7 @@ from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
 from warhammer40k_core.engine import lifecycle_state_queries as _lsq
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
+from warhammer40k_core.engine import primary_historical_event_integrity as _phei
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
@@ -896,7 +897,12 @@ class GameLifecycle:
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
             ),
         )
-        _validate_payload_consistency(state=lifecycle._require_state(), config=lifecycle._config)
+        _validate_payload_consistency(
+            state=lifecycle._require_state(),
+            config=lifecycle._config,
+            event_records=lifecycle.decision_controller.event_log.records,
+            decision_records=lifecycle.decision_controller.records,
+        )
         validate_pending_battlefield_request_consistency(
             state=lifecycle._require_state(),
             pending_request=lifecycle._pending_decision_request(),
@@ -3410,7 +3416,13 @@ def _invalid_destruction_reaction_status(
     )
 
 
-def _validate_payload_consistency(*, state: GameState, config: GameConfig | None) -> None:
+def _validate_payload_consistency(
+    *,
+    state: GameState,
+    config: GameConfig | None,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+) -> None:
     _validate_reserve_state_consistency(state=state)
     _validate_transport_cargo_state_consistency(state=state)
     _validate_battlefield_state_consistency(state=state, config=config)
@@ -3425,6 +3437,14 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     validate_config_state_payload_consistency(
         state=state,
         config=config,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
+    _phei.validate_primary_historical_event_integrity(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+        require_muster_event_provenance=config is not None,
     )
 
 

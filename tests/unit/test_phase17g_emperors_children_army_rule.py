@@ -268,7 +268,7 @@ def test_thrill_seekers_shooting_restriction_is_consumed_by_declaration_path() -
     )
     state.advance_to_next_battle_phase()
     lifecycle_payload = lifecycle.to_payload()
-    lifecycle_payload["decisions"] = DecisionController().to_payload()
+    lifecycle_payload["decisions"]["queue"] = DecisionController().to_payload()["queue"]
     lifecycle = GameLifecycle.from_payload(lifecycle_payload)
 
     shooting_request = _decision_request(lifecycle.advance_until_decision_or_terminal())

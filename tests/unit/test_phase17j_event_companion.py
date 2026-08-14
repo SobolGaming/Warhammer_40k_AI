@@ -103,7 +103,7 @@ def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> N
 
     assert mission_pack.mission_pack_id == "11e-warhammer-event-companion-2026-07"
     assert source_package.source_commit_or_import_hash == (
-        "aa272b8234ca02b2ac5b62b2bc7299998d14a386e4e9a5f9b90aaaf4ed5422a3"
+        "68d2214fdd1b3e2e1cc1e97e9b50e959a52acce03d1706c3fda5535fd5bc4d48"
     )
     assert source_package.to_payload() == {
         "edition_id": "warhammer_40000_11th",
@@ -368,7 +368,7 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
     assert len(artifact.source_only_primary_actions) == 10
     assert Counter(
         mission.engine_support_status for mission in artifact.primary_missions
-    ) == Counter({"engine_implemented": 12, "source_known_engine_pending": 13})
+    ) == Counter({"engine_implemented": 13, "source_known_engine_pending": 12})
     all_scoring_rules = tuple(
         rule for mission in artifact.primary_missions for rule in mission.scoring_rules
     )
@@ -400,6 +400,7 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
         "primary-inescapable-dominion",
         "primary-meatgrinder",
         "primary-outmaneuver",
+        "primary-purge-and-secure",
         "primary-reconnaissance-sweep",
         "primary-search-and-scour",
         "primary-unstoppable-force",
@@ -3077,6 +3078,7 @@ def test_phase17j_terrain_area_footprint_templates_match_source_polygons() -> No
 
 def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_order() -> None:
     source_rows = event_source.event_primary_mission_matrix_source_rows()
+    executable_primary_ids = event_primary_scoring.engine_implemented_primary_mission_ids()
     matrix = {
         (row.player_force_disposition_id, row.opponent_force_disposition_id): row
         for row in event_source.primary_mission_matrix_rows()
@@ -3084,6 +3086,33 @@ def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_ord
 
     assert len(source_rows) == 15
     assert len(matrix) == 25
+    complete_pair_ids = {
+        row.layout_pair_id
+        for row in source_rows
+        if row.source_left_primary_mission_id in executable_primary_ids
+        and row.source_right_primary_mission_id in executable_primary_ids
+    }
+    assert complete_pair_ids == {
+        "disruption-vs-disruption",
+        "purge-the-foe-vs-purge-the-foe",
+        "take-and-hold-vs-disruption",
+        "take-and-hold-vs-purge-the-foe",
+        "take-and-hold-vs-reconnaissance",
+        "take-and-hold-vs-take-and-hold",
+    }
+    assert (
+        sum(
+            len(row.battlefield_layout_ids)
+            for row in event_source.primary_mission_matrix_rows()
+            if row.player_force_disposition_id <= row.opponent_force_disposition_id
+            and row.primary_mission_id in executable_primary_ids
+            and matrix[
+                (row.opponent_force_disposition_id, row.player_force_disposition_id)
+            ].primary_mission_id
+            in executable_primary_ids
+        )
+        == 18
+    )
     assert (
         source_rows[10].source_left_force_disposition_id,
         source_rows[10].source_right_force_disposition_id,
@@ -3911,8 +3940,8 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
 
     assert len(coverage_rows) == 25
     assert status_counts == {
-        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 12,
-        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 13,
+        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 13,
+        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 12,
         event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 0,
     }
     assert {
@@ -3931,7 +3960,6 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         "primary-gather-intel",
         "primary-locate-and-deny",
         "primary-punishment",
-        "primary-purge-and-secure",
         "primary-sabotage",
         "primary-secure-asset",
         "primary-smoke-and-mirrors",
@@ -3994,6 +4022,7 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     }
     assert primary_rows["primary-meatgrinder"].scoring_kind == ("meatgrinder")
     assert primary_rows["primary-battlefield-dominance"].scoring_kind == ("battlefield_dominance")
+    assert primary_rows["primary-purge-and-secure"].scoring_kind == ("purge_and_secure")
     assert coverage_rows["primary-unstoppable-force"].needed_work == ()
     assert coverage_rows["primary-meatgrinder"].needed_work == ()
     assert coverage_rows["primary-death-trap"].mission_action_count == 1
@@ -4022,6 +4051,7 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         "primary-determined-acquisition",
         "primary-inescapable-dominion",
         "primary-outmaneuver",
+        "primary-purge-and-secure",
         "primary-reconnaissance-sweep",
         "primary-search-and-scour",
     ):
@@ -4032,14 +4062,27 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     assert coverage_rows["primary-punishment"].needed_work == (
         "engine_primary_start_turn_choice:condemned_enemy_units",
         "engine_primary_condition:condemned_enemy_units_left_battlefield",
-        "engine_primary_condition:control_more_objectives_than_opponent",
-        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
+    )
+    assert coverage_rows["primary-locate-and-deny"].needed_work == (
+        "engine_primary_start_battle_setup:locate_and_deny_operation_markers",
+        "engine_primary_action:sensor-sweep-locate-and-deny",
+        "engine_primary_marker_state:operation_marker_terrain_area",
+        "engine_primary_condition:single_friendly_operation_marker_terrain_area_state",
+    )
+    assert coverage_rows["primary-extract-relic"].needed_work == (
+        "engine_primary_action:sensor-sweep-extract-relic",
+        "engine_primary_marker_state:opponent_operation_marker",
+        "engine_primary_condition:friendly_unit_performed_sensor_sweep_this_turn",
+        "engine_primary_condition:single_opponent_operation_marker_terrain_area_state",
+    )
+    assert coverage_rows["primary-secure-asset"].needed_work == (
+        "engine_primary_action:secure-asset",
+        "engine_primary_condition:friendly_unit_secured_asset_this_turn",
     )
     assert coverage_rows["primary-vanguard-operation"].needed_work == (
         "engine_primary_action:vanguard-operation",
         "engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn",
         "engine_primary_condition:enemy_territory_terrain_area_control",
-        "engine_primary_condition:control_opponent_home_objective_end_of_battle",
     )
 
 

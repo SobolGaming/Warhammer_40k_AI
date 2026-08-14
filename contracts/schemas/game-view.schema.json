@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v6/game-view.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v7/game-view.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -19,7 +19,7 @@
     "battlefield_view": {
       "oneOf": [
         {
-          "$ref": "https://warhammer40k-core.local/contracts/v5/battlefield-view.schema.json"
+          "$ref": "https://warhammer40k-core.local/contracts/v6/battlefield-view.schema.json"
         },
         {
           "type": "null"
@@ -54,7 +54,7 @@
     "pending_decision": {
       "oneOf": [
         {
-          "$ref": "https://warhammer40k-core.local/contracts/v4/decision-request-view.schema.json"
+          "$ref": "https://warhammer40k-core.local/contracts/v5/decision-request-view.schema.json"
         },
         {
           "type": "null"
@@ -79,7 +79,7 @@
       "type": "array"
     },
     "projection_schema": {
-      "const": "game-view-v9-phase17n",
+      "const": "game-view-v10-phase17n-step3",
       "minLength": 1,
       "type": "string"
     },
@@ -105,9 +105,9 @@
       },
       "type": "array"
     },
-    "primary_unit_terrain_turn_start_snapshots": {
+    "primary_rules_unit_turn_start_snapshots": {
       "items": {
-        "$ref": "#/$defs/primary_unit_terrain_turn_start_snapshot"
+        "$ref": "#/$defs/primary_rules_unit_turn_start_snapshot"
       },
       "type": "array",
       "uniqueItems": true
@@ -165,7 +165,7 @@
     "mission_setup",
     "public_secondary_mission_choices",
     "public_secondary_mission_card_states",
-    "primary_unit_terrain_turn_start_snapshots",
+    "primary_rules_unit_turn_start_snapshots",
     "public_command_point_ledgers",
     "public_victory_point_ledgers",
     "public_stratagem_use_records",
@@ -351,7 +351,7 @@
       ],
       "type": "object"
     },
-    "primary_unit_terrain_turn_start_snapshot": {
+    "primary_rules_unit_turn_start_snapshot": {
       "additionalProperties": false,
       "properties": {
         "active_player_id": {
@@ -374,9 +374,9 @@
           "minLength": 1,
           "type": "string"
         },
-        "unit_memberships": {
+        "rules_unit_memberships": {
           "items": {
-            "$ref": "#/$defs/primary_unit_terrain_membership"
+            "$ref": "#/$defs/primary_rules_unit_turn_start_membership"
           },
           "type": "array",
           "uniqueItems": true
@@ -387,18 +387,54 @@
         "game_id",
         "active_player_id",
         "battle_round",
-        "unit_memberships",
+        "rules_unit_memberships",
         "source_id"
       ],
       "type": "object"
     },
-    "primary_unit_terrain_membership": {
+    "primary_rules_unit_turn_start_membership": {
       "additionalProperties": false,
       "properties": {
-        "terrain_feature_ids": {
+        "component_memberships": {
+          "items": {
+            "$ref": "#/$defs/primary_component_turn_start_membership"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "rules_unit_instance_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "rules_unit_instance_id",
+        "component_memberships"
+      ],
+      "type": "object"
+    },
+    "primary_component_turn_start_membership": {
+      "additionalProperties": false,
+      "properties": {
+        "evaluated_model_instance_ids": {
           "items": {
             "minLength": 1,
             "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "logical_terrain_area_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "objective_marker_witnesses": {
+          "items": {
+            "$ref": "#/$defs/primary_objective_marker_witness"
           },
           "type": "array",
           "uniqueItems": true
@@ -410,7 +446,32 @@
       },
       "required": [
         "unit_instance_id",
-        "terrain_feature_ids"
+        "evaluated_model_instance_ids",
+        "logical_terrain_area_ids",
+        "objective_marker_witnesses"
+      ],
+      "type": "object"
+    },
+    "primary_objective_marker_witness": {
+      "additionalProperties": false,
+      "properties": {
+        "model_instance_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "objective_marker_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "objective_marker_id",
+        "model_instance_ids"
       ],
       "type": "object"
     },

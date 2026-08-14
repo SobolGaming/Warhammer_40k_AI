@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v5/replay-metadata.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v6/replay-metadata.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -7,12 +7,14 @@
     "decision_records": {"items": {"type": "object"}, "type": "array"},
     "event_records": {"items": {"type": "object"}, "type": "array"},
     "initial_lifecycle": {
+      "additionalProperties": true,
       "properties": {
         "config": {
           "$ref": "https://warhammer40k-core.local/contracts/v3/create-session.schema.json#/properties/config"
-        }
+        },
+        "state": {"$ref": "#/$defs/step3_replay_state"}
       },
-      "required": ["config"],
+      "required": ["config", "state"],
       "type": "object"
     },
     "initial_rng_state": {"type": "object"},
@@ -20,7 +22,7 @@
       "items": {"$ref": "#/$defs/projection_checkpoint"},
       "type": "array"
     },
-    "schema_version": {"const": "replay-artifact-v5-phase17n", "type": "string"},
+    "schema_version": {"const": "replay-artifact-v6-phase17n-step3", "type": "string"},
     "source_identity": {"$ref": "#/$defs/source_identity"}
   },
   "required": [
@@ -36,6 +38,228 @@
   "title": "CORE V2 ReplayArtifactMetadataPayload",
   "type": "object",
   "$defs": {
+    "step3_replay_state": {
+      "additionalProperties": true,
+      "description": "The Contract 8 schema-owned Phase 17N Step 3 evidence slice. Other lifecycle state remains engine-private and is validated by the fail-closed replay loader.",
+      "properties": {
+        "primary_battlefield_departure_states": {
+          "items": {"$ref": "#/$defs/primary_battlefield_departure_state"},
+          "type": "array"
+        },
+        "primary_rules_unit_turn_start_snapshots": {
+          "items": {
+            "$ref": "https://warhammer40k-core.local/contracts/v7/game-view.schema.json#/$defs/primary_rules_unit_turn_start_snapshot"
+          },
+          "type": "array"
+        },
+        "primary_unit_destruction_states": {
+          "items": {"$ref": "#/$defs/primary_unit_destruction_state"},
+          "type": "array"
+        }
+      },
+      "required": [
+        "primary_rules_unit_turn_start_snapshots",
+        "primary_unit_destruction_states",
+        "primary_battlefield_departure_states"
+      ],
+      "type": "object"
+    },
+    "identifier_array": {
+      "items": {"minLength": 1, "type": "string"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "nullable_identifier": {
+      "oneOf": [
+        {"minLength": 1, "type": "string"},
+        {"type": "null"}
+      ]
+    },
+    "objective_marker_model_witness": {
+      "additionalProperties": false,
+      "properties": {
+        "model_instance_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "objective_marker_id": {"minLength": 1, "type": "string"}
+      },
+      "required": ["objective_marker_id", "model_instance_ids"],
+      "type": "object"
+    },
+    "rules_unit_objective_proximity_witness": {
+      "additionalProperties": false,
+      "properties": {
+        "component_unit_instance_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "objective_marker_witnesses": {
+          "items": {"$ref": "#/$defs/objective_marker_model_witness"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "rules_unit_instance_id": {"minLength": 1, "type": "string"}
+      },
+      "required": [
+        "rules_unit_instance_id",
+        "component_unit_instance_ids",
+        "objective_marker_witnesses"
+      ],
+      "type": "object"
+    },
+    "destruction_provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "attack_context_id": {"$ref": "#/$defs/nullable_identifier"},
+        "attack_kind": {"enum": ["melee", "ranged", "none"], "type": "string"},
+        "destruction_source_kind": {
+          "enum": ["attack", "deadly_demise", "hazardous", "ability"],
+          "type": "string"
+        },
+        "source_weapon_profile": {
+          "oneOf": [
+            {"minProperties": 1, "type": "object"},
+            {"type": "null"}
+          ]
+        }
+      },
+      "required": [
+        "destruction_source_kind",
+        "attack_kind",
+        "source_weapon_profile",
+        "attack_context_id"
+      ],
+      "type": "object"
+    },
+    "model_destruction_attribution": {
+      "additionalProperties": false,
+      "properties": {
+        "attacking_model_instance_id": {"$ref": "#/$defs/nullable_identifier"},
+        "attacking_unit_instance_id": {"$ref": "#/$defs/nullable_identifier"},
+        "destroying_player_id": {"minLength": 1, "type": "string"},
+        "destruction_provenance": {"$ref": "#/$defs/destruction_provenance"},
+        "source_model_instance_id": {"$ref": "#/$defs/nullable_identifier"},
+        "source_rules_unit_instance_id": {"$ref": "#/$defs/nullable_identifier"}
+      },
+      "required": [
+        "destroying_player_id",
+        "source_rules_unit_instance_id",
+        "source_model_instance_id",
+        "attacking_unit_instance_id",
+        "attacking_model_instance_id",
+        "destruction_provenance"
+      ],
+      "type": "object"
+    },
+    "primary_unit_destruction_state": {
+      "additionalProperties": false,
+      "properties": {
+        "active_player_id": {"minLength": 1, "type": "string"},
+        "battle_round": {"minimum": 1, "type": "integer"},
+        "destroyed_player_id": {"minLength": 1, "type": "string"},
+        "destroyed_unit_instance_id": {"minLength": 1, "type": "string"},
+        "destroying_player_id": {"$ref": "#/$defs/nullable_identifier"},
+        "destruction_attribution": {
+          "oneOf": [
+            {"$ref": "#/$defs/model_destruction_attribution"},
+            {"type": "null"}
+          ]
+        },
+        "destruction_id": {"minLength": 1, "type": "string"},
+        "game_id": {"minLength": 1, "type": "string"},
+        "phase": {"minLength": 1, "type": "string"},
+        "source_battlefield_departure_ids": {"$ref": "#/$defs/identifier_array"},
+        "source_id": {"minLength": 1, "type": "string"},
+        "source_model_destroyed_event_id": {"$ref": "#/$defs/nullable_identifier"},
+        "source_mutation_id": {"$ref": "#/$defs/nullable_identifier"},
+        "source_rules_unit_objective_proximity_witness": {
+          "oneOf": [
+            {"$ref": "#/$defs/rules_unit_objective_proximity_witness"},
+            {"type": "null"}
+          ]
+        },
+        "started_turn_objective_marker_ids": {"$ref": "#/$defs/identifier_array"},
+        "started_turn_terrain_feature_ids": {"$ref": "#/$defs/identifier_array"},
+        "unattributed_cause": {
+          "oneOf": [
+            {
+              "enum": [
+                "desperate_escape",
+                "emergency_disembark",
+                "unit_coherency",
+                "reserve_deadline"
+              ],
+              "type": "string"
+            },
+            {"type": "null"}
+          ]
+        }
+      },
+      "required": [
+        "destruction_id",
+        "game_id",
+        "destroying_player_id",
+        "destruction_attribution",
+        "source_model_destroyed_event_id",
+        "source_rules_unit_objective_proximity_witness",
+        "source_battlefield_departure_ids",
+        "unattributed_cause",
+        "source_mutation_id",
+        "destroyed_player_id",
+        "active_player_id",
+        "battle_round",
+        "phase",
+        "destroyed_unit_instance_id",
+        "started_turn_terrain_feature_ids",
+        "started_turn_objective_marker_ids",
+        "source_id"
+      ],
+      "type": "object"
+    },
+    "primary_battlefield_departure_state": {
+      "additionalProperties": false,
+      "properties": {
+        "active_player_id": {"minLength": 1, "type": "string"},
+        "affected_component_unit_instance_ids": {"$ref": "#/$defs/identifier_array"},
+        "battle_round": {"minimum": 1, "type": "integer"},
+        "component_unit_instance_ids": {"$ref": "#/$defs/identifier_array"},
+        "departed_component_unit_instance_ids": {"$ref": "#/$defs/identifier_array"},
+        "departure_id": {"minLength": 1, "type": "string"},
+        "game_id": {"minLength": 1, "type": "string"},
+        "occurrence_id": {"minLength": 1, "type": "string"},
+        "owner_player_id": {"minLength": 1, "type": "string"},
+        "phase": {"minLength": 1, "type": "string"},
+        "removal_kind": {
+          "enum": ["destroyed", "embark", "into_reserves", "temporarily_removed"],
+          "type": "string"
+        },
+        "removed_model_instance_ids": {"$ref": "#/$defs/identifier_array"},
+        "rules_unit_instance_id": {"minLength": 1, "type": "string"},
+        "source_id": {"minLength": 1, "type": "string"}
+      },
+      "required": [
+        "departure_id",
+        "game_id",
+        "owner_player_id",
+        "rules_unit_instance_id",
+        "component_unit_instance_ids",
+        "affected_component_unit_instance_ids",
+        "departed_component_unit_instance_ids",
+        "removed_model_instance_ids",
+        "battle_round",
+        "active_player_id",
+        "phase",
+        "removal_kind",
+        "occurrence_id",
+        "source_id"
+      ],
+      "type": "object"
+    },
     "projection_checkpoint": {
       "additionalProperties": false,
       "properties": {

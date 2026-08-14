@@ -828,6 +828,13 @@ def test_aircraft_normal_move_lifecycle_crossing_edge_transitions_to_reserves() 
     assert movement_state is not None
     assert movement_state.active_selection is None
     assert movement_state.moved_unit_ids == (aircraft.unit_instance_id,)
+    (departure,) = state.primary_battlefield_departure_states
+    assert departure.rules_unit_instance_id == aircraft.unit_instance_id
+    assert departure.component_unit_instance_ids == (aircraft.unit_instance_id,)
+    assert departure.departed_component_unit_instance_ids == (aircraft.unit_instance_id,)
+    assert departure.removed_model_instance_ids == aircraft.own_model_ids()
+    assert departure.removal_kind is BattlefieldRemovalKind.INTO_RESERVES
+    assert departure.source_id == f"phase10r-{expected_reason.value}"
 
     completed_payload = _last_event_payload(decisions, "movement_activation_completed")
     assert "displacement_kind" not in completed_payload

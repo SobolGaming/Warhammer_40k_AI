@@ -584,6 +584,7 @@ def apply_fade_to_darkness_turn_end_result(context: TurnEndResultContext) -> boo
     if not _unit_can_enter_strategic_reserves(context.state, unit_instance_id=unit_instance_id):
         raise GameLifecycleError("Fade to Darkness unit is no longer eligible.")
     reserve_state = context.state.reposition_unit_to_strategic_reserves(
+        event_log=context.decisions.event_log,
         player_id=player_id,
         unit_instance_id=unit_instance_id,
         reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,

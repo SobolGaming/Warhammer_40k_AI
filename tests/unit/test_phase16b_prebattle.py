@@ -245,7 +245,7 @@ def pending_multiround_redeploy_sequencing_lifecycle_payload() -> dict[str, Any]
     catalog = _catalog_with_datasheet_keywords(
         {"core-intercessor-like-infantry": ("Infantry", "Battleline", "REDEPLOY")}
     )
-    config = replace(_config(catalog=catalog), game_id="phase16b-multiround-13")
+    config = replace(_config(catalog=catalog), game_id="phase16b-multiround-step3-1")
     lifecycle, status = _advance_after_deployments(config)
     request = _decision_request(status)
     assert request.decision_type == SEQUENCING_DECISION_TYPE

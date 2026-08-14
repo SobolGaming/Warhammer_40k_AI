@@ -7,131 +7,61 @@
 export interface paths {
     "/rules-catalog": {
         parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+            query?: never; header?: never; path?: never; cookie?: never;
         };
         get: operations["getRulesCatalog"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        put?: never; post?: never; delete?: never; options?: never; head?: never; patch?: never; trace?: never;
     };
     "/sessions": {
         parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+            query?: never; header?: never; path?: never; cookie?: never;
         };
-        get?: never;
-        put?: never;
+        get?: never; put?: never;
         post: operations["createAuthoritativeSession"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        delete?: never; options?: never; head?: never; patch?: never; trace?: never;
     };
     "/sessions/{session_id}": {
         parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+            query?: never; header?: never; path?: never; cookie?: never;
         };
         get: operations["getSessionMetadata"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        put?: never; post?: never; delete?: never; options?: never; head?: never; patch?: never; trace?: never;
     };
     "/sessions/{session_id}/commands": {
         parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+            query?: never; header?: never; path?: never; cookie?: never;
         };
-        get?: never;
-        put?: never;
+        get?: never; put?: never;
         post: operations["executeSessionCommand"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        delete?: never; options?: never; head?: never; patch?: never; trace?: never;
     };
     "/sessions/{session_id}/projection": {
         parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+            query?: never; header?: never; path?: never; cookie?: never;
         };
         get: operations["getSessionProjection"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        put?: never; post?: never; delete?: never; options?: never; head?: never; patch?: never; trace?: never;
     };
     "/sessions/{session_id}/catalog": {
         parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+            query?: never; header?: never; path?: never; cookie?: never;
         };
         get: operations["getSessionCatalog"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        put?: never; post?: never; delete?: never; options?: never; head?: never; patch?: never; trace?: never;
     };
     "/sessions/{session_id}/events": {
         parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+            query?: never; header?: never; path?: never; cookie?: never;
         };
         get: operations["getSessionEvents"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        put?: never; post?: never; delete?: never; options?: never; head?: never; patch?: never; trace?: never;
     };
     "/sessions/{session_id}/replay": {
         parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+            query?: never; header?: never; path?: never; cookie?: never;
         };
         get: operations["exportSessionReplay"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        put?: never; post?: never; delete?: never; options?: never; head?: never; patch?: never; trace?: never;
     };
 }
 export type webhooks = Record<string, never>;
@@ -392,7 +322,7 @@ export interface components {
             ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v7-contract";
+            schema_version: "session-metadata-v8-contract";
             server_contract_version: string;
             session_id: string;
             session_revision: number;
@@ -690,7 +620,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v7-contract";
+            schema_version: "session-command-outcome-v8-contract";
             session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
@@ -913,7 +843,7 @@ export interface components {
             interaction: components["schemas"]["battlefield-view--interaction.schema"];
             render: components["schemas"]["battlefield-view--render.schema"];
             /** @constant */
-            schema_version: "battlefield-view-v3-phase17n";
+            schema_version: "battlefield-view-v4-phase17n-step3";
         };
         mission_setup: {
             primary_mission_assignments: {
@@ -1013,7 +943,7 @@ export interface components {
         /** CORE V2 DecisionRequestViewPayload */
         "decision-request-view.schema": {
             /** @constant */
-            schema_version: "decision-request-view-v3-primary-assignments";
+            schema_version: "decision-request-view-v4-phase17n-step3";
             actor_id: string | null;
             decision_type: string;
             is_parameterized: boolean;
@@ -1042,17 +972,27 @@ export interface components {
             /** @constant */
             schema_version: "annotated-decision-request-v2-primary-assignments";
         };
-        "game-view--primary_unit_terrain_membership.schema": {
-            terrain_feature_ids: string[];
+        "game-view--primary_objective_marker_witness.schema": {
+            model_instance_ids: string[];
+            objective_marker_id: string;
+        };
+        "game-view--primary_component_turn_start_membership.schema": {
+            evaluated_model_instance_ids: string[];
+            logical_terrain_area_ids: string[];
+            objective_marker_witnesses: components["schemas"]["game-view--primary_objective_marker_witness.schema"][];
             unit_instance_id: string;
         };
-        "game-view--primary_unit_terrain_turn_start_snapshot.schema": {
+        "game-view--primary_rules_unit_turn_start_membership.schema": {
+            component_memberships: components["schemas"]["game-view--primary_component_turn_start_membership.schema"][];
+            rules_unit_instance_id: string;
+        };
+        "game-view--primary_rules_unit_turn_start_snapshot.schema": {
             active_player_id: string;
             battle_round: number;
             game_id: string;
             snapshot_id: string;
             source_id: string;
-            unit_memberships: components["schemas"]["game-view--primary_unit_terrain_membership.schema"][];
+            rules_unit_memberships: components["schemas"]["game-view--primary_rules_unit_turn_start_membership.schema"][];
         };
         "game-view--rules_catalog_reference.schema": {
             catalog_id: string;
@@ -1089,12 +1029,12 @@ export interface components {
             nested_interaction_requests: components["schemas"]["annotated-decision-request.schema"][];
             player_ids: string[];
             /** @constant */
-            projection_schema: "game-view-v9-phase17n";
+            projection_schema: "game-view-v10-phase17n-step3";
             projection_state_hash: string;
             public_command_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_card_states: components["schemas"]["game-view--json_value.schema"][];
             public_secondary_mission_choices: components["schemas"]["game-view--json_value.schema"][];
-            primary_unit_terrain_turn_start_snapshots: components["schemas"]["game-view--primary_unit_terrain_turn_start_snapshot.schema"][];
+            primary_rules_unit_turn_start_snapshots: components["schemas"]["game-view--primary_rules_unit_turn_start_snapshot.schema"][];
             public_stratagem_use_records: components["schemas"]["game-view--json_value.schema"][];
             public_victory_point_ledgers: components["schemas"]["game-view--json_value.schema"][];
             rules_catalog: components["schemas"]["game-view--rules_catalog_reference.schema"];
@@ -1115,7 +1055,7 @@ export interface components {
             retention_limit: number;
             revision_retention_limit: number;
             /** @constant */
-            schema_version: "session-projection-v5-phase17n";
+            schema_version: "session-projection-v6-phase17n-step3";
             session_id: string;
             session_revision: number;
             /** @enum {string} */
@@ -1145,12 +1085,83 @@ export interface components {
             retention_limit: number;
             revision_retention_limit: number;
             /** @constant */
-            schema_version: "event-delta-v3-primary-assignments";
+            schema_version: "event-delta-v4-phase17n-step3";
             session_id: string;
             supplied_cursor: string;
             to_revision: number;
             /** @enum {string} */
             visibility_role: "player" | "coach" | "delayed_spectator" | "administrator";
+        };
+        "replay-metadata--identifier_array.schema": string[];
+        "replay-metadata--primary_battlefield_departure_state.schema": {
+            active_player_id: string;
+            affected_component_unit_instance_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+            battle_round: number;
+            component_unit_instance_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+            departed_component_unit_instance_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+            departure_id: string;
+            game_id: string;
+            occurrence_id: string;
+            owner_player_id: string;
+            phase: string;
+            /** @enum {string} */
+            removal_kind: "destroyed" | "embark" | "into_reserves" | "temporarily_removed";
+            removed_model_instance_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+            rules_unit_instance_id: string;
+            source_id: string;
+        };
+        "replay-metadata--nullable_identifier.schema": string | null;
+        "replay-metadata--destruction_provenance.schema": {
+            attack_context_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            /** @enum {string} */
+            attack_kind: "melee" | "ranged" | "none";
+            /** @enum {string} */
+            destruction_source_kind: "attack" | "deadly_demise" | "hazardous" | "ability";
+            source_weapon_profile: Record<string, never> | null;
+        };
+        "replay-metadata--model_destruction_attribution.schema": {
+            attacking_model_instance_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            attacking_unit_instance_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            destroying_player_id: string;
+            destruction_provenance: components["schemas"]["replay-metadata--destruction_provenance.schema"];
+            source_model_instance_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            source_rules_unit_instance_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+        };
+        "replay-metadata--objective_marker_model_witness.schema": {
+            model_instance_ids: string[];
+            objective_marker_id: string;
+        };
+        "replay-metadata--rules_unit_objective_proximity_witness.schema": {
+            component_unit_instance_ids: string[];
+            objective_marker_witnesses: components["schemas"]["replay-metadata--objective_marker_model_witness.schema"][];
+            rules_unit_instance_id: string;
+        };
+        "replay-metadata--primary_unit_destruction_state.schema": {
+            active_player_id: string;
+            battle_round: number;
+            destroyed_player_id: string;
+            destroyed_unit_instance_id: string;
+            destroying_player_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            destruction_attribution: components["schemas"]["replay-metadata--model_destruction_attribution.schema"] | null;
+            destruction_id: string;
+            game_id: string;
+            phase: string;
+            source_battlefield_departure_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+            source_id: string;
+            source_model_destroyed_event_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            source_mutation_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            source_rules_unit_objective_proximity_witness: components["schemas"]["replay-metadata--rules_unit_objective_proximity_witness.schema"] | null;
+            started_turn_objective_marker_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+            started_turn_terrain_feature_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+            unattributed_cause: ("desperate_escape" | "emergency_disembark" | "unit_coherency" | "reserve_deadline") | null;
+        };
+        /** @description The Contract 8 schema-owned Phase 17N Step 3 evidence slice. Other lifecycle state remains engine-private and is validated by the fail-closed replay loader. */
+        "replay-metadata--step3_replay_state.schema": {
+            primary_battlefield_departure_states: components["schemas"]["replay-metadata--primary_battlefield_departure_state.schema"][];
+            primary_rules_unit_turn_start_snapshots: components["schemas"]["game-view--primary_rules_unit_turn_start_snapshot.schema"][];
+            primary_unit_destruction_states: components["schemas"]["replay-metadata--primary_unit_destruction_state.schema"][];
+        } & {
+            [key: string]: unknown;
         };
         "replay-metadata--projection_checkpoint.schema": {
             checkpoint_id: string;
@@ -1186,11 +1197,14 @@ export interface components {
             event_records: Record<string, never>[];
             initial_lifecycle: {
                 config: components["schemas"]["config"];
+                state: components["schemas"]["replay-metadata--step3_replay_state.schema"];
+            } & {
+                [key: string]: unknown;
             };
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v5-phase17n";
+            schema_version: "replay-artifact-v6-phase17n-step3";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
         };
         /** CORE V2 FiniteOptionSubmissionPayload */
@@ -1292,10 +1306,7 @@ export type $defs = Record<string, never>;
 export interface operations {
     getRulesCatalog: {
         parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+            query?: never; header?: never; path?: never; cookie?: never;
         };
         requestBody?: never;
         responses: {
@@ -1313,10 +1324,7 @@ export interface operations {
     };
     createAuthoritativeSession: {
         parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+            query?: never; header?: never; path?: never; cookie?: never;
         };
         requestBody: {
             content: {
@@ -1330,8 +1338,7 @@ export interface operations {
     };
     getSessionMetadata: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: never; header?: never;
             path: {
                 session_id: components["parameters"]["SessionId"];
             };
@@ -1345,8 +1352,7 @@ export interface operations {
     };
     executeSessionCommand: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: never; header?: never;
             path: {
                 session_id: components["parameters"]["SessionId"];
             };
@@ -1369,8 +1375,7 @@ export interface operations {
     };
     getSessionProjection: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: never; header?: never;
             path: {
                 session_id: components["parameters"]["SessionId"];
             };
@@ -1384,8 +1389,7 @@ export interface operations {
     };
     getSessionCatalog: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: never; header?: never;
             path: {
                 session_id: components["parameters"]["SessionId"];
             };
@@ -1426,8 +1430,7 @@ export interface operations {
     };
     exportSessionReplay: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: never; header?: never;
             path: {
                 session_id: components["parameters"]["SessionId"];
             };
@@ -1435,7 +1438,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Replay artifact v5 with directed player Primary Mission assignments, mandatory ruleset descriptor, overlay source identity, explicit logical terrain-area identity, and Phase 17N turn-start terrain evidence for an administrator, or for a replay viewer after the session is terminal or closed. */
+            /** @description Replay artifact v6 with directed player Primary Mission assignments, mandatory ruleset descriptor and overlay source identity, explicit logical terrain-area identity, group-aware turn-start position evidence, typed destruction attribution, and battlefield-departure evidence for an administrator, or for a replay viewer after the session is terminal or closed. */
             200: {
                 headers: {
                     [name: string]: unknown;

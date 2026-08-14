@@ -40,8 +40,11 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseStatePayload,
 )
 from warhammer40k_core.engine.prebattle_records import PreBattleActionRecordPayload
+from warhammer40k_core.engine.primary_battlefield_departure import (
+    PrimaryBattlefieldDepartureStatePayload,
+)
 from warhammer40k_core.engine.primary_turn_start_evidence import (
-    PrimaryUnitTerrainTurnStartSnapshotPayload,
+    PrimaryRulesUnitTurnStartSnapshotPayload,
 )
 from warhammer40k_core.engine.reserves import (
     ReserveStatePayload,
@@ -182,9 +185,10 @@ class GameStatePayload(TypedDict):
     objective_control_records: list[ObjectiveControlRecordPayload]
     sticky_objective_control_states: list[StickyObjectiveControlStatePayload]
     primary_objective_turn_start_states: list[PrimaryObjectiveTurnStartStatePayload]
-    primary_unit_terrain_turn_start_snapshots: list[PrimaryUnitTerrainTurnStartSnapshotPayload]
+    primary_rules_unit_turn_start_snapshots: list[PrimaryRulesUnitTurnStartSnapshotPayload]
     primary_terrain_trap_states: list[PrimaryTerrainTrapStatePayload]
     primary_unit_destruction_states: list[PrimaryUnitDestructionStatePayload]
+    primary_battlefield_departure_states: list[PrimaryBattlefieldDepartureStatePayload]
     secondary_unit_destruction_states: list[SecondaryUnitDestructionStatePayload]
     secondary_objective_cleanse_states: list[SecondaryObjectiveCleanseStatePayload]
     secondary_terrain_plunder_states: list[SecondaryTerrainPlunderStatePayload]
@@ -211,4 +215,6 @@ class StartingAttachedUnitRecordPayload(TypedDict):
     leader_unit_instance_ids: list[str]
     support_unit_instance_ids: list[str]
     component_unit_instance_ids: list[str]
+    starting_model_instance_ids_by_component: dict[str, list[str]]
+    starting_model_count: int
     source_id: str

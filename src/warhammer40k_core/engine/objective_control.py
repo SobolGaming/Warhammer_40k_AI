@@ -54,6 +54,7 @@ if TYPE_CHECKING:
 
 
 class ObjectiveControlTiming(StrEnum):
+    TURN_START = "turn_start"
     PHASE_END = "phase_end"
     TURN_END = "turn_end"
 

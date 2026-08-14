@@ -171,6 +171,12 @@ class HealingStep:
             self.starting_wounds_remaining != 0 or self.final_wounds_remaining != 1
         ):
             raise GameLifecycleError("Embarked revival must return a model with one wound.")
+        if self.step_kind is HealingStepKind.REVIVE_MODEL_EMBARKED and (
+            self.request_id is None or self.result_id is None
+        ):
+            raise GameLifecycleError(
+                "Embarked revival requires recorded selection decision provenance."
+            )
         if self.step_kind is HealingStepKind.REVIVE_MODEL_DESTROYED_NO_CAPACITY and (
             self.starting_wounds_remaining != 0 or self.final_wounds_remaining != 0
         ):
@@ -510,17 +516,17 @@ def resolve_healing_until_blocked(
                 candidates=candidates,
             )
         if candidates.step_kind is HealingStepKind.REVIVE_MODEL and len(candidates.model_ids) == 1:
-            embarked_step = _apply_embarked_revival_step_if_applicable(
+            owner_unit_id = _model_owner_unit_instance_id(
                 state=state,
-                effect=current,
                 model_instance_id=candidates.model_ids[0],
-                request_id=None,
-                result_id=None,
             )
-            if embarked_step is not None:
-                current = current.with_step(embarked_step)
-                _emit_healing_step(decisions=decisions, effect=current, step=embarked_step)
-                continue
+            if state.transport_cargo_state_for_embarked_unit(owner_unit_id) is not None:
+                return current, _build_healing_model_request(
+                    state=state,
+                    decisions=decisions,
+                    effect=current,
+                    candidates=candidates,
+                )
             from warhammer40k_core.engine.healing_revival import (
                 request_healing_revival_placement,
             )
@@ -1001,6 +1007,10 @@ def _apply_embarked_revival_step_if_applicable(
     cargo_state = state.transport_cargo_state_for_embarked_unit(owner_unit_id)
     if cargo_state is None:
         return None
+    if request_id is None or result_id is None:
+        raise GameLifecycleError(
+            "Embarked revival mutation requires recorded selection decision provenance."
+        )
     alive_cargo_model_count = 0
     unit_by_id = {
         unit.unit_instance_id: unit for army in state.army_definitions for unit in army.units

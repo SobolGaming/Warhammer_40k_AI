@@ -628,7 +628,7 @@ def test_lifecycle_submit_decision_routes_triggered_movement_choice() -> None:
         candidate_witnesses=(_shift_witness(unit_placement, dx=3.0),),
     )
     lifecycle_payload = lifecycle.to_payload()
-    lifecycle_payload["decisions"] = DecisionController().to_payload()
+    lifecycle_payload["decisions"]["queue"] = DecisionController().to_payload()["queue"]
     lifecycle = GameLifecycle.from_payload(lifecycle_payload)
     state = lifecycle.state
     assert state is not None

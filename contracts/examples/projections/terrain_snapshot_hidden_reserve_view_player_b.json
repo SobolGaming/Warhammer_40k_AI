@@ -8046,7 +8046,7 @@
         }
       }
     },
-    "schema_version": "battlefield-view-v3-phase17n"
+    "schema_version": "battlefield-view-v4-phase17n-step3"
   },
   "current_battle_phase": "movement",
   "current_setup_step": null,
@@ -14816,34 +14816,60 @@
       "phase": "movement"
     },
     "request_id": "decision-request-000007",
-    "schema_version": "decision-request-view-v3-primary-assignments"
+    "schema_version": "decision-request-view-v4-phase17n-step3"
   },
   "pending_proposal": null,
   "player_ids": [
     "player-a",
     "player-b"
   ],
-  "primary_unit_terrain_turn_start_snapshots": [
+  "primary_rules_unit_turn_start_snapshots": [
     {
       "active_player_id": "player-a",
       "battle_round": 1,
       "game_id": "ui-contract-terrain-snapshot-hidden-reserve",
-      "snapshot_id": "primary-unit-terrain-turn-start:ui-contract-terrain-snapshot-hidden-reserve:round-01:player-a",
-      "source_id": "ui-contract-terrain-snapshot-hidden-reserve:primary-unit-terrain-turn-start:round-01:player-a",
-      "unit_memberships": [
+      "rules_unit_memberships": [
         {
-          "terrain_feature_ids": [],
-          "unit_instance_id": "army-alpha:intercessor-unit-1"
+          "component_memberships": [
+            {
+              "evaluated_model_instance_ids": [
+                "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+                "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+                "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+                "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+                "army-alpha:intercessor-unit-1:core-intercessor-like:005"
+              ],
+              "logical_terrain_area_ids": [],
+              "objective_marker_witnesses": [],
+              "unit_instance_id": "army-alpha:intercessor-unit-1"
+            }
+          ],
+          "rules_unit_instance_id": "army-alpha:intercessor-unit-1"
         },
         {
-          "terrain_feature_ids": [],
-          "unit_instance_id": "army-beta:intercessor-unit-2"
+          "component_memberships": [
+            {
+              "evaluated_model_instance_ids": [
+                "army-beta:intercessor-unit-2:core-intercessor-like:001",
+                "army-beta:intercessor-unit-2:core-intercessor-like:002",
+                "army-beta:intercessor-unit-2:core-intercessor-like:003",
+                "army-beta:intercessor-unit-2:core-intercessor-like:004",
+                "army-beta:intercessor-unit-2:core-intercessor-like:005"
+              ],
+              "logical_terrain_area_ids": [],
+              "objective_marker_witnesses": [],
+              "unit_instance_id": "army-beta:intercessor-unit-2"
+            }
+          ],
+          "rules_unit_instance_id": "army-beta:intercessor-unit-2"
         }
-      ]
+      ],
+      "snapshot_id": "primary-rules-unit-turn-start:ui-contract-terrain-snapshot-hidden-reserve:round-01:player-a",
+      "source_id": "ui-contract-terrain-snapshot-hidden-reserve:primary-rules-unit-turn-start:round-01:player-a"
     }
   ],
-  "projection_schema": "game-view-v9-phase17n",
-  "projection_state_hash": "8a55f0c71332851c6eed8c9da5a43da89aaa6c379da4022ed92c65500b84799e",
+  "projection_schema": "game-view-v10-phase17n-step3",
+  "projection_state_hash": "c402387fb7d8a1aaff194f7b13b4da8e5f3af92c833e27ed3982ccc501de8b4d",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

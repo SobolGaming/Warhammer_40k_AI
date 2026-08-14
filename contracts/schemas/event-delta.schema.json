@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v3/event-delta.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v4/event-delta.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -25,7 +25,7 @@
     "resync_required": {"type": "boolean"},
     "retention_limit": {"minimum": 1, "type": "integer"},
     "revision_retention_limit": {"minimum": 1, "type": "integer"},
-    "schema_version": {"const": "event-delta-v3-primary-assignments", "type": "string"},
+    "schema_version": {"const": "event-delta-v4-phase17n-step3", "type": "string"},
     "session_id": {"minLength": 1, "type": "string"},
     "supplied_cursor": {"maxLength": 2048, "minLength": 1, "type": "string"},
     "to_revision": {"minimum": 0, "type": "integer"},

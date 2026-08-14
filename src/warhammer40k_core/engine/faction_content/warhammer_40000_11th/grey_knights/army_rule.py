@@ -190,6 +190,7 @@ def apply_gate_of_infinity_turn_end_result(context: TurnEndResultContext) -> boo
     )
     required_arrival_battle_round = _next_movement_battle_round(context.state)
     reserve_state = context.state.reposition_unit_to_strategic_reserves(
+        event_log=context.decisions.event_log,
         player_id=player_id,
         unit_instance_id=rules_unit_view.unit_instance_id,
         reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,

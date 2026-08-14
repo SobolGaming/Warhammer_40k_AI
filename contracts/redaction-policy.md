@@ -40,12 +40,50 @@ Status payloads may include request/actor details only when the corresponding
 request is visible to that viewer. Catalog projections contain static public
 display data and no live hidden state.
 
-Phase 17N turn-start terrain snapshots preserve their public game/round/source
-metadata, but their `unit_memberships` rows are filtered through the exact unit
-ID set already emitted in that viewer's `unit_display_by_id`. An owned unplaced
-unit remains visible to its owner. An opponent's unplaced reserve is absent;
-the snapshot must not reveal its stable ID or add a row from which its presence
-or count can be inferred. Omniscient views retain every authoritative row.
+Phase 17N turn-start position snapshots preserve their public
+game/round/source metadata. Army-list unit and model identities, including an
+unplaced Strategic Reserve, are public to both players; Declare Battle
+Formations secrecy applies to the declaration choices and their unrevealed
+state, not to roster/datacard identity. Turn-start snapshots do not exist until
+the battle has begun, after that declaration window has closed, so both players
+receive every complete historical rules-unit row. The redactor still validates
+typed snapshots before publishing every row without viewer filtering; it never
+manufactures or removes a partial Attached Unit row.
+
+When the configured setup sequence includes `declare_battle_formations`, its
+simultaneous declarations remain unresolved from game creation through
+completion of that step. During that interval, every player-owned reserve or
+faction-rule setup request, its recorded result, and every event created by
+applying it are visible only to that player and an omniscient administrator.
+Pre-materialized embarked-unit manifests and Dedicated Transport setup
+consequences use the same boundary, including when they are materialized during
+`muster_armies`. A setup sequence with no `declare_battle_formations` step has no
+battle-formation secrecy window. Both the structured
+`battlefield_view` and the sibling raw `battlefield_state` suppress an
+opponent's reserve/cargo state and any premature model pose; live opponent
+modifier traces and mutable unit-resource totals likewise stay at their public
+roster baseline. Roster/datacard IDs remain public. Completing the step emits
+one deterministic public
+`battle_formations_revealed` event containing the final reserve, transport,
+setup-consequence, and faction-rule state. Attached-unit declarations are made
+during Muster Armies and their frozen starting records are public in the
+`army_mustered` event; they are not battle-formation secrets. Subsequent projections
+publish those formation facts normally.
+
+Authoritative `model_destroyed` events carry event-time source and destroyed
+rules-unit objective-proximity witnesses. Both witnesses describe public
+battlefield facts after Declare Battle Formations has been revealed, so player
+and administrator event streams receive the same evidence. The shared event
+projection validates both typed witness payloads before publishing them. This
+does not relax the separate redaction of still-unrevealed Declare Battle
+Formations choices and formation state.
+
+The derived `primary_turn_start_evidence_recorded`,
+`primary_battlefield_departure_recorded`, and
+`primary_unit_destruction_recorded` records are likewise public game history.
+Their complete canonical payload is identical for both players and an
+administrator; the redactor must not suppress, truncate, or owner-scope those
+evidence rows.
 
 The nested Phase 17O capability manifest is projected by this same redaction
 module. A non-omniscient viewer receives only owned roster, unit, rule,

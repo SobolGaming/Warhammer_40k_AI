@@ -48,6 +48,9 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    RulesUnitObjectiveProximityWitness,
+)
 from warhammer40k_core.engine.return_on_death import (
     SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
     PendingReturnOnDeath,
@@ -154,10 +157,12 @@ def test_return_on_death_full_health_restores_unit_and_battlefield_placement() -
     state.record_pending_return_on_death(pending)
     decisions = DecisionController()
     request = build_return_on_death_placement_request(state=state, pending=pending)
+    decisions.request_decision(request)
     result = _placement_result(
         request=request,
         placement=_unit_placement_at_destroyed_position(state=state, unit=_beta_unit(state)),
     )
+    decisions.submit_result(result)
 
     resolved = apply_return_on_death_placement_decision(
         state=state,
@@ -188,6 +193,7 @@ def test_return_on_death_fixed_wounds_restores_exact_remaining_wounds() -> None:
     state.record_pending_return_on_death(pending)
     decisions = DecisionController()
     request = build_return_on_death_placement_request(state=state, pending=pending)
+    decisions.request_decision(request)
     destroyed_model_id = pending.destroyed_model_instance_id
     assert destroyed_model_id is not None
     result = _placement_result(
@@ -198,6 +204,7 @@ def test_return_on_death_fixed_wounds_restores_exact_remaining_wounds() -> None:
             model_instance_id=destroyed_model_id,
         ),
     )
+    decisions.submit_result(result)
 
     resolved = apply_return_on_death_placement_decision(
         state=state,
@@ -1019,6 +1026,16 @@ def test_mortal_wound_destruction_preserves_placement_through_return_on_death() 
     assert model_destroyed_payload["destroyed_model_placement"] == (
         destroyed_placement.to_payload()
     )
+    source_witness = RulesUnitObjectiveProximityWitness.from_payload(
+        model_destroyed_payload["source_rules_unit_objective_proximity_witness"]
+    )
+    destroyed_witness = RulesUnitObjectiveProximityWitness.from_payload(
+        model_destroyed_payload["destroyed_rules_unit_objective_proximity_witness"]
+    )
+    assert source_witness.rules_unit_instance_id == source_unit.unit_instance_id
+    assert source_witness.component_unit_instance_ids == (source_unit.unit_instance_id,)
+    assert destroyed_witness.rules_unit_instance_id == beta.unit_instance_id
+    assert destroyed_witness.component_unit_instance_ids == (beta.unit_instance_id,)
 
     runtime = CatalogReturnOnDeathRuntime(
         ability_indexes_by_player_id={
@@ -1057,11 +1074,13 @@ def test_mortal_wound_destruction_preserves_placement_through_return_on_death() 
         model_placements=(destroyed_placement,),
     )
 
+    result = _placement_result(request=request, placement=placement)
+    decisions.submit_result(result)
     resolved = apply_return_on_death_placement_decision(
         state=state,
         decisions=decisions,
         request=request,
-        result=_placement_result(request=request, placement=placement),
+        result=result,
         ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
     )
 

@@ -13,6 +13,9 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlStatus,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    RulesUnitObjectiveProximityWitness,
+)
 from warhammer40k_core.engine.primary_scoring_conditions import (
     PrimaryUnitDestructionEvidence,
     cross_turn_destruction_comparison_evidence,
@@ -54,7 +57,10 @@ SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS = frozenset(
         "four_or_more_friendly_units_wholly_within_four_different_table_quarters_not_within_six_of_center",
         "more_enemy_units_destroyed_than_friendly_previous_turn",
         "no_enemy_units_wholly_within_own_territory_end_of_battle",
+        "one_or_more_enemy_units_destroyed_by_friendly_unit_on_objective_this_turn",
         "one_or_more_enemy_units_destroyed_this_turn",
+        "one_or_more_enemy_units_started_turn_within_central_objective_range_destroyed_this_turn",
+        "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn",
         "one_or_more_enemy_units_started_turn_in_terrain_area_destroyed_this_turn",
         "three_or_more_friendly_units_wholly_within_three_different_table_quarters_not_within_six_of_center",
     }
@@ -177,6 +183,18 @@ class PrimaryScoringConditionContext:
             raise GameLifecycleError(
                 "Primary scoring turn-start evidence references an unknown objective."
             )
+        if any(
+            not set(row.started_turn_objective_marker_ids) <= expected_objective_ids
+            or (
+                row.source_rules_unit_objective_proximity_witness is not None
+                and not set(row.source_rules_unit_objective_proximity_witness.objective_marker_ids)
+                <= expected_objective_ids
+            )
+            for row in self.destruction_evidence
+        ):
+            raise GameLifecycleError(
+                "Primary scoring destruction evidence references an unknown objective."
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -242,6 +260,24 @@ def evaluate_primary_scoring_condition(
         return _destruction_evidence(context, count_each=False)
     if condition_id == "each_enemy_unit_destroyed_this_turn":
         return _destruction_evidence(context, count_each=True)
+    if condition_id == (
+        "one_or_more_enemy_units_destroyed_by_friendly_unit_on_objective_this_turn"
+    ):
+        return _destroyed_by_friendly_unit_on_objective_evidence(context)
+    if condition_id == (
+        "one_or_more_enemy_units_started_turn_within_objective_destroyed_this_turn"
+    ):
+        return _started_turn_objective_destruction_evidence(
+            context,
+            allowed_objective_ids=None,
+        )
+    if condition_id == (
+        "one_or_more_enemy_units_started_turn_within_central_objective_range_destroyed_this_turn"
+    ):
+        return _started_turn_objective_destruction_evidence(
+            context,
+            allowed_objective_ids=objective.central_ids,
+        )
     if condition_id == "control_one_or_more_new_non_home_objectives":
         matching, turn_start_ids = _newly_controlled_non_home_ids(context, objective)
         return primary_score_count_evidence(
@@ -521,6 +557,7 @@ def _validate_destruction_evidence(
         if (
             value.active_player_id not in known_players
             or value.destroyed_player_id not in known_players
+            or value.destroying_player_id not in {None, *known_players}
         ):
             raise GameLifecycleError(
                 "Primary scoring destruction evidence references an unknown player."
@@ -645,6 +682,81 @@ def _enemy_destructions_this_turn(
         and row.active_player_id == context.record.active_player_id
         and row.battle_round == context.record.battle_round
     )
+
+
+def _destroyed_by_friendly_unit_on_objective_evidence(
+    context: PrimaryScoringConditionContext,
+) -> dict[str, JsonValue]:
+    matching = tuple(
+        row
+        for row in _enemy_destructions_this_turn(context)
+        if row.destroying_player_id == context.player_id
+        and row.destruction_attribution is not None
+        and row.destruction_attribution.source_rules_unit_instance_id is not None
+        and row.source_rules_unit_objective_proximity_witness is not None
+        and row.source_rules_unit_objective_proximity_witness.objective_marker_ids
+    )
+    objective_ids = tuple(
+        sorted(
+            {
+                objective_id
+                for row in matching
+                for objective_id in cast(
+                    RulesUnitObjectiveProximityWitness,
+                    row.source_rules_unit_objective_proximity_witness,
+                ).objective_marker_ids
+            }
+        )
+    )
+    evidence = primary_score_count_evidence(
+        score_count=1 if matching else 0,
+        destroyed_unit_instance_ids=tuple(
+            sorted({row.destroyed_unit_instance_id for row in matching})
+        ),
+        destruction_ids=tuple(row.destruction_id for row in matching),
+    )
+    evidence["source_rules_unit_objective_marker_ids"] = list(objective_ids)
+    return evidence
+
+
+def _started_turn_objective_destruction_evidence(
+    context: PrimaryScoringConditionContext,
+    *,
+    allowed_objective_ids: tuple[str, ...] | None,
+) -> dict[str, JsonValue]:
+    allowed = None if allowed_objective_ids is None else set(allowed_objective_ids)
+    matched_ids_by_destruction: dict[str, tuple[str, ...]] = {}
+    matching: list[PrimaryUnitDestructionEvidence] = []
+    for row in _enemy_destructions_this_turn(context):
+        objective_ids = tuple(
+            objective_id
+            for objective_id in row.started_turn_objective_marker_ids
+            if allowed is None or objective_id in allowed
+        )
+        if not objective_ids:
+            continue
+        matching.append(row)
+        matched_ids_by_destruction[row.destruction_id] = objective_ids
+    objective_ids = tuple(
+        sorted(
+            {
+                objective_id
+                for row_ids in matched_ids_by_destruction.values()
+                for objective_id in row_ids
+            }
+        )
+    )
+    evidence = primary_score_count_evidence(
+        score_count=1 if matching else 0,
+        destroyed_unit_instance_ids=tuple(
+            sorted({row.destroyed_unit_instance_id for row in matching})
+        ),
+        destruction_ids=tuple(row.destruction_id for row in matching),
+    )
+    evidence["started_turn_objective_marker_ids"] = list(objective_ids)
+    if allowed_objective_ids is not None:
+        evidence["central_objective_marker_ids"] = list(allowed_objective_ids)
+    return evidence
 
 
 def _table_quarter_evidence(

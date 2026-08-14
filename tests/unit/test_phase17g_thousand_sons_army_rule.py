@@ -8,6 +8,7 @@ from typing import cast
 
 import pytest
 from tests.movement_submission_helpers import straight_line_witness_for_unit
+from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -165,7 +166,7 @@ def test_lifecycle_requests_cabal_and_destinys_ruin_records_hit_reroll() -> None
 
 
 def test_twist_of_fate_modifies_ap_and_rejects_drift_or_closed_window() -> None:
-    lifecycle = _battle_ready_lifecycle(game_id="phase17g-thousand-sons-twist")
+    lifecycle = _battle_ready_lifecycle(game_id="phase17g-thousand-sons-twist-a")
     request = _next_cabal_request(lifecycle)
     option = _ritual_option(
         request,
@@ -176,7 +177,7 @@ def test_twist_of_fate_modifies_ap_and_rejects_drift_or_closed_window() -> None:
 
     status = lifecycle.submit_decision(
         DecisionResult.for_request(
-            result_id="phase17g-thousand-sons-twist-result",
+            result_id="phase17g-thousand-sons-twist-a-result",
             request=request,
             selected_option_id=option.option_id,
         )
@@ -184,6 +185,10 @@ def test_twist_of_fate_modifies_ap_and_rejects_drift_or_closed_window() -> None:
 
     assert status.status_kind is not LifecycleStatusKind.INVALID
     state = _require_state(lifecycle)
+    assert any(
+        event.event_type == "thousand_sons_twist_of_fate_manifested"
+        for event in lifecycle.decision_controller.event_log.records
+    )
     modified = army_rule.cabal_weapon_profile_modifier(
         _weapon_context(
             state=state,
@@ -504,7 +509,11 @@ def _battle_ready_lifecycle(*, game_id: str) -> GameLifecycle:
     _place_unit(state, unit_instance_id=ENEMY_LONE_OPERATIVE_ID, x=34.0, y=10.0)
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-a"))
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-b"))
-    _complete_setup_through_gate(state=state, config=config)
+    _complete_setup_through_gate(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        config=config,
+    )
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     _runtime_content_bundle(lifecycle)
     return lifecycle
@@ -874,13 +883,19 @@ def _fixed_secondary_choice(*, player_id: str) -> SecondaryMissionChoice:
     )
 
 
-def _complete_setup_through_gate(*, state: GameState, config: GameConfig) -> None:
+def _complete_setup_through_gate(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    config: GameConfig,
+) -> None:
+    ensure_army_mustered_events_for_fixture(state, decisions=decisions)
     final_setup_step = state.setup_sequence[-1]
     while state.current_setup_step is not final_setup_step:
         state.complete_current_setup_step()
     SetupCompletionGate().complete_setup_and_enter_battle(
         state=state,
-        decisions=DecisionController(),
+        decisions=decisions,
         config=config,
     )
 

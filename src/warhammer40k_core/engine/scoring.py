@@ -10,14 +10,25 @@ from warhammer40k_core.core.mission_scoring_resolution import (
 )
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.destruction_provenance import (
+    ModelDestructionAttribution,
+    ModelDestructionAttributionPayload,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
+    ObjectiveControlRecordPayload,
     ObjectiveControlStatus,
     ObjectiveControlTiming,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    PrimaryUnattributedDestructionCause,
+    RulesUnitObjectiveProximityWitness,
+    RulesUnitObjectiveProximityWitnessPayload,
+    primary_unattributed_destruction_cause_from_token,
+)
 from warhammer40k_core.engine.primary_scoring_condition_evaluator import (
     PRIMARY_SCORING_TURN_START_OBJECTIVE_CONDITIONS,
     SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS,
@@ -209,6 +220,7 @@ class PrimaryObjectiveTurnStartStatePayload(TypedDict):
     player_id: str
     active_player_id: str
     battle_round: int
+    source_objective_control_record: ObjectiveControlRecordPayload
     controlled_objective_ids: list[str]
     source_id: str
 
@@ -230,12 +242,19 @@ class PrimaryUnitDestructionStatePayload(TypedDict):
     destruction_id: str
     game_id: str
     destroying_player_id: str | None
+    destruction_attribution: ModelDestructionAttributionPayload | None
+    source_model_destroyed_event_id: str | None
+    source_rules_unit_objective_proximity_witness: RulesUnitObjectiveProximityWitnessPayload | None
+    source_battlefield_departure_ids: list[str]
+    unattributed_cause: str | None
+    source_mutation_id: str | None
     destroyed_player_id: str
     active_player_id: str
     battle_round: int
     phase: str
     destroyed_unit_instance_id: str
     started_turn_terrain_feature_ids: list[str]
+    started_turn_objective_marker_ids: list[str]
     source_id: str
 
 
@@ -753,6 +772,7 @@ class PrimaryObjectiveTurnStartState:
     player_id: str
     active_player_id: str
     battle_round: int
+    source_objective_control_record: ObjectiveControlRecord
     controlled_objective_ids: tuple[str, ...]
     source_id: str
 
@@ -789,13 +809,40 @@ class PrimaryObjectiveTurnStartState:
                 "PrimaryObjectiveTurnStartState battle_round", self.battle_round
             ),
         )
+        source_record = self.source_objective_control_record
+        if type(source_record) is not ObjectiveControlRecord:
+            raise GameLifecycleError(
+                "Primary turn-start state source objective-control record must be typed."
+            )
+        if (
+            source_record.game_id != self.game_id
+            or source_record.active_player_id != self.active_player_id
+            or source_record.battle_round != self.battle_round
+            or source_record.timing is not ObjectiveControlTiming.TURN_START
+        ):
+            raise GameLifecycleError(
+                "Primary turn-start state source objective-control identity drift."
+            )
+        object.__setattr__(self, "source_objective_control_record", source_record)
+        expected_controlled_objective_ids = tuple(
+            sorted(
+                result.objective_id
+                for result in source_record.results
+                if result.controlled_by_player_id == self.player_id
+            )
+        )
+        controlled_objective_ids = _validate_identifier_tuple(
+            "PrimaryObjectiveTurnStartState controlled_objective_ids",
+            self.controlled_objective_ids,
+        )
+        if controlled_objective_ids != expected_controlled_objective_ids:
+            raise GameLifecycleError(
+                "Primary turn-start controlled objectives drifted from source evidence."
+            )
         object.__setattr__(
             self,
             "controlled_objective_ids",
-            _validate_identifier_tuple(
-                "PrimaryObjectiveTurnStartState controlled_objective_ids",
-                self.controlled_objective_ids,
-            ),
+            controlled_objective_ids,
         )
         object.__setattr__(
             self,
@@ -810,19 +857,40 @@ class PrimaryObjectiveTurnStartState:
             "player_id": self.player_id,
             "active_player_id": self.active_player_id,
             "battle_round": self.battle_round,
+            "source_objective_control_record": (self.source_objective_control_record.to_payload()),
             "controlled_objective_ids": list(self.controlled_objective_ids),
             "source_id": self.source_id,
         }
 
     @classmethod
     def from_payload(cls, payload: PrimaryObjectiveTurnStartStatePayload) -> Self:
+        payload_object = cast(object, payload)
+        if not isinstance(payload_object, dict) or set(
+            cast(dict[object, object], payload_object)
+        ) != {
+            "state_id",
+            "game_id",
+            "player_id",
+            "active_player_id",
+            "battle_round",
+            "source_objective_control_record",
+            "controlled_objective_ids",
+            "source_id",
+        }:
+            raise GameLifecycleError("PrimaryObjectiveTurnStartState payload fields are invalid.")
         return cls(
             state_id=payload["state_id"],
             game_id=payload["game_id"],
             player_id=payload["player_id"],
             active_player_id=payload["active_player_id"],
             battle_round=payload["battle_round"],
-            controlled_objective_ids=tuple(payload["controlled_objective_ids"]),
+            source_objective_control_record=ObjectiveControlRecord.from_payload(
+                payload["source_objective_control_record"]
+            ),
+            controlled_objective_ids=_identifier_tuple_from_payload_list(
+                "PrimaryObjectiveTurnStartState controlled_objective_ids",
+                payload["controlled_objective_ids"],
+            ),
             source_id=payload["source_id"],
         )
 
@@ -932,12 +1000,19 @@ class PrimaryUnitDestructionState:
     destruction_id: str
     game_id: str
     destroying_player_id: str | None
+    destruction_attribution: ModelDestructionAttribution | None
+    source_model_destroyed_event_id: str | None
+    source_rules_unit_objective_proximity_witness: RulesUnitObjectiveProximityWitness | None
+    source_battlefield_departure_ids: tuple[str, ...]
+    unattributed_cause: PrimaryUnattributedDestructionCause | None
+    source_mutation_id: str | None
     destroyed_player_id: str
     active_player_id: str
     battle_round: int
     phase: str
     destroyed_unit_instance_id: str
     started_turn_terrain_feature_ids: tuple[str, ...]
+    started_turn_objective_marker_ids: tuple[str, ...]
     source_id: str
 
     def __post_init__(self) -> None:
@@ -960,6 +1035,93 @@ class PrimaryUnitDestructionState:
                     self.destroying_player_id,
                 ),
             )
+        if (
+            self.destruction_attribution is not None
+            and type(self.destruction_attribution) is not ModelDestructionAttribution
+        ):
+            raise GameLifecycleError(
+                "PrimaryUnitDestructionState destruction_attribution must be typed."
+            )
+        object.__setattr__(
+            self,
+            "source_model_destroyed_event_id",
+            _validate_optional_identifier(
+                "PrimaryUnitDestructionState source_model_destroyed_event_id",
+                self.source_model_destroyed_event_id,
+            ),
+        )
+        if (
+            self.source_rules_unit_objective_proximity_witness is not None
+            and type(self.source_rules_unit_objective_proximity_witness)
+            is not RulesUnitObjectiveProximityWitness
+        ):
+            raise GameLifecycleError(
+                "PrimaryUnitDestructionState source objective witness must be typed."
+            )
+        if self.unattributed_cause is not None:
+            object.__setattr__(
+                self,
+                "unattributed_cause",
+                primary_unattributed_destruction_cause_from_token(self.unattributed_cause),
+            )
+        object.__setattr__(
+            self,
+            "source_mutation_id",
+            _validate_optional_identifier(
+                "PrimaryUnitDestructionState source_mutation_id",
+                self.source_mutation_id,
+            ),
+        )
+        source_departure_ids = _validate_identifier_tuple(
+            "PrimaryUnitDestructionState source_battlefield_departure_ids",
+            self.source_battlefield_departure_ids,
+        )
+        if self.unattributed_cause is PrimaryUnattributedDestructionCause.RESERVE_DEADLINE:
+            if source_departure_ids:
+                raise GameLifecycleError(
+                    "Reserve-deadline Primary destruction cannot reference battlefield departures."
+                )
+        elif not source_departure_ids:
+            raise GameLifecycleError(
+                "Primary destruction requires source battlefield-departure evidence."
+            )
+        object.__setattr__(
+            self,
+            "source_battlefield_departure_ids",
+            source_departure_ids,
+        )
+        attribution = self.destruction_attribution
+        if attribution is None:
+            if (
+                self.destroying_player_id is not None
+                or self.source_model_destroyed_event_id is not None
+                or self.source_rules_unit_objective_proximity_witness is not None
+                or self.unattributed_cause is None
+                or self.source_mutation_id is None
+            ):
+                raise GameLifecycleError(
+                    "Unattributed Primary destruction requires one explicit cause and no source."
+                )
+        else:
+            if (
+                self.destroying_player_id != attribution.destroying_player_id
+                or self.source_model_destroyed_event_id is None
+                or self.unattributed_cause is not None
+                or self.source_mutation_id is not None
+            ):
+                raise GameLifecycleError(
+                    "Attributed Primary destruction source evidence is inconsistent."
+                )
+            witness = self.source_rules_unit_objective_proximity_witness
+            source_rules_unit_id = attribution.source_rules_unit_instance_id
+            if (source_rules_unit_id is None) != (witness is None):
+                raise GameLifecycleError(
+                    "Primary destruction source objective evidence presence is inconsistent."
+                )
+            if witness is not None and witness.rules_unit_instance_id != source_rules_unit_id:
+                raise GameLifecycleError(
+                    "Primary destruction source objective evidence identity drift."
+                )
         object.__setattr__(
             self,
             "destroyed_player_id",
@@ -1004,6 +1166,14 @@ class PrimaryUnitDestructionState:
         )
         object.__setattr__(
             self,
+            "started_turn_objective_marker_ids",
+            _validate_identifier_tuple(
+                "PrimaryUnitDestructionState started_turn_objective_marker_ids",
+                self.started_turn_objective_marker_ids,
+            ),
+        )
+        object.__setattr__(
+            self,
             "source_id",
             _validate_identifier("PrimaryUnitDestructionState source_id", self.source_id),
         )
@@ -1013,21 +1183,88 @@ class PrimaryUnitDestructionState:
             "destruction_id": self.destruction_id,
             "game_id": self.game_id,
             "destroying_player_id": self.destroying_player_id,
+            "destruction_attribution": (
+                None
+                if self.destruction_attribution is None
+                else self.destruction_attribution.to_payload()
+            ),
+            "source_model_destroyed_event_id": self.source_model_destroyed_event_id,
+            "source_rules_unit_objective_proximity_witness": (
+                None
+                if self.source_rules_unit_objective_proximity_witness is None
+                else self.source_rules_unit_objective_proximity_witness.to_payload()
+            ),
+            "source_battlefield_departure_ids": list(self.source_battlefield_departure_ids),
+            "unattributed_cause": (
+                None if self.unattributed_cause is None else self.unattributed_cause.value
+            ),
+            "source_mutation_id": self.source_mutation_id,
             "destroyed_player_id": self.destroyed_player_id,
             "active_player_id": self.active_player_id,
             "battle_round": self.battle_round,
             "phase": self.phase,
             "destroyed_unit_instance_id": self.destroyed_unit_instance_id,
             "started_turn_terrain_feature_ids": list(self.started_turn_terrain_feature_ids),
+            "started_turn_objective_marker_ids": list(self.started_turn_objective_marker_ids),
             "source_id": self.source_id,
         }
 
     @classmethod
     def from_payload(cls, payload: PrimaryUnitDestructionStatePayload) -> Self:
+        payload_object = cast(object, payload)
+        if not isinstance(payload_object, dict) or set(
+            cast(dict[object, object], payload_object)
+        ) != {
+            "destruction_id",
+            "game_id",
+            "destroying_player_id",
+            "destruction_attribution",
+            "source_model_destroyed_event_id",
+            "source_rules_unit_objective_proximity_witness",
+            "source_battlefield_departure_ids",
+            "unattributed_cause",
+            "source_mutation_id",
+            "destroyed_player_id",
+            "active_player_id",
+            "battle_round",
+            "phase",
+            "destroyed_unit_instance_id",
+            "started_turn_terrain_feature_ids",
+            "started_turn_objective_marker_ids",
+            "source_id",
+        }:
+            raise GameLifecycleError("PrimaryUnitDestructionState payload fields are invalid.")
         return cls(
             destruction_id=payload["destruction_id"],
             game_id=payload["game_id"],
             destroying_player_id=payload["destroying_player_id"],
+            destruction_attribution=(
+                None
+                if payload["destruction_attribution"] is None
+                else ModelDestructionAttribution.from_model_destroyed_payload(
+                    payload["destruction_attribution"]
+                )
+            ),
+            source_model_destroyed_event_id=payload["source_model_destroyed_event_id"],
+            source_rules_unit_objective_proximity_witness=(
+                None
+                if payload["source_rules_unit_objective_proximity_witness"] is None
+                else RulesUnitObjectiveProximityWitness.from_payload(
+                    payload["source_rules_unit_objective_proximity_witness"]
+                )
+            ),
+            source_battlefield_departure_ids=_identifier_tuple_from_payload_list(
+                "PrimaryUnitDestructionState source_battlefield_departure_ids",
+                payload["source_battlefield_departure_ids"],
+            ),
+            unattributed_cause=(
+                None
+                if payload["unattributed_cause"] is None
+                else primary_unattributed_destruction_cause_from_token(
+                    payload["unattributed_cause"]
+                )
+            ),
+            source_mutation_id=payload["source_mutation_id"],
             destroyed_player_id=payload["destroyed_player_id"],
             active_player_id=payload["active_player_id"],
             battle_round=payload["battle_round"],
@@ -1036,6 +1273,10 @@ class PrimaryUnitDestructionState:
             started_turn_terrain_feature_ids=_identifier_tuple_from_payload_list(
                 "PrimaryUnitDestructionState started_turn_terrain_feature_ids",
                 payload["started_turn_terrain_feature_ids"],
+            ),
+            started_turn_objective_marker_ids=_identifier_tuple_from_payload_list(
+                "PrimaryUnitDestructionState started_turn_objective_marker_ids",
+                payload["started_turn_objective_marker_ids"],
             ),
             source_id=payload["source_id"],
         )
@@ -2150,10 +2391,18 @@ class MissionScoringPolicy:
                             destruction_id=state.destruction_id,
                             battle_round=state.battle_round,
                             active_player_id=state.active_player_id,
+                            destroying_player_id=state.destroying_player_id,
                             destroyed_player_id=state.destroyed_player_id,
                             destroyed_unit_instance_id=state.destroyed_unit_instance_id,
+                            destruction_attribution=state.destruction_attribution,
+                            source_rules_unit_objective_proximity_witness=(
+                                state.source_rules_unit_objective_proximity_witness
+                            ),
                             started_turn_terrain_feature_ids=(
                                 state.started_turn_terrain_feature_ids
+                            ),
+                            started_turn_objective_marker_ids=(
+                                state.started_turn_objective_marker_ids
                             ),
                         )
                         for state in unit_destruction_states

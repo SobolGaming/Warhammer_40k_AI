@@ -10,9 +10,19 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyMusterRequest,
     muster_army,
 )
+from warhammer40k_core.engine.catalog_materialization_integrity import (
+    MaterializedModelPayloadsByUnitId,
+    authenticated_catalog_materialized_model_payloads_by_unit_id,
+)
+from warhammer40k_core.engine.decision_record import DecisionRecord
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage, SetupStep
-from warhammer40k_core.engine.unit_factory import UnitInstance
+from warhammer40k_core.engine.starting_attached_units import (
+    StartingAttachedUnitRecord,
+    starting_attached_unit_records_for_army,
+)
+from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_initializations_for_army,
 )
@@ -25,6 +35,8 @@ def validate_mustered_army_consistency(
     catalog: ArmyCatalog,
     muster_requests: tuple[ArmyMusterRequest, ...],
     model_geometries: tuple[ModelGeometryCatalogRecord, ...] | None,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
 ) -> None:
     if not state.army_definitions and not _state_requires_mustered_armies(state):
         return
@@ -45,12 +57,26 @@ def validate_mustered_army_consistency(
     except ArmyMusteringError as exc:
         raise GameLifecycleError("Lifecycle config army muster requests are invalid.") from exc
     state_armies = tuple(state.army_definitions)
+    _validate_starting_attached_mappings_against_muster(
+        state=state,
+        expected_armies=expected_armies,
+    )
+    materialized_model_payloads_by_unit_id = (
+        authenticated_catalog_materialized_model_payloads_by_unit_id(
+            game_id=state.game_id,
+            catalog=catalog,
+            expected_armies=expected_armies,
+            event_records=event_records,
+            decision_records=decision_records,
+        )
+    )
     if _state_requires_mustered_armies(state) and not state_armies:
         raise GameLifecycleError("Lifecycle state is missing mustered army definitions.")
     if state_armies and not _armies_match_muster_with_runtime_attached_unit_splits(
         state=state,
         state_armies=state_armies,
         expected_armies=expected_armies,
+        materialized_model_payloads_by_unit_id=(materialized_model_payloads_by_unit_id),
     ):
         raise GameLifecycleError("Lifecycle state army definitions do not match config.")
     if state_armies:
@@ -60,11 +86,39 @@ def validate_mustered_army_consistency(
         )
 
 
+def _validate_starting_attached_mappings_against_muster(
+    *,
+    state: GameState,
+    expected_armies: tuple[ArmyDefinition, ...],
+) -> None:
+    expected_by_id = {
+        record.attached_unit_instance_id: record
+        for army in expected_armies
+        for record in starting_attached_unit_records_for_army(army)
+    }
+    actual_by_id = {
+        record.attached_unit_instance_id: record for record in state.starting_attached_unit_records
+    }
+    if set(actual_by_id) != set(expected_by_id):
+        raise GameLifecycleError("Starting Attached Unit muster mapping identity drift.")
+    for attached_unit_id, expected in expected_by_id.items():
+        actual = actual_by_id[attached_unit_id]
+        if _starting_attached_frozen_mapping(actual) != _starting_attached_frozen_mapping(expected):
+            raise GameLifecycleError("Starting Attached Unit muster mapping drift.")
+
+
+def _starting_attached_frozen_mapping(
+    record: StartingAttachedUnitRecord,
+) -> tuple[tuple[str, tuple[str, ...]], ...]:
+    return record.starting_model_instance_ids_by_component
+
+
 def _armies_match_muster_with_runtime_attached_unit_splits(
     *,
     state: GameState,
     state_armies: tuple[ArmyDefinition, ...],
     expected_armies: tuple[ArmyDefinition, ...],
+    materialized_model_payloads_by_unit_id: MaterializedModelPayloadsByUnitId,
 ) -> bool:
     if len(state_armies) != len(expected_armies):
         return False
@@ -91,6 +145,7 @@ def _armies_match_muster_with_runtime_attached_unit_splits(
             units=_units_with_expected_muster_wounds(
                 state_army=state_army,
                 expected_army=expected_army,
+                materialized_model_payloads_by_unit_id=(materialized_model_payloads_by_unit_id),
             ),
         )
         if normalized_state_army != expected_army:
@@ -102,6 +157,7 @@ def _units_with_expected_muster_wounds(
     *,
     state_army: ArmyDefinition,
     expected_army: ArmyDefinition,
+    materialized_model_payloads_by_unit_id: MaterializedModelPayloadsByUnitId,
 ) -> tuple[UnitInstance, ...]:
     expected_units_by_id = {unit.unit_instance_id: unit for unit in expected_army.units}
     if {unit.unit_instance_id for unit in state_army.units} != set(expected_units_by_id):
@@ -112,8 +168,22 @@ def _units_with_expected_muster_wounds(
         expected_models_by_id = {
             model.model_instance_id: model for model in expected_unit.own_models
         }
-        if {model.model_instance_id for model in state_unit.own_models} != set(
-            expected_models_by_id
+        state_models_by_id = {model.model_instance_id: model for model in state_unit.own_models}
+        state_model_ids = set(state_models_by_id)
+        expected_model_ids = set(expected_models_by_id)
+        if not expected_model_ids <= state_model_ids:
+            return state_army.units
+        extra_model_ids = state_model_ids.difference(expected_model_ids)
+        materialized_payloads = materialized_model_payloads_by_unit_id.get(
+            state_unit.unit_instance_id,
+            {},
+        )
+        if not extra_model_ids <= set(materialized_payloads) or any(
+            not _runtime_model_matches_materialization_event(
+                model=state_models_by_id[model_id],
+                event_payload=materialized_payloads[model_id],
+            )
+            for model_id in extra_model_ids
         ):
             return state_army.units
         normalized_units.append(
@@ -121,16 +191,29 @@ def _units_with_expected_muster_wounds(
                 state_unit,
                 own_models=tuple(
                     replace(
-                        model,
-                        wounds_remaining=expected_models_by_id[
-                            model.model_instance_id
-                        ].wounds_remaining,
+                        state_models_by_id[model_id],
+                        wounds_remaining=expected_models_by_id[model_id].wounds_remaining,
                     )
-                    for model in state_unit.own_models
+                    for model_id in expected_unit.own_model_ids()
                 ),
             )
         )
     return tuple(normalized_units)
+
+
+def _runtime_model_matches_materialization_event(
+    *,
+    model: ModelInstance,
+    event_payload: dict[str, JsonValue],
+) -> bool:
+    runtime_payload = model.to_payload()
+    if set(runtime_payload) != set(event_payload):
+        return False
+    event_wounds_remaining = event_payload.get("wounds_remaining")
+    if type(event_wounds_remaining) is not int:
+        return False
+    runtime_payload["wounds_remaining"] = event_wounds_remaining
+    return bool(runtime_payload == event_payload)
 
 
 def _validate_unit_resource_initialization_consistency(

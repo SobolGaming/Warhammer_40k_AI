@@ -26,6 +26,9 @@ from warhammer40k_core.engine.prebattle import (
     prebattle_timing_state_for_state,
     redeploy_timing_state_for_state,
 )
+from warhammer40k_core.engine.primary_historical_events import (
+    record_new_primary_turn_start_evidence_events,
+)
 from warhammer40k_core.engine.reserve_declarations import (
     reserve_declaration_state_for_state,
     reserve_legality_context_for_player,
@@ -851,8 +854,20 @@ class SetupCompletionGate:
             state=state,
             checkpoint_kind="pre_battle_start",
         )
+        objective_state_ids_before = tuple(
+            value.state_id for value in state.primary_objective_turn_start_states
+        )
+        snapshot_ids_before = tuple(
+            value.snapshot_id for value in state.primary_rules_unit_turn_start_snapshots
+        )
         completed_setup_step = state.complete_final_setup_step_before_battle()
         state.enter_battle()
+        record_new_primary_turn_start_evidence_events(
+            state=state,
+            event_log=decisions.event_log,
+            objective_state_ids_before=objective_state_ids_before,
+            snapshot_ids_before=snapshot_ids_before,
+        )
         return BattleStartRecord.from_started_state(
             state=state,
             completed_setup_step=completed_setup_step,

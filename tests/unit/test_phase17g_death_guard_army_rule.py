@@ -13,6 +13,9 @@ from tests.phase11c_command_phase_helpers import (
     unit_by_id,
 )
 
+from warhammer40k_core.adapters.access_control import AuthenticatedPrincipal, PrincipalRole
+from warhammer40k_core.adapters.event_stream import EventStreamCursor
+from warhammer40k_core.adapters.projection import project_game_view
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
@@ -120,6 +123,16 @@ def test_lifecycle_requests_death_guard_plague_selection_and_records_state() -> 
     assert request is not None
     assert request.decision_type == SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE
     assert request.actor_id == "player-a"
+    assert isinstance(request.payload, dict)
+    assert request.payload["secret"] is True
+    player_a_view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-a")
+    player_b_view = project_game_view(lifecycle=lifecycle, viewer_player_id="player-b")
+    assert player_a_view["pending_decision"] is not None
+    assert player_a_view["pending_decision"]["decision_type"] == (
+        SELECT_FACTION_RULE_SETUP_OPTION_DECISION_TYPE
+    )
+    assert player_b_view["pending_decision"] is not None
+    assert player_b_view["pending_decision"]["decision_type"] == "hidden_decision"
     summary_payload = _runtime_content_bundle(lifecycle).to_summary_payload()
     assert army_rule.HOOK_ID in summary_payload["battle_formation_hook_ids"]
     assert f"{army_rule.HOOK_ID}:toughness" in summary_payload["unit_characteristic_modifier_ids"]
@@ -158,6 +171,28 @@ def test_lifecycle_requests_death_guard_plague_selection_and_records_state() -> 
         )
         is army_rule.NurglesGiftPlague.SKULLSQUIRM_BLIGHT
     )
+    owner_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-a",
+    )
+    opponent_events = EventStreamCursor().events_since(
+        lifecycle.decision_controller.event_log,
+        viewer_player_id="player-b",
+    )
+    administrator = AuthenticatedPrincipal(
+        principal_id="phase17g-admin",
+        role=PrincipalRole.ADMINISTRATOR,
+    ).bind_to_session(player_ids=lifecycle.state.player_ids)
+    admin_events = EventStreamCursor().events_since_for_context(
+        lifecycle.decision_controller.event_log,
+        viewer=administrator,
+    )
+    selected_event_type = "death_guard_nurgles_gift_plague_selected"
+    assert any(event["event_type"] == selected_event_type for event in owner_events["events"])
+    assert not any(
+        event["event_type"] == selected_event_type for event in opponent_events["events"]
+    )
+    assert any(event["event_type"] == selected_event_type for event in admin_events["events"])
     restored = GameState.from_payload(
         cast(GameStatePayload, json.loads(json.dumps(lifecycle.state.to_payload())))
     )

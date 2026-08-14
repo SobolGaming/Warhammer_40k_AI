@@ -1406,7 +1406,11 @@ def _battle_ready_lifecycle() -> GameLifecycle:
     state.record_battlefield_state(scenario.battlefield_state)
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-a"))
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-b"))
-    complete_setup_through_gate(state=state, config=config)
+    complete_setup_through_gate(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        config=config,
+    )
     _runtime_content_bundle(lifecycle)
     return lifecycle
 

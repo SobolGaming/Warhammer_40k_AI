@@ -608,6 +608,7 @@ def test_doom_benefits_known_aeldari_unit_placed_after_target_selection() -> Non
     assert battlefield is not None
     arriving_placement = battlefield.unit_placement_by_id(fixture.shining_spears.unit_instance_id)
     reserve_state = state.reposition_unit_to_strategic_reserves(
+        event_log=lifecycle.decision_controller.event_log,
         player_id="player-a",
         unit_instance_id=fixture.shining_spears.unit_instance_id,
         source_rule_ids=("test:doom:later-placed-beneficiary",),

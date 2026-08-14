@@ -1,10 +1,10 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v4/decision-request-view.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v5/decision-request-view.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "decision-request-view-v3-primary-assignments",
+      "const": "decision-request-view-v4-phase17n-step3",
       "type": "string"
     },
     "actor_id": {

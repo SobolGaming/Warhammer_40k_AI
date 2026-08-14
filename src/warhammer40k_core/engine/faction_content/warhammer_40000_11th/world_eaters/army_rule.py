@@ -54,6 +54,10 @@ from warhammer40k_core.engine.runtime_modifiers import (
     WeaponProfileModifierBinding,
     WeaponProfileModifierContext,
 )
+from warhammer40k_core.engine.unit_destroyed_hooks import (
+    model_restoration_events_for_event_log_interval,
+    unit_destruction_completion_events_for_interval,
+)
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 
 if TYPE_CHECKING:
@@ -612,6 +616,8 @@ def bloodshed_points_available(
     )
     completion_events = _unit_destruction_completion_events(
         state,
+        event_log=event_log,
+        start_index=start_index,
         interval_events=interval_events,
     )
     points = 0
@@ -863,8 +869,22 @@ def _unit_and_army_by_id(
 
 
 def _unit_owner_player_id(state: GameState, *, unit_instance_id: str) -> str:
-    _unit, army = _unit_and_army_by_id(state, unit_instance_id=unit_instance_id)
-    return army.player_id
+    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    physical_matches = tuple(
+        army.player_id
+        for army in state.army_definitions
+        for unit in army.units
+        if unit.unit_instance_id == requested_unit_id
+    )
+    historical_matches = tuple(
+        record.player_id
+        for record in state.starting_attached_unit_records
+        if record.attached_unit_instance_id == requested_unit_id
+    )
+    matches = (*physical_matches, *historical_matches)
+    if len(matches) != 1:
+        raise GameLifecycleError("Blessings of Khorne unit owner lookup failed.")
+    return matches[0]
 
 
 @dataclass(frozen=True, slots=True)
@@ -925,25 +945,28 @@ def _model_destroyed_events_after_index(
 def _unit_destruction_completion_events(
     state: GameState,
     *,
+    event_log: EventLog,
+    start_index: int,
     interval_events: tuple[_DestroyedModelEvent, ...],
 ) -> tuple[_DestroyedModelEvent, ...]:
-    if state.battlefield_state is None:
-        return ()
-    removed_model_ids = set(state.battlefield_state.removed_model_ids)
-    events_by_target_unit: dict[str, list[_DestroyedModelEvent]] = {}
-    for event in interval_events:
-        target_unit_id = _payload_string(event.payload, key="target_unit_instance_id")
-        events_by_target_unit.setdefault(target_unit_id, []).append(event)
-    completions: list[_DestroyedModelEvent] = []
-    for target_unit_id, events in events_by_target_unit.items():
-        target_unit, _target_army = _unit_and_army_by_id(state, unit_instance_id=target_unit_id)
-        target_model_ids = {model.model_instance_id for model in target_unit.own_models}
-        if not target_model_ids:
-            continue
-        if not target_model_ids <= removed_model_ids:
-            continue
-        completions.append(sorted(events, key=lambda event: event.event_order)[-1])
-    return tuple(sorted(completions, key=lambda event: event.event_order))
+    return tuple(
+        _DestroyedModelEvent(
+            event_order=event_order,
+            event_id=event_id,
+            payload=payload,
+        )
+        for event_order, event_id, payload in unit_destruction_completion_events_for_interval(
+            state=state,
+            model_destroyed_events=tuple(
+                (event.event_order, event.event_id, event.payload) for event in interval_events
+            ),
+            model_restoration_events=model_restoration_events_for_event_log_interval(
+                state=state,
+                event_log=event_log,
+                start_order_exclusive=start_index,
+            ),
+        )
+    )
 
 
 def _unit_contains_icon_of_khorne_at_event(

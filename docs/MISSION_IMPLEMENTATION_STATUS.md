@@ -67,7 +67,7 @@ Secondary status:
 ## Summary
 
 - Primary matrix cells: 25 of 25 `implemented`.
-- Primary scoring coverage: 12 of 25 `engine_implemented`, 13
+- Primary scoring coverage: 13 of 25 `engine_implemented`, 12
   `source_known_engine_pending`, 0 `awaiting_source`.
 - Primary source-only actions: `decoy-objective`, `triangulate-objective`,
   `extract-intelligence`, `surveil-enemy-unit`,
@@ -91,8 +91,10 @@ Secondary status:
 - Phase 17N has source-hashed executable battlefield packages for all 45 Event
   Companion layouts: all 15 Force Disposition pairings and each pairing's A/B/C
   variants. No layout identity remains geometry-pending.
+- Six of the 15 two-sided Force Disposition pairings now have executable
+  Primaries in both directions, covering 18 of the 45 A/B/C layout variants.
 - The local [Event Companion Battlefield Viewer](BATTLEFIELD_VIEWER.md)
-  consumes `battlefield-view-v3-phase17n` directly for every layout. It provides
+  consumes `battlefield-view-v4-phase17n-step3` directly for every layout. It provides
   an orbitable 3D schematic of classifications, component footprints, walls,
   floors, source-linked objective terrain-area footprints, deployment zones,
   territories, and No Man's Land. Objective identity records remain labels and
@@ -182,12 +184,12 @@ Secondary status:
 - All 25 Primary missions' source timing, VP values, structured condition
   tokens, current engine-support status, and the ten source-only Primary Mission
   Action descriptors are committed in `primary-scoring.json`. Its package hash
-  is `5449d260c90c9a5a798dad0fa3dbba0c7c7b56e28e726a94ce6694654cc7afbe`
+  is `a1f8a91bc8dc01088fdef5d0b9ee2e4e270db93a4b050d3a9b47c8995163dfc5`
   and its raw artifact SHA-256 is
-  `162f28bbdbd34ffcf78918abc6e85dc7e1fef9785ce2dc6f31129e7664666e80`.
+  `6f2526d2d81d7854db285d2e7969ccef59e7eac3a214588bea37bd982bada8e8`.
   The typed loader pins both hashes, the exact 25-mission/100-rule/10-action
   inventory, the exact nine-token timing vocabulary, the complete resolution
-  group grammar, and the honest 12 `engine_implemented` versus 13
+  group grammar, and the honest 13 `engine_implemented` versus 12
   `source_known_engine_pending` boundary. Repository reviews are pinned to PRs
   #107, #134, #136, and #379. PR #107 is the source-backed origin for Death
   Trap, Immovable Object, and Unstoppable Force. Only Meatgrinder currently
@@ -207,16 +209,19 @@ Secondary status:
   timing string is insufficient. The same validator runs for live awards and
   restored ledgers, including ordinary per-round Primary-total validation. The
   derived Event Companion source identity is
-  `aa272b8234ca02b2ac5b62b2bc7299998d14a386e4e9a5f9b90aaaf4ed5422a3`.
+  `68d2214fdd1b3e2e1cc1e97e9b50e959a52acce03d1706c3fda5535fd5bc4d48`.
 - Verify that the committed battlefield artifact still matches its reviewed
   inputs without writing files with
   `uv run python tools/build_event_companion_battlefields.py --check`.
 - Completing all battlefield packages does not by itself promote Primary
   Mission scoring. The eight Step 2 promotions are backed by generic runtime
   timing/resolution and objective, territory, table-quarter, destruction, and
-  turn-history evidence. The other 13 missions remain fail-closed until their
-  listed choices, marker state, actions, or conditions exist. Battlefield pages
-  are authority for layout facts, not mission-card scoring clauses.
+  turn-history evidence. Purge and Secure is the thirteenth executable Primary,
+  backed by objective-at-turn-start destruction history and exact-kill
+  friendly-source objective occupancy. The other 12 missions remain fail-closed
+  until their listed choices, marker state, actions, or conditions exist.
+  Battlefield pages are authority for layout facts, not mission-card scoring
+  clauses.
 - Component source-image placement and orientation come from reviewed
   source-page affine records. Ruin and non-ruin envelopes use dimensions rounded
   to the 0.05-inch grid and checked against the reviewed source-image spans.
@@ -252,7 +257,7 @@ five-battle-round game, as configured by the current Event Companion package.
 | `cumulative_condition` | `source_tracked`, `engine_implemented` | Every achieved branch in one typed cumulative group scores; selection evidence lists all achieved and selected rule IDs. |
 | `exclusive_or_condition` | `source_tracked`, `engine_implemented` | Only the highest-VP achieved branch in one typed exclusive group scores; rule-ID ordering breaks equal-VP ties deterministically and evidence lists suppressed branches. |
 | `exactly_one_condition` | `source_tracked` | Underlined one means exactly one, not one or more. |
-| `leaves_battlefield_event` | `source_tracked` | Card-specific evidence must include destroyed, embarked, and rule-removed units before a leaves-battlefield condition can become `state_backed`. |
+| `leaves_battlefield_event` | `source_tracked`, `engine_state_backed` | Typed battlefield-departure evidence records destroyed, embarked, and rule-removed models and rules units. Punishment still requires its Step 4 condemned-unit choice and filter before that card can execute. |
 | `vp_up_to_limit` | `source_tracked`, `engine_guarded` | Rule caps and ledger caps ignore VP above the stated limit. |
 | `when_drawn_tactical_only` | `source_tracked` | When Drawn sections apply only to Tactical Secondary Missions and must not affect Fixed Secondary mode. |
 
@@ -262,28 +267,28 @@ five-battle-round game, as configured by the current Event Companion package.
 | --- | --- | --- | --- | --- | --- | ---: | ---: | --- |
 | `purge-the-foe` | `purge-the-foe` | Meatgrinder | `primary-meatgrinder` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `purge-the-foe` | `take-and-hold` | Unstoppable Force | `primary-unstoppable-force` | `implemented` | `engine_implemented` | 4 | 0 | None |
-| `purge-the-foe` | `disruption` | Punishment | `primary-punishment` | `implemented` | `source_known_engine_pending` | 4 | 0 | `engine_primary_start_turn_choice:condemned_enemy_units`, `engine_primary_condition:condemned_enemy_units_left_battlefield`, `engine_primary_condition:control_more_objectives_than_opponent`, `engine_primary_condition:control_opponent_home_objective_end_of_battle` |
-| `purge-the-foe` | `reconnaissance` | Consecrate | `primary-consecrate` | `implemented` | `source_known_engine_pending` | 5 | 0 | `engine_primary_marker_state:consecrated_objective`, `engine_primary_condition:consecrated_objective_thresholds`, `engine_primary_condition:control_more_objectives_than_opponent`, `engine_primary_condition:enemy_home_objective_consecrated` |
+| `purge-the-foe` | `disruption` | Punishment | `primary-punishment` | `implemented` | `source_known_engine_pending` | 4 | 0 | `engine_primary_start_turn_choice:condemned_enemy_units`, `engine_primary_condition:condemned_enemy_units_left_battlefield` |
+| `purge-the-foe` | `reconnaissance` | Consecrate | `primary-consecrate` | `implemented` | `source_known_engine_pending` | 5 | 0 | `engine_primary_marker_state:consecrated_objective`, `engine_primary_condition:consecrated_objective_thresholds`, `engine_primary_condition:enemy_home_objective_consecrated` |
 | `purge-the-foe` | `priority-assets` | Destroyer's Wrath | `primary-destroyers-wrath` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `take-and-hold` | `purge-the-foe` | Immovable Object | `primary-immovable-object` | `implemented` | `engine_implemented` | 3 | 0 | None |
 | `take-and-hold` | `take-and-hold` | Battlefield Dominance | `primary-battlefield-dominance` | `implemented` | `engine_implemented` | 3 | 0 | None |
 | `take-and-hold` | `disruption` | Determined Acquisition | `primary-determined-acquisition` | `implemented` | `engine_implemented` | 3 | 0 | None |
-| `take-and-hold` | `reconnaissance` | Purge and Secure | `primary-purge-and-secure` | `implemented` | `source_known_engine_pending` | 4 | 0 | `engine_primary_condition:enemy_destroyed_by_friendly_unit_on_objective`, `engine_primary_condition:enemy_started_turn_on_objective_destroyed`, `engine_primary_condition:each_non_home_objective_controlled_from_battle_round_two`, `engine_primary_condition:control_one_or_more_new_non_home_objectives`, `engine_primary_scoring_grammar:exclusive_or_condition` |
+| `take-and-hold` | `reconnaissance` | Purge and Secure | `primary-purge-and-secure` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `take-and-hold` | `priority-assets` | Inescapable Dominion | `primary-inescapable-dominion` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `disruption` | `purge-the-foe` | Delaying Action | `primary-delaying-action` | `implemented` | `engine_implemented` | 3 | 0 | None |
 | `disruption` | `take-and-hold` | Death Trap | `primary-death-trap` | `implemented` | `engine_implemented` | 4 | 1 | None |
 | `disruption` | `disruption` | Outmanoeuvre | `primary-outmaneuver` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `disruption` | `reconnaissance` | Smoke and Mirrors | `primary-smoke-and-mirrors` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_action:decoy-objective`, `engine_primary_marker_state:decoy_objective`, `engine_primary_condition:decoy_objective_scoring`, `engine_primary_condition:opponent_territory_objective_bonus` |
-| `disruption` | `priority-assets` | Locate and Deny | `primary-locate-and-deny` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_start_battle_setup:locate_and_deny_operation_markers`, `engine_primary_action:sensor-sweep-locate-and-deny`, `engine_primary_marker_state:operation_marker_terrain_area`, `engine_primary_condition:enemy_started_turn_on_objective_destroyed`, `engine_primary_condition:single_friendly_operation_marker_terrain_area_state` |
+| `disruption` | `priority-assets` | Locate and Deny | `primary-locate-and-deny` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_start_battle_setup:locate_and_deny_operation_markers`, `engine_primary_action:sensor-sweep-locate-and-deny`, `engine_primary_marker_state:operation_marker_terrain_area`, `engine_primary_condition:single_friendly_operation_marker_terrain_area_state` |
 | `reconnaissance` | `purge-the-foe` | Triangulation | `primary-triangulation` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:triangulate-objective`, `engine_primary_marker_state:triangulated_objective`, `engine_primary_condition:triangulated_objective_thresholds`, `engine_primary_condition:control_four_or_more_objectives` |
 | `reconnaissance` | `take-and-hold` | Reconnaissance Sweep | `primary-reconnaissance-sweep` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `reconnaissance` | `disruption` | Surveil the Foe | `primary-surveil-the-foe` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_action:surveil-enemy-unit`, `engine_primary_marker_state:enemy_operation_marker`, `engine_primary_movement_effect:remove_enemy_operation_markers_from_objective`, `engine_primary_condition:enemy_unit_surveilled_marker_exception`, `engine_primary_condition:no_enemy_operation_markers_on_battlefield` |
 | `reconnaissance` | `reconnaissance` | Gather Intel | `primary-gather-intel` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:extract-intelligence`, `engine_primary_marker_state:gather_intel_operation_marker`, `engine_primary_condition:control_one_or_more_central_objectives_first_battle_round`, `engine_primary_condition:each_friendly_unit_extracted_intelligence_this_turn`, `engine_primary_condition:gather_intel_operation_marker_end_of_battle` |
 | `reconnaissance` | `priority-assets` | Search and Scour | `primary-search-and-scour` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `priority-assets` | `purge-the-foe` | Vital Link | `primary-vital-link` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:maintain-control`, `engine_primary_marker_state:vital_link_operation_marker`, `engine_primary_condition:central_objective_operation_marker_bonus`, `engine_primary_condition:controlled_central_objective_bonus`, `engine_primary_scoring_grammar:cumulative_condition` |
-| `priority-assets` | `take-and-hold` | Secure Asset | `primary-secure-asset` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_action:secure-asset`, `engine_primary_condition:friendly_unit_secured_asset_this_turn`, `engine_primary_condition:enemy_started_turn_near_central_objective_destroyed`, `engine_primary_condition:control_three_or_more_objectives` |
-| `priority-assets` | `disruption` | Extract Relic | `primary-extract-relic` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:sensor-sweep-extract-relic`, `engine_primary_marker_state:opponent_operation_marker`, `engine_primary_condition:friendly_unit_performed_sensor_sweep_this_turn`, `engine_primary_condition:enemy_started_turn_on_objective_destroyed`, `engine_primary_condition:single_opponent_operation_marker_terrain_area_state` |
-| `priority-assets` | `reconnaissance` | Vanguard Operation | `primary-vanguard-operation` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_action:vanguard-operation`, `engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn`, `engine_primary_condition:enemy_territory_terrain_area_control`, `engine_primary_condition:control_opponent_home_objective_end_of_battle` |
+| `priority-assets` | `take-and-hold` | Secure Asset | `primary-secure-asset` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_action:secure-asset`, `engine_primary_condition:friendly_unit_secured_asset_this_turn` |
+| `priority-assets` | `disruption` | Extract Relic | `primary-extract-relic` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_action:sensor-sweep-extract-relic`, `engine_primary_marker_state:opponent_operation_marker`, `engine_primary_condition:friendly_unit_performed_sensor_sweep_this_turn`, `engine_primary_condition:single_opponent_operation_marker_terrain_area_state` |
+| `priority-assets` | `reconnaissance` | Vanguard Operation | `primary-vanguard-operation` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_action:vanguard-operation`, `engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn`, `engine_primary_condition:enemy_territory_terrain_area_control` |
 | `priority-assets` | `priority-assets` | Sabotage | `primary-sabotage` | `implemented` | `source_known_engine_pending` | 3 | 1 | `engine_primary_action:commit-sabotage`, `engine_primary_condition:each_friendly_unit_committed_sabotage_this_turn`, `engine_primary_condition:sabotage_opponent_territory_objective_bonus`, `engine_primary_scoring_grammar:cumulative_condition` |
 
 ## Secondary Missions
@@ -342,14 +347,39 @@ five-battle-round game, as configured by the current Event Companion package.
   from own territory. Objective-control records must cover the exact mission
   objective inventory and cannot contain unsupported rows. Missing spatial or
   turn-history evidence fails closed instead of scoring by assumption.
-- Each player-turn boundary records one authoritative, serialized terrain
-  snapshot containing every physical unit and the battlefield terrain
-  footprints intersected by its models. Automatic destruction copies the
-  destroyed component unit's membership from that exact turn snapshot; the
-  evidence is always a concrete tuple, including an empty tuple for a unit that
-  started outside terrain. Missing snapshots, component rows, or unknown terrain
-  fail closed before a destruction record can be created, so Death Trap never
-  substitutes destruction-time position or nullable evidence.
+- Purge and Secure uses the same generic timing and exclusive-highest grammar,
+  plus engine-owned destruction evidence for the destroyed enemy unit's exact
+  start-of-turn objective membership and the friendly destroying rules unit's
+  objective membership at the destruction event. Its two destruction branches
+  cannot score together; the deterministic exclusive group selects one 3VP
+  branch and records the suppressed branch when both are achieved.
+- Each player-turn boundary records one authoritative, serialized rules-unit
+  snapshot. Attached formations remain one rules unit, while nested component
+  rows retain every physical unit, every evaluated model, intersected logical
+  terrain areas, and the exact models within range of each objective marker.
+  Automatic destruction copies the destroyed rules unit's terrain and objective
+  unions from that exact turn snapshot. Empty tuples are explicit evidence, not
+  missing data; missing snapshots, incomplete groups, unknown terrain/objectives,
+  or mismatched model witnesses fail closed.
+- Attributed destruction preserves the responsible player, rules unit, model,
+  provenance, source `model_destroyed` event, and the source rules unit's exact
+  objective-proximity witness at that event. Desperate Escape, emergency
+  disembark, coherency, and reserve-deadline losses instead carry an explicit
+  unattributed cause; the engine never invents an attacker. Destruction,
+  Embark, and in-battle reserve transitions additionally feed one generic
+  battlefield-departure history. Reserve-deadline losses were never on the
+  battlefield and therefore do not create false departure occurrences.
+- Army-list identities and battle-time historical rules-unit snapshots are
+  public to both players, including an unplaced Strategic Reserve. Declare
+  Battle Formations secrecy applies to the declaration choices before their
+  reveal, not to roster/datacard identity. Public destruction events expose the
+  same typed source and destroyed objective/model witnesses to each player and
+  administrators because those are public battlefield facts.
+- The new start-position, central-objective destruction, and battlefield-
+  departure primitives are reusable by Locate and Deny, Extract Relic, Secure
+  Asset, and Punishment. Those missions remain honestly engine-pending until
+  Step 4 supplies their required player choices, Mission Actions, and persistent
+  operation/condemned-unit state.
 - `source_known_engine_pending` primary missions must remain fail-closed until
   the listed conditions, markers, actions, or choices have engine-owned
   validation and mutation paths.

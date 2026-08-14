@@ -75,6 +75,48 @@ class EventLog:
         self._records.append(record)
         return record
 
+    def mark_secret_suffix(
+        self,
+        *,
+        start_index: int,
+        player_id: str,
+        visibility_source: str,
+    ) -> tuple[EventRecord, ...]:
+        """Mark only a newly appended player-owned event suffix as secret."""
+        if type(start_index) is not int or start_index < 0 or start_index > len(self._records):
+            raise EventLogError("Secret event suffix start index is invalid.")
+        if type(player_id) is not str or not player_id.strip():
+            raise EventLogError("Secret event suffix player_id is invalid.")
+        if type(visibility_source) is not str or not visibility_source.strip():
+            raise EventLogError("Secret event suffix visibility_source is invalid.")
+        marked: list[EventRecord] = []
+        for index in range(start_index, len(self._records)):
+            record = self._records[index]
+            if not isinstance(record.payload, dict):
+                raise EventLogError("Secret event suffix payload must be an object.")
+            secret = record.payload.get("secret")
+            if secret is not None and secret is not True:
+                raise EventLogError("Secret event suffix contains conflicting visibility metadata.")
+            existing_player = record.payload.get("player_id")
+            if existing_player is not None and existing_player != player_id:
+                raise EventLogError("Secret event suffix contains conflicting visibility metadata.")
+            existing_source = record.payload.get("visibility_source")
+            if existing_source is not None and existing_source != visibility_source:
+                raise EventLogError("Secret event suffix contains conflicting visibility metadata.")
+            updated = EventRecord(
+                event_id=record.event_id,
+                event_type=record.event_type,
+                payload={
+                    **record.payload,
+                    "secret": True,
+                    "player_id": player_id,
+                    "visibility_source": visibility_source,
+                },
+            )
+            self._records[index] = updated
+            marked.append(updated)
+        return tuple(marked)
+
     def to_payload(self) -> list[EventRecordPayload]:
         return [record.to_payload() for record in self._records]
 
