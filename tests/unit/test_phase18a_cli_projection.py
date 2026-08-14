@@ -422,7 +422,7 @@ def test_projection_payload_consumption_does_not_mutate_authoritative_state() ->
     )
 
 
-def test_non_owner_predeployment_projection_does_not_expose_unplaced_opponent_units() -> None:
+def test_non_owner_predeployment_projection_exposes_roster_but_conceals_formation_state() -> None:
     session = LocalGameSession()
     session.start(_config(game_id="phase18a-predeployment-game"))
     session.advance_until_decision_or_terminal()
@@ -430,7 +430,30 @@ def test_non_owner_predeployment_projection_does_not_expose_unplaced_opponent_un
     player_a_view = project_game_view(lifecycle=session.lifecycle, viewer_player_id="player-a")
 
     assert "army-alpha:intercessor-unit-1" in player_a_view["unit_display_by_id"]
-    assert "army-beta:intercessor-unit-2" not in player_a_view["unit_display_by_id"]
+    opponent_unit_id = "army-beta:intercessor-unit-2"
+    opponent_unit = player_a_view["unit_display_by_id"][opponent_unit_id]
+    assert opponent_unit["owner_player_id"] == "player-b"
+    assert opponent_unit["visible_status"] == "visible"
+    assert opponent_unit["unit_display_name"] == "CORE Intercessor-like Infantry"
+    assert opponent_unit["datasheet_id"] == "core-intercessor-like-infantry"
+    assert opponent_unit["selected_wargear_ids"] == ["core-bolt-rifle"]
+    opponent_model_ids = opponent_unit["model_instance_ids"]
+    assert len(opponent_model_ids) == 5
+    assert set(opponent_model_ids) <= set(player_a_view["model_display_by_id"])
+
+    battlefield_view = player_a_view["battlefield_view"]
+    assert battlefield_view is not None
+    battlefield_models = battlefield_view["authoritative"]["models_by_id"]
+    for model_id in opponent_model_ids:
+        opponent_model = battlefield_models[model_id]
+        assert opponent_model["unit_instance_id"] == opponent_unit_id
+        assert opponent_model["owner_player_id"] == "player-b"
+        assert opponent_model["state"] == "undeployed"
+        assert opponent_model["pose"] is None
+        assert opponent_model["state_context"] == {
+            "transport_unit_instance_id": None,
+            "reserve_kind": None,
+        }
 
 
 def _local_session_at_movement_unit_selection(

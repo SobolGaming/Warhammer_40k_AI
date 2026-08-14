@@ -2088,19 +2088,24 @@ def _context(
 
 def _battle_lifecycle(config: GameConfig | None = None) -> GameLifecycle:
     config = _config() if config is None else config
-    state = _battle_state(config=config)
+    decisions = DecisionController()
+    state = _battle_state(config=config, decisions=decisions)
     return GameLifecycle.from_payload(
         {
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": DecisionController().to_payload(),
+            "decisions": decisions.to_payload(),
             "reaction_queue": ReactionQueue().to_payload(),
         }
     )
 
 
-def _battle_state(config: GameConfig | None = None) -> GameState:
+def _battle_state(
+    config: GameConfig | None = None,
+    *,
+    decisions: DecisionController | None = None,
+) -> GameState:
     resolved_config = _config() if config is None else config
     armies = _mustered_armies(resolved_config)
     state = GameState.from_config(resolved_config)
@@ -2111,7 +2116,7 @@ def _battle_state(config: GameConfig | None = None) -> GameState:
         armies=armies,
     )
     state.record_battlefield_state(scenario.battlefield_state)
-    enter_battle_for_fixture(state)
+    enter_battle_for_fixture(state, decisions=decisions)
     assert state.stage is GameLifecycleStage.BATTLE
     return state
 

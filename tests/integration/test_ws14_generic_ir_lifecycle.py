@@ -28,7 +28,6 @@ from warhammer40k_core.engine.army_mustering import (
 )
 from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
 from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
-from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
@@ -1218,13 +1217,13 @@ def _more_dakka_battle_lifecycle() -> GameLifecycle:
     )
     state.record_battlefield_state(scenario.battlefield_state)
     _record_fixed_secondary_choices_for_fixture(state, config=config)
-    enter_battle_for_fixture(state)
+    decisions = enter_battle_for_fixture(state)
     lifecycle = GameLifecycle.from_payload(
         {
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": DecisionController().to_payload(),
+            "decisions": decisions.to_payload(),
             "reaction_queue": ReactionQueue().to_payload(),
         }
     )
@@ -1398,13 +1397,13 @@ def _spectacle_battle_lifecycle() -> GameLifecycle:
     )
     state.record_battlefield_state(scenario.battlefield_state)
     _record_fixed_secondary_choices_for_fixture(state, config=config)
-    enter_battle_for_fixture(state)
+    decisions = enter_battle_for_fixture(state)
     lifecycle = GameLifecycle.from_payload(
         {
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": DecisionController().to_payload(),
+            "decisions": decisions.to_payload(),
             "reaction_queue": ReactionQueue().to_payload(),
         }
     )
@@ -1598,13 +1597,13 @@ def _court_battle_lifecycle() -> GameLifecycle:
     )
     state.record_battlefield_state(scenario.battlefield_state)
     _record_fixed_secondary_choices_for_fixture(state, config=config)
-    enter_battle_for_fixture(state)
+    decisions = enter_battle_for_fixture(state)
     lifecycle = GameLifecycle.from_payload(
         {
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": DecisionController().to_payload(),
+            "decisions": decisions.to_payload(),
             "reaction_queue": ReactionQueue().to_payload(),
         }
     )

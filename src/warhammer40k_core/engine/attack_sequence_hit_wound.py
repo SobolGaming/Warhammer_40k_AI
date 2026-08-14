@@ -2,9 +2,14 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.attack_sequence_imports import *
+from warhammer40k_core.engine.battlefield_state import ModelPlacement, ModelPlacementPayload
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    destruction_source_objective_proximity_witness,
+    rules_unit_objective_proximity_witness,
+)
 
 # fmt: off
 if TYPE_CHECKING:
@@ -438,6 +443,28 @@ def _emit_damage_event(
         return None
     if destruction_attribution is None:
         raise GameLifecycleError("Destroyed-model attribution changed during emission.")
+    if not isinstance(destroyed_model_placement, dict):
+        raise GameLifecycleError(
+            "Destroyed-model emission requires exact pre-removal placement evidence."
+        )
+    typed_destroyed_model_placement = ModelPlacement.from_payload(
+        cast(ModelPlacementPayload, destroyed_model_placement)
+    )
+    destroyed_rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=damage.target_unit_instance_id,
+    )
+    destroyed_rules_unit_objective_witness = rules_unit_objective_proximity_witness(
+        state=state,
+        rules_unit_instance_id=destroyed_rules_unit.unit_instance_id,
+        included_destroyed_model_placement=typed_destroyed_model_placement,
+    )
+    source_rules_unit_objective_witness = destruction_source_objective_proximity_witness(
+        state=state,
+        event_log=decisions.event_log,
+        attribution=destruction_attribution,
+        destroyed_model_placement=typed_destroyed_model_placement,
+    )
     removal_record = _destroyed_model_removal_record(
         model_instance_id=damage.model_instance_id,
         source_phase=attack_sequence.source_phase.value,
@@ -452,6 +479,14 @@ def _emit_damage_event(
             "active_player_id": state.active_player_id,
             "phase": attack_sequence.source_phase.value,
             **destruction_attribution.to_payload(),
+            "source_rules_unit_objective_proximity_witness": (
+                None
+                if source_rules_unit_objective_witness is None
+                else source_rules_unit_objective_witness.to_payload()
+            ),
+            "destroyed_rules_unit_objective_proximity_witness": (
+                destroyed_rules_unit_objective_witness.to_payload()
+            ),
             "sequence_id": attack_sequence.sequence_id,
             "attack_context_id": attack_sequence.attack_context_id(),
             "target_unit_instance_id": damage.target_unit_instance_id,

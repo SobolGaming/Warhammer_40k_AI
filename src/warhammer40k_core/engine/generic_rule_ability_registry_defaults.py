@@ -125,7 +125,7 @@ from warhammer40k_core.engine.target_restriction_hooks import (
 from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext, TurnEndResultContext
 from warhammer40k_core.engine.unit_destroyed_hooks import (
     UnitDestroyedContext,
-    model_destroyed_events_for_lifecycle_phase,
+    unit_destruction_completion_events_for_phase,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -947,12 +947,20 @@ def _blood_tainted_states_for_army(
     objective_record = _current_objective_control_record(context)
     states: list[StickyObjectiveControlState] = []
     seen_state_keys: set[tuple[str, str, str]] = set()
-    for event_id, payload in _unit_destruction_completion_events_for_phase(context):
+    for event_id, payload in unit_destruction_completion_events_for_phase(
+        state=context.state,
+        event_log=context.event_log,
+        completed_phase=context.completed_phase,
+    ):
         attribution = ModelDestructionAttribution.from_model_destroyed_payload(payload)
         attacking_unit_id = attribution.source_rules_unit_instance_id
         if attacking_unit_id is None:
             continue
-        if not _unit_id_is_in_army(army, unit_instance_id=attacking_unit_id):
+        if not _unit_id_is_in_army(
+            context.state,
+            army,
+            unit_instance_id=attacking_unit_id,
+        ):
             continue
         matching_effects = generic_rule_ability_effects_for_unit(
             state=context.state,
@@ -964,7 +972,7 @@ def _blood_tainted_states_for_army(
             continue
         destroyed_unit_id = _payload_string(payload, "target_unit_instance_id")
         if (
-            _army_owner_for_unit(context.state.army_definitions, unit_instance_id=destroyed_unit_id)
+            _army_owner_for_unit(context.state, unit_instance_id=destroyed_unit_id)
             == army.player_id
         ):
             continue
@@ -1062,51 +1070,6 @@ def _current_objective_control_record(
     )
 
 
-def _model_destroyed_events_for_phase(
-    context: PhaseEndObjectiveControlContext,
-) -> tuple[tuple[str, dict[str, JsonValue]], ...]:
-    return tuple(
-        (event_id, payload)
-        for _event_order, event_id, payload in model_destroyed_events_for_lifecycle_phase(
-            state=context.state,
-            event_log=context.event_log,
-            completed_phase=context.completed_phase,
-        )
-    )
-
-
-def _unit_destruction_completion_events_for_phase(
-    context: PhaseEndObjectiveControlContext,
-) -> tuple[tuple[str, dict[str, JsonValue]], ...]:
-    phase_start_removed_model_ids = _phase_start_removed_model_ids(context)
-    final_removed_model_ids = _removed_model_ids(context)
-    destroyed_model_ids_by_unit: dict[str, set[str]] = {}
-    completed_unit_ids: set[str] = set()
-    completion_events: list[tuple[str, dict[str, JsonValue]]] = []
-    for event_id, payload in _model_destroyed_events_for_phase(context):
-        target_unit_id = _payload_string(payload, "target_unit_instance_id")
-        target_unit = _unit_by_id(context.state.army_definitions, unit_instance_id=target_unit_id)
-        target_model_ids = {model.model_instance_id for model in target_unit.own_models}
-        if not target_model_ids <= final_removed_model_ids:
-            continue
-        if target_unit_id in completed_unit_ids:
-            raise GameLifecycleError("Blood Tainted saw destruction after unit completion.")
-        model_id = _payload_string(payload, "model_instance_id")
-        if model_id not in target_model_ids:
-            raise GameLifecycleError("Blood Tainted model-destroyed event target drift.")
-        destroyed_model_ids = destroyed_model_ids_by_unit.setdefault(
-            target_unit_id,
-            set(target_model_ids & phase_start_removed_model_ids),
-        )
-        if model_id in destroyed_model_ids:
-            raise GameLifecycleError("Blood Tainted saw duplicate destroyed-model attribution.")
-        destroyed_model_ids.add(model_id)
-        if target_model_ids <= destroyed_model_ids:
-            completed_unit_ids.add(target_unit_id)
-            completion_events.append((event_id, payload))
-    return tuple(completion_events)
-
-
 def _phase_start_objective_ids_by_unit(
     context: PhaseEndObjectiveControlContext,
 ) -> dict[str, tuple[str, ...]]:
@@ -1123,19 +1086,17 @@ def _phase_start_objective_ids_by_unit(
         mapping[raw_unit_id] = tuple(
             _validate_identifier("objective_id", objective_id) for objective_id in raw_objective_ids
         )
+    for record in context.state.starting_attached_unit_records:
+        historical_objective_ids = {
+            objective_id
+            for unit_id in (
+                record.attached_unit_instance_id,
+                *record.component_unit_instance_ids,
+            )
+            for objective_id in mapping.get(unit_id, ())
+        }
+        mapping[record.attached_unit_instance_id] = tuple(sorted(historical_objective_ids))
     return mapping
-
-
-def _phase_start_removed_model_ids(context: PhaseEndObjectiveControlContext) -> set[str]:
-    payload = _phase_start_snapshot_payload(context)
-    if payload is None:
-        return set()
-    raw_model_ids = payload.get("removed_model_ids")
-    if not isinstance(raw_model_ids, list):
-        raise GameLifecycleError("Blood Tainted phase-start snapshot missing removed models.")
-    return {
-        _validate_identifier("removed_model_id", raw_model_id) for raw_model_id in raw_model_ids
-    }
 
 
 def _phase_start_snapshot_payload(
@@ -1157,13 +1118,6 @@ def _phase_start_snapshot_payload(
             continue
         return payload
     return None
-
-
-def _removed_model_ids(context: PhaseEndObjectiveControlContext) -> set[str]:
-    battlefield_state = context.state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Blood Tainted requires battlefield_state.")
-    return set(battlefield_state.removed_model_ids)
 
 
 def _triggering_unit(context: MovementEndSurgeContext) -> UnitInstance:
@@ -1247,34 +1201,38 @@ def _placed_unit_for_army(
     return None
 
 
-def _unit_id_is_in_army(army: ArmyDefinition, *, unit_instance_id: str) -> bool:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    return any(unit.unit_instance_id == requested_unit_id for unit in army.units)
-
-
-def _unit_by_id(
-    army_definitions: tuple[ArmyDefinition, ...] | list[ArmyDefinition],
+def _unit_id_is_in_army(
+    state: GameState,
+    army: ArmyDefinition,
     *,
     unit_instance_id: str,
-) -> UnitInstance:
+) -> bool:
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in army_definitions:
-        for unit in army.units:
-            if unit.unit_instance_id == requested_unit_id:
-                return unit
-    raise GameLifecycleError("Blood Legion unit_instance_id was not found.")
+    if any(unit.unit_instance_id == requested_unit_id for unit in army.units):
+        return True
+    return any(
+        record.attached_unit_instance_id == requested_unit_id and record.player_id == army.player_id
+        for record in state.starting_attached_unit_records
+    )
 
 
 def _army_owner_for_unit(
-    army_definitions: tuple[ArmyDefinition, ...] | list[ArmyDefinition],
+    state: GameState,
     *,
     unit_instance_id: str,
 ) -> str:
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in army_definitions:
+    for army in state.army_definitions:
         for unit in army.units:
             if unit.unit_instance_id == requested_unit_id:
                 return army.player_id
+    historical = tuple(
+        record
+        for record in state.starting_attached_unit_records
+        if record.attached_unit_instance_id == requested_unit_id
+    )
+    if len(historical) == 1:
+        return historical[0].player_id
     raise GameLifecycleError("Blood Legion unit owner was not found.")
 
 

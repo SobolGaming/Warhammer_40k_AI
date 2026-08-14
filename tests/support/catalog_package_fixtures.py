@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from collections import Counter
+from dataclasses import replace
+
 from tests.support.wahapedia_bridge_fixtures import (
     advance_charge_bridge_artifacts,
     bloodcrushers_bridge_artifacts,
@@ -16,11 +19,17 @@ from tests.support.wahapedia_bridge_fixtures import (
 )
 from tests.support.wahapedia_source_fixtures import catalog_package_id, catalog_version
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
     DatasheetDefinition,
     DatasheetWargearOption,
 )
-from warhammer40k_core.engine.army_mustering import ArmyDefinition
+from warhammer40k_core.core.detachment import DetachmentDefinition
+from warhammer40k_core.engine.army_mustering import (
+    ArmyDefinition,
+    ArmyMusterRequest,
+    muster_army,
+)
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     MusteringOptionSelection,
@@ -505,4 +514,82 @@ def flesh_hounds_army(
         ),
         force_disposition_id=force_disposition_id,
         units=(unit,),
+    )
+
+
+def config_backed_flesh_hounds_armies(
+    *,
+    package: CanonicalCatalogPackage,
+    enemy_unit_selection_id: str,
+) -> tuple[ArmyCatalog, tuple[ArmyMusterRequest, ...], tuple[ArmyDefinition, ...]]:
+    """Build the exact two-player Flesh Hounds fixture through canonical mustering."""
+    fixture_catalog = replace(
+        package.army_catalog,
+        detachments=(
+            DetachmentDefinition(
+                detachment_id="phase17k-daemons",
+                name="Phase 17K Daemons",
+                faction_id=package.army_catalog.factions[0].faction_id,
+                detachment_point_cost=1,
+                unit_datasheet_ids=tuple(
+                    datasheet.datasheet_id for datasheet in package.army_catalog.datasheets
+                ),
+                force_disposition_ids=("purge-the-foe", "take-and-hold"),
+                source_ids=("phase17k:test-detachment",),
+            ),
+        ),
+    )
+    fixture_armies = (
+        flesh_hounds_army(
+            package=package,
+            unit=flesh_hounds_unit(package=package),
+            force_disposition_id="take-and-hold",
+        ),
+        flesh_hounds_army(
+            package=package,
+            unit=flesh_hounds_unit(
+                package=package,
+                army_id="army-opponent",
+                unit_selection_id=enemy_unit_selection_id,
+            ),
+            army_id="army-opponent",
+            player_id="player-opponent",
+            force_disposition_id="purge-the-foe",
+        ),
+    )
+    requests = tuple(_flesh_hounds_muster_request(army=army) for army in fixture_armies)
+    armies = tuple(
+        muster_army(
+            catalog=fixture_catalog,
+            request=request,
+            model_geometries=package.model_geometries,
+        )
+        for request in requests
+    )
+    return fixture_catalog, requests, armies
+
+
+def _flesh_hounds_muster_request(*, army: ArmyDefinition) -> ArmyMusterRequest:
+    if len(army.units) != 1:
+        raise AssertionError("Flesh Hounds config fixture requires one unit per army.")
+    unit = army.units[0]
+    profile_counts = Counter(model.model_profile_id for model in unit.own_models)
+    selection = UnitMusterSelection(
+        unit_selection_id=unit.unit_instance_id.removeprefix(f"{army.army_id}:"),
+        datasheet_id=unit.datasheet_id,
+        model_profile_selections=tuple(
+            ModelProfileSelection(model_profile_id=profile_id, model_count=model_count)
+            for profile_id, model_count in sorted(profile_counts.items())
+        ),
+        wargear_selections=unit.wargear_selections,
+    )
+    return ArmyMusterRequest(
+        army_id=army.army_id,
+        player_id=army.player_id,
+        catalog_id=army.catalog_id,
+        source_package_id=army.source_package_id,
+        ruleset_id=army.ruleset_id,
+        detachment_selection=army.detachment_selection,
+        force_disposition_id=army.force_disposition_id,
+        unit_selections=(selection,),
     )

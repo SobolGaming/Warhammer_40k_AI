@@ -69,6 +69,11 @@ from warhammer40k_core.engine.phases.movement import (
     SELECT_MOVEMENT_UNIT_DECISION_TYPE,
     MovementPhaseActionKind,
 )
+from warhammer40k_core.engine.reserve_declarations import (
+    COMPLETE_RESERVE_DECLARATIONS_OPTION_ID,
+    SELECT_RESERVE_DECLARATION_DECISION_TYPE,
+)
+from warhammer40k_core.engine.reserves import ReserveUnitPointValue
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.timing_windows import (
@@ -177,12 +182,8 @@ def build_ui_contract_bundle() -> UiContractBundle:
         raise GameLifecycleError("UI contract movement fixture requires a pending decision.")
 
     hidden_reserve_session, _hidden_reserve_status = build_local_session_at_movement_request(
-        game_id="ui-contract-terrain-snapshot-hidden-reserve"
-    )
-    _session_state(hidden_reserve_session).reposition_unit_to_strategic_reserves(
-        player_id=PLAYER_B,
-        unit_instance_id=UNIT_BETA,
-        source_rule_ids=("ui-contract:fixture:hidden-reserve",),
+        game_id="ui-contract-terrain-snapshot-hidden-reserve",
+        strategic_reserve_unit_id=UNIT_BETA,
     )
 
     modifier_session, _modifier_status = build_local_session_at_movement_request(
@@ -581,10 +582,20 @@ def _conformance_pose(
 
 
 def build_local_session_at_movement_request(
-    *, game_id: str
+    *, game_id: str, strategic_reserve_unit_id: str | None = None
 ) -> tuple[LocalGameSession, LifecycleStatus]:
-    session, status = _fresh_started_session(game_id=game_id)
+    session, status = _fresh_started_session(
+        game_id=game_id,
+        strategic_reserve_unit_id=strategic_reserve_unit_id,
+    )
     status = _submit_fixed_secondary_choices(session=session, status=status, game_id=game_id)
+    if strategic_reserve_unit_id is not None:
+        status = _submit_strategic_reserve_declaration(
+            session=session,
+            status=status,
+            game_id=game_id,
+            unit_instance_id=strategic_reserve_unit_id,
+        )
     status = _submit_all_deployments(session=session, status=status, game_id=game_id)
     movement_request = _decision_request(status)
     _assert_decision_type(movement_request, SELECT_MOVEMENT_UNIT_DECISION_TYPE)
@@ -820,6 +831,42 @@ def _submit_fixed_secondary_choices(
     return current
 
 
+def _submit_strategic_reserve_declaration(
+    *,
+    session: LocalGameSession,
+    status: LifecycleStatus,
+    game_id: str,
+    unit_instance_id: str,
+) -> LifecycleStatus:
+    current = status
+    declaration_option_id = f"declare_strategic_reserves:{unit_instance_id}"
+    declaration_submitted = False
+    result_number = 1
+    while (
+        current.decision_request is not None
+        and current.decision_request.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE
+    ):
+        request = current.decision_request
+        option_id = (
+            declaration_option_id
+            if not declaration_submitted
+            and any(option.option_id == declaration_option_id for option in request.options)
+            else COMPLETE_RESERVE_DECLARATIONS_OPTION_ID
+        )
+        if not any(option.option_id == option_id for option in request.options):
+            raise GameLifecycleError("UI contract reserve declaration option is unavailable.")
+        current = session.submit_option(
+            request_id=request.request_id,
+            option_id=option_id,
+            result_id=f"{game_id}-reserve-declaration-{result_number:06d}",
+        )
+        declaration_submitted = declaration_submitted or option_id == declaration_option_id
+        result_number += 1
+    if not declaration_submitted:
+        raise GameLifecycleError("UI contract Strategic Reserve declaration was not submitted.")
+    return current
+
+
 def _submit_all_deployments(
     *,
     session: LocalGameSession,
@@ -992,13 +1039,20 @@ def _session_state(session: LocalGameSession) -> GameState:
     return state
 
 
-def _fresh_started_session(*, game_id: str) -> tuple[LocalGameSession, LifecycleStatus]:
+def _fresh_started_session(
+    *, game_id: str, strategic_reserve_unit_id: str | None = None
+) -> tuple[LocalGameSession, LifecycleStatus]:
     session = LocalGameSession()
-    session.start(_config(game_id=game_id))
+    session.start(
+        _config(
+            game_id=game_id,
+            strategic_reserve_unit_id=strategic_reserve_unit_id,
+        )
+    )
     return session, session.advance_until_decision_or_terminal()
 
 
-def _config(*, game_id: str) -> GameConfig:
+def _config(*, game_id: str, strategic_reserve_unit_id: str | None = None) -> GameConfig:
     source_catalog = ArmyCatalog.phase9a_canonical_content_pack()
     event_force_disposition_ids = tuple(
         disposition.force_disposition_id
@@ -1039,6 +1093,17 @@ def _config(*, game_id: str) -> GameConfig:
         player_ids=(PLAYER_A, PLAYER_B),
         turn_order=(PLAYER_A, PLAYER_B),
         fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
+        reserve_unit_points=(
+            ()
+            if strategic_reserve_unit_id is None
+            else (
+                ReserveUnitPointValue(
+                    unit_instance_id=strategic_reserve_unit_id,
+                    points=100,
+                    source_id="ui-contract:fixture:reserve-points",
+                ),
+            )
+        ),
         mission_setup=MissionSetup.from_mission_pack(
             mission_pack=warhammer_event_companion_2026_07_mission_pack(),
             mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-3",

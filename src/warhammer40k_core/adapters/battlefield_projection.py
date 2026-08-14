@@ -3,6 +3,9 @@ from __future__ import annotations
 import hashlib
 from typing import Literal, TypedDict, cast
 
+from warhammer40k_core.adapters.redaction import (
+    battle_formation_declarations_are_unresolved,
+)
 from warhammer40k_core.core.datasheet import BaseSizeKind
 from warhammer40k_core.core.deployment_zones import (
     DeploymentZoneCircleCutout,
@@ -19,7 +22,7 @@ from warhammer40k_core.geometry.model_geometry import BaseFootprintKind
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.terrain import TerrainFeatureDefinition
 
-BATTLEFIELD_VIEW_SCHEMA_VERSION = "battlefield-view-v3-phase17n"
+BATTLEFIELD_VIEW_SCHEMA_VERSION = "battlefield-view-v4-phase17n-step3"
 BATTLEFIELD_COORDINATE_SPEC_VERSION = "battlefield-coordinate-v1"
 BATTLEFIELD_COORDINATE_SPACE = "battlefield_inches_right_handed_z_up"
 
@@ -219,6 +222,8 @@ def project_battlefield_view(
     pending_request_id: str | None,
     selected_entity_ids: tuple[str, ...],
     legal_option_ids: tuple[str, ...],
+    viewer_player_id: str | None = None,
+    omniscient: bool = False,
 ) -> BattlefieldViewPayload | None:
     if type(state) is not GameState:
         raise GameLifecycleError("Battlefield projection requires GameState.")
@@ -226,6 +231,12 @@ def project_battlefield_view(
         type(model_id) is not str or not model_id for model_id in visible_model_ids
     ):
         raise GameLifecycleError("Battlefield projection visible model IDs are invalid.")
+    if viewer_player_id is not None and (
+        type(viewer_player_id) is not str or not viewer_player_id.strip()
+    ):
+        raise GameLifecycleError("Battlefield projection viewer_player_id is invalid.")
+    if type(omniscient) is not bool:
+        raise GameLifecycleError("Battlefield projection omniscient flag is invalid.")
     battlefield = state.battlefield_state
     mission = state.mission_setup
     if battlefield is None or mission is None:
@@ -236,7 +247,12 @@ def project_battlefield_view(
         raise GameLifecycleError("Battlefield and mission depths drifted.")
 
     authoritative: BattlefieldAuthoritativeEntitiesPayload = {
-        "models_by_id": _model_entities(state=state, visible_model_ids=visible_model_ids),
+        "models_by_id": _model_entities(
+            state=state,
+            visible_model_ids=visible_model_ids,
+            viewer_player_id=viewer_player_id,
+            omniscient=omniscient,
+        ),
         "terrain_features_by_id": {
             feature.feature_id: _terrain_feature_entity(feature)
             for feature in sorted(battlefield.terrain_features, key=lambda item: item.feature_id)
@@ -333,6 +349,8 @@ def _model_entities(
     *,
     state: GameState,
     visible_model_ids: frozenset[str],
+    viewer_player_id: str | None,
+    omniscient: bool,
 ) -> dict[str, BattlefieldModelEntityPayload]:
     battlefield = state.battlefield_state
     if battlefield is None:
@@ -351,20 +369,30 @@ def _model_entities(
     }
     removed_model_ids = frozenset(battlefield.removed_model_ids)
     projected: dict[str, BattlefieldModelEntityPayload] = {}
+    formation_declarations_unresolved = battle_formation_declarations_are_unresolved(state)
     for army in state.army_definitions:
         for unit in army.units:
             reserve = reserve_by_unit_id.get(unit.unit_instance_id)
             transport_unit_id = transport_by_embarked_unit_id.get(unit.unit_instance_id)
+            formation_hidden = (
+                not omniscient
+                and viewer_player_id != army.player_id
+                and formation_declarations_unresolved
+            )
             for model in unit.own_models:
                 if model.model_instance_id not in visible_model_ids:
                     continue
                 placement = placement_by_model_id.get(model.model_instance_id)
-                state_token = _model_state(
-                    model=model,
-                    placement_exists=placement is not None,
-                    removed=model.model_instance_id in removed_model_ids,
-                    transport_unit_id=transport_unit_id,
-                    reserve_status=None if reserve is None else reserve.status,
+                state_token = (
+                    "undeployed"
+                    if formation_hidden
+                    else _model_state(
+                        model=model,
+                        placement_exists=placement is not None,
+                        removed=model.model_instance_id in removed_model_ids,
+                        transport_unit_id=transport_unit_id,
+                        reserve_status=None if reserve is None else reserve.status,
+                    )
                 )
                 projected[model.model_instance_id] = {
                     "entity_kind": "model",
@@ -372,11 +400,19 @@ def _model_entities(
                     "unit_instance_id": unit.unit_instance_id,
                     "owner_player_id": army.player_id,
                     "state": state_token,
-                    "pose": None if placement is None else _pose(placement.pose),
+                    "pose": (
+                        None if formation_hidden or placement is None else _pose(placement.pose)
+                    ),
                     "geometry": _model_geometry(model),
                     "state_context": {
-                        "transport_unit_instance_id": transport_unit_id,
-                        "reserve_kind": None if reserve is None else reserve.reserve_kind.value,
+                        "transport_unit_instance_id": (
+                            None if formation_hidden else transport_unit_id
+                        ),
+                        "reserve_kind": (
+                            None
+                            if formation_hidden or reserve is None
+                            else reserve.reserve_kind.value
+                        ),
                     },
                 }
     return dict(sorted(projected.items()))

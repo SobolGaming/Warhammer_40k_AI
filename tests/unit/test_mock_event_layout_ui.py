@@ -34,7 +34,7 @@ def test_mock_event_layout_ui_consumes_exact_battlefield_projections(
     viewer_data: dict[str, object],
 ) -> None:
     assert viewer_data["viewer_schema"] == "event-companion-battlefield-viewer-v3"
-    assert viewer_data["battlefield_view_schema"] == "battlefield-view-v3-phase17n"
+    assert viewer_data["battlefield_view_schema"] == "battlefield-view-v4-phase17n-step3"
     assert viewer_data["force_dispositions"] == [
         {"id": "purge-the-foe", "name": "Purge the Foe"},
         {"id": "take-and-hold", "name": "Take and Hold"},
@@ -61,7 +61,7 @@ def test_mock_event_layout_ui_consumes_exact_battlefield_projections(
         assert "terrain_features" not in layout
 
         view = _object_map(layout["battlefield_view"])
-        assert view["schema_version"] == "battlefield-view-v3-phase17n"
+        assert view["schema_version"] == "battlefield-view-v4-phase17n-step3"
         assert view["coordinate_spec_version"] == "battlefield-coordinate-v1"
         assert view["coordinate_space"] == "battlefield_inches_right_handed_z_up"
         bounds = _object_map(view["bounds"])
@@ -284,7 +284,7 @@ def test_mock_event_layout_ui_embeds_projection_and_interactive_3d_controls(
     assert "Single terrain area" in html
     assert "Separate terrain areas" in html
 
-    assert 'const BATTLEFIELD_VIEW_SCHEMA = "battlefield-view-v3-phase17n";' in javascript
+    assert 'const BATTLEFIELD_VIEW_SCHEMA = "battlefield-view-v4-phase17n-step3";' in javascript
     assert 'const COORDINATE_SPACE = "battlefield_inches_right_handed_z_up";' in javascript
     assert "layout.battlefield_view" in javascript
     assert "view.authoritative" in javascript

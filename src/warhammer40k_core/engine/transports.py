@@ -17,13 +17,11 @@ from warhammer40k_core.core.weapon_profiles import (
 )
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
-    BattlefieldRemovalKind,
     BattlefieldRuntimeState,
     BattlefieldScenario,
     BattlefieldTransitionBatch,
     BattlefieldTransitionBatchPayload,
     ModelPlacementRecord,
-    ModelRemovalRecord,
     PlacementError,
     UnitPlacement,
     UnitPlacementPayload,
@@ -47,6 +45,12 @@ from warhammer40k_core.engine.hazard import (
     hazard_roll_spec,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, LifecycleStatus
+from warhammer40k_core.engine.transport_embark_groups import (
+    cargo_model_count,
+    embark_transition_batch_for_rules_unit,
+    embarking_rules_unit_placement,
+    remove_embarking_rules_unit_from_battlefield,
+)
 from warhammer40k_core.engine.unit_coherency import (
     UnitCoherencyResult,
     UnitCoherencyResultPayload,
@@ -1944,8 +1948,12 @@ def resolve_embark(
         if type(effect) is not PersistingEffect:
             raise GameLifecycleError("resolve_embark persisting_effects must contain effects.")
     active_cargo = cargo_state.for_movement_phase(battle_round=selection.battle_round)
-    unit = scenario.unit_instance_for_placement(unit_placement)
+    scenario.unit_instance_for_placement(unit_placement)
     transport = scenario.unit_instance_for_placement(transport_placement)
+    rules_unit, rules_unit_placement = embarking_rules_unit_placement(
+        scenario=scenario,
+        selected_unit_placement=unit_placement,
+    )
     violations: list[TransportOperationViolation] = []
     _append_transport_common_violations(
         violations=violations,
@@ -1962,7 +1970,7 @@ def resolve_embark(
                 unit_instance_id=selection.unit_instance_id,
             )
         )
-    if unit_placement.player_id != selection.player_id:
+    if rules_unit_placement.player_id != selection.player_id:
         violations.append(
             TransportOperationViolation(
                 violation_code=TransportOperationViolationCode.FRIENDLY_TRANSPORT_REQUIRED,
@@ -1970,12 +1978,15 @@ def resolve_embark(
                 unit_instance_id=unit_placement.unit_instance_id,
             )
         )
-    if active_cargo.contains_unit(unit_placement.unit_instance_id):
+    if any(
+        active_cargo.contains_unit(component_id)
+        for component_id in rules_unit.component_unit_instance_ids
+    ):
         violations.append(
             TransportOperationViolation(
                 violation_code=TransportOperationViolationCode.UNIT_ALREADY_EMBARKED,
                 message="Unit is already embarked in this Transport.",
-                unit_instance_id=unit_placement.unit_instance_id,
+                unit_instance_id=rules_unit.unit_instance_id,
             )
         )
     forbidden_source_ids = embark_transport_forbidden_effect_source_ids(
@@ -1987,43 +1998,49 @@ def resolve_embark(
             TransportOperationViolation(
                 violation_code=TransportOperationViolationCode.EMBARK_FORBIDDEN_BY_EFFECT,
                 message="A persisting rule effect forbids this unit from Embarking.",
-                unit_instance_id=unit_placement.unit_instance_id,
+                unit_instance_id=rules_unit.unit_instance_id,
                 source_rule_id=source_rule_id,
             )
         )
-    if active_cargo.unit_disembarked_this_phase(unit_placement.unit_instance_id) and not (
+    if any(
+        active_cargo.unit_disembarked_this_phase(component_id)
+        for component_id in rules_unit.component_unit_instance_ids
+    ) and not (
         selection.has_override(TransportRestrictionOverrideKind.ALLOW_EMBARK_AFTER_DISEMBARK)
     ):
         violations.append(
             TransportOperationViolation(
                 violation_code=TransportOperationViolationCode.EMBARK_AFTER_DISEMBARK_FORBIDDEN,
                 message="Unit cannot Embark after it Disembarked in the same phase.",
-                unit_instance_id=unit_placement.unit_instance_id,
+                unit_instance_id=rules_unit.unit_instance_id,
                 source_rule_id=_CORE_TRANSPORT_RULE_ID,
             )
         )
-    if not active_cargo.capacity_profile.allows_unit(unit):
+    if any(
+        not active_cargo.capacity_profile.allows_unit(component.unit)
+        for component in rules_unit.components
+    ):
         violations.append(
             TransportOperationViolation(
                 violation_code=TransportOperationViolationCode.CAPACITY_EXCEEDED,
                 message="Transport capacity profile does not allow this unit.",
-                unit_instance_id=unit.unit_instance_id,
+                unit_instance_id=rules_unit.unit_instance_id,
                 source_rule_id=active_cargo.capacity_profile.source_id,
             )
         )
     if (
-        _cargo_model_count(
+        cargo_model_count(
             scenario=scenario,
-            cargo_state=active_cargo,
+            embarked_unit_instance_ids=active_cargo.embarked_unit_instance_ids,
         )
-        + len(unit.own_models)
+        + len(rules_unit.alive_models())
         > active_cargo.capacity_profile.max_model_count
     ):
         violations.append(
             TransportOperationViolation(
                 violation_code=TransportOperationViolationCode.CAPACITY_EXCEEDED,
                 message="Transport capacity would be exceeded.",
-                unit_instance_id=unit.unit_instance_id,
+                unit_instance_id=rules_unit.unit_instance_id,
                 source_rule_id=active_cargo.capacity_profile.source_id,
             )
         )
@@ -2031,10 +2048,7 @@ def resolve_embark(
         scenario=scenario,
         unit_placement=transport_placement,
     )
-    for model in _geometry_models_for_unit_placement(
-        scenario=scenario,
-        unit_placement=unit_placement,
-    ):
+    for model in rules_unit_placement.geometry_models(scenario):
         if not _model_within_any_transport_model(
             model,
             transport_models=transport_models,
@@ -2044,7 +2058,7 @@ def resolve_embark(
                 TransportOperationViolation(
                     violation_code=TransportOperationViolationCode.EMBARK_DISTANCE,
                     message="Embark requires every model to end within 3 inches of the Transport.",
-                    unit_instance_id=unit.unit_instance_id,
+                    unit_instance_id=rules_unit.unit_instance_id,
                     model_instance_id=model.model_id,
                     blocker_id=transport_placement.unit_instance_id,
                     source_rule_id=_CORE_TRANSPORT_RULE_ID,
@@ -2057,13 +2071,17 @@ def resolve_embark(
             updated_cargo_state=None,
             transition_batch=None,
         )
+    updated_cargo = active_cargo
+    for component_id in rules_unit.component_unit_instance_ids:
+        updated_cargo = updated_cargo.with_embarked_unit(component_id)
     return EmbarkResolution(
         selection=selection,
         violations=(),
-        updated_cargo_state=active_cargo.with_embarked_unit(unit.unit_instance_id),
-        transition_batch=_embark_transition_batch(
-            unit_placement=unit_placement,
+        updated_cargo_state=updated_cargo,
+        transition_batch=embark_transition_batch_for_rules_unit(
+            rules_unit_placement=rules_unit_placement,
             transport_unit_instance_id=transport_placement.unit_instance_id,
+            source_rule_id=_CORE_TRANSPORT_RULE_ID,
         ),
     )
 
@@ -2079,7 +2097,12 @@ def apply_embark_to_battlefield(
         raise GameLifecycleError("embark must be an EmbarkResolution.")
     if not embark.is_valid:
         raise GameLifecycleError("Invalid EmbarkResolution cannot mutate battlefield_state.")
-    return battlefield_state.without_unit_placement(embark.selection.unit_instance_id)
+    if embark.transition_batch is None:
+        raise GameLifecycleError("Valid EmbarkResolution requires a transition batch.")
+    return remove_embarking_rules_unit_from_battlefield(
+        battlefield_state=battlefield_state,
+        transition_batch=embark.transition_batch,
+    )
 
 
 def resolve_disembark(
@@ -3170,27 +3193,6 @@ def _append_disembark_endpoint_violations(
         )
 
 
-def _embark_transition_batch(
-    *,
-    unit_placement: UnitPlacement,
-    transport_unit_instance_id: str,
-) -> BattlefieldTransitionBatch:
-    return BattlefieldTransitionBatch(
-        removals=tuple(
-            ModelRemovalRecord(
-                model_instance_id=model_placement.model_instance_id,
-                removal_kind=BattlefieldRemovalKind.EMBARK,
-                source_phase=BattlePhase.MOVEMENT.value,
-                source_step="move_units",
-                source_rule_id=_CORE_TRANSPORT_RULE_ID,
-                source_event_id=None,
-                destination_id=transport_unit_instance_id,
-            )
-            for model_placement in unit_placement.model_placements
-        )
-    )
-
-
 def _disembark_transition_batch(
     *,
     attempted_placement: UnitPlacement,
@@ -3210,25 +3212,6 @@ def _disembark_transition_batch(
             for model_placement in attempted_placement.model_placements
         )
     )
-
-
-def _cargo_model_count(
-    *,
-    scenario: BattlefieldScenario,
-    cargo_state: TransportCargoState,
-) -> int:
-    units = _all_unit_by_id(scenario)
-    count = 0
-    for unit_id in cargo_state.embarked_unit_instance_ids:
-        unit = units.get(unit_id)
-        if unit is None:
-            raise GameLifecycleError("TransportCargoState references an unknown embarked unit.")
-        count += sum(model.is_alive for model in unit.own_models)
-    return count
-
-
-def _all_unit_by_id(scenario: BattlefieldScenario) -> dict[str, UnitInstance]:
-    return {unit.unit_instance_id: unit for army in scenario.armies for unit in army.units}
 
 
 def _unit_by_id(units: tuple[UnitInstance, ...]) -> dict[str, UnitInstance]:

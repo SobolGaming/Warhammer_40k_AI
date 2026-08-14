@@ -5,6 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.battlefield_presence import battlefield_scenario_for_state
+from warhammer40k_core.engine.reserve_arrival_requirements import (
+    placement_kinds_for_reserve_state,
+    proposal_kind_for_reserve_state,
+)
 from warhammer40k_core.engine.stratagems_imports import *
 from warhammer40k_core.engine.stratagems_model import *
 from warhammer40k_core.engine.stratagems_requests import *
@@ -744,22 +748,16 @@ def _reserve_placement_kinds_for_unit(
     reserve_state: ReserveState,
     unit: RulesUnitView,
 ) -> tuple[BattlefieldPlacementKind, ...]:
-    if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
-        kinds = [BattlefieldPlacementKind.STRATEGIC_RESERVES]
-        if all(_unit_has_deep_strike_keyword(component.unit) for component in unit.components):
-            kinds.append(BattlefieldPlacementKind.DEEP_STRIKE)
-        return tuple(kinds)
-    if reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE:
-        return (BattlefieldPlacementKind.DEEP_STRIKE,)
-    return (BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD,)
+    return placement_kinds_for_reserve_state(
+        reserve_state,
+        all_components_have_deep_strike=all(
+            _unit_has_deep_strike_keyword(component.unit) for component in unit.components
+        ),
+    )
 
 
 def _reserve_proposal_kind(reserve_state: ReserveState) -> ProposalKind:
-    if reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE:
-        return ProposalKind.DEEP_STRIKE
-    if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
-        return ProposalKind.STRATEGIC_RESERVES
-    return ProposalKind.REINFORCEMENT
+    return proposal_kind_for_reserve_state(reserve_state)
 
 
 def _unit_has_deep_strike_keyword(unit: UnitInstance) -> bool:

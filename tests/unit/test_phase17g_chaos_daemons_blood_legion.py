@@ -75,6 +75,7 @@ from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlace
 from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionKind,
     DestructionReactionSource,
+    apply_mortal_wounds_to_unit,
 )
 from warhammer40k_core.engine.deadly_demise import (
     deadly_demise_mortal_wounds_for_target,
@@ -119,6 +120,9 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.movement_proposals import (
     MOVEMENT_PROPOSAL_DECISION_TYPE,
     MovementProposalPayload,
@@ -1814,13 +1818,17 @@ def _battle_ready_state(
     request = _runtime_content_bundle(lifecycle).battle_formation_hook_registry.next_request_for(
         BattleFormationRequestContext(
             state=state,
-            decisions=DecisionController(),
+            decisions=lifecycle.decision_controller,
             config=config,
         )
     )
     if request is not None:
         raise AssertionError("Blood Legion test fixture should not require battle formation input")
-    complete_setup_through_gate(state=state, config=config)
+    complete_setup_through_gate(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        config=config,
+    )
     return state
 
 
@@ -2114,40 +2122,62 @@ def _destroy_enemy_unit_for_blood_tainted(
     state: GameState,
     decisions: DecisionController,
 ) -> None:
-    if state.battlefield_state is None:
-        raise AssertionError("test state requires battlefield_state")
+    enemy_unit = _physical_unit_by_id(state=state, unit_instance_id=_ENEMY_UNIT_ID)
+    expected_destroyed_ids = tuple(model.model_instance_id for model in enemy_unit.own_models)
+    destroyed_ids = _apply_blood_tainted_fixture_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        source_unit_instance_id=_BLOOD_UNIT_ID,
+        application_id="phase17g-blood-tainted-destruction",
+        mortal_wounds=sum(model.wounds_remaining for model in enemy_unit.own_models),
+    )
+    if destroyed_ids != expected_destroyed_ids:
+        raise AssertionError("Blood Tainted fixture did not destroy the complete enemy unit")
+
+
+def _apply_blood_tainted_fixture_mortal_wounds(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    source_unit_instance_id: str,
+    application_id: str,
+    mortal_wounds: int,
+) -> tuple[str, ...]:
     phase = state.current_battle_phase
     if phase is None:
         raise AssertionError("test state requires current battle phase")
-    enemy_army = state.army_definition_for_player("player-b")
-    if enemy_army is None:
-        raise AssertionError("test state requires player-b army")
-    enemy_unit = enemy_army.unit_by_id(_ENEMY_UNIT_ID)
-    destroyed_model_ids = tuple(model.model_instance_id for model in enemy_unit.own_models)
-    state.replace_battlefield_state(
-        state.battlefield_state.with_removed_models(destroyed_model_ids)
+    source_unit = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=source_unit_instance_id,
     )
-    for index, model_id in enumerate(destroyed_model_ids, start=1):
-        decisions.event_log.append(
-            "model_destroyed",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "phase": phase.value,
-                **ModelDestructionAttribution.for_non_attack(
-                    destroying_player_id="player-a",
-                    source_kind=DestructionSourceKind.ABILITY,
-                    source_rules_unit_instance_id=_BLOOD_UNIT_ID,
-                    source_model_instance_id=None,
-                ).to_payload(),
-                "target_unit_instance_id": _ENEMY_UNIT_ID,
-                "model_instance_id": model_id,
-                "damage_kind": "normal",
-                "damage_event_id": f"phase17g-blood-tainted-damage-{index:02d}",
-                "destroyed_model_rules_triggered": True,
-            },
-        )
+    if not source_unit.own_models:
+        raise AssertionError("Blood Tainted fixture source unit requires a model")
+    source_model = source_unit.own_models[0]
+    application = apply_mortal_wounds_to_unit(
+        state=state,
+        decisions=decisions,
+        application_id=application_id,
+        source_rule_id=f"{application_id}:fixture-rule",
+        source_context={
+            "source_kind": "blood_tainted_fixture_mortal_wounds",
+            "source_unit_instance_id": source_unit_instance_id,
+            "source_model_instance_id": source_model.model_instance_id,
+        },
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+            state=state,
+            destroying_player_id="player-a",
+            source_rules_unit_instance_id=source_unit_instance_id,
+            source_model_instance_id=source_model.model_instance_id,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=phase,
+            source_step="blood_tainted_fixture_mortal_wounds",
+        ),
+        target_unit_instance_id=_ENEMY_UNIT_ID,
+        mortal_wounds=mortal_wounds,
+    )
+    return tuple(
+        damage.model_instance_id for damage in application.applications if damage.destroyed
+    )
 
 
 def _destroy_enemy_unit_with_gateway_attack(
@@ -2313,41 +2343,30 @@ def _destroy_enemy_unit_with_split_attackers_for_blood_tainted(
     state: GameState,
     decisions: DecisionController,
 ) -> None:
-    if state.battlefield_state is None:
-        raise AssertionError("test state requires battlefield_state")
-    phase = state.current_battle_phase
-    if phase is None:
-        raise AssertionError("test state requires current battle phase")
-    enemy_army = state.army_definition_for_player("player-b")
-    if enemy_army is None:
-        raise AssertionError("test state requires player-b army")
-    enemy_unit = enemy_army.unit_by_id(_ENEMY_UNIT_ID)
-    destroyed_model_ids = tuple(model.model_instance_id for model in enemy_unit.own_models)
-    state.replace_battlefield_state(
-        state.battlefield_state.with_removed_models(destroyed_model_ids)
+    enemy_unit = _physical_unit_by_id(state=state, unit_instance_id=_ENEMY_UNIT_ID)
+    if len(enemy_unit.own_models) < 2:
+        raise AssertionError("split-attacker fixture requires at least two enemy models")
+    first_model = enemy_unit.own_models[0]
+    first_destroyed_ids = _apply_blood_tainted_fixture_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        source_unit_instance_id=_BLOOD_UNIT_ID,
+        application_id="phase17g-blood-tainted-split-first-attacker",
+        mortal_wounds=first_model.wounds_remaining,
     )
-    for index, model_id in enumerate(destroyed_model_ids, start=1):
-        attacker_id = _BLOOD_UNIT_ID if index == 1 else _OTHER_FRIENDLY_UNIT_ID
-        decisions.event_log.append(
-            "model_destroyed",
-            {
-                "game_id": state.game_id,
-                "battle_round": state.battle_round,
-                "active_player_id": state.active_player_id,
-                "phase": phase.value,
-                **ModelDestructionAttribution.for_non_attack(
-                    destroying_player_id="player-a",
-                    source_kind=DestructionSourceKind.ABILITY,
-                    source_rules_unit_instance_id=attacker_id,
-                    source_model_instance_id=None,
-                ).to_payload(),
-                "target_unit_instance_id": _ENEMY_UNIT_ID,
-                "model_instance_id": model_id,
-                "damage_kind": "normal",
-                "damage_event_id": f"phase17g-blood-tainted-split-damage-{index:02d}",
-                "destroyed_model_rules_triggered": True,
-            },
-        )
+    if first_destroyed_ids != (first_model.model_instance_id,):
+        raise AssertionError("split-attacker fixture first source destroyed unexpected models")
+    remaining_models = enemy_unit.own_models[1:]
+    completion_destroyed_ids = _apply_blood_tainted_fixture_mortal_wounds(
+        state=state,
+        decisions=decisions,
+        source_unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
+        application_id="phase17g-blood-tainted-split-completion-attacker",
+        mortal_wounds=sum(model.wounds_remaining for model in remaining_models),
+    )
+    expected_completion_ids = tuple(model.model_instance_id for model in remaining_models)
+    if completion_destroyed_ids != expected_completion_ids:
+        raise AssertionError("split-attacker fixture completion source destroyed unexpected models")
 
 
 def _event_payload(

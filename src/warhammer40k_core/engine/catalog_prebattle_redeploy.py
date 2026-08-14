@@ -17,8 +17,10 @@ from warhammer40k_core.engine.prebattle_records import (
     PreBattleActionKind,
     record_prebattle_action,
 )
+from warhammer40k_core.engine.reserve_arrival_requirements import (
+    reposition_destruction_policy,
+)
 from warhammer40k_core.engine.reserves import (
-    ReserveDestructionTimingPolicy,
     ReserveKind,
     ReserveOrigin,
     ReserveState,
@@ -390,8 +392,9 @@ def apply_redeploy_to_strategic_reserves(
         declared_during_step=SetupStep.REDEPLOY_UNITS.value,
         entered_reserves_battle_round=None,
         entered_reserves_phase=None,
-        destruction_deadline_policy=ReserveDestructionTimingPolicy.from_mission_policy(
-            ruleset_descriptor.mission_policy
+        destruction_deadline_policy=reposition_destruction_policy(
+            mission_setup=state.mission_setup,
+            destruction_deadline_policy=None,
         ),
         source_rule_ids=(source_rule_id,),
         points_contribution=points_contribution,

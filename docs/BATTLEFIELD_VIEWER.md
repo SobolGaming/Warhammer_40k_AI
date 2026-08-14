@@ -1,7 +1,7 @@
 # Event Companion Battlefield Viewer
 
 The local battlefield viewer renders the canonical
-`battlefield-view-v3-phase17n` projection. It does not read PDF images, source
+`battlefield-view-v4-phase17n-step3` projection. It does not read PDF images, source
 row geometry, or terrain names to reconstruct the board.
 
 Start it from the repository root:
@@ -66,7 +66,7 @@ geometry. Hatch generation intersects those projected bounds with the canvas
 viewport, keeping per-frame drawing work bounded even when near-plane clipping
 produces far-off-screen vertices. Objective-to-terrain-area links are retained
 beside the projection in the viewer-only envelope because that association is
-mission metadata rather than part of `battlefield-view-v3-phase17n`. The viewer
+mission metadata rather than part of `battlefield-view-v4-phase17n-step3`. The viewer
 never converts the objective identity record's marker diameter into a
 standalone rules or selection footprint.
 

@@ -2916,6 +2916,236 @@
         }
       },
       "models_by_id": {
+        "army-alpha:intercessor-unit-1:core-intercessor-like:001": {
+          "entity_kind": "model",
+          "geometry": {
+            "geometry_source_id": "core-intercessor-like",
+            "geometry_source_kind": "catalog_base_size",
+            "height_inches": 1.7637795275590549,
+            "height_source_id": "keyword:infantry_or_character",
+            "height_source_kind": "keyword_heuristic",
+            "measurement_basis": "base",
+            "measurement_shapes": [
+              {
+                "center": {
+                  "x_inches": 0.0,
+                  "y_inches": 0.0
+                },
+                "kind": "circle",
+                "length_inches": null,
+                "radius_inches": 0.6299212598425197,
+                "rotation_degrees": 0.0,
+                "vertices": [],
+                "width_inches": null
+              }
+            ],
+            "support_shape": {
+              "center": {
+                "x_inches": 0.0,
+                "y_inches": 0.0
+              },
+              "kind": "circle",
+              "length_inches": null,
+              "radius_inches": 0.6299212598425197,
+              "rotation_degrees": 0.0,
+              "vertices": [],
+              "width_inches": null
+            }
+          },
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+          "owner_player_id": "player-a",
+          "pose": null,
+          "state": "undeployed",
+          "state_context": {
+            "reserve_kind": null,
+            "transport_unit_instance_id": null
+          },
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
+        },
+        "army-alpha:intercessor-unit-1:core-intercessor-like:002": {
+          "entity_kind": "model",
+          "geometry": {
+            "geometry_source_id": "core-intercessor-like",
+            "geometry_source_kind": "catalog_base_size",
+            "height_inches": 1.7637795275590549,
+            "height_source_id": "keyword:infantry_or_character",
+            "height_source_kind": "keyword_heuristic",
+            "measurement_basis": "base",
+            "measurement_shapes": [
+              {
+                "center": {
+                  "x_inches": 0.0,
+                  "y_inches": 0.0
+                },
+                "kind": "circle",
+                "length_inches": null,
+                "radius_inches": 0.6299212598425197,
+                "rotation_degrees": 0.0,
+                "vertices": [],
+                "width_inches": null
+              }
+            ],
+            "support_shape": {
+              "center": {
+                "x_inches": 0.0,
+                "y_inches": 0.0
+              },
+              "kind": "circle",
+              "length_inches": null,
+              "radius_inches": 0.6299212598425197,
+              "rotation_degrees": 0.0,
+              "vertices": [],
+              "width_inches": null
+            }
+          },
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+          "owner_player_id": "player-a",
+          "pose": null,
+          "state": "undeployed",
+          "state_context": {
+            "reserve_kind": null,
+            "transport_unit_instance_id": null
+          },
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
+        },
+        "army-alpha:intercessor-unit-1:core-intercessor-like:003": {
+          "entity_kind": "model",
+          "geometry": {
+            "geometry_source_id": "core-intercessor-like",
+            "geometry_source_kind": "catalog_base_size",
+            "height_inches": 1.7637795275590549,
+            "height_source_id": "keyword:infantry_or_character",
+            "height_source_kind": "keyword_heuristic",
+            "measurement_basis": "base",
+            "measurement_shapes": [
+              {
+                "center": {
+                  "x_inches": 0.0,
+                  "y_inches": 0.0
+                },
+                "kind": "circle",
+                "length_inches": null,
+                "radius_inches": 0.6299212598425197,
+                "rotation_degrees": 0.0,
+                "vertices": [],
+                "width_inches": null
+              }
+            ],
+            "support_shape": {
+              "center": {
+                "x_inches": 0.0,
+                "y_inches": 0.0
+              },
+              "kind": "circle",
+              "length_inches": null,
+              "radius_inches": 0.6299212598425197,
+              "rotation_degrees": 0.0,
+              "vertices": [],
+              "width_inches": null
+            }
+          },
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+          "owner_player_id": "player-a",
+          "pose": null,
+          "state": "undeployed",
+          "state_context": {
+            "reserve_kind": null,
+            "transport_unit_instance_id": null
+          },
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
+        },
+        "army-alpha:intercessor-unit-1:core-intercessor-like:004": {
+          "entity_kind": "model",
+          "geometry": {
+            "geometry_source_id": "core-intercessor-like",
+            "geometry_source_kind": "catalog_base_size",
+            "height_inches": 1.7637795275590549,
+            "height_source_id": "keyword:infantry_or_character",
+            "height_source_kind": "keyword_heuristic",
+            "measurement_basis": "base",
+            "measurement_shapes": [
+              {
+                "center": {
+                  "x_inches": 0.0,
+                  "y_inches": 0.0
+                },
+                "kind": "circle",
+                "length_inches": null,
+                "radius_inches": 0.6299212598425197,
+                "rotation_degrees": 0.0,
+                "vertices": [],
+                "width_inches": null
+              }
+            ],
+            "support_shape": {
+              "center": {
+                "x_inches": 0.0,
+                "y_inches": 0.0
+              },
+              "kind": "circle",
+              "length_inches": null,
+              "radius_inches": 0.6299212598425197,
+              "rotation_degrees": 0.0,
+              "vertices": [],
+              "width_inches": null
+            }
+          },
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+          "owner_player_id": "player-a",
+          "pose": null,
+          "state": "undeployed",
+          "state_context": {
+            "reserve_kind": null,
+            "transport_unit_instance_id": null
+          },
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
+        },
+        "army-alpha:intercessor-unit-1:core-intercessor-like:005": {
+          "entity_kind": "model",
+          "geometry": {
+            "geometry_source_id": "core-intercessor-like",
+            "geometry_source_kind": "catalog_base_size",
+            "height_inches": 1.7637795275590549,
+            "height_source_id": "keyword:infantry_or_character",
+            "height_source_kind": "keyword_heuristic",
+            "measurement_basis": "base",
+            "measurement_shapes": [
+              {
+                "center": {
+                  "x_inches": 0.0,
+                  "y_inches": 0.0
+                },
+                "kind": "circle",
+                "length_inches": null,
+                "radius_inches": 0.6299212598425197,
+                "rotation_degrees": 0.0,
+                "vertices": [],
+                "width_inches": null
+              }
+            ],
+            "support_shape": {
+              "center": {
+                "x_inches": 0.0,
+                "y_inches": 0.0
+              },
+              "kind": "circle",
+              "length_inches": null,
+              "radius_inches": 0.6299212598425197,
+              "rotation_degrees": 0.0,
+              "vertices": [],
+              "width_inches": null
+            }
+          },
+          "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:005",
+          "owner_player_id": "player-a",
+          "pose": null,
+          "state": "undeployed",
+          "state_context": {
+            "reserve_kind": null,
+            "transport_unit_instance_id": null
+          },
+          "unit_instance_id": "army-alpha:intercessor-unit-1"
+        },
         "army-beta:intercessor-unit-2:core-intercessor-like:001": {
           "entity_kind": "model",
           "geometry": {
@@ -6604,7 +6834,7 @@
         }
       }
     },
-    "authoritative_geometry_hash": "e7a2b9e02ccddb944abfed47bc4d1bc6e4015bb0312304ff709218461c370e5f",
+    "authoritative_geometry_hash": "7665d5ece63c9def23075e92ca1358146e6401abc518956ea7458525628d681f",
     "battlefield_id": "ui-contract-hidden-redaction:take-and-hold-vs-purge-the-foe-layout-3-deployment:battlefield",
     "bounds": {
       "max_x_inches": 44.0,
@@ -7682,7 +7912,7 @@
         }
       }
     },
-    "schema_version": "battlefield-view-v3-phase17n"
+    "schema_version": "battlefield-view-v4-phase17n-step3"
   },
   "current_battle_phase": null,
   "current_setup_step": "select_secondary_missions",
@@ -11860,6 +12090,1266 @@
     "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
   },
   "model_display_by_id": {
+    "army-alpha:intercessor-unit-1:core-intercessor-like:001": {
+      "base_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size": {
+        "base_size_id": "base-size:core-intercessor-like",
+        "diameter_mm": 32.0,
+        "kind": "circular",
+        "length_mm": null,
+        "width_mm": null
+      },
+      "current_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "datasheet_id": "core-intercessor-like-infantry",
+      "geometry": {
+        "footprint_kind": "circular",
+        "geometry_source_id": "core-intercessor-like",
+        "geometry_source_kind": "catalog_base_size",
+        "height_inches": 1.7637795275590549,
+        "height_source_id": "keyword:infantry_or_character",
+        "height_source_kind": "keyword_heuristic",
+        "parts": [
+          {
+            "footprint_kind": "circular",
+            "offset_x_inches": 0.0,
+            "offset_y_inches": 0.0,
+            "part_id": "base",
+            "radius_x_inches": 0.6299212598425197,
+            "radius_y_inches": 0.6299212598425197
+          }
+        ]
+      },
+      "model_display_name": "CORE Intercessor-like Infantry",
+      "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+      "model_profile_id": "core-intercessor-like",
+      "model_profile_name": "CORE Intercessor-like Infantry",
+      "redaction": {
+        "hidden": false,
+        "reason": null
+      },
+      "source_metadata": {
+        "catalog_id": "phase9a-canonical",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:profile"
+        ],
+        "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
+      },
+      "starting_wounds": 2,
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
+      "visible_modifiers": [],
+      "visible_status": "visible",
+      "wargear_ids": [
+        "core-bolt-rifle"
+      ],
+      "wounds_remaining": 2
+    },
+    "army-alpha:intercessor-unit-1:core-intercessor-like:002": {
+      "base_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size": {
+        "base_size_id": "base-size:core-intercessor-like",
+        "diameter_mm": 32.0,
+        "kind": "circular",
+        "length_mm": null,
+        "width_mm": null
+      },
+      "current_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "datasheet_id": "core-intercessor-like-infantry",
+      "geometry": {
+        "footprint_kind": "circular",
+        "geometry_source_id": "core-intercessor-like",
+        "geometry_source_kind": "catalog_base_size",
+        "height_inches": 1.7637795275590549,
+        "height_source_id": "keyword:infantry_or_character",
+        "height_source_kind": "keyword_heuristic",
+        "parts": [
+          {
+            "footprint_kind": "circular",
+            "offset_x_inches": 0.0,
+            "offset_y_inches": 0.0,
+            "part_id": "base",
+            "radius_x_inches": 0.6299212598425197,
+            "radius_y_inches": 0.6299212598425197
+          }
+        ]
+      },
+      "model_display_name": "CORE Intercessor-like Infantry",
+      "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+      "model_profile_id": "core-intercessor-like",
+      "model_profile_name": "CORE Intercessor-like Infantry",
+      "redaction": {
+        "hidden": false,
+        "reason": null
+      },
+      "source_metadata": {
+        "catalog_id": "phase9a-canonical",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:profile"
+        ],
+        "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
+      },
+      "starting_wounds": 2,
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
+      "visible_modifiers": [],
+      "visible_status": "visible",
+      "wargear_ids": [
+        "core-bolt-rifle"
+      ],
+      "wounds_remaining": 2
+    },
+    "army-alpha:intercessor-unit-1:core-intercessor-like:003": {
+      "base_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size": {
+        "base_size_id": "base-size:core-intercessor-like",
+        "diameter_mm": 32.0,
+        "kind": "circular",
+        "length_mm": null,
+        "width_mm": null
+      },
+      "current_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "datasheet_id": "core-intercessor-like-infantry",
+      "geometry": {
+        "footprint_kind": "circular",
+        "geometry_source_id": "core-intercessor-like",
+        "geometry_source_kind": "catalog_base_size",
+        "height_inches": 1.7637795275590549,
+        "height_source_id": "keyword:infantry_or_character",
+        "height_source_kind": "keyword_heuristic",
+        "parts": [
+          {
+            "footprint_kind": "circular",
+            "offset_x_inches": 0.0,
+            "offset_y_inches": 0.0,
+            "part_id": "base",
+            "radius_x_inches": 0.6299212598425197,
+            "radius_y_inches": 0.6299212598425197
+          }
+        ]
+      },
+      "model_display_name": "CORE Intercessor-like Infantry",
+      "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+      "model_profile_id": "core-intercessor-like",
+      "model_profile_name": "CORE Intercessor-like Infantry",
+      "redaction": {
+        "hidden": false,
+        "reason": null
+      },
+      "source_metadata": {
+        "catalog_id": "phase9a-canonical",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:profile"
+        ],
+        "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
+      },
+      "starting_wounds": 2,
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
+      "visible_modifiers": [],
+      "visible_status": "visible",
+      "wargear_ids": [
+        "core-bolt-rifle"
+      ],
+      "wounds_remaining": 2
+    },
+    "army-alpha:intercessor-unit-1:core-intercessor-like:004": {
+      "base_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size": {
+        "base_size_id": "base-size:core-intercessor-like",
+        "diameter_mm": 32.0,
+        "kind": "circular",
+        "length_mm": null,
+        "width_mm": null
+      },
+      "current_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "datasheet_id": "core-intercessor-like-infantry",
+      "geometry": {
+        "footprint_kind": "circular",
+        "geometry_source_id": "core-intercessor-like",
+        "geometry_source_kind": "catalog_base_size",
+        "height_inches": 1.7637795275590549,
+        "height_source_id": "keyword:infantry_or_character",
+        "height_source_kind": "keyword_heuristic",
+        "parts": [
+          {
+            "footprint_kind": "circular",
+            "offset_x_inches": 0.0,
+            "offset_y_inches": 0.0,
+            "part_id": "base",
+            "radius_x_inches": 0.6299212598425197,
+            "radius_y_inches": 0.6299212598425197
+          }
+        ]
+      },
+      "model_display_name": "CORE Intercessor-like Infantry",
+      "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+      "model_profile_id": "core-intercessor-like",
+      "model_profile_name": "CORE Intercessor-like Infantry",
+      "redaction": {
+        "hidden": false,
+        "reason": null
+      },
+      "source_metadata": {
+        "catalog_id": "phase9a-canonical",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:profile"
+        ],
+        "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
+      },
+      "starting_wounds": 2,
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
+      "visible_modifiers": [],
+      "visible_status": "visible",
+      "wargear_ids": [
+        "core-bolt-rifle"
+      ],
+      "wounds_remaining": 2
+    },
+    "army-alpha:intercessor-unit-1:core-intercessor-like:005": {
+      "base_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "base_size": {
+        "base_size_id": "base-size:core-intercessor-like",
+        "diameter_mm": 32.0,
+        "kind": "circular",
+        "length_mm": null,
+        "width_mm": null
+      },
+      "current_characteristics": {
+        "InSv": {
+          "applied_modifier_ids": [],
+          "base": 0,
+          "characteristic": "invulnerable_save",
+          "display_value": "-",
+          "final": 0,
+          "label": "InSv",
+          "raw": 0,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "source_dash"
+        },
+        "LD": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "leadership",
+          "display_value": "6+",
+          "final": 6,
+          "label": "LD",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "M": {
+          "applied_modifier_ids": [],
+          "base": 6,
+          "characteristic": "movement",
+          "display_value": "6\"",
+          "final": 6,
+          "label": "M",
+          "raw": 6,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "OC": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "objective_control",
+          "display_value": "2",
+          "final": 2,
+          "label": "OC",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "SV": {
+          "applied_modifier_ids": [],
+          "base": 3,
+          "characteristic": "save",
+          "display_value": "3+",
+          "final": 3,
+          "label": "SV",
+          "raw": 3,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "T": {
+          "applied_modifier_ids": [],
+          "base": 4,
+          "characteristic": "toughness",
+          "display_value": "4",
+          "final": 4,
+          "label": "T",
+          "raw": 4,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        },
+        "W": {
+          "applied_modifier_ids": [],
+          "base": 2,
+          "characteristic": "wounds",
+          "display_value": "2",
+          "final": 2,
+          "label": "W",
+          "raw": 2,
+          "redaction": {
+            "hidden": false,
+            "reason": null
+          },
+          "value_kind": "numeric"
+        }
+      },
+      "datasheet_id": "core-intercessor-like-infantry",
+      "geometry": {
+        "footprint_kind": "circular",
+        "geometry_source_id": "core-intercessor-like",
+        "geometry_source_kind": "catalog_base_size",
+        "height_inches": 1.7637795275590549,
+        "height_source_id": "keyword:infantry_or_character",
+        "height_source_kind": "keyword_heuristic",
+        "parts": [
+          {
+            "footprint_kind": "circular",
+            "offset_x_inches": 0.0,
+            "offset_y_inches": 0.0,
+            "part_id": "base",
+            "radius_x_inches": 0.6299212598425197,
+            "radius_y_inches": 0.6299212598425197
+          }
+        ]
+      },
+      "model_display_name": "CORE Intercessor-like Infantry",
+      "model_instance_id": "army-alpha:intercessor-unit-1:core-intercessor-like:005",
+      "model_profile_id": "core-intercessor-like",
+      "model_profile_name": "CORE Intercessor-like Infantry",
+      "redaction": {
+        "hidden": false,
+        "reason": null
+      },
+      "source_metadata": {
+        "catalog_id": "phase9a-canonical",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry",
+          "datasheet:core-intercessor-like-infantry:profile"
+        ],
+        "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
+      },
+      "starting_wounds": 2,
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
+      "visible_modifiers": [],
+      "visible_status": "visible",
+      "wargear_ids": [
+        "core-bolt-rifle"
+      ],
+      "wounds_remaining": 2
+    },
     "army-beta:intercessor-unit-2:core-intercessor-like:001": {
       "base_characteristics": {
         "InSv": {
@@ -13220,16 +14710,16 @@
       "setup_step": "select_secondary_missions"
     },
     "request_id": "decision-request-000002",
-    "schema_version": "decision-request-view-v3-primary-assignments"
+    "schema_version": "decision-request-view-v4-phase17n-step3"
   },
   "pending_proposal": null,
   "player_ids": [
     "player-a",
     "player-b"
   ],
-  "primary_unit_terrain_turn_start_snapshots": [],
-  "projection_schema": "game-view-v9-phase17n",
-  "projection_state_hash": "25253c0b8455ec188818097c6aa8619ddba960b532ebbec5902ea27c809b5466",
+  "primary_rules_unit_turn_start_snapshots": [],
+  "projection_schema": "game-view-v10-phase17n-step3",
+  "projection_state_hash": "e7a9eb08456fc856172b004a9a88aae6ae9fc2421cb782c99a72c2f6e48b540c",
   "public_command_point_ledgers": [
     {
       "command_points": 0,
@@ -13276,6 +14766,42 @@
   },
   "stage": "setup",
   "unit_display_by_id": {
+    "army-alpha:intercessor-unit-1": {
+      "datasheet_id": "core-intercessor-like-infantry",
+      "faction_keywords": [
+        "CORE MARINES"
+      ],
+      "keywords": [
+        "BATTLELINE",
+        "INFANTRY"
+      ],
+      "model_instance_ids": [
+        "army-alpha:intercessor-unit-1:core-intercessor-like:001",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:002",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:003",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:004",
+        "army-alpha:intercessor-unit-1:core-intercessor-like:005"
+      ],
+      "owner_player_id": "player-a",
+      "redaction": {
+        "hidden": false,
+        "reason": null
+      },
+      "resources": [],
+      "selected_wargear_ids": [
+        "core-bolt-rifle"
+      ],
+      "source_metadata": {
+        "catalog_id": "phase9a-canonical",
+        "source_ids": [
+          "datasheet:core-intercessor-like-infantry"
+        ],
+        "source_package_id": "data-package:core-v2:phase9a-canonical:0.1.0"
+      },
+      "unit_display_name": "CORE Intercessor-like Infantry",
+      "unit_instance_id": "army-alpha:intercessor-unit-1",
+      "visible_status": "visible"
+    },
     "army-beta:intercessor-unit-2": {
       "datasheet_id": "core-intercessor-like-infantry",
       "faction_keywords": [

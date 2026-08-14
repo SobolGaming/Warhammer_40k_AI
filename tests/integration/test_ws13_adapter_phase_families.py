@@ -325,7 +325,7 @@ def test_local_session_drives_armour_of_contempt_fight_save_completion_and_repla
 def test_local_session_drives_armour_of_contempt_shared_shooting_path() -> None:
     lifecycle, units = shooting_lifecycle(
         alpha_unit_ids=("attacker",),
-        game_id="ws14-armour-of-contempt-shooting-facade",
+        game_id="ws14-armour-of-contempt-shooting-facade-step3-2",
         enemy_unit_specs=(
             (
                 "defender",

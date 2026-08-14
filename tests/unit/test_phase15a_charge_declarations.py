@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 from tests.support.selected_target_charge_fixtures import (
     selected_target_charge_persisting_effect,
 )
@@ -15,7 +16,6 @@ from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, Objective
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
-from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldScenario,
     ModelDisplacementKind,
@@ -50,6 +50,7 @@ from warhammer40k_core.engine.game_state import (
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
 )
@@ -91,6 +92,9 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.reserve_arrival_requirements import (
+    reposition_destruction_policy,
+)
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.unit_coherency import MovementRollbackRecord, UnitCoherencyResult
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -109,7 +113,7 @@ from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
 )
 
-_ATTACHED_CHARGE_TARGET_ID = "attached-unit:army-beta:marked-charge-target"
+_ATTACHED_CHARGE_TARGET_ID = "attached-unit:army-beta:marked-bodyguard"
 
 
 def test_charging_unit_selection_rolls_immediately_and_uses_lifecycle_records() -> None:
@@ -2032,22 +2036,9 @@ def _charge_lifecycle(
         game_id=game_id,
         alpha_unit_ids=alpha_unit_ids,
         enemy_unit_ids=enemy_unit_ids,
+        enemy_attached_unit_ids=enemy_attached_unit_ids,
     )
     armies = _mustered_armies(config)
-    if enemy_attached_unit_ids is not None:
-        bodyguard_id, leader_id = (f"army-beta:{unit_id}" for unit_id in enemy_attached_unit_ids)
-        formation = AttachedUnitFormation(
-            attached_unit_instance_id=_ATTACHED_CHARGE_TARGET_ID,
-            bodyguard_unit_instance_id=bodyguard_id,
-            leader_unit_instance_ids=(leader_id,),
-            component_unit_instance_ids=tuple(sorted((bodyguard_id, leader_id))),
-            source_id="test:phase15a:selected-attached-target",
-            attachment_source_ids=("test:phase15a:selected-attached-target:eligibility",),
-        )
-        armies = tuple(
-            replace(army, attached_units=(formation,)) if army.player_id == "player-b" else army
-            for army in armies
-        )
     mission_setup = config.mission_setup
     assert mission_setup is not None
     scenario = create_deterministic_battlefield_scenario(
@@ -2103,6 +2094,7 @@ def _charge_lifecycle(
     state.battle_round = 1
     state.active_player_id = "player-a"
     decision_controller = GameLifecycle().decision_controller
+    ensure_army_mustered_events_for_fixture(state, decisions=decision_controller)
     if enemy_attached_unit_ids is not None:
         if selected_attached_target_effect_id is None:
             raise AssertionError("Attached Charge target fixture requires a selected effect ID.")
@@ -2170,6 +2162,7 @@ def _config(
     game_id: str,
     alpha_unit_ids: tuple[str, ...],
     enemy_unit_ids: tuple[str, ...],
+    enemy_attached_unit_ids: tuple[str, str] | None = None,
 ) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
@@ -2191,6 +2184,19 @@ def _config(
                 player_id="player-b",
                 army_id="army-beta",
                 unit_selection_ids=enemy_unit_ids,
+                character_unit_selection_ids=(
+                    () if enemy_attached_unit_ids is None else (enemy_attached_unit_ids[1],)
+                ),
+                attachment_declarations=(
+                    ()
+                    if enemy_attached_unit_ids is None
+                    else (
+                        AttachmentDeclaration(
+                            source_unit_selection_id=enemy_attached_unit_ids[1],
+                            bodyguard_unit_selection_id=enemy_attached_unit_ids[0],
+                        ),
+                    )
+                ),
             ),
         ),
         player_ids=("player-a", "player-b"),
@@ -2249,6 +2255,8 @@ def _army_muster_request(
     player_id: str,
     army_id: str,
     unit_selection_ids: tuple[str, ...],
+    character_unit_selection_ids: tuple[str, ...] = (),
+    attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -2261,18 +2269,31 @@ def _army_muster_request(
             detachment_ids=("core-combined-arms",),
         ),
         force_disposition_id="purge-the-foe",
-        unit_selections=tuple(_unit_selection(unit_id) for unit_id in unit_selection_ids),
+        unit_selections=tuple(
+            _unit_selection(
+                unit_id,
+                is_character=unit_id in character_unit_selection_ids,
+            )
+            for unit_id in unit_selection_ids
+        ),
+        attachment_declarations=attachment_declarations,
     )
 
 
-def _unit_selection(unit_selection_id: str) -> UnitMusterSelection:
+def _unit_selection(
+    unit_selection_id: str,
+    *,
+    is_character: bool = False,
+) -> UnitMusterSelection:
+    datasheet_id = "core-character-leader" if is_character else "core-intercessor-like-infantry"
+    model_profile_id = "core-character-leader" if is_character else "core-intercessor-like"
     return UnitMusterSelection(
         unit_selection_id=unit_selection_id,
-        datasheet_id="core-intercessor-like-infantry",
+        datasheet_id=datasheet_id,
         model_profile_selections=(
             ModelProfileSelection(
-                model_profile_id="core-intercessor-like",
-                model_count=5,
+                model_profile_id=model_profile_id,
+                model_count=1 if is_character else 5,
             ),
         ),
     )
@@ -2492,12 +2513,24 @@ def _unplace_alive_successor(
     state.battlefield_state = state.battlefield_state.without_unit_placement(
         successor.unit_instance_id
     )
-    state.record_reserve_state(
-        ReserveState.declared_before_battle(
-            player_id="player-b",
-            unit_instance_id=successor.unit_instance_id,
-            reserve_kind=ReserveKind.RESERVES,
-        )
+    reserve_state = ReserveState.declared_before_battle(
+        player_id="player-b",
+        unit_instance_id=successor.unit_instance_id,
+        reserve_kind=ReserveKind.RESERVES,
+        destruction_deadline_policy=reposition_destruction_policy(
+            mission_setup=state.mission_setup,
+            destruction_deadline_policy=None,
+        ),
+    )
+    state.record_reserve_state(reserve_state)
+    lifecycle.decision_controller.event_log.append(
+        "reserve_unit_declared",
+        {
+            "game_id": state.game_id,
+            "player_id": reserve_state.player_id,
+            "unit_instance_id": reserve_state.unit_instance_id,
+            "reserve_state": reserve_state.to_payload(),
+        },
     )
 
 

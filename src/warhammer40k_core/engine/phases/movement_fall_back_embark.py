@@ -5,6 +5,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.phases.movement_imports import *
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    PrimaryUnattributedDestructionCause,
+)
+from warhammer40k_core.engine.primary_historical_events import (
+    record_new_primary_battlefield_departure_events,
+    record_new_primary_unit_destruction_events,
+)
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     record_primary_unit_destructions_for_destroyed_models,
 )
@@ -109,6 +116,7 @@ def _apply_desperate_escape_model_selection_decision(
         state=state,
         decisions=decisions,
         result=action_result,
+        destruction_source_result_id=result.result_id,
         unit_placement=unit_placement,
         fall_back_result=fall_back_result,
         destroyed_model_ids=destroyed_model_ids,
@@ -122,6 +130,7 @@ def _apply_fall_back_result(
     state: GameState,
     decisions: DecisionController,
     result: DecisionResult,
+    destruction_source_result_id: str | None,
     unit_placement: UnitPlacement,
     fall_back_result: FallBackActionResult,
     destroyed_model_ids: tuple[str, ...],
@@ -132,6 +141,20 @@ def _apply_fall_back_result(
 ) -> LifecycleStatus | None:
     active_player_id = _active_player_id(state)
     scenario = _battlefield_scenario(state)
+    destruction_source_payload: dict[str, JsonValue] = {}
+    if destroyed_model_ids:
+        if destruction_source_result_id is None:
+            raise GameLifecycleError(
+                "Desperate Escape destruction requires its model-selection result ID."
+            )
+        destruction_source_payload["desperate_escape_source_mutation_id"] = _validate_identifier(
+            "destruction_source_result_id",
+            destruction_source_result_id,
+        )
+    elif destruction_source_result_id is not None:
+        raise GameLifecycleError(
+            "Desperate Escape source result requires destroyed model evidence."
+        )
     surviving_placement = fall_back_result.surviving_attempted_placement(
         destroyed_model_ids=destroyed_model_ids,
     )
@@ -191,24 +214,38 @@ def _apply_fall_back_result(
         ).with_removed_models(destroyed_model_ids)
     )
     if destroyed_model_ids:
-        for destruction in record_primary_unit_destructions_for_destroyed_models(
+        destruction_source_id = _payload_string(
+            destruction_source_payload,
+            key="desperate_escape_source_mutation_id",
+        )
+        departure_ids_before = tuple(
+            value.departure_id for value in state.primary_battlefield_departure_states
+        )
+        destruction_ids_before = tuple(
+            value.destruction_id for value in state.primary_unit_destruction_states
+        )
+        record_primary_unit_destructions_for_destroyed_models(
             state=state,
             destroyed_model_instance_ids=destroyed_model_ids,
-            destroying_player_id=None,
-            source_id=f"core-rules:desperate-escape:{result.result_id}",
-        ):
-            decisions.event_log.append(
-                "primary_unit_destruction_recorded",
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "active_player_id": state.active_player_id,
-                    "phase": BattlePhase.MOVEMENT.value,
-                    "source_rule_id": "desperate_escape",
-                    "source_result_id": result.result_id,
-                    "primary_unit_destruction_state": destruction.to_payload(),
-                },
-            )
+            destruction_attribution=None,
+            source_model_destroyed_event_id=None,
+            source_rules_unit_objective_proximity_witness=None,
+            destroyed_rules_unit_objective_proximity_witness=None,
+            unattributed_cause=PrimaryUnattributedDestructionCause.DESPERATE_ESCAPE,
+            source_mutation_id=destruction_source_id,
+            left_battlefield=True,
+            source_id=f"core-rules:desperate-escape:{destruction_source_id}",
+        )
+        record_new_primary_battlefield_departure_events(
+            state=state,
+            event_log=decisions.event_log,
+            departure_ids_before=departure_ids_before,
+        )
+        record_new_primary_unit_destruction_events(
+            state=state,
+            event_log=decisions.event_log,
+            destruction_ids_before=destruction_ids_before,
+        )
     permission_grants: tuple[FallBackEligibilityGrant, ...] = ()
     if surviving_placement is not None:
         permission_grants = fall_back_hooks.grants_for(
@@ -256,6 +293,7 @@ def _apply_fall_back_result(
         movement_payload={
             **fall_back_result.movement_payload,
             "destroyed_model_ids": list(destroyed_model_ids),
+            **destruction_source_payload,
             "start_engaged_enemy_unit_instance_ids": list(start_engaged_enemy_unit_ids),
             "fall_back_eligibility_grants": [
                 validate_json_value(grant.to_payload()) for grant in permission_grants
@@ -435,7 +473,10 @@ def _post_move_embark_options(
             selection=selection,
             unit_placement=unit_placement,
             transport_placement=transport_placement,
-            persisting_effects=state.persisting_effects_for_unit(unit_instance_id),
+            persisting_effects=_embark_persisting_effects(
+                state=state,
+                unit_instance_id=unit_instance_id,
+            ),
         )
         if not resolution.is_valid:
             continue
@@ -550,7 +591,10 @@ def _apply_embark_transport_selection_decision(
         transport_placement=scenario.battlefield_state.unit_placement_by_id(
             selection.transport_unit_instance_id
         ),
-        persisting_effects=state.persisting_effects_for_unit(active_selection.unit_instance_id),
+        persisting_effects=_embark_persisting_effects(
+            state=state,
+            unit_instance_id=active_selection.unit_instance_id,
+        ),
     )
     if not resolution.is_valid:
         invalid_payload = _transport_operation_invalid_payload(
@@ -601,6 +645,8 @@ def _apply_valid_embark(
         raise GameLifecycleError("Embark requires battlefield_state.")
     if embark.updated_cargo_state is None:
         raise GameLifecycleError("Valid EmbarkResolution requires updated cargo state.")
+    if embark.transition_batch is None:
+        raise GameLifecycleError("Valid EmbarkResolution requires a transition batch.")
     state.replace_battlefield_state(
         apply_embark_to_battlefield(
             battlefield_state=battlefield_state,
@@ -608,6 +654,25 @@ def _apply_valid_embark(
         )
     )
     state.replace_transport_cargo_state(embark.updated_cargo_state)
+    embarked_rules_unit = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=embark.selection.unit_instance_id,
+    )
+    departure_ids_before = tuple(
+        value.departure_id for value in state.primary_battlefield_departure_states
+    )
+    record_primary_battlefield_departure(
+        state=state,
+        rules_unit_instance_id=embarked_rules_unit.unit_instance_id,
+        affected_component_unit_instance_ids=(embarked_rules_unit.component_unit_instance_ids),
+        departed_component_unit_instance_ids=(embarked_rules_unit.component_unit_instance_ids),
+        removed_model_instance_ids=tuple(
+            removal.model_instance_id for removal in embark.transition_batch.removals
+        ),
+        removal_kind=BattlefieldRemovalKind.EMBARK,
+        occurrence_id=result.result_id,
+        source_id=result.result_id,
+    )
     decisions.event_log.append(
         "unit_embarked",
         {
@@ -621,10 +686,13 @@ def _apply_valid_embark(
             "result_id": result.result_id,
             "phase_body_status": "unit_embarked",
             "updated_cargo_state": validate_json_value(embark.updated_cargo_state.to_payload()),
-            "transition_batch": validate_json_value(embark.transition_batch.to_payload())
-            if embark.transition_batch is not None
-            else None,
+            "transition_batch": validate_json_value(embark.transition_batch.to_payload()),
         },
+    )
+    record_new_primary_battlefield_departure_events(
+        state=state,
+        event_log=decisions.event_log,
+        departure_ids_before=departure_ids_before,
     )
     _complete_movement_activation_with_record_ids(
         state=state,
@@ -637,6 +705,26 @@ def _apply_valid_embark(
         displacement_kind=displacement_kind,
         transition_batch=transition_batch,
     )
+
+
+def _embark_persisting_effects(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> tuple[PersistingEffect, ...]:
+    rules_unit = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=unit_instance_id,
+    )
+    identity_ids = tuple(
+        dict.fromkeys((rules_unit.unit_instance_id, *rules_unit.component_unit_instance_ids))
+    )
+    effect_by_id = {
+        effect.effect_id: effect
+        for identity_id in identity_ids
+        for effect in state.persisting_effects_for_unit(identity_id)
+    }
+    return tuple(effect_by_id[effect_id] for effect_id in sorted(effect_by_id))
 
 
 def _complete_movement_activation(

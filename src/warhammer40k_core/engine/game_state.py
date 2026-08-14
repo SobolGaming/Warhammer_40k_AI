@@ -42,6 +42,7 @@ from warhammer40k_core.engine.battle_shock_state import (
     transfer_battle_shock_after_attached_unit_split,
 )
 from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRemovalKind,
     BattlefieldRuntimeState,
     BattlefieldRuntimeStatePayload,
     BattlefieldScenario,
@@ -69,6 +70,8 @@ from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionSource,
     FeelNoPainSource,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
 from warhammer40k_core.engine.effects import (
     EffectExpirationBoundary,
     PersistingEffect,
@@ -109,9 +112,6 @@ from warhammer40k_core.engine.game_state_payloads import (
 )
 from warhammer40k_core.engine.game_state_payloads import (
     SecondaryMissionChoicePayload as SecondaryMissionChoicePayload,
-)
-from warhammer40k_core.engine.game_state_payloads import (
-    StartingAttachedUnitRecordPayload as StartingAttachedUnitRecordPayload,
 )
 from warhammer40k_core.engine.game_state_payloads import (
     TacticalSecondaryDrawPayload as TacticalSecondaryDrawPayload,
@@ -158,28 +158,41 @@ from warhammer40k_core.engine.phases.shooting import (
 from warhammer40k_core.engine.prebattle_records import (
     PreBattleActionRecord,
 )
+from warhammer40k_core.engine.primary_battlefield_departure import (
+    PrimaryBattlefieldDepartureState,
+    primary_battlefield_departure_states_from_payload,
+    record_primary_battlefield_departure,
+)
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    PrimaryUnattributedDestructionCause,
+    RulesUnitObjectiveProximityWitness,
+)
+from warhammer40k_core.engine.primary_historical_events import (
+    record_primary_battlefield_departure_event,
+    record_primary_reserve_entry_mutation_event,
+)
+from warhammer40k_core.engine.primary_historical_evidence import (
+    validate_primary_historical_evidence_state,
+)
+from warhammer40k_core.engine.primary_reserve_entry_provider import (
+    PrimaryReserveEntryProvider,
+    primary_reserve_entry_requirements,
+    validate_accepted_primary_reserve_entry_provider,
+)
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     build_primary_scoring_spatial_evidence,
 )
 from warhammer40k_core.engine.primary_turn_start_evidence import (
-    PrimaryUnitTerrainTurnStartSnapshot,
-    current_primary_unit_terrain_membership,
-    primary_unit_terrain_snapshots_with_created_unit,
-    primary_unit_terrain_turn_start_snapshots_from_payload,
+    PrimaryRulesUnitTurnStartSnapshot,
+    primary_rules_unit_turn_start_snapshots_from_payload,
+    primary_rules_unit_turn_start_snapshots_with_created_unit,
+    record_primary_rules_unit_turn_start_snapshot,
     record_primary_turn_start_evidence,
-    record_primary_unit_terrain_turn_start_snapshot,
     validate_primary_objective_turn_start_states,
-    validate_primary_unit_destruction_terrain_evidence,
-    validate_primary_unit_terrain_turn_start_snapshots,
 )
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
-    primary_unit_destruction_id as _primary_unit_destruction_id,
-)
-from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+    build_primary_unit_destruction_state,
     record_primary_unit_destructions_for_end_turn_cleanup,
-)
-from warhammer40k_core.engine.primary_unit_destruction_tracking import (
-    validate_primary_unit_destruction_states as _validate_primary_unit_destruction_states,
 )
 from warhammer40k_core.engine.ranged_attack_history_lineage import (
     ranged_attack_history_source_unit_ids as _ranged_attack_history_source_unit_ids,
@@ -187,12 +200,17 @@ from warhammer40k_core.engine.ranged_attack_history_lineage import (
 from warhammer40k_core.engine.ranged_attack_history_lineage import (
     ranged_attack_history_unit_owner_ids as _ranged_attack_history_unit_owner_ids,
 )
+from warhammer40k_core.engine.reserve_state_attached_split import (
+    arrived_reserve_state_split_successors,
+    transfer_arrived_reserve_state_after_attached_unit_split,
+)
 from warhammer40k_core.engine.reserve_state_queries import (
     reserve_state_for_rules_unit,
     unarrived_reserve_model_ids,
     validate_reserve_state_rules_unit,
 )
 from warhammer40k_core.engine.reserves import (
+    ReserveDestructionResult,
     ReserveDestructionTimingPolicy,
     ReserveKind,
     ReserveOrigin,
@@ -230,6 +248,15 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointTransaction,
     initial_victory_point_ledgers,
     secondary_mission_card_mode_from_token,
+)
+from warhammer40k_core.engine.starting_attached_units import (
+    StartingAttachedUnitRecord,
+)
+from warhammer40k_core.engine.starting_attached_units import (
+    starting_attached_unit_records_for_army as _starting_attached_unit_records_for_army,
+)
+from warhammer40k_core.engine.starting_attached_units import (
+    validate_starting_attached_unit_records as _validate_starting_attached_unit_records,
 )
 from warhammer40k_core.engine.sticky_objective_control import (
     StickyObjectiveControlState,
@@ -294,124 +321,6 @@ DEDICATED_TRANSPORT_EMPTY_STARTING_CARGO_CONSEQUENCE = (
     "empty_starting_cargo_destroyed_first_battle_round"
 )
 DEFAULT_MAX_LIFECYCLE_TRANSITIONS = 128
-
-
-@dataclass(frozen=True, slots=True)
-class StartingAttachedUnitRecord:
-    player_id: str
-    attached_unit_instance_id: str
-    bodyguard_unit_instance_id: str
-    leader_unit_instance_ids: tuple[str, ...]
-    support_unit_instance_ids: tuple[str, ...]
-    component_unit_instance_ids: tuple[str, ...]
-    source_id: str
-
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "player_id",
-            _validate_identifier("StartingAttachedUnitRecord player_id", self.player_id),
-        )
-        object.__setattr__(
-            self,
-            "attached_unit_instance_id",
-            _validate_identifier(
-                "StartingAttachedUnitRecord attached_unit_instance_id",
-                self.attached_unit_instance_id,
-            ),
-        )
-        object.__setattr__(
-            self,
-            "bodyguard_unit_instance_id",
-            _validate_identifier(
-                "StartingAttachedUnitRecord bodyguard_unit_instance_id",
-                self.bodyguard_unit_instance_id,
-            ),
-        )
-        leader_ids = _validate_identifier_tuple(
-            "StartingAttachedUnitRecord leader_unit_instance_ids",
-            self.leader_unit_instance_ids,
-            min_length=0,
-            sort_values=True,
-        )
-        support_ids = _validate_identifier_tuple(
-            "StartingAttachedUnitRecord support_unit_instance_ids",
-            self.support_unit_instance_ids,
-            min_length=0,
-            sort_values=True,
-        )
-        if not leader_ids and not support_ids:
-            raise GameLifecycleError(
-                "StartingAttachedUnitRecord requires a leader or support unit."
-            )
-        component_ids = _validate_identifier_tuple(
-            "StartingAttachedUnitRecord component_unit_instance_ids",
-            self.component_unit_instance_ids,
-            min_length=2,
-            sort_values=True,
-        )
-        expected_component_ids = tuple(
-            sorted((self.bodyguard_unit_instance_id, *leader_ids, *support_ids))
-        )
-        if component_ids != expected_component_ids:
-            raise GameLifecycleError(
-                "StartingAttachedUnitRecord component_unit_instance_ids must match components."
-            )
-        object.__setattr__(self, "leader_unit_instance_ids", leader_ids)
-        object.__setattr__(self, "support_unit_instance_ids", support_ids)
-        object.__setattr__(self, "component_unit_instance_ids", component_ids)
-        object.__setattr__(
-            self,
-            "source_id",
-            _validate_identifier("StartingAttachedUnitRecord source_id", self.source_id),
-        )
-
-    @classmethod
-    def from_formation(
-        cls,
-        *,
-        player_id: str,
-        attached_unit: AttachedUnitFormation,
-    ) -> Self:
-        if type(attached_unit) is not AttachedUnitFormation:
-            raise GameLifecycleError(
-                "StartingAttachedUnitRecord derivation requires an AttachedUnitFormation."
-            )
-        return cls(
-            player_id=player_id,
-            attached_unit_instance_id=attached_unit.attached_unit_instance_id,
-            bodyguard_unit_instance_id=attached_unit.bodyguard_unit_instance_id,
-            leader_unit_instance_ids=attached_unit.leader_unit_instance_ids,
-            support_unit_instance_ids=attached_unit.support_unit_instance_ids,
-            component_unit_instance_ids=attached_unit.component_unit_instance_ids,
-            source_id=attached_unit.source_id,
-        )
-
-    def leader_or_support_unit_instance_ids(self) -> tuple[str, ...]:
-        return tuple(sorted((*self.leader_unit_instance_ids, *self.support_unit_instance_ids)))
-
-    def to_payload(self) -> StartingAttachedUnitRecordPayload:
-        return {
-            "player_id": self.player_id,
-            "attached_unit_instance_id": self.attached_unit_instance_id,
-            "bodyguard_unit_instance_id": self.bodyguard_unit_instance_id,
-            "leader_unit_instance_ids": list(self.leader_unit_instance_ids),
-            "support_unit_instance_ids": list(self.support_unit_instance_ids),
-            "component_unit_instance_ids": list(self.component_unit_instance_ids),
-            "source_id": self.source_id,
-        }
-
-    @classmethod
-    def from_payload(cls, payload: StartingAttachedUnitRecordPayload) -> Self:
-        return cls(
-            player_id=payload["player_id"],
-            attached_unit_instance_id=payload["attached_unit_instance_id"],
-            bodyguard_unit_instance_id=payload["bodyguard_unit_instance_id"],
-            leader_unit_instance_ids=tuple(payload["leader_unit_instance_ids"]),
-            support_unit_instance_ids=tuple(payload["support_unit_instance_ids"]),
-            component_unit_instance_ids=tuple(payload["component_unit_instance_ids"]),
-            source_id=payload["source_id"],
-        )
 
 
 def _new_starting_attached_unit_records() -> list[StartingAttachedUnitRecord]:
@@ -514,7 +423,7 @@ def _new_primary_objective_turn_start_states() -> list[PrimaryObjectiveTurnStart
     return []
 
 
-def _new_primary_unit_terrain_turn_start_snapshots() -> list[PrimaryUnitTerrainTurnStartSnapshot]:
+def _new_primary_rules_unit_turn_start_snapshots() -> list[PrimaryRulesUnitTurnStartSnapshot]:
     return []
 
 
@@ -523,6 +432,10 @@ def _new_primary_terrain_trap_states() -> list[PrimaryTerrainTrapState]:
 
 
 def _new_primary_unit_destruction_states() -> list[PrimaryUnitDestructionState]:
+    return []
+
+
+def _new_primary_battlefield_departure_states() -> list[PrimaryBattlefieldDepartureState]:
     return []
 
 
@@ -1224,14 +1137,17 @@ class GameState:
     primary_objective_turn_start_states: list[PrimaryObjectiveTurnStartState] = field(
         default_factory=_new_primary_objective_turn_start_states
     )
-    primary_unit_terrain_turn_start_snapshots: list[PrimaryUnitTerrainTurnStartSnapshot] = field(
-        default_factory=_new_primary_unit_terrain_turn_start_snapshots
+    primary_rules_unit_turn_start_snapshots: list[PrimaryRulesUnitTurnStartSnapshot] = field(
+        default_factory=_new_primary_rules_unit_turn_start_snapshots
     )
     primary_terrain_trap_states: list[PrimaryTerrainTrapState] = field(
         default_factory=_new_primary_terrain_trap_states
     )
     primary_unit_destruction_states: list[PrimaryUnitDestructionState] = field(
         default_factory=_new_primary_unit_destruction_states
+    )
+    primary_battlefield_departure_states: list[PrimaryBattlefieldDepartureState] = field(
+        default_factory=_new_primary_battlefield_departure_states
     )
     secondary_unit_destruction_states: list[SecondaryUnitDestructionState] = field(
         default_factory=_new_secondary_unit_destruction_states
@@ -1368,6 +1284,7 @@ class GameState:
             self.starting_attached_unit_records,
             army_definitions=self.army_definitions,
             player_ids=self.player_ids,
+            starting_strength_records=self.starting_strength_records,
         )
         self.battlefield_state = _validate_optional_battlefield_state(self.battlefield_state)
         self.mission_setup = _validate_optional_mission_setup(
@@ -1500,24 +1417,12 @@ class GameState:
             self.primary_objective_turn_start_states,
             game_id=self.game_id,
             player_ids=self.player_ids,
-        )
-        self.primary_unit_terrain_turn_start_snapshots = (
-            validate_primary_unit_terrain_turn_start_snapshots(
-                self.primary_unit_terrain_turn_start_snapshots,
-                game_id=self.game_id,
-                player_ids=self.player_ids,
-                known_unit_instance_ids=tuple(
-                    unit.unit_instance_id for army in self.army_definitions for unit in army.units
-                ),
-                known_logical_terrain_area_ids=tuple(
-                    area.logical_terrain_area_id
-                    for area in (
-                        ()
-                        if self.mission_setup is None
-                        else _mission_terrain.mission_logical_terrain_areas(self.mission_setup)
-                    )
-                ),
-            )
+            known_objective_marker_ids=tuple(
+                marker.objective_marker_id
+                for marker in (
+                    () if self.mission_setup is None else self.mission_setup.objective_markers
+                )
+            ),
         )
         self.mission_action_states = _validate_mission_action_states(
             self.mission_action_states,
@@ -1532,16 +1437,11 @@ class GameState:
                 mission_action_states=self.mission_action_states,
             )
         )
-        self.primary_unit_destruction_states = _validate_primary_unit_destruction_states(
+        (
+            self.primary_rules_unit_turn_start_snapshots,
             self.primary_unit_destruction_states,
-            game_id=self.game_id,
-            player_ids=self.player_ids,
-            owner_by_unit_id=_unit_owner_by_id(self.army_definitions),
-        )
-        validate_primary_unit_destruction_terrain_evidence(
-            destruction_states=self.primary_unit_destruction_states,
-            terrain_snapshots=self.primary_unit_terrain_turn_start_snapshots,
-        )
+            self.primary_battlefield_departure_states,
+        ) = validate_primary_historical_evidence_state(self)
         self.secondary_unit_destruction_states = _validate_secondary_unit_destruction_states(
             self.secondary_unit_destruction_states,
             game_id=self.game_id,
@@ -2267,12 +2167,14 @@ class GameState:
             unit=unit,
             source_id=record_source_id,
         )
-        updated_primary_terrain_snapshots = primary_unit_terrain_snapshots_with_created_unit(
-            self.primary_unit_terrain_turn_start_snapshots,
-            unit_instance_id=unit.unit_instance_id,
+        updated_primary_position_snapshots = (
+            primary_rules_unit_turn_start_snapshots_with_created_unit(
+                self.primary_rules_unit_turn_start_snapshots,
+                unit_instance_id=unit.unit_instance_id,
+            )
         )
         self.army_definitions = sorted(updated_armies, key=lambda stored: stored.player_id)
-        self.primary_unit_terrain_turn_start_snapshots = updated_primary_terrain_snapshots
+        self.primary_rules_unit_turn_start_snapshots = updated_primary_position_snapshots
         self.starting_strength_records.append(record)
         self.starting_strength_records.sort(key=lambda stored: stored.unit_instance_id)
         self._record_static_core_ability_sources_for_unit(unit)
@@ -2892,14 +2794,23 @@ class GameState:
             raise GameLifecycleError(
                 "PrimaryObjectiveTurnStartState already exists for this player turn."
             )
-        self.primary_objective_turn_start_states.append(state)
-        self.primary_objective_turn_start_states.sort(key=lambda stored: stored.state_id)
+        self.primary_objective_turn_start_states = validate_primary_objective_turn_start_states(
+            [*self.primary_objective_turn_start_states, state],
+            game_id=self.game_id,
+            player_ids=self.player_ids,
+            known_objective_marker_ids=tuple(
+                marker.objective_marker_id
+                for marker in (
+                    () if self.mission_setup is None else self.mission_setup.objective_markers
+                )
+            ),
+        )
 
-    def record_primary_unit_terrain_turn_start_snapshot(
+    def record_primary_rules_unit_turn_start_snapshot(
         self,
-        snapshot: PrimaryUnitTerrainTurnStartSnapshot,
+        snapshot: PrimaryRulesUnitTurnStartSnapshot,
     ) -> None:
-        record_primary_unit_terrain_turn_start_snapshot(
+        record_primary_rules_unit_turn_start_snapshot(
             state=self,
             snapshot=snapshot,
         )
@@ -2960,68 +2871,27 @@ class GameState:
     def record_primary_unit_destruction(
         self,
         *,
-        destroying_player_id: str | None,
+        destruction_attribution: ModelDestructionAttribution | None,
+        source_model_destroyed_event_id: str | None,
+        source_rules_unit_objective_proximity_witness: (RulesUnitObjectiveProximityWitness | None),
+        source_battlefield_departure_ids: tuple[str, ...],
+        unattributed_cause: PrimaryUnattributedDestructionCause | None,
+        source_mutation_id: str | None,
         destroyed_unit_instance_id: str,
         source_id: str,
     ) -> PrimaryUnitDestructionState:
-        if self.mission_setup is None:
-            raise GameLifecycleError("Primary unit destruction tracking requires MissionSetup.")
-        if self.active_player_id is None:
-            raise GameLifecycleError("Primary unit destruction tracking requires an active player.")
-        phase = self.current_battle_phase
-        if phase is None:
-            raise GameLifecycleError("Primary unit destruction tracking requires a battle phase.")
-        requested_destroyer = (
-            None
-            if destroying_player_id is None
-            else _validate_player_id(destroying_player_id, player_ids=self.player_ids)
-        )
-        requested_unit = _validate_identifier(
-            "destroyed_unit_instance_id", destroyed_unit_instance_id
-        )
-        owner_by_unit_id = _unit_owner_by_id(self.army_definitions)
-        if requested_unit not in owner_by_unit_id:
-            raise GameLifecycleError("Primary unit destruction references an unknown unit.")
-        destroyed_player_id = owner_by_unit_id[requested_unit]
-        battlefield = self.battlefield_state
-        if battlefield is None:
-            raise GameLifecycleError(
-                "Primary unit destruction tracking requires battlefield_state."
-            )
-        destroyed_unit = self._unit_by_id(requested_unit)
-        removed_model_ids = set(battlefield.removed_model_ids)
-        if any(
-            model.is_alive and model.model_instance_id not in removed_model_ids
-            for model in destroyed_unit.own_models
-        ):
-            raise GameLifecycleError(
-                "Primary unit destruction tracking requires a destroyed physical unit."
-            )
-        requested_source_id = _validate_identifier("source_id", source_id)
-        destruction_id = _primary_unit_destruction_id(
-            game_id=self.game_id,
-            source_id=requested_source_id,
-            destroyed_unit_instance_id=requested_unit,
-        )
-        terrain_ids = current_primary_unit_terrain_membership(
+        destruction = build_primary_unit_destruction_state(
             state=self,
-            unit_instance_id=requested_unit,
-        ).terrain_feature_ids
-        if any(
-            state.destruction_id == destruction_id for state in self.primary_unit_destruction_states
-        ):
-            raise GameLifecycleError("Primary unit destruction already exists for this occurrence.")
-        destruction = PrimaryUnitDestructionState(
-            destruction_id=destruction_id,
-            game_id=self.game_id,
-            destroying_player_id=requested_destroyer,
-            destroyed_player_id=destroyed_player_id,
-            active_player_id=self.active_player_id,
-            battle_round=self.battle_round,
-            phase=phase.value,
-            destroyed_unit_instance_id=requested_unit,
-            started_turn_terrain_feature_ids=terrain_ids,
-            source_id=requested_source_id,
+            destruction_attribution=destruction_attribution,
+            source_model_destroyed_event_id=source_model_destroyed_event_id,
+            source_rules_unit_objective_proximity_witness=(
+                source_rules_unit_objective_proximity_witness
+            ),
+            source_battlefield_departure_ids=source_battlefield_departure_ids,
+            unattributed_cause=unattributed_cause,
+            source_mutation_id=source_mutation_id,
+            destroyed_unit_instance_id=destroyed_unit_instance_id,
+            source_id=source_id,
         )
         self.primary_unit_destruction_states.append(destruction)
         self.primary_unit_destruction_states.sort(key=lambda stored: stored.destruction_id)
@@ -3624,6 +3494,12 @@ class GameState:
         )
         _action_history.interrupt_and_emit_attached_unit_split(
             self, event_log, requested_attached_unit_id, surviving_ids
+        )
+        transfer_arrived_reserve_state_after_attached_unit_split(
+            state=self,
+            event_log=event_log,
+            attached_unit_instance_id=requested_attached_unit_id,
+            component_unit_instance_ids=tuple(sorted(recovery_unit_ids)),
         )
         self._remove_attached_unit_formation(attached_unit_instance_id=requested_attached_unit_id)
         replaced_ids = {*recovery_unit_ids, requested_attached_unit_id}
@@ -4289,6 +4165,53 @@ class GameState:
                 return
         raise GameLifecycleError("ReserveState does not exist for unit.")
 
+    def replace_arrived_reserve_state_after_attached_unit_split(
+        self,
+        *,
+        source_reserve_state: ReserveState,
+        successor_reserve_states: tuple[ReserveState, ...],
+    ) -> None:
+        """Atomically replace one historical attached-unit arrival with its components."""
+        if type(source_reserve_state) is not ReserveState:
+            raise GameLifecycleError("Attached split reserve source must be a ReserveState.")
+        if type(successor_reserve_states) is not tuple or not successor_reserve_states:
+            raise GameLifecycleError("Attached split reserve successors must be a non-empty tuple.")
+        if any(type(successor) is not ReserveState for successor in successor_reserve_states):
+            raise GameLifecycleError(
+                "Attached split reserve successors must contain ReserveState values."
+            )
+        successor_ids = tuple(successor.unit_instance_id for successor in successor_reserve_states)
+        expected_successors = arrived_reserve_state_split_successors(
+            source_state=source_reserve_state,
+            component_unit_instance_ids=successor_ids,
+        )
+        stored_sources = tuple(
+            stored
+            for stored in self.reserve_states
+            if stored.unit_instance_id == source_reserve_state.unit_instance_id
+        )
+        if stored_sources != (source_reserve_state,):
+            raise GameLifecycleError("Attached split ReserveState source persistence drift.")
+        if any(
+            stored.unit_instance_id in successor_ids
+            for stored in self.reserve_states
+            if stored.unit_instance_id != source_reserve_state.unit_instance_id
+        ):
+            raise GameLifecycleError("Attached split ReserveState successor already exists.")
+        if successor_reserve_states != expected_successors:
+            raise GameLifecycleError("Attached split ReserveState successor identity drift.")
+        self.reserve_states = _validate_reserve_states(
+            [
+                *(
+                    stored
+                    for stored in self.reserve_states
+                    if stored.unit_instance_id != source_reserve_state.unit_instance_id
+                ),
+                *successor_reserve_states,
+            ],
+            player_ids=self.player_ids,
+        )
+
     def record_cult_ambush_marker(self, marker: CultAmbushMarker) -> None:
         if type(marker) is not CultAmbushMarker:
             raise GameLifecycleError("cult_ambush_marker must be a CultAmbushMarker.")
@@ -4328,11 +4251,12 @@ class GameState:
     def reposition_unit_to_strategic_reserves(
         self,
         *,
+        decisions: DecisionController,
         player_id: str,
         unit_instance_id: str,
-        reserve_origin: ReserveOrigin = ReserveOrigin.DURING_BATTLE_OTHER,
-        destruction_deadline_policy: ReserveDestructionTimingPolicy | None = None,
-        source_rule_ids: tuple[str, ...] | None = None,
+        provider: PrimaryReserveEntryProvider,
+        reserve_origin: ReserveOrigin,
+        source_rule_ids: tuple[str, ...],
         required_arrival_battle_round: int | None = None,
         required_arrival_phase: BattlePhase | str | None = None,
         required_arrival_source_rule_id: str | None = None,
@@ -4352,17 +4276,53 @@ class GameState:
             unit_instance_id=requested_unit_id,
         )
         rules_unit_id = rules_unit_view.unit_instance_id
+        if type(provider) is not PrimaryReserveEntryProvider:
+            raise GameLifecycleError("Repositioned units require a typed reserve provider.")
+        if type(decisions) is not DecisionController:
+            raise GameLifecycleError("Repositioned units require DecisionController authority.")
+        validate_accepted_primary_reserve_entry_provider(
+            state=self,
+            decisions=decisions,
+            provider=provider,
+        )
+        requirements = primary_reserve_entry_requirements(
+            state=self,
+            decisions=decisions,
+            provider=provider,
+        )
+        requested_arrival_phase = (
+            None if required_arrival_phase is None else BattlePhase(required_arrival_phase).value
+        )
+        if (
+            required_arrival_battle_round != requirements.required_arrival_battle_round
+            or requested_arrival_phase != requirements.required_arrival_phase
+            or required_arrival_source_rule_id != requirements.required_arrival_source_rule_id
+            or required_arrival_placement_kind != requirements.required_arrival_placement_kind
+        ):
+            raise GameLifecycleError("Repositioned unit required-arrival authority drift.")
         origin = reserve_origin_from_token(reserve_origin)
         if origin not in {
             ReserveOrigin.DURING_BATTLE_ABILITY,
             ReserveOrigin.DURING_BATTLE_STRATAGEM,
-            ReserveOrigin.DURING_BATTLE_OTHER,
         }:
-            raise GameLifecycleError("Repositioned units require a during-battle reserve origin.")
+            raise GameLifecycleError(
+                "Repositioned units require an ability or Stratagem reserve origin."
+            )
+        if (
+            provider.reserve_origin is not origin
+            or provider.player_id != requested_player_id
+            or provider.target_rules_unit_instance_id != rules_unit_id
+            or source_rule_ids != (provider.source_rule_id,)
+        ):
+            raise GameLifecycleError("Repositioned unit reserve provider context drift.")
         if rules_unit_view.owner_player_id != requested_player_id:
             raise GameLifecycleError("Repositioned unit player_id drift.")
-        if self.reserve_state_for_unit(rules_unit_id) is not None:
-            raise GameLifecycleError("Repositioned unit already has a ReserveState.")
+        existing_reserve_state = self.reserve_state_for_unit(rules_unit_id)
+        if existing_reserve_state is not None and existing_reserve_state.status in {
+            ReserveStatus.IN_RESERVES,
+            ReserveStatus.DESTROYED,
+        }:
+            raise GameLifecycleError("Repositioned unit has a non-terminal-arrival ReserveState.")
         rules_unit_placement = RulesUnitPlacement.from_battlefield(
             view=rules_unit_view,
             battlefield_state=self.battlefield_state,
@@ -4374,7 +4334,7 @@ class GameState:
                 embarked_unit_ids.update(cargo_state.embarked_unit_instance_ids)
         policy = _arrival.reposition_destruction_policy(
             mission_setup=self.mission_setup,
-            destruction_deadline_policy=destruction_deadline_policy,
+            destruction_deadline_policy=None,
         )
         reserve_state = ReserveState.entered_during_battle(
             player_id=requested_player_id,
@@ -4392,8 +4352,35 @@ class GameState:
             required_arrival_placement_kind=required_arrival_placement_kind,
         )
         updated_battlefield = rules_unit_placement.without_from_battlefield(self.battlefield_state)
-        self.record_reserve_state(reserve_state)
+        if existing_reserve_state is None:
+            self.record_reserve_state(reserve_state)
+        else:
+            self.replace_reserve_state(reserve_state)
         self.battlefield_state = updated_battlefield
+        departure = record_primary_battlefield_departure(
+            state=self,
+            rules_unit_instance_id=rules_unit_id,
+            affected_component_unit_instance_ids=(rules_unit_view.component_unit_instance_ids),
+            departed_component_unit_instance_ids=(rules_unit_view.component_unit_instance_ids),
+            removed_model_instance_ids=tuple(
+                placement.model_instance_id for placement in rules_unit_placement.model_placements
+            ),
+            removal_kind=BattlefieldRemovalKind.INTO_RESERVES,
+            occurrence_id=provider.occurrence_id,
+            source_id=provider.occurrence_id,
+        )
+        if departure is not None:
+            record_primary_reserve_entry_mutation_event(
+                event_log=decisions.event_log,
+                departure=departure,
+                reserve_state=reserve_state,
+                provider=provider,
+                transition_batch=None,
+            )
+            record_primary_battlefield_departure_event(
+                event_log=decisions.event_log,
+                departure=departure,
+            )
         return reserve_state
 
     def record_hover_mode_state(self, hover_mode_state: HoverModeState) -> None:
@@ -4435,23 +4422,25 @@ class GameState:
         unit_by_id = {
             unit.unit_instance_id: unit for army in self.army_definitions for unit in army.units
         }
-        model_ids: list[str] = []
+        model_ids: set[str] = set()
         for cargo_state in self.transport_cargo_states:
             for unit_id in cargo_state.embarked_unit_instance_ids:
                 unit = unit_by_id.get(unit_id)
                 if unit is None:
                     raise GameLifecycleError("TransportCargoState references an unknown unit.")
-                model_ids.extend(model.model_instance_id for model in unit.own_models)
+                model_ids.update(
+                    model.model_instance_id for model in unit.own_models if model.is_alive
+                )
         return tuple(sorted(model_ids))
 
     def unavailable_model_ids(self) -> tuple[str, ...]:
         return tuple(
             sorted(
-                (
+                {
                     *self.unarrived_reserve_model_ids(),
                     *self.embarked_model_ids(),
                     *self.dedicated_transport_setup_consequence_model_ids(),
-                )
+                }
             )
         )
 
@@ -4860,14 +4849,17 @@ class GameState:
             "primary_objective_turn_start_states": [
                 state.to_payload() for state in self.primary_objective_turn_start_states
             ],
-            "primary_unit_terrain_turn_start_snapshots": [
-                snapshot.to_payload() for snapshot in self.primary_unit_terrain_turn_start_snapshots
+            "primary_rules_unit_turn_start_snapshots": [
+                snapshot.to_payload() for snapshot in self.primary_rules_unit_turn_start_snapshots
             ],
             "primary_terrain_trap_states": [
                 state.to_payload() for state in self.primary_terrain_trap_states
             ],
             "primary_unit_destruction_states": [
                 state.to_payload() for state in self.primary_unit_destruction_states
+            ],
+            "primary_battlefield_departure_states": [
+                state.to_payload() for state in self.primary_battlefield_departure_states
             ],
             "secondary_unit_destruction_states": [
                 state.to_payload() for state in self.secondary_unit_destruction_states
@@ -5202,9 +5194,9 @@ class GameState:
                 PrimaryObjectiveTurnStartState.from_payload(state)
                 for state in payload["primary_objective_turn_start_states"]
             ],
-            primary_unit_terrain_turn_start_snapshots=(
-                primary_unit_terrain_turn_start_snapshots_from_payload(
-                    payload["primary_unit_terrain_turn_start_snapshots"]
+            primary_rules_unit_turn_start_snapshots=(
+                primary_rules_unit_turn_start_snapshots_from_payload(
+                    payload["primary_rules_unit_turn_start_snapshots"]
                 )
             ),
             primary_terrain_trap_states=[
@@ -5215,6 +5207,11 @@ class GameState:
                 PrimaryUnitDestructionState.from_payload(state)
                 for state in payload["primary_unit_destruction_states"]
             ],
+            primary_battlefield_departure_states=(
+                primary_battlefield_departure_states_from_payload(
+                    payload["primary_battlefield_departure_states"]
+                )
+            ),
             secondary_unit_destruction_states=[
                 SecondaryUnitDestructionState.from_payload(state)
                 for state in payload["secondary_unit_destruction_states"]
@@ -5547,11 +5544,77 @@ class GameState:
         )
         if not destruction.destroyed_model_instance_ids:
             return
-        self.battlefield_state = apply_reserve_destruction_to_battlefield(
+        self._apply_unarrived_reserve_destruction(destruction=destruction)
+
+    def _apply_unarrived_reserve_destruction(
+        self,
+        *,
+        destruction: ReserveDestructionResult,
+    ) -> None:
+        from warhammer40k_core.engine.primary_destruction_evidence import (
+            PrimaryUnattributedDestructionCause,
+        )
+        from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+            record_primary_unit_destructions_for_destroyed_models,
+        )
+
+        if self.battlefield_state is None:
+            raise GameLifecycleError("Reserve destruction requires battlefield_state.")
+        terminal_reserve_states = tuple(
+            prior_state
+            for prior_state, updated_state in zip(
+                self.reserve_states,
+                destruction.updated_reserve_states,
+                strict=True,
+            )
+            if prior_state.status is ReserveStatus.IN_RESERVES
+            and updated_state.status is ReserveStatus.DESTROYED
+        )
+        for reserve_state in terminal_reserve_states:
+            cargo_state = self.transport_cargo_state_for_transport(reserve_state.unit_instance_id)
+            if cargo_state is None:
+                if reserve_state.embarked_unit_instance_ids:
+                    raise GameLifecycleError(
+                        "transport_cargo_states unarrived reserve route cargo drift."
+                    )
+                continue
+            if cargo_state.embarked_unit_instance_ids != reserve_state.embarked_unit_instance_ids:
+                raise GameLifecycleError(
+                    "transport_cargo_states unarrived reserve route cargo drift."
+                )
+        terminal_transport_ids = {
+            reserve_state.unit_instance_id for reserve_state in terminal_reserve_states
+        }
+        updated_battlefield_state = apply_reserve_destruction_to_battlefield(
             battlefield_state=self.battlefield_state,
             destruction=destruction,
         )
+        updated_transport_cargo_states = [
+            cargo_state
+            for cargo_state in self.transport_cargo_states
+            if cargo_state.transport_unit_instance_id not in terminal_transport_ids
+        ]
+        self.battlefield_state = updated_battlefield_state
         self.reserve_states = list(destruction.updated_reserve_states)
+        self.transport_cargo_states = updated_transport_cargo_states
+        record_primary_unit_destructions_for_destroyed_models(
+            state=self,
+            destroyed_model_instance_ids=destruction.destroyed_model_instance_ids,
+            destruction_attribution=None,
+            source_model_destroyed_event_id=None,
+            source_rules_unit_objective_proximity_witness=None,
+            destroyed_rules_unit_objective_proximity_witness=None,
+            unattributed_cause=PrimaryUnattributedDestructionCause.RESERVE_DEADLINE,
+            source_mutation_id=(
+                f"{destruction.policy.source_id}:round-{destruction.battle_round:02d}:"
+                f"{'end-of-battle' if destruction.end_of_battle else 'round-boundary'}"
+            ),
+            left_battlefield=False,
+            source_id=(
+                f"{destruction.policy.source_id}:round-{destruction.battle_round:02d}:"
+                f"{'end-of-battle' if destruction.end_of_battle else 'round-boundary'}"
+            ),
+        )
 
     def ruleset_descriptor_for_runtime_policy(self) -> RulesetDescriptor:
         return runtime_ruleset_descriptor_for_mission_setup(
@@ -6163,64 +6226,6 @@ def _validate_starting_strength_records(
     return sorted(validated, key=lambda record: record.unit_instance_id)
 
 
-def _validate_starting_attached_unit_records(
-    values: object,
-    *,
-    army_definitions: list[ArmyDefinition],
-    player_ids: tuple[str, ...],
-) -> list[StartingAttachedUnitRecord]:
-    if not isinstance(values, list):
-        raise GameLifecycleError("GameState starting_attached_unit_records must be a list.")
-    if not values and army_definitions:
-        derived: list[StartingAttachedUnitRecord] = []
-        for army_definition in army_definitions:
-            derived.extend(_starting_attached_unit_records_for_army(army_definition))
-        return sorted(derived, key=lambda record: record.attached_unit_instance_id)
-
-    expected_by_id = {
-        record.attached_unit_instance_id: record
-        for army_definition in army_definitions
-        for record in _starting_attached_unit_records_for_army(army_definition)
-    }
-    physical_owner_by_id = _unit_owner_by_id(army_definitions)
-    validated: list[StartingAttachedUnitRecord] = []
-    seen_attached_unit_ids: set[str] = set()
-    seen_component_unit_ids: set[str] = set()
-    for value in cast(list[object], values):
-        if type(value) is not StartingAttachedUnitRecord:
-            raise GameLifecycleError(
-                "GameState starting_attached_unit_records must contain "
-                "StartingAttachedUnitRecord values."
-            )
-        if value.player_id not in player_ids:
-            raise GameLifecycleError("StartingAttachedUnitRecord player_id is not in this game.")
-        if value.attached_unit_instance_id in seen_attached_unit_ids:
-            raise GameLifecycleError("GameState starting_attached_unit_records must be unique.")
-        seen_attached_unit_ids.add(value.attached_unit_instance_id)
-        for component_unit_id in value.component_unit_instance_ids:
-            owner = physical_owner_by_id.get(component_unit_id)
-            if owner is None:
-                raise GameLifecycleError("StartingAttachedUnitRecord component unit is unknown.")
-            if owner != value.player_id:
-                raise GameLifecycleError("StartingAttachedUnitRecord component player_id drift.")
-            if component_unit_id in seen_component_unit_ids:
-                raise GameLifecycleError(
-                    "StartingAttachedUnitRecord component units must not overlap."
-                )
-            seen_component_unit_ids.add(component_unit_id)
-        validated.append(value)
-    by_id = {record.attached_unit_instance_id: record for record in validated}
-    for expected_id, expected_record in expected_by_id.items():
-        record = by_id.get(expected_id)
-        if record is None:
-            raise GameLifecycleError(
-                "GameState starting_attached_unit_records must include active attached units."
-            )
-        if record != expected_record:
-            raise GameLifecycleError("StartingAttachedUnitRecord active formation drift.")
-    return sorted(validated, key=lambda record: record.attached_unit_instance_id)
-
-
 def _starting_strength_records_for_army(
     army_definition: ArmyDefinition,
 ) -> tuple[StartingStrengthRecord, ...]:
@@ -6246,27 +6251,6 @@ def _starting_strength_records_for_army(
             )
         )
     return tuple(sorted(records, key=lambda record: record.unit_instance_id))
-
-
-def _starting_attached_unit_records_for_army(
-    army_definition: ArmyDefinition,
-) -> tuple[StartingAttachedUnitRecord, ...]:
-    if type(army_definition) is not ArmyDefinition:
-        raise GameLifecycleError(
-            "StartingAttachedUnitRecord derivation requires an ArmyDefinition."
-        )
-    return tuple(
-        sorted(
-            (
-                StartingAttachedUnitRecord.from_formation(
-                    player_id=army_definition.player_id,
-                    attached_unit=attached_unit,
-                )
-                for attached_unit in army_definition.attached_units
-            ),
-            key=lambda record: record.attached_unit_instance_id,
-        )
-    )
 
 
 def _starting_strength_record_for_attached_unit(

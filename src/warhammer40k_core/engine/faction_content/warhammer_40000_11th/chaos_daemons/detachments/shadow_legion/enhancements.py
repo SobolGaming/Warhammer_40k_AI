@@ -68,8 +68,21 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
-from warhammer40k_core.engine.reserves import ReserveOrigin
-from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
+from warhammer40k_core.engine.primary_historical_events import (
+    primary_reserve_entry_source_terminal_bindings_payload,
+    record_primary_reserve_entry_provider_terminal_event,
+)
+from warhammer40k_core.engine.primary_reserve_entry_provider import (
+    PrimaryReserveEntryAbilityAuthorityKind,
+    PrimaryReserveEntryAbilityProviderDefinition,
+    primary_reserve_entry_provider_from_accepted_ability_decision,
+)
+from warhammer40k_core.engine.reserves import ReserveOrigin, ReserveStatus
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    rules_unit_view_by_id,
+    rules_unit_view_from_armies,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
 )
@@ -150,6 +163,16 @@ SUBMISSION_KIND = "chaos_daemons_shadow_legion_fade_to_darkness_turn_end"
 ELIGIBLE_EVENT = "chaos_daemons_shadow_legion_fade_to_darkness_eligible"
 USED_EVENT = "chaos_daemons_shadow_legion_fade_to_darkness_used"
 DECLINED_EVENT = "chaos_daemons_shadow_legion_fade_to_darkness_declined"
+PRIMARY_RESERVE_ENTRY_PROVIDER_DEFINITION = PrimaryReserveEntryAbilityProviderDefinition(
+    provider_id=TURN_END_HOOK_ID,
+    source_terminal_event_type=USED_EVENT,
+    authority_kind=PrimaryReserveEntryAbilityAuthorityKind.ENHANCEMENT_ASSIGNMENT,
+    source_rule_id=SOURCE_RULE_ID,
+    content_id=ENHANCEMENT_ID,
+    terminal_static_identity=(("enhancement_id", ENHANCEMENT_ID),),
+    terminal_request_identity_keys=("destroyed_enemy_unit_instance_ids",),
+    terminal_result_identity_keys=("enhancement_id", "target_unit_instance_id"),
+)
 
 
 def runtime_contribution() -> RuntimeContentContribution:
@@ -583,21 +606,45 @@ def apply_fade_to_darkness_turn_end_result(context: TurnEndResultContext) -> boo
         raise GameLifecycleError("Fade to Darkness unit no longer has a destroyed enemy unit.")
     if not _unit_can_enter_strategic_reserves(context.state, unit_instance_id=unit_instance_id):
         raise GameLifecycleError("Fade to Darkness unit is no longer eligible.")
+    target_rules_unit_id = rules_unit_view_from_armies(
+        armies=tuple(context.state.army_definitions),
+        unit_instance_id=unit_instance_id,
+    ).unit_instance_id
+    provider = primary_reserve_entry_provider_from_accepted_ability_decision(
+        state=context.state,
+        decisions=context.decisions,
+        result=context.result,
+        provider_id=TURN_END_HOOK_ID,
+        source_rule_id=SOURCE_RULE_ID,
+        target_rules_unit_instance_id=target_rules_unit_id,
+        source_terminal_event_type=USED_EVENT,
+    )
     reserve_state = context.state.reposition_unit_to_strategic_reserves(
+        decisions=context.decisions,
         player_id=player_id,
         unit_instance_id=unit_instance_id,
+        provider=provider,
         reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
         source_rule_ids=(SOURCE_RULE_ID,),
     )
-    context.decisions.event_log.append(
+    source_terminal_event = context.decisions.event_log.append(
         USED_EVENT,
-        _fade_to_darkness_event_payload(
-            context=context,
-            player_id=player_id,
-            unit_instance_id=unit_instance_id,
-            reserve_state_payload=cast(JsonValue, reserve_state.to_payload()),
-            use_ability=True,
-        ),
+        {
+            **_fade_to_darkness_event_payload(
+                context=context,
+                player_id=player_id,
+                unit_instance_id=unit_instance_id,
+                reserve_state_payload=cast(JsonValue, reserve_state.to_payload()),
+                use_ability=True,
+            ),
+            **primary_reserve_entry_source_terminal_bindings_payload(((provider, reserve_state),)),
+        },
+    )
+    record_primary_reserve_entry_provider_terminal_event(
+        event_log=context.decisions.event_log,
+        provider=provider,
+        reserve_state=reserve_state,
+        source_terminal_event=source_terminal_event,
     )
     return True
 
@@ -1084,7 +1131,8 @@ def _unit_can_enter_strategic_reserves(
         raise GameLifecycleError("Fade to Darkness requires GameState.")
     if state.battlefield_state is None:
         raise GameLifecycleError("Fade to Darkness requires battlefield_state.")
-    if state.reserve_state_for_unit(unit_instance_id) is not None:
+    reserve_state = state.reserve_state_for_unit(unit_instance_id)
+    if reserve_state is not None and reserve_state.status is not ReserveStatus.ARRIVED:
         return False
     if not state.battlefield_state.is_unit_placed(unit_instance_id):
         return False

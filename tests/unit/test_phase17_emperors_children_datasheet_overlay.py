@@ -8,6 +8,10 @@ from pathlib import Path
 from typing import Any, cast
 
 import pytest
+from tests.setup_completion_helpers import (
+    record_existing_primary_turn_start_evidence_events_for_fixture,
+    record_primary_turn_start_evidence_for_fixture,
+)
 from tools.generate_ability_support_matrix import (
     _ability_support_catalog_package,  # pyright: ignore[reportPrivateUsage]
 )
@@ -63,6 +67,11 @@ from warhammer40k_core.engine.battle_shock import (
     BattleShockTestRequest,
 )
 from warhammer40k_core.engine.battle_shock_hooks import BattleShockHookRegistry
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRemovalKind,
+    BattlefieldTransitionBatch,
+    ModelRemovalRecord,
+)
 from warhammer40k_core.engine.catalog_battle_shock_runtime import (
     catalog_battle_shock_hook_bindings,
 )
@@ -220,8 +229,9 @@ from warhammer40k_core.engine.phases.shooting import (
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.primary_turn_start_evidence import (
-    record_primary_turn_start_evidence,
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    destruction_source_objective_proximity_witness,
+    rules_unit_objective_proximity_witness,
 )
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.replay import ReplayArtifact, ReplayArtifactPayload, ReplayRunner
@@ -777,6 +787,10 @@ def test_post_shoot_pending_decision_after_target_set_change_replays() -> None:
         source_attached_id,
     ) = _configured_kakophonist_multi_target_fixture()
     decisions = DecisionController()
+    record_existing_primary_turn_start_evidence_events_for_fixture(
+        state,
+        decisions=decisions,
+    )
     runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
     battle_shock_hooks = BattleShockHookRegistry.from_bindings(
         catalog_battle_shock_hook_bindings(
@@ -1320,6 +1334,10 @@ def test_selected_target_attached_split_lifecycle_and_replay_round_trip() -> Non
     assert len(target_noise_marines.own_models) == 1
     assert target_noise_marines.own_models[0].wounds_remaining == 1
     decisions = DecisionController()
+    record_existing_primary_turn_start_evidence_events_for_fixture(
+        state,
+        decisions=decisions,
+    )
     runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
     context = _kakophonist_post_shoot_context(
         state=state,
@@ -1466,6 +1484,10 @@ def test_leader_support_split_lifecycle_and_replay_round_trip(
             ),
         )
     decisions = DecisionController()
+    record_existing_primary_turn_start_evidence_events_for_fixture(
+        state,
+        decisions=decisions,
+    )
     runtime = CatalogSelectedTargetEffectRuntime(indexes, armies)
     context = _kakophonist_post_shoot_context(
         state=state,
@@ -2403,8 +2425,8 @@ def test_infractors_excessive_assault_grants_only_melee_wound_rerolls() -> None:
 @pytest.mark.parametrize(
     ("within_objective_range", "game_id", "expected_wound_value"),
     [
-        (True, "phase18j-excessive-inside-0002", 4),
-        (False, "phase18j-excessive-outside-0008", 1),
+        (True, "phase18j-excessive-inside-0001", 4),
+        (False, "phase18j-excessive-outside-0011", 1),
     ],
 )
 def test_infractors_excessive_assault_uses_fight_lifecycle_decision_and_replays(
@@ -2492,7 +2514,7 @@ def test_infractors_excessive_assault_does_not_enter_ranged_reroll_path() -> Non
         source_datasheet_id="000004080",
         phase=BattlePhase.SHOOTING,
         with_icon=False,
-        game_id="infractors-excessive-assault-ranged-lifecycle",
+        game_id="infractors-excessive-assault-ranged-lifecycle-1",
     )
     state = session.lifecycle.state
     assert state is not None
@@ -2600,7 +2622,7 @@ def test_icon_of_excess_requires_enemy_destruction_then_resolves_unit_leadership
         "expected_gain_status",
     ),
     [
-        ("icon-lifecycle-outcome-0", False, True, "applied"),
+        ("icon-lifecycle-outcome-1", False, True, "applied"),
         ("icon-of-excess-fail-0", False, False, None),
         ("icon-cap-outcome-2", True, True, "capped"),
     ],
@@ -2697,7 +2719,7 @@ def test_icon_of_excess_uses_shooting_lifecycle_destruction_and_replays(
 
 
 def test_icon_of_excess_uses_fight_lifecycle_destruction_and_replays() -> None:
-    game_id = "icon-of-excess-fight-lifecycle"
+    game_id = "icon-of-excess-fight-lifecycle-0"
     session, tormentors, target = _battleline_lifecycle_session(
         source_datasheet_id="000004079",
         phase=BattlePhase.FIGHT,
@@ -2951,6 +2973,38 @@ def test_icon_of_excess_matches_historical_attached_attack_identity_after_split(
     _move_unit(state, tormentors.unit_instance_id, x=10.0, y=10.0)
     _move_unit(state, extra_target.unit_instance_id, x=20.0, y=10.0)
     for index, model in enumerate(target.own_models):
+        battlefield = state.battlefield_state
+        assert battlefield is not None
+        destroyed_model_placement = battlefield.model_placement_or_none(model.model_instance_id)
+        assert destroyed_model_placement is not None
+        attack_context_id = f"attack-context:icon-attached-split:{index}"
+        attribution = ModelDestructionAttribution.for_attack(
+            destroying_player_id="player-a",
+            attacking_unit_instance_id=attached_view.unit_instance_id,
+            attacking_model_instance_id=tormentors.own_models[0].model_instance_id,
+            weapon_profile=_weapon_profile("000004079", "Boltgun"),
+            attack_context_id=attack_context_id,
+        )
+        source_witness = destruction_source_objective_proximity_witness(
+            state=state,
+            event_log=decisions.event_log,
+            attribution=attribution,
+            destroyed_model_placement=destroyed_model_placement,
+        )
+        assert source_witness is not None
+        destroyed_witness = rules_unit_objective_proximity_witness(
+            state=state,
+            rules_unit_instance_id=target.unit_instance_id,
+            included_destroyed_model_placement=destroyed_model_placement,
+        )
+        removal_record = ModelRemovalRecord(
+            model_instance_id=model.model_instance_id,
+            removal_kind=BattlefieldRemovalKind.DESTROYED,
+            source_phase=BattlePhase.SHOOTING.value,
+            source_step=AttackSequenceStep.DAMAGE.value,
+            source_event_id=attack_context_id,
+        )
+        transition_batch = BattlefieldTransitionBatch(removals=(removal_record,))
         destroy_model_by_rule(state=state, model_instance_id=model.model_instance_id)
         decisions.event_log.append(
             "model_destroyed",
@@ -2959,15 +3013,21 @@ def test_icon_of_excess_matches_historical_attached_attack_identity_after_split(
                 "battle_round": state.battle_round,
                 "active_player_id": "player-a",
                 "phase": BattlePhase.SHOOTING.value,
-                **ModelDestructionAttribution.for_attack(
-                    destroying_player_id="player-a",
-                    attacking_unit_instance_id=attached_view.unit_instance_id,
-                    attacking_model_instance_id=(tormentors.own_models[0].model_instance_id),
-                    weapon_profile=_weapon_profile("000004079", "Boltgun"),
-                    attack_context_id=f"attack-context:icon-attached-split:{index}",
-                ).to_payload(),
+                **attribution.to_payload(),
+                "source_rules_unit_objective_proximity_witness": source_witness.to_payload(),
+                "destroyed_rules_unit_objective_proximity_witness": (
+                    destroyed_witness.to_payload()
+                ),
+                "sequence_id": "attack-sequence:icon-attached-split",
+                "attack_context_id": attack_context_id,
                 "target_unit_instance_id": target.unit_instance_id,
                 "model_instance_id": model.model_instance_id,
+                "damage_kind": DamageKind.NORMAL.value,
+                "damage_event_id": None,
+                "removal_record": removal_record.to_payload(),
+                "transition_batch": transition_batch.to_payload(),
+                "destroyed_model_placement": destroyed_model_placement.to_payload(),
+                "destroyed_model_rules_triggered": False,
             },
         )
     for model in leader.own_models:
@@ -3919,7 +3979,8 @@ def _fulgrim_opponent_turn_fight_session(
         )
     _move_unit(state, fulgrim.unit_instance_id, x=10.0, y=10.0)
     _move_unit(state, enemy.unit_instance_id, x=15.5, y=10.0)
-    record_primary_turn_start_evidence(state=state)
+    decisions = DecisionController()
+    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
     lifecycle = GameLifecycle.from_payload(
         cast(
             GameLifecyclePayload,
@@ -3927,7 +3988,7 @@ def _fulgrim_opponent_turn_fight_session(
                 "config": config.to_payload(),
                 "parameterized_movement_proposals": True,
                 "state": state.to_payload(),
-                "decisions": DecisionController().to_payload(),
+                "decisions": decisions.to_payload(),
                 "reaction_queue": ReactionQueue().to_payload(),
             },
         )
@@ -4752,7 +4813,8 @@ def _configured_kakophonist_fixture(
                 fixed_mission_ids=("assassination", "bring_it_down"),
             )
         )
-    record_primary_turn_start_evidence(state=state)
+    decisions = DecisionController()
+    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
     records = catalog_ability_records_from_catalog(catalog)
     indexes = {
         army.player_id: build_player_ability_index(records, army=army, catalog=catalog)
@@ -5407,7 +5469,8 @@ def _battleline_lifecycle_session(
                 fixed_mission_ids=("assassination", "bring_it_down"),
             )
         )
-    record_primary_turn_start_evidence(state=state)
+    decisions = DecisionController()
+    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
     lifecycle = GameLifecycle.from_payload(
         cast(
             GameLifecyclePayload,
@@ -5415,7 +5478,7 @@ def _battleline_lifecycle_session(
                 "config": config.to_payload(),
                 "parameterized_movement_proposals": True,
                 "state": state.to_payload(),
-                "decisions": DecisionController().to_payload(),
+                "decisions": decisions.to_payload(),
                 "reaction_queue": ReactionQueue().to_payload(),
             },
         )

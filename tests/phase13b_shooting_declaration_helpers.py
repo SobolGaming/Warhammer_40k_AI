@@ -6,6 +6,7 @@ from typing import Any, cast
 
 import warhammer40k_core.engine.attack_sequence as attack_sequence_module
 import warhammer40k_core.engine.phases.shooting as shooting_phase_module
+from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
@@ -81,9 +82,13 @@ from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionSource,
     FeelNoPainResolution,
     FeelNoPainSource,
+    apply_mortal_wounds_to_unit,
+    unit_owner_player_id,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.destruction_provenance import DestructionSourceKind
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventLog, JsonValue, validate_json_value
@@ -103,6 +108,9 @@ from warhammer40k_core.engine.list_validation import (
 from warhammer40k_core.engine.mission_setup import (
     MissionSetup,
     PlayerPrimaryMissionAssignment,
+)
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
 )
 from warhammer40k_core.engine.movement_proposals import (
     PLACEMENT_PROPOSAL_DECISION_TYPE,
@@ -131,9 +139,6 @@ from warhammer40k_core.engine.phases.shooting import (
     ShootingPhaseState,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.primary_turn_start_evidence import (
-    record_primary_turn_start_evidence,
-)
 from warhammer40k_core.engine.saves import (
     SaveKind,
     saving_throw_roll_spec,
@@ -245,6 +250,7 @@ __all__ = (
     "_proposal_from_declarations",
     "_proposal_from_request",
     "_record_parameterized_result_for_apply",
+    "_reduce_unit_to_last_model_with_mortal_wounds",
     "_replace_enemy_with_attached_character_fixture",
     "_replace_unit_instance_in_state",
     "_replace_unit_toughness",
@@ -499,6 +505,7 @@ def _shooting_lifecycle(
         state = _state(lifecycle)
         _configure_shooting_battle_state(
             state=state,
+            decisions=lifecycle.decision_controller,
             armies=armies,
             battlefield=battlefield,
             units=dict(cached_units),
@@ -664,6 +671,7 @@ def _build_shooting_lifecycle(
     state = _state(lifecycle)
     _configure_shooting_battle_state(
         state=state,
+        decisions=lifecycle.decision_controller,
         armies=armies,
         battlefield=battlefield,
         units=units,
@@ -675,6 +683,7 @@ def _build_shooting_lifecycle(
 def _configure_shooting_battle_state(
     *,
     state: GameState,
+    decisions: DecisionController,
     armies: tuple[ArmyDefinition, ...],
     battlefield: BattlefieldRuntimeState,
     units: dict[str, UnitInstance],
@@ -696,7 +705,7 @@ def _configure_shooting_battle_state(
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     state.battle_round = 1
     state.active_player_id = "player-a"
-    record_primary_turn_start_evidence(state=state)
+    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
     if embarked_unit_ids:
         transport = units["transport-1"]
         state.record_transport_cargo_state(
@@ -2390,16 +2399,80 @@ def _stored_shooting_attack_sequence(lifecycle: GameLifecycle) -> AttackSequence
     return shooting_state.attack_sequence
 
 
+def _reduce_unit_to_last_model_with_mortal_wounds(
+    lifecycle: GameLifecycle,
+    *,
+    target_unit: UnitInstance,
+    source_unit: UnitInstance,
+    application_id: str,
+) -> ModelInstance:
+    state = _state(lifecycle)
+    phase = state.current_battle_phase
+    if phase is None:
+        raise AssertionError("pre-existing casualty fixture requires a battle phase")
+    if len(target_unit.own_models) < 2:
+        raise AssertionError("pre-existing casualty fixture requires at least two target models")
+    if not source_unit.own_models:
+        raise AssertionError("pre-existing casualty fixture requires a source model")
+    casualty_models = target_unit.own_models[:-1]
+    survivor = target_unit.own_models[-1]
+    source_model = source_unit.own_models[0]
+    destroying_player_id = unit_owner_player_id(
+        state=state,
+        unit_instance_id=source_unit.unit_instance_id,
+    )
+    application = apply_mortal_wounds_to_unit(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        application_id=application_id,
+        source_rule_id=f"{application_id}:fixture-rule",
+        source_context={
+            "source_kind": "fixture_preexisting_casualties",
+            "source_unit_instance_id": source_unit.unit_instance_id,
+            "source_model_instance_id": source_model.model_instance_id,
+        },
+        destruction_evidence=MortalWoundDestructionEvidence.for_non_attack_state(
+            state=state,
+            destroying_player_id=destroying_player_id,
+            source_rules_unit_instance_id=source_unit.unit_instance_id,
+            source_model_instance_id=source_model.model_instance_id,
+            destruction_source_kind=DestructionSourceKind.ABILITY,
+            action_phase=phase,
+            source_step="fixture_preexisting_casualties",
+        ),
+        target_unit_instance_id=target_unit.unit_instance_id,
+        mortal_wounds=sum(model.wounds_remaining for model in casualty_models),
+    )
+    expected_destroyed_ids = tuple(model.model_instance_id for model in casualty_models)
+    destroyed_ids = tuple(
+        damage.model_instance_id for damage in application.applications if damage.destroyed
+    )
+    if destroyed_ids != expected_destroyed_ids:
+        raise AssertionError("pre-existing casualty fixture destroyed unexpected models")
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("pre-existing casualty fixture requires battlefield state")
+    placed_ids = battlefield.placed_model_ids()
+    remaining_target_ids = tuple(
+        model.model_instance_id
+        for model in target_unit.own_models
+        if model.model_instance_id in placed_ids
+    )
+    if remaining_target_ids != (survivor.model_instance_id,):
+        raise AssertionError("pre-existing casualty fixture did not leave one target survivor")
+    return survivor
+
+
 def _paused_optional_fnp_lifecycle() -> tuple[GameLifecycle, DecisionRequest]:
     lifecycle, units = _shooting_lifecycle(alpha_unit_ids=("intercessor-1",))
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
     defender = units["enemy"]
-    defender_model = defender.own_models[0]
-    battlefield = state.battlefield_state
-    assert battlefield is not None
-    state.battlefield_state = battlefield.with_removed_models(
-        tuple(model.model_instance_id for model in defender.own_models[1:])
+    defender_model = _reduce_unit_to_last_model_with_mortal_wounds(
+        lifecycle,
+        target_unit=defender,
+        source_unit=attacker,
+        application_id="phase14h-fnp-round-trip-preexisting-casualties",
     )
     source_a = FeelNoPainSource(source_id="phase14h-fnp-a", threshold=5)
     source_b = FeelNoPainSource(source_id="phase14h-fnp-b", threshold=6)

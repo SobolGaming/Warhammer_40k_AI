@@ -6,6 +6,8 @@ from typing import cast
 
 import pytest
 
+from warhammer40k_core.adapters.access_control import AuthenticatedPrincipal, PrincipalRole
+from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import (
     MUSTERING_WARLORD_FORBIDDEN,
@@ -51,6 +53,7 @@ from warhammer40k_core.engine.attached_unit_formation import (
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.deployment import deployment_unit_selection_request
+from warhammer40k_core.engine.event_log import EventRecordPayload
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
@@ -1382,6 +1385,23 @@ def _phase16d_mission_setup() -> MissionSetup:
         defender_player_id="player-b",
         defender_force_disposition_id="purge-the-foe",
     )
+
+
+def _event_payload_exists_for_transport(
+    events: list[EventRecordPayload],
+    *,
+    event_type: str,
+    transport_unit_instance_id: str,
+) -> bool:
+    for event in events:
+        if event["event_type"] != event_type:
+            continue
+        payload = event["payload"]
+        if not isinstance(payload, dict):
+            continue
+        if payload.get("transport_unit_instance_id") == transport_unit_instance_id:
+            return True
+    return False
 
 
 def _detachment_by_id(catalog: ArmyCatalog, detachment_id: str) -> DetachmentDefinition:
@@ -4103,6 +4123,37 @@ def test_phase16d_setup_records_starting_transport_cargo_from_manifest() -> None
         state.starting_strength_record_for_unit("army-alpha:bodyguard-unit")
     event_types = tuple(event.event_type for event in decisions.event_log.records)
     assert "battle_formation_transport_manifest_recorded" in event_types
+    owner_events = EventStreamCursor().events_since(
+        decisions.event_log,
+        viewer_player_id="player-a",
+    )
+    opponent_events = EventStreamCursor().events_since(
+        decisions.event_log,
+        viewer_player_id="player-b",
+    )
+    administrator = AuthenticatedPrincipal(
+        principal_id="phase16d-admin",
+        role=PrincipalRole.ADMINISTRATOR,
+    ).bind_to_session(player_ids=state.player_ids)
+    admin_events = EventStreamCursor().events_since_for_context(
+        decisions.event_log,
+        viewer=administrator,
+    )
+    assert _event_payload_exists_for_transport(
+        owner_events["events"],
+        event_type="battle_formation_transport_manifest_recorded",
+        transport_unit_instance_id="army-alpha:transport-unit",
+    )
+    assert not _event_payload_exists_for_transport(
+        opponent_events["events"],
+        event_type="battle_formation_transport_manifest_recorded",
+        transport_unit_instance_id="army-alpha:transport-unit",
+    )
+    assert _event_payload_exists_for_transport(
+        admin_events["events"],
+        event_type="battle_formation_transport_manifest_recorded",
+        transport_unit_instance_id="army-alpha:transport-unit",
+    )
 
 
 def test_phase16d_empty_dedicated_transport_manifest_records_setup_consequence() -> None:
@@ -4168,6 +4219,24 @@ def test_phase16d_empty_dedicated_transport_manifest_records_setup_consequence()
     assert "deploy:attached-unit:army-alpha:bodyguard-unit" in option_ids
     assert "dedicated_transport_setup_consequence_recorded" in tuple(
         event.event_type for event in decisions.event_log.records
+    )
+    owner_events = EventStreamCursor().events_since(
+        decisions.event_log,
+        viewer_player_id="player-a",
+    )
+    opponent_events = EventStreamCursor().events_since(
+        decisions.event_log,
+        viewer_player_id="player-b",
+    )
+    assert _event_payload_exists_for_transport(
+        owner_events["events"],
+        event_type="dedicated_transport_setup_consequence_recorded",
+        transport_unit_instance_id="army-alpha:transport-unit",
+    )
+    assert not _event_payload_exists_for_transport(
+        opponent_events["events"],
+        event_type="dedicated_transport_setup_consequence_recorded",
+        transport_unit_instance_id="army-alpha:transport-unit",
     )
     assert GameState.from_payload(payload).to_payload() == state.to_payload()
 

@@ -404,43 +404,54 @@ reference server currently requires:
   explicit logical terrain-area identities;
 - `finite-submission-v1` for finite option submissions;
 - `parameterized-submission-v1` for proposal submissions;
-- `lifecycle-status-v2-primary-assignments` for server lifecycle responses;
-- `decision-request-view-v3-primary-assignments` for visible or redacted
+- `lifecycle-status-v3-phase17n-step3` for server lifecycle responses whose
+  unresolved Declare Battle Formations state is viewer-scoped;
+- `decision-request-view-v4-phase17n-step3` for visible or redacted
   pending decisions;
 - `annotated-decision-request-v2-primary-assignments` for nested interaction
   requests;
-- `event-delta-v2-primary-assignments` for the in-process integer-cursor adapter delta only;
-- `event-delta-v3-primary-assignments` for authenticated role-bound HTTP event deltas;
-- `game-view-v9-phase17n` for role-scoped game projections whose public mission
-  state contains both directed Primary Mission assignments and whose turn-start
-  terrain evidence contains exactly the units visible in `unit_display_by_id`;
-- `battlefield-view-v3-phase17n` for authoritative battlefield geometry with explicit
-  terrain-area logical identity and terrain area and feature classifications;
-- `session-projection-v5-phase17n` for full role-scoped reconnect projections;
-- `session-create-v4`, `session-metadata-v7-contract`,
-  `session-command-result-v7-contract`, and `session-command-outcome-v7-contract` for the
+- `event-delta-v3-phase17n-step3` for the in-process integer-cursor adapter delta only;
+- `event-delta-v4-phase17n-step3` for authenticated role-bound HTTP event deltas;
+- `game-view-v10-phase17n-step3` for role-scoped game projections whose public
+  mission state contains both directed Primary Mission assignments and whose
+  group-aware turn-start position evidence contains complete public rules-unit
+  rows;
+- `battlefield-view-v4-phase17n-step3` for authoritative battlefield geometry
+  with explicit terrain-area logical identity and terrain area and feature
+  classifications, plus viewer-scoped model formation state before reveal;
+- `session-projection-v6-phase17n-step3` for full role-scoped reconnect projections;
+- `session-create-v4`, `session-metadata-v8-contract`,
+  `session-command-result-v8-contract`, and `session-command-outcome-v8-contract` for the
   authenticated formal session protocol;
 - `capability-manifest-v2-directed-primary` inside
   `support-profile-v4-directed-primary` for viewer-scoped capability evidence
   whose public mission identity includes both assignments;
 - `physical-proposal-context-v2` for engine-owned physical proposal context;
-- `replay-artifact-v5-phase17n` for replay artifacts whose required source
+- `replay-artifact-v6-phase17n-step3` for replay artifacts whose required source
   identity includes `ruleset_descriptor_hash`, `rules_overlay_ids`, and the
   atomic `mission_pack_id` / `mission_source_package_hash` pair, while the
   embedded mission setup includes both directed Primary Mission assignments,
-  Phase 17N engine-state evidence, and explicit logical terrain-area identities;
+  Phase 17N group-aware turn-start position, destruction-attribution, and
+  battlefield-departure evidence, and explicit logical terrain-area identities;
 - `error-envelope-v1` for typed transport errors.
 
-The Contract 7 replay loader accepts only `replay-artifact-v5-phase17n`; v4
-artifacts require the retained 6.x deployment. It never infers directed Primary
-Mission assignments, missing logical terrain-area grouping, or mission source
-identity. Mission identity fields are both non-null when the configured or
+The Contract 8 replay loader accepts only `replay-artifact-v6-phase17n-step3`;
+v5 artifacts require the retained 7.x deployment. It never infers directed
+Primary Mission assignments, grouped position history, destruction sources,
+battlefield departures, missing logical terrain-area grouping, or mission
+source identity. Mission identity fields are both non-null when the configured or
 late-bound lifecycle has a mission setup and both null otherwise; canonical
 mission source-package hash drift is rejected. A mismatched
 request version fails before queue consumption or engine mutation. External
 error and status payloads are
 viewer-scoped by the same shared redaction policy as game projections and
 events.
+
+The external replay schema requires the lifecycle state and closes the three
+Step 3 evidence row families without duplicating every engine-private lifecycle
+field. Full lifecycle shape, event linkage, source attribution, and historical
+cross-record consistency remain fail-closed runtime-loader responsibilities;
+JSON Schema acceptance alone does not certify a replay as reproducible.
 
 Compatibility, coordinate, session, and redaction semantics are normative in
 `contracts/compatibility-policy.md`, `contracts/coordinate-system.md`,
@@ -1629,7 +1640,31 @@ Accepted Strategic Reserves selections create deterministic `StrategicReserveDec
 
 Malformed, stale, wrong-actor, wrong-step, wrong-ruleset-hash, wrong-current-points, wrong-option, option-payload drift, duplicate, wrong-player, unknown-unit, over-cap, missing source-points, or forbidden-unit submissions reject before the pending queue is popped and before a `DecisionRecord` or reserve mutation is created. Rule-invalid reserve declarations must not be repaired by changing reserve kind, deploying the unit, or dropping it.
 
-Reserve declaration choices are public table setup information in the current Phase 16C rules scope. If a future mission or hidden deployment rule hides reserve or battle-formation information, pending requests, option lists, completion counts, decision records, reserve states, events, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through unit IDs, points, option counts, source context, reserve kind, or derived deployment availability.
+Reserve declarations are simultaneous-secret Declare Battle Formations choices.
+Every pending request, option list, DecisionRecord, automatic AIRCRAFT
+declaration, reserve mutation event, and derived reserve/cargo state is visible
+only to the owning player and an omniscient administrator until both players
+have completed the step. If the configured setup sequence includes Declare
+Battle Formations, this secrecy window begins at game creation so that choices
+pre-materialized during `muster_armies` cannot leak before the declaration step
+becomes current. A sequence without that step has no battle-formation secrecy
+window. Army-list unit/model identities and datacards remain public. Throughout
+the unresolved interval, both `battlefield_view` and the sibling raw
+`battlefield_state` neutralize opponent formation state and poses, while live
+opponent modifier traces and mutable unit-resource totals remain at their public
+roster baseline. Completing the step emits one deterministic public
+`battle_formations_revealed` event with
+the final reserve, transport-cargo, Dedicated Transport consequence, and
+battle-formation faction-rule states; later deployment availability and
+battlefield projections are public. Adapters must not infer a hidden declaration
+from option counts, missing deployment candidates, cursor metadata, or another
+projection sibling.
+
+Leader and Support attachment declarations are resolved during Muster Armies,
+not Declare Battle Formations. The public `army_mustered` event includes the
+army's exact frozen `starting_attached_unit_records`, identically for both players
+and administrators. Adapters must not hide those attachment bindings behind the
+battle-formation reveal.
 
 Required Phase 16C adapter-contract tests:
 
@@ -1640,7 +1675,8 @@ Required Phase 16C adapter-contract tests:
 - stale, malformed, wrong-context, and drifted submissions reject before queue pop and before mutation;
 - declared reserve units are absent from Deploy Armies options and later use the shared Move Units reserve-arrival path;
 - deterministic JSON-safe decision, reserve-state, event, lifecycle, and replay payload round-trip;
-- viewer-scoped projection/event redaction for any future hidden reserve declaration information.
+- owner/opponent/administrator differential projection and event coverage before
+  reveal, plus identical public formation state after reveal.
 
 ## Phase 17G Setup Faction-Rule Decisions
 
@@ -1668,7 +1704,15 @@ Accepted Code Chivalric selections create a deterministic `FactionRuleState` wit
 
 Malformed, stale, wrong-actor, wrong-step, wrong-faction, duplicate-selection, unsupported-option, and option-payload drift submissions reject before the pending queue is popped and before a `DecisionRecord`, `FactionRuleState`, `PersistingEffect`, or event is created.
 
-Faction-rule setup choices are public table setup information in the current Phase 17G rules scope. If a future faction rule hides setup selections, pending requests, option lists, decision records, faction-rule states, events, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through option counts, source context, selected state kind, selected payload, or derived engine values.
+Faction-rule choices made during Declare Battle Formations use the same
+simultaneous-secret boundary as reserve declarations. Their pending requests,
+option lists, DecisionRecords, state-changing events, dice/resource side
+effects, and selected `FactionRuleState` are owner/administrator-only until the
+public `battle_formations_revealed` event. Start-battle choices made after that
+setup step, such as Fated Hero, are outside this secrecy window and retain their
+documented timing. Adapters must not leak an unresolved battle-formation choice
+through option counts, source context, selected state kind, selected payload,
+derived values, or event siblings.
 
 Required Phase 17G setup faction-rule tests:
 
@@ -1994,9 +2038,19 @@ Webway option payloads include `submission_kind: "aeldari_corsair_coterie_webway
 
 Accepted use selections validate that the rules unit is still on the battlefield, not already in reserves, not within Engagement Range when required by the source rule, and, for Fade to Darkness, that the enhanced unit destroyed one or more enemy units in the current Fight phase, then remove every physical component from the battlefield and create one canonical Strategic Reserves `ReserveState` with source evidence. Grey Knights Gate of Infinity uses the same grouped mutation, with one required-arrival reserve state for the selected attached rules unit in the next Grey Knights Movement phase. Accepted decline or complete selections emit a replay-safe event and do not mutate battlefield or reserve state. Webway Pathstone records a used event once per battle for the enhanced unit and does not offer another decision after use. Fade to Darkness records a use or decline event for the current Fight phase and does not offer another decision for that unit in the same phase. Gate of Infinity records each selected rules unit and re-emits the request until the battle-size cap is exhausted, the Grey Knights player chooses `complete`, or no eligible unit remains. Catalog IR Hunters from the Warp is not once-per-battle in the source text, so it may be offered again in a later eligible opponent turn after the unit returns and becomes eligible.
 
+Every during-battle ability or generic RuleIR Stratagem removal now carries one typed `PrimaryReserveEntryProvider`. Its public payload binds the provider kind and ID, player, executed source rule, canonical target rules-unit ID, accepted decision record/request/result IDs, optional Stratagem-use ID, and the real source terminal event type. The engine re-authenticates that provider against the live accepted `DecisionRecord` immediately before mutation. A provider payload, event-log reference, display name, or self-consistent copied evidence rows cannot authorize removal without that exact accepted decision and its source-owned evidence. The accepted source owner also binds its immutable terminal fields: catalog record and target for catalog IR, Enhancement or Datasheet ability identity for faction abilities, all component IDs for attached Gate of Infinity units, and the request-captured destroyed-enemy witness for Fade to Darkness.
+
+The public event graph is ordered and replay-closed in both directions. Ability removals always record the accepted `decision_requested` and `decision_recorded` pair, the source owner's used event with exactly one `primary_reserve_entry_bindings` row, and finally `primary_reserve_entry_provider_resolved`. When matched-play Primary history is active, that same occurrence also records `primary_reserve_entry_mutated` and `primary_battlefield_departure_recorded`; those two Primary evidence rows are not fabricated for a lifecycle without mission-backed Primary tracking. Generic RuleIR Stratagem removals additionally require the exact accepted catalog/context/target/effect selection, persisted `StratagemUseRecord`, `stratagem_used`, one matching `rule_execution_effect_applied` event, and the generic RuleIR source terminal before provider resolution. Catalog-backed Ability and Stratagem records and their complete effect payloads must equal the owning player's active runtime catalogs; Webway Pathstone and Fade to Darkness instead bind to their Enhancement assignments, while Gate of Infinity binds to its Datasheet ability registration. Replay-carried decision and use rows cannot authenticate a coordinated rewrite of source authority. Restore rejects missing, duplicated, reordered, cloned, orphaned, or conflicting provider, mutation, derived-departure, source-terminal, and provider-terminal rows; it also rejects target-set, component-set, catalog, source, RuleIR clause/effect, arrival requirement, reserve-state, or terminal-binding drift.
+
+All during-battle reserve origins are reverse-closed, but they do not pretend to share one provider shape. Ordinary turn-end `DURING_BATTLE_ABILITY` and `DURING_BATTLE_STRATAGEM` removals resolve through the typed provider chain above. Cult Ambush is a bespoke `DURING_BATTLE_ABILITY` occurrence that instead resolves through its accepted resurgence decision, destroyed-model and starting-strength evidence, and exact resource-spend transaction. Aircraft `DURING_BATTLE_OTHER` entries resolve through their accepted movement decision and exact battlefield transition. An unregistered `DURING_BATTLE_OTHER` state or a syntactically self-consistent state without its route-specific authority is invalid.
+
+An existing `IN_RESERVES` or `DESTROYED` state rejects another removal. A unit whose prior state is `ARRIVED` may enter again when a new source-backed opportunity is legal; the engine replaces that terminal state with a fresh occurrence, new entry timing, and new departure evidence. Every repeated entry requires exactly one intervening accepted reinforcement-placement decision and arrival event. A current `ARRIVED` state must match its accepted placement and transition, while a current `DESTROYED` state must match its mission-owned reserve-deadline destruction. Required arrival timing and placement authority come only from the registered source provider, while the reserve destruction-deadline policy comes only from the active mission. Adapters must not preserve or copy an earlier occurrence's arrival/deadline fields into a later one.
+
+If an attached rules unit splits after arriving, a public `reserve_state_transferred_after_attached_unit_split` event preserves that historical arrival against every original physical component. This includes a component destroyed when the split occurs: the row records that it arrived before its later casualty rather than claiming that it survived the split. The transfer carries the original provider-backed occurrence and immutable arrival fields, assigns aggregate points and embarked-cargo evidence once, and is the only accepted ancestry from a historical attached reserve state to its component reserve states. Restore rejects missing, duplicated, non-causal, incomplete, or drifted transfer evidence.
+
 Malformed, stale, wrong-actor, wrong-phase, wrong-hook, unsupported-option, option-payload drift, source-record drift, already-used when the source is once-per-battle, exhausted-cap, attached component drift, missing Gate of Infinity ability on any Grey Knights component, already-in-reserves, unplaced, or Engagement Range submissions reject before unauthorized mutation.
 
-Turn-end faction-rule choices are public table information in the current Phase 17G rules scope. If a future faction rule hides turn-end choices, pending requests, option lists, decision records, reserve states, events, projections, and event deltas must be viewer-scoped and must not leak hidden opponent information through option counts, source context, selected payload, reserve eligibility, or derived engine values.
+Turn-end faction-rule choices, roster identities, battlefield positions, reserve states after Declare Battle Formations resolves, objective witnesses, destruction attribution, and the historical events described here are public table information. Some current-state facts appear directly in `GameView`; event-time witnesses and attribution appear in the public event stream. Player and administrator viewers receive the same evidence identities. The secrecy boundary is the unresolved Declare Battle Formations choice and declaration state, whose pending requests, options, records, projections, and event deltas remain viewer-scoped until revealed by normal play.
 
 Required Phase 17G turn-end faction-rule tests:
 
@@ -2043,7 +2097,7 @@ Required Phase 17G Stratagem-cost modifier tests:
 - malformed, stale, wrong-context, drifted, already-used, and ineligible submissions reject before unauthorized mutation;
 - viewer-scoped projection/event redaction for any future hidden Stratagem-cost modifier selections.
 
-Catalog command-point gains do not introduce a separate adapter choice. Supported generic RuleIR currently covers a source model destroying an enemy keyword-gated unit and explicit owner-phase-start/end gains with no roll, a fixed D6-family threshold, or a Leadership test while the source model is alive and on the battlefield. The engine owns all rolls, CP cap enforcement, ledger mutation, and replay events. Every authoritative `model_destroyed` event carries `destroying_player_id`, nullable `source_rules_unit_instance_id`, nullable `attacking_unit_instance_id` and `attacking_model_instance_id`, plus the typed `destruction_provenance` described above. Attack provenance requires both attacking identities and uses the attacking rules-unit identity as the source identity. Non-attack provenance forbids attack identities; `source_rules_unit_instance_id` is populated only when the engine has an authoritative ability, Hazardous, or Deadly Demise source rules unit, and remains null otherwise. Destruction consumers must parse provenance before reading attack-only fields and must ignore unattributed non-attack destructions instead of inferring an attacker from the current phase or event family. Adapters must not award CP, roll a test, infer the attacker, or bypass the per-battle-round gain cap locally.
+Catalog command-point gains do not introduce a separate adapter choice. Supported generic RuleIR currently covers a source model destroying an enemy keyword-gated unit and explicit owner-phase-start/end gains with no roll, a fixed D6-family threshold, or a Leadership test while the source model is alive and on the battlefield. The engine owns all rolls, CP cap enforcement, ledger mutation, and replay events. Every authoritative `model_destroyed` event carries `destroying_player_id`, nullable `source_rules_unit_instance_id`, nullable `attacking_unit_instance_id` and `attacking_model_instance_id`, plus the typed `destruction_provenance` described above. It also carries event-time `source_rules_unit_objective_proximity_witness` and `destroyed_rules_unit_objective_proximity_witness` values with canonical rules-unit identity, physical component IDs, and exact objective-marker/model witnesses. Attack provenance requires both attacking identities and uses the attacking rules-unit identity as the source identity. Non-attack provenance forbids attack identities; `source_rules_unit_instance_id` is populated only when the engine has an authoritative ability, Hazardous, or Deadly Demise source rules unit, and remains null otherwise. Destruction consumers must parse provenance before reading attack-only fields and must ignore unattributed non-attack destructions instead of inferring an attacker from the current phase or event family. Source and destroyed objective-proximity witnesses are public event-time battlefield facts after Declare Battle Formations is revealed, so player and administrator event streams receive identical typed evidence. This does not expose still-unrevealed Declare Battle Formations choices. Adapters must not award CP, roll a test, infer the attacker, alter the recorded proximity, or bypass the per-battle-round gain cap locally.
 
 ## Phase 17G Battle-Round Faction-Rule Decisions
 
@@ -2700,6 +2754,15 @@ Parameterized proposal requests use a different validation rule. The pending req
 
 Every `submit_movement_proposal` and shared `submit_placement_proposal` request carries a required opaque `spatial_context_hash`. The engine computes the token from authoritative battlefield bounds and placements, terrain, mission geometry, model physical state, measurement/support dimensions, and geometry/height provenance. Adapters preserve the token only as request context; they do not compute, compare, or submit it as validation authority. Immediately before queue pop, the engine recomputes the token from current authoritative state. Any mismatch returns typed `spatial_context_drift`, leaves the pending request queued, creates no `DecisionRecord`, and mutates no battlefield state. A retry issued after a rule-invalid recorded attempt receives a fresh engine-owned token.
 
+For accepted reserve-arrival history, lifecycle snapshot restoration cross-binds that
+request-time token to the engine-emitted `placement_proposal_requested` event and
+authenticates the complete decision and route-event ordering. It deliberately does
+not recompute historical geometry from the final snapshot, which may contain later
+movement, destruction, return-to-reserves, or attached-unit splits. Full historical
+spatial verification belongs to `ReplayRunner`, which re-executes the recorded
+decisions against the original state sequence and exercises the live stale-submission
+check at each request.
+
 Before the queue is popped or a `DecisionRecord` is created, Phase 11D must validate:
 
 - request ID drift;
@@ -2756,7 +2819,7 @@ The submission contract is shared. The information available to a producer is no
 Phase 18J publishes `GameViewPayload.battlefield_view` as the canonical visual
 play-surface contract. The member remains optional because projections can
 exist before battlefield and mission state; current engine projections emit
-`battlefield-view-v3-phase17n` when
+`battlefield-view-v4-phase17n-step3` when
 both battlefield and mission state exist and emit `null` before that boundary.
 Its normative world frame is defined in `contracts/coordinate-system.md`:
 inches, lower-left origin, positive X/Y on the board plane, positive Z above
@@ -2818,7 +2881,7 @@ terrain areas as the objective footprint and treat the objective marker as
 stable objective identity/label metadata. Adapters must submit complete logical
 membership: referencing any physical terrain area requires listing every
 mission-setup terrain area with the same `logical_terrain_area_id`. Layout,
-mission-setup, Contract 7 create, replay, and objective-control validation
+mission-setup, Contract 8 create, replay, and objective-control validation
 reject partial logical groups. Removing a physical member, relabelling the
 survivor, or clearing `battlefield_layout_id` does not bypass the canonical
 source-layout reconciliation. Replay state must retain the same mission setup
@@ -2870,7 +2933,7 @@ hybrid projection model:
    `LocalGameSession.view(...)`.
 2. Live viewer-safe unit/model projection. Phase 18A introduced
    `projection_schema: "game-view-v3-phase18a"`; the current `GameViewPayload`
-   uses `game-view-v9-phase17n`, includes
+   uses `game-view-v10-phase17n-step3`, includes
    `projection_state_hash`, references the static catalog through
    `rules_catalog`, and exposes read-only `unit_display_by_id` and
    `model_display_by_id` maps keyed by stable `unit_instance_id` and
@@ -2923,12 +2986,12 @@ effects, aura application, Battle-shock effects, hidden/revealed status, unit
 visibility, or redaction state from static catalog data plus modifier records.
 
 The Phase 18A unit/model display projection is deterministic, JSON-safe,
-viewer-scoped, read-only, and presentation-only. Own units and viewer-visible
-placed opponent units may appear in `unit_display_by_id` and
-`model_display_by_id`. Fully hidden or not-yet-revealed opponent records are
-omitted when exposing their stable IDs, counts, or presence would leak hidden
-information; field-level hidden values inside an otherwise visible record must
-use explicit redactions or unknown values. `projection_state_hash` changes when
+viewer-scoped, read-only, and presentation-only. Army lists and datacards are
+public tabletop information, so both players receive every mustered unit and
+model in `unit_display_by_id` and `model_display_by_id`, including units that
+are embarked or remain unplaced in Strategic Reserves. Declare Battle
+Formations secrecy applies to the declaration choices and unrevealed formation
+state, not to those roster identities. `projection_state_hash` changes when
 the adapter-visible live display state changes, including wound changes, so UI
 caches can refresh display data without treating it as authoritative rules
 state. Issue #145 is complete because a visible known model can render through
@@ -2943,18 +3006,21 @@ Phase 11E adds scoring state to the viewer projection:
 - `public_secondary_mission_card_states`: Fixed and Tactical card state payloads scoped
   through the secondary-mission reveal gate.
 - `public_victory_point_ledgers`: victory point ledgers scoped to the viewer.
-- `primary_unit_terrain_turn_start_snapshots`: deterministic, engine-owned
-  evidence recording each viewer-visible physical unit's intersection with
-  manifested battlefield terrain at each player-turn boundary.
+- `primary_rules_unit_turn_start_snapshots`: deterministic, engine-owned
+  evidence recording each rules unit's exact physical component
+  models, logical terrain-area membership, and objective-marker/model proximity
+  at each player-turn boundary.
 
-Turn-start terrain snapshot metadata is public, but each viewer receives only
-membership rows for unit IDs present in that same view's `unit_display_by_id`.
-Owned unplaced units retain an empty terrain-membership list; an opponent's
-unrevealed reserve row is omitted entirely, so neither its stable ID nor its
-presence contributes to the viewer payload. Visible Attached Unit components
-remain separate physical rows. Adapters may display this evidence for scoring
-audit but must not recalculate it from current positions or use omitted rows to
-infer hidden roster state.
+Turn-start snapshots are created only after battle entry, once Declare Battle
+Formations has completed and its results are public. Both players therefore
+receive every complete historical rules-unit row, including rows for units that
+are now unplaced. Each outer row carries `rules_unit_instance_id` and
+`component_memberships`; component rows carry `unit_instance_id`, exact
+`evaluated_model_instance_ids`, `logical_terrain_area_ids`, and
+`objective_marker_witnesses`, whose model lists identify exactly which models
+were in range. Units that began the turn off the battlefield retain explicit
+empty position sets. Adapters may display this evidence for scoring audit but
+must not recalculate it from current positions.
 
 Chapter Approved 2026-27 secondary selection is simultaneous-secret. A player's
 Fixed/Tactical mode and Fixed mission IDs are secret only until every player has
@@ -3337,7 +3403,7 @@ role-scoped projection hash. The wire token contains no readable cursor state;
 the client treats it as an indivisible string.
 
 `GET /sessions/{session_id}/events?cursor=...&limit=...` returns deterministic
-`event-delta-v3-primary-assignments` pages. `sequence_number` is one-based and contiguous within a
+`event-delta-v4-phase17n-step3` pages. `sequence_number` is one-based and contiguous within a
 viewer scope. Hidden records are omitted while pagination advances the
 protected authoritative offset; they create no projection count, placeholder,
 sequence gap, extra page, or `has_more` oracle. Page size defaults to 100 and is

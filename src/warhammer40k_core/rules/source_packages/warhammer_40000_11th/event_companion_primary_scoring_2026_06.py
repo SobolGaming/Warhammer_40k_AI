@@ -14,8 +14,8 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 
 ARTIFACT_SCHEMA: Final = "core-v2-phase17n-event-companion-primary-scoring-v4"
 SOURCE_PACKAGE_ID: Final = "gw-11e-warhammer-event-companion-v1-1-2026-07"
-EXPECTED_PACKAGE_HASH: Final = "5449d260c90c9a5a798dad0fa3dbba0c7c7b56e28e726a94ce6694654cc7afbe"
-EXPECTED_ARTIFACT_SHA256: Final = "162f28bbdbd34ffcf78918abc6e85dc7e1fef9785ce2dc6f31129e7664666e80"
+EXPECTED_PACKAGE_HASH: Final = "a1f8a91bc8dc01088fdef5d0b9ee2e4e270db93a4b050d3a9b47c8995163dfc5"
+EXPECTED_ARTIFACT_SHA256: Final = "6f2526d2d81d7854db285d2e7969ccef59e7eac3a214588bea37bd982bada8e8"
 _ARTIFACT_PACKAGE: Final = "warhammer40k_core.rules.source_packages.warhammer_40000_11th"
 _ARTIFACT_PATH: Final = "event_companion_2026_06_artifacts/primary-scoring.json"
 _PENDING_SCORING_KIND: Final = "event_companion_primary_source_known_engine_pending"
@@ -69,6 +69,7 @@ _EXPECTED_ENGINE_IMPLEMENTED_SCORING_KINDS: Final = {
     "primary-inescapable-dominion": "inescapable_dominion",
     "primary-meatgrinder": "meatgrinder",
     "primary-outmaneuver": "outmaneuver",
+    "primary-purge-and-secure": "purge_and_secure",
     "primary-reconnaissance-sweep": "reconnaissance_sweep",
     "primary-search-and-scour": "search_and_scour",
     "primary-unstoppable-force": "unstoppable_force",

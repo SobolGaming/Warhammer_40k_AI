@@ -83,6 +83,13 @@ from warhammer40k_core.engine.phases.movement import (
     resolve_fall_back_move,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_battlefield_departure import (
+    PrimaryBattlefieldDepartureState,
+    primary_battlefield_departure_id,
+    primary_battlefield_departure_states_from_payload,
+    record_primary_battlefield_departure,
+    validate_primary_battlefield_departure_states,
+)
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
@@ -109,7 +116,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-muster-one-0009"
-_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-muster-two-0001"
+_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-coherency-fail-001-003-0071"
 _MULTI_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-02-0001"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
@@ -982,6 +989,17 @@ def test_fall_back_desperate_escape_can_destroy_failed_model_set_without_replay_
     assert {placement.model_instance_id for placement in surviving_placement.model_placements} == (
         set(all_unit_model_ids) - set(destroyed_model_ids)
     )
+    (departure,) = state.primary_battlefield_departure_states
+    expected_source_id = (
+        "core-rules:desperate-escape:phase10o-result-000009:army-alpha:intercessor-unit-1"
+    )
+    assert departure.removal_kind is BattlefieldRemovalKind.DESTROYED
+    assert departure.affected_component_unit_instance_ids == ("army-alpha:intercessor-unit-1",)
+    assert departure.departed_component_unit_instance_ids == ()
+    assert departure.removed_model_instance_ids == tuple(sorted(destroyed_model_ids))
+    assert departure.source_id == expected_source_id
+    assert departure.occurrence_id == expected_source_id
+    assert not state.primary_unit_destruction_states
     assert (
         state.fell_back_unit_state_for_unit(
             player_id="player-a",
@@ -990,12 +1008,328 @@ def test_fall_back_desperate_escape_can_destroy_failed_model_set_without_replay_
         )
         is not None
     )
+    completion_payload = cast(
+        dict[str, JsonValue],
+        next(
+            event.payload
+            for event in reversed(lifecycle.decision_controller.event_log.records)
+            if event.event_type == "movement_activation_completed"
+        ),
+    )
+    assert completion_payload["destroyed_model_ids"] == list(destroyed_model_ids)
+    assert completion_payload["desperate_escape_source_mutation_id"] == "phase10o-result-000009"
 
     payload = cast(
         GameLifecyclePayload,
         json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
     )
     assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
+
+
+@pytest.mark.parametrize(
+    ("corruption", "expected_error"),
+    [
+        ("not_object", "payload must be an object"),
+        ("missing_field", "payload is missing required field: source_id"),
+        ("unexpected_field", "payload contains unexpected field: forged"),
+        ("components_not_list", "component_unit_instance_ids must be a list"),
+        ("components_empty", "component_unit_instance_ids must not be empty"),
+        ("components_duplicate", "component_unit_instance_ids must not contain duplicates"),
+        ("affected_not_list", "affected_component_unit_instance_ids must be a list"),
+        ("affected_outside_unit", "affected components must belong to the rules unit"),
+        ("departed_not_list", "departed_component_unit_instance_ids must be a list"),
+        ("departed_outside_affected", "departed components must be affected"),
+        ("removed_not_list", "removed_model_instance_ids must be a list"),
+        ("removed_duplicate", "removed_model_instance_ids must not contain duplicates"),
+        ("battle_round", "battle_round must be a positive integer"),
+        ("removal_kind", "removal kind is unsupported"),
+        ("source_id", "source_id must not be empty"),
+    ],
+)
+def test_primary_battlefield_departure_payload_fails_closed(
+    corruption: str,
+    expected_error: str,
+) -> None:
+    departure = _valid_primary_battlefield_departure()
+    payload: object = cast(dict[str, JsonValue], departure.to_payload())
+    if corruption == "not_object":
+        payload = None
+    else:
+        assert isinstance(payload, dict)
+        if corruption == "missing_field":
+            payload.pop("source_id")
+        elif corruption == "unexpected_field":
+            payload["forged"] = True
+        elif corruption == "components_not_list":
+            payload["component_unit_instance_ids"] = "unit-a"
+        elif corruption == "components_empty":
+            payload["component_unit_instance_ids"] = []
+        elif corruption == "components_duplicate":
+            payload["component_unit_instance_ids"] = ["unit-a", "unit-a"]
+        elif corruption == "affected_not_list":
+            payload["affected_component_unit_instance_ids"] = "unit-a"
+        elif corruption == "affected_outside_unit":
+            payload["affected_component_unit_instance_ids"] = ["unit-b"]
+        elif corruption == "departed_not_list":
+            payload["departed_component_unit_instance_ids"] = "unit-a"
+        elif corruption == "departed_outside_affected":
+            payload["departed_component_unit_instance_ids"] = ["unit-b"]
+        elif corruption == "removed_not_list":
+            payload["removed_model_instance_ids"] = "model-a"
+        elif corruption == "removed_duplicate":
+            payload["removed_model_instance_ids"] = ["model-a", "model-a"]
+        elif corruption == "battle_round":
+            payload["battle_round"] = 0
+        elif corruption == "removal_kind":
+            payload["removal_kind"] = "forged-removal"
+        elif corruption == "source_id":
+            payload["source_id"] = ""
+        else:
+            raise AssertionError(f"unsupported departure payload corruption: {corruption}")
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        PrimaryBattlefieldDepartureState.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("corruption", "expected_error"),
+    [
+        ("not_list", "states must be a list"),
+        ("untyped", "states must contain typed values"),
+        ("game", "game_id drift"),
+        ("owner_player", "references an unknown player"),
+        ("active_player", "references an unknown player"),
+        ("rules_unit", "references an unknown rules unit"),
+        ("components", "component identity drift"),
+        ("owner", "owner drift"),
+        ("removed_model", "model outside its affected components"),
+        ("affected_component", "Every affected component must contribute"),
+        ("departure_id", "departure_id drift"),
+        ("duplicate", "states must be unique"),
+    ],
+)
+def test_primary_battlefield_departure_state_validation_fails_closed(
+    corruption: str,
+    expected_error: str,
+) -> None:
+    departure = _valid_primary_battlefield_departure()
+    values: object = [departure]
+    owner_by_unit_id: dict[str, str] = {"unit-a": "player-a", "unit-b": "player-a"}
+    model_ids_by_unit_id: dict[str, tuple[str, ...]] = {
+        "unit-a": ("model-a",),
+        "unit-b": ("model-b",),
+    }
+    components_by_id: dict[str, tuple[str, ...]] = {"unit-a": ("unit-a",)}
+    if corruption == "not_list":
+        values = None
+    elif corruption == "untyped":
+        values = [departure.to_payload()]
+    elif corruption == "game":
+        values = [replace(departure, game_id="game-b")]
+    elif corruption == "owner_player":
+        values = [replace(departure, owner_player_id="player-forged")]
+    elif corruption == "active_player":
+        values = [replace(departure, active_player_id="player-forged")]
+    elif corruption == "rules_unit":
+        values = [replace(departure, rules_unit_instance_id="unit-forged")]
+    elif corruption == "components":
+        values = [
+            replace(
+                departure,
+                component_unit_instance_ids=("unit-a", "unit-b"),
+            )
+        ]
+    elif corruption == "owner":
+        values = [replace(departure, owner_player_id="player-b")]
+    elif corruption == "removed_model":
+        values = [replace(departure, removed_model_instance_ids=("model-forged",))]
+    elif corruption == "affected_component":
+        values = [
+            replace(
+                departure,
+                component_unit_instance_ids=("unit-a", "unit-b"),
+                affected_component_unit_instance_ids=("unit-a", "unit-b"),
+            )
+        ]
+        components_by_id = {"unit-a": ("unit-a", "unit-b")}
+    elif corruption == "departure_id":
+        values = [replace(departure, departure_id="departure-forged")]
+    elif corruption == "duplicate":
+        values = [departure, departure]
+    else:
+        raise AssertionError(f"unsupported departure-state corruption: {corruption}")
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        validate_primary_battlefield_departure_states(
+            values,
+            game_id="game-a",
+            player_ids=("player-a", "player-b"),
+            owner_by_unit_id=owner_by_unit_id,
+            model_ids_by_unit_id=model_ids_by_unit_id,
+            known_rules_unit_components_by_id=components_by_id,
+        )
+
+
+def test_primary_battlefield_departure_collection_and_identity_validation_fail_closed() -> None:
+    with pytest.raises(GameLifecycleError, match="payloads must be a list"):
+        primary_battlefield_departure_states_from_payload(None)
+    with pytest.raises(GameLifecycleError, match="Departed components must be affected"):
+        primary_battlefield_departure_id(
+            game_id="game-a",
+            rules_unit_instance_id="unit-a",
+            affected_component_unit_instance_ids=("unit-a",),
+            departed_component_unit_instance_ids=("unit-b",),
+            removed_model_instance_ids=("model-a",),
+            battle_round=1,
+            active_player_id="player-a",
+            phase=BattlePhase.MOVEMENT.value,
+            removal_kind=BattlefieldRemovalKind.DESTROYED,
+            occurrence_id="occurrence-a",
+            source_id="source-a",
+        )
+
+
+@pytest.mark.parametrize(
+    ("corruption", "expected_error"),
+    [
+        ("state", "tracking requires GameState"),
+        ("stage", "can only occur during battle"),
+        ("active_phase", "requires active-player phase state"),
+        ("affected", "affected components do not belong to the rules unit"),
+        ("departed", "departed components must be affected"),
+        ("removed_model", "removed models do not belong to an affected component"),
+        ("battlefield", "requires battlefield_state"),
+        ("still_placed", "removed models must have left the battlefield"),
+        ("departed_placed", "departed component must have no current model"),
+        ("duplicate", "occurrence already exists"),
+        ("affected_not_tuple", "affected_component_unit_instance_ids must be a tuple"),
+    ],
+)
+def test_record_primary_battlefield_departure_fails_closed(
+    corruption: str,
+    expected_error: str,
+) -> None:
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        _run_primary_battlefield_departure_corruption(corruption)
+
+
+def _run_primary_battlefield_departure_corruption(corruption: str) -> None:
+    if corruption == "state":
+        record_primary_battlefield_departure(
+            state=cast(GameState, object()),
+            rules_unit_instance_id="unit:a",
+            affected_component_unit_instance_ids=("unit:a",),
+            departed_component_unit_instance_ids=(),
+            removed_model_instance_ids=("model:a",),
+            removal_kind=BattlefieldRemovalKind.DESTROYED,
+            occurrence_id="occurrence:a",
+            source_id="source:a",
+        )
+        return
+    lifecycle, _movement_status = _advance_to_movement_unit_selection(_config())
+    state = _state(lifecycle)
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("departure integrity test requires battlefield state")
+    unit_id = "army-alpha:intercessor-unit-1"
+    enemy_unit_id = "army-beta:intercessor-unit-2"
+    model_id = battlefield.unit_placement_by_id(unit_id).model_placements[0].model_instance_id
+    affected: object = (unit_id,)
+    departed: tuple[str, ...] = ()
+    removed_model_ids = (model_id,)
+    if corruption not in {"still_placed", "battlefield"}:
+        state.replace_battlefield_state(battlefield.with_removed_models((model_id,)))
+    if corruption == "stage":
+        state.stage = GameLifecycleStage.SETUP
+    elif corruption == "active_phase":
+        state.active_player_id = None
+    elif corruption == "affected":
+        affected = (enemy_unit_id,)
+    elif corruption == "departed":
+        departed = (enemy_unit_id,)
+    elif corruption == "removed_model":
+        removed_model_ids = ("army-alpha:intercessor-unit-1:model-forged",)
+    elif corruption == "battlefield":
+        state.battlefield_state = None
+    elif corruption == "departed_placed":
+        departed = (unit_id,)
+    elif corruption == "affected_not_tuple":
+        affected = [unit_id]
+    elif corruption == "duplicate":
+        record_primary_battlefield_departure(
+            state=state,
+            rules_unit_instance_id=unit_id,
+            affected_component_unit_instance_ids=(unit_id,),
+            departed_component_unit_instance_ids=(),
+            removed_model_instance_ids=removed_model_ids,
+            removal_kind=BattlefieldRemovalKind.DESTROYED,
+            occurrence_id="occurrence:departure-validation",
+            source_id="source:departure-validation",
+        )
+    elif corruption != "still_placed":
+        raise AssertionError(f"unsupported departure tracking corruption: {corruption}")
+    record_primary_battlefield_departure(
+        state=state,
+        rules_unit_instance_id=unit_id,
+        affected_component_unit_instance_ids=cast(tuple[str, ...], affected),
+        departed_component_unit_instance_ids=departed,
+        removed_model_instance_ids=removed_model_ids,
+        removal_kind=BattlefieldRemovalKind.DESTROYED,
+        occurrence_id="occurrence:departure-validation",
+        source_id="source:departure-validation",
+    )
+
+
+def test_primary_battlefield_departure_is_not_recorded_without_mission_setup() -> None:
+    lifecycle, _movement_status = _advance_to_movement_unit_selection(_config())
+    state = _state(lifecycle)
+    state.mission_setup = None
+
+    assert (
+        record_primary_battlefield_departure(
+            state=state,
+            rules_unit_instance_id="army-alpha:intercessor-unit-1",
+            affected_component_unit_instance_ids=("army-alpha:intercessor-unit-1",),
+            departed_component_unit_instance_ids=(),
+            removed_model_instance_ids=("army-alpha:intercessor-unit-1:core-intercessor-like:001",),
+            removal_kind=BattlefieldRemovalKind.DESTROYED,
+            occurrence_id="occurrence:no-mission",
+            source_id="source:no-mission",
+        )
+        is None
+    )
+
+
+def _valid_primary_battlefield_departure() -> PrimaryBattlefieldDepartureState:
+    departure_id = primary_battlefield_departure_id(
+        game_id="game-a",
+        rules_unit_instance_id="unit-a",
+        affected_component_unit_instance_ids=("unit-a",),
+        departed_component_unit_instance_ids=(),
+        removed_model_instance_ids=("model-a",),
+        battle_round=1,
+        active_player_id="player-a",
+        phase=BattlePhase.MOVEMENT.value,
+        removal_kind=BattlefieldRemovalKind.DESTROYED,
+        occurrence_id="occurrence-a",
+        source_id="source-a",
+    )
+    return PrimaryBattlefieldDepartureState(
+        departure_id=departure_id,
+        game_id="game-a",
+        owner_player_id="player-a",
+        rules_unit_instance_id="unit-a",
+        component_unit_instance_ids=("unit-a",),
+        affected_component_unit_instance_ids=("unit-a",),
+        departed_component_unit_instance_ids=(),
+        removed_model_instance_ids=("model-a",),
+        battle_round=1,
+        active_player_id="player-a",
+        phase=BattlePhase.MOVEMENT.value,
+        removal_kind=BattlefieldRemovalKind.DESTROYED,
+        occurrence_id="occurrence-a",
+        source_id="source-a",
+    )
 
 
 def test_game_state_records_and_clears_fell_back_unit_state() -> None:

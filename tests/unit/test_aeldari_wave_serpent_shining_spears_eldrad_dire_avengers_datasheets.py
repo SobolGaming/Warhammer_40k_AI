@@ -79,6 +79,7 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
@@ -607,10 +608,14 @@ def test_doom_benefits_known_aeldari_unit_placed_after_target_selection() -> Non
     battlefield = state.battlefield_state
     assert battlefield is not None
     arriving_placement = battlefield.unit_placement_by_id(fixture.shining_spears.unit_instance_id)
-    reserve_state = state.reposition_unit_to_strategic_reserves(
+    reserve_state = ReserveState.declared_before_battle(
         player_id="player-a",
         unit_instance_id=fixture.shining_spears.unit_instance_id,
-        source_rule_ids=("test:doom:later-placed-beneficiary",),
+        reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+    )
+    state.record_reserve_state(reserve_state)
+    state.replace_battlefield_state(
+        battlefield.without_unit_placement(fixture.shining_spears.unit_instance_id)
     )
     session = LocalGameSession(lifecycle=lifecycle)
     pending = session.advance_until_decision_or_terminal()

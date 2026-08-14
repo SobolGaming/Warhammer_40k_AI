@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 # pyright: reportPrivateUsage=false
+from copy import deepcopy
 from dataclasses import replace
 from typing import cast
 
@@ -70,7 +71,10 @@ from warhammer40k_core.engine.damage_allocation import (
     is_mortal_wound_feel_no_pain_request,
     mortal_wound_feel_no_pain_source_context,
 )
-from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_controller import (
+    DecisionController,
+    DecisionControllerPayload,
+)
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
     DecisionRequest,
@@ -144,6 +148,9 @@ from warhammer40k_core.engine.phases.shooting import (
     request_out_of_phase_shooting_declaration,
 )
 from warhammer40k_core.engine.prebattle import scout_ability_instances_for_rules_unit
+from warhammer40k_core.engine.primary_battlefield_departure_integrity import (
+    validate_non_destroyed_battlefield_departure_provenance,
+)
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
     ReserveOrigin,
@@ -182,12 +189,15 @@ from warhammer40k_core.engine.stratagems import (
     StratagemUseRecord,
     visible_enemy_unit_effect_selection,
 )
+from warhammer40k_core.engine.stratagems_eligibility import derive_stratagem_use_unit_ids
 from warhammer40k_core.engine.stratagems_generic_metadata import (
     companion_unit_effect_selection,
 )
 from warhammer40k_core.engine.stratagems_generic_rule_ir import (
     _apply_generic_rule_ir_stratagem_handler,
 )
+from warhammer40k_core.engine.stratagems_requests import create_stratagem_use_decision_request
+from warhammer40k_core.engine.stratagems_selection import _stratagem_decision_option
 from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionContext
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.turn_end_hooks import (
@@ -793,7 +803,8 @@ def test_shadow_legion_companion_metadata_rejects_malformed_selection_payloads()
 
     with pytest.raises(GameLifecycleError, match="StratagemUseRecord"):
         generic_metadata.generic_rule_ir_execution_target_unit_ids(
-            cast(StratagemUseRecord, object())
+            state=state,
+            use_record=cast(StratagemUseRecord, object()),
         )
 
 
@@ -1270,7 +1281,10 @@ def test_shadow_legion_generic_runtime_trigger_and_selection_helpers_are_fail_fa
         == enemy_unit.unit_instance_id
     )
     assert (
-        generic_rule_ir_runtime._single_execution_target_unit_id(hit_record)
+        generic_rule_ir_runtime._single_execution_target_unit_id(
+            state=state,
+            use_record=hit_record,
+        )
         == source_unit.unit_instance_id
     )
 
@@ -1306,10 +1320,11 @@ def test_shadow_legion_generic_runtime_trigger_and_selection_helpers_are_fail_fa
 
     with pytest.raises(GameLifecycleError, match="requires one target unit"):
         generic_rule_ir_runtime._single_execution_target_unit_id(
-            _shadow_legion_use_record_fixture(
+            state=state,
+            use_record=_shadow_legion_use_record_fixture(
                 target_unit_id=source_unit.unit_instance_id,
                 effect_selection=companion_unit_effect_selection(enemy_unit.unit_instance_id),
-            )
+            ),
         )
     effect_selection_error_records = (
         (
@@ -2976,6 +2991,8 @@ def test_fade_to_darkness_turn_end_choice_moves_unit_to_strategic_reserves_once(
             f"chaos-daemons:shadow-legion:fade-to-darkness:{unit.unit_instance_id}:use"
         ),
     )
+    decisions.request_decision(request)
+    decisions.submit_result(result)
     handled = enhancements.apply_fade_to_darkness_turn_end_result(
         TurnEndResultContext(
             state=state,
@@ -3018,6 +3035,75 @@ def test_fade_to_darkness_turn_end_choice_moves_unit_to_strategic_reserves_once(
                 request=request,
                 result=result,
             )
+        )
+
+
+def test_fade_to_darkness_reserve_provenance_rejects_destroyed_enemy_witness_drift() -> None:
+    state = _shadow_legion_state(unit_keywords=("Shadow Legion", "Undivided"))
+    unit = _unit_for_player(state, player_id="player-a")
+    target = _unit_for_player(state, player_id="player-b")
+    _assign_fade_to_darkness(state, unit=unit)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    decisions = DecisionController()
+    _record_fade_to_darkness_destroyed_enemy(
+        state=state,
+        decisions=decisions,
+        attacker=unit,
+        target=target,
+    )
+    request = _decision_request(
+        enhancements.fade_to_darkness_turn_end_request(
+            TurnEndRequestContext(
+                state=state,
+                decisions=decisions,
+                completed_phase=BattlePhase.FIGHT,
+            )
+        )
+    )
+    result = DecisionResult.for_request(
+        result_id="result-fade-to-darkness-witness-integrity",
+        request=request,
+        selected_option_id=(
+            f"chaos-daemons:shadow-legion:fade-to-darkness:{unit.unit_instance_id}:use"
+        ),
+    )
+    decisions.request_decision(request)
+    decisions.submit_result(result)
+    assert enhancements.apply_fade_to_darkness_turn_end_result(
+        TurnEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+
+    validate_non_destroyed_battlefield_departure_provenance(
+        state=state,
+        departures=tuple(state.primary_battlefield_departure_states),
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+    )
+    tampered_payload: DecisionControllerPayload = deepcopy(decisions.to_payload())
+    source_terminals = tuple(
+        event
+        for event in tampered_payload["event_log"]
+        if event["event_type"] == enhancements.USED_EVENT
+    )
+    assert len(source_terminals) == 1
+    source_terminal_payload = cast(dict[str, JsonValue], source_terminals[0]["payload"])
+    source_terminal_payload["destroyed_enemy_unit_instance_ids"] = ["forged-enemy-unit"]
+    tampered_decisions = DecisionController.from_payload(tampered_payload)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Ability reserve source terminal request identity drift",
+    ):
+        validate_non_destroyed_battlefield_departure_provenance(
+            state=state,
+            departures=tuple(state.primary_battlefield_departure_states),
+            event_records=tampered_decisions.event_log.records,
+            decision_records=tampered_decisions.records,
         )
 
 
@@ -3269,6 +3355,44 @@ def _use_shadow_legion_stratagem(
         effect_payload=definition.effect_payload,
     )
     decisions = DecisionController()
+    option = _stratagem_decision_option(
+        context=context,
+        record=record,
+        target_binding=target_binding,
+        effect_selection=effect_selection,
+    )
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(option,),
+        request_id=use_record.request_id,
+    )
+    result = DecisionResult.for_request(
+        result_id=use_record.result_id,
+        request=request,
+        selected_option_id=option.option_id,
+    )
+    decisions.request_decision(request)
+    decisions.submit_result(result)
+    targeted_ids, affected_ids = derive_stratagem_use_unit_ids(
+        state=state,
+        definition=definition,
+        context=context,
+        target_binding=target_binding,
+        effect_selection=effect_selection,
+    )
+    use_record = replace(
+        use_record,
+        battle_round=context.battle_round,
+        phase=context.phase,
+        active_player_id=context.active_player_id,
+        timing_window_id=context.timing_window_id,
+        selected_option_id=option.option_id,
+        targeted_unit_instance_ids=targeted_ids,
+        affected_unit_instance_ids=affected_ids,
+    )
+    state.record_stratagem_use(use_record)
+    decisions.event_log.append("stratagem_used", use_record.to_payload())
     config = phase11c_config()
     _apply_generic_rule_ir_stratagem_handler(
         state=state,

@@ -10,7 +10,60 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.mission_setup import MissionSetup
+    from warhammer40k_core.engine.movement_proposals import ProposalKind
     from warhammer40k_core.engine.reserves import ReserveDestructionTimingPolicy, ReserveState
+
+
+def placement_kinds_for_reserve_state(
+    reserve_state: ReserveState,
+    *,
+    all_components_have_deep_strike: bool,
+) -> tuple[BattlefieldPlacementKind, ...]:
+    from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
+
+    if type(reserve_state) is not ReserveState:
+        raise GameLifecycleError("Reserve arrival placement kinds require ReserveState.")
+    if type(all_components_have_deep_strike) is not bool:
+        raise GameLifecycleError("Reserve arrival Deep Strike authority must be a bool.")
+    if reserve_state.required_arrival_placement_kind is not None:
+        return (
+            battlefield_placement_kind_from_token(reserve_state.required_arrival_placement_kind),
+        )
+    if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
+        kinds = [BattlefieldPlacementKind.STRATEGIC_RESERVES]
+        if all_components_have_deep_strike:
+            kinds.append(BattlefieldPlacementKind.DEEP_STRIKE)
+        return tuple(sorted(kinds, key=lambda kind: kind.value))
+    if reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE:
+        return (BattlefieldPlacementKind.DEEP_STRIKE,)
+    return (BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD,)
+
+
+def proposal_kind_for_reserve_state(reserve_state: ReserveState) -> ProposalKind:
+    from warhammer40k_core.engine.movement_proposals import ProposalKind
+    from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
+
+    if type(reserve_state) is not ReserveState:
+        raise GameLifecycleError("Reserve arrival proposal kind requires ReserveState.")
+    if (
+        reserve_state.required_arrival_placement_kind == BattlefieldPlacementKind.DEEP_STRIKE.value
+        or reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE
+    ):
+        return ProposalKind.DEEP_STRIKE
+    if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
+        return ProposalKind.STRATEGIC_RESERVES
+    return ProposalKind.REINFORCEMENT
+
+
+def source_rule_id_for_placement_kind(
+    placement_kind: BattlefieldPlacementKind,
+) -> str:
+    resolved_kind = battlefield_placement_kind_from_token(placement_kind)
+    if resolved_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES:
+        return "strategic_reserves"
+    if resolved_kind is BattlefieldPlacementKind.DEEP_STRIKE:
+        return "deep_strike"
+    return "reserves"
 
 
 def kind_token(

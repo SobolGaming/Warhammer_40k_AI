@@ -4,7 +4,7 @@ Version: `battlefield-coordinate-v1`
 
 Wire coordinate space: `battlefield_inches_right_handed_z_up`
 
-This document is normative for `battlefield-view-v3-phase17n`, movement/placement
+This document is normative for `battlefield-view-v4-phase17n-step3`, movement/placement
 proposals, and battlefield rendering. The JSON Schema is
 `schemas/battlefield-view.schema.json`.
 
@@ -59,7 +59,7 @@ legality; only an accepted engine submission does.
 
 ## Three geometry classes
 
-`battlefield-view-v3-phase17n` deliberately separates:
+`battlefield-view-v4-phase17n-step3` deliberately separates:
 
 1. `authoritative`: engine/source-owned model measurement footprints and
    heights, model poses and physical states, terrain footprints/volumes,

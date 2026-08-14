@@ -1,6 +1,6 @@
 # CORE V2 external contract
 
-Contract version: `7.0.0`
+Contract version: `8.0.0`
 
 This directory is the canonical, language-neutral Phase 17O capability and
 Phase 18D contract, Phase 18E session protocol, Phase 18F
@@ -15,13 +15,13 @@ decision-family coverage inventory distinguishes real session-derived
 `live_scenario` examples from `envelope_only` entries; inventory presence alone
 is not an executable-coverage claim.
 
-Contract 7 replaces the former single mission-wide Primary Mission selection
-with two public, directed `primary_mission_assignments`. Each assignment
-binds one player, that player's selected Force Disposition, and the Primary
-Mission resolved from the ordered player-versus-opponent matrix cell. Create,
-projection, lifecycle, event, capability, and replay payload families were cut over
-together so clients cannot silently interpret a directed match-up as one shared
-Primary Mission.
+Contract 8 retains Contract 7's two public, directed
+`primary_mission_assignments` and replaces physical-unit-only turn-start terrain
+history with authoritative rules-unit position evidence. An attached rules unit
+is one outer history row whose physical component rows preserve exact evaluated
+models, logical terrain-area membership, and objective-marker/model witnesses.
+Projection, event, session, and replay payload families were cut over together;
+there is no compatibility alias or inferred history for Contract 7 payloads.
 
 The contract describes the same `AdapterGameSession` path used by local UI,
 CLI, headless, replay, and network producers:
@@ -51,17 +51,24 @@ references without inferring rules interactions from `decision_type` or display
 text. Hidden decisions expose `interaction: null` and no nested interaction
 requests. The typed `nested_interaction_requests` field publishes nested choices
 without forcing clients to inspect arbitrary proposal JSON.
-Phase 18J adds the optional `battlefield_view` game-view member. Contract 7
-publishes the directed Primary Mission additions as `game-view-v9-phase17n` and
-`battlefield-view-v3-phase17n`: turn-start terrain evidence is filtered through
-the same viewer-visible unit set as datacards, and terrain areas/features carry
-explicit classification. Authoritative terrain-area entities also require
+Contract 8 advances the pending-decision and lifecycle-status families to
+`decision-request-view-v4-phase17n-step3` and
+`lifecycle-status-v3-phase17n-step3`: unresolved Declare Battle Formations
+choices now use the shared viewer-redaction boundary instead of exposing their
+request or status details to the opponent.
+Phase 18J adds the optional `battlefield_view` game-view member. Contract 8
+publishes the Step 3 Primary evidence additions as
+`game-view-v10-phase17n-step3` with
+`battlefield-view-v4-phase17n-step3`: roster/datacard identities and complete
+post-reveal rules-unit history rows are public to both players, including
+unplaced reserves, and terrain areas/features carry explicit classification.
+Authoritative terrain-area entities also require
 logical terrain-area identity, which participates in the authoritative geometry
 hash. The battlefield family separates viewer-scoped authoritative
 geometry and its hash from interaction overlays and non-authoritative render
 hints under the normative `coordinate-system.md` world frame.
 `examples/battlefield/geometry-conformance.json` is the canonical standalone
-`battlefield-view-v3-phase17n` fixture for every declared geometry union surface and is
+`battlefield-view-v4-phase17n-step3` fixture for every declared geometry union surface and is
 validated by both Python and the generated TypeScript client. Movement and
 shared placement proposal requests use a separate opaque engine-owned
 `spatial_context_hash`; the viewer-scoped authoritative hash is informational.
@@ -71,16 +78,25 @@ family as the standalone submission schema; it is not an unrestricted JSON
 value. The generated TypeScript gate constructs and schema-validates all 85
 published interaction cases.
 
-Replay exports use `replay-artifact-v5-phase17n`. Their embedded mission setup
-requires both directed player Primary Mission assignments and explicit logical
-terrain-area identities. Runtime import accepts only that exact discriminator;
-v4 artifacts require the retained 6.x deployment and fail with a typed
-unsupported-version error on the 7.x runtime. The runtime never infers a
-missing directed assignment or missing logical grouping. Replay source identity
+Replay exports use `replay-artifact-v6-phase17n-step3`. Their embedded mission
+setup requires both directed player Primary Mission assignments and explicit
+logical terrain-area identities; their game state requires group-aware
+turn-start position history, typed destruction attribution, and battlefield
+departure evidence. Runtime import accepts only that exact discriminator; v5
+artifacts require the retained 7.x deployment and fail with a typed
+unsupported-version error on the 8.x runtime. The runtime never infers a
+missing directed assignment, grouped position history, destruction source, or
+departure record. Replay source identity
 also binds `mission_pack_id` to the authoritative mission source package hash;
 both fields are non-null when a mission is bound and both are null otherwise.
 Loading rejects a partial pair or any hash drift from the reconstructed
 lifecycle.
+
+The replay JSON Schema owns the stable export envelope and the complete shape
+of the three Step 3 evidence families while deliberately leaving unrelated
+engine-private lifecycle fields open. The fail-closed runtime loader validates
+the complete lifecycle payload and all cross-record/event integrity; schema
+acceptance alone is not replay certification.
 
 Phase 17O publishes `capability-manifest-v2-directed-primary` inside the
 `support-profile-v4-directed-primary` envelope. It publishes independent

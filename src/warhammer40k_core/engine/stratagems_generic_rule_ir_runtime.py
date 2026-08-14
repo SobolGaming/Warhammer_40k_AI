@@ -33,7 +33,16 @@ from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
     MortalWoundDestructionEvidence,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.reserves import ReserveOrigin
+from warhammer40k_core.engine.primary_historical_events import (
+    primary_reserve_entry_source_terminal_bindings_payload,
+    record_primary_reserve_entry_provider_terminal_event,
+)
+from warhammer40k_core.engine.primary_reserve_entry_provider import (
+    GENERIC_STRATAGEM_RESERVE_REMOVAL_RESOLVED_EVENT,
+    PrimaryReserveEntryProvider,
+    primary_reserve_entry_provider_from_accepted_stratagem_use,
+)
+from warhammer40k_core.engine.reserves import ReserveOrigin, ReserveState
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.stratagems_generic_metadata import (
     generic_rule_ir_execution_target_unit_ids,
@@ -153,7 +162,7 @@ def resolve_generic_rule_ir_context_battle_shock(
         "required_source_keyword",
     )
     if required_source_keyword is not None:
-        source_unit_id = _single_execution_target_unit_id(use_record)
+        source_unit_id = _single_execution_target_unit_id(state=state, use_record=use_record)
         if not unit_has_keyword(
             unit_by_id(state=state, unit_instance_id=source_unit_id),
             required_source_keyword,
@@ -271,10 +280,25 @@ def apply_generic_rule_ir_reserve_removal(
     if required_arrival_round_offset is not None and required_arrival_round_offset <= 0:
         raise GameLifecycleError("Generic reserve removal arrival offset must be positive.")
     reserve_payloads: list[JsonValue] = []
-    for unit_id in generic_rule_ir_execution_target_unit_ids(use_record):
+    reserve_entries: list[tuple[PrimaryReserveEntryProvider, ReserveState]] = []
+    for unit_id in generic_rule_ir_execution_target_unit_ids(state=state, use_record=use_record):
+        target_rules_unit_id = rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=unit_id,
+        ).unit_instance_id
+        provider = primary_reserve_entry_provider_from_accepted_stratagem_use(
+            state=state,
+            decisions=decisions,
+            use_record=use_record,
+            source_rule_id=source_rule_id,
+            target_rules_unit_instance_id=target_rules_unit_id,
+            executed_effect_payload=effect_payload,
+        )
         reserve_state = state.reposition_unit_to_strategic_reserves(
+            decisions=decisions,
             player_id=use_record.player_id,
             unit_instance_id=unit_id,
+            provider=provider,
             reserve_origin=ReserveOrigin.DURING_BATTLE_STRATAGEM,
             source_rule_ids=(source_rule_id,),
             required_arrival_battle_round=required_arrival_battle_round,
@@ -283,8 +307,9 @@ def apply_generic_rule_ir_reserve_removal(
             required_arrival_placement_kind=required_arrival_placement_kind,
         )
         reserve_payloads.append(validate_json_value(reserve_state.to_payload()))
-    decisions.event_log.append(
-        "generic_stratagem_reserve_removal_resolved",
+        reserve_entries.append((provider, reserve_state))
+    source_terminal_event = decisions.event_log.append(
+        GENERIC_STRATAGEM_RESERVE_REMOVAL_RESOLVED_EVENT,
         {
             "game_id": state.game_id,
             "player_id": use_record.player_id,
@@ -294,8 +319,17 @@ def apply_generic_rule_ir_reserve_removal(
             "stratagem_use": validate_json_value(use_record.to_payload()),
             "reserve_states": reserve_payloads,
             "generic_rule_effect": validate_json_value(effect_payload),
+            "stratagem_effect_payload": validate_json_value(use_record.effect_payload),
+            **primary_reserve_entry_source_terminal_bindings_payload(tuple(reserve_entries)),
         },
     )
+    for provider, reserve_state in reserve_entries:
+        record_primary_reserve_entry_provider_terminal_event(
+            event_log=decisions.event_log,
+            provider=provider,
+            reserve_state=reserve_state,
+            source_terminal_event=source_terminal_event,
+        )
 
 
 def resolve_generic_rule_ir_restore_lost_wounds(
@@ -308,7 +342,7 @@ def resolve_generic_rule_ir_restore_lost_wounds(
     rule_result_payload: JsonValue,
     effect_payload: dict[str, JsonValue],
 ) -> None:
-    target_unit_id = _single_execution_target_unit_id(use_record)
+    target_unit_id = _single_execution_target_unit_id(state=state, use_record=use_record)
     amount = _required_rule_effect_int_parameter(effect_payload, "amount")
     if amount <= 0:
         raise GameLifecycleError("Generic wound restoration amount must be positive.")
@@ -356,7 +390,7 @@ def resolve_generic_rule_ir_return_destroyed_target(
     rule_result_payload: JsonValue,
     effect_payload: dict[str, JsonValue],
 ) -> None:
-    target_unit_id = _single_execution_target_unit_id(use_record)
+    target_unit_id = _single_execution_target_unit_id(state=state, use_record=use_record)
     target_unit = unit_by_id(state=state, unit_instance_id=target_unit_id)
     if not _unit_has_required_keyword_sequence(target_unit, effect_payload=effect_payload):
         return
@@ -448,7 +482,7 @@ def _resolve_generic_roll_pool_mortal_wounds(
         "required_target_keyword",
     )
     if required_keyword is not None:
-        unit_id = _single_execution_target_unit_id(use_record)
+        unit_id = _single_execution_target_unit_id(state=state, use_record=use_record)
         unit = unit_by_id(state=state, unit_instance_id=unit_id)
         if not unit_has_keyword(unit, required_keyword):
             return
@@ -546,7 +580,7 @@ def _resolve_generic_roll_per_context_target_mortal_wounds(
     )
     source_unit = unit_by_id(
         state=state,
-        unit_instance_id=_single_execution_target_unit_id(use_record),
+        unit_instance_id=_single_execution_target_unit_id(state=state, use_record=use_record),
     )
     bonus = _source_keyword_bonus(source_unit=source_unit, effect_payload=effect_payload)
     manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
@@ -913,8 +947,8 @@ def _unit_has_required_keyword_sequence(
     return all(unit_has_keyword(unit, keyword) for keyword in required_keywords)
 
 
-def _single_execution_target_unit_id(use_record: StratagemUseRecord) -> str:
-    target_ids = generic_rule_ir_execution_target_unit_ids(use_record)
+def _single_execution_target_unit_id(*, state: GameState, use_record: StratagemUseRecord) -> str:
+    target_ids = generic_rule_ir_execution_target_unit_ids(state=state, use_record=use_record)
     if len(target_ids) != 1:
         raise GameLifecycleError("Generic RuleIR effect requires one target unit.")
     return target_ids[0]

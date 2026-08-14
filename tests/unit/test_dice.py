@@ -929,6 +929,63 @@ def test_event_log_tuple_payloads_normalize_to_lists() -> None:
     assert record.payload == {"values": [1, 2, 3]}
 
 
+def test_event_log_marks_only_the_new_player_owned_secret_suffix() -> None:
+    event_log = EventLog()
+    public_record = event_log.append("public_before", {"value": 1})
+    suffix_start = len(event_log.records)
+    first_secret = event_log.append("formation_choice", {"choice": "reserves"})
+    second_secret = event_log.append(
+        "formation_effect",
+        {
+            "effect": "recorded",
+            "secret": True,
+            "player_id": "player-a",
+            "visibility_source": "declare_battle_formations",
+        },
+    )
+
+    marked = event_log.mark_secret_suffix(
+        start_index=suffix_start,
+        player_id="player-a",
+        visibility_source="declare_battle_formations",
+    )
+
+    assert event_log.records[0] == public_record
+    assert tuple(record.event_id for record in marked) == (
+        first_secret.event_id,
+        second_secret.event_id,
+    )
+    assert all(
+        record.payload
+        == {
+            **({"choice": "reserves"} if index == 0 else {"effect": "recorded"}),
+            "secret": True,
+            "player_id": "player-a",
+            "visibility_source": "declare_battle_formations",
+        }
+        for index, record in enumerate(marked)
+    )
+
+
+def test_event_log_rejects_conflicting_secret_suffix_metadata() -> None:
+    event_log = EventLog()
+    event_log.append(
+        "formation_choice",
+        {
+            "secret": True,
+            "player_id": "player-b",
+            "visibility_source": "declare_battle_formations",
+        },
+    )
+
+    with pytest.raises(EventLogError, match="conflicting visibility metadata"):
+        event_log.mark_secret_suffix(
+            start_index=0,
+            player_id="player-a",
+            visibility_source="declare_battle_formations",
+        )
+
+
 def test_one_d6_result_override_round_trips_without_consuming_rng() -> None:
     manager = DiceRollManager("aspect-token-seed")
     state = manager.roll(

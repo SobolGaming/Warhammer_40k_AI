@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.engine.reserve_arrival_requirements import (
+    placement_kinds_for_reserve_state,
+    proposal_kind_for_reserve_state,
+)
 from warhammer40k_core.engine.reserves import StrategicReserveRule
 
 from warhammer40k_core.engine.phases.movement_imports import *
@@ -244,6 +248,7 @@ def _request_reinforcement_placement(
             "request_id": request.request_id,
             "source_decision_request_id": result.request_id,
             "source_decision_result_id": result.result_id,
+            "spatial_context_hash": proposal_request.spatial_context_hash,
             "phase_body_status": "placement_proposal_required",
         },
     )
@@ -269,28 +274,16 @@ def _reserve_placement_kinds_for_unit(
     reserve_state: ReserveState,
     unit: RulesUnitView,
 ) -> tuple[BattlefieldPlacementKind, ...]:
-    if reserve_state.required_arrival_placement_kind is not None:
-        return (
-            battlefield_placement_kind_from_token(reserve_state.required_arrival_placement_kind),
-        )
-    if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
-        kinds = [BattlefieldPlacementKind.STRATEGIC_RESERVES]
-        if all(_unit_has_deep_strike_keyword(component.unit) for component in unit.components):
-            kinds.append(BattlefieldPlacementKind.DEEP_STRIKE)
-        return tuple(kinds)
-    if reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE:
-        return (BattlefieldPlacementKind.DEEP_STRIKE,)
-    return (BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD,)
+    return placement_kinds_for_reserve_state(
+        reserve_state,
+        all_components_have_deep_strike=all(
+            _unit_has_deep_strike_keyword(component.unit) for component in unit.components
+        ),
+    )
 
 
 def _reserve_proposal_kind(reserve_state: ReserveState) -> ProposalKind:
-    if reserve_state.required_arrival_placement_kind == BattlefieldPlacementKind.DEEP_STRIKE.value:
-        return ProposalKind.DEEP_STRIKE
-    if reserve_state.reserve_kind is ReserveKind.DEEP_STRIKE:
-        return ProposalKind.DEEP_STRIKE
-    if reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
-        return ProposalKind.STRATEGIC_RESERVES
-    return ProposalKind.REINFORCEMENT
+    return proposal_kind_for_reserve_state(reserve_state)
 
 
 def _request_placement_proposal_retry(
@@ -329,6 +322,7 @@ def _request_placement_proposal_retry(
         "request_id": request.request_id,
         "source_decision_request_id": proposal_request.source_decision_request_id,
         "source_decision_result_id": proposal_request.source_decision_result_id,
+        "spatial_context_hash": retry_proposal.spatial_context_hash,
         "previous_proposal_request_id": proposal_request.request_id,
         "rejected_result_id": rejected_result.result_id,
         "phase_body_status": "placement_proposal_required",
@@ -552,13 +546,17 @@ def _apply_valid_reinforcement_placement(
     battlefield_state = state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Reinforcement placement requires battlefield_state.")
+    arrived_state = placement.arrived_reserve_state()
+    if state.active_player_id != arrived_state.player_id:
+        raise GameLifecycleError(
+            "Ordinary reinforcement placement owner must be the active player."
+        )
     state.replace_battlefield_state(
         apply_reinforcement_placement_to_battlefield(
             battlefield_state=battlefield_state,
             placement=placement,
         )
     )
-    arrived_state = placement.arrived_reserve_state()
     state.replace_reserve_state(arrived_state)
     movement_state = state.movement_phase_state
     if movement_state is None:
@@ -571,7 +569,8 @@ def _apply_valid_reinforcement_placement(
         {
             "game_id": state.game_id,
             "battle_round": state.battle_round,
-            "active_player_id": arrived_state.player_id,
+            "active_player_id": state.active_player_id,
+            "player_id": arrived_state.player_id,
             "phase": BattlePhase.MOVEMENT.value,
             "step": MovementPhaseStepKind.MOVE_UNITS.value,
             "unit_instance_id": arrived_state.unit_instance_id,

@@ -77,6 +77,9 @@ from warhammer40k_core.engine.phase import (
 )
 from warhammer40k_core.engine.phases.fight import FightPhaseHandler
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    RulesUnitObjectiveProximityWitness,
+)
 from warhammer40k_core.engine.reaction_queue import (
     REACTION_DECISION_TYPE,
     ReactionQueue,
@@ -1710,6 +1713,12 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
     root_attribution = ModelDestructionAttribution.from_model_destroyed_payload(
         destroyed_payloads[root_model_id]
     )
+    collateral_source_witness = RulesUnitObjectiveProximityWitness.from_payload(
+        destroyed_payloads[bodyguard_model_id]["source_rules_unit_objective_proximity_witness"]
+    )
+    root_destroyed_witness = RulesUnitObjectiveProximityWitness.from_payload(
+        destroyed_payloads[root_model_id]["destroyed_rules_unit_objective_proximity_witness"]
+    )
     assert (
         collateral_attribution.destruction_provenance.destruction_source_kind
         is DestructionSourceKind.DEADLY_DEMISE
@@ -1718,6 +1727,8 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
     assert collateral_attribution.source_model_instance_id == root_model_id
     assert collateral_attribution.attacking_unit_instance_id is None
     assert collateral_attribution.attacking_model_instance_id is None
+    assert collateral_source_witness == root_destroyed_witness
+    assert collateral_source_witness.rules_unit_instance_id == enemy.unit_instance_id
     assert (
         root_attribution.destruction_provenance.destruction_source_kind
         is DestructionSourceKind.ABILITY
@@ -2281,7 +2292,11 @@ def _deadly_demise_source(
     )
 
 
-def _battle_state(*, unit_selection_ids: tuple[str, ...]) -> GameState:
+def _battle_state(
+    *,
+    unit_selection_ids: tuple[str, ...],
+    decisions: DecisionController | None = None,
+) -> GameState:
     config = _config(unit_selection_ids=unit_selection_ids)
     armies = _mustered_armies(config)
     state = GameState.from_config(config)
@@ -2292,20 +2307,21 @@ def _battle_state(*, unit_selection_ids: tuple[str, ...]) -> GameState:
         armies=armies,
     )
     state.record_battlefield_state(scenario.battlefield_state)
-    enter_battle_for_fixture(state)
+    enter_battle_for_fixture(state, decisions=decisions)
     assert state.stage is GameLifecycleStage.BATTLE
     return state
 
 
 def _battle_lifecycle(*, unit_selection_ids: tuple[str, ...]) -> GameLifecycle:
     config = _config(unit_selection_ids=unit_selection_ids)
-    state = _battle_state(unit_selection_ids=unit_selection_ids)
+    decisions = DecisionController()
+    state = _battle_state(unit_selection_ids=unit_selection_ids, decisions=decisions)
     return GameLifecycle.from_payload(
         {
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": DecisionController().to_payload(),
+            "decisions": decisions.to_payload(),
             "reaction_queue": {"frames": []},
         }
     )

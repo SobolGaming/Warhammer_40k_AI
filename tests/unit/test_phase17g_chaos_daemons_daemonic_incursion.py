@@ -1,6 +1,7 @@
 # pyright: reportPrivateUsage=false
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass, replace
 from typing import cast
 
@@ -17,6 +18,7 @@ from tests.phase10p_reserves_helpers import (
     submit_reserve_placement_payload,
     with_model_pose,
 )
+from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -56,6 +58,7 @@ from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
     EnhancementAssignment,
+    muster_army,
 )
 from warhammer40k_core.engine.attack_sequence import AttackSequence
 from warhammer40k_core.engine.attack_sequence_completion_hooks import (
@@ -75,8 +78,12 @@ from warhammer40k_core.engine.charge_effects import (
     CHARGE_AFTER_ADVANCE_EFFECT_KIND,
     charge_after_advance_allowed_by_effects,
 )
+from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_record import DecisionRecordPayload
+from warhammer40k_core.engine.decision_request import PARAMETERIZED_DECISION_OPTION_ID
+from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     EffectExpiration,
@@ -84,7 +91,12 @@ from warhammer40k_core.engine.effects import (
     PersistingEffect,
 )
 from warhammer40k_core.engine.enhancement_effects import apply_enhancement_effects
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import (
+    EventRecord,
+    EventRecordPayload,
+    JsonValue,
+    validate_json_value,
+)
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.runtime import (
@@ -105,11 +117,17 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
     stratagems as daemonic_stratagems,
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.movement_proposals import (
+    PLACEMENT_PROPOSAL_DECISION_TYPE,
+    MovementProposalRequest,
+    PlacementProposalPayload,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -117,8 +135,13 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.movement import (
+    COMPLETE_REINFORCEMENTS_OPTION_ID,
     MovementPhaseHandler,
     MovementPhaseState,
+)
+from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_reserve_entry_lifecycle_integrity import (
+    validate_primary_reserve_entry_lifecycle_integrity,
 )
 from warhammer40k_core.engine.reserve_arrival_hooks import (
     ReserveArrivalDistanceContext,
@@ -127,6 +150,7 @@ from warhammer40k_core.engine.reserve_arrival_hooks import (
 from warhammer40k_core.engine.reserves import (
     ReserveDestructionTimingPolicy,
     ReserveKind,
+    ReserveOrigin,
     ReservePlacementViolationCode,
     ReserveState,
     ReserveStatus,
@@ -143,16 +167,26 @@ from warhammer40k_core.engine.source_backed_rerolls import (
     SourceBackedRerollPermissionContext,
     source_backed_reroll_permission_context_for_unit,
 )
+from warhammer40k_core.engine.stratagem_catalog import eleventh_edition_core_stratagem_index
+from warhammer40k_core.engine.stratagems_eligibility import derive_stratagem_use_unit_ids
 from warhammer40k_core.engine.stratagems_generic_metadata import (
     objective_marker_effect_selection,
 )
 from warhammer40k_core.engine.stratagems_model import (
+    StratagemCatalogIndex,
+    StratagemCatalogRecord,
     StratagemDefinition,
     StratagemEligibilityContext,
     StratagemTargetBinding,
     StratagemTargetKind,
+    StratagemTargetProposal,
     StratagemUseRecord,
 )
+from warhammer40k_core.engine.stratagems_requests import (
+    create_stratagem_use_decision_request,
+    request_stratagem_target_proposal,
+)
+from warhammer40k_core.engine.stratagems_selection import _stratagem_decision_option
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.wargear_selections import (
@@ -1114,6 +1148,948 @@ def test_the_realm_of_chaos_removes_unit_to_deep_strike_required_reserves() -> N
     assert reserve_payload["required_arrival_placement_kind"] == "deep_strike"
 
 
+def test_realm_of_chaos_config_backed_replay_binds_active_runtime_catalog() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+
+    assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
+
+
+def test_realm_of_chaos_replay_requires_active_runtime_catalog() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    payload: GameLifecyclePayload = deepcopy(lifecycle.to_payload())
+    payload["config"] = None
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="requires active runtime Stratagem catalog authority",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_realm_of_chaos_replay_rejects_coordinated_carried_catalog_drift() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    payload: GameLifecyclePayload = deepcopy(lifecycle.to_payload())
+
+    _rewrite_realm_of_chaos_catalog_source(payload, source_id="forged:catalog-source")
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="active catalog authority drift",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_realm_of_chaos_replay_binds_full_rule_execution_context() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    payload: GameLifecyclePayload = deepcopy(lifecycle.to_payload())
+    execution_events = tuple(
+        event
+        for event in payload["decisions"]["event_log"]
+        if event["event_type"] == "rule_execution_effect_applied"
+    )
+    if len(execution_events) != 1:
+        raise AssertionError("test requires one Realm of Chaos RuleIR effect event")
+    execution_payload = execution_events[0]["payload"]
+    assert isinstance(execution_payload, dict)
+    execution_context = execution_payload["context"]
+    assert isinstance(execution_context, dict)
+    execution_context["active_player_id"] = "player-b"
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Stratagem reserve provider execution event drift",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_realm_of_chaos_provider_rejects_coordinated_disabled_catalog_record() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    payload: GameLifecyclePayload = deepcopy(lifecycle.to_payload())
+    _rewrite_realm_of_chaos_catalog_disabled(payload)
+    decisions = DecisionController.from_payload(payload["decisions"])
+    state = GameState.from_payload(payload["state"])
+    runtime_bundle = lifecycle._runtime_content_bundle
+    if runtime_bundle is None:
+        raise AssertionError("test requires runtime content")
+    original_index = runtime_bundle.stratagem_indexes_by_player_id["player-a"]
+    disabled_index = StratagemCatalogIndex.from_records(
+        tuple(
+            replace(record, disabled=True)
+            if record.definition.stratagem_id
+            == daemonic_incursion_ir.THE_REALM_OF_CHAOS_STRATAGEM_ID
+            else record
+            for record in original_index.all_records()
+        )
+    )
+
+    with pytest.raises(GameLifecycleError, match="active catalog authority drift"):
+        validate_primary_reserve_entry_lifecycle_integrity(
+            state=state,
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+            stratagem_indexes_by_player_id={"player-a": disabled_index},
+        )
+
+
+def test_realm_of_chaos_replay_rejects_orphan_empty_source_terminal() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    payload: GameLifecyclePayload = deepcopy(lifecycle.to_payload())
+    event_log = payload["decisions"]["event_log"]
+    source_terminal = next(
+        event
+        for event in event_log
+        if event["event_type"] == "generic_stratagem_reserve_removal_resolved"
+    )
+    orphan_payload = deepcopy(source_terminal["payload"])
+    assert isinstance(orphan_payload, dict)
+    orphan_use = orphan_payload["stratagem_use"]
+    assert isinstance(orphan_use, dict)
+    orphan_use["use_id"] = "orphan-realm-of-chaos-use"
+    orphan_payload["primary_reserve_entry_bindings"] = []
+    orphan_payload["reserve_states"] = []
+    event_log.append(
+        {
+            "event_id": f"event-{len(event_log) + 1:06d}",
+            "event_type": "generic_stratagem_reserve_removal_resolved",
+            "payload": orphan_payload,
+        }
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="requires non-empty bindings",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_realm_of_chaos_replay_rejects_altered_duplicate_source_binding() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    payload: GameLifecyclePayload = deepcopy(lifecycle.to_payload())
+    source_terminal = next(
+        event
+        for event in payload["decisions"]["event_log"]
+        if event["event_type"] == "generic_stratagem_reserve_removal_resolved"
+    )
+    source_payload = source_terminal["payload"]
+    assert isinstance(source_payload, dict)
+    bindings = source_payload["primary_reserve_entry_bindings"]
+    assert isinstance(bindings, list)
+    assert len(bindings) == 1
+    altered = deepcopy(bindings[0])
+    assert isinstance(altered, dict)
+    provider = altered["provider"]
+    reserve_entry = altered["reserve_entry_state"]
+    assert isinstance(provider, dict)
+    assert isinstance(reserve_entry, dict)
+    provider["source_rule_id"] = "forged:rule-ir-source"
+    reserve_entry["source_rule_ids"] = ["forged:rule-ir-source"]
+    bindings.append(altered)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="source terminal occurrence is duplicated",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_realm_of_chaos_replay_rejects_provider_with_mismatched_stratagem_use() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    payload: GameLifecyclePayload = deepcopy(lifecycle.to_payload())
+
+    _rewrite_realm_of_chaos_provider_use_id(
+        payload,
+        stratagem_use_id="forged:realm-of-chaos-use",
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match=(
+            r"authoritative reserve mutation event|source terminal use is missing|"
+            r"use identity is missing"
+        ),
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_realm_of_chaos_replay_rejects_forged_arrived_status() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    state = lifecycle.state
+    if state is None or state.battlefield_state is None:
+        raise AssertionError("test lifecycle requires battlefield state")
+    reserve_state = state.reserve_states[0]
+    reserve_unit = state.army_definitions[0].unit_by_id(reserve_state.unit_instance_id)
+    placement = reserve_placement(
+        reserve_unit=reserve_unit,
+        poses=tuple(
+            Pose.at(x=10.0 + 2.0 * index, y=30.0, z=0.0, facing_degrees=0.0)
+            for index in range(len(reserve_unit.own_models))
+        ),
+    )
+    state.replace_battlefield_state(state.battlefield_state.with_added_unit_placement(placement))
+    state.replace_reserve_state(
+        reserve_state.mark_arrived(
+            battle_round=2,
+            phase=BattlePhase.MOVEMENT,
+            large_model_exception_used=False,
+            post_arrival_restrictions=(),
+        )
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Arrived ReserveState lacks one authenticated arrival",
+    ):
+        GameLifecycle.from_payload(lifecycle.to_payload())
+
+
+def test_realm_of_chaos_replay_rejects_forged_destroyed_status() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    state = lifecycle.state
+    if state is None or state.battlefield_state is None:
+        raise AssertionError("test lifecycle requires battlefield state")
+    reserve_state = state.reserve_states[0]
+    reserve_unit = state.army_definitions[0].unit_by_id(reserve_state.unit_instance_id)
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unplaced_models_marked_removed(
+            tuple(model.model_instance_id for model in reserve_unit.own_models)
+        )
+    )
+    state.replace_reserve_state(reserve_state.mark_destroyed(battle_round=3))
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="lacks one authenticated reserve-deadline destruction",
+    ):
+        GameLifecycle.from_payload(lifecycle.to_payload())
+
+
+def test_realm_of_chaos_real_reinforcement_arrival_replays_and_rejects_clone() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("test lifecycle requires state")
+    _arrive_realm_target_from_reserves(
+        lifecycle=lifecycle,
+        battle_round=2,
+        result_id_prefix="phase17g-realm-arrival",
+    )
+
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+
+    assert restored.state is not None
+    assert restored.state.reserve_states[0].status is ReserveStatus.ARRIVED
+    assert restored.state.reserve_states[0].arrived_battle_round == 2
+    cloned_payload: GameLifecyclePayload = deepcopy(lifecycle.to_payload())
+    event_log = cloned_payload["decisions"]["event_log"]
+    arrival_event = next(
+        event for event in event_log if event["event_type"] == "reinforcement_unit_arrived"
+    )
+    event_log.append(
+        {
+            "event_id": f"event-{len(event_log) + 1:06d}",
+            "event_type": "reinforcement_unit_arrived",
+            "payload": deepcopy(arrival_event["payload"]),
+        }
+    )
+    with pytest.raises(GameLifecycleError, match="Reserve arrival decision record is reused"):
+        GameLifecycle.from_payload(cloned_payload)
+
+
+@pytest.fixture(scope="module")
+def phase17n_realm_retry_payload() -> GameLifecyclePayload:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    _arrive_realm_target_from_reserves(
+        lifecycle=lifecycle,
+        battle_round=2,
+        result_id_prefix="phase17n-realm-arrival-retry",
+        invalid_first=True,
+    )
+    return lifecycle.to_payload()
+
+
+def test_realm_of_chaos_invalid_placement_retry_then_valid_arrival_replays(
+    phase17n_realm_retry_payload: GameLifecyclePayload,
+) -> None:
+    payload = deepcopy(phase17n_realm_retry_payload)
+
+    restored = GameLifecycle.from_payload(deepcopy(payload))
+
+    assert restored.to_payload() == payload
+    assert restored.state is not None
+    assert restored.state.reserve_states[0].status is ReserveStatus.ARRIVED
+    assert any(
+        event.event_type == "reinforcement_placement_invalid"
+        for event in restored.decision_controller.event_log.records
+    )
+
+
+@pytest.fixture(scope="module")
+def phase17n_realm_arrival_payload() -> GameLifecyclePayload:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    _arrive_realm_target_from_reserves(
+        lifecycle=lifecycle,
+        battle_round=2,
+        result_id_prefix="phase17n-realm-authority",
+    )
+    return lifecycle.to_payload()
+
+
+def test_realm_of_chaos_replay_rejects_coordinated_arrival_placement_kind_tamper(
+    phase17n_realm_arrival_payload: GameLifecyclePayload,
+) -> None:
+    result_id = "phase17n-realm-authority-place"
+    payload: GameLifecyclePayload = deepcopy(phase17n_realm_arrival_payload)
+    decision = _decision_record_payload_for_result(payload, result_id=result_id)
+    result_payload = _json_object_for_test(decision["result"]["payload"])
+    result_payload["placement_kind"] = BattlefieldPlacementKind.STRATEGIC_RESERVES.value
+    _sync_decision_recorded_event(payload, decision=decision)
+
+    arrival_payload = _arrival_event_payload_for_result(payload, result_id=result_id)
+    arrival_payload["placement_kind"] = BattlefieldPlacementKind.STRATEGIC_RESERVES.value
+    transition_payload = _json_object_for_test(arrival_payload["transition_batch"])
+    transition_placements = _json_object_list_for_test(transition_payload["placements"])
+    for placement in transition_placements:
+        placement["placement_kind"] = BattlefieldPlacementKind.STRATEGIC_RESERVES.value
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Reserve arrival request/result proposal authority drift",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("field_name", "forged_value"),
+    [
+        ("source_rule_id", "forged:arrival-source-rule"),
+        ("source_phase", BattlePhase.SHOOTING.value),
+        ("source_step", "forged_arrival_step"),
+        ("source_event_id", "forged:arrival-source-event"),
+    ],
+)
+def test_realm_of_chaos_replay_rejects_transition_source_authority_tamper(
+    phase17n_realm_arrival_payload: GameLifecyclePayload,
+    field_name: str,
+    forged_value: str,
+) -> None:
+    result_id = "phase17n-realm-authority-place"
+    payload: GameLifecyclePayload = deepcopy(phase17n_realm_arrival_payload)
+    arrival_payload = _arrival_event_payload_for_result(payload, result_id=result_id)
+    transition_payload = _json_object_for_test(arrival_payload["transition_batch"])
+    transition_placements = _json_object_list_for_test(transition_payload["placements"])
+    for placement in transition_placements:
+        placement[field_name] = forged_value
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Reserve arrival transition source authority drift",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_realm_of_chaos_replay_rejects_invented_arrival_model_identity(
+    phase17n_realm_arrival_payload: GameLifecyclePayload,
+) -> None:
+    result_id = "phase17n-realm-authority-place"
+    payload: GameLifecyclePayload = deepcopy(phase17n_realm_arrival_payload)
+    invented_model_id = "army-alpha:daemon-unit:invented-model"
+
+    decision = _decision_record_payload_for_result(payload, result_id=result_id)
+    result_payload = _json_object_for_test(decision["result"]["payload"])
+    attempted_placement = _json_object_for_test(result_payload["attempted_placement"])
+    attempted_models = _json_object_list_for_test(attempted_placement["model_placements"])
+    attempted_models[0]["model_instance_id"] = invented_model_id
+    _sync_decision_recorded_event(payload, decision=decision)
+
+    arrival_payload = _arrival_event_payload_for_result(payload, result_id=result_id)
+    rules_unit_placement = _json_object_for_test(arrival_payload["rules_unit_placement"])
+    component_placements = _json_object_list_for_test(
+        rules_unit_placement["component_unit_placements"]
+    )
+    arrived_models = _json_object_list_for_test(component_placements[0]["model_placements"])
+    arrived_models[0]["model_instance_id"] = invented_model_id
+    transition_payload = _json_object_for_test(arrival_payload["transition_batch"])
+    transition_placements = _json_object_list_for_test(transition_payload["placements"])
+    transition_placements[0]["model_instance_id"] = invented_model_id
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Reserve arrival request/result proposal authority drift",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("tamper_kind", "error_match"),
+    [
+        ("arrival_phase_body_status", "Reserve arrival route event authority drift"),
+        ("arrival_component_ids", "Reserve arrival route event authority drift"),
+        ("predecessor_ids", "Reserve arrival placement request predecessor drift"),
+        ("proposal_kind", "Reserve arrival request ReserveState authority drift"),
+        ("context_model_ids", "Reserve arrival request/result proposal authority drift"),
+        ("context_reserve_source", "Reserve arrival request ReserveState source drift"),
+        ("context_reserve_missing", "Reserve arrival request lacks ReserveState source authority"),
+    ],
+)
+def test_realm_of_chaos_replay_rejects_arrival_route_contract_tamper(
+    phase17n_realm_arrival_payload: GameLifecyclePayload,
+    tamper_kind: str,
+    error_match: str,
+) -> None:
+    result_id = "phase17n-realm-authority-place"
+    payload: GameLifecyclePayload = deepcopy(phase17n_realm_arrival_payload)
+    decision = _decision_record_payload_for_result(payload, result_id=result_id)
+    request_payload = _placement_proposal_request_payload_for_test(decision)
+    result_payload = _json_object_for_test(decision["result"]["payload"])
+    arrival_payload = _arrival_event_payload_for_result(payload, result_id=result_id)
+    proposal_event_payload = _placement_proposal_requested_payload_for_test(
+        payload,
+        request_id=decision["request"]["request_id"],
+    )
+
+    if tamper_kind == "arrival_phase_body_status":
+        arrival_payload["phase_body_status"] = "forged_arrival_status"
+    elif tamper_kind == "arrival_component_ids":
+        arrival_payload["component_unit_instance_ids"] = ["army-alpha:forged-component"]
+    elif tamper_kind == "predecessor_ids":
+        request_payload["source_decision_request_id"] = "forged:selection-request"
+        request_payload["source_decision_result_id"] = "forged:selection-result"
+        proposal_event_payload["source_decision_request_id"] = "forged:selection-request"
+        proposal_event_payload["source_decision_result_id"] = "forged:selection-result"
+    elif tamper_kind == "proposal_kind":
+        forged_kind = "strategic_reserves_placement"
+        request_payload["proposal_kind"] = forged_kind
+        result_payload["proposal_kind"] = forged_kind
+        proposal_event_payload["proposal_kind"] = forged_kind
+    elif tamper_kind == "context_model_ids":
+        context = _json_object_for_test(request_payload["context"])
+        context["model_instance_ids"] = ["army-alpha:daemon-unit:invented-model"]
+    elif tamper_kind == "context_reserve_source":
+        context = _json_object_for_test(request_payload["context"])
+        reserve_state_payload = _json_object_for_test(context["reserve_state"])
+        reserve_state_payload["source_rule_ids"] = ["forged:reserve-source"]
+    elif tamper_kind == "context_reserve_missing":
+        context = _json_object_for_test(request_payload["context"])
+        context.pop("reserve_state")
+    else:
+        raise AssertionError(f"unsupported arrival route tamper: {tamper_kind}")
+
+    if tamper_kind not in {"arrival_phase_body_status", "arrival_component_ids"}:
+        _sync_decision_requested_event(payload, decision=decision)
+        _sync_decision_recorded_event(payload, decision=decision)
+    with pytest.raises(GameLifecycleError, match=error_match):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("tamper_kind", "error_match"),
+    [
+        ("missing_source", "Reserve arrival lacks one placement source event"),
+        ("spatial_authority", "placement request spatial authority drift"),
+        ("source_authority", "placement source event authority drift"),
+        ("source_order", "placement source event ordering drift"),
+        ("selection_authority", "reinforcement selection authority drift"),
+        ("selection_event", "reinforcement selection event closure drift"),
+        ("selection_order", "reinforcement selection ordering drift"),
+        ("arrival_order", "Reserve arrival decision ordering drift"),
+    ],
+)
+def test_realm_of_chaos_replay_rejects_arrival_source_and_event_order_tamper(
+    phase17n_realm_arrival_payload: GameLifecyclePayload,
+    tamper_kind: str,
+    error_match: str,
+) -> None:
+    payload: GameLifecyclePayload = deepcopy(phase17n_realm_arrival_payload)
+    placement_result_id = "phase17n-realm-authority-place"
+    placement_decision = _decision_record_payload_for_result(
+        payload,
+        result_id=placement_result_id,
+    )
+    placement_request_id = placement_decision["request"]["request_id"]
+    placement_source_event = _event_record_for_request_id(
+        payload,
+        event_type="placement_proposal_requested",
+        request_id=placement_request_id,
+    )
+    placement_requested_event = _event_record_for_request_id(
+        payload,
+        event_type="decision_requested",
+        request_id=placement_request_id,
+    )
+    selection_decision = _decision_record_payload_for_result(
+        payload,
+        result_id="phase17n-realm-authority-select",
+    )
+    selection_terminal_event = _event_record_for_request_id(
+        payload,
+        event_type="reinforcement_unit_selected",
+        request_id=selection_decision["request"]["request_id"],
+    )
+
+    if tamper_kind == "missing_source":
+        placement_source_event["event_type"] = "forged_placement_proposal_requested"
+    elif tamper_kind == "spatial_authority":
+        _json_object_for_test(placement_source_event["payload"])["spatial_context_hash"] = (
+            "forged:spatial-context"
+        )
+    elif tamper_kind == "source_authority":
+        _json_object_for_test(placement_source_event["payload"])["phase_body_status"] = (
+            "forged_placement_status"
+        )
+    elif tamper_kind == "source_order":
+        _swap_event_contents(placement_requested_event, placement_source_event)
+    elif tamper_kind == "selection_authority":
+        selection_request_payload = _json_object_for_test(selection_decision["request"]["payload"])
+        selection_request_payload["active_player_id"] = "player-b"
+        _sync_decision_requested_event(payload, decision=selection_decision)
+        _sync_decision_recorded_event(payload, decision=selection_decision)
+    elif tamper_kind == "selection_event":
+        _json_object_for_test(selection_terminal_event["payload"])["phase_body_status"] = (
+            "forged_selection_status"
+        )
+    elif tamper_kind == "selection_order":
+        _swap_event_contents(selection_terminal_event, placement_requested_event)
+    elif tamper_kind == "arrival_order":
+        arrival_event = _event_record_for_result_id(
+            payload,
+            event_type="reinforcement_unit_arrived",
+            result_id=placement_result_id,
+        )
+        placement_recorded_event = _event_record_for_result_id(
+            payload,
+            event_type="decision_recorded",
+            result_id=placement_result_id,
+        )
+        _swap_event_contents(arrival_event, placement_recorded_event)
+    else:
+        raise AssertionError(f"unsupported source/order tamper: {tamper_kind}")
+
+    with pytest.raises(GameLifecycleError, match=error_match):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("tamper_kind", "error_match"),
+    [
+        ("missing_predecessor", "retry lacks one rejected predecessor"),
+        ("predecessor_authority", "retry predecessor authority drift"),
+        ("predecessor_order", "retry predecessor ordering drift"),
+        ("missing_invalid_event", "retry lacks one invalid predecessor event"),
+        ("invalid_event_authority", "retry invalid event authority drift"),
+        ("invalid_event_order", "retry invalid event ordering drift"),
+    ],
+)
+def test_realm_of_chaos_replay_rejects_arrival_retry_chain_tamper(
+    phase17n_realm_retry_payload: GameLifecyclePayload,
+    tamper_kind: str,
+    error_match: str,
+) -> None:
+    payload: GameLifecyclePayload = deepcopy(phase17n_realm_retry_payload)
+    final_decision = _decision_record_payload_for_result(
+        payload,
+        result_id="phase17n-realm-arrival-retry-place",
+    )
+    rejected_decision = _decision_record_payload_for_result(
+        payload,
+        result_id="phase17n-realm-arrival-retry-invalid",
+    )
+    final_request_id = final_decision["request"]["request_id"]
+    rejected_request_id = rejected_decision["request"]["request_id"]
+    final_source_event = _event_record_for_request_id(
+        payload,
+        event_type="placement_proposal_requested",
+        request_id=final_request_id,
+    )
+    invalid_event = _event_record_for_result_id(
+        payload,
+        event_type="reinforcement_placement_invalid",
+        result_id=rejected_decision["result"]["result_id"],
+    )
+
+    if tamper_kind == "missing_predecessor":
+        final_source_payload = _json_object_for_test(final_source_event["payload"])
+        final_source_payload["previous_proposal_request_id"] = "forged:previous-request"
+        final_source_payload["rejected_result_id"] = "forged:rejected-result"
+    elif tamper_kind == "predecessor_authority":
+        previous_request = _placement_proposal_request_payload_for_test(rejected_decision)
+        previous_context = _json_object_for_test(previous_request["context"])
+        previous_context["forged_authority"] = True
+        _sync_decision_requested_event(payload, decision=rejected_decision)
+        _sync_decision_recorded_event(payload, decision=rejected_decision)
+    elif tamper_kind == "predecessor_order":
+        predecessor_requested = _event_record_for_request_id(
+            payload,
+            event_type="decision_requested",
+            request_id=rejected_request_id,
+        )
+        predecessor_recorded = _event_record_for_result_id(
+            payload,
+            event_type="decision_recorded",
+            result_id=rejected_decision["result"]["result_id"],
+        )
+        _swap_event_contents(predecessor_requested, predecessor_recorded)
+    elif tamper_kind == "missing_invalid_event":
+        invalid_event["event_type"] = "forged_reinforcement_placement_invalid"
+    elif tamper_kind == "invalid_event_authority":
+        _json_object_for_test(invalid_event["payload"])["violations"] = []
+    elif tamper_kind == "invalid_event_order":
+        final_requested = _event_record_for_request_id(
+            payload,
+            event_type="decision_requested",
+            request_id=final_request_id,
+        )
+        _swap_event_contents(invalid_event, final_requested)
+    else:
+        raise AssertionError(f"unsupported retry tamper: {tamper_kind}")
+
+    with pytest.raises(GameLifecycleError, match=error_match):
+        GameLifecycle.from_payload(payload)
+
+
+def test_rapid_ingress_retry_rejects_invalid_event_player_authority(
+    phase17n_rapid_ingress_retry_payload: GameLifecyclePayload,
+) -> None:
+    payload: GameLifecyclePayload = deepcopy(phase17n_rapid_ingress_retry_payload)
+    invalid_event = _event_record_for_result_id(
+        payload,
+        event_type="rapid_ingress_placement_invalid",
+        result_id="phase17n-rapid-ingress-retry:invalid",
+    )
+    _json_object_for_test(invalid_event["payload"])["player_id"] = "player-b"
+
+    with pytest.raises(GameLifecycleError, match="retry invalid event authority drift"):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("tamper_kind", "error_match"),
+    [
+        ("missing_terminal", "source/provider terminal closure drift"),
+        ("binding", "provider terminal binding drift"),
+        ("ordering", "source/provider terminal ordering drift"),
+        ("occurrence", "provider terminal occurrence drift"),
+        ("duplicate", "provider terminal occurrence is duplicated"),
+        ("empty_evidence", "provider terminal reserve evidence is empty"),
+        ("extra_field", "provider terminal fields are malformed"),
+    ],
+)
+def test_realm_of_chaos_replay_rejects_provider_terminal_integrity_tamper(
+    phase17n_realm_arrival_payload: GameLifecyclePayload,
+    tamper_kind: str,
+    error_match: str,
+) -> None:
+    payload: GameLifecyclePayload = deepcopy(phase17n_realm_arrival_payload)
+    source_terminal = _event_record_for_type(
+        payload,
+        event_type="generic_stratagem_reserve_removal_resolved",
+    )
+    provider_terminal = _event_record_for_type(
+        payload,
+        event_type="primary_reserve_entry_provider_resolved",
+    )
+    provider_payload = _json_object_for_test(provider_terminal["payload"])
+
+    if tamper_kind == "missing_terminal":
+        provider_terminal["event_type"] = "forged_provider_terminal"
+    elif tamper_kind == "binding":
+        provider_payload["source_terminal_event_id"] = "event:forged"
+    elif tamper_kind == "ordering":
+        _swap_event_contents(source_terminal, provider_terminal)
+        swapped_provider_payload = _json_object_for_test(source_terminal["payload"])
+        swapped_provider_payload["source_terminal_event_id"] = provider_terminal["event_id"]
+    elif tamper_kind == "occurrence":
+        provider_payload["occurrence_id"] = "occurrence:forged"
+    elif tamper_kind == "duplicate":
+        event_log = payload["decisions"]["event_log"]
+        event_log.append(
+            {
+                "event_id": f"event-{len(event_log) + 1:06d}",
+                "event_type": provider_terminal["event_type"],
+                "payload": deepcopy(provider_terminal["payload"]),
+            }
+        )
+    elif tamper_kind == "empty_evidence":
+        provider_payload["reserve_entry_state"] = {}
+    elif tamper_kind == "extra_field":
+        provider_payload["forged"] = True
+    else:
+        raise AssertionError(f"unsupported provider-terminal tamper: {tamper_kind}")
+
+    state = GameState.from_payload(payload["state"])
+    decisions = DecisionController.from_payload(payload["decisions"])
+    runtime_bundle = _daemonic_incursion_runtime_bundle(state)
+    with pytest.raises(GameLifecycleError, match=error_match):
+        validate_primary_reserve_entry_lifecycle_integrity(
+            state=state,
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+            stratagem_indexes_by_player_id=runtime_bundle.stratagem_indexes_by_player_id,
+        )
+
+
+def test_declared_reserve_arrival_realm_reentry_and_second_arrival_replay() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle(prior_declared_arrival=True)
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("test lifecycle requires state")
+    assert (
+        sum(
+            event.event_type == "reinforcement_unit_arrived"
+            for event in lifecycle.decision_controller.event_log.records
+        )
+        == 1
+    )
+
+    _arrive_realm_target_from_reserves(
+        lifecycle=lifecycle,
+        battle_round=3,
+        result_id_prefix="phase17n-realm-second-arrival",
+    )
+
+    payload = lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(deepcopy(payload))
+    assert restored.to_payload() == payload
+    assert restored.state is not None
+    assert restored.state.reserve_states[0].status is ReserveStatus.ARRIVED
+    assert (
+        sum(
+            event.event_type == "reinforcement_unit_arrived"
+            for event in restored.decision_controller.event_log.records
+        )
+        == 2
+    )
+
+
+def test_realm_reentry_rapid_ingress_binds_opponent_active_player() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle(prior_declared_arrival=True)
+    record = _active_ingress_record(lifecycle, stratagem_id="rapid-ingress")
+    _submit_config_backed_ingress(
+        lifecycle=lifecycle,
+        record=record,
+        active_player_id="player-b",
+        placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+        result_id_prefix="phase17n-rapid-ingress-reentry",
+    )
+
+    payload = lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(deepcopy(payload))
+    assert restored.to_payload() == payload
+    assert restored.state is not None
+    assert restored.state.active_player_id == "player-b"
+
+    forged_payload: GameLifecyclePayload = deepcopy(payload)
+    matching_events = tuple(
+        event
+        for event in forged_payload["decisions"]["event_log"]
+        if event["event_type"] in {"reinforcement_unit_arrived", "rapid_ingress_resolved"}
+        and isinstance(event["payload"], dict)
+        and event["payload"].get("step") == "rapid_ingress"
+    )
+    if len(matching_events) != 2:
+        raise AssertionError("test requires one Rapid Ingress arrival/terminal pair")
+    for event in matching_events:
+        _json_object_for_test(event["payload"])["active_player_id"] = "player-a"
+    with pytest.raises(GameLifecycleError, match="Reserve arrival placement identity drift"):
+        GameLifecycle.from_payload(forged_payload)
+
+
+@pytest.fixture(scope="module")
+def phase17n_rapid_ingress_retry_payload() -> GameLifecyclePayload:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle(prior_declared_arrival=True)
+    record = _active_ingress_record(lifecycle, stratagem_id="rapid-ingress")
+    _submit_config_backed_ingress(
+        lifecycle=lifecycle,
+        record=record,
+        active_player_id="player-b",
+        placement_kind=BattlefieldPlacementKind.DEEP_STRIKE,
+        result_id_prefix="phase17n-rapid-ingress-retry",
+        invalid_first=True,
+    )
+    return lifecycle.to_payload()
+
+
+def test_realm_reentry_rapid_ingress_invalid_retry_replays(
+    phase17n_rapid_ingress_retry_payload: GameLifecyclePayload,
+) -> None:
+    payload = deepcopy(phase17n_rapid_ingress_retry_payload)
+
+    restored = GameLifecycle.from_payload(deepcopy(payload))
+
+    assert restored.to_payload() == payload
+    assert restored.state is not None
+    assert restored.state.reserve_states[0].status is ReserveStatus.ARRIVED
+    assert any(
+        event.event_type == "rapid_ingress_placement_invalid"
+        for event in restored.decision_controller.event_log.records
+    )
+
+
+def test_realm_of_chaos_occurrence_requires_persisted_reserve_state() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("test lifecycle requires state")
+    state.reserve_states.clear()
+    runtime_bundle = _daemonic_incursion_runtime_bundle(state)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="occurrence lacks its persisted ReserveState",
+    ):
+        validate_primary_reserve_entry_lifecycle_integrity(
+            state=state,
+            event_records=lifecycle.decision_controller.event_log.records,
+            decision_records=lifecycle.decision_controller.records,
+            stratagem_indexes_by_player_id=runtime_bundle.stratagem_indexes_by_player_id,
+        )
+
+
+def test_realm_of_chaos_no_mission_audit_rejects_forged_requested_event() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("test lifecycle requires state")
+    state.mission_setup = None
+    requested_event = next(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == "decision_requested"
+    )
+    requested_payload = cast(dict[str, JsonValue], requested_event.payload)
+    forged_event = EventRecord(
+        event_id=requested_event.event_id,
+        event_type=requested_event.event_type,
+        payload={**requested_payload, "request_id": "forged:request"},
+    )
+    events = tuple(
+        forged_event if event.event_id == requested_event.event_id else event
+        for event in lifecycle.decision_controller.event_log.records
+    )
+    runtime_bundle = _daemonic_incursion_runtime_bundle(state)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="exact requested and recorded decision events",
+    ):
+        validate_primary_reserve_entry_lifecycle_integrity(
+            state=state,
+            event_records=events,
+            decision_records=lifecycle.decision_controller.records,
+            stratagem_indexes_by_player_id=runtime_bundle.stratagem_indexes_by_player_id,
+        )
+
+
+def test_realm_of_chaos_provider_audit_rejects_source_terminal_round_drift() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("test lifecycle requires state")
+    events = tuple(
+        EventRecord(
+            event_id=event.event_id,
+            event_type=event.event_type,
+            payload={**cast(dict[str, JsonValue], event.payload), "battle_round": 99},
+        )
+        if event.event_type == "generic_stratagem_reserve_removal_resolved"
+        else event
+        for event in lifecycle.decision_controller.event_log.records
+    )
+    runtime_bundle = _daemonic_incursion_runtime_bundle(state)
+
+    with pytest.raises(GameLifecycleError, match="source terminal timing drift"):
+        validate_primary_reserve_entry_lifecycle_integrity(
+            state=state,
+            event_records=events,
+            decision_records=lifecycle.decision_controller.records,
+            stratagem_indexes_by_player_id=runtime_bundle.stratagem_indexes_by_player_id,
+        )
+
+
+def test_realm_of_chaos_provider_audit_recomputes_required_arrival() -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("test lifecycle requires state")
+    events: list[EventRecord] = []
+    for event in lifecycle.decision_controller.event_log.records:
+        if event.event_type != "generic_stratagem_reserve_removal_resolved":
+            events.append(event)
+            continue
+        payload = deepcopy(cast(dict[str, JsonValue], event.payload))
+        bindings = cast(list[JsonValue], payload["primary_reserve_entry_bindings"])
+        binding = cast(dict[str, JsonValue], bindings[0])
+        binding_reserve = cast(dict[str, JsonValue], binding["reserve_entry_state"])
+        reserve_states = cast(list[JsonValue], payload["reserve_states"])
+        terminal_reserve = cast(dict[str, JsonValue], reserve_states[0])
+        binding_reserve["required_arrival_battle_round"] = 3
+        terminal_reserve["required_arrival_battle_round"] = 3
+        events.append(
+            EventRecord(
+                event_id=event.event_id,
+                event_type=event.event_type,
+                payload=payload,
+            )
+        )
+    runtime_bundle = _daemonic_incursion_runtime_bundle(state)
+
+    with pytest.raises(GameLifecycleError, match="source requirements drift"):
+        validate_primary_reserve_entry_lifecycle_integrity(
+            state=state,
+            event_records=tuple(events),
+            decision_records=lifecycle.decision_controller.records,
+            stratagem_indexes_by_player_id=runtime_bundle.stratagem_indexes_by_player_id,
+        )
+
+
+@pytest.mark.parametrize(
+    "reserve_origin",
+    [
+        ReserveOrigin.DURING_BATTLE_ABILITY,
+        ReserveOrigin.DURING_BATTLE_STRATAGEM,
+        ReserveOrigin.DURING_BATTLE_OTHER,
+    ],
+)
+def test_replay_rejects_standalone_during_battle_reserve_state(
+    reserve_origin: ReserveOrigin,
+) -> None:
+    lifecycle = _config_backed_realm_of_chaos_lifecycle()
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("test lifecycle requires state")
+    if len(state.reserve_states) != 1:
+        raise AssertionError("test lifecycle requires Realm of Chaos ReserveState")
+    authoritative_reserve = state.reserve_states[0]
+    enemy_unit = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-b"
+        for unit in army.units
+    )
+    fabricated = ReserveState.entered_during_battle(
+        player_id="player-b",
+        unit_instance_id=enemy_unit.unit_instance_id,
+        reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT,
+        reserve_origin=reserve_origin,
+        destruction_deadline_policy=authoritative_reserve.destruction_deadline_policy,
+        source_rule_ids=(f"forged:{reserve_origin.value}",),
+    ).mark_arrived(
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT,
+        large_model_exception_used=False,
+        post_arrival_restrictions=(),
+    )
+    payload: GameLifecyclePayload = deepcopy(lifecycle.to_payload())
+    payload["state"]["reserve_states"].append(fabricated.to_payload())
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="lacks an authoritative entry occurrence",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
 def test_staged_realm_of_chaos_requires_first_turn_generic_ingress() -> None:
     state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
     state.active_player_id = "player-b"
@@ -1240,12 +2216,13 @@ def test_the_realm_of_chaos_companion_selection_requires_shadow_units() -> None:
         is None
     )
     assert generic_metadata.generic_rule_ir_execution_target_unit_ids(
-        _daemonic_stratagem_use_record(
+        state=state,
+        use_record=_daemonic_stratagem_use_record(
             definition=definition,
             target_unit_id=target_unit.unit_instance_id,
             phase=BattlePhase.MOVEMENT,
             effect_selection=companion_selection,
-        )
+        ),
     ) == tuple(sorted((target_unit.unit_instance_id, reserve_unit.unit_instance_id)))
 
 
@@ -2141,6 +3118,56 @@ def _apply_daemonic_stratagem(
     use_record: StratagemUseRecord,
     context: StratagemEligibilityContext,
 ) -> None:
+    records = tuple(
+        record
+        for contribution in (
+            daemonic_stratagems.runtime_contribution(),
+            july_updates.runtime_contribution(),
+        )
+        for record in contribution.stratagem_records
+        if record.definition == definition
+    )
+    if len(records) != 1:
+        raise AssertionError("test requires one exact Stratagem catalog record")
+    option = _stratagem_decision_option(
+        context=context,
+        record=records[0],
+        target_binding=use_record.target_binding,
+        effect_selection=use_record.effect_selection,
+    )
+    request = create_stratagem_use_decision_request(
+        state=state,
+        context=context,
+        options=(option,),
+        request_id=use_record.request_id,
+    )
+    result = DecisionResult.for_request(
+        result_id=use_record.result_id,
+        request=request,
+        selected_option_id=option.option_id,
+    )
+    decisions.request_decision(request)
+    decisions.submit_result(result)
+    targeted_ids, affected_ids = derive_stratagem_use_unit_ids(
+        state=state,
+        definition=definition,
+        context=context,
+        target_binding=use_record.target_binding,
+        effect_selection=use_record.effect_selection,
+    )
+    use_record = replace(
+        use_record,
+        battle_round=context.battle_round,
+        phase=context.phase,
+        active_player_id=context.active_player_id,
+        timing_window_id=context.timing_window_id,
+        selected_option_id=option.option_id,
+        targeted_unit_instance_ids=targeted_ids,
+        affected_unit_instance_ids=affected_ids,
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(context.phase)
+    state.record_stratagem_use(use_record)
+    decisions.event_log.append("stratagem_used", use_record.to_payload())
     stratagems_generic_rule_ir._apply_generic_rule_ir_stratagem_handler(
         state=state,
         decisions=decisions,
@@ -2257,6 +3284,679 @@ def _runtime_activation(
         selected_weapon_keywords=(),
         loaded_unit_instance_ids=(),
     )
+
+
+def _config_backed_realm_of_chaos_lifecycle(
+    *,
+    prior_declared_arrival: bool = False,
+) -> GameLifecycle:
+    config = _daemonic_incursion_config(game_id="phase17g-daemonic-incursion-realm-authority")
+    armies = tuple(
+        muster_army(catalog=config.army_catalog, request=request)
+        for request in config.army_muster_requests
+    )
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase17g-daemonic-incursion-realm-authority-battlefield",
+        armies=armies,
+    )
+    state.record_battlefield_state(scenario.battlefield_state)
+    decisions = DecisionController()
+    enter_battle_for_fixture(state, decisions=decisions)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    state.active_player_id = "player-a"
+    runtime_bundle = build_runtime_content_bundle_for_armies(
+        config=config,
+        armies=armies,
+    )
+    realm_records = tuple(
+        record
+        for record in runtime_bundle.stratagem_indexes_by_player_id["player-a"].all_records()
+        if record.definition.stratagem_id == daemonic_incursion_ir.THE_REALM_OF_CHAOS_STRATAGEM_ID
+        and record.definition.source_id == daemonic_incursion_ir.THE_REALM_OF_CHAOS_SOURCE_RULE_ID
+        and isinstance(record.definition.effect_payload, dict)
+        and record.definition.effect_payload.get("effect_selection_kind") is None
+    )
+    if len(realm_records) != 1:
+        raise AssertionError("test requires one active Realm of Chaos single-target record")
+    definition = realm_records[0].definition
+    target_unit_id = armies[0].units[0].unit_instance_id
+    lifecycle = GameLifecycle(
+        state=state,
+        decision_controller=decisions,
+        _config=config,
+        _runtime_content_bundle=runtime_bundle,
+    )
+    if prior_declared_arrival:
+        if state.battlefield_state is None:
+            raise AssertionError("test requires a battlefield state")
+        state.replace_battlefield_state(
+            state.battlefield_state.without_unit_placement(target_unit_id)
+        )
+        declared_state = ReserveState.declared_before_battle(
+            player_id="player-a",
+            unit_instance_id=target_unit_id,
+            reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+            destruction_deadline_policy=(
+                reserve_arrival_requirements.reposition_destruction_policy(
+                    mission_setup=state.mission_setup,
+                    destruction_deadline_policy=None,
+                )
+            ),
+        )
+        state.record_reserve_state(declared_state)
+        decisions.event_log.append(
+            "reserve_unit_declared",
+            {
+                "game_id": state.game_id,
+                "player_id": "player-a",
+                "unit_instance_id": target_unit_id,
+                "reserve_state": declared_state.to_payload(),
+            },
+        )
+        _arrive_realm_target_from_reserves(
+            lifecycle=lifecycle,
+            battle_round=2,
+            result_id_prefix="phase17n-realm-prior-declared-arrival",
+        )
+        state.movement_phase_state = None
+    context = _daemonic_stratagem_context(
+        state=state,
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.END_TURN,
+    )
+    _apply_daemonic_stratagem(
+        state=state,
+        decisions=decisions,
+        definition=definition,
+        use_record=_daemonic_stratagem_use_record(
+            definition=definition,
+            target_unit_id=target_unit_id,
+            phase=BattlePhase.MOVEMENT,
+        ),
+        context=context,
+    )
+    return GameLifecycle.from_payload(lifecycle.to_payload())
+
+
+def _arrive_realm_target_from_reserves(
+    *,
+    lifecycle: GameLifecycle,
+    battle_round: int,
+    result_id_prefix: str,
+    invalid_first: bool = False,
+) -> None:
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("test lifecycle requires state")
+    reserve_state = state.reserve_states[0]
+    reserve_unit = state.army_definitions[0].unit_by_id(reserve_state.unit_instance_id)
+    state.battle_round = battle_round
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    state.active_player_id = "player-a"
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=battle_round,
+        active_player_id="player-a",
+        selected_unit_ids=(),
+        moved_unit_ids=(),
+    )
+    handler = MovementPhaseHandler(
+        ruleset_descriptor=_ruleset(),
+        reserve_arrival_distance_hooks=_runtime_reserve_arrival_registry(state),
+    )
+    decisions = lifecycle.decision_controller
+    selection_request = decision_request(handler.begin_phase(state=state, decisions=decisions))
+    placement_request = decision_request(
+        submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=selection_request,
+            option_id=reserve_state.unit_instance_id,
+            result_id=f"{result_id_prefix}-select",
+        )
+    )
+    placement_kind = (
+        BattlefieldPlacementKind.DEEP_STRIKE
+        if reserve_state.required_arrival_placement_kind
+        == BattlefieldPlacementKind.DEEP_STRIKE.value
+        else BattlefieldPlacementKind.STRATEGIC_RESERVES
+    )
+    if invalid_first:
+        invalid_status = submit_reserve_placement_payload(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=placement_request,
+            reserve_unit=reserve_unit,
+            placement_kind=placement_kind,
+            attempted_placement=reserve_placement(
+                reserve_unit=reserve_unit,
+                poses=tuple(
+                    Pose.at(
+                        x=10.0 + 2.0 * index,
+                        y=-10.0,
+                        z=0.0,
+                        facing_degrees=0.0,
+                    )
+                    for index in range(len(reserve_unit.own_models))
+                ),
+            ),
+            result_id=f"{result_id_prefix}-invalid",
+        )
+        if invalid_status is None or invalid_status.status_kind is not LifecycleStatusKind.INVALID:
+            raise AssertionError("test requires one rejected reserve placement")
+        placement_request = decisions.queue.peek_next()
+        if placement_request.decision_type != PLACEMENT_PROPOSAL_DECISION_TYPE:
+            raise AssertionError("test requires one retry placement request")
+    completion_status = submit_reserve_placement_payload(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        reserve_unit=reserve_unit,
+        placement_kind=placement_kind,
+        attempted_placement=reserve_placement(
+            reserve_unit=reserve_unit,
+            poses=tuple(
+                Pose.at(
+                    x=10.0 + 2.0 * index,
+                    y=(
+                        30.0
+                        if placement_kind is BattlefieldPlacementKind.DEEP_STRIKE
+                        else base_radius_inches(_RESERVE_BASE_DIAMETER_MM)
+                    ),
+                    z=0.0,
+                    facing_degrees=0.0,
+                )
+                for index in range(len(reserve_unit.own_models))
+            ),
+        ),
+        result_id=f"{result_id_prefix}-place",
+    )
+    if completion_status is not None and completion_status.decision_request is not None:
+        completion_request = decision_request(completion_status)
+        submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=completion_request,
+            option_id=COMPLETE_REINFORCEMENTS_OPTION_ID,
+            result_id=f"{result_id_prefix}-complete",
+        )
+
+
+def _active_ingress_record(
+    lifecycle: GameLifecycle,
+    *,
+    stratagem_id: str,
+) -> StratagemCatalogRecord:
+    if stratagem_id == "rapid-ingress":
+        indexes = (eleventh_edition_core_stratagem_index(),)
+    else:
+        indexes = (
+            lifecycle._require_runtime_content_bundle().stratagem_indexes_by_player_id["player-a"],
+        )
+    records = tuple(
+        record
+        for index in indexes
+        for record in index.all_records()
+        if record.definition.stratagem_id == stratagem_id
+    )
+    if len(records) != 1:
+        all_ids = tuple(
+            record.definition.stratagem_id for index in indexes for record in index.all_records()
+        )
+        raise AssertionError(f"test requires one active ingress Stratagem record: {all_ids}")
+    return records[0]
+
+
+def _submit_config_backed_ingress(
+    *,
+    lifecycle: GameLifecycle,
+    record: StratagemCatalogRecord,
+    active_player_id: str,
+    placement_kind: BattlefieldPlacementKind,
+    result_id_prefix: str,
+    invalid_first: bool = False,
+) -> None:
+    state = lifecycle.state
+    if state is None:
+        raise AssertionError("test lifecycle requires state")
+    reserve_state = state.reserve_states[0]
+    reserve_unit = state.army_definitions[0].unit_by_id(reserve_state.unit_instance_id)
+    state.active_player_id = active_player_id
+    state.battle_round = 3
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=3,
+        active_player_id=active_player_id,
+    )
+    state.gain_command_points(
+        player_id="player-a",
+        amount=1,
+        source_id=f"{result_id_prefix}:command-point",
+        source_kind=CommandPointSourceKind.OTHER,
+        cap_exempt=True,
+    )
+    context = StratagemEligibilityContext(
+        game_id=state.game_id,
+        player_id="player-a",
+        battle_round=state.battle_round,
+        phase=BattlePhase.MOVEMENT,
+        active_player_id=active_player_id,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        timing_window_id=f"{result_id_prefix}:end-movement",
+    )
+    proposal = StratagemTargetProposal.for_request(
+        context=context,
+        catalog_record=record,
+    )
+    waiting = request_stratagem_target_proposal(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        proposal_request=proposal,
+    )
+    target_request = decision_request(waiting)
+    placement_status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id=f"{result_id_prefix}:target",
+            request_id=target_request.request_id,
+            decision_type=target_request.decision_type,
+            actor_id=target_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(
+                {
+                    "proposal": proposal.with_binding(
+                        _friendly_daemon_target_binding(reserve_state.unit_instance_id)
+                    ).to_payload()
+                }
+            ),
+        )
+    )
+    placement_request = decision_request(placement_status)
+    movement_request = MovementProposalRequest.from_decision_request_payload(
+        placement_request.payload
+    )
+    if invalid_first:
+        invalid_status = lifecycle.submit_decision(
+            DecisionResult(
+                result_id=f"{result_id_prefix}:invalid",
+                request_id=placement_request.request_id,
+                decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+                actor_id=placement_request.actor_id,
+                selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+                payload=validate_json_value(
+                    PlacementProposalPayload(
+                        proposal_request_id=movement_request.request_id,
+                        proposal_kind=movement_request.proposal_kind,
+                        unit_instance_id=reserve_state.unit_instance_id,
+                        placement_kind=placement_kind,
+                        attempted_placement=reserve_placement(
+                            reserve_unit=reserve_unit,
+                            poses=tuple(
+                                Pose.at(
+                                    x=10.0 + 2.0 * index,
+                                    y=-10.0,
+                                    z=0.0,
+                                    facing_degrees=0.0,
+                                )
+                                for index in range(len(reserve_unit.own_models))
+                            ),
+                        ),
+                    ).to_payload()
+                ),
+            )
+        )
+        if invalid_status.status_kind is not LifecycleStatusKind.INVALID:
+            raise AssertionError("test ingress requires one rejected placement")
+        placement_request = lifecycle.decision_controller.queue.peek_next()
+        movement_request = MovementProposalRequest.from_decision_request_payload(
+            placement_request.payload
+        )
+    y_inches = (
+        30.0
+        if placement_kind is BattlefieldPlacementKind.RETURN_TO_BATTLEFIELD
+        else base_radius_inches(_RESERVE_BASE_DIAMETER_MM)
+    )
+    attempted_placement = reserve_placement(
+        reserve_unit=reserve_unit,
+        poses=tuple(
+            Pose.at(x=10.0 + 2.0 * index, y=y_inches, z=0.0, facing_degrees=0.0)
+            for index in range(len(reserve_unit.own_models))
+        ),
+    )
+    final_status = lifecycle.submit_decision(
+        DecisionResult(
+            result_id=f"{result_id_prefix}:placement",
+            request_id=placement_request.request_id,
+            decision_type=PLACEMENT_PROPOSAL_DECISION_TYPE,
+            actor_id=placement_request.actor_id,
+            selected_option_id=PARAMETERIZED_DECISION_OPTION_ID,
+            payload=validate_json_value(
+                PlacementProposalPayload(
+                    proposal_request_id=movement_request.request_id,
+                    proposal_kind=movement_request.proposal_kind,
+                    unit_instance_id=reserve_state.unit_instance_id,
+                    placement_kind=placement_kind,
+                    attempted_placement=attempted_placement,
+                ).to_payload()
+            ),
+        )
+    )
+    if final_status.status_kind is LifecycleStatusKind.INVALID:
+        raise AssertionError(f"test ingress placement must be valid: {final_status.payload}")
+    ingress_events = tuple(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type in {"reinforcement_unit_arrived", "rapid_ingress_resolved"}
+        and isinstance(event.payload, dict)
+        and event.payload.get("result_id") == f"{result_id_prefix}:placement"
+    )
+    if len(ingress_events) != 2:
+        raise AssertionError("test ingress must emit one arrival and one terminal event")
+
+
+def _decision_record_payload_for_result(
+    payload: GameLifecyclePayload,
+    *,
+    result_id: str,
+) -> DecisionRecordPayload:
+    matches = tuple(
+        decision
+        for decision in payload["decisions"]["records"]
+        if decision["result"]["result_id"] == result_id
+    )
+    if len(matches) != 1:
+        raise AssertionError("test requires one accepted placement decision")
+    return matches[0]
+
+
+def _arrival_event_payload_for_result(
+    payload: GameLifecyclePayload,
+    *,
+    result_id: str,
+) -> dict[str, JsonValue]:
+    matches = tuple(
+        event_payload
+        for event in payload["decisions"]["event_log"]
+        if event["event_type"] == "reinforcement_unit_arrived"
+        and isinstance((event_payload := event["payload"]), dict)
+        and event_payload.get("result_id") == result_id
+    )
+    if len(matches) != 1:
+        raise AssertionError("test requires one reinforcement arrival event")
+    return matches[0]
+
+
+def _event_record_for_type(
+    payload: GameLifecyclePayload,
+    *,
+    event_type: str,
+) -> EventRecordPayload:
+    matches = tuple(
+        event for event in payload["decisions"]["event_log"] if event["event_type"] == event_type
+    )
+    if len(matches) != 1:
+        raise AssertionError(f"test requires one {event_type} event")
+    return matches[0]
+
+
+def _event_record_for_request_id(
+    payload: GameLifecyclePayload,
+    *,
+    event_type: str,
+    request_id: str,
+) -> EventRecordPayload:
+    matches = tuple(
+        event
+        for event in payload["decisions"]["event_log"]
+        if event["event_type"] == event_type
+        and isinstance(event["payload"], dict)
+        and event["payload"].get("request_id") == request_id
+    )
+    if len(matches) != 1:
+        raise AssertionError(f"test requires one {event_type} event for {request_id}")
+    return matches[0]
+
+
+def _event_record_for_result_id(
+    payload: GameLifecyclePayload,
+    *,
+    event_type: str,
+    result_id: str,
+) -> EventRecordPayload:
+    matches: list[EventRecordPayload] = []
+    for event in payload["decisions"]["event_log"]:
+        if event["event_type"] != event_type or not isinstance(event["payload"], dict):
+            continue
+        event_payload = event["payload"]
+        recorded_result = event_payload.get("result")
+        if event_payload.get("result_id") == result_id or (
+            isinstance(recorded_result, dict) and recorded_result.get("result_id") == result_id
+        ):
+            matches.append(event)
+    if len(matches) != 1:
+        raise AssertionError(f"test requires one {event_type} event for {result_id}")
+    return matches[0]
+
+
+def _swap_event_contents(first: EventRecordPayload, second: EventRecordPayload) -> None:
+    first["event_type"], second["event_type"] = second["event_type"], first["event_type"]
+    first["payload"], second["payload"] = second["payload"], first["payload"]
+
+
+def _placement_proposal_request_payload_for_test(
+    decision: DecisionRecordPayload,
+) -> dict[str, JsonValue]:
+    request_wrapper = _json_object_for_test(decision["request"]["payload"])
+    return _json_object_for_test(request_wrapper["proposal_request"])
+
+
+def _placement_proposal_requested_payload_for_test(
+    payload: GameLifecyclePayload,
+    *,
+    request_id: str,
+) -> dict[str, JsonValue]:
+    matches = tuple(
+        event_payload
+        for event in payload["decisions"]["event_log"]
+        if event["event_type"] == "placement_proposal_requested"
+        and isinstance((event_payload := event["payload"]), dict)
+        and event_payload.get("request_id") == request_id
+    )
+    if len(matches) != 1:
+        raise AssertionError("test requires one placement proposal requested event")
+    return matches[0]
+
+
+def _sync_decision_requested_event(
+    payload: GameLifecyclePayload,
+    *,
+    decision: DecisionRecordPayload,
+) -> None:
+    request_id = decision["request"]["request_id"]
+    matches = tuple(
+        event
+        for event in payload["decisions"]["event_log"]
+        if event["event_type"] == "decision_requested"
+        and isinstance(event["payload"], dict)
+        and event["payload"].get("request_id") == request_id
+    )
+    if len(matches) != 1:
+        raise AssertionError("test requires one requested placement decision event")
+    matches[0]["payload"] = validate_json_value(deepcopy(decision["request"]))
+
+
+def _sync_decision_recorded_event(
+    payload: GameLifecyclePayload,
+    *,
+    decision: DecisionRecordPayload,
+) -> None:
+    result_id = decision["result"]["result_id"]
+    matches: list[EventRecordPayload] = []
+    for event in payload["decisions"]["event_log"]:
+        event_payload = event["payload"]
+        if event["event_type"] != "decision_recorded" or not isinstance(event_payload, dict):
+            continue
+        recorded_result = event_payload.get("result")
+        if isinstance(recorded_result, dict) and recorded_result.get("result_id") == result_id:
+            matches.append(event)
+    if len(matches) != 1:
+        raise AssertionError("test requires one recorded placement decision event")
+    matches[0]["payload"] = validate_json_value(deepcopy(decision))
+
+
+def _json_object_for_test(value: JsonValue) -> dict[str, JsonValue]:
+    if not isinstance(value, dict):
+        pytest.fail("test payload must be an object")
+    return value
+
+
+def _json_object_list_for_test(value: JsonValue) -> list[dict[str, JsonValue]]:
+    if not isinstance(value, list) or not all(isinstance(item, dict) for item in value):
+        raise AssertionError("test payload must be a list of objects")
+    return cast(list[dict[str, JsonValue]], value)
+
+
+def _rewrite_realm_of_chaos_catalog_disabled(payload: GameLifecyclePayload) -> None:
+    records = payload["decisions"]["records"]
+    if len(records) != 1:
+        raise AssertionError("test requires one accepted Realm of Chaos decision")
+    decision = records[0]
+    selected_option_id = decision["result"]["selected_option_id"]
+    selected_options = tuple(
+        option
+        for option in decision["request"]["options"]
+        if option["option_id"] == selected_option_id
+    )
+    if len(selected_options) != 1:
+        raise AssertionError("test requires one selected Realm of Chaos option")
+    option_payload = selected_options[0]["payload"]
+    result_payload = decision["result"]["payload"]
+    assert isinstance(option_payload, dict)
+    assert isinstance(result_payload, dict)
+    option_record = option_payload.get("catalog_record")
+    result_record = result_payload.get("catalog_record")
+    assert isinstance(option_record, dict)
+    assert isinstance(result_record, dict)
+    option_record["disabled"] = True
+    result_record["disabled"] = True
+    request_id = decision["request"]["request_id"]
+    result_id = decision["result"]["result_id"]
+    for event in payload["decisions"]["event_log"]:
+        event_payload = event["payload"]
+        if event["event_type"] == "decision_requested" and isinstance(event_payload, dict):
+            if event_payload.get("request_id") == request_id:
+                event["payload"] = validate_json_value(deepcopy(decision["request"]))
+        elif event["event_type"] == "decision_recorded" and isinstance(event_payload, dict):
+            result = event_payload.get("result")
+            if isinstance(result, dict) and result.get("result_id") == result_id:
+                event["payload"] = validate_json_value(deepcopy(decision))
+
+
+def _rewrite_realm_of_chaos_catalog_source(
+    payload: GameLifecyclePayload,
+    *,
+    source_id: str,
+) -> None:
+    records = payload["decisions"]["records"]
+    if len(records) != 1:
+        raise AssertionError("test requires one accepted Realm of Chaos decision")
+    decision = records[0]
+    selected_option_id = decision["result"]["selected_option_id"]
+    selected_options = tuple(
+        option
+        for option in decision["request"]["options"]
+        if option["option_id"] == selected_option_id
+    )
+    if len(selected_options) != 1:
+        raise AssertionError("test requires one selected Realm of Chaos option")
+    option_payload = selected_options[0]["payload"]
+    result_payload = decision["result"]["payload"]
+    assert isinstance(option_payload, dict)
+    assert isinstance(result_payload, dict)
+    option_record = option_payload.get("catalog_record")
+    result_record = result_payload.get("catalog_record")
+    assert isinstance(option_record, dict)
+    assert isinstance(result_record, dict)
+    option_definition = option_record.get("definition")
+    result_definition = result_record.get("definition")
+    assert isinstance(option_definition, dict)
+    assert isinstance(result_definition, dict)
+    option_definition["source_id"] = source_id
+    result_definition["source_id"] = source_id
+
+    use_payloads = payload["state"]["stratagem_use_records"]
+    if len(use_payloads) != 1:
+        raise AssertionError("test requires one Realm of Chaos use")
+    use_payloads[0]["source_id"] = source_id
+    request_id = decision["request"]["request_id"]
+    result_id = decision["result"]["result_id"]
+    for event in payload["decisions"]["event_log"]:
+        event_payload = event["payload"]
+        if event["event_type"] == "decision_requested" and isinstance(event_payload, dict):
+            if event_payload.get("request_id") == request_id:
+                event["payload"] = validate_json_value(deepcopy(decision["request"]))
+        elif event["event_type"] == "decision_recorded" and isinstance(event_payload, dict):
+            result = event_payload.get("result")
+            if isinstance(result, dict) and result.get("result_id") == result_id:
+                event["payload"] = validate_json_value(deepcopy(decision))
+        elif event["event_type"] == "stratagem_used" and isinstance(event_payload, dict):
+            event_payload["source_id"] = source_id
+        elif event["event_type"] == "generic_stratagem_reserve_removal_resolved" and isinstance(
+            event_payload, dict
+        ):
+            terminal_use = event_payload.get("stratagem_use")
+            if not isinstance(terminal_use, dict):
+                raise AssertionError("test requires source-terminal Realm of Chaos use")
+            terminal_use["source_id"] = source_id
+
+
+def _rewrite_realm_of_chaos_provider_use_id(
+    payload: GameLifecyclePayload,
+    *,
+    stratagem_use_id: str,
+) -> None:
+    target_unit_id: str | None = None
+    for event in payload["decisions"]["event_log"]:
+        event_payload = event["payload"]
+        if not isinstance(event_payload, dict):
+            continue
+        providers: list[dict[str, JsonValue]] = []
+        provider_payload = event_payload.get("provider")
+        if isinstance(provider_payload, dict):
+            providers.append(provider_payload)
+        bindings = event_payload.get("primary_reserve_entry_bindings")
+        if isinstance(bindings, list):
+            for binding in bindings:
+                if not isinstance(binding, dict):
+                    continue
+                binding_provider = binding.get("provider")
+                if not isinstance(binding_provider, dict):
+                    continue
+                providers.append(binding_provider)
+        for provider in providers:
+            candidate_target_id = provider.get("target_rules_unit_instance_id")
+            if type(candidate_target_id) is not str:
+                raise AssertionError("test requires provider target identity")
+            if target_unit_id is not None and target_unit_id != candidate_target_id:
+                raise AssertionError("test requires one provider target identity")
+            target_unit_id = candidate_target_id
+            provider["stratagem_use_id"] = stratagem_use_id
+        if target_unit_id is None:
+            continue
+        occurrence_id = f"{stratagem_use_id}:reserve-entry:{target_unit_id}"
+        if "occurrence_id" in event_payload:
+            event_payload["occurrence_id"] = occurrence_id
+        if isinstance(bindings, list):
+            for binding in bindings:
+                if isinstance(binding, dict):
+                    binding["occurrence_id"] = occurrence_id
+    if target_unit_id is None:
+        raise AssertionError("test requires Realm of Chaos provider evidence")
 
 
 def _enemy_unit_id(state: GameState) -> str:

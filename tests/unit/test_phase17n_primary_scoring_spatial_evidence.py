@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import math
+from copy import deepcopy
 from dataclasses import replace
+from typing import Any, cast
 
 import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
@@ -13,13 +16,21 @@ from warhammer40k_core.engine.army_mustering import (
     muster_army,
 )
 from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldRemovalKind,
     BattlefieldRuntimeState,
     BattlefieldScenario,
     ModelPlacement,
     PlacedArmy,
     UnitPlacement,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.destruction_provenance import (
+    DestructionSourceKind,
+    ModelDestructionAttribution,
+)
+from warhammer40k_core.engine.event_log import EventRecordPayload, JsonValue
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     DetachmentSelection,
@@ -35,20 +46,50 @@ from warhammer40k_core.engine.objective_control import (
     ObjectiveControlTiming,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.primary_battlefield_departure import (
+    PrimaryBattlefieldDepartureState,
+    primary_battlefield_departure_id,
+)
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    rules_unit_objective_proximity_witness,
+)
+from warhammer40k_core.engine.primary_historical_events import (
+    PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT,
+    PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT,
+    record_new_primary_battlefield_departure_events,
+    record_new_primary_turn_start_evidence_events,
+    record_primary_unit_destruction_event,
+)
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     PRIMARY_SCORING_NO_ENEMY_IN_OWN_TERRITORY_CONDITION,
     PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITION,
     PRIMARY_SCORING_SPATIAL_CONDITIONS,
     PRIMARY_SCORING_TABLE_QUARTER_CONDITIONS,
     TABLE_QUARTER_IDS,
+    PrimaryScoringSpatialEvidence,
+    PrimaryTableQuarterUnitWitness,
+    PrimaryTerritoryUnitWitness,
     build_primary_scoring_spatial_evidence,
+    objective_control_record_hash,
+)
+from warhammer40k_core.engine.primary_turn_start_evidence import (
+    record_primary_turn_start_evidence,
+)
+from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+    record_primary_destroyed_model_departures,
+    record_primary_unit_destructions_for_destroyed_models,
+)
+from warhammer40k_core.engine.reserve_arrival_requirements import (
+    reposition_destruction_policy,
 )
 from warhammer40k_core.engine.reserves import (
-    ReserveDestructionTimingPolicy,
     ReserveKind,
     ReserveState,
 )
-from warhammer40k_core.engine.scoring import VictoryPointLedger
+from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState, VictoryPointLedger
+from warhammer40k_core.engine.starting_attached_units import (
+    starting_attached_unit_records_for_army,
+)
 from warhammer40k_core.engine.transports import (
     TransportCapacityProfile,
     TransportCargoState,
@@ -60,6 +101,279 @@ from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import (
     warhammer_event_companion_2026_07_mission_pack,
 )
+
+
+@pytest.mark.parametrize(
+    ("corruption", "expected_error"),
+    [
+        ("quarter_id", "quarter_id is unsupported"),
+        ("unrequested_quarter", "unrequested table-quarter witnesses"),
+        ("unrequested_territory", "unrequested territory witnesses"),
+        ("unrequested_objectives", "unrequested territory objectives"),
+        ("unsupported_condition", "requested_condition_ids are unsupported"),
+        ("quarters_not_tuple", "table-quarter witnesses must be a tuple"),
+        ("quarter_untyped", "table-quarter witnesses are invalid"),
+        ("quarter_duplicate_unit", "rules units must have one table-quarter witness"),
+        ("quarters_unsorted", "table-quarter witnesses must be sorted"),
+        ("territories_not_tuple", "territory witnesses must be a tuple"),
+        ("territory_untyped", "territory witnesses are invalid"),
+        ("territory_duplicate_unit", "territory witness units must be unique"),
+        ("territories_unsorted", "territory witnesses must be sorted"),
+        ("conditions_not_tuple", "requested_condition_ids must be a tuple"),
+        ("conditions_empty", "requested_condition_ids must not be empty"),
+        ("conditions_duplicate", "requested_condition_ids must not contain duplicates"),
+        ("conditions_unsorted", "requested_condition_ids must be sorted"),
+        ("battle_round", "battle_round must be a positive integer"),
+        ("timing", "timing must be ObjectiveControlTiming"),
+    ],
+)
+def test_primary_spatial_evidence_constructor_fails_closed(
+    corruption: str,
+    expected_error: str,
+) -> None:
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        _run_primary_spatial_evidence_constructor_corruption(corruption)
+
+
+def _run_primary_spatial_evidence_constructor_corruption(corruption: str) -> None:
+    first_quarter = PrimaryTableQuarterUnitWitness(
+        rules_unit_instance_id="rules-unit:quarter-a",
+        quarter_id=TABLE_QUARTER_IDS[0],
+        model_instance_ids=("model:quarter-a",),
+    )
+    second_quarter = PrimaryTableQuarterUnitWitness(
+        rules_unit_instance_id="rules-unit:quarter-b",
+        quarter_id=TABLE_QUARTER_IDS[1],
+        model_instance_ids=("model:quarter-b",),
+    )
+    first_territory = PrimaryTerritoryUnitWitness(
+        rules_unit_instance_id="rules-unit:territory-a",
+        model_instance_ids=("model:territory-a",),
+    )
+    second_territory = PrimaryTerritoryUnitWitness(
+        rules_unit_instance_id="rules-unit:territory-b",
+        model_instance_ids=("model:territory-b",),
+    )
+    parameters: dict[str, Any] = {
+        "game_id": "game:spatial-validation",
+        "battlefield_id": "battlefield:spatial-validation",
+        "battle_round": 2,
+        "active_player_id": "player-a",
+        "phase": BattlePhase.COMMAND.value,
+        "timing": ObjectiveControlTiming.PHASE_END,
+        "objective_control_record_id": "record:spatial-validation",
+        "objective_control_record_hash": "hash:spatial-validation",
+        "player_id": "player-a",
+        "requested_condition_ids": tuple(sorted(PRIMARY_SCORING_SPATIAL_CONDITIONS)),
+        "table_quarter_unit_witnesses": tuple(
+            sorted(
+                (first_quarter, second_quarter),
+                key=lambda witness: (witness.quarter_id, witness.rules_unit_instance_id),
+            )
+        ),
+        "enemy_units_wholly_within_own_territory": (
+            first_territory,
+            second_territory,
+        ),
+        "opponent_territory_objective_ids": ("objective:opponent",),
+    }
+    if corruption == "quarter_id":
+        PrimaryTableQuarterUnitWitness(
+            rules_unit_instance_id="rules-unit:quarter-invalid",
+            quarter_id="quarter:invalid",
+            model_instance_ids=("model:quarter-invalid",),
+        )
+    elif corruption == "unrequested_quarter":
+        parameters["requested_condition_ids"] = (
+            PRIMARY_SCORING_NO_ENEMY_IN_OWN_TERRITORY_CONDITION,
+        )
+        parameters["enemy_units_wholly_within_own_territory"] = ()
+        parameters["opponent_territory_objective_ids"] = ()
+    elif corruption == "unrequested_territory":
+        parameters["requested_condition_ids"] = (
+            sorted(PRIMARY_SCORING_TABLE_QUARTER_CONDITIONS)[0],
+        )
+        parameters["table_quarter_unit_witnesses"] = ()
+        parameters["opponent_territory_objective_ids"] = ()
+    elif corruption == "unrequested_objectives":
+        parameters["requested_condition_ids"] = (
+            sorted(PRIMARY_SCORING_TABLE_QUARTER_CONDITIONS)[0],
+        )
+        parameters["table_quarter_unit_witnesses"] = ()
+        parameters["enemy_units_wholly_within_own_territory"] = ()
+    elif corruption == "unsupported_condition":
+        parameters["requested_condition_ids"] = ("condition:unsupported",)
+        parameters["table_quarter_unit_witnesses"] = ()
+        parameters["enemy_units_wholly_within_own_territory"] = ()
+        parameters["opponent_territory_objective_ids"] = ()
+    elif corruption == "quarters_not_tuple":
+        parameters["table_quarter_unit_witnesses"] = []
+    elif corruption == "quarter_untyped":
+        parameters["table_quarter_unit_witnesses"] = (object(),)
+    elif corruption == "quarter_duplicate_unit":
+        parameters["table_quarter_unit_witnesses"] = tuple(
+            sorted(
+                (
+                    first_quarter,
+                    replace(first_quarter, quarter_id=TABLE_QUARTER_IDS[1]),
+                ),
+                key=lambda witness: (witness.quarter_id, witness.rules_unit_instance_id),
+            )
+        )
+    elif corruption == "quarters_unsorted":
+        parameters["table_quarter_unit_witnesses"] = tuple(
+            sorted(
+                (first_quarter, second_quarter),
+                key=lambda witness: (witness.quarter_id, witness.rules_unit_instance_id),
+                reverse=True,
+            )
+        )
+    elif corruption == "territories_not_tuple":
+        parameters["enemy_units_wholly_within_own_territory"] = []
+    elif corruption == "territory_untyped":
+        parameters["enemy_units_wholly_within_own_territory"] = (object(),)
+    elif corruption == "territory_duplicate_unit":
+        parameters["enemy_units_wholly_within_own_territory"] = (
+            first_territory,
+            replace(first_territory, model_instance_ids=("model:territory-c",)),
+        )
+    elif corruption == "territories_unsorted":
+        parameters["enemy_units_wholly_within_own_territory"] = (
+            second_territory,
+            first_territory,
+        )
+    elif corruption == "conditions_not_tuple":
+        parameters["requested_condition_ids"] = list(PRIMARY_SCORING_SPATIAL_CONDITIONS)
+    elif corruption == "conditions_empty":
+        parameters["requested_condition_ids"] = ()
+        parameters["table_quarter_unit_witnesses"] = ()
+        parameters["enemy_units_wholly_within_own_territory"] = ()
+        parameters["opponent_territory_objective_ids"] = ()
+    elif corruption == "conditions_duplicate":
+        condition = sorted(PRIMARY_SCORING_SPATIAL_CONDITIONS)[0]
+        parameters["requested_condition_ids"] = (condition, condition)
+    elif corruption == "conditions_unsorted":
+        parameters["requested_condition_ids"] = tuple(
+            sorted(PRIMARY_SCORING_SPATIAL_CONDITIONS, reverse=True)
+        )
+    elif corruption == "battle_round":
+        parameters["battle_round"] = 0
+    elif corruption == "timing":
+        parameters["timing"] = ObjectiveControlTiming.PHASE_END.value
+    else:
+        raise AssertionError(f"unsupported spatial constructor corruption: {corruption}")
+
+    if corruption != "quarter_id":
+        PrimaryScoringSpatialEvidence(**parameters)
+
+
+def test_primary_spatial_evidence_public_validation_fails_closed() -> None:
+    state = _spatial_evidence_state()
+    record = _authoritative_spatial_record(state)
+
+    with pytest.raises(GameLifecycleError, match="requires GameState"):
+        build_primary_scoring_spatial_evidence(
+            state=cast(GameState, object()),
+            player_id="player-a",
+            record=record,
+            requested_condition_ids=tuple(sorted(PRIMARY_SCORING_SPATIAL_CONDITIONS)),
+        )
+    with pytest.raises(GameLifecycleError, match="requires an ObjectiveControlRecord"):
+        build_primary_scoring_spatial_evidence(
+            state=state,
+            player_id="player-a",
+            record=cast(ObjectiveControlRecord, object()),
+            requested_condition_ids=tuple(sorted(PRIMARY_SCORING_SPATIAL_CONDITIONS)),
+        )
+    with pytest.raises(GameLifecycleError, match="player_id is not in this game"):
+        build_primary_scoring_spatial_evidence(
+            state=state,
+            player_id="player-c",
+            record=record,
+            requested_condition_ids=tuple(sorted(PRIMARY_SCORING_SPATIAL_CONDITIONS)),
+        )
+    with pytest.raises(GameLifecycleError, match="record hash requires an ObjectiveControlRecord"):
+        objective_control_record_hash(cast(ObjectiveControlRecord, object()))
+
+
+@pytest.mark.parametrize(
+    ("corruption", "expected_error"),
+    [
+        ("mission_missing", "requires mission and battlefield state"),
+        ("placed_unavailable", "placed model marked unavailable"),
+        ("alive_unplaced", "alive rules unit with no accounted placement"),
+        ("mission_player", "player_id is not in MissionSetup"),
+        ("territory_missing", "exactly one territory for each player role"),
+        ("dimensions", "battlefield dimensions drifted from MissionSetup"),
+        ("boundary_missing", "requires an active battle boundary"),
+        ("record_drift", "ObjectiveControlRecord drifted from GameState"),
+        ("record_unstored", "requires the authoritative ObjectiveControlRecord"),
+    ],
+)
+def test_primary_spatial_evidence_state_integrity_fails_closed(
+    corruption: str,
+    expected_error: str,
+) -> None:
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        _run_primary_spatial_evidence_state_corruption(corruption)
+
+
+def _run_primary_spatial_evidence_state_corruption(corruption: str) -> None:
+    state = _spatial_evidence_state()
+    record = _authoritative_spatial_record(state)
+    battlefield = state.battlefield_state
+    mission_setup = state.mission_setup
+    if battlefield is None or mission_setup is None:
+        raise AssertionError("spatial integrity test requires mission battlefield state")
+    if corruption == "mission_missing":
+        state.mission_setup = None
+    elif corruption == "placed_unavailable":
+        state.reserve_states.append(
+            replace(
+                state.reserve_states[0],
+                unit_instance_id="army-alpha:east",
+            )
+        )
+    elif corruption == "alive_unplaced":
+        state.replace_battlefield_state(battlefield.without_unit_placement("army-alpha:east"))
+    elif corruption == "mission_player":
+        state.mission_setup = MissionSetup.from_mission_pack(
+            mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+            mission_pool_entry_id="mission-take-and-hold-vs-purge-the-foe-layout-1",
+            terrain_layout_id="take-and-hold-vs-purge-the-foe-layout-1",
+            attacker_player_id="player-c",
+            attacker_force_disposition_id="purge-the-foe",
+            defender_player_id="player-d",
+            defender_force_disposition_id="take-and-hold",
+        )
+    elif corruption == "territory_missing":
+        state.mission_setup = replace(
+            mission_setup,
+            battlefield_regions=tuple(
+                region
+                for region in mission_setup.battlefield_regions
+                if region.region_kind is not BattlefieldRegionKind.TERRITORY
+            ),
+        )
+    elif corruption == "dimensions":
+        state.battlefield_state = replace(
+            battlefield,
+            battlefield_width_inches=battlefield.battlefield_width_inches + 1.0,
+        )
+    elif corruption == "boundary_missing":
+        state.active_player_id = None
+    elif corruption == "record_drift":
+        record = replace(record, game_id="game:forged")
+    elif corruption == "record_unstored":
+        record = replace(record, record_id="record:forged")
+    else:
+        raise AssertionError(f"unsupported spatial state corruption: {corruption}")
+    build_primary_scoring_spatial_evidence(
+        state=state,
+        player_id="player-a",
+        record=record,
+        requested_condition_ids=tuple(sorted(PRIMARY_SCORING_SPATIAL_CONDITIONS)),
+    )
 
 
 def test_primary_spatial_evidence_is_group_aware_exact_and_deterministic() -> None:
@@ -558,6 +872,813 @@ def test_primary_restore_rejects_more_than_fifteen_ordinary_vp_in_one_round() ->
         GameState.from_payload(state.to_payload())
 
 
+@pytest.fixture(scope="module")
+def primary_historical_lifecycle_payload() -> GameLifecyclePayload:
+    return _primary_historical_destruction_lifecycle_payload()
+
+
+@pytest.mark.parametrize(
+    ("corruption", "expected_error"),
+    [
+        (
+            "departure_state_missing",
+            "Primary battlefield departure recorded event requires a state payload",
+        ),
+        (
+            "departure_id_missing",
+            "Primary battlefield departure recorded event requires a departure ID",
+        ),
+        (
+            "departure_payload_drift",
+            "Primary battlefield departure recorded-event payload drift",
+        ),
+        (
+            "departure_duplicate",
+            "Primary battlefield departure requires exactly one recorded event",
+        ),
+        (
+            "destruction_state_missing",
+            "Primary destruction recorded state is malformed",
+        ),
+        (
+            "destruction_id_missing",
+            "Primary destruction recorded identity is malformed",
+        ),
+        (
+            "destruction_payload_drift",
+            "Primary destruction recorded-event payload drift",
+        ),
+        (
+            "destruction_duplicate",
+            "Primary destruction historical state requires exactly one recorded event",
+        ),
+    ],
+)
+def test_primary_historical_restore_rejects_recorded_event_graph_corruption(
+    primary_historical_lifecycle_payload: GameLifecyclePayload,
+    corruption: str,
+    expected_error: str,
+) -> None:
+    payload = deepcopy(primary_historical_lifecycle_payload)
+    _corrupt_primary_recorded_event_graph(payload=payload, corruption=corruption)
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("corruption", "expected_error"),
+    [
+        (
+            "attribution",
+            "Attributed Primary destruction attribution drifted from model_destroyed evidence",
+        ),
+        (
+            "source_witness_missing",
+            "model_destroyed evidence lacks a source witness",
+        ),
+        (
+            "source_witness_none",
+            "source witness drifted from model_destroyed evidence",
+        ),
+        (
+            "destroyed_witness_missing",
+            "model_destroyed evidence lacks a destroyed witness",
+        ),
+        (
+            "model_malformed",
+            "Primary destroyed departure model event is malformed",
+        ),
+        (
+            "model_outside_starting_unit",
+            "Primary destroyed departure model component drift",
+        ),
+        (
+            "game",
+            "Primary destroyed departure model timing drift",
+        ),
+        (
+            "battle_round",
+            "Primary destroyed departure model timing drift",
+        ),
+        (
+            "active_player",
+            "Primary destroyed departure model timing drift",
+        ),
+        (
+            "target",
+            "Primary destruction target drifted from model_destroyed evidence",
+        ),
+    ],
+)
+def test_primary_historical_restore_rejects_final_model_event_corruption(
+    primary_historical_lifecycle_payload: GameLifecyclePayload,
+    corruption: str,
+    expected_error: str,
+) -> None:
+    payload = deepcopy(primary_historical_lifecycle_payload)
+    _corrupt_final_model_destroyed_event(payload=payload, corruption=corruption)
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("removal_kind", "expected_error"),
+    [
+        (
+            BattlefieldRemovalKind.TEMPORARILY_REMOVED,
+            "Primary battlefield departure has no authoritative mutation provider",
+        ),
+        (
+            BattlefieldRemovalKind.EMBARK,
+            "Primary EMBARK departure requires one authoritative transport mutation event",
+        ),
+        (
+            BattlefieldRemovalKind.INTO_RESERVES,
+            "Primary INTO_RESERVES departure requires one authoritative reserve mutation event",
+        ),
+    ],
+)
+def test_primary_restore_rejects_departure_relabelled_without_route_provider(
+    primary_historical_lifecycle_payload: GameLifecyclePayload,
+    removal_kind: BattlefieldRemovalKind,
+    expected_error: str,
+) -> None:
+    payload = deepcopy(primary_historical_lifecycle_payload)
+    _relabel_primary_departure(payload=payload, removal_kind=removal_kind)
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("corruption", "expected_error"),
+    [
+        (
+            "snapshot_missing_field",
+            "PrimaryRulesUnitTurnStartSnapshot payload is missing required field: source_id",
+        ),
+        (
+            "snapshot_unexpected_field",
+            "PrimaryRulesUnitTurnStartSnapshot payload contains unexpected field: forged",
+        ),
+        (
+            "snapshot_memberships_malformed",
+            "PrimaryRulesUnitTurnStartSnapshot rules_unit_memberships must be a list",
+        ),
+        (
+            "snapshot_round_malformed",
+            "PrimaryRulesUnitTurnStartSnapshot battle_round must be an integer",
+        ),
+        (
+            "snapshot_round_zero",
+            "PrimaryRulesUnitTurnStartSnapshot battle_round must be at least 1",
+        ),
+        (
+            "objective_witness_empty",
+            "PrimaryObjectiveMarkerWitness requires at least one model",
+        ),
+        (
+            "objective_witness_unevaluated",
+            "PrimaryComponentTurnStartMembership objective witness references an unevaluated model",
+        ),
+        (
+            "evaluated_model_duplicate",
+            "PrimaryComponentTurnStartMembership evaluated_model_instance_ids must not "
+            "contain duplicates",
+        ),
+        ("snapshot_game", "PrimaryRulesUnitTurnStartSnapshot game_id drift"),
+        (
+            "snapshot_player",
+            "PrimaryRulesUnitTurnStartSnapshot player_id is not in this game",
+        ),
+        ("snapshot_id", "PrimaryRulesUnitTurnStartSnapshot snapshot_id drift"),
+        ("snapshot_source", "PrimaryRulesUnitTurnStartSnapshot source_id drift"),
+        (
+            "snapshot_duplicate",
+            "GameState primary rules-unit turn-start snapshots must be unique",
+        ),
+        (
+            "snapshot_missing_component",
+            "Primary rules-unit turn-start snapshot must contain every physical unit",
+        ),
+        (
+            "snapshot_attached_grouping",
+            "Primary rules-unit turn-start snapshot has invalid attached-unit grouping",
+        ),
+        (
+            "snapshot_attached_split_missing",
+            "Primary rules-unit turn-start snapshot must preserve an attached group or its "
+            "complete split component set",
+        ),
+        (
+            "snapshot_independent_grouping",
+            "Primary rules-unit turn-start snapshot has invalid independent-unit grouping",
+        ),
+        (
+            "rules_membership_duplicate",
+            "PrimaryRulesUnitTurnStartSnapshot rules-unit memberships must be unique",
+        ),
+        (
+            "component_overlap",
+            "PrimaryRulesUnitTurnStartSnapshot physical components must not overlap",
+        ),
+        (
+            "component_duplicate",
+            "PrimaryRulesUnitTurnStartMembership components must be unique",
+        ),
+        (
+            "component_empty",
+            "PrimaryRulesUnitTurnStartMembership requires at least one component",
+        ),
+        (
+            "objective_witness_duplicate",
+            "PrimaryComponentTurnStartMembership objective witnesses must be unique",
+        ),
+        (
+            "snapshot_model_outside_component",
+            "Primary turn-start snapshot references a model outside its component",
+        ),
+        (
+            "snapshot_unknown_area",
+            "Primary turn-start snapshot references an unknown logical terrain area",
+        ),
+        (
+            "snapshot_unknown_objective",
+            "Primary turn-start snapshot references an unknown objective marker",
+        ),
+        (
+            "objective_game",
+            "PrimaryObjectiveTurnStartState game_id drift",
+        ),
+        (
+            "objective_player",
+            "PrimaryObjectiveTurnStartState player_id is not in this game",
+        ),
+        ("objective_state_id", "PrimaryObjectiveTurnStartState state_id drift"),
+        ("objective_source", "PrimaryObjectiveTurnStartState source_id drift"),
+        (
+            "objective_unknown_marker",
+            "PrimaryObjectiveTurnStartState contains an unknown objective marker",
+        ),
+        (
+            "objective_duplicate",
+            "GameState primary turn-start states must be unique",
+        ),
+        (
+            "turn_graph_missing_objective",
+            "Primary turn-start objective and position evidence turn keys must match exactly",
+        ),
+        (
+            "destruction_missing_snapshot",
+            "Primary unit destruction requires exactly one matching turn-start position snapshot",
+        ),
+        (
+            "destruction_terrain_drift",
+            "Primary unit destruction terrain evidence does not match its turn snapshot",
+        ),
+        (
+            "destruction_objective_drift",
+            "Primary unit destruction objective evidence does not match its turn snapshot",
+        ),
+    ],
+)
+def test_primary_restore_rejects_turn_start_evidence_corruption(
+    primary_historical_lifecycle_payload: GameLifecyclePayload,
+    corruption: str,
+    expected_error: str,
+) -> None:
+    payload = deepcopy(primary_historical_lifecycle_payload)
+    _corrupt_primary_turn_start_evidence(payload=payload, corruption=corruption)
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        GameLifecycle.from_payload(payload)
+
+
+def _corrupt_primary_turn_start_evidence(
+    *,
+    payload: GameLifecyclePayload,
+    corruption: str,
+) -> None:
+    state_payload = payload["state"]
+    snapshot_rows = state_payload["primary_rules_unit_turn_start_snapshots"]
+    objective_rows = state_payload["primary_objective_turn_start_states"]
+    destruction_rows = state_payload["primary_unit_destruction_states"]
+    assert len(snapshot_rows) == 1
+    assert len(objective_rows) == 1
+    assert len(destruction_rows) == 1
+    snapshot = cast(dict[str, JsonValue], snapshot_rows[0])
+    objective = cast(dict[str, JsonValue], objective_rows[0])
+    destruction = cast(dict[str, JsonValue], destruction_rows[0])
+    memberships = cast(list[dict[str, JsonValue]], snapshot["rules_unit_memberships"])
+
+    if corruption == "snapshot_missing_field":
+        snapshot.pop("source_id")
+        return
+    if corruption == "snapshot_unexpected_field":
+        snapshot["forged"] = True
+        return
+    if corruption == "snapshot_memberships_malformed":
+        snapshot["rules_unit_memberships"] = None
+        return
+    if corruption == "snapshot_round_malformed":
+        snapshot["battle_round"] = "1"
+        return
+    if corruption == "snapshot_round_zero":
+        snapshot["battle_round"] = 0
+        return
+    if corruption in {
+        "objective_witness_empty",
+        "objective_witness_unevaluated",
+        "snapshot_unknown_objective",
+    }:
+        component = next(
+            cast(dict[str, JsonValue], raw_component)
+            for membership in memberships
+            for raw_component in cast(list[JsonValue], membership["component_memberships"])
+            if cast(dict[str, JsonValue], raw_component)["objective_marker_witnesses"]
+        )
+        witnesses = cast(
+            list[dict[str, JsonValue]],
+            component["objective_marker_witnesses"],
+        )
+        if corruption == "objective_witness_empty":
+            witnesses[0]["model_instance_ids"] = []
+        elif corruption == "objective_witness_unevaluated":
+            witnesses[0]["model_instance_ids"] = ["forged-model-instance"]
+        else:
+            witnesses[0]["objective_marker_id"] = "objective:forged"
+        return
+    if corruption == "evaluated_model_duplicate":
+        component = next(
+            cast(dict[str, JsonValue], raw_component)
+            for membership in memberships
+            for raw_component in cast(list[JsonValue], membership["component_memberships"])
+            if cast(dict[str, JsonValue], raw_component)["evaluated_model_instance_ids"]
+        )
+        model_ids = cast(list[JsonValue], component["evaluated_model_instance_ids"])
+        model_ids.append(model_ids[0])
+        return
+    if corruption == "snapshot_game":
+        snapshot["game_id"] = "game:forged"
+        return
+    if corruption == "snapshot_player":
+        snapshot["active_player_id"] = "player:forged"
+        return
+    if corruption == "snapshot_id":
+        snapshot["snapshot_id"] = "snapshot:forged"
+        return
+    if corruption == "snapshot_source":
+        snapshot["source_id"] = "source:forged"
+        return
+    if corruption == "snapshot_duplicate":
+        snapshot_rows.append(deepcopy(snapshot_rows[0]))
+        return
+    if corruption == "snapshot_missing_component":
+        memberships.pop(0)
+        return
+    if corruption == "snapshot_attached_grouping":
+        attached = next(
+            membership
+            for membership in memberships
+            if cast(str, membership["rules_unit_instance_id"]).startswith("attached-unit:")
+        )
+        independent = next(
+            membership
+            for membership in memberships
+            if membership["rules_unit_instance_id"] == "army-alpha:east"
+        )
+        attached_components = cast(list[JsonValue], attached["component_memberships"])
+        independent_components = cast(list[JsonValue], independent["component_memberships"])
+        attached_components[0], independent_components[0] = (
+            independent_components[0],
+            attached_components[0],
+        )
+        return
+    if corruption == "snapshot_attached_split_missing":
+        attached = next(
+            membership
+            for membership in memberships
+            if cast(str, membership["rules_unit_instance_id"]).startswith("attached-unit:")
+        )
+        attached["rules_unit_instance_id"] = "rules-unit:forged"
+        return
+    if corruption == "snapshot_independent_grouping":
+        independent = next(
+            membership
+            for membership in memberships
+            if membership["rules_unit_instance_id"] == "army-alpha:east"
+        )
+        independent["rules_unit_instance_id"] = "rules-unit:forged"
+        return
+    if corruption == "rules_membership_duplicate":
+        memberships.append(deepcopy(memberships[0]))
+        return
+    if corruption == "component_overlap":
+        first_components = cast(list[JsonValue], memberships[0]["component_memberships"])
+        memberships[1]["component_memberships"] = [deepcopy(first_components[0])]
+        return
+    if corruption == "component_duplicate":
+        components = cast(list[JsonValue], memberships[0]["component_memberships"])
+        components.append(deepcopy(components[0]))
+        return
+    if corruption == "component_empty":
+        memberships[0]["component_memberships"] = []
+        return
+    if corruption == "objective_witness_duplicate":
+        component = next(
+            cast(dict[str, JsonValue], raw_component)
+            for membership in memberships
+            for raw_component in cast(list[JsonValue], membership["component_memberships"])
+            if cast(dict[str, JsonValue], raw_component)["objective_marker_witnesses"]
+        )
+        raw_witnesses = cast(list[JsonValue], component["objective_marker_witnesses"])
+        raw_witnesses.append(deepcopy(raw_witnesses[0]))
+        return
+    if corruption == "snapshot_model_outside_component":
+        target = next(
+            membership
+            for membership in memberships
+            if membership["rules_unit_instance_id"] == "army-alpha:east"
+        )
+        source = next(
+            membership
+            for membership in memberships
+            if membership["rules_unit_instance_id"] == "army-alpha:near"
+        )
+        target_component = cast(
+            dict[str, JsonValue],
+            cast(list[JsonValue], target["component_memberships"])[0],
+        )
+        source_component = cast(
+            dict[str, JsonValue],
+            cast(list[JsonValue], source["component_memberships"])[0],
+        )
+        target_models = cast(list[JsonValue], target_component["evaluated_model_instance_ids"])
+        source_models = cast(list[JsonValue], source_component["evaluated_model_instance_ids"])
+        target_models.append(source_models[0])
+        return
+    if corruption == "snapshot_unknown_area":
+        membership = next(
+            membership
+            for membership in memberships
+            if membership["rules_unit_instance_id"] == "army-alpha:east"
+        )
+        component = cast(
+            dict[str, JsonValue],
+            cast(list[JsonValue], membership["component_memberships"])[0],
+        )
+        cast(list[JsonValue], component["logical_terrain_area_ids"]).append("terrain-area:forged")
+        return
+    source_record = cast(dict[str, JsonValue], objective["source_objective_control_record"])
+    if corruption == "objective_game":
+        objective["game_id"] = "game:forged"
+        source_record["game_id"] = "game:forged"
+        return
+    if corruption == "objective_player":
+        objective["player_id"] = "player:forged"
+        objective["active_player_id"] = "player:forged"
+        objective["controlled_objective_ids"] = []
+        source_record["active_player_id"] = "player:forged"
+        return
+    if corruption == "objective_state_id":
+        objective["state_id"] = "state:forged"
+        return
+    if corruption == "objective_source":
+        objective["source_id"] = "source:forged"
+        return
+    if corruption == "objective_unknown_marker":
+        results = cast(list[JsonValue], source_record["results"])
+        forged_result = deepcopy(cast(dict[str, JsonValue], results[0]))
+        forged_result["objective_id"] = "objective:forged"
+        results.append(forged_result)
+        controlled_ids = cast(list[JsonValue], objective["controlled_objective_ids"])
+        controlled_ids.append("objective:forged")
+        return
+    if corruption == "objective_duplicate":
+        objective_rows.append(deepcopy(objective_rows[0]))
+        return
+    if corruption == "turn_graph_missing_objective":
+        objective_rows.clear()
+        return
+    if corruption == "destruction_missing_snapshot":
+        objective_rows.clear()
+        snapshot_rows.clear()
+        return
+    if corruption == "destruction_terrain_drift":
+        destruction["started_turn_terrain_feature_ids"] = []
+        return
+    if corruption == "destruction_objective_drift":
+        destruction["started_turn_objective_marker_ids"] = []
+        return
+    raise AssertionError(f"unsupported turn-start evidence corruption: {corruption}")
+
+
+def _primary_historical_destruction_lifecycle_payload() -> GameLifecyclePayload:
+    state = _spatial_evidence_state()
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("historical evidence test requires battlefield state")
+    reserve_state = state.reserve_states[0]
+    reserve_unit = _unit(state, reserve_state.unit_instance_id)
+    player_a = state.army_definition_for_player("player-a")
+    if player_a is None:
+        raise AssertionError("historical evidence test requires player-a army")
+    state.replace_battlefield_state(
+        battlefield.with_added_unit_placement(
+            _unit_placement(player_a, reserve_unit, anchor=(50.0, 30.0))
+        )
+    )
+    state.reserve_states.clear()
+
+    decisions = DecisionController()
+    lifecycle = GameLifecycle(state=state, decision_controller=decisions)
+    objective_state_ids_before = tuple(
+        value.state_id for value in state.primary_objective_turn_start_states
+    )
+    snapshot_ids_before = tuple(
+        value.snapshot_id for value in state.primary_rules_unit_turn_start_snapshots
+    )
+    record_primary_turn_start_evidence(state=state)
+    record_new_primary_turn_start_evidence_events(
+        state=state,
+        event_log=decisions.event_log,
+        objective_state_ids_before=objective_state_ids_before,
+        snapshot_ids_before=snapshot_ids_before,
+    )
+
+    attacker = _unit(state, "army-alpha:near")
+    target = _unit(state, "army-beta:enemy")
+    source_witness = rules_unit_objective_proximity_witness(
+        state=state,
+        rules_unit_instance_id=attacker.unit_instance_id,
+    )
+    attribution = ModelDestructionAttribution.for_non_attack(
+        destroying_player_id="player-a",
+        source_kind=DestructionSourceKind.ABILITY,
+        source_rules_unit_instance_id=attacker.unit_instance_id,
+        source_model_instance_id=attacker.own_models[0].model_instance_id,
+    )
+    destructions: tuple[PrimaryUnitDestructionState, ...] = ()
+    tracking_rule_id = "core-rules:primary-unit-destruction-tracking"
+    for model_id in target.own_model_ids():
+        destroyed_witness = rules_unit_objective_proximity_witness(
+            state=state,
+            rules_unit_instance_id=target.unit_instance_id,
+        )
+        _set_model_wounds_remaining(
+            state=state,
+            unit_instance_id=target.unit_instance_id,
+            model_instance_id=model_id,
+            wounds_remaining=0,
+        )
+        current_battlefield = state.battlefield_state
+        if current_battlefield is None:
+            raise AssertionError("historical evidence test requires battlefield state")
+        state.replace_battlefield_state(current_battlefield.with_removed_models((model_id,)))
+        model_destroyed_event = decisions.event_log.append(
+            "model_destroyed",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.MOVEMENT.value,
+                **attribution.to_payload(),
+                "source_rules_unit_objective_proximity_witness": source_witness.to_payload(),
+                "destroyed_rules_unit_objective_proximity_witness": (
+                    destroyed_witness.to_payload()
+                ),
+                "target_unit_instance_id": target.unit_instance_id,
+                "model_instance_id": model_id,
+            },
+        )
+        departure_ids_before = tuple(
+            value.departure_id for value in state.primary_battlefield_departure_states
+        )
+        record_primary_destroyed_model_departures(
+            state=state,
+            destroyed_model_instance_ids=(model_id,),
+            source_id=f"{tracking_rule_id}:{model_destroyed_event.event_id}",
+            occurrence_id=model_destroyed_event.event_id,
+        )
+        destructions = record_primary_unit_destructions_for_destroyed_models(
+            state=state,
+            destroyed_model_instance_ids=(model_id,),
+            destruction_attribution=attribution,
+            source_model_destroyed_event_id=model_destroyed_event.event_id,
+            source_rules_unit_objective_proximity_witness=source_witness,
+            destroyed_rules_unit_objective_proximity_witness=destroyed_witness,
+            unattributed_cause=None,
+            source_mutation_id=None,
+            left_battlefield=False,
+            source_id=f"{tracking_rule_id}:{model_destroyed_event.event_id}",
+        )
+        record_new_primary_battlefield_departure_events(
+            state=state,
+            event_log=decisions.event_log,
+            departure_ids_before=departure_ids_before,
+        )
+    if len(destructions) != 1:
+        raise AssertionError("historical evidence test requires one completed destruction")
+    record_primary_unit_destruction_event(
+        event_log=decisions.event_log,
+        destruction=destructions[0],
+    )
+    payload = lifecycle.to_payload()
+    if GameLifecycle.from_payload(deepcopy(payload)).to_payload() != payload:
+        raise AssertionError("historical evidence lifecycle failed exact round trip")
+    return payload
+
+
+def _set_model_wounds_remaining(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+    model_instance_id: str,
+    wounds_remaining: int,
+) -> None:
+    unit = _unit(state, unit_instance_id)
+    state.replace_army_definitions(
+        [
+            replace(
+                army,
+                units=tuple(
+                    replace(
+                        candidate,
+                        own_models=tuple(
+                            replace(model, wounds_remaining=wounds_remaining)
+                            if model.model_instance_id == model_instance_id
+                            else model
+                            for model in candidate.own_models
+                        ),
+                    )
+                    if candidate.unit_instance_id == unit.unit_instance_id
+                    else candidate
+                    for candidate in army.units
+                ),
+            )
+            for army in state.army_definitions
+        ]
+    )
+
+
+def _corrupt_primary_recorded_event_graph(
+    *,
+    payload: GameLifecyclePayload,
+    corruption: str,
+) -> None:
+    event_type = (
+        PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT
+        if corruption.startswith("departure_")
+        else PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT
+    )
+    event = _recorded_event_for_corruption(payload=payload, event_type=event_type)
+    events = payload["decisions"]["event_log"]
+    if corruption.endswith("_duplicate"):
+        duplicate = deepcopy(event)
+        duplicate["event_id"] = f"event-{len(events) + 1:06d}"
+        events.append(duplicate)
+        return
+    event_payload = _event_payload(event)
+    state_key = (
+        "primary_battlefield_departure_state"
+        if event_type == PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT
+        else "primary_unit_destruction_state"
+    )
+    if corruption.endswith("_state_missing"):
+        event_payload[state_key] = None
+        return
+    raw_state = event_payload.get(state_key)
+    assert isinstance(raw_state, dict)
+    state_payload = raw_state
+    if corruption.endswith("_id_missing"):
+        identity_key = (
+            "departure_id"
+            if event_type == PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT
+            else "destruction_id"
+        )
+        state_payload.pop(identity_key)
+        return
+    if corruption.endswith("_payload_drift"):
+        state_payload["phase"] = BattlePhase.FIGHT.value
+        return
+    raise AssertionError(f"unsupported historical recorded-event corruption: {corruption}")
+
+
+def _corrupt_final_model_destroyed_event(
+    *,
+    payload: GameLifecyclePayload,
+    corruption: str,
+) -> None:
+    destruction_rows = payload["state"]["primary_unit_destruction_states"]
+    if len(destruction_rows) != 1:
+        raise AssertionError("historical evidence test requires one destruction row")
+    final_event_id = destruction_rows[0]["source_model_destroyed_event_id"]
+    if type(final_event_id) is not str:
+        raise AssertionError("historical evidence test requires an attributed destruction")
+    event = next(
+        value for value in payload["decisions"]["event_log"] if value["event_id"] == final_event_id
+    )
+    event_payload = _event_payload(event)
+    if corruption == "attribution":
+        event_payload["destroying_player_id"] = "player-b"
+    elif corruption == "source_witness_missing":
+        event_payload.pop("source_rules_unit_objective_proximity_witness")
+    elif corruption == "source_witness_none":
+        event_payload["source_rules_unit_objective_proximity_witness"] = None
+    elif corruption == "destroyed_witness_missing":
+        event_payload.pop("destroyed_rules_unit_objective_proximity_witness")
+    elif corruption == "model_malformed":
+        event_payload["model_instance_id"] = 17
+    elif corruption == "model_outside_starting_unit":
+        event_payload["model_instance_id"] = event_payload["source_model_instance_id"]
+    elif corruption == "game":
+        event_payload["game_id"] = "forged-game"
+    elif corruption == "battle_round":
+        event_payload["battle_round"] = 2
+    elif corruption == "active_player":
+        event_payload["active_player_id"] = "player-b"
+    elif corruption == "target":
+        event_payload["target_unit_instance_id"] = "army-alpha:near"
+    else:
+        raise AssertionError(f"unsupported model_destroyed corruption: {corruption}")
+
+
+def _relabel_primary_departure(
+    *,
+    payload: GameLifecyclePayload,
+    removal_kind: BattlefieldRemovalKind,
+) -> None:
+    departure_rows = payload["state"]["primary_battlefield_departure_states"]
+    if not departure_rows:
+        raise AssertionError("historical evidence test requires departure rows")
+    original = PrimaryBattlefieldDepartureState.from_payload(departure_rows[0])
+    updated = replace(
+        original,
+        departure_id=primary_battlefield_departure_id(
+            game_id=original.game_id,
+            rules_unit_instance_id=original.rules_unit_instance_id,
+            affected_component_unit_instance_ids=(original.affected_component_unit_instance_ids),
+            departed_component_unit_instance_ids=(original.departed_component_unit_instance_ids),
+            removed_model_instance_ids=original.removed_model_instance_ids,
+            battle_round=original.battle_round,
+            active_player_id=original.active_player_id,
+            phase=original.phase,
+            removal_kind=removal_kind,
+            occurrence_id=original.occurrence_id,
+            source_id=original.source_id,
+        ),
+        removal_kind=removal_kind,
+    )
+    departure_rows[0] = updated.to_payload()
+    recorded_event = _recorded_departure_event(
+        payload=payload,
+        departure_id=original.departure_id,
+    )
+    _event_payload(recorded_event)["primary_battlefield_departure_state"] = cast(
+        dict[str, JsonValue], updated.to_payload()
+    )
+
+
+def _recorded_event_for_corruption(
+    *,
+    payload: GameLifecyclePayload,
+    event_type: str,
+) -> EventRecordPayload:
+    matches = tuple(
+        event for event in payload["decisions"]["event_log"] if event["event_type"] == event_type
+    )
+    if not matches:
+        raise AssertionError(f"historical evidence test requires a {event_type} event")
+    if event_type == PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT and len(matches) != 1:
+        raise AssertionError("historical evidence test requires one destruction event")
+    return matches[-1]
+
+
+def _recorded_departure_event(
+    *,
+    payload: GameLifecyclePayload,
+    departure_id: str,
+) -> EventRecordPayload:
+    matches: list[EventRecordPayload] = []
+    for event in payload["decisions"]["event_log"]:
+        if event["event_type"] != PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT:
+            continue
+        recorded_payload = _event_payload(event)
+        raw_departure = recorded_payload.get("primary_battlefield_departure_state")
+        if isinstance(raw_departure, dict) and raw_departure.get("departure_id") == departure_id:
+            matches.append(event)
+    if len(matches) != 1:
+        raise AssertionError("historical evidence test requires one matching departure event")
+    return matches[0]
+
+
+def _event_payload(event: EventRecordPayload) -> dict[str, JsonValue]:
+    assert isinstance(event["payload"], dict)
+    return event["payload"]
+
+
 def _spatial_evidence_state(
     *,
     player_a_force_disposition_id: str = "purge-the-foe",
@@ -627,16 +1748,8 @@ def _spatial_evidence_state(
         ),
         removed_model_ids=tuple(
             sorted(
-                (
-                    *(
-                        model.model_instance_id
-                        for model in player_a.unit_by_id("army-alpha:embarked").own_models
-                    ),
-                    *(
-                        model.model_instance_id
-                        for model in player_a.unit_by_id("army-alpha:destroyed").own_models
-                    ),
-                )
+                model.model_instance_id
+                for model in player_a.unit_by_id("army-alpha:destroyed").own_models
             )
         ),
     )
@@ -657,6 +1770,11 @@ def _spatial_evidence_state(
         battle_round=1,
         active_player_id="player-a",
         army_definitions=[player_a, player_b],
+        starting_attached_unit_records=[
+            record
+            for army in (player_a, player_b)
+            for record in starting_attached_unit_records_for_army(army)
+        ],
         battlefield_state=battlefield,
         mission_setup=resolved_mission_setup,
         reserve_states=[
@@ -664,8 +1782,9 @@ def _spatial_evidence_state(
                 player_id="player-a",
                 unit_instance_id="army-alpha:reserve",
                 reserve_kind=ReserveKind.STRATEGIC_RESERVES,
-                destruction_deadline_policy=(
-                    ReserveDestructionTimingPolicy.chapter_approved_2026_27()
+                destruction_deadline_policy=reposition_destruction_policy(
+                    mission_setup=resolved_mission_setup,
+                    destruction_deadline_policy=None,
                 ),
             )
         ],

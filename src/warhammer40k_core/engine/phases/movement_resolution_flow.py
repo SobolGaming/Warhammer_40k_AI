@@ -9,6 +9,10 @@ from warhammer40k_core.engine.battle_shock_resolution import (
     is_battle_shock_reroll_request,
 )
 from warhammer40k_core.engine.decision_result import DecisionResultPayload
+from warhammer40k_core.engine.primary_historical_events import (
+    record_new_primary_battlefield_departure_events,
+    record_primary_reserve_entry_mutation_event,
+)
 from warhammer40k_core.engine.phases.movement_imports import *
 from warhammer40k_core.engine.phases.movement_model import *
 from warhammer40k_core.engine.phases.movement_state import *
@@ -623,6 +627,7 @@ def _continue_forced_desperate_escape_fall_back(
         state=state,
         decisions=decisions,
         result=action_result,
+        destruction_source_result_id=None,
         unit_placement=unit_placement,
         fall_back_result=fall_back_result,
         destroyed_model_ids=(),
@@ -1021,10 +1026,41 @@ def _apply_aircraft_reserve_transition_for_normal_move(
             transition=transition,
         )
     )
+    aircraft_rules_unit = rules_unit_view_from_armies(
+        armies=tuple(state.army_definitions),
+        unit_instance_id=transition.reserve_state.unit_instance_id,
+    )
+    departure_ids_before = tuple(
+        value.departure_id for value in state.primary_battlefield_departure_states
+    )
     if state.reserve_state_for_unit(transition.reserve_state.unit_instance_id) is None:
         state.record_reserve_state(transition.reserve_state)
     else:
         state.replace_reserve_state(transition.reserve_state)
+    departure = record_primary_battlefield_departure(
+        state=state,
+        rules_unit_instance_id=aircraft_rules_unit.unit_instance_id,
+        affected_component_unit_instance_ids=(aircraft_rules_unit.component_unit_instance_ids),
+        departed_component_unit_instance_ids=(aircraft_rules_unit.component_unit_instance_ids),
+        removed_model_instance_ids=tuple(
+            removal.model_instance_id for removal in transition.transition_batch.removals
+        ),
+        removal_kind=BattlefieldRemovalKind.INTO_RESERVES,
+        occurrence_id=result.result_id,
+        source_id=result.result_id,
+    )
+    if departure is not None:
+        record_primary_reserve_entry_mutation_event(
+            event_log=decisions.event_log,
+            departure=departure,
+            reserve_state=transition.reserve_state,
+            transition_batch=transition.transition_batch,
+        )
+    record_new_primary_battlefield_departure_events(
+        state=state,
+        event_log=decisions.event_log,
+        departure_ids_before=departure_ids_before,
+    )
     _complete_movement_activation(
         state=state,
         decisions=decisions,

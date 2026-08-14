@@ -5,7 +5,10 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
-from tests.setup_completion_helpers import enter_battle_for_fixture
+from tests.setup_completion_helpers import (
+    enter_battle_for_fixture,
+    record_primary_turn_start_evidence_for_fixture,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec, DiceRollState
@@ -98,12 +101,11 @@ from warhammer40k_core.engine.phases.movement import (
 )
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
-from warhammer40k_core.engine.primary_turn_start_evidence import (
-    record_primary_turn_start_evidence,
-)
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.reserve_arrival_requirements import (
+    reposition_destruction_policy,
+)
 from warhammer40k_core.engine.reserves import (
-    ReserveDestructionTimingPolicy,
     ReserveKind,
     ReserveState,
     ReserveStatus,
@@ -1869,7 +1871,9 @@ def test_phase15e_heroic_intervention_charge_move_applies_witness_and_fights_fir
 
 
 def test_phase15e_heroic_intervention_charge_move_rejects_missing_witness() -> None:
-    lifecycle = _battle_lifecycle()
+    lifecycle = _battle_lifecycle(
+        replace(_config(), game_id="phase12c-heroic-missing-witness-0000")
+    )
     state = _state(lifecycle)
     _set_current_battle_phase(state, BattlePhase.CHARGE)
     state.active_player_id = "player-b"
@@ -1900,6 +1904,8 @@ def test_phase15e_heroic_intervention_charge_move_rejects_missing_witness() -> N
     )
     request = _decision_request(waiting)
     proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    assert proposal_request.context is not None
+    assert proposal_request.context["reachable_target_unit_instance_ids"] == [enemy_unit_id]
 
     status = _submit_heroic_charge_move_proposal(
         lifecycle,
@@ -3407,7 +3413,10 @@ def test_phase13d_smokescreen_registers_defensive_effects() -> None:
     smoke_state = _state(smoke_lifecycle)
     _set_current_battle_phase(smoke_state, BattlePhase.SHOOTING)
     smoke_state.active_player_id = "player-b"
-    record_primary_turn_start_evidence(state=smoke_state)
+    record_primary_turn_start_evidence_for_fixture(
+        smoke_state,
+        decisions=smoke_lifecycle.decision_controller,
+    )
     _replace_unit_keywords(
         smoke_state,
         unit_instance_id="army-alpha:intercessor-unit-1",
@@ -3881,7 +3890,7 @@ def test_rapid_ingress_reaction_target_and_placement_restore_before_parent_resum
     state.battle_round = 2
     _grant_cp(state, player_id="player-b", amount=1)
     reserve_state, _reserve_unit, _reserve_army = _move_unit_to_reserves(
-        state,
+        lifecycle,
         player_id="player-b",
         unit_instance_id="army-beta:enemy-unit",
     )
@@ -3994,7 +4003,7 @@ def test_movement_phase_progression_offers_rapid_ingress_reaction_from_index() -
     state.battle_round = 2
     _grant_cp(state, player_id="player-b", amount=1)
     reserve_state, _reserve_unit, _reserve_army = _move_unit_to_reserves(
-        state,
+        lifecycle,
         player_id="player-b",
         unit_instance_id="army-beta:enemy-unit",
     )
@@ -4082,7 +4091,7 @@ def test_movement_phase_progression_declines_rapid_ingress_reaction_from_index()
     state.battle_round = 2
     _grant_cp(state, player_id="player-b", amount=1)
     reserve_state, _reserve_unit, _reserve_army = _move_unit_to_reserves(
-        state,
+        lifecycle,
         player_id="player-b",
         unit_instance_id="army-beta:enemy-unit",
     )
@@ -4808,11 +4817,12 @@ def _first_shooting_type(target_candidate: dict[str, object]) -> ShootingType:
 
 
 def _move_unit_to_reserves(
-    state: GameState,
+    lifecycle: GameLifecycle,
     *,
     player_id: str,
     unit_instance_id: str,
 ) -> tuple[ReserveState, UnitInstance, ArmyDefinition]:
+    state = _state(lifecycle)
     battlefield_state = state.battlefield_state
     assert battlefield_state is not None
     state.replace_battlefield_state(battlefield_state.without_unit_placement(unit_instance_id))
@@ -4820,9 +4830,21 @@ def _move_unit_to_reserves(
         player_id=player_id,
         unit_instance_id=unit_instance_id,
         reserve_kind=ReserveKind.RESERVES,
-        destruction_deadline_policy=ReserveDestructionTimingPolicy.chapter_approved_2026_27(),
+        destruction_deadline_policy=reposition_destruction_policy(
+            mission_setup=state.mission_setup,
+            destruction_deadline_policy=None,
+        ),
     )
     state.record_reserve_state(reserve_state)
+    lifecycle.decision_controller.event_log.append(
+        "reserve_unit_declared",
+        {
+            "game_id": state.game_id,
+            "player_id": player_id,
+            "unit_instance_id": unit_instance_id,
+            "reserve_state": reserve_state.to_payload(),
+        },
+    )
     army = state.army_definition_for_player(player_id)
     assert army is not None
     return reserve_state, army.unit_by_id(unit_instance_id), army
@@ -4836,7 +4858,7 @@ def _request_rapid_ingress_placement(
     state.battle_round = 2
     _grant_cp(state, player_id="player-b", amount=1)
     reserve_state, reserve_unit, reserve_army = _move_unit_to_reserves(
-        state,
+        lifecycle,
         player_id="player-b",
         unit_instance_id="army-beta:enemy-unit",
     )
@@ -4880,7 +4902,7 @@ def _request_rapid_ingress_reaction_placement(
     state.battle_round = 2
     _grant_cp(state, player_id="player-b", amount=1)
     reserve_state, reserve_unit, reserve_army = _move_unit_to_reserves(
-        state,
+        lifecycle,
         player_id="player-b",
         unit_instance_id="army-beta:enemy-unit",
     )
@@ -5012,13 +5034,14 @@ def _set_command_step_ready_for_tactical_secondary(state: GameState) -> None:
 
 def _battle_lifecycle(config: GameConfig | None = None) -> GameLifecycle:
     config = _config() if config is None else config
-    state = _battle_state(config=config)
+    decisions = DecisionController()
+    state = _battle_state(config=config, decisions=decisions)
     return GameLifecycle.from_payload(
         {
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": DecisionController().to_payload(),
+            "decisions": decisions.to_payload(),
             "reaction_queue": ReactionQueue().to_payload(),
         }
     )
@@ -5031,7 +5054,8 @@ def _july_thousand_sons_defiler_lifecycle() -> tuple[GameLifecycle, StratagemCat
         beta_datasheet_ids=("000001030", "000001030", "core-intercessor-like-infantry"),
         catalog=catalog,
     )
-    state = _battle_state(config=config)
+    decisions = DecisionController()
+    state = _battle_state(config=config, decisions=decisions)
     armies = tuple(state.army_definitions)
     bundle = RuntimeContentBundle.from_contributions(
         activation=RuntimeContentActivation.from_armies(
@@ -5049,7 +5073,7 @@ def _july_thousand_sons_defiler_lifecycle() -> tuple[GameLifecycle, StratagemCat
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": DecisionController().to_payload(),
+            "decisions": decisions.to_payload(),
             "reaction_queue": ReactionQueue().to_payload(),
         },
         runtime_content_bundle=bundle,
@@ -5208,7 +5232,11 @@ def _prepare_counteroffensive_fight_state(
     ).with_next_band()
 
 
-def _battle_state(config: GameConfig | None = None) -> GameState:
+def _battle_state(
+    config: GameConfig | None = None,
+    *,
+    decisions: DecisionController | None = None,
+) -> GameState:
     resolved_config = _config() if config is None else config
     armies = _mustered_armies(resolved_config)
     state = GameState.from_config(resolved_config)
@@ -5219,7 +5247,7 @@ def _battle_state(config: GameConfig | None = None) -> GameState:
         armies=armies,
     )
     state.record_battlefield_state(scenario.battlefield_state)
-    enter_battle_for_fixture(state)
+    enter_battle_for_fixture(state, decisions=decisions)
     assert state.stage is GameLifecycleStage.BATTLE
     return state
 

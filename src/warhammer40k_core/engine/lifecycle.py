@@ -19,7 +19,12 @@ from warhammer40k_core.engine import fight_unit_selected_hooks as _fu
 from warhammer40k_core.engine import lifecycle_state_queries as _lsq
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
+from warhammer40k_core.engine import primary_historical_event_integrity as _phei
+from warhammer40k_core.engine import primary_reserve_entry_lifecycle_integrity as _preli
+from warhammer40k_core.engine import primary_reserve_entry_state_integrity as _presi
+from warhammer40k_core.engine import reserve_state_integrity as _rsi
 from warhammer40k_core.engine import rule_model_destruction
+from warhammer40k_core.engine import transport_state_integrity as _tsi
 from warhammer40k_core.engine.advance_hooks import SELECT_ADVANCE_MOVE_GRANT_DECISION_TYPE
 from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attack_sequence import (
@@ -282,14 +287,12 @@ from warhammer40k_core.engine.reserve_declarations import (
     SELECT_RESERVE_DECLARATION_DECISION_TYPE,
     invalid_reserve_declaration_status,
 )
-from warhammer40k_core.engine.reserves import ReserveStatus
 from warhammer40k_core.engine.return_on_death import (
     SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
     apply_return_on_death_placement_decision,
     invalid_return_on_death_placement_status,
 )
 from warhammer40k_core.engine.rules_units import (
-    rules_unit_view_from_armies,
     rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.sequencing import (
@@ -896,7 +899,12 @@ class GameLifecycle:
                 ruleset_descriptor=None if config is None else config.ruleset_descriptor
             ),
         )
-        _validate_payload_consistency(state=lifecycle._require_state(), config=lifecycle._config)
+        _validate_payload_consistency(
+            state=lifecycle._require_state(),
+            config=lifecycle._config,
+            event_records=lifecycle.decision_controller.event_log.records,
+            decision_records=lifecycle.decision_controller.records,
+        )
         validate_pending_battlefield_request_consistency(
             state=lifecycle._require_state(),
             pending_request=lifecycle._pending_decision_request(),
@@ -915,6 +923,21 @@ class GameLifecycle:
                 )
             )
         lifecycle._refresh_runtime_content_bundle_if_armies_mustered()
+        _preli.validate_primary_reserve_entry_lifecycle_integrity(
+            state=lifecycle._require_state(),
+            event_records=lifecycle.decision_controller.event_log.records,
+            decision_records=lifecycle.decision_controller.records,
+            stratagem_indexes_by_player_id=(
+                None
+                if lifecycle._runtime_content_bundle is None
+                else lifecycle._runtime_content_bundle.stratagem_indexes_by_player_id
+            ),
+            ability_indexes_by_player_id=(
+                None
+                if lifecycle._runtime_content_bundle is None
+                else lifecycle._runtime_content_bundle.ability_indexes_by_player_id
+            ),
+        )
         lifecycle._battle_round_flow = BattleRoundFlow(
             phase_handlers=lifecycle._phase_handlers(),
             battle_round_start_hooks=(
@@ -3410,10 +3433,24 @@ def _invalid_destruction_reaction_status(
     )
 
 
-def _validate_payload_consistency(*, state: GameState, config: GameConfig | None) -> None:
-    _validate_reserve_state_consistency(state=state)
-    _validate_transport_cargo_state_consistency(state=state)
+def _validate_payload_consistency(
+    *,
+    state: GameState,
+    config: GameConfig | None,
+    event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+) -> None:
+    _rsi.validate_reserve_state_consistency(state=state)
+    _presi.validate_reserve_state_attached_split_integrity(
+        state=state,
+        event_records=event_records,
+    )
+    _tsi.validate_transport_cargo_state_consistency(state=state)
     _validate_battlefield_state_consistency(state=state, config=config)
+    _rsi.validate_initial_reserve_destruction_policy_authority(
+        state=state,
+        event_records=event_records,
+    )
     _validate_movement_phase_state_consistency(state=state)
     _validate_shooting_phase_state_consistency(state=state)
     _validate_charge_phase_state_consistency(state=state)
@@ -3425,6 +3462,14 @@ def _validate_payload_consistency(*, state: GameState, config: GameConfig | None
     validate_config_state_payload_consistency(
         state=state,
         config=config,
+        event_records=event_records,
+        decision_records=decision_records,
+    )
+    _phei.validate_primary_historical_event_integrity(
+        state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+        require_muster_event_provenance=config is not None,
     )
 
 
@@ -3459,125 +3504,6 @@ def _validate_battlefield_state_consistency(
             )
     except PlacementError as exc:
         raise GameLifecycleError("Lifecycle state battlefield_state is invalid.") from exc
-
-
-def _validate_reserve_state_consistency(*, state: GameState) -> None:
-    if not state.reserve_states:
-        return
-    for reserve_state in state.reserve_states:
-        reserve_view = rules_unit_view_from_armies(
-            armies=tuple(state.army_definitions),
-            unit_instance_id=reserve_state.unit_instance_id,
-        )
-        if reserve_view.unit_instance_id != reserve_state.unit_instance_id:
-            raise GameLifecycleError("reserve_states must use canonical rules-unit identity.")
-        if reserve_view.owner_player_id != reserve_state.player_id:
-            raise GameLifecycleError("reserve_states player_id does not match unit owner.")
-        for embarked_unit_id in reserve_state.embarked_unit_instance_ids:
-            embarked_view = rules_unit_view_from_armies(
-                armies=tuple(state.army_definitions),
-                unit_instance_id=embarked_unit_id,
-            )
-            if embarked_view.owner_player_id != reserve_state.player_id:
-                raise GameLifecycleError("reserve_states embarked unit owner drift.")
-
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        return
-    placed_model_ids = set(battlefield_state.placed_model_ids())
-    removed_model_ids = set(battlefield_state.removed_model_ids)
-    for reserve_state in state.reserve_states:
-        reserve_view = rules_unit_view_from_armies(
-            armies=tuple(state.army_definitions),
-            unit_instance_id=reserve_state.unit_instance_id,
-        )
-        reserve_model_ids = {model.model_instance_id for model in reserve_view.own_models}
-        embarked_model_ids: set[str] = set()
-        for embarked_unit_id in reserve_state.embarked_unit_instance_ids:
-            embarked_view = rules_unit_view_from_armies(
-                armies=tuple(state.army_definitions),
-                unit_instance_id=embarked_unit_id,
-            )
-            embarked_model_ids.update(model.model_instance_id for model in embarked_view.own_models)
-        if reserve_state.status is ReserveStatus.IN_RESERVES:
-            if (reserve_model_ids | embarked_model_ids) & placed_model_ids:
-                raise GameLifecycleError("unarrived reserve models must not be placed.")
-            if (reserve_model_ids | embarked_model_ids) & removed_model_ids:
-                raise GameLifecycleError("unarrived reserve models must not be removed.")
-        if reserve_state.status is ReserveStatus.ARRIVED:
-            if not reserve_model_ids <= placed_model_ids:
-                raise GameLifecycleError("arrived reserve unit models must be placed.")
-            if reserve_model_ids & removed_model_ids:
-                raise GameLifecycleError("arrived reserve unit models must not be removed.")
-        if (
-            reserve_state.status is ReserveStatus.DESTROYED
-            and not (reserve_model_ids | embarked_model_ids) <= removed_model_ids
-        ):
-            raise GameLifecycleError("destroyed reserve models must be removed.")
-
-
-def _validate_transport_cargo_state_consistency(*, state: GameState) -> None:
-    if not state.transport_cargo_states:
-        return
-    unit_by_id = {
-        unit.unit_instance_id: unit for army in state.army_definitions for unit in army.units
-    }
-    owner_by_unit_id = {
-        unit.unit_instance_id: army.player_id
-        for army in state.army_definitions
-        for unit in army.units
-    }
-    model_ids_by_unit_id = {
-        unit.unit_instance_id: tuple(model.model_instance_id for model in unit.own_models)
-        for army in state.army_definitions
-        for unit in army.units
-    }
-    embarked_unit_ids: set[str] = set()
-    for cargo_state in state.transport_cargo_states:
-        transport = unit_by_id.get(cargo_state.transport_unit_instance_id)
-        if transport is None:
-            raise GameLifecycleError("transport_cargo_states transport unit is unknown.")
-        if owner_by_unit_id[cargo_state.transport_unit_instance_id] != cargo_state.player_id:
-            raise GameLifecycleError("transport_cargo_states player_id does not match owner.")
-        if transport.datasheet_id != cargo_state.capacity_profile.transport_datasheet_id:
-            raise GameLifecycleError("transport_cargo_states transport datasheet drift.")
-        cargo_model_count = 0
-        for embarked_unit_id in cargo_state.embarked_unit_instance_ids:
-            embarked_unit = unit_by_id.get(embarked_unit_id)
-            if embarked_unit is None:
-                raise GameLifecycleError("transport_cargo_states embarked unit is unknown.")
-            if owner_by_unit_id[embarked_unit_id] != cargo_state.player_id:
-                raise GameLifecycleError("transport_cargo_states embarked unit owner drift.")
-            if embarked_unit_id in embarked_unit_ids:
-                raise GameLifecycleError("unit cannot be embarked in more than one Transport.")
-            embarked_unit_ids.add(embarked_unit_id)
-            if not cargo_state.capacity_profile.allows_unit(embarked_unit):
-                raise GameLifecycleError("transport_cargo_states capacity profile rejects cargo.")
-            cargo_model_count += len(embarked_unit.own_models)
-        if cargo_model_count > cargo_state.capacity_profile.max_model_count:
-            raise GameLifecycleError("transport_cargo_states capacity is exceeded.")
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        return
-    placed_unit_ids = {
-        placement.unit_instance_id
-        for army in battlefield_state.placed_armies
-        for placement in army.unit_placements
-    }
-    placed_model_ids = set(battlefield_state.placed_model_ids())
-    removed_model_ids = set(battlefield_state.removed_model_ids)
-    for cargo_state in state.transport_cargo_states:
-        if cargo_state.transport_unit_instance_id not in placed_unit_ids:
-            raise GameLifecycleError("transport_cargo_states transport unit must be placed.")
-        transport_model_ids = set(model_ids_by_unit_id[cargo_state.transport_unit_instance_id])
-        if transport_model_ids & removed_model_ids:
-            raise GameLifecycleError("transport_cargo_states transport models must not be removed.")
-        for embarked_unit_id in cargo_state.embarked_unit_instance_ids:
-            model_ids = set(model_ids_by_unit_id[embarked_unit_id])
-            if model_ids & placed_model_ids:
-                raise GameLifecycleError("embarked unit models must not be placed.")
-            if model_ids & removed_model_ids:
-                raise GameLifecycleError("embarked unit models must not be removed.")
 
 
 def _validate_movement_phase_state_consistency(*, state: GameState) -> None:

@@ -5,6 +5,8 @@ from collections.abc import Callable
 from dataclasses import replace
 from typing import cast
 
+from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
+
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
@@ -411,7 +413,11 @@ def _battle_ready_lifecycle() -> GameLifecycle:
     state.record_battlefield_state(scenario.battlefield_state)
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-a"))
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-b"))
-    _complete_setup_through_gate(state=state, config=config)
+    _complete_setup_through_gate(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        config=config,
+    )
     _runtime_content_bundle(lifecycle)
     return lifecycle
 
@@ -770,13 +776,19 @@ def _unit_placement_at(
     )
 
 
-def _complete_setup_through_gate(*, state: GameState, config: GameConfig) -> None:
+def _complete_setup_through_gate(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    config: GameConfig,
+) -> None:
+    ensure_army_mustered_events_for_fixture(state, decisions=decisions)
     final_setup_step = state.setup_sequence[-1]
     while state.current_setup_step is not final_setup_step:
         state.complete_current_setup_step()
     SetupCompletionGate().complete_setup_and_enter_battle(
         state=state,
-        decisions=DecisionController(),
+        decisions=decisions,
         config=config,
     )
 

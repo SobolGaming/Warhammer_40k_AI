@@ -1,7 +1,7 @@
 "use strict";
 
 const VIEWER_SCHEMA = "event-companion-battlefield-viewer-v3";
-const BATTLEFIELD_VIEW_SCHEMA = "battlefield-view-v3-phase17n";
+const BATTLEFIELD_VIEW_SCHEMA = "battlefield-view-v4-phase17n-step3";
 const COORDINATE_SPEC = "battlefield-coordinate-v1";
 const COORDINATE_SPACE = "battlefield_inches_right_handed_z_up";
 const VIEWER_GEOMETRY = globalThis.BattlefieldViewerGeometry;

@@ -33,7 +33,7 @@ from warhammer40k_core.engine.deployment import (
     deployment_setup_state_for_state,
     deployment_unit_selection_request,
 )
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import (
     DedicatedTransportSetupConsequence,
     GameConfig,
@@ -94,6 +94,35 @@ from warhammer40k_core.engine.transports import TransportCapacityProfile, Transp
 from warhammer40k_core.engine.unit_coherency import assert_battlefield_units_in_coherency
 
 SECONDARY_MISSION_DECISION_TYPE = "select_secondary_missions"
+
+
+def army_mustered_event_payload(
+    *,
+    state: GameState,
+    army_definition: ArmyDefinition,
+) -> dict[str, JsonValue]:
+    if type(state) is not GameState or type(army_definition) is not ArmyDefinition:
+        raise GameLifecycleError(
+            "Army mustered event payload requires GameState and ArmyDefinition."
+        )
+    return cast(
+        dict[str, JsonValue],
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "setup_step": SetupStep.MUSTER_ARMIES.value,
+                "player_id": army_definition.player_id,
+                "army_id": army_definition.army_id,
+                "unit_count": len(army_definition.units),
+                "roster_legality_report": (army_definition.roster_legality_report.to_payload()),
+                "starting_attached_unit_records": [
+                    record.to_payload()
+                    for record in state.starting_attached_unit_records
+                    if record.player_id == army_definition.player_id
+                ],
+            }
+        ),
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -424,6 +453,11 @@ class SetupFlow:
             decisions.event_log.append("battle_started", battle_start_payload)
         else:
             completed_step = state.complete_current_setup_step()
+        if completed_step is SetupStep.DECLARE_BATTLE_FORMATIONS:
+            decisions.event_log.append(
+                "battle_formations_revealed",
+                _battle_formations_revealed_payload(state),
+            )
         decisions.event_log.append(
             "setup_step_completed",
             {
@@ -478,6 +512,7 @@ class SetupFlow:
                 )
             ):
                 return
+            battle_formation_event_start = len(decisions.event_log.records)
             if self.battle_formation_hooks.apply_result(
                 BattleFormationResultContext(
                     state=state,
@@ -487,15 +522,26 @@ class SetupFlow:
                     result=result,
                 )
             ):
+                decisions.event_log.mark_secret_suffix(
+                    start_index=battle_formation_event_start,
+                    player_id=_required_decision_actor(result),
+                    visibility_source=SetupStep.DECLARE_BATTLE_FORMATIONS.value,
+                )
                 return
             raise GameLifecycleError("Faction rule setup decision was not handled.")
         if result.decision_type == SELECT_RESERVE_DECLARATION_DECISION_TYPE:
+            reserve_event_start = len(decisions.event_log.records)
             apply_reserve_declaration_decision(
                 state=state,
                 config=config,
                 request=decisions.record_for_result(result).request,
                 result=result,
                 decisions=decisions,
+            )
+            decisions.event_log.mark_secret_suffix(
+                start_index=reserve_event_start,
+                player_id=_required_decision_actor(result),
+                visibility_source=SetupStep.DECLARE_BATTLE_FORMATIONS.value,
             )
             return
         if result.decision_type == SELECT_DEPLOYMENT_UNIT_DECISION_TYPE:
@@ -640,14 +686,10 @@ class SetupFlow:
             )
             decisions.event_log.append(
                 "army_mustered",
-                {
-                    "game_id": state.game_id,
-                    "setup_step": SetupStep.MUSTER_ARMIES.value,
-                    "player_id": army_definition.player_id,
-                    "army_id": army_definition.army_id,
-                    "unit_count": len(army_definition.units),
-                    "roster_legality_report": army_definition.roster_legality_report.to_payload(),
-                },
+                army_mustered_event_payload(
+                    state=state,
+                    army_definition=army_definition,
+                ),
             )
             for ledger in state.unit_resource_ledgers:
                 if ledger.player_id != army_definition.player_id:
@@ -668,6 +710,8 @@ class SetupFlow:
                         "game_id": state.game_id,
                         "setup_step": SetupStep.MUSTER_ARMIES.value,
                         "player_id": army_definition.player_id,
+                        "secret": True,
+                        "visibility_source": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
                         "army_id": army_definition.army_id,
                         "transport_unit_instance_id": cargo_state.transport_unit_instance_id,
                         "transport_cargo_state": cargo_state.to_payload(),
@@ -680,6 +724,8 @@ class SetupFlow:
                         "game_id": state.game_id,
                         "setup_step": SetupStep.MUSTER_ARMIES.value,
                         "player_id": army_definition.player_id,
+                        "secret": True,
+                        "visibility_source": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
                         "army_id": army_definition.army_id,
                         "transport_unit_instance_id": consequence.transport_unit_instance_id,
                         "consequence": consequence.to_payload(),
@@ -741,6 +787,7 @@ class SetupFlow:
             )
         )
         if hook_request is not None:
+            hook_request = _secret_battle_formation_request(hook_request)
             decisions.request_decision(hook_request)
             return LifecycleStatus.waiting_for_decision(
                 stage=GameLifecycleStage.SETUP,
@@ -1165,6 +1212,70 @@ def _secondary_mission_options(
             )
         )
     return tuple(options)
+
+
+def _required_decision_actor(result: DecisionResult) -> str:
+    if result.actor_id is None:
+        raise GameLifecycleError("Declare Battle Formations decision requires an actor.")
+    return result.actor_id
+
+
+def _secret_battle_formation_request(request: DecisionRequest) -> DecisionRequest:
+    if request.actor_id is None:
+        raise GameLifecycleError("Declare Battle Formations request requires an actor.")
+    if not isinstance(request.payload, dict):
+        raise GameLifecycleError("Declare Battle Formations request payload must be an object.")
+    secret = request.payload.get("secret")
+    if secret is not None and secret is not True:
+        raise GameLifecycleError("Declare Battle Formations request has conflicting secrecy.")
+    return replace(request, payload={**request.payload, "secret": True})
+
+
+def _battle_formations_revealed_payload(state: GameState) -> dict[str, JsonValue]:
+    if type(state) is not GameState:
+        raise GameLifecycleError("Battle formations reveal requires GameState.")
+    reserve_states = sorted(
+        (
+            reserve
+            for reserve in state.reserve_states
+            if reserve.declared_during_step == SetupStep.DECLARE_BATTLE_FORMATIONS.value
+        ),
+        key=lambda reserve: (reserve.player_id, reserve.unit_instance_id),
+    )
+    cargo_states = sorted(
+        (cargo for cargo in state.transport_cargo_states if cargo.embarked_unit_instance_ids),
+        key=lambda cargo: (cargo.player_id, cargo.transport_unit_instance_id),
+    )
+    faction_states = sorted(
+        (
+            faction_state
+            for faction_state in state.faction_rule_states
+            if faction_state.setup_step is SetupStep.DECLARE_BATTLE_FORMATIONS
+        ),
+        key=lambda faction_state: (faction_state.player_id, faction_state.state_id),
+    )
+    transport_consequences = sorted(
+        state.dedicated_transport_setup_consequences,
+        key=lambda consequence: (
+            consequence.player_id,
+            consequence.transport_unit_instance_id,
+        ),
+    )
+    return {
+        "game_id": state.game_id,
+        "setup_step": SetupStep.DECLARE_BATTLE_FORMATIONS.value,
+        "player_ids": list(state.player_ids),
+        "reserve_states": cast(JsonValue, [reserve.to_payload() for reserve in reserve_states]),
+        "transport_cargo_states": cast(JsonValue, [cargo.to_payload() for cargo in cargo_states]),
+        "dedicated_transport_setup_consequences": cast(
+            JsonValue,
+            [consequence.to_payload() for consequence in transport_consequences],
+        ),
+        "faction_rule_states": cast(
+            JsonValue,
+            [faction_state.to_payload() for faction_state in faction_states],
+        ),
+    }
 
 
 def _invalid_authoritative_setup_request_status(

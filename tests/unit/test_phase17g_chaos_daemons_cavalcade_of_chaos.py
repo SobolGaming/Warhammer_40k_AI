@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import replace
 from math import cos, radians, sin
 from typing import cast
@@ -74,6 +75,7 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
     DecisionRequest,
+    DecisionRequestPayload,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
@@ -111,7 +113,7 @@ from warhammer40k_core.engine.fight_resolution import (
     MeleeWeaponDeclaration,
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState
-from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
@@ -615,6 +617,15 @@ def test_cavalcade_from_beyond_the_veil_arrives_from_strategic_reserves_round_on
     assert stratagem_use["stratagem_id"] == stratagems.FROM_BEYOND_THE_VEIL_STRATAGEM_ID
     assert stratagem_use["handler_id"] == GENERIC_RULE_IR_STRATAGEM_HANDLER_ID
 
+    payload = lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(deepcopy(payload))
+    assert restored.to_payload() == payload
+
+    forged_payload: GameLifecyclePayload = deepcopy(payload)
+    _rewrite_carried_ingress_effect_as_non_placement(forged_payload)
+    with pytest.raises(GameLifecycleError, match="Primary reserve RuleIR effect descriptor drift"):
+        GameLifecycle.from_payload(forged_payload)
+
 
 def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> None:
     config = _cavalcade_config(turn_order=("player-b", "player-a"))
@@ -780,15 +791,21 @@ def test_cavalcade_inescapable_manifestations_forces_desperate_escape_mode() -> 
             selected_option_id="reroll:0,1",
         )
     )
+    final_status = _decline_stratagem_target_proposal_if_present(
+        lifecycle,
+        final_status,
+        result_id="phase17g-inescapable-decline-fire-overwatch",
+    )
 
     assert final_status.status_kind in {
         LifecycleStatusKind.ADVANCED,
         LifecycleStatusKind.WAITING_FOR_DECISION,
     }
     if final_status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
-        assert decision_request(final_status).decision_type == (
-            SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE
-        )
+        assert decision_request(final_status).decision_type in {
+            SELECT_DESPERATE_ESCAPE_MODEL_DECISION_TYPE,
+            SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+        }
     roll_events = [
         cast(dict[str, JsonValue], event.payload)
         for event in lifecycle.decision_controller.event_log.records
@@ -1337,7 +1354,7 @@ def _runtime_content_bundle(lifecycle: GameLifecycle) -> RuntimeContentBundle:
 
 def _rehydrate_lifecycle_with_empty_decisions(lifecycle: GameLifecycle) -> GameLifecycle:
     payload = lifecycle.to_payload()
-    payload["decisions"] = DecisionController().to_payload()
+    payload["decisions"]["queue"] = DecisionController().to_payload()["queue"]
     return GameLifecycle.from_payload(payload)
 
 
@@ -2035,6 +2052,55 @@ def _submit_placement_proposal(
             payload=validate_json_value(payload.to_payload()),
         )
     )
+
+
+def _rewrite_carried_ingress_effect_as_non_placement(
+    payload: GameLifecyclePayload,
+) -> None:
+    matching_records = tuple(
+        record
+        for record in payload["decisions"]["records"]
+        if record["request"]["decision_type"] == PLACEMENT_PROPOSAL_DECISION_TYPE
+        and _request_carries_generic_rule_effect(record["request"])
+    )
+    if len(matching_records) != 1:
+        raise AssertionError("test requires one generic RuleIR ingress placement decision")
+    record = matching_records[0]
+    request_payload = cast(dict[str, JsonValue], record["request"]["payload"])
+    proposal_request = cast(dict[str, JsonValue], request_payload["proposal_request"])
+    context = cast(dict[str, JsonValue], proposal_request["context"])
+    generic_effect = cast(dict[str, JsonValue], context["generic_rule_effect"])
+    effect_descriptor = cast(dict[str, JsonValue], generic_effect["effect"])
+    effect_descriptor["kind"] = "ability_grant"
+    execution = cast(dict[str, JsonValue], context["generic_rule_execution_result"])
+    execution["effect_payloads"] = [deepcopy(generic_effect)]
+    request_id = record["request"]["request_id"]
+    record_id = record["record_id"]
+    for event in payload["decisions"]["event_log"]:
+        event_payload = event["payload"]
+        if not isinstance(event_payload, dict):
+            continue
+        if (
+            event["event_type"] == "decision_requested"
+            and event_payload.get("request_id") == request_id
+        ):
+            event["payload"] = validate_json_value(deepcopy(record["request"]))
+        if (
+            event["event_type"] == "decision_recorded"
+            and event_payload.get("record_id") == record_id
+        ):
+            event["payload"] = validate_json_value(deepcopy(record))
+
+
+def _request_carries_generic_rule_effect(request: DecisionRequestPayload) -> bool:
+    request_payload = request["payload"]
+    if not isinstance(request_payload, dict):
+        return False
+    proposal_request = request_payload.get("proposal_request")
+    if not isinstance(proposal_request, dict):
+        return False
+    context = proposal_request.get("context")
+    return isinstance(context, dict) and "generic_rule_effect" in context
 
 
 def _with_model_poses(

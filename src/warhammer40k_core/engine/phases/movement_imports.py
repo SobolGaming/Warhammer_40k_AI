@@ -161,6 +161,9 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.primary_battlefield_departure import (
+    record_primary_battlefield_departure,
+)
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.reaction_windows import (
     ReactionWindow as TriggeredReactionWindow,
@@ -502,6 +505,7 @@ __all__ = (
     "objective_marker_endpoint_placement_violation",
     "parameterized_decision_option",
     "replace",
+    "record_primary_battlefield_departure",
     "resolve_aircraft_reserve_transition",
     "resolve_combat_disembark",
     "resolve_disembark",

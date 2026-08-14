@@ -1684,7 +1684,7 @@ def _advance_lifecycle_state_to_phase(lifecycle: GameLifecycle, phase: BattlePha
 
 def _rehydrate_lifecycle_with_empty_decisions(lifecycle: GameLifecycle) -> GameLifecycle:
     payload = lifecycle.to_payload()
-    payload["decisions"] = DecisionController().to_payload()
+    payload["decisions"]["queue"] = DecisionController().to_payload()["queue"]
     return GameLifecycle.from_payload(payload)
 
 

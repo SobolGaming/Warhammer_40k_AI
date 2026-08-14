@@ -7,6 +7,7 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -817,7 +818,11 @@ def _battle_ready_lifecycle(*, non_tau_selected: bool = False) -> GameLifecycle:
     _place_unit(state, unit_instance_id=ENEMY_OTHER_ID, x=20.0, y=18.0)
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-a"))
     state.record_secondary_mission_choice(_fixed_secondary_choice(player_id="player-b"))
-    _complete_setup_through_gate(state=state, config=config)
+    _complete_setup_through_gate(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        config=config,
+    )
     _set_current_battle_phase(state, BattlePhase.SHOOTING)
     _runtime_content_bundle(lifecycle)
     return lifecycle
@@ -1054,13 +1059,19 @@ def _fixed_secondary_choice(*, player_id: str) -> SecondaryMissionChoice:
     )
 
 
-def _complete_setup_through_gate(*, state: GameState, config: GameConfig) -> None:
+def _complete_setup_through_gate(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    config: GameConfig,
+) -> None:
+    ensure_army_mustered_events_for_fixture(state, decisions=decisions)
     final_setup_step = state.setup_sequence[-1]
     while state.current_setup_step is not final_setup_step:
         state.complete_current_setup_step()
     SetupCompletionGate().complete_setup_and_enter_battle(
         state=state,
-        decisions=DecisionController(),
+        decisions=decisions,
         config=config,
     )
 

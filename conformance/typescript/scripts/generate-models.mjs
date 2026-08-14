@@ -105,10 +105,50 @@ try {
   process.exitCode = generated.status ?? 1;
   if (generated.status === 0) {
     const generatedSource = readFileSync(outputPath, "utf8");
-    writeFileSync(outputPath, `// @ts-nocheck -- recursive JSON values are generator-owned.\n${generatedSource}`);
+    const compactedSource = compactNeverPropertyRuns(generatedSource);
+    writeFileSync(
+      outputPath,
+      `// @ts-nocheck -- recursive JSON values are generator-owned.\n${compactedSource}`,
+    );
   }
 } finally {
   rmSync(temporaryDirectory, { recursive: true, force: true });
+}
+
+function compactNeverPropertyRuns(source) {
+  const trailingNewline = source.endsWith("\n");
+  const lines = source.split("\n");
+  if (trailingNewline) {
+    lines.pop();
+  }
+  const compacted = [];
+  let pendingIndent = null;
+  let pendingProperties = [];
+
+  const flushPending = () => {
+    if (pendingIndent !== null) {
+      compacted.push(`${pendingIndent}${pendingProperties.join(" ")}`);
+    }
+    pendingIndent = null;
+    pendingProperties = [];
+  };
+
+  for (const line of lines) {
+    const match = /^(\s+)([A-Za-z_$][A-Za-z0-9_$]*\?: never;)$/.exec(line);
+    if (match === null) {
+      flushPending();
+      compacted.push(line);
+      continue;
+    }
+    const [, indent, property] = match;
+    if (pendingIndent !== indent) {
+      flushPending();
+      pendingIndent = indent;
+    }
+    pendingProperties.push(property);
+  }
+  flushPending();
+  return `${compacted.join("\n")}${trailingNewline ? "\n" : ""}`;
 }
 
 function normalizeSchemaReferences(value, currentSchemaName) {

@@ -828,6 +828,13 @@ def test_aircraft_normal_move_lifecycle_crossing_edge_transitions_to_reserves() 
     assert movement_state is not None
     assert movement_state.active_selection is None
     assert movement_state.moved_unit_ids == (aircraft.unit_instance_id,)
+    (departure,) = state.primary_battlefield_departure_states
+    assert departure.rules_unit_instance_id == aircraft.unit_instance_id
+    assert departure.component_unit_instance_ids == (aircraft.unit_instance_id,)
+    assert departure.departed_component_unit_instance_ids == (aircraft.unit_instance_id,)
+    assert departure.removed_model_instance_ids == aircraft.own_model_ids()
+    assert departure.removal_kind is BattlefieldRemovalKind.INTO_RESERVES
+    assert departure.source_id == f"phase10r-{expected_reason.value}"
 
     completed_payload = _last_event_payload(decisions, "movement_activation_completed")
     assert "displacement_kind" not in completed_payload
@@ -848,6 +855,35 @@ def test_aircraft_normal_move_lifecycle_crossing_edge_transitions_to_reserves() 
         json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
     )
     assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
+
+    forged_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    source_records = tuple(
+        record
+        for record in forged_payload["decisions"]["records"]
+        if record["result"]["result_id"] == departure.source_id
+    )
+    assert len(source_records) == 1
+    source_record = source_records[0]
+    renamed_event_count = 0
+    for event in forged_payload["decisions"]["event_log"]:
+        if (
+            event["event_type"] == "decision_requested"
+            and event["payload"] == source_record["request"]
+        ):
+            event["event_type"] = "forged_aircraft_decision_requested"
+            renamed_event_count += 1
+        if event["event_type"] == "decision_recorded" and event["payload"] == source_record:
+            event["event_type"] = "forged_aircraft_decision_recorded"
+            renamed_event_count += 1
+    assert renamed_event_count == 2
+    with pytest.raises(
+        GameLifecycleError,
+        match="Primary Aircraft reserve departure requires exact requested and recorded decision",
+    ):
+        GameLifecycle.from_payload(forged_payload)
 
 
 def test_aircraft_edge_transition_uses_full_base_footprint_containment() -> None:

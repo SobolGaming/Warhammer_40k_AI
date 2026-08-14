@@ -541,7 +541,7 @@ def test_advance_resolves_dice_then_requests_parameterized_movement() -> None:
                 unit_instance_id=proposal.unit_instance_id,
                 movement_phase_action=MovementPhaseActionKind.ADVANCE.value,
                 movement_mode=MovementMode.ADVANCE.value,
-                witness=_shift_witness(before, dx=6.0 + advance_value),
+                witness=_shift_witness(before, dx=0.0, dy=6.0 + advance_value),
             ).to_payload()
         ),
         result_id="phase11d-advance-proposal",
@@ -560,7 +560,7 @@ def test_advance_resolves_dice_then_requests_parameterized_movement() -> None:
 
 def test_fall_back_proposal_preserves_desperate_escape_follow_up() -> None:
     session, movement_status = _local_session_at_movement_unit_selection(
-        game_id="phase10o-one-v2-new-0000",
+        game_id="phase11d-desperate-escape-failure-0000",
         pose_factory=_fall_back_deployment_pose,
     )
     state = _session_state(session)

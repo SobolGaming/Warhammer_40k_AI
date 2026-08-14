@@ -309,19 +309,24 @@ def _battle_lifecycle(
     beta_unit_selection_ids: tuple[str, ...] = ("enemy-unit",),
 ) -> GameLifecycle:
     config = _config(beta_unit_selection_ids=beta_unit_selection_ids)
-    state = _battle_state(config)
+    decisions = DecisionController()
+    state = _battle_state(config, decisions=decisions)
     return GameLifecycle.from_payload(
         {
             "config": config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
-            "decisions": DecisionController().to_payload(),
+            "decisions": decisions.to_payload(),
             "reaction_queue": {"frames": []},
         }
     )
 
 
-def _battle_state(config: GameConfig | None = None) -> GameState:
+def _battle_state(
+    config: GameConfig | None = None,
+    *,
+    decisions: DecisionController | None = None,
+) -> GameState:
     resolved_config = _config() if config is None else config
     state = GameState.from_config(resolved_config)
     armies = tuple(
@@ -336,7 +341,7 @@ def _battle_state(config: GameConfig | None = None) -> GameState:
             armies=armies,
         ).battlefield_state
     )
-    enter_battle_for_fixture(state)
+    enter_battle_for_fixture(state, decisions=decisions)
     assert state.stage is GameLifecycleStage.BATTLE
     return state
 

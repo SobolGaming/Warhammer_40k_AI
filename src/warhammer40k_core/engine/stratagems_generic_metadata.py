@@ -97,13 +97,42 @@ def objective_marker_id_or_none(effect_selection: JsonValue) -> str | None:
     return _validate_identifier(OBJECTIVE_MARKER_CONTEXT_KEY, value)
 
 
-def generic_rule_ir_execution_target_unit_ids(use_record: StratagemUseRecord) -> tuple[str, ...]:
+def generic_rule_ir_execution_target_unit_ids(
+    *, state: GameState, use_record: StratagemUseRecord
+) -> tuple[str, ...]:
     if type(use_record) is not StratagemUseRecord:
         raise GameLifecycleError("Generic RuleIR target IDs require a StratagemUseRecord.")
     target_ids = list(use_record.targeted_unit_instance_ids)
     companion_id = companion_unit_id_or_none(use_record.effect_selection)
-    if companion_id is not None and companion_id not in target_ids:
-        target_ids.append(companion_id)
+    if companion_id is not None:
+        from warhammer40k_core.engine.rules_units import (
+            current_rules_unit_views_for_identity,
+            rules_unit_identities_share_lineage,
+        )
+
+        recorded_companion_ids = tuple(
+            unit_id
+            for unit_id in use_record.affected_unit_instance_ids
+            if rules_unit_identities_share_lineage(
+                state=state,
+                first_unit_instance_id=unit_id,
+                second_unit_instance_id=companion_id,
+            )
+        )
+        if len(recorded_companion_ids) == 1:
+            canonical_companion_id = recorded_companion_ids[0]
+        else:
+            current_views = current_rules_unit_views_for_identity(
+                state=state,
+                unit_instance_id=companion_id,
+            )
+            if len(current_views) != 1:
+                raise GameLifecycleError(
+                    "Generic RuleIR companion identity is historically ambiguous."
+                )
+            canonical_companion_id = current_views[0].unit_instance_id
+        if canonical_companion_id not in target_ids:
+            target_ids.append(canonical_companion_id)
     return tuple(sorted(target_ids))
 
 
@@ -203,7 +232,18 @@ def companion_selection_error(
     if target_binding is None or target_binding.target_unit_instance_id is None:
         return "target_unit_required"
     target_unit_id = target_binding.target_unit_instance_id
-    if companion_id == target_unit_id:
+    from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+
+    if (
+        rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=companion_id,
+        ).unit_instance_id
+        == rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=target_unit_id,
+        ).unit_instance_id
+    ):
         return "companion_unit_is_target"
     companion = unit_by_id(state=state, unit_instance_id=companion_id)
     if unit_owner_player_id(state=state, unit_instance_id=companion_id) != context.player_id:

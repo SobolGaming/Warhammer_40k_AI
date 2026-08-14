@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition
 from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
@@ -152,17 +153,24 @@ def battle_state(
     state.record_secondary_mission_choice(
         secondary_choice(player_id="player-b", mode=player_b_secondary)
     )
-    complete_setup_through_gate(state=state, config=config)
+    decisions = DecisionController()
+    complete_setup_through_gate(state=state, decisions=decisions, config=config)
     return state
 
 
-def complete_setup_through_gate(*, state: GameState, config: GameConfig) -> None:
+def complete_setup_through_gate(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    config: GameConfig,
+) -> None:
+    ensure_army_mustered_events_for_fixture(state, decisions=decisions)
     final_setup_step = state.setup_sequence[-1]
     while state.current_setup_step is not final_setup_step:
         state.complete_current_setup_step()
     SetupCompletionGate().complete_setup_and_enter_battle(
         state=state,
-        decisions=DecisionController(),
+        decisions=decisions,
         config=config,
     )
 

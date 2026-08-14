@@ -46,7 +46,7 @@ def unarrived_reserve_model_ids(
     armies: tuple[ArmyDefinition, ...],
     reserve_states: tuple[ReserveState, ...],
 ) -> tuple[str, ...]:
-    model_ids: list[str] = []
+    model_ids: set[str] = set()
     for reserve_state in reserve_states:
         if reserve_state.status is not ReserveStatus.IN_RESERVES:
             continue
@@ -54,11 +54,11 @@ def unarrived_reserve_model_ids(
             armies=armies,
             reserve_state=reserve_state,
         )
-        model_ids.extend(model.model_instance_id for model in reserve_view.own_models)
+        model_ids.update(model.model_instance_id for model in reserve_view.alive_models())
         for embarked_unit_id in reserve_state.embarked_unit_instance_ids:
             embarked_view = rules_unit_view_from_armies(
                 armies=armies,
                 unit_instance_id=embarked_unit_id,
             )
-            model_ids.extend(model.model_instance_id for model in embarked_view.own_models)
+            model_ids.update(model.model_instance_id for model in embarked_view.alive_models())
     return tuple(sorted(model_ids))

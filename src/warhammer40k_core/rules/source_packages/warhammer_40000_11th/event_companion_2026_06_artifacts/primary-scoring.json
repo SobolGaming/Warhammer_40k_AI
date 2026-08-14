@@ -962,8 +962,8 @@
     {
       "primary_mission_id": "primary-purge-and-secure",
       "mission_name": "Purge and Secure",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "purge_and_secure",
       "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
@@ -1797,5 +1797,5 @@
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:vanguard-operation"
     }
   ],
-  "package_hash": "5449d260c90c9a5a798dad0fa3dbba0c7c7b56e28e726a94ce6694654cc7afbe"
+  "package_hash": "a1f8a91bc8dc01088fdef5d0b9ee2e4e270db93a4b050d3a9b47c8995163dfc5"
 }
