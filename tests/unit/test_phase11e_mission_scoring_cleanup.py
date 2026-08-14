@@ -219,10 +219,12 @@ from warhammer40k_core.engine.primary_unit_destruction_tracking import (
 )
 from warhammer40k_core.engine.replay import ReplayArtifact, ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.reserves import (
+    ReserveDestructionTimingPolicy,
     ReserveKind,
     ReserveOrigin,
     ReserveState,
     ReserveStatus,
+    resolve_unarrived_reserve_destruction,
 )
 from warhammer40k_core.engine.return_on_death import (
     RETURN_ON_DEATH_PENDING_CREATED_EVENT_TYPE,
@@ -1152,6 +1154,135 @@ def test_reserve_deadline_lifecycle_restore_rejects_timeline_corruption(
 
     with pytest.raises(GameLifecycleError, match=error_match):
         GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    "preexisting_cargo_casualty",
+    [
+        pytest.param(False, id="complete-cargo"),
+        pytest.param(True, id="preexisting-cargo-casualty"),
+    ],
+)
+def test_reserve_deadline_retires_current_transport_cargo_and_round_trips(
+    preexisting_cargo_casualty: bool,
+) -> None:
+    lifecycle, _cargo_state, route_model_ids = _transport_reserve_deadline_lifecycle(
+        preexisting_cargo_casualty=preexisting_cargo_casualty
+    )
+
+    _resolve_transport_reserve_at_round_boundary(lifecycle)
+
+    state = cast(GameState, lifecycle.state)
+    reserve_state = state.reserve_state_for_unit("army-alpha:transport-unit-2")
+    assert reserve_state is not None
+    assert reserve_state.status is ReserveStatus.DESTROYED
+    assert reserve_state.embarked_unit_instance_ids == ("army-alpha:intercessor-unit-1",)
+    assert state.transport_cargo_state_for_transport("army-alpha:transport-unit-2") is None
+    assert state.battlefield_state is not None
+    assert set(route_model_ids) <= set(state.battlefield_state.removed_model_ids)
+    assert set(route_model_ids).isdisjoint(state.battlefield_state.placed_model_ids())
+
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    restored = GameLifecycle.from_payload(payload)
+    assert restored.to_payload() == lifecycle.to_payload()
+
+
+def test_end_of_battle_reserve_destruction_retires_current_transport_cargo() -> None:
+    core_policy = ReserveDestructionTimingPolicy.core_rules_default()
+    lifecycle, _cargo_state, route_model_ids = _transport_reserve_deadline_lifecycle(
+        destruction_deadline_policy=core_policy
+    )
+    state = cast(GameState, lifecycle.state)
+    assert state.battlefield_state is not None
+    state.battle_round = 5
+    record_primary_turn_start_evidence(state=state)
+    destruction = resolve_unarrived_reserve_destruction(
+        reserve_states=tuple(state.reserve_states),
+        armies=tuple(state.army_definitions),
+        battlefield_state=state.battlefield_state,
+        policy=core_policy,
+        battle_round=5,
+        end_of_battle=True,
+    )
+
+    state._apply_unarrived_reserve_destruction(  # pyright: ignore[reportPrivateUsage]
+        destruction=destruction
+    )
+
+    reserve_state = state.reserve_state_for_unit("army-alpha:transport-unit-2")
+    assert reserve_state is not None
+    assert reserve_state.status is ReserveStatus.DESTROYED
+    assert reserve_state.embarked_unit_instance_ids == ("army-alpha:intercessor-unit-1",)
+    assert state.transport_cargo_state_for_transport("army-alpha:transport-unit-2") is None
+    assert state.battlefield_state is not None
+    assert set(route_model_ids) <= set(state.battlefield_state.removed_model_ids)
+    assert set(route_model_ids).isdisjoint(state.battlefield_state.placed_model_ids())
+    state_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    assert GameState.from_payload(state_payload).to_payload() == state.to_payload()
+
+
+@pytest.mark.parametrize(
+    "terminal_cargo_kind",
+    [
+        pytest.param("stale", id="stale-exact-row"),
+        pytest.param("mismatched", id="mismatched-row"),
+    ],
+)
+def test_restore_rejects_current_cargo_row_for_destroyed_reserve_transport(
+    terminal_cargo_kind: str,
+) -> None:
+    lifecycle, cargo_state, _route_model_ids = _transport_reserve_deadline_lifecycle()
+    _resolve_transport_reserve_at_round_boundary(lifecycle)
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    cargo_payload = cargo_state.to_payload()
+    if terminal_cargo_kind == "mismatched":
+        cargo_payload["embarked_unit_instance_ids"] = []
+    payload["state"]["transport_cargo_states"].append(cargo_payload)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="destroyed reserve route must not retain current cargo",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    "active_cargo_drift",
+    [
+        pytest.param("missing", id="missing-current-cargo"),
+        pytest.param("mismatched", id="mismatched-current-cargo"),
+    ],
+)
+def test_reserve_deadline_rejects_active_cargo_drift_before_atomic_mutation(
+    active_cargo_drift: str,
+) -> None:
+    lifecycle, cargo_state, _route_model_ids = _transport_reserve_deadline_lifecycle()
+    state = cast(GameState, lifecycle.state)
+    if active_cargo_drift == "missing":
+        state.remove_transport_cargo_state(cargo_state.transport_unit_instance_id)
+    else:
+        state.replace_transport_cargo_state(replace(cargo_state, embarked_unit_instance_ids=()))
+    state.battle_round = 3
+    before_payload = state.to_payload()
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="transport_cargo_states unarrived reserve route cargo drift",
+    ):
+        state._resolve_unarrived_reserve_destruction_boundary(  # pyright: ignore[reportPrivateUsage]
+            end_of_battle=False
+        )
+
+    assert state.to_payload() == before_payload
 
 
 def test_primary_historical_event_recorders_fail_closed_at_typed_boundaries(
@@ -9390,6 +9521,102 @@ def _authentic_primary_destruction_lifecycle_payload() -> GameLifecyclePayload:
     return payload
 
 
+def _transport_reserve_deadline_lifecycle(
+    *,
+    preexisting_cargo_casualty: bool = False,
+    destruction_deadline_policy: ReserveDestructionTimingPolicy | None = None,
+) -> tuple[GameLifecycle, TransportCargoState, tuple[str, ...]]:
+    config = _config_with_player_a_transport()
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        decisions=lifecycle.decision_controller,
+    )
+    lifecycle = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+        )
+    )
+    state = cast(GameState, lifecycle.state)
+    assert state.battlefield_state is not None
+    owner_army = state.army_definition_for_player("player-a")
+    assert owner_army is not None
+    transport = owner_army.unit_by_id("army-alpha:transport-unit-2")
+    passenger = owner_army.unit_by_id("army-alpha:intercessor-unit-1")
+    route_model_ids = tuple(
+        sorted(
+            model.model_instance_id for unit in (transport, passenger) for model in unit.own_models
+        )
+    )
+    battlefield = state.battlefield_state
+    if preexisting_cargo_casualty:
+        casualty_id = passenger.own_models[0].model_instance_id
+        _set_model_wounds_remaining(
+            state,
+            model_instance_id=casualty_id,
+            wounds_remaining=0,
+        )
+        battlefield = battlefield.with_removed_models((casualty_id,))
+    state.replace_battlefield_state(
+        battlefield.without_unit_placement(passenger.unit_instance_id).without_unit_placement(
+            transport.unit_instance_id
+        )
+    )
+    cargo_state = TransportCargoState(
+        player_id="player-a",
+        transport_unit_instance_id=transport.unit_instance_id,
+        capacity_profile=TransportCapacityProfile(
+            transport_datasheet_id=transport.datasheet_id,
+            max_model_count=10,
+            allowed_keywords=("INFANTRY",),
+            source_id="phase17n-reserve-deadline-transport-capacity",
+        ),
+        embarked_unit_instance_ids=(passenger.unit_instance_id,),
+    )
+    state.record_transport_cargo_state(cargo_state)
+    resolved_policy = destruction_deadline_policy
+    if resolved_policy is None:
+        assert state.mission_setup is not None
+        resolved_policy = reserve_destruction_policy_from_scoring_policy(
+            mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
+        )
+    declared_reserve = ReserveState.declared_before_battle(
+        player_id="player-a",
+        unit_instance_id=transport.unit_instance_id,
+        reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+        destruction_deadline_policy=resolved_policy,
+        embarked_unit_instance_ids=(passenger.unit_instance_id,),
+    )
+    state.record_reserve_state(declared_reserve)
+    lifecycle.decision_controller.event_log.append(
+        "reserve_unit_declared",
+        {
+            "game_id": state.game_id,
+            "player_id": declared_reserve.player_id,
+            "unit_instance_id": declared_reserve.unit_instance_id,
+            "reserve_state": declared_reserve.to_payload(),
+        },
+    )
+    return lifecycle, cargo_state, route_model_ids
+
+
+def _resolve_transport_reserve_at_round_boundary(lifecycle: GameLifecycle) -> None:
+    state = cast(GameState, lifecycle.state)
+    state.battle_round = 3
+    state.active_player_id = "player-b"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    record_primary_turn_start_evidence(state=state)
+    BattleRoundFlow(
+        phase_handlers={BattlePhase.FIGHT: PlaceholderPhaseHandler(BattlePhase.FIGHT)}
+    ).advance(state=state, decisions=lifecycle.decision_controller)
+    _record_missing_turn_start_evidence_events(
+        state=state,
+        decisions=lifecycle.decision_controller,
+    )
+
+
 def _authentic_reserve_deadline_lifecycle_payload() -> GameLifecyclePayload:
     lifecycle = _battle_lifecycle()
     state = lifecycle.state
@@ -9779,6 +10006,34 @@ def _set_unit_wounds_remaining(
             for army in state.army_definitions
         ]
     )
+
+
+def _set_model_wounds_remaining(
+    state: GameState,
+    *,
+    model_instance_id: str,
+    wounds_remaining: int,
+) -> None:
+    matched = False
+    updated_armies: list[ArmyDefinition] = []
+    for army in state.army_definitions:
+        updated_units: list[UnitInstance] = []
+        for unit in army.units:
+            updated_models = tuple(
+                replace(model, wounds_remaining=wounds_remaining)
+                if model.model_instance_id == model_instance_id
+                else model
+                for model in unit.own_models
+            )
+            if updated_models != unit.own_models:
+                matched = True
+                updated_units.append(replace(unit, own_models=updated_models))
+            else:
+                updated_units.append(unit)
+        updated_armies.append(replace(army, units=tuple(updated_units)))
+    if not matched:
+        raise AssertionError(f"Missing model {model_instance_id}.")
+    state.replace_army_definitions(updated_armies)
 
 
 def _decline_stratagem_window_if_pending(

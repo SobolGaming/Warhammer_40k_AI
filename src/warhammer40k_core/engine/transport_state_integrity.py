@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.reserves import ReserveStatus
 
 
 def validate_transport_cargo_state_consistency(*, state: GameState) -> None:
@@ -21,6 +22,11 @@ def validate_transport_cargo_state_consistency(*, state: GameState) -> None:
     }
     embarked_unit_ids: set[str] = set()
     for cargo_state in state.transport_cargo_states:
+        reserve_state = state.reserve_state_for_unit(cargo_state.transport_unit_instance_id)
+        if reserve_state is not None and reserve_state.status is ReserveStatus.DESTROYED:
+            raise GameLifecycleError(
+                "transport_cargo_states destroyed reserve route must not retain current cargo."
+            )
         transport = unit_by_id.get(cargo_state.transport_unit_instance_id)
         if transport is None:
             raise GameLifecycleError("transport_cargo_states transport unit is unknown.")
