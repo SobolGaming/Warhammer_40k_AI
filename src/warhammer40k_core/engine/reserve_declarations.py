@@ -22,10 +22,12 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     SetupStep,
 )
+from warhammer40k_core.engine.reserve_arrival_requirements import (
+    reposition_destruction_policy,
+)
 from warhammer40k_core.engine.reserves import (
     AircraftReserveDeclaration,
     DeepStrikeSetupDeclaration,
-    ReserveDestructionTimingPolicy,
     ReserveKind,
     ReserveOrigin,
     ReserveState,
@@ -589,8 +591,9 @@ def apply_mandatory_aircraft_reserve_declarations(
 ) -> tuple[ReserveState, ...]:
     if state.current_setup_step is not SetupStep.DECLARE_BATTLE_FORMATIONS:
         raise GameLifecycleError("Aircraft reserve declarations require DECLARE_BATTLE_FORMATIONS.")
-    policy = ReserveDestructionTimingPolicy.from_mission_policy(
-        config.ruleset_descriptor.mission_policy
+    policy = reposition_destruction_policy(
+        mission_setup=state.mission_setup,
+        destruction_deadline_policy=None,
     )
     recorded: list[ReserveState] = []
     for army in state.army_definitions:
@@ -885,8 +888,9 @@ def apply_reserve_declaration_decision(
         player_id=selection.player_id,
         unit_instance_id=unit_id,
     )
-    policy = ReserveDestructionTimingPolicy.from_mission_policy(
-        config.ruleset_descriptor.mission_policy
+    policy = reposition_destruction_policy(
+        mission_setup=state.mission_setup,
+        destruction_deadline_policy=None,
     )
     if selection.reserve_kind is ReserveKind.STRATEGIC_RESERVES:
         declaration = StrategicReserveDeclaration(

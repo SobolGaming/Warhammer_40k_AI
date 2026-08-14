@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 
 # pyright: reportPrivateUsage=false
 from dataclasses import replace
@@ -65,9 +66,10 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequest,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.interaction_metadata import interaction_descriptor_for_request
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
     BattleSize,
     DetachmentSelection,
@@ -86,6 +88,9 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatusKind,
     SetupStep,
+)
+from warhammer40k_core.engine.primary_reserve_entry_lifecycle_integrity import (
+    validate_primary_reserve_entry_lifecycle_integrity,
 )
 from warhammer40k_core.engine.reserves import (
     ReserveKind,
@@ -243,6 +248,12 @@ def test_destroyed_unit_spends_resurgence_and_creates_cult_ambush_reserve() -> N
     assert marker_request.decision_type == SUBMIT_CULT_AMBUSH_MARKER_PLACEMENT_DECISION_TYPE
     assert marker_request.actor_id == GSC_PLAYER_ID
     assert json.loads(json.dumps(marker_request.to_payload())) == marker_request.to_payload()
+    validate_primary_reserve_entry_lifecycle_integrity(
+        state=state,
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+        stratagem_indexes_by_player_id=None,
+    )
 
 
 def test_default_ruleset_does_not_activate_tacoma_cult_ambush_exclusions() -> None:
@@ -333,6 +344,35 @@ def test_tacoma_overlay_excludes_attached_character_from_cult_ambush() -> None:
     reserve_state = state.reserve_state_for_unit(replacement.unit_instance_id)
     assert reserve_state is not None
     assert ATTACHED_CHARACTER_EXCLUSION_SOURCE_ID in reserve_state.source_rule_ids
+    validate_primary_reserve_entry_lifecycle_integrity(
+        state=state,
+        event_records=decisions.event_log.records,
+        decision_records=decisions.records,
+        stratagem_indexes_by_player_id=None,
+    )
+    state.replace_reserve_state(
+        replace(reserve_state, source_rule_ids=(*reserve_state.source_rule_ids, "forged-source"))
+    )
+    tampered_spent_events: list[EventRecord] = []
+    for event in decisions.event_log.records:
+        if event.event_type != "genestealer_cults_cult_ambush_resurgence_spent":
+            tampered_spent_events.append(event)
+            continue
+        spent_payload = dict(cast(dict[str, JsonValue], event.payload))
+        spent_reserve_state = dict(cast(dict[str, JsonValue], spent_payload["reserve_state"]))
+        spent_reserve_state["source_rule_ids"] = [
+            *cast(list[str], spent_reserve_state["source_rule_ids"]),
+            "forged-source",
+        ]
+        spent_payload["reserve_state"] = spent_reserve_state
+        tampered_spent_events.append(replace(event, payload=validate_json_value(spent_payload)))
+    with pytest.raises(GameLifecycleError, match="Cult Ambush reserve-entry identity drift"):
+        validate_primary_reserve_entry_lifecycle_integrity(
+            state=state,
+            event_records=tuple(tampered_spent_events),
+            decision_records=decisions.records,
+            stratagem_indexes_by_player_id=None,
+        )
 
     character_only_state, _bodyguard, _enemy_unit = _battle_state(
         gsc_unit_id=NEOPHYTE_UNIT_ID,
@@ -1496,6 +1536,8 @@ def test_marker_ingress_sets_up_cult_ambush_unit_in_first_round() -> None:
         request=ingress_request,
         selected_option_id=ingress_option.option_id,
     )
+    decisions.request_decision(ingress_request)
+    decisions.submit_result(ingress_result)
     assert apply_cult_ambush_marker_ingress_selection(
         TurnEndResultContext(
             state=state,
@@ -1556,6 +1598,30 @@ def test_marker_ingress_sets_up_cult_ambush_unit_in_first_round() -> None:
     assert arrived_state.arrived_battle_round == 1
     assert state.battlefield_state is not None
     assert state.battlefield_state.unit_placement_by_id(replacement.unit_instance_id)
+    destroyed_unit = _unit_by_id(state, ACOLYTE_UNIT_ID)
+    state.replace_battlefield_state(
+        state.battlefield_state.with_unplaced_models_marked_removed(
+            tuple(model.model_instance_id for model in destroyed_unit.own_models)
+        )
+    )
+    lifecycle = GameLifecycle(state=state, decision_controller=decisions)
+    lifecycle_payload = lifecycle.to_payload()
+    restored = GameLifecycle.from_payload(deepcopy(lifecycle_payload))
+    assert restored.state is not None
+    restored_reserve = restored.state.reserve_state_for_unit(replacement.unit_instance_id)
+    assert restored_reserve is not None
+    assert restored_reserve.status is ReserveStatus.ARRIVED
+    assert restored.state.active_player_id == ENEMY_PLAYER_ID
+    tampered_payload = deepcopy(lifecycle_payload)
+    arrival_event_payload = next(
+        event["payload"]
+        for event in tampered_payload["decisions"]["event_log"]
+        if event["event_type"] == "reinforcement_unit_arrived"
+    )
+    assert isinstance(arrival_event_payload, dict)
+    arrival_event_payload["active_player_id"] = GSC_PLAYER_ID
+    with pytest.raises(GameLifecycleError, match="Cult Ambush arrival source context drift"):
+        GameLifecycle.from_payload(tampered_payload)
 
 
 def test_invalid_marker_ingress_placement_records_retry_without_arrival() -> None:
@@ -1594,6 +1660,8 @@ def test_invalid_marker_ingress_placement_records_retry_without_arrival() -> Non
         request=ingress_request,
         selected_option_id=_option_by_selection(ingress_request, "ingress").option_id,
     )
+    decisions.request_decision(ingress_request)
+    decisions.submit_result(ingress_result)
     assert apply_cult_ambush_marker_ingress_selection(
         TurnEndResultContext(
             state=state,

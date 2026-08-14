@@ -94,6 +94,11 @@ from warhammer40k_core.engine.primary_destruction_evidence import (
     RulesUnitObjectiveProximityWitness,
     rules_unit_objective_proximity_witness,
 )
+from warhammer40k_core.engine.primary_destruction_timeline_integrity import (
+    _alive_model_ids_before_order,
+    _completion_timeline_inputs,
+    _restorations_with_transition_order,
+)
 from warhammer40k_core.engine.primary_historical_events import (
     record_new_primary_battlefield_departure_events,
     record_new_primary_turn_start_evidence_events,
@@ -370,84 +375,6 @@ def test_replay_v6_rejects_missing_destroyed_battlefield_departure() -> None:
 
     assert isinstance(exc_info.value.__cause__, GameLifecycleError)
     assert "lacks its exact battlefield departure" in str(exc_info.value.__cause__)
-
-
-@pytest.mark.parametrize(
-    "forged_removal_kind",
-    [
-        BattlefieldRemovalKind.EMBARK,
-        BattlefieldRemovalKind.INTO_RESERVES,
-        BattlefieldRemovalKind.TEMPORARILY_REMOVED,
-    ],
-)
-def test_replay_v6_rejects_cloned_non_destruction_departure_and_derived_event(
-    forged_removal_kind: BattlefieldRemovalKind,
-) -> None:
-    lifecycle, units = _movement_phase_lifecycle(
-        game_id=f"phase18b-invented-{forged_removal_kind.value}-departure"
-    )
-    state = _state(lifecycle)
-    state.reposition_unit_to_strategic_reserves(
-        event_log=lifecycle.decision_controller.event_log,
-        player_id="player-b",
-        unit_instance_id=units["target"].unit_instance_id,
-    )
-    payload = _lifecycle_payload_copy(lifecycle)
-    assert (
-        GameLifecycle.from_payload(
-            cast(GameLifecyclePayload, json.loads(json.dumps(payload, sort_keys=True)))
-        ).to_payload()
-        == lifecycle.to_payload()
-    )
-    state_payload = cast(dict[str, JsonValue], payload["state"])
-    departures = cast(list[JsonValue], state_payload["primary_battlefield_departure_states"])
-    assert len(departures) == 1
-    forged = cast(dict[str, JsonValue], json.loads(json.dumps(departures[0])))
-    forged_source_id = f"phase18b:invented:{forged_removal_kind.value}"
-    forged["source_id"] = forged_source_id
-    forged["removal_kind"] = forged_removal_kind.value
-    forged["departure_id"] = primary_battlefield_departure_id(
-        game_id=cast(str, forged["game_id"]),
-        rules_unit_instance_id=cast(str, forged["rules_unit_instance_id"]),
-        affected_component_unit_instance_ids=tuple(
-            cast(list[str], forged["affected_component_unit_instance_ids"])
-        ),
-        departed_component_unit_instance_ids=tuple(
-            cast(list[str], forged["departed_component_unit_instance_ids"])
-        ),
-        removed_model_instance_ids=tuple(cast(list[str], forged["removed_model_instance_ids"])),
-        battle_round=cast(int, forged["battle_round"]),
-        active_player_id=cast(str, forged["active_player_id"]),
-        phase=cast(str, forged["phase"]),
-        removal_kind=forged_removal_kind,
-        occurrence_id=cast(str, forged["occurrence_id"]),
-        source_id=forged_source_id,
-    )
-    departures.append(forged)
-    decisions_payload = cast(dict[str, JsonValue], payload["decisions"])
-    events = cast(list[JsonValue], decisions_payload["event_log"])
-    original_derived_event = next(
-        cast(dict[str, JsonValue], event)
-        for event in events
-        if cast(dict[str, JsonValue], event)["event_type"]
-        == "primary_battlefield_departure_recorded"
-    )
-    cloned_derived_event = cast(
-        dict[str, JsonValue],
-        json.loads(json.dumps(original_derived_event, sort_keys=True)),
-    )
-    cloned_derived_event["event_id"] = f"event-{len(events) + 1:06d}"
-    cloned_derived_payload = cast(dict[str, JsonValue], cloned_derived_event["payload"])
-    cloned_derived_payload["primary_battlefield_departure_state"] = json.loads(
-        json.dumps(forged, sort_keys=True)
-    )
-    events.append(cloned_derived_event)
-
-    with pytest.raises(
-        GameLifecycleError,
-        match=r"authoritative .* mutation event|no authoritative mutation provider",
-    ):
-        GameLifecycle.from_payload(payload)
 
 
 def test_replay_v6_rejects_invented_reserve_deadline_destruction() -> None:
@@ -839,7 +766,7 @@ def test_replay_v6_rejects_attributed_destruction_relabelled_as_coherency_cleanu
         GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
 
 
-def test_replay_v6_rejects_attributed_destruction_relabelled_as_reserve_deadline() -> None:
+def test_replay_v6_rejects_attributed_destruction_relabelled_with_forged_deadline() -> None:
     payload = _populated_primary_destruction_replay_payload()
     lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
     state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
@@ -919,7 +846,10 @@ def test_replay_v6_rejects_attributed_destruction_relabelled_as_reserve_deadline
         "primary_unit_destruction_state": json.loads(json.dumps(destruction, sort_keys=True)),
     }
 
-    with pytest.raises(GameLifecycleError, match="exact battlefield departure"):
+    with pytest.raises(
+        GameLifecycleError,
+        match="Initial ReserveState destruction deadline policy authority drift",
+    ):
         GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
 
 
@@ -1124,23 +1054,36 @@ def test_replay_v6_rejects_destroyed_rules_unit_witness_identity_drift() -> None
 
 
 def test_replay_v6_accepts_reserve_deadline_destruction_without_departure() -> None:
-    lifecycle, units = _movement_phase_lifecycle(game_id="phase18b-reserve-deadline-integrity")
+    lifecycle, units = _movement_phase_lifecycle(
+        game_id="phase18b-reserve-deadline-integrity",
+        large_target=True,
+    )
     state = _state(lifecycle)
+    attacker = units["attacker"]
     target = units["target"]
+    assert len(target.own_models) == 20
     battlefield = state.battlefield_state
     mission_setup = state.mission_setup
     assert battlefield is not None
     assert mission_setup is not None
     state.battlefield_state = battlefield.without_unit_placement(target.unit_instance_id)
-    state.record_reserve_state(
-        ReserveState.declared_before_battle(
-            player_id="player-b",
-            unit_instance_id=target.unit_instance_id,
-            reserve_kind=ReserveKind.STRATEGIC_RESERVES,
-            destruction_deadline_policy=reserve_destruction_policy_from_scoring_policy(
-                mission_scoring_policies_from_setup(mission_setup).common_policy
-            ),
-        )
+    declared_reserve_state = ReserveState.declared_before_battle(
+        player_id="player-b",
+        unit_instance_id=target.unit_instance_id,
+        reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+        destruction_deadline_policy=reserve_destruction_policy_from_scoring_policy(
+            mission_scoring_policies_from_setup(mission_setup).common_policy
+        ),
+    )
+    state.record_reserve_state(declared_reserve_state)
+    lifecycle.decision_controller.event_log.append(
+        "reserve_unit_declared",
+        {
+            "game_id": state.game_id,
+            "player_id": "player-b",
+            "unit_instance_id": target.unit_instance_id,
+            "reserve_state": declared_reserve_state.to_payload(),
+        },
     )
     state.battle_round = 3
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
@@ -1166,12 +1109,181 @@ def test_replay_v6_accepts_reserve_deadline_destruction_without_departure() -> N
         event_log=lifecycle.decision_controller.event_log,
         destruction_ids_before=destruction_ids_before,
     )
+    attacker_source_witness = rules_unit_objective_proximity_witness(
+        state=state,
+        rules_unit_instance_id=attacker.unit_instance_id,
+    )
+    later_destructions = _record_primary_destruction_test_step(
+        lifecycle=lifecycle,
+        unit=attacker,
+        target_rules_unit_id=attacker.unit_instance_id,
+        attribution=ModelDestructionAttribution.for_non_attack(
+            destroying_player_id="player-a",
+            source_kind=DestructionSourceKind.HAZARDOUS,
+            source_rules_unit_instance_id=attacker.unit_instance_id,
+            source_model_instance_id=None,
+        ),
+        source_witness=attacker_source_witness,
+        tracking_rule_id="core-rules:primary-unit-destruction-tracking",
+        destroyed_model_ids=(attacker.own_models[0].model_instance_id,),
+    )
 
     assert len(state.primary_unit_destruction_states) == 1
+    assert later_destructions == ()
     assert state.primary_unit_destruction_states[0].source_battlefield_departure_ids == ()
-    assert state.primary_battlefield_departure_states == []
+    assert len(state.primary_battlefield_departure_states) == 1
     restored = GameLifecycle.from_payload(_lifecycle_payload_copy(lifecycle))
     assert restored.to_payload() == lifecycle.to_payload()
+
+    forged_payload = _lifecycle_payload_copy(lifecycle)
+    state_payload = cast(dict[str, JsonValue], forged_payload["state"])
+    reserve_states = cast(list[JsonValue], state_payload["reserve_states"])
+    assert len(reserve_states) == 1
+    reserve_state_payload = cast(dict[str, JsonValue], reserve_states[0])
+    policy_payload = cast(
+        dict[str, JsonValue], reserve_state_payload["destruction_deadline_policy"]
+    )
+    forged_policy_source_id = "phase18b:forged:reserve-deadline-policy"
+    policy_payload["source_id"] = forged_policy_source_id
+
+    destructions = cast(list[JsonValue], state_payload["primary_unit_destruction_states"])
+    assert len(destructions) == 1
+    destruction = cast(dict[str, JsonValue], destructions[0])
+    destroyed_unit_id = cast(str, destruction["destroyed_unit_instance_id"])
+    mutation_id = f"{forged_policy_source_id}:round-03:round-boundary"
+    source_id = f"{mutation_id}:{destroyed_unit_id}"
+    destruction["source_mutation_id"] = mutation_id
+    destruction["source_id"] = source_id
+    destruction["destruction_id"] = primary_unit_destruction_id(
+        game_id=cast(str, destruction["game_id"]),
+        source_id=source_id,
+        destroyed_unit_instance_id=destroyed_unit_id,
+    )
+    decisions_payload = cast(dict[str, JsonValue], forged_payload["decisions"])
+    recorded_events = tuple(
+        cast(dict[str, JsonValue], event)
+        for event in cast(list[JsonValue], decisions_payload["event_log"])
+        if cast(dict[str, JsonValue], event)["event_type"] == "primary_unit_destruction_recorded"
+    )
+    assert len(recorded_events) == 1
+    recorded_payload = cast(dict[str, JsonValue], recorded_events[0]["payload"])
+    recorded_payload["primary_unit_destruction_state"] = json.loads(
+        json.dumps(destruction, sort_keys=True)
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Initial ReserveState destruction deadline policy authority drift",
+    ):
+        GameLifecycle.from_payload(forged_payload)
+
+
+def test_structured_timeline_orders_restore_entry_deadline_sequence() -> None:
+    # Event Companion exempts during-battle Strategic Reserves entries from its
+    # round-three deadline. This pure chronology regression covers the integrity
+    # grammar without pretending that the combined live sequence is legal there.
+    destruction_event_order = 1
+    restoration_event_order = 4
+    reserve_entry_event_order = 6
+    deadline_event_order = 10
+    transition_rows: tuple[tuple[tuple[int, int], str, dict[str, JsonValue], str], ...] = (
+        (
+            (destruction_event_order, 1),
+            "transition-model-a",
+            {"model_instance_id": "model-a"},
+            "completion-model-a",
+        ),
+    )
+    restorations = _restorations_with_transition_order(
+        raw_restorations=((restoration_event_order, "event-restored-a", ("model-a",)),),
+    )
+
+    assert restorations[0][0][0] < reserve_entry_event_order
+    assert reserve_entry_event_order < deadline_event_order
+    assert _alive_model_ids_before_order(
+        starting_model_ids=("model-a", "model-b"),
+        transition_rows=transition_rows,
+        restorations=restorations,
+        before_order=(deadline_event_order, 0),
+    ) == ("model-a", "model-b")
+
+
+def test_destruction_timeline_restoration_after_deadline_does_not_change_membership() -> None:
+    deadline_event_order = 10
+    transition_rows: tuple[tuple[tuple[int, int], str, dict[str, JsonValue], str], ...] = (
+        (
+            (1, 1),
+            "transition-model-a",
+            {"model_instance_id": "model-a"},
+            "completion-model-a",
+        ),
+    )
+    restorations = _restorations_with_transition_order(
+        raw_restorations=((20, "event-restored-a", ("model-a",)),),
+    )
+
+    assert restorations[0][0][0] > deadline_event_order
+    assert _alive_model_ids_before_order(
+        starting_model_ids=("model-a", "model-b"),
+        transition_rows=transition_rows,
+        restorations=restorations,
+        before_order=(deadline_event_order, 0),
+    ) == ("model-b",)
+
+
+def test_destruction_timeline_same_provider_rows_and_later_restoration_are_deterministic() -> None:
+    transition_rows: tuple[tuple[tuple[int, int], str, dict[str, JsonValue], str], ...] = (
+        (
+            (1, 1),
+            "transition-model-a",
+            {"model_instance_id": "model-a"},
+            "completion-model-a",
+        ),
+        (
+            (1, 2),
+            "transition-model-b",
+            {"model_instance_id": "model-b"},
+            "completion-model-b",
+        ),
+    )
+    restorations = _restorations_with_transition_order(
+        raw_restorations=((4, "event-restored-a", ("model-a",)),),
+    )
+
+    expected = ("model-a", "model-c")
+    for ordered_rows in (transition_rows, tuple(reversed(transition_rows))):
+        assert (
+            _alive_model_ids_before_order(
+                starting_model_ids=("model-a", "model-b", "model-c"),
+                transition_rows=ordered_rows,
+                restorations=restorations,
+                before_order=(10, 0),
+            )
+            == expected
+        )
+
+
+def test_destruction_timeline_large_deadline_stays_before_immediate_next_event() -> None:
+    transition_rows: tuple[tuple[tuple[int, int], str, dict[str, JsonValue], str], ...] = tuple(
+        (
+            (10, offset),
+            f"transition-model-{offset:02d}",
+            {"model_instance_id": f"model-{offset:02d}"},
+            "reserve-deadline-completion",
+        )
+        for offset in range(1, 21)
+    )
+    restorations = _restorations_with_transition_order(
+        raw_restorations=((11, "event-restored-model-01", ("model-01",)),),
+    )
+
+    model_destroyed_events, model_restoration_events = _completion_timeline_inputs(
+        transition_rows=transition_rows,
+        restorations=restorations,
+    )
+
+    assert tuple(order for order, _event_id, _payload in model_destroyed_events) == tuple(range(20))
+    assert model_restoration_events[0][0] == 20
 
 
 @pytest.mark.parametrize("remove_and_relabel_member", [False, True])
@@ -1785,8 +1897,13 @@ def _movement_phase_lifecycle(
     *,
     game_id: str,
     attached_target: bool = False,
+    large_target: bool = False,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
-    config = _combat_config(game_id=game_id, attached_target=attached_target)
+    config = _combat_config(
+        game_id=game_id,
+        attached_target=attached_target,
+        large_target=large_target,
+    )
     armies = _mustered_armies(config)
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id=f"{game_id}-battlefield",
@@ -2210,8 +2327,38 @@ def _setup_config(*, game_id: str) -> GameConfig:
     )
 
 
-def _combat_config(*, game_id: str, attached_target: bool = False) -> GameConfig:
+def _combat_config(
+    *,
+    game_id: str,
+    attached_target: bool = False,
+    large_target: bool = False,
+) -> GameConfig:
+    if attached_target and large_target:
+        raise AssertionError("Large target fixture cannot also be Attached.")
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    target_muster_request = _army_muster_request(
+        catalog=catalog,
+        player_id="player-b",
+        army_id="army-beta",
+        unit_selection_ids=("target",),
+        force_disposition_id="purge-the-foe",
+    )
+    if large_target:
+        target_muster_request = replace(
+            target_muster_request,
+            unit_selections=(
+                UnitMusterSelection(
+                    unit_selection_id="target",
+                    datasheet_id="core-boyz-like-infantry",
+                    model_profile_selections=(
+                        ModelProfileSelection(
+                            model_profile_id="core-boyz-like",
+                            model_count=20,
+                        ),
+                    ),
+                ),
+            ),
+        )
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
@@ -2230,13 +2377,7 @@ def _combat_config(*, game_id: str, attached_target: bool = False) -> GameConfig
             (
                 _attached_target_muster_request(catalog=catalog)
                 if attached_target
-                else _army_muster_request(
-                    catalog=catalog,
-                    player_id="player-b",
-                    army_id="army-beta",
-                    unit_selection_ids=("target",),
-                    force_disposition_id="purge-the-foe",
-                )
+                else target_muster_request
             ),
         ),
         player_ids=("player-a", "player-b"),

@@ -70,6 +70,7 @@ from warhammer40k_core.engine.damage_allocation import (
     DestructionReactionSource,
     FeelNoPainSource,
 )
+from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.destruction_provenance import ModelDestructionAttribution
 from warhammer40k_core.engine.effects import (
     EffectExpirationBoundary,
@@ -173,6 +174,11 @@ from warhammer40k_core.engine.primary_historical_events import (
 from warhammer40k_core.engine.primary_historical_evidence import (
     validate_primary_historical_evidence_state,
 )
+from warhammer40k_core.engine.primary_reserve_entry_provider import (
+    PrimaryReserveEntryProvider,
+    primary_reserve_entry_requirements,
+    validate_accepted_primary_reserve_entry_provider,
+)
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     build_primary_scoring_spatial_evidence,
 )
@@ -193,6 +199,10 @@ from warhammer40k_core.engine.ranged_attack_history_lineage import (
 )
 from warhammer40k_core.engine.ranged_attack_history_lineage import (
     ranged_attack_history_unit_owner_ids as _ranged_attack_history_unit_owner_ids,
+)
+from warhammer40k_core.engine.reserve_state_attached_split import (
+    arrived_reserve_state_split_successors,
+    transfer_arrived_reserve_state_after_attached_unit_split,
 )
 from warhammer40k_core.engine.reserve_state_queries import (
     reserve_state_for_rules_unit,
@@ -3484,6 +3494,12 @@ class GameState:
         _action_history.interrupt_and_emit_attached_unit_split(
             self, event_log, requested_attached_unit_id, surviving_ids
         )
+        transfer_arrived_reserve_state_after_attached_unit_split(
+            state=self,
+            event_log=event_log,
+            attached_unit_instance_id=requested_attached_unit_id,
+            component_unit_instance_ids=tuple(sorted(recovery_unit_ids)),
+        )
         self._remove_attached_unit_formation(attached_unit_instance_id=requested_attached_unit_id)
         replaced_ids = {*recovery_unit_ids, requested_attached_unit_id}
         self.starting_strength_records = [
@@ -4148,6 +4164,53 @@ class GameState:
                 return
         raise GameLifecycleError("ReserveState does not exist for unit.")
 
+    def replace_arrived_reserve_state_after_attached_unit_split(
+        self,
+        *,
+        source_reserve_state: ReserveState,
+        successor_reserve_states: tuple[ReserveState, ...],
+    ) -> None:
+        """Atomically replace one historical attached-unit arrival with its components."""
+        if type(source_reserve_state) is not ReserveState:
+            raise GameLifecycleError("Attached split reserve source must be a ReserveState.")
+        if type(successor_reserve_states) is not tuple or not successor_reserve_states:
+            raise GameLifecycleError("Attached split reserve successors must be a non-empty tuple.")
+        if any(type(successor) is not ReserveState for successor in successor_reserve_states):
+            raise GameLifecycleError(
+                "Attached split reserve successors must contain ReserveState values."
+            )
+        successor_ids = tuple(successor.unit_instance_id for successor in successor_reserve_states)
+        expected_successors = arrived_reserve_state_split_successors(
+            source_state=source_reserve_state,
+            component_unit_instance_ids=successor_ids,
+        )
+        stored_sources = tuple(
+            stored
+            for stored in self.reserve_states
+            if stored.unit_instance_id == source_reserve_state.unit_instance_id
+        )
+        if stored_sources != (source_reserve_state,):
+            raise GameLifecycleError("Attached split ReserveState source persistence drift.")
+        if any(
+            stored.unit_instance_id in successor_ids
+            for stored in self.reserve_states
+            if stored.unit_instance_id != source_reserve_state.unit_instance_id
+        ):
+            raise GameLifecycleError("Attached split ReserveState successor already exists.")
+        if successor_reserve_states != expected_successors:
+            raise GameLifecycleError("Attached split ReserveState successor identity drift.")
+        self.reserve_states = _validate_reserve_states(
+            [
+                *(
+                    stored
+                    for stored in self.reserve_states
+                    if stored.unit_instance_id != source_reserve_state.unit_instance_id
+                ),
+                *successor_reserve_states,
+            ],
+            player_ids=self.player_ids,
+        )
+
     def record_cult_ambush_marker(self, marker: CultAmbushMarker) -> None:
         if type(marker) is not CultAmbushMarker:
             raise GameLifecycleError("cult_ambush_marker must be a CultAmbushMarker.")
@@ -4187,12 +4250,12 @@ class GameState:
     def reposition_unit_to_strategic_reserves(
         self,
         *,
-        event_log: EventLog,
+        decisions: DecisionController,
         player_id: str,
         unit_instance_id: str,
-        reserve_origin: ReserveOrigin = ReserveOrigin.DURING_BATTLE_OTHER,
-        destruction_deadline_policy: ReserveDestructionTimingPolicy | None = None,
-        source_rule_ids: tuple[str, ...] | None = None,
+        provider: PrimaryReserveEntryProvider,
+        reserve_origin: ReserveOrigin,
+        source_rule_ids: tuple[str, ...],
         required_arrival_battle_round: int | None = None,
         required_arrival_phase: BattlePhase | str | None = None,
         required_arrival_source_rule_id: str | None = None,
@@ -4212,17 +4275,53 @@ class GameState:
             unit_instance_id=requested_unit_id,
         )
         rules_unit_id = rules_unit_view.unit_instance_id
+        if type(provider) is not PrimaryReserveEntryProvider:
+            raise GameLifecycleError("Repositioned units require a typed reserve provider.")
+        if type(decisions) is not DecisionController:
+            raise GameLifecycleError("Repositioned units require DecisionController authority.")
+        validate_accepted_primary_reserve_entry_provider(
+            state=self,
+            decisions=decisions,
+            provider=provider,
+        )
+        requirements = primary_reserve_entry_requirements(
+            state=self,
+            decisions=decisions,
+            provider=provider,
+        )
+        requested_arrival_phase = (
+            None if required_arrival_phase is None else BattlePhase(required_arrival_phase).value
+        )
+        if (
+            required_arrival_battle_round != requirements.required_arrival_battle_round
+            or requested_arrival_phase != requirements.required_arrival_phase
+            or required_arrival_source_rule_id != requirements.required_arrival_source_rule_id
+            or required_arrival_placement_kind != requirements.required_arrival_placement_kind
+        ):
+            raise GameLifecycleError("Repositioned unit required-arrival authority drift.")
         origin = reserve_origin_from_token(reserve_origin)
         if origin not in {
             ReserveOrigin.DURING_BATTLE_ABILITY,
             ReserveOrigin.DURING_BATTLE_STRATAGEM,
-            ReserveOrigin.DURING_BATTLE_OTHER,
         }:
-            raise GameLifecycleError("Repositioned units require a during-battle reserve origin.")
+            raise GameLifecycleError(
+                "Repositioned units require an ability or Stratagem reserve origin."
+            )
+        if (
+            provider.reserve_origin is not origin
+            or provider.player_id != requested_player_id
+            or provider.target_rules_unit_instance_id != rules_unit_id
+            or source_rule_ids != (provider.source_rule_id,)
+        ):
+            raise GameLifecycleError("Repositioned unit reserve provider context drift.")
         if rules_unit_view.owner_player_id != requested_player_id:
             raise GameLifecycleError("Repositioned unit player_id drift.")
-        if self.reserve_state_for_unit(rules_unit_id) is not None:
-            raise GameLifecycleError("Repositioned unit already has a ReserveState.")
+        existing_reserve_state = self.reserve_state_for_unit(rules_unit_id)
+        if existing_reserve_state is not None and existing_reserve_state.status in {
+            ReserveStatus.IN_RESERVES,
+            ReserveStatus.DESTROYED,
+        }:
+            raise GameLifecycleError("Repositioned unit has a non-terminal-arrival ReserveState.")
         rules_unit_placement = RulesUnitPlacement.from_battlefield(
             view=rules_unit_view,
             battlefield_state=self.battlefield_state,
@@ -4234,7 +4333,7 @@ class GameState:
                 embarked_unit_ids.update(cargo_state.embarked_unit_instance_ids)
         policy = _arrival.reposition_destruction_policy(
             mission_setup=self.mission_setup,
-            destruction_deadline_policy=destruction_deadline_policy,
+            destruction_deadline_policy=None,
         )
         reserve_state = ReserveState.entered_during_battle(
             player_id=requested_player_id,
@@ -4252,7 +4351,10 @@ class GameState:
             required_arrival_placement_kind=required_arrival_placement_kind,
         )
         updated_battlefield = rules_unit_placement.without_from_battlefield(self.battlefield_state)
-        self.record_reserve_state(reserve_state)
+        if existing_reserve_state is None:
+            self.record_reserve_state(reserve_state)
+        else:
+            self.replace_reserve_state(reserve_state)
         self.battlefield_state = updated_battlefield
         departure = record_primary_battlefield_departure(
             state=self,
@@ -4263,24 +4365,19 @@ class GameState:
                 placement.model_instance_id for placement in rules_unit_placement.model_placements
             ),
             removal_kind=BattlefieldRemovalKind.INTO_RESERVES,
-            occurrence_id=(
-                f"{self.game_id}:reposition-reserve:round-{self.battle_round:02d}:"
-                f"{current_phase.value}:{rules_unit_id}"
-            ),
-            source_id=(
-                f"{self.game_id}:reposition-reserve:round-{self.battle_round:02d}:"
-                f"{current_phase.value}:{rules_unit_id}"
-            ),
+            occurrence_id=provider.occurrence_id,
+            source_id=provider.occurrence_id,
         )
         if departure is not None:
             record_primary_reserve_entry_mutation_event(
-                event_log=event_log,
+                event_log=decisions.event_log,
                 departure=departure,
                 reserve_state=reserve_state,
+                provider=provider,
                 transition_batch=None,
             )
             record_primary_battlefield_departure_event(
-                event_log=event_log,
+                event_log=decisions.event_log,
                 departure=departure,
             )
         return reserve_state

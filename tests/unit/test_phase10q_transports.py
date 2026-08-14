@@ -86,6 +86,9 @@ from warhammer40k_core.engine.phases.movement import (
     MovementUnitSelection,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.reserve_arrival_requirements import (
+    reposition_destruction_policy,
+)
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.starting_attached_units import (
     starting_attached_unit_records_for_army,
@@ -1494,19 +1497,17 @@ def test_replay_rejects_advanced_state_for_unplaced_unremoved_unembarked_unit() 
     state.battlefield_state = state.battlefield_state.without_unit_placement(
         passenger.unit_instance_id
     )
-    state.record_reserve_state(
-        ReserveState.declared_before_battle(
-            player_id="player-a",
-            unit_instance_id=passenger.unit_instance_id,
-            reserve_kind=ReserveKind.RESERVES,
-        )
+    decisions = _record_declared_reserve_for_replay_fixture(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=passenger.unit_instance_id,
     )
     state.record_advanced_unit_state(_advanced_unit_state(passenger.unit_instance_id))
     payload: GameLifecyclePayload = {
         "config": None,
         "parameterized_movement_proposals": True,
         "state": state.to_payload(),
-        "decisions": DecisionController().to_payload(),
+        "decisions": decisions.to_payload(),
         "reaction_queue": {"frames": []},
     }
 
@@ -1521,12 +1522,10 @@ def test_replay_rejects_fell_back_state_for_unplaced_unremoved_unembarked_unit()
     state.battlefield_state = state.battlefield_state.without_unit_placement(
         passenger.unit_instance_id
     )
-    state.record_reserve_state(
-        ReserveState.declared_before_battle(
-            player_id="player-a",
-            unit_instance_id=passenger.unit_instance_id,
-            reserve_kind=ReserveKind.RESERVES,
-        )
+    decisions = _record_declared_reserve_for_replay_fixture(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=passenger.unit_instance_id,
     )
     state.record_fell_back_unit_state(
         FellBackUnitState(
@@ -1539,7 +1538,7 @@ def test_replay_rejects_fell_back_state_for_unplaced_unremoved_unembarked_unit()
         "config": None,
         "parameterized_movement_proposals": True,
         "state": state.to_payload(),
-        "decisions": DecisionController().to_payload(),
+        "decisions": decisions.to_payload(),
         "reaction_queue": {"frames": []},
     }
 
@@ -3756,6 +3755,35 @@ def _advanced_unit_state(unit_instance_id: str) -> AdvancedUnitState:
             advance_roll=advance_roll,
         ),
     )
+
+
+def _record_declared_reserve_for_replay_fixture(
+    *,
+    state: GameState,
+    player_id: str,
+    unit_instance_id: str,
+) -> DecisionController:
+    decisions = DecisionController()
+    reserve_state = ReserveState.declared_before_battle(
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+        reserve_kind=ReserveKind.RESERVES,
+        destruction_deadline_policy=reposition_destruction_policy(
+            mission_setup=state.mission_setup,
+            destruction_deadline_policy=None,
+        ),
+    )
+    state.record_reserve_state(reserve_state)
+    decisions.event_log.append(
+        "reserve_unit_declared",
+        {
+            "game_id": state.game_id,
+            "player_id": player_id,
+            "unit_instance_id": unit_instance_id,
+            "reserve_state": reserve_state.to_payload(),
+        },
+    )
+    return decisions
 
 
 def _transport_scenario(

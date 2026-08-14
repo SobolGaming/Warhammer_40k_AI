@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
+from typing import cast
 
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
@@ -37,7 +38,7 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
-from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     AttachmentDeclaration,
     DetachmentSelection,
@@ -1087,6 +1088,59 @@ def test_phase16c_reserve_declaration_payloads_round_trip_through_lifecycle_payl
     assert isinstance(reserve_event.payload, dict)
     assert reserve_event.payload["secret"] is True
     assert reserve_event.payload["visibility_source"] == (SetupStep.DECLARE_BATTLE_FORMATIONS.value)
+
+    missing_source_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(declared_payload, sort_keys=True)),
+    )
+    missing_source_event = next(
+        event
+        for event in missing_source_payload["decisions"]["event_log"]
+        if event["event_type"] == "reserve_unit_declared"
+    )
+    missing_source_event["event_type"] = "phase16c_removed_reserve_declaration"
+    with pytest.raises(
+        GameLifecycleError,
+        match="Initial ReserveState requires exactly one declaration evidence route",
+    ):
+        GameLifecycle.from_payload(missing_source_payload)
+
+    duplicate_source_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(declared_payload, sort_keys=True)),
+    )
+    duplicate_events = duplicate_source_payload["decisions"]["event_log"]
+    source_event = next(
+        event for event in duplicate_events if event["event_type"] == "reserve_unit_declared"
+    )
+    duplicate_events.append(
+        {
+            "event_id": f"event-{len(duplicate_events) + 1:06d}",
+            "event_type": source_event["event_type"],
+            "payload": json.loads(json.dumps(source_event["payload"], sort_keys=True)),
+        }
+    )
+    with pytest.raises(GameLifecycleError, match="Initial reserve declaration evidence drift"):
+        GameLifecycle.from_payload(duplicate_source_payload)
+
+    forged_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(declared_payload, sort_keys=True)),
+    )
+    forged_declaration_event = next(
+        event
+        for event in forged_payload["decisions"]["event_log"]
+        if event["event_type"] == "reserve_unit_declared"
+    )
+    assert isinstance(forged_declaration_event["payload"], dict)
+    forged_reserve_state = forged_declaration_event["payload"]["reserve_state"]
+    assert isinstance(forged_reserve_state, dict)
+    forged_policy = forged_reserve_state["destruction_deadline_policy"]
+    assert isinstance(forged_policy, dict)
+    forged_policy["source_id"] = "phase16c:forged:reserve-deadline-policy"
+
+    with pytest.raises(GameLifecycleError, match="Initial reserve declaration evidence drift"):
+        GameLifecycle.from_payload(forged_payload)
 
 
 def test_phase16c_aircraft_and_malformed_submission_errors_are_typed() -> None:

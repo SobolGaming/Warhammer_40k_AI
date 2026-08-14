@@ -20,8 +20,18 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
 from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.reserves import ReserveOrigin
+from warhammer40k_core.engine.primary_historical_events import (
+    primary_reserve_entry_source_terminal_bindings_payload,
+    record_primary_reserve_entry_provider_terminal_event,
+)
+from warhammer40k_core.engine.primary_reserve_entry_provider import (
+    PrimaryReserveEntryAbilityAuthorityKind,
+    PrimaryReserveEntryAbilityProviderDefinition,
+    primary_reserve_entry_provider_from_accepted_ability_decision,
+)
+from warhammer40k_core.engine.reserves import ReserveOrigin, ReserveStatus
 from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
     TurnEndHookBinding,
@@ -44,6 +54,12 @@ from warhammer40k_core.rules.rule_ir import (
 CATALOG_TURN_END_RESERVES_SUBMISSION_KIND = "catalog_ir_turn_end_reserves"
 CATALOG_TURN_END_RESERVES_USED_EVENT = "catalog_ir_turn_end_reserves_used"
 CATALOG_TURN_END_RESERVES_DECLINED_EVENT = "catalog_ir_turn_end_reserves_declined"
+PRIMARY_RESERVE_ENTRY_PROVIDER_DEFINITION = PrimaryReserveEntryAbilityProviderDefinition(
+    provider_id=CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+    source_terminal_event_type=CATALOG_TURN_END_RESERVES_USED_EVENT,
+    authority_kind=PrimaryReserveEntryAbilityAuthorityKind.CATALOG_RULE_IR,
+    terminal_result_identity_keys=("catalog_record_id", "target_unit_instance_id"),
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -178,23 +194,48 @@ class CatalogTurnEndReserveRuntime:
             unit_instance_id=unit_instance_id,
         ):
             raise GameLifecycleError("Catalog turn-end reserve unit is no longer eligible.")
+        target_rules_unit_id = rules_unit_view_from_armies(
+            armies=tuple(context.state.army_definitions),
+            unit_instance_id=unit_instance_id,
+        ).unit_instance_id
+        provider = primary_reserve_entry_provider_from_accepted_ability_decision(
+            state=context.state,
+            decisions=context.decisions,
+            result=context.result,
+            provider_id=CATALOG_IR_CAN_BE_PLACED_IN_RESERVES_CONSUMER_ID,
+            source_rule_id=record.definition.source_id,
+            target_rules_unit_instance_id=target_rules_unit_id,
+            source_terminal_event_type=CATALOG_TURN_END_RESERVES_USED_EVENT,
+        )
         reserve_state = context.state.reposition_unit_to_strategic_reserves(
-            event_log=context.decisions.event_log,
+            decisions=context.decisions,
             player_id=player_id,
             unit_instance_id=unit_instance_id,
+            provider=provider,
             reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
             source_rule_ids=(record.definition.source_id,),
         )
-        context.decisions.event_log.append(
+        source_terminal_event = context.decisions.event_log.append(
             CATALOG_TURN_END_RESERVES_USED_EVENT,
-            _event_payload(
-                context=context,
-                record=record,
-                player_id=player_id,
-                unit_instance_id=unit_instance_id,
-                reserve_state_payload=cast(JsonValue, reserve_state.to_payload()),
-                use_ability=True,
-            ),
+            {
+                **_event_payload(
+                    context=context,
+                    record=record,
+                    player_id=player_id,
+                    unit_instance_id=unit_instance_id,
+                    reserve_state_payload=cast(JsonValue, reserve_state.to_payload()),
+                    use_ability=True,
+                ),
+                **primary_reserve_entry_source_terminal_bindings_payload(
+                    ((provider, reserve_state),)
+                ),
+            },
+        )
+        record_primary_reserve_entry_provider_terminal_event(
+            event_log=context.decisions.event_log,
+            provider=provider,
+            reserve_state=reserve_state,
+            source_terminal_event=source_terminal_event,
         )
         return True
 
@@ -349,7 +390,8 @@ def _unit_can_enter_strategic_reserves(
         raise GameLifecycleError("Catalog turn-end reserves require GameState.")
     if state.battlefield_state is None:
         raise GameLifecycleError("Catalog turn-end reserves require battlefield_state.")
-    if state.reserve_state_for_unit(unit_instance_id) is not None:
+    reserve_state = state.reserve_state_for_unit(unit_instance_id)
+    if reserve_state is not None and reserve_state.status is not ReserveStatus.ARRIVED:
         return False
     if not state.battlefield_state.is_unit_placed(unit_instance_id):
         return False

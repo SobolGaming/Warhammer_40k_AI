@@ -37,10 +37,7 @@ PRIMARY_DESTRUCTION_LEFT_BATTLEFIELD_BY_CALLER = {
 PRIMARY_BATTLEFIELD_DEPARTURE_CALLS = {
     "src/warhammer40k_core/engine/game_state.py": (
         "BattlefieldRemovalKind.INTO_RESERVES",
-        (
-            "f'{self.game_id}:reposition-reserve:round-{self.battle_round:02d}:"
-            "{current_phase.value}:{rules_unit_id}'"
-        ),
+        "provider.occurrence_id",
     ),
     "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": (
         "BattlefieldRemovalKind.EMBARK",
@@ -56,10 +53,7 @@ PRIMARY_BATTLEFIELD_DEPARTURE_CALLS = {
     ),
 }
 PRIMARY_BATTLEFIELD_DEPARTURE_OCCURRENCES = {
-    "src/warhammer40k_core/engine/game_state.py": (
-        "f'{self.game_id}:reposition-reserve:round-{self.battle_round:02d}:"
-        "{current_phase.value}:{rules_unit_id}'"
-    ),
+    "src/warhammer40k_core/engine/game_state.py": "provider.occurrence_id",
     "src/warhammer40k_core/engine/phases/movement_fall_back_embark.py": "result.result_id",
     "src/warhammer40k_core/engine/phases/movement_resolution_flow.py": "result.result_id",
     "src/warhammer40k_core/engine/primary_unit_destruction_tracking.py": ("edge_occurrence_id"),

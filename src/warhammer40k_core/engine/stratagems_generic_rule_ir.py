@@ -53,9 +53,9 @@ def _require_target_unit_id(binding: StratagemTargetBinding) -> str:
 
 
 def _generic_rule_ir_from_stratagem_payload(effect_payload: JsonValue) -> object:
-    from warhammer40k_core.engine.rule_execution import rule_ir_from_execution_payload
+    from warhammer40k_core.engine.rule_execution import scoped_rule_ir_from_execution_payload
 
-    return rule_ir_from_execution_payload(effect_payload)
+    return scoped_rule_ir_from_execution_payload(effect_payload)
 
 
 def _apply_generic_rule_ir_stratagem_handler(
@@ -74,10 +74,10 @@ def _apply_generic_rule_ir_stratagem_handler(
         RuleExecutionContext,
         RuleExecutionStatus,
         execute_rule_ir,
-        rule_ir_from_execution_payload,
+        scoped_rule_ir_from_execution_payload,
     )
 
-    rule_ir = rule_ir_from_execution_payload(definition.effect_payload)
+    rule_ir = scoped_rule_ir_from_execution_payload(definition.effect_payload)
     rule_result = execute_rule_ir(
         rule_ir=rule_ir,
         context=RuleExecutionContext(
@@ -88,7 +88,10 @@ def _apply_generic_rule_ir_stratagem_handler(
             active_player_id=context.active_player_id,
             timing_window_id=context.timing_window_id,
             source_unit_instance_id=_single_target_unit_id_or_none(use_record),
-            target_unit_instance_ids=_meta.generic_rule_ir_execution_target_unit_ids(use_record),
+            target_unit_instance_ids=_meta.generic_rule_ir_execution_target_unit_ids(
+                state=state,
+                use_record=use_record,
+            ),
             target_player_id=target_binding.target_player_id,
             trigger_payload=_generic_stratagem_rule_trigger_payload(
                 context=context,
@@ -746,6 +749,19 @@ def _request_generic_rule_ir_strategic_reserves_placement(
                     "stratagem_handler_id": GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
                     "stratagem_use": validate_json_value(use_record.to_payload()),
                     "reserve_state": validate_json_value(reserve_state.to_payload()),
+                    "component_unit_instance_ids": list(
+                        _unit_for_reserve_state(
+                            state=state,
+                            reserve_state=reserve_state,
+                        ).component_unit_instance_ids
+                    ),
+                    "model_instance_ids": sorted(
+                        model.model_instance_id
+                        for model in _unit_for_reserve_state(
+                            state=state,
+                            reserve_state=reserve_state,
+                        ).alive_models()
+                    ),
                     "from_start_of_battle": True,
                     "mark_movement_phase_reinforcement_arrival": (
                         context.active_player_id == context.player_id
@@ -773,6 +789,7 @@ def _request_generic_rule_ir_strategic_reserves_placement(
             "request_id": request.request_id,
             "source_decision_request_id": use_record.request_id,
             "source_decision_result_id": use_record.result_id,
+            "spatial_context_hash": proposal_request.spatial_context_hash,
             "stratagem_use_id": use_record.use_id,
             "phase_body_status": "generic_rule_ir_placement_proposal_required",
         },

@@ -243,6 +243,7 @@ def _request_rapid_ingress_placement_retry(
             "request_id": request.request_id,
             "source_decision_request_id": retry_proposal.source_decision_request_id,
             "source_decision_result_id": retry_proposal.source_decision_result_id,
+            "spatial_context_hash": retry_proposal.spatial_context_hash,
             "previous_proposal_request_id": proposal_request.request_id,
             "rejected_result_id": rejected_result.result_id,
             "phase_body_status": "rapid_ingress_placement_proposal_required",

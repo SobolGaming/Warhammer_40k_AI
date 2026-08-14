@@ -54,6 +54,11 @@ class _ScoringRulesUnitIdentity(Protocol):
     def starting_model_instance_ids(self) -> tuple[str, ...]: ...
 
 
+type _TimelineOrder = tuple[int, int]
+type _TransitionRow = tuple[_TimelineOrder, str, dict[str, JsonValue], str]
+type _RestorationRow = tuple[_TimelineOrder, str, tuple[str, ...]]
+
+
 def validate_full_destruction_transition_timeline(
     *,
     state: GameState,
@@ -73,16 +78,10 @@ def validate_full_destruction_transition_timeline(
         start_order_exclusive=-1,
         decision_records=decision_records,
     )
-    stride = max(
-        16,
-        2
-        + sum(
-            len(departure.removed_model_instance_ids)
-            for departure in departures
-            if departure.removal_kind is BattlefieldRemovalKind.DESTROYED
-        ),
+    restorations = _restorations_with_transition_order(
+        raw_restorations=raw_restorations,
     )
-    transition_rows: list[tuple[int, str, dict[str, JsonValue], str]] = []
+    transition_rows: list[_TransitionRow] = []
     rows_by_event_order: dict[int, list[tuple[PrimaryBattlefieldDepartureState, str]]] = {}
     for departure in departures:
         if departure.removal_kind is not BattlefieldRemovalKind.DESTROYED:
@@ -102,7 +101,7 @@ def validate_full_destruction_transition_timeline(
             transition_id = f"primary-transition:{departure.departure_id}:{model_id}"
             transition_rows.append(
                 (
-                    event_order * stride + offset,
+                    (event_order, offset),
                     transition_id,
                     {
                         "game_id": state.game_id,
@@ -120,8 +119,7 @@ def validate_full_destruction_transition_timeline(
         event_records=event_records,
         event_index_by_id=event_index_by_id,
         prior_transition_rows=tuple(transition_rows),
-        raw_restorations=raw_restorations,
-        stride=stride,
+        restorations=restorations,
     )
     transition_rows.extend(reserve_rows)
     transition_rows.sort(key=lambda value: value[0])
@@ -130,17 +128,14 @@ def validate_full_destruction_transition_timeline(
     completion_key_by_transition_id = {row[1]: row[3] for row in transition_rows}
     if len(completion_key_by_transition_id) != len(transition_rows):
         raise GameLifecycleError("Primary destruction transition IDs must be unique.")
-    scaled_restorations = tuple(
-        (event_order * stride, event_id, model_ids)
-        for event_order, event_id, model_ids in raw_restorations
+    model_destroyed_events, model_restoration_events = _completion_timeline_inputs(
+        transition_rows=tuple(transition_rows),
+        restorations=restorations,
     )
     completions = unit_destruction_completion_events_from_starting_presence(
         state=state,
-        model_destroyed_events=tuple(
-            (order, transition_id, payload)
-            for order, transition_id, payload, _completion_key in transition_rows
-        ),
-        model_restoration_events=scaled_restorations,
+        model_destroyed_events=model_destroyed_events,
+        model_restoration_events=model_restoration_events,
     )
     observed = tuple(
         sorted(
@@ -173,10 +168,9 @@ def _validated_reserve_deadline_transition_rows(
     identities_by_id: Mapping[str, _ScoringRulesUnitIdentity],
     event_records: tuple[EventRecord, ...],
     event_index_by_id: dict[str, int],
-    prior_transition_rows: tuple[tuple[int, str, dict[str, JsonValue], str], ...],
-    raw_restorations: tuple[tuple[int, str, tuple[str, ...]], ...],
-    stride: int,
-) -> list[tuple[int, str, dict[str, JsonValue], str]]:
+    prior_transition_rows: tuple[_TransitionRow, ...],
+    restorations: tuple[_RestorationRow, ...],
+) -> list[_TransitionRow]:
     from warhammer40k_core.engine.reserves import ReserveState, ReserveStatus
 
     destruction_event_order_by_id = _recorded_destruction_event_order_by_id(
@@ -188,7 +182,7 @@ def _validated_reserve_deadline_transition_rows(
         for unit in army.units
         for model in unit.own_models
     }
-    reserve_rows: list[tuple[int, str, dict[str, JsonValue], str]] = []
+    reserve_rows: list[_TransitionRow] = []
     for destruction in destructions:
         if destruction.unattributed_cause is not (
             PrimaryUnattributedDestructionCause.RESERVE_DEADLINE
@@ -244,8 +238,8 @@ def _validated_reserve_deadline_transition_rows(
         alive_model_ids = _alive_model_ids_before_order(
             starting_model_ids=identity.starting_model_instance_ids,
             transition_rows=prior_transition_rows,
-            restorations=raw_restorations,
-            before_order=event_order * stride,
+            restorations=restorations,
+            before_order=(event_order, 0),
         )
         if not alive_model_ids:
             raise GameLifecycleError(
@@ -260,7 +254,7 @@ def _validated_reserve_deadline_transition_rows(
             transition_id = f"primary-reserve-transition:{destruction.destruction_id}:{model_id}"
             reserve_rows.append(
                 (
-                    event_order * stride + offset,
+                    (event_order, offset),
                     transition_id,
                     {
                         "game_id": state.game_id,
@@ -273,15 +267,61 @@ def _validated_reserve_deadline_transition_rows(
     return reserve_rows
 
 
+def _restorations_with_transition_order(
+    *,
+    raw_restorations: tuple[tuple[int, str, tuple[str, ...]], ...],
+) -> tuple[_RestorationRow, ...]:
+    """Represent restoration records in the shared structured timeline order."""
+    return tuple(
+        ((event_order, 0), event_id, model_ids)
+        for event_order, event_id, model_ids in raw_restorations
+    )
+
+
+def _completion_timeline_inputs(
+    *,
+    transition_rows: tuple[_TransitionRow, ...],
+    restorations: tuple[_RestorationRow, ...],
+) -> tuple[
+    tuple[tuple[int, str, dict[str, JsonValue]], ...],
+    tuple[tuple[int, str, tuple[str, ...]], ...],
+]:
+    """Assign dense integer ranks only at the completion-helper boundary."""
+    timeline_orders = tuple(row[0] for row in transition_rows) + tuple(
+        restoration[0] for restoration in restorations
+    )
+    if len(set(timeline_orders)) != len(timeline_orders):
+        raise GameLifecycleError("Primary destruction transition ordering is ambiguous.")
+    rank_by_order = {
+        timeline_order: rank for rank, timeline_order in enumerate(sorted(timeline_orders))
+    }
+    return (
+        tuple(
+            (rank_by_order[order], transition_id, payload)
+            for order, transition_id, payload, _completion_key in sorted(
+                transition_rows,
+                key=lambda row: row[0],
+            )
+        ),
+        tuple(
+            (rank_by_order[order], event_id, model_ids)
+            for order, event_id, model_ids in sorted(
+                restorations,
+                key=lambda row: row[0],
+            )
+        ),
+    )
+
+
 def _alive_model_ids_before_order(
     *,
     starting_model_ids: tuple[str, ...],
-    transition_rows: tuple[tuple[int, str, dict[str, JsonValue], str], ...],
-    restorations: tuple[tuple[int, str, tuple[str, ...]], ...],
-    before_order: int,
+    transition_rows: tuple[_TransitionRow, ...],
+    restorations: tuple[_RestorationRow, ...],
+    before_order: _TimelineOrder,
 ) -> tuple[str, ...]:
     alive = dict.fromkeys(starting_model_ids, True)
-    timeline: list[tuple[int, str, tuple[str, ...]]] = [
+    timeline: list[tuple[_TimelineOrder, str, tuple[str, ...]]] = [
         (
             order,
             "destroyed",

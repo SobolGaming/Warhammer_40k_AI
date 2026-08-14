@@ -11,6 +11,10 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
 )
+from warhammer40k_core.engine.primary_reserve_entry_provider import (
+    PRIMARY_RESERVE_ENTRY_PROVIDER_RESOLVED_EVENT,
+    PrimaryReserveEntryProvider,
+)
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartSnapshot,
 )
@@ -26,6 +30,7 @@ if TYPE_CHECKING:
 
 PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT = "primary_battlefield_departure_recorded"
 PRIMARY_RESERVE_ENTRY_MUTATION_EVENT = "primary_reserve_entry_mutated"
+PRIMARY_RESERVE_ENTRY_SOURCE_BINDINGS_KEY = "primary_reserve_entry_bindings"
 PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT = "primary_turn_start_evidence_recorded"
 PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT = "primary_unit_destruction_recorded"
 
@@ -90,6 +95,7 @@ def record_primary_reserve_entry_mutation_event(
     event_log: EventLog,
     departure: PrimaryBattlefieldDepartureState,
     reserve_state: ReserveState,
+    provider: PrimaryReserveEntryProvider | None = None,
     transition_batch: BattlefieldTransitionBatch | None,
 ) -> EventRecord:
     """Record the engine-owned reserve mutation that precedes derived departure evidence."""
@@ -108,6 +114,18 @@ def record_primary_reserve_entry_mutation_event(
         or reserve_state.entered_reserves_phase != departure.phase
     ):
         raise GameLifecycleError("Reserve-entry mutation identity drifted from its departure.")
+    if transition_batch is None:
+        if type(provider) is not PrimaryReserveEntryProvider or (
+            provider.player_id != departure.owner_player_id
+            or provider.target_rules_unit_instance_id != departure.rules_unit_instance_id
+            or provider.occurrence_id != departure.occurrence_id
+            or departure.source_id != provider.occurrence_id
+            or reserve_state.reserve_origin is not provider.reserve_origin
+            or reserve_state.source_rule_ids != (provider.source_rule_id,)
+        ):
+            raise GameLifecycleError("Reserve-entry mutation provider identity drift.")
+    elif provider is not None:
+        raise GameLifecycleError("Aircraft reserve-entry mutation cannot name an ability provider.")
     transition_payload: JsonValue = None
     if transition_batch is not None:
         if type(transition_batch) is not BattlefieldTransitionBatch:
@@ -134,8 +152,87 @@ def record_primary_reserve_entry_mutation_event(
             "occurrence_id": departure.occurrence_id,
             "source_id": departure.source_id,
             "removed_model_instance_ids": list(departure.removed_model_instance_ids),
+            "provider": None if provider is None else provider.to_payload(),
             "reserve_entry_state": reserve_entry,
             "transition_batch": transition_payload,
+        },
+    )
+
+
+def primary_reserve_entry_source_terminal_bindings_payload(
+    entries: tuple[tuple[PrimaryReserveEntryProvider, ReserveState], ...],
+) -> dict[str, JsonValue]:
+    """Build the standardized binding carried by a real source terminal event."""
+    if type(entries) is not tuple or not entries:
+        raise GameLifecycleError("Reserve-entry source terminal requires provider entries.")
+    bindings: list[JsonValue] = []
+    occurrence_ids: set[str] = set()
+    for provider, reserve_state in entries:
+        if (
+            type(provider) is not PrimaryReserveEntryProvider
+            or type(reserve_state) is not ReserveState
+        ):
+            raise GameLifecycleError("Reserve-entry source terminal entries must be typed.")
+        if (
+            provider.player_id != reserve_state.player_id
+            or provider.target_rules_unit_instance_id != reserve_state.unit_instance_id
+            or provider.reserve_origin is not reserve_state.reserve_origin
+            or reserve_state.source_rule_ids != (provider.source_rule_id,)
+        ):
+            raise GameLifecycleError("Reserve-entry source terminal binding identity drift.")
+        if provider.occurrence_id in occurrence_ids:
+            raise GameLifecycleError("Reserve-entry source terminal occurrence is duplicated.")
+        occurrence_ids.add(provider.occurrence_id)
+        bindings.append(
+            {
+                "occurrence_id": provider.occurrence_id,
+                "provider": provider.to_payload(),
+                "reserve_entry_state": reserve_entry_evidence_payload(reserve_state),
+            }
+        )
+    return {PRIMARY_RESERVE_ENTRY_SOURCE_BINDINGS_KEY: bindings}
+
+
+def record_primary_reserve_entry_provider_terminal_event(
+    *,
+    event_log: EventLog,
+    provider: PrimaryReserveEntryProvider,
+    reserve_state: ReserveState,
+    source_terminal_event: EventRecord,
+) -> EventRecord:
+    """Close one provider occurrence after its real semantic terminal event."""
+    _require_event_log(event_log)
+    if (
+        type(provider) is not PrimaryReserveEntryProvider
+        or type(reserve_state) is not ReserveState
+        or type(source_terminal_event) is not EventRecord
+    ):
+        raise GameLifecycleError("Reserve-entry provider terminal requires typed evidence.")
+    if source_terminal_event.event_type != provider.source_terminal_event_type:
+        raise GameLifecycleError("Reserve-entry source terminal event type drift.")
+    if source_terminal_event not in event_log.records:
+        raise GameLifecycleError("Reserve-entry source terminal is not in the event log.")
+    expected_payload = primary_reserve_entry_source_terminal_bindings_payload(
+        ((provider, reserve_state),)
+    )
+    raw_expected_bindings = expected_payload[PRIMARY_RESERVE_ENTRY_SOURCE_BINDINGS_KEY]
+    if not isinstance(raw_expected_bindings, list) or len(raw_expected_bindings) != 1:
+        raise GameLifecycleError("Reserve-entry source terminal binding builder drift.")
+    expected_binding = raw_expected_bindings[0]
+    source_payload = source_terminal_event.payload
+    if not isinstance(source_payload, dict):
+        raise GameLifecycleError("Reserve-entry source terminal payload must be an object.")
+    raw_bindings = source_payload.get(PRIMARY_RESERVE_ENTRY_SOURCE_BINDINGS_KEY)
+    if not isinstance(raw_bindings, list) or raw_bindings.count(expected_binding) != 1:
+        raise GameLifecycleError("Reserve-entry source terminal lacks its exact provider binding.")
+    return event_log.append(
+        PRIMARY_RESERVE_ENTRY_PROVIDER_RESOLVED_EVENT,
+        {
+            "occurrence_id": provider.occurrence_id,
+            "provider": provider.to_payload(),
+            "reserve_entry_state": reserve_entry_evidence_payload(reserve_state),
+            "source_terminal_event_id": source_terminal_event.event_id,
+            "source_terminal_event_type": source_terminal_event.event_type,
         },
     )
 
@@ -327,13 +424,16 @@ def _identifier_set(value: object, *, field_name: str) -> set[str]:
 __all__ = (
     "PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT",
     "PRIMARY_RESERVE_ENTRY_MUTATION_EVENT",
+    "PRIMARY_RESERVE_ENTRY_SOURCE_BINDINGS_KEY",
     "PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT",
     "PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT",
+    "primary_reserve_entry_source_terminal_bindings_payload",
     "record_new_primary_battlefield_departure_events",
     "record_new_primary_turn_start_evidence_events",
     "record_new_primary_unit_destruction_events",
     "record_primary_battlefield_departure_event",
     "record_primary_reserve_entry_mutation_event",
+    "record_primary_reserve_entry_provider_terminal_event",
     "record_primary_turn_start_evidence_event",
     "record_primary_unit_destruction_event",
     "reserve_entry_evidence_payload",

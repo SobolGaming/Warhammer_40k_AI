@@ -2,6 +2,7 @@
 # pyright: reportUnusedImport=false
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR
@@ -58,7 +59,76 @@ __all__ = (
     "_stratagem_affected_unit_ids",
     "_stratagem_targeted_unit_ids",
     "_unit_has_runtime_attached_role",
+    "derive_recorded_stratagem_use_unit_ids",
+    "derive_stratagem_use_unit_ids",
 )
+
+
+def derive_stratagem_use_unit_ids(
+    *,
+    state: GameState,
+    definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+    effect_selection: JsonValue = None,
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Return the canonical targeted and affected IDs owned by a selection."""
+    return (
+        _stratagem_targeted_unit_ids(
+            state=state,
+            definition=definition,
+            context=context,
+            target_binding=target_binding,
+        ),
+        _stratagem_affected_unit_ids(
+            state=state,
+            definition=definition,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=effect_selection,
+        ),
+    )
+
+
+def derive_recorded_stratagem_use_unit_ids(
+    *,
+    state: GameState,
+    definition: StratagemDefinition,
+    context: StratagemEligibilityContext,
+    target_binding: StratagemTargetBinding | None,
+    effect_selection: JsonValue,
+    recorded_targeted_unit_ids: tuple[str, ...],
+    recorded_affected_unit_ids: tuple[str, ...],
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Re-derive immutable use IDs without recanonicalizing historical topology."""
+    validated_targeted_ids = _validate_stratagem_affected_unit_ids(recorded_targeted_unit_ids)
+    validated_affected_ids = _validate_stratagem_affected_unit_ids(recorded_affected_unit_ids)
+    targeted_ids = _stratagem_targeted_unit_ids(
+        state=state,
+        definition=definition,
+        context=context,
+        target_binding=target_binding,
+        unit_id_resolver=lambda raw_id: _recorded_stratagem_unit_id(
+            state=state,
+            raw_unit_id=raw_id,
+            recorded_unit_ids=validated_targeted_ids,
+        ),
+    )
+    affected_ids = _stratagem_affected_unit_ids(
+        state=state,
+        definition=definition,
+        context=context,
+        target_binding=target_binding,
+        effect_selection=effect_selection,
+        unit_id_resolver=lambda raw_id: _recorded_stratagem_unit_id(
+            state=state,
+            raw_unit_id=raw_id,
+            recorded_unit_ids=validated_affected_ids,
+        ),
+    )
+    if targeted_ids != validated_targeted_ids or affected_ids != validated_affected_ids:
+        raise GameLifecycleError("Recorded Stratagem unit identity set drift.")
+    return targeted_ids, affected_ids
 
 
 def _handler_unavailable_reason(
@@ -306,6 +376,7 @@ def _stratagem_targeted_unit_ids(
     definition: StratagemDefinition,
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding | None,
+    unit_id_resolver: Callable[[str], str] | None = None,
 ) -> tuple[str, ...]:
     raw_unit_ids: list[str] = []
     if target_binding is not None and target_binding.target_unit_instance_id is not None:
@@ -314,9 +385,13 @@ def _stratagem_targeted_unit_ids(
         return ()
     return _validate_stratagem_affected_unit_ids(
         tuple(
-            _canonical_stratagem_affected_unit_id(
-                state=state,
-                unit_instance_id=unit_instance_id,
+            (
+                _canonical_stratagem_affected_unit_id(
+                    state=state,
+                    unit_instance_id=unit_instance_id,
+                )
+                if unit_id_resolver is None
+                else unit_id_resolver(unit_instance_id)
             )
             for unit_instance_id in raw_unit_ids
         )
@@ -330,6 +405,7 @@ def _stratagem_affected_unit_ids(
     context: StratagemEligibilityContext,
     target_binding: StratagemTargetBinding | None,
     effect_selection: JsonValue = None,
+    unit_id_resolver: Callable[[str], str] | None = None,
 ) -> tuple[str, ...]:
     raw_unit_ids: list[str] = []
     if target_binding is not None and target_binding.target_unit_instance_id is not None:
@@ -367,13 +443,39 @@ def _stratagem_affected_unit_ids(
         return ()
     return _validate_stratagem_affected_unit_ids(
         tuple(
-            _canonical_stratagem_affected_unit_id(
-                state=state,
-                unit_instance_id=unit_instance_id,
+            (
+                _canonical_stratagem_affected_unit_id(
+                    state=state,
+                    unit_instance_id=unit_instance_id,
+                )
+                if unit_id_resolver is None
+                else unit_id_resolver(unit_instance_id)
             )
             for unit_instance_id in raw_unit_ids
         )
     )
+
+
+def _recorded_stratagem_unit_id(
+    *,
+    state: GameState,
+    raw_unit_id: str,
+    recorded_unit_ids: tuple[str, ...],
+) -> str:
+    from warhammer40k_core.engine.rules_units import rules_unit_identities_share_lineage
+
+    matches = tuple(
+        recorded_id
+        for recorded_id in recorded_unit_ids
+        if rules_unit_identities_share_lineage(
+            state=state,
+            first_unit_instance_id=raw_unit_id,
+            second_unit_instance_id=recorded_id,
+        )
+    )
+    if len(matches) != 1:
+        raise GameLifecycleError("Recorded Stratagem unit identity is historically ambiguous.")
+    return matches[0]
 
 
 def _canonical_stratagem_affected_unit_id(
@@ -382,17 +484,39 @@ def _canonical_stratagem_affected_unit_id(
     unit_instance_id: str,
 ) -> str:
     requested_unit_id = _validate_identifier("affected_unit_instance_id", unit_instance_id)
-    owner = _rules_unit_owner(state=state, unit_instance_id=requested_unit_id)
-    if owner is None:
-        raise GameLifecycleError("Stratagem affected unit is unknown.")
-    if requested_unit_id.startswith("attached-unit:"):
-        return requested_unit_id
-    attached_unit_id = _attached_unit_id_for_component(
+    from warhammer40k_core.engine.rules_units import current_rules_unit_views_for_identity
+
+    current_views = current_rules_unit_views_for_identity(
         state=state,
         unit_instance_id=requested_unit_id,
     )
-    if attached_unit_id is not None:
-        return attached_unit_id
+    if not current_views:
+        raise GameLifecycleError("Stratagem affected unit has no current rules-unit view.")
+    owners = {view.owner_player_id for view in current_views}
+    if len(owners) != 1:
+        raise GameLifecycleError("Stratagem affected unit owner is ambiguous.")
+    if requested_unit_id.startswith("attached-unit:") or len(current_views) > 1:
+        return requested_unit_id
+    current_view = next(iter(current_views))
+    if (
+        current_view.attached_unit is not None
+        and requested_unit_id in current_view.component_unit_instance_ids
+    ):
+        return current_view.unit_instance_id
+    historical_attached_records = tuple(
+        record
+        for record in state.starting_attached_unit_records
+        if requested_unit_id in record.component_unit_instance_ids
+    )
+    if len(historical_attached_records) > 1:
+        raise GameLifecycleError("Stratagem affected unit attachment lineage is ambiguous.")
+    if not historical_attached_records:
+        starting_strength_attached_id = _attached_unit_id_for_component(
+            state=state,
+            unit_instance_id=requested_unit_id,
+        )
+        if starting_strength_attached_id is not None:
+            return starting_strength_attached_id
     unit = _unit_by_id_or_none(state=state, unit_instance_id=requested_unit_id)
     if unit is not None and _unit_has_keyword(unit, "ATTACHED_UNIT"):
         return requested_unit_id
@@ -780,6 +904,16 @@ def _rules_unit_owner(*, state: GameState, unit_instance_id: str) -> str | None:
     owner = _unit_owner(state=state, unit_instance_id=requested_unit_id)
     if owner is not None:
         return owner
+    historical_owners = {
+        record.player_id
+        for record in state.starting_attached_unit_records
+        if requested_unit_id == record.attached_unit_instance_id
+        or requested_unit_id in record.component_unit_instance_ids
+    }
+    if len(historical_owners) > 1:
+        raise GameLifecycleError("Rules-unit owner identity is ambiguous.")
+    if historical_owners:
+        return next(iter(historical_owners))
     for record in state.starting_strength_records:
         if record.unit_instance_id == requested_unit_id:
             return record.player_id

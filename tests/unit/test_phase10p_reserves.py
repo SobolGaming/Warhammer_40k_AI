@@ -54,6 +54,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
     LifecycleStatusKind,
+    SetupStep,
 )
 from warhammer40k_core.engine.phases.movement import (
     COMPLETE_REINFORCEMENTS_OPTION_ID,
@@ -63,6 +64,14 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseStepKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.reserve_declarations import (
+    apply_reserve_declaration_decision,
+    invalid_reserve_declaration_status,
+    reserve_declaration_request_for_player,
+)
+from warhammer40k_core.engine.reserve_restriction_integrity import (
+    reserve_arrival_restriction_expiry_is_proven,
+)
 from warhammer40k_core.engine.reserves import (
     LARGE_MODEL_STRATEGIC_RESERVE_RESTRICTIONS,
     BattlefieldEdge,
@@ -79,6 +88,7 @@ from warhammer40k_core.engine.reserves import (
     ReservePostArrivalRestriction,
     ReserveState,
     ReserveStatus,
+    ReserveUnitPointValue,
     StrategicReserveDeclaration,
     StrategicReserveRule,
     apply_reinforcement_placement_to_battlefield,
@@ -198,6 +208,41 @@ def test_reinforcements_valid_strategic_reserves_arrival_mutates_state_atomicall
     assert isinstance(transition_batch, dict)
     placements = cast(list[dict[str, object]], transition_batch["placements"])
     assert placements[0]["placement_kind"] == BattlefieldPlacementKind.STRATEGIC_RESERVES.value
+
+
+def test_declared_reserve_arrival_round_trip_rejects_route_event_tamper() -> None:
+    lifecycle = _declared_reserve_arrival_lifecycle()
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+
+    restored = GameLifecycle.from_payload(payload)
+
+    assert restored.state is not None
+    restored_reserve = restored.state.reserve_state_for_unit("army-alpha:intercessor-unit-1")
+    assert restored_reserve is not None
+    assert restored_reserve.status is ReserveStatus.ARRIVED
+
+    forged_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    matching_arrivals = tuple(
+        event
+        for event in forged_payload["decisions"]["event_log"]
+        if event["event_type"] == "reinforcement_unit_arrived"
+    )
+    assert len(matching_arrivals) == 1
+    arrival_payload = matching_arrivals[0]["payload"]
+    assert isinstance(arrival_payload, dict)
+    arrival_payload["phase_body_status"] = "forged_initial_arrival_status"
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="Reserve arrival route event authority drift",
+    ):
+        GameLifecycle.from_payload(forged_payload)
 
 
 def test_reinforcements_valid_deep_strike_uses_deep_strike_placement_record() -> None:
@@ -824,6 +869,27 @@ def test_large_model_exception_records_all_turn_restrictions() -> None:
         ReservePostArrivalRestriction.NO_RANGED_ATTACKS,
         ReservePostArrivalRestriction.NO_CHARGE,
     }
+
+
+def test_rapid_ingress_restriction_expiry_uses_arrival_active_player_turn() -> None:
+    state, _scenario, _reserve_state, _reserve_unit = _battle_state_with_reserve()
+    state.battle_round = 3
+    state.active_player_id = "player-a"
+
+    assert not reserve_arrival_restriction_expiry_is_proven(
+        state=state,
+        arrival_active_player_id="player-a",
+        restriction_battle_round=3,
+    )
+
+    # P2's Rapid Ingress during active P1's turn expires when P1's turn ends,
+    # even though the reserve owner is P2 and the battle round has not changed.
+    state.active_player_id = "player-b"
+    assert reserve_arrival_restriction_expiry_is_proven(
+        state=state,
+        arrival_active_player_id="player-a",
+        restriction_battle_round=3,
+    )
 
 
 def test_core_policy_destroys_unarrived_reserves_only_at_end_of_battle() -> None:
@@ -1629,13 +1695,13 @@ def test_phase10p_reserve_type_guards_are_fail_fast() -> None:
     assert (
         arrived_state.clear_expired_post_arrival_restrictions(
             player_id="player-b",
-            battle_round=3,
+            battle_round=2,
         )
         is arrived_state
     )
     assert (
         arrived_state.clear_expired_post_arrival_restrictions(
-            player_id="player-a",
+            player_id="player-b",
             battle_round=3,
         ).post_arrival_restrictions
         == ()
@@ -2070,6 +2136,117 @@ def _battle_state_with_reserve(
     )
     state.record_reserve_state(reserve_state)
     return state, scenario, reserve_state, reserve_unit
+
+
+def _declared_reserve_arrival_lifecycle() -> GameLifecycle:
+    ruleset_descriptor = _chapter_approved_ruleset()
+    reserve_unit_id = "army-alpha:intercessor-unit-1"
+    config = replace(
+        _config(ruleset_descriptor=ruleset_descriptor),
+        reserve_unit_points=(
+            ReserveUnitPointValue(
+                unit_instance_id=reserve_unit_id,
+                points=400,
+                source_id="phase10p:declared-arrival:points",
+            ),
+        ),
+    )
+    armies = _mustered_armies(config)
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    state.setup_step_index = state.setup_sequence.index(SetupStep.DECLARE_BATTLE_FORMATIONS)
+    decisions = DecisionController()
+    declaration_request = reserve_declaration_request_for_player(
+        state=state,
+        config=config,
+        player_id="player-a",
+    )
+    decisions.request_decision(declaration_request)
+    declaration_result = DecisionResult.for_request(
+        result_id="phase10p-declared-arrival-declare",
+        request=declaration_request,
+        selected_option_id=f"declare_strategic_reserves:{reserve_unit_id}",
+    )
+    assert (
+        invalid_reserve_declaration_status(
+            state=state,
+            config=config,
+            request=declaration_request,
+            result=declaration_result,
+        )
+        is None
+    )
+    decisions.submit_result(declaration_result)
+    apply_reserve_declaration_decision(
+        state=state,
+        config=config,
+        request=declaration_request,
+        result=declaration_result,
+        decisions=decisions,
+    )
+
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase10p-declared-arrival-battlefield",
+        armies=armies,
+    )
+    state.record_battlefield_state(
+        scenario.battlefield_state.without_unit_placement(reserve_unit_id)
+    )
+    state.stage = GameLifecycleStage.BATTLE
+    state.setup_step_index = None
+    state.battle_round = 3
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    state.active_player_id = "player-a"
+    state.movement_phase_state = MovementPhaseState(
+        battle_round=3,
+        active_player_id="player-a",
+        selected_unit_ids=("army-alpha:intercessor-unit-2",),
+        moved_unit_ids=("army-alpha:intercessor-unit-2",),
+    )
+    handler = MovementPhaseHandler(ruleset_descriptor=ruleset_descriptor)
+    selection_request = _decision_request(handler.begin_phase(state=state, decisions=decisions))
+    placement_request = _decision_request(
+        _submit_handler_decision(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            request=selection_request,
+            option_id=reserve_unit_id,
+            result_id="phase10p-declared-arrival-select",
+        )
+    )
+    reserve_unit = armies[0].unit_by_id(reserve_unit_id)
+    base_diameter_mm = reserve_unit.own_models[0].base_size.diameter_mm
+    if base_diameter_mm is None:
+        raise AssertionError("declared reserve fixture requires circular model bases")
+    _submit_reserve_placement_payload(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        request=placement_request,
+        reserve_unit=reserve_unit,
+        placement_kind=BattlefieldPlacementKind.STRATEGIC_RESERVES,
+        attempted_placement=_reserve_placement(
+            reserve_unit=reserve_unit,
+            poses=tuple(
+                Pose.at(
+                    x=10.0 + 2.0 * index,
+                    y=_base_radius_inches(base_diameter_mm),
+                    z=0.0,
+                    facing_degrees=0.0,
+                )
+                for index in range(len(reserve_unit.own_models))
+            ),
+        ),
+        result_id="phase10p-declared-arrival-place",
+    )
+    return GameLifecycle(
+        state=state,
+        decision_controller=decisions,
+        _config=config,
+        _movement_phase_handler=handler,
+    )
 
 
 def _set_movement_ready_for_reinforcements(

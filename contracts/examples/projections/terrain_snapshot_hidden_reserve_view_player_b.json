@@ -6983,7 +6983,7 @@
       ],
       "measurement_overlays": [],
       "path_overlays": [],
-      "request_id": "decision-request-000007",
+      "request_id": "decision-request-000006",
       "selected_or_acting_entity_ids": []
     },
     "render": {
@@ -14815,7 +14815,7 @@
       "game_id": "ui-contract-terrain-snapshot-hidden-reserve",
       "phase": "movement"
     },
-    "request_id": "decision-request-000007",
+    "request_id": "decision-request-000006",
     "schema_version": "decision-request-view-v4-phase17n-step3"
   },
   "pending_proposal": null,
@@ -14849,13 +14849,7 @@
         {
           "component_memberships": [
             {
-              "evaluated_model_instance_ids": [
-                "army-beta:intercessor-unit-2:core-intercessor-like:001",
-                "army-beta:intercessor-unit-2:core-intercessor-like:002",
-                "army-beta:intercessor-unit-2:core-intercessor-like:003",
-                "army-beta:intercessor-unit-2:core-intercessor-like:004",
-                "army-beta:intercessor-unit-2:core-intercessor-like:005"
-              ],
+              "evaluated_model_instance_ids": [],
               "logical_terrain_area_ids": [],
               "objective_marker_witnesses": [],
               "unit_instance_id": "army-beta:intercessor-unit-2"
@@ -14869,7 +14863,7 @@
     }
   ],
   "projection_schema": "game-view-v10-phase17n-step3",
-  "projection_state_hash": "c402387fb7d8a1aaff194f7b13b4da8e5f3af92c833e27ed3982ccc501de8b4d",
+  "projection_state_hash": "63f761a4aa92851765b137d12589923f42ddb0e1162a810ebbc5a46323ca9692",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

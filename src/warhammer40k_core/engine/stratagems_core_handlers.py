@@ -613,6 +613,7 @@ def _apply_rapid_ingress_handler(
             "request_id": request.request_id,
             "source_decision_request_id": result.request_id,
             "source_decision_result_id": result.result_id,
+            "spatial_context_hash": proposal_request.spatial_context_hash,
             "stratagem_use_id": use_record.use_id,
             "phase_body_status": "rapid_ingress_placement_proposal_required",
         },
@@ -632,6 +633,7 @@ def _apply_ingress_move_handler(
     reserve_state = _reserve_state_for_target(state=state, target_binding=target_binding)
     if reserve_state.reserve_kind is not ReserveKind.STRATEGIC_RESERVES:
         raise GameLifecycleError("Ingress move requires a Strategic Reserves target.")
+    unit = _unit_for_reserve_state(state=state, reserve_state=reserve_state)
     _ingress_move_effect_payload(definition)
     proposal_request = MovementProposalRequest(
         request_id=state.next_decision_request_id(),
@@ -653,6 +655,10 @@ def _apply_ingress_move_handler(
                     "stratagem_handler_id": GENERIC_INGRESS_MOVE_HANDLER_ID,
                     "stratagem_use": validate_json_value(use_record.to_payload()),
                     "reserve_state": validate_json_value(reserve_state.to_payload()),
+                    "component_unit_instance_ids": list(unit.component_unit_instance_ids),
+                    "model_instance_ids": sorted(
+                        model.model_instance_id for model in unit.alive_models()
+                    ),
                     "from_start_of_battle": True,
                     "mark_movement_phase_reinforcement_arrival": (
                         context.active_player_id == context.player_id
@@ -678,6 +684,7 @@ def _apply_ingress_move_handler(
             "request_id": request.request_id,
             "source_decision_request_id": result.request_id,
             "source_decision_result_id": result.result_id,
+            "spatial_context_hash": proposal_request.spatial_context_hash,
             "stratagem_use_id": use_record.use_id,
             "phase_body_status": "ingress_move_placement_proposal_required",
         },

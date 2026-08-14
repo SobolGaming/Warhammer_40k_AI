@@ -330,6 +330,39 @@ def current_rules_unit_views_for_identity(
     return tuple(sorted(descendants, key=lambda view: view.unit_instance_id))
 
 
+def rules_unit_identities_share_lineage(
+    *,
+    state: GameState,
+    first_unit_instance_id: str,
+    second_unit_instance_id: str,
+) -> bool:
+    """Return whether two identities resolve to an overlapping current rules unit.
+
+    A historical attached identity overlaps each of its current descendants.  Two
+    descendants that split apart do not overlap one another merely because they
+    shared a starting formation.
+    """
+    first_views = current_rules_unit_views_for_identity(
+        state=state,
+        unit_instance_id=first_unit_instance_id,
+    )
+    second_views = current_rules_unit_views_for_identity(
+        state=state,
+        unit_instance_id=second_unit_instance_id,
+    )
+    first_owners = {view.owner_player_id for view in first_views}
+    second_owners = {view.owner_player_id for view in second_views}
+    if len(first_owners) != 1 or first_owners != second_owners:
+        return False
+    first_component_ids = {
+        component_id for view in first_views for component_id in view.component_unit_instance_ids
+    }
+    second_component_ids = {
+        component_id for view in second_views for component_id in view.component_unit_instance_ids
+    }
+    return bool(first_component_ids.intersection(second_component_ids))
+
+
 def reconcile_rules_unit_identity(
     *,
     state: GameState,

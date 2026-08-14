@@ -723,11 +723,17 @@ class ReserveState:
         player_id: str,
         battle_round: int,
     ) -> Self:
-        requested_player_id = _validate_identifier("player_id", player_id)
+        _validate_identifier("player_id", player_id)
         requested_round = _validate_positive_int("battle_round", battle_round)
-        if (
-            self.player_id != requested_player_id
-            or self.restriction_battle_round != requested_round
+        if self.restriction_battle_round is None:
+            return self
+        from warhammer40k_core.engine.reserve_restriction_integrity import (
+            reserve_arrival_restriction_cleanup_is_due,
+        )
+
+        if not reserve_arrival_restriction_cleanup_is_due(
+            restriction_battle_round=self.restriction_battle_round,
+            completed_battle_round=requested_round,
         ):
             return self
         return replace(
@@ -2427,11 +2433,7 @@ def _reserve_arrival_transition_batch(
 
 
 def _source_rule_id_for_placement_kind(placement_kind: BattlefieldPlacementKind) -> str:
-    if placement_kind is BattlefieldPlacementKind.STRATEGIC_RESERVES:
-        return _STRATEGIC_RESERVES_RULE_ID
-    if placement_kind is BattlefieldPlacementKind.DEEP_STRIKE:
-        return _DEEP_STRIKE_RULE_ID
-    return _RESERVES_RULE_ID
+    return _arrival.source_rule_id_for_placement_kind(placement_kind)
 
 
 def _terrain_endpoint_violation(

@@ -32,7 +32,17 @@ from warhammer40k_core.engine.faction_content.common import (
 )
 from warhammer40k_core.engine.faction_rule_states import FactionRuleState
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, SetupStep
-from warhammer40k_core.engine.reserves import ReserveOrigin
+from warhammer40k_core.engine.primary_historical_events import (
+    primary_reserve_entry_source_terminal_bindings_payload,
+    record_primary_reserve_entry_provider_terminal_event,
+)
+from warhammer40k_core.engine.primary_reserve_entry_provider import (
+    PrimaryReserveEntryAbilityAuthorityKind,
+    PrimaryReserveEntryAbilityProviderDefinition,
+    primary_reserve_entry_provider_from_accepted_ability_decision,
+)
+from warhammer40k_core.engine.reserves import ReserveOrigin, ReserveStatus
+from warhammer40k_core.engine.rules_units import rules_unit_view_from_armies
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
     SaveOptionModifierContext,
@@ -98,6 +108,15 @@ ARCHRAIDER_AURA_RANGE_INCHES = 12.0
 
 WEBWAY_PATHSTONE_USED_EVENT = "aeldari_corsair_coterie_webway_pathstone_used"
 WEBWAY_PATHSTONE_DECLINED_EVENT = "aeldari_corsair_coterie_webway_pathstone_declined"
+PRIMARY_RESERVE_ENTRY_PROVIDER_DEFINITION = PrimaryReserveEntryAbilityProviderDefinition(
+    provider_id=WEBWAY_PATHSTONE_TURN_END_HOOK_ID,
+    source_terminal_event_type=WEBWAY_PATHSTONE_USED_EVENT,
+    authority_kind=PrimaryReserveEntryAbilityAuthorityKind.ENHANCEMENT_ASSIGNMENT,
+    source_rule_id=WEBWAY_PATHSTONE_SOURCE_RULE_ID,
+    content_id=WEBWAY_PATHSTONE_ENHANCEMENT_ID,
+    terminal_static_identity=(("enhancement_id", WEBWAY_PATHSTONE_ENHANCEMENT_ID),),
+    terminal_result_identity_keys=("enhancement_id", "target_unit_instance_id"),
+)
 ARCHRAIDER_MODEL_SELECTED_EVENT = "aeldari_corsair_coterie_archraider_model_selected"
 ARCHRAIDER_COST_MODIFIER_USED_EVENT = "aeldari_corsair_coterie_lord_of_deceit_used"
 ARCHRAIDER_COST_MODIFIER_DECLINED_EVENT = "aeldari_corsair_coterie_lord_of_deceit_declined"
@@ -604,6 +623,7 @@ def apply_webway_pathstone_turn_end_result(context: TurnEndResultContext) -> boo
                 player_id=player_id,
                 unit_instance_id=unit_instance_id,
                 reserve_state_payload=None,
+                use_ability=False,
             ),
         )
         return True
@@ -612,21 +632,45 @@ def apply_webway_pathstone_turn_end_result(context: TurnEndResultContext) -> boo
         unit_instance_id=unit_instance_id,
     ):
         raise GameLifecycleError("Webway Pathstone unit is no longer eligible.")
+    target_rules_unit_id = rules_unit_view_from_armies(
+        armies=tuple(context.state.army_definitions),
+        unit_instance_id=unit_instance_id,
+    ).unit_instance_id
+    provider = primary_reserve_entry_provider_from_accepted_ability_decision(
+        state=context.state,
+        decisions=context.decisions,
+        result=context.result,
+        provider_id=WEBWAY_PATHSTONE_TURN_END_HOOK_ID,
+        source_rule_id=WEBWAY_PATHSTONE_SOURCE_RULE_ID,
+        target_rules_unit_instance_id=target_rules_unit_id,
+        source_terminal_event_type=WEBWAY_PATHSTONE_USED_EVENT,
+    )
     reserve_state = context.state.reposition_unit_to_strategic_reserves(
-        event_log=context.decisions.event_log,
+        decisions=context.decisions,
         player_id=player_id,
         unit_instance_id=unit_instance_id,
+        provider=provider,
         reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
         source_rule_ids=(WEBWAY_PATHSTONE_SOURCE_RULE_ID,),
     )
-    context.decisions.event_log.append(
+    source_terminal_event = context.decisions.event_log.append(
         WEBWAY_PATHSTONE_USED_EVENT,
-        _webway_pathstone_event_payload(
-            context=context,
-            player_id=player_id,
-            unit_instance_id=unit_instance_id,
-            reserve_state_payload=cast(JsonValue, reserve_state.to_payload()),
-        ),
+        {
+            **_webway_pathstone_event_payload(
+                context=context,
+                player_id=player_id,
+                unit_instance_id=unit_instance_id,
+                reserve_state_payload=cast(JsonValue, reserve_state.to_payload()),
+                use_ability=True,
+            ),
+            **primary_reserve_entry_source_terminal_bindings_payload(((provider, reserve_state),)),
+        },
+    )
+    record_primary_reserve_entry_provider_terminal_event(
+        event_log=context.decisions.event_log,
+        provider=provider,
+        reserve_state=reserve_state,
+        source_terminal_event=source_terminal_event,
     )
     return True
 
@@ -761,7 +805,8 @@ def _webway_pathstone_unit_can_enter_reserves(
         raise GameLifecycleError("Webway Pathstone requires GameState.")
     if state.battlefield_state is None:
         raise GameLifecycleError("Webway Pathstone requires battlefield_state.")
-    if state.reserve_state_for_unit(unit_instance_id) is not None:
+    reserve_state = state.reserve_state_for_unit(unit_instance_id)
+    if reserve_state is not None and reserve_state.status is not ReserveStatus.ARRIVED:
         return False
     if not state.battlefield_state.is_unit_placed(unit_instance_id):
         return False
@@ -1020,6 +1065,7 @@ def _webway_pathstone_event_payload(
     player_id: str,
     unit_instance_id: str,
     reserve_state_payload: JsonValue,
+    use_ability: bool,
 ) -> dict[str, JsonValue]:
     return {
         "game_id": context.state.game_id,
@@ -1036,6 +1082,7 @@ def _webway_pathstone_event_payload(
         "request_id": context.request.request_id,
         "result_id": context.result.result_id,
         "selected_option_id": context.result.selected_option_id,
+        "use_ability": use_ability,
         "reserve_state": reserve_state_payload,
     }
 

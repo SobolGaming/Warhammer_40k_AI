@@ -92,6 +92,9 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.reserve_arrival_requirements import (
+    reposition_destruction_policy,
+)
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.unit_coherency import MovementRollbackRecord, UnitCoherencyResult
 from warhammer40k_core.engine.unit_factory import UnitInstance
@@ -2510,12 +2513,24 @@ def _unplace_alive_successor(
     state.battlefield_state = state.battlefield_state.without_unit_placement(
         successor.unit_instance_id
     )
-    state.record_reserve_state(
-        ReserveState.declared_before_battle(
-            player_id="player-b",
-            unit_instance_id=successor.unit_instance_id,
-            reserve_kind=ReserveKind.RESERVES,
-        )
+    reserve_state = ReserveState.declared_before_battle(
+        player_id="player-b",
+        unit_instance_id=successor.unit_instance_id,
+        reserve_kind=ReserveKind.RESERVES,
+        destruction_deadline_policy=reposition_destruction_policy(
+            mission_setup=state.mission_setup,
+            destruction_deadline_policy=None,
+        ),
+    )
+    state.record_reserve_state(reserve_state)
+    lifecycle.decision_controller.event_log.append(
+        "reserve_unit_declared",
+        {
+            "game_id": state.game_id,
+            "player_id": reserve_state.player_id,
+            "unit_instance_id": reserve_state.unit_instance_id,
+            "reserve_state": reserve_state.to_payload(),
+        },
     )
 
 

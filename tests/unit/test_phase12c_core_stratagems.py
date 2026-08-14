@@ -102,8 +102,10 @@ from warhammer40k_core.engine.phases.movement import (
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.reaction_queue import ReactionQueue
+from warhammer40k_core.engine.reserve_arrival_requirements import (
+    reposition_destruction_policy,
+)
 from warhammer40k_core.engine.reserves import (
-    ReserveDestructionTimingPolicy,
     ReserveKind,
     ReserveState,
     ReserveStatus,
@@ -3888,7 +3890,7 @@ def test_rapid_ingress_reaction_target_and_placement_restore_before_parent_resum
     state.battle_round = 2
     _grant_cp(state, player_id="player-b", amount=1)
     reserve_state, _reserve_unit, _reserve_army = _move_unit_to_reserves(
-        state,
+        lifecycle,
         player_id="player-b",
         unit_instance_id="army-beta:enemy-unit",
     )
@@ -4001,7 +4003,7 @@ def test_movement_phase_progression_offers_rapid_ingress_reaction_from_index() -
     state.battle_round = 2
     _grant_cp(state, player_id="player-b", amount=1)
     reserve_state, _reserve_unit, _reserve_army = _move_unit_to_reserves(
-        state,
+        lifecycle,
         player_id="player-b",
         unit_instance_id="army-beta:enemy-unit",
     )
@@ -4089,7 +4091,7 @@ def test_movement_phase_progression_declines_rapid_ingress_reaction_from_index()
     state.battle_round = 2
     _grant_cp(state, player_id="player-b", amount=1)
     reserve_state, _reserve_unit, _reserve_army = _move_unit_to_reserves(
-        state,
+        lifecycle,
         player_id="player-b",
         unit_instance_id="army-beta:enemy-unit",
     )
@@ -4815,11 +4817,12 @@ def _first_shooting_type(target_candidate: dict[str, object]) -> ShootingType:
 
 
 def _move_unit_to_reserves(
-    state: GameState,
+    lifecycle: GameLifecycle,
     *,
     player_id: str,
     unit_instance_id: str,
 ) -> tuple[ReserveState, UnitInstance, ArmyDefinition]:
+    state = _state(lifecycle)
     battlefield_state = state.battlefield_state
     assert battlefield_state is not None
     state.replace_battlefield_state(battlefield_state.without_unit_placement(unit_instance_id))
@@ -4827,9 +4830,21 @@ def _move_unit_to_reserves(
         player_id=player_id,
         unit_instance_id=unit_instance_id,
         reserve_kind=ReserveKind.RESERVES,
-        destruction_deadline_policy=ReserveDestructionTimingPolicy.chapter_approved_2026_27(),
+        destruction_deadline_policy=reposition_destruction_policy(
+            mission_setup=state.mission_setup,
+            destruction_deadline_policy=None,
+        ),
     )
     state.record_reserve_state(reserve_state)
+    lifecycle.decision_controller.event_log.append(
+        "reserve_unit_declared",
+        {
+            "game_id": state.game_id,
+            "player_id": player_id,
+            "unit_instance_id": unit_instance_id,
+            "reserve_state": reserve_state.to_payload(),
+        },
+    )
     army = state.army_definition_for_player(player_id)
     assert army is not None
     return reserve_state, army.unit_by_id(unit_instance_id), army
@@ -4843,7 +4858,7 @@ def _request_rapid_ingress_placement(
     state.battle_round = 2
     _grant_cp(state, player_id="player-b", amount=1)
     reserve_state, reserve_unit, reserve_army = _move_unit_to_reserves(
-        state,
+        lifecycle,
         player_id="player-b",
         unit_instance_id="army-beta:enemy-unit",
     )
@@ -4887,7 +4902,7 @@ def _request_rapid_ingress_reaction_placement(
     state.battle_round = 2
     _grant_cp(state, player_id="player-b", amount=1)
     reserve_state, reserve_unit, reserve_army = _move_unit_to_reserves(
-        state,
+        lifecycle,
         player_id="player-b",
         unit_instance_id="army-beta:enemy-unit",
     )

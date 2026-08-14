@@ -9,6 +9,11 @@ from tests.deployment_submission_helpers import submit_all_deployments_if_pendin
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.datasheet import (
+    CatalogAbilitySourceKind,
+    CatalogAbilitySupport,
+    DatasheetAbilityDescriptor,
+)
 from warhammer40k_core.core.dice import (
     DiceExpression,
     DiceRollSpec,
@@ -62,6 +67,9 @@ from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import EventLog
+from warhammer40k_core.engine.faction_content.warhammer_40000_11th.grey_knights import (
+    army_rule as grey_knights_army_rule,
+)
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
@@ -107,6 +115,10 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_reserve_entry_provider import (
+    PrimaryReserveEntryProvider,
+    primary_reserve_entry_provider_from_accepted_ability_decision,
+)
 from warhammer40k_core.engine.reserves import (
     ReserveDestructionTimingPolicy,
     ReserveKind,
@@ -121,6 +133,11 @@ from warhammer40k_core.engine.transports import (
     DisembarkModeKind,
     TransportCapacityProfile,
     TransportMovementStatus,
+)
+from warhammer40k_core.engine.turn_end_hooks import (
+    TurnEndHookRegistry,
+    TurnEndRequestContext,
+    TurnEndResultContext,
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.engine.unit_state import (
@@ -1065,17 +1082,92 @@ def test_setup_declarations_reject_duplicate_and_drift_contexts() -> None:
         )
 
 
-def test_repositioned_unit_preserves_move_history_and_effects() -> None:
-    state = _battle_state()
-    event_log = EventLog()
-    state.advance_to_next_battle_phase()
-    assert state.current_battle_phase is BattlePhase.MOVEMENT
-    unit_id = "army-alpha:intercessor-unit-1"
-    unit = _unit_by_id(state, unit_id)
+def test_authenticated_reposition_preserves_prior_turn_fall_back_history() -> None:
+    state, decisions, registry, request, unit, _transport = _gate_of_infinity_pending_decision()
     fell_back = FellBackUnitState(
         player_id="player-a",
         battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+    )
+    state.record_fell_back_unit_state(fell_back)
+
+    result, provider = _accept_gate_of_infinity_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        unit=unit,
+        result_id="phase11c-gate-preserve-fall-back-history",
+    )
+    assert registry.apply_result(
+        TurnEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+
+    assert (
+        state.fell_back_unit_state_for_unit(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+        )
+        == fell_back
+    )
+    assert state.primary_battlefield_departure_states[-1].source_id == provider.occurrence_id
+    assert GameState.from_payload(_game_state_payload_copy(state)).to_payload() == (
+        state.to_payload()
+    )
+
+
+def test_authenticated_reposition_preserves_prior_turn_advance_history() -> None:
+    state, decisions, registry, request, unit, _transport = _gate_of_infinity_pending_decision()
+    advanced = _advanced_unit_state(state=state, unit_instance_id=unit.unit_instance_id)
+    state.record_advanced_unit_state(advanced)
+
+    result, provider = _accept_gate_of_infinity_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        unit=unit,
+        result_id="phase11c-gate-preserve-advance-history",
+    )
+    assert registry.apply_result(
+        TurnEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
+    )
+
+    assert (
+        state.advanced_unit_state_for_unit(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=unit.unit_instance_id,
+        )
+        == advanced
+    )
+    assert state.primary_battlefield_departure_states[-1].source_id == provider.occurrence_id
+    assert GameState.from_payload(_game_state_payload_copy(state)).to_payload() == (
+        state.to_payload()
+    )
+
+
+def test_authenticated_reposition_preserves_disembark_history_and_effects() -> None:
+    state, decisions, registry, request, unit, transport = _gate_of_infinity_pending_decision()
+    unit_id = unit.unit_instance_id
+    assert "INFANTRY" in unit.keywords
+    assert "TRANSPORT" in transport.keywords
+    disembarked = DisembarkedUnitState.for_mode(
+        player_id="player-a",
+        battle_round=state.battle_round,
         unit_instance_id=unit_id,
+        transport_unit_instance_id=transport.unit_instance_id,
+        disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
+        transport_movement_status=TransportMovementStatus.REMAIN_STATIONARY,
     )
     effect = PersistingEffect(
         effect_id="phase11c-repositioned-effect",
@@ -1090,112 +1182,23 @@ def test_repositioned_unit_preserves_move_history_and_effects() -> None:
         ),
         effect_payload={"modifier": "phase14h-repositioned-effect"},
     )
-    state.record_fell_back_unit_state(fell_back)
+    state.record_disembarked_unit_state(disembarked)
     state.record_persisting_effect(effect)
 
-    reserve_state = state.reposition_unit_to_strategic_reserves(
-        event_log=event_log,
-        player_id="player-a",
-        unit_instance_id=unit_id,
-        reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
-        required_arrival_battle_round=2,
-        required_arrival_phase=BattlePhase.MOVEMENT,
-        required_arrival_source_rule_id="phase14h-required-arrival",
+    result, provider = _accept_gate_of_infinity_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        unit=unit,
+        result_id="phase11c-gate-preserve-history",
     )
-
-    assert reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
-    assert reserve_state.reserve_origin is ReserveOrigin.DURING_BATTLE_ABILITY
-    assert reserve_state.entered_reserves_battle_round == 1
-    assert reserve_state.entered_reserves_phase == BattlePhase.MOVEMENT.value
-    assert reserve_state.required_arrival_battle_round == 2
-    assert reserve_state.required_arrival_phase == BattlePhase.MOVEMENT.value
-    assert reserve_state.required_arrival_source_rule_id == "phase14h-required-arrival"
-    assert reserve_state.destruction_deadline_policy.exclude_during_battle_strategic_reserves
-    assert state.reserve_state_for_unit(unit_id) == reserve_state
-    assert (
-        state.fell_back_unit_state_for_unit(
-            player_id="player-a",
-            battle_round=state.battle_round,
-            unit_instance_id=unit_id,
+    assert registry.apply_result(
+        TurnEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
         )
-        == fell_back
-    )
-    assert state.persisting_effects_for_unit(unit_id) == (effect,)
-    assert state.battlefield_state is not None
-    with pytest.raises(PlacementError, match="unit_instance_id is not placed"):
-        state.battlefield_state.unit_placement_by_id(unit_id)
-    assert set(state.battlefield_state.removed_model_ids).isdisjoint(unit.own_model_ids())
-    (departure,) = state.primary_battlefield_departure_states
-    assert departure.rules_unit_instance_id == unit_id
-    assert departure.component_unit_instance_ids == (unit_id,)
-    assert departure.departed_component_unit_instance_ids == (unit_id,)
-    assert departure.removed_model_instance_ids == unit.own_model_ids()
-    assert departure.removal_kind is BattlefieldRemovalKind.INTO_RESERVES
-    assert departure.source_id == (
-        f"{state.game_id}:reposition-reserve:round-{state.battle_round:02d}:"
-        f"{BattlePhase.MOVEMENT.value}:{unit_id}"
-    )
-    assert GameState.from_payload(_game_state_payload_copy(state)).to_payload() == (
-        state.to_payload()
-    )
-
-
-def test_repositioned_unit_preserves_advance_history() -> None:
-    state = _battle_state()
-    event_log = EventLog()
-    state.advance_to_next_battle_phase()
-    unit_id = "army-alpha:intercessor-unit-1"
-    advanced = _advanced_unit_state(state=state, unit_instance_id=unit_id)
-    state.record_advanced_unit_state(advanced)
-
-    state.reposition_unit_to_strategic_reserves(
-        event_log=event_log,
-        player_id="player-a",
-        unit_instance_id=unit_id,
-    )
-
-    assert (
-        state.advanced_unit_state_for_unit(
-            player_id="player-a",
-            battle_round=state.battle_round,
-            unit_instance_id=unit_id,
-        )
-        == advanced
-    )
-    assert GameState.from_payload(_game_state_payload_copy(state)).to_payload() == (
-        state.to_payload()
-    )
-
-
-def test_repositioned_unit_preserves_disembark_history() -> None:
-    state = _battle_state(
-        player_a_units=(
-            _default_unit_selection("passenger-unit"),
-            _unit_selection(
-                unit_selection_id="transport-unit",
-                datasheet_id="core-transport",
-                model_profile_id="core-transport",
-                model_count=1,
-            ),
-        )
-    )
-    event_log = EventLog()
-    state.advance_to_next_battle_phase()
-    unit_id = "army-alpha:passenger-unit"
-    disembarked = DisembarkedUnitState.for_mode(
-        player_id="player-a",
-        battle_round=state.battle_round,
-        unit_instance_id=unit_id,
-        transport_unit_instance_id="army-alpha:transport-unit",
-        disembark_mode=DisembarkModeKind.TACTICAL_DISEMBARK,
-        transport_movement_status=TransportMovementStatus.REMAIN_STATIONARY,
-    )
-    state.record_disembarked_unit_state(disembarked)
-
-    state.reposition_unit_to_strategic_reserves(
-        event_log=event_log,
-        player_id="player-a",
-        unit_instance_id=unit_id,
     )
 
     assert (
@@ -1206,48 +1209,91 @@ def test_repositioned_unit_preserves_disembark_history() -> None:
         )
         == disembarked
     )
-    assert GameState.from_payload(_game_state_payload_copy(state)).to_payload() == (
-        state.to_payload()
-    )
+    assert state.persisting_effects_for_unit(unit_id) == (effect,)
+    reserve_state = state.reserve_state_for_unit(unit_id)
+    assert reserve_state is not None
+    assert reserve_state.reserve_kind is ReserveKind.STRATEGIC_RESERVES
+    assert reserve_state.reserve_origin is ReserveOrigin.DURING_BATTLE_ABILITY
+    assert reserve_state.source_rule_ids == (provider.source_rule_id,)
+    assert state.battlefield_state is not None
+    with pytest.raises(PlacementError, match="unit_instance_id is not placed"):
+        state.battlefield_state.unit_placement_by_id(unit_id)
+    assert set(state.battlefield_state.removed_model_ids).isdisjoint(unit.own_model_ids())
+    (departure,) = state.primary_battlefield_departure_states
+    assert departure.rules_unit_instance_id == unit_id
+    assert departure.component_unit_instance_ids == (unit_id,)
+    assert departure.departed_component_unit_instance_ids == (unit_id,)
+    assert departure.removed_model_instance_ids == unit.own_model_ids()
+    assert departure.removal_kind is BattlefieldRemovalKind.INTO_RESERVES
+    assert departure.source_id == provider.occurrence_id
+    lifecycle = GameLifecycle(state=state, decision_controller=decisions)
+    assert GameLifecycle.from_payload(lifecycle.to_payload()).to_payload() == lifecycle.to_payload()
 
 
 def test_repositioned_unit_rejects_invalid_contexts_before_mutation() -> None:
+    state, decisions, registry, request, unit, _transport = _gate_of_infinity_pending_decision()
+    unit_id = unit.unit_instance_id
+    result, provider = _accept_gate_of_infinity_decision(
+        state=state,
+        decisions=decisions,
+        request=request,
+        unit=unit,
+        result_id="phase11c-gate-invalid-contexts",
+    )
+    source_rule_ids = (provider.source_rule_id,)
     setup_state = GameState.from_config(_config())
-    event_log = EventLog()
     with pytest.raises(GameLifecycleError, match="only enter reserves during battle"):
         setup_state.reposition_unit_to_strategic_reserves(
-            event_log=event_log,
+            decisions=decisions,
             player_id="player-a",
-            unit_instance_id="army-alpha:intercessor-unit-1",
+            unit_instance_id=unit_id,
+            provider=provider,
+            reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
+            source_rule_ids=source_rule_ids,
         )
 
-    state = _battle_state()
-    unit_id = "army-alpha:intercessor-unit-1"
     assert state.battlefield_state is not None
     before_battlefield = state.battlefield_state.to_payload()
-    with pytest.raises(GameLifecycleError, match="during-battle reserve origin"):
+    before_events = decisions.event_log.records
+    with pytest.raises(GameLifecycleError, match="ability or Stratagem reserve origin"):
         state.reposition_unit_to_strategic_reserves(
-            event_log=event_log,
+            decisions=decisions,
             player_id="player-a",
             unit_instance_id=unit_id,
+            provider=provider,
             reserve_origin=ReserveOrigin.DECLARE_BATTLE_FORMATIONS,
+            source_rule_ids=source_rule_ids,
+            required_arrival_battle_round=2,
+            required_arrival_phase=BattlePhase.MOVEMENT,
+            required_arrival_source_rule_id=provider.source_rule_id,
         )
-    with pytest.raises(GameLifecycleError, match="player_id drift"):
+    with pytest.raises(GameLifecycleError, match="reserve provider context drift"):
         state.reposition_unit_to_strategic_reserves(
-            event_log=event_log,
+            decisions=decisions,
             player_id="player-b",
             unit_instance_id=unit_id,
+            provider=provider,
+            reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
+            source_rule_ids=source_rule_ids,
+            required_arrival_battle_round=2,
+            required_arrival_phase=BattlePhase.MOVEMENT,
+            required_arrival_source_rule_id=provider.source_rule_id,
         )
     assert state.battlefield_state.to_payload() == before_battlefield
     assert state.reserve_state_for_unit(unit_id) is None
+    assert decisions.event_log.records == before_events
 
-    state.advance_to_next_battle_phase()
-    with pytest.raises(GameLifecycleError, match="destruction_deadline_policy must be a policy"):
+    with pytest.raises(GameLifecycleError, match="required-arrival authority drift"):
         state.reposition_unit_to_strategic_reserves(
-            event_log=event_log,
+            decisions=decisions,
             player_id="player-a",
             unit_instance_id=unit_id,
-            destruction_deadline_policy=cast(Any, object()),
+            provider=provider,
+            reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
+            source_rule_ids=source_rule_ids,
+            required_arrival_battle_round=3,
+            required_arrival_phase=BattlePhase.MOVEMENT,
+            required_arrival_source_rule_id=provider.source_rule_id,
         )
     assert state.battlefield_state is not None
     unplaced_state = GameState.from_payload(_game_state_payload_copy(state))
@@ -1257,20 +1303,35 @@ def test_repositioned_unit_rejects_invalid_contexts_before_mutation() -> None:
     )
     with pytest.raises(GameLifecycleError, match="must be on the battlefield"):
         unplaced_state.reposition_unit_to_strategic_reserves(
-            event_log=event_log,
+            decisions=decisions,
             player_id="player-a",
             unit_instance_id=unit_id,
+            provider=provider,
+            reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
+            source_rule_ids=source_rule_ids,
+            required_arrival_battle_round=2,
+            required_arrival_phase=BattlePhase.MOVEMENT,
+            required_arrival_source_rule_id=provider.source_rule_id,
         )
-    state.reposition_unit_to_strategic_reserves(
-        event_log=event_log,
-        player_id="player-a",
-        unit_instance_id=unit_id,
+    assert registry.apply_result(
+        TurnEndResultContext(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+        )
     )
-    with pytest.raises(GameLifecycleError, match="already has a ReserveState"):
+    with pytest.raises(GameLifecycleError, match="non-terminal-arrival ReserveState"):
         state.reposition_unit_to_strategic_reserves(
-            event_log=event_log,
+            decisions=decisions,
             player_id="player-a",
             unit_instance_id=unit_id,
+            provider=provider,
+            reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
+            source_rule_ids=source_rule_ids,
+            required_arrival_battle_round=2,
+            required_arrival_phase=BattlePhase.MOVEMENT,
+            required_arrival_source_rule_id=provider.source_rule_id,
         )
 
 
@@ -2342,6 +2403,122 @@ def _advanced_unit_state(*, state: GameState, unit_instance_id: str) -> Advanced
             advance_roll=advance_roll,
         ),
     )
+
+
+def _gate_of_infinity_pending_decision() -> tuple[
+    GameState,
+    DecisionController,
+    TurnEndHookRegistry,
+    DecisionRequest,
+    UnitInstance,
+    UnitInstance,
+]:
+    config = _config(
+        player_a_units=(
+            _default_unit_selection("gate-unit"),
+            _unit_selection(
+                unit_selection_id="transport-unit",
+                datasheet_id="core-transport",
+                model_profile_id="core-transport",
+                model_count=1,
+            ),
+        )
+    )
+    army, enemy_army = _mustered_armies(config)
+    unit = army.unit_by_id("army-alpha:gate-unit")
+    transport = army.unit_by_id("army-alpha:transport-unit")
+    unit = replace(
+        unit,
+        faction_keywords=tuple(sorted((*unit.faction_keywords, "GREY KNIGHTS"))),
+        datasheet_abilities=(
+            *unit.datasheet_abilities,
+            DatasheetAbilityDescriptor(
+                ability_id=grey_knights_army_rule.GATE_OF_INFINITY_ABILITY_ID,
+                name=grey_knights_army_rule.GATE_OF_INFINITY_ABILITY_NAME,
+                source_id=grey_knights_army_rule.SOURCE_RULE_ID,
+                support=CatalogAbilitySupport.DESCRIPTOR_ONLY,
+                source_kind=CatalogAbilitySourceKind.DATASHEET,
+                effect_description="Select this unit for Gate of Infinity.",
+                timing_tags=("end_turn",),
+                parameter_tokens=("strategic_reserves",),
+            ),
+        ),
+    )
+    army = replace(
+        army,
+        detachment_selection=DetachmentSelection(
+            faction_id=grey_knights_army_rule.GREY_KNIGHTS_FACTION_ID,
+            detachment_ids=("phase17g-grey-knights-test-detachment",),
+        ),
+        units=(unit, transport),
+    )
+    descriptor = _ruleset()
+    battle_phase_sequence = tuple(descriptor.battle_phase_sequence.phases)
+    state = GameState(
+        game_id="phase11c-authenticated-reposition-game",
+        ruleset_descriptor_hash=descriptor.descriptor_hash,
+        stage=GameLifecycleStage.BATTLE,
+        setup_sequence=tuple(descriptor.setup_sequence.steps),
+        battle_phase_sequence=battle_phase_sequence,
+        setup_step_index=None,
+        battle_phase_index=battle_phase_sequence.index(BattlePhase.FIGHT),
+        battle_round=1,
+        active_player_id="player-b",
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        tactical_secondary_draw_count=2,
+        mission_setup=_mission_setup(),
+    )
+    state.record_army_definition(army)
+    state.record_army_definition(enemy_army)
+    state.record_battlefield_state(
+        create_deterministic_battlefield_scenario(
+            battlefield_id="phase11c-authenticated-reposition-battlefield",
+            armies=(army, enemy_army),
+        ).battlefield_state
+    )
+    registry = TurnEndHookRegistry.from_bindings(
+        grey_knights_army_rule.runtime_contribution().turn_end_hook_bindings
+    )
+    decisions = DecisionController()
+    request = registry.next_request_for(
+        TurnEndRequestContext(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.FIGHT,
+        )
+    )
+    assert request is not None
+    assert request.actor_id == army.player_id
+    decisions.request_decision(request)
+    return state, decisions, registry, request, unit, transport
+
+
+def _accept_gate_of_infinity_decision(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    request: DecisionRequest,
+    unit: UnitInstance,
+    result_id: str,
+) -> tuple[DecisionResult, PrimaryReserveEntryProvider]:
+    use_option = next(option for option in request.options if option.option_id.endswith(":use"))
+    result = DecisionResult.for_request(
+        result_id=result_id,
+        request=request,
+        selected_option_id=use_option.option_id,
+    )
+    decisions.submit_result(result)
+    provider = primary_reserve_entry_provider_from_accepted_ability_decision(
+        state=state,
+        decisions=decisions,
+        result=result,
+        provider_id=grey_knights_army_rule.HOOK_ID,
+        source_rule_id=grey_knights_army_rule.SOURCE_RULE_ID,
+        target_rules_unit_instance_id=unit.unit_instance_id,
+        source_terminal_event_type=grey_knights_army_rule.GATE_OF_INFINITY_USED_EVENT,
+    )
+    return result, provider
 
 
 def _center_marker_definition(state: GameState) -> ObjectiveMarkerDefinition:

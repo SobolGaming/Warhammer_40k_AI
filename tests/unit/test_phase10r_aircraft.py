@@ -856,6 +856,35 @@ def test_aircraft_normal_move_lifecycle_crossing_edge_transitions_to_reserves() 
     )
     assert GameLifecycle.from_payload(payload).to_payload() == lifecycle.to_payload()
 
+    forged_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(payload, sort_keys=True)),
+    )
+    source_records = tuple(
+        record
+        for record in forged_payload["decisions"]["records"]
+        if record["result"]["result_id"] == departure.source_id
+    )
+    assert len(source_records) == 1
+    source_record = source_records[0]
+    renamed_event_count = 0
+    for event in forged_payload["decisions"]["event_log"]:
+        if (
+            event["event_type"] == "decision_requested"
+            and event["payload"] == source_record["request"]
+        ):
+            event["event_type"] = "forged_aircraft_decision_requested"
+            renamed_event_count += 1
+        if event["event_type"] == "decision_recorded" and event["payload"] == source_record:
+            event["event_type"] = "forged_aircraft_decision_recorded"
+            renamed_event_count += 1
+    assert renamed_event_count == 2
+    with pytest.raises(
+        GameLifecycleError,
+        match="Primary Aircraft reserve departure requires exact requested and recorded decision",
+    ):
+        GameLifecycle.from_payload(forged_payload)
+
 
 def test_aircraft_edge_transition_uses_full_base_footprint_containment() -> None:
     scenario, aircraft, _enemy = _aircraft_scenario()

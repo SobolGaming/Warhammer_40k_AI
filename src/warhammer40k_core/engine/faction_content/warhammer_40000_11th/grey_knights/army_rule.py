@@ -26,7 +26,17 @@ from warhammer40k_core.engine.faction_content.common import (
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import BattleSize
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
-from warhammer40k_core.engine.reserves import ReserveOrigin
+from warhammer40k_core.engine.primary_historical_events import (
+    primary_reserve_entry_source_terminal_bindings_payload,
+    record_primary_reserve_entry_provider_terminal_event,
+)
+from warhammer40k_core.engine.primary_reserve_entry_provider import (
+    PrimaryReserveEntryAbilityAuthorityKind,
+    PrimaryReserveEntryAbilityProviderDefinition,
+    PrimaryReserveEntryComponentMatchPolicy,
+    primary_reserve_entry_provider_from_accepted_ability_decision,
+)
+from warhammer40k_core.engine.reserves import ReserveOrigin, ReserveStatus
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
 from warhammer40k_core.engine.turn_end_hooks import (
     SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
@@ -47,6 +57,30 @@ TELEPORT_ASSAULT_ABILITY_NAME = "Teleport Assault"
 SUBMISSION_KIND = "grey_knights_gate_of_infinity_turn_end"
 GATE_OF_INFINITY_USED_EVENT = "grey_knights_gate_of_infinity_used"
 GATE_OF_INFINITY_COMPLETED_EVENT = "grey_knights_gate_of_infinity_completed"
+PRIMARY_RESERVE_ENTRY_PROVIDER_DEFINITION = PrimaryReserveEntryAbilityProviderDefinition(
+    provider_id=HOOK_ID,
+    source_terminal_event_type=GATE_OF_INFINITY_USED_EVENT,
+    authority_kind=PrimaryReserveEntryAbilityAuthorityKind.DATASHEET_ABILITY,
+    source_rule_id=SOURCE_RULE_ID,
+    content_id=GATE_OF_INFINITY_ABILITY_ID,
+    component_match_policy=PrimaryReserveEntryComponentMatchPolicy.ALL_COMPONENTS,
+    terminal_static_identity=(
+        ("faction_id", GREY_KNIGHTS_FACTION_ID),
+        ("ability_id", GATE_OF_INFINITY_ABILITY_ID),
+        ("ability_name", GATE_OF_INFINITY_ABILITY_NAME),
+        ("required_arrival_phase", BattlePhase.MOVEMENT.value),
+    ),
+    terminal_request_identity_keys=("max_units",),
+    terminal_result_identity_keys=(
+        "ability_id",
+        "ability_name",
+        "target_rules_unit_instance_id",
+        "component_unit_instance_ids",
+    ),
+    required_arrival_timing="next_owner_movement_phase",
+    required_arrival_phase=BattlePhase.MOVEMENT.value,
+    required_arrival_source_rule_id=SOURCE_RULE_ID,
+)
 
 _BATTLE_SIZE_CAPS = {
     BattleSize.INCURSION: 2,
@@ -189,10 +223,20 @@ def apply_gate_of_infinity_turn_end_result(context: TurnEndResultContext) -> boo
         rules_unit_view=rules_unit_view,
     )
     required_arrival_battle_round = _next_movement_battle_round(context.state)
+    provider = primary_reserve_entry_provider_from_accepted_ability_decision(
+        state=context.state,
+        decisions=context.decisions,
+        result=context.result,
+        provider_id=HOOK_ID,
+        source_rule_id=SOURCE_RULE_ID,
+        target_rules_unit_instance_id=rules_unit_view.unit_instance_id,
+        source_terminal_event_type=GATE_OF_INFINITY_USED_EVENT,
+    )
     reserve_state = context.state.reposition_unit_to_strategic_reserves(
-        event_log=context.decisions.event_log,
+        decisions=context.decisions,
         player_id=player_id,
         unit_instance_id=rules_unit_view.unit_instance_id,
+        provider=provider,
         reserve_origin=ReserveOrigin.DURING_BATTLE_ABILITY,
         source_rule_ids=(SOURCE_RULE_ID,),
         required_arrival_battle_round=required_arrival_battle_round,
@@ -200,16 +244,25 @@ def apply_gate_of_infinity_turn_end_result(context: TurnEndResultContext) -> boo
         required_arrival_source_rule_id=SOURCE_RULE_ID,
     )
     reserve_state_payloads = (cast(JsonValue, reserve_state.to_payload()),)
-    context.decisions.event_log.append(
+    source_terminal_event = context.decisions.event_log.append(
         GATE_OF_INFINITY_USED_EVENT,
-        _used_event_payload(
-            context=context,
-            player_id=player_id,
-            rules_unit_view=rules_unit_view,
-            reserve_state_payloads=reserve_state_payloads,
-            selected_count_after=len(used_rules_unit_ids) + 1,
-            max_units=max_units,
-        ),
+        {
+            **_used_event_payload(
+                context=context,
+                player_id=player_id,
+                rules_unit_view=rules_unit_view,
+                reserve_state_payloads=reserve_state_payloads,
+                selected_count_after=len(used_rules_unit_ids) + 1,
+                max_units=max_units,
+            ),
+            **primary_reserve_entry_source_terminal_bindings_payload(((provider, reserve_state),)),
+        },
+    )
+    record_primary_reserve_entry_provider_terminal_event(
+        event_log=context.decisions.event_log,
+        provider=provider,
+        reserve_state=reserve_state,
+        source_terminal_event=source_terminal_event,
     )
     return True
 
@@ -351,7 +404,8 @@ def _rules_unit_can_enter_strategic_reserves(
         return False
     for component in rules_unit_view.components:
         unit_instance_id = component.unit.unit_instance_id
-        if state.reserve_state_for_unit(unit_instance_id) is not None:
+        reserve_state = state.reserve_state_for_unit(unit_instance_id)
+        if reserve_state is not None and reserve_state.status is not ReserveStatus.ARRIVED:
             return False
         placement = state.battlefield_state.unit_placement_or_none(unit_instance_id)
         if placement is None:
@@ -374,9 +428,10 @@ def _assert_rules_unit_can_enter_strategic_reserves(
         raise GameLifecycleError("Grey Knights Gate of Infinity unit is within Engagement Range.")
     for component in rules_unit_view.components:
         unit_instance_id = component.unit.unit_instance_id
-        if state.reserve_state_for_unit(unit_instance_id) is not None:
+        reserve_state = state.reserve_state_for_unit(unit_instance_id)
+        if reserve_state is not None and reserve_state.status is not ReserveStatus.ARRIVED:
             raise GameLifecycleError(
-                "Grey Knights Gate of Infinity unit already has a ReserveState."
+                "Grey Knights Gate of Infinity unit has an active or destroyed ReserveState."
             )
         try:
             placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)

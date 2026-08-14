@@ -2365,6 +2365,8 @@ def test_webway_pathstone_turn_end_choice_moves_unit_to_strategic_reserves_once(
         request=request,
         selected_option_id=(f"aeldari:corsair-coterie:webway-pathstone:{_WEBWAY_UNIT_ID}:use"),
     )
+    decisions.request_decision(request)
+    decisions.submit_result(result)
     handled = enhancements.apply_webway_pathstone_turn_end_result(
         TurnEndResultContext(
             state=state,
