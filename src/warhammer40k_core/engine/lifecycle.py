@@ -20,6 +20,8 @@ from warhammer40k_core.engine import lifecycle_state_queries as _lsq
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine import primary_historical_event_integrity as _phei
+from warhammer40k_core.engine import primary_mission_action_integrity as _pmai
+from warhammer40k_core.engine import primary_mission_state_validation as _pmsv
 from warhammer40k_core.engine import primary_reserve_entry_lifecycle_integrity as _preli
 from warhammer40k_core.engine import primary_reserve_entry_state_integrity as _presi
 from warhammer40k_core.engine import reserve_state_integrity as _rsi
@@ -278,6 +280,9 @@ from warhammer40k_core.engine.prebattle import (
     invalid_prebattle_proposal_status,
     is_prebattle_proposal_request,
 )
+from warhammer40k_core.engine.primary_mission_choices import (
+    locate_and_deny_start_battle_binding,
+)
 from warhammer40k_core.engine.reaction_queue import (
     REACTION_DECISION_TYPE,
     ReactionQueue,
@@ -306,6 +311,7 @@ from warhammer40k_core.engine.shooting_phase_start_hooks import (
 from warhammer40k_core.engine.shooting_unit_selected_hooks import (
     SELECT_SHOOTING_UNIT_GRANT_DECISION_TYPE,
 )
+from warhammer40k_core.engine.start_battle_hooks import StartBattleHookRegistry
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
     StratagemCostChoiceRequestContext,
@@ -2182,6 +2188,7 @@ class GameLifecycle:
         result.validate_for_request(request)
         return invalid_mission_decision_status(
             state=self._require_state(),
+            decisions=self.decision_controller,
             request=request,
             result=result,
             runtime_modifier_registry=self._shooting_phase_handler.runtime_modifier_registry,
@@ -2195,6 +2202,7 @@ class GameLifecycle:
         state = self._require_state()
         apply_mission_decision(
             state=state,
+            request=record.request,
             result=result,
             decisions=self.decision_controller,
             runtime_modifier_registry=self._shooting_phase_handler.runtime_modifier_registry,
@@ -2697,7 +2705,12 @@ class GameLifecycle:
         self._setup_flow = replace(
             self._setup_flow,
             battle_formation_hooks=bundle.battle_formation_hook_registry,
-            start_battle_hooks=bundle.start_battle_hook_registry,
+            start_battle_hooks=StartBattleHookRegistry.from_bindings(
+                (
+                    *bundle.start_battle_hook_registry.all_bindings(),
+                    locate_and_deny_start_battle_binding(),
+                )
+            ),
         )
         runtime_stratagem_index = _combined_runtime_stratagem_index(
             bundle,
@@ -3470,6 +3483,14 @@ def _validate_payload_consistency(
         event_records=event_records,
         decision_records=decision_records,
         require_muster_event_provenance=config is not None,
+    )
+    _pmsv.validate_primary_mission_progress_state(
+        state,
+        event_records=event_records,
+    )
+    _pmai.validate_primary_mission_action_integrity(
+        state=state,
+        event_records=event_records,
     )
 
 

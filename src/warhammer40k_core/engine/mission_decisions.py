@@ -40,6 +40,11 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.primary_mission_choices import (
+    SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
+    apply_primary_mission_choice,
+    invalid_primary_mission_choice_request_status,
+)
 from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
@@ -60,11 +65,14 @@ MISSION_DECISION_TYPES = frozenset(
         TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
         TACTICAL_SECONDARY_DISCARD_DECISION_TYPE,
         START_MISSION_ACTION_DECISION_TYPE,
+        SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
     )
 )
 
 
 def mission_decision_pauses_after_apply(request: DecisionRequest) -> bool:
+    if request.decision_type == SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE:
+        return True
     if request.decision_type != START_MISSION_ACTION_DECISION_TYPE:
         return False
     payload = _payload_object(request.payload)
@@ -473,11 +481,19 @@ def request_mission_action_start(
 def invalid_mission_decision_status(
     *,
     state: GameState,
+    decisions: DecisionController,
     request: DecisionRequest,
     result: DecisionResult,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _require_runtime_modifier_registry(runtime_modifier_registry)
+    if request.decision_type == SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE:
+        return invalid_primary_mission_choice_request_status(
+            state=state,
+            decisions=decisions,
+            request=request,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
     if request.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
         payload = _payload_object(result.payload)
         player_id = _payload_string(payload, key="player_id")
@@ -681,11 +697,22 @@ def invalid_mission_decision_status(
 def apply_mission_decision(
     *,
     state: GameState,
+    request: DecisionRequest,
     result: DecisionResult,
     decisions: DecisionController,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> None:
     _require_runtime_modifier_registry(runtime_modifier_registry)
+    if result.decision_type == SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE:
+        if not apply_primary_mission_choice(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+            runtime_modifier_registry=runtime_modifier_registry,
+        ):
+            raise GameLifecycleError("Primary mission choice was not handled.")
+        return
     if result.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
         _apply_tactical_secondary_score(state=state, result=result, decisions=decisions)
         return
@@ -863,9 +890,11 @@ def _apply_start_mission_action(
         raise GameLifecycleError("Battle-shocked units cannot start actions.")
     action_state = MissionActionState.start(
         action_id=f"mission-action:{result.result_id}",
+        mission_action_id=mission_action.mission_action_id,
         player_id=player_id,
         unit_instance_id=unit_instance_id,
         target_id=_payload_string(payload, key="target_id"),
+        condition_target_id=_payload_optional_string(payload, key="condition_target_id"),
         mission_id=mission_action.mission_id,
         battle_round=state.battle_round,
         phase=_current_phase(state).value,
@@ -899,6 +928,7 @@ def _apply_start_mission_action(
             "phase": _current_phase(state).value,
             "mission_action_id": mission_action.mission_action_id,
             "target_id": _payload_string(payload, key="target_id"),
+            "condition_target_id": _payload_optional_string(payload, key="condition_target_id"),
             "target_policy": mission_action.target_policy,
             "mission_action_state": validate_json_value(action_state.to_payload()),
         },
@@ -1303,6 +1333,13 @@ def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
 
 def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     value = payload[key]
+    return _validate_identifier(key, value)
+
+
+def _payload_optional_string(payload: dict[str, JsonValue], *, key: str) -> str | None:
+    value = payload[key]
+    if value is None:
+        return None
     return _validate_identifier(key, value)
 
 

@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v6/replay-metadata.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v7/replay-metadata.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -12,7 +12,7 @@
         "config": {
           "$ref": "https://warhammer40k-core.local/contracts/v3/create-session.schema.json#/properties/config"
         },
-        "state": {"$ref": "#/$defs/step3_replay_state"}
+        "state": {"$ref": "#/$defs/step4_replay_state"}
       },
       "required": ["config", "state"],
       "type": "object"
@@ -22,7 +22,7 @@
       "items": {"$ref": "#/$defs/projection_checkpoint"},
       "type": "array"
     },
-    "schema_version": {"const": "replay-artifact-v6-phase17n-step3", "type": "string"},
+    "schema_version": {"const": "replay-artifact-v7-phase17n-step4", "type": "string"},
     "source_identity": {"$ref": "#/$defs/source_identity"}
   },
   "required": [
@@ -38,19 +38,27 @@
   "title": "CORE V2 ReplayArtifactMetadataPayload",
   "type": "object",
   "$defs": {
-    "step3_replay_state": {
+    "step4_replay_state": {
       "additionalProperties": true,
-      "description": "The Contract 8 schema-owned Phase 17N Step 3 evidence slice. Other lifecycle state remains engine-private and is validated by the fail-closed replay loader.",
+      "description": "The Contract 9 schema-owned Phase 17N Step 4 evidence and persistent mission-state slice. Other lifecycle state remains engine-private and is validated by the fail-closed replay loader.",
       "properties": {
+        "mission_action_states": {
+          "items": {"$ref": "#/$defs/mission_action_state"},
+          "type": "array",
+          "uniqueItems": true
+        },
         "primary_battlefield_departure_states": {
           "items": {"$ref": "#/$defs/primary_battlefield_departure_state"},
           "type": "array"
         },
         "primary_rules_unit_turn_start_snapshots": {
           "items": {
-            "$ref": "https://warhammer40k-core.local/contracts/v7/game-view.schema.json#/$defs/primary_rules_unit_turn_start_snapshot"
+            "$ref": "https://warhammer40k-core.local/contracts/v8/game-view.schema.json#/$defs/primary_rules_unit_turn_start_snapshot"
           },
           "type": "array"
+        },
+        "primary_mission_progress_state": {
+          "$ref": "https://warhammer40k-core.local/contracts/v8/game-view.schema.json#/$defs/primary_mission_progress_state"
         },
         "primary_unit_destruction_states": {
           "items": {"$ref": "#/$defs/primary_unit_destruction_state"},
@@ -58,9 +66,72 @@
         }
       },
       "required": [
+        "mission_action_states",
         "primary_rules_unit_turn_start_snapshots",
         "primary_unit_destruction_states",
-        "primary_battlefield_departure_states"
+        "primary_battlefield_departure_states",
+        "primary_mission_progress_state"
+      ],
+      "type": "object"
+    },
+    "mission_action_state": {
+      "additionalProperties": false,
+      "properties": {
+        "action_id": {"minLength": 1, "type": "string"},
+        "mission_action_id": {"minLength": 1, "type": "string"},
+        "player_id": {"minLength": 1, "type": "string"},
+        "unit_instance_id": {"minLength": 1, "type": "string"},
+        "target_id": {"minLength": 1, "type": "string"},
+        "condition_target_id": {"$ref": "#/$defs/nullable_identifier"},
+        "mission_id": {"minLength": 1, "type": "string"},
+        "battle_round_started": {"minimum": 1, "type": "integer"},
+        "phase_started": {"minLength": 1, "type": "string"},
+        "start_timing": {"minLength": 1, "type": "string"},
+        "completion_timing": {"minLength": 1, "type": "string"},
+        "eligible_unit_instance_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "interruption_conditions": {"$ref": "#/$defs/identifier_array"},
+        "scoring_source_id": {"minLength": 1, "type": "string"},
+        "victory_points": {"minimum": 0, "type": "integer"},
+        "status": {
+          "enum": ["started", "completed", "interrupted"],
+          "type": "string"
+        },
+        "completed_battle_round": {
+          "oneOf": [
+            {"minimum": 1, "type": "integer"},
+            {"type": "null"}
+          ]
+        },
+        "completed_phase": {"$ref": "#/$defs/nullable_identifier"},
+        "interrupted_reason": {"$ref": "#/$defs/nullable_identifier"},
+        "score_transaction_id": {"$ref": "#/$defs/nullable_identifier"}
+      },
+      "required": [
+        "action_id",
+        "mission_action_id",
+        "player_id",
+        "unit_instance_id",
+        "target_id",
+        "condition_target_id",
+        "mission_id",
+        "battle_round_started",
+        "phase_started",
+        "start_timing",
+        "completion_timing",
+        "eligible_unit_instance_ids",
+        "interruption_conditions",
+        "scoring_source_id",
+        "victory_points",
+        "status",
+        "completed_battle_round",
+        "completed_phase",
+        "interrupted_reason",
+        "score_transaction_id"
       ],
       "type": "object"
     },

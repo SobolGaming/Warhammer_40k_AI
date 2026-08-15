@@ -14710,16 +14710,21 @@
       "setup_step": "select_secondary_missions"
     },
     "request_id": "decision-request-000001",
-    "schema_version": "decision-request-view-v4-phase17n-step3"
+    "schema_version": "decision-request-view-v5-phase17n-step4"
   },
   "pending_proposal": null,
   "player_ids": [
     "player-a",
     "player-b"
   ],
+  "primary_mission_progress_state": {
+    "condemned_selections": [],
+    "consecration_designations": [],
+    "markers": []
+  },
   "primary_rules_unit_turn_start_snapshots": [],
-  "projection_schema": "game-view-v10-phase17n-step3",
-  "projection_state_hash": "118969c797f5650aa152137f02783ea2c361f16c54993ea643e4d107abc59f0c",
+  "projection_schema": "game-view-v11-phase17n-step4",
+  "projection_state_hash": "3abf2d3e1f00aef9a37275ce0a89e7a31efa8946363abf9c32999df4ec67687c",
   "public_command_point_ledgers": [
     {
       "command_points": 0,

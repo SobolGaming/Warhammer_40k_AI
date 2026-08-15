@@ -10,6 +10,12 @@ from tests.deployment_submission_helpers import (
     deployment_placement_payload_for_request,
 )
 from tests.movement_submission_helpers import straight_line_witness_for_unit
+from tests.phase11c_command_phase_helpers import (
+    complete_setup_through_gate,
+    mustered_armies,
+    phase11c_config,
+    secondary_choice,
+)
 from tests.phase13b_shooting_declaration_helpers import (
     _proposal_from_request as shooting_declaration_proposal,
 )
@@ -28,6 +34,8 @@ from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
 from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_record import DecisionRecord
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.deployment import (
     SELECT_DEPLOYMENT_UNIT_DECISION_TYPE,
@@ -42,8 +50,8 @@ from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
     MeleeDeclarationProposalRequest,
 )
-from warhammer40k_core.engine.game_state import GameConfig, GameState
-from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.game_state import GameConfig, GameState, SecondaryMissionMode
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
@@ -71,6 +79,12 @@ from warhammer40k_core.engine.phases.shooting import (
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
 )
+from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_mission_choices import (
+    PRIMARY_MISSION_CHOICE_RESOLVED_EVENT,
+    SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
+    punishment_choice_request,
+)
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.shooting_types import ShootingType
@@ -83,7 +97,10 @@ from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
 from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.mission_pack_import import (
+    chapter_approved_2026_27_mission_pack,
+    warhammer_event_companion_2026_07_mission_pack,
+)
 
 
 @pytest.mark.integration
@@ -399,6 +416,198 @@ def test_local_session_drives_armour_of_contempt_shared_shooting_path() -> None:
         session.replay_artifact(artifact_id="replay:ws14:aoc:shooting-facade")
     ).run()
     assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.integration
+def test_local_session_drives_primary_mission_choice_with_public_views_and_replay() -> None:
+    session, status, enemy_unit_id = _primary_mission_choice_facade_session()
+    request = _assert_request(status, SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE)
+    assert request.actor_id == "player-a"
+    assert len(request.options) == 1
+
+    player_a_view = session.view(viewer_player_id="player-a")
+    player_b_view = session.view(viewer_player_id="player-b")
+    player_a_pending = player_a_view["pending_decision"]
+    player_b_pending = player_b_view["pending_decision"]
+    assert player_a_pending is not None
+    assert player_b_pending is not None
+    assert player_a_pending["request_id"] == request.request_id
+    assert player_b_pending["request_id"] == request.request_id
+    assert player_a_pending["payload"] == player_b_pending["payload"]
+    assert player_a_pending["options"] == player_b_pending["options"]
+    assert player_a_pending["interaction"] == player_b_pending["interaction"]
+    interaction = player_a_pending["interaction"]
+    assert interaction is not None
+    assert interaction["interaction_kind"] == "finite_option_list"
+    assert interaction["submission_kind"] == "finite"
+
+    cursor = EventStreamCursor(session.event_record_count())
+    record_count = session.decision_record_count()
+    selected_option = request.options[0]
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=selected_option.option_id,
+        result_id="phase17n-punishment-choice-facade-result",
+    )
+
+    assert status.status_kind is LifecycleStatusKind.ADVANCED
+    assert session.decision_record_count() == record_count + 1
+    record = session.lifecycle.decision_controller.records[-1]
+    record_payload = record.to_payload()
+    restored_record = DecisionRecord.from_payload(record_payload)
+    assert restored_record == record
+    serialized_record = json.dumps(record_payload, sort_keys=True)
+    assert serialized_record == json.dumps(restored_record.to_payload(), sort_keys=True)
+    assert "object at 0x" not in serialized_record
+
+    state = session.lifecycle.state
+    assert state is not None
+    condemned = state.primary_mission_progress_state.condemned_selections
+    assert len(condemned) == 1
+    assert condemned[0].selected_rules_unit_instance_ids == (enemy_unit_id,)
+
+    player_a_events = session.events_since(cursor, viewer_player_id="player-a")
+    player_b_events = session.events_since(cursor, viewer_player_id="player-b")
+    assert player_a_events["viewer_player_id"] == "player-a"
+    assert player_b_events["viewer_player_id"] == "player-b"
+    assert player_a_events["events"] == player_b_events["events"]
+    _assert_event_types(
+        player_a_events,
+        "decision_recorded",
+        PRIMARY_MISSION_CHOICE_RESOLVED_EVENT,
+    )
+
+    player_a_resolved = session.view(viewer_player_id="player-a")
+    player_b_resolved = session.view(viewer_player_id="player-b")
+    assert player_a_resolved["pending_decision"] is None
+    assert player_b_resolved["pending_decision"] is None
+    assert (
+        player_a_resolved["primary_mission_progress_state"]
+        == (player_b_resolved["primary_mission_progress_state"])
+    )
+    assert player_a_resolved["primary_mission_progress_state"] == (
+        state.primary_mission_progress_state.to_payload()
+    )
+
+    artifact = session.replay_artifact(artifact_id="replay:phase17n:punishment-choice-facade")
+    serialized_artifact = json.dumps(artifact, sort_keys=True)
+    assert "object at 0x" not in serialized_artifact
+    replay = ReplayRunner.from_payload(artifact).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.integration
+def test_local_session_rejects_drifted_primary_mission_choice_before_mutation() -> None:
+    session, status, enemy_unit_id = _primary_mission_choice_facade_session()
+    request = _assert_request(status, SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE)
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    progress_before = state.primary_mission_progress_state.to_payload()
+    record_count_before = session.decision_record_count()
+    event_count_before = session.event_record_count()
+
+    state.battlefield_state = state.battlefield_state.without_unit_placement(enemy_unit_id)
+    invalid = session.submit_option(
+        request_id=request.request_id,
+        option_id=request.options[0].option_id,
+        result_id="phase17n-punishment-choice-drifted-result",
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert _json_object(invalid.payload)["invalid_reason"] == (
+        "primary_mission_choice_request_drift"
+    )
+    assert session.decision_record_count() == record_count_before
+    assert session.event_record_count() == event_count_before
+    assert state.primary_mission_progress_state.to_payload() == progress_before
+    pending = session.lifecycle.pending_decision_request()
+    assert pending is not None
+    assert pending.to_payload() == request.to_payload()
+
+
+def _primary_mission_choice_facade_session() -> tuple[LocalGameSession, LifecycleStatus, str]:
+    setup = MissionSetup.from_mission_pack(
+        mission_pack=warhammer_event_companion_2026_07_mission_pack(),
+        mission_pool_entry_id="mission-purge-the-foe-vs-disruption-layout-1",
+        terrain_layout_id="purge-the-foe-vs-disruption-layout-1",
+        attacker_player_id="player-a",
+        attacker_force_disposition_id="purge-the-foe",
+        defender_player_id="player-b",
+        defender_force_disposition_id="disruption",
+    )
+    base = phase11c_config()
+    catalog = replace(
+        base.army_catalog,
+        detachments=tuple(
+            replace(
+                detachment,
+                force_disposition_ids=(*detachment.force_disposition_ids, "disruption"),
+            )
+            if detachment.detachment_id == "core-combined-arms"
+            else detachment
+            for detachment in base.army_catalog.detachments
+        ),
+    )
+    config = replace(
+        base,
+        game_id="phase17n-primary-mission-choice-facade",
+        army_catalog=catalog,
+        mission_setup=setup,
+        army_muster_requests=tuple(
+            replace(
+                request,
+                force_disposition_id=(
+                    "purge-the-foe" if request.player_id == "player-a" else "disruption"
+                ),
+            )
+            for request in base.army_muster_requests
+        ),
+    )
+    state = GameState.from_config(config)
+    for army in mustered_armies(config):
+        state.record_army_definition(army)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase17n-primary-mission-choice-facade-battlefield",
+        armies=tuple(state.army_definitions),
+        battlefield_width_inches=setup.battlefield_width_inches,
+        battlefield_depth_inches=setup.battlefield_depth_inches,
+        terrain_features=setup.terrain_features,
+    )
+    state.record_battlefield_state(scenario.battlefield_state)
+    for player_id in state.player_ids:
+        state.record_secondary_mission_choice(
+            secondary_choice(player_id=player_id, mode=SecondaryMissionMode.FIXED)
+        )
+    decisions = DecisionController()
+    complete_setup_through_gate(state=state, decisions=decisions, config=config)
+    request = punishment_choice_request(
+        state=state,
+        decisions=decisions,
+    )
+    assert request is not None
+    decisions.request_decision(request)
+    enemy_unit_id = next(
+        unit.unit_instance_id
+        for army in state.army_definitions
+        if army.player_id == "player-b"
+        for unit in army.units
+    )
+    lifecycle = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            {
+                "config": config.to_payload(),
+                "parameterized_movement_proposals": True,
+                "state": state.to_payload(),
+                "decisions": decisions.to_payload(),
+                "reaction_queue": {"frames": []},
+            },
+        )
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    status = session.advance_until_decision_or_terminal()
+    return session, status, enemy_unit_id
 
 
 def _submit_fixed_secondaries(

@@ -4459,9 +4459,11 @@ def _record_attached_split_authoritative_state(
     state.record_mission_action_state(
         MissionActionState.start(
             action_id="test:leader-support-split:mission-action",
+            mission_action_id="test:leader-support-split:mission-action",
             player_id="player-b",
             unit_instance_id=target_attached_id,
             target_id="test:leader-support-split:action-target",
+            condition_target_id="test:leader-support-split:action-target",
             mission_id="test:leader-support-split:mission",
             battle_round=state.battle_round,
             phase=BattlePhase.SHOOTING.value,

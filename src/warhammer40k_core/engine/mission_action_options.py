@@ -15,6 +15,9 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.mission_action_eligibility import (
     mission_action_unit_ineligibility_reason,
 )
+from warhammer40k_core.engine.mission_action_policies import (
+    SUPPORTED_MISSION_ACTION_TARGET_POLICIES as PRIMARY_MISSION_ACTION_TARGET_POLICIES,
+)
 from warhammer40k_core.engine.mission_terrain import (
     logical_terrain_area_within_player_deployment_zone,
     logical_terrain_area_within_player_territory,
@@ -29,6 +32,10 @@ from warhammer40k_core.engine.objective_control import (
     resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.primary_mission_action_options import (
+    primary_mission_action_start_targets,
+    primary_mission_action_target_kind,
+)
 from warhammer40k_core.engine.primary_scoring_conditions import (
     home_objective_ids as _home_objective_ids,
 )
@@ -41,8 +48,11 @@ from warhammer40k_core.engine.rules_units import (
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import SecondaryMissionCardStatus
 
-SUPPORTED_MISSION_ACTION_TARGET_POLICIES = frozenset(
+_LEGACY_MISSION_ACTION_TARGET_POLICIES = frozenset(
     ("objective_marker", "trappable_terrain_area", "plunderable_terrain_area")
+)
+SUPPORTED_MISSION_ACTION_TARGET_POLICIES = frozenset(
+    (*_LEGACY_MISSION_ACTION_TARGET_POLICIES, *PRIMARY_MISSION_ACTION_TARGET_POLICIES)
 )
 
 
@@ -51,6 +61,7 @@ class MissionActionStartOption:
     action: MissionActionDefinition
     unit_instance_id: str
     target_id: str
+    condition_target_id: str | None
     eligible_unit_instance_ids: tuple[str, ...]
 
     def option_id(self) -> str:
@@ -84,6 +95,7 @@ class MissionActionStartOption:
             "mission_kind": self.action.mission_kind,
             "unit_instance_id": self.unit_instance_id,
             "target_id": self.target_id,
+            "condition_target_id": self.condition_target_id,
             "target_kind": _target_kind_for_policy(self.action.target_policy),
             "target_policy": self.action.target_policy,
             "start_timing": self.action.start_timing,
@@ -139,6 +151,24 @@ def mission_action_start_options(
         raise GameLifecycleError("Mission Action start requires MissionSetup.")
     if action.target_policy not in SUPPORTED_MISSION_ACTION_TARGET_POLICIES:
         raise GameLifecycleError("Unsupported Mission Action target policy.")
+    if action.target_policy in PRIMARY_MISSION_ACTION_TARGET_POLICIES:
+        primary_targets = primary_mission_action_start_targets(
+            state=state,
+            player_id=player_id,
+            action=action,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        eligible_unit_ids = tuple(sorted({target.unit_instance_id for target in primary_targets}))
+        return tuple(
+            MissionActionStartOption(
+                action=action,
+                unit_instance_id=target.unit_instance_id,
+                target_id=target.target_id,
+                condition_target_id=target.condition_target_id,
+                eligible_unit_instance_ids=eligible_unit_ids,
+            )
+            for target in primary_targets
+        )
     placed_army = battlefield_state.placed_army_for_player_or_none(player_id)
     if placed_army is None:
         return ()
@@ -172,6 +202,7 @@ def mission_action_start_options(
             action=action,
             unit_instance_id=unit_id,
             target_id=target_id,
+            condition_target_id=target_id,
             eligible_unit_instance_ids=eligible_unit_ids,
         )
         for unit_id, target_id in eligible_target_pairs
@@ -539,6 +570,8 @@ def _terrain_area_target_ids_by_unit(
 
 def _target_kind_for_policy(target_policy: str) -> str:
     policy = _validate_identifier("target_policy", target_policy)
+    if policy in PRIMARY_MISSION_ACTION_TARGET_POLICIES:
+        return primary_mission_action_target_kind(policy)
     if policy == "objective_marker":
         return "objective_marker"
     if policy in {"trappable_terrain_area", "plunderable_terrain_area"}:
@@ -552,6 +585,9 @@ def _target_display_name(*, state: GameState, target_id: str) -> str:
     for marker in state.mission_setup.objective_markers:
         if marker.objective_marker_id == target_id:
             return marker.name
+    for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        if rules_unit.unit_instance_id == target_id:
+            return rules_unit_display_name(rules_unit)
     mission_logical_terrain_area_by_id(
         state.mission_setup,
         logical_terrain_area_id=target_id,

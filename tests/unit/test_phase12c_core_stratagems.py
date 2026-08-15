@@ -1865,6 +1865,7 @@ def test_phase15e_heroic_intervention_charge_move_applies_witness_and_fights_fir
     assert state.battlefield_state.to_payload() != before_battlefield
     assert len(displacements) == 5
     assert {cast(str, record["displacement_kind"]) for record in displacements} == {"charge_move"}
+    assert completed["unit_instance_id"] == heroic_unit_id
     assert effect_payload["effect_kind"] == "charge_grants_fights_first"
     assert effect_payload["stratagem_use_id"] == state.stratagem_use_records[0].use_id
     assert state.persisting_effects_for_unit(heroic_unit_id)

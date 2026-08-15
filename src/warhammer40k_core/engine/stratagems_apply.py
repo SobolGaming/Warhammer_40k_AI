@@ -657,6 +657,10 @@ def apply_heroic_intervention_charge_move(
         },
     )
     state.record_persisting_effect(effect)
+    moving_rules_unit_instance_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=resolution.unit_instance_id,
+    ).unit_instance_id
     decisions.event_log.append(
         "heroic_intervention_charge_move_completed",
         {
@@ -664,6 +668,7 @@ def apply_heroic_intervention_charge_move(
             "player_id": use_record.player_id,
             "battle_round": state.battle_round,
             "phase": BattlePhase.CHARGE.value,
+            "unit_instance_id": moving_rules_unit_instance_id,
             "stratagem_use": use_record.to_payload(),
             "proposal_request_id": proposal_request.request_id,
             "transition_batch": transition_batch.to_payload(),

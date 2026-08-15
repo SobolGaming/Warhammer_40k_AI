@@ -1,14 +1,14 @@
 {
-  "artifact_schema": "core-v2-phase17n-event-companion-primary-scoring-v4",
+  "artifact_schema": "core-v2-phase17n-event-companion-primary-scoring-v5",
   "source_package_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
   "authoritative_source": {
     "source_kind": "project_owner_supplied_official_source_transcription",
     "source_title": "Warhammer 40,000 Chapter Approved 2026-27 Primary Mission cards",
-    "source_scope": "All 25 Primary mission scoring records and 10 source-only Primary Mission Action descriptors",
+    "source_scope": "All 25 Primary mission scoring records, 10 executable Primary Mission Action descriptors, 2 Primary mission state rules, and 3 Primary mission choice rules",
     "official_source_binary_status": "not_committed_transcription_review_only",
-    "structured_transcription_scope": "all_primary_scoring_and_source_only_action_descriptors",
+    "structured_transcription_scope": "all_primary_scoring_action_state_and_choice_descriptors",
     "verbatim_text_scope": "meatgrinder_scoring_clauses_only",
-    "review_status": "reviewed_and_merged",
+    "review_status": "reviewed_with_project_owner_supplied_step4_clauses",
     "review_records": [
       {
         "pull_request": 107,
@@ -1655,7 +1655,7 @@
       ]
     }
   ],
-  "source_only_primary_actions": [
+  "primary_mission_actions": [
     {
       "mission_action_id": "commit-sabotage",
       "primary_mission_id": "primary-sabotage",
@@ -1667,7 +1667,7 @@
       "target_policy": "objective_marker_excluding_home",
       "use_limit": "unlimited_different_objective_per_unit_this_phase",
       "effect_descriptor": "unit_commits_sabotage_if_action_unit_controls_target_at_turn_end",
-      "engine_exposure_status": "source_known_engine_pending",
+      "engine_exposure_status": "engine_implemented",
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:commit-sabotage"
     },
     {
@@ -1681,7 +1681,7 @@
       "target_policy": "objective_marker_excluding_home_not_decoy",
       "use_limit": "unlimited_different_objective_per_unit_this_phase",
       "effect_descriptor": "objective_becomes_decoy_if_action_unit_controls_target_at_turn_end",
-      "engine_exposure_status": "source_known_engine_pending",
+      "engine_exposure_status": "engine_implemented",
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:decoy-objective"
     },
     {
@@ -1695,7 +1695,7 @@
       "target_policy": "objective_marker_excluding_home_without_friendly_operation_marker",
       "use_limit": "unlimited_different_objective_per_unit_this_phase",
       "effect_descriptor": "objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end",
-      "engine_exposure_status": "source_known_engine_pending",
+      "engine_exposure_status": "engine_implemented",
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:extract-intelligence"
     },
     {
@@ -1709,7 +1709,7 @@
       "target_policy": "central_objective_marker",
       "use_limit": "once_per_turn",
       "effect_descriptor": "central_objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end",
-      "engine_exposure_status": "source_known_engine_pending",
+      "engine_exposure_status": "engine_implemented",
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:maintain-control"
     },
     {
@@ -1723,7 +1723,7 @@
       "target_policy": "objective_marker_excluding_home",
       "use_limit": "once_per_turn",
       "effect_descriptor": "unit_secures_asset_if_action_unit_controls_target_at_turn_end",
-      "engine_exposure_status": "source_known_engine_pending",
+      "engine_exposure_status": "engine_implemented",
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:secure-asset"
     },
     {
@@ -1734,10 +1734,10 @@
       "start_timing": "shooting_phase_action_start",
       "completion_timing": "turn_end",
       "eligible_unit_policy": "active_player_unit_within_range_of_central_objective",
-      "target_policy": "opponent_operation_marker_requires_more_than_one_marker_remaining",
+      "target_policy": "central_objective_and_opponent_operation_marker_requires_more_than_one_opponent_marker_remaining",
       "use_limit": "once_per_turn",
-      "effect_descriptor": "remove_one_opponent_operation_marker_if_action_unit_controls_central_objective_at_turn_end",
-      "engine_exposure_status": "source_known_engine_pending",
+      "effect_descriptor": "remove_one_opponent_operation_marker_if_action_unit_controls_selected_central_objective_at_turn_end",
+      "engine_exposure_status": "engine_implemented",
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:sensor-sweep-extract-relic"
     },
     {
@@ -1748,10 +1748,10 @@
       "start_timing": "shooting_phase_action_start",
       "completion_timing": "turn_end",
       "eligible_unit_policy": "active_player_unit_within_range_of_central_objective",
-      "target_policy": "operation_marker_requires_more_than_one_marker_remaining",
+      "target_policy": "central_objective_and_friendly_operation_marker_requires_more_than_one_friendly_marker_remaining",
       "use_limit": "once_per_turn",
-      "effect_descriptor": "remove_one_operation_marker_if_action_unit_controls_central_objective_at_turn_end",
-      "engine_exposure_status": "source_known_engine_pending",
+      "effect_descriptor": "remove_one_friendly_operation_marker_if_action_unit_controls_selected_central_objective_at_turn_end",
+      "engine_exposure_status": "engine_implemented",
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:sensor-sweep-locate-and-deny"
     },
     {
@@ -1765,7 +1765,7 @@
       "target_policy": "visible_enemy_unit_within_18_not_surveilled_this_turn",
       "use_limit": "unlimited",
       "effect_descriptor": "enemy_unit_becomes_surveilled_until_turn_end",
-      "engine_exposure_status": "source_known_engine_pending",
+      "engine_exposure_status": "engine_implemented",
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:surveil-enemy-unit"
     },
     {
@@ -1779,7 +1779,7 @@
       "target_policy": "objective_marker_excluding_home",
       "use_limit": "once_per_turn",
       "effect_descriptor": "objective_becomes_triangulated_if_action_unit_controls_target_at_turn_end",
-      "engine_exposure_status": "source_known_engine_pending",
+      "engine_exposure_status": "engine_implemented",
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:triangulate-objective"
     },
     {
@@ -1793,9 +1793,78 @@
       "target_policy": "terrain_area_in_enemy_territory",
       "use_limit": "once_per_turn",
       "effect_descriptor": "unit_performs_vanguard_operation_if_no_enemy_units_in_terrain_area_at_turn_end",
-      "engine_exposure_status": "source_known_engine_pending",
+      "engine_exposure_status": "engine_implemented",
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:vanguard-operation"
     }
   ],
-  "package_hash": "a1f8a91bc8dc01088fdef5d0b9ee2e4e270db93a4b050d3a9b47c8995163dfc5"
+  "primary_mission_state_rules": [
+    {
+      "state_rule_id": "consecrate-destroyer-becomes-consecration-unit",
+      "primary_mission_id": "primary-consecrate",
+      "trigger_timing": "friendly_rules_unit_destroys_one_or_more_units",
+      "subject_policy": "destroying_friendly_rules_unit",
+      "effect_descriptor": "unit_becomes_consecration_unit",
+      "effect_duration": "until_consumed",
+      "engine_exposure_status": "engine_implemented",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-state-rule:consecrate-destroyer-becomes-consecration-unit"
+    },
+    {
+      "state_rule_id": "surveil-remove-operation-markers-after-move",
+      "primary_mission_id": "primary-surveil-the-foe",
+      "trigger_timing": "friendly_rules_unit_move_end",
+      "subject_policy": "moving_friendly_rules_unit_within_range_of_objective_with_opponent_operation_markers",
+      "effect_descriptor": "remove_all_opponent_operation_markers_from_each_in_range_objective",
+      "effect_duration": "immediate",
+      "engine_exposure_status": "engine_implemented",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-state-rule:surveil-remove-operation-markers-after-move"
+    }
+  ],
+  "primary_mission_choice_rules": [
+    {
+      "choice_rule_id": "consecrate-objective-at-turn-end",
+      "primary_mission_id": "primary-consecrate",
+      "trigger_timing": "own_turn_end",
+      "subject_policy": "each_friendly_consecration_unit",
+      "target_policy": "objective_within_subject_range_excluding_home_not_consecrated",
+      "selection_policy": "optional_up_to_one_per_subject",
+      "minimum_selections": 0,
+      "maximum_selections": 1,
+      "fallback_target_policy": null,
+      "effect_descriptor": "place_friendly_operation_marker_consecrate_objective_and_consume_unit_status",
+      "effect_duration": "persistent",
+      "engine_exposure_status": "engine_implemented",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-choice-rule:consecrate-objective-at-turn-end"
+    },
+    {
+      "choice_rule_id": "locate-and-deny-operation-marker-setup",
+      "primary_mission_id": "primary-locate-and-deny",
+      "trigger_timing": "battle_start",
+      "subject_policy": null,
+      "target_policy": "terrain_area_outside_own_deployment_zone",
+      "selection_policy": "exactly_five_or_all_available_when_fewer",
+      "minimum_selections": 0,
+      "maximum_selections": 5,
+      "fallback_target_policy": null,
+      "effect_descriptor": "place_one_friendly_operation_marker_in_each_selected_terrain_area",
+      "effect_duration": "persistent",
+      "engine_exposure_status": "engine_implemented",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-choice-rule:locate-and-deny-operation-marker-setup"
+    },
+    {
+      "choice_rule_id": "punishment-condemn-enemy-units",
+      "primary_mission_id": "primary-punishment",
+      "trigger_timing": "own_turn_start",
+      "subject_policy": null,
+      "target_policy": "enemy_battlefield_unit_within_objective_range_or_destroyed_friendly_unit_previous_turn",
+      "selection_policy": "one_to_three_or_exactly_one_fallback_when_no_primary_targets",
+      "minimum_selections": 1,
+      "maximum_selections": 3,
+      "fallback_target_policy": "enemy_battlefield_unit",
+      "effect_descriptor": "selected_enemy_units_become_condemned",
+      "effect_duration": "until_start_of_own_next_turn",
+      "engine_exposure_status": "engine_implemented",
+      "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-choice-rule:punishment-condemn-enemy-units"
+    }
+  ],
+  "package_hash": "a2adf58fea80100b46e473d808c9a605be87ca71189b5815f4445c26decb4c2c"
 }

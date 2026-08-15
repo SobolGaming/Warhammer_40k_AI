@@ -105,7 +105,7 @@ try {
   process.exitCode = generated.status ?? 1;
   if (generated.status === 0) {
     const generatedSource = readFileSync(outputPath, "utf8");
-    const compactedSource = compactNeverPropertyRuns(generatedSource);
+    const compactedSource = compactSingleLinePropertyRuns(generatedSource);
     writeFileSync(
       outputPath,
       `// @ts-nocheck -- recursive JSON values are generator-owned.\n${compactedSource}`,
@@ -115,7 +115,8 @@ try {
   rmSync(temporaryDirectory, { recursive: true, force: true });
 }
 
-function compactNeverPropertyRuns(source) {
+function compactSingleLinePropertyRuns(source) {
+  const maximumLineLength = 120;
   const trailingNewline = source.endsWith("\n");
   const lines = source.split("\n");
   if (trailingNewline) {
@@ -134,7 +135,10 @@ function compactNeverPropertyRuns(source) {
   };
 
   for (const line of lines) {
-    const match = /^(\s+)([A-Za-z_$][A-Za-z0-9_$]*\?: never;)$/.exec(line);
+    // Comments and nested object types deliberately terminate a compacted run.
+    const match = /^(\s+)((?:"[^"]+"|[A-Za-z_$][A-Za-z0-9_$]*)\??: [^{};]+;)$/.exec(
+      line,
+    );
     if (match === null) {
       flushPending();
       compacted.push(line);
@@ -142,6 +146,11 @@ function compactNeverPropertyRuns(source) {
     }
     const [, indent, property] = match;
     if (pendingIndent !== indent) {
+      flushPending();
+      pendingIndent = indent;
+    }
+    const candidate = `${indent}${[...pendingProperties, property].join(" ")}`;
+    if (pendingProperties.length > 0 && candidate.length > maximumLineLength) {
       flushPending();
       pendingIndent = indent;
     }

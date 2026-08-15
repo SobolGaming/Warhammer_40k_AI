@@ -4181,9 +4181,11 @@ def test_booby_trap_action_is_primary_scoped_and_immediate_zero_vp() -> None:
 
     zero_vp_action = MissionActionState.start(
         action_id="mission-action:phase16-zero-vp-complete",
+        mission_action_id="booby-trap-terrain",
         player_id="player-a",
         unit_instance_id="army-alpha:intercessor-unit-1",
         target_id=SCORING_TERRAIN_FEATURE_ID,
+        condition_target_id=SCORING_TERRAIN_FEATURE_ID,
         mission_id="primary-death-trap",
         battle_round=1,
         phase=BattlePhase.SHOOTING.value,
@@ -8609,9 +8611,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError):
         MissionActionState.start(
             action_id="cleanse:invalid:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -8625,9 +8629,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError):
         MissionActionState(
             action_id="cleanse:started-with-completion:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round_started=1,
             phase_started=BattlePhase.MOVEMENT.value,
@@ -8642,9 +8648,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError):
         MissionActionState(
             action_id="cleanse:completed-without-round:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round_started=1,
             phase_started=BattlePhase.MOVEMENT.value,
@@ -8660,9 +8668,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError, match="eligible_unit_instance_ids must be a tuple"):
         MissionActionState.start(
             action_id="cleanse:eligible-not-tuple:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -8676,9 +8686,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError, match="eligible_unit_instance_ids must not contain"):
         MissionActionState.start(
             action_id="cleanse:duplicate-eligible:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -8695,9 +8707,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError, match="eligible_unit_instance_ids must contain"):
         MissionActionState.start(
             action_id="cleanse:no-eligible:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -8711,9 +8725,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError, match="unit_instance_id must be a string"):
         MissionActionState.start(
             action_id="cleanse:non-string-unit:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id=cast(str, 1),
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -8727,9 +8743,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError, match="unit_instance_id must not be empty"):
         MissionActionState.start(
             action_id="cleanse:empty-unit:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id=" ",
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -8743,9 +8761,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError, match="battle_round_started must be an integer"):
         MissionActionState.start(
             action_id="cleanse:round-not-int:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=cast(int, "1"),
             phase=BattlePhase.MOVEMENT.value,
@@ -8759,9 +8779,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError, match="battle_round_started must be at least 1"):
         MissionActionState.start(
             action_id="cleanse:round-zero:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=0,
             phase=BattlePhase.MOVEMENT.value,
@@ -8775,9 +8797,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError, match="victory_points must be an integer"):
         MissionActionState.start(
             action_id="cleanse:vp-not-int:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -8791,9 +8815,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError, match="victory_points must not be negative"):
         MissionActionState.start(
             action_id="cleanse:vp-negative:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -8807,9 +8833,11 @@ def test_mission_action_state_rejects_drifted_completion_and_status_fields() -> 
     with pytest.raises(GameLifecycleError):
         MissionActionState(
             action_id="cleanse:interrupted-with-score:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id="army-alpha:intercessor-unit-1",
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round_started=1,
             phase_started=BattlePhase.MOVEMENT.value,
@@ -9033,9 +9061,11 @@ def _record_completed_zero_vp_mission_action(
     unit_instance_id = army.units[0].unit_instance_id
     started = MissionActionState.start(
         action_id=action_id,
+        mission_action_id=mission_action.mission_action_id,
         player_id=player_id,
         unit_instance_id=unit_instance_id,
         target_id=target_id,
+        condition_target_id=target_id,
         mission_id=mission_action.mission_id,
         battle_round=state.battle_round,
         phase=mission_action.start_phase,
@@ -9137,9 +9167,11 @@ def test_phase14c_battle_shocked_units_cannot_start_or_complete_mission_actions(
     with pytest.raises(GameLifecycleError, match="cannot start actions"):
         MissionActionState.start(
             action_id="cleanse:center:player-a",
+            mission_action_id="cleanse-objective",
             player_id="player-a",
             unit_instance_id=unit_id,
             target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
+            condition_target_id="take-and-hold-vs-purge-the-foe-layout-3-center-central",
             mission_id="cleanse",
             battle_round=1,
             phase=BattlePhase.MOVEMENT.value,
@@ -9169,9 +9201,11 @@ def _mission_action_state(
 ) -> MissionActionState:
     return MissionActionState.start(
         action_id=action_id,
+        mission_action_id="cleanse-objective",
         player_id="player-a",
         unit_instance_id="army-alpha:intercessor-unit-1",
         target_id=target_id,
+        condition_target_id=target_id,
         mission_id="cleanse",
         battle_round=1,
         phase=BattlePhase.MOVEMENT.value,
@@ -9191,9 +9225,11 @@ def _attached_cleanse_action(
 ) -> MissionActionState:
     return MissionActionState.start(
         action_id=action_id,
+        mission_action_id="cleanse-objective",
         player_id="player-a",
         unit_instance_id="attached-unit:army-alpha:bodyguard-unit",
         target_id=_center_marker_definition(state).objective_marker_id,
+        condition_target_id=_center_marker_definition(state).objective_marker_id,
         mission_id="cleanse",
         battle_round=state.battle_round,
         phase=BattlePhase.SHOOTING.value,

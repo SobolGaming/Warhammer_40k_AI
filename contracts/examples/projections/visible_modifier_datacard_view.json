@@ -14961,13 +14961,18 @@
       "phase": "movement"
     },
     "request_id": "decision-request-000007",
-    "schema_version": "decision-request-view-v4-phase17n-step3"
+    "schema_version": "decision-request-view-v5-phase17n-step4"
   },
   "pending_proposal": null,
   "player_ids": [
     "player-a",
     "player-b"
   ],
+  "primary_mission_progress_state": {
+    "condemned_selections": [],
+    "consecration_designations": [],
+    "markers": []
+  },
   "primary_rules_unit_turn_start_snapshots": [
     {
       "active_player_id": "player-a",
@@ -15013,8 +15018,8 @@
       "source_id": "ui-contract-visible-modifier:primary-rules-unit-turn-start:round-01:player-a"
     }
   ],
-  "projection_schema": "game-view-v10-phase17n-step3",
-  "projection_state_hash": "76c14c14038e950c9f450bd7d7e0ec662b3bc65d34ba8b59389688b919b6d181",
+  "projection_schema": "game-view-v11-phase17n-step4",
+  "projection_state_hash": "2c08261294aba66f5f149113d5f906b30cc24fa5cdd7180cc7dd85f2c8dca511",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

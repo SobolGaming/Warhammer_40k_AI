@@ -1,6 +1,6 @@
 {
   "game_id": "phase18d-contract-session",
-  "schema_version": "lifecycle-status-v3-phase17n-step3",
+  "schema_version": "lifecycle-status-v4-phase17n-step4",
   "status": {
     "actor_id": "player-a",
     "decision_type": "select_secondary_missions",

@@ -218,7 +218,7 @@ def test_ui_contract_schemas_validate_generated_and_live_payloads() -> None:
     rules_catalog_validator.validate(session.rules_catalog_view())
     assert (
         session.events_since(EventStreamCursor(0), viewer_player_id=PLAYER_A)["schema_version"]
-        == "event-delta-v3-phase17n-step3"
+        == "event-delta-v4-phase17n-step4"
     )
 
 
@@ -239,9 +239,10 @@ def test_phase17n_projection_family_versions_cover_the_new_closed_shapes() -> No
     assert (
         _json_object(game_view_properties["projection_schema"])["const"]
         == PROJECTION_SCHEMA_VERSION
-        == "game-view-v10-phase17n-step3"
+        == "game-view-v11-phase17n-step4"
     )
     assert "primary_rules_unit_turn_start_snapshots" in game_view_required
+    assert "primary_mission_progress_state" in game_view_required
     assert (
         _json_object(battlefield_properties["schema_version"])["const"]
         == BATTLEFIELD_VIEW_SCHEMA_VERSION
@@ -283,22 +284,22 @@ def test_phase17n_unresolved_formation_redaction_versions_nested_payload_familie
     )
 
     decision_request_uri = (
-        "https://warhammer40k-core.local/contracts/v5/decision-request-view.schema.json"
+        "https://warhammer40k-core.local/contracts/v6/decision-request-view.schema.json"
     )
     lifecycle_status_uri = (
-        "https://warhammer40k-core.local/contracts/v3/lifecycle-status.schema.json"
+        "https://warhammer40k-core.local/contracts/v4/lifecycle-status.schema.json"
     )
     assert decision_request_schema["$id"] == decision_request_uri
     assert (
         _json_object(_json_object(decision_request_schema["properties"])["schema_version"])["const"]
         == DECISION_REQUEST_VIEW_SCHEMA_VERSION
-        == "decision-request-view-v4-phase17n-step3"
+        == "decision-request-view-v5-phase17n-step4"
     )
     assert lifecycle_status_schema["$id"] == lifecycle_status_uri
     assert (
         _json_object(_json_object(lifecycle_status_schema["properties"])["schema_version"])["const"]
         == LIFECYCLE_STATUS_SCHEMA_VERSION
-        == "lifecycle-status-v3-phase17n-step3"
+        == "lifecycle-status-v4-phase17n-step4"
     )
 
     pending_decision_schema = _json_object(
@@ -315,7 +316,7 @@ def test_phase17n_unresolved_formation_redaction_versions_nested_payload_familie
     assert lifecycle_status_ref["$ref"] == f"{lifecycle_status_uri}#/$defs/status"
 
     assert decision_family_schema["$id"] == (
-        "https://warhammer40k-core.local/contracts/v6/decision-family-live.schema.json"
+        "https://warhammer40k-core.local/contracts/v7/decision-family-live.schema.json"
     )
     decision_family_defs = _json_object(decision_family_schema["$defs"])
     for family_name in (
@@ -397,14 +398,14 @@ def test_live_movement_proposal_schema_requires_spatial_context_hash() -> None:
         validator.validate(without_spatial_context)
 
 
-def test_session_metadata_contract_version_accepts_compatible_major_eight_releases() -> None:
+def test_session_metadata_contract_version_accepts_compatible_major_nine_releases() -> None:
     registry = _schema_registry()
     validator = _schema_validator("session-metadata.schema.json", registry=registry)
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "8.1.0"}
-    incompatible = {**_json_object(metadata), "server_contract_version": "7.3.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "9.1.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "8.3.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):
@@ -428,7 +429,7 @@ def test_replay_metadata_schema_rejects_missing_rules_overlay_identity() -> None
         _read_json(REPO_ROOT / Path("contracts/schemas/replay-metadata.schema.json"))
     )
     assert replay_schema["$id"] == (
-        "https://warhammer40k-core.local/contracts/v6/replay-metadata.schema.json"
+        "https://warhammer40k-core.local/contracts/v7/replay-metadata.schema.json"
     )
     validator = _schema_validator("replay-metadata.schema.json", registry=_schema_registry())
     replay = _json_object(_read_json(REPO_ROOT / Path("contracts/examples/replay-metadata.json")))

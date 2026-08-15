@@ -42,6 +42,9 @@ from warhammer40k_core.engine.interaction_metadata import (
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.objective_control import model_objective_control_characteristic
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_mission_state import (
+    PrimaryMissionProgressStatePayload,
+)
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartSnapshotPayload,
 )
@@ -51,7 +54,7 @@ from warhammer40k_core.engine.unit_resource_state import (
     unit_resource_total,
 )
 
-PROJECTION_SCHEMA_VERSION = "game-view-v10-phase17n-step3"
+PROJECTION_SCHEMA_VERSION = "game-view-v11-phase17n-step4"
 RULES_CATALOG_VIEW_SCHEMA_VERSION = "rules-catalog-view-v2"
 
 _DATACARD_CHARACTERISTICS: tuple[tuple[Characteristic, str], ...] = (
@@ -313,6 +316,7 @@ class GameViewPayload(TypedDict):
     public_secondary_mission_choices: list[JsonValue]
     public_secondary_mission_card_states: list[JsonValue]
     primary_rules_unit_turn_start_snapshots: list[PrimaryRulesUnitTurnStartSnapshotPayload]
+    primary_mission_progress_state: PrimaryMissionProgressStatePayload
     public_command_point_ledgers: list[JsonValue]
     public_victory_point_ledgers: list[JsonValue]
     public_stratagem_use_records: list[JsonValue]
@@ -596,6 +600,7 @@ def project_game_view(
                 state.primary_rules_unit_turn_start_snapshots,
             )
         ),
+        "primary_mission_progress_state": state.primary_mission_progress_state.to_payload(),
         "public_command_point_ledgers": [
             validate_json_value(ledger.to_payload()) for ledger in state.command_point_ledgers
         ],

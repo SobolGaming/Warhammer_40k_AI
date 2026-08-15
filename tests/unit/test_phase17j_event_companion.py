@@ -37,6 +37,7 @@ from warhammer40k_core.core.terrain_areas import (
     TerrainAreaLocalTransform,
 )
 from warhammer40k_core.core.terrain_display import TerrainDisplayPoint
+from warhammer40k_core.engine import mission_action_policies
 from warhammer40k_core.engine.final_scoring import FinalScoringResult
 from warhammer40k_core.engine.mission_setup import MissionSetup, MissionSetupError
 from warhammer40k_core.engine.missions import (
@@ -103,7 +104,7 @@ def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> N
 
     assert mission_pack.mission_pack_id == "11e-warhammer-event-companion-2026-07"
     assert source_package.source_commit_or_import_hash == (
-        "68d2214fdd1b3e2e1cc1e97e9b50e959a52acce03d1706c3fda5535fd5bc4d48"
+        "281c1a62b7b0d6aa61ac03095642cd7a85b8ff8907c94d6424c3a01aeacf0dcc"
     )
     assert source_package.to_payload() == {
         "edition_id": "warhammer_40000_11th",
@@ -365,7 +366,72 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
     assert len(artifact.primary_missions) == 25
     assert {mission.max_vp_per_turn for mission in artifact.primary_missions} == {15}
     assert sum(len(mission.scoring_rules) for mission in artifact.primary_missions) == 100
-    assert len(artifact.source_only_primary_actions) == 10
+    assert len(artifact.primary_mission_actions) == 10
+    assert {action.engine_exposure_status for action in artifact.primary_mission_actions} == {
+        "engine_implemented"
+    }
+    assert len(artifact.primary_mission_state_rules) == 2
+    assert len(artifact.primary_mission_choice_rules) == 3
+    state_rules = {rule.state_rule_id: rule for rule in artifact.primary_mission_state_rules}
+    assert msgspec.to_builtins(state_rules["surveil-remove-operation-markers-after-move"]) == {
+        "state_rule_id": "surveil-remove-operation-markers-after-move",
+        "primary_mission_id": "primary-surveil-the-foe",
+        "trigger_timing": "friendly_rules_unit_move_end",
+        "subject_policy": (
+            "moving_friendly_rules_unit_within_range_of_objective_with_opponent_operation_markers"
+        ),
+        "effect_descriptor": ("remove_all_opponent_operation_markers_from_each_in_range_objective"),
+        "effect_duration": "immediate",
+        "engine_exposure_status": "engine_implemented",
+        "source_id": (
+            "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-state-rule:"
+            "surveil-remove-operation-markers-after-move"
+        ),
+    }
+    choice_rules = {rule.choice_rule_id: rule for rule in artifact.primary_mission_choice_rules}
+    assert msgspec.to_builtins(choice_rules["consecrate-objective-at-turn-end"]) == {
+        "choice_rule_id": "consecrate-objective-at-turn-end",
+        "primary_mission_id": "primary-consecrate",
+        "trigger_timing": "own_turn_end",
+        "subject_policy": "each_friendly_consecration_unit",
+        "target_policy": "objective_within_subject_range_excluding_home_not_consecrated",
+        "selection_policy": "optional_up_to_one_per_subject",
+        "minimum_selections": 0,
+        "maximum_selections": 1,
+        "fallback_target_policy": None,
+        "effect_descriptor": (
+            "place_friendly_operation_marker_consecrate_objective_and_consume_unit_status"
+        ),
+        "effect_duration": "persistent",
+        "engine_exposure_status": "engine_implemented",
+        "source_id": (
+            "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-choice-rule:"
+            "consecrate-objective-at-turn-end"
+        ),
+    }
+    assert msgspec.to_builtins(choice_rules["locate-and-deny-operation-marker-setup"]) == {
+        "choice_rule_id": "locate-and-deny-operation-marker-setup",
+        "primary_mission_id": "primary-locate-and-deny",
+        "trigger_timing": "battle_start",
+        "subject_policy": None,
+        "target_policy": "terrain_area_outside_own_deployment_zone",
+        "selection_policy": "exactly_five_or_all_available_when_fewer",
+        "minimum_selections": 0,
+        "maximum_selections": 5,
+        "fallback_target_policy": None,
+        "effect_descriptor": "place_one_friendly_operation_marker_in_each_selected_terrain_area",
+        "effect_duration": "persistent",
+        "engine_exposure_status": "engine_implemented",
+        "source_id": (
+            "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-choice-rule:"
+            "locate-and-deny-operation-marker-setup"
+        ),
+    }
+    punishment_choice = choice_rules["punishment-condemn-enemy-units"]
+    assert punishment_choice.minimum_selections == 1
+    assert punishment_choice.maximum_selections == 3
+    assert punishment_choice.fallback_target_policy == "enemy_battlefield_unit"
+    assert punishment_choice.effect_duration == "until_start_of_own_next_turn"
     assert Counter(
         mission.engine_support_status for mission in artifact.primary_missions
     ) == Counter({"engine_implemented": 13, "source_known_engine_pending": 12})
@@ -488,7 +554,7 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
         )
     assert tuple(
         row.to_payload() for row in event_source.primary_mission_action_source_rows()
-    ) == tuple(msgspec.to_builtins(row) for row in artifact.source_only_primary_actions)
+    ) == tuple(msgspec.to_builtins(row) for row in artifact.primary_mission_actions)
     event_primary_scoring.validate_event_companion_primary_scoring_artifact_bytes(raw)
 
     with pytest.raises(ValueError, match="artifact bytes drifted"):
@@ -586,13 +652,29 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
             json.dumps(grammar_drift_payload).encode()
         )
 
-    promoted_action_payload = json.loads(raw)
-    promoted_action_payload["source_only_primary_actions"][0]["engine_exposure_status"] = (
-        "engine_implemented"
+    demoted_action_payload = json.loads(raw)
+    demoted_action_payload["primary_mission_actions"][0]["engine_exposure_status"] = (
+        "source_known_engine_pending"
     )
-    with pytest.raises(ValueError, match="must remain engine-pending"):
+    with pytest.raises(ValueError, match="must be engine-implemented"):
         event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
-            json.dumps(promoted_action_payload).encode()
+            json.dumps(demoted_action_payload).encode()
+        )
+
+    state_rule_drift_payload = json.loads(raw)
+    state_rule_drift_payload["primary_mission_state_rules"][0]["effect_descriptor"] = (
+        "forged_state_effect"
+    )
+    with pytest.raises(ValueError, match="state-rule clauses drifted"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(state_rule_drift_payload).encode()
+        )
+
+    choice_rule_drift_payload = json.loads(raw)
+    choice_rule_drift_payload["primary_mission_choice_rules"][1]["maximum_selections"] = 4
+    with pytest.raises(ValueError, match="choice-rule clauses drifted"):
+        event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
+            json.dumps(choice_rule_drift_payload).encode()
         )
 
 
@@ -4086,7 +4168,7 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     )
 
 
-def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions() -> None:
+def test_phase17n_primary_actions_are_exposed_with_source_backed_policies() -> None:
     action_sources = {
         row.mission_action_id: row for row in event_source.primary_mission_action_source_rows()
     }
@@ -4115,7 +4197,7 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
         "target_policy": "objective_marker_excluding_home_not_decoy",
         "use_limit": "unlimited_different_objective_per_unit_this_phase",
         "effect_descriptor": "objective_becomes_decoy_if_action_unit_controls_target_at_turn_end",
-        "engine_exposure_status": "source_known_engine_pending",
+        "engine_exposure_status": "engine_implemented",
         "source_id": (
             "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:decoy-objective"
         ),
@@ -4136,7 +4218,7 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
         "effect_descriptor": (
             "objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end"
         ),
-        "engine_exposure_status": "source_known_engine_pending",
+        "engine_exposure_status": "engine_implemented",
         "source_id": (
             "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:extract-intelligence"
         ),
@@ -4152,16 +4234,18 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
         "target_policy": "visible_enemy_unit_within_18_not_surveilled_this_turn",
         "use_limit": "unlimited",
         "effect_descriptor": "enemy_unit_becomes_surveilled_until_turn_end",
-        "engine_exposure_status": "source_known_engine_pending",
+        "engine_exposure_status": "engine_implemented",
         "source_id": (
             "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:surveil-enemy-unit"
         ),
     }
     assert action_sources["sensor-sweep-locate-and-deny"].target_policy == (
-        "operation_marker_requires_more_than_one_marker_remaining"
+        "central_objective_and_friendly_operation_marker_requires_more_than_one_"
+        "friendly_marker_remaining"
     )
     assert action_sources["sensor-sweep-extract-relic"].effect_descriptor == (
-        "remove_one_opponent_operation_marker_if_action_unit_controls_central_objective_at_turn_end"
+        "remove_one_opponent_operation_marker_if_action_unit_controls_selected_central_"
+        "objective_at_turn_end"
     )
     assert action_sources["commit-sabotage"].use_limit == (
         "unlimited_different_objective_per_unit_this_phase"
@@ -4177,7 +4261,7 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
         "target_policy": "objective_marker_excluding_home",
         "use_limit": "once_per_turn",
         "effect_descriptor": "unit_secures_asset_if_action_unit_controls_target_at_turn_end",
-        "engine_exposure_status": "source_known_engine_pending",
+        "engine_exposure_status": "engine_implemented",
         "source_id": ("gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:secure-asset"),
     }
     assert action_sources["vanguard-operation"].eligible_unit_policy == (
@@ -4186,9 +4270,80 @@ def test_phase17j_primary_source_only_actions_are_not_exposed_as_runtime_actions
     assert action_sources["maintain-control"].effect_descriptor == (
         "central_objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end"
     )
-    for action_id in action_sources:
-        with pytest.raises(MissionPackError, match="mission_action_id"):
-            mission_pack.mission_action(action_id)
+    assert len(mission_pack.mission_actions) == 14
+    for action_id, source_row in action_sources.items():
+        runtime_action = mission_pack.mission_action(action_id)
+        policy = mission_action_policies.mission_action_policy_for_identity(
+            mission_action_id=action_id,
+            source_id=source_row.source_id,
+        )
+        assert runtime_action.mission_id == source_row.primary_mission_id
+        assert runtime_action.mission_kind == "primary"
+        assert runtime_action.source_id == (
+            f"gw-11e-warhammer-event-companion-v1-1-2026-07:action:{action_id}"
+        )
+        assert policy.source_id == source_row.source_id
+        assert runtime_action.victory_points == 0
+        assert policy.primary_mission_id == runtime_action.mission_id
+        assert policy.use_limit == source_row.use_limit
+        assert policy.effect_descriptor == source_row.effect_descriptor
+        assert policy.target_policy == runtime_action.target_policy
+        assert policy.interruption_conditions == runtime_action.interruption_conditions
+
+
+def test_phase17n_primary_state_and_choice_rules_have_strict_runtime_lookups() -> None:
+    consecrate_state = mission_action_policies.primary_mission_state_rule_for_id(
+        "consecrate-destroyer-becomes-consecration-unit"
+    )
+    surveil_state = mission_action_policies.primary_mission_state_rule_for_id(
+        "surveil-remove-operation-markers-after-move"
+    )
+    punishment_choice = mission_action_policies.primary_mission_choice_rule_for_id(
+        "punishment-condemn-enemy-units"
+    )
+    locate_choice = mission_action_policies.primary_mission_choice_rule_for_id(
+        "locate-and-deny-operation-marker-setup"
+    )
+
+    assert consecrate_state.effect_descriptor == "unit_becomes_consecration_unit"
+    assert consecrate_state.effect_duration == "until_consumed"
+    assert surveil_state.trigger_timing == "friendly_rules_unit_move_end"
+    assert surveil_state.effect_descriptor == (
+        "remove_all_opponent_operation_markers_from_each_in_range_objective"
+    )
+    assert punishment_choice.selection_policy == (
+        "one_to_three_or_exactly_one_fallback_when_no_primary_targets"
+    )
+    assert punishment_choice.fallback_target_policy == "enemy_battlefield_unit"
+    assert locate_choice.selection_policy == "exactly_five_or_all_available_when_fewer"
+    assert locate_choice.maximum_selections == 5
+    assert tuple(
+        rule.choice_rule_id
+        for rule in mission_action_policies.primary_mission_choice_rules_for_mission(
+            "primary-consecrate"
+        )
+    ) == ("consecrate-objective-at-turn-end",)
+    assert tuple(
+        rule.state_rule_id
+        for rule in mission_action_policies.primary_mission_state_rules_for_mission(
+            "primary-surveil-the-foe"
+        )
+    ) == ("surveil-remove-operation-markers-after-move",)
+    with pytest.raises(
+        mission_action_policies.MissionActionPolicyError,
+        match="policy is not registered",
+    ):
+        mission_action_policies.mission_action_policy_for_id("forged-action")
+    with pytest.raises(
+        mission_action_policies.MissionActionPolicyError,
+        match="identify different rules",
+    ):
+        mission_action_policies.mission_action_policy_for_identity(
+            mission_action_id="commit-sabotage",
+            source_id=(
+                "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-action:decoy-objective"
+            ),
+        )
 
 
 def test_phase17j_source_known_engine_pending_primary_scoring_fails_on_primary_path() -> None:
