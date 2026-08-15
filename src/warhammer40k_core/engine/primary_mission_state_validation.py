@@ -21,11 +21,14 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_historical_events import (
     PRIMARY_CONSECRATION_UNIT_DESIGNATED_EVENT,
 )
+from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
+    PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY,
+    PrimaryMissionActionCompletionEvidence,
+)
 from warhammer40k_core.engine.primary_mission_choice_payloads import (
     CONSECRATE_CHOICE_KIND,
     LOCATE_AND_DENY_CHOICE_KIND,
     PUNISHMENT_CHOICE_KIND,
-    SENSOR_SWEEP_CHOICE_KIND,
     PrimaryMissionChoiceData,
 )
 from warhammer40k_core.engine.primary_mission_choice_policy import (
@@ -39,6 +42,9 @@ from warhammer40k_core.engine.primary_mission_marker_integrity import (
     SURVEIL_MOVE_PROCESSED_EVENT,
     validate_surveil_marker_removal_events,
 )
+from warhammer40k_core.engine.primary_mission_sensor_integrity import (
+    validate_sensor_sweep_choice_historical_policy,
+)
 from warhammer40k_core.engine.primary_mission_state import (
     MarkerAnchorKind,
     PrimaryCondemnedSelectionState,
@@ -51,6 +57,8 @@ from warhammer40k_core.engine.primary_mission_state import (
 from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.decision_record import DecisionRecord
+    from warhammer40k_core.engine.decision_request import DecisionRequest
     from warhammer40k_core.engine.game_state import GameState
 
 
@@ -126,12 +134,17 @@ def validate_primary_mission_progress_state(
     state: GameState,
     *,
     event_records: tuple[EventRecord, ...] | None = None,
+    decision_records: tuple[DecisionRecord, ...] | None = None,
+    pending_decision_requests: tuple[DecisionRequest, ...] | None = None,
 ) -> PrimaryMissionProgressState:
     """Validate the persistent Primary-mission progress graph.
 
     ``event_records=None`` is the explicit GameState construction context, where
-    only state-owned evidence is available.  Supplying event records additionally
-    authenticates every mutation edge and rejects omitted persisted progress.
+    only state-owned evidence is available. Supplying event records additionally
+    authenticates every mutation edge and rejects omitted persisted progress;
+    supplying decision records closes every nonautomatic player choice to its
+    accepted request/result pair, while pending requests authenticate an
+    in-progress Consecrate turn-end choice queue.
     """
     progress = state.primary_mission_progress_state
     if type(progress) is not PrimaryMissionProgressState:
@@ -154,6 +167,25 @@ def validate_primary_mission_progress_state(
                 progress=progress,
                 graph=graph,
                 event_graph=event_graph,
+            )
+        from warhammer40k_core.engine.primary_mission_consecrate_integrity import (
+            validate_primary_mission_consecrate_integrity,
+        )
+
+        validate_primary_mission_consecrate_integrity(
+            state=state,
+            event_records=event_graph.records,
+            pending_decision_requests=pending_decision_requests,
+        )
+        if decision_records is not None:
+            from warhammer40k_core.engine.primary_mission_decision_integrity import (
+                validate_primary_mission_choice_decision_integrity,
+            )
+
+            validate_primary_mission_choice_decision_integrity(
+                state=state,
+                event_records=event_graph.records,
+                decision_records=decision_records,
             )
     return progress
 
@@ -794,8 +826,10 @@ def _validate_event_progress(
         if marker.status is PrimaryMissionMarkerStatus.REMOVED:
             removal_index = _validate_marker_removal_event(
                 marker=marker,
+                progress=progress,
                 graph=graph,
                 event_graph=event_graph,
+                creation_index_by_marker_id=creation_index_by_marker_id,
                 surveil_removal_index_by_marker_id=surveil_removal_index_by_marker_id,
             )
             if removal_index <= creation_index_by_marker_id[marker.marker_id]:
@@ -841,12 +875,21 @@ def _validate_marker_creation_event(
             "primary_mission_marker": cast(dict[str, JsonValue], creation_payload),
             "source_id": marker.source_rule_id,
         }
-        matches = tuple(
-            record
-            for record in event_graph.records
-            if record.event_type == _MISSION_ACTION_COMPLETED_EVENT
-            and record.payload == expected_payload
-        )
+        matches: list[EventRecord] = []
+        for record in event_graph.records:
+            if record.event_type != _MISSION_ACTION_COMPLETED_EVENT or not isinstance(
+                record.payload, dict
+            ):
+                continue
+            actual_payload = dict(record.payload)
+            raw_completion_evidence = actual_payload.pop(
+                PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY,
+                None,
+            )
+            if actual_payload != expected_payload:
+                continue
+            PrimaryMissionActionCompletionEvidence.from_payload(raw_completion_evidence)
+            matches.append(record)
         if len(matches) != 1:
             raise GameLifecycleError("Action-created Primary marker requires one completion event.")
         return event_graph.index_by_id[matches[0].event_id]
@@ -891,8 +934,10 @@ def _validate_marker_creation_event(
 def _validate_marker_removal_event(
     *,
     marker: PrimaryMissionMarkerState,
+    progress: PrimaryMissionProgressState,
     graph: _StateGraph,
     event_graph: _EventGraph,
+    creation_index_by_marker_id: dict[str, int],
     surveil_removal_index_by_marker_id: dict[str, int],
 ) -> int:
     removal_event_id = cast(str, marker.removal_event_id)
@@ -909,19 +954,19 @@ def _validate_marker_removal_event(
             mission_id=action.mission_id,
             graph=graph,
         )
-        if (
-            payload.get("removed_marker") != marker.to_payload()
-            or payload.get("result_id") != marker.removal_result_id
-            or choice.choice_kind != SENSOR_SWEEP_CHOICE_KIND
-            or choice.player_id != action.player_id
-            or choice.primary_mission_id != action.mission_id
-            or choice.source_descriptor_id != descriptor.mission_action_id
-            or choice.source_rule_id != descriptor.source_id
-            or choice.source_action_id != action.action_id
-            or choice.selected_target_ids != (marker.marker_id,)
-            or choice.evidence_ids != (action.action_id,)
-        ):
-            raise GameLifecycleError("Action-removed Primary marker event identity drift.")
+        validate_sensor_sweep_choice_historical_policy(
+            state=graph.state,
+            progress=progress,
+            marker=marker,
+            action=action,
+            descriptor=descriptor,
+            choice=choice,
+            choice_event=event,
+            choice_event_payload=payload,
+            event_records=event_graph.records,
+            event_index_by_id=event_graph.index_by_id,
+            creation_index_by_marker_id=creation_index_by_marker_id,
+        )
         return event_graph.index_by_id[event.event_id]
 
     processed_index = surveil_removal_index_by_marker_id.get(marker.marker_id)

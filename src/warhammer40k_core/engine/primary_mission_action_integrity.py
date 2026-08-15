@@ -20,9 +20,24 @@ from warhammer40k_core.engine.mission_terrain import (
     logical_terrain_area_within_player_territory,
     mission_logical_terrain_area_by_id,
 )
+from warhammer40k_core.engine.objective_control import ObjectiveControlRecord
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.primary_mission_action_interruptions import (
     validate_primary_mission_action_interruption_evidence,
+)
+from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
+    PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY,
+    PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY,
+    PrimaryMissionActionCompletionEvidence,
+    PrimaryMissionActionStartEvidence,
+)
+from warhammer40k_core.engine.primary_mission_action_lifecycle_policy import (
+    active_primary_mission_marker_ids_at_event,
+    objective_control_record_for_completion_evidence,
+    primary_mission_action_prior_use_evidence,
+    validate_primary_mission_action_completion_evidence,
+    validate_primary_mission_action_start_evidence,
+    validate_primary_mission_action_use_limits,
 )
 from warhammer40k_core.engine.primary_mission_action_options import (
     primary_mission_action_target_kind,
@@ -37,6 +52,7 @@ from warhammer40k_core.engine.primary_scoring_conditions import home_objective_i
 from warhammer40k_core.engine.rules_units import current_rules_unit_views_for_identity
 
 if TYPE_CHECKING:
+    from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.game_state import GameState
 
 
@@ -92,6 +108,7 @@ def validate_primary_mission_action_integrity(
     *,
     state: GameState,
     event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...] | None = None,
 ) -> None:
     """Authenticate source-backed Primary Action state against runtime and event authority."""
 
@@ -106,6 +123,16 @@ def validate_primary_mission_action_integrity(
     event_index_by_id = {record.event_id: index for index, record in enumerate(event_records)}
     if len(event_index_by_id) != len(event_records):
         raise GameLifecycleError("Primary Mission Action event identities are duplicated.")
+    if decision_records is not None:
+        from warhammer40k_core.engine.primary_mission_decision_integrity import (
+            validate_primary_mission_action_start_decision_integrity,
+        )
+
+        validate_primary_mission_action_start_decision_integrity(
+            state=state,
+            event_records=event_records,
+            decision_records=decision_records,
+        )
 
     policies = {
         descriptor.mission_action_id: descriptor
@@ -150,6 +177,17 @@ def validate_primary_mission_action_integrity(
             event_records=event_records,
             event_index_by_id=event_index_by_id,
         )
+        _validate_lifecycle_policy_evidence(
+            state=state,
+            action=action,
+            runtime_action=runtime_action,
+            policy=policy,
+            start_event=start_event,
+            terminal_event=terminal_event,
+            action_events=action_events,
+            event_records=event_records,
+            event_index_by_id=event_index_by_id,
+        )
         _validate_sensor_start_policy(
             state=state,
             action=action,
@@ -170,13 +208,203 @@ def validate_primary_mission_action_integrity(
         ):
             raise GameLifecycleError("Primary Mission Action terminal event ordering drifted.")
 
-    _validate_sensor_use_limits(actions=actions, policies=policies)
+    validate_primary_mission_action_use_limits(
+        state=state,
+        ordered_actions=tuple(
+            sorted(
+                actions,
+                key=lambda action: _start_event_order(
+                    action_id=action.action_id,
+                    action_events=action_events,
+                    event_index_by_id=event_index_by_id,
+                ),
+            )
+        ),
+        policies=policies,
+    )
     _validate_marker_action_references(
         state=state,
         action_ids=frozenset(action_by_id),
         policy_ids=frozenset(policies),
         policy_source_ids=frozenset(policy.source_id for policy in policies.values()),
     )
+
+
+def _validate_lifecycle_policy_evidence(
+    *,
+    state: GameState,
+    action: MissionActionState,
+    runtime_action: MissionActionDefinition,
+    policy: MissionActionPolicyDescriptor,
+    start_event: EventRecord,
+    terminal_event: EventRecord | None,
+    action_events: dict[str, tuple[tuple[int, EventRecord], ...]],
+    event_records: tuple[EventRecord, ...],
+    event_index_by_id: dict[str, int],
+) -> None:
+    start_payload = _object(start_event.payload, label="Primary Mission Action start event")
+    start_evidence = PrimaryMissionActionStartEvidence.from_payload(
+        start_payload.get(PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY)
+    )
+    if (
+        start_evidence.player_id != action.player_id
+        or start_evidence.battle_round != action.battle_round_started
+        or start_evidence.phase != action.phase_started
+        or start_evidence.unit_instance_id != action.unit_instance_id
+        or start_evidence.target_id != action.target_id
+        or start_evidence.condition_target_id != action.condition_target_id
+        or start_evidence.eligible_unit_instance_ids != action.eligible_unit_instance_ids
+    ):
+        raise GameLifecycleError("Primary Mission Action start evidence state drifted.")
+    start_order = event_index_by_id[start_event.event_id]
+    prior_actions: list[MissionActionState] = []
+    for candidate in state.mission_action_states:
+        if candidate.action_id == action.action_id:
+            continue
+        candidate_records = action_events.get(candidate.action_id, ())
+        starts = tuple(
+            record
+            for _index, record in candidate_records
+            if record.event_type == "mission_action_started"
+        )
+        if len(starts) != 1:
+            raise GameLifecycleError(
+                "Primary Mission Action prior-use event history is incomplete."
+            )
+        if event_index_by_id[starts[0].event_id] < start_order:
+            prior_actions.append(candidate)
+    expected_prior_uses = primary_mission_action_prior_use_evidence(
+        state=state,
+        actions=tuple(prior_actions),
+    )
+    validate_primary_mission_action_start_evidence(
+        state=state,
+        action=runtime_action,
+        policy=policy,
+        evidence=start_evidence,
+        expected_active_marker_ids=active_primary_mission_marker_ids_at_event(
+            state=state,
+            event=start_event,
+            event_index_by_id=event_index_by_id,
+        ),
+        expected_prior_uses=expected_prior_uses,
+    )
+
+    if terminal_event is None:
+        return
+    terminal_payload = _object(
+        terminal_event.payload,
+        label="Primary Mission Action terminal event",
+    )
+    completion_payload = terminal_payload.get(PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY)
+    completion_failed = terminal_event.event_type == "mission_action_completion_failed"
+    if terminal_event.event_type == "mission_action_interrupted" and not completion_failed:
+        if completion_payload is not None:
+            raise GameLifecycleError("Interrupted Primary Mission Action has completion evidence.")
+        return
+    completion_evidence = PrimaryMissionActionCompletionEvidence.from_payload(completion_payload)
+    expected_round = (
+        action.completed_battle_round
+        if action.status is MissionActionStatus.COMPLETED
+        else action.battle_round_started
+    )
+    expected_phase = (
+        action.completed_phase
+        if action.status is MissionActionStatus.COMPLETED
+        else state.battle_phase_sequence[-1].value
+    )
+    if (
+        expected_round is None
+        or expected_phase is None
+        or completion_evidence.battle_round != expected_round
+        or completion_evidence.phase != expected_phase
+    ):
+        raise GameLifecycleError("Primary Mission Action completion evidence context drifted.")
+    objective_record = objective_control_record_for_completion_evidence(
+        state=state,
+        evidence=completion_evidence,
+    )
+    if policy.completion_timing == "turn_end":
+        if objective_record is None:
+            raise GameLifecycleError(
+                "Turn-end Primary Mission Action lacks objective boundary evidence."
+            )
+        _validate_completion_boundary_event(
+            record=objective_record,
+            start_event=start_event,
+            terminal_event=terminal_event,
+            event_records=event_records,
+            event_index_by_id=event_index_by_id,
+        )
+    evaluated = validate_primary_mission_action_completion_evidence(
+        state=state,
+        action=action,
+        policy=policy,
+        evidence=completion_evidence,
+        objective_control_record=objective_record,
+    )
+    if (terminal_event.event_type == "mission_action_completed" and not evaluated) or (
+        completion_failed and evaluated
+    ):
+        raise GameLifecycleError(
+            "Primary Mission Action terminal status contradicts completion evidence."
+        )
+
+
+def _validate_completion_boundary_event(
+    *,
+    record: ObjectiveControlRecord,
+    start_event: EventRecord,
+    terminal_event: EventRecord,
+    event_records: tuple[EventRecord, ...],
+    event_index_by_id: dict[str, int],
+) -> None:
+    matches = tuple(
+        event
+        for event in event_records
+        if event.event_type == "end_boundary_objective_control_determined"
+        and isinstance(event.payload, dict)
+        and event.payload.get("record_ids") == [record.record_id]
+    )
+    if len(matches) != 1:
+        raise GameLifecycleError(
+            "Primary Mission Action completion lacks one objective boundary event."
+        )
+    boundary = matches[0]
+    payload = _object(boundary.payload, label="Objective-control boundary event")
+    expected_payload: dict[str, JsonValue] = {
+        "game_id": record.game_id,
+        "battle_round": record.battle_round,
+        "phase": record.phase,
+        "record_ids": [record.record_id],
+        "source_rule_id": (
+            "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+        ),
+    }
+    if payload != expected_payload or not (
+        event_index_by_id[start_event.event_id]
+        < event_index_by_id[boundary.event_id]
+        < event_index_by_id[terminal_event.event_id]
+    ):
+        raise GameLifecycleError(
+            "Primary Mission Action objective boundary event ordering drifted."
+        )
+
+
+def _start_event_order(
+    *,
+    action_id: str,
+    action_events: dict[str, tuple[tuple[int, EventRecord], ...]],
+    event_index_by_id: dict[str, int],
+) -> int:
+    starts = tuple(
+        record
+        for _index, record in action_events.get(action_id, ())
+        if record.event_type == "mission_action_started"
+    )
+    if len(starts) != 1:
+        raise GameLifecycleError("Primary Mission Action start event ordering is incomplete.")
+    return event_index_by_id[starts[0].event_id]
 
 
 def _validate_runtime_definition(
@@ -893,28 +1121,6 @@ def _sensor_marker_ids_at_start(
             continue
         raise GameLifecycleError("Sensor Sweep start policy is unsupported.")
     return tuple(sorted(candidates))
-
-
-def _validate_sensor_use_limits(
-    *,
-    actions: tuple[MissionActionState, ...],
-    policies: dict[str, MissionActionPolicyDescriptor],
-) -> None:
-    uses: set[tuple[str, int, str]] = set()
-    for action in actions:
-        policy = policies[action.mission_action_id]
-        if policy.effect_descriptor not in _SENSOR_EFFECTS:
-            continue
-        if policy.use_limit != "once_per_turn":
-            raise GameLifecycleError("Sensor Sweep start-policy use limit drifted.")
-        use = (
-            action.player_id,
-            action.battle_round_started,
-            action.mission_action_id,
-        )
-        if use in uses:
-            raise GameLifecycleError("Sensor Sweep once-per-turn use limit was exceeded.")
-        uses.add(use)
 
 
 def _sensor_effect_can_be_pending(*, state: GameState, action: MissionActionState) -> bool:

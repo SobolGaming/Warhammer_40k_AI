@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
 
+from warhammer40k_core.engine.mission_action_policies import PrimaryMissionChoiceRuleDescriptor
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.mission_terrain import (
     logical_terrain_area_within_player_deployment_zone,
@@ -11,13 +12,23 @@ from warhammer40k_core.engine.mission_terrain import (
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
     ObjectiveControlResult,
+    ObjectiveControlTiming,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_mission_state import (
+    PrimaryConsecrationDesignationState,
+    PrimaryMissionMarkerState,
+    is_consecrated_objective_marker,
+)
+from warhammer40k_core.engine.primary_scoring_conditions import home_objective_ids
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartMembership,
     PrimaryRulesUnitTurnStartSnapshot,
 )
-from warhammer40k_core.engine.rules_units import rules_unit_views_from_armies
+from warhammer40k_core.engine.rules_units import (
+    current_rules_unit_views_for_identity,
+    rules_unit_views_from_armies,
+)
 from warhammer40k_core.engine.scoring import PrimaryObjectiveTurnStartState
 
 if TYPE_CHECKING:
@@ -25,6 +36,7 @@ if TYPE_CHECKING:
 
 
 PunishmentCandidatePresenceContext = Literal["live_request", "historical_restore"]
+ConsecrateCandidatePresenceContext = Literal["live_request", "historical_restore"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -39,6 +51,12 @@ class PunishmentChoicePolicy:
     candidate_rules_unit_instance_ids: tuple[str, ...]
     candidate_evidence_ids: tuple[str, ...]
     used_fallback_candidates: bool
+
+
+@dataclass(frozen=True, slots=True)
+class ConsecrateChoicePolicy:
+    eligible_objective_ids: tuple[str, ...]
+    evidence_ids: tuple[str, ...]
 
 
 def resolve_locate_and_deny_choice_policy(
@@ -147,6 +165,107 @@ def resolve_punishment_choice_policy(
         candidate_rules_unit_instance_ids=candidate_ids,
         candidate_evidence_ids=evidence_ids,
         used_fallback_candidates=used_fallback,
+    )
+
+
+def resolve_consecrate_choice_policy(
+    *,
+    state: GameState,
+    player_id: str,
+    designation: PrimaryConsecrationDesignationState,
+    descriptor: PrimaryMissionChoiceRuleDescriptor,
+    objective_control_record: ObjectiveControlRecord,
+    consecrated_markers: tuple[PrimaryMissionMarkerState, ...],
+    candidate_presence_context: ConsecrateCandidatePresenceContext,
+) -> ConsecrateChoicePolicy:
+    """Resolve Consecrate targets from live or immutable historical presence.
+
+    Live requests deliberately follow the designation's current descendant
+    rules-unit views so pending requests become stale after an Attached Unit
+    split or another current-state change. Historical restoration instead uses
+    the designation's persisted component lineage and the exact cited turn-end
+    objective-control record; later battlefield state must not rewrite history.
+    """
+
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Consecrate policy requires GameState.")
+    if type(designation) is not PrimaryConsecrationDesignationState:
+        raise GameLifecycleError("Consecrate policy requires a designation.")
+    if type(descriptor) is not PrimaryMissionChoiceRuleDescriptor:
+        raise GameLifecycleError("Consecrate policy requires a choice descriptor.")
+    if type(objective_control_record) is not ObjectiveControlRecord:
+        raise GameLifecycleError("Consecrate policy requires an objective-control record.")
+    if type(consecrated_markers) is not tuple or any(
+        type(marker) is not PrimaryMissionMarkerState for marker in consecrated_markers
+    ):
+        raise GameLifecycleError("Consecrate policy requires a marker tuple.")
+    if candidate_presence_context not in {"live_request", "historical_restore"}:
+        raise GameLifecycleError("Consecrate candidate presence context is unsupported.")
+    if player_id not in state.player_ids:
+        raise GameLifecycleError("Consecrate policy player is not in this game.")
+    if (
+        designation.game_id != state.game_id
+        or designation.owner_player_id != player_id
+        or designation.mission_id != descriptor.primary_mission_id
+    ):
+        raise GameLifecycleError("Consecrate designation identity drifted.")
+    mission_setup = state.mission_setup
+    battlefield = state.battlefield_state
+    if mission_setup is None or battlefield is None:
+        raise GameLifecycleError("Consecrate policy requires mission battlefield state.")
+    if mission_setup.primary_mission_id_for_player(player_id) != descriptor.primary_mission_id:
+        raise GameLifecycleError("Consecrate policy mission assignment drifted.")
+    if (
+        objective_control_record.game_id != state.game_id
+        or objective_control_record.active_player_id != player_id
+        or objective_control_record.timing is not ObjectiveControlTiming.TURN_END
+        or objective_control_record.battlefield_id != battlefield.battlefield_id
+    ):
+        raise GameLifecycleError("Consecrate objective-control context drifted.")
+
+    source_identity = (descriptor.source_id, descriptor.choice_rule_id)
+    excluded_ids = set(home_objective_ids(mission_setup, player_id=player_id))
+    excluded_ids.update(
+        marker.objective_marker_id
+        for marker in consecrated_markers
+        if is_consecrated_objective_marker(marker, source_identity)
+        and marker.objective_marker_id is not None
+    )
+    if candidate_presence_context == "live_request":
+        subject_components = tuple(
+            (view.owner_player_id, frozenset(view.component_unit_instance_ids))
+            for view in current_rules_unit_views_for_identity(
+                state=state,
+                unit_instance_id=designation.rules_unit_instance_id,
+            )
+        )
+    else:
+        subject_components = (
+            (designation.owner_player_id, frozenset(designation.component_unit_instance_ids)),
+        )
+    if any(owner_player_id != player_id for owner_player_id, _components in subject_components):
+        raise GameLifecycleError("Consecrate designation ownership drifted.")
+
+    eligible_ids = tuple(
+        sorted(
+            result.objective_id
+            for result in objective_control_record.results
+            if result.objective_id not in excluded_ids
+            and any(
+                any(
+                    contribution.player_id == owner_player_id
+                    and contribution.unit_instance_id in component_ids
+                    for contribution in result.contributors
+                )
+                for owner_player_id, component_ids in subject_components
+            )
+        )
+    )
+    return ConsecrateChoicePolicy(
+        eligible_objective_ids=eligible_ids,
+        evidence_ids=(objective_control_record.record_id,),
     )
 
 
@@ -402,9 +521,12 @@ def _previous_turn_key_or_none(
 
 
 __all__ = (
+    "ConsecrateCandidatePresenceContext",
+    "ConsecrateChoicePolicy",
     "LocateAndDenyChoicePolicy",
     "PunishmentCandidatePresenceContext",
     "PunishmentChoicePolicy",
+    "resolve_consecrate_choice_policy",
     "resolve_locate_and_deny_choice_policy",
     "resolve_punishment_choice_policy",
 )

@@ -18,6 +18,9 @@ from warhammer40k_core.engine.mission_action_eligibility import (
 from warhammer40k_core.engine.mission_action_policies import (
     SUPPORTED_MISSION_ACTION_TARGET_POLICIES as PRIMARY_MISSION_ACTION_TARGET_POLICIES,
 )
+from warhammer40k_core.engine.mission_action_policies import (
+    mission_action_policy_for_id,
+)
 from warhammer40k_core.engine.mission_terrain import (
     logical_terrain_area_within_player_deployment_zone,
     logical_terrain_area_within_player_territory,
@@ -32,6 +35,18 @@ from warhammer40k_core.engine.objective_control import (
     resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.primary_mission_action_battlefield_evidence import (
+    MissionActionBattlefieldBoundaryEvidence,
+)
+from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
+    MissionActionStartAuthorityEvidence,
+    MissionActionStartAuthorityOptionEvidence,
+    PrimaryMissionActionStartEvidence,
+    canonical_json_object,
+)
+from warhammer40k_core.engine.primary_mission_action_lifecycle_policy import (
+    capture_primary_mission_action_start_evidence,
+)
 from warhammer40k_core.engine.primary_mission_action_options import (
     primary_mission_action_start_targets,
     primary_mission_action_target_kind,
@@ -206,6 +221,150 @@ def mission_action_start_options(
             eligible_unit_instance_ids=eligible_unit_ids,
         )
         for unit_id, target_id in eligible_target_pairs
+    )
+
+
+def primary_mission_action_start_evidence_for_selection(
+    *,
+    state: GameState,
+    player_id: str,
+    action: MissionActionDefinition,
+    unit_instance_id: str,
+    target_id: str,
+    condition_target_id: str | None,
+    opportunity: bool,
+    decline_option_id: str,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> PrimaryMissionActionStartEvidence:
+    """Recompute the complete legal inventory before capturing selected start evidence."""
+
+    _require_runtime_modifier_registry(runtime_modifier_registry)
+    if action.target_policy not in PRIMARY_MISSION_ACTION_TARGET_POLICIES:
+        raise GameLifecycleError("Start evidence requires a source-backed Primary Action.")
+    battlefield_state = state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Start evidence requires battlefield_state.")
+    phase = _current_phase(state)
+    options = (
+        mission_action_opportunity_options(
+            state=state,
+            player_id=player_id,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        if opportunity
+        else mission_action_start_options(
+            state=state,
+            player_id=player_id,
+            action=action,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+    )
+    matching = tuple(
+        option
+        for option in options
+        if option.action.mission_action_id == action.mission_action_id
+        and option.unit_instance_id == unit_instance_id
+        and option.target_id == target_id
+        and option.condition_target_id == condition_target_id
+    )
+    if len(matching) != 1:
+        raise GameLifecycleError("Selected Primary Mission Action target is not legal.")
+    action_option_ids = [option.option_id() for option in options]
+    if opportunity:
+        request_payload: dict[str, JsonValue] = {
+            "game_id": state.game_id,
+            "player_id": player_id,
+            "battle_round": state.battle_round,
+            "phase": phase.value,
+            "mission_action_opportunity": True,
+            "legal_mission_action_ids": cast(
+                list[JsonValue],
+                sorted({option.action.mission_action_id for option in options}),
+            ),
+            "legal_action_option_ids": cast(list[JsonValue], action_option_ids),
+            "legal_option_ids": cast(
+                list[JsonValue],
+                sorted((*action_option_ids, decline_option_id)),
+            ),
+        }
+        authority_options = (
+            *(
+                MissionActionStartAuthorityOptionEvidence(
+                    option_id=option.option_id(),
+                    label=option.label(state=state),
+                    payload_json=canonical_json_object(
+                        {
+                            **option.payload(
+                                state=state,
+                                player_id=player_id,
+                                phase=phase,
+                            ),
+                            "mission_action_opportunity": True,
+                            "legal_action_option_ids": action_option_ids,
+                        }
+                    ),
+                )
+                for option in options
+            ),
+            MissionActionStartAuthorityOptionEvidence(
+                option_id=decline_option_id,
+                label="Continue to shooting",
+                payload_json=canonical_json_object(
+                    {
+                        "game_id": state.game_id,
+                        "player_id": player_id,
+                        "battle_round": state.battle_round,
+                        "phase": phase.value,
+                        "mission_action_opportunity": True,
+                        "legal_action_option_ids": action_option_ids,
+                    }
+                ),
+            ),
+        )
+    else:
+        request_payload = {
+            "game_id": state.game_id,
+            "player_id": player_id,
+            "battle_round": state.battle_round,
+            "phase": phase.value,
+            "mission_action_id": action.mission_action_id,
+            "legal_option_ids": cast(list[JsonValue], action_option_ids),
+        }
+        authority_options = tuple(
+            MissionActionStartAuthorityOptionEvidence(
+                option_id=option.option_id(),
+                label=option.label(state=state),
+                payload_json=canonical_json_object(
+                    option.payload(
+                        state=state,
+                        player_id=player_id,
+                        phase=phase,
+                    )
+                ),
+            )
+            for option in options
+        )
+    start_authority = MissionActionStartAuthorityEvidence(
+        request_kind="opportunity" if opportunity else "direct",
+        request_payload_json=canonical_json_object(request_payload),
+        battlefield_boundary=MissionActionBattlefieldBoundaryEvidence.from_battlefield_state(
+            battlefield_state
+        ),
+        options=authority_options,
+        candidate_units=(),
+        terrain_model_inventory=(),
+    )
+    return capture_primary_mission_action_start_evidence(
+        state=state,
+        player_id=player_id,
+        action=action,
+        policy=mission_action_policy_for_id(action.mission_action_id),
+        unit_instance_id=unit_instance_id,
+        target_id=target_id,
+        condition_target_id=condition_target_id,
+        eligible_unit_instance_ids=matching[0].eligible_unit_instance_ids,
+        start_authority=start_authority,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
 
 

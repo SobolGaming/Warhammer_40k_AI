@@ -24,7 +24,6 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
-    ObjectiveControlResult,
     ObjectiveControlTiming,
     resolve_objective_control,
 )
@@ -42,6 +41,7 @@ from warhammer40k_core.engine.primary_mission_choice_payloads import (
     PrimaryMissionChoicePayload,
 )
 from warhammer40k_core.engine.primary_mission_choice_policy import (
+    resolve_consecrate_choice_policy,
     resolve_locate_and_deny_choice_policy,
     resolve_punishment_choice_policy,
 )
@@ -53,14 +53,8 @@ from warhammer40k_core.engine.primary_mission_state import (
     PrimaryMissionMarkerState,
     PrimaryMissionMarkerStatus,
     PrimaryMissionProgressState,
-    is_consecrated_objective_marker,
     primary_condemned_selection_id,
     primary_mission_marker_id,
-)
-from warhammer40k_core.engine.primary_scoring_conditions import home_objective_ids
-from warhammer40k_core.engine.rules_units import (
-    RulesUnitView,
-    current_rules_unit_views_for_identity,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.start_battle_hooks import (
@@ -207,12 +201,14 @@ def consecrate_choice_request(
         timing=ObjectiveControlTiming.TURN_END,
         runtime_modifier_registry=runtime_modifier_registry,
     )
-    target_ids = _eligible_consecration_objective_ids(
+    policy = resolve_consecrate_choice_policy(
         state=state,
         player_id=player_id,
         designation=designation,
         descriptor=descriptor,
-        record=record,
+        objective_control_record=record,
+        consecrated_markers=state.primary_mission_progress_state.markers,
+        candidate_presence_context="live_request",
     )
     choice = PrimaryMissionChoiceData(
         game_id=state.game_id,
@@ -225,16 +221,19 @@ def consecrate_choice_request(
         phase=_current_phase(state),
         subject_id=designation.designation_id,
         source_action_id=None,
-        legal_target_ids=target_ids,
+        legal_target_ids=policy.eligible_objective_ids,
         selected_target_ids=(),
-        evidence_ids=(record.record_id,),
+        evidence_ids=policy.evidence_ids,
         used_fallback_candidates=False,
     )
     return _choice_request(
         state=state,
         request_id=request_id,
         choice=choice,
-        selected_target_sets=(*((target_id,) for target_id in target_ids), ()),
+        selected_target_sets=(
+            *((target_id,) for target_id in policy.eligible_objective_ids),
+            (),
+        ),
     )
 
 
@@ -253,8 +252,8 @@ def sensor_sweep_marker_removal_choice_request(
         for marker in state.primary_mission_progress_state.markers
     ):
         return None
-    markers = _sensor_sweep_markers(
-        progress=state.primary_mission_progress_state,
+    markers = sensor_sweep_markers_for_policy(
+        markers=state.primary_mission_progress_state.markers,
         action=action,
         descriptor=descriptor,
     )
@@ -945,7 +944,10 @@ def _choice_request(
         payload=validate_json_value(choice.to_payload()),
         options=tuple(
             DecisionOption(
-                option_id=_choice_option_id(choice=choice, selected_ids=selected_ids),
+                option_id=primary_mission_choice_option_id(
+                    choice=choice,
+                    selected_ids=selected_ids,
+                ),
                 label=_choice_option_label(choice=choice, selected_ids=selected_ids),
                 payload=validate_json_value(
                     choice.with_selected_targets(selected_ids).to_payload()
@@ -956,7 +958,7 @@ def _choice_request(
     )
 
 
-def _choice_option_id(
+def primary_mission_choice_option_id(
     *,
     choice: PrimaryMissionChoiceData,
     selected_ids: tuple[str, ...],
@@ -1003,48 +1005,6 @@ def _next_consecration_designation(
         )
     )
     return None if not candidates else min(candidates, key=lambda value: value.designation_id)
-
-
-def _eligible_consecration_objective_ids(
-    *,
-    state: GameState,
-    player_id: str,
-    designation: PrimaryConsecrationDesignationState,
-    descriptor: PrimaryMissionChoiceRuleDescriptor,
-    record: ObjectiveControlRecord,
-) -> tuple[str, ...]:
-    mission_setup = _mission_setup(state)
-    excluded_ids = set(home_objective_ids(mission_setup, player_id=player_id))
-    source_identity = (descriptor.source_id, descriptor.choice_rule_id)
-    excluded_ids.update(
-        marker.objective_marker_id
-        for marker in state.primary_mission_progress_state.markers
-        if is_consecrated_objective_marker(marker, source_identity)
-        and marker.objective_marker_id is not None
-    )
-    views = current_rules_unit_views_for_identity(
-        state=state,
-        unit_instance_id=designation.rules_unit_instance_id,
-    )
-    return tuple(
-        result.objective_id
-        for result in record.results
-        if result.objective_id not in excluded_ids
-        and any(_result_has_rules_unit(result=result, view=view) for view in views)
-    )
-
-
-def _result_has_rules_unit(
-    *,
-    result: ObjectiveControlResult,
-    view: RulesUnitView,
-) -> bool:
-    component_ids = set(view.component_unit_instance_ids)
-    return any(
-        contribution.player_id == view.owner_player_id
-        and contribution.unit_instance_id in component_ids
-        for contribution in result.contributors
-    )
 
 
 def _current_objective_control_record(
@@ -1098,16 +1058,20 @@ def _sensor_sweep_descriptor(action: MissionActionState) -> MissionActionPolicyD
     return descriptor
 
 
-def _sensor_sweep_markers(
+def sensor_sweep_markers_for_policy(
     *,
-    progress: PrimaryMissionProgressState,
+    markers: tuple[PrimaryMissionMarkerState, ...],
     action: MissionActionState,
     descriptor: MissionActionPolicyDescriptor,
 ) -> tuple[PrimaryMissionMarkerState, ...]:
+    if type(markers) is not tuple or any(
+        type(marker) is not PrimaryMissionMarkerState for marker in markers
+    ):
+        raise GameLifecycleError("Sensor Sweep marker policy requires typed markers.")
     if descriptor.mission_action_id == SENSOR_SWEEP_LOCATE_ACTION_ID:
         return tuple(
             marker
-            for marker in progress.markers
+            for marker in markers
             if marker.status is PrimaryMissionMarkerStatus.ACTIVE
             and marker.marker_kind == PRIMARY_OPERATION_MARKER_KIND
             and marker.mission_id == descriptor.primary_mission_id
@@ -1116,7 +1080,7 @@ def _sensor_sweep_markers(
     if descriptor.mission_action_id == SENSOR_SWEEP_EXTRACT_ACTION_ID:
         return tuple(
             marker
-            for marker in progress.markers
+            for marker in markers
             if marker.status is PrimaryMissionMarkerStatus.ACTIVE
             and marker.marker_kind == PRIMARY_OPERATION_MARKER_KIND
             and marker.owner_player_id != action.player_id
@@ -1364,6 +1328,8 @@ __all__ = (
     "invalid_primary_mission_choice_request_status",
     "locate_and_deny_setup_choice_request",
     "locate_and_deny_start_battle_binding",
+    "primary_mission_choice_option_id",
     "punishment_choice_request",
     "sensor_sweep_marker_removal_choice_request",
+    "sensor_sweep_markers_for_policy",
 )

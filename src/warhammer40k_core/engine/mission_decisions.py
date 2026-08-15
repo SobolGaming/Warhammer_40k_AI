@@ -33,12 +33,26 @@ from warhammer40k_core.engine.mission_action_options import (
 from warhammer40k_core.engine.mission_action_options import (
     mission_action_start_options as _mission_action_start_options,
 )
+from warhammer40k_core.engine.mission_action_options import (
+    primary_mission_action_start_evidence_for_selection as _primary_start_evidence,
+)
+from warhammer40k_core.engine.mission_action_policies import (
+    mission_action_policy_descriptors,
+    mission_action_policy_for_id,
+)
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
+)
+from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
+    PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY,
+    PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY,
+)
+from warhammer40k_core.engine.primary_mission_action_lifecycle_policy import (
+    capture_primary_mission_action_completion_evidence,
 )
 from warhammer40k_core.engine.primary_mission_choices import (
     SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
@@ -67,6 +81,9 @@ MISSION_DECISION_TYPES = frozenset(
         START_MISSION_ACTION_DECISION_TYPE,
         SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
     )
+)
+_PRIMARY_MISSION_ACTION_IDS = frozenset(
+    descriptor.mission_action_id for descriptor in mission_action_policy_descriptors()
 )
 
 
@@ -888,21 +905,46 @@ def _apply_start_mission_action(
         unit_instance_id=unit_instance_id,
     ):
         raise GameLifecycleError("Battle-shocked units cannot start actions.")
+    target_id = _payload_string(payload, key="target_id")
+    condition_target_id = _payload_optional_string(payload, key="condition_target_id")
+    primary_policy = (
+        mission_action_policy_for_id(mission_action.mission_action_id)
+        if mission_action.mission_action_id in _PRIMARY_MISSION_ACTION_IDS
+        else None
+    )
+    start_evidence = (
+        _primary_start_evidence(
+            state=state,
+            player_id=player_id,
+            action=mission_action,
+            unit_instance_id=unit_instance_id,
+            target_id=target_id,
+            condition_target_id=condition_target_id,
+            opportunity=payload.get("mission_action_opportunity") is True,
+            decline_option_id=DECLINE_MISSION_ACTION_START_OPTION_ID,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        if primary_policy is not None
+        else None
+    )
+    eligible_unit_instance_ids = (
+        tuple(_payload_string_list(payload, key="eligible_unit_instance_ids"))
+        if start_evidence is None
+        else start_evidence.eligible_unit_instance_ids
+    )
     action_state = MissionActionState.start(
         action_id=f"mission-action:{result.result_id}",
         mission_action_id=mission_action.mission_action_id,
         player_id=player_id,
         unit_instance_id=unit_instance_id,
-        target_id=_payload_string(payload, key="target_id"),
-        condition_target_id=_payload_optional_string(payload, key="condition_target_id"),
+        target_id=target_id,
+        condition_target_id=condition_target_id,
         mission_id=mission_action.mission_id,
         battle_round=state.battle_round,
         phase=_current_phase(state).value,
         start_timing=mission_action.start_timing,
         completion_timing=mission_action.completion_timing,
-        eligible_unit_instance_ids=tuple(
-            _payload_string_list(payload, key="eligible_unit_instance_ids")
-        ),
+        eligible_unit_instance_ids=eligible_unit_instance_ids,
         interruption_conditions=mission_action.interruption_conditions,
         scoring_source_id=mission_action.scoring_source_id,
         victory_points=mission_action.victory_points,
@@ -919,20 +961,20 @@ def _apply_start_mission_action(
     else:
         completed_state = None
         state.record_mission_action_state(action_state)
-    decisions.event_log.append(
-        "mission_action_started",
-        {
-            "game_id": state.game_id,
-            "player_id": player_id,
-            "battle_round": state.battle_round,
-            "phase": _current_phase(state).value,
-            "mission_action_id": mission_action.mission_action_id,
-            "target_id": _payload_string(payload, key="target_id"),
-            "condition_target_id": _payload_optional_string(payload, key="condition_target_id"),
-            "target_policy": mission_action.target_policy,
-            "mission_action_state": validate_json_value(action_state.to_payload()),
-        },
-    )
+    start_event_payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "player_id": player_id,
+        "battle_round": state.battle_round,
+        "phase": _current_phase(state).value,
+        "mission_action_id": mission_action.mission_action_id,
+        "target_id": target_id,
+        "condition_target_id": condition_target_id,
+        "target_policy": mission_action.target_policy,
+        "mission_action_state": validate_json_value(action_state.to_payload()),
+    }
+    if start_evidence is not None:
+        start_event_payload[PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY] = start_evidence.to_payload()
+    decisions.event_log.append("mission_action_started", start_event_payload)
     if completed_state is None:
         return
     trap_state_payload: JsonValue | None = None
@@ -979,21 +1021,30 @@ def _apply_start_mission_action(
                 "secondary_terrain_plunder_state": plunder_state_payload,
             },
         )
-    decisions.event_log.append(
-        "mission_action_completed",
-        {
-            "game_id": state.game_id,
-            "player_id": player_id,
-            "battle_round": state.battle_round,
-            "phase": _current_phase(state).value,
-            "mission_action_id": mission_action.mission_action_id,
-            "target_id": completed_state.target_id,
-            "target_policy": mission_action.target_policy,
-            "mission_action_state": validate_json_value(completed_state.to_payload()),
-            "primary_terrain_trap_state": trap_state_payload,
-            "secondary_terrain_plunder_state": plunder_state_payload,
-        },
-    )
+    completion_event_payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "player_id": player_id,
+        "battle_round": state.battle_round,
+        "phase": _current_phase(state).value,
+        "mission_action_id": mission_action.mission_action_id,
+        "target_id": completed_state.target_id,
+        "target_policy": mission_action.target_policy,
+        "mission_action_state": validate_json_value(completed_state.to_payload()),
+        "primary_terrain_trap_state": trap_state_payload,
+        "secondary_terrain_plunder_state": plunder_state_payload,
+    }
+    if primary_policy is not None:
+        completion_evidence = capture_primary_mission_action_completion_evidence(
+            state=state,
+            action=completed_state,
+            policy=primary_policy,
+            completed_phase=_current_phase(state),
+            objective_control_record=None,
+        )
+        completion_event_payload[PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY] = (
+            completion_evidence.to_payload()
+        )
+    decisions.event_log.append("mission_action_completed", completion_event_payload)
 
 
 def _apply_mission_action_opportunity_decline(

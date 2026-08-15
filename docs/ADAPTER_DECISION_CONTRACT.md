@@ -895,11 +895,13 @@ The supported choice kinds are:
   records an automatic empty condemned selection and opens no pending request.
 - `consecrate_objective`: at the assigned player's turn end, one request is
   emitted for the next active consecration designation not yet resolved in
-  that owner turn. Each eligible non-home, not-already-friendly-consecrated
-  objective in range of that designated rules unit is a singleton option, and
-  an empty option declines. Selection creates a public consecrated marker and
-  consumes the designation. Decline retains the designation but records the
-  current owner turn so it cannot prompt again until a later turn.
+  that owner turn. Each eligible non-home objective in range of that designated
+  rules unit that has never previously been consecrated is a singleton option,
+  and an empty option declines. A removed/tombstoned Consecrate marker still
+  proves that its objective was previously consecrated. Selection creates a
+  public consecrated marker and consumes the designation. Decline retains the
+  designation but records the current owner turn so it cannot prompt again
+  until a later turn.
 - `sensor_sweep_marker_removal`: after a qualifying Sensor Sweep Action has
   completed, every eligible active operation marker is a singleton option.
   `sensor-sweep-locate-and-deny` enumerates friendly operation markers;
@@ -916,6 +918,37 @@ Adapters continue to submit the emitted
 `start:<mission_action_id>:<unit_instance_id>:<target_id>` option. The engine
 owns target policies, use limits, Action state, immediate or turn-end
 completion, marker/status effects, and follow-up Primary choices.
+
+Each accepted Step 4 Action start is closed to exactly one authoritative
+`DecisionRecord`. Its actor, request/result IDs, deterministic selected option,
+selected option payload, complete eligible-unit inventory, mission/source
+policy, unit, target, and condition target must agree with the persisted Action
+and the later `mission_action_started` mutation. The exact
+`decision_requested` and `decision_recorded` events precede that mutation.
+Restore rejects a source-backed Action state or start event without that
+decision closure.
+
+The public `mission_action_started` event also carries typed
+`mission_action_start_evidence` (`primary-mission-action-start-evidence-v1`).
+This immutable bundle records the source round/phase and policy, complete legal
+unit inventory, selected-unit eligibility state, objective/terrain or Surveil
+range-and-visibility witnesses, relevant operation-marker inventory, and all
+prior Action uses. Its typed start authority preserves the exact request and
+every option plus one complete candidate row for every friendly rules-unit
+membership at that boundary. It also preserves the typed battlefield identity,
+dimensions, and exact terrain-feature inventory needed to reproduce historical
+line-of-sight and visibility-cache inputs after later state normalization.
+Candidate rows cover the stable component/model
+universe, eligibility outcome, objective and Surveil witnesses, terrain-model
+inventory, and derived legal Primary option IDs. Restore derives the eligible
+unit and option inventories from those rows and requires exact agreement with
+the full authoritative request, including every nonselected option. Live option
+generation and restore consume the same generic policy evaluator. Restore
+therefore enforces battle-round-two starts,
+`once_per_turn`, `unlimited`, and
+`unlimited_different_objective_per_unit_this_phase` across the complete ordered
+Action history; Surveil's no-repeat target rule is enforced independently of
+its unlimited Action count.
 
 Turn ordering is engine-owned and blocking. Locate and Deny drains before
 battle entry. Punishment drains after battle-round-start hooks and before the
@@ -3339,20 +3372,55 @@ semantic members: `choice`, `request_id`, `result_id`,
 `selected_option_id`, `automatic`, `created_markers`,
 `condemned_selection`, `updated_designation`, and `removed_marker`.
 Automatic empty Punishment resolution has null request/result/option IDs and
-still records the complete choice and condemned-selection row.
+still records the complete choice and condemned-selection row. Every
+nonautomatic resolution is rebound during restore to exactly one accepted
+finite `DecisionRecord`, including its deterministic complete option inventory
+and requested/recorded/mutation ordering. An automatic empty Punishment must
+have no attached player decision.
 
 Accepted or automatically resolved Step 4 state is also linked through
 `mission_action_completed`, `primary_consecration_unit_designated`, and
 `primary_surveil_move_marker_removal_resolved` when applicable. A completed
 Primary Action event includes its complete `mission_action_state` and nullable
-`primary_mission_marker`. Consecrate designations bind the authoritative
-destruction event and state row. Surveil move resolutions bind the processed
+`primary_mission_marker`. Source-backed completed and completion-failed Action
+events also carry `mission_action_completion_evidence`
+(`primary-mission-action-completion-evidence-v1`). Turn-end evidence cites the
+exact authoritative `ObjectiveControlRecord` ID and canonical payload hash,
+the target result, Action-unit lineage contributors, Battle-shock state, and,
+for Vanguard Operation, one terrain-membership row for every static army model
+and the exactly derived terrain-intersection and enemy-presence inventory.
+Restore requires Action start before the cited objective-control boundary and
+that boundary before the terminal event, reruns the same completion evaluator
+used live, and rejects a terminal status that disagrees with that evidence.
+
+Consecrate designations bind the authoritative destruction event and state
+row. Restore also applies the rule in reverse: every qualifying retained
+friendly-attributed destruction must have exactly one deterministic designation
+unless that rules-unit lineage was already actively designated at that event.
+A Consecrate request additionally cites one exact turn-end objective-control
+record; its destruction/designation lineage and objective-control boundary must
+precede `decision_requested`. Restore reconstructs the full legal objective set
+at that historical request boundary from designation component lineage and all
+prior Consecrate markers, then compares the exact legal targets and evidence
+IDs before accepting its DecisionRecord and marker/designation mutation. Every
+active designation requires one resolution at each applicable owner turn-end
+boundary. A paused sequential queue is valid only when the exact earliest
+unresolved Consecrate request remains in the persisted pending-decision queue;
+an unmatched event or an unrelated Primary choice cannot mask an omitted
+resolution.
+Surveil move resolutions bind the processed
 move-completion event and every tombstoned marker. Their public payload carries
 `moving_rules_unit_objective_proximity_witness`; `objective_marker_ids` is
 exactly the witness objective set, and `removed_primary_mission_markers` is the
 complete set of opponent Operation markers active on those objectives at the
 trigger boundary. Adapters must consume this event order and must not emit
 synthetic marker, condemnation, designation, or Action events.
+
+Sensor Sweep marker-removal restore reconstructs marker activity at the exact
+`decision_requested` boundary from every marker's creation and optional removal
+event. It applies the same friendly/opponent marker policy used live and
+requires the complete canonical legal-marker inventory before accepting the
+choice DecisionRecord and tombstone mutation.
 
 ## Replay and Resume
 
@@ -3369,8 +3437,9 @@ Contract 9 replay uses `replay-artifact-v7-phase17n-step4`. It preserves a
 pending `select_primary_mission_choice` request, deterministic finite option
 IDs/payloads, the complete `primary_mission_progress_state`, and the linked
 decision, Action, destruction, marker, condemnation, designation, and event
-records. Restore validates those identities and relationships fail closed; it
-does not infer Step 4 state for a Contract 8 artifact.
+records. Restore validates exact DecisionRequest/DecisionResult/mutation
+closure, Action start and completion evidence, and historical Consecrate legal
+targets fail closed; it does not infer Step 4 state for a Contract 8 artifact.
 
 Replay and tests may choose decisions differently from a human UI, but they must submit the same `DecisionResult` shape through the same lifecycle path.
 

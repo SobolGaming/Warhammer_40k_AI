@@ -910,6 +910,7 @@ class GameLifecycle:
             config=lifecycle._config,
             event_records=lifecycle.decision_controller.event_log.records,
             decision_records=lifecycle.decision_controller.records,
+            pending_decision_requests=lifecycle.decision_controller.queue.pending_requests,
         )
         validate_pending_battlefield_request_consistency(
             state=lifecycle._require_state(),
@@ -3452,6 +3453,7 @@ def _validate_payload_consistency(
     config: GameConfig | None,
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...],
+    pending_decision_requests: tuple[DecisionRequest, ...],
 ) -> None:
     _rsi.validate_reserve_state_consistency(state=state)
     _presi.validate_reserve_state_attached_split_integrity(
@@ -3487,10 +3489,13 @@ def _validate_payload_consistency(
     _pmsv.validate_primary_mission_progress_state(
         state,
         event_records=event_records,
+        decision_records=decision_records,
+        pending_decision_requests=pending_decision_requests,
     )
     _pmai.validate_primary_mission_action_integrity(
         state=state,
         event_records=event_records,
+        decision_records=decision_records,
     )
 
 
