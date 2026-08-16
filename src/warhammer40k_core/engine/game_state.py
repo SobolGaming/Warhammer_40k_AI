@@ -174,6 +174,13 @@ from warhammer40k_core.engine.primary_historical_events import (
 from warhammer40k_core.engine.primary_historical_evidence import (
     validate_primary_historical_evidence_state,
 )
+from warhammer40k_core.engine.primary_mission_state import PrimaryMissionProgressState
+from warhammer40k_core.engine.primary_mission_state_runtime import (
+    record_consecration_designation_for_destruction,
+)
+from warhammer40k_core.engine.primary_mission_state_validation import (
+    validate_primary_mission_progress_state,
+)
 from warhammer40k_core.engine.primary_reserve_entry_provider import (
     PrimaryReserveEntryProvider,
     primary_reserve_entry_requirements,
@@ -1161,6 +1168,9 @@ class GameState:
     mission_action_states: list[MissionActionState] = field(
         default_factory=_new_mission_action_states
     )
+    primary_mission_progress_state: PrimaryMissionProgressState = field(
+        default_factory=PrimaryMissionProgressState.empty
+    )
     end_turn_cleanup_states: list[EndTurnCleanupState] = field(
         default_factory=_new_end_turn_cleanup_states
     )
@@ -1428,6 +1438,8 @@ class GameState:
             self.mission_action_states,
             player_ids=self.player_ids,
         )
+        if type(self.primary_mission_progress_state) is not PrimaryMissionProgressState:
+            raise GameLifecycleError("GameState requires typed primary mission progress state.")
         self.primary_terrain_trap_states = (
             _scoring_evidence_validation.validate_primary_terrain_trap_states(
                 self.primary_terrain_trap_states,
@@ -1442,6 +1454,7 @@ class GameState:
             self.primary_unit_destruction_states,
             self.primary_battlefield_departure_states,
         ) = validate_primary_historical_evidence_state(self)
+        self.primary_mission_progress_state = validate_primary_mission_progress_state(self)
         self.secondary_unit_destruction_states = _validate_secondary_unit_destruction_states(
             self.secondary_unit_destruction_states,
             game_id=self.game_id,
@@ -1922,21 +1935,9 @@ class GameState:
             self.battle_phase_index += 1
             self._expire_persisting_effects_at_current_phase_start()
             return completed_phase
-        self._clear_turn_action_states(
-            player_id=completed_player_id,
-            battle_round=self.battle_round,
-        )
-        self._resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)
-        turn_end_record = self.record_objective_control_boundary(
+        turn_end_record = self.prepare_current_turn_end_boundary(
             completed_phase=completed_phase,
-            timing=ObjectiveControlTiming.TURN_END,
             runtime_modifier_registry=runtime_modifier_registry,
-        )
-        self.expire_persisting_effects_at_boundary(
-            EffectExpirationBoundary.turn_end(
-                battle_round=self.battle_round,
-                player_id=completed_player_id,
-            )
         )
         self._score_objective_control_boundary(turn_end_record)
         if completed_phase is BattlePhase.COMMAND:
@@ -2669,12 +2670,28 @@ class GameState:
     def replace_mission_action_state(self, action_state: MissionActionState) -> None:
         if type(action_state) is not MissionActionState:
             raise GameLifecycleError("mission_action_state must be a MissionActionState.")
+        if action_state.player_id not in self.player_ids:
+            raise GameLifecycleError("MissionActionState player_id is not in this game.")
         for index, stored in enumerate(self.mission_action_states):
             if stored.action_id == action_state.action_id:
                 self.mission_action_states[index] = action_state
-                self.mission_action_states.sort(key=lambda state: state.action_id)
                 return
         raise GameLifecycleError("MissionActionState does not exist for action_id.")
+
+    def replace_mission_action_state_with_primary_progress(
+        self,
+        action_state: MissionActionState,
+        progress: PrimaryMissionProgressState,
+    ) -> None:
+        if type(progress) is not PrimaryMissionProgressState:
+            raise GameLifecycleError("Primary mission progress replacement must be typed.")
+        self.replace_mission_action_state(action_state)
+        self.primary_mission_progress_state = progress
+
+    def replace_primary_mission_progress_state(self, progress: PrimaryMissionProgressState) -> None:
+        if type(progress) is not PrimaryMissionProgressState:
+            raise GameLifecycleError("Primary mission progress replacement must be typed.")
+        self.primary_mission_progress_state = progress
 
     def complete_mission_action(
         self,
@@ -2895,6 +2912,7 @@ class GameState:
         )
         self.primary_unit_destruction_states.append(destruction)
         self.primary_unit_destruction_states.sort(key=lambda stored: stored.destruction_id)
+        record_consecration_designation_for_destruction(state=self, destruction=destruction)
         return destruction
 
     def record_secondary_unit_destruction(
@@ -4871,6 +4889,7 @@ class GameState:
                 state.to_payload() for state in self.secondary_terrain_plunder_states
             ],
             "mission_action_states": [state.to_payload() for state in self.mission_action_states],
+            "primary_mission_progress_state": self.primary_mission_progress_state.to_payload(),
             "end_turn_cleanup_states": [
                 state.to_payload() for state in self.end_turn_cleanup_states
             ],
@@ -5227,6 +5246,9 @@ class GameState:
             mission_action_states=[
                 MissionActionState.from_payload(state) for state in payload["mission_action_states"]
             ],
+            primary_mission_progress_state=PrimaryMissionProgressState.from_payload(
+                payload["primary_mission_progress_state"]
+            ),
             end_turn_cleanup_states=[
                 EndTurnCleanupState.from_payload(state)
                 for state in payload["end_turn_cleanup_states"]
@@ -5369,6 +5391,51 @@ class GameState:
             timing=timing,
             runtime_modifier_registry=runtime_modifier_registry,
         )
+
+    def prepare_current_turn_end_boundary(
+        self,
+        *,
+        completed_phase: BattlePhase,
+        runtime_modifier_registry: RuntimeModifierRegistry | None,
+    ) -> ObjectiveControlRecord:
+        if self.stage is not GameLifecycleStage.BATTLE:
+            raise GameLifecycleError("Turn-end preparation requires battle stage.")
+        if self.active_player_id is None or self.battle_phase_index is None:
+            raise GameLifecycleError("Turn-end preparation requires an active battle turn.")
+        if self.battle_phase_index + 1 != len(self.battle_phase_sequence):
+            raise GameLifecycleError("Turn-end preparation requires the final battle phase.")
+        if completed_phase is not self.current_battle_phase:
+            raise GameLifecycleError("Turn-end preparation phase drifted.")
+        existing = tuple(
+            record
+            for record in self.objective_control_records
+            if record.timing is ObjectiveControlTiming.TURN_END
+            and record.battle_round == self.battle_round
+            and record.active_player_id == self.active_player_id
+            and record.phase == completed_phase.value
+        )
+        if len(existing) > 1:
+            raise GameLifecycleError("Turn-end preparation found duplicate objective records.")
+        if existing:
+            return existing[0]
+        completed_player_id = self.active_player_id
+        self._clear_turn_action_states(
+            player_id=completed_player_id,
+            battle_round=self.battle_round,
+        )
+        self._resolve_end_turn_cleanup_boundary(completed_phase=completed_phase)
+        record = self.record_objective_control_boundary(
+            completed_phase=completed_phase,
+            timing=ObjectiveControlTiming.TURN_END,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        self.expire_persisting_effects_at_boundary(
+            EffectExpirationBoundary.turn_end(
+                battle_round=self.battle_round,
+                player_id=completed_player_id,
+            )
+        )
+        return record
 
     def expire_sticky_objective_control_states(
         self,

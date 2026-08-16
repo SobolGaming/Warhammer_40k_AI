@@ -32,6 +32,7 @@ from warhammer40k_core.engine.fight_on_death import remove_models_awaiting_fight
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
+    ObjectiveControlRecord,
     ObjectiveControlTiming,
     resolve_objective_control,
 )
@@ -51,6 +52,19 @@ from warhammer40k_core.engine.primary_historical_events import (
     record_new_primary_turn_start_evidence_events,
     record_new_primary_unit_destruction_events,
     record_primary_unit_destruction_event,
+)
+from warhammer40k_core.engine.primary_mission_action_interruptions import (
+    reconcile_primary_mission_action_interruptions,
+)
+from warhammer40k_core.engine.primary_mission_action_resolution import (
+    resolve_primary_mission_actions_at_turn_end,
+)
+from warhammer40k_core.engine.primary_mission_choice_opportunities import (
+    next_primary_mission_turn_end_choice_request,
+)
+from warhammer40k_core.engine.primary_mission_choices import punishment_choice_request
+from warhammer40k_core.engine.primary_mission_state_runtime import (
+    resolve_surveil_marker_removal_for_completed_moves,
 )
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     record_primary_destroyed_model_departures,
@@ -173,26 +187,6 @@ class BattleRoundFlow:
         handler = self._phase_handlers.get(current_phase)
         if handler is None:
             raise GameLifecycleError("BattleRoundFlow missing handler for current battle phase.")
-        _emit_start_timing_windows(
-            state=state,
-            decisions=decisions,
-            runtime_event_index=self._runtime_event_index,
-            runtime_modifier_registry=self._runtime_modifier_registry,
-            ruleset_descriptor=self._ruleset_descriptor,
-            army_catalog=self._army_catalog,
-        )
-        pending_start_request = _pending_decision_request(decisions)
-        if pending_start_request is not None:
-            return LifecycleStatus.waiting_for_decision(
-                stage=GameLifecycleStage.BATTLE,
-                decision_request=pending_start_request,
-                payload={
-                    "battle_round": state.battle_round,
-                    "phase": current_phase.value,
-                    "phase_body_status": "start_timing_window_decision_required",
-                    "request_id": pending_start_request.request_id,
-                },
-            )
         start_request = (
             self._battle_round_start_hooks.next_request_for(
                 BattleRoundStartRequestContext(state=state, decisions=decisions)
@@ -221,6 +215,57 @@ class BattleRoundFlow:
                     "request_id": start_request.request_id,
                 },
             )
+        turn_start_request = (
+            punishment_choice_request(
+                state=state,
+                decisions=decisions,
+            )
+            if _is_start_of_player_turn(state)
+            else None
+        )
+        if turn_start_request is not None:
+            decisions.request_decision(turn_start_request)
+            decisions.event_log.append(
+                "primary_mission_choice_requested",
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "phase": current_phase.value,
+                    "request_id": turn_start_request.request_id,
+                    "decision_type": turn_start_request.decision_type,
+                    "actor_id": turn_start_request.actor_id,
+                },
+            )
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=turn_start_request,
+                payload={
+                    "battle_round": state.battle_round,
+                    "phase": current_phase.value,
+                    "phase_body_status": "primary_mission_turn_start_choice_required",
+                    "request_id": turn_start_request.request_id,
+                },
+            )
+        _emit_start_timing_windows(
+            state=state,
+            decisions=decisions,
+            runtime_event_index=self._runtime_event_index,
+            runtime_modifier_registry=self._runtime_modifier_registry,
+            ruleset_descriptor=self._ruleset_descriptor,
+            army_catalog=self._army_catalog,
+        )
+        pending_start_request = _pending_decision_request(decisions)
+        if pending_start_request is not None:
+            return LifecycleStatus.waiting_for_decision(
+                stage=GameLifecycleStage.BATTLE,
+                decision_request=pending_start_request,
+                payload={
+                    "battle_round": state.battle_round,
+                    "phase": current_phase.value,
+                    "phase_body_status": "start_timing_window_decision_required",
+                    "request_id": pending_start_request.request_id,
+                },
+            )
         _emit_phase_start_objective_proximity_snapshot_if_available(
             state=state,
             decisions=decisions,
@@ -231,6 +276,16 @@ class BattleRoundFlow:
             state=state,
             decisions=decisions,
             reaction_queue=reaction_queue,
+        )
+        reconcile_primary_mission_action_interruptions(
+            state=state,
+            decisions=decisions,
+        )
+        resolve_surveil_marker_removal_for_completed_moves(
+            state=state,
+            decisions=decisions,
+            completed_phase=current_phase,
+            runtime_modifier_registry=self._runtime_modifier_registry,
         )
         if status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION:
             return status
@@ -299,6 +354,10 @@ class BattleRoundFlow:
             state=state,
             decisions=decisions,
             registry=self._unit_destroyed_hooks,
+        )
+        reconcile_primary_mission_action_interruptions(
+            state=state,
+            decisions=decisions,
         )
         pending_request = _pending_decision_request(decisions)
         if pending_request is not None:
@@ -378,6 +437,71 @@ class BattleRoundFlow:
         snapshot_ids_before_advance = tuple(
             value.snapshot_id for value in state.primary_rules_unit_turn_start_snapshots
         )
+        if _is_end_of_player_turn(state):
+            turn_end_record = state.prepare_current_turn_end_boundary(
+                completed_phase=current_phase,
+                runtime_modifier_registry=self._runtime_modifier_registry,
+            )
+            _emit_objective_control_boundary_event_if_missing(
+                decisions=decisions,
+                record=turn_end_record,
+            )
+            record_new_primary_battlefield_departure_events(
+                state=state,
+                event_log=decisions.event_log,
+                departure_ids_before=departure_ids_before_advance,
+            )
+            record_new_primary_unit_destruction_events(
+                state=state,
+                event_log=decisions.event_log,
+                destruction_ids_before=destruction_ids_before_advance,
+            )
+            reconcile_primary_mission_action_interruptions(
+                state=state,
+                decisions=decisions,
+            )
+            departure_ids_before_advance = tuple(
+                value.departure_id for value in state.primary_battlefield_departure_states
+            )
+            destruction_ids_before_advance = tuple(
+                value.destruction_id for value in state.primary_unit_destruction_states
+            )
+            resolve_primary_mission_actions_at_turn_end(
+                state=state,
+                decisions=decisions,
+                completed_phase=current_phase,
+                turn_end_record=turn_end_record,
+                runtime_modifier_registry=self._runtime_modifier_registry,
+            )
+            primary_choice_request = next_primary_mission_turn_end_choice_request(
+                state=state,
+                decisions=decisions,
+                completed_phase=current_phase,
+                runtime_modifier_registry=self._runtime_modifier_registry,
+            )
+            if primary_choice_request is not None:
+                decisions.request_decision(primary_choice_request)
+                decisions.event_log.append(
+                    "primary_mission_choice_requested",
+                    {
+                        "game_id": state.game_id,
+                        "battle_round": state.battle_round,
+                        "phase": current_phase.value,
+                        "request_id": primary_choice_request.request_id,
+                        "decision_type": primary_choice_request.decision_type,
+                        "actor_id": primary_choice_request.actor_id,
+                    },
+                )
+                return LifecycleStatus.waiting_for_decision(
+                    stage=GameLifecycleStage.BATTLE,
+                    decision_request=primary_choice_request,
+                    payload={
+                        "battle_round": state.battle_round,
+                        "phase": current_phase.value,
+                        "phase_body_status": "primary_mission_turn_end_choice_required",
+                        "request_id": primary_choice_request.request_id,
+                    },
+                )
         completed_phase = state.advance_to_next_battle_phase(
             runtime_modifier_registry=self._runtime_modifier_registry
         )
@@ -408,19 +532,9 @@ class BattleRoundFlow:
                 "Battle phase advance produced multiple turn-end objective-control records."
             )
         if turn_end_records:
-            turn_end_record = turn_end_records[0]
-            decisions.event_log.append(
-                "end_boundary_objective_control_determined",
-                {
-                    "game_id": turn_end_record.game_id,
-                    "battle_round": turn_end_record.battle_round,
-                    "phase": turn_end_record.phase,
-                    "record_ids": [turn_end_record.record_id],
-                    "source_rule_id": (
-                        "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:"
-                        "14.02.01-control-first"
-                    ),
-                },
+            _emit_objective_control_boundary_event_if_missing(
+                decisions=decisions,
+                record=turn_end_records[0],
             )
         decisions.event_log.append(
             "battle_phase_completed",
@@ -520,6 +634,47 @@ def _is_start_of_battle_round(state: GameState) -> bool:
         and state.battle_phase_index == 0
         and bool(state.turn_order)
         and state.active_player_id == state.turn_order[0]
+    )
+
+
+def _is_start_of_player_turn(state: GameState) -> bool:
+    return (
+        state.stage is GameLifecycleStage.BATTLE
+        and state.current_battle_phase is BattlePhase.COMMAND
+        and state.battle_phase_index == 0
+        and state.active_player_id is not None
+    )
+
+
+def _is_end_of_player_turn(state: GameState) -> bool:
+    return state.battle_phase_index is not None and state.battle_phase_index + 1 == len(
+        state.battle_phase_sequence
+    )
+
+
+def _emit_objective_control_boundary_event_if_missing(
+    *,
+    decisions: DecisionController,
+    record: ObjectiveControlRecord,
+) -> None:
+    if any(
+        event.event_type == "end_boundary_objective_control_determined"
+        and isinstance(event.payload, dict)
+        and event.payload.get("record_ids") == [record.record_id]
+        for event in decisions.event_log.records
+    ):
+        return
+    decisions.event_log.append(
+        "end_boundary_objective_control_determined",
+        {
+            "game_id": record.game_id,
+            "battle_round": record.battle_round,
+            "phase": record.phase,
+            "record_ids": [record.record_id],
+            "source_rule_id": (
+                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+            ),
+        },
     )
 
 

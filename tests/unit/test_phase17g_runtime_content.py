@@ -1388,6 +1388,24 @@ def test_lifecycle_rebuilds_runtime_content_bundle_without_serializing_callables
     assert "object at 0x" not in json.dumps(payload, sort_keys=True)
 
 
+def test_lifecycle_direct_runtime_bundle_initializes_canonical_audit() -> None:
+    config = _canonical_lifecycle_config()
+    source_lifecycle = GameLifecycle()
+    source_lifecycle.start(config)
+    source_lifecycle.advance_until_decision_or_terminal()
+    bundle = _runtime_content_bundle(source_lifecycle)
+
+    lifecycle = GameLifecycle(
+        state=source_lifecycle.state,
+        _config=config,
+        _runtime_content_bundle=bundle,
+    )
+
+    audit_payload = lifecycle.to_payload().get("runtime_content_audit")
+
+    assert audit_payload == bundle.to_summary_payload()
+
+
 def test_lifecycle_runtime_content_refresh_uses_input_cache(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

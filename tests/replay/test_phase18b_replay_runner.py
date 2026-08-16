@@ -185,7 +185,7 @@ def test_setup_to_battle_replay_reproduces_exactly() -> None:
     assert payload["event_records"]
     assert payload["projection_checkpoints"]
     assert payload["schema_version"] == REPLAY_ARTIFACT_SCHEMA_VERSION
-    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v6-phase17n-step3"
+    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v7-phase17n-step4"
 
 
 def test_replay_source_identity_binds_canonical_mission_package_hash() -> None:

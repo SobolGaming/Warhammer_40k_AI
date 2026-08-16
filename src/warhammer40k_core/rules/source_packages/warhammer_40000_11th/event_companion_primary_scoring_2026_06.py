@@ -12,10 +12,10 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
     package_artifact_bytes,
 )
 
-ARTIFACT_SCHEMA: Final = "core-v2-phase17n-event-companion-primary-scoring-v4"
+ARTIFACT_SCHEMA: Final = "core-v2-phase17n-event-companion-primary-scoring-v5"
 SOURCE_PACKAGE_ID: Final = "gw-11e-warhammer-event-companion-v1-1-2026-07"
-EXPECTED_PACKAGE_HASH: Final = "a1f8a91bc8dc01088fdef5d0b9ee2e4e270db93a4b050d3a9b47c8995163dfc5"
-EXPECTED_ARTIFACT_SHA256: Final = "6f2526d2d81d7854db285d2e7969ccef59e7eac3a214588bea37bd982bada8e8"
+EXPECTED_PACKAGE_HASH: Final = "a2adf58fea80100b46e473d808c9a605be87ca71189b5815f4445c26decb4c2c"
+EXPECTED_ARTIFACT_SHA256: Final = "b7bde84fbe50e575a7da5dbac62e2cdb4cbcd0c3346287a8028a19cdc563caba"
 _ARTIFACT_PACKAGE: Final = "warhammer40k_core.rules.source_packages.warhammer_40000_11th"
 _ARTIFACT_PATH: Final = "event_companion_2026_06_artifacts/primary-scoring.json"
 _PENDING_SCORING_KIND: Final = "event_companion_primary_source_known_engine_pending"
@@ -152,7 +152,7 @@ _EXPECTED_RULE_COUNTS: Final = {
     "primary-vanguard-operation": 4,
     "primary-vital-link": 5,
 }
-_EXPECTED_SOURCE_ONLY_ACTION_IDS: Final = (
+_EXPECTED_PRIMARY_ACTION_IDS: Final = (
     "commit-sabotage",
     "decoy-objective",
     "extract-intelligence",
@@ -164,6 +164,193 @@ _EXPECTED_SOURCE_ONLY_ACTION_IDS: Final = (
     "triangulate-objective",
     "vanguard-operation",
 )
+_EXPECTED_PRIMARY_ACTION_CLAUSES: Final = {
+    "commit-sabotage": (
+        "primary-sabotage",
+        "Sabotage",
+        "shooting",
+        "shooting_phase_action_start",
+        "turn_end",
+        "active_player_unit_within_range_of_non_home_objective",
+        "objective_marker_excluding_home",
+        "unlimited_different_objective_per_unit_this_phase",
+        "unit_commits_sabotage_if_action_unit_controls_target_at_turn_end",
+    ),
+    "decoy-objective": (
+        "primary-smoke-and-mirrors",
+        "Decoy",
+        "shooting",
+        "shooting_phase_action_start",
+        "turn_end",
+        "active_player_unit",
+        "objective_marker_excluding_home_not_decoy",
+        "unlimited_different_objective_per_unit_this_phase",
+        "objective_becomes_decoy_if_action_unit_controls_target_at_turn_end",
+    ),
+    "extract-intelligence": (
+        "primary-gather-intel",
+        "Extract Intelligence",
+        "shooting",
+        "shooting_phase_action_start_from_battle_round_two",
+        "turn_end",
+        "active_player_unit",
+        "objective_marker_excluding_home_without_friendly_operation_marker",
+        "unlimited_different_objective_per_unit_this_phase",
+        "objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end",
+    ),
+    "maintain-control": (
+        "primary-vital-link",
+        "Maintain Control",
+        "shooting",
+        "shooting_phase_action_start",
+        "turn_end",
+        "active_player_unit_within_range_of_central_objective",
+        "central_objective_marker",
+        "once_per_turn",
+        "central_objective_gains_operation_marker_if_action_unit_controls_target_at_turn_end",
+    ),
+    "secure-asset": (
+        "primary-secure-asset",
+        "Secure Asset",
+        "shooting",
+        "shooting_phase_action_start",
+        "turn_end",
+        "active_player_unit_within_range_of_non_home_objective",
+        "objective_marker_excluding_home",
+        "once_per_turn",
+        "unit_secures_asset_if_action_unit_controls_target_at_turn_end",
+    ),
+    "sensor-sweep-extract-relic": (
+        "primary-extract-relic",
+        "Sensor Sweep",
+        "shooting",
+        "shooting_phase_action_start",
+        "turn_end",
+        "active_player_unit_within_range_of_central_objective",
+        (
+            "central_objective_and_opponent_operation_marker_requires_more_than_one_"
+            "opponent_marker_remaining"
+        ),
+        "once_per_turn",
+        (
+            "remove_one_opponent_operation_marker_if_action_unit_controls_selected_central_"
+            "objective_at_turn_end"
+        ),
+    ),
+    "sensor-sweep-locate-and-deny": (
+        "primary-locate-and-deny",
+        "Sensor Sweep",
+        "shooting",
+        "shooting_phase_action_start",
+        "turn_end",
+        "active_player_unit_within_range_of_central_objective",
+        (
+            "central_objective_and_friendly_operation_marker_requires_more_than_one_"
+            "friendly_marker_remaining"
+        ),
+        "once_per_turn",
+        (
+            "remove_one_friendly_operation_marker_if_action_unit_controls_selected_central_"
+            "objective_at_turn_end"
+        ),
+    ),
+    "surveil-enemy-unit": (
+        "primary-surveil-the-foe",
+        "Surveil the Foe",
+        "shooting",
+        "shooting_phase_action_start",
+        "immediate",
+        "active_player_unit",
+        "visible_enemy_unit_within_18_not_surveilled_this_turn",
+        "unlimited",
+        "enemy_unit_becomes_surveilled_until_turn_end",
+    ),
+    "triangulate-objective": (
+        "primary-triangulation",
+        "Triangulate",
+        "shooting",
+        "shooting_phase_action_start_from_battle_round_two",
+        "turn_end",
+        "active_player_unit",
+        "objective_marker_excluding_home",
+        "once_per_turn",
+        "objective_becomes_triangulated_if_action_unit_controls_target_at_turn_end",
+    ),
+    "vanguard-operation": (
+        "primary-vanguard-operation",
+        "Vanguard Operation",
+        "shooting",
+        "shooting_phase_action_start",
+        "turn_end",
+        "active_player_unit_within_terrain_area_in_enemy_territory",
+        "terrain_area_in_enemy_territory",
+        "once_per_turn",
+        "unit_performs_vanguard_operation_if_no_enemy_units_in_terrain_area_at_turn_end",
+    ),
+}
+_EXPECTED_PRIMARY_STATE_RULE_IDS: Final = (
+    "consecrate-destroyer-becomes-consecration-unit",
+    "surveil-remove-operation-markers-after-move",
+)
+_EXPECTED_PRIMARY_STATE_RULE_CLAUSES: Final = {
+    "consecrate-destroyer-becomes-consecration-unit": (
+        "primary-consecrate",
+        "friendly_rules_unit_destroys_one_or_more_units",
+        "destroying_friendly_rules_unit",
+        "unit_becomes_consecration_unit",
+        "until_consumed",
+    ),
+    "surveil-remove-operation-markers-after-move": (
+        "primary-surveil-the-foe",
+        "friendly_rules_unit_move_end",
+        ("moving_friendly_rules_unit_within_range_of_objective_with_opponent_operation_markers"),
+        "remove_all_opponent_operation_markers_from_each_in_range_objective",
+        "immediate",
+    ),
+}
+_EXPECTED_PRIMARY_CHOICE_RULE_IDS: Final = (
+    "consecrate-objective-at-turn-end",
+    "locate-and-deny-operation-marker-setup",
+    "punishment-condemn-enemy-units",
+)
+_EXPECTED_PRIMARY_CHOICE_RULE_CLAUSES: Final = {
+    "consecrate-objective-at-turn-end": (
+        "primary-consecrate",
+        "own_turn_end",
+        "each_friendly_consecration_unit",
+        "objective_within_subject_range_excluding_home_not_consecrated",
+        "optional_up_to_one_per_subject",
+        0,
+        1,
+        None,
+        "place_friendly_operation_marker_consecrate_objective_and_consume_unit_status",
+        "persistent",
+    ),
+    "locate-and-deny-operation-marker-setup": (
+        "primary-locate-and-deny",
+        "battle_start",
+        None,
+        "terrain_area_outside_own_deployment_zone",
+        "exactly_five_or_all_available_when_fewer",
+        0,
+        5,
+        None,
+        "place_one_friendly_operation_marker_in_each_selected_terrain_area",
+        "persistent",
+    ),
+    "punishment-condemn-enemy-units": (
+        "primary-punishment",
+        "own_turn_start",
+        None,
+        ("enemy_battlefield_unit_within_objective_range_or_destroyed_friendly_unit_previous_turn"),
+        "one_to_three_or_exactly_one_fallback_when_no_primary_targets",
+        1,
+        3,
+        "enemy_battlefield_unit",
+        "selected_enemy_units_become_condemned",
+        "until_start_of_own_next_turn",
+    ),
+}
 
 
 class EventCompanionPrimaryScoringArtifactError(ValueError):
@@ -265,7 +452,7 @@ class PrimaryMissionScoringArtifact(
     scoring_rules: tuple[PrimaryScoringRuleArtifact, ...]
 
 
-class PrimaryMissionActionSourceArtifact(
+class PrimaryMissionActionArtifact(
     msgspec.Struct,
     frozen=True,
     forbid_unknown_fields=True,
@@ -284,6 +471,41 @@ class PrimaryMissionActionSourceArtifact(
     source_id: str
 
 
+class PrimaryMissionStateRuleArtifact(
+    msgspec.Struct,
+    frozen=True,
+    forbid_unknown_fields=True,
+):
+    state_rule_id: str
+    primary_mission_id: str
+    trigger_timing: str
+    subject_policy: str
+    effect_descriptor: str
+    effect_duration: str
+    engine_exposure_status: str
+    source_id: str
+
+
+class PrimaryMissionChoiceRuleArtifact(
+    msgspec.Struct,
+    frozen=True,
+    forbid_unknown_fields=True,
+):
+    choice_rule_id: str
+    primary_mission_id: str
+    trigger_timing: str
+    subject_policy: str | None
+    target_policy: str
+    selection_policy: str
+    minimum_selections: int
+    maximum_selections: int
+    fallback_target_policy: str | None
+    effect_descriptor: str
+    effect_duration: str
+    engine_exposure_status: str
+    source_id: str
+
+
 class EventCompanionPrimaryScoringArtifact(
     msgspec.Struct,
     frozen=True,
@@ -296,7 +518,9 @@ class EventCompanionPrimaryScoringArtifact(
     layout_source_boundary: LayoutSourceBoundaryArtifact
     scoring_limit_source: EventCompanionScoringLimitSourceArtifact
     primary_missions: tuple[PrimaryMissionScoringArtifact, ...]
-    source_only_primary_actions: tuple[PrimaryMissionActionSourceArtifact, ...]
+    primary_mission_actions: tuple[PrimaryMissionActionArtifact, ...]
+    primary_mission_state_rules: tuple[PrimaryMissionStateRuleArtifact, ...]
+    primary_mission_choice_rules: tuple[PrimaryMissionChoiceRuleArtifact, ...]
     package_hash: str
 
     def validate(self) -> None:
@@ -318,11 +542,20 @@ class EventCompanionPrimaryScoringArtifact(
                 self.scoring_limit_source.primary_max_vp_per_battle_round
             ),
         )
-        _validate_source_only_primary_actions(
-            self.source_only_primary_actions,
-            primary_mission_ids=frozenset(
-                mission.primary_mission_id for mission in self.primary_missions
-            ),
+        primary_mission_ids = frozenset(
+            mission.primary_mission_id for mission in self.primary_missions
+        )
+        _validate_primary_mission_actions(
+            self.primary_mission_actions,
+            primary_mission_ids=primary_mission_ids,
+        )
+        _validate_primary_mission_state_rules(
+            self.primary_mission_state_rules,
+            primary_mission_ids=primary_mission_ids,
+        )
+        _validate_primary_mission_choice_rules(
+            self.primary_mission_choice_rules,
+            primary_mission_ids=primary_mission_ids,
         )
         _validate_sha256("package_hash", self.package_hash)
         if self.package_hash != primary_scoring_package_hash(self):
@@ -386,13 +619,13 @@ def _validate_authoritative_source(source: AuthoritativeScoringSourceArtifact) -
         "project_owner_supplied_official_source_transcription",
         "Warhammer 40,000 Chapter Approved 2026-27 Primary Mission cards",
         (
-            "All 25 Primary mission scoring records and 10 source-only Primary Mission "
-            "Action descriptors"
+            "All 25 Primary mission scoring records, 10 executable Primary Mission Action "
+            "descriptors, 2 Primary mission state rules, and 3 Primary mission choice rules"
         ),
         "not_committed_transcription_review_only",
-        "all_primary_scoring_and_source_only_action_descriptors",
+        "all_primary_scoring_action_state_and_choice_descriptors",
         "meatgrinder_scoring_clauses_only",
-        "reviewed_and_merged",
+        "reviewed_with_project_owner_supplied_step4_clauses",
     ):
         raise EventCompanionPrimaryScoringArtifactError(
             "Event Companion primary-scoring authoritative provenance drifted."
@@ -632,18 +865,18 @@ def _validate_resolution_groups(
         )
 
 
-def _validate_source_only_primary_actions(
-    actions: tuple[PrimaryMissionActionSourceArtifact, ...],
+def _validate_primary_mission_actions(
+    actions: tuple[PrimaryMissionActionArtifact, ...],
     *,
     primary_mission_ids: frozenset[str],
 ) -> None:
-    if tuple(action.mission_action_id for action in actions) != (_EXPECTED_SOURCE_ONLY_ACTION_IDS):
+    if tuple(action.mission_action_id for action in actions) != _EXPECTED_PRIMARY_ACTION_IDS:
         raise EventCompanionPrimaryScoringArtifactError(
-            "Event Companion source-only Primary Action inventory or order drifted."
+            "Event Companion Primary Action inventory or order drifted."
         )
     identifiers = IdentifierValidator(
         error_factory=EventCompanionPrimaryScoringArtifactError,
-        message_prefix="Event Companion source-only Primary Action",
+        message_prefix="Event Companion Primary Action",
     )
     for action in actions:
         for field_name, value in (
@@ -661,15 +894,145 @@ def _validate_source_only_primary_actions(
         _validate_canonical_text("action name", action.name)
         if action.primary_mission_id not in primary_mission_ids:
             raise EventCompanionPrimaryScoringArtifactError(
-                "Event Companion source-only Primary Action references an unknown mission."
+                "Event Companion Primary Action references an unknown mission."
             )
-        if action.engine_exposure_status != "source_known_engine_pending":
+        if action.engine_exposure_status != "engine_implemented":
             raise EventCompanionPrimaryScoringArtifactError(
-                "Event Companion source-only Primary Actions must remain engine-pending."
+                "Event Companion Primary Actions must be engine-implemented."
             )
         if action.source_id != (f"{SOURCE_PACKAGE_ID}:primary-action:{action.mission_action_id}"):
             raise EventCompanionPrimaryScoringArtifactError(
-                "Event Companion source-only Primary Action source ID drifted."
+                "Event Companion Primary Action source ID drifted."
+            )
+        actual_clause = (
+            action.primary_mission_id,
+            action.name,
+            action.start_phase,
+            action.start_timing,
+            action.completion_timing,
+            action.eligible_unit_policy,
+            action.target_policy,
+            action.use_limit,
+            action.effect_descriptor,
+        )
+        if actual_clause != _EXPECTED_PRIMARY_ACTION_CLAUSES[action.mission_action_id]:
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion Primary Action clauses drifted."
+            )
+
+
+def _validate_primary_mission_state_rules(
+    rules: tuple[PrimaryMissionStateRuleArtifact, ...],
+    *,
+    primary_mission_ids: frozenset[str],
+) -> None:
+    if tuple(rule.state_rule_id for rule in rules) != _EXPECTED_PRIMARY_STATE_RULE_IDS:
+        raise EventCompanionPrimaryScoringArtifactError(
+            "Event Companion Primary state-rule inventory or order drifted."
+        )
+    identifiers = IdentifierValidator(
+        error_factory=EventCompanionPrimaryScoringArtifactError,
+        message_prefix="Event Companion Primary state rule",
+    )
+    for rule in rules:
+        for field_name, value in (
+            ("state_rule_id", rule.state_rule_id),
+            ("primary_mission_id", rule.primary_mission_id),
+            ("trigger_timing", rule.trigger_timing),
+            ("subject_policy", rule.subject_policy),
+            ("effect_descriptor", rule.effect_descriptor),
+            ("effect_duration", rule.effect_duration),
+        ):
+            identifiers(field_name, value)
+        if rule.primary_mission_id not in primary_mission_ids:
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion Primary state rule references an unknown mission."
+            )
+        if rule.engine_exposure_status != "engine_implemented":
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion Primary state rules must be engine-implemented."
+            )
+        if rule.source_id != f"{SOURCE_PACKAGE_ID}:primary-state-rule:{rule.state_rule_id}":
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion Primary state-rule source ID drifted."
+            )
+        actual_clause = (
+            rule.primary_mission_id,
+            rule.trigger_timing,
+            rule.subject_policy,
+            rule.effect_descriptor,
+            rule.effect_duration,
+        )
+        if actual_clause != _EXPECTED_PRIMARY_STATE_RULE_CLAUSES[rule.state_rule_id]:
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion Primary state-rule clauses drifted."
+            )
+
+
+def _validate_primary_mission_choice_rules(
+    rules: tuple[PrimaryMissionChoiceRuleArtifact, ...],
+    *,
+    primary_mission_ids: frozenset[str],
+) -> None:
+    if tuple(rule.choice_rule_id for rule in rules) != _EXPECTED_PRIMARY_CHOICE_RULE_IDS:
+        raise EventCompanionPrimaryScoringArtifactError(
+            "Event Companion Primary choice-rule inventory or order drifted."
+        )
+    identifiers = IdentifierValidator(
+        error_factory=EventCompanionPrimaryScoringArtifactError,
+        message_prefix="Event Companion Primary choice rule",
+    )
+    for rule in rules:
+        for field_name, value in (
+            ("choice_rule_id", rule.choice_rule_id),
+            ("primary_mission_id", rule.primary_mission_id),
+            ("trigger_timing", rule.trigger_timing),
+            ("target_policy", rule.target_policy),
+            ("selection_policy", rule.selection_policy),
+            ("effect_descriptor", rule.effect_descriptor),
+            ("effect_duration", rule.effect_duration),
+        ):
+            identifiers(field_name, value)
+        if rule.subject_policy is not None:
+            identifiers("subject_policy", rule.subject_policy)
+        if rule.fallback_target_policy is not None:
+            identifiers("fallback_target_policy", rule.fallback_target_policy)
+        if (
+            type(rule.minimum_selections) is not int
+            or type(rule.maximum_selections) is not int
+            or rule.minimum_selections < 0
+            or rule.maximum_selections < rule.minimum_selections
+        ):
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion Primary choice-rule selection bounds are invalid."
+            )
+        if rule.primary_mission_id not in primary_mission_ids:
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion Primary choice rule references an unknown mission."
+            )
+        if rule.engine_exposure_status != "engine_implemented":
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion Primary choice rules must be engine-implemented."
+            )
+        if rule.source_id != f"{SOURCE_PACKAGE_ID}:primary-choice-rule:{rule.choice_rule_id}":
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion Primary choice-rule source ID drifted."
+            )
+        actual_clause = (
+            rule.primary_mission_id,
+            rule.trigger_timing,
+            rule.subject_policy,
+            rule.target_policy,
+            rule.selection_policy,
+            rule.minimum_selections,
+            rule.maximum_selections,
+            rule.fallback_target_policy,
+            rule.effect_descriptor,
+            rule.effect_duration,
+        )
+        if actual_clause != _EXPECTED_PRIMARY_CHOICE_RULE_CLAUSES[rule.choice_rule_id]:
+            raise EventCompanionPrimaryScoringArtifactError(
+                "Event Companion Primary choice-rule clauses drifted."
             )
 
 
@@ -736,8 +1099,10 @@ __all__ = (
     "EventCompanionPrimaryScoringArtifact",
     "EventCompanionPrimaryScoringArtifactError",
     "EventCompanionScoringLimitSourceArtifact",
-    "PrimaryMissionActionSourceArtifact",
+    "PrimaryMissionActionArtifact",
+    "PrimaryMissionChoiceRuleArtifact",
     "PrimaryMissionScoringArtifact",
+    "PrimaryMissionStateRuleArtifact",
     "PrimaryScoringRuleArtifact",
     "engine_implemented_primary_mission_ids",
     "event_companion_primary_scoring_artifact",

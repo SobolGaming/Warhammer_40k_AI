@@ -22,6 +22,7 @@ class MissionActionStatus(StrEnum):
 MISSION_ACTION_UNIT_MOVED_INTERRUPTION_REASON = "unit_moved"
 MISSION_ACTION_UNIT_DESTROYED_INTERRUPTION_REASON = "unit_destroyed"
 MISSION_ACTION_UNIT_LEFT_BATTLEFIELD_INTERRUPTION_REASON = "unit_left_battlefield"
+MISSION_ACTION_COMPLETION_CONDITION_FAILED_REASON = "completion_condition_failed"
 
 _MISSION_ACTION_DISPLACEMENTS_ALLOWED_TO_CONTINUE = frozenset(
     {
@@ -33,9 +34,11 @@ _MISSION_ACTION_DISPLACEMENTS_ALLOWED_TO_CONTINUE = frozenset(
 
 class MissionActionStatePayload(TypedDict):
     action_id: str
+    mission_action_id: str
     player_id: str
     unit_instance_id: str
     target_id: str
+    condition_target_id: str | None
     mission_id: str
     battle_round_started: int
     phase_started: str
@@ -55,9 +58,11 @@ class MissionActionStatePayload(TypedDict):
 @dataclass(frozen=True, slots=True)
 class MissionActionState:
     action_id: str
+    mission_action_id: str
     player_id: str
     unit_instance_id: str
     target_id: str
+    condition_target_id: str | None
     mission_id: str
     battle_round_started: int
     phase_started: str
@@ -81,6 +86,14 @@ class MissionActionState:
         )
         object.__setattr__(
             self,
+            "mission_action_id",
+            _validate_identifier(
+                "MissionActionState mission_action_id",
+                self.mission_action_id,
+            ),
+        )
+        object.__setattr__(
+            self,
             "player_id",
             _validate_identifier("MissionActionState player_id", self.player_id),
         )
@@ -93,6 +106,14 @@ class MissionActionState:
             self,
             "target_id",
             _validate_identifier("MissionActionState target_id", self.target_id),
+        )
+        object.__setattr__(
+            self,
+            "condition_target_id",
+            _validate_optional_identifier(
+                "MissionActionState condition_target_id",
+                self.condition_target_id,
+            ),
         )
         object.__setattr__(
             self,
@@ -189,9 +210,11 @@ class MissionActionState:
         cls,
         *,
         action_id: str,
+        mission_action_id: str,
         player_id: str,
         unit_instance_id: str,
         target_id: str,
+        condition_target_id: str | None,
         mission_id: str,
         battle_round: int,
         phase: str,
@@ -210,9 +233,11 @@ class MissionActionState:
         )
         return cls(
             action_id=action_id,
+            mission_action_id=mission_action_id,
             player_id=player_id,
             unit_instance_id=unit_instance_id,
             target_id=target_id,
+            condition_target_id=condition_target_id,
             mission_id=mission_id,
             battle_round_started=battle_round,
             phase_started=phase,
@@ -254,9 +279,11 @@ class MissionActionState:
             raise GameLifecycleError("Mission Action scoring amount drift.")
         return type(self)(
             action_id=self.action_id,
+            mission_action_id=self.mission_action_id,
             player_id=self.player_id,
             unit_instance_id=self.unit_instance_id,
             target_id=self.target_id,
+            condition_target_id=self.condition_target_id,
             mission_id=self.mission_id,
             battle_round_started=self.battle_round_started,
             phase_started=self.phase_started,
@@ -295,9 +322,11 @@ class MissionActionState:
             raise GameLifecycleError("Mission Action completion timing drift.")
         return type(self)(
             action_id=self.action_id,
+            mission_action_id=self.mission_action_id,
             player_id=self.player_id,
             unit_instance_id=self.unit_instance_id,
             target_id=self.target_id,
+            condition_target_id=self.condition_target_id,
             mission_id=self.mission_id,
             battle_round_started=self.battle_round_started,
             phase_started=self.phase_started,
@@ -322,9 +351,11 @@ class MissionActionState:
             raise GameLifecycleError("Mission Action interruption reason is not configured.")
         return type(self)(
             action_id=self.action_id,
+            mission_action_id=self.mission_action_id,
             player_id=self.player_id,
             unit_instance_id=self.unit_instance_id,
             target_id=self.target_id,
+            condition_target_id=self.condition_target_id,
             mission_id=self.mission_id,
             battle_round_started=self.battle_round_started,
             phase_started=self.phase_started,
@@ -338,12 +369,37 @@ class MissionActionState:
             interrupted_reason=requested_reason,
         )
 
+    def fail_completion(self) -> Self:
+        if self.status is not MissionActionStatus.STARTED:
+            raise GameLifecycleError("Only started mission Actions can fail completion.")
+        return type(self)(
+            action_id=self.action_id,
+            mission_action_id=self.mission_action_id,
+            player_id=self.player_id,
+            unit_instance_id=self.unit_instance_id,
+            target_id=self.target_id,
+            condition_target_id=self.condition_target_id,
+            mission_id=self.mission_id,
+            battle_round_started=self.battle_round_started,
+            phase_started=self.phase_started,
+            start_timing=self.start_timing,
+            completion_timing=self.completion_timing,
+            eligible_unit_instance_ids=self.eligible_unit_instance_ids,
+            interruption_conditions=self.interruption_conditions,
+            scoring_source_id=self.scoring_source_id,
+            victory_points=self.victory_points,
+            status=MissionActionStatus.INTERRUPTED,
+            interrupted_reason=MISSION_ACTION_COMPLETION_CONDITION_FAILED_REASON,
+        )
+
     def to_payload(self) -> MissionActionStatePayload:
         return {
             "action_id": self.action_id,
+            "mission_action_id": self.mission_action_id,
             "player_id": self.player_id,
             "unit_instance_id": self.unit_instance_id,
             "target_id": self.target_id,
+            "condition_target_id": self.condition_target_id,
             "mission_id": self.mission_id,
             "battle_round_started": self.battle_round_started,
             "phase_started": self.phase_started,
@@ -364,9 +420,11 @@ class MissionActionState:
     def from_payload(cls, payload: MissionActionStatePayload) -> Self:
         return cls(
             action_id=payload["action_id"],
+            mission_action_id=payload["mission_action_id"],
             player_id=payload["player_id"],
             unit_instance_id=payload["unit_instance_id"],
             target_id=payload["target_id"],
+            condition_target_id=payload["condition_target_id"],
             mission_id=payload["mission_id"],
             battle_round_started=payload["battle_round_started"],
             phase_started=payload["phase_started"],

@@ -14623,16 +14623,21 @@
       "secret": true
     },
     "request_id": "hidden-request",
-    "schema_version": "decision-request-view-v4-phase17n-step3"
+    "schema_version": "decision-request-view-v5-phase17n-step4"
   },
   "pending_proposal": null,
   "player_ids": [
     "player-a",
     "player-b"
   ],
+  "primary_mission_progress_state": {
+    "condemned_selections": [],
+    "consecration_designations": [],
+    "markers": []
+  },
   "primary_rules_unit_turn_start_snapshots": [],
-  "projection_schema": "game-view-v10-phase17n-step3",
-  "projection_state_hash": "8c785d1a3eb6d645da80bdcf2101baa55f2a98bcf01213a4156e6f06b077fc09",
+  "projection_schema": "game-view-v11-phase17n-step4",
+  "projection_state_hash": "09069fe007e45745ef27aa8d05f7bd7b5b17af195ee9bab3ec21cdacd5eda1d1",
   "public_command_point_ledgers": [
     {
       "command_points": 0,

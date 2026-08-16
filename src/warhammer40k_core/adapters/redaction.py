@@ -20,6 +20,12 @@ from warhammer40k_core.engine.phase import (
 from warhammer40k_core.engine.primary_destruction_evidence import (
     RulesUnitObjectiveProximityWitness,
 )
+from warhammer40k_core.engine.primary_mission_action_decline_integrity import (
+    MISSION_ACTION_OPPORTUNITY_DECLINED_EVENT,
+)
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
+    PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT,
+)
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartSnapshot,
     PrimaryRulesUnitTurnStartSnapshotPayload,
@@ -323,6 +329,18 @@ def _event_record_hidden_from_context(
         )
     if event_type == "secondary_mission_choice_recorded":
         event_payload = _json_object("secondary_mission_choice_recorded payload", payload)
+        return not (
+            viewer.policy.omniscient
+            or viewer.owns_player(_required_string(event_payload, key="player_id"))
+        )
+    if event_type in {
+        PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT,
+        MISSION_ACTION_OPPORTUNITY_DECLINED_EVENT,
+    }:
+        event_payload = _json_object(
+            f"{event_type} payload",
+            payload,
+        )
         return not (
             viewer.policy.omniscient
             or viewer.owns_player(_required_string(event_payload, key="player_id"))

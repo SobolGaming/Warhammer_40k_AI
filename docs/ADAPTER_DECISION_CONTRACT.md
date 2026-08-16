@@ -4,6 +4,11 @@ Status: Phase 11D contract with Phase 11E scoring projection/event-stream additi
 
 This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout and catalog RuleIR pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog named-weapon and Shooting-start selected-target ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog move/setup-completed mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window/interface-intent requirements, Phase 18C shared adapter session facade requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]` for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
+Phase 17N Step 4 extends that scoring contract with public persistent Primary
+Mission progress, the shared finite Primary Mission choice family, the ten
+source-backed Primary Mission Actions, and deterministic turn-boundary,
+event-stream, and replay requirements.
+
 The short rule:
 
 All clients share the same authoritative submission contract. Adapters may differ only in how they render, choose, transmit, or generate submissions. No adapter gets a private mutation path, a private rules path, or a bypass around replay-facing `DecisionRecord` and `EventRecord` generation.
@@ -214,6 +219,12 @@ The shared contract uses these objects and payloads:
 - `ParameterizedSubmission`: adapter wrapper for submitting JSON-safe proposal payloads.
 - `DecisionResult`: engine-facing result created from a submission and pending request.
 - `DecisionRecord`: replay-facing record of a request/result pair.
+- `PrimaryMissionChoiceData`: strict JSON-safe finite-choice payload binding
+  one Primary Mission timing, actor, source descriptor/rule, legal target set,
+  selected target set, evidence set, and optional subject or source Action.
+- `PrimaryMissionProgressState`: public, replay-safe Primary Mission audit state
+  containing persistent/tombstoned markers, historical Punishment condemned
+  selections, and active/consumed Consecrate designations.
 - `ProposalRequestPayload`: neutral parameterized physical-action request embedded inside a `DecisionRequest.payload`.
 - `MovementProposalPayload`: parameterized movement answer, including `PathWitness`, `movement_mode`, and the explicit `fall_back_mode` when Fall Back was selected.
 - `TriggeredMovementSelection`: finite triggered-movement answer selecting one
@@ -404,41 +415,44 @@ reference server currently requires:
   explicit logical terrain-area identities;
 - `finite-submission-v1` for finite option submissions;
 - `parameterized-submission-v1` for proposal submissions;
-- `lifecycle-status-v3-phase17n-step3` for server lifecycle responses whose
-  unresolved Declare Battle Formations state is viewer-scoped;
-- `decision-request-view-v4-phase17n-step3` for visible or redacted
-  pending decisions;
+- `lifecycle-status-v4-phase17n-step4` for server lifecycle responses whose
+  public Primary Mission choices and unresolved viewer-scoped Declare Battle
+  Formations state use the shared redaction boundary;
+- `decision-request-view-v5-phase17n-step4` for visible or redacted pending
+  decisions, including public `select_primary_mission_choice` options;
 - `annotated-decision-request-v2-primary-assignments` for nested interaction
   requests;
-- `event-delta-v3-phase17n-step3` for the in-process integer-cursor adapter delta only;
-- `event-delta-v4-phase17n-step3` for authenticated role-bound HTTP event deltas;
-- `game-view-v10-phase17n-step3` for role-scoped game projections whose public
-  mission state contains both directed Primary Mission assignments and whose
-  group-aware turn-start position evidence contains complete public rules-unit
-  rows;
+- `event-delta-v4-phase17n-step4` for the in-process integer-cursor adapter delta only;
+- `event-delta-v5-phase17n-step4` for authenticated role-bound HTTP event deltas;
+- `game-view-v11-phase17n-step4` for role-scoped game projections whose public
+  mission state contains both directed Primary Mission assignments, complete
+  group-aware turn-start position rows, and persistent Step 4 Primary Mission
+  progress;
 - `battlefield-view-v4-phase17n-step3` for authoritative battlefield geometry
   with explicit terrain-area logical identity and terrain area and feature
   classifications, plus viewer-scoped model formation state before reveal;
-- `session-projection-v6-phase17n-step3` for full role-scoped reconnect projections;
-- `session-create-v4`, `session-metadata-v8-contract`,
-  `session-command-result-v8-contract`, and `session-command-outcome-v8-contract` for the
+- `session-projection-v7-phase17n-step4` for full role-scoped reconnect projections;
+- `session-create-v4`, `session-metadata-v9-contract`,
+  `session-command-result-v9-contract`, and `session-command-outcome-v9-contract` for the
   authenticated formal session protocol;
 - `capability-manifest-v2-directed-primary` inside
   `support-profile-v4-directed-primary` for viewer-scoped capability evidence
   whose public mission identity includes both assignments;
 - `physical-proposal-context-v2` for engine-owned physical proposal context;
-- `replay-artifact-v6-phase17n-step3` for replay artifacts whose required source
+- `replay-artifact-v7-phase17n-step4` for replay artifacts whose required source
   identity includes `ruleset_descriptor_hash`, `rules_overlay_ids`, and the
   atomic `mission_pack_id` / `mission_source_package_hash` pair, while the
   embedded mission setup includes both directed Primary Mission assignments,
-  Phase 17N group-aware turn-start position, destruction-attribution, and
-  battlefield-departure evidence, and explicit logical terrain-area identities;
+  Phase 17N group-aware turn-start position, destruction-attribution,
+  battlefield-departure evidence, persistent Primary Mission progress state,
+  and explicit logical terrain-area identities;
 - `error-envelope-v1` for typed transport errors.
 
-The Contract 8 replay loader accepts only `replay-artifact-v6-phase17n-step3`;
-v5 artifacts require the retained 7.x deployment. It never infers directed
+The Contract 9 replay loader accepts only `replay-artifact-v7-phase17n-step4`;
+v6 artifacts require the retained 8.x deployment. It never infers directed
 Primary Mission assignments, grouped position history, destruction sources,
-battlefield departures, missing logical terrain-area grouping, or mission
+battlefield departures, persistent markers, condemned selections,
+consecration designations, missing logical terrain-area grouping, or mission
 source identity. Mission identity fields are both non-null when the configured or
 late-bound lifecycle has a mission setup and both null otherwise; canonical
 mission source-package hash drift is rejected. A mismatched
@@ -448,10 +462,11 @@ viewer-scoped by the same shared redaction policy as game projections and
 events.
 
 The external replay schema requires the lifecycle state and closes the three
-Step 3 evidence row families without duplicating every engine-private lifecycle
-field. Full lifecycle shape, event linkage, source attribution, and historical
-cross-record consistency remain fail-closed runtime-loader responsibilities;
-JSON Schema acceptance alone does not certify a replay as reproducible.
+Step 3 evidence row families plus the Step 4 Primary progress state without
+duplicating every engine-private lifecycle field. Full lifecycle shape, event
+linkage, source attribution, and historical cross-record consistency remain
+fail-closed runtime-loader responsibilities; JSON Schema acceptance alone does
+not certify a replay as reproducible.
 
 Compatibility, coordinate, session, and redaction semantics are normative in
 `contracts/compatibility-policy.md`, `contracts/coordinate-system.md`,
@@ -513,6 +528,7 @@ implementation-level contract.
 Finite decisions are bounded option choices already enumerated by the engine. Examples include:
 
 - secondary mission selection;
+- Primary Mission setup, turn-start, and turn-end choices;
 - Tactical secondary discard;
 - Mission Action start selection;
 - unit selection;
@@ -840,6 +856,154 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   state instead of creating a VP transaction. Mission Action target policies
   that are not yet represented as finite options return a typed `unsupported`
   status instead of exposing an adapter mutation path.
+
+An accepted `continue_to_shooting` selection emits exactly one
+`mission_action_opportunity_declined` mutation event containing the exact
+request ID, result ID, selected option ID, and internal boundary evidence. On
+restore, the engine reconstructs the complete Primary and held-Secondary
+Action inventory from the referenced request checkpoint and requires exact
+closure through `decision_requested`, `DecisionRecord`, `decision_recorded`,
+the decline event, and the current `ShootingPhaseState` flag. A decline cannot
+create `MissionActionState`; without that exact authority the flag must remain
+false. Because the internal evidence contains the owning player's active
+Secondary identities and complete Action inventory, shared adapter redaction
+exposes the decline event only to that player and an omniscient administrator;
+opponents receive no event payload through projections, deltas, responses, or
+reconnects.
+
+### Phase 17N Step 4 Primary Mission choices
+
+Step 4 uses the public finite decision type
+`select_primary_mission_choice`. The request payload is strict
+`PrimaryMissionChoiceData` with `game_id`, `choice_kind`, `player_id`,
+`primary_mission_id`, `source_descriptor_id`, `source_rule_id`, nullable
+`battle_round`/`phase`, nullable `subject_id` and `source_action_id`, complete
+`legal_target_ids`, empty `selected_target_ids`, `evidence_ids`, and
+`used_fallback_candidates`. The round and phase are both null only for the
+start-battle choice. Each option repeats that exact payload with its selected
+target set. Adapters must select one option ID from the pending request and
+must not edit the payload.
+
+Option IDs are deterministic
+`primary-mission-choice:<canonical-payload-sha256>` values. Their identity
+binds the game, choice kind, player, source descriptor, subject, source Action,
+and selected targets. The digest is opaque adapter data; clients must not
+construct or decode it. Non-empty option labels are `Select <target IDs>` and
+the empty Consecrate option is `Decline this choice`.
+
+The supported choice kinds are:
+
+- `locate_and_deny_setup`: at the final setup/start-battle boundary, each
+  player assigned Locate and Deny receives all exact five-area combinations
+  outside their own deployment zone, or the one exact all-available cardinality
+  when fewer than five areas exist. Acceptance creates one public friendly
+  operation marker for every selected logical terrain area. The setup
+  completion gate cannot enter battle until every emitted request is resolved.
+- `punishment_condemnation`: at the start of the assigned player's turn, the
+  engine enumerates all one-, two-, and three-unit combinations, capped by the
+  candidate count, from enemy battlefield rules units in objective range or
+  identified by authoritative destruction evidence as previous-turn
+  destroyers of friendly units. When that preferred candidate set is empty but
+  battlefield enemies exist, options are exactly the single-unit fallbacks and
+  `used_fallback_candidates` is true. When no candidate exists, the engine
+  records an automatic empty condemned selection and opens no pending request.
+- `consecrate_objective`: at the assigned player's turn end, one request is
+  emitted for the next active consecration designation not yet resolved in
+  that owner turn. Each eligible non-home objective in range of that designated
+  rules unit that has never previously been consecrated is a singleton option,
+  and an empty option declines. A removed/tombstoned Consecrate marker still
+  proves that its objective was previously consecrated. Selection creates a
+  public consecrated marker and consumes the designation. Decline retains the
+  designation but records the current owner turn so it cannot prompt again
+  until a later turn.
+- `sensor_sweep_marker_removal`: after a qualifying Sensor Sweep Action has
+  completed, every eligible active operation marker is a singleton option.
+  `sensor-sweep-locate-and-deny` enumerates friendly operation markers;
+  `sensor-sweep-extract-relic` enumerates opponent operation markers. The
+  selected row becomes a provenance-complete `removed` tombstone and is never
+  deleted.
+
+Step 4 also completes the existing `start_mission_action` path for ten
+source-backed Primary Actions: `commit-sabotage`, `decoy-objective`,
+`extract-intelligence`, `maintain-control`, `secure-asset`,
+`sensor-sweep-extract-relic`, `sensor-sweep-locate-and-deny`,
+`surveil-enemy-unit`, `triangulate-objective`, and `vanguard-operation`.
+Adapters continue to submit the emitted
+`start:<mission_action_id>:<unit_instance_id>:<target_id>` option. The engine
+owns target policies, use limits, Action state, immediate or turn-end
+completion, marker/status effects, and follow-up Primary choices.
+
+On lifecycle restore, a pending `start_mission_action` or
+`select_primary_mission_choice` request is accepted only as the sole queue
+head, with exactly one matching `decision_requested` event, no matching
+`DecisionRecord`, and no later authoritative mutation. The lifecycle
+regenerates the complete direct or opportunity Action inventory, or the
+complete Locate and Deny, Punishment, Consecrate, or Sensor Sweep choice
+inventory, from the restored boundary. Orphaned, duplicated, stale-context,
+partial-option, and otherwise impossible pending sequences fail before the
+request is exposed to an adapter. A pending Action request also requires its
+engine-recorded boundary checkpoint immediately before `decision_requested`;
+restore uses the checkpoint-backed pure option reconstruction path and does not
+record a second checkpoint or request while authenticating it.
+
+Each accepted Step 4 Action start is closed to exactly one authoritative
+`DecisionRecord`. Its actor, request/result IDs, deterministic selected option,
+selected option payload, complete eligible-unit inventory, mission/source
+policy, unit, target, and condition target must agree with the persisted Action
+and the later `mission_action_started` mutation. The exact
+`decision_requested` and `decision_recorded` events precede that mutation.
+Restore rejects a source-backed Action state or start event without that
+decision closure.
+
+The public `mission_action_started` event also carries typed
+`mission_action_start_evidence` (`primary-mission-action-start-evidence-v1`).
+This immutable bundle records the source round/phase and policy, complete legal
+unit inventory, selected-unit eligibility state, objective/terrain or Surveil
+range-and-visibility witnesses, relevant operation-marker inventory, and all
+prior Action uses. Its typed start authority preserves the exact request and
+every option plus one complete candidate row for every friendly rules-unit
+membership at that boundary. It also preserves the typed battlefield identity,
+dimensions, and exact terrain-feature inventory needed to reproduce historical
+line-of-sight and visibility-cache inputs after later state normalization.
+Candidate rows cover the stable component/model
+universe, eligibility outcome, objective and Surveil witnesses, terrain-model
+inventory, and derived legal Primary option IDs. Restore derives the eligible
+unit and option inventories from those rows and requires exact agreement with
+the full authoritative request, including every nonselected option. Live option
+generation and restore consume the same generic policy evaluator. Restore
+therefore enforces battle-round-two starts,
+`once_per_turn`, `unlimited`, and
+`unlimited_different_objective_per_unit_this_phase` across the complete ordered
+Action history; Surveil's no-repeat target rule is enforced independently of
+its unlimited Action count.
+
+The engine's `primary_mission_boundary_checkpoint_recorded` events are internal
+replay-authority records, not public battlefield events. Their payload can
+contain the owning player's hidden active-Secondary identities and prior-use
+inventory. Shared adapter redaction therefore exposes a checkpoint only to its
+owning player and an omniscient administrator; opponents receive no checkpoint
+payload through projections, event deltas, server responses, or reconnects.
+
+Restore authenticates every `primary_mission_boundary_checkpoint_recorded`
+event in chronological order. Each checkpoint's complete physical state is
+derived from already-authenticated authority plus intervening authoritative
+mutations, so no checkpoint becomes a new trust root. Every `action_request`
+checkpoint must be immediately paired with its exact `start_mission_action`
+`decision_requested` event, and every `turn_end` checkpoint must be consumed by
+exactly one matching Vanguard terminal-evidence event before the next
+checkpoint. Orphaned, duplicated, or mismatched checkpoints fail closed.
+
+Turn ordering is engine-owned and blocking. Locate and Deny drains before
+battle entry. Punishment drains after battle-round-start hooks and before the
+ordinary Command phase start windows/body. At a player-turn end, the engine
+records the authoritative turn-end objective-control boundary and resolves
+started Primary Actions before emitting a Step 4 turn-end request; completed
+Sensor Sweep removals have priority over Consecrate designations. Only one
+request is pending at a time, and the engine recomputes the next opportunity
+after each accepted result before it advances the turn. Surveil the Foe's
+move-triggered removal of opponent operation markers is automatic at the
+shared phase-flow boundary for each unprocessed completed-move event and is
+not an adapter submission.
 
 If destruction splits an Attached Unit, the engine interrupts each qualifying
 started Action before removing the canonical formation identity and emits one
@@ -2750,6 +2914,18 @@ Adapters should treat invalid proposal responses as authoritative diagnostics, n
 
 Finite requests use the existing selected-option equality rule: `DecisionResult.selected_option_id` must name one option on the pending `DecisionRequest`, and `DecisionResult.payload` must equal that option's payload.
 
+For `select_primary_mission_choice`, the lifecycle additionally regenerates
+the complete authoritative request before queue pop, `DecisionRecord`
+creation, or state mutation. It rechecks stage/timing, actor, choice kind,
+Primary assignment, source IDs, subject or source Action, legal target and
+evidence inventories, fallback state, option IDs, and option payloads. Stale or
+drifted requests return `primary_mission_choice_request_drift` in
+`invalid_reason` and `authoritative_request` in `field`. Malformed payloads,
+unsupported choice kinds,
+invented option IDs, and wrong request/result context are likewise rejected
+before mutation. The pending request remains unresolved and no marker,
+condemned selection, designation update, Action result, or event is committed.
+
 Parameterized proposal requests use a different validation rule. The pending request still contains the fixed `submit_parameterized_payload` option, and the submitted `DecisionResult.selected_option_id` must be `submit_parameterized_payload`. For parameterized requests, `DecisionResult.payload` is the adapter's movement or placement proposal. It is validated against the embedded `ProposalRequestPayload`; it is not required to equal the fixed option payload `{"submission_kind": "parameterized"}`.
 
 Every `submit_movement_proposal` and shared `submit_placement_proposal` request carries a required opaque `spatial_context_hash`. The engine computes the token from authoritative battlefield bounds and placements, terrain, mission geometry, model physical state, measurement/support dimensions, and geometry/height provenance. Adapters preserve the token only as request context; they do not compute, compare, or submit it as validation authority. Immediately before queue pop, the engine recomputes the token from current authoritative state. Any mismatch returns typed `spatial_context_drift`, leaves the pending request queued, creates no `DecisionRecord`, and mutates no battlefield state. A retry issued after a rule-invalid recorded attempt receives a fresh engine-owned token.
@@ -2881,7 +3057,7 @@ terrain areas as the objective footprint and treat the objective marker as
 stable objective identity/label metadata. Adapters must submit complete logical
 membership: referencing any physical terrain area requires listing every
 mission-setup terrain area with the same `logical_terrain_area_id`. Layout,
-mission-setup, Contract 8 create, replay, and objective-control validation
+mission-setup, Contract 9 create, replay, and objective-control validation
 reject partial logical groups. Removing a physical member, relabelling the
 survivor, or clearing `battlefield_layout_id` does not bypass the canonical
 source-layout reconciliation. Replay state must retain the same mission setup
@@ -2933,7 +3109,7 @@ hybrid projection model:
    `LocalGameSession.view(...)`.
 2. Live viewer-safe unit/model projection. Phase 18A introduced
    `projection_schema: "game-view-v3-phase18a"`; the current `GameViewPayload`
-   uses `game-view-v10-phase17n-step3`, includes
+   uses `game-view-v11-phase17n-step4`, includes
    `projection_state_hash`, references the static catalog through
    `rules_catalog`, and exposes read-only `unit_display_by_id` and
    `model_display_by_id` maps keyed by stable `unit_instance_id` and
@@ -3010,6 +3186,10 @@ Phase 11E adds scoring state to the viewer projection:
   evidence recording each rules unit's exact physical component
   models, logical terrain-area membership, and objective-marker/model proximity
   at each player-turn boundary.
+- `primary_mission_progress_state`: deterministic, engine-owned public Primary
+  Mission state containing persistent/tombstoned markers, historical
+  Punishment condemned selections, and active/consumed Consecrate
+  designations.
 
 Turn-start snapshots are created only after battle entry, once Declare Battle
 Formations has completed and its results are public. Both players therefore
@@ -3021,6 +3201,33 @@ are now unplaced. Each outer row carries `rules_unit_instance_id` and
 were in range. Units that began the turn off the battlefield retain explicit
 empty position sets. Adapters may display this evidence for scoring audit but
 must not recalculate it from current positions.
+
+Phase 17N Step 4 progress is public tabletop mission state. Both player views,
+role-scoped event deltas, reconnect projections, and replay expose the same
+rows at the same visible revision; delayed spectators receive those rows only
+when their normal delayed projection reaches that revision. Primary choices do
+not carry the shared `secret` request flag and are not redacted as
+`hidden_decision`. Their pending request, option inventory, accepted result,
+and progress effect are visible to both players.
+
+`primary_mission_progress_state.markers` records stable marker/game/owner/
+mission/source identities, marker kind, exactly one objective or terrain
+anchor, optional creation battle context, source event/result/Action/
+destruction/designation provenance, and `active` or `removed` status. Removed
+markers remain in the collection with complete removal battle context and
+source/event/result/Action provenance. Adapters must render status rather than
+interpreting absence as removal.
+
+`condemned_selections` preserves each Punishment turn's candidate policy,
+complete candidate rules-unit and evidence inventories, selected rules units,
+minimum/maximum selection counts, fallback flag, optional decision request and
+result IDs, and source event. `consecration_designations` preserves the
+designated rules-unit identity and physical components, source destruction and
+creation context, last declined-resolution context, active/consumed status,
+and the consumed marker plus consumption provenance. These collections are
+historical audit records, not adapter mutation instructions. They participate
+in `projection_state_hash` and must be replaced from a fresh projection after
+resynchronization.
 
 Chapter Approved 2026-27 secondary selection is simultaneous-secret. A player's
 Fixed/Tactical mode and Fixed mission IDs are secret only until every player has
@@ -3199,6 +3406,65 @@ Public adapter streams must follow the same visibility model as
 `SecondaryMissionCardState.to_public_payload(...)`, and
 `VictoryPointLedger.to_public_payload(...)`.
 
+Phase 17N Step 4 Primary progress and choice events are public. Every pending
+choice has the ordinary deterministic `decision_requested`; battle turn-start
+and turn-end choices then carry `primary_mission_choice_requested`. An accepted
+choice records `decision_recorded` before
+`primary_mission_choice_resolved`. Every resolution payload has exactly these
+semantic members: `choice`, `request_id`, `result_id`,
+`selected_option_id`, `automatic`, `created_markers`,
+`condemned_selection`, `updated_designation`, and `removed_marker`.
+Automatic empty Punishment resolution has null request/result/option IDs and
+still records the complete choice and condemned-selection row. Every
+nonautomatic resolution is rebound during restore to exactly one accepted
+finite `DecisionRecord`, including its deterministic complete option inventory
+and requested/recorded/mutation ordering. An automatic empty Punishment must
+have no attached player decision.
+
+Accepted or automatically resolved Step 4 state is also linked through
+`mission_action_completed`, `primary_consecration_unit_designated`, and
+`primary_surveil_move_marker_removal_resolved` when applicable. A completed
+Primary Action event includes its complete `mission_action_state` and nullable
+`primary_mission_marker`. Source-backed completed and completion-failed Action
+events also carry `mission_action_completion_evidence`
+(`primary-mission-action-completion-evidence-v1`). Turn-end evidence cites the
+exact authoritative `ObjectiveControlRecord` ID and canonical payload hash,
+the target result, Action-unit lineage contributors, Battle-shock state, and,
+for Vanguard Operation, one terrain-membership row for every static army model
+and the exactly derived terrain-intersection and enemy-presence inventory.
+Restore requires Action start before the cited objective-control boundary and
+that boundary before the terminal event, reruns the same completion evaluator
+used live, and rejects a terminal status that disagrees with that evidence.
+
+Consecrate designations bind the authoritative destruction event and state
+row. Restore also applies the rule in reverse: every qualifying retained
+friendly-attributed destruction must have exactly one deterministic designation
+unless that rules-unit lineage was already actively designated at that event.
+A Consecrate request additionally cites one exact turn-end objective-control
+record; its destruction/designation lineage and objective-control boundary must
+precede `decision_requested`. Restore reconstructs the full legal objective set
+at that historical request boundary from designation component lineage and all
+prior Consecrate markers, then compares the exact legal targets and evidence
+IDs before accepting its DecisionRecord and marker/designation mutation. Every
+active designation requires one resolution at each applicable owner turn-end
+boundary. A paused sequential queue is valid only when the exact earliest
+unresolved Consecrate request remains in the persisted pending-decision queue;
+an unmatched event or an unrelated Primary choice cannot mask an omitted
+resolution.
+Surveil move resolutions bind the processed
+move-completion event and every tombstoned marker. Their public payload carries
+`moving_rules_unit_objective_proximity_witness`; `objective_marker_ids` is
+exactly the witness objective set, and `removed_primary_mission_markers` is the
+complete set of opponent Operation markers active on those objectives at the
+trigger boundary. Adapters must consume this event order and must not emit
+synthetic marker, condemnation, designation, or Action events.
+
+Sensor Sweep marker-removal restore reconstructs marker activity at the exact
+`decision_requested` boundary from every marker's creation and optional removal
+event. It applies the same friendly/opponent marker policy used live and
+requires the complete canonical legal-marker inventory before accepting the
+choice DecisionRecord and tombstone mutation.
+
 ## Replay and Resume
 
 Replay-facing payloads must remain deterministic and JSON-safe:
@@ -3209,6 +3475,14 @@ Replay-facing payloads must remain deterministic and JSON-safe:
 - stable lifecycle payloads.
 
 Phase 11D must ensure replay/resume preserves pending parameterized proposal requests. Restoring after a finite movement-action result has been accepted but before the proposal has been submitted must reproduce the same pending proposal request and validation context.
+
+Contract 9 replay uses `replay-artifact-v7-phase17n-step4`. It preserves a
+pending `select_primary_mission_choice` request, deterministic finite option
+IDs/payloads, the complete `primary_mission_progress_state`, and the linked
+decision, Action, destruction, marker, condemnation, designation, and event
+records. Restore validates exact DecisionRequest/DecisionResult/mutation
+closure, Action start and completion evidence, and historical Consecrate legal
+targets fail closed; it does not infer Step 4 state for a Contract 8 artifact.
 
 Replay and tests may choose decisions differently from a human UI, but they must submit the same `DecisionResult` shape through the same lifecycle path.
 
@@ -3403,7 +3677,7 @@ role-scoped projection hash. The wire token contains no readable cursor state;
 the client treats it as an indivisible string.
 
 `GET /sessions/{session_id}/events?cursor=...&limit=...` returns deterministic
-`event-delta-v4-phase17n-step3` pages. `sequence_number` is one-based and contiguous within a
+`event-delta-v5-phase17n-step4` pages. `sequence_number` is one-based and contiguous within a
 viewer scope. Hidden records are omitted while pagination advances the
 protected authoritative offset; they create no projection count, placeholder,
 sequence gap, extra page, or `has_more` oracle. Page size defaults to 100 and is

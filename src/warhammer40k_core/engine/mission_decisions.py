@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from itertools import combinations
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.actions import MissionActionState
@@ -33,12 +33,40 @@ from warhammer40k_core.engine.mission_action_options import (
 from warhammer40k_core.engine.mission_action_options import (
     mission_action_start_options as _mission_action_start_options,
 )
+from warhammer40k_core.engine.mission_action_options import (
+    primary_mission_action_start_evidence_for_selection as _primary_start_evidence,
+)
+from warhammer40k_core.engine.mission_action_policies import (
+    mission_action_policy_descriptors,
+    mission_action_policy_for_id,
+)
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
     LifecycleStatus,
+)
+from warhammer40k_core.engine.primary_mission_action_decline_integrity import (
+    apply_mission_action_opportunity_decline_mutation,
+)
+from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
+    PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY,
+    PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY,
+)
+from warhammer40k_core.engine.primary_mission_action_lifecycle_policy import (
+    capture_primary_mission_action_completion_evidence,
+)
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
+    primary_mission_boundary_checkpoint_for_request,
+    record_primary_mission_boundary_checkpoint,
+    validate_primary_mission_action_request_checkpoint,
+    validate_primary_mission_boundary_checkpoint_modifier_sources,
+)
+from warhammer40k_core.engine.primary_mission_choices import (
+    SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
+    apply_primary_mission_choice,
+    invalid_primary_mission_choice_request_status,
 )
 from warhammer40k_core.engine.rules_units import rules_unit_is_battle_shocked
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
@@ -51,6 +79,11 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointTransaction,
 )
 
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+    from warhammer40k_core.engine.faction_rule_execution import FactionRuleExecutionRegistry
+    from warhammer40k_core.engine.runtime_rule_ir_authority import RuntimeRuleIRAuthorityIndex
+
 TACTICAL_SECONDARY_SCORE_DECISION_TYPE = "score_tactical_secondary_mission"
 TACTICAL_SECONDARY_DISCARD_DECISION_TYPE = "discard_tactical_secondary_mission"
 START_MISSION_ACTION_DECISION_TYPE = "start_mission_action"
@@ -60,11 +93,17 @@ MISSION_DECISION_TYPES = frozenset(
         TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
         TACTICAL_SECONDARY_DISCARD_DECISION_TYPE,
         START_MISSION_ACTION_DECISION_TYPE,
+        SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
     )
+)
+_PRIMARY_MISSION_ACTION_IDS = frozenset(
+    descriptor.mission_action_id for descriptor in mission_action_policy_descriptors()
 )
 
 
 def mission_decision_pauses_after_apply(request: DecisionRequest) -> bool:
+    if request.decision_type == SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE:
+        return True
     if request.decision_type != START_MISSION_ACTION_DECISION_TYPE:
         return False
     payload = _payload_object(request.payload)
@@ -174,6 +213,13 @@ def request_mission_action_opportunity(
                 },
             ),
         ),
+    )
+    record_primary_mission_boundary_checkpoint(
+        state=state,
+        event_log=decisions.event_log,
+        boundary_kind="action_request",
+        player_id=requested_player,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     decisions.request_decision(request)
     return LifecycleStatus.waiting_for_decision(
@@ -458,6 +504,13 @@ def request_mission_action_start(
             for option in options
         ),
     )
+    record_primary_mission_boundary_checkpoint(
+        state=state,
+        event_log=decisions.event_log,
+        boundary_kind="action_request",
+        player_id=requested_player,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
     decisions.request_decision(request)
     return LifecycleStatus.waiting_for_decision(
         stage=state.stage,
@@ -473,11 +526,19 @@ def request_mission_action_start(
 def invalid_mission_decision_status(
     *,
     state: GameState,
+    decisions: DecisionController,
     request: DecisionRequest,
     result: DecisionResult,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> LifecycleStatus | None:
     _require_runtime_modifier_registry(runtime_modifier_registry)
+    if request.decision_type == SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE:
+        return invalid_primary_mission_choice_request_status(
+            state=state,
+            decisions=decisions,
+            request=request,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
     if request.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
         payload = _payload_object(result.payload)
         player_id = _payload_string(payload, key="player_id")
@@ -681,11 +742,25 @@ def invalid_mission_decision_status(
 def apply_mission_decision(
     *,
     state: GameState,
+    request: DecisionRequest,
     result: DecisionResult,
     decisions: DecisionController,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    rule_ir_authority_index: RuntimeRuleIRAuthorityIndex | None = None,
+    faction_rule_execution_registry: FactionRuleExecutionRegistry | None = None,
+    runtime_content_activation: RuntimeContentActivation | None = None,
 ) -> None:
     _require_runtime_modifier_registry(runtime_modifier_registry)
+    if result.decision_type == SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE:
+        if not apply_primary_mission_choice(
+            state=state,
+            decisions=decisions,
+            request=request,
+            result=result,
+            runtime_modifier_registry=runtime_modifier_registry,
+        ):
+            raise GameLifecycleError("Primary mission choice was not handled.")
+        return
     if result.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
         _apply_tactical_secondary_score(state=state, result=result, decisions=decisions)
         return
@@ -694,11 +769,15 @@ def apply_mission_decision(
         return
     if result.decision_type == START_MISSION_ACTION_DECISION_TYPE:
         if result.selected_option_id == DECLINE_MISSION_ACTION_START_OPTION_ID:
-            _apply_mission_action_opportunity_decline(
+            apply_mission_action_opportunity_decline_mutation(
                 state=state,
+                request=request,
                 result=result,
                 decisions=decisions,
                 runtime_modifier_registry=runtime_modifier_registry,
+                rule_ir_authority_index=rule_ir_authority_index,
+                faction_rule_execution_registry=faction_rule_execution_registry,
+                runtime_content_activation=runtime_content_activation,
             )
             return
         _apply_start_mission_action(
@@ -706,6 +785,9 @@ def apply_mission_decision(
             result=result,
             decisions=decisions,
             runtime_modifier_registry=runtime_modifier_registry,
+            rule_ir_authority_index=rule_ir_authority_index,
+            faction_rule_execution_registry=faction_rule_execution_registry,
+            runtime_content_activation=runtime_content_activation,
         )
         return
     raise GameLifecycleError("Mission decision handler received unsupported decision_type.")
@@ -845,6 +927,9 @@ def _apply_start_mission_action(
     result: DecisionResult,
     decisions: DecisionController,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    rule_ir_authority_index: RuntimeRuleIRAuthorityIndex | None,
+    faction_rule_execution_registry: FactionRuleExecutionRegistry | None,
+    runtime_content_activation: RuntimeContentActivation | None,
 ) -> None:
     _assert_battle_state(state)
     _require_runtime_modifier_registry(runtime_modifier_registry)
@@ -861,19 +946,71 @@ def _apply_start_mission_action(
         unit_instance_id=unit_instance_id,
     ):
         raise GameLifecycleError("Battle-shocked units cannot start actions.")
+    target_id = _payload_string(payload, key="target_id")
+    condition_target_id = _payload_optional_string(payload, key="condition_target_id")
+    primary_policy = (
+        mission_action_policy_for_id(mission_action.mission_action_id)
+        if mission_action.mission_action_id in _PRIMARY_MISSION_ACTION_IDS
+        else None
+    )
+    if primary_policy is None:
+        start_evidence = None
+    else:
+        boundary_checkpoint, _checkpoint, _checkpoint_index = (
+            primary_mission_boundary_checkpoint_for_request(
+                event_records=decisions.event_log.records,
+                request_id=result.request_id,
+            )
+        )
+        validate_primary_mission_action_request_checkpoint(
+            state=state,
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+            request_id=result.request_id,
+            reference=boundary_checkpoint,
+            player_id=player_id,
+            battle_round=state.battle_round,
+            phase=_current_phase(state).value,
+            rule_ir_authority_index=rule_ir_authority_index,
+            faction_rule_execution_registry=faction_rule_execution_registry,
+            runtime_content_activation=runtime_content_activation,
+        )
+        validate_primary_mission_boundary_checkpoint_modifier_sources(
+            state=state,
+            checkpoint=_checkpoint,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        start_evidence = _primary_start_evidence(
+            state=state,
+            player_id=player_id,
+            action=mission_action,
+            unit_instance_id=unit_instance_id,
+            target_id=target_id,
+            condition_target_id=condition_target_id,
+            opportunity=payload.get("mission_action_opportunity") is True,
+            decline_option_id=DECLINE_MISSION_ACTION_START_OPTION_ID,
+            boundary_checkpoint=boundary_checkpoint,
+            boundary_checkpoint_evidence=_checkpoint,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+    eligible_unit_instance_ids = (
+        tuple(_payload_string_list(payload, key="eligible_unit_instance_ids"))
+        if start_evidence is None
+        else start_evidence.eligible_unit_instance_ids
+    )
     action_state = MissionActionState.start(
         action_id=f"mission-action:{result.result_id}",
+        mission_action_id=mission_action.mission_action_id,
         player_id=player_id,
         unit_instance_id=unit_instance_id,
-        target_id=_payload_string(payload, key="target_id"),
+        target_id=target_id,
+        condition_target_id=condition_target_id,
         mission_id=mission_action.mission_id,
         battle_round=state.battle_round,
         phase=_current_phase(state).value,
         start_timing=mission_action.start_timing,
         completion_timing=mission_action.completion_timing,
-        eligible_unit_instance_ids=tuple(
-            _payload_string_list(payload, key="eligible_unit_instance_ids")
-        ),
+        eligible_unit_instance_ids=eligible_unit_instance_ids,
         interruption_conditions=mission_action.interruption_conditions,
         scoring_source_id=mission_action.scoring_source_id,
         victory_points=mission_action.victory_points,
@@ -890,19 +1027,20 @@ def _apply_start_mission_action(
     else:
         completed_state = None
         state.record_mission_action_state(action_state)
-    decisions.event_log.append(
-        "mission_action_started",
-        {
-            "game_id": state.game_id,
-            "player_id": player_id,
-            "battle_round": state.battle_round,
-            "phase": _current_phase(state).value,
-            "mission_action_id": mission_action.mission_action_id,
-            "target_id": _payload_string(payload, key="target_id"),
-            "target_policy": mission_action.target_policy,
-            "mission_action_state": validate_json_value(action_state.to_payload()),
-        },
-    )
+    start_event_payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "player_id": player_id,
+        "battle_round": state.battle_round,
+        "phase": _current_phase(state).value,
+        "mission_action_id": mission_action.mission_action_id,
+        "target_id": target_id,
+        "condition_target_id": condition_target_id,
+        "target_policy": mission_action.target_policy,
+        "mission_action_state": validate_json_value(action_state.to_payload()),
+    }
+    if start_evidence is not None:
+        start_event_payload[PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY] = start_evidence.to_payload()
+    decisions.event_log.append("mission_action_started", start_event_payload)
     if completed_state is None:
         return
     trap_state_payload: JsonValue | None = None
@@ -949,59 +1087,31 @@ def _apply_start_mission_action(
                 "secondary_terrain_plunder_state": plunder_state_payload,
             },
         )
-    decisions.event_log.append(
-        "mission_action_completed",
-        {
-            "game_id": state.game_id,
-            "player_id": player_id,
-            "battle_round": state.battle_round,
-            "phase": _current_phase(state).value,
-            "mission_action_id": mission_action.mission_action_id,
-            "target_id": completed_state.target_id,
-            "target_policy": mission_action.target_policy,
-            "mission_action_state": validate_json_value(completed_state.to_payload()),
-            "primary_terrain_trap_state": trap_state_payload,
-            "secondary_terrain_plunder_state": plunder_state_payload,
-        },
-    )
-
-
-def _apply_mission_action_opportunity_decline(
-    *,
-    state: GameState,
-    result: DecisionResult,
-    decisions: DecisionController,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-) -> None:
-    _assert_battle_state(state)
-    payload = _payload_object(result.payload)
-    player_id = _payload_string(payload, key="player_id")
-    _validate_decision_context(state=state, payload=payload, player_id=player_id, result=result)
-    if not _payload_bool(payload, key="mission_action_opportunity"):
-        raise GameLifecycleError("Mission Action decline requires an opportunity payload.")
-    drift_reason = _mission_action_opportunity_drift_reason(
-        state=state,
-        payload=payload,
-        player_id=player_id,
-        runtime_modifier_registry=runtime_modifier_registry,
-    )
-    if drift_reason is not None:
-        raise GameLifecycleError(f"Mission Action opportunity drifted: {drift_reason}.")
-    shooting_state = state.shooting_phase_state
-    if shooting_state is None:
-        raise GameLifecycleError("Mission Action decline requires ShootingPhaseState.")
-    state.replace_shooting_phase_state(shooting_state.with_mission_action_opportunity_declined())
-    decisions.event_log.append(
-        "mission_action_opportunity_declined",
-        {
-            "game_id": state.game_id,
-            "player_id": player_id,
-            "battle_round": state.battle_round,
-            "phase": _current_phase(state).value,
-            "request_id": result.request_id,
-            "result_id": result.result_id,
-        },
-    )
+    completion_event_payload: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "player_id": player_id,
+        "battle_round": state.battle_round,
+        "phase": _current_phase(state).value,
+        "mission_action_id": mission_action.mission_action_id,
+        "target_id": completed_state.target_id,
+        "target_policy": mission_action.target_policy,
+        "mission_action_state": validate_json_value(completed_state.to_payload()),
+        "primary_terrain_trap_state": trap_state_payload,
+        "secondary_terrain_plunder_state": plunder_state_payload,
+    }
+    if primary_policy is not None:
+        completion_evidence = capture_primary_mission_action_completion_evidence(
+            state=state,
+            action=completed_state,
+            policy=primary_policy,
+            completed_phase=_current_phase(state),
+            objective_control_record=None,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        completion_event_payload[PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY] = (
+            completion_evidence.to_payload()
+        )
+    decisions.event_log.append("mission_action_completed", completion_event_payload)
 
 
 def _active_tactical_secondary_cards(
@@ -1303,6 +1413,13 @@ def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
 
 def _payload_string(payload: dict[str, JsonValue], *, key: str) -> str:
     value = payload[key]
+    return _validate_identifier(key, value)
+
+
+def _payload_optional_string(payload: dict[str, JsonValue], *, key: str) -> str | None:
+    value = payload[key]
+    if value is None:
+        return None
     return _validate_identifier(key, value)
 
 

@@ -921,9 +921,11 @@ def test_selected_to_fight_risk_destruction_splits_attached_unit_after_final_com
     state.record_persisting_effect(carried_effect)
     mission_action = MissionActionState.start(
         action_id=f"attached-risk-action:{destroyed_component}",
+        mission_action_id="attached-risk-action",
         player_id="player-source",
         unit_instance_id=attached_id,
         target_id="attached-risk-objective",
+        condition_target_id="attached-risk-objective",
         mission_id="attached-risk-mission",
         battle_round=state.battle_round,
         phase=BattlePhase.FIGHT.value,

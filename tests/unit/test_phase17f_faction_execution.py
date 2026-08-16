@@ -9,6 +9,14 @@ from typing import cast
 import pytest
 
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
+from warhammer40k_core.engine.abilities import (
+    GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+    AbilityCatalogIndex,
+    AbilityCatalogRecord,
+    AbilityDefinition,
+    AbilityTimingDescriptor,
+)
+from warhammer40k_core.engine.event_log import validate_json_value
 from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleExecutionContext,
     FactionRuleExecutionRegistry,
@@ -17,10 +25,22 @@ from warhammer40k_core.engine.faction_rule_execution import (
     FactionRuleGenericIrExecutor,
     FactionRuleNamedHandler,
     default_faction_rule_execution_registry,
+    default_faction_rule_ir_resolver,
     faction_result_from_rule_execution_result,
+    faction_rule_generic_ir_executor_for_resolver,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_execution import RuleExecutionResult
+from warhammer40k_core.engine.runtime_rule_ir_authority import RuntimeRuleIRAuthorityIndex
+from warhammer40k_core.engine.stratagems_model import (
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
+    StratagemCatalogIndex,
+    StratagemCatalogRecord,
+    StratagemCategory,
+    StratagemDefinition,
+    StratagemTimingDescriptor,
+)
+from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_ir,
 )
@@ -983,6 +1003,80 @@ def test_phase17f_default_registry_returns_typed_invalid_for_generic_ir_missing_
     generic_payload = replay_payload["generic_rule_execution_result"]
     assert isinstance(generic_payload, dict)
     assert generic_payload["status"] == "invalid"
+
+
+def test_runtime_rule_ir_authority_combines_exact_active_runtime_sources() -> None:
+    generic_records = tuple(
+        record
+        for record in faction_execution_source.execution_records()
+        if record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    )
+    ability_ir = default_faction_rule_ir_resolver(generic_records[0].coverage_descriptor_id)
+    stratagem_ir = default_faction_rule_ir_resolver(generic_records[1].coverage_descriptor_id)
+    faction_record = generic_records[2]
+    resolver = default_faction_rule_ir_resolver
+    registry = FactionRuleExecutionRegistry.from_records(
+        (faction_record,),
+        generic_ir_executor=faction_rule_generic_ir_executor_for_resolver(resolver),
+        rule_ir_resolver=resolver,
+    )
+    faction_ir = registry.resolved_generic_rule_ir(faction_record.execution_id)
+    ability_record = AbilityCatalogRecord(
+        record_id="test:rule-ir-authority:ability",
+        definition=AbilityDefinition(
+            ability_id="test-authority-ability",
+            name="Test authority ability",
+            source_id="test:ability-descriptor-source",
+            when_descriptor="passive",
+            effect_descriptor="test",
+            restrictions_descriptor="none",
+            timing=AbilityTimingDescriptor(trigger_kind=TimingTriggerKind.PASSIVE_QUERY),
+            handler_id=GENERIC_RULE_IR_ABILITY_HANDLER_ID,
+            replay_payload=validate_json_value({"rule_ir": ability_ir.to_payload()}),
+        ),
+    )
+    stratagem_record = StratagemCatalogRecord(
+        record_id="test:rule-ir-authority:stratagem",
+        definition=StratagemDefinition(
+            stratagem_id="test-authority-stratagem",
+            name="Test authority stratagem",
+            source_id="test:stratagem-descriptor-source",
+            command_point_cost=1,
+            category=StratagemCategory.BATTLE_TACTIC,
+            when_descriptor="any phase",
+            target_descriptor="none",
+            effect_descriptor="test",
+            restrictions_descriptor="none",
+            timing=StratagemTimingDescriptor(trigger_kind=TimingTriggerKind.ANY_PHASE),
+            handler_id=GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
+            effect_payload=validate_json_value({"rule_ir": stratagem_ir.to_payload()}),
+        ),
+    )
+
+    index = RuntimeRuleIRAuthorityIndex.from_runtime_sources(
+        ability_indexes_by_player_id={
+            "player-a": AbilityCatalogIndex.from_records((ability_record,))
+        },
+        stratagem_indexes_by_player_id={
+            "player-a": StratagemCatalogIndex.from_records((stratagem_record,))
+        },
+        faction_rule_execution_registry=registry,
+    )
+
+    for rule_ir in (ability_ir, stratagem_ir, faction_ir):
+        assert (
+            index.rule_ir_for(
+                source_id=rule_ir.source_id,
+                rule_ir_hash=rule_ir.ir_hash(),
+            )
+            == rule_ir
+        )
+    with pytest.raises(GameLifecycleError, match="not authoritative"):
+        index.rule_ir_for(source_id=ability_ir.source_id, rule_ir_hash="0" * 64)
+    with pytest.raises(GameLifecycleError, match="registered resolver"):
+        FactionRuleExecutionRegistry.from_records((faction_record,)).resolved_generic_rule_ir(
+            faction_record.execution_id
+        )
 
 
 def test_phase17f_generic_ir_unsupported_result_retains_rule_replay_payload() -> None:

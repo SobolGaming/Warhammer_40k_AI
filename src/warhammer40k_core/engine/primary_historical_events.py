@@ -11,6 +11,9 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
 )
+from warhammer40k_core.engine.primary_mission_state import (
+    PrimaryConsecrationDesignationState,
+)
 from warhammer40k_core.engine.primary_reserve_entry_provider import (
     PRIMARY_RESERVE_ENTRY_PROVIDER_RESOLVED_EVENT,
     PrimaryReserveEntryProvider,
@@ -33,6 +36,7 @@ PRIMARY_RESERVE_ENTRY_MUTATION_EVENT = "primary_reserve_entry_mutated"
 PRIMARY_RESERVE_ENTRY_SOURCE_BINDINGS_KEY = "primary_reserve_entry_bindings"
 PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT = "primary_turn_start_evidence_recorded"
 PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT = "primary_unit_destruction_recorded"
+PRIMARY_CONSECRATION_UNIT_DESIGNATED_EVENT = "primary_consecration_unit_designated"
 
 
 def record_primary_battlefield_departure_event(
@@ -293,6 +297,29 @@ def record_primary_unit_destruction_event(
     )
 
 
+def record_primary_consecration_unit_designated_event(
+    *,
+    event_log: EventLog,
+    designation: PrimaryConsecrationDesignationState,
+) -> EventRecord:
+    _require_event_log(event_log)
+    if type(designation) is not PrimaryConsecrationDesignationState:
+        raise GameLifecycleError("Consecration designation event requires typed state.")
+    return event_log.append(
+        PRIMARY_CONSECRATION_UNIT_DESIGNATED_EVENT,
+        {
+            "game_id": designation.game_id,
+            "battle_round": designation.created_battle_round,
+            "active_player_id": designation.created_active_player_id,
+            "phase": designation.created_phase,
+            "player_id": designation.owner_player_id,
+            "source_destruction_id": designation.source_destruction_id,
+            "primary_consecration_designation_state": designation.to_payload(),
+            "source_id": designation.source_rule_id,
+        },
+    )
+
+
 def record_new_primary_battlefield_departure_events(
     *,
     state: GameState,
@@ -334,13 +361,29 @@ def record_new_primary_unit_destruction_events(
         for destruction in state.primary_unit_destruction_states
         if destruction.destruction_id not in known_ids
     )
-    return tuple(
-        record_primary_unit_destruction_event(
-            event_log=event_log,
-            destruction=destruction,
+    records: list[EventRecord] = []
+    for destruction in new_destructions:
+        records.append(
+            record_primary_unit_destruction_event(
+                event_log=event_log,
+                destruction=destruction,
+            )
         )
-        for destruction in new_destructions
-    )
+        designations = tuple(
+            designation
+            for designation in state.primary_mission_progress_state.consecration_designations
+            if designation.source_destruction_id == destruction.destruction_id
+        )
+        if len(designations) > 1:
+            raise GameLifecycleError("Primary destruction produced multiple consecration states.")
+        if designations:
+            records.append(
+                record_primary_consecration_unit_designated_event(
+                    event_log=event_log,
+                    designation=designations[0],
+                )
+            )
+    return tuple(records)
 
 
 def record_new_primary_turn_start_evidence_events(
@@ -423,6 +466,7 @@ def _identifier_set(value: object, *, field_name: str) -> set[str]:
 
 __all__ = (
     "PRIMARY_BATTLEFIELD_DEPARTURE_RECORDED_EVENT",
+    "PRIMARY_CONSECRATION_UNIT_DESIGNATED_EVENT",
     "PRIMARY_RESERVE_ENTRY_MUTATION_EVENT",
     "PRIMARY_RESERVE_ENTRY_SOURCE_BINDINGS_KEY",
     "PRIMARY_TURN_START_EVIDENCE_RECORDED_EVENT",
@@ -432,6 +476,7 @@ __all__ = (
     "record_new_primary_turn_start_evidence_events",
     "record_new_primary_unit_destruction_events",
     "record_primary_battlefield_departure_event",
+    "record_primary_consecration_unit_designated_event",
     "record_primary_reserve_entry_mutation_event",
     "record_primary_reserve_entry_provider_terminal_event",
     "record_primary_turn_start_evidence_event",

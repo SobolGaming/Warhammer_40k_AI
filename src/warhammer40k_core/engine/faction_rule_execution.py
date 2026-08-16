@@ -335,6 +335,7 @@ class FactionRuleExecutionRegistry:
     _records_by_execution_id: Mapping[str, Phase17FExecutionRecord]
     _named_handlers: Mapping[str, FactionRuleNamedHandler]
     _generic_ir_executor: FactionRuleGenericIrExecutor | None = None
+    _rule_ir_resolver: FactionRuleIrResolver | None = None
 
     @classmethod
     def from_records(
@@ -343,6 +344,7 @@ class FactionRuleExecutionRegistry:
         *,
         named_handlers: Mapping[str, FactionRuleNamedHandler] | None = None,
         generic_ir_executor: FactionRuleGenericIrExecutor | None = None,
+        rule_ir_resolver: FactionRuleIrResolver | None = None,
     ) -> Self:
         if type(records) is not tuple:
             raise GameLifecycleError("FactionRuleExecutionRegistry records must be a tuple.")
@@ -359,6 +361,7 @@ class FactionRuleExecutionRegistry:
             _records_by_execution_id=MappingProxyType(mapped),
             _named_handlers=_validate_named_handlers(named_handlers),
             _generic_ir_executor=_validate_generic_ir_executor(generic_ir_executor),
+            _rule_ir_resolver=_validate_optional_rule_ir_resolver(rule_ir_resolver),
         )
 
     def all_records(self) -> tuple[Phase17FExecutionRecord, ...]:
@@ -421,6 +424,25 @@ class FactionRuleExecutionRegistry:
             raise GameLifecycleError("FactionRuleExecutionRegistry missing execution record.")
         return record
 
+    def resolved_generic_rule_ir(self, execution_id: str) -> RuleIR:
+        """Return the exact source RuleIR used by this registry's generic executor."""
+
+        record = self.record_by_execution_id(execution_id)
+        if record.execution_status is not Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR:
+            raise GameLifecycleError(
+                "Faction RuleIR authority requires an executable generic-IR record."
+            )
+        if self._rule_ir_resolver is None:
+            raise GameLifecycleError("Faction RuleIR authority requires a registered resolver.")
+        rule_ir = self._rule_ir_resolver(record.coverage_descriptor_id)
+        if type(rule_ir) is not RuleIR:
+            raise GameLifecycleError("Faction RuleIR resolver returned an invalid value.")
+        if record.rule_ir_hash != rule_ir.ir_hash():
+            raise GameLifecycleError(
+                "Generic faction-rule execution record has stale rule_ir_hash."
+            )
+        return rule_ir
+
     def execute(
         self,
         *,
@@ -476,6 +498,7 @@ def default_faction_rule_execution_registry() -> FactionRuleExecutionRegistry:
     return FactionRuleExecutionRegistry.from_records(
         faction_execution_2026_27.execution_records(),
         generic_ir_executor=default_faction_rule_generic_ir_executor,
+        rule_ir_resolver=default_faction_rule_ir_resolver,
     )
 
 
@@ -673,6 +696,14 @@ def _validate_rule_ir_resolver(
     if not callable(rule_ir_resolver):
         raise GameLifecycleError("Faction RuleIR resolver must be callable.")
     return rule_ir_resolver
+
+
+def _validate_optional_rule_ir_resolver(
+    rule_ir_resolver: FactionRuleIrResolver | None,
+) -> FactionRuleIrResolver | None:
+    if rule_ir_resolver is None:
+        return None
+    return _validate_rule_ir_resolver(rule_ir_resolver)
 
 
 def _validate_executor_result(

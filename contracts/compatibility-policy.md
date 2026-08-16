@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`8.0.0`, declared in `openapi.yaml`, `manifest.json`, and
+`9.0.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -27,11 +27,11 @@ The pull-request contract audit performs three independent checks:
    contract requires a major increase. This preserves compatible additions
    made anywhere in the current major line.
 2. The proposed contract is compared with the oldest committed baseline for
-   its current major, currently `compatibility/8.0.0-shape.json`. Breaking
-   changes are rejected while the bundle major remains `8`, preserving the
+   its current major, currently `compatibility/9.0.0-shape.json`. Breaking
+   changes are rejected while the bundle major remains `9`, preserving the
    original clients for the full supported major. The immutable 1.0.0,
-   2.0.0, 3.0.0, 4.0.0, 5.0.0, 6.0.0, and 7.0.0 baselines remain committed as
-   historical compatibility anchors.
+   2.0.0, 3.0.0, 4.0.0, 5.0.0, 6.0.0, 7.0.0, and 8.0.0 baselines remain
+   committed as historical compatibility anchors.
 3. Every released baseline present on the base commit must retain the exact
    decoded UTF-8 text after line-ending normalization.
 
@@ -47,28 +47,29 @@ must be reviewed in the same change.
 
 ## Support window
 
-The reference server supports one contract major at a time. Contract 8 retains
-Contract 7's directed Primary assignments and replaces physical-unit-only
-turn-start terrain history with grouped rules-unit position evidence containing
-exact component, terrain-area, and objective-marker/model witnesses. The
-`battlefield-view-v4-phase17n-step3` family preserves the established geometry
-contract while adding the Contract 8 pre-reveal model-state redaction boundary.
-The `decision-request-view-v4-phase17n-step3` and
-`lifecycle-status-v3-phase17n-step3` families likewise identify the changed
-viewer-redaction semantics for unresolved Declare Battle Formations choices.
+The reference server supports one contract major at a time. Contract 9 retains
+Contract 8's directed Primary assignments and grouped historical evidence and
+adds the required public `primary_mission_progress_state`. That state records
+persistent/tombstoned mission markers, historical Punishment condemned
+selections, and active/consumed Consecrate designations with source and event
+provenance. `select_primary_mission_choice` requests and results are public
+finite choices. The `battlefield-view-v4-phase17n-step3` family is unchanged;
+Step 4 changes mission state, decision, lifecycle, event, session, and replay
+families without changing authoritative battlefield coordinates or geometry
+hash semantics.
 
-Deployers upgrading a hosted 7.x service must retain a separately deployed 7.x
-adapter through at least 2027-08-13 and one released 8.x minor line, whichever
-is later. The retained adapter is a separate deployment pinned to a 7.x build;
-the repository's Contract 8 reference server does not provide content
-negotiation or parallel 7.x endpoints. Contract 8 clients must regenerate from
-the Contract 8 schemas, discard cached Contract 7 projections, event cursors,
+Deployers upgrading a hosted 8.x service must retain a separately deployed 8.x
+adapter through at least 2027-08-14 and one released 9.x minor line, whichever
+is later. The retained adapter is a separate deployment pinned to an 8.x build;
+the repository's Contract 9 reference server does not provide content
+negotiation or parallel 8.x endpoints. Contract 9 clients must regenerate from
+the Contract 9 schemas, discard cached Contract 8 projections, event cursors,
 replay metadata, and checkpoints, and fetch a fresh projection after
-authentication. Contract 7 cursors remain valid only against the retained 7.x
+authentication. Contract 8 cursors remain valid only against the retained 8.x
 deployment. Prior retention dates remain in force for deployers covered by
-earlier migrations. See `migrations/7-to-8.md`, `migrations/6-to-7.md`,
-`migrations/5-to-6.md`, `migrations/4-to-5.md`, and
-`migrations/3-to-4.md`.
+earlier migrations. See `migrations/8-to-9.md`, `migrations/7-to-8.md`,
+`migrations/6-to-7.md`, `migrations/5-to-6.md`,
+`migrations/4-to-5.md`, and `migrations/3-to-4.md`.
 
 Unknown or mismatched request `schema_version` values fail before engine
 mutation with `schema_version_mismatch`. Servers never reinterpret a request

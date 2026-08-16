@@ -15563,6 +15563,11 @@
       ],
       "prebattle_action_records": [],
       "primary_battlefield_departure_states": [],
+      "primary_mission_progress_state": {
+        "condemned_selections": [],
+        "consecration_designations": [],
+        "markers": []
+      },
       "primary_objective_turn_start_states": [],
       "primary_rules_unit_turn_start_snapshots": [],
       "primary_terrain_trap_states": [],
@@ -15669,14 +15674,14 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v6-phase17n-step3",
+  "schema_version": "replay-artifact-v7-phase17n-step4",
   "source_identity": {
     "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
     "catalog_id": "phase9a-canonical",
     "game_config_hash": "0f4bea564150afae66c86c23b8289a04bfe2bde2bae0463752717825e9a62291",
     "game_id": "phase18d-contract-session",
     "mission_pack_id": "11e-warhammer-event-companion-2026-07",
-    "mission_source_package_hash": "68d2214fdd1b3e2e1cc1e97e9b50e959a52acce03d1706c3fda5535fd5bc4d48",
+    "mission_source_package_hash": "281c1a62b7b0d6aa61ac03095642cd7a85b8ff8907c94d6424c3a01aeacf0dcc",
     "rules_overlay_ids": [],
     "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
     "source_ids": [

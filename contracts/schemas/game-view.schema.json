@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v7/game-view.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v8/game-view.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -54,7 +54,7 @@
     "pending_decision": {
       "oneOf": [
         {
-          "$ref": "https://warhammer40k-core.local/contracts/v5/decision-request-view.schema.json"
+          "$ref": "https://warhammer40k-core.local/contracts/v6/decision-request-view.schema.json"
         },
         {
           "type": "null"
@@ -79,7 +79,7 @@
       "type": "array"
     },
     "projection_schema": {
-      "const": "game-view-v10-phase17n-step3",
+      "const": "game-view-v11-phase17n-step4",
       "minLength": 1,
       "type": "string"
     },
@@ -111,6 +111,9 @@
       },
       "type": "array",
       "uniqueItems": true
+    },
+    "primary_mission_progress_state": {
+      "$ref": "#/$defs/primary_mission_progress_state"
     },
     "public_stratagem_use_records": {
       "items": {
@@ -166,6 +169,7 @@
     "public_secondary_mission_choices",
     "public_secondary_mission_card_states",
     "primary_rules_unit_turn_start_snapshots",
+    "primary_mission_progress_state",
     "public_command_point_ledgers",
     "public_victory_point_ledgers",
     "public_stratagem_use_records",
@@ -474,6 +478,222 @@
         "model_instance_ids"
       ],
       "type": "object"
+    },
+    "primary_mission_progress_state": {
+      "additionalProperties": false,
+      "properties": {
+        "markers": {
+          "items": {"$ref": "#/$defs/primary_mission_marker_state"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "condemned_selections": {
+          "items": {"$ref": "#/$defs/primary_condemned_selection_state"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "consecration_designations": {
+          "items": {"$ref": "#/$defs/primary_consecration_designation_state"},
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "markers",
+        "condemned_selections",
+        "consecration_designations"
+      ],
+      "type": "object"
+    },
+    "primary_mission_marker_state": {
+      "additionalProperties": false,
+      "properties": {
+        "marker_id": {"minLength": 1, "type": "string"},
+        "game_id": {"minLength": 1, "type": "string"},
+        "owner_player_id": {"minLength": 1, "type": "string"},
+        "mission_id": {"minLength": 1, "type": "string"},
+        "source_rule_id": {"minLength": 1, "type": "string"},
+        "source_descriptor_id": {"minLength": 1, "type": "string"},
+        "marker_kind": {"minLength": 1, "type": "string"},
+        "anchor_kind": {
+          "enum": ["objective", "terrain_feature"],
+          "type": "string"
+        },
+        "objective_marker_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "terrain_feature_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "created_battle_round": {"$ref": "#/$defs/primary_nullable_positive_integer"},
+        "created_phase": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "created_active_player_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "source_event_id": {"minLength": 1, "type": "string"},
+        "source_result_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "source_action_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "source_destruction_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "source_designation_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "status": {"enum": ["active", "removed"], "type": "string"},
+        "removed_battle_round": {"$ref": "#/$defs/primary_nullable_positive_integer"},
+        "removed_phase": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "removed_active_player_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "removal_source_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "removal_event_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "removal_result_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "removal_action_id": {"$ref": "#/$defs/primary_nullable_identifier"}
+      },
+      "required": [
+        "marker_id",
+        "game_id",
+        "owner_player_id",
+        "mission_id",
+        "source_rule_id",
+        "source_descriptor_id",
+        "marker_kind",
+        "anchor_kind",
+        "objective_marker_id",
+        "terrain_feature_id",
+        "created_battle_round",
+        "created_phase",
+        "created_active_player_id",
+        "source_event_id",
+        "source_result_id",
+        "source_action_id",
+        "source_destruction_id",
+        "source_designation_id",
+        "status",
+        "removed_battle_round",
+        "removed_phase",
+        "removed_active_player_id",
+        "removal_source_id",
+        "removal_event_id",
+        "removal_result_id",
+        "removal_action_id"
+      ],
+      "type": "object"
+    },
+    "primary_condemned_selection_state": {
+      "additionalProperties": false,
+      "properties": {
+        "selection_id": {"minLength": 1, "type": "string"},
+        "game_id": {"minLength": 1, "type": "string"},
+        "owner_player_id": {"minLength": 1, "type": "string"},
+        "mission_id": {"minLength": 1, "type": "string"},
+        "source_rule_id": {"minLength": 1, "type": "string"},
+        "source_descriptor_id": {"minLength": 1, "type": "string"},
+        "battle_round": {"minimum": 1, "type": "integer"},
+        "active_player_id": {"minLength": 1, "type": "string"},
+        "candidate_policy_id": {"minLength": 1, "type": "string"},
+        "candidate_rules_unit_instance_ids": {
+          "$ref": "#/$defs/primary_identifier_array"
+        },
+        "candidate_evidence_ids": {"$ref": "#/$defs/primary_identifier_array"},
+        "selected_rules_unit_instance_ids": {
+          "$ref": "#/$defs/primary_identifier_array"
+        },
+        "minimum_selection_count": {"minimum": 0, "type": "integer"},
+        "maximum_selection_count": {"minimum": 0, "type": "integer"},
+        "used_fallback_candidates": {"type": "boolean"},
+        "selection_request_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "selection_result_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "source_event_id": {"minLength": 1, "type": "string"}
+      },
+      "required": [
+        "selection_id",
+        "game_id",
+        "owner_player_id",
+        "mission_id",
+        "source_rule_id",
+        "source_descriptor_id",
+        "battle_round",
+        "active_player_id",
+        "candidate_policy_id",
+        "candidate_rules_unit_instance_ids",
+        "candidate_evidence_ids",
+        "selected_rules_unit_instance_ids",
+        "minimum_selection_count",
+        "maximum_selection_count",
+        "used_fallback_candidates",
+        "selection_request_id",
+        "selection_result_id",
+        "source_event_id"
+      ],
+      "type": "object"
+    },
+    "primary_consecration_designation_state": {
+      "additionalProperties": false,
+      "properties": {
+        "designation_id": {"minLength": 1, "type": "string"},
+        "game_id": {"minLength": 1, "type": "string"},
+        "owner_player_id": {"minLength": 1, "type": "string"},
+        "mission_id": {"minLength": 1, "type": "string"},
+        "source_rule_id": {"minLength": 1, "type": "string"},
+        "source_descriptor_id": {"minLength": 1, "type": "string"},
+        "rules_unit_instance_id": {"minLength": 1, "type": "string"},
+        "component_unit_instance_ids": {"$ref": "#/$defs/primary_identifier_array"},
+        "source_destruction_id": {"minLength": 1, "type": "string"},
+        "created_battle_round": {"minimum": 1, "type": "integer"},
+        "created_phase": {"minLength": 1, "type": "string"},
+        "created_active_player_id": {"minLength": 1, "type": "string"},
+        "source_event_id": {"minLength": 1, "type": "string"},
+        "last_resolved_battle_round": {
+          "$ref": "#/$defs/primary_nullable_positive_integer"
+        },
+        "last_resolved_active_player_id": {
+          "$ref": "#/$defs/primary_nullable_identifier"
+        },
+        "last_resolution_event_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "last_resolution_result_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "status": {"enum": ["active", "consumed"], "type": "string"},
+        "consumed_marker_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "consumed_battle_round": {"$ref": "#/$defs/primary_nullable_positive_integer"},
+        "consumed_phase": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "consumed_active_player_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "consumption_source_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "consumption_event_id": {"$ref": "#/$defs/primary_nullable_identifier"},
+        "consumption_result_id": {"$ref": "#/$defs/primary_nullable_identifier"}
+      },
+      "required": [
+        "designation_id",
+        "game_id",
+        "owner_player_id",
+        "mission_id",
+        "source_rule_id",
+        "source_descriptor_id",
+        "rules_unit_instance_id",
+        "component_unit_instance_ids",
+        "source_destruction_id",
+        "created_battle_round",
+        "created_phase",
+        "created_active_player_id",
+        "source_event_id",
+        "last_resolved_battle_round",
+        "last_resolved_active_player_id",
+        "last_resolution_event_id",
+        "last_resolution_result_id",
+        "status",
+        "consumed_marker_id",
+        "consumed_battle_round",
+        "consumed_phase",
+        "consumed_active_player_id",
+        "consumption_source_id",
+        "consumption_event_id",
+        "consumption_result_id"
+      ],
+      "type": "object"
+    },
+    "primary_identifier_array": {
+      "items": {"minLength": 1, "type": "string"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "primary_nullable_identifier": {
+      "oneOf": [
+        {"minLength": 1, "type": "string"},
+        {"type": "null"}
+      ]
+    },
+    "primary_nullable_positive_integer": {
+      "oneOf": [
+        {"minimum": 1, "type": "integer"},
+        {"type": "null"}
+      ]
     },
     "redaction": {
       "additionalProperties": false,

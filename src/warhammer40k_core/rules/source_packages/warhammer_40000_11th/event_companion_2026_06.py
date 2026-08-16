@@ -71,7 +71,7 @@ DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-EXPECTED_SOURCE_IMPORT_HASH = "68d2214fdd1b3e2e1cc1e97e9b50e959a52acce03d1706c3fda5535fd5bc4d48"
+EXPECTED_SOURCE_IMPORT_HASH = "281c1a62b7b0d6aa61ac03095642cd7a85b8ff8907c94d6424c3a01aeacf0dcc"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -860,31 +860,28 @@ def primary_mission_action_source_rows() -> tuple[EventPrimaryMissionActionSourc
             engine_exposure_status=row.engine_exposure_status,
             source_id=row.source_id,
         )
-        for row in artifact.source_only_primary_actions
+        for row in artifact.primary_mission_actions
     )
 
 
 def primary_mission_scoring_coverage_rows() -> tuple[EventPrimaryMissionScoringCoverageRow, ...]:
     primary_rows = {row.primary_mission_id: row for row in primary_mission_rows()}
-    imported_action_counts: dict[str, int] = {}
+    action_ids_by_primary_mission: dict[str, set[str]] = {}
     for action in mission_action_rows():
         if action.mission_kind != "primary":
             continue
-        imported_action_counts[action.mission_id] = (
-            imported_action_counts.get(action.mission_id, 0) + 1
+        action_ids_by_primary_mission.setdefault(action.mission_id, set()).add(
+            action.mission_action_id
         )
-    source_action_counts: dict[str, int] = {}
     for source_action in primary_mission_action_source_rows():
-        source_action_counts[source_action.primary_mission_id] = (
-            source_action_counts.get(source_action.primary_mission_id, 0) + 1
+        action_ids_by_primary_mission.setdefault(source_action.primary_mission_id, set()).add(
+            source_action.mission_action_id
         )
     rows: list[EventPrimaryMissionScoringCoverageRow] = []
     for mission_id, mission_name in _event_primary_mission_names():
         primary = primary_rows[mission_id]
         scoring_rule_count = len(primary.scoring_rules)
-        mission_action_count = imported_action_counts.get(mission_id, 0) + source_action_counts.get(
-            mission_id, 0
-        )
+        mission_action_count = len(action_ids_by_primary_mission.get(mission_id, set()))
         needed_work = _primary_mission_needed_work(mission_id)
         if mission_id in _ENGINE_IMPLEMENTED_PRIMARY_MISSION_IDS:
             status = PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED
@@ -955,7 +952,45 @@ def primary_mission_matrix_rows() -> tuple[chapter_approved.SourcePrimaryMission
 
 
 def mission_action_rows() -> tuple[chapter_approved.SourceMissionActionRow, ...]:
-    return chapter_approved.mission_action_rows()
+    return (*chapter_approved.mission_action_rows(), *_event_primary_mission_action_rows())
+
+
+def _event_primary_mission_action_rows() -> tuple[chapter_approved.SourceMissionActionRow, ...]:
+    rows: list[chapter_approved.SourceMissionActionRow] = []
+    for source_row in primary_mission_action_source_rows():
+        if source_row.engine_exposure_status != "engine_implemented":
+            raise MissionPackError(
+                "Event Companion Primary Mission Action runtime exposure status drifted."
+            )
+        if source_row.completion_timing == "immediate":
+            interruption_conditions: tuple[str, ...] = ()
+        elif source_row.completion_timing == "turn_end":
+            interruption_conditions = (
+                "unit_moved",
+                "unit_destroyed",
+                "unit_left_battlefield",
+            )
+        else:
+            raise MissionPackError(
+                "Event Companion Primary Mission Action completion timing is unsupported."
+            )
+        rows.append(
+            chapter_approved.SourceMissionActionRow(
+                mission_action_id=source_row.mission_action_id,
+                mission_id=source_row.primary_mission_id,
+                mission_kind="primary",
+                name=source_row.name,
+                start_phase=source_row.start_phase,
+                start_timing=source_row.start_timing,
+                completion_timing=source_row.completion_timing,
+                eligible_unit_policy=source_row.eligible_unit_policy,
+                target_policy=source_row.target_policy,
+                interruption_conditions=interruption_conditions,
+                victory_points=0,
+                scoring_source_id=source_row.primary_mission_id,
+            )
+        )
+    return tuple(rows)
 
 
 def mission_pack_scoring_row() -> chapter_approved.SourceMissionPackScoringRow:
@@ -2285,7 +2320,7 @@ def _import_hash() -> str:
         "mission_sequence": mission_sequence_descriptor().to_payload(),
         "primary_missions": [row.to_payload() for row in primary_mission_rows()],
         "primary_scoring_artifact_hashes": {
-            "all-primary-missions-and-source-only-actions": PRIMARY_SCORING_PACKAGE_HASH,
+            "all-primary-missions-actions-state-and-choice-rules": PRIMARY_SCORING_PACKAGE_HASH,
         },
         "primary_mission_action_sources": [
             row.to_payload() for row in primary_mission_action_source_rows()

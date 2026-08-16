@@ -11,6 +11,9 @@ from warhammer40k_core.engine.decision_request import (
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_mission_choices import (
+    SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
+)
 
 INTERACTION_DESCRIPTOR_SCHEMA_VERSION = "interaction-descriptor-v2-variants"
 INTERACTION_ANNOTATED_REQUEST_SCHEMA_VERSION = "annotated-decision-request-v2-primary-assignments"
@@ -128,6 +131,9 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
         "resolve_reaction_window": InteractionSpec(InteractionKind.OPPORTUNITY_WINDOW),
         "resolve_sequencing_order": InteractionSpec(InteractionKind.ORDERED_SEQUENCING),
         "score_tactical_secondary_mission": InteractionSpec(InteractionKind.CONFIRMATION),
+        SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE: InteractionSpec(
+            InteractionKind.FINITE_OPTION_LIST
+        ),
         "select_allocation_order": InteractionSpec(InteractionKind.ORDERED_SEQUENCING),
         "select_attack_weapon_group": InteractionSpec(
             InteractionKind.WEAPON_ALLOCATION_MATRIX,

@@ -14816,13 +14816,18 @@
       "phase": "movement"
     },
     "request_id": "decision-request-000006",
-    "schema_version": "decision-request-view-v4-phase17n-step3"
+    "schema_version": "decision-request-view-v5-phase17n-step4"
   },
   "pending_proposal": null,
   "player_ids": [
     "player-a",
     "player-b"
   ],
+  "primary_mission_progress_state": {
+    "condemned_selections": [],
+    "consecration_designations": [],
+    "markers": []
+  },
   "primary_rules_unit_turn_start_snapshots": [
     {
       "active_player_id": "player-a",
@@ -14862,8 +14867,8 @@
       "source_id": "ui-contract-terrain-snapshot-hidden-reserve:primary-rules-unit-turn-start:round-01:player-a"
     }
   ],
-  "projection_schema": "game-view-v10-phase17n-step3",
-  "projection_state_hash": "63f761a4aa92851765b137d12589923f42ddb0e1162a810ebbc5a46323ca9692",
+  "projection_schema": "game-view-v11-phase17n-step4",
+  "projection_state_hash": "76271f51d981cbf74f347a4e8352b9cafa7452e339eb7850044a170a6c739cb6",
   "public_command_point_ledgers": [
     {
       "command_points": 1,

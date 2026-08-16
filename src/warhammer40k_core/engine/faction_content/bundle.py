@@ -1381,6 +1381,7 @@ class RuntimeContentBundle:
             records,
             named_handlers=named_handlers,
             generic_ir_executor=generic_ir_executor,
+            rule_ir_resolver=rule_ir_resolver,
         )
         contribution_ids = _validate_identifier_tuple(
             "contribution_ids",

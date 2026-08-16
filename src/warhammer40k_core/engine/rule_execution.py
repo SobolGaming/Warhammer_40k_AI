@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import hashlib
-import json
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from enum import StrEnum
@@ -32,6 +30,9 @@ from warhammer40k_core.engine.event_log import (
     validate_json_value,
 )
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.generic_rule_effect_identity import (
+    generic_rule_persisting_effect_id,
+)
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rule_aura_resolution import aura_affected_unit_ids
 from warhammer40k_core.engine.rule_duration_execution import (
@@ -40,7 +41,6 @@ from warhammer40k_core.engine.rule_duration_execution import (
 )
 from warhammer40k_core.engine.rule_frequency import (
     consume_optional_ability_frequency,
-    optional_ability_frequency_condition,
     optional_ability_frequency_unavailable_reason,
 )
 from warhammer40k_core.engine.rule_target_resolution import (
@@ -1170,11 +1170,12 @@ def _persisting_effect_or_none(
     if expiration is None:
         return None
     persisting_effect = generic_rule_persisting_effect(
-        effect_id=_effect_id(
+        effect_id=generic_rule_persisting_effect_id(
             rule_ir=rule_ir,
             clause=clause,
             effect=effect,
-            context=context,
+            source_unit_instance_id=context.source_unit_instance_id,
+            source_model_instance_id=context.source_model_instance_id,
             target_unit_instance_ids=target_unit_instance_ids,
         ),
         source_rule_id=rule_ir.source_id,
@@ -1506,34 +1507,6 @@ def _fallback_event_id(
     effect_kind = "clause" if effect is None else effect.kind.value
     clause_suffix = clause.clause_id.rsplit(":", 1)[-1]
     return f"rule-event:{rule_ir.ir_hash()[:12]}:{clause_suffix}:{effect_kind}:{suffix}"
-
-
-def _effect_id(
-    *,
-    rule_ir: RuleIR,
-    clause: RuleClause,
-    effect: RuleEffectSpec,
-    context: RuleExecutionContext,
-    target_unit_instance_ids: tuple[str, ...],
-) -> str:
-    identity: object = effect.to_payload()
-    if optional_ability_frequency_condition(clause) is not None:
-        identity = {
-            "effect": effect.to_payload(),
-            "source_model_instance_id": context.source_model_instance_id,
-            "source_unit_instance_id": context.source_unit_instance_id,
-            "target_unit_instance_ids": list(target_unit_instance_ids),
-        }
-    canonical = json.dumps(
-        identity,
-        sort_keys=True,
-        separators=(",", ":"),
-    ).encode()
-    effect_suffix = hashlib.sha256(canonical).hexdigest()[:8]
-    return (
-        f"rule-effect:{rule_ir.ir_hash()[:16]}:"
-        f"{clause.clause_id.rsplit(':', 1)[-1]}:{effect_suffix}"
-    )
 
 
 def _diagnostic_payloads(rule_ir: RuleIR) -> list[dict[str, JsonValue]]:

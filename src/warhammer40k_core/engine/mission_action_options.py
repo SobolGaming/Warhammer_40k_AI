@@ -15,6 +15,12 @@ from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.mission_action_eligibility import (
     mission_action_unit_ineligibility_reason,
 )
+from warhammer40k_core.engine.mission_action_policies import (
+    SUPPORTED_MISSION_ACTION_TARGET_POLICIES as PRIMARY_MISSION_ACTION_TARGET_POLICIES,
+)
+from warhammer40k_core.engine.mission_action_policies import (
+    mission_action_policy_for_id,
+)
 from warhammer40k_core.engine.mission_terrain import (
     logical_terrain_area_within_player_deployment_zone,
     logical_terrain_area_within_player_territory,
@@ -29,6 +35,32 @@ from warhammer40k_core.engine.objective_control import (
     resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.primary_mission_action_battlefield_evidence import (
+    MissionActionBattlefieldBoundaryEvidence,
+)
+from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
+    MissionActionStartAuthorityEvidence,
+    MissionActionStartAuthorityOptionEvidence,
+    PrimaryMissionActionStartEvidence,
+    canonical_json_object,
+)
+from warhammer40k_core.engine.primary_mission_action_lifecycle_policy import (
+    capture_primary_mission_action_start_evidence,
+)
+from warhammer40k_core.engine.primary_mission_action_options import (
+    primary_mission_action_start_targets,
+    primary_mission_action_target_kind,
+)
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
+    terrain_model_inventory_from_checkpoint,
+)
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
+    PrimaryMissionBoundaryCheckpoint,
+    PrimaryMissionBoundaryCheckpointReference,
+)
+from warhammer40k_core.engine.primary_mission_boundary_state import (
+    primary_mission_action_boundary_state_from_checkpoint,
+)
 from warhammer40k_core.engine.primary_scoring_conditions import (
     home_objective_ids as _home_objective_ids,
 )
@@ -41,8 +73,11 @@ from warhammer40k_core.engine.rules_units import (
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import SecondaryMissionCardStatus
 
-SUPPORTED_MISSION_ACTION_TARGET_POLICIES = frozenset(
+_LEGACY_MISSION_ACTION_TARGET_POLICIES = frozenset(
     ("objective_marker", "trappable_terrain_area", "plunderable_terrain_area")
+)
+SUPPORTED_MISSION_ACTION_TARGET_POLICIES = frozenset(
+    (*_LEGACY_MISSION_ACTION_TARGET_POLICIES, *PRIMARY_MISSION_ACTION_TARGET_POLICIES)
 )
 
 
@@ -51,6 +86,7 @@ class MissionActionStartOption:
     action: MissionActionDefinition
     unit_instance_id: str
     target_id: str
+    condition_target_id: str | None
     eligible_unit_instance_ids: tuple[str, ...]
 
     def option_id(self) -> str:
@@ -84,6 +120,7 @@ class MissionActionStartOption:
             "mission_kind": self.action.mission_kind,
             "unit_instance_id": self.unit_instance_id,
             "target_id": self.target_id,
+            "condition_target_id": self.condition_target_id,
             "target_kind": _target_kind_for_policy(self.action.target_policy),
             "target_policy": self.action.target_policy,
             "start_timing": self.action.start_timing,
@@ -139,6 +176,24 @@ def mission_action_start_options(
         raise GameLifecycleError("Mission Action start requires MissionSetup.")
     if action.target_policy not in SUPPORTED_MISSION_ACTION_TARGET_POLICIES:
         raise GameLifecycleError("Unsupported Mission Action target policy.")
+    if action.target_policy in PRIMARY_MISSION_ACTION_TARGET_POLICIES:
+        primary_targets = primary_mission_action_start_targets(
+            state=state,
+            player_id=player_id,
+            action=action,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        eligible_unit_ids = tuple(sorted({target.unit_instance_id for target in primary_targets}))
+        return tuple(
+            MissionActionStartOption(
+                action=action,
+                unit_instance_id=target.unit_instance_id,
+                target_id=target.target_id,
+                condition_target_id=target.condition_target_id,
+                eligible_unit_instance_ids=eligible_unit_ids,
+            )
+            for target in primary_targets
+        )
     placed_army = battlefield_state.placed_army_for_player_or_none(player_id)
     if placed_army is None:
         return ()
@@ -172,9 +227,170 @@ def mission_action_start_options(
             action=action,
             unit_instance_id=unit_id,
             target_id=target_id,
+            condition_target_id=target_id,
             eligible_unit_instance_ids=eligible_unit_ids,
         )
         for unit_id, target_id in eligible_target_pairs
+    )
+
+
+def primary_mission_action_start_evidence_for_selection(
+    *,
+    state: GameState,
+    player_id: str,
+    action: MissionActionDefinition,
+    unit_instance_id: str,
+    target_id: str,
+    condition_target_id: str | None,
+    opportunity: bool,
+    decline_option_id: str,
+    boundary_checkpoint: PrimaryMissionBoundaryCheckpointReference,
+    boundary_checkpoint_evidence: PrimaryMissionBoundaryCheckpoint,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> PrimaryMissionActionStartEvidence:
+    """Recompute the complete legal inventory before capturing selected start evidence."""
+
+    _require_runtime_modifier_registry(runtime_modifier_registry)
+    if (
+        boundary_checkpoint_evidence.reference(event_id=boundary_checkpoint.checkpoint_event_id)
+        != boundary_checkpoint
+    ):
+        raise GameLifecycleError("Primary Mission Action boundary checkpoint drifted.")
+    boundary_state = primary_mission_action_boundary_state_from_checkpoint(
+        state=state,
+        checkpoint=boundary_checkpoint_evidence,
+    )
+    boundary_registry = RuntimeModifierRegistry.empty()
+    if action.target_policy not in PRIMARY_MISSION_ACTION_TARGET_POLICIES:
+        raise GameLifecycleError("Start evidence requires a source-backed Primary Action.")
+    battlefield_state = boundary_state.battlefield_state
+    if battlefield_state is None:
+        raise GameLifecycleError("Start evidence requires battlefield_state.")
+    phase = _current_phase(boundary_state)
+    options = (
+        mission_action_opportunity_options(
+            state=boundary_state,
+            player_id=player_id,
+            runtime_modifier_registry=boundary_registry,
+        )
+        if opportunity
+        else mission_action_start_options(
+            state=boundary_state,
+            player_id=player_id,
+            action=action,
+            runtime_modifier_registry=boundary_registry,
+        )
+    )
+    matching = tuple(
+        option
+        for option in options
+        if option.action.mission_action_id == action.mission_action_id
+        and option.unit_instance_id == unit_instance_id
+        and option.target_id == target_id
+        and option.condition_target_id == condition_target_id
+    )
+    if len(matching) != 1:
+        raise GameLifecycleError("Selected Primary Mission Action target is not legal.")
+    action_option_ids = [option.option_id() for option in options]
+    if opportunity:
+        request_payload: dict[str, JsonValue] = {
+            "game_id": boundary_state.game_id,
+            "player_id": player_id,
+            "battle_round": boundary_state.battle_round,
+            "phase": phase.value,
+            "mission_action_opportunity": True,
+            "legal_mission_action_ids": cast(
+                list[JsonValue],
+                sorted({option.action.mission_action_id for option in options}),
+            ),
+            "legal_action_option_ids": cast(list[JsonValue], action_option_ids),
+            "legal_option_ids": cast(
+                list[JsonValue],
+                sorted((*action_option_ids, decline_option_id)),
+            ),
+        }
+        authority_options = (
+            *(
+                MissionActionStartAuthorityOptionEvidence(
+                    option_id=option.option_id(),
+                    label=option.label(state=boundary_state),
+                    payload_json=canonical_json_object(
+                        {
+                            **option.payload(
+                                state=boundary_state,
+                                player_id=player_id,
+                                phase=phase,
+                            ),
+                            "mission_action_opportunity": True,
+                            "legal_action_option_ids": action_option_ids,
+                        }
+                    ),
+                )
+                for option in options
+            ),
+            MissionActionStartAuthorityOptionEvidence(
+                option_id=decline_option_id,
+                label="Continue to shooting",
+                payload_json=canonical_json_object(
+                    {
+                        "game_id": boundary_state.game_id,
+                        "player_id": player_id,
+                        "battle_round": boundary_state.battle_round,
+                        "phase": phase.value,
+                        "mission_action_opportunity": True,
+                        "legal_action_option_ids": action_option_ids,
+                    }
+                ),
+            ),
+        )
+    else:
+        request_payload = {
+            "game_id": boundary_state.game_id,
+            "player_id": player_id,
+            "battle_round": boundary_state.battle_round,
+            "phase": phase.value,
+            "mission_action_id": action.mission_action_id,
+            "legal_option_ids": cast(list[JsonValue], action_option_ids),
+        }
+        authority_options = tuple(
+            MissionActionStartAuthorityOptionEvidence(
+                option_id=option.option_id(),
+                label=option.label(state=boundary_state),
+                payload_json=canonical_json_object(
+                    option.payload(
+                        state=boundary_state,
+                        player_id=player_id,
+                        phase=phase,
+                    )
+                ),
+            )
+            for option in options
+        )
+    start_authority = MissionActionStartAuthorityEvidence(
+        request_kind="opportunity" if opportunity else "direct",
+        request_payload_json=canonical_json_object(request_payload),
+        battlefield_boundary=MissionActionBattlefieldBoundaryEvidence.from_battlefield_state(
+            battlefield_state
+        ),
+        options=authority_options,
+        candidate_units=(),
+        terrain_model_inventory=(),
+    )
+    return capture_primary_mission_action_start_evidence(
+        state=boundary_state,
+        player_id=player_id,
+        action=action,
+        policy=mission_action_policy_for_id(action.mission_action_id),
+        unit_instance_id=unit_instance_id,
+        target_id=target_id,
+        condition_target_id=condition_target_id,
+        eligible_unit_instance_ids=matching[0].eligible_unit_instance_ids,
+        start_authority=start_authority,
+        boundary_checkpoint=boundary_checkpoint,
+        boundary_terrain_model_inventory=terrain_model_inventory_from_checkpoint(
+            boundary_checkpoint_evidence
+        ),
+        runtime_modifier_registry=boundary_registry,
     )
 
 
@@ -539,6 +755,8 @@ def _terrain_area_target_ids_by_unit(
 
 def _target_kind_for_policy(target_policy: str) -> str:
     policy = _validate_identifier("target_policy", target_policy)
+    if policy in PRIMARY_MISSION_ACTION_TARGET_POLICIES:
+        return primary_mission_action_target_kind(policy)
     if policy == "objective_marker":
         return "objective_marker"
     if policy in {"trappable_terrain_area", "plunderable_terrain_area"}:
@@ -552,6 +770,9 @@ def _target_display_name(*, state: GameState, target_id: str) -> str:
     for marker in state.mission_setup.objective_markers:
         if marker.objective_marker_id == target_id:
             return marker.name
+    for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        if rules_unit.unit_instance_id == target_id:
+            return rules_unit_display_name(rules_unit)
     mission_logical_terrain_area_by_id(
         state.mission_setup,
         logical_terrain_area_id=target_id,

@@ -50,7 +50,6 @@ from warhammer40k_core.engine.runtime_modifiers import (
     HitRollMinimumUnmodifiedSuccessContext,
     HitRollModifierContext,
     MovementBudgetModifierContext,
-    ObjectiveControlModifierContext,
     SaveOptionModifierContext,
     UnitCharacteristicModifierContext,
     WeaponProfileModifierContext,
@@ -494,15 +493,40 @@ def generic_rule_modified_unit_characteristic(
             "Generic unit characteristic hooks require UnitCharacteristicModifierContext."
         )
     current = context.current_value
-    for effect in _matching_generic_unit_effects(
+    for _effect_id, delta in generic_rule_unit_characteristic_modifiers(
         state=context.state,
         unit_instance_id=context.unit_instance_id,
+        characteristic=context.characteristic,
+    ):
+        current = max(0, current + delta)
+    return current
+
+
+def generic_rule_unit_characteristic_modifiers(
+    *,
+    state: object,
+    unit_instance_id: str,
+    characteristic: Characteristic,
+) -> tuple[tuple[str, int], ...]:
+    if type(characteristic) is not Characteristic:
+        raise GameLifecycleError(
+            "Generic unit characteristic modifier queries require Characteristic."
+        )
+    modifiers: list[tuple[str, int]] = []
+    for effect in _matching_generic_unit_effects(
+        state=state,
+        unit_instance_id=unit_instance_id,
         effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
     ):
-        if _characteristic_parameter(effect.parameters) is not context.characteristic:
+        if _characteristic_parameter(effect.parameters) is not characteristic:
             continue
-        current = max(0, current + _required_int_parameter(effect.parameters, key="delta"))
-    return current
+        modifiers.append(
+            (
+                effect.persisting_effect.effect_id,
+                _required_int_parameter(effect.parameters, key="delta"),
+            )
+        )
+    return tuple(modifiers)
 
 
 def generic_rule_modified_movement_inches(
@@ -511,39 +535,18 @@ def generic_rule_modified_movement_inches(
     if type(context) is not MovementBudgetModifierContext:
         raise GameLifecycleError("Generic movement hooks require MovementBudgetModifierContext.")
     current = context.current_movement_inches
-    for effect in _matching_generic_unit_effects(
+    for _effect_id, delta in generic_rule_unit_characteristic_modifiers(
         state=context.state,
         unit_instance_id=context.unit_instance_id,
-        effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
+        characteristic=Characteristic.MOVEMENT,
     ):
-        if _characteristic_parameter(effect.parameters) is not Characteristic.MOVEMENT:
-            continue
-        current = max(0.0, current + _required_int_parameter(effect.parameters, key="delta"))
+        current = max(0.0, current + delta)
     for effect in _matching_generic_unit_effects(
         state=context.state,
         unit_instance_id=context.unit_instance_id,
         effect_kind=RuleEffectKind.MODIFY_MOVE_DISTANCE,
     ):
         current = max(0.0, current + _required_numeric_parameter(effect.parameters, key="delta"))
-    return current
-
-
-def generic_rule_modified_objective_control(
-    context: ObjectiveControlModifierContext,
-) -> int:
-    if type(context) is not ObjectiveControlModifierContext:
-        raise GameLifecycleError(
-            "Generic Objective Control hooks require ObjectiveControlModifierContext."
-        )
-    current = context.current_objective_control
-    for effect in _matching_generic_unit_effects(
-        state=context.state,
-        unit_instance_id=context.unit_instance_id,
-        effect_kind=RuleEffectKind.MODIFY_CHARACTERISTIC,
-    ):
-        if _characteristic_parameter(effect.parameters) is not Characteristic.OBJECTIVE_CONTROL:
-            continue
-        current = max(0, current + _required_int_parameter(effect.parameters, key="delta"))
     return current
 
 

@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v3/lifecycle-status.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v4/lifecycle-status.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -8,7 +8,7 @@
       "type": "string"
     },
     "schema_version": {
-      "const": "lifecycle-status-v3-phase17n-step3",
+      "const": "lifecycle-status-v4-phase17n-step4",
       "type": "string"
     },
     "status": {

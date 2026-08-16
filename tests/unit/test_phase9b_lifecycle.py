@@ -845,7 +845,21 @@ def test_turn_end_objective_control_audit_follows_post_cleanup_capture() -> None
     ]
     event_types = tuple(event.event_type for event in decisions.event_log.records)
     turn_end_audit_index = decisions.event_log.records.index(fight_boundary_events[-1])
-    assert event_types[turn_end_audit_index + 1] == "battle_phase_completed"
+    phase_completed_index = next(
+        index
+        for index in range(turn_end_audit_index + 1, len(event_types))
+        if event_types[index] == "battle_phase_completed"
+    )
+    turn_start_evidence_indexes = tuple(
+        index
+        for index in range(turn_end_audit_index + 1, len(event_types))
+        if event_types[index] == "primary_turn_start_evidence_recorded"
+    )
+    assert turn_end_audit_index < phase_completed_index
+    assert all(
+        turn_end_audit_index < index < phase_completed_index
+        for index in turn_start_evidence_indexes
+    )
 
 
 def test_battle_round_increments_after_all_players_complete_fight_phase() -> None:

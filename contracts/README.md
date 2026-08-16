@@ -1,6 +1,6 @@
 # CORE V2 external contract
 
-Contract version: `8.0.0`
+Contract version: `9.0.0`
 
 This directory is the canonical, language-neutral Phase 17O capability and
 Phase 18D contract, Phase 18E session protocol, Phase 18F
@@ -15,13 +15,15 @@ decision-family coverage inventory distinguishes real session-derived
 `live_scenario` examples from `envelope_only` entries; inventory presence alone
 is not an executable-coverage claim.
 
-Contract 8 retains Contract 7's two public, directed
-`primary_mission_assignments` and replaces physical-unit-only turn-start terrain
-history with authoritative rules-unit position evidence. An attached rules unit
-is one outer history row whose physical component rows preserve exact evaluated
-models, logical terrain-area membership, and objective-marker/model witnesses.
-Projection, event, session, and replay payload families were cut over together;
-there is no compatibility alias or inferred history for Contract 7 payloads.
+Contract 9 retains Contract 8's two public, directed
+`primary_mission_assignments` and group-aware Step 3 historical evidence, then
+adds the required public `primary_mission_progress_state`. Its marker,
+condemned-selection, and consecration-designation rows preserve source,
+decision, event, action, destruction, and removal or consumption provenance.
+The new `select_primary_mission_choice` finite family exposes only
+engine-enumerated Primary choices. Projection, decision, lifecycle, event,
+session, and replay payload families were cut over together; there is no
+compatibility alias or inferred Step 4 state for Contract 8 payloads.
 
 The contract describes the same `AdapterGameSession` path used by local UI,
 CLI, headless, replay, and network producers:
@@ -51,17 +53,23 @@ references without inferring rules interactions from `decision_type` or display
 text. Hidden decisions expose `interaction: null` and no nested interaction
 requests. The typed `nested_interaction_requests` field publishes nested choices
 without forcing clients to inspect arbitrary proposal JSON.
-Contract 8 advances the pending-decision and lifecycle-status families to
-`decision-request-view-v4-phase17n-step3` and
-`lifecycle-status-v3-phase17n-step3`: unresolved Declare Battle Formations
-choices now use the shared viewer-redaction boundary instead of exposing their
-request or status details to the opponent.
-Phase 18J adds the optional `battlefield_view` game-view member. Contract 8
-publishes the Step 3 Primary evidence additions as
-`game-view-v10-phase17n-step3` with
-`battlefield-view-v4-phase17n-step3`: roster/datacard identities and complete
-post-reveal rules-unit history rows are public to both players, including
-unplaced reserves, and terrain areas/features carry explicit classification.
+Contract 9 advances the pending-decision and lifecycle-status families to
+`decision-request-view-v5-phase17n-step4` and
+`lifecycle-status-v4-phase17n-step4`. Primary Mission finite requests, their
+options, and their waiting statuses are public; existing hidden Declare Battle
+Formations choices retain the shared viewer-redaction boundary.
+The full reconnect wrapper uses `session-projection-v7-phase17n-step4`.
+In-process integer-cursor deltas use `event-delta-v4-phase17n-step4`, while
+authenticated HTTP deltas use `event-delta-v5-phase17n-step4`. Formal session
+metadata, command results, and command outcomes use their `v9-contract`
+families.
+Phase 18J adds the optional `battlefield_view` game-view member. Contract 9
+publishes the Step 4 progress additions as
+`game-view-v11-phase17n-step4`; the nested
+`battlefield-view-v4-phase17n-step3` family is unchanged. Roster/datacard
+identities, complete post-reveal rules-unit history rows, and Primary progress
+rows are public to both players, including unplaced reserves, while terrain
+areas/features carry explicit classification.
 Authoritative terrain-area entities also require
 logical terrain-area identity, which participates in the authoritative geometry
 hash. The battlefield family separates viewer-scoped authoritative
@@ -75,28 +83,30 @@ shared placement proposal requests use a separate opaque engine-owned
 Its parameterized command member references the same canonical 20-kind proposal
 union plus both typed Cult Ambush alternatives and the return-on-death payload
 family as the standalone submission schema; it is not an unrestricted JSON
-value. The generated TypeScript gate constructs and schema-validates all 85
-published interaction cases.
+value. The generated TypeScript gate constructs and schema-validates every
+published interaction case.
 
-Replay exports use `replay-artifact-v6-phase17n-step3`. Their embedded mission
+Replay exports use `replay-artifact-v7-phase17n-step4`. Their embedded mission
 setup requires both directed player Primary Mission assignments and explicit
 logical terrain-area identities; their game state requires group-aware
 turn-start position history, typed destruction attribution, and battlefield
-departure evidence. Runtime import accepts only that exact discriminator; v5
-artifacts require the retained 7.x deployment and fail with a typed
-unsupported-version error on the 8.x runtime. The runtime never infers a
-missing directed assignment, grouped position history, destruction source, or
-departure record. Replay source identity
+departure evidence plus the complete persistent Primary Mission progress
+state. Runtime import accepts only that exact discriminator; v6 artifacts
+require the retained 8.x deployment and fail with a typed unsupported-version
+error on the 9.x runtime. The runtime never infers a missing directed
+assignment, grouped position history, destruction source, departure record,
+marker, condemned selection, or consecration designation. Replay source identity
 also binds `mission_pack_id` to the authoritative mission source package hash;
 both fields are non-null when a mission is bound and both are null otherwise.
 Loading rejects a partial pair or any hash drift from the reconstructed
 lifecycle.
 
-The replay JSON Schema owns the stable export envelope and the complete shape
-of the three Step 3 evidence families while deliberately leaving unrelated
-engine-private lifecycle fields open. The fail-closed runtime loader validates
-the complete lifecycle payload and all cross-record/event integrity; schema
-acceptance alone is not replay certification.
+The replay JSON Schema owns the stable export envelope, the complete shape of
+the three Step 3 evidence families, and the Step 4 Primary progress state while
+deliberately leaving unrelated engine-private lifecycle fields open. The
+fail-closed runtime loader validates the complete lifecycle payload and all
+cross-record/event integrity; schema acceptance alone is not replay
+certification.
 
 Phase 17O publishes `capability-manifest-v2-directed-primary` inside the
 `support-profile-v4-directed-primary` envelope. It publishes independent

@@ -1765,9 +1765,11 @@ def test_unit_that_started_action_this_turn_cannot_declare_charge(action_status:
     unit_id = units["intercessor-1"].unit_instance_id
     action_state = MissionActionState.start(
         action_id=f"phase15a-action-{action_status}",
+        mission_action_id="phase15a-action",
         player_id="player-a",
         unit_instance_id=unit_id,
         target_id="phase15a-action-target",
+        condition_target_id="phase15a-action-target",
         mission_id="phase15a-action-mission",
         battle_round=state.battle_round,
         phase=BattlePhase.SHOOTING.value,

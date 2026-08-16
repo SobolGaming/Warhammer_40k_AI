@@ -43,6 +43,7 @@ from warhammer40k_core.engine.prebattle_records import PreBattleActionRecordPayl
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureStatePayload,
 )
+from warhammer40k_core.engine.primary_mission_state import PrimaryMissionProgressStatePayload
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartSnapshotPayload,
 )
@@ -193,6 +194,7 @@ class GameStatePayload(TypedDict):
     secondary_objective_cleanse_states: list[SecondaryObjectiveCleanseStatePayload]
     secondary_terrain_plunder_states: list[SecondaryTerrainPlunderStatePayload]
     mission_action_states: list[MissionActionStatePayload]
+    primary_mission_progress_state: PrimaryMissionProgressStatePayload
     end_turn_cleanup_states: list[EndTurnCleanupStatePayload]
     scoring_window_states: list[ScoringWindowStatePayload]
     persisting_effects: list[PersistingEffectPayload]
