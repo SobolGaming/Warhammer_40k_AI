@@ -8,11 +8,13 @@ from tests.phase11c_command_phase_helpers import (
     battle_state,
     phase11c_config,
     unit_selection,
+    with_model_offsets,
 )
 from tests.setup_completion_helpers import (
     record_existing_primary_turn_start_evidence_events_for_fixture,
 )
 
+from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind
 from warhammer40k_core.engine.abilities import (
     GENERIC_RULE_IR_ABILITY_HANDLER_ID,
@@ -23,17 +25,24 @@ from warhammer40k_core.engine.abilities import (
     AbilityTimingDescriptor,
 )
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
-from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    SecondaryMissionChoice,
+    SecondaryMissionMode,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+from warhammer40k_core.engine.mission_decisions import (
+    apply_mission_decision,
+    request_mission_action_opportunity,
+)
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.phases.shooting_model import ShootingPhaseState
-from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
-    record_primary_mission_boundary_checkpoint,
-)
 from warhammer40k_core.engine.primary_mission_objective_control_source_authority import (
     _creation_family as creation_family,  # pyright: ignore[reportPrivateUsage]
 )
@@ -99,6 +108,7 @@ from warhammer40k_core.engine.runtime_rule_ir_authority import (
 from warhammer40k_core.engine.runtime_rule_ir_authority import (
     _validated_rule_ir_mapping as validated_rule_ir_mapping,  # pyright: ignore[reportPrivateUsage]
 )
+from warhammer40k_core.engine.scoring import SecondaryMissionCardState
 from warhammer40k_core.engine.stratagems_model import StratagemCatalogIndex
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.rules.parsed_tokens import TextSpan
@@ -899,11 +909,84 @@ def _enter_shooting_phase(state: GameState) -> None:
 def _record_checkpoint(*, state: GameState, decisions: DecisionController) -> None:
     player_id = state.active_player_id
     assert player_id is not None
-    record_primary_mission_boundary_checkpoint(
+    setup = state.mission_setup
+    battlefield = state.battlefield_state
+    army = state.army_definition_for_player(player_id)
+    assert setup is not None
+    assert battlefield is not None
+    assert army is not None
+    state.secondary_mission_choices = sorted(
+        (
+            *(
+                choice
+                for choice in state.secondary_mission_choices
+                if choice.player_id != player_id
+            ),
+            SecondaryMissionChoice(
+                player_id=player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("bring_it_down", "cleanse"),
+            ),
+        ),
+        key=lambda choice: choice.player_id,
+    )
+    state.secondary_mission_card_states = [
+        card for card in state.secondary_mission_card_states if card.player_id != player_id
+    ]
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_fixed(
+            player_id=player_id,
+            secondary_mission_id="bring_it_down",
+        )
+    )
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_fixed(
+            player_id=player_id,
+            secondary_mission_id="cleanse",
+        )
+    )
+    central = next(
+        marker
+        for marker in setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+    )
+    action_unit = army.units[0]
+    placement = battlefield.unit_placement_by_id(action_unit.unit_instance_id)
+    coherent_offsets = tuple(
+        (float(index % 5), float(index // 5)) for index in range(len(placement.model_placements))
+    )
+    state.battlefield_state = battlefield.with_unit_placement(
+        with_model_offsets(
+            placement,
+            central,
+            offsets=coherent_offsets,
+        )
+    )
+    _enter_shooting_phase(state)
+    status = request_mission_action_opportunity(
         state=state,
-        event_log=decisions.event_log,
-        boundary_kind="action_request",
         player_id=player_id,
+        decisions=decisions,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+    request = status.decision_request if status is not None else None
+    assert request is not None
+    option = next(
+        option
+        for option in request.options
+        if option.option_id.startswith("start:cleanse-objective:")
+    )
+    result = DecisionResult.for_request(
+        result_id=f"{request.request_id}:cleanse-result",
+        request=request,
+        selected_option_id=option.option_id,
+    )
+    record = decisions.submit_result(result)
+    apply_mission_decision(
+        state=state,
+        request=record.request,
+        result=result,
+        decisions=decisions,
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
 

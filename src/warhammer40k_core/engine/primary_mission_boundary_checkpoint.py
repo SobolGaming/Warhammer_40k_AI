@@ -9,6 +9,11 @@ from warhammer40k_core.engine.attached_unit_formation import (
     AttachedUnitFormationPayload,
 )
 from warhammer40k_core.engine.decision_record import DecisionRecord
+from warhammer40k_core.engine.decision_request import (
+    DecisionError,
+    DecisionRequest,
+    DecisionRequestPayload,
+)
 from warhammer40k_core.engine.effects import (
     GENERIC_RULE_EFFECT_KIND,
     PersistingEffect,
@@ -23,6 +28,8 @@ from warhammer40k_core.engine.event_log import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
+    PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY,
+    PRIMARY_MISSION_ACTION_VANGUARD_EFFECT,
     MissionActionPriorUseEvidence,
     MissionActionTerrainModelInventoryEvidence,
     PrimaryMissionActionCompletionEvidence,
@@ -204,15 +211,19 @@ def validate_primary_mission_boundary_checkpoint_source_registry(
     *,
     state: GameState,
     event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    pending_decision_requests: tuple[DecisionRequest, ...],
     runtime_modifier_registry: RuntimeModifierRegistry,
     rule_ir_authority_index: RuntimeRuleIRAuthorityIndex | None = None,
     faction_rule_execution_registry: FactionRuleExecutionRegistry | None = None,
     runtime_content_activation: RuntimeContentActivation | None = None,
 ) -> None:
+    checkpoint_rows: list[tuple[int, EventRecord, PrimaryMissionBoundaryCheckpoint]] = []
     for checkpoint_index, event in enumerate(event_records):
         if event.event_type != PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT:
             continue
         checkpoint = PrimaryMissionBoundaryCheckpoint.from_payload(event.payload)
+        checkpoint_rows.append((checkpoint_index, event, checkpoint))
         validate_primary_mission_oc_effect_event_authority(
             state=state,
             event_records=event_records,
@@ -240,6 +251,162 @@ def validate_primary_mission_boundary_checkpoint_source_registry(
                 checkpoint=checkpoint,
                 runtime_modifier_registry=runtime_modifier_registry,
             )
+    if checkpoint_rows:
+        checkpoint_index, _event, checkpoint = checkpoint_rows[-1]
+        validate_primary_mission_boundary_physical_authority(
+            state=state,
+            event_records=event_records,
+            decision_records=decision_records,
+            checkpoint_index=checkpoint_index,
+            checkpoint=checkpoint,
+        )
+    _validate_checkpoint_ownership(
+        event_records=event_records,
+        checkpoint_rows=tuple(checkpoint_rows),
+        decision_records=decision_records,
+        pending_decision_requests=pending_decision_requests,
+    )
+
+
+def _validate_checkpoint_ownership(
+    *,
+    event_records: tuple[EventRecord, ...],
+    checkpoint_rows: tuple[tuple[int, EventRecord, PrimaryMissionBoundaryCheckpoint], ...],
+    decision_records: tuple[DecisionRecord, ...],
+    pending_decision_requests: tuple[DecisionRequest, ...],
+) -> None:
+    from warhammer40k_core.engine.mission_decisions import (
+        START_MISSION_ACTION_DECISION_TYPE,
+    )
+
+    checkpoints_by_event_id = {
+        event.event_id: (index, checkpoint) for index, event, checkpoint in checkpoint_rows
+    }
+    if len(checkpoints_by_event_id) != len(checkpoint_rows):
+        raise GameLifecycleError("Primary mission checkpoint event identities are duplicated.")
+    next_checkpoint_index_by_event_id = {
+        event.event_id: (
+            checkpoint_rows[position + 1][0]
+            if position + 1 < len(checkpoint_rows)
+            else len(event_records)
+        )
+        for position, (_index, event, _checkpoint) in enumerate(checkpoint_rows)
+    }
+
+    action_request_checkpoint_ids: set[str] = set()
+    turn_end_checkpoint_ids: set[str] = set()
+    for checkpoint_index, checkpoint_event, checkpoint in checkpoint_rows:
+        if checkpoint.boundary_kind == "turn_end":
+            turn_end_checkpoint_ids.add(checkpoint_event.event_id)
+            continue
+        if checkpoint_index + 1 >= len(event_records):
+            raise GameLifecycleError("Primary mission Action checkpoint is orphaned.")
+        request_event = event_records[checkpoint_index + 1]
+        request = _checkpoint_owned_action_request(event=request_event)
+        payload = request.payload
+        if not isinstance(payload, dict) or (
+            request.decision_type != START_MISSION_ACTION_DECISION_TYPE
+            or request.actor_id != checkpoint.player_id
+            or checkpoint.active_player_id != checkpoint.player_id
+            or payload.get("game_id") != checkpoint.game_id
+            or payload.get("player_id") != checkpoint.player_id
+            or payload.get("battle_round") != checkpoint.battle_round
+            or payload.get("phase") != checkpoint.phase
+        ):
+            raise GameLifecycleError("Primary mission Action checkpoint ownership drifted.")
+        _validate_checkpoint_request_decision_authority(
+            request=request,
+            decision_records=decision_records,
+            pending_decision_requests=pending_decision_requests,
+        )
+        action_request_checkpoint_ids.add(checkpoint_event.event_id)
+
+    for request_index, event in enumerate(event_records):
+        if event.event_type != "decision_requested" or not isinstance(event.payload, dict):
+            continue
+        if event.payload.get("decision_type") != START_MISSION_ACTION_DECISION_TYPE:
+            continue
+        if request_index == 0:
+            raise GameLifecycleError("Primary mission Action request checkpoint is missing.")
+        checkpoint_event = event_records[request_index - 1]
+        owned = checkpoints_by_event_id.get(checkpoint_event.event_id)
+        if owned is None or owned[1].boundary_kind != "action_request":
+            raise GameLifecycleError("Primary mission Action request checkpoint is missing.")
+        action_request_checkpoint_ids.add(checkpoint_event.event_id)
+
+    vanguard_checkpoint_consumer_counts: dict[str, int] = {}
+    for terminal_index, event in enumerate(event_records):
+        if event.event_type not in {
+            "mission_action_completed",
+            "mission_action_completion_failed",
+        } or not isinstance(event.payload, dict):
+            continue
+        raw_evidence = event.payload.get(PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY)
+        if raw_evidence is None:
+            continue
+        evidence = PrimaryMissionActionCompletionEvidence.from_payload(raw_evidence)
+        reference = evidence.boundary_checkpoint
+        if reference is None:
+            continue
+        owned = checkpoints_by_event_id.get(reference.checkpoint_event_id)
+        if owned is None:
+            raise GameLifecycleError("Vanguard checkpoint consumer references a missing event.")
+        checkpoint_index, checkpoint = owned
+        if (
+            evidence.effect_descriptor != PRIMARY_MISSION_ACTION_VANGUARD_EFFECT
+            or checkpoint.boundary_kind != "turn_end"
+            or checkpoint.reference(event_id=reference.checkpoint_event_id) != reference
+            or checkpoint_index >= terminal_index
+            or terminal_index >= next_checkpoint_index_by_event_id[reference.checkpoint_event_id]
+            or checkpoint.game_id != evidence.game_id
+            or checkpoint.player_id != evidence.player_id
+            or checkpoint.active_player_id != evidence.active_player_id
+            or checkpoint.battle_round != evidence.battle_round
+            or checkpoint.phase != evidence.phase
+        ):
+            raise GameLifecycleError("Vanguard checkpoint consumer ownership drifted.")
+        vanguard_checkpoint_consumer_counts[reference.checkpoint_event_id] = (
+            vanguard_checkpoint_consumer_counts.get(reference.checkpoint_event_id, 0) + 1
+        )
+
+    if any(count != 1 for count in vanguard_checkpoint_consumer_counts.values()):
+        raise GameLifecycleError("Vanguard checkpoint consumer inventory is duplicated.")
+    vanguard_checkpoint_ids = set(vanguard_checkpoint_consumer_counts)
+    owned_checkpoint_ids = action_request_checkpoint_ids | vanguard_checkpoint_ids
+    all_checkpoint_ids = set(checkpoints_by_event_id)
+    if owned_checkpoint_ids != all_checkpoint_ids:
+        orphaned = all_checkpoint_ids.difference(owned_checkpoint_ids)
+        if orphaned <= turn_end_checkpoint_ids:
+            raise GameLifecycleError("Primary mission turn-end checkpoint is orphaned.")
+        raise GameLifecycleError("Primary mission Action checkpoint is orphaned.")
+
+
+def _checkpoint_owned_action_request(*, event: EventRecord) -> DecisionRequest:
+    if event.event_type != "decision_requested" or not isinstance(event.payload, dict):
+        raise GameLifecycleError("Primary mission Action checkpoint is orphaned.")
+    try:
+        return DecisionRequest.from_payload(cast(DecisionRequestPayload, event.payload))
+    except (DecisionError, KeyError, TypeError) as exc:
+        raise GameLifecycleError("Primary mission Action checkpoint request is invalid.") from exc
+
+
+def _validate_checkpoint_request_decision_authority(
+    *,
+    request: DecisionRequest,
+    decision_records: tuple[DecisionRecord, ...],
+    pending_decision_requests: tuple[DecisionRequest, ...],
+) -> None:
+    authoritative = tuple(
+        record.request
+        for record in decision_records
+        if record.request.request_id == request.request_id
+    ) + tuple(
+        pending for pending in pending_decision_requests if pending.request_id == request.request_id
+    )
+    if len(authoritative) != 1 or authoritative[0] != request:
+        raise GameLifecycleError(
+            "Primary mission Action checkpoint request lacks exact decision authority."
+        )
 
 
 def primary_mission_boundary_checkpoint_for_reference(

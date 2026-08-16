@@ -958,6 +958,8 @@ class GameLifecycle:
         _pmbc.validate_primary_mission_boundary_checkpoint_source_registry(
             state=lifecycle._require_state(),
             event_records=lifecycle.decision_controller.event_log.records,
+            decision_records=lifecycle.decision_controller.records,
+            pending_decision_requests=(lifecycle.decision_controller.queue.pending_requests),
             runtime_modifier_registry=lifecycle._shooting_phase_handler.runtime_modifier_registry,
             rule_ir_authority_index=rule_ir_authority_index,
             faction_rule_execution_registry=faction_rule_execution_registry,

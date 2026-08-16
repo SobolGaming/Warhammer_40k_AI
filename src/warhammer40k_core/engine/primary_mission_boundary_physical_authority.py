@@ -77,32 +77,42 @@ def validate_primary_mission_boundary_physical_authority(
             mutation_index=event_index,
             payload=event.payload,
         )
+    current = _current_authority_by_model(state=state)
+    current_model_ids = frozenset(current)
+    initial_model_ids = _initial_model_ids(state=state)
+    if not initial_model_ids <= current_model_ids:
+        raise GameLifecycleError("Primary mission initial model inventory drifted.")
     before = _physical_authority_before_checkpoint(
         event_records=event_records,
         checkpoint_index=checkpoint_index,
+        checkpoint=checkpoint,
+        allowed_model_ids=current_model_ids,
+        initial_model_ids=initial_model_ids,
+    )
+    checkpoint_authority = _checkpoint_authority(
+        checkpoint=checkpoint,
+        expected_game_id=state.game_id,
+        expected_battlefield_id=_current_battlefield_id(state=state),
+        allowed_model_ids=current_model_ids,
+        required_model_ids=frozenset(before) | initial_model_ids,
     )
     later_records = event_records[checkpoint_index + 1 :]
-    checkpoint_authority = {
-        row.model_instance_id: _PhysicalAuthority(
-            presence=row.presence,
-            pose=_checkpoint_pose(row),
-            wounds_remaining=row.wounds_remaining,
-        )
-        for row in checkpoint.model_states
-    }
     later = _physical_authority_by_model(
         later_records,
         initial=checkpoint_authority,
     )
-    current = _current_authority_by_model(state=state)
     for row in checkpoint.model_states:
         preceding = before.get(row.model_instance_id)
         if preceding is not None:
             _validate_row_against_authority(row=row, authority=preceding, context="preceding")
+    for model_instance_id, authority in later.items():
+        current_authority = current.get(model_instance_id)
+        if current_authority is None:
+            raise GameLifecycleError("Primary mission physical history model inventory drifted.")
         _validate_authority_against_current(
-            model_instance_id=row.model_instance_id,
-            authority=later[row.model_instance_id],
-            current=current[row.model_instance_id],
+            model_instance_id=model_instance_id,
+            authority=authority,
+            current=current_authority,
         )
 
 
@@ -137,30 +147,72 @@ def _physical_authority_before_checkpoint(
     *,
     event_records: tuple[EventRecord, ...],
     checkpoint_index: int,
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+    allowed_model_ids: frozenset[str],
+    initial_model_ids: frozenset[str],
 ) -> dict[str, _PhysicalAuthority]:
-    prior_checkpoint_rows = tuple(
-        (index, event)
-        for index, event in enumerate(event_records[:checkpoint_index])
-        if event.event_type == PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT
+    authority: dict[str, _PhysicalAuthority] = {}
+    segment_start = 0
+    for prior_index, event in enumerate(event_records[:checkpoint_index]):
+        if event.event_type != PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT:
+            continue
+        authority = _physical_authority_by_model(
+            event_records[segment_start:prior_index],
+            initial=authority,
+        )
+        prior_checkpoint = PrimaryMissionBoundaryCheckpoint.from_payload(event.payload)
+        seeded = _checkpoint_authority(
+            checkpoint=prior_checkpoint,
+            expected_game_id=checkpoint.game_id,
+            expected_battlefield_id=checkpoint.battlefield_id,
+            allowed_model_ids=allowed_model_ids,
+            required_model_ids=frozenset(authority) | initial_model_ids,
+        )
+        for row in prior_checkpoint.model_states:
+            preceding = authority.get(row.model_instance_id)
+            if preceding is not None:
+                _validate_row_against_authority(
+                    row=row,
+                    authority=preceding,
+                    context="preceding",
+                )
+        authority.update(seeded)
+        segment_start = prior_index + 1
+    return _physical_authority_by_model(
+        event_records[segment_start:checkpoint_index],
+        initial=authority,
     )
-    if not prior_checkpoint_rows:
-        return _physical_authority_by_model(event_records[:checkpoint_index])
-    prior_index, prior_event = prior_checkpoint_rows[-1]
-    prior_checkpoint = PrimaryMissionBoundaryCheckpoint.from_payload(prior_event.payload)
-    seeded = {
+
+
+def _checkpoint_authority(
+    *,
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+    expected_game_id: str,
+    expected_battlefield_id: str,
+    allowed_model_ids: frozenset[str],
+    required_model_ids: frozenset[str],
+) -> dict[str, _PhysicalAuthority]:
+    if (
+        checkpoint.game_id != expected_game_id
+        or checkpoint.battlefield_id != expected_battlefield_id
+    ):
+        raise GameLifecycleError("Primary mission checkpoint physical context drifted.")
+    authority = {
         row.model_instance_id: _PhysicalAuthority(
             presence=row.presence,
             pose=_checkpoint_pose(row),
             wounds_remaining=row.wounds_remaining,
         )
-        for row in prior_checkpoint.model_states
+        for row in checkpoint.model_states
     }
-    if len(seeded) != len(prior_checkpoint.model_states):
+    if len(authority) != len(checkpoint.model_states):
         raise GameLifecycleError("Primary mission checkpoint model authority is duplicated.")
-    return _physical_authority_by_model(
-        event_records[prior_index + 1 : checkpoint_index],
-        initial=seeded,
-    )
+    checkpoint_model_ids = frozenset(authority)
+    if not checkpoint_model_ids <= allowed_model_ids:
+        raise GameLifecycleError("Primary mission checkpoint model authority inventory drifted.")
+    if not required_model_ids <= checkpoint_model_ids:
+        raise GameLifecycleError("Primary mission checkpoint model authority inventory regressed.")
+    return authority
 
 
 def _transition_from_event(event: EventRecord) -> BattlefieldTransitionBatch | None:
@@ -359,6 +411,40 @@ def _current_authority_by_model(*, state: GameState) -> dict[str, _PhysicalAutho
                     wounds_remaining=model.wounds_remaining,
                 )
     return current
+
+
+def _initial_model_ids(*, state: GameState) -> frozenset[str]:
+    attached_component_ids = {
+        component_id
+        for army in state.army_definitions
+        for formation in army.attached_units
+        for component_id in formation.component_unit_instance_ids
+    }
+    starting_strength_by_unit_id = {
+        record.unit_instance_id: record for record in state.starting_strength_records
+    }
+    if len(starting_strength_by_unit_id) != len(state.starting_strength_records):
+        raise GameLifecycleError("Primary mission starting-strength inventory is duplicated.")
+    initial_ids: set[str] = set()
+    for army in state.army_definitions:
+        for unit in army.units:
+            if unit.unit_instance_id not in attached_component_ids:
+                record = starting_strength_by_unit_id.get(unit.unit_instance_id)
+                if record is None:
+                    raise GameLifecycleError(
+                        "Primary mission model inventory lacks starting-strength authority."
+                    )
+                if record.source_id != f"army-muster:{unit.unit_instance_id}":
+                    continue
+            initial_ids.update(model.model_instance_id for model in unit.own_models)
+    return frozenset(initial_ids)
+
+
+def _current_battlefield_id(*, state: GameState) -> str:
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Primary mission physical authority requires battlefield state.")
+    return battlefield.battlefield_id
 
 
 def _validate_row_against_authority(

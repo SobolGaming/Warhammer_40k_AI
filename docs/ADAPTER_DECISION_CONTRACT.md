@@ -984,6 +984,15 @@ inventory. Shared adapter redaction therefore exposes a checkpoint only to its
 owning player and an omniscient administrator; opponents receive no checkpoint
 payload through projections, event deltas, server responses, or reconnects.
 
+Restore authenticates every `primary_mission_boundary_checkpoint_recorded`
+event in chronological order. Each checkpoint's complete physical state is
+derived from already-authenticated authority plus intervening authoritative
+mutations, so no checkpoint becomes a new trust root. Every `action_request`
+checkpoint must be immediately paired with its exact `start_mission_action`
+`decision_requested` event, and every `turn_end` checkpoint must be consumed by
+exactly one matching Vanguard terminal-evidence event before the next
+checkpoint. Orphaned, duplicated, or mismatched checkpoints fail closed.
+
 Turn ordering is engine-owned and blocking. Locate and Deny drains before
 battle entry. Punishment drains after battle-round-start hooks and before the
 ordinary Command phase start windows/body. At a player-turn end, the engine

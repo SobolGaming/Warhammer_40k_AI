@@ -103,7 +103,7 @@ def test_restore_rejects_pending_step4_request_without_requested_event(
 
     with pytest.raises(
         GameLifecycleError,
-        match="requires one exact decision_requested event",
+        match="Primary mission Action checkpoint is orphaned",
     ):
         GameLifecycle.from_payload(payload)
 
