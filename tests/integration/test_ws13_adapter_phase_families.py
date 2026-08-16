@@ -63,7 +63,7 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     ProposalKind,
 )
-from warhammer40k_core.engine.phase import LifecycleStatus, LifecycleStatusKind
+from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus, LifecycleStatusKind
 from warhammer40k_core.engine.phases.charge import (
     COMPLETE_CHARGE_PHASE_OPTION_ID,
     SELECT_CHARGING_UNIT_DECISION_TYPE,
@@ -587,6 +587,17 @@ def _primary_mission_choice_facade_session() -> tuple[LocalGameSession, Lifecycl
     )
     assert request is not None
     decisions.request_decision(request)
+    decisions.event_log.append(
+        "primary_mission_choice_requested",
+        {
+            "game_id": state.game_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.COMMAND.value,
+            "request_id": request.request_id,
+            "decision_type": request.decision_type,
+            "actor_id": request.actor_id,
+        },
+    )
     enemy_unit_id = next(
         unit.unit_instance_id
         for army in state.army_definitions

@@ -1182,21 +1182,28 @@ class RuntimeModifierRegistry:
         )
 
     def modified_objective_control(self, context: ObjectiveControlModifierContext) -> int:
+        from warhammer40k_core.engine.generic_rule_objective_control import apply_generic_oc
+
+        current, _ = self.objective_control_binding_trace(context)
+        return apply_generic_oc(replace(context, current_objective_control=current))
+
+    def objective_control_binding_trace(
+        self,
+        context: ObjectiveControlModifierContext,
+    ) -> tuple[int, tuple[str, ...]]:
         if type(context) is not ObjectiveControlModifierContext:
             raise GameLifecycleError("Objective Control modifiers require a context.")
-        from warhammer40k_core.engine.generic_rule_attack_hooks import (
-            generic_rule_modified_objective_control,
-        )
-
         current = context.current_objective_control
+        applied_modifier_ids: list[str] = []
         for binding in self.objective_control_modifier_bindings:
-            current = _validate_non_negative_int(
+            modified = _validate_non_negative_int(
                 f"{binding.modifier_id} returned Objective Control",
                 binding.handler(replace(context, current_objective_control=current)),
             )
-        return generic_rule_modified_objective_control(
-            replace(context, current_objective_control=current)
-        )
+            if modified != current:
+                applied_modifier_ids.append(binding.modifier_id)
+            current = modified
+        return current, tuple(applied_modifier_ids)
 
     def advance_roll_modifiers(
         self,
@@ -1489,6 +1496,4 @@ def _validate_identifier_tuple(
 
 
 def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
-    if value is None:
-        return None
-    return _validate_identifier(field_name, value)
+    return None if value is None else _validate_identifier(field_name, value)

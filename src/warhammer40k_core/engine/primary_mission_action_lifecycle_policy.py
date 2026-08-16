@@ -6,10 +6,7 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.core.missions import MissionActionDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.actions import MissionActionState
-from warhammer40k_core.engine.battlefield_state import (
-    BattlefieldScenario,
-    geometry_model_for_placement,
-)
+from warhammer40k_core.engine.battlefield_state import BattlefieldScenario
 from warhammer40k_core.engine.event_log import EventRecord
 from warhammer40k_core.engine.mission_action_eligibility import (
     mission_action_unit_ineligibility_reason,
@@ -21,7 +18,6 @@ from warhammer40k_core.engine.mission_action_policies import (
 from warhammer40k_core.engine.mission_terrain import (
     logical_terrain_area_within_player_territory,
     mission_logical_terrain_areas,
-    model_intersects_logical_terrain_area,
 )
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
@@ -43,19 +39,21 @@ from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
     MissionActionStartAuthorityEvidence,
     MissionActionSurveilTargetEvidence,
     MissionActionTerrainIntersectionEvidence,
+    MissionActionTerrainModelInventoryEvidence,
     PrimaryMissionActionCompletionEvidence,
     PrimaryMissionActionStartEvidence,
     canonical_identifier_tuple,
     canonical_mission_action_prior_uses,
-    canonical_terrain_intersections,
     require_primary_mission_game_state,
 )
 from warhammer40k_core.engine.primary_mission_action_start_authority import (
-    capture_primary_mission_action_start_authority,
     capture_primary_mission_action_terrain_model_inventory,
     terrain_intersections_from_model_inventory,
     validate_primary_mission_action_start_authority,
     validate_primary_mission_action_terrain_model_inventory,
+)
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
+    PrimaryMissionBoundaryCheckpointReference,
 )
 from warhammer40k_core.engine.primary_mission_state import PrimaryMissionMarkerStatus
 from warhammer40k_core.engine.primary_scoring_conditions import home_objective_ids
@@ -66,7 +64,6 @@ from warhammer40k_core.engine.rules_units import (
     rules_unit_identity_ids,
     rules_unit_is_battle_shocked,
     rules_unit_view_by_id,
-    rules_unit_views_from_armies,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.shooting_selection_range import target_within_shooting_selection_range
@@ -96,6 +93,8 @@ def capture_primary_mission_action_start_evidence(
     condition_target_id: str | None,
     eligible_unit_instance_ids: tuple[str, ...],
     start_authority: MissionActionStartAuthorityEvidence,
+    boundary_checkpoint: PrimaryMissionBoundaryCheckpointReference,
+    boundary_terrain_model_inventory: tuple[MissionActionTerrainModelInventoryEvidence, ...],
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> PrimaryMissionActionStartEvidence:
     require_primary_mission_game_state(state)
@@ -132,12 +131,6 @@ def capture_primary_mission_action_start_evidence(
         state=state,
         actions=tuple(state.mission_action_states),
     )
-    start_authority = capture_primary_mission_action_start_authority(
-        state=state,
-        player_id=player_id,
-        authority=start_authority,
-        runtime_modifier_registry=runtime_modifier_registry,
-    )
     target_kind = _target_kind(policy.target_policy)
     objective_witness = (
         rules_unit_objective_proximity_witness(
@@ -148,7 +141,15 @@ def capture_primary_mission_action_start_evidence(
         else None
     )
     terrain_intersections = (
-        terrain_intersections_from_model_inventory(start_authority.terrain_model_inventory)
+        terrain_intersections_from_model_inventory(
+            tuple(
+                row
+                for row in boundary_terrain_model_inventory
+                if row.owner_player_id == player_id
+                and row.rules_unit_instance_id == rules_unit.unit_instance_id
+                and row.component_unit_instance_id in component_ids
+            )
+        )
         if target_kind == "terrain_area"
         else ()
     )
@@ -235,6 +236,7 @@ def capture_primary_mission_action_start_evidence(
         surveil_target_evidence=surveil_evidence,
         prior_uses=prior_uses,
         start_authority=start_authority,
+        boundary_checkpoint=boundary_checkpoint,
     )
     validate_primary_mission_action_start_evidence(
         state=state,
@@ -244,6 +246,7 @@ def capture_primary_mission_action_start_evidence(
         expected_active_marker_ids=evidence.active_primary_mission_marker_ids,
         expected_prior_uses=prior_uses,
         validate_current_visibility_cache=True,
+        validate_request_authority=False,
     )
     return evidence
 
@@ -257,6 +260,7 @@ def validate_primary_mission_action_start_evidence(
     expected_active_marker_ids: tuple[str, ...],
     expected_prior_uses: tuple[MissionActionPriorUseEvidence, ...],
     validate_current_visibility_cache: bool = False,
+    validate_request_authority: bool = True,
 ) -> None:
     require_primary_mission_game_state(state)
     if (
@@ -377,10 +381,11 @@ def validate_primary_mission_action_start_evidence(
     expected_prior = canonical_mission_action_prior_uses(expected_prior_uses)
     if evidence.prior_uses != expected_prior:
         raise GameLifecycleError("Primary Mission Action prior-use inventory drifted.")
-    validate_primary_mission_action_start_authority(
-        state=state,
-        evidence=evidence,
-    )
+    if validate_request_authority:
+        validate_primary_mission_action_start_authority(
+            state=state,
+            evidence=evidence,
+        )
     expected_enemy_territory_ids = _enemy_territory_area_ids(
         state=state,
         player_id=evidence.player_id,
@@ -411,6 +416,8 @@ def capture_primary_mission_action_completion_evidence(
     policy: MissionActionPolicyDescriptor,
     completed_phase: BattlePhase,
     objective_control_record: ObjectiveControlRecord | None,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    boundary_checkpoint: PrimaryMissionBoundaryCheckpointReference | None = None,
 ) -> PrimaryMissionActionCompletionEvidence:
     require_primary_mission_game_state(state)
     if state.active_player_id is None:
@@ -448,7 +455,7 @@ def capture_primary_mission_action_completion_evidence(
     terrain_model_inventory = (
         capture_primary_mission_action_terrain_model_inventory(
             state=state,
-            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         if policy.effect_descriptor == PRIMARY_MISSION_ACTION_VANGUARD_EFFECT
         else ()
@@ -492,6 +499,7 @@ def capture_primary_mission_action_completion_evidence(
         action_unit_contributor_model_instance_ids=contributor_model_ids,
         terrain_intersections=terrain_intersections,
         terrain_model_inventory=terrain_model_inventory,
+        boundary_checkpoint=boundary_checkpoint,
         completion_condition_met=False,
     )
     met = evaluate_primary_mission_action_completion_evidence(
@@ -624,6 +632,10 @@ def validate_primary_mission_action_completion_evidence(
     ):
         raise GameLifecycleError("Non-objective Primary Mission Action has objective evidence.")
     if policy.effect_descriptor == PRIMARY_MISSION_ACTION_VANGUARD_EFFECT:
+        if evidence.boundary_checkpoint is None:
+            raise GameLifecycleError(
+                "Vanguard Primary Mission Action lacks an end-turn boundary checkpoint."
+            )
         if not evidence.terrain_model_inventory:
             raise GameLifecycleError(
                 "Vanguard Primary Mission Action lacks terrain-model inventory."
@@ -640,7 +652,11 @@ def validate_primary_mission_action_completion_evidence(
             state=state,
             values=evidence.terrain_intersections,
         )
-    elif evidence.terrain_intersections or evidence.terrain_model_inventory:
+    elif (
+        evidence.terrain_intersections
+        or evidence.terrain_model_inventory
+        or evidence.boundary_checkpoint is not None
+    ):
         raise GameLifecycleError("Non-Vanguard Primary Mission Action has terrain evidence.")
     completion_condition_met = evaluate_primary_mission_action_completion_evidence(
         evidence=evidence,
@@ -816,44 +832,6 @@ def active_primary_mission_marker_ids_at_event(
             continue
         active.append(marker.marker_id)
     return tuple(sorted(active))
-
-
-def capture_primary_mission_action_terrain_intersections(
-    *, state: GameState
-) -> tuple[MissionActionTerrainIntersectionEvidence, ...]:
-    setup = state.mission_setup
-    battlefield = state.battlefield_state
-    if setup is None or battlefield is None:
-        raise GameLifecycleError("Primary Mission Action terrain evidence requires battle state.")
-    areas = mission_logical_terrain_areas(setup)
-    scenario = BattlefieldScenario(
-        armies=tuple(state.army_definitions), battlefield_state=battlefield
-    )
-    rows: list[MissionActionTerrainIntersectionEvidence] = []
-    for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
-        for component in rules_unit.components:
-            placement = battlefield.unit_placement_or_none(component.unit.unit_instance_id)
-            if placement is None:
-                continue
-            for model_placement in placement.model_placements:
-                model_instance = scenario.model_instance_for_placement(model_placement)
-                if not model_instance.is_alive:
-                    continue
-                geometry_model = geometry_model_for_placement(
-                    model=model_instance, placement=model_placement
-                )
-                for area in areas:
-                    if model_intersects_logical_terrain_area(geometry_model, area=area):
-                        rows.append(
-                            MissionActionTerrainIntersectionEvidence(
-                                logical_terrain_area_id=area.logical_terrain_area_id,
-                                owner_player_id=rules_unit.owner_player_id,
-                                rules_unit_instance_id=rules_unit.unit_instance_id,
-                                component_unit_instance_id=component.unit.unit_instance_id,
-                                model_instance_id=model_instance.model_instance_id,
-                            )
-                        )
-    return canonical_terrain_intersections(tuple(rows))
 
 
 def objective_control_record_for_completion_evidence(
@@ -1050,8 +1028,11 @@ def _validate_start_target(
         _validate_terrain_intersection_identities(
             state=state, values=evidence.terrain_intersections
         )
-        if evidence.terrain_intersections != terrain_intersections_from_model_inventory(
-            evidence.start_authority.terrain_model_inventory
+        if any(
+            row.owner_player_id != evidence.player_id
+            or row.rules_unit_instance_id != evidence.unit_instance_id
+            or row.component_unit_instance_id not in evidence.component_unit_instance_ids
+            for row in evidence.terrain_intersections
         ):
             raise GameLifecycleError("Primary Mission Action start terrain inventory drifted.")
         return

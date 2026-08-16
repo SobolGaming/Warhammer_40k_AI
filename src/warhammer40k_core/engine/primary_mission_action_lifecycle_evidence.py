@@ -17,6 +17,9 @@ from warhammer40k_core.engine.primary_destruction_evidence import (
 from warhammer40k_core.engine.primary_mission_action_battlefield_evidence import (
     MissionActionBattlefieldBoundaryEvidence,
 )
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
+    PrimaryMissionBoundaryCheckpointReference,
+)
 
 PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY = "mission_action_start_evidence"
 PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY = "mission_action_completion_evidence"
@@ -736,6 +739,7 @@ class PrimaryMissionActionStartEvidence:
     surveil_target_evidence: MissionActionSurveilTargetEvidence | None
     prior_uses: tuple[MissionActionPriorUseEvidence, ...]
     start_authority: MissionActionStartAuthorityEvidence
+    boundary_checkpoint: PrimaryMissionBoundaryCheckpointReference
 
     def __post_init__(self) -> None:
         for field_name, value in (
@@ -819,6 +823,8 @@ class PrimaryMissionActionStartEvidence:
         )
         if type(self.start_authority) is not MissionActionStartAuthorityEvidence:
             raise GameLifecycleError("Primary Mission Action complete start authority is invalid.")
+        if type(self.boundary_checkpoint) is not PrimaryMissionBoundaryCheckpointReference:
+            raise GameLifecycleError("Primary Mission Action start boundary checkpoint is invalid.")
 
     def to_payload(self) -> dict[str, JsonValue]:
         return cast(
@@ -878,6 +884,7 @@ class PrimaryMissionActionStartEvidence:
                     ),
                     "prior_uses": [item.to_payload() for item in self.prior_uses],
                     "start_authority": self.start_authority.to_payload(),
+                    "boundary_checkpoint": self.boundary_checkpoint.to_payload(),
                 }
             ),
         )
@@ -922,6 +929,7 @@ class PrimaryMissionActionStartEvidence:
             "surveil_target_evidence",
             "prior_uses",
             "start_authority",
+            "boundary_checkpoint",
         )
         raw = _payload_mapping(payload, label="PrimaryMissionActionStartEvidence", keys=keys)
         objective_payload = raw["objective_proximity_witness"]
@@ -986,6 +994,9 @@ class PrimaryMissionActionStartEvidence:
             start_authority=MissionActionStartAuthorityEvidence.from_payload(
                 raw["start_authority"]
             ),
+            boundary_checkpoint=PrimaryMissionBoundaryCheckpointReference.from_payload(
+                raw["boundary_checkpoint"]
+            ),
         )
 
 
@@ -1012,6 +1023,7 @@ class PrimaryMissionActionCompletionEvidence:
     action_unit_contributor_model_instance_ids: tuple[str, ...]
     terrain_intersections: tuple[MissionActionTerrainIntersectionEvidence, ...]
     terrain_model_inventory: tuple[MissionActionTerrainModelInventoryEvidence, ...]
+    boundary_checkpoint: PrimaryMissionBoundaryCheckpointReference | None
     completion_condition_met: bool
 
     def __post_init__(self) -> None:
@@ -1093,6 +1105,12 @@ class PrimaryMissionActionCompletionEvidence:
             "terrain_model_inventory",
             canonical_terrain_model_inventory(self.terrain_model_inventory),
         )
+        if self.boundary_checkpoint is not None and (
+            type(self.boundary_checkpoint) is not PrimaryMissionBoundaryCheckpointReference
+        ):
+            raise GameLifecycleError(
+                "Primary Mission Action completion boundary checkpoint is invalid."
+            )
         for field_name in ("action_unit_battle_shocked", "completion_condition_met"):
             if type(getattr(self, field_name)) is not bool:
                 raise GameLifecycleError(f"Primary Mission Action {field_name} must be a bool.")
@@ -1135,6 +1153,11 @@ class PrimaryMissionActionCompletionEvidence:
                     "terrain_model_inventory": [
                         item.to_payload() for item in self.terrain_model_inventory
                     ],
+                    "boundary_checkpoint": (
+                        None
+                        if self.boundary_checkpoint is None
+                        else self.boundary_checkpoint.to_payload()
+                    ),
                     "completion_condition_met": self.completion_condition_met,
                 }
             ),
@@ -1164,6 +1187,7 @@ class PrimaryMissionActionCompletionEvidence:
             "action_unit_contributor_model_instance_ids",
             "terrain_intersections",
             "terrain_model_inventory",
+            "boundary_checkpoint",
             "completion_condition_met",
         )
         raw = _payload_mapping(payload, label="PrimaryMissionActionCompletionEvidence", keys=keys)
@@ -1205,6 +1229,13 @@ class PrimaryMissionActionCompletionEvidence:
             terrain_model_inventory=tuple(
                 MissionActionTerrainModelInventoryEvidence.from_payload(item)
                 for item in _list(raw, "terrain_model_inventory")
+            ),
+            boundary_checkpoint=(
+                None
+                if raw["boundary_checkpoint"] is None
+                else PrimaryMissionBoundaryCheckpointReference.from_payload(
+                    raw["boundary_checkpoint"]
+                )
             ),
             completion_condition_met=_bool(raw, "completion_condition_met"),
         )

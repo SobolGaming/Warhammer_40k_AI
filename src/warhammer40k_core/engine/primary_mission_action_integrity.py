@@ -22,12 +22,16 @@ from warhammer40k_core.engine.mission_terrain import (
 )
 from warhammer40k_core.engine.objective_control import ObjectiveControlRecord
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.primary_mission_action_decline_integrity import (
+    validate_mission_action_opportunity_decline_integrity,
+)
 from warhammer40k_core.engine.primary_mission_action_interruptions import (
     validate_primary_mission_action_interruption_evidence,
 )
 from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
     PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY,
     PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY,
+    PRIMARY_MISSION_ACTION_VANGUARD_EFFECT,
     PrimaryMissionActionCompletionEvidence,
     PrimaryMissionActionStartEvidence,
 )
@@ -42,6 +46,15 @@ from warhammer40k_core.engine.primary_mission_action_lifecycle_policy import (
 from warhammer40k_core.engine.primary_mission_action_options import (
     primary_mission_action_target_kind,
 )
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
+    active_primary_marker_ids_from_checkpoint,
+    mission_action_prior_uses_from_checkpoint,
+    validate_primary_mission_action_start_checkpoint_evidence,
+    validate_primary_mission_vanguard_checkpoint_evidence,
+)
+from warhammer40k_core.engine.primary_mission_boundary_state import (
+    primary_mission_action_boundary_state_from_checkpoint,
+)
 from warhammer40k_core.engine.primary_mission_choice_payloads import PrimaryMissionChoiceData
 from warhammer40k_core.engine.primary_mission_state import (
     MarkerAnchorKind,
@@ -53,7 +66,10 @@ from warhammer40k_core.engine.rules_units import current_rules_unit_views_for_id
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_record import DecisionRecord
+    from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+    from warhammer40k_core.engine.faction_rule_execution import FactionRuleExecutionRegistry
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.runtime_rule_ir_authority import RuntimeRuleIRAuthorityIndex
 
 
 _ACTION_EVENT_TYPES = frozenset(
@@ -109,6 +125,9 @@ def validate_primary_mission_action_integrity(
     state: GameState,
     event_records: tuple[EventRecord, ...],
     decision_records: tuple[DecisionRecord, ...] | None = None,
+    rule_ir_authority_index: RuntimeRuleIRAuthorityIndex | None = None,
+    faction_rule_execution_registry: FactionRuleExecutionRegistry | None = None,
+    runtime_content_activation: RuntimeContentActivation | None = None,
 ) -> None:
     """Authenticate source-backed Primary Action state against runtime and event authority."""
 
@@ -132,6 +151,14 @@ def validate_primary_mission_action_integrity(
             state=state,
             event_records=event_records,
             decision_records=decision_records,
+        )
+        validate_mission_action_opportunity_decline_integrity(
+            state=state,
+            event_records=event_records,
+            decision_records=decision_records,
+            rule_ir_authority_index=rule_ir_authority_index,
+            faction_rule_execution_registry=faction_rule_execution_registry,
+            runtime_content_activation=runtime_content_activation,
         )
 
     policies = {
@@ -186,7 +213,11 @@ def validate_primary_mission_action_integrity(
             terminal_event=terminal_event,
             action_events=action_events,
             event_records=event_records,
+            decision_records=() if decision_records is None else decision_records,
             event_index_by_id=event_index_by_id,
+            rule_ir_authority_index=rule_ir_authority_index,
+            faction_rule_execution_registry=faction_rule_execution_registry,
+            runtime_content_activation=runtime_content_activation,
         )
         _validate_sensor_start_policy(
             state=state,
@@ -240,7 +271,11 @@ def _validate_lifecycle_policy_evidence(
     terminal_event: EventRecord | None,
     action_events: dict[str, tuple[tuple[int, EventRecord], ...]],
     event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
     event_index_by_id: dict[str, int],
+    rule_ir_authority_index: RuntimeRuleIRAuthorityIndex | None,
+    faction_rule_execution_registry: FactionRuleExecutionRegistry | None,
+    runtime_content_activation: RuntimeContentActivation | None,
 ) -> None:
     start_payload = _object(start_event.payload, label="Primary Mission Action start event")
     start_evidence = PrimaryMissionActionStartEvidence.from_payload(
@@ -277,17 +312,40 @@ def _validate_lifecycle_policy_evidence(
         state=state,
         actions=tuple(prior_actions),
     )
-    validate_primary_mission_action_start_evidence(
+    checkpoint = validate_primary_mission_action_start_checkpoint_evidence(
         state=state,
+        event_records=event_records,
+        decision_records=decision_records,
+        request_id=_request_id_for_action(
+            action=action,
+            event_records=event_records,
+        ),
+        evidence=start_evidence,
+        rule_ir_authority_index=rule_ir_authority_index,
+        faction_rule_execution_registry=faction_rule_execution_registry,
+        runtime_content_activation=runtime_content_activation,
+    )
+    checkpoint_prior_uses = mission_action_prior_uses_from_checkpoint(checkpoint)
+    if checkpoint_prior_uses != expected_prior_uses:
+        raise GameLifecycleError("Primary Mission Action checkpoint prior-use history drifted.")
+    expected_marker_ids = active_primary_mission_marker_ids_at_event(
+        state=state,
+        event=start_event,
+        event_index_by_id=event_index_by_id,
+    )
+    if active_primary_marker_ids_from_checkpoint(checkpoint) != expected_marker_ids:
+        raise GameLifecycleError("Primary Mission Action checkpoint marker history drifted.")
+    boundary_state = primary_mission_action_boundary_state_from_checkpoint(
+        state=state,
+        checkpoint=checkpoint,
+    )
+    validate_primary_mission_action_start_evidence(
+        state=boundary_state,
         action=runtime_action,
         policy=policy,
         evidence=start_evidence,
-        expected_active_marker_ids=active_primary_mission_marker_ids_at_event(
-            state=state,
-            event=start_event,
-            event_index_by_id=event_index_by_id,
-        ),
-        expected_prior_uses=expected_prior_uses,
+        expected_active_marker_ids=expected_marker_ids,
+        expected_prior_uses=checkpoint_prior_uses,
     )
 
     if terminal_event is None:
@@ -324,6 +382,17 @@ def _validate_lifecycle_policy_evidence(
         state=state,
         evidence=completion_evidence,
     )
+    if policy.effect_descriptor == PRIMARY_MISSION_ACTION_VANGUARD_EFFECT:
+        validate_primary_mission_vanguard_checkpoint_evidence(
+            state=state,
+            event_records=event_records,
+            decision_records=decision_records,
+            terminal_event_id=terminal_event.event_id,
+            evidence=completion_evidence,
+            rule_ir_authority_index=rule_ir_authority_index,
+            faction_rule_execution_registry=faction_rule_execution_registry,
+            runtime_content_activation=runtime_content_activation,
+        )
     if policy.completion_timing == "turn_end":
         if objective_record is None:
             raise GameLifecycleError(
@@ -389,6 +458,35 @@ def _validate_completion_boundary_event(
         raise GameLifecycleError(
             "Primary Mission Action objective boundary event ordering drifted."
         )
+
+
+def _request_id_for_action(
+    *,
+    action: MissionActionState,
+    event_records: tuple[EventRecord, ...],
+) -> str:
+    prefix = "mission-action:"
+    if not action.action_id.startswith(prefix):
+        raise GameLifecycleError("Primary Mission Action action identity drifted.")
+    result_id = action.action_id.removeprefix(prefix)
+    matches: list[str] = []
+    for event in event_records:
+        if event.event_type != "decision_recorded" or not isinstance(event.payload, dict):
+            continue
+        result = event.payload.get("result")
+        if not isinstance(result, dict) or result.get("result_id") != result_id:
+            continue
+        request_id = result.get("request_id")
+        if type(request_id) is not str:
+            raise GameLifecycleError(
+                "Primary Mission Action DecisionRecord request identity is invalid."
+            )
+        matches.append(request_id)
+    if len(matches) != 1:
+        raise GameLifecycleError(
+            "Primary Mission Action lacks one DecisionRecord request identity."
+        )
+    return matches[0]
 
 
 def _start_event_order(

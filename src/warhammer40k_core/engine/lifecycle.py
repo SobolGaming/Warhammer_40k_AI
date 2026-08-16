@@ -21,6 +21,8 @@ from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _moveme
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine import primary_historical_event_integrity as _phei
 from warhammer40k_core.engine import primary_mission_action_integrity as _pmai
+from warhammer40k_core.engine import primary_mission_boundary_checkpoint as _pmbc
+from warhammer40k_core.engine import primary_mission_pending_request_integrity as _pmpri
 from warhammer40k_core.engine import primary_mission_state_validation as _pmsv
 from warhammer40k_core.engine import primary_reserve_entry_lifecycle_integrity as _preli
 from warhammer40k_core.engine import primary_reserve_entry_state_integrity as _presi
@@ -299,6 +301,9 @@ from warhammer40k_core.engine.return_on_death import (
 )
 from warhammer40k_core.engine.rules_units import (
     rules_unit_views_from_armies,
+)
+from warhammer40k_core.engine.runtime_rule_ir_authority import (
+    runtime_rule_ir_authority_index_from_bundle,
 )
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
@@ -646,6 +651,11 @@ class GameLifecycle:
             )
         if not self.parameterized_movement_proposals:
             raise GameLifecycleError("GameLifecycle requires parameterized movement proposals.")
+        if self._runtime_content_bundle is not None:
+            self._runtime_content_audit = cast(
+                Mapping[str, JsonValue],
+                validate_json_value(self._runtime_content_bundle.to_summary_payload()),
+            )
         self._decision_dispatch_registry = self._build_decision_dispatch_registry()
 
     @property
@@ -922,14 +932,45 @@ class GameLifecycle:
             pending_request=lifecycle._pending_decision_request(),
             reaction_frame_decision_types=_REACTION_FRAME_DECISION_TYPES,
         )
-        if runtime_content_bundle is not None:
-            lifecycle._runtime_content_activation_input_hash = (
-                _runtime_content_activation_input_hash(
-                    config=cast(GameConfig, config),
-                    armies=tuple(lifecycle._require_state().army_definitions),
-                )
-            )
-        lifecycle._refresh_runtime_content_bundle_if_armies_mustered()
+        lifecycle._refresh_runtime_content_bundle_if_armies_mustered(
+            preserve_existing_bundle=runtime_content_bundle is not None,
+        )
+        refreshed_bundle = lifecycle._runtime_content_bundle
+        rule_ir_authority_index = (
+            None
+            if refreshed_bundle is None
+            else runtime_rule_ir_authority_index_from_bundle(refreshed_bundle)
+        )
+        faction_rule_execution_registry = (
+            None if refreshed_bundle is None else refreshed_bundle.faction_rule_execution_registry
+        )
+        runtime_content_activation = (
+            None if refreshed_bundle is None else refreshed_bundle.activation
+        )
+        _pmai.validate_primary_mission_action_integrity(
+            state=lifecycle._require_state(),
+            event_records=lifecycle.decision_controller.event_log.records,
+            decision_records=lifecycle.decision_controller.records,
+            rule_ir_authority_index=rule_ir_authority_index,
+            faction_rule_execution_registry=faction_rule_execution_registry,
+            runtime_content_activation=runtime_content_activation,
+        )
+        _pmbc.validate_primary_mission_boundary_checkpoint_source_registry(
+            state=lifecycle._require_state(),
+            event_records=lifecycle.decision_controller.event_log.records,
+            runtime_modifier_registry=lifecycle._shooting_phase_handler.runtime_modifier_registry,
+            rule_ir_authority_index=rule_ir_authority_index,
+            faction_rule_execution_registry=faction_rule_execution_registry,
+            runtime_content_activation=runtime_content_activation,
+        )
+        _pmpri.validate_primary_mission_pending_request_integrity(
+            state=lifecycle._require_state(),
+            decisions=lifecycle.decision_controller,
+            runtime_modifier_registry=lifecycle._shooting_phase_handler.runtime_modifier_registry,
+            rule_ir_authority_index=rule_ir_authority_index,
+            faction_rule_execution_registry=faction_rule_execution_registry,
+            runtime_content_activation=runtime_content_activation,
+        )
         _preli.validate_primary_reserve_entry_lifecycle_integrity(
             state=lifecycle._require_state(),
             event_records=lifecycle.decision_controller.event_log.records,
@@ -2201,12 +2242,20 @@ class GameLifecycle:
         result: DecisionResult,
     ) -> LifecycleStatus:
         state = self._require_state()
+        bundle = self._runtime_content_bundle
         apply_mission_decision(
             state=state,
             request=record.request,
             result=result,
             decisions=self.decision_controller,
             runtime_modifier_registry=self._shooting_phase_handler.runtime_modifier_registry,
+            rule_ir_authority_index=(
+                None if bundle is None else runtime_rule_ir_authority_index_from_bundle(bundle)
+            ),
+            faction_rule_execution_registry=(
+                None if bundle is None else bundle.faction_rule_execution_registry
+            ),
+            runtime_content_activation=None if bundle is None else bundle.activation,
         )
         if mission_decision_pauses_after_apply(record.request):
             return LifecycleStatus.advanced(
@@ -2665,7 +2714,11 @@ class GameLifecycle:
             raise GameLifecycleError("GameLifecycle runtime content bundle is unavailable.")
         return self._runtime_content_bundle
 
-    def _refresh_runtime_content_bundle_if_armies_mustered(self) -> None:
+    def _refresh_runtime_content_bundle_if_armies_mustered(
+        self,
+        *,
+        preserve_existing_bundle: bool = False,
+    ) -> None:
         if self._config is None:
             return
         state = self._require_state()
@@ -2685,17 +2738,29 @@ class GameLifecycle:
             config=self._config,
             armies=armies,
         )
-        if (
+        if preserve_existing_bundle:
+            bundle = self._runtime_content_bundle
+            if bundle is None or (
+                bundle.activation.roster_content_ids() != activation.roster_content_ids()
+                or bundle.activation.selected_enhancement_assignments
+                != activation.selected_enhancement_assignments
+                or bundle.activation.loaded_unit_instance_ids != activation.loaded_unit_instance_ids
+                or bundle.activation.selected_weapon_keywords != activation.selected_weapon_keywords
+            ):
+                raise GameLifecycleError(
+                    "Explicit runtime content bundle contradicts the restored armies."
+                )
+        elif (
             self._runtime_content_bundle is not None
             and self._runtime_content_bundle.activation.activation_hash
             == activation.activation_hash
         ):
-            self._runtime_content_activation_input_hash = activation_input_hash
-            return
-        bundle = build_runtime_content_bundle_for_armies(
-            config=self._config,
-            armies=armies,
-        )
+            bundle = self._runtime_content_bundle
+        else:
+            bundle = build_runtime_content_bundle_for_armies(
+                config=self._config,
+                armies=armies,
+            )
         ability_indexes = bundle.ability_indexes_by_player_id
         _sbkc.CatalogStartBattleKeywordChoiceRuntime(ability_indexes, armies).validate_state(
             state, self.decision_controller
@@ -3491,11 +3556,6 @@ def _validate_payload_consistency(
         event_records=event_records,
         decision_records=decision_records,
         pending_decision_requests=pending_decision_requests,
-    )
-    _pmai.validate_primary_mission_action_integrity(
-        state=state,
-        event_records=event_records,
-        decision_records=decision_records,
     )
 
 

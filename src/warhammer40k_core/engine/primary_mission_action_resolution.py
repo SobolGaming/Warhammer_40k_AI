@@ -17,10 +17,14 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
     PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY,
     PRIMARY_MISSION_ACTION_MARKER_EFFECTS,
+    PRIMARY_MISSION_ACTION_VANGUARD_EFFECT,
     PrimaryMissionActionCompletionEvidence,
 )
 from warhammer40k_core.engine.primary_mission_action_lifecycle_policy import (
     capture_primary_mission_action_completion_evidence,
+)
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
+    record_primary_mission_boundary_checkpoint,
 )
 from warhammer40k_core.engine.primary_mission_state import (
     MarkerAnchorKind,
@@ -28,6 +32,7 @@ from warhammer40k_core.engine.primary_mission_state import (
     PrimaryMissionProgressState,
     primary_mission_marker_id,
 )
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
 
 def resolve_primary_mission_actions_at_turn_end(
@@ -36,6 +41,7 @@ def resolve_primary_mission_actions_at_turn_end(
     decisions: DecisionController,
     completed_phase: BattlePhase,
     turn_end_record: ObjectiveControlRecord,
+    runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> tuple[MissionActionState, ...]:
     _validate_boundary(
         state=state,
@@ -55,6 +61,21 @@ def resolve_primary_mission_actions_at_turn_end(
         and action.battle_round_started == state.battle_round
         and action.completion_timing == "turn_end"
     )
+    vanguard_checkpoint = (
+        record_primary_mission_boundary_checkpoint(
+            state=state,
+            event_log=decisions.event_log,
+            boundary_kind="turn_end",
+            player_id=_active_player_id(state),
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        if any(
+            mission_action_policy_for_id(action.mission_action_id).effect_descriptor
+            == PRIMARY_MISSION_ACTION_VANGUARD_EFFECT
+            for action in pending
+        )
+        else None
+    )
     resolved: list[MissionActionState] = []
     for action in pending:
         policy = mission_action_policy_for_id(action.mission_action_id)
@@ -64,6 +85,12 @@ def resolve_primary_mission_actions_at_turn_end(
             policy=policy,
             completed_phase=completed_phase,
             objective_control_record=turn_end_record,
+            runtime_modifier_registry=runtime_modifier_registry,
+            boundary_checkpoint=(
+                vanguard_checkpoint
+                if policy.effect_descriptor == PRIMARY_MISSION_ACTION_VANGUARD_EFFECT
+                else None
+            ),
         )
         if not completion_evidence.completion_condition_met:
             failed = action.fail_completion()
@@ -236,6 +263,12 @@ def _validate_boundary(
         or turn_end_record.timing is not ObjectiveControlTiming.TURN_END
     ):
         raise GameLifecycleError("Primary Action turn-end objective record drifted.")
+
+
+def _active_player_id(state: GameState) -> str:
+    if state.active_player_id is None:
+        raise GameLifecycleError("Primary Action resolution requires active player.")
+    return state.active_player_id
 
 
 __all__ = ("resolve_primary_mission_actions_at_turn_end",)

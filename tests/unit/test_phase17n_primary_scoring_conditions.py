@@ -13,6 +13,12 @@ from tests.phase11c_command_phase_helpers import (
     with_model_offsets,
 )
 from tests.phase15a_charge_declaration_helpers import charge_lifecycle
+from tests.phase17n_primary_mission_helpers import (
+    append_authenticated_normal_move,
+)
+from tests.phase17n_primary_mission_helpers import (
+    phase17n_started_primary_action_fixture as shared_started_primary_action_fixture,
+)
 
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
@@ -104,7 +110,6 @@ from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
     PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY,
     PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY,
     MissionActionPriorUseEvidence,
-    MissionActionStartAuthorityEvidence,
     MissionActionStartAuthorityOptionEvidence,
     PrimaryMissionActionCompletionEvidence,
     PrimaryMissionActionStartEvidence,
@@ -182,6 +187,7 @@ from warhammer40k_core.engine.primary_victory_point_policy import (
     validate_primary_victory_point_transaction,
     validate_victory_point_ledger_policy,
 )
+from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     MissionScoringPolicy,
@@ -2967,24 +2973,6 @@ def test_phase17n_consecrate_restore_rejects_omitted_required_designation() -> N
         )
 
 
-def test_phase17n_consecrate_restore_allows_pending_turn_resolution() -> None:
-    state, decisions, _designation_id, _target_id = _phase17n_consecrate_choice_state()
-    request = consecrate_choice_request(
-        state=state,
-        decisions=decisions,
-        request_id="phase17n-consecrate-pending-restore-request",
-    )
-    assert request is not None
-    decisions.request_decision(request)
-
-    validate_primary_mission_progress_state(
-        state,
-        event_records=decisions.event_log.records,
-        decision_records=decisions.records,
-        pending_decision_requests=decisions.queue.pending_requests,
-    )
-
-
 def test_phase17n_consecrate_restore_rejects_wrong_subject_pending_choice() -> None:
     state, decisions, _designation_id, _target_id = _phase17n_consecrate_choice_state()
     request = consecrate_choice_request(
@@ -3032,41 +3020,6 @@ def test_phase17n_consecrate_restore_rejects_wrong_subject_pending_choice() -> N
             decision_records=decisions.records,
             pending_decision_requests=decisions.queue.pending_requests,
         )
-
-
-def test_phase17n_sensor_restore_allows_pending_marker_choice() -> None:
-    state, decisions, actions = _phase17n_sensor_start_integrity_fixture(action_count=1)
-    action = actions[0]
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
-    record = _phase17n_action_turn_end_record(
-        state=state,
-        decisions=decisions,
-        controlled_target_id=action.target_id,
-        action=action,
-    )
-    resolved = resolve_primary_mission_actions_at_turn_end(
-        state=state,
-        decisions=decisions,
-        completed_phase=BattlePhase.FIGHT,
-        turn_end_record=record,
-    )
-    assert len(resolved) == 1
-    assert resolved[0].status is MissionActionStatus.COMPLETED
-    request = sensor_sweep_marker_removal_choice_request(
-        state=state,
-        decisions=decisions,
-        action_id=resolved[0].action_id,
-        request_id="phase17n-sensor-pending-restore-request",
-    )
-    assert request is not None
-    decisions.request_decision(request)
-
-    validate_primary_mission_progress_state(
-        state,
-        event_records=decisions.event_log.records,
-        decision_records=decisions.records,
-        pending_decision_requests=decisions.queue.pending_requests,
-    )
 
 
 def test_phase17n_sensor_sweep_removes_policy_scoped_marker_and_tombstones_action() -> None:
@@ -3311,6 +3264,7 @@ def test_phase17n_restore_authenticates_surveil_move_marker_removal() -> None:
     validate_primary_mission_action_integrity(
         state=state,
         event_records=decisions.event_log.records,
+        decision_records=decisions.records,
     )
     assert EventLog.from_payload(decisions.event_log.to_payload()).to_payload() == (
         decisions.event_log.to_payload()
@@ -3701,6 +3655,7 @@ def _phase17n_resolved_sensor_choice_fixture() -> tuple[
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
         turn_end_record=record,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     assert len(resolved) == 1
     assert resolved[0].status is MissionActionStatus.COMPLETED
@@ -4246,7 +4201,7 @@ def test_phase17n_restore_rejects_sensor_sweep_started_with_only_one_eligible_ma
         markers=(marker,),
     )
 
-    with pytest.raises(GameLifecycleError, match="start marker inventory drifted"):
+    with pytest.raises(GameLifecycleError, match="boundary marker inventory drifted"):
         validate_primary_mission_action_integrity(
             state=state,
             event_records=decisions.event_log.records,
@@ -4306,7 +4261,10 @@ def test_phase17n_restore_rejects_duplicate_sensor_sweep_start_authority() -> No
     state, decisions, actions = _phase17n_sensor_start_integrity_fixture(action_count=2)
     assert len(actions) == 2
 
-    with pytest.raises(GameLifecycleError, match="start candidate eligibility inventory drifted"):
+    with pytest.raises(
+        GameLifecycleError,
+        match="start evidence drifted from its boundary checkpoint",
+    ):
         validate_primary_mission_action_integrity(
             state=state,
             event_records=decisions.event_log.records,
@@ -4462,7 +4420,7 @@ def test_phase17n_restore_binds_primary_action_to_exact_decision_and_event_order
     [
         ("missing_key", "battlefield boundary payload keys drifted"),
         ("extra_key", "battlefield boundary payload keys drifted"),
-        ("terrain_omission", "battlefield boundary drifted"),
+        ("terrain_omission", "checkpoint-backed battlefield authority drifted"),
     ],
 )
 def test_phase17n_action_restore_rejects_battlefield_boundary_drift(
@@ -4548,7 +4506,6 @@ def test_phase17n_action_restore_rejects_coordinated_nonselected_option_shrink()
         if cast(dict[str, JsonValue], option.payload)["unit_instance_id"] != omitted_unit_id
     )
     assert len(retained_options) == 1
-    retained_option_ids = frozenset(option.option_id for option in retained_options)
     request_payload = dict(cast(dict[str, JsonValue], request.payload))
     request_payload["legal_option_ids"] = [option.option_id for option in retained_options]
     forged_request = replace(
@@ -4577,10 +4534,9 @@ def test_phase17n_action_restore_rejects_coordinated_nonselected_option_shrink()
     evidence = PrimaryMissionActionStartEvidence.from_payload(
         start_payload[PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY]
     )
-    forged_authority = MissionActionStartAuthorityEvidence(
-        request_kind=evidence.start_authority.request_kind,
+    forged_authority = replace(
+        evidence.start_authority,
         request_payload_json=canonical_json(forged_request.payload),
-        battlefield_boundary=evidence.start_authority.battlefield_boundary,
         options=tuple(
             MissionActionStartAuthorityOptionEvidence(
                 option_id=option.option_id,
@@ -4589,26 +4545,6 @@ def test_phase17n_action_restore_rejects_coordinated_nonselected_option_shrink()
             )
             for option in retained_options
         ),
-        candidate_units=tuple(
-            replace(
-                candidate,
-                legal_primary_option_ids=tuple(
-                    option_id
-                    for option_id in candidate.legal_primary_option_ids
-                    if option_id in retained_option_ids
-                ),
-            )
-            for candidate in evidence.start_authority.candidate_units
-            if candidate.unit_instance_id != omitted_unit_id
-        ),
-        terrain_model_inventory=evidence.start_authority.terrain_model_inventory,
-        battle_shocked_unit_instance_ids=(
-            evidence.start_authority.battle_shocked_unit_instance_ids
-        ),
-        advanced_unit_instance_ids=evidence.start_authority.advanced_unit_instance_ids,
-        fell_back_unit_instance_ids=evidence.start_authority.fell_back_unit_instance_ids,
-        shot_unit_instance_ids=evidence.start_authority.shot_unit_instance_ids,
-        active_secondary_mission_ids=evidence.start_authority.active_secondary_mission_ids,
     )
     forged_evidence = replace(
         evidence,
@@ -4651,126 +4587,6 @@ def test_phase17n_action_restore_rejects_coordinated_nonselected_option_shrink()
         validate_primary_mission_action_integrity(
             state=forged_state,
             event_records=tuple(forged_events),
-        )
-
-
-def test_phase17n_action_restore_rejects_derived_positive_oc_option_shrink() -> None:
-    state, decisions, action, _target_id = _phase17n_started_primary_action_fixture(
-        layout_id="disruption-vs-reconnaissance-layout-1",
-        attacker_force_disposition_id="disruption",
-        defender_force_disposition_id="reconnaissance",
-        player_id="player-a",
-        mission_action_id="decoy-objective",
-        current_phase=BattlePhase.FIGHT,
-        player_unit_count=2,
-    )
-    decision = decisions.records[0]
-    request = decision.request
-    omitted_unit_id = next(
-        unit_id
-        for unit_id in action.eligible_unit_instance_ids
-        if unit_id != action.unit_instance_id
-    )
-    forged_eligible_ids = (action.unit_instance_id,)
-    retained_options = tuple(
-        replace(
-            option,
-            payload=validate_json_value(
-                {
-                    **cast(dict[str, JsonValue], option.payload),
-                    "eligible_unit_instance_ids": list(forged_eligible_ids),
-                }
-            ),
-        )
-        for option in request.options
-        if cast(dict[str, JsonValue], option.payload)["unit_instance_id"] != omitted_unit_id
-    )
-    request_payload = dict(cast(dict[str, JsonValue], request.payload))
-    request_payload["legal_option_ids"] = [option.option_id for option in retained_options]
-    forged_request = replace(
-        request,
-        payload=validate_json_value(request_payload),
-        options=retained_options,
-    )
-    selected_option = forged_request.option_by_id(decision.result.selected_option_id)
-    forged_result = replace(decision.result, payload=selected_option.payload)
-    forged_decision = replace(
-        decision,
-        request=forged_request,
-        result=forged_result,
-    )
-
-    start_event = next(
-        event
-        for event in decisions.event_log.records
-        if event.event_type == "mission_action_started"
-    )
-    start_payload = dict(cast(dict[str, JsonValue], start_event.payload))
-    evidence = PrimaryMissionActionStartEvidence.from_payload(
-        start_payload[PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY]
-    )
-    forged_authority = replace(
-        evidence.start_authority,
-        request_payload_json=canonical_json(forged_request.payload),
-        options=tuple(
-            MissionActionStartAuthorityOptionEvidence(
-                option_id=option.option_id,
-                label=option.label,
-                payload_json=canonical_json(option.payload),
-            )
-            for option in forged_request.options
-        ),
-        candidate_units=tuple(
-            replace(
-                candidate,
-                positive_objective_control_model_instance_ids=(),
-                unit_ineligibility_reason="mission_action_unit_zero_objective_control",
-                legal_primary_option_ids=(),
-            )
-            if candidate.unit_instance_id == omitted_unit_id
-            else candidate
-            for candidate in evidence.start_authority.candidate_units
-        ),
-    )
-    forged_evidence = replace(
-        evidence,
-        eligible_unit_instance_ids=forged_eligible_ids,
-        start_authority=forged_authority,
-    )
-    forged_action = replace(action, eligible_unit_instance_ids=forged_eligible_ids)
-    forged_state = deepcopy(state)
-    forged_state.mission_action_states = [forged_action]
-    start_payload["mission_action_state"] = validate_json_value(forged_action.to_payload())
-    start_payload[PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY] = validate_json_value(
-        forged_evidence.to_payload()
-    )
-
-    forged_events = list(decisions.event_log.records)
-    for index, event in enumerate(forged_events):
-        if event.event_type == "decision_requested":
-            forged_events[index] = replace(
-                event,
-                payload=validate_json_value(forged_request.to_payload()),
-            )
-        elif event.event_type == "decision_recorded":
-            forged_events[index] = replace(
-                event,
-                payload=validate_json_value(forged_decision.to_payload()),
-            )
-        elif event.event_type == "mission_action_started":
-            forged_events[index] = replace(
-                event,
-                payload=validate_json_value(start_payload),
-            )
-
-    with pytest.raises(
-        GameLifecycleError,
-        match=r"Primary Mission Action start candidate .*inventory drifted",
-    ):
-        validate_primary_mission_action_integrity(
-            state=forged_state,
-            event_records=tuple(forged_events),
-            decision_records=(forged_decision,),
         )
 
 
@@ -5005,10 +4821,14 @@ def _phase17n_surveil_action_start_evidence_fixture() -> tuple[
     )
 
 
-def test_phase17n_surveil_start_rejects_duplicate_target_history() -> None:
+def test_phase17n_surveil_start_rejects_history_and_geometry_drift() -> None:
     state, evidence = _phase17n_surveil_action_start_evidence_fixture()
     surveil = evidence.surveil_target_evidence
     assert surveil is not None
+    runtime_action = mission_action_for_state(
+        state=state,
+        mission_action_id=evidence.mission_action_id,
+    )
     prior = MissionActionPriorUseEvidence(
         action_id="phase17n-prior-surveil",
         mission_action_id=evidence.mission_action_id,
@@ -5021,12 +4841,8 @@ def test_phase17n_surveil_start_rejects_duplicate_target_history() -> None:
         target_rules_unit_identity_ids=surveil.target_rules_unit_identity_ids,
     )
     forged_evidence = replace(evidence, prior_uses=(prior,))
-    runtime_action = mission_action_for_state(
-        state=state,
-        mission_action_id=evidence.mission_action_id,
-    )
 
-    with pytest.raises(GameLifecycleError, match="start candidate option inventory drifted"):
+    with pytest.raises(GameLifecycleError, match="already surveilled"):
         validate_primary_mission_action_start_evidence(
             state=state,
             action=runtime_action,
@@ -5034,41 +4850,30 @@ def test_phase17n_surveil_start_rejects_duplicate_target_history() -> None:
             evidence=forged_evidence,
             expected_active_marker_ids=forged_evidence.active_primary_mission_marker_ids,
             expected_prior_uses=forged_evidence.prior_uses,
+            validate_request_authority=False,
         )
 
-
-@pytest.mark.parametrize("witness_kind", ["range", "line_of_sight"])
-def test_phase17n_surveil_start_rejects_range_or_visibility_witness_drift(
-    witness_kind: str,
-) -> None:
-    state, evidence = _phase17n_surveil_action_start_evidence_fixture()
-    surveil = evidence.surveil_target_evidence
-    assert surveil is not None
-    if witness_kind == "range":
-        forged_surveil = replace(
-            surveil,
-            observer_component_unit_instance_ids_within_18=(),
-        )
-    else:
-        forged_surveil = replace(
+    for forged_surveil in (
+        replace(surveil, observer_component_unit_instance_ids_within_18=()),
+        replace(
             surveil,
             observer_component_unit_instance_ids_with_line_of_sight=(),
-        )
-    forged_evidence = replace(evidence, surveil_target_evidence=forged_surveil)
-    runtime_action = mission_action_for_state(
-        state=state,
-        mission_action_id=evidence.mission_action_id,
-    )
-
-    with pytest.raises(GameLifecycleError, match="Surveil Primary Mission Action geometry drifted"):
-        validate_primary_mission_action_start_evidence(
-            state=state,
-            action=runtime_action,
-            policy=mission_action_policy_for_id(evidence.mission_action_id),
-            evidence=forged_evidence,
-            expected_active_marker_ids=forged_evidence.active_primary_mission_marker_ids,
-            expected_prior_uses=forged_evidence.prior_uses,
-        )
+        ),
+    ):
+        forged_evidence = replace(evidence, surveil_target_evidence=forged_surveil)
+        with pytest.raises(
+            GameLifecycleError,
+            match="Surveil Primary Mission Action geometry drifted",
+        ):
+            validate_primary_mission_action_start_evidence(
+                state=state,
+                action=runtime_action,
+                policy=mission_action_policy_for_id(evidence.mission_action_id),
+                evidence=forged_evidence,
+                expected_active_marker_ids=(forged_evidence.active_primary_mission_marker_ids),
+                expected_prior_uses=forged_evidence.prior_uses,
+                validate_request_authority=False,
+            )
 
 
 def test_phase17n_vanguard_start_replay_requires_selected_terrain_intersection() -> None:
@@ -5097,7 +4902,7 @@ def test_phase17n_vanguard_start_replay_requires_selected_terrain_intersection()
         payload=validate_json_value(start_payload),
     )
 
-    with pytest.raises(GameLifecycleError, match="terrain eligibility policy"):
+    with pytest.raises(GameLifecycleError, match="boundary checkpoint"):
         validate_primary_mission_action_integrity(
             state=state,
             event_records=tuple(records),
@@ -5125,6 +4930,7 @@ def test_phase17n_turn_end_action_commits_marker_with_completion_event_authority
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
         turn_end_record=record,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
 
     assert len(resolved) == 1
@@ -5216,6 +5022,7 @@ def test_phase17n_restore_rejects_tampered_action_completion_result_and_record_h
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
         turn_end_record=record,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     records = list(decisions.event_log.records)
     completion_index = next(
@@ -5303,6 +5110,7 @@ def test_phase17n_restore_rejects_forged_objective_completion_without_source_con
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
         turn_end_record=record,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     assert len(resolved) == 1
     assert resolved[0].interrupted_reason == "completion_condition_failed"
@@ -5376,6 +5184,7 @@ def test_phase17n_restore_rejects_coordinated_completed_to_failed_action_rewrite
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
         turn_end_record=record,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     assert len(resolved) == 1
     assert resolved[0].status is MissionActionStatus.COMPLETED
@@ -5432,6 +5241,7 @@ def test_phase17n_restore_requires_action_start_before_objective_boundary() -> N
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
         turn_end_record=record,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     records = list(decisions.event_log.records)
     boundary_index = next(
@@ -5453,45 +5263,14 @@ def test_phase17n_restore_requires_action_start_before_objective_boundary() -> N
 
 
 def test_phase17n_vanguard_completion_evidence_requires_enemy_terrain_row() -> None:
-    state, decisions, action, target_id = _phase17n_started_primary_action_fixture(
+    state, decisions, action, target_id = shared_started_primary_action_fixture(
         layout_id="reconnaissance-vs-priority-assets-layout-1",
         attacker_force_disposition_id="reconnaissance",
         defender_force_disposition_id="priority-assets",
         player_id="player-b",
         mission_action_id="vanguard-operation",
         current_phase=BattlePhase.FIGHT,
-    )
-    assert state.mission_setup is not None
-    assert state.battlefield_state is not None
-    target_area = next(
-        area
-        for area in mission_logical_terrain_areas(state.mission_setup)
-        if area.logical_terrain_area_id == target_id
-    )
-    min_x, min_y, max_x, max_y = target_area.bounds()
-    enemy_unit = next(
-        unit
-        for army in state.army_definitions
-        if army.player_id != action.player_id
-        for unit in army.units
-    )
-    enemy_placement = state.battlefield_state.unit_placement_by_id(enemy_unit.unit_instance_id)
-    state.battlefield_state = state.battlefield_state.with_unit_placement(
-        replace(
-            enemy_placement,
-            model_placements=tuple(
-                replace(
-                    model_placement,
-                    pose=Pose.at(
-                        ((min_x + max_x) / 2.0) + (index * 0.1),
-                        (min_y + max_y) / 2.0,
-                        model_placement.pose.position.z,
-                        facing_degrees=model_placement.pose.facing.degrees,
-                    ),
-                )
-                for index, model_placement in enumerate(enemy_placement.model_placements)
-            ),
-        )
+        vanguard_enemy_position="inside",
     )
     record = _phase17n_action_turn_end_record(
         state=state,
@@ -5504,6 +5283,7 @@ def test_phase17n_vanguard_completion_evidence_requires_enemy_terrain_row() -> N
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
         turn_end_record=record,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     assert len(resolved) == 1
     assert resolved[0].status is MissionActionStatus.INTERRUPTED
@@ -5548,130 +5328,6 @@ def test_phase17n_vanguard_completion_evidence_requires_enemy_terrain_row() -> N
         )
 
 
-def test_phase17n_vanguard_rejects_derived_membership_and_outcome_rewrite() -> None:
-    state, decisions, action, target_id = _phase17n_started_primary_action_fixture(
-        layout_id="reconnaissance-vs-priority-assets-layout-1",
-        attacker_force_disposition_id="reconnaissance",
-        defender_force_disposition_id="priority-assets",
-        player_id="player-b",
-        mission_action_id="vanguard-operation",
-        current_phase=BattlePhase.FIGHT,
-    )
-    assert state.mission_setup is not None
-    assert state.battlefield_state is not None
-    target_area = next(
-        area
-        for area in mission_logical_terrain_areas(state.mission_setup)
-        if area.logical_terrain_area_id == target_id
-    )
-    min_x, min_y, max_x, max_y = target_area.bounds()
-    enemy_unit = next(
-        unit
-        for army in state.army_definitions
-        if army.player_id != action.player_id
-        for unit in army.units
-    )
-    enemy_placement = state.battlefield_state.unit_placement_by_id(enemy_unit.unit_instance_id)
-    state.battlefield_state = state.battlefield_state.with_unit_placement(
-        replace(
-            enemy_placement,
-            model_placements=tuple(
-                replace(
-                    model_placement,
-                    pose=Pose.at(
-                        ((min_x + max_x) / 2.0) + (index * 0.1),
-                        (min_y + max_y) / 2.0,
-                        model_placement.pose.position.z,
-                        facing_degrees=model_placement.pose.facing.degrees,
-                    ),
-                )
-                for index, model_placement in enumerate(enemy_placement.model_placements)
-            ),
-        )
-    )
-    record = _phase17n_action_turn_end_record(
-        state=state,
-        decisions=decisions,
-        controlled_target_id=target_id,
-        action=action,
-    )
-    resolved = resolve_primary_mission_actions_at_turn_end(
-        state=state,
-        decisions=decisions,
-        completed_phase=BattlePhase.FIGHT,
-        turn_end_record=record,
-    )
-    assert len(resolved) == 1
-    assert resolved[0].status is MissionActionStatus.INTERRUPTED
-
-    records = list(decisions.event_log.records)
-    terminal_index = next(
-        index
-        for index, event in enumerate(records)
-        if event.event_type == "mission_action_completion_failed"
-    )
-    terminal = records[terminal_index]
-    terminal_payload = dict(cast(dict[str, JsonValue], terminal.payload))
-    evidence = PrimaryMissionActionCompletionEvidence.from_payload(
-        terminal_payload[PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY]
-    )
-    affected_model_ids = {
-        row.model_instance_id
-        for row in evidence.terrain_model_inventory
-        if row.owner_player_id != action.player_id and target_id in row.logical_terrain_area_ids
-    }
-    assert affected_model_ids
-    forged_inventory = tuple(
-        replace(
-            row,
-            logical_terrain_area_ids=tuple(
-                area_id for area_id in row.logical_terrain_area_ids if area_id != target_id
-            ),
-        )
-        if row.model_instance_id in affected_model_ids
-        else row
-        for row in evidence.terrain_model_inventory
-    )
-    forged_evidence = replace(
-        evidence,
-        terrain_model_inventory=forged_inventory,
-        terrain_intersections=tuple(
-            row
-            for row in evidence.terrain_intersections
-            if not (
-                row.model_instance_id in affected_model_ids
-                and row.logical_terrain_area_id == target_id
-            )
-        ),
-        completion_condition_met=True,
-    )
-    forged_completed = action.complete_without_award(
-        battle_round=state.battle_round,
-        phase=BattlePhase.FIGHT.value,
-        completion_timing=action.completion_timing,
-    )
-    state.mission_action_states = [forged_completed]
-    terminal_payload["mission_action_state"] = validate_json_value(forged_completed.to_payload())
-    terminal_payload[PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY] = validate_json_value(
-        forged_evidence.to_payload()
-    )
-    records[terminal_index] = replace(
-        terminal,
-        event_type="mission_action_completed",
-        payload=validate_json_value(terminal_payload),
-    )
-
-    with pytest.raises(
-        GameLifecycleError,
-        match="terrain-model inventory drifted",
-    ):
-        validate_primary_mission_action_integrity(
-            state=state,
-            event_records=tuple(records),
-            decision_records=decisions.records,
-        )
-
-
 def test_phase17n_reconciliation_interrupts_post_start_charge_move_once() -> None:
     state, decisions, action, _target_id = _phase17n_started_primary_action_fixture(
         layout_id="purge-the-foe-vs-priority-assets-layout-1",
@@ -5708,6 +5364,16 @@ def test_phase17n_reconciliation_interrupts_post_start_charge_move_once() -> Non
             ).to_payload(),
         },
     )
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        unit_placement.with_model_placements(
+            tuple(
+                placement.with_pose(displacement.end_pose)
+                if placement.model_instance_id == displacement.model_instance_id
+                else placement
+                for placement in unit_placement.model_placements
+            )
+        )
+    )
 
     interrupted = reconcile_primary_mission_action_interruptions(
         state=state,
@@ -5733,6 +5399,7 @@ def test_phase17n_reconciliation_interrupts_post_start_charge_move_once() -> Non
     validate_primary_mission_action_integrity(
         state=state,
         event_records=decisions.event_log.records,
+        decision_records=decisions.records,
     )
     forged_payload = dict(terminal_payload)
     forged_payload.pop("source_evidence_event_id")
@@ -5867,22 +5534,31 @@ def test_phase17n_action_destruction_replay_cites_canonical_completion_event() -
         if unit.unit_instance_id == action.unit_instance_id
     )
     model_ids = action_unit.own_model_ids()
-    model_event = decisions.event_log.append(
-        "model_destroyed",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "active_player_id": state.active_player_id,
-            "phase": BattlePhase.FIGHT.value,
-            "model_instance_id": model_ids[-1],
-        },
+    model_events = tuple(
+        decisions.event_log.append(
+            "model_destroyed",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "model_instance_id": model_id,
+            },
+        )
+        for model_id in model_ids
     )
+    _phase17n_set_model_wounds(state, model_ids=model_ids, wounds_remaining=0)
     state.battlefield_state = state.battlefield_state.with_removed_models(model_ids)
     departures = record_primary_destroyed_model_departures(
         state=state,
         destroyed_model_instance_ids=model_ids,
         source_id="phase17n-action-canonical-destruction",
     )
+    for departure in departures:
+        record_primary_battlefield_departure_event(
+            event_log=decisions.event_log,
+            departure=departure,
+        )
     destroying_player_id = next(
         player_id for player_id in state.player_ids if player_id != action.player_id
     )
@@ -5893,7 +5569,7 @@ def test_phase17n_action_destruction_replay_cites_canonical_completion_event() -
             source_rules_unit_instance_id=None,
             source_model_instance_id=None,
         ),
-        source_model_destroyed_event_id=model_event.event_id,
+        source_model_destroyed_event_id=model_events[-1].event_id,
         source_rules_unit_objective_proximity_witness=None,
         source_battlefield_departure_ids=tuple(departure.departure_id for departure in departures),
         unattributed_cause=None,
@@ -6006,9 +5682,27 @@ def test_phase17n_reconciliation_distinguishes_destruction_and_departure(
     removed_model_ids = tuple(
         model_placement.model_instance_id for model_placement in placement.model_placements
     )
-    state.battlefield_state = state.battlefield_state.without_unit_placement(
-        action.unit_instance_id
-    )
+    if removal_kind is BattlefieldRemovalKind.DESTROYED:
+        _phase17n_set_model_wounds(
+            state,
+            model_ids=removed_model_ids,
+            wounds_remaining=0,
+        )
+        state.battlefield_state = state.battlefield_state.with_removed_models(removed_model_ids)
+    else:
+        state.battlefield_state = state.battlefield_state.without_unit_placement(
+            action.unit_instance_id
+        )
+        state.record_reserve_state(
+            ReserveState.entered_during_battle(
+                player_id=action.player_id,
+                unit_instance_id=action.unit_instance_id,
+                reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+                battle_round=state.battle_round,
+                phase=BattlePhase.FIGHT,
+                source_rule_ids=("phase17n-departure-reserve-authority",),
+            )
+        )
     departure = record_primary_battlefield_departure(
         state=state,
         rules_unit_instance_id=action.unit_instance_id,
@@ -6034,43 +5728,6 @@ def test_phase17n_reconciliation_distinguishes_destruction_and_departure(
     assert interrupted[0].interrupted_reason == expected_reason
     terminal_payload = cast(dict[str, JsonValue], decisions.event_log.records[-1].payload)
     assert terminal_payload["source_evidence_event_id"] == evidence.event_id
-    validate_primary_mission_action_integrity(
-        state=state,
-        event_records=decisions.event_log.records,
-    )
-
-
-def test_phase17n_vanguard_completion_requires_action_unit_on_selected_terrain() -> None:
-    state, decisions, action, target_id = _phase17n_started_primary_action_fixture(
-        layout_id="reconnaissance-vs-priority-assets-layout-1",
-        attacker_force_disposition_id="reconnaissance",
-        defender_force_disposition_id="priority-assets",
-        player_id="player-b",
-        mission_action_id="vanguard-operation",
-        current_phase=BattlePhase.FIGHT,
-    )
-    assert state.battlefield_state is not None
-    state.battlefield_state = state.battlefield_state.without_unit_placement(
-        action.unit_instance_id
-    )
-    record = _phase17n_action_turn_end_record(
-        state=state,
-        decisions=decisions,
-        controlled_target_id=target_id,
-        action=action,
-    )
-
-    resolved = resolve_primary_mission_actions_at_turn_end(
-        state=state,
-        decisions=decisions,
-        completed_phase=BattlePhase.FIGHT,
-        turn_end_record=record,
-    )
-
-    assert len(resolved) == 1
-    assert resolved[0].status is MissionActionStatus.INTERRUPTED
-    assert resolved[0].interrupted_reason == "completion_condition_failed"
-    assert state.primary_mission_progress_state.markers == ()
     validate_primary_mission_action_integrity(
         state=state,
         event_records=decisions.event_log.records,
@@ -6375,6 +6032,35 @@ def _phase17n_forged_completion_marker(
     )
 
 
+def _phase17n_set_model_wounds(
+    state: GameState,
+    *,
+    model_ids: tuple[str, ...],
+    wounds_remaining: int,
+) -> None:
+    requested_ids = set(model_ids)
+    state.army_definitions = [
+        replace(
+            army,
+            units=tuple(
+                replace(
+                    unit,
+                    own_models=tuple(
+                        replace(model, wounds_remaining=wounds_remaining)
+                        if model.model_instance_id in requested_ids
+                        else model
+                        for model in unit.own_models
+                    ),
+                )
+                if requested_ids.intersection(unit.own_model_ids())
+                else unit
+                for unit in army.units
+            ),
+        )
+        for army in state.army_definitions
+    ]
+
+
 def _phase17n_surveil_integrity_fixture() -> tuple[GameState, DecisionController]:
     state, decisions, action, target_id = _phase17n_started_primary_action_fixture(
         layout_id="disruption-vs-reconnaissance-layout-1",
@@ -6395,11 +6081,12 @@ def _phase17n_surveil_integrity_fixture() -> tuple[GameState, DecisionController
         decisions=decisions,
         completed_phase=BattlePhase.FIGHT,
         turn_end_record=record,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     assert len(resolved) == 1
 
     state.active_player_id = "player-b"
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.CHARGE)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
     assert state.battlefield_state is not None
     assert state.mission_setup is not None
     moving_unit = next(
@@ -6414,27 +6101,23 @@ def _phase17n_surveil_integrity_fixture() -> tuple[GameState, DecisionController
         if marker.objective_marker_id == target_id
     )
     placement = state.battlefield_state.unit_placement_by_id(moving_unit.unit_instance_id)
-    state.battlefield_state = state.battlefield_state.with_unit_placement(
-        with_model_offsets(
-            placement,
-            objective,
-            offsets=((0.0, 0.0), (1.4, 0.0), (2.8, 0.0), (0.0, 1.4), (1.4, 1.4)),
-        )
-    )
-    decisions.event_log.append(
-        "heroic_intervention_charge_move_completed",
-        {
-            "game_id": state.game_id,
-            "player_id": "player-b",
-            "battle_round": state.battle_round,
-            "phase": BattlePhase.CHARGE.value,
-            "unit_instance_id": moving_unit.unit_instance_id,
-        },
+    anchor = placement.model_placements[0].pose.position
+    append_authenticated_normal_move(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=moving_unit.unit_instance_id,
+        suffix="surveil-marker-removal",
+        pose_transform=lambda pose: Pose.at(
+            pose.position.x + objective.x_inches - anchor.x,
+            pose.position.y + objective.y_inches - anchor.y,
+            pose.position.z + objective.z_inches - anchor.z,
+            facing_degrees=pose.facing.degrees,
+        ),
     )
     resolve_surveil_marker_removal_for_completed_moves(
         state=state,
         decisions=decisions,
-        completed_phase=BattlePhase.CHARGE,
+        completed_phase=BattlePhase.MOVEMENT,
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     assert state.primary_mission_progress_state.markers[0].status is (

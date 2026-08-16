@@ -857,6 +857,20 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   that are not yet represented as finite options return a typed `unsupported`
   status instead of exposing an adapter mutation path.
 
+An accepted `continue_to_shooting` selection emits exactly one
+`mission_action_opportunity_declined` mutation event containing the exact
+request ID, result ID, selected option ID, and internal boundary evidence. On
+restore, the engine reconstructs the complete Primary and held-Secondary
+Action inventory from the referenced request checkpoint and requires exact
+closure through `decision_requested`, `DecisionRecord`, `decision_recorded`,
+the decline event, and the current `ShootingPhaseState` flag. A decline cannot
+create `MissionActionState`; without that exact authority the flag must remain
+false. Because the internal evidence contains the owning player's active
+Secondary identities and complete Action inventory, shared adapter redaction
+exposes the decline event only to that player and an omniscient administrator;
+opponents receive no event payload through projections, deltas, responses, or
+reconnects.
+
 ### Phase 17N Step 4 Primary Mission choices
 
 Step 4 uses the public finite decision type
@@ -919,6 +933,19 @@ Adapters continue to submit the emitted
 owns target policies, use limits, Action state, immediate or turn-end
 completion, marker/status effects, and follow-up Primary choices.
 
+On lifecycle restore, a pending `start_mission_action` or
+`select_primary_mission_choice` request is accepted only as the sole queue
+head, with exactly one matching `decision_requested` event, no matching
+`DecisionRecord`, and no later authoritative mutation. The lifecycle
+regenerates the complete direct or opportunity Action inventory, or the
+complete Locate and Deny, Punishment, Consecrate, or Sensor Sweep choice
+inventory, from the restored boundary. Orphaned, duplicated, stale-context,
+partial-option, and otherwise impossible pending sequences fail before the
+request is exposed to an adapter. A pending Action request also requires its
+engine-recorded boundary checkpoint immediately before `decision_requested`;
+restore uses the checkpoint-backed pure option reconstruction path and does not
+record a second checkpoint or request while authenticating it.
+
 Each accepted Step 4 Action start is closed to exactly one authoritative
 `DecisionRecord`. Its actor, request/result IDs, deterministic selected option,
 selected option payload, complete eligible-unit inventory, mission/source
@@ -949,6 +976,13 @@ therefore enforces battle-round-two starts,
 `unlimited_different_objective_per_unit_this_phase` across the complete ordered
 Action history; Surveil's no-repeat target rule is enforced independently of
 its unlimited Action count.
+
+The engine's `primary_mission_boundary_checkpoint_recorded` events are internal
+replay-authority records, not public battlefield events. Their payload can
+contain the owning player's hidden active-Secondary identities and prior-use
+inventory. Shared adapter redaction therefore exposes a checkpoint only to its
+owning player and an omniscient administrator; opponents receive no checkpoint
+payload through projections, event deltas, server responses, or reconnects.
 
 Turn ordering is engine-owned and blocking. Locate and Deny drains before
 battle entry. Punishment drains after battle-round-start hooks and before the

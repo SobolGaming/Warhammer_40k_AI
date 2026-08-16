@@ -471,6 +471,7 @@ class BattleRoundFlow:
                 decisions=decisions,
                 completed_phase=current_phase,
                 turn_end_record=turn_end_record,
+                runtime_modifier_registry=self._runtime_modifier_registry,
             )
             primary_choice_request = next_primary_mission_turn_end_choice_request(
                 state=state,

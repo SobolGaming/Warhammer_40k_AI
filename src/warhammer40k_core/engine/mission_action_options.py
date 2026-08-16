@@ -51,6 +51,16 @@ from warhammer40k_core.engine.primary_mission_action_options import (
     primary_mission_action_start_targets,
     primary_mission_action_target_kind,
 )
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
+    terrain_model_inventory_from_checkpoint,
+)
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
+    PrimaryMissionBoundaryCheckpoint,
+    PrimaryMissionBoundaryCheckpointReference,
+)
+from warhammer40k_core.engine.primary_mission_boundary_state import (
+    primary_mission_action_boundary_state_from_checkpoint,
+)
 from warhammer40k_core.engine.primary_scoring_conditions import (
     home_objective_ids as _home_objective_ids,
 )
@@ -234,29 +244,41 @@ def primary_mission_action_start_evidence_for_selection(
     condition_target_id: str | None,
     opportunity: bool,
     decline_option_id: str,
+    boundary_checkpoint: PrimaryMissionBoundaryCheckpointReference,
+    boundary_checkpoint_evidence: PrimaryMissionBoundaryCheckpoint,
     runtime_modifier_registry: RuntimeModifierRegistry,
 ) -> PrimaryMissionActionStartEvidence:
     """Recompute the complete legal inventory before capturing selected start evidence."""
 
     _require_runtime_modifier_registry(runtime_modifier_registry)
+    if (
+        boundary_checkpoint_evidence.reference(event_id=boundary_checkpoint.checkpoint_event_id)
+        != boundary_checkpoint
+    ):
+        raise GameLifecycleError("Primary Mission Action boundary checkpoint drifted.")
+    boundary_state = primary_mission_action_boundary_state_from_checkpoint(
+        state=state,
+        checkpoint=boundary_checkpoint_evidence,
+    )
+    boundary_registry = RuntimeModifierRegistry.empty()
     if action.target_policy not in PRIMARY_MISSION_ACTION_TARGET_POLICIES:
         raise GameLifecycleError("Start evidence requires a source-backed Primary Action.")
-    battlefield_state = state.battlefield_state
+    battlefield_state = boundary_state.battlefield_state
     if battlefield_state is None:
         raise GameLifecycleError("Start evidence requires battlefield_state.")
-    phase = _current_phase(state)
+    phase = _current_phase(boundary_state)
     options = (
         mission_action_opportunity_options(
-            state=state,
+            state=boundary_state,
             player_id=player_id,
-            runtime_modifier_registry=runtime_modifier_registry,
+            runtime_modifier_registry=boundary_registry,
         )
         if opportunity
         else mission_action_start_options(
-            state=state,
+            state=boundary_state,
             player_id=player_id,
             action=action,
-            runtime_modifier_registry=runtime_modifier_registry,
+            runtime_modifier_registry=boundary_registry,
         )
     )
     matching = tuple(
@@ -272,9 +294,9 @@ def primary_mission_action_start_evidence_for_selection(
     action_option_ids = [option.option_id() for option in options]
     if opportunity:
         request_payload: dict[str, JsonValue] = {
-            "game_id": state.game_id,
+            "game_id": boundary_state.game_id,
             "player_id": player_id,
-            "battle_round": state.battle_round,
+            "battle_round": boundary_state.battle_round,
             "phase": phase.value,
             "mission_action_opportunity": True,
             "legal_mission_action_ids": cast(
@@ -291,11 +313,11 @@ def primary_mission_action_start_evidence_for_selection(
             *(
                 MissionActionStartAuthorityOptionEvidence(
                     option_id=option.option_id(),
-                    label=option.label(state=state),
+                    label=option.label(state=boundary_state),
                     payload_json=canonical_json_object(
                         {
                             **option.payload(
-                                state=state,
+                                state=boundary_state,
                                 player_id=player_id,
                                 phase=phase,
                             ),
@@ -311,9 +333,9 @@ def primary_mission_action_start_evidence_for_selection(
                 label="Continue to shooting",
                 payload_json=canonical_json_object(
                     {
-                        "game_id": state.game_id,
+                        "game_id": boundary_state.game_id,
                         "player_id": player_id,
-                        "battle_round": state.battle_round,
+                        "battle_round": boundary_state.battle_round,
                         "phase": phase.value,
                         "mission_action_opportunity": True,
                         "legal_action_option_ids": action_option_ids,
@@ -323,9 +345,9 @@ def primary_mission_action_start_evidence_for_selection(
         )
     else:
         request_payload = {
-            "game_id": state.game_id,
+            "game_id": boundary_state.game_id,
             "player_id": player_id,
-            "battle_round": state.battle_round,
+            "battle_round": boundary_state.battle_round,
             "phase": phase.value,
             "mission_action_id": action.mission_action_id,
             "legal_option_ids": cast(list[JsonValue], action_option_ids),
@@ -333,10 +355,10 @@ def primary_mission_action_start_evidence_for_selection(
         authority_options = tuple(
             MissionActionStartAuthorityOptionEvidence(
                 option_id=option.option_id(),
-                label=option.label(state=state),
+                label=option.label(state=boundary_state),
                 payload_json=canonical_json_object(
                     option.payload(
-                        state=state,
+                        state=boundary_state,
                         player_id=player_id,
                         phase=phase,
                     )
@@ -355,7 +377,7 @@ def primary_mission_action_start_evidence_for_selection(
         terrain_model_inventory=(),
     )
     return capture_primary_mission_action_start_evidence(
-        state=state,
+        state=boundary_state,
         player_id=player_id,
         action=action,
         policy=mission_action_policy_for_id(action.mission_action_id),
@@ -364,7 +386,11 @@ def primary_mission_action_start_evidence_for_selection(
         condition_target_id=condition_target_id,
         eligible_unit_instance_ids=matching[0].eligible_unit_instance_ids,
         start_authority=start_authority,
-        runtime_modifier_registry=runtime_modifier_registry,
+        boundary_checkpoint=boundary_checkpoint,
+        boundary_terrain_model_inventory=terrain_model_inventory_from_checkpoint(
+            boundary_checkpoint_evidence
+        ),
+        runtime_modifier_registry=boundary_registry,
     )
 
 

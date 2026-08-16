@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
+    MissionActionStartAuthorityEvidence,
     PrimaryMissionActionStartEvidence,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
@@ -25,26 +26,96 @@ def validate_recomputed_primary_mission_action_request_authority(
 ) -> None:
     """Require the stored request and every option to match the start boundary."""
 
+    _validate_recomputed_request_authority(
+        state=state,
+        player_id=evidence.player_id,
+        battle_round=evidence.battle_round,
+        authority=evidence.start_authority,
+        selected_mission_action_id=evidence.mission_action_id,
+        runtime_modifier_registry=None,
+    )
+
+
+def validate_recomputed_primary_mission_action_opportunity_authority(
+    *,
+    state: GameState,
+    player_id: str,
+    battle_round: int,
+    authority: MissionActionStartAuthorityEvidence,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+) -> None:
+    if authority.request_kind != "opportunity":
+        raise GameLifecycleError(
+            "Primary Mission Action opportunity authority request kind drifted."
+        )
+    _validate_recomputed_request_authority(
+        state=state,
+        player_id=player_id,
+        battle_round=battle_round,
+        authority=authority,
+        selected_mission_action_id=None,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+
+
+def validate_recomputed_primary_mission_action_direct_authority(
+    *,
+    state: GameState,
+    player_id: str,
+    battle_round: int,
+    mission_action_id: str,
+    authority: MissionActionStartAuthorityEvidence,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+) -> None:
+    """Recompute one direct Action request without recording another request."""
+
+    if authority.request_kind != "direct":
+        raise GameLifecycleError("Primary Mission Action direct authority request kind drifted.")
+    _validate_recomputed_request_authority(
+        state=state,
+        player_id=player_id,
+        battle_round=battle_round,
+        authority=authority,
+        selected_mission_action_id=mission_action_id,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+
+
+def _validate_recomputed_request_authority(
+    *,
+    state: GameState,
+    player_id: str,
+    battle_round: int,
+    authority: MissionActionStartAuthorityEvidence,
+    selected_mission_action_id: str | None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None,
+) -> None:
+
     from warhammer40k_core.engine.mission_action_options import (
         mission_action_for_state,
         mission_action_opportunity_options,
         mission_action_start_options,
     )
 
-    authority = evidence.start_authority
     phase = BattlePhase.SHOOTING
-    registry = RuntimeModifierRegistry.empty()
+    registry = (
+        RuntimeModifierRegistry.empty()
+        if runtime_modifier_registry is None
+        else runtime_modifier_registry
+    )
+    if type(registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError("Primary Mission Action request authority requires modifiers.")
     if authority.request_kind == "opportunity":
         options = mission_action_opportunity_options(
             state=state,
-            player_id=evidence.player_id,
+            player_id=player_id,
             runtime_modifier_registry=registry,
         )
         action_option_ids = [option.option_id() for option in options]
         expected_request: dict[str, object] = {
             "game_id": state.game_id,
-            "player_id": evidence.player_id,
-            "battle_round": evidence.battle_round,
+            "player_id": player_id,
+            "battle_round": battle_round,
             "phase": phase.value,
             "mission_action_opportunity": True,
             "legal_mission_action_ids": cast(
@@ -62,7 +133,7 @@ def validate_recomputed_primary_mission_action_request_authority(
                 _option_authority_row(
                     option=option,
                     state=state,
-                    player_id=evidence.player_id,
+                    player_id=player_id,
                     phase=phase,
                     opportunity_action_option_ids=action_option_ids,
                 )
@@ -74,8 +145,8 @@ def validate_recomputed_primary_mission_action_request_authority(
                 _canonical_json(
                     {
                         "game_id": state.game_id,
-                        "player_id": evidence.player_id,
-                        "battle_round": evidence.battle_round,
+                        "player_id": player_id,
+                        "battle_round": battle_round,
                         "phase": phase.value,
                         "mission_action_opportunity": True,
                         "legal_action_option_ids": action_option_ids,
@@ -84,30 +155,34 @@ def validate_recomputed_primary_mission_action_request_authority(
             ),
         )
     elif authority.request_kind == "direct":
+        if selected_mission_action_id is None:
+            raise GameLifecycleError(
+                "Primary Mission Action direct authority lacks selected Action identity."
+            )
         action = mission_action_for_state(
             state=state,
-            mission_action_id=evidence.mission_action_id,
+            mission_action_id=selected_mission_action_id,
         )
         options = mission_action_start_options(
             state=state,
-            player_id=evidence.player_id,
+            player_id=player_id,
             action=action,
             runtime_modifier_registry=registry,
         )
         action_option_ids = [option.option_id() for option in options]
         expected_request = {
             "game_id": state.game_id,
-            "player_id": evidence.player_id,
-            "battle_round": evidence.battle_round,
+            "player_id": player_id,
+            "battle_round": battle_round,
             "phase": phase.value,
-            "mission_action_id": evidence.mission_action_id,
+            "mission_action_id": selected_mission_action_id,
             "legal_option_ids": cast(list[JsonValue], action_option_ids),
         }
         expected_options = tuple(
             _option_authority_row(
                 option=option,
                 state=state,
-                player_id=evidence.player_id,
+                player_id=player_id,
                 phase=phase,
                 opportunity_action_option_ids=None,
             )
@@ -153,4 +228,8 @@ def _canonical_json(value: object) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
 
 
-__all__ = ("validate_recomputed_primary_mission_action_request_authority",)
+__all__ = (
+    "validate_recomputed_primary_mission_action_direct_authority",
+    "validate_recomputed_primary_mission_action_opportunity_authority",
+    "validate_recomputed_primary_mission_action_request_authority",
+)

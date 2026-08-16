@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from itertools import combinations
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.actions import MissionActionState
@@ -47,12 +47,21 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.primary_mission_action_decline_integrity import (
+    apply_mission_action_opportunity_decline_mutation,
+)
 from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
     PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY,
     PRIMARY_MISSION_ACTION_START_EVIDENCE_KEY,
 )
 from warhammer40k_core.engine.primary_mission_action_lifecycle_policy import (
     capture_primary_mission_action_completion_evidence,
+)
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
+    primary_mission_boundary_checkpoint_for_request,
+    record_primary_mission_boundary_checkpoint,
+    validate_primary_mission_action_request_checkpoint,
+    validate_primary_mission_boundary_checkpoint_modifier_sources,
 )
 from warhammer40k_core.engine.primary_mission_choices import (
     SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
@@ -69,6 +78,11 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
     VictoryPointTransaction,
 )
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+    from warhammer40k_core.engine.faction_rule_execution import FactionRuleExecutionRegistry
+    from warhammer40k_core.engine.runtime_rule_ir_authority import RuntimeRuleIRAuthorityIndex
 
 TACTICAL_SECONDARY_SCORE_DECISION_TYPE = "score_tactical_secondary_mission"
 TACTICAL_SECONDARY_DISCARD_DECISION_TYPE = "discard_tactical_secondary_mission"
@@ -199,6 +213,13 @@ def request_mission_action_opportunity(
                 },
             ),
         ),
+    )
+    record_primary_mission_boundary_checkpoint(
+        state=state,
+        event_log=decisions.event_log,
+        boundary_kind="action_request",
+        player_id=requested_player,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     decisions.request_decision(request)
     return LifecycleStatus.waiting_for_decision(
@@ -483,6 +504,13 @@ def request_mission_action_start(
             for option in options
         ),
     )
+    record_primary_mission_boundary_checkpoint(
+        state=state,
+        event_log=decisions.event_log,
+        boundary_kind="action_request",
+        player_id=requested_player,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
     decisions.request_decision(request)
     return LifecycleStatus.waiting_for_decision(
         stage=state.stage,
@@ -718,6 +746,9 @@ def apply_mission_decision(
     result: DecisionResult,
     decisions: DecisionController,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    rule_ir_authority_index: RuntimeRuleIRAuthorityIndex | None = None,
+    faction_rule_execution_registry: FactionRuleExecutionRegistry | None = None,
+    runtime_content_activation: RuntimeContentActivation | None = None,
 ) -> None:
     _require_runtime_modifier_registry(runtime_modifier_registry)
     if result.decision_type == SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE:
@@ -738,11 +769,15 @@ def apply_mission_decision(
         return
     if result.decision_type == START_MISSION_ACTION_DECISION_TYPE:
         if result.selected_option_id == DECLINE_MISSION_ACTION_START_OPTION_ID:
-            _apply_mission_action_opportunity_decline(
+            apply_mission_action_opportunity_decline_mutation(
                 state=state,
+                request=request,
                 result=result,
                 decisions=decisions,
                 runtime_modifier_registry=runtime_modifier_registry,
+                rule_ir_authority_index=rule_ir_authority_index,
+                faction_rule_execution_registry=faction_rule_execution_registry,
+                runtime_content_activation=runtime_content_activation,
             )
             return
         _apply_start_mission_action(
@@ -750,6 +785,9 @@ def apply_mission_decision(
             result=result,
             decisions=decisions,
             runtime_modifier_registry=runtime_modifier_registry,
+            rule_ir_authority_index=rule_ir_authority_index,
+            faction_rule_execution_registry=faction_rule_execution_registry,
+            runtime_content_activation=runtime_content_activation,
         )
         return
     raise GameLifecycleError("Mission decision handler received unsupported decision_type.")
@@ -889,6 +927,9 @@ def _apply_start_mission_action(
     result: DecisionResult,
     decisions: DecisionController,
     runtime_modifier_registry: RuntimeModifierRegistry,
+    rule_ir_authority_index: RuntimeRuleIRAuthorityIndex | None,
+    faction_rule_execution_registry: FactionRuleExecutionRegistry | None,
+    runtime_content_activation: RuntimeContentActivation | None,
 ) -> None:
     _assert_battle_state(state)
     _require_runtime_modifier_registry(runtime_modifier_registry)
@@ -912,8 +953,34 @@ def _apply_start_mission_action(
         if mission_action.mission_action_id in _PRIMARY_MISSION_ACTION_IDS
         else None
     )
-    start_evidence = (
-        _primary_start_evidence(
+    if primary_policy is None:
+        start_evidence = None
+    else:
+        boundary_checkpoint, _checkpoint, _checkpoint_index = (
+            primary_mission_boundary_checkpoint_for_request(
+                event_records=decisions.event_log.records,
+                request_id=result.request_id,
+            )
+        )
+        validate_primary_mission_action_request_checkpoint(
+            state=state,
+            event_records=decisions.event_log.records,
+            decision_records=decisions.records,
+            request_id=result.request_id,
+            reference=boundary_checkpoint,
+            player_id=player_id,
+            battle_round=state.battle_round,
+            phase=_current_phase(state).value,
+            rule_ir_authority_index=rule_ir_authority_index,
+            faction_rule_execution_registry=faction_rule_execution_registry,
+            runtime_content_activation=runtime_content_activation,
+        )
+        validate_primary_mission_boundary_checkpoint_modifier_sources(
+            state=state,
+            checkpoint=_checkpoint,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
+        start_evidence = _primary_start_evidence(
             state=state,
             player_id=player_id,
             action=mission_action,
@@ -922,11 +989,10 @@ def _apply_start_mission_action(
             condition_target_id=condition_target_id,
             opportunity=payload.get("mission_action_opportunity") is True,
             decline_option_id=DECLINE_MISSION_ACTION_START_OPTION_ID,
+            boundary_checkpoint=boundary_checkpoint,
+            boundary_checkpoint_evidence=_checkpoint,
             runtime_modifier_registry=runtime_modifier_registry,
         )
-        if primary_policy is not None
-        else None
-    )
     eligible_unit_instance_ids = (
         tuple(_payload_string_list(payload, key="eligible_unit_instance_ids"))
         if start_evidence is None
@@ -1040,49 +1106,12 @@ def _apply_start_mission_action(
             policy=primary_policy,
             completed_phase=_current_phase(state),
             objective_control_record=None,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
         completion_event_payload[PRIMARY_MISSION_ACTION_COMPLETION_EVIDENCE_KEY] = (
             completion_evidence.to_payload()
         )
     decisions.event_log.append("mission_action_completed", completion_event_payload)
-
-
-def _apply_mission_action_opportunity_decline(
-    *,
-    state: GameState,
-    result: DecisionResult,
-    decisions: DecisionController,
-    runtime_modifier_registry: RuntimeModifierRegistry,
-) -> None:
-    _assert_battle_state(state)
-    payload = _payload_object(result.payload)
-    player_id = _payload_string(payload, key="player_id")
-    _validate_decision_context(state=state, payload=payload, player_id=player_id, result=result)
-    if not _payload_bool(payload, key="mission_action_opportunity"):
-        raise GameLifecycleError("Mission Action decline requires an opportunity payload.")
-    drift_reason = _mission_action_opportunity_drift_reason(
-        state=state,
-        payload=payload,
-        player_id=player_id,
-        runtime_modifier_registry=runtime_modifier_registry,
-    )
-    if drift_reason is not None:
-        raise GameLifecycleError(f"Mission Action opportunity drifted: {drift_reason}.")
-    shooting_state = state.shooting_phase_state
-    if shooting_state is None:
-        raise GameLifecycleError("Mission Action decline requires ShootingPhaseState.")
-    state.replace_shooting_phase_state(shooting_state.with_mission_action_opportunity_declined())
-    decisions.event_log.append(
-        "mission_action_opportunity_declined",
-        {
-            "game_id": state.game_id,
-            "player_id": player_id,
-            "battle_round": state.battle_round,
-            "phase": _current_phase(state).value,
-            "request_id": result.request_id,
-            "result_id": result.result_id,
-        },
-    )
 
 
 def _active_tactical_secondary_cards(
