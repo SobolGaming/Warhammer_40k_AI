@@ -6,6 +6,7 @@ from typing import cast
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegion, BattlefieldRegionKind
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import primary_scoring_state_evidence as _state_evidence
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.objective_control import (
@@ -31,15 +32,18 @@ SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS = frozenset(
     {
         "control_central_and_expansion_objectives",
         "control_enemy_home_objective",
+        "control_four_or_more_objectives_end_of_battle",
         "control_more_objectives_than_opponent_first_and_second_battle_round",
         "control_more_objectives_than_opponent_from_battle_round_two",
         "control_one_or_more_central_objectives",
         "control_one_or_more_central_objectives_end_of_battle",
+        "control_one_or_more_central_objectives_first_battle_round",
         "control_one_or_more_new_non_home_objectives",
         "control_one_or_more_non_home_objectives_from_battle_round_two",
         "control_opponent_home_objective",
         "control_opponent_home_objective_end_of_battle",
         "control_three_or_more_objectives",
+        "control_three_or_more_objectives_from_battle_round_two",
         "control_two_or_more_objectives_from_battle_round_two",
         "each_controlled_objective",
         "each_controlled_objective_from_battle_round_two",
@@ -57,6 +61,7 @@ SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS = frozenset(
         "four_or_more_friendly_units_wholly_within_four_different_table_quarters_not_within_six_of_center",
         "more_enemy_units_destroyed_than_friendly_previous_turn",
         "no_enemy_units_wholly_within_own_territory_end_of_battle",
+        "one_or_more_controlled_non_home_objectives_is_central_objective",
         "one_or_more_enemy_units_destroyed_by_friendly_unit_on_objective_this_turn",
         "one_or_more_enemy_units_destroyed_this_turn",
         "one_or_more_enemy_units_started_turn_within_central_objective_range_destroyed_this_turn",
@@ -82,6 +87,7 @@ class PrimaryScoringConditionContext:
     player_id: str
     turn_start_controlled_objective_ids: tuple[str, ...] | None = None
     destruction_evidence: tuple[PrimaryUnitDestructionEvidence, ...] = ()
+    state_evidence: _state_evidence.PrimaryScoringStateEvidence | None = None
     spatial_evidence: PrimaryScoringSpatialEvidence | None = None
     end_of_battle: bool = False
 
@@ -168,6 +174,14 @@ class PrimaryScoringConditionContext:
                 raise GameLifecycleError(
                     "Primary scoring condition spatial evidence context drift."
                 )
+        if self.state_evidence is not None:
+            _state_evidence.validate_primary_scoring_state_evidence_context(
+                self.state_evidence,
+                mission_setup=self.mission_setup,
+                turn_order=ordered_players,
+                record=self.record,
+                end_of_battle=self.end_of_battle,
+            )
         _validate_objective_control_record(
             record=self.record,
             mission_setup=self.mission_setup,
@@ -243,6 +257,13 @@ def evaluate_primary_scoring_condition(
             objective.central_ids,
         )
         return _binary_objective_evidence(controlled_central_ids)
+    if condition_id == "control_one_or_more_central_objectives_first_battle_round":
+        controlled_central_ids = (
+            _intersection(objective.controlled_ids, objective.central_ids)
+            if record.battle_round == 1
+            else ()
+        )
+        return _binary_objective_evidence(controlled_central_ids)
     if condition_id == "control_one_or_more_central_objectives_end_of_battle":
         controlled_central_ids = (
             _intersection(objective.controlled_ids, objective.central_ids)
@@ -250,6 +271,12 @@ def evaluate_primary_scoring_condition(
             else ()
         )
         return _binary_objective_evidence(controlled_central_ids)
+    if condition_id == "one_or_more_controlled_non_home_objectives_is_central_objective":
+        controlled_non_home_central_ids = _intersection(
+            objective.non_home_ids,
+            objective.central_ids,
+        )
+        return _non_home_binary_evidence(objective, controlled_non_home_central_ids)
     if condition_id == "each_non_home_objective_controlled_battle_rounds_two_to_four":
         matching = objective.non_home_ids if 2 <= record.battle_round <= 4 else ()
         return _non_home_count_evidence(objective, matching)
@@ -366,9 +393,15 @@ def evaluate_primary_scoring_condition(
         return evidence
     if condition_id == "control_three_or_more_objectives":
         return _threshold_objective_evidence(objective.controlled_ids, threshold=3)
+    if condition_id == "control_three_or_more_objectives_from_battle_round_two":
+        controlled_ids = objective.controlled_ids if record.battle_round >= 2 else ()
+        return _threshold_objective_evidence(controlled_ids, threshold=3)
     if condition_id == "control_two_or_more_objectives_from_battle_round_two":
         controlled_ids = objective.controlled_ids if record.battle_round >= 2 else ()
         return _threshold_objective_evidence(controlled_ids, threshold=2)
+    if condition_id == "control_four_or_more_objectives_end_of_battle":
+        controlled_ids = objective.controlled_ids if context.end_of_battle else ()
+        return _threshold_objective_evidence(controlled_ids, threshold=4)
     if condition_id == "each_non_home_objective_controlled_first_battle_round":
         matching = objective.non_home_ids if record.battle_round == 1 else ()
         return _non_home_count_evidence(objective, matching)

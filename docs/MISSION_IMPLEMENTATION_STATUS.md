@@ -74,6 +74,25 @@ Secondary status:
   `surveil-enemy-unit`, `sensor-sweep-locate-and-deny`,
   `sensor-sweep-extract-relic`, `commit-sabotage`, `secure-asset`,
   `vanguard-operation`, and `maintain-control`.
+- Phase 17N Step 5A routes every ordinary and end-of-battle Primary scoring
+  boundary through the shared `score_primary_objective_control_boundary` path
+  and immutable, content-addressed `PrimaryScoringStateEvidence`. The bridge
+  authenticates the stored objective-control record and carries Primary
+  mission progress, assigned Primary Action history, battlefield-departure
+  history, exact frozen unit-destruction history membership, and current
+  group-aware rules-unit positions with replay-safe hash and context validation.
+  The aggregate derives all historical and spatial
+  inputs from authoritative `GameState`; award-bearing evidence is persisted
+  by objective-control record and ordinary/end-of-battle boundary kind, and
+  live or restored Primary VP rows must resolve their ID/hash to that registry.
+  Restore proves the frozen Action, progress, departure, destruction-history,
+  and component sets are complete against authoritative history, rejects future/stale chronology and
+  non-final end-of-battle claims, and keeps full rows replay-only rather than in
+  viewer-scoped projections.
+  It also implements four simple source-backed objective predicates without
+  promoting any of the 12 condition-pending missions. Counts remain 13/12
+  missions and 6/15 pairings (18/45 variants), with no pairing certification
+  claimed.
 - Runtime Mission Actions: 14 total. The ten Step 4 Primary Actions join Death
   Trap's `booby-trap-terrain`, Terraform's `terraform-objective`, Cleanse's
   `cleanse-objective`, and Plunder's `plunder-terrain`. They are automatically
@@ -209,7 +228,7 @@ Secondary status:
   timing string is insufficient. The same validator runs for live awards and
   restored ledgers, including ordinary per-round Primary-total validation. The
   derived Event Companion source identity is
-  `68d2214fdd1b3e2e1cc1e97e9b50e959a52acce03d1706c3fda5535fd5bc4d48`.
+  `c724fad0b3bf86f04abcc673b06f5e3829849177de99e9f8ad71a6430c142fd4`.
 - Verify that the committed battlefield artifact still matches its reviewed
   inputs without writing files with
   `uv run python tools/build_event_companion_battlefields.py --check`.
@@ -219,7 +238,8 @@ Secondary status:
   turn-history evidence. Purge and Secure is the thirteenth executable Primary,
   backed by objective-at-turn-start destruction history and exact-kill
   friendly-source objective occupancy. The other 12 missions remain fail-closed
-  until their listed choices, marker state, actions, or conditions exist.
+  until their listed card-specific scoring conditions have engine-owned
+  evidence and validation.
   Battlefield pages are authority for layout facts, not mission-card scoring
   clauses.
 - Component source-image placement and orientation come from reviewed
@@ -280,12 +300,12 @@ five-battle-round game, as configured by the current Event Companion package.
 | `disruption` | `disruption` | Outmanoeuvre | `primary-outmaneuver` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `disruption` | `reconnaissance` | Smoke and Mirrors | `primary-smoke-and-mirrors` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_condition:decoy_objective_scoring`, `engine_primary_condition:opponent_territory_objective_bonus` |
 | `disruption` | `priority-assets` | Locate and Deny | `primary-locate-and-deny` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_condition:single_friendly_operation_marker_terrain_area_state` |
-| `reconnaissance` | `purge-the-foe` | Triangulation | `primary-triangulation` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_condition:triangulated_objective_thresholds`, `engine_primary_condition:control_four_or_more_objectives` |
+| `reconnaissance` | `purge-the-foe` | Triangulation | `primary-triangulation` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_condition:triangulated_objective_thresholds` |
 | `reconnaissance` | `take-and-hold` | Reconnaissance Sweep | `primary-reconnaissance-sweep` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `reconnaissance` | `disruption` | Surveil the Foe | `primary-surveil-the-foe` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_condition:enemy_unit_surveilled_marker_exception`, `engine_primary_condition:no_enemy_operation_markers_on_battlefield` |
-| `reconnaissance` | `reconnaissance` | Gather Intel | `primary-gather-intel` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_condition:control_one_or_more_central_objectives_first_battle_round`, `engine_primary_condition:each_friendly_unit_extracted_intelligence_this_turn`, `engine_primary_condition:gather_intel_operation_marker_end_of_battle` |
+| `reconnaissance` | `reconnaissance` | Gather Intel | `primary-gather-intel` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_condition:each_friendly_unit_extracted_intelligence_this_turn`, `engine_primary_condition:gather_intel_operation_marker_end_of_battle` |
 | `reconnaissance` | `priority-assets` | Search and Scour | `primary-search-and-scour` | `implemented` | `engine_implemented` | 4 | 0 | None |
-| `priority-assets` | `purge-the-foe` | Vital Link | `primary-vital-link` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_condition:central_objective_operation_marker_bonus`, `engine_primary_condition:controlled_central_objective_bonus` |
+| `priority-assets` | `purge-the-foe` | Vital Link | `primary-vital-link` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_condition:central_objective_operation_marker_bonus` |
 | `priority-assets` | `take-and-hold` | Secure Asset | `primary-secure-asset` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_condition:friendly_unit_secured_asset_this_turn` |
 | `priority-assets` | `disruption` | Extract Relic | `primary-extract-relic` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_condition:friendly_unit_performed_sensor_sweep_this_turn`, `engine_primary_condition:single_opponent_operation_marker_terrain_area_state` |
 | `priority-assets` | `reconnaissance` | Vanguard Operation | `primary-vanguard-operation` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn`, `engine_primary_condition:enemy_territory_terrain_area_control` |
@@ -393,9 +413,11 @@ five-battle-round game, as configured by the current Event Companion package.
   evidence. Step 4 also supplies the finite condemned-unit and marker-setup
   choices and Surveil the Foe's engine-owned move cleanup for enemy operation
   markers.
-- Pairing-wide normal-lifecycle, replay, and viewer-scoped projection
-  certification remains Phase 17N Step 5; Step 4 does not promote the 12
-  condition-pending cards or claim complete pairing certification.
+- Step 5A's scoring-state bridge and four simple objective predicates are
+  complete. Pairing-wide normal-lifecycle, replay, and viewer-scoped projection
+  certification remains later Phase 17N Step 5 work; neither Step 4 nor Step 5A
+  promotes the 12 condition-pending cards or claims complete pairing
+  certification.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,
   tactical draw, scoring, retain/discard, Fixed card states that remain active
   after scoring, the 20 VP per Fixed Mission card cap, state-backed awards, and

@@ -47,12 +47,20 @@ from warhammer40k_core.engine.primary_destruction_evidence import (
     destruction_source_objective_proximity_witness,
     rules_unit_objective_proximity_witness,
 )
+from warhammer40k_core.engine.primary_mission_state import PrimaryMissionProgressState
 from warhammer40k_core.engine.primary_scoring_resolution import (
     PrimaryScoringResolutionCandidate,
     PrimaryScoringResolutionMode,
     ResolvedPrimaryScoringCandidate,
     primary_scoring_resolution_mode_from_token,
     resolve_primary_scoring_candidates,
+)
+from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
+    objective_control_record_hash,
+)
+from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    PrimaryScoringBoundaryKind,
+    PrimaryScoringStateEvidence,
 )
 from warhammer40k_core.engine.primary_scoring_timing import (
     SUPPORTED_PRIMARY_SCORING_TIMINGS,
@@ -83,6 +91,9 @@ from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     record_primary_unit_destructions_for_end_turn_cleanup,
     validate_primary_unit_destruction_source_witness_identity,
     validate_primary_unit_destruction_states,
+)
+from warhammer40k_core.engine.primary_victory_point_policy import (
+    validate_victory_point_ledger_policy,
 )
 from warhammer40k_core.engine.scoring import (
     MissionScoringPolicy,
@@ -505,6 +516,7 @@ def test_phase17n_cumulative_primary_awards_share_the_source_backed_round_cap() 
             ),
         ),
     )
+    state_evidence = _test_primary_state_evidence(record=record, end_of_battle=False)
     ledger = VictoryPointLedger.initial(player_id="player-a")
     transactions: list[VictoryPointTransaction] = []
     for result in resolved:
@@ -524,6 +536,8 @@ def test_phase17n_cumulative_primary_awards_share_the_source_backed_round_cap() 
             metadata={
                 **result.metadata(),
                 "objective_control_record_id": record.record_id,
+                "primary_scoring_state_evidence_id": state_evidence.evidence_id,
+                "primary_scoring_state_evidence_hash": state_evidence.evidence_hash,
                 "score_count": result.candidate.amount // rule.victory_points,
                 "scoring_rule_condition": rule.condition,
                 "scoring_rule_id": rule.rule_id,
@@ -535,6 +549,7 @@ def test_phase17n_cumulative_primary_awards_share_the_source_backed_round_cap() 
             ledger=ledger,
             award=award,
             objective_control_records=(record,),
+            primary_scoring_state_evidence_records=(state_evidence,),
             turn_order=("player-a", "player-b"),
             current_active_player_id="player-a",
         )
@@ -563,6 +578,15 @@ def test_phase17n_cumulative_primary_awards_share_the_source_backed_round_cap() 
         "primary_battle_round_points_before": 12,
         "primary_battle_round_points_after": 15,
     }
+    assert validate_victory_point_ledger_policy(
+        policy=policy,
+        ledger=ledger,
+        objective_control_records=(record,),
+        primary_scoring_state_evidence_records=(state_evidence,),
+        turn_order=("player-a", "player-b"),
+    ).primary_binding_identities == frozenset(
+        (record.record_id, result.candidate.rule_id) for result in resolved
+    )
 
 
 def test_phase17n_round_two_primary_cannot_impersonate_end_of_battle_scoring() -> None:
@@ -590,6 +614,7 @@ def test_phase17n_round_two_primary_cannot_impersonate_end_of_battle_scoring() -
             ),
         ),
     )
+    state_evidence = _test_primary_state_evidence(record=record, end_of_battle=True)
     award = VictoryPointAward(
         player_id="player-a",
         battle_round=2,
@@ -600,6 +625,8 @@ def test_phase17n_round_two_primary_cannot_impersonate_end_of_battle_scoring() -
         scoring_timing="end_of_battle",
         metadata={
             "objective_control_record_id": record.record_id,
+            "primary_scoring_state_evidence_id": state_evidence.evidence_id,
+            "primary_scoring_state_evidence_hash": state_evidence.evidence_hash,
             "score_count": 1,
             "scoring_rule_condition": rule.condition,
             "scoring_rule_id": rule.rule_id,
@@ -613,6 +640,7 @@ def test_phase17n_round_two_primary_cannot_impersonate_end_of_battle_scoring() -
             ledger=VictoryPointLedger.initial(player_id="player-a"),
             award=award,
             objective_control_records=(record,),
+            primary_scoring_state_evidence_records=(state_evidence,),
             turn_order=("player-a", "player-b"),
             current_active_player_id="player-b",
         )
@@ -2199,6 +2227,34 @@ def _runtime_policy(
         end_of_round_scoring_windows=("end-of-round",),
         end_of_game_scoring_windows=("end-of-game",),
         source_id="source:mission-policy",
+    )
+
+
+def _test_primary_state_evidence(
+    *,
+    record: ObjectiveControlRecord,
+    end_of_battle: bool,
+) -> PrimaryScoringStateEvidence:
+    return PrimaryScoringStateEvidence.create(
+        game_id=record.game_id,
+        battlefield_id=record.battlefield_id,
+        battle_round=record.battle_round,
+        active_player_id=record.active_player_id,
+        phase=record.phase,
+        timing=record.timing,
+        scoring_boundary_kind=(
+            PrimaryScoringBoundaryKind.END_OF_BATTLE
+            if end_of_battle
+            else PrimaryScoringBoundaryKind.ORDINARY
+        ),
+        objective_control_record_id=record.record_id,
+        objective_control_record_hash=objective_control_record_hash(record),
+        primary_mission_progress_state=PrimaryMissionProgressState.empty(),
+        primary_mission_action_states=(),
+        primary_battlefield_departure_states=(),
+        primary_unit_destruction_state_ids=(),
+        current_rules_unit_position_witnesses=(),
+        primary_scoring_spatial_evidence_by_player_id=(),
     )
 
 

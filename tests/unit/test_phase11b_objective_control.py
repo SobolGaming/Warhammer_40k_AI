@@ -826,11 +826,12 @@ def test_objective_control_payloads_round_trip_without_object_reprs() -> None:
         player_a_offsets=((2.0, 0.0),),
         player_b_offsets=((-2.0, 0.0),),
     )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
     record = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
             state,
             timing=ObjectiveControlTiming.PHASE_END,
-            phase=BattlePhase.COMMAND,
+            phase=BattlePhase.MOVEMENT,
         )
     )
     state.record_objective_control_record(record)

@@ -20,9 +20,8 @@ from warhammer40k_core.engine import lifecycle_state_queries as _lsq
 from warhammer40k_core.engine import movement_phase_end_mortal_wounds as _movement_mw
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
 from warhammer40k_core.engine import primary_historical_event_integrity as _phei
-from warhammer40k_core.engine import primary_mission_action_integrity as _pmai
-from warhammer40k_core.engine import primary_mission_boundary_checkpoint as _pmbc
 from warhammer40k_core.engine import primary_mission_pending_request_integrity as _pmpri
+from warhammer40k_core.engine import primary_mission_restore_integrity as _pmri
 from warhammer40k_core.engine import primary_mission_state_validation as _pmsv
 from warhammer40k_core.engine import primary_reserve_entry_lifecycle_integrity as _preli
 from warhammer40k_core.engine import primary_reserve_entry_state_integrity as _presi
@@ -947,23 +946,11 @@ class GameLifecycle:
         runtime_content_activation = (
             None if refreshed_bundle is None else refreshed_bundle.activation
         )
-        _pmai.validate_primary_mission_action_integrity(
+        _pmri.validate_primary_mission_restore_integrity(
             state=lifecycle._require_state(),
-            event_records=lifecycle.decision_controller.event_log.records,
-            decision_records=lifecycle.decision_controller.records,
-            rule_ir_authority_index=rule_ir_authority_index,
-            faction_rule_execution_registry=faction_rule_execution_registry,
-            runtime_content_activation=runtime_content_activation,
-        )
-        _pmbc.validate_primary_mission_boundary_checkpoint_source_registry(
-            state=lifecycle._require_state(),
-            event_records=lifecycle.decision_controller.event_log.records,
-            decision_records=lifecycle.decision_controller.records,
-            pending_decision_requests=(lifecycle.decision_controller.queue.pending_requests),
+            decisions=lifecycle.decision_controller,
             runtime_modifier_registry=lifecycle._shooting_phase_handler.runtime_modifier_registry,
-            rule_ir_authority_index=rule_ir_authority_index,
-            faction_rule_execution_registry=faction_rule_execution_registry,
-            runtime_content_activation=runtime_content_activation,
+            runtime_content_bundle=refreshed_bundle,
         )
         _pmpri.validate_primary_mission_pending_request_integrity(
             state=lifecycle._require_state(),

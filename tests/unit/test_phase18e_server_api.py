@@ -297,7 +297,7 @@ def test_phase18e_server_api_smoke_exports_replay_and_schema_valid_payloads() ->
     identities = _field_object(capability_manifest, "identities")
     assert _field_object(identities, "mission_pack")
     assert _field_object(identities, "terrain_layout")
-    assert _field_object(identities, "contract_schema")["contract_version"] == "9.0.0"
+    assert _field_object(identities, "contract_schema")["contract_version"] == "10.0.0"
 
     player_a_support = _request(
         server,
@@ -1021,7 +1021,7 @@ def test_phase18e_command_result_schema_requires_accepted_commands_to_be_committ
     )
     example.pop("command_id")
     example.pop("outcome_code")
-    example["schema_version"] = "session-command-result-v9-contract"
+    example["schema_version"] = "session-command-result-v10-contract"
     for committed, accepted in ((True, True), (True, False), (False, False)):
         payload = {**example, "committed": committed, "accepted": accepted}
         validator.validate(payload)

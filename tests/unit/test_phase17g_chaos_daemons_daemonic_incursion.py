@@ -687,6 +687,50 @@ def test_corrupt_realspace_generic_stratagem_records_sticky_objective_shadow_sta
     assert event_state["objective_id"] == objective_id
 
 
+def test_corrupt_realspace_config_backed_replay_authenticates_current_sticky_state() -> None:
+    lifecycle = _config_backed_corrupt_realspace_lifecycle()
+
+    restored = GameLifecycle.from_payload(deepcopy(lifecycle.to_payload()))
+
+    assert restored.to_payload() == lifecycle.to_payload()
+    assert restored.state is not None
+    assert len(restored.state.sticky_objective_control_states) == 1
+
+
+def test_corrupt_realspace_replay_rejects_coordinated_current_sticky_state_event_forgery() -> None:
+    lifecycle = _config_backed_corrupt_realspace_lifecycle()
+    payload = deepcopy(lifecycle.to_payload())
+    state_payload = cast(dict[str, JsonValue], payload["state"])
+    sticky_states = cast(
+        list[dict[str, JsonValue]],
+        state_payload["sticky_objective_control_states"],
+    )
+    if len(sticky_states) != 1:
+        raise AssertionError("test requires one current Corrupt Realspace sticky state")
+    enemy_unit_id = next(
+        cast(str, unit["unit_instance_id"])
+        for army in cast(list[dict[str, JsonValue]], state_payload["army_definitions"])
+        if army["player_id"] == "player-b"
+        for unit in cast(list[dict[str, JsonValue]], army["units"])
+    )
+    forged_sticky = sticky_states[0]
+    forged_sticky["originating_unit_instance_id"] = enemy_unit_id
+    forged_sticky["destroyed_unit_instance_id"] = enemy_unit_id
+    replay_payload = cast(dict[str, JsonValue], forged_sticky["replay_payload"])
+    replay_payload["target_unit_instance_id"] = enemy_unit_id
+    for event in payload["decisions"]["event_log"]:
+        if event["event_type"] != "generic_stratagem_sticky_objective_control_registered":
+            continue
+        event_payload = cast(dict[str, JsonValue], event["payload"])
+        event_payload["sticky_objective_control_state"] = deepcopy(forged_sticky)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="generic Stratagem sticky source drifted",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
 def test_corrupt_realspace_generic_stratagem_requires_objective_selection() -> None:
     state, _reserve_state, _reserve_unit = _daemonic_incursion_reserve_state()
     definition = _daemonic_stratagem_definition(
@@ -3377,6 +3421,66 @@ def _config_backed_realm_of_chaos_lifecycle(
             phase=BattlePhase.MOVEMENT,
         ),
         context=context,
+    )
+    return GameLifecycle.from_payload(lifecycle.to_payload())
+
+
+def _config_backed_corrupt_realspace_lifecycle() -> GameLifecycle:
+    config = _daemonic_incursion_config(
+        game_id="phase17g-daemonic-incursion-corrupt-realspace-authority"
+    )
+    armies = tuple(
+        muster_army(catalog=config.army_catalog, request=request)
+        for request in config.army_muster_requests
+    )
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase17g-corrupt-realspace-authority-battlefield",
+        armies=armies,
+    )
+    state.record_battlefield_state(scenario.battlefield_state)
+    decisions = DecisionController()
+    enter_battle_for_fixture(state, decisions=decisions)
+    runtime_bundle = build_runtime_content_bundle_for_armies(
+        config=config,
+        armies=armies,
+    )
+    corrupt_records = tuple(
+        record
+        for record in runtime_bundle.stratagem_indexes_by_player_id["player-a"].all_records()
+        if record.definition.stratagem_id == daemonic_incursion_ir.CORRUPT_REALSPACE_STRATAGEM_ID
+    )
+    if len(corrupt_records) != 1:
+        raise AssertionError("test requires one active Corrupt Realspace record")
+    mission_setup = state.mission_setup
+    if mission_setup is None:
+        raise AssertionError("test requires mission setup")
+    definition = corrupt_records[0].definition
+    target_unit_id = armies[0].units[0].unit_instance_id
+    objective_id = mission_setup.objective_markers[0].objective_marker_id
+    lifecycle = GameLifecycle(
+        state=state,
+        decision_controller=decisions,
+        _config=config,
+        _runtime_content_bundle=runtime_bundle,
+    )
+    _apply_daemonic_stratagem(
+        state=state,
+        decisions=decisions,
+        definition=definition,
+        use_record=_daemonic_stratagem_use_record(
+            definition=definition,
+            target_unit_id=target_unit_id,
+            phase=BattlePhase.COMMAND,
+            effect_selection=objective_marker_effect_selection(objective_id),
+        ),
+        context=_daemonic_stratagem_context(
+            state=state,
+            phase=BattlePhase.COMMAND,
+            trigger_kind=TimingTriggerKind.START_PHASE,
+        ),
     )
     return GameLifecycle.from_payload(lifecycle.to_payload())
 

@@ -92,10 +92,14 @@ def record_objective_control_boundary(
     for stored in state.objective_control_records:
         if stored.record_id == record.record_id:
             return stored
+    sticky_witnesses = tuple(state.sticky_objective_control_states)
     retained_record = apply_sticky_objective_control(
         record=record,
-        states=tuple(state.sticky_objective_control_states),
+        states=sticky_witnesses,
+    )
+    state.record_objective_control_record(
+        retained_record,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     state.expire_sticky_objective_control_states(record)
-    state.record_objective_control_record(retained_record)
     return retained_record

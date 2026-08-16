@@ -1,6 +1,6 @@
 # CORE V2 external contract
 
-Contract version: `9.0.0`
+Contract version: `10.0.0`
 
 This directory is the canonical, language-neutral Phase 17O capability and
 Phase 18D contract, Phase 18E session protocol, Phase 18F
@@ -15,15 +15,20 @@ decision-family coverage inventory distinguishes real session-derived
 `live_scenario` examples from `envelope_only` entries; inventory presence alone
 is not an executable-coverage claim.
 
-Contract 9 retains Contract 8's two public, directed
-`primary_mission_assignments` and group-aware Step 3 historical evidence, then
-adds the required public `primary_mission_progress_state`. Its marker,
-condemned-selection, and consecration-designation rows preserve source,
-decision, event, action, destruction, and removal or consumption provenance.
-The new `select_primary_mission_choice` finite family exposes only
-engine-enumerated Primary choices. Projection, decision, lifecycle, event,
-session, and replay payload families were cut over together; there is no
-compatibility alias or inferred Step 4 state for Contract 8 payloads.
+Contract 10 retains Contract 9's public, directed
+`primary_mission_assignments`, group-aware historical evidence, required
+`primary_mission_progress_state`, and engine-enumerated
+`select_primary_mission_choice` finite family. It adds the required
+engine-private `objective_control_record_authorities` and
+`primary_scoring_state_evidence_records` replay state. Each objective-control
+authority binds a record ID/hash to a closed, content-addressed physical
+boundary checkpoint and the exact retained sticky-control witnesses. Each
+content-addressed row freezes the exact ordinary or end-of-battle scoring
+boundary and the authoritative progress, Primary Action/departure history, and
+current group-aware physical memberships and player-scoped spatial-condition
+witnesses that the Primary rules evaluation consumed, whether that boundary
+produced one or more awards or zero awards. There is no
+compatibility alias or inferred empty registry for Contract 9 replays.
 
 The contract describes the same `AdapterGameSession` path used by local UI,
 CLI, headless, replay, and network producers:
@@ -53,7 +58,7 @@ references without inferring rules interactions from `decision_type` or display
 text. Hidden decisions expose `interaction: null` and no nested interaction
 requests. The typed `nested_interaction_requests` field publishes nested choices
 without forcing clients to inspect arbitrary proposal JSON.
-Contract 9 advances the pending-decision and lifecycle-status families to
+Contract 10 retains the pending-decision and lifecycle-status families at
 `decision-request-view-v5-phase17n-step4` and
 `lifecycle-status-v4-phase17n-step4`. Primary Mission finite requests, their
 options, and their waiting statuses are public; existing hidden Declare Battle
@@ -61,9 +66,10 @@ Formations choices retain the shared viewer-redaction boundary.
 The full reconnect wrapper uses `session-projection-v7-phase17n-step4`.
 In-process integer-cursor deltas use `event-delta-v4-phase17n-step4`, while
 authenticated HTTP deltas use `event-delta-v5-phase17n-step4`. Formal session
-metadata, command results, and command outcomes use their `v9-contract`
-families.
-Phase 18J adds the optional `battlefield_view` game-view member. Contract 9
+metadata, command results, and command outcomes use their `v10-contract`
+families because metadata declares the Contract 10 server major. Other session
+and viewer projection families are unchanged.
+Phase 18J adds the optional `battlefield_view` game-view member. Contract 10
 publishes the Step 4 progress additions as
 `game-view-v11-phase17n-step4`; the nested
 `battlefield-view-v4-phase17n-step3` family is unchanged. Roster/datacard
@@ -86,27 +92,55 @@ family as the standalone submission schema; it is not an unrestricted JSON
 value. The generated TypeScript gate constructs and schema-validates every
 published interaction case.
 
-Replay exports use `replay-artifact-v7-phase17n-step4`. Their embedded mission
+Replay exports use `replay-artifact-v8-phase17n-step5a`. Their embedded mission
 setup requires both directed player Primary Mission assignments and explicit
 logical terrain-area identities; their game state requires group-aware
 turn-start position history, typed destruction attribution, and battlefield
 departure evidence plus the complete persistent Primary Mission progress
-state. Runtime import accepts only that exact discriminator; v6 artifacts
-require the retained 8.x deployment and fail with a typed unsupported-version
-error on the 9.x runtime. The runtime never infers a missing directed
+state and the complete `objective_control_record_authorities` and
+`primary_scoring_state_evidence_records` registries. Objective-control
+authorities preserve the exact model presence/placements, resolved Objective
+Control, modifier sources, attached-unit state, phase flags, marker/prior-use
+state, and retained sticky-control provenance for every persisted record.
+Every registry row is closed and typed by the replay schema and binds its
+content hash/ID, ordinary or end-of-battle boundary kind, objective-control
+record identity/hash, Primary progress, qualifying Action/departure history,
+current rules-unit memberships, and frozen per-player table-quarter, territory,
+and opponent-territory-objective evidence. Runtime import accepts only that exact
+discriminator; v7 artifacts require the retained 9.x deployment and fail with
+a typed unsupported-version error on the 10.x runtime. The runtime never
+infers a missing directed
 assignment, grouped position history, destruction source, departure record,
-marker, condemned selection, or consecration designation. Replay source identity
+marker, condemned selection, consecration designation, or scoring-state row.
+Replay source identity
 also binds `mission_pack_id` to the authoritative mission source package hash;
 both fields are non-null when a mission is bound and both are null otherwise.
 Loading rejects a partial pair or any hash drift from the reconstructed
 lifecycle.
 
-The replay JSON Schema owns the stable export envelope, the complete shape of
-the three Step 3 evidence families, and the Step 4 Primary progress state while
-deliberately leaving unrelated engine-private lifecycle fields open. The
+The scoring-state registry is inverse-complete: every Objective Control
+boundary with at least one applicable assigned-Primary rule has exactly one row
+for each required ordinary or end-of-battle boundary kind, including boundaries
+whose evaluation awards zero VP, and every persisted row must map back to one
+such applicable-rule boundary. Awarded transactions must then match the exact
+deterministic re-evaluation; deleting transactions together with their evidence
+cannot make an applicable historical boundary disappear.
+
+The replay JSON Schema owns the stable export envelope, the closed
+objective-control authority/checkpoint graph, the complete shape of
+the three Step 3 evidence families, the Step 4 Primary progress state, and the
+closed Step 5A scoring-state evidence rows while deliberately leaving unrelated
+engine-private lifecycle fields open. The
 fail-closed runtime loader validates the complete lifecycle payload and all
 cross-record/event integrity; schema acceptance alone is not replay
 certification.
+
+The scoring-state evidence registry is deliberately absent from
+`game-view-v11-phase17n-step4` and
+`session-projection-v7-phase17n-step4`. Viewer projections expose public
+mission state and awarded victory-point transactions, not the engine-private
+replay registry; its addition therefore does not change either projection
+family discriminator.
 
 Phase 17O publishes `capability-manifest-v2-directed-primary` inside the
 `support-profile-v4-directed-primary` envelope. It publishes independent

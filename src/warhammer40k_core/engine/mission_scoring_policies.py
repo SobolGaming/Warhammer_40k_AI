@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Self, TypedDict, cast
+from typing import TYPE_CHECKING, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue
@@ -12,15 +12,16 @@ from warhammer40k_core.engine.mission_setup import (
 )
 from warhammer40k_core.engine.objective_control import ObjectiveControlRecord
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
-    PrimaryScoringSpatialEvidence,
+from warhammer40k_core.engine.primary_scoring_history_evidence import (
+    primary_unit_destruction_states_for_evidence,
+)
+from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    PrimaryScoringBoundaryKind,
+    PrimaryScoringStateEvidence,
 )
 from warhammer40k_core.engine.scoring import (
     MissionScoringPolicy,
     MissionScoringPolicyPayload,
-    PrimaryObjectiveTurnStartState,
-    PrimaryTerrainTrapState,
-    PrimaryUnitDestructionState,
     SecondaryObjectiveCleanseState,
     SecondaryTerrainPlunderState,
     SecondaryUnitDestructionState,
@@ -29,6 +30,9 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
 )
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
 
 
 class MissionScoringPoliciesPayload(TypedDict):
@@ -106,28 +110,86 @@ class MissionScoringPolicies:
         self,
         *,
         record: ObjectiveControlRecord,
-        mission_setup: MissionSetup,
-        turn_order: tuple[str, ...],
-        turn_start_states: tuple[PrimaryObjectiveTurnStartState, ...],
-        terrain_trap_states: tuple[PrimaryTerrainTrapState, ...],
-        unit_destruction_states: tuple[PrimaryUnitDestructionState, ...],
-        spatial_evidence_by_player_id: tuple[PrimaryScoringSpatialEvidence, ...] = (),
-        scoring_player_ids: tuple[str, ...] = (),
+        authoritative_state: GameState,
         end_of_battle: bool = False,
     ) -> tuple[VictoryPointAward, ...]:
-        self.validate_mission_setup(mission_setup)
-        player_ids = _validate_scoring_player_ids(
-            scoring_player_ids,
-            policies=self,
-            default_player_id=record.active_player_id,
+        from warhammer40k_core.engine.game_state import GameState
+        from warhammer40k_core.engine.primary_scoring_state_evidence import (
+            build_primary_scoring_state_evidence,
         )
-        if not end_of_battle and player_ids != (record.active_player_id,):
-            raise GameLifecycleError(
-                "Ordinary Primary scoring must use the active player's policy."
+
+        if type(authoritative_state) is not GameState:
+            raise GameLifecycleError("Primary scoring authority requires GameState.")
+        if type(record) is not ObjectiveControlRecord:
+            raise GameLifecycleError("Primary scoring requires an ObjectiveControlRecord.")
+        if type(end_of_battle) is not bool:
+            raise GameLifecycleError("Primary scoring end_of_battle must be a bool.")
+        authoritative_setup = authoritative_state.mission_setup
+        if type(authoritative_setup) is not MissionSetup:
+            raise GameLifecycleError("Primary scoring authority requires MissionSetup.")
+        self.validate_mission_setup(authoritative_setup)
+        state_evidence = build_primary_scoring_state_evidence(
+            state=authoritative_state,
+            record=record,
+            end_of_battle=end_of_battle,
+        )
+        return self.primary_awards_from_state_evidence(
+            record=record,
+            authoritative_state=authoritative_state,
+            state_evidence=state_evidence,
+        )
+
+    def primary_awards_from_state_evidence(
+        self,
+        *,
+        record: ObjectiveControlRecord,
+        authoritative_state: GameState,
+        state_evidence: PrimaryScoringStateEvidence,
+    ) -> tuple[VictoryPointAward, ...]:
+        """Re-evaluate one persisted Primary boundary through the normal policy path."""
+        from warhammer40k_core.engine.game_state import GameState
+
+        if type(authoritative_state) is not GameState:
+            raise GameLifecycleError("Primary scoring authority requires GameState.")
+        if type(record) is not ObjectiveControlRecord:
+            raise GameLifecycleError("Primary scoring requires an ObjectiveControlRecord.")
+        if type(state_evidence) is not PrimaryScoringStateEvidence:
+            raise GameLifecycleError("Primary scoring requires typed state evidence.")
+        authoritative_setup = authoritative_state.mission_setup
+        if type(authoritative_setup) is not MissionSetup:
+            raise GameLifecycleError("Primary scoring authority requires MissionSetup.")
+        self.validate_mission_setup(authoritative_setup)
+        end_of_battle = (
+            state_evidence.scoring_boundary_kind is PrimaryScoringBoundaryKind.END_OF_BATTLE
+        )
+        player_ids = (
+            tuple(authoritative_state.player_ids) if end_of_battle else (record.active_player_id,)
+        )
+        turn_start_states = tuple(
+            value
+            for value in authoritative_state.primary_objective_turn_start_states
+            if _primary_history_row_is_not_after_boundary(
+                battle_round=value.battle_round,
+                active_player_id=value.active_player_id,
+                phase=value.source_objective_control_record.phase,
+                record=record,
+                state=authoritative_state,
             )
-        spatial_evidence = _validate_spatial_evidence(
-            spatial_evidence_by_player_id,
-            scoring_player_ids=player_ids,
+        )
+        terrain_trap_states = tuple(
+            value
+            for value in authoritative_state.primary_terrain_trap_states
+            if _primary_history_row_is_not_after_boundary(
+                battle_round=value.battle_round,
+                active_player_id=value.active_player_id,
+                phase=value.phase,
+                record=record,
+                state=authoritative_state,
+            )
+        )
+        unit_destruction_states = primary_unit_destruction_states_for_evidence(
+            state=authoritative_state,
+            destruction_state_ids=state_evidence.primary_unit_destruction_state_ids,
         )
         awards: list[VictoryPointAward] = []
         for player_id in player_ids:
@@ -135,15 +197,18 @@ class MissionScoringPolicies:
             awards.extend(
                 policy.primary_awards_from_objective_control(
                     record=record,
-                    mission_setup=mission_setup,
-                    turn_order=turn_order,
+                    mission_setup=authoritative_setup,
+                    turn_order=authoritative_state.turn_order,
                     turn_start_states=turn_start_states,
                     terrain_trap_states=terrain_trap_states,
                     unit_destruction_states=unit_destruction_states,
+                    state_evidence=state_evidence,
                     spatial_evidence=next(
                         (
                             evidence
-                            for evidence in spatial_evidence
+                            for evidence in (
+                                state_evidence.primary_scoring_spatial_evidence_by_player_id
+                            )
                             if evidence.player_id == player_id
                         ),
                         None,
@@ -232,6 +297,7 @@ class MissionScoringPolicies:
         ledger: VictoryPointLedger,
         award: VictoryPointAward,
         objective_control_records: tuple[ObjectiveControlRecord, ...],
+        primary_scoring_state_evidence_records: tuple[PrimaryScoringStateEvidence, ...],
         turn_order: tuple[str, ...],
         current_active_player_id: str | None,
     ) -> tuple[int, JsonValue]:
@@ -239,6 +305,7 @@ class MissionScoringPolicies:
             ledger=ledger,
             award=award,
             objective_control_records=objective_control_records,
+            primary_scoring_state_evidence_records=(primary_scoring_state_evidence_records),
             turn_order=turn_order,
             current_active_player_id=current_active_player_id,
         )
@@ -290,6 +357,38 @@ class MissionScoringPolicies:
         from warhammer40k_core.engine.missions import validate_mission_setup_source_layout
 
         validate_mission_setup_source_layout(mission_setup)
+
+
+def _primary_history_row_is_not_after_boundary(
+    *,
+    battle_round: int,
+    active_player_id: str,
+    phase: str,
+    record: ObjectiveControlRecord,
+    state: GameState,
+) -> bool:
+    """Compare one append-only Primary history row with a scoring boundary."""
+    turn_index_by_player_id = {player_id: index for index, player_id in enumerate(state.turn_order)}
+    if active_player_id not in turn_index_by_player_id:
+        raise GameLifecycleError("Primary scoring history active player is not in turn_order.")
+    if record.active_player_id not in turn_index_by_player_id:
+        raise GameLifecycleError("Primary scoring boundary active player is not in turn_order.")
+    phase_index_by_name = {
+        battle_phase.value: index for index, battle_phase in enumerate(state.battle_phase_sequence)
+    }
+    if phase not in phase_index_by_name:
+        raise GameLifecycleError("Primary scoring history phase is not in the battle sequence.")
+    if record.phase not in phase_index_by_name:
+        raise GameLifecycleError("Primary scoring boundary phase is not in the battle sequence.")
+    return (
+        battle_round,
+        turn_index_by_player_id[active_player_id],
+        phase_index_by_name[phase],
+    ) <= (
+        record.battle_round,
+        turn_index_by_player_id[record.active_player_id],
+        phase_index_by_name[record.phase],
+    )
 
 
 def _validate_player_policies(values: object) -> tuple[MissionScoringPolicy, ...]:
@@ -399,54 +498,6 @@ def _validate_policy_assignments(
             or policy.primary_mission_id != assignment.primary_mission_id
         ):
             raise GameLifecycleError("MissionScoringPolicies policy assignment drifted.")
-
-
-def _validate_scoring_player_ids(
-    values: object,
-    *,
-    policies: MissionScoringPolicies,
-    default_player_id: str,
-) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("scoring_player_ids must be a tuple.")
-    requested_values = cast(tuple[object, ...], values)
-    if not requested_values:
-        return (policies.policy_for_player(default_player_id).player_id,)
-    player_ids: list[str] = []
-    seen: set[str] = set()
-    for value in requested_values:
-        player_id = _identifier("scoring_player_ids value", value)
-        if player_id in seen:
-            raise GameLifecycleError("scoring_player_ids must not contain duplicates.")
-        policies.policy_for_player(player_id)
-        seen.add(player_id)
-        player_ids.append(player_id)
-    return tuple(player_ids)
-
-
-def _validate_spatial_evidence(
-    values: object,
-    *,
-    scoring_player_ids: tuple[str, ...],
-) -> tuple[PrimaryScoringSpatialEvidence, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("Primary scoring spatial evidence must be a tuple.")
-    evidence_rows: list[PrimaryScoringSpatialEvidence] = []
-    seen_player_ids: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        if type(value) is not PrimaryScoringSpatialEvidence:
-            raise GameLifecycleError(
-                "Primary scoring spatial evidence must contain typed evidence."
-            )
-        if value.player_id not in scoring_player_ids:
-            raise GameLifecycleError(
-                "Primary scoring spatial evidence belongs to a non-scoring player."
-            )
-        if value.player_id in seen_player_ids:
-            raise GameLifecycleError("Primary scoring spatial evidence must not duplicate players.")
-        seen_player_ids.add(value.player_id)
-        evidence_rows.append(value)
-    return tuple(sorted(evidence_rows, key=lambda evidence: evidence.player_id))
 
 
 _identifier = IdentifierValidator(GameLifecycleError)

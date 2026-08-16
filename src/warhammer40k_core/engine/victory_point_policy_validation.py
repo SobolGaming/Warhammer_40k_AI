@@ -6,6 +6,9 @@ from warhammer40k_core.engine.mission_scoring_policies import MissionScoringPoli
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.objective_control import ObjectiveControlRecord
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    PrimaryScoringStateEvidence,
+)
 from warhammer40k_core.engine.primary_victory_point_policy import (
     validate_victory_point_ledger_policy,
 )
@@ -48,6 +51,7 @@ def validate_victory_point_ledger_policy_sources(
     *,
     mission_setup: MissionSetup | None,
     objective_control_records: tuple[ObjectiveControlRecord, ...],
+    primary_scoring_state_evidence_records: tuple[PrimaryScoringStateEvidence, ...],
     turn_order: tuple[str, ...],
     current_battle_round: int,
     policies: MissionScoringPolicies | None = None,
@@ -79,5 +83,6 @@ def validate_victory_point_ledger_policy_sources(
             policy=policy,
             ledger=ledger,
             objective_control_records=objective_control_records,
+            primary_scoring_state_evidence_records=primary_scoring_state_evidence_records,
             turn_order=turn_order,
         )

@@ -3,14 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
-from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.validation import IdentifierValidator
-from warhammer40k_core.engine.battlefield_state import geometry_model_for_placement
-from warhammer40k_core.engine.mission_terrain import (
-    MissionLogicalTerrainArea,
-    mission_logical_terrain_areas,
-    model_intersects_logical_terrain_area,
-)
+from warhammer40k_core.engine.battlefield_state import ModelPlacement
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlTiming,
@@ -25,9 +19,6 @@ from warhammer40k_core.engine.scoring import (
     PrimaryObjectiveTurnStartState,
     PrimaryUnitDestructionState,
 )
-from warhammer40k_core.geometry.measurement import objective_marker_controls_model
-from warhammer40k_core.geometry.pose import Pose
-from warhammer40k_core.geometry.volume import Model as GeometryModel
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -551,25 +542,7 @@ def build_primary_rules_unit_turn_start_snapshot(
         )
     if state.active_player_id is None:
         raise GameLifecycleError("Primary turn-start position tracking requires an active player.")
-    if {feature.feature_id for feature in battlefield.terrain_features} != {
-        feature.feature_id for feature in mission_setup.terrain_features
-    }:
-        raise GameLifecycleError(
-            "Primary turn-start position tracking requires mission and battlefield terrain parity."
-        )
-    logical_terrain_areas = mission_logical_terrain_areas(mission_setup)
-    objective_markers = tuple(
-        definition.to_objective_marker() for definition in mission_setup.objective_markers
-    )
-    memberships = tuple(
-        _build_rules_unit_membership(
-            state=state,
-            rules_unit=rules_unit,
-            logical_terrain_areas=logical_terrain_areas,
-            objective_markers=objective_markers,
-        )
-        for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
-    )
+    memberships = build_current_primary_rules_unit_memberships(state=state)
     return PrimaryRulesUnitTurnStartSnapshot(
         snapshot_id=_turn_evidence_id("primary-rules-unit-turn-start", state),
         game_id=state.game_id,
@@ -580,6 +553,36 @@ def build_primary_rules_unit_turn_start_snapshot(
             f"{state.game_id}:primary-rules-unit-turn-start:"
             f"round-{state.battle_round:02d}:{state.active_player_id}"
         ),
+    )
+
+
+def build_current_primary_rules_unit_memberships(
+    *,
+    state: GameState,
+) -> tuple[PrimaryRulesUnitTurnStartMembership, ...]:
+    """Build group-aware physical membership witnesses at the current boundary."""
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Primary current-position tracking requires GameState.")
+    mission_setup = state.mission_setup
+    battlefield = state.battlefield_state
+    if mission_setup is None or battlefield is None:
+        raise GameLifecycleError(
+            "Primary current-position tracking requires mission and battlefield state."
+        )
+    if {feature.feature_id for feature in battlefield.terrain_features} != {
+        feature.feature_id for feature in mission_setup.terrain_features
+    }:
+        raise GameLifecycleError(
+            "Primary turn-start position tracking requires mission and battlefield terrain parity."
+        )
+    return tuple(
+        _build_rules_unit_membership(
+            state=state,
+            rules_unit=rules_unit,
+        )
+        for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
     )
 
 
@@ -945,82 +948,48 @@ def _build_rules_unit_membership(
     *,
     state: GameState,
     rules_unit: RulesUnitView,
-    logical_terrain_areas: tuple[MissionLogicalTerrainArea, ...],
-    objective_markers: tuple[ObjectiveMarker, ...],
 ) -> PrimaryRulesUnitTurnStartMembership:
+    from warhammer40k_core.engine.primary_position_membership import (
+        build_primary_rules_unit_membership_from_model_placements,
+    )
+
     battlefield = state.battlefield_state
     if battlefield is None:
         raise GameLifecycleError(
             "Primary turn-start position membership requires battlefield state."
         )
     removed_model_ids = frozenset(battlefield.removed_model_ids)
-    component_memberships: list[PrimaryComponentTurnStartMembership] = []
+    unavailable_model_ids = frozenset(state.unavailable_model_ids())
+    placements_by_id: dict[str, ModelPlacement] = {}
     for component in rules_unit.components:
-        geometry_models_by_id: dict[str, GeometryModel] = {}
         for model in component.unit.own_models:
-            placement = battlefield.model_placement_or_none(model.model_instance_id)
-            if (
-                not model.is_alive
-                or placement is None
-                or model.model_instance_id in removed_model_ids
-            ):
+            if not model.is_alive:
                 continue
-            geometry_models_by_id[model.model_instance_id] = geometry_model_for_placement(
-                model=model,
-                placement=placement,
-            )
-        logical_area_ids = tuple(
-            sorted(
-                {
-                    area.logical_terrain_area_id
-                    for area in logical_terrain_areas
-                    for geometry_model in geometry_models_by_id.values()
-                    if model_intersects_logical_terrain_area(
-                        geometry_model,
-                        area=area,
+            placement = battlefield.model_placement_or_none(model.model_instance_id)
+            removed = model.model_instance_id in removed_model_ids
+            unavailable = model.model_instance_id in unavailable_model_ids
+            if placement is None:
+                if not removed and not unavailable:
+                    raise GameLifecycleError(
+                        "Primary position evidence found an alive model with no accounted "
+                        "placement."
                     )
-                }
-            )
-        )
-        objective_witnesses = tuple(
-            PrimaryObjectiveMarkerWitness(
-                objective_marker_id=marker.objective_marker_id,
-                model_instance_ids=model_ids,
-            )
-            for marker in objective_markers
-            for model_ids in (
-                tuple(
-                    sorted(
-                        model_id
-                        for model_id, geometry_model in geometry_models_by_id.items()
-                        if objective_marker_controls_model(
-                            marker_pose=Pose.at(
-                                marker.x_inches,
-                                marker.y_inches,
-                                marker.z_inches,
-                            ),
-                            model=geometry_model,
-                            marker_id=marker.objective_marker_id,
-                            horizontal_inches=marker.control_horizontal_inches,
-                            vertical_inches=marker.control_vertical_inches,
-                            marker_diameter_inches=marker.marker_diameter_inches,
-                        )
-                    )
-                ),
-            )
-            if model_ids
-        )
-        component_memberships.append(
-            PrimaryComponentTurnStartMembership(
-                unit_instance_id=component.unit.unit_instance_id,
-                evaluated_model_instance_ids=tuple(sorted(geometry_models_by_id)),
-                logical_terrain_area_ids=logical_area_ids,
-                objective_marker_witnesses=objective_witnesses,
-            )
-        )
-    return PrimaryRulesUnitTurnStartMembership(
+                continue
+            if removed or unavailable:
+                raise GameLifecycleError(
+                    "Primary position evidence found a placed model marked unavailable."
+                )
+            if placement.player_id != rules_unit.owner_player_id:
+                raise GameLifecycleError("Primary position evidence model placement owner drift.")
+            if placement.unit_instance_id != component.unit.unit_instance_id:
+                raise GameLifecycleError("Primary position evidence component placement drift.")
+            placements_by_id[model.model_instance_id] = placement
+    return build_primary_rules_unit_membership_from_model_placements(
+        state=state,
         rules_unit_instance_id=rules_unit.unit_instance_id,
-        component_memberships=tuple(component_memberships),
+        owner_player_id=rules_unit.owner_player_id,
+        component_unit_instance_ids=rules_unit.component_unit_instance_ids,
+        model_placements=tuple(placements_by_id.values()),
     )
 
 
@@ -1380,6 +1349,7 @@ __all__ = (
     "PrimaryRulesUnitTurnStartMembershipPayload",
     "PrimaryRulesUnitTurnStartSnapshot",
     "PrimaryRulesUnitTurnStartSnapshotPayload",
+    "build_current_primary_rules_unit_memberships",
     "build_primary_rules_unit_turn_start_snapshot",
     "current_primary_component_turn_start_membership",
     "current_primary_rules_unit_turn_start_membership",

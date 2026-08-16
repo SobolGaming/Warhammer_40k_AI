@@ -116,8 +116,11 @@ scoring slice promotes eight additional evidence-complete Primaries, and the
 subsequent destruction-attribution slice promotes Purge and Secure. Step 4 adds
 persistent mission markers, player choices, Surveil move cleanup, and all ten
 source-backed Primary Mission Actions; the other 12 remain source-known and
-engine-pending for their card-specific scoring conditions. Pairing-wide
-lifecycle, replay, and viewer-scoped certification remains Step 5.
+engine-pending for their card-specific scoring conditions. Step 5A adds the
+authenticated scoring-state bridge and four source-backed generic objective
+predicates without changing the 13/12 mission boundary or the six-of-15
+pairing boundary (18 of 45 variants). Pairing-wide lifecycle, replay, and
+viewer-scoped certification remains later Step 5 work.
 **Phase 18A is complete** for local CLI/human decision entry and viewer-safe
 hybrid datacard projections: `interfaces/cli.py` renders pending finite and
 parameterized requests, submits normal lifecycle `DecisionResult`s, and
@@ -395,7 +398,7 @@ Implemented foundation and partial integration baselines:
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
 | 17J | Complete | Warhammer Event Companion v1.1 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with explicit extraction status, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
-| 17N | Partial | Battlefield geometry and Step 4 marker/action/choice state are complete, including 14 runtime Mission Actions; generic timing/resolution, objective/territory/table-quarter evidence, and Purge and Secure destruction attribution make 13 of 25 Primaries executable while 12 remain pending on card-specific scoring conditions and pairing certification remains Step 5 |
+| 17N | Partial | Battlefield geometry, Step 4 marker/action/choice state, and the Step 5A content-addressed scoring-state bridge are complete, including 14 runtime Mission Actions; generic timing/resolution, objective/territory/table-quarter evidence, and Purge and Secure destruction attribution make 13 of 25 Primaries executable while 12 remain pending on card-specific scoring conditions and pairing certification remains later Step 5 work |
 | 17O | Complete | Viewer-scoped eight-axis capability manifest with selected roster/unit/rule/mission/geometry rows, evidence, blockers, identities, and mechanically derived certification claims |
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
@@ -4975,7 +4978,8 @@ Primaries in both directions, covering 18 of the 45 A/B/C variants with complete
 two-sided Primary scoring. The remaining 12 Primaries stay source-known and
 engine-pending for their card-specific scoring conditions. Step 4's mission
 actions, choices, persistent marker state, and Surveil movement cleanup are
-engine-owned; pairing-wide certification remains Step 5.
+engine-owned. Step 5A's scoring-state bridge and four simple objective
+predicates are complete; pairing-wide certification remains later Step 5 work.
 
 The battlefield Single/Separate logical-area semantics come from the page-8
 Layouts Key, while coordinates and layout facts come from pages 9-53 of
@@ -5071,7 +5075,7 @@ record; the free-form timing field alone cannot claim the exemption. Live
 awards and restored ledgers use the same policy validator, and restore rejects
 ordinary Primary totals above 15VP in one battle round. The resulting complete
 mission source identity is pinned as
-`68d2214fdd1b3e2e1cc1e97e9b50e959a52acce03d1706c3fda5535fd5bc4d48`.
+`c724fad0b3bf86f04abcc673b06f5e3829849177de99e9f8ad71a6430c142fd4`.
 
 The Phase 17N scoring schema has exactly nine source timing tokens and requires
 every scoring row to declare one of `independent`, `cumulative`, or
@@ -5148,10 +5152,44 @@ and viewer-scoped projections. This closes the Step 4 action, marker, choice,
 and movement-cleanup blockers without promoting any card whose scoring
 conditions remain unimplemented.
 
-Step 5 remains the certification boundary for every Force Disposition pairing
-through normal lifecycle execution, replay, and viewer-scoped projections. The
-13-of-25 executable scoring count and six fully executable two-sided pairings
-remain authoritative until that condition work and certification are complete.
+Step 5A makes authoritative non-OC mission state a mandatory input to the
+normal Primary scoring policy path. Each ordinary and end-of-battle boundary
+builds one immutable, content-addressed `PrimaryScoringStateEvidence` value
+bound to the exact stored objective-control record, its hash, and an explicit
+ordinary or end-of-battle boundary kind. The evidence contains
+`PrimaryMissionProgressState`, only the players' assigned Primary
+`MissionActionState` histories, complete battlefield-departure history, and
+the exact frozen Primary unit-destruction history membership, plus current
+group-aware physical membership witnesses for every rules unit. The
+aggregate scoring API derives mission setup, turn order, historical evidence,
+spatial evidence, scoring players, and this bridge directly from `GameState`;
+callers cannot substitute parallel evidence tuples. Construction validates
+mission assignment, registered Action policy identity, chronology, rules-unit
+ownership/components, and exact record/setup context. Evidence rows that back
+awards are persisted in `GameState`, serialized for replay, and keyed by the
+objective-control record plus boundary kind so ordinary and end-of-battle
+scoring can safely share the final turn-end record. Live awards and restored
+Primary ledger transactions must resolve their evidence ID and hash to exactly
+one persisted row; paired ID/hash tampering, missing rows, duplicate boundary
+rows, and nested payload drift fail closed. Restore also proves that frozen
+Action, mission-progress, departure, destruction-history, and
+rules-unit component sets are complete against authoritative state history;
+future progress, stale started Actions, impossible completion order, and
+caller-asserted non-final end-of-battle boundaries are rejected. Full evidence
+rows are authoritative/replay-only and are omitted from viewer-scoped game and
+session projections; public VP records retain only their opaque evidence
+ID/hash commitments. The same slice adds the
+source-backed generic predicates for a central objective in round one, three
+objectives from round two, four objectives at battle end, and a controlled
+non-home objective that is central. Those predicates remove only their exact
+tracker blockers: no pending Primary is promoted, so the authoritative status
+remains 13 executable and 12 pending.
+
+The remaining Step 5 work retains the certification boundary for every Force
+Disposition pairing through normal lifecycle execution, replay, and
+viewer-scoped projections. The 13-of-25 executable scoring count and six fully
+executable two-sided pairings remain authoritative until that condition work
+and certification are complete.
 
 `uv run python tools/build_event_companion_battlefields.py --check` rebuilds the
 complete battlefield package in memory from its reviewed inputs, verifies its

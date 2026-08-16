@@ -19,6 +19,7 @@ from warhammer40k_core.engine.final_scoring import (
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
+    GameStatePayload,
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
@@ -31,14 +32,14 @@ from warhammer40k_core.engine.mission_setup import (
 )
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.objective_control import (
-    ObjectiveControlRecord,
-    ObjectiveControlResult,
-    ObjectiveControlScore,
-    ObjectiveControlStatus,
     ObjectiveControlTiming,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    build_primary_scoring_state_evidence,
+    record_primary_scoring_state_evidence,
+)
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     record_primary_turn_start_evidence,
 )
@@ -51,6 +52,7 @@ from warhammer40k_core.engine.scoring_cap_audit import metadata_with_vp_cap_audi
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
+from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import (
     chapter_approved_2026_27_mission_pack,
     warhammer_event_companion_2026_07_mission_pack,
@@ -275,6 +277,76 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
         )
         == 46
     )
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+    forged_uncapped_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    forged_uncapped_ledger = next(
+        ledger
+        for ledger in forged_uncapped_payload["victory_point_ledgers"]
+        if ledger["player_id"] == "player-a"
+    )
+    forged_uncapped_transaction = next(
+        transaction
+        for transaction in forged_uncapped_ledger["transactions"]
+        if transaction["source_kind"] == "mission_action"
+        and isinstance(transaction["metadata"], dict)
+        and "vp_cap_audit" not in transaction["metadata"]
+    )
+    forged_uncapped_metadata = cast(
+        dict[str, JsonValue],
+        forged_uncapped_transaction["metadata"],
+    )
+    forged_uncapped_metadata["vp_cap_audit"] = {
+        "requested_amount": forged_uncapped_transaction["amount"],
+        "applied_amount": forged_uncapped_transaction["amount"],
+        "source_cap": 999,
+        "source_points_before": 777,
+        "source_points_after": 1,
+        "total_cap": 1,
+        "total_points_before": 999,
+        "total_points_after": 0,
+        "capped_reasons": ["forged_reason"],
+    }
+    with pytest.raises(
+        GameLifecycleError,
+        match="cap audit drifted from chronological ledger policy",
+    ):
+        GameState.from_payload(forged_uncapped_payload)
+
+    tampered_capped_payload = cast(
+        GameStatePayload,
+        json.loads(json.dumps(state.to_payload(), sort_keys=True)),
+    )
+    tampered_capped_ledger = next(
+        ledger
+        for ledger in tampered_capped_payload["victory_point_ledgers"]
+        if ledger["player_id"] == "player-a"
+    )
+    tampered_capped_transaction = next(
+        transaction
+        for transaction in tampered_capped_ledger["transactions"]
+        if transaction["source_kind"] == "mission_action"
+        and transaction["source_id"] == "primary-death-trap"
+        and isinstance(transaction["metadata"], dict)
+        and "vp_cap_audit" in transaction["metadata"]
+    )
+    tampered_capped_metadata = cast(
+        dict[str, JsonValue],
+        tampered_capped_transaction["metadata"],
+    )
+    tampered_capped_audit = cast(
+        dict[str, JsonValue],
+        tampered_capped_metadata["vp_cap_audit"],
+    )
+    tampered_capped_audit["source_points_before"] = 999
+    with pytest.raises(
+        GameLifecycleError,
+        match="cap audit drifted from chronological ledger policy",
+    ):
+        GameState.from_payload(tampered_capped_payload)
 
 
 def test_phase11f_vp_cap_audit_metadata_shapes_and_validation_are_explicit() -> None:
@@ -367,52 +439,10 @@ def test_phase11f_primary_vp_rejects_opponent_and_forged_source_ids() -> None:
 def test_phase11f_state_restore_rejects_primary_ledger_source_drift(
     source_kind: str,
 ) -> None:
-    state = _battle_state()
+    state, award = _immovable_object_primary_award_fixture()
     assert state.mission_setup is not None
     opponent_primary = state.mission_setup.primary_mission_id_for_player("player-b")
-    policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
-    state.battle_round = 2
-    controlled_objective_id = state.mission_setup.objective_markers[0].objective_marker_id
-    record = ObjectiveControlRecord(
-        record_id="objective-control:round-02:player-a:command:phase_end",
-        game_id=state.game_id,
-        battle_round=2,
-        active_player_id="player-a",
-        timing=ObjectiveControlTiming.PHASE_END,
-        phase=BattlePhase.COMMAND.value,
-        battlefield_id="phase11f-battlefield",
-        results=tuple(
-            ObjectiveControlResult(
-                objective_id=marker.objective_marker_id,
-                status=(
-                    ObjectiveControlStatus.CONTROLLED
-                    if marker.objective_marker_id == controlled_objective_id
-                    else ObjectiveControlStatus.UNCONTROLLED
-                ),
-                controlled_by_player_id=(
-                    "player-a" if marker.objective_marker_id == controlled_objective_id else None
-                ),
-                scores=(
-                    (ObjectiveControlScore(player_id="player-a", score=1),)
-                    if marker.objective_marker_id == controlled_objective_id
-                    else ()
-                ),
-            )
-            for marker in state.mission_setup.objective_markers
-        ),
-    )
-    state.record_objective_control_record(record)
-    awards = policy.primary_awards_from_objective_control(
-        record=record,
-        mission_setup=state.mission_setup,
-        turn_order=state.turn_order,
-        turn_start_states=tuple(state.primary_objective_turn_start_states),
-        terrain_trap_states=tuple(state.primary_terrain_trap_states),
-        unit_destruction_states=tuple(state.primary_unit_destruction_states),
-    )
-    if len(awards) != 1:
-        raise AssertionError("Primary source-drift test requires one generated award")
-    state.award_victory_points(awards[0])
+    state.award_victory_points(award)
     payload = state.to_payload()
     player_a_ledger = next(
         ledger for ledger in payload["victory_point_ledgers"] if ledger["player_id"] == "player-a"
@@ -426,6 +456,40 @@ def test_phase11f_state_restore_rejects_primary_ledger_source_drift(
         match="Primary VP source does not match the player's assigned Primary mission",
     ):
         GameState.from_payload(payload)
+
+
+def test_phase11f_state_restore_revalidates_primary_score_count_semantics() -> None:
+    state, award = _immovable_object_primary_award_fixture()
+    transaction = state.award_victory_points(award)
+    assert transaction.amount == 5
+    assert state.victory_point_total("player-a") == 5
+
+    payload = state.to_payload()
+    player_a_ledger = next(
+        ledger for ledger in payload["victory_point_ledgers"] if ledger["player_id"] == "player-a"
+    )
+    transaction_payload = player_a_ledger["transactions"][0]
+    metadata = cast(dict[str, object], transaction_payload["metadata"])
+    assert metadata["score_count"] == 1
+    assert "vp_cap_audit" not in metadata
+    metadata["score_count"] = 2
+    transaction_payload["amount"] = 10
+    player_a_ledger["victory_points"] = 10
+
+    with pytest.raises(GameLifecycleError, match="Primary VP"):
+        GameState.from_payload(payload)
+
+
+def test_phase11f_live_primary_award_revalidates_score_count_semantics() -> None:
+    state, award = _immovable_object_primary_award_fixture()
+    forged_metadata = dict(cast(dict[str, JsonValue], award.metadata))
+    assert forged_metadata["score_count"] == 1
+    forged_metadata["score_count"] = 2
+    forged_award = replace(award, amount=10, metadata=forged_metadata)
+
+    with pytest.raises(GameLifecycleError, match="Primary VP"):
+        state.award_victory_points(forged_award)
+    assert state.victory_point_total("player-a") == 0
 
 
 def test_phase11f_scoring_policy_rejects_source_geometry_drift() -> None:
@@ -511,6 +575,74 @@ def test_phase11f_final_result_payload_rejects_policy_and_score_tampering() -> N
     assignments = cast(list[dict[str, object]], assignment_drift["primary_mission_assignments"])
     assignments[0]["primary_mission_id"] = assignments[1]["primary_mission_id"]
     _assert_final_payload_rejected(assignment_drift, "directional matrix")
+
+
+def _immovable_object_primary_award_fixture() -> tuple[GameState, VictoryPointAward]:
+    state = _battle_state()
+    mission_setup = state.mission_setup
+    if mission_setup is None:
+        raise AssertionError("Immovable Object award fixture requires MissionSetup.")
+    policy = mission_scoring_policies_from_setup(mission_setup).policy_for_player("player-a")
+    state.battle_round = 2
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("Immovable Object award fixture requires battlefield state.")
+    controlled_marker = mission_setup.objective_markers[0]
+    player_a_unit = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-a"
+        for unit in army.units
+    )
+    placement = battlefield.unit_placement_by_id(player_a_unit.unit_instance_id)
+    offsets = ((0.0, 0.0), (1.0, 0.0), (2.0, 0.0), (0.0, 1.0), (1.0, 1.0))
+    state.battlefield_state = battlefield.with_unit_placement(
+        replace(
+            placement,
+            model_placements=tuple(
+                replace(
+                    model_placement,
+                    pose=Pose.at(
+                        controlled_marker.x_inches + x_offset,
+                        controlled_marker.y_inches + y_offset,
+                        model_placement.pose.position.z,
+                        facing_degrees=model_placement.pose.facing.degrees,
+                    ),
+                )
+                for model_placement, (x_offset, y_offset) in zip(
+                    placement.model_placements,
+                    offsets,
+                    strict=True,
+                )
+            ),
+        )
+    )
+    record = state.record_objective_control_boundary(
+        completed_phase=BattlePhase.COMMAND,
+        timing=ObjectiveControlTiming.PHASE_END,
+        runtime_modifier_registry=None,
+    )
+    state_evidence = build_primary_scoring_state_evidence(
+        state=state,
+        record=record,
+        end_of_battle=False,
+    )
+    awards = policy.primary_awards_from_objective_control(
+        record=record,
+        mission_setup=mission_setup,
+        turn_order=state.turn_order,
+        turn_start_states=tuple(state.primary_objective_turn_start_states),
+        terrain_trap_states=tuple(state.primary_terrain_trap_states),
+        unit_destruction_states=tuple(state.primary_unit_destruction_states),
+        state_evidence=state_evidence,
+    )
+    if len(awards) != 1 or awards[0].amount != 5:
+        raise AssertionError("Immovable Object fixture requires one 5VP Primary award.")
+    metadata = awards[0].metadata
+    if not isinstance(metadata, dict) or metadata.get("score_count") != 1:
+        raise AssertionError("Immovable Object fixture requires score_count 1 evidence.")
+    record_primary_scoring_state_evidence(state=state, evidence=state_evidence)
+    return state, awards[0]
 
 
 def _assert_final_payload_rejected(payload: dict[str, object], message: str) -> None:

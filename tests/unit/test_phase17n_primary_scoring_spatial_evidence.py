@@ -40,9 +40,6 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
-    ObjectiveControlResult,
-    ObjectiveControlScore,
-    ObjectiveControlStatus,
     ObjectiveControlTiming,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
@@ -72,12 +69,20 @@ from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     build_primary_scoring_spatial_evidence,
     objective_control_record_hash,
 )
+from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    build_primary_scoring_state_evidence,
+    record_primary_scoring_state_evidence,
+)
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     record_primary_turn_start_evidence,
 )
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     record_primary_destroyed_model_departures,
     record_primary_unit_destructions_for_destroyed_models,
+)
+from warhammer40k_core.engine.primary_victory_point_policy import (
+    validate_primary_victory_point_transaction,
+    validate_victory_point_ledger_policy,
 )
 from warhammer40k_core.engine.reserve_arrival_requirements import (
     reposition_destruction_policy,
@@ -698,11 +703,7 @@ def test_search_and_scour_scores_exact_end_of_battle_territory_evidence() -> Non
     policies = mission_scoring_policies_from_setup(setup)
     ordinary_awards = policies.primary_awards_from_objective_control(
         record=ordinary_record,
-        mission_setup=setup,
-        turn_order=state.turn_order,
-        turn_start_states=tuple(state.primary_objective_turn_start_states),
-        terrain_trap_states=tuple(state.primary_terrain_trap_states),
-        unit_destruction_states=tuple(state.primary_unit_destruction_states),
+        authoritative_state=state,
     )
     assert {
         metadata["scoring_rule_id"]: award.amount
@@ -712,6 +713,11 @@ def test_search_and_scour_scores_exact_end_of_battle_territory_evidence() -> Non
         "search-and-scour-central-objective-turn-end": 3,
         "search-and-scour-objective-control": 12,
     }
+    _record_primary_scoring_evidence(
+        state=state,
+        record=ordinary_record,
+        end_of_battle=False,
+    )
     for ordinary_award in ordinary_awards:
         state.award_victory_points(ordinary_award)
     assert state.victory_point_total("player-a") == 15
@@ -721,11 +727,8 @@ def test_search_and_scour_scores_exact_end_of_battle_territory_evidence() -> Non
         unit_instance_id="army-beta:enemy",
         anchor=(32.0, 7.0),
     )
-    state.active_player_id = "player-b"
-    record = _authoritative_spatial_record(
-        state,
-        timing=ObjectiveControlTiming.TURN_END,
-    )
+    state.turn_order = ("player-b", "player-a")
+    record = ordinary_record
     required_conditions = policies.policy_for_player(
         "player-a"
     ).required_primary_spatial_conditions(
@@ -738,15 +741,20 @@ def test_search_and_scour_scores_exact_end_of_battle_territory_evidence() -> Non
         record=record,
         requested_condition_ids=required_conditions,
     )
-
-    awards = policies.primary_awards_from_objective_control(
+    state_evidence = build_primary_scoring_state_evidence(
+        state=state,
+        record=record,
+        end_of_battle=True,
+    )
+    awards = policies.policy_for_player("player-a").primary_awards_from_objective_control(
         record=record,
         mission_setup=setup,
         turn_order=state.turn_order,
         turn_start_states=tuple(state.primary_objective_turn_start_states),
         terrain_trap_states=tuple(state.primary_terrain_trap_states),
         unit_destruction_states=tuple(state.primary_unit_destruction_states),
-        spatial_evidence_by_player_id=(spatial_evidence,),
+        state_evidence=state_evidence,
+        spatial_evidence=spatial_evidence,
         scoring_player_ids=("player-a",),
         end_of_battle=True,
     )
@@ -762,26 +770,60 @@ def test_search_and_scour_scores_exact_end_of_battle_territory_evidence() -> Non
     assert award.metadata["own_territory_region_id"] == (
         "reconnaissance-vs-priority-assets-layout-1-attacker-territory"
     )
-    transaction = state.award_victory_points(award)
+    _record_primary_scoring_evidence(
+        state=state,
+        record=record,
+        end_of_battle=True,
+    )
+    ledger = state.victory_point_ledger_for_player("player-a")
+    applied_amount, transaction_metadata = policies.capped_award_for_ledger(
+        ledger=ledger,
+        award=award,
+        objective_control_records=tuple(state.objective_control_records),
+        primary_scoring_state_evidence_records=tuple(state.primary_scoring_state_evidence_records),
+        turn_order=state.turn_order,
+        current_active_player_id=state.active_player_id,
+    )
+    updated_ledger, transaction = ledger.award(
+        award,
+        applied_amount=applied_amount,
+        metadata=transaction_metadata,
+    )
     assert transaction.amount == 5
     assert transaction.scoring_timing == "end_of_battle"
-    assert state.victory_point_total("player-a") == 20
-
-    payload = state.to_payload()
-    player_ledger = next(
-        ledger for ledger in payload["victory_point_ledgers"] if ledger["player_id"] == "player-a"
+    assert updated_ledger.victory_points == 20
+    restored_ledger = VictoryPointLedger.from_payload(updated_ledger.to_payload())
+    assert restored_ledger == updated_ledger
+    validate_victory_point_ledger_policy(
+        policy=policies.policy_for_player("player-a"),
+        ledger=restored_ledger,
+        objective_control_records=tuple(state.objective_control_records),
+        primary_scoring_state_evidence_records=tuple(state.primary_scoring_state_evidence_records),
+        turn_order=state.turn_order,
     )
-    player_ledger["victory_points"] = 115
-    end_of_battle_row = player_ledger["transactions"][-1]
-    end_of_battle_row["amount"] = 100
-    assert isinstance(end_of_battle_row["metadata"], dict)
-    end_of_battle_row["metadata"]["vp_cap_audit"] = {
-        "requested_amount": 5,
-        "applied_amount": 100,
-    }
+    assert isinstance(transaction.metadata, dict)
+    invalid_transaction = replace(
+        transaction,
+        amount=100,
+        metadata={
+            **transaction.metadata,
+            "vp_cap_audit": {
+                "requested_amount": 5,
+                "applied_amount": 100,
+            },
+        },
+    )
 
     with pytest.raises(GameLifecycleError, match="applied_amount exceeds requested_amount"):
-        GameState.from_payload(payload)
+        validate_primary_victory_point_transaction(
+            policy=policies.policy_for_player("player-a"),
+            transaction=invalid_transaction,
+            objective_control_records=tuple(state.objective_control_records),
+            primary_scoring_state_evidence_records=tuple(
+                state.primary_scoring_state_evidence_records
+            ),
+            turn_order=state.turn_order,
+        )
 
 
 def test_primary_restore_rejects_forged_round_two_end_of_battle_exemption() -> None:
@@ -807,14 +849,15 @@ def test_primary_restore_rejects_forged_round_two_end_of_battle_exemption() -> N
         award
         for award in policies.primary_awards_from_objective_control(
             record=record,
-            mission_setup=setup,
-            turn_order=state.turn_order,
-            turn_start_states=tuple(state.primary_objective_turn_start_states),
-            terrain_trap_states=tuple(state.primary_terrain_trap_states),
-            unit_destruction_states=tuple(state.primary_unit_destruction_states),
+            authoritative_state=state,
         )
         if isinstance(award.metadata, dict)
         and award.metadata["scoring_rule_id"] == "search-and-scour-objective-control"
+    )
+    _record_primary_scoring_evidence(
+        state=state,
+        record=record,
+        end_of_battle=False,
     )
     state.award_victory_points(award)
     payload = state.to_payload()
@@ -853,11 +896,7 @@ def test_primary_restore_rejects_more_than_fifteen_ordinary_vp_in_one_round() ->
     policies = mission_scoring_policies_from_setup(setup)
     awards = policies.primary_awards_from_objective_control(
         record=record,
-        mission_setup=setup,
-        turn_order=state.turn_order,
-        turn_start_states=tuple(state.primary_objective_turn_start_states),
-        terrain_trap_states=tuple(state.primary_terrain_trap_states),
-        unit_destruction_states=tuple(state.primary_unit_destruction_states),
+        authoritative_state=state,
     )
     assert sum(award.amount for award in awards) == 19
     ledger = VictoryPointLedger.initial(player_id="player-a")
@@ -867,8 +906,16 @@ def test_primary_restore_rejects_more_than_fifteen_ordinary_vp_in_one_round() ->
         ledger if stored.player_id == "player-a" else stored
         for stored in state.victory_point_ledgers
     ]
+    _record_primary_scoring_evidence(
+        state=state,
+        record=record,
+        end_of_battle=False,
+    )
 
-    with pytest.raises(GameLifecycleError, match="exceed the battle-round cap"):
+    with pytest.raises(
+        GameLifecycleError,
+        match="cap audit drifted from chronological ledger policy",
+    ):
         GameState.from_payload(state.to_payload())
 
 
@@ -1835,41 +1882,52 @@ def _controlled_objective_record(
     )
     if not controlled_ids <= known_ids:
         raise AssertionError("controlled-objective test record contains an unknown objective")
-    record = ObjectiveControlRecord(
-        record_id=(
-            "objective-control:"
-            f"round-{state.battle_round:02d}:"
-            f"{state.active_player_id}:"
-            f"{phase.value}:"
-            f"{timing.value}"
-        ),
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        active_player_id=state.active_player_id,
-        timing=timing,
-        phase=phase.value,
-        battlefield_id=state.battlefield_state.battlefield_id,
-        results=tuple(
-            ObjectiveControlResult(
-                objective_id=marker.objective_marker_id,
-                status=(
-                    ObjectiveControlStatus.CONTROLLED
-                    if marker.objective_marker_id in controlled_ids
-                    else ObjectiveControlStatus.UNCONTROLLED
-                ),
-                controlled_by_player_id=(
-                    "player-a" if marker.objective_marker_id in controlled_ids else None
-                ),
-                scores=(
-                    (ObjectiveControlScore(player_id="player-a", score=1),)
-                    if marker.objective_marker_id in controlled_ids
-                    else ()
-                ),
-            )
-            for marker in state.mission_setup.objective_markers
-        ),
+    controlling_unit_ids = (
+        "army-alpha:east",
+        "army-alpha:south",
+        "army-alpha:southeast",
+        "army-alpha:near",
     )
-    state.record_objective_control_record(record)
+    if len(controlled_ids) > len(controlling_unit_ids):
+        raise AssertionError("controlled-objective test record needs more placed units")
+    player_a_placement_ids = tuple(
+        placement.unit_instance_id
+        for army in state.battlefield_state.placed_armies
+        if army.player_id == "player-a"
+        for placement in army.unit_placements
+    )
+    for unit_instance_id in player_a_placement_ids:
+        _relocate_unit_placement(
+            state,
+            unit_instance_id=unit_instance_id,
+            anchor=(21.0, 56.0),
+        )
+    markers_by_id = {
+        marker.objective_marker_id: marker for marker in state.mission_setup.objective_markers
+    }
+    for unit_instance_id, objective_id in zip(
+        controlling_unit_ids[: len(controlled_objective_ids)],
+        controlled_objective_ids,
+        strict=True,
+    ):
+        marker = markers_by_id[objective_id]
+        _relocate_unit_placement(
+            state,
+            unit_instance_id=unit_instance_id,
+            anchor=(marker.x_inches, marker.y_inches),
+        )
+    record = state.record_objective_control_boundary(
+        completed_phase=phase,
+        timing=timing,
+        runtime_modifier_registry=None,
+    )
+    player_a_controlled_ids = frozenset(
+        result.objective_id
+        for result in record.results
+        if result.controlled_by_player_id == "player-a"
+    )
+    if player_a_controlled_ids != controlled_ids:
+        raise AssertionError("controlled-objective test placement did not resolve exact control")
     return record
 
 
@@ -1981,6 +2039,22 @@ def _with_destroyed_unit(
             if unit.unit_instance_id == unit_instance_id
             else unit
             for unit in army.units
+        ),
+    )
+
+
+def _record_primary_scoring_evidence(
+    *,
+    state: GameState,
+    record: ObjectiveControlRecord,
+    end_of_battle: bool,
+) -> None:
+    record_primary_scoring_state_evidence(
+        state=state,
+        evidence=build_primary_scoring_state_evidence(
+            state=state,
+            record=record,
+            end_of_battle=end_of_battle,
         ),
     )
 

@@ -7,6 +7,7 @@ from typing import Any, cast
 import pytest
 from tests.phase13b_shooting_declaration_helpers import (
     _advanced_unit_state,
+    _apply_shooting_declaration_without_advancing,
     _assert_command_reroll_request,
     _assert_invalid_proposal_status,
     _assert_stale_damage_model_choice_rejected_before_queue_pop,
@@ -11652,6 +11653,19 @@ def test_phase13e_deadly_demise_is_mandatory_and_not_a_decline_choice() -> None:
 
 @pytest.mark.slow
 def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demise() -> None:
+    weapon_profile = replace(
+        _weapon_profile_by_wargear(
+            wargear_id="core-bolt-rifle",
+            weapon_profile_id="core-bolt-rifle:standard",
+        ),
+        profile_id="phase14h-destroyed-transport-rifle",
+        name="Phase 14H destroyed transport rifle",
+        attack_profile=AttackProfile.fixed(1),
+        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
+        damage_profile=DamageProfile.fixed(20),
+        keywords=(),
+        abilities=(),
+    )
     lifecycle, units = _shooting_lifecycle(
         alpha_unit_ids=("intercessor-1",),
         game_id="phase14h-destroyed-transport",
@@ -11659,6 +11673,7 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
             ("enemy-transport", "core-transport", "core-transport", 1),
             ("enemy-passenger", "core-intercessor-like-infantry", "core-intercessor-like", 5),
         ),
+        catalog=_catalog_with_extra_bolt_profile(weapon_profile),
     )
     state = _state(lifecycle)
     attacker = units["intercessor-1"]
@@ -11698,33 +11713,24 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
         model_instance_id=transport_model.model_instance_id,
         sources=(deadly_demise_source,),
     )
-    weapon_profile = replace(
-        _first_weapon_profile(lifecycle, attacker),
-        strength=CharacteristicValue.from_raw(Characteristic.STRENGTH, 20),
-        damage_profile=DamageProfile.fixed(transport_model.wounds_remaining),
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    declaration_request = _select_shooting_unit_and_type(
+        lifecycle,
+        selection_request=selection_request,
+        unit_instance_id=attacker.unit_instance_id,
+        selection_result_id="phase14h-destroyed-transport-select-shooter",
     )
-    sequence_id = "phase14h-destroyed-transport"
-    sequence = AttackSequence.start(
-        sequence_id=sequence_id,
-        attacker_player_id="player-a",
-        attacking_unit_instance_id=attacker.unit_instance_id,
-        attack_pools=(
-            _attack_pool_for_test(
-                attacker=attacker,
-                defender=transport,
-                weapon_profile=weapon_profile,
-                attacks=1,
-            ),
+    sequence = _apply_shooting_declaration_without_advancing(
+        lifecycle,
+        request=declaration_request,
+        proposal=_proposal_from_request(
+            request=declaration_request,
+            target_unit_id=transport.unit_instance_id,
+            weapon_profile_id=weapon_profile.profile_id,
         ),
+        result_id="phase14h-destroyed-transport-declaration",
     )
-    state.shooting_phase_state = ShootingPhaseState(
-        battle_round=state.battle_round,
-        active_player_id="player-a",
-        selected_unit_ids=(attacker.unit_instance_id,),
-        shot_unit_ids=(attacker.unit_instance_id,),
-        attack_pools=sequence.attack_pools,
-        attack_sequence=sequence,
-    )
+    sequence_id = sequence.sequence_id
     attack_context_id = f"{sequence_id}:pool-001:attack-001"
     hit_spec = DiceRollSpec(
         expression=DiceExpression(quantity=1, sides=6),
@@ -11778,9 +11784,13 @@ def test_phase14h_destroyed_transport_disembarks_before_removal_and_deadly_demis
     proposal_context = proposal_request.context or {}
     battlefield_before_disembark = state.battlefield_state
     assert battlefield_before_disembark is not None
-    state.shooting_phase_state = state.shooting_phase_state.with_attack_sequence_update(
-        attack_sequence=remaining_sequence,
-        allocated_model_ids_this_phase=allocated_ids,
+    shooting_phase_state = state.shooting_phase_state
+    assert shooting_phase_state is not None
+    state.replace_shooting_phase_state(
+        shooting_phase_state.with_attack_sequence_update(
+            attack_sequence=remaining_sequence,
+            allocated_model_ids_this_phase=allocated_ids,
+        )
     )
 
     assert request.decision_type == PLACEMENT_PROPOSAL_DECISION_TYPE

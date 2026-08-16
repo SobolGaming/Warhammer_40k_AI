@@ -16,6 +16,7 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
     ObjectiveControlTiming,
+    objective_control_timing_from_token,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_from_armies
@@ -131,6 +132,27 @@ class PrimaryTableQuarterUnitWitness:
             "model_instance_ids": list(self.model_instance_ids),
         }
 
+    @classmethod
+    def from_payload(cls, payload: object) -> PrimaryTableQuarterUnitWitness:
+        raw = _required_payload_mapping(
+            payload,
+            field_name="PrimaryTableQuarterUnitWitness payload",
+            required_keys=("rules_unit_instance_id", "quarter_id", "model_instance_ids"),
+        )
+        return cls(
+            rules_unit_instance_id=cast(str, raw["rules_unit_instance_id"]),
+            quarter_id=cast(str, raw["quarter_id"]),
+            model_instance_ids=tuple(
+                cast(
+                    list[str],
+                    _required_payload_list(
+                        raw["model_instance_ids"],
+                        field_name="PrimaryTableQuarterUnitWitness model_instance_ids",
+                    ),
+                )
+            ),
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class PrimaryTerritoryUnitWitness:
@@ -161,6 +183,26 @@ class PrimaryTerritoryUnitWitness:
             "rules_unit_instance_id": self.rules_unit_instance_id,
             "model_instance_ids": list(self.model_instance_ids),
         }
+
+    @classmethod
+    def from_payload(cls, payload: object) -> PrimaryTerritoryUnitWitness:
+        raw = _required_payload_mapping(
+            payload,
+            field_name="PrimaryTerritoryUnitWitness payload",
+            required_keys=("rules_unit_instance_id", "model_instance_ids"),
+        )
+        return cls(
+            rules_unit_instance_id=cast(str, raw["rules_unit_instance_id"]),
+            model_instance_ids=tuple(
+                cast(
+                    list[str],
+                    _required_payload_list(
+                        raw["model_instance_ids"],
+                        field_name="PrimaryTerritoryUnitWitness model_instance_ids",
+                    ),
+                )
+            ),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -277,6 +319,57 @@ class PrimaryScoringSpatialEvidence:
             ],
             "opponent_territory_objective_ids": list(self.opponent_territory_objective_ids),
         }
+
+    @classmethod
+    def from_payload(cls, payload: object) -> PrimaryScoringSpatialEvidence:
+        raw = _required_payload_mapping(
+            payload,
+            field_name="PrimaryScoringSpatialEvidence payload",
+            required_keys=tuple(PrimaryScoringSpatialEvidencePayload.__annotations__),
+        )
+        return cls(
+            game_id=cast(str, raw["game_id"]),
+            battlefield_id=cast(str, raw["battlefield_id"]),
+            battle_round=cast(int, raw["battle_round"]),
+            active_player_id=cast(str, raw["active_player_id"]),
+            phase=cast(str, raw["phase"]),
+            timing=objective_control_timing_from_token(raw["timing"]),
+            objective_control_record_id=cast(str, raw["objective_control_record_id"]),
+            objective_control_record_hash=cast(str, raw["objective_control_record_hash"]),
+            player_id=cast(str, raw["player_id"]),
+            requested_condition_ids=tuple(
+                cast(
+                    list[str],
+                    _required_payload_list(
+                        raw["requested_condition_ids"],
+                        field_name="PrimaryScoringSpatialEvidence requested_condition_ids",
+                    ),
+                )
+            ),
+            table_quarter_unit_witnesses=tuple(
+                PrimaryTableQuarterUnitWitness.from_payload(value)
+                for value in _required_payload_list(
+                    raw["table_quarter_unit_witnesses"],
+                    field_name="PrimaryScoringSpatialEvidence table-quarter witnesses",
+                )
+            ),
+            enemy_units_wholly_within_own_territory=tuple(
+                PrimaryTerritoryUnitWitness.from_payload(value)
+                for value in _required_payload_list(
+                    raw["enemy_units_wholly_within_own_territory"],
+                    field_name="PrimaryScoringSpatialEvidence territory witnesses",
+                )
+            ),
+            opponent_territory_objective_ids=tuple(
+                cast(
+                    list[str],
+                    _required_payload_list(
+                        raw["opponent_territory_objective_ids"],
+                        field_name=("PrimaryScoringSpatialEvidence opponent territory objectives"),
+                    ),
+                )
+            ),
+        )
 
 
 def build_primary_scoring_spatial_evidence(
@@ -736,6 +829,29 @@ def _validate_sorted_identifier_tuple(
     if identifiers != tuple(sorted(identifiers)):
         raise GameLifecycleError(f"{field_name} must be sorted.")
     return identifiers
+
+
+def _required_payload_mapping(
+    payload: object,
+    *,
+    field_name: str,
+    required_keys: tuple[str, ...],
+) -> dict[str, object]:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError(f"{field_name} must be an object.")
+    untyped_raw = cast(dict[object, object], payload)
+    if any(type(key) is not str for key in untyped_raw):
+        raise GameLifecycleError(f"{field_name} must be an object.")
+    raw = cast(dict[str, object], payload)
+    if set(raw) != set(required_keys):
+        raise GameLifecycleError(f"{field_name} fields are invalid.")
+    return raw
+
+
+def _required_payload_list(value: object, *, field_name: str) -> list[object]:
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"{field_name} must be a list.")
+    return cast(list[object], value)
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

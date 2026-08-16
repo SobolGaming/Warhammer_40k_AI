@@ -52,6 +52,10 @@ from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.external_contract import (
     DECISION_REQUEST_VIEW_SCHEMA_VERSION,
     LIFECYCLE_STATUS_SCHEMA_VERSION,
+    SESSION_COMMAND_OUTCOME_SCHEMA_VERSION,
+    SESSION_COMMAND_RESULT_SCHEMA_VERSION,
+    SESSION_METADATA_SCHEMA_VERSION,
+    SESSION_PROJECTION_SCHEMA_VERSION,
 )
 from warhammer40k_core.adapters.projection import (
     PROJECTION_SCHEMA_VERSION,
@@ -398,18 +402,63 @@ def test_live_movement_proposal_schema_requires_spatial_context_hash() -> None:
         validator.validate(without_spatial_context)
 
 
-def test_session_metadata_contract_version_accepts_compatible_major_nine_releases() -> None:
+def test_session_metadata_contract_version_accepts_compatible_major_ten_releases() -> None:
     registry = _schema_registry()
     validator = _schema_validator("session-metadata.schema.json", registry=registry)
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "9.1.0"}
-    incompatible = {**_json_object(metadata), "server_contract_version": "8.3.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "10.1.0"}
+    incompatible = {**_json_object(metadata), "server_contract_version": "9.3.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):
         validator.validate(incompatible)
+
+
+def test_contract_ten_advances_only_affected_session_wrapper_families() -> None:
+    metadata = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/session-metadata.schema.json"))
+    )
+    result = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/session-command-result.schema.json"))
+    )
+    outcome = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/session-command-outcome.schema.json"))
+    )
+    projection = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/session-projection.schema.json"))
+    )
+
+    assert metadata["$id"] == (
+        "https://warhammer40k-core.local/contracts/v10/session-metadata.schema.json"
+    )
+    assert result["$id"] == (
+        "https://warhammer40k-core.local/contracts/v10/session-command-result.schema.json"
+    )
+    assert outcome["$id"] == (
+        "https://warhammer40k-core.local/contracts/v10/session-command-outcome.schema.json"
+    )
+    assert (
+        _json_object(_json_object(metadata["properties"])["schema_version"])["const"]
+        == SESSION_METADATA_SCHEMA_VERSION
+        == "session-metadata-v10-contract"
+    )
+    assert (
+        _json_object(_json_object(result["properties"])["schema_version"])["const"]
+        == SESSION_COMMAND_RESULT_SCHEMA_VERSION
+        == "session-command-result-v10-contract"
+    )
+    assert (
+        _json_object(_json_object(outcome["properties"])["schema_version"])["const"]
+        == SESSION_COMMAND_OUTCOME_SCHEMA_VERSION
+        == "session-command-outcome-v10-contract"
+    )
+    assert (
+        _json_object(_json_object(projection["properties"])["schema_version"])["const"]
+        == SESSION_PROJECTION_SCHEMA_VERSION
+        == "session-projection-v7-phase17n-step4"
+    )
 
 
 @pytest.mark.parametrize("field_name", ["ruleset_descriptor_hash", "rules_overlay_ids"])
@@ -429,7 +478,7 @@ def test_replay_metadata_schema_rejects_missing_rules_overlay_identity() -> None
         _read_json(REPO_ROOT / Path("contracts/schemas/replay-metadata.schema.json"))
     )
     assert replay_schema["$id"] == (
-        "https://warhammer40k-core.local/contracts/v7/replay-metadata.schema.json"
+        "https://warhammer40k-core.local/contracts/v8/replay-metadata.schema.json"
     )
     validator = _schema_validator("replay-metadata.schema.json", registry=_schema_registry())
     replay = _json_object(_read_json(REPO_ROOT / Path("contracts/examples/replay-metadata.json")))
@@ -438,6 +487,78 @@ def test_replay_metadata_schema_rejects_missing_rules_overlay_identity() -> None
 
     with pytest.raises(ValidationError):
         validator.validate(replay)
+
+
+def test_replay_metadata_schema_requires_closed_step5a_scoring_state_evidence() -> None:
+    replay_schema = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/replay-metadata.schema.json"))
+    )
+    initial_lifecycle = _json_object(_json_object(replay_schema["properties"])["initial_lifecycle"])
+    state = _json_object(_json_object(initial_lifecycle["properties"])["state"])
+    assert state["$ref"] == "#/$defs/step5a_replay_state"
+
+    definitions = _json_object(replay_schema["$defs"])
+    replay_state = _json_object(definitions["step5a_replay_state"])
+    replay_state_required = {_json_string(value) for value in _json_list(replay_state["required"])}
+    assert "objective_control_record_authorities" in replay_state_required
+    assert "primary_scoring_state_evidence_records" in replay_state_required
+    authority_collection = _json_object(
+        _json_object(replay_state["properties"])["objective_control_record_authorities"]
+    )
+    assert _json_object(authority_collection["items"])["$ref"] == (
+        "#/$defs/objective_control_record_authority"
+    )
+    evidence_collection = _json_object(
+        _json_object(replay_state["properties"])["primary_scoring_state_evidence_records"]
+    )
+    assert _json_object(evidence_collection["items"])["$ref"] == (
+        "#/$defs/primary_scoring_state_evidence"
+    )
+
+    evidence = _json_object(definitions["primary_scoring_state_evidence"])
+    assert evidence["additionalProperties"] is False
+    assert {_json_string(value) for value in _json_list(evidence["required"])} == set(
+        _json_object(evidence["properties"])
+    )
+    destruction_ids = _json_object(
+        _json_object(evidence["properties"])["primary_unit_destruction_state_ids"]
+    )
+    assert destruction_ids["uniqueItems"] is True
+    assert _json_object(destruction_ids["items"])["type"] == "string"
+    spatial_collection = _json_object(
+        _json_object(evidence["properties"])["primary_scoring_spatial_evidence_by_player_id"]
+    )
+    assert _json_object(spatial_collection["items"])["$ref"] == (
+        "#/$defs/primary_scoring_spatial_evidence"
+    )
+    witness = _json_object(definitions["primary_scoring_rules_unit_position_witness"])
+    membership = _json_object(_json_object(witness["properties"])["rules_unit_membership"])
+    assert membership["$ref"] == (
+        "https://warhammer40k-core.local/contracts/v8/game-view.schema.json"
+        "#/$defs/primary_rules_unit_turn_start_membership"
+    )
+    for definition_name in (
+        "objective_control_record_authority",
+        "primary_mission_boundary_checkpoint",
+        "primary_mission_boundary_model_state",
+        "primary_mission_objective_control_modifier_source",
+        "sticky_objective_control_state",
+        "primary_scoring_spatial_evidence",
+        "primary_table_quarter_unit_witness",
+        "primary_territory_unit_witness",
+    ):
+        definition = _json_object(definitions[definition_name])
+        assert definition["additionalProperties"] is False
+        assert {_json_string(value) for value in _json_list(definition["required"])} == set(
+            _json_object(definition["properties"])
+        )
+
+    game_view_schema = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/game-view.schema.json"))
+    )
+    assert "primary_scoring_state_evidence_records" not in _json_object(
+        game_view_schema["properties"]
+    )
 
 
 @pytest.mark.parametrize(

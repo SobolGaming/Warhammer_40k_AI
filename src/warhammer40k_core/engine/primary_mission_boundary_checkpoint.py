@@ -207,6 +207,26 @@ def validate_primary_mission_boundary_checkpoint_modifier_sources(
         )
 
 
+def validate_primary_mission_boundary_checkpoint_runtime_source_registry(
+    *,
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+    runtime_modifier_registry: RuntimeModifierRegistry,
+) -> None:
+    """Bind a persisted checkpoint's applied OC sources to the loaded registry."""
+    if type(checkpoint) is not PrimaryMissionBoundaryCheckpoint:
+        raise GameLifecycleError(
+            "Primary mission boundary source validation requires a checkpoint."
+        )
+    if type(runtime_modifier_registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError(
+            "Primary mission boundary source validation requires a RuntimeModifierRegistry."
+        )
+    _validate_checkpoint_modifier_source_registry(
+        checkpoint=checkpoint,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
+
+
 def validate_primary_mission_boundary_checkpoint_source_registry(
     *,
     state: GameState,
@@ -735,7 +755,6 @@ def validate_primary_mission_boundary_checkpoint(
         raise GameLifecycleError("Primary mission boundary checkpoint battlefield drifted.")
     inventory = terrain_model_inventory_from_checkpoint(checkpoint)
     validate_primary_mission_action_terrain_model_inventory(state=state, values=inventory)
-    _validate_presence(state=state, checkpoint=checkpoint)
     _validate_attached_unit_inventory(state=state, checkpoint=checkpoint)
     _validate_marker_inventory(state=state, checkpoint=checkpoint)
     _validate_action_opportunity_history(state=state, checkpoint=checkpoint)
@@ -810,10 +829,10 @@ def _boundary_model_state(
         presence = "battlefield"
     elif not alive:
         presence = "destroyed"
-    elif row.model_instance_id in reserve_model_ids:
-        presence = "reserves"
     elif row.model_instance_id in embarked_model_ids:
         presence = "embarked"
+    elif row.model_instance_id in reserve_model_ids:
+        presence = "reserves"
     else:
         presence = "off_battlefield"
     return PrimaryMissionBoundaryModelState(
@@ -1007,21 +1026,6 @@ def _is_generic_objective_control_effect(effect: PersistingEffect) -> bool:
     )
 
 
-def _validate_presence(*, state: GameState, checkpoint: PrimaryMissionBoundaryCheckpoint) -> None:
-    if (
-        state.battle_round != checkpoint.battle_round
-        or state.active_player_id != checkpoint.active_player_id
-    ):
-        return
-    reserve_model_ids = set(state.unarrived_reserve_model_ids())
-    embarked_model_ids = set(state.embarked_model_ids())
-    for row in checkpoint.model_states:
-        if row.presence == "reserves" and row.model_instance_id not in reserve_model_ids:
-            raise GameLifecycleError("Primary mission boundary reserve presence drifted.")
-        if row.presence == "embarked" and row.model_instance_id not in embarked_model_ids:
-            raise GameLifecycleError("Primary mission boundary embarkation presence drifted.")
-
-
 def _validate_attached_unit_inventory(
     *, state: GameState, checkpoint: PrimaryMissionBoundaryCheckpoint
 ) -> None:
@@ -1146,10 +1150,9 @@ def _validate_retained_same_turn_state(
             if row.player_id == checkpoint.player_id and row.battle_round == checkpoint.battle_round
         )
     )
-    if (
-        checkpoint.advanced_unit_state_jsons != expected_advanced
-        or checkpoint.fell_back_unit_state_jsons != expected_fell_back
-    ):
+    if not set(checkpoint.advanced_unit_state_jsons) <= set(expected_advanced) or not set(
+        checkpoint.fell_back_unit_state_jsons
+    ) <= set(expected_fell_back):
         raise GameLifecycleError("Primary mission boundary retained unit history drifted.")
     if (
         state.battle_round == checkpoint.battle_round
@@ -1196,11 +1199,11 @@ def _validate_retained_turn_end_model_state(
         elif not alive:
             presence = "destroyed"
             placement_json = None
-        elif row.model_instance_id in reserve_ids:
-            presence = "reserves"
-            placement_json = None
         elif row.model_instance_id in embarked_ids:
             presence = "embarked"
+            placement_json = None
+        elif row.model_instance_id in reserve_ids:
+            presence = "reserves"
             placement_json = None
         else:
             presence = "off_battlefield"
@@ -1255,6 +1258,7 @@ __all__ = (
     "validate_primary_mission_action_start_checkpoint_evidence",
     "validate_primary_mission_boundary_checkpoint",
     "validate_primary_mission_boundary_checkpoint_modifier_sources",
+    "validate_primary_mission_boundary_checkpoint_runtime_source_registry",
     "validate_primary_mission_vanguard_checkpoint",
     "validate_primary_mission_vanguard_checkpoint_evidence",
 )

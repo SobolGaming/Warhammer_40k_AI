@@ -17,6 +17,7 @@ from warhammer40k_core.adapters.projection import (
     project_game_view,
 )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
+from warhammer40k_core.core.attributes import CharacteristicValue
 from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
@@ -64,6 +65,13 @@ from warhammer40k_core.engine.movement_proposals import (
     MovementProposalRequest,
     ProposalKind,
 )
+from warhammer40k_core.engine.objective_control import (
+    ObjectiveControlRecord,
+    ObjectiveControlResult,
+)
+from warhammer40k_core.engine.objective_control_record_authority import (
+    ObjectiveControlRecordAuthority,
+)
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -105,6 +113,11 @@ from warhammer40k_core.engine.primary_historical_events import (
     record_new_primary_unit_destruction_events,
     record_primary_unit_destruction_event,
 )
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
+    PrimaryMissionBoundaryCheckpoint,
+    PrimaryMissionBoundaryModelState,
+    PrimaryMissionObjectiveControlModifierSource,
+)
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     record_primary_turn_start_evidence,
 )
@@ -131,6 +144,10 @@ from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
 from warhammer40k_core.engine.setup_flow import (
     SECONDARY_MISSION_DECISION_TYPE,
     army_mustered_event_payload,
+)
+from warhammer40k_core.engine.sticky_objective_control import (
+    StickyObjectiveControlState,
+    apply_sticky_objective_control,
 )
 from warhammer40k_core.engine.stratagems import (
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
@@ -185,7 +202,177 @@ def test_setup_to_battle_replay_reproduces_exactly() -> None:
     assert payload["event_records"]
     assert payload["projection_checkpoints"]
     assert payload["schema_version"] == REPLAY_ARTIFACT_SCHEMA_VERSION
-    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v7-phase17n-step4"
+    assert REPLAY_ARTIFACT_SCHEMA_VERSION == "replay-artifact-v8-phase17n-step5a"
+
+
+def test_replay_v8_round_trips_objective_control_record_boundary_authority() -> None:
+    lifecycle, record = _objective_control_authority_lifecycle(
+        game_id="phase18b-objective-control-authority-round-trip"
+    )
+
+    restored = GameLifecycle.from_payload(_lifecycle_payload_copy(lifecycle))
+
+    assert restored.to_payload() == lifecycle.to_payload()
+    assert restored.state is not None
+    assert restored.state.objective_control_records == [record]
+    assert len(restored.state.objective_control_record_authorities) == 1
+
+
+def test_replay_v8_rejects_orphaned_canonical_objective_control_boundary_event() -> None:
+    lifecycle, _record = _objective_control_authority_lifecycle(
+        game_id="phase18b-objective-control-orphaned-boundary-event"
+    )
+    payload = _lifecycle_payload_copy(lifecycle)
+    state_payload = cast(dict[str, JsonValue], payload["state"])
+    state_payload["objective_control_records"] = []
+    state_payload["objective_control_record_authorities"] = []
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="canonical boundary event does not identify exactly one stored record",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_replay_v8_rejects_rehashed_sticky_control_without_creation_event() -> None:
+    lifecycle, record = _objective_control_authority_lifecycle(
+        game_id="phase18b-objective-control-sticky-forgery"
+    )
+    state = _state(lifecycle)
+    authority = state.objective_control_record_authorities[0]
+    controlled = next(
+        result for result in record.results if result.controlled_by_player_id == "player-a"
+    )
+    source_unit = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-a"
+        for unit in army.units
+    )
+    destroyed_unit = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-b"
+        for unit in army.units
+    )
+    forged_witness = StickyObjectiveControlState(
+        state_id="phase18b-forged-sticky-state",
+        game_id=state.game_id,
+        player_id="player-a",
+        objective_id=controlled.objective_id,
+        source_rule_id="phase18b-forged-sticky-source",
+        source_event_id="phase18b-forged-sticky-event",
+        battle_round=state.battle_round,
+        phase=record.phase,
+        active_player_id=record.active_player_id,
+        originating_unit_instance_id=source_unit.unit_instance_id,
+        destroyed_unit_instance_id=destroyed_unit.unit_instance_id,
+        replay_payload={"forged": True},
+    )
+    forged_record = apply_sticky_objective_control(
+        record=record,
+        states=(forged_witness,),
+    )
+    forged_authority = ObjectiveControlRecordAuthority.create(
+        record=forged_record,
+        boundary_checkpoint=authority.boundary_checkpoint,
+        retained_sticky_objective_control_states=(forged_witness,),
+    )
+    payload = _lifecycle_payload_copy(lifecycle)
+    state_payload = cast(dict[str, JsonValue], payload["state"])
+    cast(list[JsonValue], state_payload["sticky_objective_control_states"]).append(
+        validate_json_value(forged_witness.to_payload())
+    )
+    _replace_objective_control_record_authority_payload(
+        state_payload=state_payload,
+        record=forged_record,
+        authority=forged_authority,
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="sticky witness lacks exact creation-event authority",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_replay_v8_rejects_rehashed_unregistered_objective_control_modifier() -> None:
+    lifecycle, record = _objective_control_authority_lifecycle(
+        game_id="phase18b-objective-control-modifier-forgery"
+    )
+    state = _state(lifecycle)
+    authority = state.objective_control_record_authorities[0]
+    result = next(candidate for candidate in record.results if candidate.contributors)
+    contribution = result.contributors[0]
+    checkpoint = authority.boundary_checkpoint
+    model_state = next(
+        row
+        for row in checkpoint.model_states
+        if row.model_instance_id == contribution.model_instance_id
+    )
+    resolved = CharacteristicValue.from_payload(
+        json.loads(model_state.resolved_objective_control_json)
+    )
+    modifier_id = "phase18b-forged-objective-control-modifier"
+    forged_resolved = replace(
+        resolved,
+        final=resolved.final + 8,
+        applied_modifier_ids=(*resolved.applied_modifier_ids, modifier_id),
+    )
+    forged_model_state = replace(
+        model_state,
+        resolved_objective_control_json=canonical_json(forged_resolved.to_payload()),
+    )
+    forged_checkpoint = _rebuild_objective_control_checkpoint(
+        checkpoint,
+        model_states=tuple(
+            forged_model_state if row.model_instance_id == model_state.model_instance_id else row
+            for row in checkpoint.model_states
+        ),
+        objective_control_modifier_sources=(
+            PrimaryMissionObjectiveControlModifierSource(
+                modifier_id=modifier_id,
+                source_id="phase18b-forged-objective-control-source",
+                source_effect_id=None,
+                source_effect_json=None,
+            ),
+        ),
+    )
+    forged_result = ObjectiveControlResult.from_contributors(
+        objective_id=result.objective_id,
+        contributors=tuple(
+            replace(
+                candidate,
+                objective_control=forged_resolved.final,
+                effective_objective_control=forged_resolved.final,
+            )
+            if candidate.model_instance_id == contribution.model_instance_id
+            else candidate
+            for candidate in result.contributors
+        ),
+    )
+    forged_record = replace(
+        record,
+        results=tuple(
+            forged_result if candidate.objective_id == result.objective_id else candidate
+            for candidate in record.results
+        ),
+    )
+    forged_authority = ObjectiveControlRecordAuthority.create(
+        record=forged_record,
+        boundary_checkpoint=forged_checkpoint,
+        retained_sticky_objective_control_states=(),
+    )
+    payload = _lifecycle_payload_copy(lifecycle)
+    state_payload = cast(dict[str, JsonValue], payload["state"])
+    _replace_objective_control_record_authority_payload(
+        state_payload=state_payload,
+        record=forged_record,
+        authority=forged_authority,
+    )
+
+    with pytest.raises(GameLifecycleError, match="modifier is unregistered"):
+        GameLifecycle.from_payload(payload)
 
 
 def test_replay_source_identity_binds_canonical_mission_package_hash() -> None:
@@ -238,6 +425,8 @@ def test_legacy_replay_versions_are_rejected_without_shape_inference() -> None:
         "replay-artifact-v3-phase17n",
         "replay-artifact-v4-phase17n",
         "replay-artifact-v5-phase17n",
+        "replay-artifact-v6-phase17n-step3",
+        "replay-artifact-v7-phase17n-step4",
     ):
         legacy_payload = _artifact_payload_copy(_setup_to_battle_artifact())
         legacy_payload["schema_version"] = legacy_schema_version
@@ -1985,6 +2174,103 @@ def _movement_phase_lifecycle(
         },
     )
     return GameLifecycle.from_payload(payload), units
+
+
+def _objective_control_authority_lifecycle(
+    *,
+    game_id: str,
+) -> tuple[GameLifecycle, ObjectiveControlRecord]:
+    lifecycle, units = _movement_phase_lifecycle(game_id=game_id)
+    state = _state(lifecycle)
+    battlefield = state.battlefield_state
+    mission_setup = state.mission_setup
+    assert battlefield is not None
+    assert mission_setup is not None
+    objective = mission_setup.objective_markers[0]
+    attacker = units["attacker"]
+    placement = battlefield.unit_placement_by_id(attacker.unit_instance_id)
+    state.battlefield_state = battlefield.with_unit_placement(
+        placement.with_model_placements(
+            tuple(
+                replace(
+                    model_placement,
+                    pose=Pose.at(
+                        objective.x_inches + (index * 0.1),
+                        objective.y_inches,
+                        model_placement.pose.position.z,
+                        facing_degrees=model_placement.pose.facing.degrees,
+                    ),
+                )
+                for index, model_placement in enumerate(placement.model_placements)
+            )
+        )
+    )
+    record = state.determine_current_phase_end_objective_control(
+        runtime_modifier_registry=(lifecycle._shooting_phase_handler.runtime_modifier_registry)
+    )
+    lifecycle.decision_controller.event_log.append(
+        "end_boundary_objective_control_determined",
+        {
+            "game_id": record.game_id,
+            "battle_round": record.battle_round,
+            "phase": record.phase,
+            "record_ids": [record.record_id],
+            "source_rule_id": (
+                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+            ),
+        },
+    )
+    assert any(result.contributors for result in record.results)
+    return lifecycle, record
+
+
+def _replace_objective_control_record_authority_payload(
+    *,
+    state_payload: dict[str, JsonValue],
+    record: ObjectiveControlRecord,
+    authority: ObjectiveControlRecordAuthority,
+) -> None:
+    records = cast(list[JsonValue], state_payload["objective_control_records"])
+    records[:] = [
+        validate_json_value(record.to_payload())
+        if cast(dict[str, JsonValue], stored)["record_id"] == record.record_id
+        else stored
+        for stored in records
+    ]
+    authorities = cast(list[JsonValue], state_payload["objective_control_record_authorities"])
+    authorities[:] = [
+        validate_json_value(authority.to_payload())
+        if cast(dict[str, JsonValue], stored)["objective_control_record_id"] == record.record_id
+        else stored
+        for stored in authorities
+    ]
+
+
+def _rebuild_objective_control_checkpoint(
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+    *,
+    model_states: tuple[PrimaryMissionBoundaryModelState, ...],
+    objective_control_modifier_sources: tuple[PrimaryMissionObjectiveControlModifierSource, ...],
+) -> PrimaryMissionBoundaryCheckpoint:
+    return PrimaryMissionBoundaryCheckpoint.create(
+        boundary_kind=checkpoint.boundary_kind,
+        game_id=checkpoint.game_id,
+        player_id=checkpoint.player_id,
+        active_player_id=checkpoint.active_player_id,
+        battle_round=checkpoint.battle_round,
+        phase=checkpoint.phase,
+        battlefield_id=checkpoint.battlefield_id,
+        model_states=model_states,
+        attached_unit_formation_jsons=checkpoint.attached_unit_formation_jsons,
+        battle_shocked_unit_instance_ids=checkpoint.battle_shocked_unit_instance_ids,
+        advanced_unit_state_jsons=checkpoint.advanced_unit_state_jsons,
+        fell_back_unit_state_jsons=checkpoint.fell_back_unit_state_jsons,
+        shot_unit_instance_ids=checkpoint.shot_unit_instance_ids,
+        objective_control_modifier_sources=objective_control_modifier_sources,
+        active_primary_marker_jsons=checkpoint.active_primary_marker_jsons,
+        active_secondary_mission_ids=checkpoint.active_secondary_mission_ids,
+        mission_action_prior_use_jsons=checkpoint.mission_action_prior_use_jsons,
+    )
 
 
 def _populated_primary_destruction_replay_payload(

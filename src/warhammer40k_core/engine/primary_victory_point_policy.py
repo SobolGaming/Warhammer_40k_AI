@@ -5,11 +5,19 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.core.descriptor_hash import validate_sha256_hex
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
     ObjectiveControlTiming,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
+    objective_control_record_hash,
+)
+from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    PrimaryScoringBoundaryKind,
+    PrimaryScoringStateEvidence,
+)
 from warhammer40k_core.engine.primary_scoring_timing import (
     primary_scoring_timing_applies,
 )
@@ -50,6 +58,7 @@ def validate_primary_victory_point_award(
     policy: MissionScoringPolicy,
     award: VictoryPointAward,
     objective_control_records: Sequence[ObjectiveControlRecord],
+    primary_scoring_state_evidence_records: Sequence[PrimaryScoringStateEvidence],
     turn_order: tuple[str, ...],
     expected_boundary_active_player_id: str,
 ) -> PrimaryVictoryPointPolicyBinding:
@@ -57,6 +66,7 @@ def validate_primary_victory_point_award(
         policy=policy,
         record=award,
         objective_control_records=objective_control_records,
+        primary_scoring_state_evidence_records=primary_scoring_state_evidence_records,
         turn_order=turn_order,
         expected_boundary_active_player_id=expected_boundary_active_player_id,
         allow_cap_audit=False,
@@ -68,12 +78,14 @@ def validate_primary_victory_point_transaction(
     policy: MissionScoringPolicy,
     transaction: VictoryPointTransaction,
     objective_control_records: Sequence[ObjectiveControlRecord],
+    primary_scoring_state_evidence_records: Sequence[PrimaryScoringStateEvidence],
     turn_order: tuple[str, ...],
 ) -> PrimaryVictoryPointPolicyBinding:
     return _validate_primary_victory_point_record(
         policy=policy,
         record=transaction,
         objective_control_records=objective_control_records,
+        primary_scoring_state_evidence_records=primary_scoring_state_evidence_records,
         turn_order=turn_order,
         expected_boundary_active_player_id=None,
         allow_cap_audit=True,
@@ -85,13 +97,18 @@ def validate_victory_point_ledger_policy(
     policy: MissionScoringPolicy,
     ledger: VictoryPointLedger,
     objective_control_records: Sequence[ObjectiveControlRecord],
+    primary_scoring_state_evidence_records: Sequence[PrimaryScoringStateEvidence],
     turn_order: tuple[str, ...],
 ) -> VictoryPointLedgerPolicyValidation:
-    """Validate source bindings and the ordinary Primary round cap."""
+    """Replay ledger chronology and validate source bindings plus Primary cap audits."""
 
     from warhammer40k_core.engine.scoring import (
         VictoryPointCapBucket,
+        VictoryPointLedger,
         VictoryPointSourceKind,
+    )
+    from warhammer40k_core.engine.victory_point_cap_resolution import (
+        resolve_victory_point_cap,
     )
 
     if ledger.player_id != policy.player_id:
@@ -99,17 +116,29 @@ def validate_victory_point_ledger_policy(
     end_of_battle_transaction_ids: set[str] = set()
     primary_binding_identities: set[tuple[str, str]] = set()
     primary_bucket_transactions: list[VictoryPointTransaction] = []
-    for transaction in ledger.transactions:
+    replayed_ledger = VictoryPointLedger.initial(player_id=ledger.player_id)
+    previous_primary_order_key: tuple[int, int, int, int, int, int, str] | None = None
+    for transaction_index, transaction in enumerate(ledger.transactions, start=1):
+        expected_transaction_id = (
+            f"victory-point:{ledger.player_id}:round-{transaction.battle_round:02d}:"
+            f"{transaction_index:06d}"
+        )
+        if transaction.transaction_id != expected_transaction_id:
+            raise GameLifecycleError(
+                "Victory Point ledger transaction identity or chronology drifted."
+            )
         cap_bucket = policy.cap_bucket_for_victory_point_source(
             source_kind=transaction.source_kind,
             source_id=transaction.source_id,
         )
         binding = None
+        end_of_battle_exempt = False
         if transaction.source_kind is VictoryPointSourceKind.PRIMARY:
             binding = validate_primary_victory_point_transaction(
                 policy=policy,
                 transaction=transaction,
                 objective_control_records=objective_control_records,
+                primary_scoring_state_evidence_records=(primary_scoring_state_evidence_records),
                 turn_order=turn_order,
             )
             if binding.identity in primary_binding_identities:
@@ -117,14 +146,55 @@ def validate_victory_point_ledger_policy(
                     "Primary VP ledger must not repeat a scoring rule at one boundary."
                 )
             primary_binding_identities.add(binding.identity)
-            if binding.cap_treatment is PrimaryVictoryPointCapTreatment.END_OF_BATTLE_EXEMPT:
-                end_of_battle_transaction_ids.add(transaction.transaction_id)
+            primary_order_key = _primary_transaction_order_key(
+                binding=binding,
+                objective_control_records=objective_control_records,
+                turn_order=turn_order,
+                scoring_player_id=policy.player_id,
+            )
+            if (
+                previous_primary_order_key is not None
+                and primary_order_key < previous_primary_order_key
+            ):
+                raise GameLifecycleError(
+                    "Primary VP ledger transaction chronology drifted from scoring boundaries."
+                )
+            previous_primary_order_key = primary_order_key
+            end_of_battle_exempt = (
+                binding.cap_treatment is PrimaryVictoryPointCapTreatment.END_OF_BATTLE_EXEMPT
+            )
         if cap_bucket is VictoryPointCapBucket.PRIMARY:
             if transaction.scoring_timing == "end_of_battle" and binding is None:
                 raise GameLifecycleError(
                     "Only a source-backed Primary scoring rule may claim end-of-battle exemption."
                 )
             primary_bucket_transactions.append(transaction)
+        uncapped_award = _uncapped_award_from_transaction(transaction)
+        cap_resolution = resolve_victory_point_cap(
+            policy=policy,
+            ledger=replayed_ledger,
+            award=uncapped_award,
+            end_of_battle_transaction_ids=frozenset(end_of_battle_transaction_ids),
+            end_of_battle_exempt=end_of_battle_exempt,
+        )
+        if (
+            transaction.amount != cap_resolution.applied_amount
+            or transaction.metadata != cap_resolution.metadata
+        ):
+            if binding is not None:
+                raise GameLifecycleError(
+                    "Primary VP transaction cap audit drifted from chronological ledger policy."
+                )
+            raise GameLifecycleError(
+                "Victory point transaction cap audit drifted from chronological ledger policy."
+            )
+        if end_of_battle_exempt:
+            end_of_battle_transaction_ids.add(transaction.transaction_id)
+        replayed_ledger = VictoryPointLedger(
+            player_id=ledger.player_id,
+            victory_points=replayed_ledger.victory_points + transaction.amount,
+            transactions=(*replayed_ledger.transactions, transaction),
+        )
 
     if policy.primary_max_vp_per_turn is not None:
         round_totals: dict[int, int] = {}
@@ -144,11 +214,96 @@ def validate_victory_point_ledger_policy(
     )
 
 
+def _uncapped_award_from_transaction(
+    transaction: VictoryPointTransaction,
+) -> VictoryPointAward:
+    from warhammer40k_core.engine.scoring import VictoryPointAward
+
+    metadata = transaction.metadata
+    requested_amount = transaction.amount
+    if isinstance(metadata, dict) and "vp_cap_audit" in metadata:
+        cap_audit = metadata["vp_cap_audit"]
+        if not isinstance(cap_audit, dict):
+            raise GameLifecycleError("Victory point transaction cap audit must be an object.")
+        requested_amount_value = cap_audit.get("requested_amount")
+        applied_amount = cap_audit.get("applied_amount")
+        if type(requested_amount_value) is not int or requested_amount_value <= 0:
+            raise GameLifecycleError(
+                "Victory point transaction cap audit requires positive requested_amount."
+            )
+        if type(applied_amount) is not int or applied_amount != transaction.amount:
+            raise GameLifecycleError("Victory point transaction cap audit applied_amount drifted.")
+        if applied_amount > requested_amount_value:
+            raise GameLifecycleError(
+                "Victory point transaction cap audit applied_amount exceeds requested_amount."
+            )
+        requested_amount = requested_amount_value
+        restored_metadata = dict(metadata)
+        restored_metadata.pop("vp_cap_audit")
+        metadata = restored_metadata
+    return VictoryPointAward(
+        player_id=transaction.player_id,
+        battle_round=transaction.battle_round,
+        phase=transaction.phase,
+        amount=requested_amount,
+        source_kind=transaction.source_kind,
+        source_id=transaction.source_id,
+        scoring_timing=transaction.scoring_timing,
+        hidden=transaction.hidden,
+        metadata=metadata,
+    )
+
+
+def _primary_transaction_order_key(
+    *,
+    binding: PrimaryVictoryPointPolicyBinding,
+    objective_control_records: Sequence[ObjectiveControlRecord],
+    turn_order: tuple[str, ...],
+    scoring_player_id: str,
+) -> tuple[int, int, int, int, int, int, str]:
+    matches = tuple(
+        record
+        for record in objective_control_records
+        if record.record_id == binding.objective_control_record_id
+    )
+    if len(matches) != 1:
+        raise GameLifecycleError(
+            "Primary VP transaction chronology requires one objective-control boundary."
+        )
+    boundary = matches[0]
+    if boundary.active_player_id not in turn_order:
+        raise GameLifecycleError(
+            "Primary VP transaction chronology boundary player is not in turn order."
+        )
+    if scoring_player_id not in turn_order:
+        raise GameLifecycleError(
+            "Primary VP transaction chronology scoring player is not in turn order."
+        )
+    phase_order = tuple(phase.value for phase in BattlePhase)
+    if boundary.phase not in phase_order:
+        raise GameLifecycleError("Primary VP transaction chronology boundary phase is unsupported.")
+    timing_order = (
+        ObjectiveControlTiming.TURN_START,
+        ObjectiveControlTiming.PHASE_END,
+        ObjectiveControlTiming.TURN_END,
+    )
+    return (
+        boundary.battle_round,
+        turn_order.index(boundary.active_player_id),
+        phase_order.index(boundary.phase),
+        timing_order.index(boundary.timing),
+        (1 if binding.cap_treatment is PrimaryVictoryPointCapTreatment.END_OF_BATTLE_EXEMPT else 0),
+        turn_order.index(scoring_player_id),
+        binding.scoring_rule_id,
+    )
+
+
 def _validate_primary_victory_point_record(
     *,
     policy: MissionScoringPolicy,
     record: VictoryPointAward | VictoryPointTransaction,
     objective_control_records: Sequence[ObjectiveControlRecord],
+    primary_scoring_state_evidence_records: Sequence[PrimaryScoringStateEvidence],
     turn_order: tuple[str, ...],
     expected_boundary_active_player_id: str | None,
     allow_cap_audit: bool,
@@ -170,6 +325,14 @@ def _validate_primary_victory_point_record(
     if not isinstance(record.metadata, dict):
         raise GameLifecycleError("Primary VP metadata must be an object.")
     metadata = record.metadata
+    state_evidence_id = _required_string(metadata, "primary_scoring_state_evidence_id")
+    state_evidence_hash = validate_sha256_hex(
+        _required_string(metadata, "primary_scoring_state_evidence_hash"),
+        field_name="Primary VP primary_scoring_state_evidence_hash",
+        error_type=GameLifecycleError,
+    )
+    if state_evidence_id != f"primary-scoring-state-evidence:{state_evidence_hash}":
+        raise GameLifecycleError("Primary VP scoring-state evidence identity drifted.")
     scoring_rule_id = _required_string(metadata, "scoring_rule_id")
     rule_matches = tuple(
         rule for rule in policy.primary_scoring_rules if rule.rule_id == scoring_rule_id
@@ -221,8 +384,12 @@ def _validate_primary_victory_point_record(
         and boundary.active_player_id != expected_boundary_active_player_id
     ):
         raise GameLifecycleError("Primary VP boundary drifted from the active player.")
-
     end_of_battle = record.scoring_timing == "end_of_battle"
+    expected_boundary_kind = (
+        PrimaryScoringBoundaryKind.END_OF_BATTLE
+        if end_of_battle
+        else PrimaryScoringBoundaryKind.ORDINARY
+    )
     if (rule.timing == "end_of_battle") != end_of_battle:
         raise GameLifecycleError("Primary VP scoring_timing drifted from its source rule.")
     if end_of_battle:
@@ -261,6 +428,30 @@ def _validate_primary_victory_point_record(
     ):
         raise GameLifecycleError(
             "Primary VP scoring rule does not apply at its objective-control boundary."
+        )
+    if any(
+        type(evidence) is not PrimaryScoringStateEvidence
+        for evidence in primary_scoring_state_evidence_records
+    ):
+        raise GameLifecycleError("Primary VP authority registry must contain typed state evidence.")
+    state_evidence_matches = tuple(
+        evidence
+        for evidence in primary_scoring_state_evidence_records
+        if evidence.evidence_id == state_evidence_id
+    )
+    if len(state_evidence_matches) != 1:
+        raise GameLifecycleError(
+            "Primary VP scoring-state evidence does not identify an authoritative record."
+        )
+    state_evidence = state_evidence_matches[0]
+    if (
+        state_evidence.evidence_hash != state_evidence_hash
+        or state_evidence.objective_control_record_id != boundary.record_id
+        or state_evidence.objective_control_record_hash != objective_control_record_hash(boundary)
+        or state_evidence.scoring_boundary_kind is not expected_boundary_kind
+    ):
+        raise GameLifecycleError(
+            "Primary VP scoring-state evidence drifted from its authoritative boundary."
         )
     return PrimaryVictoryPointPolicyBinding(
         scoring_rule_id=scoring_rule_id,

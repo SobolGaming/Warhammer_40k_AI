@@ -88,24 +88,31 @@ def fight_lifecycle(
     alpha_detachment_ids: tuple[str, ...] = ("core-combined-arms",),
     enemy_faction_id: str = "core-marine-force",
     enemy_detachment_ids: tuple[str, ...] = ("core-combined-arms",),
+    config: GameConfig | None = None,
+    battle_phase: BattlePhase = BattlePhase.FIGHT,
+    poses_by_unit_key: dict[str, tuple[Pose, ...]] | None = None,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
-    config = fight_config(
-        game_id=game_id,
-        alpha_unit_ids=alpha_unit_ids,
-        enemy_unit_ids=enemy_unit_ids,
-        datasheet_id=datasheet_id,
-        model_profile_id=model_profile_id,
-        model_count=model_count,
-        alpha_unit_specs=alpha_unit_specs,
-        enemy_unit_specs=enemy_unit_specs,
-        catalog=catalog,
-        alpha_faction_id=alpha_faction_id,
-        alpha_detachment_ids=alpha_detachment_ids,
-        enemy_faction_id=enemy_faction_id,
-        enemy_detachment_ids=enemy_detachment_ids,
+    resolved_config = (
+        fight_config(
+            game_id=game_id,
+            alpha_unit_ids=alpha_unit_ids,
+            enemy_unit_ids=enemy_unit_ids,
+            datasheet_id=datasheet_id,
+            model_profile_id=model_profile_id,
+            model_count=model_count,
+            alpha_unit_specs=alpha_unit_specs,
+            enemy_unit_specs=enemy_unit_specs,
+            catalog=catalog,
+            alpha_faction_id=alpha_faction_id,
+            alpha_detachment_ids=alpha_detachment_ids,
+            enemy_faction_id=enemy_faction_id,
+            enemy_detachment_ids=enemy_detachment_ids,
+        )
+        if config is None
+        else config
     )
-    armies = mustered_armies(config)
-    mission = config.mission_setup
+    armies = mustered_armies(resolved_config)
+    mission = resolved_config.mission_setup
     assert mission is not None
     scenario = create_deterministic_battlefield_scenario(
         battlefield_id=f"{game_id}-battlefield",
@@ -127,19 +134,23 @@ def fight_lifecycle(
                 unit,
                 army_id=army_id,
                 player_id=player_id,
-                poses=compact_test_unit_poses(
-                    origin=origins[key],
-                    model_count=len(unit.own_models),
+                poses=(
+                    compact_test_unit_poses(
+                        origin=origins[key],
+                        model_count=len(unit.own_models),
+                    )
+                    if poses_by_unit_key is None
+                    else poses_by_unit_key[key]
                 ),
             )
         )
-    state = GameState.from_config(config)
+    state = GameState.from_config(resolved_config)
     for army in armies:
         state.record_army_definition(army)
     state.record_battlefield_state(battlefield)
     state.stage = GameLifecycleStage.BATTLE
     state.setup_step_index = None
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    state.battle_phase_index = state.battle_phase_sequence.index(battle_phase)
     state.battle_round = 1
     state.active_player_id = "player-a"
     for player_id in state.player_ids:
@@ -169,7 +180,7 @@ def fight_lifecycle(
     payload = cast(
         GameLifecyclePayload,
         {
-            "config": config.to_payload(),
+            "config": resolved_config.to_payload(),
             "parameterized_movement_proposals": True,
             "state": state.to_payload(),
             "decisions": decisions.to_payload(),

@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`9.0.0`, declared in `openapi.yaml`, `manifest.json`, and
+`10.0.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -27,11 +27,11 @@ The pull-request contract audit performs three independent checks:
    contract requires a major increase. This preserves compatible additions
    made anywhere in the current major line.
 2. The proposed contract is compared with the oldest committed baseline for
-   its current major, currently `compatibility/9.0.0-shape.json`. Breaking
-   changes are rejected while the bundle major remains `9`, preserving the
+   its current major, currently `compatibility/10.0.0-shape.json`. Breaking
+   changes are rejected while the bundle major remains `10`, preserving the
    original clients for the full supported major. The immutable 1.0.0,
-   2.0.0, 3.0.0, 4.0.0, 5.0.0, 6.0.0, 7.0.0, and 8.0.0 baselines remain
-   committed as historical compatibility anchors.
+   2.0.0, 3.0.0, 4.0.0, 5.0.0, 6.0.0, 7.0.0, 8.0.0, and 9.0.0 baselines
+   remain committed as historical compatibility anchors.
 3. Every released baseline present on the base commit must retain the exact
    decoded UTF-8 text after line-ending normalization.
 
@@ -47,27 +47,43 @@ must be reviewed in the same change.
 
 ## Support window
 
-The reference server supports one contract major at a time. Contract 9 retains
-Contract 8's directed Primary assignments and grouped historical evidence and
-adds the required public `primary_mission_progress_state`. That state records
-persistent/tombstoned mission markers, historical Punishment condemned
-selections, and active/consumed Consecrate designations with source and event
-provenance. `select_primary_mission_choice` requests and results are public
-finite choices. The `battlefield-view-v4-phase17n-step3` family is unchanged;
-Step 4 changes mission state, decision, lifecycle, event, session, and replay
-families without changing authoritative battlefield coordinates or geometry
-hash semantics.
+The reference server supports one contract major at a time. Contract 10 retains
+Contract 9's directed Primary assignments, grouped historical evidence,
+persistent Primary Mission progress, public Primary choices, and viewer-facing
+projection families. It adds the required engine-private
+`objective_control_record_authorities` and
+`primary_scoring_state_evidence_records` replay state. Objective-control
+authorities bind each persisted record to a closed, content-addressed physical
+boundary checkpoint plus retained sticky-control provenance. Each closed,
+content-addressed row freezes the objective-control boundary, boundary kind,
+Primary progress, qualifying Primary Action/departure history, and current
+group-aware physical memberships plus the per-player spatial-condition evidence
+consumed by the Primary rules evaluation, including a zero-award result. The
+`game-view-v11-phase17n-step4`, `session-projection-v7-phase17n-step4`, and
+`battlefield-view-v4-phase17n-step3` families are unchanged because this
+authoritative registry is replay/audit state and is deliberately omitted from
+viewer projections.
 
-Deployers upgrading a hosted 8.x service must retain a separately deployed 8.x
-adapter through at least 2027-08-14 and one released 9.x minor line, whichever
-is later. The retained adapter is a separate deployment pinned to an 8.x build;
-the repository's Contract 9 reference server does not provide content
-negotiation or parallel 8.x endpoints. Contract 9 clients must regenerate from
-the Contract 9 schemas, discard cached Contract 8 projections, event cursors,
-replay metadata, and checkpoints, and fetch a fresh projection after
-authentication. Contract 8 cursors remain valid only against the retained 8.x
-deployment. Prior retention dates remain in force for deployers covered by
-earlier migrations. See `migrations/8-to-9.md`, `migrations/7-to-8.md`,
+The registry is exactly inverse-complete over applicable assigned-Primary
+rules: every required ordinary or end-of-battle evaluation boundary has one
+row even when evaluation awards zero VP, every row maps back to such a
+boundary, and every awarded transaction matches deterministic re-evaluation.
+Contract 10 therefore rejects removal of transactions together with their
+evidence when the underlying applicable Objective Control boundary remains.
+
+Deployers upgrading a hosted 9.x service must retain a separately deployed 9.x
+adapter through at least 2027-08-16 and one released 10.x minor line, whichever
+is later. The retained adapter is a separate deployment pinned to a 9.x build;
+the repository's Contract 10 reference server does not provide content
+negotiation or parallel 9.x endpoints. Contract 10 clients must regenerate from
+the Contract 10 schemas, discard cached Contract 9 session metadata, command
+results/outcomes, replay metadata, and replay checkpoints, and fetch fresh
+session metadata after authentication. Contract 9 replay artifacts remain
+valid only against the retained 9.x deployment; their missing
+objective-control-authority and scoring-state registries are never inferred as
+empty. Prior retention dates remain in force for
+deployers covered by earlier migrations. See `migrations/9-to-10.md`,
+`migrations/8-to-9.md`, `migrations/7-to-8.md`,
 `migrations/6-to-7.md`, `migrations/5-to-6.md`,
 `migrations/4-to-5.md`, and `migrations/3-to-4.md`.
 

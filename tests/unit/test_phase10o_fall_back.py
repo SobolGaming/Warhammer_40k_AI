@@ -14,6 +14,7 @@ from tests.movement_submission_helpers import (
     submit_default_movement_proposal_if_pending,
     submit_movement_proposal,
 )
+from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
@@ -49,7 +50,12 @@ from warhammer40k_core.engine.effects import (
     PersistingEffect,
 )
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
-from warhammer40k_core.engine.game_state import GameConfig, GameState
+from warhammer40k_core.engine.game_state import (
+    GameConfig,
+    GameState,
+    SecondaryMissionChoice,
+    SecondaryMissionMode,
+)
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
@@ -116,7 +122,7 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
 )
 
 _ONE_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-muster-one-0009"
-_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-coherency-fail-001-003-0071"
+_TWO_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-coherency-authenticated-001-003-0002"
 _MULTI_FAILED_DESPERATE_ESCAPE_GAME_ID = "phase10o-terrain-display-02-0001"
 _ORDERED_FALL_BACK_OPTION_ID = (
     f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
@@ -1531,9 +1537,10 @@ def _advance_to_fall_back_action_request(
     *,
     game_id: str = "phase10o-desperate",
 ) -> tuple[GameLifecycle, DecisionRequest]:
-    lifecycle, movement_status = _advance_to_movement_unit_selection(_config(game_id=game_id))
+    lifecycle, movement_status = _movement_lifecycle_with_overflight_engagement(
+        _config(game_id=game_id)
+    )
     _mark_first_unit_battle_shocked(_state(lifecycle))
-    _move_first_enemy_model_into_overflight_engagement(lifecycle)
     action_status = _submit_result(
         lifecycle,
         request=_decision_request(movement_status),
@@ -1594,6 +1601,89 @@ def _advance_to_movement_unit_selection(
         result_id_prefix="phase10o-deploy",
         pose_factory=_fall_back_deployment_pose,
     )
+    assert _decision_request(movement_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    return lifecycle, movement_status
+
+
+def _movement_lifecycle_with_overflight_engagement(
+    config: GameConfig,
+) -> tuple[GameLifecycle, LifecycleStatus]:
+    mission_setup = config.mission_setup
+    assert mission_setup is not None
+    armies = tuple(
+        muster_army(catalog=config.army_catalog, request=request)
+        for request in config.army_muster_requests
+    )
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id=f"{config.game_id}-battlefield",
+        armies=armies,
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+    )
+    battlefield = scenario.battlefield_state
+    for army in armies:
+        for unit in army.units:
+            placement = battlefield.unit_placement_by_id(unit.unit_instance_id)
+            battlefield = battlefield.with_unit_placement(
+                placement.with_model_placements(
+                    tuple(
+                        model_placement.with_pose(
+                            _fall_back_deployment_pose(
+                                index,
+                                army.player_id,
+                                model_placement.model_instance_id,
+                            )
+                        )
+                        for index, model_placement in enumerate(placement.model_placements)
+                    )
+                )
+            )
+    friendly = battlefield.unit_placement_by_id("army-alpha:intercessor-unit-1")
+    enemy = battlefield.unit_placement_by_id("army-beta:intercessor-unit-2")
+    first_friendly_pose = friendly.model_placements[0].pose
+    battlefield = battlefield.with_unit_placement(
+        _translated_enemy_unit(
+            enemy,
+            first_model_pose=Pose.at(
+                first_friendly_pose.position.x,
+                first_friendly_pose.position.y + 2.0,
+                first_friendly_pose.position.z,
+                facing_degrees=180.0,
+            ),
+        )
+    )
+    state = GameState.from_config(config)
+    for army in armies:
+        state.record_army_definition(army)
+    state.record_battlefield_state(battlefield)
+    for player_id in state.player_ids:
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player_id=player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("assassination", "bring_it_down"),
+            )
+        )
+    state.stage = GameLifecycleStage.BATTLE
+    state.setup_step_index = None
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    state.battle_round = 1
+    state.active_player_id = "player-a"
+    decisions = DecisionController()
+    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
+    lifecycle = GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            {
+                "config": config.to_payload(),
+                "parameterized_movement_proposals": True,
+                "state": state.to_payload(),
+                "decisions": decisions.to_payload(),
+                "reaction_queue": {"frames": []},
+            },
+        )
+    )
+    movement_status = lifecycle.advance_until_decision_or_terminal()
     assert _decision_request(movement_status).decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     return lifecycle, movement_status
 
@@ -1791,23 +1881,6 @@ def _army_muster_request(
             for unit_selection_id in unit_selection_ids
         ),
     )
-
-
-def _move_first_enemy_model_into_overflight_engagement(lifecycle: GameLifecycle) -> None:
-    state = _state(lifecycle)
-    battlefield_state = state.battlefield_state
-    assert battlefield_state is not None
-    friendly = battlefield_state.unit_placement_by_id("army-alpha:intercessor-unit-1")
-    enemy = battlefield_state.unit_placement_by_id("army-beta:intercessor-unit-2")
-    first_friendly_pose = friendly.model_placements[0].pose
-    target_pose = Pose.at(
-        first_friendly_pose.position.x,
-        first_friendly_pose.position.y + 2.0,
-        first_friendly_pose.position.z,
-        facing_degrees=180.0,
-    )
-    updated_enemy = _translated_enemy_unit(enemy, first_model_pose=target_pose)
-    state.battlefield_state = battlefield_state.with_unit_placement(updated_enemy)
 
 
 def _move_first_enemy_model_into_side_engagement(lifecycle: GameLifecycle) -> None:
