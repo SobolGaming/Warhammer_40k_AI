@@ -6662,6 +6662,93 @@
           ],
           "type": "object"
         },
+        "primary_scoring_boundary_lifecycle": {
+          "additionalProperties": false,
+          "description": "Typed Objective Control capture to Primary scoring-commit lifecycle for one required boundary.",
+          "properties": {
+            "evidence_id": {
+              "$ref": "#/$defs/nullable_identifier"
+            },
+            "lifecycle_hash": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "lifecycle_id": {
+              "pattern": "^primary-scoring-boundary-lifecycle:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "objective_control_record_hash": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "objective_control_record_id": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "pending_decision_request_id": {
+              "$ref": "#/$defs/nullable_identifier"
+            },
+            "pending_window": {
+              "$ref": "#/$defs/nullable_identifier"
+            },
+            "primary_transaction_ids": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            "schema_version": {
+              "const": "primary-scoring-boundary-lifecycle-v1",
+              "type": "string"
+            },
+            "scoring_boundary_kind": {
+              "enum": [
+                "ordinary",
+                "end_of_battle"
+              ],
+              "type": "string"
+            },
+            "scoring_commit_checkpoint_hash": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                }
+              ]
+            },
+            "scoring_commit_checkpoint_id": {
+              "$ref": "#/$defs/nullable_identifier"
+            },
+            "status": {
+              "enum": [
+                "pending",
+                "resolved"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "schema_version",
+            "objective_control_record_id",
+            "objective_control_record_hash",
+            "scoring_boundary_kind",
+            "status",
+            "pending_window",
+            "pending_decision_request_id",
+            "scoring_commit_checkpoint_id",
+            "scoring_commit_checkpoint_hash",
+            "evidence_id",
+            "primary_transaction_ids",
+            "lifecycle_id",
+            "lifecycle_hash"
+          ],
+          "type": "object"
+        },
         "primary_scoring_rules_unit_position_witness": {
           "additionalProperties": false,
           "properties": {
@@ -6862,6 +6949,14 @@
               ],
               "type": "string"
             },
+            "scoring_commit_checkpoint_hash": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "scoring_commit_checkpoint_id": {
+              "minLength": 1,
+              "type": "string"
+            },
             "timing": {
               "enum": [
                 "turn_start",
@@ -6882,6 +6977,8 @@
             "scoring_boundary_kind",
             "objective_control_record_id",
             "objective_control_record_hash",
+            "scoring_commit_checkpoint_id",
+            "scoring_commit_checkpoint_hash",
             "primary_mission_progress_state",
             "primary_mission_action_states",
             "primary_battlefield_departure_states",
@@ -7263,6 +7360,13 @@
               },
               "type": "array"
             },
+            "primary_scoring_boundary_lifecycles": {
+              "items": {
+                "$ref": "#/$defs/primary_scoring_boundary_lifecycle"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
             "primary_scoring_state_evidence_records": {
               "items": {
                 "$ref": "#/$defs/primary_scoring_state_evidence"
@@ -7284,7 +7388,8 @@
             "primary_unit_destruction_states",
             "primary_battlefield_departure_states",
             "primary_mission_progress_state",
-            "primary_scoring_state_evidence_records"
+            "primary_scoring_state_evidence_records",
+            "primary_scoring_boundary_lifecycles"
           ],
           "type": "object"
         },

@@ -871,6 +871,31 @@ def _objective_control_timing(value: object) -> ObjectiveControlTiming:
     return value
 
 
+def validate_primary_scoring_spatial_evidence_rows(
+    values: object,
+) -> tuple[PrimaryScoringSpatialEvidence, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("PrimaryScoringStateEvidence spatial evidence must be a tuple.")
+    raw_values = cast(tuple[object, ...], values)
+    rows: list[PrimaryScoringSpatialEvidence] = []
+    seen_players: set[str] = set()
+    for value in raw_values:
+        if type(value) is not PrimaryScoringSpatialEvidence:
+            raise GameLifecycleError(
+                "PrimaryScoringStateEvidence spatial evidence must contain typed rows."
+            )
+        if value.player_id in seen_players:
+            raise GameLifecycleError(
+                "PrimaryScoringStateEvidence spatial evidence must not duplicate players."
+            )
+        seen_players.add(value.player_id)
+        rows.append(value)
+    expected = tuple(sorted(rows, key=lambda row: row.player_id))
+    if raw_values != expected:
+        raise GameLifecycleError("PrimaryScoringStateEvidence spatial evidence must be sorted.")
+    return expected
+
+
 __all__ = (
     "PRIMARY_SCORING_FOUR_TABLE_QUARTERS_CONDITION",
     "PRIMARY_SCORING_NO_ENEMY_IN_OWN_TERRITORY_CONDITION",
@@ -887,4 +912,5 @@ __all__ = (
     "PrimaryTerritoryUnitWitnessPayload",
     "build_primary_scoring_spatial_evidence",
     "objective_control_record_hash",
+    "validate_primary_scoring_spatial_evidence_rows",
 )

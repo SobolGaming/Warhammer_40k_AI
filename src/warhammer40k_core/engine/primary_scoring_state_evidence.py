@@ -39,12 +39,14 @@ from warhammer40k_core.engine.primary_scoring_history_evidence import (
 from warhammer40k_core.engine.primary_scoring_position_witness import (
     PrimaryScoringRulesUnitPositionWitness,
     PrimaryScoringRulesUnitPositionWitnessPayload,
+    validate_primary_scoring_position_witnesses,
 )
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     PrimaryScoringSpatialEvidence,
     PrimaryScoringSpatialEvidencePayload,
     build_primary_scoring_spatial_evidence,
     objective_control_record_hash,
+    validate_primary_scoring_spatial_evidence_rows,
 )
 from warhammer40k_core.engine.primary_scoring_state_evidence_integrity import (
     validate_primary_scoring_action_boundary,
@@ -60,6 +62,10 @@ from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views
 if TYPE_CHECKING:
     from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatePayload
     from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
+        PrimaryMissionBoundaryCheckpoint,
+    )
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
 
 PRIMARY_SCORING_STATE_EVIDENCE_SCHEMA = "primary-scoring-state-evidence-v1"
@@ -82,6 +88,8 @@ class PrimaryScoringStateEvidencePayload(TypedDict):
     scoring_boundary_kind: str
     objective_control_record_id: str
     objective_control_record_hash: str
+    scoring_commit_checkpoint_id: str
+    scoring_commit_checkpoint_hash: str
     primary_mission_progress_state: PrimaryMissionProgressStatePayload
     primary_mission_action_states: list[MissionActionStatePayload]
     primary_battlefield_departure_states: list[PrimaryBattlefieldDepartureStatePayload]
@@ -106,6 +114,8 @@ class PrimaryScoringStateEvidence:
     scoring_boundary_kind: PrimaryScoringBoundaryKind
     objective_control_record_id: str
     objective_control_record_hash: str
+    scoring_commit_checkpoint_id: str
+    scoring_commit_checkpoint_hash: str
     primary_mission_progress_state: PrimaryMissionProgressState
     primary_mission_action_states: tuple[MissionActionState, ...]
     primary_battlefield_departure_states: tuple[PrimaryBattlefieldDepartureState, ...]
@@ -123,6 +133,7 @@ class PrimaryScoringStateEvidence:
             "active_player_id",
             "phase",
             "objective_control_record_id",
+            "scoring_commit_checkpoint_id",
         ):
             object.__setattr__(
                 self,
@@ -159,6 +170,15 @@ class PrimaryScoringStateEvidence:
                 error_type=GameLifecycleError,
             ),
         )
+        object.__setattr__(
+            self,
+            "scoring_commit_checkpoint_hash",
+            validate_sha256_hex(
+                self.scoring_commit_checkpoint_hash,
+                field_name="PrimaryScoringStateEvidence scoring_commit_checkpoint_hash",
+                error_type=GameLifecycleError,
+            ),
+        )
         if type(self.primary_mission_progress_state) is not PrimaryMissionProgressState:
             raise GameLifecycleError(
                 "PrimaryScoringStateEvidence requires typed Primary mission progress."
@@ -183,12 +203,14 @@ class PrimaryScoringStateEvidence:
         object.__setattr__(
             self,
             "current_rules_unit_position_witnesses",
-            _validate_position_witnesses(self.current_rules_unit_position_witnesses),
+            validate_primary_scoring_position_witnesses(self.current_rules_unit_position_witnesses),
         )
         object.__setattr__(
             self,
             "primary_scoring_spatial_evidence_by_player_id",
-            _validate_spatial_evidence_rows(self.primary_scoring_spatial_evidence_by_player_id),
+            validate_primary_scoring_spatial_evidence_rows(
+                self.primary_scoring_spatial_evidence_by_player_id
+            ),
         )
         object.__setattr__(
             self,
@@ -223,6 +245,8 @@ class PrimaryScoringStateEvidence:
         scoring_boundary_kind: PrimaryScoringBoundaryKind,
         objective_control_record_id: str,
         objective_control_record_hash: str,
+        scoring_commit_checkpoint_id: str,
+        scoring_commit_checkpoint_hash: str,
         primary_mission_progress_state: PrimaryMissionProgressState,
         primary_mission_action_states: tuple[MissionActionState, ...],
         primary_battlefield_departure_states: tuple[PrimaryBattlefieldDepartureState, ...],
@@ -252,6 +276,15 @@ class PrimaryScoringStateEvidence:
             field_name="objective_control_record_hash",
             error_type=GameLifecycleError,
         )
+        validated_commit_id = _validate_identifier(
+            "scoring_commit_checkpoint_id",
+            scoring_commit_checkpoint_id,
+        )
+        validated_commit_hash = validate_sha256_hex(
+            scoring_commit_checkpoint_hash,
+            field_name="scoring_commit_checkpoint_hash",
+            error_type=GameLifecycleError,
+        )
         if type(primary_mission_progress_state) is not PrimaryMissionProgressState:
             raise GameLifecycleError(
                 "Primary scoring state evidence creation requires typed progress."
@@ -263,8 +296,10 @@ class PrimaryScoringStateEvidence:
         destruction_state_ids = validate_primary_unit_destruction_state_ids(
             primary_unit_destruction_state_ids
         )
-        positions = _validate_position_witnesses(current_rules_unit_position_witnesses)
-        spatial_rows = _validate_spatial_evidence_rows(
+        positions = validate_primary_scoring_position_witnesses(
+            current_rules_unit_position_witnesses
+        )
+        spatial_rows = validate_primary_scoring_spatial_evidence_rows(
             primary_scoring_spatial_evidence_by_player_id
         )
         content = _primary_scoring_state_content_payload(
@@ -278,6 +313,8 @@ class PrimaryScoringStateEvidence:
             scoring_boundary_kind=scoring_boundary_kind,
             objective_control_record_id=validated_record_id,
             objective_control_record_hash=validated_record_hash,
+            scoring_commit_checkpoint_id=validated_commit_id,
+            scoring_commit_checkpoint_hash=validated_commit_hash,
             primary_mission_progress_state=primary_mission_progress_state,
             primary_mission_action_states=actions,
             primary_battlefield_departure_states=departures,
@@ -297,6 +334,8 @@ class PrimaryScoringStateEvidence:
             scoring_boundary_kind=scoring_boundary_kind,
             objective_control_record_id=validated_record_id,
             objective_control_record_hash=validated_record_hash,
+            scoring_commit_checkpoint_id=validated_commit_id,
+            scoring_commit_checkpoint_hash=validated_commit_hash,
             primary_mission_progress_state=primary_mission_progress_state,
             primary_mission_action_states=actions,
             primary_battlefield_departure_states=departures,
@@ -331,6 +370,8 @@ class PrimaryScoringStateEvidence:
             scoring_boundary_kind=self.scoring_boundary_kind,
             objective_control_record_id=self.objective_control_record_id,
             objective_control_record_hash=self.objective_control_record_hash,
+            scoring_commit_checkpoint_id=self.scoring_commit_checkpoint_id,
+            scoring_commit_checkpoint_hash=self.scoring_commit_checkpoint_hash,
             primary_mission_progress_state=self.primary_mission_progress_state,
             primary_mission_action_states=self.primary_mission_action_states,
             primary_battlefield_departure_states=self.primary_battlefield_departure_states,
@@ -373,6 +414,11 @@ class PrimaryScoringStateEvidence:
             objective_control_record_hash=cast(
                 str,
                 raw["objective_control_record_hash"],
+            ),
+            scoring_commit_checkpoint_id=cast(str, raw["scoring_commit_checkpoint_id"]),
+            scoring_commit_checkpoint_hash=cast(
+                str,
+                raw["scoring_commit_checkpoint_hash"],
             ),
             primary_mission_progress_state=PrimaryMissionProgressState.from_payload(
                 raw["primary_mission_progress_state"]
@@ -422,12 +468,18 @@ def build_primary_scoring_state_evidence(
     state: GameState,
     record: ObjectiveControlRecord,
     end_of_battle: bool,
+    scoring_commit_checkpoint: PrimaryMissionBoundaryCheckpoint | None = None,
+    proposed_objective_control_record: ObjectiveControlRecord | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> PrimaryScoringStateEvidence:
     """Freeze the authoritative scoring-facing state at one stored OC boundary."""
     from warhammer40k_core.engine.actions import MissionActionState
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.primary_mission_state_validation import (
         validate_primary_mission_progress_state,
+    )
+    from warhammer40k_core.engine.primary_scoring_commit_checkpoint import (
+        bound_primary_scoring_commit_checkpoint,
     )
     from warhammer40k_core.engine.primary_turn_start_evidence import (
         build_current_primary_rules_unit_memberships,
@@ -468,10 +520,29 @@ def build_primary_scoring_state_evidence(
         for candidate in state.objective_control_records
         if candidate.record_id == record.record_id
     )
-    if stored_records != (record,):
+    if proposed_objective_control_record is not None:
+        if type(proposed_objective_control_record) is not ObjectiveControlRecord:
+            raise GameLifecycleError(
+                "Primary scoring proposed ObjectiveControlRecord must be typed."
+            )
+        if proposed_objective_control_record != record:
+            raise GameLifecycleError(
+                "Primary scoring proposed ObjectiveControlRecord drifted from the scored record."
+            )
+        if stored_records:
+            raise GameLifecycleError(
+                "Primary scoring proposed ObjectiveControlRecord is already stored."
+            )
+    elif stored_records != (record,):
         raise GameLifecycleError(
             "Primary scoring state evidence requires the authoritative stored record."
         )
+    scoring_commit_checkpoint = bound_primary_scoring_commit_checkpoint(
+        state=state,
+        record=record,
+        scoring_commit_checkpoint=scoring_commit_checkpoint,
+        runtime_modifier_registry=runtime_modifier_registry,
+    )
     progress = validate_primary_mission_progress_state(state)
     policies_by_id = primary_scoring_action_policies_by_id(mission_setup)
     assignment_by_player = {
@@ -579,6 +650,8 @@ def build_primary_scoring_state_evidence(
         ),
         objective_control_record_id=record.record_id,
         objective_control_record_hash=objective_control_record_hash(record),
+        scoring_commit_checkpoint_id=scoring_commit_checkpoint.checkpoint_id,
+        scoring_commit_checkpoint_hash=scoring_commit_checkpoint.checkpoint_hash,
         primary_mission_progress_state=progress,
         primary_mission_action_states=primary_actions,
         primary_battlefield_departure_states=departures,
@@ -894,6 +967,8 @@ def _primary_scoring_state_content_payload(
     scoring_boundary_kind: PrimaryScoringBoundaryKind,
     objective_control_record_id: str,
     objective_control_record_hash: str,
+    scoring_commit_checkpoint_id: str,
+    scoring_commit_checkpoint_hash: str,
     primary_mission_progress_state: PrimaryMissionProgressState,
     primary_mission_action_states: tuple[MissionActionState, ...],
     primary_battlefield_departure_states: tuple[PrimaryBattlefieldDepartureState, ...],
@@ -912,6 +987,8 @@ def _primary_scoring_state_content_payload(
         "scoring_boundary_kind": scoring_boundary_kind.value,
         "objective_control_record_id": objective_control_record_id,
         "objective_control_record_hash": objective_control_record_hash,
+        "scoring_commit_checkpoint_id": scoring_commit_checkpoint_id,
+        "scoring_commit_checkpoint_hash": scoring_commit_checkpoint_hash,
         "primary_mission_progress_state": primary_mission_progress_state.to_payload(),
         "primary_mission_action_states": [
             action.to_payload() for action in primary_mission_action_states
@@ -927,58 +1004,6 @@ def _primary_scoring_state_content_payload(
             evidence.to_payload() for evidence in primary_scoring_spatial_evidence_by_player_id
         ],
     }
-
-
-def _validate_position_witnesses(
-    values: object,
-) -> tuple[PrimaryScoringRulesUnitPositionWitness, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError(
-            "PrimaryScoringStateEvidence current position witnesses must be a tuple."
-        )
-    raw_values = cast(tuple[object, ...], values)
-    witnesses: list[PrimaryScoringRulesUnitPositionWitness] = []
-    seen_ids: set[str] = set()
-    for value in raw_values:
-        if type(value) is not PrimaryScoringRulesUnitPositionWitness:
-            raise GameLifecycleError(
-                "PrimaryScoringStateEvidence positions must contain typed witnesses."
-            )
-        if value.rules_unit_instance_id in seen_ids:
-            raise GameLifecycleError(
-                "PrimaryScoringStateEvidence rules-unit positions must be unique."
-            )
-        seen_ids.add(value.rules_unit_instance_id)
-        witnesses.append(value)
-    expected = tuple(sorted(witnesses, key=lambda witness: witness.rules_unit_instance_id))
-    if raw_values != expected:
-        raise GameLifecycleError("PrimaryScoringStateEvidence rules-unit positions must be sorted.")
-    return expected
-
-
-def _validate_spatial_evidence_rows(
-    values: object,
-) -> tuple[PrimaryScoringSpatialEvidence, ...]:
-    if type(values) is not tuple:
-        raise GameLifecycleError("PrimaryScoringStateEvidence spatial evidence must be a tuple.")
-    raw_values = cast(tuple[object, ...], values)
-    rows: list[PrimaryScoringSpatialEvidence] = []
-    seen_players: set[str] = set()
-    for value in raw_values:
-        if type(value) is not PrimaryScoringSpatialEvidence:
-            raise GameLifecycleError(
-                "PrimaryScoringStateEvidence spatial evidence must contain typed rows."
-            )
-        if value.player_id in seen_players:
-            raise GameLifecycleError(
-                "PrimaryScoringStateEvidence spatial evidence must not duplicate players."
-            )
-        seen_players.add(value.player_id)
-        rows.append(value)
-    expected = tuple(sorted(rows, key=lambda row: row.player_id))
-    if raw_values != expected:
-        raise GameLifecycleError("PrimaryScoringStateEvidence spatial evidence must be sorted.")
-    return expected
 
 
 def _primary_mission_action_state_from_payload(payload: object) -> MissionActionState:

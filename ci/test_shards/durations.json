@@ -156,6 +156,7 @@
     "tests/unit/test_phase17n_boundary_checkpoint_unit_history.py": 19.536,
     "tests/unit/test_phase17n_mission_action_decline_integrity.py": 6.328,
     "tests/unit/test_phase17n_pending_request_integrity.py": 29.673,
+    "tests/unit/test_phase17n_primary_scoring_boundary_lifecycle.py": 57.48,
     "tests/unit/test_phase17n_primary_scoring_conditions.py": 354.84,
     "tests/unit/test_phase17n_primary_scoring_grammar.py": 51.653,
     "tests/unit/test_phase17n_primary_scoring_position_history_integrity.py": 20.073,
@@ -198,26 +199,26 @@
   "shard_count": 4,
   "shards": [
     {
-      "duration_seconds": 3444.62,
+      "duration_seconds": 3458.99,
       "shard_id": 1,
-      "test_file_count": 49
+      "test_file_count": 48
     },
     {
-      "duration_seconds": 3444.621,
+      "duration_seconds": 3458.991,
       "shard_id": 2,
       "test_file_count": 49
     },
     {
-      "duration_seconds": 3444.62,
+      "duration_seconds": 3458.99,
       "shard_id": 3,
-      "test_file_count": 48
+      "test_file_count": 49
     },
     {
-      "duration_seconds": 3444.62,
+      "duration_seconds": 3458.99,
       "shard_id": 4,
-      "test_file_count": 48
+      "test_file_count": 49
     }
   ],
   "strategy": "largest-processing-time-by-historical-file-duration",
-  "total_test_duration_seconds": 13778.481
+  "total_test_duration_seconds": 13835.961
 }

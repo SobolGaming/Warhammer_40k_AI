@@ -78,7 +78,16 @@ def validate_primary_transaction_semantics(*, state: GameState) -> None:
         (evidence.objective_control_record_id, evidence.scoring_boundary_kind)
         for evidence in state.primary_scoring_state_evidence_records
     }
-    if evidence_boundary_keys != required_boundary_keys:
+    from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+        pending_primary_scoring_boundary_keys,
+    )
+
+    pending_keys = pending_primary_scoring_boundary_keys(state=state)
+    if pending_keys - required_boundary_keys:
+        raise GameLifecycleError(
+            "Pending Primary scoring boundary is not required for the stored record."
+        )
+    if evidence_boundary_keys != required_boundary_keys - pending_keys:
         raise GameLifecycleError(
             "Primary scoring-state evidence registry is incomplete or unexpected."
         )

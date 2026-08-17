@@ -4580,6 +4580,7 @@ def test_state_backed_secondary_scoring_closes_zero_award_primary_boundary_once(
         secondary_mission_id="assassination",
         mode=card_mode,
         phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
     )
 
     turn_end_records = tuple(
@@ -4608,18 +4609,6 @@ def test_state_backed_secondary_scoring_closes_zero_award_primary_boundary_once(
 
     state_payload = state.to_payload()
     assert GameState.from_payload(state_payload).to_payload() == state_payload
-    lifecycle.decision_controller.event_log.append(
-        "end_boundary_objective_control_determined",
-        {
-            "game_id": state.game_id,
-            "battle_round": state.battle_round,
-            "phase": BattlePhase.FIGHT.value,
-            "record_ids": [turn_end_records[0].record_id],
-            "source_rule_id": (
-                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
-            ),
-        },
-    )
     lifecycle_payload = lifecycle.to_payload()
     restored_lifecycle = GameLifecycle.from_payload(lifecycle_payload)
     assert restored_lifecycle.state is not None
@@ -4673,6 +4662,7 @@ def test_bring_it_down_scores_each_destroyed_w10_model_and_caps_tactical() -> No
         secondary_mission_id="bring-it-down",
         mode=SecondaryMissionCardMode.FIXED,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     tactical_state = _battle_state_from_config(
@@ -4698,6 +4688,7 @@ def test_bring_it_down_scores_each_destroyed_w10_model_and_caps_tactical() -> No
         secondary_mission_id="bring-it-down",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     assert fixed_state.victory_point_total("player-a") == 5
@@ -4748,6 +4739,7 @@ def test_overwhelming_force_scores_destroyed_units_that_started_on_objectives_wi
         secondary_mission_id="overwhelming-force",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     metadata = _transaction_metadata(
@@ -4781,6 +4773,7 @@ def test_no_prisoners_scores_each_destroyed_enemy_unit_with_cap() -> None:
         secondary_mission_id="no-prisoners",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     metadata = _transaction_metadata(
@@ -4813,6 +4806,7 @@ def test_a_grievous_blow_scores_destroyed_starting_strength_thirteen_units() -> 
         secondary_mission_id="a-grievous-blow",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     metadata = _transaction_metadata(
@@ -4971,6 +4965,7 @@ def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
         secondary_mission_id="cleanse",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     plunder_state = _battle_state(
@@ -5011,6 +5006,7 @@ def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
         secondary_mission_id="plunder",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     cleanse_metadata = _transaction_metadata(
@@ -5057,6 +5053,7 @@ def test_defend_stronghold_scores_at_opponent_turn_end_with_deployment_zone_bonu
         secondary_mission_id="defend-stronghold",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     metadata = _transaction_metadata(
@@ -7243,6 +7240,17 @@ def test_started_next_phase_replay_rejects_coordinated_prior_completion_deletion
         GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
 
 
+def _event_binds_objective_control_record(event: dict[str, JsonValue], record_id: str) -> bool:
+    payload = event["payload"]
+    if not isinstance(payload, dict):
+        return False
+    if event["event_type"] == "end_boundary_objective_control_determined":
+        return payload.get("record_ids") == [record_id]
+    if event["event_type"] == "primary_scoring_commit_checkpoint_recorded":
+        return payload.get("objective_control_record_id") == record_id
+    return False
+
+
 def test_completed_turn_replay_rejects_zero_award_boundary_history_deletion() -> None:
     config = _config()
     lifecycle = GameLifecycle()
@@ -7314,22 +7322,19 @@ def test_completed_turn_replay_rejects_zero_award_boundary_history_deletion() ->
         for evidence in scoring_evidence
         if cast(dict[str, JsonValue], evidence)["objective_control_record_id"] != turn_end_record_id
     ]
+    state_payload["primary_scoring_boundary_lifecycles"] = [
+        row
+        for row in cast(list[JsonValue], state_payload["primary_scoring_boundary_lifecycles"])
+        if cast(dict[str, JsonValue], row)["objective_control_record_id"] != turn_end_record_id
+    ]
     decisions_payload = cast(dict[str, JsonValue], lifecycle_payload["decisions"])
     event_log = cast(list[JsonValue], decisions_payload["event_log"])
     retained_events = [
         cast(dict[str, JsonValue], event)
         for event in event_log
-        if not (
-            cast(dict[str, JsonValue], event)["event_type"]
-            == "end_boundary_objective_control_determined"
-            and cast(
-                dict[str, JsonValue],
-                cast(dict[str, JsonValue], event)["payload"],
-            )["record_ids"]
-            == [turn_end_record_id]
-        )
+        if not _event_binds_objective_control_record(event, turn_end_record_id)
     ]
-    assert len(retained_events) == len(event_log) - 1
+    assert len(retained_events) == len(event_log) - 2
     for event_order, event in enumerate(retained_events, start=1):
         event["event_id"] = f"event-{event_order:06d}"
     decisions_payload["event_log"] = cast(list[JsonValue], retained_events)

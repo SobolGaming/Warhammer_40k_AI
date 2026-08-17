@@ -7,6 +7,9 @@ from warhammer40k_core.engine import primary_mission_action_integrity as _pmai
 from warhammer40k_core.engine import primary_mission_boundary_checkpoint as _pmbc
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+    validate_pending_primary_scoring_boundary_restore_authority,
+)
 from warhammer40k_core.engine.primary_scoring_state_evidence_integrity import (
     validate_primary_scoring_position_event_authority,
 )
@@ -91,6 +94,11 @@ def validate_primary_mission_restore_integrity(
         rule_ir_authority_index=rule_ir_authority_index,
         faction_rule_execution_registry=faction_rule_execution_registry,
         runtime_content_activation=runtime_content_activation,
+    )
+    validate_pending_primary_scoring_boundary_restore_authority(
+        state=state,
+        event_records=event_records,
+        pending_decision_requests=decisions.queue.pending_requests,
     )
     validate_primary_scoring_position_event_authority(
         state=state,

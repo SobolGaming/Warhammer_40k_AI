@@ -22,6 +22,10 @@ from warhammer40k_core.engine.objective_control import (
     resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.primary_scoring_commit_checkpoint import (
+    bound_primary_scoring_commit_checkpoint,
+    emit_primary_scoring_commit_checkpoint,
+)
 from warhammer40k_core.engine.primary_scoring_state_evidence import (
     build_primary_scoring_state_evidence,
     record_primary_scoring_state_evidence,
@@ -88,10 +92,23 @@ def scoring_position_lifecycle_payload() -> GameLifecyclePayload:
             ),
         },
     )
+    scoring_commit_checkpoint = bound_primary_scoring_commit_checkpoint(
+        state=state,
+        record=scoring_record,
+        scoring_commit_checkpoint=None,
+        runtime_modifier_registry=None,
+    )
     evidence = build_primary_scoring_state_evidence(
         state=state,
         record=scoring_record,
         end_of_battle=False,
+        scoring_commit_checkpoint=scoring_commit_checkpoint,
+    )
+    emit_primary_scoring_commit_checkpoint(
+        event_log=decisions.event_log,
+        objective_control_record_id=scoring_record.record_id,
+        scoring_boundary_kind=evidence.scoring_boundary_kind.value,
+        checkpoint=scoring_commit_checkpoint,
     )
     awards = mission_scoring_policies_from_setup(
         mission_setup

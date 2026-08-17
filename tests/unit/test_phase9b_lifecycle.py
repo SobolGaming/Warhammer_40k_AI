@@ -785,6 +785,7 @@ def test_placeholder_phase_handler_emits_explicit_noop_and_advances_boundary() -
         "end_boundary_objective_control_determined",
         "timing_window_opened",
         "timing_window_resolved",
+        "primary_scoring_commit_checkpoint_recorded",
         "battle_phase_completed",
         "timing_window_opened",
         "timing_window_resolved",

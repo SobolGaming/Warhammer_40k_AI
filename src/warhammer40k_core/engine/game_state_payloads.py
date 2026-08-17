@@ -84,6 +84,9 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.objective_control_record_authority import (
         ObjectiveControlRecordAuthorityPayload,
     )
+    from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+        PrimaryScoringBoundaryLifecyclePayload,
+    )
 
 
 class GameConfigPayload(TypedDict):
@@ -194,6 +197,7 @@ class GameStatePayload(TypedDict):
     objective_control_records: list[ObjectiveControlRecordPayload]
     objective_control_record_authorities: list[ObjectiveControlRecordAuthorityPayload]
     primary_scoring_state_evidence_records: list[PrimaryScoringStateEvidencePayload]
+    primary_scoring_boundary_lifecycles: list[PrimaryScoringBoundaryLifecyclePayload]
     sticky_objective_control_states: list[StickyObjectiveControlStatePayload]
     primary_objective_turn_start_states: list[PrimaryObjectiveTurnStartStatePayload]
     primary_rules_unit_turn_start_snapshots: list[PrimaryRulesUnitTurnStartSnapshotPayload]

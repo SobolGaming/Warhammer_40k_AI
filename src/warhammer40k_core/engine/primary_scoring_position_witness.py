@@ -81,10 +81,38 @@ class PrimaryScoringRulesUnitPositionWitness:
         )
 
 
+def validate_primary_scoring_position_witnesses(
+    values: object,
+) -> tuple[PrimaryScoringRulesUnitPositionWitness, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError(
+            "PrimaryScoringStateEvidence current position witnesses must be a tuple."
+        )
+    raw_values = cast(tuple[object, ...], values)
+    witnesses: list[PrimaryScoringRulesUnitPositionWitness] = []
+    seen_ids: set[str] = set()
+    for value in raw_values:
+        if type(value) is not PrimaryScoringRulesUnitPositionWitness:
+            raise GameLifecycleError(
+                "PrimaryScoringStateEvidence positions must contain typed witnesses."
+            )
+        if value.rules_unit_instance_id in seen_ids:
+            raise GameLifecycleError(
+                "PrimaryScoringStateEvidence rules-unit positions must be unique."
+            )
+        seen_ids.add(value.rules_unit_instance_id)
+        witnesses.append(value)
+    expected = tuple(sorted(witnesses, key=lambda witness: witness.rules_unit_instance_id))
+    if raw_values != expected:
+        raise GameLifecycleError("PrimaryScoringStateEvidence rules-unit positions must be sorted.")
+    return expected
+
+
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
 __all__ = (
     "PrimaryScoringRulesUnitPositionWitness",
     "PrimaryScoringRulesUnitPositionWitnessPayload",
+    "validate_primary_scoring_position_witnesses",
 )

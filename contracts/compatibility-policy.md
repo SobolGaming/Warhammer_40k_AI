@@ -51,8 +51,9 @@ The reference server supports one contract major at a time. Contract 10 retains
 Contract 9's directed Primary assignments, grouped historical evidence,
 persistent Primary Mission progress, public Primary choices, and viewer-facing
 projection families. It adds the required engine-private
-`objective_control_record_authorities` and
-`primary_scoring_state_evidence_records` replay state. Objective-control
+`objective_control_record_authorities`,
+`primary_scoring_state_evidence_records`, and
+`primary_scoring_boundary_lifecycles` replay state. Objective-control
 authorities bind each persisted record to a closed, content-addressed physical
 boundary checkpoint plus retained sticky-control provenance. Each closed,
 content-addressed row freezes the objective-control boundary, boundary kind,

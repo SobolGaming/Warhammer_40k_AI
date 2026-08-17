@@ -92,6 +92,7 @@ from warhammer40k_core.engine.primary_turn_start_evidence import (
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState, ReserveStatus
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
 from warhammer40k_core.engine.sticky_objective_control import (
     StickyObjectiveControlState,
     apply_sticky_objective_control,
@@ -581,6 +582,8 @@ def test_phase17n_step5a_bridge_round_trips_complete_authoritative_state(
         "scoring_boundary_kind",
         "objective_control_record_id",
         "objective_control_record_hash",
+        "scoring_commit_checkpoint_id",
+        "scoring_commit_checkpoint_hash",
         "primary_mission_progress_state",
         "primary_mission_action_states",
         "primary_battlefield_departure_states",
@@ -1201,6 +1204,19 @@ def test_phase17n_step5a_bridge_filters_non_primary_actions_and_preserves_groups
         replace(army, attached_units=(formation,)) if army.player_id == "player-a" else army
         for army in restored.army_definitions
     ]
+    unit_by_id = {
+        unit.unit_instance_id: unit for army in restored.army_definitions for unit in army.units
+    }
+    restored.starting_attached_unit_records.append(
+        StartingAttachedUnitRecord.from_formation(
+            player_id="player-a",
+            attached_unit=formation,
+            unit_by_id=unit_by_id,
+        )
+    )
+    restored.starting_attached_unit_records.sort(
+        key=lambda record: record.attached_unit_instance_id
+    )
 
     grouped = build_primary_scoring_state_evidence(
         state=restored,
@@ -1282,6 +1298,8 @@ def test_phase17n_step5a_bridge_fails_closed_for_tamper_and_unauthenticated_stat
         scoring_boundary_kind=evidence.scoring_boundary_kind,
         objective_control_record_id=evidence.objective_control_record_id,
         objective_control_record_hash=evidence.objective_control_record_hash,
+        scoring_commit_checkpoint_id=evidence.scoring_commit_checkpoint_id,
+        scoring_commit_checkpoint_hash=evidence.scoring_commit_checkpoint_hash,
         primary_mission_progress_state=evidence.primary_mission_progress_state,
         primary_mission_action_states=evidence.primary_mission_action_states,
         primary_battlefield_departure_states=(evidence.primary_battlefield_departure_states),
@@ -2055,6 +2073,8 @@ def _rebuild_state_evidence(
             if record is None
             else objective_control_record_hash(record)
         ),
+        scoring_commit_checkpoint_id=evidence.scoring_commit_checkpoint_id,
+        scoring_commit_checkpoint_hash=evidence.scoring_commit_checkpoint_hash,
         primary_mission_progress_state=(
             evidence.primary_mission_progress_state
             if primary_mission_progress_state is None

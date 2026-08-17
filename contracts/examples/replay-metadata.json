@@ -15571,6 +15571,7 @@
       },
       "primary_objective_turn_start_states": [],
       "primary_rules_unit_turn_start_snapshots": [],
+      "primary_scoring_boundary_lifecycles": [],
       "primary_scoring_state_evidence_records": [],
       "primary_terrain_trap_states": [],
       "primary_unit_destruction_states": [],

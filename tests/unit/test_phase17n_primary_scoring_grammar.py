@@ -2249,6 +2249,8 @@ def _test_primary_state_evidence(
         ),
         objective_control_record_id=record.record_id,
         objective_control_record_hash=objective_control_record_hash(record),
+        scoring_commit_checkpoint_id="primary-mission-boundary:" + "0" * 64,
+        scoring_commit_checkpoint_hash="0" * 64,
         primary_mission_progress_state=PrimaryMissionProgressState.empty(),
         primary_mission_action_states=(),
         primary_battlefield_departure_states=(),

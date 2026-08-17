@@ -19,8 +19,9 @@ Contract 10 retains Contract 9's public, directed
 `primary_mission_assignments`, group-aware historical evidence, required
 `primary_mission_progress_state`, and engine-enumerated
 `select_primary_mission_choice` finite family. It adds the required
-engine-private `objective_control_record_authorities` and
-`primary_scoring_state_evidence_records` replay state. Each objective-control
+engine-private `objective_control_record_authorities`,
+`primary_scoring_state_evidence_records`, and
+`primary_scoring_boundary_lifecycles` replay state. Each objective-control
 authority binds a record ID/hash to a closed, content-addressed physical
 boundary checkpoint and the exact retained sticky-control witnesses. Each
 content-addressed row freezes the exact ordinary or end-of-battle scoring
@@ -97,8 +98,9 @@ setup requires both directed player Primary Mission assignments and explicit
 logical terrain-area identities; their game state requires group-aware
 turn-start position history, typed destruction attribution, and battlefield
 departure evidence plus the complete persistent Primary Mission progress
-state and the complete `objective_control_record_authorities` and
-`primary_scoring_state_evidence_records` registries. Objective-control
+state and the complete `objective_control_record_authorities`,
+`primary_scoring_state_evidence_records`, and
+`primary_scoring_boundary_lifecycles` registries. Objective-control
 authorities preserve the exact model presence/placements, resolved Objective
 Control, modifier sources, attached-unit state, phase flags, marker/prior-use
 state, and retained sticky-control provenance for every persisted record.

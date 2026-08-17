@@ -502,6 +502,7 @@ def test_replay_metadata_schema_requires_closed_step5a_scoring_state_evidence() 
     replay_state_required = {_json_string(value) for value in _json_list(replay_state["required"])}
     assert "objective_control_record_authorities" in replay_state_required
     assert "primary_scoring_state_evidence_records" in replay_state_required
+    assert "primary_scoring_boundary_lifecycles" in replay_state_required
     authority_collection = _json_object(
         _json_object(replay_state["properties"])["objective_control_record_authorities"]
     )
@@ -513,6 +514,12 @@ def test_replay_metadata_schema_requires_closed_step5a_scoring_state_evidence() 
     )
     assert _json_object(evidence_collection["items"])["$ref"] == (
         "#/$defs/primary_scoring_state_evidence"
+    )
+    lifecycle_collection = _json_object(
+        _json_object(replay_state["properties"])["primary_scoring_boundary_lifecycles"]
+    )
+    assert _json_object(lifecycle_collection["items"])["$ref"] == (
+        "#/$defs/primary_scoring_boundary_lifecycle"
     )
 
     evidence = _json_object(definitions["primary_scoring_state_evidence"])
@@ -544,6 +551,7 @@ def test_replay_metadata_schema_requires_closed_step5a_scoring_state_evidence() 
         "primary_mission_objective_control_modifier_source",
         "sticky_objective_control_state",
         "primary_scoring_spatial_evidence",
+        "primary_scoring_boundary_lifecycle",
         "primary_table_quarter_unit_witness",
         "primary_territory_unit_witness",
     ):

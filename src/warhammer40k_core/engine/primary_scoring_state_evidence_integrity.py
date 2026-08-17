@@ -327,6 +327,10 @@ def validate_primary_scoring_position_event_authority(
     from warhammer40k_core.engine.primary_position_membership import (
         build_primary_rules_unit_membership_from_model_placements,
     )
+    from warhammer40k_core.engine.primary_scoring_commit_checkpoint import (
+        PRIMARY_SCORING_COMMIT_BOUNDARY_KIND,
+        primary_scoring_commit_checkpoint_from_events,
+    )
 
     if type(state) is not GameState:
         raise GameLifecycleError("Primary scoring position event authority requires GameState.")
@@ -394,26 +398,49 @@ def validate_primary_scoring_position_event_authority(
             raise GameLifecycleError(
                 "Primary scoring position evidence lacks Objective Control authority."
             )
-        checkpoint = authority.boundary_checkpoint
+        oc_checkpoint = authority.boundary_checkpoint
         if (
             authority.objective_control_record_hash != evidence.objective_control_record_hash
-            or checkpoint.boundary_kind != "objective_control"
-            or checkpoint.game_id != evidence.game_id
-            or checkpoint.battlefield_id != evidence.battlefield_id
-            or checkpoint.active_player_id != evidence.active_player_id
-            or checkpoint.battle_round != evidence.battle_round
-            or checkpoint.phase != evidence.phase
+            or oc_checkpoint.boundary_kind != "objective_control"
+            or oc_checkpoint.game_id != evidence.game_id
+            or oc_checkpoint.battlefield_id != evidence.battlefield_id
+            or oc_checkpoint.active_player_id != evidence.active_player_id
+            or oc_checkpoint.battle_round != evidence.battle_round
+            or oc_checkpoint.phase != evidence.phase
         ):
             raise GameLifecycleError(
                 "Primary scoring position evidence Objective Control authority drifted."
             )
-        model_placements = placements_by_record_id.get(evidence.objective_control_record_id)
+        commit_event_index, commit_checkpoint = primary_scoring_commit_checkpoint_from_events(
+            event_records=event_records,
+            objective_control_record_id=evidence.objective_control_record_id,
+            scoring_boundary_kind=evidence.scoring_boundary_kind.value,
+        )
+        oc_event_index = event_records.index(event)
+        if commit_event_index <= oc_event_index:
+            raise GameLifecycleError(
+                "Primary scoring-commit checkpoint must follow Objective Control capture."
+            )
+        if (
+            commit_checkpoint.checkpoint_id != evidence.scoring_commit_checkpoint_id
+            or commit_checkpoint.checkpoint_hash != evidence.scoring_commit_checkpoint_hash
+            or commit_checkpoint.boundary_kind != PRIMARY_SCORING_COMMIT_BOUNDARY_KIND
+            or commit_checkpoint.game_id != evidence.game_id
+            or commit_checkpoint.battlefield_id != evidence.battlefield_id
+            or commit_checkpoint.active_player_id != evidence.active_player_id
+            or commit_checkpoint.battle_round != evidence.battle_round
+            or commit_checkpoint.phase != evidence.phase
+        ):
+            raise GameLifecycleError(
+                "Primary scoring position evidence scoring-commit checkpoint drifted."
+            )
+        model_placements = placements_by_record_id.get(evidence.scoring_commit_checkpoint_id)
         if model_placements is None:
             model_placements = primary_mission_model_placements_from_checkpoint(
                 state=state,
-                checkpoint=checkpoint,
+                checkpoint=commit_checkpoint,
             )
-            placements_by_record_id[evidence.objective_control_record_id] = model_placements
+            placements_by_record_id[evidence.scoring_commit_checkpoint_id] = model_placements
         for witness in evidence.current_rules_unit_position_witnesses:
             expected = build_primary_rules_unit_membership_from_model_placements(
                 state=state,

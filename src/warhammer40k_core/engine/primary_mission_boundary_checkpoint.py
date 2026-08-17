@@ -258,7 +258,8 @@ def validate_primary_mission_boundary_checkpoint_source_registry(
             runtime_modifier_registry=runtime_modifier_registry,
         )
         if (
-            state.battle_round == checkpoint.battle_round
+            checkpoint.boundary_kind not in {"primary_scoring_commit", "objective_control"}
+            and state.battle_round == checkpoint.battle_round
             and state.active_player_id == checkpoint.active_player_id
         ):
             validate_primary_mission_boundary_checkpoint_modifier_sources(
@@ -316,8 +317,9 @@ def _validate_checkpoint_ownership(
     action_request_checkpoint_ids: set[str] = set()
     turn_end_checkpoint_ids: set[str] = set()
     for checkpoint_index, checkpoint_event, checkpoint in checkpoint_rows:
-        if checkpoint.boundary_kind == "turn_end":
-            turn_end_checkpoint_ids.add(checkpoint_event.event_id)
+        if checkpoint.boundary_kind in {"turn_end", "objective_control", "primary_scoring_commit"}:
+            if checkpoint.boundary_kind == "turn_end":
+                turn_end_checkpoint_ids.add(checkpoint_event.event_id)
             continue
         if checkpoint_index + 1 >= len(event_records):
             raise GameLifecycleError("Primary mission Action checkpoint is orphaned.")
