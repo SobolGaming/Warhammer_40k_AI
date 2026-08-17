@@ -5,6 +5,9 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine import (
     primary_scoring_transaction_integrity as _primary_vp_integrity,
 )
+from warhammer40k_core.engine import (
+    secondary_scoring_transaction_integrity as _secondary_vp_integrity,
+)
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.phase import GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.scoring import (
@@ -58,6 +61,11 @@ def resolve_victory_point_award_for_game_state(
         )
     if award.source_kind is VictoryPointSourceKind.PRIMARY:
         _primary_vp_integrity.validate_primary_award_semantics(state=state, award=award)
+    elif award.source_kind in {
+        VictoryPointSourceKind.FIXED_SECONDARY,
+        VictoryPointSourceKind.TACTICAL_SECONDARY,
+    }:
+        _secondary_vp_integrity.validate_secondary_award_semantics(state=state, award=award)
     updated, transaction = ledger.award(
         award,
         applied_amount=applied_amount,
@@ -70,4 +78,12 @@ def resolve_victory_point_award_for_game_state(
     return sorted(ledgers, key=lambda stored: stored.player_id), transaction
 
 
-__all__ = ("resolve_victory_point_award_for_game_state",)
+def validate_secondary_transaction_semantics(*, state: GameState) -> None:
+    """Restore-time Secondary VP semantic authentication."""
+    _secondary_vp_integrity.validate_secondary_transaction_semantics(state=state)
+
+
+__all__ = (
+    "resolve_victory_point_award_for_game_state",
+    "validate_secondary_transaction_semantics",
+)

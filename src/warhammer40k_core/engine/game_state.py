@@ -1576,6 +1576,7 @@ class GameState:
             self.secondary_mission_card_states,
             player_ids=self.player_ids,
         )
+        _vp_awards.validate_secondary_transaction_semantics(state=self)
         self.tactical_secondary_achievement_contexts = (
             _validate_tactical_secondary_achievement_contexts(
                 self.tactical_secondary_achievement_contexts,

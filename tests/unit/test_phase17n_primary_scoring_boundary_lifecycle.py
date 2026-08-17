@@ -7,7 +7,18 @@ from re import escape
 from typing import cast
 
 import pytest
-from tests.phase11c_command_phase_helpers import with_model_offsets
+from tests.phase11c_command_phase_helpers import (
+    army_muster_request,
+    complete_setup_through_gate,
+    default_unit_selection,
+    mustered_armies,
+    ruleset,
+    secondary_choice,
+    with_model_offsets,
+)
+from tests.phase11c_command_phase_helpers import (
+    mission_setup as phase11c_mission_setup,
+)
 from tests.phase17n_primary_mission_helpers import (
     append_authenticated_normal_move,
     phase17n_event_setup,
@@ -15,6 +26,7 @@ from tests.phase17n_primary_mission_helpers import (
 )
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 
+from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
@@ -37,14 +49,15 @@ from warhammer40k_core.engine.destruction_provenance import (
     ModelDestructionAttribution,
 )
 from warhammer40k_core.engine.event_log import canonical_json, validate_json_value
-from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.game_state import GameConfig, GameState, SecondaryMissionMode
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
     ObjectiveControlTiming,
 )
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
 )
@@ -1132,6 +1145,219 @@ def test_fixed_bring_it_down_scores_distinct_turn_end_records() -> None:
     assert retry_a == first
     assert retry_b == second
     assert record_ids == _fixed_secondary_record_ids(state)
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+    assert restored.state is not None
+    assert restored.state.to_payload() == state.to_payload()
+
+
+def test_fixed_bring_it_down_same_card_scores_two_turn_end_records() -> None:
+    lifecycle = _two_defender_battlefield_dominance_lifecycle(
+        phase=BattlePhase.FIGHT,
+        battle_round=3,
+    )
+    state = lifecycle.state
+    assert state is not None
+    defender_units = tuple(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-b"
+        for unit in army.units
+    )
+    assert len(defender_units) == 2
+    for unit in defender_units:
+        _set_unit_starting_wounds(state, unit.unit_instance_id, wounds=10)
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_fixed(
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+        )
+    )
+    state.active_player_id = "player-a"
+    state.record_secondary_unit_destruction(
+        destroying_player_id="player-a",
+        destroyed_unit_instance_id=defender_units[0].unit_instance_id,
+        destroyed_model_instance_ids=(defender_units[0].own_models[0].model_instance_id,),
+        started_turn_objective_marker_ids=(),
+        source_id="p2-bring-it-down-same-card-a",
+    )
+    first = state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    first_record_id = state.objective_control_records[-1].record_id
+    state.active_player_id = "player-b"
+    state.record_secondary_unit_destruction(
+        destroying_player_id="player-a",
+        destroyed_unit_instance_id=defender_units[1].unit_instance_id,
+        destroyed_model_instance_ids=(defender_units[1].own_models[0].model_instance_id,),
+        started_turn_objective_marker_ids=(),
+        source_id="p2-bring-it-down-same-card-b",
+    )
+    second = state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    second_record_id = state.objective_control_records[-1].record_id
+    assert first.status.value == "active"
+    assert second.status.value == "active"
+    assert first_record_id != second_record_id
+    assert _fixed_secondary_record_ids(state) == (first_record_id, second_record_id)
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+    assert restored.state is not None
+    assert restored.state.to_payload() == state.to_payload()
+
+
+def test_restore_rejects_duplicate_fixed_secondary_at_same_record() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    payload = deepcopy(lifecycle.to_payload())
+    ledger = _ledger_payload(payload, player_id="player-a")
+    secondary = _secondary_transaction_payloads(ledger, source_kind="fixed_secondary")
+    assert len(secondary) == 1
+    duplicate = deepcopy(secondary[0])
+    transactions = _json_list(ledger["transactions"], label="victory point transactions")
+    battle_round = duplicate["battle_round"]
+    assert isinstance(battle_round, int)
+    duplicate["transaction_id"] = (
+        f"victory-point:player-a:round-{battle_round:02d}:{len(transactions) + 1:06d}"
+    )
+    transactions.append(duplicate)
+    amount = duplicate["amount"]
+    assert isinstance(amount, int)
+    victory_points = ledger["victory_points"]
+    assert isinstance(victory_points, int)
+    ledger["victory_points"] = victory_points + amount
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP ledger must not repeat a source at one boundary",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_restore_rejects_secondary_transaction_with_unknown_source_id() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    payload = deepcopy(lifecycle.to_payload())
+    ledger = _ledger_payload(payload, player_id="player-a")
+    secondary = _secondary_transaction_payloads(ledger, source_kind="fixed_secondary")
+    assert len(secondary) == 1
+    secondary[0]["source_id"] = "unknown-secondary-mission"
+    metadata = _json_object(secondary[0]["metadata"], label="secondary metadata")
+    metadata["secondary_mission_id"] = "unknown-secondary-mission"
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP source is not source-backed",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_restore_rejects_secondary_moved_to_different_oc_record() -> None:
+    lifecycle = _two_player_bring_it_down_scored_lifecycle()
+    payload = deepcopy(lifecycle.to_payload())
+    player_a_ledger = _ledger_payload(payload, player_id="player-a")
+    player_b_ledger = _ledger_payload(payload, player_id="player-b")
+    player_a_secondary = _secondary_transaction_payloads(
+        player_a_ledger,
+        source_kind="fixed_secondary",
+    )
+    player_b_secondary = _secondary_transaction_payloads(
+        player_b_ledger,
+        source_kind="fixed_secondary",
+    )
+    assert len(player_a_secondary) == 1
+    assert len(player_b_secondary) == 1
+    player_a_metadata = _json_object(
+        player_a_secondary[0]["metadata"],
+        label="player-a secondary metadata",
+    )
+    player_b_metadata = _json_object(
+        player_b_secondary[0]["metadata"],
+        label="player-b secondary metadata",
+    )
+    original_record_id = player_a_metadata["objective_control_record_id"]
+    moved_record_id = player_b_metadata["objective_control_record_id"]
+    assert original_record_id != moved_record_id
+    player_a_metadata["objective_control_record_id"] = moved_record_id
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP transactions drifted from authoritative scoring-state semantics",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_restore_rejects_rewritten_secondary_amount_and_evidence_below_caps() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    payload = deepcopy(lifecycle.to_payload())
+    ledger = _ledger_payload(payload, player_id="player-a")
+    secondary = _secondary_transaction_payloads(ledger, source_kind="fixed_secondary")
+    assert len(secondary) == 1
+    transaction = secondary[0]
+    original_amount = transaction["amount"]
+    assert isinstance(original_amount, int)
+    new_amount = original_amount + 4
+    transaction["amount"] = new_amount
+    victory_points = ledger["victory_points"]
+    assert isinstance(victory_points, int)
+    ledger["victory_points"] = victory_points + 4
+    metadata = _json_object(transaction["metadata"], label="secondary metadata")
+    score_count_by_rule = _json_object(
+        metadata["score_count_by_rule"],
+        label="score_count_by_rule",
+    )
+    victory_points_by_rule = _json_object(
+        metadata["victory_points_by_rule"],
+        label="victory_points_by_rule",
+    )
+    evidence_by_rule = _json_object(metadata["evidence_by_rule"], label="evidence_by_rule")
+    for rule_id in tuple(score_count_by_rule):
+        score_count_by_rule[rule_id] = 2
+        victory_points_by_rule[rule_id] = new_amount
+        evidence = _json_object(evidence_by_rule[rule_id], label="rule evidence")
+        evidence["score_count"] = 2
+        destroyed_models = evidence.get("destroyed_model_instance_ids")
+        if type(destroyed_models) is list and destroyed_models:
+            typed_models = cast(list[object], destroyed_models)
+            first_model = typed_models[0]
+            assert isinstance(first_model, str)
+            evidence["destroyed_model_instance_ids"] = [first_model, f"{first_model}-forged"]
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP transactions drifted from authoritative scoring-state semantics",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_restore_rejects_scored_tactical_card_without_identified_transaction() -> None:
+    lifecycle, state = _defend_stronghold_ready_lifecycle()
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    payload = deepcopy(lifecycle.to_payload())
+    state_payload = _json_object(payload["state"], label="lifecycle state")
+    cards = _json_list(
+        state_payload["secondary_mission_card_states"],
+        label="secondary mission card states",
+    )
+    scored_cards = [
+        card
+        for card in (_json_object(raw_card, label="secondary card") for raw_card in cards)
+        if card.get("status") == "scored"
+    ]
+    assert len(scored_cards) == 1
+    scored_cards[0]["scored_transaction_id"] = "victory-point:player-a:round-02:999999"
+    with pytest.raises(
+        GameLifecycleError,
+        match="Scored tactical secondary card does not identify its ledger transaction",
+    ):
+        GameLifecycle.from_payload(payload)
 
 
 def test_deleted_resolved_lifecycle_row_fails_restore() -> None:
@@ -1323,6 +1549,216 @@ def _battlefield_dominance_lifecycle(
         battle_round=battle_round,
     )
     return GameLifecycle(state=state, decision_controller=DecisionController())
+
+
+def _two_defender_battlefield_dominance_lifecycle(
+    *,
+    phase: BattlePhase,
+    battle_round: int,
+) -> GameLifecycle:
+    setup = phase17n_event_setup(
+        layout_id="take-and-hold-vs-take-and-hold-layout-1",
+        attacker_force_disposition_id="take-and-hold",
+        defender_force_disposition_id="take-and-hold",
+    )
+    catalog = ArmyCatalog.phase9a_canonical_content_pack()
+    config = GameConfig(
+        game_id="phase11c-game",
+        allow_legacy_non_strict_rosters=True,
+        ruleset_descriptor=ruleset(),
+        army_catalog=catalog,
+        army_muster_requests=(
+            army_muster_request(
+                catalog=catalog,
+                player_id="player-a",
+                army_id="army-alpha",
+                unit_selections=(default_unit_selection("intercessor-unit-1"),),
+            ),
+            army_muster_request(
+                catalog=catalog,
+                player_id="player-b",
+                army_id="army-beta",
+                unit_selections=(
+                    default_unit_selection("intercessor-unit-3"),
+                    default_unit_selection("intercessor-unit-4"),
+                ),
+            ),
+        ),
+        player_ids=("player-a", "player-b"),
+        turn_order=("player-a", "player-b"),
+        fixed_secondary_mission_ids=("assassination", "bring_it_down", "cleanse"),
+        mission_setup=phase11c_mission_setup(),
+    )
+    state = GameState.from_config(config)
+    for army in mustered_armies(config):
+        state.record_army_definition(army)
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase11c-battlefield",
+        armies=tuple(state.army_definitions),
+    )
+    state.record_battlefield_state(scenario.battlefield_state)
+    state.record_secondary_mission_choice(
+        secondary_choice(player_id="player-a", mode=SecondaryMissionMode.FIXED)
+    )
+    state.record_secondary_mission_choice(
+        secondary_choice(player_id="player-b", mode=SecondaryMissionMode.FIXED)
+    )
+    complete_setup_through_gate(
+        state=state,
+        decisions=DecisionController(),
+        config=config,
+    )
+    state.mission_setup = setup
+    assert state.battlefield_state is not None
+    state.battlefield_state = replace(
+        state.battlefield_state,
+        battlefield_width_inches=setup.battlefield_width_inches,
+        battlefield_depth_inches=setup.battlefield_depth_inches,
+        terrain_features=setup.terrain_features,
+    )
+    state.army_definitions = [
+        replace(
+            army,
+            force_disposition_id=(
+                setup.primary_mission_assignment_for_player(army.player_id).force_disposition_id
+            ),
+        )
+        for army in state.army_definitions
+    ]
+    state.stage = GameLifecycleStage.BATTLE
+    state.setup_step_index = None
+    state.battle_round = battle_round
+    state.active_player_id = "player-a"
+    state.battle_phase_index = state.battle_phase_sequence.index(phase)
+    state.replace_movement_phase_state(None)
+    state.replace_shooting_phase_state(None)
+    state.replace_charge_phase_state(None)
+    state.replace_fight_phase_state(None)
+    state.primary_objective_turn_start_states = []
+    state.primary_rules_unit_turn_start_snapshots = []
+    return GameLifecycle(state=state, decision_controller=DecisionController())
+
+
+def _bring_it_down_player_a_scored_lifecycle() -> GameLifecycle:
+    lifecycle = _battlefield_dominance_lifecycle(phase=BattlePhase.FIGHT, battle_round=3)
+    state = lifecycle.state
+    assert state is not None
+    player_b_unit = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-b"
+        for unit in army.units
+    )
+    _set_unit_starting_wounds(state, player_b_unit.unit_instance_id, wounds=10)
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_fixed(
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+        )
+    )
+    state.active_player_id = "player-a"
+    state.record_secondary_unit_destruction(
+        destroying_player_id="player-a",
+        destroyed_unit_instance_id=player_b_unit.unit_instance_id,
+        destroyed_model_instance_ids=(player_b_unit.own_models[0].model_instance_id,),
+        started_turn_objective_marker_ids=(),
+        source_id="p2-bring-it-down-restore",
+    )
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    return lifecycle
+
+
+def _two_player_bring_it_down_scored_lifecycle() -> GameLifecycle:
+    lifecycle = _battlefield_dominance_lifecycle(phase=BattlePhase.FIGHT, battle_round=3)
+    state = lifecycle.state
+    assert state is not None
+    player_a_unit = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-a"
+        for unit in army.units
+    )
+    player_b_unit = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-b"
+        for unit in army.units
+    )
+    _set_unit_starting_wounds(state, player_a_unit.unit_instance_id, wounds=10)
+    _set_unit_starting_wounds(state, player_b_unit.unit_instance_id, wounds=10)
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_fixed(
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+        )
+    )
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_fixed(
+            player_id="player-b",
+            secondary_mission_id="bring-it-down",
+        )
+    )
+    state.active_player_id = "player-a"
+    state.record_secondary_unit_destruction(
+        destroying_player_id="player-a",
+        destroyed_unit_instance_id=player_b_unit.unit_instance_id,
+        destroyed_model_instance_ids=(player_b_unit.own_models[0].model_instance_id,),
+        started_turn_objective_marker_ids=(),
+        source_id="p2-bring-it-down-a",
+    )
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    state.active_player_id = "player-b"
+    state.record_secondary_unit_destruction(
+        destroying_player_id="player-b",
+        destroyed_unit_instance_id=player_a_unit.unit_instance_id,
+        destroyed_model_instance_ids=(player_a_unit.own_models[0].model_instance_id,),
+        started_turn_objective_marker_ids=(),
+        source_id="p2-bring-it-down-b",
+    )
+    state.score_secondary_mission_from_state(
+        player_id="player-b",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    return lifecycle
+
+
+def _ledger_payload(payload: GameLifecyclePayload, *, player_id: str) -> dict[str, object]:
+    state = _json_object(payload["state"], label="lifecycle state")
+    ledgers = _json_list(state["victory_point_ledgers"], label="victory point ledgers")
+    for ledger in ledgers:
+        ledger_map = _json_object(ledger, label="victory point ledger")
+        if ledger_map["player_id"] == player_id:
+            return ledger_map
+    raise AssertionError(f"ledger for {player_id} was not found")
+
+
+def _secondary_transaction_payloads(
+    ledger: dict[str, object],
+    *,
+    source_kind: str,
+) -> list[dict[str, object]]:
+    transactions = _json_list(ledger["transactions"], label="victory point transactions")
+    matches: list[dict[str, object]] = []
+    for transaction in transactions:
+        transaction_map = _json_object(transaction, label="victory point transaction")
+        if transaction_map["source_kind"] == source_kind:
+            matches.append(transaction_map)
+    return matches
 
 
 def _defend_stronghold_ready_lifecycle() -> tuple[GameLifecycle, GameState]:
@@ -1741,6 +2177,12 @@ def _json_object(value: object, *, label: str) -> dict[str, object]:
     if type(value) is not dict:
         raise AssertionError(f"{label} must be a JSON object.")
     return cast(dict[str, object], value)
+
+
+def _json_list(value: object, *, label: str) -> list[object]:
+    if type(value) is not list:
+        raise AssertionError(f"{label} must be a JSON list.")
+    return cast(list[object], value)
 
 
 def _fixed_secondary_record_ids(state: GameState) -> tuple[str, ...]:

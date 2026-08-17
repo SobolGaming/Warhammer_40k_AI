@@ -107,6 +107,11 @@ def validate_victory_point_ledger_policy(
         VictoryPointLedger,
         VictoryPointSourceKind,
     )
+    from warhammer40k_core.engine.secondary_victory_point_policy import (
+        require_source_backed_secondary_cap_bucket,
+        state_backed_secondary_binding_identity,
+        validate_state_backed_secondary_ledger_binding,
+    )
     from warhammer40k_core.engine.victory_point_cap_resolution import (
         resolve_victory_point_cap,
     )
@@ -115,6 +120,8 @@ def validate_victory_point_ledger_policy(
         raise GameLifecycleError("VP ledger and policy player_id drift.")
     end_of_battle_transaction_ids: set[str] = set()
     primary_binding_identities: set[tuple[str, str]] = set()
+    secondary_binding_identities: set[tuple[str, VictoryPointSourceKind, str, str]] = set()
+    tactical_source_identities: set[tuple[str, str]] = set()
     primary_bucket_transactions: list[VictoryPointTransaction] = []
     replayed_ledger = VictoryPointLedger.initial(player_id=ledger.player_id)
     previous_primary_order_key: tuple[int, int, int, int, int, int, str] | None = None
@@ -133,6 +140,39 @@ def validate_victory_point_ledger_policy(
         )
         binding = None
         end_of_battle_exempt = False
+        if transaction.source_kind in {
+            VictoryPointSourceKind.FIXED_SECONDARY,
+            VictoryPointSourceKind.TACTICAL_SECONDARY,
+        }:
+            secondary_identity = state_backed_secondary_binding_identity(
+                player_id=transaction.player_id,
+                source_kind=transaction.source_kind,
+                source_id=transaction.source_id,
+                metadata=transaction.metadata,
+            )
+            if secondary_identity is not None:
+                require_source_backed_secondary_cap_bucket(
+                    policy=policy,
+                    source_kind=transaction.source_kind,
+                    source_id=transaction.source_id,
+                )
+                secondary_identity = validate_state_backed_secondary_ledger_binding(
+                    transaction=transaction,
+                    objective_control_records=objective_control_records,
+                )
+                if secondary_identity in secondary_binding_identities:
+                    raise GameLifecycleError(
+                        "Secondary VP ledger must not repeat a source at one boundary."
+                    )
+                secondary_binding_identities.add(secondary_identity)
+                if transaction.source_kind is VictoryPointSourceKind.TACTICAL_SECONDARY:
+                    tactical_key = (transaction.player_id, transaction.source_id)
+                    if tactical_key in tactical_source_identities:
+                        raise GameLifecycleError(
+                            "Tactical Secondary VP ledger must not repeat a source "
+                            "across boundaries."
+                        )
+                    tactical_source_identities.add(tactical_key)
         if transaction.source_kind is VictoryPointSourceKind.PRIMARY:
             binding = validate_primary_victory_point_transaction(
                 policy=policy,
