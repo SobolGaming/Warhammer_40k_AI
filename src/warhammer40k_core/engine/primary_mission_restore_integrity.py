@@ -103,6 +103,11 @@ def validate_primary_mission_restore_integrity(
     validate_primary_scoring_position_event_authority(
         state=state,
         event_records=event_records,
+        decision_records=decision_records,
+        runtime_modifier_registry=runtime_modifier_registry,
+        rule_ir_authority_index=rule_ir_authority_index,
+        faction_rule_execution_registry=faction_rule_execution_registry,
+        runtime_content_activation=runtime_content_activation,
     )
 
 

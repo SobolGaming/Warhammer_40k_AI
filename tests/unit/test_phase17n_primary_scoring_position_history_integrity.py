@@ -22,6 +22,9 @@ from warhammer40k_core.engine.objective_control import (
     resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+    resolve_primary_scoring_boundary_lifecycle,
+)
 from warhammer40k_core.engine.primary_scoring_commit_checkpoint import (
     bound_primary_scoring_commit_checkpoint,
     emit_primary_scoring_commit_checkpoint,
@@ -121,6 +124,14 @@ def scoring_position_lifecycle_payload() -> GameLifecyclePayload:
     record_primary_scoring_state_evidence(state=state, evidence=evidence)
     for award in awards:
         state.award_victory_points(award)
+    resolve_primary_scoring_boundary_lifecycle(
+        state=state,
+        record=scoring_record,
+        scoring_boundary_kind=evidence.scoring_boundary_kind,
+        scoring_commit_checkpoint_id=evidence.scoring_commit_checkpoint_id,
+        scoring_commit_checkpoint_hash=evidence.scoring_commit_checkpoint_hash,
+        evidence_id=evidence.evidence_id,
+    )
 
     payload = GameLifecycle(state=state, decision_controller=decisions).to_payload()
     assert GameLifecycle.from_payload(deepcopy(payload)).to_payload() == payload
@@ -172,6 +183,18 @@ def test_restore_rejects_rehashed_incomplete_primary_position_witness(
                 continue
             metadata["primary_scoring_state_evidence_id"] = evidence["evidence_id"]
             metadata["primary_scoring_state_evidence_hash"] = digest
+    for row in payload["state"]["primary_scoring_boundary_lifecycles"]:
+        if row["evidence_id"] != old_evidence_id:
+            continue
+        row["evidence_id"] = evidence["evidence_id"]
+        lifecycle_content = {
+            key: value
+            for key, value in row.items()
+            if key not in {"lifecycle_id", "lifecycle_hash"}
+        }
+        lifecycle_digest = canonical_payload_sha256(lifecycle_content)
+        row["lifecycle_id"] = f"primary-scoring-boundary-lifecycle:{lifecycle_digest}"
+        row["lifecycle_hash"] = lifecycle_digest
 
     with pytest.raises(
         GameLifecycleError,

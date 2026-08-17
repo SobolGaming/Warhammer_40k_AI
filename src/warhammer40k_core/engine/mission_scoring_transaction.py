@@ -6,15 +6,24 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.event_log import EventLog, EventRecord
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.objective_control import (
-    ObjectiveControlContext,
     ObjectiveControlRecord,
     ObjectiveControlTiming,
-    resolve_objective_control,
+)
+from warhammer40k_core.engine.objective_control_boundary_proposal import (
+    commit_canonical_objective_control_proposal,
+    propose_canonical_objective_control_boundary,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_scoring_boundary import (
     score_primary_objective_control_boundary,
 )
+from warhammer40k_core.engine.primary_scoring_boundary_inventory import (
+    required_primary_scoring_boundary_kinds,
+)
+from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+    PrimaryScoringBoundaryStatus,
+)
+from warhammer40k_core.engine.primary_scoring_state_evidence import PrimaryScoringBoundaryKind
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
@@ -82,14 +91,13 @@ def score_secondary_mission_from_state(
         secondary_mission_id=secondary_mission_id,
         mode=requested_mode,
     )
-    record = resolve_objective_control(
-        ObjectiveControlContext.from_game_state(
-            state,
-            timing=ObjectiveControlTiming.TURN_END,
-            phase=phase,
-            ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
-        )
+    proposal = propose_canonical_objective_control_boundary(
+        state=state,
+        completed_phase=phase,
+        timing=ObjectiveControlTiming.TURN_END,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
+    record = proposal.retained_record
     policy = mission_scoring_policies_from_setup(state.mission_setup)
     source_kind = (
         VictoryPointSourceKind.FIXED_SECONDARY
@@ -101,7 +109,7 @@ def score_secondary_mission_from_state(
         card_state=card_state,
         record=record,
         source_kind=source_kind,
-        phase=phase,
+        policies=policy,
     ):
         return card_state
     award = policy.secondary_award_from_mission_state(
@@ -125,13 +133,11 @@ def score_secondary_mission_from_state(
         raise GameLifecycleError("State-backed secondary mission requirements are not met.")
     snapshot = _capture_aggregate(state=state, event_log=event_log)
     try:
-        if not any(
-            stored.record_id == record.record_id for stored in state.objective_control_records
-        ):
-            state.record_objective_control_record(
-                record,
-                runtime_modifier_registry=runtime_modifier_registry,
-            )
+        commit_canonical_objective_control_proposal(
+            state=state,
+            proposal=proposal,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
         _emit_objective_control_boundary_event_if_missing(event_log=event_log, record=record)
         score_primary_objective_control_boundary(
             state=state,
@@ -190,31 +196,93 @@ def _already_scored_at_boundary(
     card_state: SecondaryMissionCardState,
     record: ObjectiveControlRecord,
     source_kind: VictoryPointSourceKind,
-    phase: BattlePhase,
+    policies: object,
 ) -> bool:
     stored = any(stored.record_id == record.record_id for stored in state.objective_control_records)
     if not stored:
         return False
-    primary_closed = any(
-        evidence.objective_control_record_id == record.record_id
-        for evidence in state.primary_scoring_state_evidence_records
-    )
     ledger = state.victory_point_ledger_for_player(card_state.player_id)
     secondary_transactions = tuple(
         transaction
         for transaction in ledger.transactions
         if transaction.source_kind is source_kind
         and transaction.source_id == card_state.secondary_mission_id
-        and transaction.battle_round == state.battle_round
-        and transaction.phase == phase.value
+        and _transaction_objective_control_record_id(transaction) == record.record_id
     )
     if not secondary_transactions:
         return False
-    if not primary_closed:
+    _validate_secondary_primary_closure(
+        state=state,
+        record=record,
+        policies=policies,
+    )
+    return True
+
+
+def _transaction_objective_control_record_id(transaction: object) -> str:
+    from warhammer40k_core.engine.scoring import VictoryPointTransaction
+
+    if type(transaction) is not VictoryPointTransaction:
+        raise GameLifecycleError("Secondary scoring retry requires a VictoryPointTransaction.")
+    metadata = transaction.metadata
+    if not isinstance(metadata, dict):
+        raise GameLifecycleError(
+            "Secondary scoring transaction metadata must include objective_control_record_id."
+        )
+    record_id = metadata.get("objective_control_record_id")
+    if type(record_id) is not str or not record_id:
+        raise GameLifecycleError(
+            "Secondary scoring transaction metadata must include objective_control_record_id."
+        )
+    return record_id
+
+
+def _validate_secondary_primary_closure(
+    *,
+    state: GameState,
+    record: ObjectiveControlRecord,
+    policies: object,
+) -> None:
+    from warhammer40k_core.engine.mission_scoring_policies import MissionScoringPolicies
+
+    if type(policies) is not MissionScoringPolicies:
+        raise GameLifecycleError("Secondary scoring Primary closure requires scoring policies.")
+    required = required_primary_scoring_boundary_kinds(
+        policies=policies,
+        record=record,
+        turn_order=state.turn_order,
+    )
+    ordinary_required = PrimaryScoringBoundaryKind.ORDINARY in required
+    ordinary_evidence = tuple(
+        evidence
+        for evidence in state.primary_scoring_state_evidence_records
+        if evidence.objective_control_record_id == record.record_id
+        and evidence.scoring_boundary_kind is PrimaryScoringBoundaryKind.ORDINARY
+    )
+    if not ordinary_required:
+        if ordinary_evidence:
+            raise GameLifecycleError(
+                "State-backed secondary scoring found unexpected Primary evidence."
+            )
+        return
+    if len(ordinary_evidence) != 1:
         raise GameLifecycleError(
             "State-backed secondary scoring found a Secondary award without Primary evidence."
         )
-    return True
+    evidence = ordinary_evidence[0]
+    resolved = tuple(
+        row
+        for row in state.primary_scoring_boundary_lifecycles
+        if row.objective_control_record_id == record.record_id
+        and row.scoring_boundary_kind is PrimaryScoringBoundaryKind.ORDINARY
+        and row.status is PrimaryScoringBoundaryStatus.RESOLVED
+        and row.evidence_id == evidence.evidence_id
+    )
+    if len(resolved) != 1:
+        raise GameLifecycleError(
+            "State-backed secondary scoring found a Secondary award without "
+            "a resolved Primary lifecycle."
+        )
 
 
 def _emit_objective_control_boundary_event_if_missing(

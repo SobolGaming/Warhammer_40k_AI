@@ -117,7 +117,12 @@ def score_primary_objective_control_boundary(
                 scoring_boundary_kind=boundary_kind.value,
                 checkpoint=scoring_commit_checkpoint,
             )
-        record_primary_scoring_state_evidence(state=state, evidence=state_evidence)
+        record_primary_scoring_state_evidence(
+            state=state,
+            evidence=state_evidence,
+            scoring_commit_checkpoint=scoring_commit_checkpoint,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
         for award in awards:
             state.award_victory_points(award)
         validate_primary_boundary_transaction_semantics(

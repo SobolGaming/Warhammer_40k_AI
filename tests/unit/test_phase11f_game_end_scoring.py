@@ -36,6 +36,9 @@ from warhammer40k_core.engine.objective_control import (
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+    resolve_primary_scoring_boundary_lifecycle,
+)
 from warhammer40k_core.engine.primary_scoring_state_evidence import (
     build_primary_scoring_state_evidence,
     record_primary_scoring_state_evidence,
@@ -463,6 +466,20 @@ def test_phase11f_state_restore_revalidates_primary_score_count_semantics() -> N
     transaction = state.award_victory_points(award)
     assert transaction.amount == 5
     assert state.victory_point_total("player-a") == 5
+    evidence = state.primary_scoring_state_evidence_records[-1]
+    record = next(
+        stored
+        for stored in state.objective_control_records
+        if stored.record_id == evidence.objective_control_record_id
+    )
+    resolve_primary_scoring_boundary_lifecycle(
+        state=state,
+        record=record,
+        scoring_boundary_kind=evidence.scoring_boundary_kind,
+        scoring_commit_checkpoint_id=evidence.scoring_commit_checkpoint_id,
+        scoring_commit_checkpoint_hash=evidence.scoring_commit_checkpoint_hash,
+        evidence_id=evidence.evidence_id,
+    )
 
     payload = state.to_payload()
     player_a_ledger = next(

@@ -4,6 +4,7 @@ from copy import deepcopy
 from dataclasses import replace
 from json import loads as json_loads
 from re import escape
+from typing import cast
 
 import pytest
 from tests.phase11c_command_phase_helpers import with_model_offsets
@@ -37,7 +38,7 @@ from warhammer40k_core.engine.destruction_provenance import (
 )
 from warhammer40k_core.engine.event_log import canonical_json, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
-from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
@@ -57,22 +58,46 @@ from warhammer40k_core.engine.primary_historical_events import (
 from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
     PrimaryMissionBoundaryCheckpoint,
     PrimaryMissionBoundaryModelState,
+    PrimaryMissionObjectiveControlModifierSource,
+)
+from warhammer40k_core.engine.primary_mission_boundary_physical_authority import (
+    primary_mission_model_placements_from_checkpoint,
+)
+from warhammer40k_core.engine.primary_position_membership import (
+    build_primary_rules_unit_membership_from_model_placements,
 )
 from warhammer40k_core.engine.primary_scoring_boundary import (
     score_primary_objective_control_boundary,
 )
 from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
-    PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
+    PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED,
     PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH,
+    PrimaryScoringBoundaryLifecyclePayload,
     PrimaryScoringBoundaryStatus,
     mark_pending_primary_scoring_boundaries,
     pending_primary_scoring_boundary_keys,
+    resolve_primary_scoring_boundary_lifecycle,
 )
 from warhammer40k_core.engine.primary_scoring_commit_checkpoint import (
     PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT,
     bound_primary_scoring_commit_checkpoint,
 )
+from warhammer40k_core.engine.primary_scoring_commit_checkpoint_authority import (
+    validate_primary_scoring_spatial_rows_from_checkpoint,
+)
+from warhammer40k_core.engine.primary_scoring_position_witness import (
+    PrimaryScoringRulesUnitPositionWitnessPayload,
+)
+from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
+    PRIMARY_SCORING_NO_ENEMY_IN_OWN_TERRITORY_CONDITION,
+    TABLE_QUARTER_NORTH_WEST,
+    PrimaryTerritoryUnitWitness,
+    build_primary_scoring_spatial_evidence,
+)
 from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    PrimaryScoringBoundaryKind,
+    PrimaryScoringStateEvidence,
+    PrimaryScoringStateEvidencePayload,
     build_primary_scoring_state_evidence,
     record_primary_scoring_state_evidence,
 )
@@ -88,12 +113,21 @@ from warhammer40k_core.engine.return_on_death import (
     apply_return_on_death_placement_decision,
     resolve_pending_return_on_death_phase_end,
 )
+from warhammer40k_core.engine.runtime_modifiers import (
+    ObjectiveControlModifierBinding,
+    ObjectiveControlModifierContext,
+    RuntimeModifierRegistry,
+)
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
     VictoryPointAward,
     VictoryPointSourceKind,
     VictoryPointTransaction,
+)
+from warhammer40k_core.engine.sticky_objective_control import StickyObjectiveControlState
+from warhammer40k_core.engine.turn_end_hooks import (
+    SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
 )
 from warhammer40k_core.geometry.pose import Pose
 
@@ -501,7 +535,7 @@ def test_coordinated_rewrite_of_post_oc_mutation_and_scoring_checkpoint_fails() 
         lifecycle_digest = canonical_payload_sha256(lifecycle_content)
         row["lifecycle_id"] = f"primary-scoring-boundary-lifecycle:{lifecycle_digest}"
         row["lifecycle_hash"] = lifecycle_digest
-    with pytest.raises(GameLifecycleError, match="drifted"):
+    with pytest.raises(GameLifecycleError, match="movement history"):
         GameLifecycle.from_payload(payload)
 
 
@@ -528,6 +562,14 @@ def test_evidence_without_scoring_commit_checkpoint_event_fails_restore() -> Non
     record_primary_scoring_state_evidence(state=state, evidence=evidence)
     for award in awards:
         state.award_victory_points(award)
+    resolve_primary_scoring_boundary_lifecycle(
+        state=state,
+        record=record,
+        scoring_boundary_kind=PrimaryScoringBoundaryKind.ORDINARY,
+        scoring_commit_checkpoint_id=evidence.scoring_commit_checkpoint_id,
+        scoring_commit_checkpoint_hash=evidence.scoring_commit_checkpoint_hash,
+        evidence_id=evidence.evidence_id,
+    )
     with pytest.raises(
         GameLifecycleError,
         match=escape(
@@ -535,6 +577,637 @@ def test_evidence_without_scoring_commit_checkpoint_event_fails_restore() -> Non
         ),
     ):
         GameLifecycle.from_payload(lifecycle.to_payload())
+
+
+def test_forged_table_quarter_witness_fails_restore_after_coordinated_rehash() -> None:
+    lifecycle = _scored_reconnaissance_turn_end_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    payload = deepcopy(lifecycle.to_payload())
+    evidence = payload["state"]["primary_scoring_state_evidence_records"][0]
+    spatial_rows = evidence["primary_scoring_spatial_evidence_by_player_id"]
+    assert spatial_rows
+    unit = next(
+        candidate
+        for army in state.army_definitions
+        if army.player_id == "player-a"
+        for candidate in army.units
+    )
+    spatial_rows[0]["table_quarter_unit_witnesses"] = [
+        {
+            "rules_unit_instance_id": unit.unit_instance_id,
+            "quarter_id": TABLE_QUARTER_NORTH_WEST,
+            "model_instance_ids": [unit.own_models[0].model_instance_id],
+        }
+    ]
+    _rehash_evidence_transactions_and_lifecycles(payload, evidence=evidence)
+    with pytest.raises(GameLifecycleError, match="spatial evidence drifted"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_forged_territory_witness_fails_restore_after_coordinated_rehash() -> None:
+    lifecycle = _scored_determined_acquisition_command_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    payload = deepcopy(lifecycle.to_payload())
+    evidence = payload["state"]["primary_scoring_state_evidence_records"][0]
+    spatial_rows = evidence["primary_scoring_spatial_evidence_by_player_id"]
+    assert spatial_rows
+    territory_row = next(
+        row
+        for row in spatial_rows
+        if "each_controlled_objective_in_opponent_territory" in row["requested_condition_ids"]
+    )
+    assert state.mission_setup is not None
+    marker_id = next(
+        marker.objective_marker_id
+        for marker in state.mission_setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.DEFENDER_HOME
+    )
+    authentic = list(territory_row["opponent_territory_objective_ids"])
+    if marker_id in authentic:
+        territory_row["opponent_territory_objective_ids"] = [
+            objective_id for objective_id in authentic if objective_id != marker_id
+        ]
+    else:
+        territory_row["opponent_territory_objective_ids"] = [*authentic, marker_id]
+    _rehash_evidence_transactions_and_lifecycles(payload, evidence=evidence)
+    with pytest.raises(GameLifecycleError, match="spatial evidence"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_forged_territory_unit_witness_fails_checkpoint_spatial_rebuild() -> None:
+    setup = phase17n_event_setup(
+        layout_id="reconnaissance-vs-priority-assets-layout-1",
+        attacker_force_disposition_id="reconnaissance",
+        defender_force_disposition_id="priority-assets",
+    )
+    state = phase17n_state_with_setup(
+        setup=setup,
+        active_player_id="player-a",
+        phase=BattlePhase.FIGHT,
+        battle_round=5,
+    )
+    state.turn_order = ("player-b", "player-a")
+    _place_player_on_role(state, player_id="player-b", role=ObjectiveMarkerRole.ATTACKER_HOME)
+    record = state.record_objective_control_boundary(
+        completed_phase=BattlePhase.FIGHT,
+        timing=ObjectiveControlTiming.TURN_END,
+        runtime_modifier_registry=None,
+    )
+    checkpoint = bound_primary_scoring_commit_checkpoint(
+        state=state,
+        record=record,
+        scoring_commit_checkpoint=None,
+        runtime_modifier_registry=None,
+    )
+    evidence = build_primary_scoring_state_evidence(
+        state=state,
+        record=record,
+        end_of_battle=True,
+        scoring_commit_checkpoint=checkpoint,
+    )
+    payload = evidence.to_payload()
+    spatial_row = next(
+        row
+        for row in payload["primary_scoring_spatial_evidence_by_player_id"]
+        if PRIMARY_SCORING_NO_ENEMY_IN_OWN_TERRITORY_CONDITION in row["requested_condition_ids"]
+    )
+    enemy = next(
+        candidate
+        for army in state.army_definitions
+        if army.player_id == "player-b"
+        for candidate in army.units
+    )
+    authentic = list(spatial_row["enemy_units_wholly_within_own_territory"])
+    if authentic:
+        spatial_row["enemy_units_wholly_within_own_territory"] = [
+            {
+                "rules_unit_instance_id": authentic[0]["rules_unit_instance_id"],
+                "model_instance_ids": [enemy.own_models[0].model_instance_id],
+            }
+        ]
+    else:
+        spatial_row["enemy_units_wholly_within_own_territory"] = [
+            PrimaryTerritoryUnitWitness(
+                rules_unit_instance_id=enemy.unit_instance_id,
+                model_instance_ids=(enemy.own_models[0].model_instance_id,),
+            ).to_payload()
+        ]
+    content = {
+        key: value for key, value in payload.items() if key not in {"evidence_id", "evidence_hash"}
+    }
+    digest = canonical_payload_sha256(content)
+    payload["evidence_id"] = f"primary-scoring-state-evidence:{digest}"
+    payload["evidence_hash"] = digest
+    forged_evidence = PrimaryScoringStateEvidence.from_payload(payload)
+    placements = primary_mission_model_placements_from_checkpoint(
+        state=state,
+        checkpoint=checkpoint,
+    )
+    with pytest.raises(GameLifecycleError, match="spatial evidence drifted"):
+        validate_primary_scoring_spatial_rows_from_checkpoint(
+            state=state,
+            evidence=forged_evidence,
+            model_placements=placements,
+        )
+
+
+def test_forged_commit_checkpoint_pose_without_physical_event_fails_restore() -> None:
+    lifecycle = _scored_command_boundary_after_mutation(kind="move")
+    state = lifecycle.state
+    assert state is not None
+    payload = deepcopy(lifecycle.to_payload())
+    events = payload["decisions"]["event_log"]
+    commit_event = next(
+        event for event in events if event["event_type"] == PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT
+    )
+    raw_payload = commit_event["payload"]
+    assert isinstance(raw_payload, dict)
+    checkpoint = PrimaryMissionBoundaryCheckpoint.from_payload(raw_payload["checkpoint"])
+    rewritten_states = tuple(_offset_checkpoint_model_state(row) for row in checkpoint.model_states)
+    rewritten = _checkpoint_with_model_states(checkpoint, rewritten_states)
+    raw_payload["checkpoint"] = rewritten.to_payload()
+    evidence = payload["state"]["primary_scoring_state_evidence_records"][0]
+    forged_placements = primary_mission_model_placements_from_checkpoint(
+        state=state,
+        checkpoint=rewritten,
+    )
+    rebuilt_witnesses: list[PrimaryScoringRulesUnitPositionWitnessPayload] = []
+    for witness in evidence["current_rules_unit_position_witnesses"]:
+        membership_payload = witness["rules_unit_membership"]
+        component_unit_instance_ids = tuple(
+            component["unit_instance_id"]
+            for component in membership_payload["component_memberships"]
+        )
+        membership = build_primary_rules_unit_membership_from_model_placements(
+            state=state,
+            rules_unit_instance_id=membership_payload["rules_unit_instance_id"],
+            owner_player_id=witness["owner_player_id"],
+            component_unit_instance_ids=component_unit_instance_ids,
+            model_placements=forged_placements,
+        )
+        rebuilt_witnesses.append(
+            {
+                "owner_player_id": witness["owner_player_id"],
+                "rules_unit_membership": membership.to_payload(),
+            }
+        )
+    evidence["current_rules_unit_position_witnesses"] = rebuilt_witnesses
+    record = state.objective_control_records[-1]
+    evidence["primary_scoring_spatial_evidence_by_player_id"] = [
+        build_primary_scoring_spatial_evidence(
+            state=state,
+            player_id=row["player_id"],
+            record=record,
+            requested_condition_ids=tuple(row["requested_condition_ids"]),
+            model_placements=forged_placements,
+        ).to_payload()
+        if row["requested_condition_ids"]
+        else row
+        for row in evidence["primary_scoring_spatial_evidence_by_player_id"]
+    ]
+    evidence["scoring_commit_checkpoint_id"] = rewritten.checkpoint_id
+    evidence["scoring_commit_checkpoint_hash"] = rewritten.checkpoint_hash
+    _rehash_evidence_transactions_and_lifecycles(
+        payload,
+        evidence=evidence,
+        scoring_commit_checkpoint=rewritten,
+    )
+    with pytest.raises(GameLifecycleError, match="movement history"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_forged_commit_checkpoint_modifier_source_fails_registry_restore() -> None:
+    lifecycle = _scored_command_boundary_after_mutation(kind="move")
+    payload = deepcopy(lifecycle.to_payload())
+    events = payload["decisions"]["event_log"]
+    commit_event = next(
+        event for event in events if event["event_type"] == PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT
+    )
+    raw_payload = commit_event["payload"]
+    assert isinstance(raw_payload, dict)
+    checkpoint = PrimaryMissionBoundaryCheckpoint.from_payload(raw_payload["checkpoint"])
+    first = checkpoint.model_states[0]
+    resolved_payload = validate_json_value(json_loads(first.resolved_objective_control_json))
+    assert isinstance(resolved_payload, dict)
+    raw_applied = resolved_payload.get("applied_modifier_ids")
+    applied: list[str] = []
+    if isinstance(raw_applied, list):
+        for modifier_id in raw_applied:
+            assert isinstance(modifier_id, str)
+            applied.append(modifier_id)
+    applied.append("p2-forged-oc-modifier")
+    resolved_payload["applied_modifier_ids"] = validate_json_value(applied)
+    rewritten_states = (
+        replace(first, resolved_objective_control_json=canonical_json(resolved_payload)),
+        *checkpoint.model_states[1:],
+    )
+    rewritten = PrimaryMissionBoundaryCheckpoint.create(
+        boundary_kind=checkpoint.boundary_kind,
+        game_id=checkpoint.game_id,
+        player_id=checkpoint.player_id,
+        active_player_id=checkpoint.active_player_id,
+        battle_round=checkpoint.battle_round,
+        phase=checkpoint.phase,
+        battlefield_id=checkpoint.battlefield_id,
+        model_states=rewritten_states,
+        attached_unit_formation_jsons=checkpoint.attached_unit_formation_jsons,
+        battle_shocked_unit_instance_ids=checkpoint.battle_shocked_unit_instance_ids,
+        advanced_unit_state_jsons=checkpoint.advanced_unit_state_jsons,
+        fell_back_unit_state_jsons=checkpoint.fell_back_unit_state_jsons,
+        shot_unit_instance_ids=checkpoint.shot_unit_instance_ids,
+        objective_control_modifier_sources=(
+            *checkpoint.objective_control_modifier_sources,
+            PrimaryMissionObjectiveControlModifierSource(
+                modifier_id="p2-forged-oc-modifier",
+                source_id="p2-forged-oc-source",
+                source_effect_id=None,
+                source_effect_json=None,
+            ),
+        ),
+        active_primary_marker_jsons=checkpoint.active_primary_marker_jsons,
+        active_secondary_mission_ids=checkpoint.active_secondary_mission_ids,
+        mission_action_prior_use_jsons=checkpoint.mission_action_prior_use_jsons,
+    )
+    raw_payload["checkpoint"] = rewritten.to_payload()
+    evidence = payload["state"]["primary_scoring_state_evidence_records"][0]
+    evidence["scoring_commit_checkpoint_id"] = rewritten.checkpoint_id
+    evidence["scoring_commit_checkpoint_hash"] = rewritten.checkpoint_hash
+    _rehash_evidence_transactions_and_lifecycles(
+        payload,
+        evidence=evidence,
+        scoring_commit_checkpoint=rewritten,
+    )
+    with pytest.raises(GameLifecycleError, match="unregistered"):
+        GameLifecycle.from_payload(payload)
+
+
+def test_sticky_control_satisfies_secondary_at_opponent_turn_end() -> None:
+    lifecycle, state = _defend_stronghold_ready_lifecycle()
+    home = next(
+        marker
+        for marker in state.mission_setup.objective_markers  # type: ignore[union-attr]
+        if marker.objective_role is ObjectiveMarkerRole.ATTACKER_HOME
+    )
+    sticky = _sticky_state_for(
+        state,
+        player_id="player-a",
+        objective_id=home.objective_marker_id,
+        active_player_id="player-b",
+    )
+    state.record_sticky_objective_control_state(sticky)
+    _place_player_away_from_objectives(state, player_id="player-a")
+    scored = state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    assert scored.status.value == "scored"
+    record = state.objective_control_records[-1]
+    home_result = record.result_by_objective_id(home.objective_marker_id)
+    assert home_result.retained_control_source_id is not None
+
+
+def test_sticky_control_expires_during_successful_atomic_secondary() -> None:
+    lifecycle, state = _defend_stronghold_ready_lifecycle()
+    central = next(
+        marker
+        for marker in state.mission_setup.objective_markers  # type: ignore[union-attr]
+        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+    )
+    sticky = _sticky_state_for(
+        state,
+        player_id="player-a",
+        objective_id=central.objective_marker_id,
+        active_player_id="player-b",
+    )
+    state.record_sticky_objective_control_state(sticky)
+    _place_player_on_role(state, player_id="player-b", role=ObjectiveMarkerRole.CENTRAL)
+    assert state.sticky_objective_control_states
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    assert state.sticky_objective_control_states == []
+
+
+def test_runtime_oc_modifier_changes_secondary_scoring_result() -> None:
+    def _zero_oc(context: ObjectiveControlModifierContext) -> int:
+        assert context.current_objective_control >= 0
+        return 0
+
+    registry = RuntimeModifierRegistry.from_bindings(
+        objective_control_modifier_bindings=(
+            ObjectiveControlModifierBinding(
+                modifier_id="p2-zero-oc",
+                source_id="p2-zero-oc-source",
+                handler=_zero_oc,
+            ),
+        )
+    )
+    modified_lifecycle, modified_state = _defend_stronghold_ready_lifecycle()
+    modified_state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=modified_lifecycle.decision_controller.event_log,
+        runtime_modifier_registry=registry,
+    )
+    baseline_lifecycle, baseline_state = _defend_stronghold_ready_lifecycle()
+    scored = baseline_state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=baseline_lifecycle.decision_controller.event_log,
+    )
+    assert scored.status.value == "scored"
+    assert _tactical_secondary_amount(
+        modified_state,
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+    ) != _tactical_secondary_amount(
+        baseline_state,
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+    )
+
+
+def test_preexisting_canonical_sticky_record_is_reused_exactly() -> None:
+    lifecycle, state = _defend_stronghold_ready_lifecycle()
+    home = next(
+        marker
+        for marker in state.mission_setup.objective_markers  # type: ignore[union-attr]
+        if marker.objective_role is ObjectiveMarkerRole.ATTACKER_HOME
+    )
+    sticky = _sticky_state_for(
+        state,
+        player_id="player-a",
+        objective_id=home.objective_marker_id,
+        active_player_id="player-b",
+    )
+    state.record_sticky_objective_control_state(sticky)
+    stored = state.record_objective_control_boundary(
+        completed_phase=BattlePhase.FIGHT,
+        timing=ObjectiveControlTiming.TURN_END,
+        runtime_modifier_registry=None,
+    )
+    _place_player_away_from_objectives(state, player_id="player-a")
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    assert state.objective_control_records == [stored]
+
+
+def test_failure_after_canonical_oc_projection_restores_sticky_inventory(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    lifecycle, state = _defend_stronghold_ready_lifecycle()
+    home = next(
+        marker
+        for marker in state.mission_setup.objective_markers  # type: ignore[union-attr]
+        if marker.objective_role is ObjectiveMarkerRole.ATTACKER_HOME
+    )
+    sticky = _sticky_state_for(
+        state,
+        player_id="player-a",
+        objective_id=home.objective_marker_id,
+        active_player_id="player-b",
+    )
+    state.record_sticky_objective_control_state(sticky)
+    original = GameState.award_victory_points
+
+    def _fail_secondary(self: GameState, award: VictoryPointAward) -> VictoryPointTransaction:
+        if self is state and award.source_kind is VictoryPointSourceKind.TACTICAL_SECONDARY:
+            raise GameLifecycleError("injected secondary ledger failure")
+        return original(self, award)
+
+    monkeypatch.setattr(GameState, "award_victory_points", _fail_secondary)
+    before = tuple(state.sticky_objective_control_states)
+    with pytest.raises(GameLifecycleError, match="injected secondary ledger failure"):
+        state.score_secondary_mission_from_state(
+            player_id="player-a",
+            secondary_mission_id="defend-stronghold",
+            mode=SecondaryMissionCardMode.TACTICAL,
+            phase=BattlePhase.FIGHT,
+            event_log=lifecycle.decision_controller.event_log,
+        )
+    assert tuple(state.sticky_objective_control_states) == before
+
+
+def test_secondary_retry_without_applicable_primary_evidence() -> None:
+    lifecycle = _battlefield_dominance_lifecycle(phase=BattlePhase.FIGHT, battle_round=3)
+    state = lifecycle.state
+    assert state is not None
+    state.active_player_id = "player-b"
+    _place_player_on_role(state, player_id="player-a", role=ObjectiveMarkerRole.ATTACKER_HOME)
+    _place_player_on_role(state, player_id="player-b", role=ObjectiveMarkerRole.DEFENDER_HOME)
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="defend-stronghold",
+            battle_round=3,
+            source_result_id="p2-no-primary-retry",
+        )
+    )
+    first = state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    assert state.primary_scoring_state_evidence_records == []
+    second = state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    assert second == first
+    secondary_ids = tuple(
+        transaction.transaction_id
+        for ledger in state.victory_point_ledgers
+        for transaction in ledger.transactions
+        if transaction.source_kind is VictoryPointSourceKind.TACTICAL_SECONDARY
+    )
+    assert len(secondary_ids) == 1
+
+
+def test_fixed_bring_it_down_scores_distinct_turn_end_records() -> None:
+    lifecycle = _battlefield_dominance_lifecycle(phase=BattlePhase.FIGHT, battle_round=3)
+    state = lifecycle.state
+    assert state is not None
+    player_a_unit = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-a"
+        for unit in army.units
+    )
+    player_b_unit = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-b"
+        for unit in army.units
+    )
+    _set_unit_starting_wounds(state, player_a_unit.unit_instance_id, wounds=10)
+    _set_unit_starting_wounds(state, player_b_unit.unit_instance_id, wounds=10)
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_fixed(
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+        )
+    )
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_fixed(
+            player_id="player-b",
+            secondary_mission_id="bring-it-down",
+        )
+    )
+    state.active_player_id = "player-a"
+    state.record_secondary_unit_destruction(
+        destroying_player_id="player-a",
+        destroyed_unit_instance_id=player_b_unit.unit_instance_id,
+        destroyed_model_instance_ids=(player_b_unit.own_models[0].model_instance_id,),
+        started_turn_objective_marker_ids=(),
+        source_id="p2-bring-it-down-a",
+    )
+    first = state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    first_record_id = state.objective_control_records[-1].record_id
+    state.active_player_id = "player-b"
+    state.record_secondary_unit_destruction(
+        destroying_player_id="player-b",
+        destroyed_unit_instance_id=player_a_unit.unit_instance_id,
+        destroyed_model_instance_ids=(player_a_unit.own_models[0].model_instance_id,),
+        started_turn_objective_marker_ids=(),
+        source_id="p2-bring-it-down-b",
+    )
+    second = state.score_secondary_mission_from_state(
+        player_id="player-b",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    second_record_id = state.objective_control_records[-1].record_id
+    assert first.status.value == "active"
+    assert second.status.value == "active"
+    assert first_record_id != second_record_id
+    record_ids = _fixed_secondary_record_ids(state)
+    assert record_ids == (first_record_id, second_record_id)
+    state.active_player_id = "player-a"
+    retry_a = state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    state.active_player_id = "player-b"
+    retry_b = state.score_secondary_mission_from_state(
+        player_id="player-b",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    assert retry_a == first
+    assert retry_b == second
+    assert record_ids == _fixed_secondary_record_ids(state)
+
+
+def test_deleted_resolved_lifecycle_row_fails_restore() -> None:
+    lifecycle = _scored_command_boundary_after_mutation(kind="move")
+    payload = deepcopy(lifecycle.to_payload())
+    rows = payload["state"]["primary_scoring_boundary_lifecycles"]
+    assert rows
+    payload["state"]["primary_scoring_boundary_lifecycles"] = rows[1:]
+    with pytest.raises(
+        GameLifecycleError,
+        match="lifecycle registry is incomplete or unexpected",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_deleted_all_resolved_lifecycle_rows_fails_restore() -> None:
+    lifecycle = _scored_command_boundary_after_mutation(kind="move")
+    payload = deepcopy(lifecycle.to_payload())
+    payload["state"]["primary_scoring_boundary_lifecycles"] = []
+    with pytest.raises(
+        GameLifecycleError,
+        match="lifecycle registry is incomplete or unexpected",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_incorrect_legal_pending_window_fails_restore() -> None:
+    lifecycle = _pending_command_boundary_lifecycle()
+    payload = deepcopy(lifecycle.to_payload())
+    for row in payload["state"]["primary_scoring_boundary_lifecycles"]:
+        row["pending_window"] = PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH
+        _rehash_lifecycle_row(row)
+    with pytest.raises(
+        GameLifecycleError,
+        match="window does not match the queue-head decision family",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_pending_row_bound_to_unrelated_queue_head_fails_restore() -> None:
+    lifecycle = _pending_command_boundary_lifecycle()
+    payload = deepcopy(lifecycle.to_payload())
+    queue = payload["decisions"]["queue"]["pending_requests"]
+    queue[0]["decision_type"] = SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE
+    for event in payload["decisions"]["event_log"]:
+        if event["event_type"] != "decision_requested":
+            continue
+        request_payload = event["payload"]
+        if (
+            isinstance(request_payload, dict)
+            and request_payload.get("request_id") == queue[0]["request_id"]
+        ):
+            request_payload["decision_type"] = SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE
+    with pytest.raises(
+        GameLifecycleError,
+        match="window does not match the queue-head decision family",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_coordinated_lifecycle_deletion_with_evidence_and_ledger_rewrite_fails() -> None:
+    lifecycle = _scored_command_boundary_after_mutation(kind="move")
+    payload = deepcopy(lifecycle.to_payload())
+    payload["state"]["primary_scoring_boundary_lifecycles"] = []
+    payload["state"]["primary_scoring_state_evidence_records"] = []
+    for ledger in payload["state"]["victory_point_ledgers"]:
+        ledger["transactions"] = [
+            transaction
+            for transaction in ledger["transactions"]
+            if transaction["source_kind"] != "primary"
+        ]
+        ledger["victory_points"] = sum(
+            transaction["amount"] for transaction in ledger["transactions"]
+        )
+    with pytest.raises(GameLifecycleError):
+        GameLifecycle.from_payload(payload)
 
 
 def _pending_command_boundary_lifecycle() -> GameLifecycle:
@@ -545,7 +1218,7 @@ def _pending_command_boundary_lifecycle() -> GameLifecycle:
     _emit_oc_event(decisions=lifecycle.decision_controller, record=record)
     _queue_pending_window(
         lifecycle=lifecycle,
-        pending_window=PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH,
+        pending_window=PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED,
     )
     return lifecycle
 
@@ -572,7 +1245,7 @@ def _pending_final_turn_end_boundary_lifecycle() -> GameLifecycle:
     lifecycle = GameLifecycle(state=state, decision_controller=decisions)
     _queue_pending_window(
         lifecycle=lifecycle,
-        pending_window=PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
+        pending_window=PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED,
     )
     return lifecycle
 
@@ -1037,3 +1710,222 @@ def _offset_checkpoint_model_state(
         )
     )
     return replace(row, model_placement_json=canonical_json(moved.to_payload()))
+
+
+def _checkpoint_with_model_states(
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+    model_states: tuple[PrimaryMissionBoundaryModelState, ...],
+) -> PrimaryMissionBoundaryCheckpoint:
+    return PrimaryMissionBoundaryCheckpoint.create(
+        boundary_kind=checkpoint.boundary_kind,
+        game_id=checkpoint.game_id,
+        player_id=checkpoint.player_id,
+        active_player_id=checkpoint.active_player_id,
+        battle_round=checkpoint.battle_round,
+        phase=checkpoint.phase,
+        battlefield_id=checkpoint.battlefield_id,
+        model_states=model_states,
+        attached_unit_formation_jsons=checkpoint.attached_unit_formation_jsons,
+        battle_shocked_unit_instance_ids=checkpoint.battle_shocked_unit_instance_ids,
+        advanced_unit_state_jsons=checkpoint.advanced_unit_state_jsons,
+        fell_back_unit_state_jsons=checkpoint.fell_back_unit_state_jsons,
+        shot_unit_instance_ids=checkpoint.shot_unit_instance_ids,
+        objective_control_modifier_sources=checkpoint.objective_control_modifier_sources,
+        active_primary_marker_jsons=checkpoint.active_primary_marker_jsons,
+        active_secondary_mission_ids=checkpoint.active_secondary_mission_ids,
+        mission_action_prior_use_jsons=checkpoint.mission_action_prior_use_jsons,
+    )
+
+
+def _json_object(value: object, *, label: str) -> dict[str, object]:
+    if type(value) is not dict:
+        raise AssertionError(f"{label} must be a JSON object.")
+    return cast(dict[str, object], value)
+
+
+def _fixed_secondary_record_ids(state: GameState) -> tuple[str, ...]:
+    record_ids: list[str] = []
+    for ledger in state.victory_point_ledgers:
+        for transaction in ledger.transactions:
+            if transaction.source_kind is not VictoryPointSourceKind.FIXED_SECONDARY:
+                continue
+            metadata = transaction.metadata
+            assert isinstance(metadata, dict)
+            record_id = metadata.get("objective_control_record_id")
+            assert isinstance(record_id, str)
+            record_ids.append(record_id)
+    return tuple(record_ids)
+
+
+def _rehash_evidence_transactions_and_lifecycles(
+    payload: GameLifecyclePayload,
+    *,
+    evidence: PrimaryScoringStateEvidencePayload,
+    scoring_commit_checkpoint: PrimaryMissionBoundaryCheckpoint | None = None,
+) -> None:
+    evidence_map = _json_object(evidence, label="primary scoring evidence")
+    old_evidence_id = evidence_map["evidence_id"]
+    assert isinstance(old_evidence_id, str)
+    content = {
+        key: value
+        for key, value in evidence_map.items()
+        if key not in {"evidence_id", "evidence_hash"}
+    }
+    digest = canonical_payload_sha256(content)
+    new_evidence_id = f"primary-scoring-state-evidence:{digest}"
+    evidence_map["evidence_id"] = new_evidence_id
+    evidence_map["evidence_hash"] = digest
+    state = payload["state"]
+    for ledger in state["victory_point_ledgers"]:
+        for transaction in ledger["transactions"]:
+            metadata = transaction["metadata"]
+            if type(metadata) is not dict:
+                continue
+            metadata_map = cast(dict[str, object], metadata)
+            if metadata_map.get("primary_scoring_state_evidence_id") != old_evidence_id:
+                continue
+            metadata_map["primary_scoring_state_evidence_id"] = new_evidence_id
+            metadata_map["primary_scoring_state_evidence_hash"] = digest
+    for row in state["primary_scoring_boundary_lifecycles"]:
+        if row["evidence_id"] != old_evidence_id:
+            continue
+        row["evidence_id"] = new_evidence_id
+        if scoring_commit_checkpoint is not None:
+            row["scoring_commit_checkpoint_id"] = scoring_commit_checkpoint.checkpoint_id
+            row["scoring_commit_checkpoint_hash"] = scoring_commit_checkpoint.checkpoint_hash
+        _rehash_lifecycle_row(row)
+
+
+def _rehash_lifecycle_row(row: PrimaryScoringBoundaryLifecyclePayload) -> None:
+    row_map = _json_object(row, label="primary scoring boundary lifecycle")
+    content = {
+        key: value
+        for key, value in row_map.items()
+        if key not in {"lifecycle_id", "lifecycle_hash"}
+    }
+    digest = canonical_payload_sha256(content)
+    row_map["lifecycle_id"] = f"primary-scoring-boundary-lifecycle:{digest}"
+    row_map["lifecycle_hash"] = digest
+
+
+def _scored_reconnaissance_turn_end_lifecycle() -> GameLifecycle:
+    setup = phase17n_event_setup(
+        layout_id="take-and-hold-vs-reconnaissance-layout-1",
+        attacker_force_disposition_id="reconnaissance",
+        defender_force_disposition_id="take-and-hold",
+    )
+    state = phase17n_state_with_setup(
+        setup=setup,
+        active_player_id="player-a",
+        phase=BattlePhase.FIGHT,
+        battle_round=1,
+    )
+    decisions = DecisionController()
+    record = state.record_objective_control_boundary(
+        completed_phase=BattlePhase.FIGHT,
+        timing=ObjectiveControlTiming.TURN_END,
+        runtime_modifier_registry=None,
+    )
+    _emit_oc_event(decisions=decisions, record=record)
+    score_primary_objective_control_boundary(
+        state=state,
+        record=record,
+        end_of_battle=False,
+        event_log=decisions.event_log,
+    )
+    return GameLifecycle(state=state, decision_controller=decisions)
+
+
+def _scored_determined_acquisition_command_lifecycle() -> GameLifecycle:
+    setup = phase17n_event_setup(
+        layout_id="take-and-hold-vs-disruption-layout-1",
+        attacker_force_disposition_id="take-and-hold",
+        defender_force_disposition_id="disruption",
+    )
+    state = phase17n_state_with_setup(
+        setup=setup,
+        active_player_id="player-a",
+        phase=BattlePhase.COMMAND,
+        battle_round=2,
+    )
+    _place_player_on_role(state, player_id="player-a", role=ObjectiveMarkerRole.DEFENDER_HOME)
+    decisions = DecisionController()
+    record = state.determine_current_phase_end_objective_control()
+    _emit_oc_event(decisions=decisions, record=record)
+    score_primary_objective_control_boundary(
+        state=state,
+        record=record,
+        end_of_battle=False,
+        event_log=decisions.event_log,
+    )
+    return GameLifecycle(state=state, decision_controller=decisions)
+
+
+def _tactical_secondary_amount(
+    state: GameState,
+    *,
+    player_id: str,
+    secondary_mission_id: str,
+) -> int:
+    ledger = state.victory_point_ledger_for_player(player_id)
+    amounts = tuple(
+        transaction.amount
+        for transaction in ledger.transactions
+        if transaction.source_kind is VictoryPointSourceKind.TACTICAL_SECONDARY
+        and transaction.source_id == secondary_mission_id
+    )
+    assert len(amounts) == 1
+    return amounts[0]
+
+
+def _sticky_state_for(
+    state: GameState,
+    *,
+    player_id: str,
+    objective_id: str,
+    active_player_id: str,
+) -> StickyObjectiveControlState:
+    originating = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == player_id
+        for unit in army.units
+    )
+    destroyed = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id != player_id
+        for unit in army.units
+    )
+    return StickyObjectiveControlState(
+        state_id=f"p2-sticky-{player_id}-{objective_id}",
+        game_id=state.game_id,
+        player_id=player_id,
+        objective_id=objective_id,
+        source_rule_id="p2-sticky-source",
+        source_event_id="p2-sticky-event",
+        battle_round=state.battle_round,
+        phase=BattlePhase.FIGHT.value,
+        active_player_id=active_player_id,
+        originating_unit_instance_id=originating.unit_instance_id,
+        destroyed_unit_instance_id=destroyed.unit_instance_id,
+        replay_payload={"source": "p2-sticky"},
+    )
+
+
+def _set_unit_starting_wounds(state: GameState, unit_instance_id: str, *, wounds: int) -> None:
+    for army_index, army in enumerate(state.army_definitions):
+        units = list(army.units)
+        for unit_index, unit in enumerate(units):
+            if unit.unit_instance_id != unit_instance_id:
+                continue
+            units[unit_index] = replace(
+                unit,
+                own_models=tuple(
+                    replace(model, starting_wounds=wounds, wounds_remaining=wounds)
+                    for model in unit.own_models
+                ),
+            )
+            state.army_definitions[army_index] = replace(army, units=tuple(units))
+            return
+    raise AssertionError(f"unit {unit_instance_id} was not found")

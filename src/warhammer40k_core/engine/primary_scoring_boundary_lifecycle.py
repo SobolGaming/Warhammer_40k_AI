@@ -39,6 +39,12 @@ LEGAL_PRIMARY_SCORING_PENDING_WINDOWS = frozenset(
         PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
     }
 )
+_PENDING_WINDOW_PROVENANCE_EVENT_TYPES = {
+    PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED: "decision_requested",
+    PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH: "return_on_death_set_back_up_requested",
+    PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE: "turn_end_faction_rule_requested",
+    PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE: "primary_mission_choice_requested",
+}
 
 
 class PrimaryScoringBoundaryStatus(StrEnum):
@@ -449,7 +455,10 @@ def resolve_primary_scoring_boundary_lifecycle(
         )
     )
     state.replace_primary_scoring_boundary_lifecycles(_sorted_lifecycles((*retained, resolved)))
-    validate_primary_scoring_boundary_lifecycles(state=state)
+    validate_primary_scoring_boundary_lifecycles(
+        state=state,
+        require_complete_inventory=False,
+    )
 
 
 def pending_primary_scoring_boundary_keys(
@@ -463,7 +472,11 @@ def pending_primary_scoring_boundary_keys(
     )
 
 
-def validate_primary_scoring_boundary_lifecycles(*, state: GameState) -> None:
+def validate_primary_scoring_boundary_lifecycles(
+    *,
+    state: GameState,
+    require_complete_inventory: bool = True,
+) -> None:
     """Require lifecycle rows to match OC inventory, evidence, and current battle context."""
     from warhammer40k_core.engine.game_state import GameState
 
@@ -544,12 +557,27 @@ def validate_primary_scoring_boundary_lifecycles(*, state: GameState) -> None:
             "Pending Primary scoring boundaries must share one lifecycle window and request."
         )
     pending_keys = set(pending_primary_scoring_boundary_keys(state=state))
+    resolved_keys = {
+        (row.objective_control_record_id, row.scoring_boundary_kind)
+        for row in rows
+        if row.status is PrimaryScoringBoundaryStatus.RESOLVED
+    }
     evidenced_keys = set(evidence_by_key)
+    if pending_keys & resolved_keys:
+        raise GameLifecycleError(
+            "Primary scoring boundary lifecycle cannot be both pending and resolved."
+        )
     if pending_keys & evidenced_keys:
         raise GameLifecycleError("Pending Primary scoring boundary also has committed evidence.")
-    if pending_keys and pending_keys | evidenced_keys != required:
+    if require_complete_inventory and (
+        pending_keys | resolved_keys != required or seen_keys != required
+    ):
         raise GameLifecycleError(
             "Primary scoring boundary lifecycle registry is incomplete or unexpected."
+        )
+    if resolved_keys != evidenced_keys:
+        raise GameLifecycleError(
+            "Resolved Primary scoring boundary lifecycle registry drifted from committed evidence."
         )
 
 
@@ -601,6 +629,14 @@ def validate_pending_primary_scoring_boundary_restore_authority(
         raise GameLifecycleError(
             "Pending Primary scoring boundary request does not match the queue head."
         )
+    pending_window = next(iter(windows))
+    if pending_window is None:
+        raise GameLifecycleError("Pending Primary scoring restore requires a pending window.")
+    _validate_pending_window_decision_authority(
+        pending_window=pending_window,
+        queue_head=queue_head,
+        event_records=event_records,
+    )
     record_ids = {row.objective_control_record_id for row in pending_rows}
     for record_id in record_ids:
         matches = tuple(
@@ -630,6 +666,90 @@ def validate_pending_primary_scoring_boundary_restore_authority(
             raise GameLifecycleError(
                 "Pending Primary scoring Objective Control event context drifted."
             )
+
+
+def _validate_pending_window_decision_authority(
+    *,
+    pending_window: str,
+    queue_head: DecisionRequest,
+    event_records: tuple[EventRecord, ...],
+) -> None:
+    allowed_decision_types = _pending_window_decision_types(pending_window)
+    if queue_head.decision_type not in allowed_decision_types:
+        raise GameLifecycleError(
+            "Pending Primary scoring window does not match the queue-head decision family."
+        )
+    event_type = _PENDING_WINDOW_PROVENANCE_EVENT_TYPES[pending_window]
+    matches = tuple(
+        event
+        for event in event_records
+        if event.event_type == event_type
+        and isinstance(event.payload, dict)
+        and event.payload.get("request_id") == queue_head.request_id
+    )
+    if len(matches) != 1:
+        raise GameLifecycleError("Pending Primary scoring window lacks exact event provenance.")
+    payload = matches[0].payload
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Pending Primary scoring window provenance payload is invalid.")
+    if event_type == "decision_requested":
+        if payload != queue_head.to_payload():
+            raise GameLifecycleError(
+                "Pending Primary scoring window decision request provenance drifted."
+            )
+        return
+    decision_type = payload.get("decision_type")
+    if decision_type is not None and decision_type != queue_head.decision_type:
+        raise GameLifecycleError("Pending Primary scoring window event decision type drifted.")
+    actor_id = payload.get("actor_id")
+    if actor_id is not None and actor_id != queue_head.actor_id:
+        raise GameLifecycleError("Pending Primary scoring window event actor drifted.")
+
+
+def _pending_window_decision_types(pending_window: str) -> frozenset[str]:
+    from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
+        SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
+    )
+    from warhammer40k_core.engine.damage_allocation import (
+        SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+    )
+    from warhammer40k_core.engine.healing import SELECT_HEALING_MODEL_DECISION_TYPE
+    from warhammer40k_core.engine.healing_revival import (
+        SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
+    )
+    from warhammer40k_core.engine.primary_mission_choices import (
+        SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
+    )
+    from warhammer40k_core.engine.return_on_death import (
+        SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE,
+    )
+    from warhammer40k_core.engine.turn_end_hooks import (
+        SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE,
+    )
+
+    families = {
+        PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED: frozenset(
+            {
+                SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
+                SELECT_HEALING_MODEL_DECISION_TYPE,
+                SUBMIT_HEALING_REVIVAL_PLACEMENT_DECISION_TYPE,
+                SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+            }
+        ),
+        PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH: frozenset(
+            {SUBMIT_RETURN_ON_DEATH_PLACEMENT_DECISION_TYPE}
+        ),
+        PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE: frozenset(
+            {SELECT_FACTION_RULE_TURN_END_OPTION_DECISION_TYPE}
+        ),
+        PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE: frozenset(
+            {SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE}
+        ),
+    }
+    allowed = families.get(pending_window)
+    if allowed is None:
+        raise GameLifecycleError("Pending Primary scoring window is not a legal pending window.")
+    return allowed
 
 
 def _required_boundary_keys(

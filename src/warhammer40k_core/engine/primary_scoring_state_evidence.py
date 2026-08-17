@@ -4,10 +4,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import TYPE_CHECKING, Self, TypedDict, cast
 
-from warhammer40k_core.core.descriptor_hash import (
-    canonical_payload_sha256,
-    validate_sha256_hex,
-)
+from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256, validate_sha256_hex
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.battlefield_state import BattlefieldRuntimeState
 from warhammer40k_core.engine.mission_setup import MissionSetup
@@ -66,7 +63,6 @@ if TYPE_CHECKING:
         PrimaryMissionBoundaryCheckpoint,
     )
     from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
-
 
 PRIMARY_SCORING_STATE_EVIDENCE_SCHEMA = "primary-scoring-state-evidence-v1"
 _PRIMARY_SCORING_STATE_EVIDENCE_ID_PREFIX = "primary-scoring-state-evidence"
@@ -809,6 +805,8 @@ def validate_primary_scoring_state_evidence_authority(
     state: GameState,
     record: ObjectiveControlRecord,
     end_of_battle: bool,
+    scoring_commit_checkpoint: PrimaryMissionBoundaryCheckpoint | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> None:
     """Require evidence to equal the canonical projection of authoritative state."""
     from warhammer40k_core.engine.game_state import GameState
@@ -823,6 +821,8 @@ def validate_primary_scoring_state_evidence_authority(
         state=state,
         record=record,
         end_of_battle=end_of_battle,
+        scoring_commit_checkpoint=scoring_commit_checkpoint,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     if evidence != expected:
         raise GameLifecycleError(
@@ -834,6 +834,8 @@ def record_primary_scoring_state_evidence(
     *,
     state: GameState,
     evidence: PrimaryScoringStateEvidence,
+    scoring_commit_checkpoint: PrimaryMissionBoundaryCheckpoint | None = None,
+    runtime_modifier_registry: RuntimeModifierRegistry | None = None,
 ) -> None:
     """Persist one canonical boundary witness, allowing exact boundary reuse."""
     from warhammer40k_core.engine.game_state import GameState
@@ -856,6 +858,8 @@ def record_primary_scoring_state_evidence(
         state=state,
         record=record_matches[0],
         end_of_battle=(evidence.scoring_boundary_kind is PrimaryScoringBoundaryKind.END_OF_BATTLE),
+        scoring_commit_checkpoint=scoring_commit_checkpoint,
+        runtime_modifier_registry=runtime_modifier_registry,
     )
     boundary_matches = tuple(
         stored
@@ -1468,9 +1472,7 @@ def _validate_positive_int(label: str, value: object) -> int:
     return value
 
 
-def _primary_scoring_boundary_kind_from_token(
-    value: object,
-) -> PrimaryScoringBoundaryKind:
+def _primary_scoring_boundary_kind_from_token(value: object) -> PrimaryScoringBoundaryKind:
     if value == PrimaryScoringBoundaryKind.ORDINARY.value:
         return PrimaryScoringBoundaryKind.ORDINARY
     if value == PrimaryScoringBoundaryKind.END_OF_BATTLE.value:
@@ -1479,7 +1481,6 @@ def _primary_scoring_boundary_kind_from_token(
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-
 
 __all__ = (
     "PRIMARY_SCORING_STATE_EVIDENCE_SCHEMA",

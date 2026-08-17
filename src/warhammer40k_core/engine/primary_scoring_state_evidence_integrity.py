@@ -29,10 +29,15 @@ from warhammer40k_core.engine.primary_scoring_history_evidence import (
 if TYPE_CHECKING:
     from warhammer40k_core.engine.actions import MissionActionState
     from warhammer40k_core.engine.battlefield_state import ModelPlacement
+    from warhammer40k_core.engine.decision_record import DecisionRecord
+    from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
+    from warhammer40k_core.engine.faction_rule_execution import FactionRuleExecutionRegistry
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.primary_scoring_state_evidence import (
         PrimaryScoringStateEvidence,
     )
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+    from warhammer40k_core.engine.runtime_rule_ir_authority import RuntimeRuleIRAuthorityIndex
 
 
 _OBJECTIVE_CONTROL_TIMING_ORDER = {
@@ -318,8 +323,14 @@ def validate_primary_scoring_position_event_authority(
     *,
     state: GameState,
     event_records: tuple[EventRecord, ...],
+    decision_records: tuple[DecisionRecord, ...],
+    runtime_modifier_registry: RuntimeModifierRegistry,
+    rule_ir_authority_index: RuntimeRuleIRAuthorityIndex | None = None,
+    faction_rule_execution_registry: FactionRuleExecutionRegistry | None = None,
+    runtime_content_activation: RuntimeContentActivation | None = None,
 ) -> None:
     """Bind persisted position witnesses to the exact historical scoring boundary."""
+    from warhammer40k_core.engine.decision_record import DecisionRecord
     from warhammer40k_core.engine.game_state import GameState
     from warhammer40k_core.engine.primary_mission_boundary_physical_authority import (
         primary_mission_model_placements_from_checkpoint,
@@ -331,6 +342,11 @@ def validate_primary_scoring_position_event_authority(
         PRIMARY_SCORING_COMMIT_BOUNDARY_KIND,
         primary_scoring_commit_checkpoint_from_events,
     )
+    from warhammer40k_core.engine.primary_scoring_commit_checkpoint_authority import (
+        authenticate_primary_scoring_commit_checkpoint,
+        validate_primary_scoring_spatial_rows_from_checkpoint,
+    )
+    from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 
     if type(state) is not GameState:
         raise GameLifecycleError("Primary scoring position event authority requires GameState.")
@@ -339,6 +355,16 @@ def validate_primary_scoring_position_event_authority(
     ):
         raise GameLifecycleError(
             "Primary scoring position event authority requires typed event records."
+        )
+    if type(decision_records) is not tuple or any(
+        type(record) is not DecisionRecord for record in decision_records
+    ):
+        raise GameLifecycleError(
+            "Primary scoring position event authority requires typed decision records."
+        )
+    if type(runtime_modifier_registry) is not RuntimeModifierRegistry:
+        raise GameLifecycleError(
+            "Primary scoring position event authority requires RuntimeModifierRegistry."
         )
     boundary_events_by_record_id: dict[str, list[EventRecord]] = {}
     for event in event_records:
@@ -421,6 +447,17 @@ def validate_primary_scoring_position_event_authority(
             raise GameLifecycleError(
                 "Primary scoring-commit checkpoint must follow Objective Control capture."
             )
+        authenticate_primary_scoring_commit_checkpoint(
+            state=state,
+            event_records=event_records,
+            decision_records=decision_records,
+            checkpoint_index=commit_event_index,
+            checkpoint=commit_checkpoint,
+            runtime_modifier_registry=runtime_modifier_registry,
+            rule_ir_authority_index=rule_ir_authority_index,
+            faction_rule_execution_registry=faction_rule_execution_registry,
+            runtime_content_activation=runtime_content_activation,
+        )
         if (
             commit_checkpoint.checkpoint_id != evidence.scoring_commit_checkpoint_id
             or commit_checkpoint.checkpoint_hash != evidence.scoring_commit_checkpoint_hash
@@ -455,6 +492,11 @@ def validate_primary_scoring_position_event_authority(
                 raise GameLifecycleError(
                     "Primary scoring position witness drifted from authoritative boundary history."
                 )
+        validate_primary_scoring_spatial_rows_from_checkpoint(
+            state=state,
+            evidence=evidence,
+            model_placements=model_placements,
+        )
 
 
 def _validate_authoritative_actions(

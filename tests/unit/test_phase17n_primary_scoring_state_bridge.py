@@ -65,6 +65,9 @@ from warhammer40k_core.engine.primary_scoring_action_policy import (
 from warhammer40k_core.engine.primary_scoring_boundary import (
     score_primary_objective_control_boundary,
 )
+from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+    resolve_primary_scoring_boundary_lifecycle,
+)
 from warhammer40k_core.engine.primary_scoring_condition_evaluator import (
     SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS,
 )
@@ -541,6 +544,14 @@ def persisted_primary_scoring_boundary() -> tuple[
     record_primary_scoring_state_evidence(state=state, evidence=evidence)
     for award in awards:
         state.award_victory_points(award)
+    resolve_primary_scoring_boundary_lifecycle(
+        state=state,
+        record=scoring_record,
+        scoring_boundary_kind=evidence.scoring_boundary_kind,
+        scoring_commit_checkpoint_id=evidence.scoring_commit_checkpoint_id,
+        scoring_commit_checkpoint_hash=evidence.scoring_commit_checkpoint_hash,
+        evidence_id=evidence.evidence_id,
+    )
     GameState.from_payload(state.to_payload())
     return state, evidence
 
@@ -1937,7 +1948,7 @@ def test_phase17n_step5a_restore_rejects_primary_scoring_bridge_erasure(
 
     with pytest.raises(
         GameLifecycleError,
-        match=r"Primary (?:VP transactions|scoring-state evidence registry)",
+        match=r"Primary (?:VP transactions|scoring-state evidence registry|scoring boundary)",
     ):
         GameState.from_payload(payload)
 
