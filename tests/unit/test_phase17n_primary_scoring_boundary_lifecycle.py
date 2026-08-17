@@ -48,7 +48,7 @@ from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
     ModelDestructionAttribution,
 )
-from warhammer40k_core.engine.event_log import canonical_json, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.game_state import GameConfig, GameState, SecondaryMissionMode
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
@@ -135,8 +135,25 @@ from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
     VictoryPointAward,
+    VictoryPointCapBucket,
     VictoryPointSourceKind,
     VictoryPointTransaction,
+)
+from warhammer40k_core.engine.secondary_scoring_transaction_integrity import (
+    _expected_state_backed_secondary_award,  # pyright: ignore[reportPrivateUsage]
+    _record_for_binding,  # pyright: ignore[reportPrivateUsage]
+    _reject_duplicate_tactical_source,  # pyright: ignore[reportPrivateUsage]
+    _uncapped_award_from_transaction,  # pyright: ignore[reportPrivateUsage]
+    _validate_scored_tactical_card_bindings,  # pyright: ignore[reportPrivateUsage]
+    validate_secondary_award_semantics,
+    validate_secondary_transaction_semantics,
+)
+from warhammer40k_core.engine.secondary_victory_point_policy import (
+    require_source_backed_secondary_cap_bucket,
+    state_backed_secondary_binding_identity,
+    state_backed_secondary_objective_control_record_id,
+    validate_state_backed_secondary_award_binding,
+    validate_state_backed_secondary_ledger_binding,
 )
 from warhammer40k_core.engine.sticky_objective_control import StickyObjectiveControlState
 from warhammer40k_core.engine.turn_end_hooks import (
@@ -1360,6 +1377,576 @@ def test_restore_rejects_scored_tactical_card_without_identified_transaction() -
         GameLifecycle.from_payload(payload)
 
 
+def test_secondary_cap_bucket_requires_secondary_kind_and_source_backed_mission() -> None:
+    setup = phase17n_event_setup(
+        layout_id="take-and-hold-vs-take-and-hold-layout-1",
+        attacker_force_disposition_id="take-and-hold",
+        defender_force_disposition_id="take-and-hold",
+    )
+    policy = mission_scoring_policies_from_setup(setup).policy_for_player("player-a")
+    assert (
+        require_source_backed_secondary_cap_bucket(
+            policy=policy,
+            source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+            source_id="bring-it-down",
+        )
+        is VictoryPointCapBucket.SECONDARY
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP cap bucket requires a Secondary source kind",
+    ):
+        require_source_backed_secondary_cap_bucket(
+            policy=policy,
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            source_id="bring-it-down",
+        )
+    with pytest.raises(GameLifecycleError, match="Secondary VP source is not source-backed"):
+        require_source_backed_secondary_cap_bucket(
+            policy=policy,
+            source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+            source_id="not-a-source-backed-secondary",
+        )
+
+
+def test_secondary_binding_identity_and_metadata_guards() -> None:
+    assert (
+        state_backed_secondary_binding_identity(
+            player_id="player-a",
+            source_kind=VictoryPointSourceKind.PRIMARY,
+            source_id="primary-take-and-hold",
+            metadata={"objective_control_record_id": "oc-1"},
+        )
+        is None
+    )
+    assert (
+        state_backed_secondary_objective_control_record_id(
+            {"secondary_mission_id": "bring-it-down"}
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="Secondary VP metadata must be an object"):
+        state_backed_secondary_objective_control_record_id(["not-an-object"])
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP metadata requires objective_control_record_id",
+    ):
+        state_backed_secondary_objective_control_record_id({"objective_control_record_id": ""})
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP metadata requires objective_control_record_id",
+    ):
+        state_backed_secondary_objective_control_record_id({"objective_control_record_id": 12})
+
+
+def test_state_backed_secondary_bindings_require_one_matching_record() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    transaction = _secondary_transaction(
+        state,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+    )
+    award = _award_from_transaction(transaction)
+    records = tuple(state.objective_control_records)
+    assert validate_state_backed_secondary_ledger_binding(
+        transaction=transaction,
+        objective_control_records=records,
+    ) == (
+        transaction.player_id,
+        transaction.source_kind,
+        transaction.source_id,
+        _json_object(transaction.metadata, label="secondary metadata")[
+            "objective_control_record_id"
+        ],
+    )
+    assert (
+        validate_state_backed_secondary_award_binding(
+            award=award,
+            objective_control_records=records,
+        )[3]
+        == _json_object(award.metadata, label="award metadata")["objective_control_record_id"]
+    )
+    unbound = replace(transaction, metadata={"secondary_mission_id": "bring-it-down"})
+    with pytest.raises(
+        GameLifecycleError,
+        match="State-backed Secondary VP transaction requires a boundary",
+    ):
+        validate_state_backed_secondary_ledger_binding(
+            transaction=unbound,
+            objective_control_records=records,
+        )
+    unbound_award = replace(award, metadata={"secondary_mission_id": "bring-it-down"})
+    with pytest.raises(
+        GameLifecycleError,
+        match="State-backed Secondary VP award requires a boundary",
+    ):
+        validate_state_backed_secondary_award_binding(
+            award=unbound_award,
+            objective_control_records=records,
+        )
+    drifted = replace(transaction, battle_round=transaction.battle_round + 1)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP transaction timing drifted from its objective-control boundary",
+    ):
+        validate_state_backed_secondary_ledger_binding(
+            transaction=drifted,
+            objective_control_records=records,
+        )
+    drifted_award = replace(award, phase="command")
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP award timing drifted from its objective-control boundary",
+    ):
+        validate_state_backed_secondary_award_binding(
+            award=drifted_award,
+            objective_control_records=records,
+        )
+    missing = replace(
+        transaction,
+        metadata={
+            **_json_map(transaction.metadata, label="secondary metadata"),
+            "objective_control_record_id": "missing-objective-control-record",
+        },
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP transaction requires one objective-control boundary",
+    ):
+        validate_state_backed_secondary_ledger_binding(
+            transaction=missing,
+            objective_control_records=records,
+        )
+
+
+def test_secondary_semantic_validation_rejects_wrong_types_and_source_kinds() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    transaction = _secondary_transaction(
+        state,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+    )
+    award = _award_from_transaction(transaction)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP semantic validation requires GameState",
+    ):
+        validate_secondary_award_semantics(state=cast(GameState, object()), award=award)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP semantic validation requires an award",
+    ):
+        validate_secondary_award_semantics(
+            state=state,
+            award=cast(VictoryPointAward, object()),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP semantic validation requires a Secondary award",
+    ):
+        validate_secondary_award_semantics(
+            state=state,
+            award=replace(award, source_kind=VictoryPointSourceKind.PRIMARY),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP transaction validation requires GameState",
+    ):
+        validate_secondary_transaction_semantics(state=cast(GameState, object()))
+    validate_secondary_award_semantics(
+        state=state,
+        award=replace(award, metadata={"scoring_rule_id": "legacy-secondary"}),
+    )
+
+
+def test_live_secondary_award_rejects_duplicate_binding_and_amount_drift() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    transaction = _secondary_transaction(
+        state,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+    )
+    award = _award_from_transaction(transaction)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP ledger must not repeat a source at one boundary",
+    ):
+        validate_secondary_award_semantics(state=state, award=award)
+    record = state.objective_control_records[-1]
+    cloned = replace(record, record_id=f"{record.record_id}-clone")
+    state.objective_control_records = [*state.objective_control_records, cloned]
+    drifted = replace(
+        award,
+        amount=award.amount + 1,
+        metadata={
+            **_json_map(award.metadata, label="award metadata"),
+            "objective_control_record_id": cloned.record_id,
+        },
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP award drifted from authoritative scoring-state semantics",
+    ):
+        validate_secondary_award_semantics(state=state, award=drifted)
+    state.secondary_mission_card_states = []
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP source does not identify an active or scored card",
+    ):
+        validate_secondary_award_semantics(state=state, award=drifted)
+
+
+def test_live_tactical_award_rejects_repeat_source_and_missing_card() -> None:
+    lifecycle, state = _defend_stronghold_ready_lifecycle()
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    transaction = _secondary_transaction(
+        state,
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+    )
+    award = _award_from_transaction(transaction)
+    _validate_scored_tactical_card_bindings(state=state, transactions=(transaction,))
+    record = state.objective_control_records[-1]
+    cloned = replace(record, record_id=f"{record.record_id}-clone")
+    state.objective_control_records = [*state.objective_control_records, cloned]
+    repeated = replace(
+        award,
+        metadata={
+            **_json_map(award.metadata, label="award metadata"),
+            "objective_control_record_id": cloned.record_id,
+        },
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Tactical Secondary VP ledger must not repeat a source across boundaries",
+    ):
+        validate_secondary_award_semantics(state=state, award=repeated)
+    _reject_duplicate_tactical_source(
+        state=state,
+        player_id="player-b",
+        source_id="defend-stronghold",
+    )
+
+
+def test_restore_secondary_semantics_cover_duplicate_and_setup_guards() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    ledger = state.victory_point_ledger_for_player("player-a")
+    transaction = _secondary_transaction(
+        state,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+    )
+    duplicate = replace(
+        transaction,
+        transaction_id=f"{transaction.transaction_id}-duplicate",
+    )
+    state.victory_point_ledgers = [
+        replace(
+            ledger,
+            victory_points=ledger.victory_points + duplicate.amount,
+            transactions=(*ledger.transactions, duplicate),
+        )
+        if stored.player_id == ledger.player_id
+        else stored
+        for stored in state.victory_point_ledgers
+    ]
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP ledger must not repeat a source at one boundary",
+    ):
+        validate_secondary_transaction_semantics(state=state)
+    restored = _bring_it_down_player_a_scored_lifecycle()
+    restored_state = restored.state
+    assert restored_state is not None
+    restored_state.mission_setup = None
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP semantic validation requires MissionSetup",
+    ):
+        validate_secondary_transaction_semantics(state=restored_state)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP semantic validation requires MissionSetup",
+    ):
+        _expected_state_backed_secondary_award(
+            state=restored_state,
+            player_id="player-a",
+            source_id="bring-it-down",
+            source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+            hidden=False,
+            record=restored_state.objective_control_records[-1],
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP semantic validation requires one objective-control boundary",
+    ):
+        _record_for_binding(
+            state=restored_state,
+            binding=(
+                "player-a",
+                VictoryPointSourceKind.FIXED_SECONDARY,
+                "bring-it-down",
+                "missing-objective-control-record",
+            ),
+        )
+    drifted_lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    drifted_state = drifted_lifecycle.state
+    assert drifted_state is not None
+    drifted_transaction = _secondary_transaction(
+        drifted_state,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+    )
+    drifted_ledger = drifted_state.victory_point_ledger_for_player("player-a")
+    rewritten = replace(drifted_transaction, amount=drifted_transaction.amount + 1)
+    drifted_state.victory_point_ledgers = [
+        replace(
+            drifted_ledger,
+            victory_points=drifted_ledger.victory_points + 1,
+            transactions=tuple(
+                rewritten
+                if stored_tx.transaction_id == drifted_transaction.transaction_id
+                else stored_tx
+                for stored_tx in drifted_ledger.transactions
+            ),
+        )
+        if stored.player_id == drifted_ledger.player_id
+        else stored
+        for stored in drifted_state.victory_point_ledgers
+    ]
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP transactions drifted from authoritative scoring-state semantics",
+    ):
+        validate_secondary_transaction_semantics(state=drifted_state)
+
+
+def test_restore_tactical_semantics_reject_active_card_and_wrong_transaction() -> None:
+    lifecycle, state = _defend_stronghold_ready_lifecycle()
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    transaction = _secondary_transaction(
+        state,
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+    )
+    state.secondary_mission_card_states = [
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="defend-stronghold",
+            battle_round=2,
+            source_result_id="p2-defend-stronghold-active",
+        )
+    ]
+    with pytest.raises(
+        GameLifecycleError,
+        match="Scored tactical secondary card does not identify its ledger transaction",
+    ):
+        validate_secondary_transaction_semantics(state=state)
+    scored = SecondaryMissionCardState.active_tactical(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        battle_round=2,
+        source_result_id="p2-defend-stronghold-scored",
+    ).score(transaction_id=transaction.transaction_id)
+    mismatched = replace(transaction, player_id="player-b")
+    state.secondary_mission_card_states = [scored]
+    with pytest.raises(
+        GameLifecycleError,
+        match="Scored tactical secondary card does not identify its ledger transaction",
+    ):
+        _validate_scored_tactical_card_bindings(state=state, transactions=(mismatched,))
+    kind_mismatch = replace(
+        transaction,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Scored tactical secondary card does not identify its ledger transaction",
+    ):
+        _validate_scored_tactical_card_bindings(state=state, transactions=(kind_mismatch,))
+    source_mismatch = replace(transaction, source_id="bring-it-down")
+    with pytest.raises(
+        GameLifecycleError,
+        match="Scored tactical secondary card does not identify its ledger transaction",
+    ):
+        _validate_scored_tactical_card_bindings(state=state, transactions=(source_mismatch,))
+    record = state.objective_control_records[-1]
+    cloned = replace(record, record_id=f"{record.record_id}-clone")
+    state.objective_control_records = [*state.objective_control_records, cloned]
+    second = replace(
+        transaction,
+        transaction_id=f"{transaction.transaction_id}-second",
+        metadata={
+            **_json_map(transaction.metadata, label="secondary metadata"),
+            "objective_control_record_id": cloned.record_id,
+        },
+    )
+    ledger = state.victory_point_ledger_for_player("player-a")
+    state.victory_point_ledgers = [
+        replace(
+            ledger,
+            victory_points=ledger.victory_points + second.amount,
+            transactions=(*ledger.transactions, second),
+        )
+        if stored.player_id == ledger.player_id
+        else stored
+        for stored in state.victory_point_ledgers
+    ]
+    state.secondary_mission_card_states = [scored]
+    with pytest.raises(
+        GameLifecycleError,
+        match="Tactical Secondary VP ledger must not repeat a source across boundaries",
+    ):
+        validate_secondary_transaction_semantics(state=state)
+
+
+def test_uncapped_secondary_award_from_transaction_validates_cap_audit() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    transaction = _secondary_transaction(
+        state,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+    )
+    metadata = _json_map(transaction.metadata, label="secondary metadata")
+    awarded = _uncapped_award_from_transaction(transaction)
+    assert awarded.amount == transaction.amount
+    valid_audit = replace(
+        transaction,
+        metadata={
+            **metadata,
+            "vp_cap_audit": {
+                "requested_amount": transaction.amount + 1,
+                "applied_amount": transaction.amount,
+            },
+        },
+    )
+    uncapped = _uncapped_award_from_transaction(valid_audit)
+    assert uncapped.amount == transaction.amount + 1
+    assert isinstance(uncapped.metadata, dict)
+    assert "vp_cap_audit" not in uncapped.metadata
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP transaction cap audit must be an object",
+    ):
+        _uncapped_award_from_transaction(
+            replace(transaction, metadata={**metadata, "vp_cap_audit": ["not-an-object"]})
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP transaction cap audit requires positive requested_amount",
+    ):
+        _uncapped_award_from_transaction(
+            replace(
+                transaction,
+                metadata={
+                    **metadata,
+                    "vp_cap_audit": {
+                        "requested_amount": 0,
+                        "applied_amount": transaction.amount,
+                    },
+                },
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP transaction cap audit applied_amount drifted",
+    ):
+        _uncapped_award_from_transaction(
+            replace(
+                transaction,
+                metadata={
+                    **metadata,
+                    "vp_cap_audit": {
+                        "requested_amount": transaction.amount + 2,
+                        "applied_amount": transaction.amount + 1,
+                    },
+                },
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP transaction cap audit applied_amount exceeds requested_amount",
+    ):
+        _uncapped_award_from_transaction(
+            replace(
+                transaction,
+                amount=transaction.amount + 1,
+                metadata={
+                    **metadata,
+                    "vp_cap_audit": {
+                        "requested_amount": transaction.amount,
+                        "applied_amount": transaction.amount + 1,
+                    },
+                },
+            )
+        )
+
+
+def test_restore_skips_non_state_backed_secondary_rows() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    transaction = _secondary_transaction(
+        state,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+    )
+    ledger = state.victory_point_ledger_for_player("player-a")
+    legacy = replace(
+        transaction,
+        transaction_id=f"{transaction.transaction_id}-legacy",
+        metadata={"scoring_rule_id": "legacy-secondary"},
+    )
+    legacy_tactical = replace(
+        transaction,
+        transaction_id=f"{transaction.transaction_id}-legacy-tactical",
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+        source_id="defend-stronghold",
+        metadata={"scoring_rule_id": "legacy-tactical"},
+    )
+    state.victory_point_ledgers = [
+        replace(
+            ledger,
+            victory_points=ledger.victory_points + legacy.amount + legacy_tactical.amount,
+            transactions=(*ledger.transactions, legacy, legacy_tactical),
+        )
+        if stored.player_id == ledger.player_id
+        else stored
+        for stored in state.victory_point_ledgers
+    ]
+    validate_secondary_transaction_semantics(state=state)
+    _reject_duplicate_tactical_source(
+        state=state,
+        player_id="player-a",
+        source_id="defend-stronghold",
+    )
+    scored = SecondaryMissionCardState.active_tactical(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        battle_round=2,
+        source_result_id="p2-defend-stronghold-unbound",
+    ).score(transaction_id="victory-point:player-a:round-02:999999")
+    state.secondary_mission_card_states = [scored]
+    with pytest.raises(
+        GameLifecycleError,
+        match="Scored tactical secondary card does not identify its ledger transaction",
+    ):
+        _validate_scored_tactical_card_bindings(state=state, transactions=())
+
+
 def test_deleted_resolved_lifecycle_row_fails_restore() -> None:
     lifecycle = _scored_command_boundary_after_mutation(kind="move")
     payload = deepcopy(lifecycle.to_payload())
@@ -1759,6 +2346,26 @@ def _secondary_transaction_payloads(
         if transaction_map["source_kind"] == source_kind:
             matches.append(transaction_map)
     return matches
+
+
+def _secondary_transaction(
+    state: GameState,
+    *,
+    source_kind: VictoryPointSourceKind,
+) -> VictoryPointTransaction:
+    matches = tuple(
+        transaction
+        for ledger in state.victory_point_ledgers
+        for transaction in ledger.transactions
+        if transaction.source_kind is source_kind
+    )
+    if len(matches) != 1:
+        raise AssertionError(f"expected one {source_kind.value} transaction")
+    return matches[0]
+
+
+def _award_from_transaction(transaction: VictoryPointTransaction) -> VictoryPointAward:
+    return _uncapped_award_from_transaction(transaction)
 
 
 def _defend_stronghold_ready_lifecycle() -> tuple[GameLifecycle, GameState]:
@@ -2177,6 +2784,10 @@ def _json_object(value: object, *, label: str) -> dict[str, object]:
     if type(value) is not dict:
         raise AssertionError(f"{label} must be a JSON object.")
     return cast(dict[str, object], value)
+
+
+def _json_map(value: object, *, label: str) -> dict[str, JsonValue]:
+    return cast(dict[str, JsonValue], _json_object(value, label=label))
 
 
 def _json_list(value: object, *, label: str) -> list[object]:

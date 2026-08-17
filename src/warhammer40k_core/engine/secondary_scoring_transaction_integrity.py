@@ -116,7 +116,7 @@ def validate_secondary_transaction_semantics(*, state: GameState) -> None:
                     "Tactical Secondary VP ledger must not repeat a source across boundaries."
                 )
             seen_tactical_sources.add(tactical_key)
-        card = _card_for_secondary_source(
+        _card_for_secondary_source(
             state=state,
             player_id=transaction.player_id,
             source_id=transaction.source_id,
@@ -128,13 +128,6 @@ def validate_secondary_transaction_semantics(*, state: GameState) -> None:
                 else None
             ),
         )
-        if (
-            transaction.source_kind is VictoryPointSourceKind.TACTICAL_SECONDARY
-            and card.status is not SecondaryMissionCardStatus.SCORED
-        ):
-            raise GameLifecycleError(
-                "State-backed Tactical Secondary transaction requires a scored card."
-            )
         expected = _expected_state_backed_secondary_award(
             state=state,
             player_id=transaction.player_id,
