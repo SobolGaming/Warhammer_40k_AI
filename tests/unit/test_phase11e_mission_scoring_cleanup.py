@@ -7240,7 +7240,9 @@ def test_started_next_phase_replay_rejects_coordinated_prior_completion_deletion
         GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
 
 
-def _event_binds_objective_control_record(event: dict[str, JsonValue], record_id: str) -> bool:
+def _event_binds_objective_control_record(event: JsonValue, record_id: str) -> bool:
+    if not isinstance(event, dict):
+        return False
     payload = event["payload"]
     if not isinstance(payload, dict):
         return False

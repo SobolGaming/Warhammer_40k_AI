@@ -1098,7 +1098,8 @@ export interface components {
             timing: "turn_start" | "phase_end" | "turn_end";
             /** @enum {string} */
             scoring_boundary_kind: "ordinary" | "end_of_battle"; objective_control_record_id: string;
-            objective_control_record_hash: string;
+            objective_control_record_hash: string; scoring_commit_checkpoint_id: string;
+            scoring_commit_checkpoint_hash: string;
             primary_mission_progress_state: components["schemas"]["game-view--primary_mission_progress_state.schema"];
             primary_mission_action_states: components["schemas"]["replay-metadata--mission_action_state.schema"][];
             primary_battlefield_departure_states: components["schemas"]["replay-metadata--primary_battlefield_departure_state.schema"][];
@@ -1106,6 +1107,22 @@ export interface components {
             current_rules_unit_position_witnesses: components["schemas"]["replay-metadata--primary_scoring_rules_unit_position_witness.schema"][];
             primary_scoring_spatial_evidence_by_player_id: components["schemas"]["replay-metadata--primary_scoring_spatial_evidence.schema"][];
             evidence_id: string; evidence_hash: string;
+        };
+        /** @description Typed Objective Control capture to Primary scoring-commit lifecycle for one required boundary. */
+        "replay-metadata--primary_scoring_boundary_lifecycle.schema": {
+            /** @constant */
+            schema_version: "primary-scoring-boundary-lifecycle-v1"; objective_control_record_id: string;
+            objective_control_record_hash: string;
+            /** @enum {string} */
+            scoring_boundary_kind: "ordinary" | "end_of_battle";
+            /** @enum {string} */
+            status: "pending" | "resolved";
+            pending_window: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            pending_decision_request_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            scoring_commit_checkpoint_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            scoring_commit_checkpoint_hash: null | string;
+            evidence_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            primary_transaction_ids: string[]; lifecycle_id: string; lifecycle_hash: string;
         };
         "replay-metadata--destruction_provenance.schema": {
             attack_context_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
@@ -1154,6 +1171,7 @@ export interface components {
             primary_rules_unit_turn_start_snapshots: components["schemas"]["game-view--primary_rules_unit_turn_start_snapshot.schema"][];
             primary_mission_progress_state: components["schemas"]["game-view--primary_mission_progress_state.schema"];
             primary_scoring_state_evidence_records: components["schemas"]["replay-metadata--primary_scoring_state_evidence.schema"][];
+            primary_scoring_boundary_lifecycles: components["schemas"]["replay-metadata--primary_scoring_boundary_lifecycle.schema"][];
             primary_unit_destruction_states: components["schemas"]["replay-metadata--primary_unit_destruction_state.schema"][];
         } & {
             [key: string]: unknown;
