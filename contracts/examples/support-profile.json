@@ -1052,7 +1052,7 @@
         "identity_id": "warhammer40k-core-v2:0.1.0"
       },
       "mission_pack": {
-        "identity_hash": "85a0738e3d13bea48256d7c99e386637c64d56828650ebcd60b06300c22770ec",
+        "identity_hash": "6e9fe2f2fc734fba1821b2323b2d2b42c9217cfca816cac843c76dd625296f73",
         "identity_id": "11e-warhammer-event-companion-2026-07"
       },
       "ruleset": {
@@ -1066,7 +1066,7 @@
           "source_kind": "army_catalog"
         },
         {
-          "identity_hash": "ce8cf6559a2758c02abf3ee6f3009fd63aff3f51bd3042bf393ea8552c00745f",
+          "identity_hash": "ca61d092eb5bfac8ccf85fed76c12fff1eb424ec9486da823541c1425b6c4079",
           "identity_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
           "source_kind": "mission_pack"
         }
@@ -1177,7 +1177,7 @@
             "evidence_refs": [
               "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object",
               "mission-setup-sha256:9bac6ada15611ebbe97bcc4d46ab5523b71b706e93c02f2d454c58397f5973a8",
-              "mission-source-package-hash:ce8cf6559a2758c02abf3ee6f3009fd63aff3f51bd3042bf393ea8552c00745f"
+              "mission-source-package-hash:ca61d092eb5bfac8ccf85fed76c12fff1eb424ec9486da823541c1425b6c4079"
             ],
             "reason_code": null,
             "source_ids": [
@@ -1227,7 +1227,7 @@
           "force_disposition_id": "take-and-hold",
           "mission_pack_id": "11e-warhammer-event-companion-2026-07",
           "mission_setup_hash": "9bac6ada15611ebbe97bcc4d46ab5523b71b706e93c02f2d454c58397f5973a8",
-          "mission_source_package_hash": "ce8cf6559a2758c02abf3ee6f3009fd63aff3f51bd3042bf393ea8552c00745f",
+          "mission_source_package_hash": "ca61d092eb5bfac8ccf85fed76c12fff1eb424ec9486da823541c1425b6c4079",
           "primary_mission_id": "primary-immovable-object",
           "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
         },
@@ -1325,7 +1325,7 @@
             "evidence_refs": [
               "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-unstoppable-force",
               "mission-setup-sha256:9bac6ada15611ebbe97bcc4d46ab5523b71b706e93c02f2d454c58397f5973a8",
-              "mission-source-package-hash:ce8cf6559a2758c02abf3ee6f3009fd63aff3f51bd3042bf393ea8552c00745f"
+              "mission-source-package-hash:ca61d092eb5bfac8ccf85fed76c12fff1eb424ec9486da823541c1425b6c4079"
             ],
             "reason_code": null,
             "source_ids": [
@@ -1375,7 +1375,7 @@
           "force_disposition_id": "purge-the-foe",
           "mission_pack_id": "11e-warhammer-event-companion-2026-07",
           "mission_setup_hash": "9bac6ada15611ebbe97bcc4d46ab5523b71b706e93c02f2d454c58397f5973a8",
-          "mission_source_package_hash": "ce8cf6559a2758c02abf3ee6f3009fd63aff3f51bd3042bf393ea8552c00745f",
+          "mission_source_package_hash": "ca61d092eb5bfac8ccf85fed76c12fff1eb424ec9486da823541c1425b6c4079",
           "primary_mission_id": "primary-unstoppable-force",
           "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
         },
@@ -1604,7 +1604,7 @@
           "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object",
           "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-unstoppable-force",
           "mission-setup-sha256:9bac6ada15611ebbe97bcc4d46ab5523b71b706e93c02f2d454c58397f5973a8",
-          "mission-source-package-hash:ce8cf6559a2758c02abf3ee6f3009fd63aff3f51bd3042bf393ea8552c00745f",
+          "mission-source-package-hash:ca61d092eb5bfac8ccf85fed76c12fff1eb424ec9486da823541c1425b6c4079",
           "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3:player-a:primary-immovable-object",
           "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3:player-b:primary-unstoppable-force",
           "phase9a-canonical/core-deep-strike-unit/core/core-deep-strike/none",

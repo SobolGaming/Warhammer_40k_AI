@@ -324,7 +324,7 @@ def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -
     primary_by_id = {primary.primary_mission_id: primary for primary in package.primary_missions}
     step5a_mission_ids = {
         "primary-gather-intel",
-        "primary-secure-asset",
+        "primary-extract-relic",
         "primary-vital-link",
     }
     coverage_by_id = {
@@ -336,7 +336,7 @@ def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -
             row.status is event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED
             for row in coverage_by_id.values()
         )
-        == 16
+        == 19
     )
     assert (
         sum(
@@ -344,7 +344,7 @@ def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -
             is event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
             for row in coverage_by_id.values()
         )
-        == 9
+        == 6
     )
     for mission_id in step5a_mission_ids:
         assert coverage_by_id[mission_id].status is (
