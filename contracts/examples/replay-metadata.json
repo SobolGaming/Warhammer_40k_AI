@@ -15552,6 +15552,7 @@
       },
       "movement_phase_state": null,
       "normal_move_states": [],
+      "objective_control_record_authorities": [],
       "objective_control_records": [],
       "one_shot_weapon_use_records": [],
       "out_of_phase_shooting_state": null,
@@ -15570,6 +15571,8 @@
       },
       "primary_objective_turn_start_states": [],
       "primary_rules_unit_turn_start_snapshots": [],
+      "primary_scoring_boundary_lifecycles": [],
+      "primary_scoring_state_evidence_records": [],
       "primary_terrain_trap_states": [],
       "primary_unit_destruction_states": [],
       "ranged_attack_history_records": [],
@@ -15674,14 +15677,14 @@
     "seed": "phase18d-contract-session"
   },
   "projection_checkpoints": [],
-  "schema_version": "replay-artifact-v7-phase17n-step4",
+  "schema_version": "replay-artifact-v8-phase17n-step5a",
   "source_identity": {
     "catalog_hash": "624fdfa50ef0bfc0e0ce5c965f1b57bd1ca9b40f4d691f15860161ae212bf6f6",
     "catalog_id": "phase9a-canonical",
     "game_config_hash": "0f4bea564150afae66c86c23b8289a04bfe2bde2bae0463752717825e9a62291",
     "game_id": "phase18d-contract-session",
     "mission_pack_id": "11e-warhammer-event-companion-2026-07",
-    "mission_source_package_hash": "281c1a62b7b0d6aa61ac03095642cd7a85b8ff8907c94d6424c3a01aeacf0dcc",
+    "mission_source_package_hash": "c724fad0b3bf86f04abcc673b06f5e3829849177de99e9f8ad71a6430c142fd4",
     "rules_overlay_ids": [],
     "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
     "source_ids": [

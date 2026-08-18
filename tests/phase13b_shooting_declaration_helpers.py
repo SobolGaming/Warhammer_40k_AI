@@ -136,6 +136,7 @@ from warhammer40k_core.engine.phases.shooting import (
     SELECT_SHOOTING_TYPE_DECISION_TYPE,
     SELECT_SHOOTING_UNIT_DECISION_TYPE,
     SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE,
+    ShootingPhaseHandler,
     ShootingPhaseState,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
@@ -183,6 +184,7 @@ from warhammer40k_core.rules.mission_pack_import import (
 __all__ = (
     "_advanced_unit_state",
     "_alpha_unit_spec",
+    "_apply_shooting_declaration_without_advancing",
     "_army_muster_request",
     "_assert_command_reroll_request",
     "_assert_invalid_proposal_status",
@@ -705,7 +707,6 @@ def _configure_shooting_battle_state(
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
     state.battle_round = 1
     state.active_player_id = "player-a"
-    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
     if embarked_unit_ids:
         transport = units["transport-1"]
         state.record_transport_cargo_state(
@@ -726,6 +727,7 @@ def _configure_shooting_battle_state(
                 ),
             )
         )
+    record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
 
 
 @cache
@@ -1439,6 +1441,46 @@ def _select_shooting_unit_and_type(
     )
     assert declaration_request.decision_type == SUBMIT_SHOOTING_DECLARATION_DECISION_TYPE
     return declaration_request
+
+
+def _apply_shooting_declaration_without_advancing(
+    lifecycle: GameLifecycle,
+    *,
+    request: DecisionRequest,
+    proposal: ShootingDeclarationProposal,
+    result_id: str,
+) -> AttackSequence:
+    """Apply a real declaration while leaving injected attack resolution to the test."""
+    state = _state(lifecycle)
+    result = _proposal_decision_result(
+        request=request,
+        payload=proposal.to_payload(),
+        result_id=result_id,
+    )
+    handler = ShootingPhaseHandler(
+        ruleset_descriptor=lifecycle.config.ruleset_descriptor,
+        army_catalog=lifecycle.config.army_catalog,
+    )
+    invalid_status = handler.invalid_declaration_submission_status(
+        state=state,
+        request=request,
+        result=result,
+        decisions=lifecycle.decision_controller,
+    )
+    if invalid_status is not None:
+        raise AssertionError(invalid_status.message)
+    lifecycle.decision_controller.submit_result(result)
+    status = handler.apply_decision(
+        state=state,
+        result=result,
+        decisions=lifecycle.decision_controller,
+    )
+    if status is not None:
+        raise AssertionError("Shooting declaration unexpectedly blocked before attack resolution.")
+    shooting_state = state.shooting_phase_state
+    if shooting_state is None or shooting_state.attack_sequence is None:
+        raise AssertionError("Shooting declaration did not create an attack sequence.")
+    return shooting_state.attack_sequence
 
 
 def _submit_payload(

@@ -66,6 +66,13 @@ from warhammer40k_core.engine.primary_mission_choices import punishment_choice_r
 from warhammer40k_core.engine.primary_mission_state_runtime import (
     resolve_surveil_marker_removal_for_completed_moves,
 )
+from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+    PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED,
+    PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
+    PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH,
+    PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE,
+    mark_pending_primary_scoring_boundaries,
+)
 from warhammer40k_core.engine.primary_unit_destruction_tracking import (
     record_primary_destroyed_model_departures,
     record_primary_unit_destruction_for_logical_completion,
@@ -361,30 +368,22 @@ class BattleRoundFlow:
         )
         pending_request = _pending_decision_request(decisions)
         if pending_request is not None:
-            return LifecycleStatus.waiting_for_decision(
-                stage=GameLifecycleStage.BATTLE,
-                decision_request=pending_request,
-                payload={
-                    "battle_round": state.battle_round,
-                    "phase": current_phase.value,
-                    "phase_body_status": "phase_end_unit_destroyed_rule_required",
-                    "request_id": pending_request.request_id,
-                },
+            return _waiting_for_post_objective_control_decision(
+                state=state,
+                current_phase=current_phase,
+                pending_request=pending_request,
+                pending_window=PRIMARY_SCORING_PENDING_WINDOW_PHASE_END_UNIT_DESTROYED,
             )
         return_request = resolve_pending_return_on_death_phase_end(
             state=state,
             decisions=decisions,
         )
         if return_request is not None:
-            return LifecycleStatus.waiting_for_decision(
-                stage=GameLifecycleStage.BATTLE,
-                decision_request=return_request,
-                payload={
-                    "battle_round": state.battle_round,
-                    "phase": current_phase.value,
-                    "phase_body_status": "return_on_death_placement_required",
-                    "request_id": return_request.request_id,
-                },
+            return _waiting_for_post_objective_control_decision(
+                state=state,
+                current_phase=current_phase,
+                pending_request=return_request,
+                pending_window=PRIMARY_SCORING_PENDING_WINDOW_RETURN_ON_DEATH,
             )
         resolve_cult_ambush_marker_removal_for_completed_moves(
             state=state,
@@ -412,15 +411,11 @@ class BattleRoundFlow:
                     "actor_id": turn_end_request.actor_id,
                 },
             )
-            return LifecycleStatus.waiting_for_decision(
-                stage=GameLifecycleStage.BATTLE,
-                decision_request=turn_end_request,
-                payload={
-                    "battle_round": state.battle_round,
-                    "phase": current_phase.value,
-                    "phase_body_status": "turn_end_faction_rule_required",
-                    "request_id": turn_end_request.request_id,
-                },
+            return _waiting_for_post_objective_control_decision(
+                state=state,
+                current_phase=current_phase,
+                pending_request=turn_end_request,
+                pending_window=PRIMARY_SCORING_PENDING_WINDOW_TURN_END_FACTION_RULE,
             )
         objective_control_record_ids_before_advance = {
             record.record_id for record in state.objective_control_records
@@ -492,18 +487,15 @@ class BattleRoundFlow:
                         "actor_id": primary_choice_request.actor_id,
                     },
                 )
-                return LifecycleStatus.waiting_for_decision(
-                    stage=GameLifecycleStage.BATTLE,
-                    decision_request=primary_choice_request,
-                    payload={
-                        "battle_round": state.battle_round,
-                        "phase": current_phase.value,
-                        "phase_body_status": "primary_mission_turn_end_choice_required",
-                        "request_id": primary_choice_request.request_id,
-                    },
+                return _waiting_for_post_objective_control_decision(
+                    state=state,
+                    current_phase=current_phase,
+                    pending_request=primary_choice_request,
+                    pending_window=PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
                 )
         completed_phase = state.advance_to_next_battle_phase(
-            runtime_modifier_registry=self._runtime_modifier_registry
+            runtime_modifier_registry=self._runtime_modifier_registry,
+            event_log=decisions.event_log,
         )
         record_new_primary_battlefield_departure_events(
             state=state,
@@ -625,6 +617,30 @@ def _current_battle_phase_payload(state: GameState) -> str | None:
     if current_phase is None:
         return None
     return current_phase.value
+
+
+def _waiting_for_post_objective_control_decision(
+    *,
+    state: GameState,
+    current_phase: BattlePhase,
+    pending_request: DecisionRequest,
+    pending_window: str,
+) -> LifecycleStatus:
+    mark_pending_primary_scoring_boundaries(
+        state=state,
+        pending_window=pending_window,
+        pending_decision_request_id=pending_request.request_id,
+    )
+    return LifecycleStatus.waiting_for_decision(
+        stage=GameLifecycleStage.BATTLE,
+        decision_request=pending_request,
+        payload={
+            "battle_round": state.battle_round,
+            "phase": current_phase.value,
+            "phase_body_status": pending_window,
+            "request_id": pending_request.request_id,
+        },
+    )
 
 
 def _is_start_of_battle_round(state: GameState) -> bool:

@@ -1077,6 +1077,16 @@ def _movement_state_with_partial_placement() -> GameState:
         battlefield_id="phase10b-partial-placement",
         armies=armies,
     )
+    state.record_battlefield_state(scenario.battlefield_state)
+    for player_id in state.player_ids:
+        state.record_secondary_mission_choice(
+            SecondaryMissionChoice(
+                player_id=player_id,
+                mode=SecondaryMissionMode.FIXED,
+                fixed_mission_ids=("assassination", "bring_it_down"),
+            )
+        )
+    enter_battle_for_fixture(state)
     first_army = scenario.battlefield_state.placed_armies[0]
     second_army = scenario.battlefield_state.placed_armies[1]
     first_unit = first_army.unit_placements[0]
@@ -1091,16 +1101,7 @@ def _movement_state_with_partial_placement() -> GameState:
             second_army,
         ),
     )
-    state.record_battlefield_state(partial_battlefield)
-    for player_id in state.player_ids:
-        state.record_secondary_mission_choice(
-            SecondaryMissionChoice(
-                player_id=player_id,
-                mode=SecondaryMissionMode.FIXED,
-                fixed_mission_ids=("assassination", "bring_it_down"),
-            )
-        )
-    enter_battle_for_fixture(state)
+    state.replace_battlefield_state(partial_battlefield)
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
     return state
 

@@ -13,6 +13,7 @@ from tests.movement_submission_helpers import (
     submit_movement_proposal,
 )
 from tests.phase13b_shooting_declaration_helpers import proposal_from_request
+from tests.phase15c_fight_order_helpers import fight_lifecycle
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
 from warhammer40k_core.adapters.local_session import LocalGameSession
@@ -909,24 +910,20 @@ def test_aeldari_sudden_strike_fight_option_extends_pile_in_and_consolidation() 
 
 
 def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -> None:
-    lifecycle, _movement_status = _advance_to_movement_unit_selection(
-        _aeldari_config(
-            aeldari_datasheet_id=_AELDARI_FIGHT_DATASHEET_ID,
-            aeldari_model_profile_id="core-character-leader",
-        )
+    config = _aeldari_config(
+        aeldari_datasheet_id=_AELDARI_FIGHT_DATASHEET_ID,
+        aeldari_model_profile_id="core-character-leader",
     )
-    state = _state(lifecycle)
-    _place_unit_poses(
-        state,
-        unit_instance_id=_AELDARI_UNIT_ID,
-        poses=(Pose.at(10.0, 20.0, 0.0),),
+    lifecycle, _units = fight_lifecycle(
+        alpha_unit_ids=(_AELDARI_UNIT_SELECTION_ID,),
+        enemy_unit_ids=(_ENEMY_UNIT_SELECTION_ID,),
+        origins={
+            _AELDARI_UNIT_SELECTION_ID: Pose.at(10.0, 20.0),
+            _ENEMY_UNIT_SELECTION_ID: Pose.at(12.15, 20.0, facing_degrees=180.0),
+        },
+        game_id=config.game_id,
+        config=config,
     )
-    _place_unit_poses(
-        state,
-        unit_instance_id=_ENEMY_UNIT_ID,
-        poses=_unit_line_poses(x=12.15, y=20.0),
-    )
-    _advance_lifecycle_state_to_phase(lifecycle, BattlePhase.FIGHT)
     lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
     state = _state(lifecycle)
     bundle = _runtime_content_bundle(lifecycle)

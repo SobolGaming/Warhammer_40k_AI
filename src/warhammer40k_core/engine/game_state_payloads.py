@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import NotRequired, TypedDict
+from typing import TYPE_CHECKING, NotRequired, TypedDict
 
 from warhammer40k_core.core.army_catalog import ArmyCatalogPayload
 from warhammer40k_core.core.model_geometry_catalog import ModelGeometryCatalogRecordPayload
@@ -44,6 +44,9 @@ from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureStatePayload,
 )
 from warhammer40k_core.engine.primary_mission_state import PrimaryMissionProgressStatePayload
+from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    PrimaryScoringStateEvidencePayload,
+)
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartSnapshotPayload,
 )
@@ -76,6 +79,14 @@ from warhammer40k_core.engine.transports import (
 from warhammer40k_core.engine.turn_cleanup import EndTurnCleanupStatePayload
 from warhammer40k_core.engine.unit_resources import UnitResourceLedgerPayload
 from warhammer40k_core.engine.unit_state import StartingStrengthRecordPayload
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.objective_control_record_authority import (
+        ObjectiveControlRecordAuthorityPayload,
+    )
+    from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+        PrimaryScoringBoundaryLifecyclePayload,
+    )
 
 
 class GameConfigPayload(TypedDict):
@@ -184,6 +195,9 @@ class GameStatePayload(TypedDict):
     battle_shocked_unit_ids: list[str]
     battle_shocked_unit_states: list[BattleShockedUnitStatePayload]
     objective_control_records: list[ObjectiveControlRecordPayload]
+    objective_control_record_authorities: list[ObjectiveControlRecordAuthorityPayload]
+    primary_scoring_state_evidence_records: list[PrimaryScoringStateEvidencePayload]
+    primary_scoring_boundary_lifecycles: list[PrimaryScoringBoundaryLifecyclePayload]
     sticky_objective_control_states: list[StickyObjectiveControlStatePayload]
     primary_objective_turn_start_states: list[PrimaryObjectiveTurnStartStatePayload]
     primary_rules_unit_turn_start_snapshots: list[PrimaryRulesUnitTurnStartSnapshotPayload]

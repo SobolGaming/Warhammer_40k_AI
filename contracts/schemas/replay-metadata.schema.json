@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v7/replay-metadata.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v8/replay-metadata.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -12,7 +12,7 @@
         "config": {
           "$ref": "https://warhammer40k-core.local/contracts/v3/create-session.schema.json#/properties/config"
         },
-        "state": {"$ref": "#/$defs/step4_replay_state"}
+        "state": {"$ref": "#/$defs/step5a_replay_state"}
       },
       "required": ["config", "state"],
       "type": "object"
@@ -22,7 +22,7 @@
       "items": {"$ref": "#/$defs/projection_checkpoint"},
       "type": "array"
     },
-    "schema_version": {"const": "replay-artifact-v7-phase17n-step4", "type": "string"},
+    "schema_version": {"const": "replay-artifact-v8-phase17n-step5a", "type": "string"},
     "source_identity": {"$ref": "#/$defs/source_identity"}
   },
   "required": [
@@ -38,12 +38,17 @@
   "title": "CORE V2 ReplayArtifactMetadataPayload",
   "type": "object",
   "$defs": {
-    "step4_replay_state": {
+    "step5a_replay_state": {
       "additionalProperties": true,
-      "description": "The Contract 9 schema-owned Phase 17N Step 4 evidence and persistent mission-state slice. Other lifecycle state remains engine-private and is validated by the fail-closed replay loader.",
+      "description": "The Contract 10 schema-owned Objective Control authority, Phase 17N Step 5A evidence, and persistent mission-state slice. Other lifecycle state remains engine-private and is validated by the fail-closed replay loader.",
       "properties": {
         "mission_action_states": {
           "items": {"$ref": "#/$defs/mission_action_state"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "objective_control_record_authorities": {
+          "items": {"$ref": "#/$defs/objective_control_record_authority"},
           "type": "array",
           "uniqueItems": true
         },
@@ -60,6 +65,16 @@
         "primary_mission_progress_state": {
           "$ref": "https://warhammer40k-core.local/contracts/v8/game-view.schema.json#/$defs/primary_mission_progress_state"
         },
+        "primary_scoring_state_evidence_records": {
+          "items": {"$ref": "#/$defs/primary_scoring_state_evidence"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "primary_scoring_boundary_lifecycles": {
+          "items": {"$ref": "#/$defs/primary_scoring_boundary_lifecycle"},
+          "type": "array",
+          "uniqueItems": true
+        },
         "primary_unit_destruction_states": {
           "items": {"$ref": "#/$defs/primary_unit_destruction_state"},
           "type": "array"
@@ -67,11 +82,440 @@
       },
       "required": [
         "mission_action_states",
+        "objective_control_record_authorities",
         "primary_rules_unit_turn_start_snapshots",
         "primary_unit_destruction_states",
         "primary_battlefield_departure_states",
-        "primary_mission_progress_state"
+        "primary_mission_progress_state",
+        "primary_scoring_state_evidence_records",
+        "primary_scoring_boundary_lifecycles"
       ],
+      "type": "object"
+    },
+    "objective_control_record_authority": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "objective-control-record-authority-v1",
+          "type": "string"
+        },
+        "objective_control_record_id": {"minLength": 1, "type": "string"},
+        "objective_control_record_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "boundary_checkpoint": {"$ref": "#/$defs/primary_mission_boundary_checkpoint"},
+        "retained_sticky_objective_control_states": {
+          "items": {"$ref": "#/$defs/sticky_objective_control_state"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "authority_id": {
+          "pattern": "^objective-control-record-authority:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "authority_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+      },
+      "required": [
+        "schema_version",
+        "objective_control_record_id",
+        "objective_control_record_hash",
+        "boundary_checkpoint",
+        "retained_sticky_objective_control_states",
+        "authority_id",
+        "authority_hash"
+      ],
+      "type": "object"
+    },
+    "primary_mission_boundary_checkpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "primary-mission-boundary-checkpoint-v1",
+          "type": "string"
+        },
+        "boundary_kind": {
+          "enum": ["action_request", "objective_control", "turn_end"],
+          "type": "string"
+        },
+        "game_id": {"minLength": 1, "type": "string"},
+        "player_id": {"minLength": 1, "type": "string"},
+        "active_player_id": {"minLength": 1, "type": "string"},
+        "battle_round": {"minimum": 1, "type": "integer"},
+        "phase": {"minLength": 1, "type": "string"},
+        "battlefield_id": {"minLength": 1, "type": "string"},
+        "model_states": {
+          "items": {"$ref": "#/$defs/primary_mission_boundary_model_state"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "attached_unit_formation_jsons": {"$ref": "#/$defs/canonical_json_object_strings"},
+        "battle_shocked_unit_instance_ids": {"$ref": "#/$defs/identifier_array"},
+        "advanced_unit_state_jsons": {"$ref": "#/$defs/canonical_json_object_strings"},
+        "fell_back_unit_state_jsons": {"$ref": "#/$defs/canonical_json_object_strings"},
+        "shot_unit_instance_ids": {"$ref": "#/$defs/identifier_array"},
+        "objective_control_modifier_sources": {
+          "items": {"$ref": "#/$defs/primary_mission_objective_control_modifier_source"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "active_primary_marker_jsons": {"$ref": "#/$defs/canonical_json_object_strings"},
+        "active_secondary_mission_ids": {"$ref": "#/$defs/identifier_array"},
+        "mission_action_prior_use_jsons": {"$ref": "#/$defs/canonical_json_object_strings"},
+        "checkpoint_id": {
+          "pattern": "^primary-mission-boundary:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "checkpoint_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+      },
+      "required": [
+        "schema_version",
+        "boundary_kind",
+        "game_id",
+        "player_id",
+        "active_player_id",
+        "battle_round",
+        "phase",
+        "battlefield_id",
+        "model_states",
+        "attached_unit_formation_jsons",
+        "battle_shocked_unit_instance_ids",
+        "advanced_unit_state_jsons",
+        "fell_back_unit_state_jsons",
+        "shot_unit_instance_ids",
+        "objective_control_modifier_sources",
+        "active_primary_marker_jsons",
+        "active_secondary_mission_ids",
+        "mission_action_prior_use_jsons",
+        "checkpoint_id",
+        "checkpoint_hash"
+      ],
+      "type": "object"
+    },
+    "primary_mission_boundary_model_state": {
+      "additionalProperties": false,
+      "properties": {
+        "owner_player_id": {"minLength": 1, "type": "string"},
+        "rules_unit_instance_id": {"minLength": 1, "type": "string"},
+        "component_unit_instance_id": {"minLength": 1, "type": "string"},
+        "model_instance_id": {"minLength": 1, "type": "string"},
+        "alive": {"type": "boolean"},
+        "wounds_remaining": {"minimum": 0, "type": "integer"},
+        "presence": {
+          "enum": ["battlefield", "destroyed", "embarked", "off_battlefield", "reserves"],
+          "type": "string"
+        },
+        "model_placement_json": {"$ref": "#/$defs/nullable_canonical_json_object_string"},
+        "source_objective_control_json": {"$ref": "#/$defs/canonical_json_object_string"},
+        "resolved_objective_control_json": {"$ref": "#/$defs/canonical_json_object_string"},
+        "logical_terrain_area_ids": {"$ref": "#/$defs/identifier_array"}
+      },
+      "required": [
+        "owner_player_id",
+        "rules_unit_instance_id",
+        "component_unit_instance_id",
+        "model_instance_id",
+        "alive",
+        "wounds_remaining",
+        "presence",
+        "model_placement_json",
+        "source_objective_control_json",
+        "resolved_objective_control_json",
+        "logical_terrain_area_ids"
+      ],
+      "type": "object"
+    },
+    "primary_mission_objective_control_modifier_source": {
+      "additionalProperties": false,
+      "properties": {
+        "modifier_id": {"minLength": 1, "type": "string"},
+        "source_id": {"minLength": 1, "type": "string"},
+        "source_effect_id": {"$ref": "#/$defs/nullable_identifier"},
+        "source_effect_json": {"$ref": "#/$defs/nullable_canonical_json_object_string"}
+      },
+      "required": ["modifier_id", "source_id", "source_effect_id", "source_effect_json"],
+      "type": "object"
+    },
+    "sticky_objective_control_state": {
+      "additionalProperties": false,
+      "properties": {
+        "state_id": {"minLength": 1, "type": "string"},
+        "game_id": {"minLength": 1, "type": "string"},
+        "player_id": {"minLength": 1, "type": "string"},
+        "objective_id": {"minLength": 1, "type": "string"},
+        "source_rule_id": {"minLength": 1, "type": "string"},
+        "source_event_id": {"minLength": 1, "type": "string"},
+        "battle_round": {"minimum": 1, "type": "integer"},
+        "phase": {"minLength": 1, "type": "string"},
+        "active_player_id": {"minLength": 1, "type": "string"},
+        "originating_unit_instance_id": {"minLength": 1, "type": "string"},
+        "destroyed_unit_instance_id": {"minLength": 1, "type": "string"},
+        "replay_payload": {"$ref": "#/$defs/json_value"}
+      },
+      "required": [
+        "state_id",
+        "game_id",
+        "player_id",
+        "objective_id",
+        "source_rule_id",
+        "source_event_id",
+        "battle_round",
+        "phase",
+        "active_player_id",
+        "originating_unit_instance_id",
+        "destroyed_unit_instance_id",
+        "replay_payload"
+      ],
+      "type": "object"
+    },
+    "primary_scoring_state_evidence": {
+      "additionalProperties": false,
+      "description": "One content-addressed state snapshot required for every ordinary or end-of-battle boundary with an applicable assigned-Primary rule, including zero-award evaluations.",
+      "properties": {
+        "schema_version": {
+          "const": "primary-scoring-state-evidence-v1",
+          "type": "string"
+        },
+        "game_id": {"minLength": 1, "type": "string"},
+        "battlefield_id": {"minLength": 1, "type": "string"},
+        "battle_round": {"minimum": 1, "type": "integer"},
+        "active_player_id": {"minLength": 1, "type": "string"},
+        "phase": {
+          "enum": ["command", "movement", "shooting", "charge", "fight"],
+          "type": "string"
+        },
+        "timing": {
+          "enum": ["turn_start", "phase_end", "turn_end"],
+          "type": "string"
+        },
+        "scoring_boundary_kind": {
+          "enum": ["ordinary", "end_of_battle"],
+          "type": "string"
+        },
+        "objective_control_record_id": {"minLength": 1, "type": "string"},
+        "objective_control_record_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "scoring_commit_checkpoint_id": {"minLength": 1, "type": "string"},
+        "scoring_commit_checkpoint_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "primary_mission_progress_state": {
+          "$ref": "https://warhammer40k-core.local/contracts/v8/game-view.schema.json#/$defs/primary_mission_progress_state"
+        },
+        "primary_mission_action_states": {
+          "items": {"$ref": "#/$defs/mission_action_state"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "primary_battlefield_departure_states": {
+          "items": {"$ref": "#/$defs/primary_battlefield_departure_state"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "primary_unit_destruction_state_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "current_rules_unit_position_witnesses": {
+          "items": {"$ref": "#/$defs/primary_scoring_rules_unit_position_witness"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "primary_scoring_spatial_evidence_by_player_id": {
+          "items": {"$ref": "#/$defs/primary_scoring_spatial_evidence"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "evidence_id": {
+          "pattern": "^primary-scoring-state-evidence:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "evidence_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+      },
+      "required": [
+        "schema_version",
+        "game_id",
+        "battlefield_id",
+        "battle_round",
+        "active_player_id",
+        "phase",
+        "timing",
+        "scoring_boundary_kind",
+        "objective_control_record_id",
+        "objective_control_record_hash",
+        "scoring_commit_checkpoint_id",
+        "scoring_commit_checkpoint_hash",
+        "primary_mission_progress_state",
+        "primary_mission_action_states",
+        "primary_battlefield_departure_states",
+        "primary_unit_destruction_state_ids",
+        "current_rules_unit_position_witnesses",
+        "primary_scoring_spatial_evidence_by_player_id",
+        "evidence_id",
+        "evidence_hash"
+      ],
+      "type": "object"
+    },
+    "primary_scoring_boundary_lifecycle": {
+      "additionalProperties": false,
+      "description": "Typed Objective Control capture to Primary scoring-commit lifecycle for one required boundary.",
+      "properties": {
+        "schema_version": {
+          "const": "primary-scoring-boundary-lifecycle-v1",
+          "type": "string"
+        },
+        "objective_control_record_id": {"minLength": 1, "type": "string"},
+        "objective_control_record_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "scoring_boundary_kind": {
+          "enum": ["ordinary", "end_of_battle"],
+          "type": "string"
+        },
+        "status": {
+          "enum": ["pending", "resolved"],
+          "type": "string"
+        },
+        "pending_window": {"$ref": "#/$defs/nullable_identifier"},
+        "pending_decision_request_id": {"$ref": "#/$defs/nullable_identifier"},
+        "scoring_commit_checkpoint_id": {"$ref": "#/$defs/nullable_identifier"},
+        "scoring_commit_checkpoint_hash": {
+          "anyOf": [
+            {"type": "null"},
+            {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+          ]
+        },
+        "evidence_id": {"$ref": "#/$defs/nullable_identifier"},
+        "primary_transaction_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "lifecycle_id": {
+          "pattern": "^primary-scoring-boundary-lifecycle:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "lifecycle_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+      },
+      "required": [
+        "schema_version",
+        "objective_control_record_id",
+        "objective_control_record_hash",
+        "scoring_boundary_kind",
+        "status",
+        "pending_window",
+        "pending_decision_request_id",
+        "scoring_commit_checkpoint_id",
+        "scoring_commit_checkpoint_hash",
+        "evidence_id",
+        "primary_transaction_ids",
+        "lifecycle_id",
+        "lifecycle_hash"
+      ],
+      "type": "object"
+    },
+    "primary_scoring_rules_unit_position_witness": {
+      "additionalProperties": false,
+      "properties": {
+        "owner_player_id": {"minLength": 1, "type": "string"},
+        "rules_unit_membership": {
+          "$ref": "https://warhammer40k-core.local/contracts/v8/game-view.schema.json#/$defs/primary_rules_unit_turn_start_membership"
+        }
+      },
+      "required": ["owner_player_id", "rules_unit_membership"],
+      "type": "object"
+    },
+    "primary_scoring_spatial_evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "game_id": {"minLength": 1, "type": "string"},
+        "battlefield_id": {"minLength": 1, "type": "string"},
+        "battle_round": {"minimum": 1, "type": "integer"},
+        "active_player_id": {"minLength": 1, "type": "string"},
+        "phase": {
+          "enum": ["command", "movement", "shooting", "charge", "fight"],
+          "type": "string"
+        },
+        "timing": {
+          "enum": ["turn_start", "phase_end", "turn_end"],
+          "type": "string"
+        },
+        "objective_control_record_id": {"minLength": 1, "type": "string"},
+        "objective_control_record_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "player_id": {"minLength": 1, "type": "string"},
+        "requested_condition_ids": {"$ref": "#/$defs/identifier_array"},
+        "table_quarter_unit_witnesses": {
+          "items": {"$ref": "#/$defs/primary_table_quarter_unit_witness"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "enemy_units_wholly_within_own_territory": {
+          "items": {"$ref": "#/$defs/primary_territory_unit_witness"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "opponent_territory_objective_ids": {"$ref": "#/$defs/identifier_array"}
+      },
+      "required": [
+        "game_id",
+        "battlefield_id",
+        "battle_round",
+        "active_player_id",
+        "phase",
+        "timing",
+        "objective_control_record_id",
+        "objective_control_record_hash",
+        "player_id",
+        "requested_condition_ids",
+        "table_quarter_unit_witnesses",
+        "enemy_units_wholly_within_own_territory",
+        "opponent_territory_objective_ids"
+      ],
+      "type": "object"
+    },
+    "primary_table_quarter_unit_witness": {
+      "additionalProperties": false,
+      "properties": {
+        "rules_unit_instance_id": {"minLength": 1, "type": "string"},
+        "quarter_id": {
+          "enum": [
+            "table-quarter:north-west",
+            "table-quarter:north-east",
+            "table-quarter:south-west",
+            "table-quarter:south-east"
+          ],
+          "type": "string"
+        },
+        "model_instance_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": ["rules_unit_instance_id", "quarter_id", "model_instance_ids"],
+      "type": "object"
+    },
+    "primary_territory_unit_witness": {
+      "additionalProperties": false,
+      "properties": {
+        "rules_unit_instance_id": {"minLength": 1, "type": "string"},
+        "model_instance_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": ["rules_unit_instance_id", "model_instance_ids"],
       "type": "object"
     },
     "mission_action_state": {
@@ -139,6 +583,31 @@
       "items": {"minLength": 1, "type": "string"},
       "type": "array",
       "uniqueItems": true
+    },
+    "json_value": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "boolean"},
+        {"type": "number"},
+        {"type": "string"},
+        {"items": {"$ref": "#/$defs/json_value"}, "type": "array"},
+        {"additionalProperties": {"$ref": "#/$defs/json_value"}, "type": "object"}
+      ]
+    },
+    "canonical_json_object_string": {
+      "minLength": 2,
+      "type": "string"
+    },
+    "canonical_json_object_strings": {
+      "items": {"$ref": "#/$defs/canonical_json_object_string"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "nullable_canonical_json_object_string": {
+      "oneOf": [
+        {"$ref": "#/$defs/canonical_json_object_string"},
+        {"type": "null"}
+      ]
     },
     "nullable_identifier": {
       "oneOf": [

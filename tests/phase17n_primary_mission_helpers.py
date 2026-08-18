@@ -16,6 +16,7 @@ from warhammer40k_core.engine.battlefield_state import (
     ModelDisplacementKind,
     ModelDisplacementRecord,
 )
+from warhammer40k_core.engine.damage_allocation import destroy_model_by_rule
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -39,6 +40,7 @@ from warhammer40k_core.engine.mission_decisions import (
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.mission_terrain import (
+    logical_terrain_area_within_player_deployment_zone,
     logical_terrain_area_within_player_territory,
     mission_logical_terrain_areas,
 )
@@ -49,10 +51,12 @@ from warhammer40k_core.engine.movement_proposals import (
     ProposalKind,
 )
 from warhammer40k_core.engine.objective_control import (
+    ObjectiveControlContext,
     ObjectiveControlContribution,
     ObjectiveControlRecord,
     ObjectiveControlResult,
     ObjectiveControlTiming,
+    resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage
 from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
@@ -169,7 +173,37 @@ def phase17n_started_primary_action_fixture(
     assert len(units) == player_unit_count
     unit = units[0]
     assert state.mission_setup is not None
-    if runtime_action.target_policy == "terrain_area_in_enemy_territory":
+    if runtime_action.target_policy == "trappable_terrain_area":
+        target_area = next(
+            area
+            for area in mission_logical_terrain_areas(state.mission_setup)
+            if not logical_terrain_area_within_player_deployment_zone(
+                area,
+                mission_setup=state.mission_setup,
+                player_id=player_id,
+            )
+        )
+        target_id = target_area.logical_terrain_area_id
+        target_point = target_area.members[0].footprint_polygon[0]
+        placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+        state.battlefield_state = state.battlefield_state.with_unit_placement(
+            replace(
+                placement,
+                model_placements=tuple(
+                    replace(
+                        model_placement,
+                        pose=Pose.at(
+                            target_point.x_inches + (index * 0.1),
+                            target_point.y_inches,
+                            model_placement.pose.position.z,
+                            facing_degrees=model_placement.pose.facing.degrees,
+                        ),
+                    )
+                    for index, model_placement in enumerate(placement.model_placements)
+                ),
+            )
+        )
+    elif runtime_action.target_policy == "terrain_area_in_enemy_territory":
         opponent_id = next(
             candidate_id for candidate_id in state.player_ids if candidate_id != player_id
         )
@@ -336,44 +370,22 @@ def phase17n_action_turn_end_record(
     decisions: DecisionController,
     controlled_target_id: str,
     action: MissionActionState,
-    contributing_unit_instance_id: str | None = None,
 ) -> ObjectiveControlRecord:
     assert state.mission_setup is not None
     assert state.battlefield_state is not None
-    contributor_id = contributing_unit_instance_id or action.unit_instance_id
-    contributor_player_id, unit = next(
-        (army.player_id, unit)
-        for army in state.army_definitions
-        for unit in army.units
-        if unit.unit_instance_id == contributor_id
+    if controlled_target_id != action.target_id:
+        raise AssertionError("Primary Action turn-end target drifted.")
+    resolved = resolve_objective_control(
+        ObjectiveControlContext.from_game_state(
+            state,
+            timing=ObjectiveControlTiming.TURN_END,
+            phase=BattlePhase.FIGHT,
+            ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
+        )
     )
-    contribution = ObjectiveControlContribution(
-        player_id=contributor_player_id,
-        unit_instance_id=unit.unit_instance_id,
-        model_instance_id=unit.own_models[0].model_instance_id,
-        objective_control=1,
-        effective_objective_control=1,
-        battle_shocked=False,
-        horizontal_distance_inches=0.0,
-        vertical_gap_inches=0.0,
-    )
-    record = ObjectiveControlRecord(
+    record = replace(
+        resolved,
         record_id=f"phase17n-action-turn-end:{action.action_id}",
-        game_id=state.game_id,
-        battle_round=state.battle_round,
-        active_player_id=action.player_id,
-        timing=ObjectiveControlTiming.TURN_END,
-        phase=BattlePhase.FIGHT.value,
-        battlefield_id=state.battlefield_state.battlefield_id,
-        results=tuple(
-            ObjectiveControlResult.from_contributors(
-                objective_id=marker.objective_marker_id,
-                contributors=(
-                    (contribution,) if marker.objective_marker_id == controlled_target_id else ()
-                ),
-            )
-            for marker in state.mission_setup.objective_markers
-        ),
     )
     state.record_objective_control_record(record)
     decisions.event_log.append(
@@ -592,7 +604,7 @@ def phase17n_locate_pending_fixture() -> tuple[
         attacker_force_disposition_id="disruption",
         defender_force_disposition_id="priority-assets",
     )
-    state = _state_with_setup(
+    state = phase17n_state_with_setup(
         setup=setup,
         active_player_id=None,
         phase=None,
@@ -617,7 +629,7 @@ def phase17n_punishment_pending_fixture() -> tuple[
         attacker_force_disposition_id="purge-the-foe",
         defender_force_disposition_id="disruption",
     )
-    state = _state_with_setup(
+    state = phase17n_state_with_setup(
         setup=setup,
         active_player_id="player-a",
         phase=BattlePhase.COMMAND,
@@ -709,7 +721,7 @@ def phase17n_consecrate_pending_fixture() -> tuple[
         attacker_force_disposition_id="purge-the-foe",
         defender_force_disposition_id="reconnaissance",
     )
-    state = _state_with_setup(
+    state = phase17n_state_with_setup(
         setup=setup,
         active_player_id="player-a",
         phase=BattlePhase.SHOOTING,
@@ -778,7 +790,7 @@ def phase17n_consecrate_pending_fixture() -> tuple[
             },
         )
         model_events.append(model_event)
-        state.battlefield_state = state.battlefield_state.with_removed_models((model_id,))
+        destroy_model_by_rule(state=state, model_instance_id=model_id)
         model_departures = record_primary_destroyed_model_departures(
             state=state,
             destroyed_model_instance_ids=(model_id,),
@@ -929,7 +941,7 @@ def _action_ready_state() -> GameState:
         attacker_force_disposition_id="purge-the-foe",
         defender_force_disposition_id="priority-assets",
     )
-    state = _state_with_setup(
+    state = phase17n_state_with_setup(
         setup=setup,
         active_player_id="player-b",
         phase=BattlePhase.SHOOTING,
@@ -961,7 +973,7 @@ def _action_ready_state() -> GameState:
     return state
 
 
-def _state_with_setup(
+def phase17n_state_with_setup(
     *,
     setup: MissionSetup,
     active_player_id: str | None,

@@ -71,7 +71,7 @@ DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-EXPECTED_SOURCE_IMPORT_HASH = "281c1a62b7b0d6aa61ac03095642cd7a85b8ff8907c94d6424c3a01aeacf0dcc"
+EXPECTED_SOURCE_IMPORT_HASH = "c724fad0b3bf86f04abcc673b06f5e3829849177de99e9f8ad71a6430c142fd4"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -1022,74 +1022,40 @@ _ENGINE_IMPLEMENTED_PRIMARY_MISSION_IDS = engine_implemented_primary_mission_ids
 
 _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
     "primary-consecrate": (
-        "engine_primary_marker_state:consecrated_objective",
         "engine_primary_condition:consecrated_objective_thresholds",
         "engine_primary_condition:enemy_home_objective_consecrated",
     ),
     "primary-extract-relic": (
-        "engine_primary_action:sensor-sweep-extract-relic",
-        "engine_primary_marker_state:opponent_operation_marker",
         "engine_primary_condition:friendly_unit_performed_sensor_sweep_this_turn",
         "engine_primary_condition:single_opponent_operation_marker_terrain_area_state",
     ),
     "primary-gather-intel": (
-        "engine_primary_action:extract-intelligence",
-        "engine_primary_marker_state:gather_intel_operation_marker",
-        "engine_primary_condition:control_one_or_more_central_objectives_first_battle_round",
         "engine_primary_condition:each_friendly_unit_extracted_intelligence_this_turn",
         "engine_primary_condition:gather_intel_operation_marker_end_of_battle",
     ),
     "primary-locate-and-deny": (
-        "engine_primary_start_battle_setup:locate_and_deny_operation_markers",
-        "engine_primary_action:sensor-sweep-locate-and-deny",
-        "engine_primary_marker_state:operation_marker_terrain_area",
         "engine_primary_condition:single_friendly_operation_marker_terrain_area_state",
     ),
-    "primary-punishment": (
-        "engine_primary_start_turn_choice:condemned_enemy_units",
-        "engine_primary_condition:condemned_enemy_units_left_battlefield",
-    ),
+    "primary-punishment": ("engine_primary_condition:condemned_enemy_units_left_battlefield",),
     "primary-sabotage": (
-        "engine_primary_action:commit-sabotage",
         "engine_primary_condition:each_friendly_unit_committed_sabotage_this_turn",
         "engine_primary_condition:sabotage_opponent_territory_objective_bonus",
-        "engine_primary_scoring_grammar:cumulative_condition",
     ),
-    "primary-secure-asset": (
-        "engine_primary_action:secure-asset",
-        "engine_primary_condition:friendly_unit_secured_asset_this_turn",
-    ),
+    "primary-secure-asset": ("engine_primary_condition:friendly_unit_secured_asset_this_turn",),
     "primary-smoke-and-mirrors": (
-        "engine_primary_action:decoy-objective",
-        "engine_primary_marker_state:decoy_objective",
         "engine_primary_condition:decoy_objective_scoring",
         "engine_primary_condition:opponent_territory_objective_bonus",
     ),
     "primary-surveil-the-foe": (
-        "engine_primary_action:surveil-enemy-unit",
-        "engine_primary_marker_state:enemy_operation_marker",
-        "engine_primary_movement_effect:remove_enemy_operation_markers_from_objective",
         "engine_primary_condition:enemy_unit_surveilled_marker_exception",
         "engine_primary_condition:no_enemy_operation_markers_on_battlefield",
     ),
-    "primary-triangulation": (
-        "engine_primary_action:triangulate-objective",
-        "engine_primary_marker_state:triangulated_objective",
-        "engine_primary_condition:triangulated_objective_thresholds",
-        "engine_primary_condition:control_four_or_more_objectives",
-    ),
+    "primary-triangulation": ("engine_primary_condition:triangulated_objective_thresholds",),
     "primary-vanguard-operation": (
-        "engine_primary_action:vanguard-operation",
         "engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn",
         "engine_primary_condition:enemy_territory_terrain_area_control",
     ),
-    "primary-vital-link": (
-        "engine_primary_action:maintain-control",
-        "engine_primary_marker_state:vital_link_operation_marker",
-        "engine_primary_condition:central_objective_operation_marker_bonus",
-        "engine_primary_condition:controlled_central_objective_bonus",
-        "engine_primary_scoring_grammar:cumulative_condition",
-    ),
+    "primary-vital-link": ("engine_primary_condition:central_objective_operation_marker_bonus",),
 }
 
 

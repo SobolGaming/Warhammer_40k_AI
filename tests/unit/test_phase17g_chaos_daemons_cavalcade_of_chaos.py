@@ -21,6 +21,7 @@ from tests.phase10o_fall_back_helpers import (
     fall_back_witness,
     move_first_enemy_model_into_side_engagement,
 )
+from tests.phase15c_fight_order_helpers import fight_lifecycle
 from tests.support.catalog_package_fixtures import bloodcrushers_package
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
@@ -78,7 +79,7 @@ from warhammer40k_core.engine.decision_request import (
     DecisionRequestPayload,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
-from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.effects import PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons.detachments.cavalcade_of_chaos import (  # noqa: E501
@@ -971,7 +972,35 @@ def test_cavalcade_apocalyptic_steeds_roster_requires_mounted_target() -> None:
 
 def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecycle() -> None:
     config = _cavalcade_config(soul_shattering_charge=True)
-    lifecycle, _movement_status = advance_to_movement_unit_selection(config)
+    friendly_poses = (
+        Pose.at(10.0, 20.0),
+        Pose.at(10.0, 21.9),
+        Pose.at(10.0, 23.8),
+        Pose.at(10.0, 25.7),
+        Pose.at(10.0, 27.6),
+    )
+    enemy_poses = (
+        Pose.at(12.15, 20.0),
+        Pose.at(14.05, 20.0),
+        Pose.at(15.95, 20.0),
+        Pose.at(17.85, 20.0),
+        Pose.at(19.75, 20.0),
+    )
+    lifecycle, _units = fight_lifecycle(
+        alpha_unit_ids=("intercessor-unit-1",),
+        enemy_unit_ids=("intercessor-unit-2",),
+        origins={
+            "intercessor-unit-1": friendly_poses[0],
+            "intercessor-unit-2": enemy_poses[0],
+        },
+        game_id=config.game_id,
+        charge_fights_first_unit_keys=("intercessor-unit-1",),
+        config=config,
+        poses_by_unit_key={
+            "intercessor-unit-1": friendly_poses,
+            "intercessor-unit-2": enemy_poses,
+        },
+    )
     state = fall_back_state(lifecycle)
     army = state.army_definition_for_player("player-a")
     if army is None:
@@ -980,9 +1009,6 @@ def test_cavalcade_soul_shattering_charge_extends_melee_targeting_through_lifecy
     engaged_model_id = unit.own_models[0].model_instance_id
     extended_model_id = unit.own_models[1].model_instance_id
 
-    _place_soul_shattering_charge_positions(state)
-    _record_charge_move_for_unit(state, unit_instance_id=_CAVALCADE_UNIT_ID)
-    _advance_lifecycle_state_to_phase(lifecycle, BattlePhase.FIGHT)
     lifecycle = _rehydrate_lifecycle_with_empty_decisions(lifecycle)
     state = fall_back_state(lifecycle)
     bundle = _runtime_content_bundle(lifecycle)
@@ -1847,44 +1873,6 @@ def _selected_cavalcade_enhancement_ids(
     return tuple(selected)
 
 
-def _advance_lifecycle_state_to_phase(lifecycle: GameLifecycle, phase: BattlePhase) -> None:
-    state = fall_back_state(lifecycle)
-    while state.current_battle_phase is not phase:
-        if state.current_battle_phase is None:
-            raise AssertionError("battle state ended before expected phase")
-        state.advance_to_next_battle_phase()
-
-
-def _place_soul_shattering_charge_positions(state: GameState) -> None:
-    friendly_placement = _with_model_poses(
-        _unit_placement(state, _CAVALCADE_UNIT_ID),
-        poses=(
-            Pose.at(10.0, 20.0),
-            Pose.at(10.0, 21.9),
-            Pose.at(10.0, 23.8),
-            Pose.at(10.0, 25.7),
-            Pose.at(10.0, 27.6),
-        ),
-    )
-    enemy_placement = _with_model_poses(
-        _unit_placement(state, _ENEMY_UNIT_ID),
-        poses=(
-            Pose.at(12.15, 20.0),
-            Pose.at(14.05, 20.0),
-            Pose.at(15.95, 20.0),
-            Pose.at(17.85, 20.0),
-            Pose.at(19.75, 20.0),
-        ),
-    )
-    if state.battlefield_state is None:
-        raise AssertionError("test state requires battlefield_state")
-    state.replace_battlefield_state(
-        state.battlefield_state.with_unit_placement(friendly_placement).with_unit_placement(
-            enemy_placement
-        )
-    )
-
-
 def _place_warp_riders_ruins_traversal_positions(state: GameState) -> None:
     ruins = _warp_riders_traversal_ruin_from_state(state)
     ground_wall = _longest_ground_wall(ruins)
@@ -2124,28 +2112,6 @@ def _with_model_poses(
             )
             for placement, pose in zip(unit_placement.model_placements, poses, strict=True)
         ),
-    )
-
-
-def _record_charge_move_for_unit(state: GameState, *, unit_instance_id: str) -> None:
-    state.record_persisting_effect(
-        PersistingEffect(
-            effect_id=f"phase17g-soul-shattering:{unit_instance_id}:charge-fights-first",
-            source_rule_id="core-rules:charge:fights-first",
-            owner_player_id="player-a",
-            target_unit_instance_ids=(unit_instance_id,),
-            started_battle_round=state.battle_round,
-            started_phase=BattlePhase.CHARGE,
-            expiration=EffectExpiration.end_turn(
-                battle_round=state.battle_round,
-                player_id="player-a",
-            ),
-            effect_payload={
-                "effect_kind": "charge_grants_fights_first",
-                "proposal_request_id": "phase17g-soul-shattering-charge-request",
-                "decision_result_id": "phase17g-soul-shattering-charge-result",
-            },
-        )
     )
 
 

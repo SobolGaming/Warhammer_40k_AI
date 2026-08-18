@@ -432,28 +432,31 @@ reference server currently requires:
   with explicit terrain-area logical identity and terrain area and feature
   classifications, plus viewer-scoped model formation state before reveal;
 - `session-projection-v7-phase17n-step4` for full role-scoped reconnect projections;
-- `session-create-v4`, `session-metadata-v9-contract`,
-  `session-command-result-v9-contract`, and `session-command-outcome-v9-contract` for the
+- `session-create-v4`, `session-metadata-v10-contract`,
+  `session-command-result-v10-contract`, and `session-command-outcome-v10-contract` for the
   authenticated formal session protocol;
 - `capability-manifest-v2-directed-primary` inside
   `support-profile-v4-directed-primary` for viewer-scoped capability evidence
   whose public mission identity includes both assignments;
 - `physical-proposal-context-v2` for engine-owned physical proposal context;
-- `replay-artifact-v7-phase17n-step4` for replay artifacts whose required source
+- `replay-artifact-v8-phase17n-step5a` for replay artifacts whose required source
   identity includes `ruleset_descriptor_hash`, `rules_overlay_ids`, and the
   atomic `mission_pack_id` / `mission_source_package_hash` pair, while the
   embedded mission setup includes both directed Primary Mission assignments,
   Phase 17N group-aware turn-start position, destruction-attribution,
   battlefield-departure evidence, persistent Primary Mission progress state,
-  and explicit logical terrain-area identities;
+  the content-addressed Primary scoring-state evidence registry with frozen
+  destruction-history membership, and explicit
+  logical terrain-area identities;
 - `error-envelope-v1` for typed transport errors.
 
-The Contract 9 replay loader accepts only `replay-artifact-v7-phase17n-step4`;
-v6 artifacts require the retained 8.x deployment. It never infers directed
+The Contract 10 replay loader accepts only `replay-artifact-v8-phase17n-step5a`;
+v7 artifacts require the retained 9.x deployment. It never infers directed
 Primary Mission assignments, grouped position history, destruction sources,
 battlefield departures, persistent markers, condemned selections,
-consecration designations, missing logical terrain-area grouping, or mission
-source identity. Mission identity fields are both non-null when the configured or
+consecration designations, scoring-state evidence, missing logical terrain-area
+grouping, or mission source identity. Mission identity fields are both non-null
+when the configured or
 late-bound lifecycle has a mission setup and both null otherwise; canonical
 mission source-package hash drift is rejected. A mismatched
 request version fails before queue consumption or engine mutation. External
@@ -462,11 +465,30 @@ viewer-scoped by the same shared redaction policy as game projections and
 events.
 
 The external replay schema requires the lifecycle state and closes the three
-Step 3 evidence row families plus the Step 4 Primary progress state without
-duplicating every engine-private lifecycle field. Full lifecycle shape, event
-linkage, source attribution, and historical cross-record consistency remain
-fail-closed runtime-loader responsibilities; JSON Schema acceptance alone does
-not certify a replay as reproducible.
+Step 3 evidence row families, the Step 4 Primary progress state, and each Step
+5A scoring-state evidence row without duplicating every engine-private
+lifecycle field. Each evidence row binds its content hash/ID, scoring boundary
+kind, objective-control record identity/hash, progress, qualifying Action and
+departure history, exact Primary unit-destruction history membership, current
+group-aware memberships, and frozen player-scoped
+table-quarter, territory, and opponent-territory-objective witnesses. Full lifecycle shape,
+event linkage, source attribution, and historical cross-record consistency
+remain fail-closed runtime-loader responsibilities; JSON Schema acceptance
+alone does not certify a replay as reproducible.
+
+Evidence is persisted at every assigned-Primary boundary with at least one
+applicable rule, including deterministic zero-award evaluations. Restore
+enforces exact inverse completeness: every required ordinary or end-of-battle
+boundary has one row, every row maps back to a required boundary, and any
+awarded transactions equal normal policy re-evaluation. Removing transactions
+together with their evidence cannot hide an applicable historical boundary.
+
+`primary_scoring_state_evidence_records` is authoritative replay/audit state,
+not viewer projection state. It is deliberately omitted from
+`game-view-v11-phase17n-step4` and
+`session-projection-v7-phase17n-step4`; those family versions remain unchanged.
+Adapters render public mission progress and awarded victory-point transactions
+without receiving the engine-private registry.
 
 Compatibility, coordinate, session, and redaction semantics are normative in
 `contracts/compatibility-policy.md`, `contracts/coordinate-system.md`,
@@ -992,6 +1014,17 @@ checkpoint must be immediately paired with its exact `start_mission_action`
 `decision_requested` event, and every `turn_end` checkpoint must be consumed by
 exactly one matching Vanguard terminal-evidence event before the next
 checkpoint. Orphaned, duplicated, or mismatched checkpoints fail closed.
+
+Contract 10 additionally persists the engine-private
+`objective_control_record_authorities` registry. Every Objective Control record
+has exactly one content-addressed authority row binding its record ID/hash to a
+closed `objective_control` boundary checkpoint and the exact retained
+sticky-control witnesses applied to that result. Restore reconstructs
+objective membership and characteristic authority from the frozen placement,
+model, modifier-source, and mission-state evidence; it never derives an older
+record from later battlefield positions. These rows and their embedded hidden
+checkpoint state follow the same replay-only viewer boundary above and are not
+adapter-visible projections or event deltas.
 
 Turn ordering is engine-owned and blocking. Locate and Deny drains before
 battle entry. Punishment drains after battle-round-start hooks and before the
@@ -3057,7 +3090,7 @@ terrain areas as the objective footprint and treat the objective marker as
 stable objective identity/label metadata. Adapters must submit complete logical
 membership: referencing any physical terrain area requires listing every
 mission-setup terrain area with the same `logical_terrain_area_id`. Layout,
-mission-setup, Contract 9 create, replay, and objective-control validation
+mission-setup, Contract 10 create, replay, and objective-control validation
 reject partial logical groups. Removing a physical member, relabelling the
 survivor, or clearing `battlefield_layout_id` does not bypass the canonical
 source-layout reconciliation. Replay state must retain the same mission setup
@@ -3476,13 +3509,19 @@ Replay-facing payloads must remain deterministic and JSON-safe:
 
 Phase 11D must ensure replay/resume preserves pending parameterized proposal requests. Restoring after a finite movement-action result has been accepted but before the proposal has been submitted must reproduce the same pending proposal request and validation context.
 
-Contract 9 replay uses `replay-artifact-v7-phase17n-step4`. It preserves a
+Contract 10 replay uses `replay-artifact-v8-phase17n-step5a`. It preserves a
 pending `select_primary_mission_choice` request, deterministic finite option
-IDs/payloads, the complete `primary_mission_progress_state`, and the linked
-decision, Action, destruction, marker, condemnation, designation, and event
-records. Restore validates exact DecisionRequest/DecisionResult/mutation
-closure, Action start and completion evidence, and historical Consecrate legal
-targets fail closed; it does not infer Step 4 state for a Contract 8 artifact.
+IDs/payloads, the complete `primary_mission_progress_state`, the mandatory
+`primary_scoring_state_evidence_records`, and the linked decision, Action,
+destruction, marker, condemnation, designation, score, and event records.
+Each scoring-state row also preserves the exact per-player spatial-condition
+evidence and destruction-history membership consumed at that historical
+boundary; restore never derives either from later battlefield state.
+Restore validates exact DecisionRequest/DecisionResult/mutation closure,
+Action start and completion evidence, historical Consecrate legal targets, and
+every applicable zero- or nonzero-award boundary plus every score-to-evidence
+reference fail closed; it does not infer an empty Step 5A registry for a
+Contract 9 artifact.
 
 Replay and tests may choose decisions differently from a human UI, but they must submit the same `DecisionResult` shape through the same lifecycle path.
 

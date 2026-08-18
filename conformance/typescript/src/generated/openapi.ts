@@ -268,7 +268,7 @@ export interface components {
             projection_state_hash: string; rules_overlay_ids: string[]; ruleset_descriptor_hash: string;
             ruleset_id: Record<string, never>;
             /** @constant */
-            schema_version: "session-metadata-v9-contract"; server_contract_version: string; session_id: string;
+            schema_version: "session-metadata-v10-contract"; server_contract_version: string; session_id: string;
             session_revision: number;
             /** @enum {string} */
             session_state: "created" | "active" | "terminal" | "closed"; source_hash: string; source_package_id: string;
@@ -542,7 +542,7 @@ export interface components {
             /** @enum {string} */
             outcome_code: "command_committed" | "proposal_invalid" | "rule_path_unsupported";
             /** @constant */
-            schema_version: "session-command-outcome-v9-contract";
+            schema_version: "session-command-outcome-v10-contract";
             session: components["schemas"]["session-metadata.schema"];
         } & ({
             /** @constant */
@@ -997,6 +997,59 @@ export interface components {
             interrupted_reason: components["schemas"]["replay-metadata--nullable_identifier.schema"];
             score_transaction_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
         };
+        "replay-metadata--canonical_json_object_string.schema": string;
+        "replay-metadata--nullable_canonical_json_object_string.schema": components["schemas"]["replay-metadata--canonical_json_object_string.schema"] | null;
+        "replay-metadata--primary_mission_boundary_model_state.schema": {
+            owner_player_id: string; rules_unit_instance_id: string; component_unit_instance_id: string;
+            model_instance_id: string; alive: boolean; wounds_remaining: number;
+            /** @enum {string} */
+            presence: "battlefield" | "destroyed" | "embarked" | "off_battlefield" | "reserves";
+            model_placement_json: components["schemas"]["replay-metadata--nullable_canonical_json_object_string.schema"];
+            source_objective_control_json: components["schemas"]["replay-metadata--canonical_json_object_string.schema"];
+            resolved_objective_control_json: components["schemas"]["replay-metadata--canonical_json_object_string.schema"];
+            logical_terrain_area_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+        };
+        "replay-metadata--canonical_json_object_strings.schema": components["schemas"]["replay-metadata--canonical_json_object_string.schema"][];
+        "replay-metadata--primary_mission_objective_control_modifier_source.schema": {
+            modifier_id: string; source_id: string;
+            source_effect_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            source_effect_json: components["schemas"]["replay-metadata--nullable_canonical_json_object_string.schema"];
+        };
+        "replay-metadata--primary_mission_boundary_checkpoint.schema": {
+            /** @constant */
+            schema_version: "primary-mission-boundary-checkpoint-v1";
+            /** @enum {string} */
+            boundary_kind: "action_request" | "objective_control" | "turn_end"; game_id: string; player_id: string;
+            active_player_id: string; battle_round: number; phase: string; battlefield_id: string;
+            model_states: components["schemas"]["replay-metadata--primary_mission_boundary_model_state.schema"][];
+            attached_unit_formation_jsons: components["schemas"]["replay-metadata--canonical_json_object_strings.schema"];
+            battle_shocked_unit_instance_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+            advanced_unit_state_jsons: components["schemas"]["replay-metadata--canonical_json_object_strings.schema"];
+            fell_back_unit_state_jsons: components["schemas"]["replay-metadata--canonical_json_object_strings.schema"];
+            shot_unit_instance_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+            objective_control_modifier_sources: components["schemas"]["replay-metadata--primary_mission_objective_control_modifier_source.schema"][];
+            active_primary_marker_jsons: components["schemas"]["replay-metadata--canonical_json_object_strings.schema"];
+            active_secondary_mission_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+            mission_action_prior_use_jsons: components["schemas"]["replay-metadata--canonical_json_object_strings.schema"];
+            checkpoint_id: string; checkpoint_hash: string;
+        };
+        "replay-metadata--json_value.schema": null | boolean | number | string | components["schemas"]["replay-metadata--json_value.schema"][] | {
+            [key: string]: components["schemas"]["replay-metadata--json_value.schema"];
+        };
+        "replay-metadata--sticky_objective_control_state.schema": {
+            state_id: string; game_id: string; player_id: string; objective_id: string; source_rule_id: string;
+            source_event_id: string; battle_round: number; phase: string; active_player_id: string;
+            originating_unit_instance_id: string; destroyed_unit_instance_id: string;
+            replay_payload: components["schemas"]["replay-metadata--json_value.schema"];
+        };
+        "replay-metadata--objective_control_record_authority.schema": {
+            /** @constant */
+            schema_version: "objective-control-record-authority-v1"; objective_control_record_id: string;
+            objective_control_record_hash: string;
+            boundary_checkpoint: components["schemas"]["replay-metadata--primary_mission_boundary_checkpoint.schema"];
+            retained_sticky_objective_control_states: components["schemas"]["replay-metadata--sticky_objective_control_state.schema"][];
+            authority_id: string; authority_hash: string;
+        };
         "replay-metadata--primary_battlefield_departure_state.schema": {
             active_player_id: string;
             affected_component_unit_instance_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
@@ -1008,6 +1061,68 @@ export interface components {
             removal_kind: "destroyed" | "embark" | "into_reserves" | "temporarily_removed";
             removed_model_instance_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
             rules_unit_instance_id: string; source_id: string;
+        };
+        "replay-metadata--primary_scoring_rules_unit_position_witness.schema": {
+            owner_player_id: string;
+            rules_unit_membership: components["schemas"]["game-view--primary_rules_unit_turn_start_membership.schema"];
+        };
+        "replay-metadata--primary_table_quarter_unit_witness.schema": {
+            rules_unit_instance_id: string;
+            /** @enum {string} */
+            quarter_id: "table-quarter:north-west" | "table-quarter:north-east" | "table-quarter:south-west" | "table-quarter:south-east";
+            model_instance_ids: string[];
+        };
+        "replay-metadata--primary_territory_unit_witness.schema": {
+            rules_unit_instance_id: string; model_instance_ids: string[];
+        };
+        "replay-metadata--primary_scoring_spatial_evidence.schema": {
+            game_id: string; battlefield_id: string; battle_round: number; active_player_id: string;
+            /** @enum {string} */
+            phase: "command" | "movement" | "shooting" | "charge" | "fight";
+            /** @enum {string} */
+            timing: "turn_start" | "phase_end" | "turn_end"; objective_control_record_id: string;
+            objective_control_record_hash: string; player_id: string;
+            requested_condition_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+            table_quarter_unit_witnesses: components["schemas"]["replay-metadata--primary_table_quarter_unit_witness.schema"][];
+            enemy_units_wholly_within_own_territory: components["schemas"]["replay-metadata--primary_territory_unit_witness.schema"][];
+            opponent_territory_objective_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
+        };
+        /** @description One content-addressed state snapshot required for every ordinary or end-of-battle boundary with an applicable assigned-Primary rule, including zero-award evaluations. */
+        "replay-metadata--primary_scoring_state_evidence.schema": {
+            /** @constant */
+            schema_version: "primary-scoring-state-evidence-v1"; game_id: string; battlefield_id: string;
+            battle_round: number; active_player_id: string;
+            /** @enum {string} */
+            phase: "command" | "movement" | "shooting" | "charge" | "fight";
+            /** @enum {string} */
+            timing: "turn_start" | "phase_end" | "turn_end";
+            /** @enum {string} */
+            scoring_boundary_kind: "ordinary" | "end_of_battle"; objective_control_record_id: string;
+            objective_control_record_hash: string; scoring_commit_checkpoint_id: string;
+            scoring_commit_checkpoint_hash: string;
+            primary_mission_progress_state: components["schemas"]["game-view--primary_mission_progress_state.schema"];
+            primary_mission_action_states: components["schemas"]["replay-metadata--mission_action_state.schema"][];
+            primary_battlefield_departure_states: components["schemas"]["replay-metadata--primary_battlefield_departure_state.schema"][];
+            primary_unit_destruction_state_ids: string[];
+            current_rules_unit_position_witnesses: components["schemas"]["replay-metadata--primary_scoring_rules_unit_position_witness.schema"][];
+            primary_scoring_spatial_evidence_by_player_id: components["schemas"]["replay-metadata--primary_scoring_spatial_evidence.schema"][];
+            evidence_id: string; evidence_hash: string;
+        };
+        /** @description Typed Objective Control capture to Primary scoring-commit lifecycle for one required boundary. */
+        "replay-metadata--primary_scoring_boundary_lifecycle.schema": {
+            /** @constant */
+            schema_version: "primary-scoring-boundary-lifecycle-v1"; objective_control_record_id: string;
+            objective_control_record_hash: string;
+            /** @enum {string} */
+            scoring_boundary_kind: "ordinary" | "end_of_battle";
+            /** @enum {string} */
+            status: "pending" | "resolved";
+            pending_window: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            pending_decision_request_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            scoring_commit_checkpoint_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            scoring_commit_checkpoint_hash: null | string;
+            evidence_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
+            primary_transaction_ids: string[]; lifecycle_id: string; lifecycle_hash: string;
         };
         "replay-metadata--destruction_provenance.schema": {
             attack_context_id: components["schemas"]["replay-metadata--nullable_identifier.schema"];
@@ -1048,12 +1163,15 @@ export interface components {
             started_turn_terrain_feature_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
             unattributed_cause: ("desperate_escape" | "emergency_disembark" | "unit_coherency" | "reserve_deadline") | null;
         };
-        /** @description The Contract 9 schema-owned Phase 17N Step 4 evidence and persistent mission-state slice. Other lifecycle state remains engine-private and is validated by the fail-closed replay loader. */
-        "replay-metadata--step4_replay_state.schema": {
+        /** @description The Contract 10 schema-owned Objective Control authority, Phase 17N Step 5A evidence, and persistent mission-state slice. Other lifecycle state remains engine-private and is validated by the fail-closed replay loader. */
+        "replay-metadata--step5a_replay_state.schema": {
             mission_action_states: components["schemas"]["replay-metadata--mission_action_state.schema"][];
+            objective_control_record_authorities: components["schemas"]["replay-metadata--objective_control_record_authority.schema"][];
             primary_battlefield_departure_states: components["schemas"]["replay-metadata--primary_battlefield_departure_state.schema"][];
             primary_rules_unit_turn_start_snapshots: components["schemas"]["game-view--primary_rules_unit_turn_start_snapshot.schema"][];
             primary_mission_progress_state: components["schemas"]["game-view--primary_mission_progress_state.schema"];
+            primary_scoring_state_evidence_records: components["schemas"]["replay-metadata--primary_scoring_state_evidence.schema"][];
+            primary_scoring_boundary_lifecycles: components["schemas"]["replay-metadata--primary_scoring_boundary_lifecycle.schema"][];
             primary_unit_destruction_states: components["schemas"]["replay-metadata--primary_unit_destruction_state.schema"][];
         } & {
             [key: string]: unknown;
@@ -1076,14 +1194,14 @@ export interface components {
             artifact_id: string; decision_records: Record<string, never>[]; event_records: Record<string, never>[];
             initial_lifecycle: {
                 config: components["schemas"]["config"];
-                state: components["schemas"]["replay-metadata--step4_replay_state.schema"];
+                state: components["schemas"]["replay-metadata--step5a_replay_state.schema"];
             } & {
                 [key: string]: unknown;
             };
             initial_rng_state: Record<string, never>;
             projection_checkpoints: components["schemas"]["replay-metadata--projection_checkpoint.schema"][];
             /** @constant */
-            schema_version: "replay-artifact-v7-phase17n-step4";
+            schema_version: "replay-artifact-v8-phase17n-step5a";
             source_identity: components["schemas"]["replay-metadata--source_identity.schema"];
         };
         /** CORE V2 FiniteOptionSubmissionPayload */

@@ -418,6 +418,16 @@ class MissionActionState:
 
     @classmethod
     def from_payload(cls, payload: MissionActionStatePayload) -> Self:
+        eligible_unit_ids = payload["eligible_unit_instance_ids"]
+        interruption_conditions = payload["interruption_conditions"]
+        if type(eligible_unit_ids) is not list:
+            raise GameLifecycleError(
+                "MissionActionState eligible_unit_instance_ids payload must be a list."
+            )
+        if type(interruption_conditions) is not list:
+            raise GameLifecycleError(
+                "MissionActionState interruption_conditions payload must be a list."
+            )
         return cls(
             action_id=payload["action_id"],
             mission_action_id=payload["mission_action_id"],
@@ -430,8 +440,8 @@ class MissionActionState:
             phase_started=payload["phase_started"],
             start_timing=payload["start_timing"],
             completion_timing=payload["completion_timing"],
-            eligible_unit_instance_ids=tuple(payload["eligible_unit_instance_ids"]),
-            interruption_conditions=tuple(payload["interruption_conditions"]),
+            eligible_unit_instance_ids=tuple(eligible_unit_ids),
+            interruption_conditions=tuple(interruption_conditions),
             scoring_source_id=payload["scoring_source_id"],
             victory_points=payload["victory_points"],
             status=mission_action_status_from_token(payload["status"]),
@@ -450,6 +460,10 @@ class MissionActionState:
         if self.status is MissionActionStatus.COMPLETED:
             if self.completed_battle_round is None or self.completed_phase is None:
                 raise GameLifecycleError("Completed mission Action requires completion fields.")
+            if self.completed_battle_round < self.battle_round_started:
+                raise GameLifecycleError(
+                    "Completed mission Action cannot predate its start battle round."
+                )
             if self.score_transaction_id is None and self.victory_points != 0:
                 raise GameLifecycleError("Completed scoring mission Action requires transaction.")
             if self.score_transaction_id is not None and self.victory_points == 0:

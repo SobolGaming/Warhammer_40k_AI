@@ -131,6 +131,18 @@ class EventLog:
             event_log._records.append(record)
         return event_log
 
+    def replace_records(self, records: tuple[EventRecord, ...]) -> None:
+        """Restore an exact sequential event suffix after a transactional rollback."""
+        if type(records) is not tuple or any(type(record) is not EventRecord for record in records):
+            raise EventLogError("EventLog replace_records requires typed EventRecord values.")
+        rebuilt: list[EventRecord] = []
+        for expected_index, record in enumerate(records, start=1):
+            expected_event_id = f"event-{expected_index:06d}"
+            if record.event_id != expected_event_id:
+                raise EventLogError("EventLog replacement contains non-sequential event IDs.")
+            rebuilt.append(record)
+        self._records = rebuilt
+
 
 def canonical_json(value: object) -> str:
     return json.dumps(

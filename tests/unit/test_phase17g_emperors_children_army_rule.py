@@ -17,6 +17,7 @@ from tests.phase11c_command_phase_helpers import (
     default_unit_selection,
     unit_by_id,
 )
+from tests.phase15c_fight_order_helpers import fight_lifecycle
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import DatasheetDefinition, DatasheetKeywordSet
@@ -31,7 +32,6 @@ from warhammer40k_core.engine.advance_eligibility_hooks import (
     AdvanceEligibilityHookRegistry,
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest
-from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
     DecisionRequest,
@@ -238,10 +238,21 @@ def test_thrill_seekers_advance_eligibility_is_consumed_by_movement_lifecycle() 
 
 
 def test_thrill_seekers_shooting_restriction_is_consumed_by_declaration_path() -> None:
-    lifecycle, _movement_request = _emperors_children_lifecycle_to_movement_unit_selection(
+    config = _emperors_children_config(enemy_unit_ids=("restricted-target", "legal-target"))
+    lifecycle, _units = fight_lifecycle(
+        alpha_unit_ids=("noise-marine",),
         enemy_unit_ids=("restricted-target", "legal-target"),
-        pose_factory=_turn_start_engagement_deployment_pose,
+        origins={
+            "noise-marine": Pose.at(10.0, 20.0),
+            "restricted-target": Pose.at(10.0, 22.15, facing_degrees=180.0),
+            "legal-target": Pose.at(28.0, 20.0, facing_degrees=180.0),
+        },
+        game_id=config.game_id,
+        config=config,
+        battle_phase=BattlePhase.MOVEMENT,
     )
+    movement_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    assert movement_request.decision_type == SELECT_MOVEMENT_UNIT_DECISION_TYPE
     state = _state(lifecycle)
     _reseed_turn_start_engagement_snapshot_from_current_positions(state)
 
@@ -252,26 +263,59 @@ def test_thrill_seekers_shooting_restriction_is_consumed_by_declaration_path() -
         friendly_unit_instance_id=EMPERORS_CHILDREN_LIFECYCLE_UNIT_ID,
     ) == (EMPERORS_CHILDREN_RESTRICTED_TARGET_ID,)
 
-    _replace_unit_poses(
-        state,
-        unit_instance_id=EMPERORS_CHILDREN_LIFECYCLE_UNIT_ID,
-        poses=_compact_poses(origin=Pose.at(19.0, 20.0), model_count=5),
-    )
-    state.record_fell_back_unit_state(
-        FellBackUnitState(
-            player_id="player-a",
-            battle_round=state.battle_round,
-            unit_instance_id=EMPERORS_CHILDREN_LIFECYCLE_UNIT_ID,
-            can_shoot=True,
-            can_declare_charge=True,
+    action_request = _decision_request(
+        _submit_result(
+            lifecycle,
+            request=movement_request,
+            option_id=EMPERORS_CHILDREN_LIFECYCLE_UNIT_ID,
+            result_id="phase17g-ec-select-fall-back-unit",
         )
     )
-    state.advance_to_next_battle_phase()
-    lifecycle_payload = lifecycle.to_payload()
-    lifecycle_payload["decisions"]["queue"] = DecisionController().to_payload()["queue"]
-    lifecycle = GameLifecycle.from_payload(lifecycle_payload)
+    ordered_retreat_option_id = (
+        f"{MovementPhaseActionKind.FALL_BACK.value}:{FallBackModeKind.ORDERED_RETREAT.value}"
+    )
+    assert ordered_retreat_option_id in {option.option_id for option in action_request.options}
+    movement_proposal_request = _decision_request_of_type(
+        lifecycle,
+        status=_submit_result(
+            lifecycle,
+            request=action_request,
+            option_id=ordered_retreat_option_id,
+            result_id="phase17g-ec-select-fall-back-action",
+        ),
+        decision_type=MOVEMENT_PROPOSAL_DECISION_TYPE,
+        result_id_prefix="phase17g-ec-pre-fall-back",
+    )
+    submit_movement_proposal(
+        lifecycle,
+        request=movement_proposal_request,
+        result_id="phase17g-ec-submit-fall-back",
+        unit_instance_id=EMPERORS_CHILDREN_LIFECYCLE_UNIT_ID,
+        movement_phase_action=MovementPhaseActionKind.FALL_BACK,
+        movement_mode=MovementMode.FALL_BACK,
+        fall_back_mode=FallBackModeKind.ORDERED_RETREAT,
+        witness=straight_line_witness_for_unit(
+            lifecycle,
+            unit_instance_id=EMPERORS_CHILDREN_LIFECYCLE_UNIT_ID,
+            dy=-6.0,
+        ),
+    )
+    fell_back = state.fell_back_unit_state_for_unit(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=EMPERORS_CHILDREN_LIFECYCLE_UNIT_ID,
+    )
+    assert fell_back is not None
+    assert fell_back.can_shoot is True
 
-    shooting_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    lifecycle = GameLifecycle.from_payload(lifecycle.to_payload())
+
+    shooting_request = _decision_request_of_type(
+        lifecycle,
+        status=lifecycle.advance_until_decision_or_terminal(),
+        decision_type=SELECT_SHOOTING_UNIT_DECISION_TYPE,
+        result_id_prefix="phase17g-ec-after-fall-back",
+    )
     assert shooting_request.decision_type == SELECT_SHOOTING_UNIT_DECISION_TYPE
     assert EMPERORS_CHILDREN_LIFECYCLE_UNIT_ID in {
         option.option_id for option in shooting_request.options
@@ -559,7 +603,12 @@ def test_thrill_seekers_blocks_target_attacked_by_another_unit_this_phase() -> N
         acting_attacker,
         unit_instance_id="army-alpha:noise-marine-unit-2",
     )
-    _append_unit_to_player_army(state, player_id="player-a", unit=other_attacker)
+    _append_unit_to_player_army(
+        state,
+        player_id="player-a",
+        unit=other_attacker,
+        source_unit_instance_id=acting_attacker.unit_instance_id,
+    )
     defender = unit_by_id(state, ENEMY_UNIT_ID)
     state.record_advanced_unit_state(
         _advanced_unit_state(state=state, unit_instance_id=EMPERORS_CHILDREN_UNIT_ID)
@@ -1045,27 +1094,6 @@ def _shooting_and_charge_reachable_deployment_pose(
     raise AssertionError(f"Unexpected unit {unit_instance_id}.")
 
 
-def _turn_start_engagement_deployment_pose(
-    index: int,
-    _player_id: str,
-    model_instance_id: str,
-) -> Pose:
-    unit_instance_id = _unit_instance_id_from_model_instance_id(model_instance_id)
-    if unit_instance_id == EMPERORS_CHILDREN_LIFECYCLE_UNIT_ID:
-        return _compact_poses(origin=Pose.at(10.0, 20.0), model_count=5)[index]
-    if unit_instance_id == EMPERORS_CHILDREN_RESTRICTED_TARGET_ID:
-        return _compact_poses(
-            origin=Pose.at(10.0, 20.0, facing_degrees=180.0),
-            model_count=5,
-        )[index]
-    if unit_instance_id == EMPERORS_CHILDREN_LEGAL_TARGET_ID:
-        return _compact_poses(
-            origin=Pose.at(28.0, 20.0, facing_degrees=180.0),
-            model_count=5,
-        )[index]
-    raise AssertionError(f"Unexpected unit {unit_instance_id}.")
-
-
 def _defiler_turn_start_engagement_deployment_pose(
     index: int,
     _player_id: str,
@@ -1127,25 +1155,6 @@ def _unit_instance_id_from_model_instance_id(model_instance_id: str) -> str:
     if model_instance_id.startswith(f"{EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID}:"):
         return EMPERORS_CHILDREN_DEFILER_LIFECYCLE_UNIT_ID
     return model_instance_id.rsplit(":", 2)[0]
-
-
-def _replace_unit_poses(
-    state: GameState,
-    *,
-    unit_instance_id: str,
-    poses: tuple[Pose, ...],
-) -> None:
-    battlefield_state = state.battlefield_state
-    assert battlefield_state is not None
-    placement = battlefield_state.unit_placement_by_id(unit_instance_id)
-    assert len(poses) == len(placement.model_placements)
-    updated_placement = placement.with_model_placements(
-        tuple(
-            model_placement.with_pose(pose)
-            for model_placement, pose in zip(placement.model_placements, poses, strict=True)
-        )
-    )
-    state.replace_battlefield_state(battlefield_state.with_unit_placement(updated_placement))
 
 
 def _apply_fixture_poses_from_factory(
@@ -1256,11 +1265,46 @@ def _copy_unit_for_test(unit: UnitInstance, *, unit_instance_id: str) -> UnitIns
     )
 
 
-def _append_unit_to_player_army(state: GameState, *, player_id: str, unit: UnitInstance) -> None:
+def _append_unit_to_player_army(
+    state: GameState,
+    *,
+    player_id: str,
+    unit: UnitInstance,
+    source_unit_instance_id: str,
+) -> None:
     state.army_definitions = [
         replace(army, units=(*army.units, unit)) if army.player_id == player_id else army
         for army in state.army_definitions
     ]
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("copied-unit fixture requires battlefield state")
+    source_placement = battlefield.unit_placement_by_id(source_unit_instance_id)
+    if len(source_placement.model_placements) != len(unit.own_models):
+        raise AssertionError("copied-unit fixture requires matching model counts")
+    copied_placement = replace(
+        source_placement,
+        unit_instance_id=unit.unit_instance_id,
+        model_placements=tuple(
+            replace(
+                model_placement,
+                unit_instance_id=unit.unit_instance_id,
+                model_instance_id=model.model_instance_id,
+                pose=Pose.at(
+                    model_placement.pose.position.x - 10.0,
+                    model_placement.pose.position.y,
+                    model_placement.pose.position.z,
+                    facing_degrees=model_placement.pose.facing.degrees,
+                ),
+            )
+            for model_placement, model in zip(
+                source_placement.model_placements,
+                unit.own_models,
+                strict=True,
+            )
+        ),
+    )
+    state.replace_battlefield_state(battlefield.with_added_unit_placement(copied_placement))
 
 
 def _advanced_unit_state(*, state: GameState, unit_instance_id: str) -> AdvancedUnitState:

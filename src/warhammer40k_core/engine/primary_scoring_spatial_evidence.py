@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol, TypedDict, cast
 
@@ -16,6 +17,7 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
     ObjectiveControlTiming,
+    objective_control_timing_from_token,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_from_armies
@@ -131,6 +133,27 @@ class PrimaryTableQuarterUnitWitness:
             "model_instance_ids": list(self.model_instance_ids),
         }
 
+    @classmethod
+    def from_payload(cls, payload: object) -> PrimaryTableQuarterUnitWitness:
+        raw = _required_payload_mapping(
+            payload,
+            field_name="PrimaryTableQuarterUnitWitness payload",
+            required_keys=("rules_unit_instance_id", "quarter_id", "model_instance_ids"),
+        )
+        return cls(
+            rules_unit_instance_id=cast(str, raw["rules_unit_instance_id"]),
+            quarter_id=cast(str, raw["quarter_id"]),
+            model_instance_ids=tuple(
+                cast(
+                    list[str],
+                    _required_payload_list(
+                        raw["model_instance_ids"],
+                        field_name="PrimaryTableQuarterUnitWitness model_instance_ids",
+                    ),
+                )
+            ),
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class PrimaryTerritoryUnitWitness:
@@ -161,6 +184,26 @@ class PrimaryTerritoryUnitWitness:
             "rules_unit_instance_id": self.rules_unit_instance_id,
             "model_instance_ids": list(self.model_instance_ids),
         }
+
+    @classmethod
+    def from_payload(cls, payload: object) -> PrimaryTerritoryUnitWitness:
+        raw = _required_payload_mapping(
+            payload,
+            field_name="PrimaryTerritoryUnitWitness payload",
+            required_keys=("rules_unit_instance_id", "model_instance_ids"),
+        )
+        return cls(
+            rules_unit_instance_id=cast(str, raw["rules_unit_instance_id"]),
+            model_instance_ids=tuple(
+                cast(
+                    list[str],
+                    _required_payload_list(
+                        raw["model_instance_ids"],
+                        field_name="PrimaryTerritoryUnitWitness model_instance_ids",
+                    ),
+                )
+            ),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -278,6 +321,57 @@ class PrimaryScoringSpatialEvidence:
             "opponent_territory_objective_ids": list(self.opponent_territory_objective_ids),
         }
 
+    @classmethod
+    def from_payload(cls, payload: object) -> PrimaryScoringSpatialEvidence:
+        raw = _required_payload_mapping(
+            payload,
+            field_name="PrimaryScoringSpatialEvidence payload",
+            required_keys=tuple(PrimaryScoringSpatialEvidencePayload.__annotations__),
+        )
+        return cls(
+            game_id=cast(str, raw["game_id"]),
+            battlefield_id=cast(str, raw["battlefield_id"]),
+            battle_round=cast(int, raw["battle_round"]),
+            active_player_id=cast(str, raw["active_player_id"]),
+            phase=cast(str, raw["phase"]),
+            timing=objective_control_timing_from_token(raw["timing"]),
+            objective_control_record_id=cast(str, raw["objective_control_record_id"]),
+            objective_control_record_hash=cast(str, raw["objective_control_record_hash"]),
+            player_id=cast(str, raw["player_id"]),
+            requested_condition_ids=tuple(
+                cast(
+                    list[str],
+                    _required_payload_list(
+                        raw["requested_condition_ids"],
+                        field_name="PrimaryScoringSpatialEvidence requested_condition_ids",
+                    ),
+                )
+            ),
+            table_quarter_unit_witnesses=tuple(
+                PrimaryTableQuarterUnitWitness.from_payload(value)
+                for value in _required_payload_list(
+                    raw["table_quarter_unit_witnesses"],
+                    field_name="PrimaryScoringSpatialEvidence table-quarter witnesses",
+                )
+            ),
+            enemy_units_wholly_within_own_territory=tuple(
+                PrimaryTerritoryUnitWitness.from_payload(value)
+                for value in _required_payload_list(
+                    raw["enemy_units_wholly_within_own_territory"],
+                    field_name="PrimaryScoringSpatialEvidence territory witnesses",
+                )
+            ),
+            opponent_territory_objective_ids=tuple(
+                cast(
+                    list[str],
+                    _required_payload_list(
+                        raw["opponent_territory_objective_ids"],
+                        field_name=("PrimaryScoringSpatialEvidence opponent territory objectives"),
+                    ),
+                )
+            ),
+        )
+
 
 def build_primary_scoring_spatial_evidence(
     *,
@@ -285,6 +379,7 @@ def build_primary_scoring_spatial_evidence(
     player_id: str,
     record: ObjectiveControlRecord,
     requested_condition_ids: tuple[str, ...],
+    model_placements: tuple[ModelPlacement, ...] | None = None,
 ) -> PrimaryScoringSpatialEvidence:
     """Derive exact, deterministic spatial witnesses for generic Primary conditions."""
     from warhammer40k_core.engine.game_state import GameState
@@ -313,6 +408,7 @@ def build_primary_scoring_spatial_evidence(
         state=state,
         battlefield_state=battlefield_state,
         record=record,
+        require_current_battle_context=model_placements is None,
     )
     needs_quarters = bool(
         PRIMARY_SCORING_TABLE_QUARTER_CONDITIONS.intersection(requested_conditions)
@@ -345,7 +441,10 @@ def build_primary_scoring_spatial_evidence(
         if needs_opponent_objectives
         else None
     )
-    unavailable_model_ids = set(state.unavailable_model_ids())
+    placement_by_model_id = None if model_placements is None else _placement_map(model_placements)
+    unavailable_model_ids: set[str] = (
+        set() if placement_by_model_id is not None else set(state.unavailable_model_ids())
+    )
     views = (
         rules_unit_views_from_armies(armies=tuple(state.army_definitions))
         if needs_quarters or needs_enemy_territory
@@ -363,6 +462,7 @@ def build_primary_scoring_spatial_evidence(
                 view=view,
                 battlefield_state=battlefield_state,
                 unavailable_model_ids=unavailable_model_ids,
+                placement_by_model_id=placement_by_model_id,
             )
         )
         is not None
@@ -439,7 +539,28 @@ def _placed_alive_rules_unit_or_none(
     view: RulesUnitView,
     battlefield_state: BattlefieldRuntimeState,
     unavailable_model_ids: set[str],
+    placement_by_model_id: dict[str, ModelPlacement] | None = None,
 ) -> tuple[RulesUnitView, tuple[ModelPlacement, ...]] | None:
+    model_by_id = {model.model_instance_id: model for model in view.own_models}
+    if placement_by_model_id is not None:
+        placements = tuple(
+            sorted(
+                (
+                    placement_by_model_id[model_id]
+                    for model_id in model_by_id
+                    if model_id in placement_by_model_id
+                ),
+                key=lambda placement: placement.model_instance_id,
+            )
+        )
+        if not placements:
+            return None
+        _validate_spatial_placements(
+            view=view,
+            placements=placements,
+            model_by_id=model_by_id,
+        )
+        return view, placements
     removed_model_ids = set(battlefield_state.removed_model_ids)
     alive_models = tuple(
         sorted(
@@ -473,7 +594,25 @@ def _placed_alive_rules_unit_or_none(
         raise GameLifecycleError(
             "Primary spatial scoring requires every alive model in a rules unit to be placed."
         )
+    _validate_spatial_placements(
+        view=view,
+        placements=placements,
+        model_by_id=model_by_id,
+    )
+    return view, tuple(sorted(placements, key=lambda placement: placement.model_instance_id))
+
+
+def _validate_spatial_placements(
+    *,
+    view: RulesUnitView,
+    placements: tuple[ModelPlacement, ...],
+    model_by_id: Mapping[str, object],
+) -> None:
     for placement in placements:
+        if placement.model_instance_id not in model_by_id:
+            raise GameLifecycleError(
+                "Primary spatial scoring model placement is missing from its rules unit."
+            )
         if placement.player_id != view.owner_player_id:
             raise GameLifecycleError("Primary spatial scoring model placement owner drift.")
         if (
@@ -481,7 +620,19 @@ def _placed_alive_rules_unit_or_none(
             != view.component_unit_for_model(placement.model_instance_id).unit_instance_id
         ):
             raise GameLifecycleError("Primary spatial scoring component placement drift.")
-    return view, tuple(sorted(placements, key=lambda placement: placement.model_instance_id))
+
+
+def _placement_map(model_placements: tuple[ModelPlacement, ...]) -> dict[str, ModelPlacement]:
+    if type(model_placements) is not tuple or any(
+        type(placement) is not ModelPlacement for placement in model_placements
+    ):
+        raise GameLifecycleError("Primary spatial scoring model placements must be typed.")
+    placement_by_model_id: dict[str, ModelPlacement] = {}
+    for placement in model_placements:
+        if placement.model_instance_id in placement_by_model_id:
+            raise GameLifecycleError("Primary spatial scoring model placements are duplicated.")
+        placement_by_model_id[placement.model_instance_id] = placement
+    return placement_by_model_id
 
 
 def _table_quarter_witness_or_none(
@@ -492,7 +643,7 @@ def _table_quarter_witness_or_none(
 ) -> PrimaryTableQuarterUnitWitness | None:
     center_x = battlefield_state.battlefield_width_inches / 2.0
     center_y = battlefield_state.battlefield_depth_inches / 2.0
-    model_by_id = {model.model_instance_id: model for model in view.alive_models()}
+    model_by_id = {model.model_instance_id: model for model in view.own_models}
     geometry_models = tuple(
         geometry_model_for_placement(
             model=model_by_id[placement.model_instance_id],
@@ -547,7 +698,7 @@ def _placements_wholly_within_region(
     placements: tuple[ModelPlacement, ...],
     region_footprint: _Footprint,
 ) -> bool:
-    model_by_id = {model.model_instance_id: model for model in view.alive_models()}
+    model_by_id = {model.model_instance_id: model for model in view.own_models}
     return all(
         region_footprint.covers(
             shapely_backend.footprint_for_base(
@@ -609,18 +760,26 @@ def _validate_record_identity(
     state: GameState,
     battlefield_state: BattlefieldRuntimeState,
     record: ObjectiveControlRecord,
+    require_current_battle_context: bool = True,
 ) -> None:
-    current_phase = state.current_battle_phase
-    if current_phase is None or state.active_player_id is None:
-        raise GameLifecycleError(
-            "Primary spatial scoring evidence requires an active battle boundary."
-        )
-    if (
-        record.game_id != state.game_id
-        or record.battlefield_id != battlefield_state.battlefield_id
-        or record.battle_round != state.battle_round
-        or record.active_player_id != state.active_player_id
-        or record.phase != current_phase.value
+    if require_current_battle_context:
+        current_phase = state.current_battle_phase
+        if current_phase is None or state.active_player_id is None:
+            raise GameLifecycleError(
+                "Primary spatial scoring evidence requires an active battle boundary."
+            )
+        if (
+            record.game_id != state.game_id
+            or record.battlefield_id != battlefield_state.battlefield_id
+            or record.battle_round != state.battle_round
+            or record.active_player_id != state.active_player_id
+            or record.phase != current_phase.value
+        ):
+            raise GameLifecycleError(
+                "Primary spatial scoring ObjectiveControlRecord drifted from GameState."
+            )
+    elif (
+        record.game_id != state.game_id or record.battlefield_id != battlefield_state.battlefield_id
     ):
         raise GameLifecycleError(
             "Primary spatial scoring ObjectiveControlRecord drifted from GameState."
@@ -738,6 +897,29 @@ def _validate_sorted_identifier_tuple(
     return identifiers
 
 
+def _required_payload_mapping(
+    payload: object,
+    *,
+    field_name: str,
+    required_keys: tuple[str, ...],
+) -> dict[str, object]:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError(f"{field_name} must be an object.")
+    untyped_raw = cast(dict[object, object], payload)
+    if any(type(key) is not str for key in untyped_raw):
+        raise GameLifecycleError(f"{field_name} must be an object.")
+    raw = cast(dict[str, object], payload)
+    if set(raw) != set(required_keys):
+        raise GameLifecycleError(f"{field_name} fields are invalid.")
+    return raw
+
+
+def _required_payload_list(value: object, *, field_name: str) -> list[object]:
+    if not isinstance(value, list):
+        raise GameLifecycleError(f"{field_name} must be a list.")
+    return cast(list[object], value)
+
+
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
 
@@ -753,6 +935,31 @@ def _objective_control_timing(value: object) -> ObjectiveControlTiming:
             "PrimaryScoringSpatialEvidence timing must be ObjectiveControlTiming."
         )
     return value
+
+
+def validate_primary_scoring_spatial_evidence_rows(
+    values: object,
+) -> tuple[PrimaryScoringSpatialEvidence, ...]:
+    if type(values) is not tuple:
+        raise GameLifecycleError("PrimaryScoringStateEvidence spatial evidence must be a tuple.")
+    raw_values = cast(tuple[object, ...], values)
+    rows: list[PrimaryScoringSpatialEvidence] = []
+    seen_players: set[str] = set()
+    for value in raw_values:
+        if type(value) is not PrimaryScoringSpatialEvidence:
+            raise GameLifecycleError(
+                "PrimaryScoringStateEvidence spatial evidence must contain typed rows."
+            )
+        if value.player_id in seen_players:
+            raise GameLifecycleError(
+                "PrimaryScoringStateEvidence spatial evidence must not duplicate players."
+            )
+        seen_players.add(value.player_id)
+        rows.append(value)
+    expected = tuple(sorted(rows, key=lambda row: row.player_id))
+    if raw_values != expected:
+        raise GameLifecycleError("PrimaryScoringStateEvidence spatial evidence must be sorted.")
+    return expected
 
 
 __all__ = (
@@ -771,4 +978,5 @@ __all__ = (
     "PrimaryTerritoryUnitWitnessPayload",
     "build_primary_scoring_spatial_evidence",
     "objective_control_record_hash",
+    "validate_primary_scoring_spatial_evidence_rows",
 )

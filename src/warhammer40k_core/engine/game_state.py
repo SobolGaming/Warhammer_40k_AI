@@ -21,8 +21,11 @@ from warhammer40k_core.engine import (
     mission_scoring_evidence_validation as _scoring_evidence_validation,
 )
 from warhammer40k_core.engine import mission_terrain as _mission_terrain
+from warhammer40k_core.engine import objective_control_record_authority as _oc_authority
 from warhammer40k_core.engine import physical_proposal_context as _physical_context
+from warhammer40k_core.engine import primary_scoring_transaction_integrity as _primary_vp_integrity
 from warhammer40k_core.engine import reserve_arrival_requirements as _arrival
+from warhammer40k_core.engine import victory_point_award_service as _vp_awards
 from warhammer40k_core.engine.actions import MissionActionState
 from warhammer40k_core.engine.aircraft import HoverModeState
 from warhammer40k_core.engine.army_mustering import (
@@ -186,8 +189,17 @@ from warhammer40k_core.engine.primary_reserve_entry_provider import (
     primary_reserve_entry_requirements,
     validate_accepted_primary_reserve_entry_provider,
 )
-from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
-    build_primary_scoring_spatial_evidence,
+from warhammer40k_core.engine.primary_scoring_boundary import (
+    score_primary_objective_control_boundary,
+)
+from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+    PrimaryScoringBoundaryLifecycle,
+    validate_primary_scoring_boundary_lifecycles,
+)
+from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    PrimaryScoringStateEvidence,
+    validate_primary_scoring_state_evidence_records,
+    validate_primary_scoring_state_evidence_records_authority,
 )
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartSnapshot,
@@ -316,7 +328,6 @@ from warhammer40k_core.engine.victory_point_policy_validation import (
     validate_victory_point_ledger_policy_sources,
     validate_victory_point_ledgers,
 )
-from warhammer40k_core.geometry import shapely_backend
 
 
 class SecondaryMissionMode(StrEnum):
@@ -1138,6 +1149,15 @@ class GameState:
     objective_control_records: list[ObjectiveControlRecord] = field(
         default_factory=_new_objective_control_records
     )
+    objective_control_record_authorities: list[_oc_authority.ObjectiveControlRecordAuthority] = (
+        field(default_factory=lambda: list[_oc_authority.ObjectiveControlRecordAuthority]())
+    )
+    primary_scoring_state_evidence_records: list[PrimaryScoringStateEvidence] = field(
+        default_factory=lambda: list[PrimaryScoringStateEvidence]()
+    )
+    primary_scoring_boundary_lifecycles: list[PrimaryScoringBoundaryLifecycle] = field(
+        default_factory=lambda: list[PrimaryScoringBoundaryLifecycle]()
+    )
     sticky_objective_control_states: list[StickyObjectiveControlState] = field(
         default_factory=_new_sticky_objective_control_states
     )
@@ -1406,10 +1426,22 @@ class GameState:
             game_id=self.game_id,
             player_ids=self.player_ids,
         )
+        self.primary_scoring_state_evidence_records = (
+            validate_primary_scoring_state_evidence_records(
+                self.primary_scoring_state_evidence_records,
+                game_id=self.game_id,
+                mission_setup=self.mission_setup,
+                turn_order=self.turn_order,
+                objective_control_records=tuple(self.objective_control_records),
+            )
+        )
         validate_victory_point_ledger_policy_sources(
             self.victory_point_ledgers,
             mission_setup=self.mission_setup,
             objective_control_records=tuple(self.objective_control_records),
+            primary_scoring_state_evidence_records=tuple(
+                self.primary_scoring_state_evidence_records
+            ),
             turn_order=self.turn_order,
             current_battle_round=self.battle_round,
             policies=(
@@ -1422,6 +1454,13 @@ class GameState:
             self.sticky_objective_control_states,
             game_id=self.game_id,
             player_ids=self.player_ids,
+        )
+        self.objective_control_record_authorities = (
+            _oc_authority.validate_objective_control_record_authorities(
+                self.objective_control_record_authorities,
+                state=self,
+                records=tuple(self.objective_control_records),
+            )
         )
         self.primary_objective_turn_start_states = validate_primary_objective_turn_start_states(
             self.primary_objective_turn_start_states,
@@ -1455,6 +1494,12 @@ class GameState:
             self.primary_battlefield_departure_states,
         ) = validate_primary_historical_evidence_state(self)
         self.primary_mission_progress_state = validate_primary_mission_progress_state(self)
+        validate_primary_scoring_state_evidence_records_authority(
+            self.primary_scoring_state_evidence_records,
+            state=self,
+        )
+        validate_primary_scoring_boundary_lifecycles(state=self)
+        _primary_vp_integrity.validate_primary_transaction_semantics(state=self)
         self.secondary_unit_destruction_states = _validate_secondary_unit_destruction_states(
             self.secondary_unit_destruction_states,
             game_id=self.game_id,
@@ -1530,6 +1575,7 @@ class GameState:
             self.secondary_mission_card_states,
             player_ids=self.player_ids,
         )
+        _vp_awards.validate_secondary_transaction_semantics(state=self)
         self.tactical_secondary_achievement_contexts = (
             _validate_tactical_secondary_achievement_contexts(
                 self.tactical_secondary_achievement_contexts,
@@ -1900,6 +1946,7 @@ class GameState:
         self,
         *,
         runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+        event_log: EventLog | None = None,
     ) -> BattlePhase:
         if self.stage is not GameLifecycleStage.BATTLE:
             raise GameLifecycleError("GameState can advance battle phases only during battle.")
@@ -1919,7 +1966,7 @@ class GameState:
                 player_id=completed_player_id,
             )
         )
-        self._score_objective_control_boundary(phase_end_record)
+        self._score_objective_control_boundary(phase_end_record, event_log=event_log)
         if self.battle_phase_index + 1 < len(self.battle_phase_sequence):
             if completed_phase is BattlePhase.COMMAND:
                 self.command_step_state = None
@@ -1939,7 +1986,7 @@ class GameState:
             completed_phase=completed_phase,
             runtime_modifier_registry=runtime_modifier_registry,
         )
-        self._score_objective_control_boundary(turn_end_record)
+        self._score_objective_control_boundary(turn_end_record, event_log=event_log)
         if completed_phase is BattlePhase.COMMAND:
             self.command_step_state = None
         if completed_phase is BattlePhase.MOVEMENT:
@@ -1962,7 +2009,7 @@ class GameState:
         if battle_round_ended and self._game_ends_after_completed_round(completed_round):
             self._resolve_unarrived_reserve_destruction_boundary(end_of_battle=True)
             self._record_scoring_windows_boundary(ScoringWindowKind.END_OF_GAME)
-            self._score_end_of_battle_primary_boundary(turn_end_record)
+            self._score_end_of_battle_primary_boundary(turn_end_record, event_log=event_log)
             self.expire_persisting_effects_at_boundary(EffectExpirationBoundary.battle_end())
             self.stage = GameLifecycleStage.COMPLETE
             self.battle_phase_index = None
@@ -2612,43 +2659,34 @@ class GameState:
         return self.victory_point_ledger_for_player(player_id).victory_points
 
     def award_victory_points(self, award: VictoryPointAward) -> VictoryPointTransaction:
-        if type(award) is not VictoryPointAward:
-            raise GameLifecycleError("GameState award must be a VictoryPointAward.")
-        requested_player_id = _validate_player_id(award.player_id, player_ids=self.player_ids)
-        if award.source_kind is VictoryPointSourceKind.PRIMARY:
-            if self.mission_setup is None:
-                raise GameLifecycleError("Primary VP awards require a mission setup.")
-            if self.stage is not GameLifecycleStage.BATTLE:
-                raise GameLifecycleError("Primary VP awards may be recorded only during battle.")
-            if award.battle_round != self.battle_round:
-                raise GameLifecycleError("Primary VP award battle_round drift.")
-            if self.current_battle_phase is None or award.phase != self.current_battle_phase.value:
-                raise GameLifecycleError("Primary VP award phase drift.")
-            if self.active_player_id is None:
-                raise GameLifecycleError("Primary VP award requires an active player.")
-        ledger = self.victory_point_ledger_for_player(requested_player_id)
-        applied_amount = award.amount
-        transaction_metadata = award.metadata
-        if self.mission_setup is not None:
-            policy = mission_scoring_policies_from_setup(self.mission_setup)
-            applied_amount, transaction_metadata = policy.capped_award_for_ledger(
-                ledger=ledger,
-                award=award,
-                objective_control_records=tuple(self.objective_control_records),
-                turn_order=self.turn_order,
-                current_active_player_id=self.active_player_id,
-            )
-        updated, transaction = ledger.award(
-            award,
-            applied_amount=applied_amount,
-            metadata=transaction_metadata,
+        self.victory_point_ledgers, transaction = (
+            _vp_awards.resolve_victory_point_award_for_game_state(state=self, award=award)
         )
-        self.victory_point_ledgers = [
-            updated if stored.player_id == requested_player_id else stored
-            for stored in self.victory_point_ledgers
-        ]
-        self.victory_point_ledgers.sort(key=lambda stored: stored.player_id)
         return transaction
+
+    def replace_primary_scoring_boundary_lifecycles(
+        self, rows: list[PrimaryScoringBoundaryLifecycle]
+    ) -> None:
+        self.primary_scoring_boundary_lifecycles = list(rows)
+
+    def restore_mission_scoring_aggregate(self, snapshot: object) -> None:
+        from warhammer40k_core.engine import mission_scoring_transaction as scoring_tx
+
+        if type(snapshot) is not scoring_tx.MissionScoringAggregateSnapshot:
+            raise GameLifecycleError("Mission scoring restore requires a typed aggregate snapshot.")
+        self.objective_control_records = list(snapshot.objective_control_records)
+        self.objective_control_record_authorities = list(
+            snapshot.objective_control_record_authorities
+        )
+        self.sticky_objective_control_states = list(snapshot.sticky_objective_control_states)
+        self.primary_scoring_state_evidence_records = list(
+            snapshot.primary_scoring_state_evidence_records
+        )
+        self.victory_point_ledgers = list(snapshot.victory_point_ledgers)
+        self.secondary_mission_card_states = list(snapshot.secondary_mission_card_states)
+        self.primary_scoring_boundary_lifecycles = list(
+            snapshot.primary_scoring_boundary_lifecycles
+        )
 
     def record_mission_action_state(self, action_state: MissionActionState) -> None:
         if type(action_state) is not MissionActionState:
@@ -3629,6 +3667,9 @@ class GameState:
             self.victory_point_ledgers,
             mission_setup=validated_setup,
             objective_control_records=tuple(self.objective_control_records),
+            primary_scoring_state_evidence_records=tuple(
+                self.primary_scoring_state_evidence_records
+            ),
             turn_order=self.turn_order,
             current_battle_round=self.battle_round,
             policies=mission_scoring_policies_from_setup(validated_setup),
@@ -3846,7 +3887,7 @@ class GameState:
         if requested_mode is SecondaryMissionCardMode.FIXED:
             return card_state
         scored = card_state.score(transaction_id=transaction.transaction_id)
-        self._replace_secondary_mission_card_state(scored)
+        self.replace_secondary_mission_card_state(scored)
         return scored
 
     def score_secondary_mission_from_state(
@@ -3856,59 +3897,22 @@ class GameState:
         secondary_mission_id: str,
         mode: SecondaryMissionCardMode,
         phase: BattlePhase,
+        event_log: EventLog,
+        runtime_modifier_registry: RuntimeModifierRegistry | None = None,
     ) -> SecondaryMissionCardState:
-        if self.mission_setup is None:
-            raise GameLifecycleError("State-backed secondary scoring requires MissionSetup.")
-        if type(phase) is not BattlePhase:
-            raise GameLifecycleError("State-backed secondary scoring phase must be a BattlePhase.")
-        requested_mode = secondary_mission_card_mode_from_token(mode)
-        card_state = self.secondary_mission_card_state(
+        from warhammer40k_core.engine.mission_scoring_transaction import (
+            score_secondary_mission_from_state as _score_secondary_mission_from_state,
+        )
+
+        return _score_secondary_mission_from_state(
+            state=self,
+            event_log=event_log,
             player_id=player_id,
             secondary_mission_id=secondary_mission_id,
-            mode=requested_mode,
+            mode=mode,
+            phase=phase,
+            runtime_modifier_registry=runtime_modifier_registry,
         )
-        if card_state is None:
-            raise GameLifecycleError("Secondary mission card is not active.")
-        record = resolve_objective_control(
-            ObjectiveControlContext.from_game_state(
-                self,
-                timing=ObjectiveControlTiming.TURN_END,
-                phase=phase,
-                ruleset_descriptor=self.ruleset_descriptor_for_runtime_policy(),
-            )
-        )
-        self._record_objective_control_record_if_absent(record)
-        policy = mission_scoring_policies_from_setup(self.mission_setup)
-        source_kind = (
-            VictoryPointSourceKind.FIXED_SECONDARY
-            if requested_mode is SecondaryMissionCardMode.FIXED
-            else VictoryPointSourceKind.TACTICAL_SECONDARY
-        )
-        award = policy.secondary_award_from_mission_state(
-            player_id=card_state.player_id,
-            battle_round=self.battle_round,
-            phase=phase.value,
-            secondary_mission_id=card_state.secondary_mission_id,
-            source_kind=source_kind,
-            hidden=False,
-            record=record,
-            mission_setup=self.mission_setup,
-            unit_destruction_states=tuple(self.secondary_unit_destruction_states),
-            objective_cleanse_states=tuple(self.secondary_objective_cleanse_states),
-            terrain_plunder_states=tuple(self.secondary_terrain_plunder_states),
-            enemy_unit_ids_in_player_deployment_zone=(
-                self._enemy_unit_ids_in_player_deployment_zone(card_state.player_id)
-            ),
-            starting_strength_records=tuple(self.starting_strength_records),
-        )
-        if award is None:
-            raise GameLifecycleError("State-backed secondary mission requirements are not met.")
-        transaction = self.award_victory_points(award)
-        if requested_mode is SecondaryMissionCardMode.FIXED:
-            return card_state
-        scored = card_state.score(transaction_id=transaction.transaction_id)
-        self._replace_secondary_mission_card_state(scored)
-        return scored
 
     def record_tactical_secondary_achievement_context(
         self,
@@ -4040,7 +4044,7 @@ class GameState:
         if card_state is None:
             raise GameLifecycleError("Tactical secondary card is not active.")
         discarded = card_state.discard(result_id=result_id)
-        self._replace_secondary_mission_card_state(discarded)
+        self.replace_secondary_mission_card_state(discarded)
         return discarded
 
     def has_tactical_secondary_discard_cp_reward_window(self, window_id: str) -> bool:
@@ -4065,7 +4069,7 @@ class GameState:
         self.tactical_secondary_replacement_player_ids.append(requested_player_id)
         self.tactical_secondary_replacement_player_ids.sort()
 
-    def _replace_secondary_mission_card_state(
+    def replace_secondary_mission_card_state(
         self,
         card_state: SecondaryMissionCardState,
     ) -> None:
@@ -4097,7 +4101,12 @@ class GameState:
                 return
         raise GameLifecycleError("SecondaryMissionCardState does not exist.")
 
-    def record_objective_control_record(self, record: ObjectiveControlRecord) -> None:
+    def record_objective_control_record(
+        self,
+        record: ObjectiveControlRecord,
+        *,
+        runtime_modifier_registry: RuntimeModifierRegistry | None = None,
+    ) -> None:
         if type(record) is not ObjectiveControlRecord:
             raise GameLifecycleError(
                 "GameState objective_control_record must be an ObjectiveControlRecord."
@@ -4112,7 +4121,13 @@ class GameState:
             raise GameLifecycleError("ObjectiveControlRecord phase is not in this game.")
         if any(stored.record_id == record.record_id for stored in self.objective_control_records):
             raise GameLifecycleError("ObjectiveControlRecord already exists.")
+        authority = _oc_authority.capture_objective_control_record_authority(
+            state=self,
+            record=record,
+            runtime_modifier_registry=runtime_modifier_registry,
+        )
         self.objective_control_records.append(record)
+        self.objective_control_record_authorities.append(authority)
 
     def record_sticky_objective_control_state(
         self,
@@ -4861,6 +4876,15 @@ class GameState:
             "objective_control_records": [
                 record.to_payload() for record in self.objective_control_records
             ],
+            "objective_control_record_authorities": [
+                authority.to_payload() for authority in self.objective_control_record_authorities
+            ],
+            "primary_scoring_state_evidence_records": [
+                evidence.to_payload() for evidence in self.primary_scoring_state_evidence_records
+            ],
+            "primary_scoring_boundary_lifecycles": [
+                row.to_payload() for row in self.primary_scoring_boundary_lifecycles
+            ],
             "sticky_objective_control_states": [
                 state.to_payload() for state in self.sticky_objective_control_states
             ],
@@ -4948,6 +4972,9 @@ class GameState:
             )
 
         payload = cast(dict[str, JsonValue], self.to_payload())
+        payload["objective_control_record_authorities"] = []
+        payload["primary_scoring_state_evidence_records"] = []
+        payload["primary_scoring_boundary_lifecycles"] = []
         payload["secondary_mission_choices"] = cast(JsonValue, public_choices)
         payload["victory_point_ledgers"] = [
             ledger.to_public_payload(
@@ -5204,6 +5231,18 @@ class GameState:
             objective_control_records=[
                 ObjectiveControlRecord.from_payload(record)
                 for record in payload["objective_control_records"]
+            ],
+            objective_control_record_authorities=[
+                _oc_authority.ObjectiveControlRecordAuthority.from_payload(authority)
+                for authority in payload["objective_control_record_authorities"]
+            ],
+            primary_scoring_state_evidence_records=[
+                PrimaryScoringStateEvidence.from_payload(evidence)
+                for evidence in payload["primary_scoring_state_evidence_records"]
+            ],
+            primary_scoring_boundary_lifecycles=[
+                PrimaryScoringBoundaryLifecycle.from_payload(row)
+                for row in payload["primary_scoring_boundary_lifecycles"]
             ],
             sticky_objective_control_states=[
                 StickyObjectiveControlState.from_payload(state)
@@ -5465,111 +5504,41 @@ class GameState:
             runtime_modifier_registry=runtime_modifier_registry,
         )
 
-    def _score_objective_control_boundary(self, record: ObjectiveControlRecord) -> None:
-        if self.mission_setup is None:
-            raise GameLifecycleError("Mission scoring requires MissionSetup.")
-        policy = mission_scoring_policies_from_setup(self.mission_setup)
-        scoring_player_id = record.active_player_id
-        required_spatial_conditions = policy.policy_for_player(
-            scoring_player_id
-        ).required_primary_spatial_conditions(record=record)
-        spatial_evidence = (
-            (
-                build_primary_scoring_spatial_evidence(
-                    state=self,
-                    player_id=scoring_player_id,
-                    record=record,
-                    requested_condition_ids=required_spatial_conditions,
-                ),
-            )
-            if required_spatial_conditions
-            else ()
-        )
-        for award in policy.primary_awards_from_objective_control(
+    def _score_objective_control_boundary(
+        self,
+        record: ObjectiveControlRecord,
+        *,
+        event_log: EventLog | None = None,
+    ) -> None:
+        score_primary_objective_control_boundary(
+            state=self,
             record=record,
-            mission_setup=self.mission_setup,
-            turn_order=self.turn_order,
-            turn_start_states=tuple(self.primary_objective_turn_start_states),
-            terrain_trap_states=tuple(self.primary_terrain_trap_states),
-            unit_destruction_states=tuple(self.primary_unit_destruction_states),
-            spatial_evidence_by_player_id=spatial_evidence,
-        ):
-            self.award_victory_points(award)
+            end_of_battle=False,
+            event_log=event_log,
+        )
 
-    def _score_end_of_battle_primary_boundary(self, record: ObjectiveControlRecord) -> None:
-        if self.mission_setup is None:
-            raise GameLifecycleError("Mission scoring requires MissionSetup.")
-        policy = mission_scoring_policies_from_setup(self.mission_setup)
-        scoring_player_ids = tuple(self.player_ids)
-        spatial_evidence = tuple(
-            build_primary_scoring_spatial_evidence(
-                state=self,
-                player_id=player_id,
-                record=record,
-                requested_condition_ids=required_conditions,
-            )
-            for player_id in scoring_player_ids
-            for required_conditions in (
-                policy.policy_for_player(player_id).required_primary_spatial_conditions(
-                    record=record,
-                    end_of_battle=True,
-                ),
-            )
-            if required_conditions
-        )
-        for award in policy.primary_awards_from_objective_control(
+    def _score_end_of_battle_primary_boundary(
+        self,
+        record: ObjectiveControlRecord,
+        *,
+        event_log: EventLog | None = None,
+    ) -> None:
+        score_primary_objective_control_boundary(
+            state=self,
             record=record,
-            mission_setup=self.mission_setup,
-            turn_order=self.turn_order,
-            turn_start_states=tuple(self.primary_objective_turn_start_states),
-            terrain_trap_states=tuple(self.primary_terrain_trap_states),
-            unit_destruction_states=tuple(self.primary_unit_destruction_states),
-            spatial_evidence_by_player_id=spatial_evidence,
-            scoring_player_ids=scoring_player_ids,
             end_of_battle=True,
-        ):
-            self.award_victory_points(award)
+            event_log=event_log,
+        )
 
-    def _enemy_unit_ids_in_player_deployment_zone(self, player_id: str) -> tuple[str, ...]:
-        if self.mission_setup is None:
-            raise GameLifecycleError("Deployment-zone secondary scoring requires MissionSetup.")
-        if self.battlefield_state is None:
-            raise GameLifecycleError(
-                "Deployment-zone secondary scoring requires battlefield_state."
-            )
-        requested_player = _validate_player_id(player_id, player_ids=self.player_ids)
-        zones = tuple(
-            zone
-            for zone in self.mission_setup.deployment_zones
-            if zone.player_id == requested_player
+    def enemy_unit_ids_in_player_deployment_zone(self, player_id: str) -> tuple[str, ...]:
+        from warhammer40k_core.engine.secondary_deployment_zone_evidence import (
+            enemy_unit_ids_in_player_deployment_zone_from_battlefield,
         )
-        if not zones:
-            raise GameLifecycleError("Deployment-zone secondary scoring requires player zone.")
-        scenario = BattlefieldScenario(
-            armies=tuple(self.army_definitions),
-            battlefield_state=self.battlefield_state,
+
+        return enemy_unit_ids_in_player_deployment_zone_from_battlefield(
+            state=self,
+            player_id=player_id,
         )
-        enemy_unit_ids: set[str] = set()
-        for placed_army in self.battlefield_state.placed_armies:
-            if placed_army.player_id == requested_player:
-                continue
-            for unit_placement in placed_army.unit_placements:
-                for model_placement in unit_placement.model_placements:
-                    model = geometry_model_for_placement(
-                        model=scenario.model_instance_for_placement(model_placement),
-                        placement=model_placement,
-                    )
-                    if any(
-                        shapely_backend.base_footprint_intersects_deployment_zone(
-                            model.base,
-                            model.pose,
-                            zone,
-                        )
-                        for zone in zones
-                    ):
-                        enemy_unit_ids.add(unit_placement.unit_instance_id)
-                        break
-        return tuple(sorted(enemy_unit_ids))
 
     def _resolve_end_turn_cleanup_boundary(self, *, completed_phase: BattlePhase) -> None:
         if self.battlefield_state is None:

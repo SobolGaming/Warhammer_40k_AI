@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Warhammer 40,000 CORE V2 Adapter Contract",
-    "version": "9.0.0",
-    "description": "Directed player Primary Mission assignments for Force Disposition match-ups, Phase 17O viewer-scoped capability manifests, and the authenticated Phase 18G/18H session protocol with Phase 18I typed interactions and the Phase 18J battlefield coordinate/geometry contract, explicit logical terrain-area identity, Phase 17N viewer-scoped group-aware turn-start terrain/objective evidence and terrain classifications, mandatory engine-owned spatial context on physical proposal requests, mandatory rules-overlay source identity, exact replay artifact v6 loading without inferred legacy mission, position, attribution, or departure state, server-owned role bindings, opaque role-bound cursors, deterministic pagination, and explicit projection resynchronization."
+    "version": "10.0.0",
+    "description": "Directed player Primary Mission assignments for Force Disposition match-ups, Phase 17O viewer-scoped capability manifests, and the authenticated Phase 18G/18H session protocol with Phase 18I typed interactions and the Phase 18J battlefield coordinate/geometry contract, explicit logical terrain-area identity, Phase 17N viewer-scoped group-aware turn-start terrain/objective evidence and terrain classifications, mandatory engine-owned spatial context on physical proposal requests, mandatory rules-overlay source identity, exact replay artifact v8 loading with required content-addressed Objective Control authority and Primary scoring-state evidence and without inferred legacy mission, position, attribution, departure, progress, or scoring state, server-owned role bindings, opaque role-bound cursors, deterministic pagination, and explicit projection resynchronization."
   },
   "servers": [{"url": "http://127.0.0.1:8000"}],
   "security": [{"bearerAuth": []}],

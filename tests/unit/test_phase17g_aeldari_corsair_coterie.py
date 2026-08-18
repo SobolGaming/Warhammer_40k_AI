@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import replace
 from typing import Any, cast
 
@@ -14,7 +15,10 @@ from tests.phase15c_fight_order_helpers import (
     fight_lifecycle,
     submit_minimal_melee_declaration,
 )
-from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
+from tests.setup_completion_helpers import (
+    enter_battle_for_fixture,
+    record_primary_turn_start_evidence_for_fixture,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -141,6 +145,7 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
+from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.roster_points import RosterUnitPointValue
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierContext,
@@ -2839,6 +2844,39 @@ def test_webway_pathstone_lifecycle_records_void_thieves_before_turn_end_reserve
         )
 
 
+def test_void_thieves_replay_rejects_coordinated_current_sticky_state_event_forgery() -> None:
+    lifecycle = _restorable_corsair_phase_hook_lifecycle()
+    payload = deepcopy(lifecycle.to_payload())
+    state_payload = cast(dict[str, JsonValue], payload["state"])
+    sticky_states = cast(
+        list[dict[str, JsonValue]],
+        state_payload["sticky_objective_control_states"],
+    )
+    if len(sticky_states) != 1:
+        raise AssertionError("test requires one current Void Thieves sticky state")
+    enemy_unit_id = next(
+        cast(str, unit["unit_instance_id"])
+        for army in cast(list[dict[str, JsonValue]], state_payload["army_definitions"])
+        if army["player_id"] == "player-b"
+        for unit in cast(list[dict[str, JsonValue]], army["units"])
+    )
+    forged_sticky = sticky_states[0]
+    forged_sticky["originating_unit_instance_id"] = enemy_unit_id
+    forged_sticky["destroyed_unit_instance_id"] = enemy_unit_id
+    forged_sticky["replay_payload"] = {"forged": True}
+    for event in payload["decisions"]["event_log"]:
+        if event["event_type"] != "sticky_objective_control_state_recorded":
+            continue
+        event_payload = cast(dict[str, JsonValue], event["payload"])
+        event_payload["sticky_objective_control_state"] = deepcopy(forged_sticky)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="phase-hook sticky originating unit ownership drifted",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
 def test_archraider_lord_of_deceit_lifecycle_pauses_and_resumes_stratagem_cost() -> None:
     assignments = (_assignment(enhancements.ARCHRAIDER_ENHANCEMENT_ID, "archraider"),)
     config = _corsair_game_config(enhancement_assignments=assignments)
@@ -4973,6 +5011,49 @@ def _corsair_lifecycle_for_state(*, config: GameConfig, state: GameState) -> Gam
     )
     refresh_runtime_content_bundle()
     return lifecycle
+
+
+def _restorable_corsair_phase_hook_lifecycle() -> GameLifecycle:
+    config = _corsair_game_config()
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    state = GameState.from_config(config)
+    armies = tuple(
+        muster_army(catalog=config.army_catalog, request=request)
+        for request in config.army_muster_requests
+    )
+    for army in armies:
+        state.record_army_definition(army)
+    mission_setup = config.mission_setup
+    if mission_setup is None:
+        raise AssertionError("restorable Corsair lifecycle requires mission setup")
+    scenario = create_deterministic_battlefield_scenario(
+        battlefield_id="phase17g-corsair-sticky-authority-battlefield",
+        armies=armies,
+        battlefield_width_inches=mission_setup.battlefield_width_inches,
+        battlefield_depth_inches=mission_setup.battlefield_depth_inches,
+        terrain_features=mission_setup.terrain_features,
+    )
+    state.record_battlefield_state(scenario.battlefield_state)
+    _record_lifecycle_secondary_choices(state)
+    enter_battle_for_fixture(state, decisions=lifecycle.decision_controller)
+    lifecycle.state = state
+    refresh_runtime_content_bundle = cast(
+        Callable[[], None],
+        object.__getattribute__(
+            lifecycle,
+            "_refresh_runtime_content_bundle_if_armies_mustered",
+        ),
+    )
+    refresh_runtime_content_bundle()
+    status = lifecycle.advance_until_decision_or_terminal()
+    if status.decision_request is None or status.decision_request.decision_type != (
+        SELECT_MOVEMENT_UNIT_DECISION_TYPE
+    ):
+        raise AssertionError("restorable Corsair lifecycle must reach Movement selection")
+    if len(state.sticky_objective_control_states) != 1:
+        raise AssertionError("restorable Corsair lifecycle requires one sticky state")
+    return GameLifecycle.from_payload(lifecycle.to_payload())
 
 
 def _corsair_runtime_bundle_for_state(state: GameState) -> RuntimeContentBundle:

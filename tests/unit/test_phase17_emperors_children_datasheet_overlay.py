@@ -8,6 +8,10 @@ from pathlib import Path
 from typing import Any, cast
 
 import pytest
+from tests.movement_submission_helpers import (
+    straight_line_witness_for_unit,
+    submit_action_and_movement_proposal,
+)
 from tests.setup_completion_helpers import (
     record_existing_primary_turn_start_evidence_events_for_fixture,
     record_primary_turn_start_evidence_for_fixture,
@@ -38,7 +42,11 @@ from warhammer40k_core.core.attachment_eligibility import (
 from warhammer40k_core.core.attributes import Characteristic
 from warhammer40k_core.core.detachment import DetachmentDefinition
 from warhammer40k_core.core.model_geometry_catalog import GeometrySourceUnits
-from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
+    MovementMode,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.weapon_profiles import AttackProfile, WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.abilities import AbilityCatalogIndex
@@ -222,6 +230,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatus,
     LifecycleStatusKind,
 )
+from warhammer40k_core.engine.phases.movement import MovementPhaseActionKind
 from warhammer40k_core.engine.phases.shooting import (
     COMPLETE_SHOOTING_PHASE_OPTION_ID,
     SELECT_SHOOTING_TYPE_DECISION_TYPE,
@@ -262,6 +271,8 @@ from warhammer40k_core.engine.sticky_objective_control import (
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     STRATAGEM_DECISION_TYPE,
+    STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
+    stratagem_decline_payload,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.unit_factory import UnitFactory, UnitInstance
@@ -3208,13 +3219,14 @@ def test_tormentors_objective_defiled_records_through_lifecycle_and_replays() ->
         phase=BattlePhase.COMMAND,
         with_icon=False,
         game_id="tormentors-objective-defiled-lifecycle",
+        single_target_model=True,
     )
     state = session.lifecycle.state
     assert state is not None
     marker = state.mission_setup.objective_markers[0] if state.mission_setup else None
     assert marker is not None
     _move_unit(state, tormentors.unit_instance_id, x=marker.x_inches, y=marker.y_inches)
-    _move_unit(state, target.unit_instance_id, x=marker.x_inches + 20.0, y=marker.y_inches)
+    _move_unit(state, target.unit_instance_id, x=marker.x_inches + 3.5, y=marker.y_inches)
 
     status = session.advance_until_decision_or_terminal()
     for index in range(32):
@@ -3251,11 +3263,17 @@ def test_tormentors_objective_defiled_records_through_lifecycle_and_replays() ->
         cast(dict[str, JsonValue], recorded_events[0].payload)["sticky_objective_control_state"]
         == sticky.to_payload()
     )
-    _move_unit(
-        state,
-        tormentors.unit_instance_id,
-        x=marker.x_inches + 20.0,
+    status = _move_unit_with_authenticated_normal_move(
+        session=session,
+        status=status,
+        unit_instance_id=tormentors.unit_instance_id,
+        x=marker.x_inches - 5.0,
         y=marker.y_inches,
+        suffix="objective-defiled-tormentors-departure",
+    )
+    initial_lifecycle_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
     )
     status = _advance_battleline_without_actions_to_phase(
         session=session,
@@ -3268,21 +3286,9 @@ def test_tormentors_objective_defiled_records_through_lifecycle_and_replays() ->
         if record.phase == BattlePhase.MOVEMENT.value
         and record.timing is ObjectiveControlTiming.PHASE_END
     )
-    retained = movement_record.result_by_objective_id(marker.objective_marker_id)
-    assert retained.controlled_by_player_id == "player-a"
-    assert retained.retained_control_source_id == sticky.source_rule_id
-    assert sticky in state.sticky_objective_control_states
-
-    _move_unit(state, target.unit_instance_id, x=marker.x_inches, y=marker.y_inches)
-    initial_lifecycle_payload = cast(
-        GameLifecyclePayload,
-        json.loads(json.dumps(session.lifecycle.to_payload(), sort_keys=True)),
-    )
-    status = _advance_battleline_without_actions_to_phase(
-        session=session,
-        status=status,
-        target_phase=BattlePhase.CHARGE,
-    )
+    enemy_control = movement_record.result_by_objective_id(marker.objective_marker_id)
+    assert enemy_control.controlled_by_player_id == "player-b"
+    assert enemy_control.retained_control_source_id is None
     assert status.status_kind in {
         LifecycleStatusKind.WAITING_FOR_DECISION,
         LifecycleStatusKind.TERMINAL,
@@ -3290,16 +3296,6 @@ def test_tormentors_objective_defiled_records_through_lifecycle_and_replays() ->
     assert all(
         stored.objective_id != marker.objective_marker_id
         for stored in state.sticky_objective_control_states
-    )
-    shooting_record = next(
-        record
-        for record in state.objective_control_records
-        if record.phase == BattlePhase.SHOOTING.value
-        and record.timing is ObjectiveControlTiming.PHASE_END
-    )
-    assert (
-        shooting_record.result_by_objective_id(marker.objective_marker_id).controlled_by_player_id
-        == "player-b"
     )
     replay_payload = cast(
         ReplayArtifactPayload,
@@ -5705,6 +5701,13 @@ def _advance_battleline_without_actions_to_phase(
             option_id = "remain_stationary"
         elif request.decision_type == DICE_REROLL_DECISION_TYPE:
             option_id = "decline"
+        elif request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE:
+            status = session.submit_parameterized_payload(
+                request_id=request.request_id,
+                result_id=result_id,
+                payload=stratagem_decline_payload(),
+            )
+            continue
         else:
             if request.is_parameterized_submission_request():
                 raise AssertionError(
@@ -6041,6 +6044,54 @@ def _move_unit(state: GameState, unit_instance_id: str, *, x: float, y: float) -
         ),
     )
     state.replace_battlefield_state(battlefield.with_unit_placement(moved))
+
+
+def _move_unit_with_authenticated_normal_move(
+    *,
+    session: LocalGameSession,
+    status: LifecycleStatus,
+    unit_instance_id: str,
+    x: float,
+    y: float,
+    suffix: str,
+) -> LifecycleStatus:
+    state = session.lifecycle.state
+    assert state is not None
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    placement = battlefield.unit_placement_by_id(unit_instance_id)
+    anchor = placement.model_placements[0].pose
+    dx = x - anchor.position.x
+    dy = y - anchor.position.y
+    unit_request = _decision_request(status)
+    unit_option = next(
+        option
+        for option in unit_request.options
+        if isinstance(option.payload, dict)
+        and option.payload.get("unit_instance_id") == unit_instance_id
+    )
+    action_status = session.submit_option(
+        request_id=unit_request.request_id,
+        option_id=unit_option.option_id,
+        result_id=f"{suffix}:unit-result",
+    )
+    action_request = _decision_request(action_status)
+    return submit_action_and_movement_proposal(
+        session.lifecycle,
+        request=action_request,
+        option_id=MovementPhaseActionKind.NORMAL_MOVE.value,
+        action_result_id=f"{suffix}:action-result",
+        proposal_result_id=f"{suffix}:proposal-result",
+        unit_instance_id=unit_instance_id,
+        movement_phase_action=MovementPhaseActionKind.NORMAL_MOVE,
+        movement_mode=MovementMode.NORMAL,
+        witness=straight_line_witness_for_unit(
+            session.lifecycle,
+            unit_instance_id=unit_instance_id,
+            dx=dx,
+            dy=dy,
+        ),
+    )
 
 
 def _unit_from_state(state: GameState, unit_instance_id: str) -> UnitInstance:

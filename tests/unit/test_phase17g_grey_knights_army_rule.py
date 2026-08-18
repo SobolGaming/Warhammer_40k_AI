@@ -22,6 +22,7 @@ from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormati
 from warhammer40k_core.engine.attached_unit_reconciliation import (
     split_attached_rules_unit_if_required,
 )
+from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldPlacementKind,
     BattlefieldRuntimeState,
@@ -48,10 +49,8 @@ from warhammer40k_core.engine.movement_proposals import (
     PlacementProposalPayload,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
+from warhammer40k_core.engine.phases.fight import FightPhaseHandler
 from warhammer40k_core.engine.phases.movement import MovementPhaseHandler, MovementPhaseState
-from warhammer40k_core.engine.primary_historical_events import (
-    record_new_primary_turn_start_evidence_events,
-)
 from warhammer40k_core.engine.primary_reserve_entry_provider import (
     PrimaryReserveEntryProvider,
 )
@@ -822,28 +821,20 @@ def test_prebattle_arrival_attached_split_requires_persisted_transfer() -> None:
     ):
         GameLifecycle.from_payload(premature_expiry_payload)
 
-    objective_state_ids_before = tuple(
-        value.state_id for value in state.primary_objective_turn_start_states
-    )
-    snapshot_ids_before = tuple(
-        value.snapshot_id for value in state.primary_rules_unit_turn_start_snapshots
-    )
-    for _phase in range(3):
-        state.advance_to_next_battle_phase()
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
     assert state.current_battle_phase is BattlePhase.FIGHT
-    decisions.event_log.append(
-        "timing_window_resolved",
-        {
-            "timing_window": turn_end_window.to_payload(),
-            "resolution_order": [],
+    battle_round_flow = BattleRoundFlow(
+        phase_handlers={
+            BattlePhase.FIGHT: FightPhaseHandler(ruleset_descriptor=_ruleset_descriptor())
         },
+        turn_end_hooks=TurnEndHookRegistry.from_bindings(
+            army_rule.runtime_contribution().turn_end_hook_bindings
+        ),
+        ruleset_descriptor=_ruleset_descriptor(),
     )
-    state.advance_to_next_battle_phase()
-    record_new_primary_turn_start_evidence_events(
+    battle_round_flow.advance(
         state=state,
-        event_log=decisions.event_log,
-        objective_state_ids_before=objective_state_ids_before,
-        snapshot_ids_before=snapshot_ids_before,
+        decisions=decisions,
     )
     assert state.active_player_id == "player-opponent"
     assert all(

@@ -10,6 +10,7 @@ from warhammer40k_core.core.mission_scoring_resolution import (
 )
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine import primary_scoring_state_evidence as _state
 from warhammer40k_core.engine.destruction_provenance import (
     ModelDestructionAttribution,
     ModelDestructionAttributionPayload,
@@ -63,7 +64,7 @@ from warhammer40k_core.engine.primary_victory_point_policy import (
     validate_primary_victory_point_award,
     validate_victory_point_ledger_policy,
 )
-from warhammer40k_core.engine.scoring_cap_audit import metadata_with_vp_cap_audit
+from warhammer40k_core.engine.secondary_scoring_provider import SecondaryScoringProviderKind
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 
 
@@ -2127,6 +2128,7 @@ class MissionScoringPolicy:
         turn_start_states: tuple[PrimaryObjectiveTurnStartState, ...],
         terrain_trap_states: tuple[PrimaryTerrainTrapState, ...],
         unit_destruction_states: tuple[PrimaryUnitDestructionState, ...],
+        state_evidence: _state.PrimaryScoringStateEvidence,
         spatial_evidence: PrimaryScoringSpatialEvidence | None = None,
         scoring_player_ids: tuple[str, ...] = (),
         end_of_battle: bool = False,
@@ -2167,13 +2169,18 @@ class MissionScoringPolicy:
         if record.active_player_id not in ordered_players:
             raise GameLifecycleError("Primary scoring active player is missing from turn_order.")
         if not end_of_battle and record.active_player_id != self.player_id:
-            raise GameLifecycleError(
-                "Ordinary Primary scoring must use the active player's policy."
-            )
+            raise GameLifecycleError("Ordinary Primary scoring requires active-player policy.")
         if end_of_battle and record.active_player_id != ordered_players[-1]:
             raise GameLifecycleError(
                 "End-of-battle Primary scoring requires the last player's turn-end record."
             )
+        _state.validate_primary_scoring_state_evidence_context(
+            state_evidence,
+            mission_setup=mission_setup,
+            turn_order=ordered_players,
+            record=record,
+            end_of_battle=end_of_battle,
+        )
         starts = _validate_primary_turn_start_state_tuple(turn_start_states)
         traps = _validate_primary_terrain_trap_state_tuple(terrain_trap_states)
         destructions = _validate_primary_unit_destruction_state_tuple(unit_destruction_states)
@@ -2184,11 +2191,9 @@ class MissionScoringPolicy:
             terrain_trap_states=traps,
             unit_destruction_states=destructions,
         )
-        player_ids = (
-            _validate_identifier_tuple("scoring_player_ids", scoring_player_ids)
-            if scoring_player_ids
-            else (record.active_player_id,)
-        )
+        player_ids = _validate_identifier_tuple("scoring_player_ids", scoring_player_ids)
+        if not player_ids:
+            player_ids = (record.active_player_id,)
         if any(player_id not in ordered_players for player_id in player_ids):
             raise GameLifecycleError("Primary scoring player is missing from turn_order.")
         if player_ids != (self.player_id,):
@@ -2199,17 +2204,13 @@ class MissionScoringPolicy:
         )
         if required_spatial_conditions:
             if spatial_evidence is None:
-                raise GameLifecycleError(
-                    "Primary scoring policy requires spatial evidence for this boundary."
-                )
+                raise GameLifecycleError("Primary scoring policy requires spatial evidence.")
             if spatial_evidence.requested_condition_ids != required_spatial_conditions:
                 raise GameLifecycleError(
                     "Primary scoring policy spatial evidence conditions drifted."
                 )
         elif spatial_evidence is not None:
-            raise GameLifecycleError(
-                "Primary scoring policy received unrequested spatial evidence."
-            )
+            raise GameLifecycleError("Unexpected Primary scoring spatial evidence.")
         achieved_awards_by_rule_id: dict[str, VictoryPointAward] = {}
         rule_by_id: dict[str, PrimaryMissionScoringRule] = {}
         for rule in self.primary_scoring_rules:
@@ -2229,6 +2230,7 @@ class MissionScoringPolicy:
                     turn_start_states=starts,
                     terrain_trap_states=traps,
                     unit_destruction_states=destructions,
+                    state_evidence=state_evidence,
                     spatial_evidence=spatial_evidence,
                     end_of_battle=end_of_battle,
                 )
@@ -2314,6 +2316,7 @@ class MissionScoringPolicy:
         turn_start_states: tuple[PrimaryObjectiveTurnStartState, ...],
         terrain_trap_states: tuple[PrimaryTerrainTrapState, ...],
         unit_destruction_states: tuple[PrimaryUnitDestructionState, ...],
+        state_evidence: _state.PrimaryScoringStateEvidence,
         spatial_evidence: PrimaryScoringSpatialEvidence | None,
         end_of_battle: bool,
     ) -> VictoryPointAward | None:
@@ -2326,6 +2329,7 @@ class MissionScoringPolicy:
             turn_start_states=turn_start_states,
             terrain_trap_states=terrain_trap_states,
             unit_destruction_states=unit_destruction_states,
+            state_evidence=state_evidence,
             spatial_evidence=spatial_evidence,
             end_of_battle=end_of_battle,
         )
@@ -2347,6 +2351,8 @@ class MissionScoringPolicy:
             metadata={
                 **evidence,
                 "objective_control_record_id": record.record_id,
+                "primary_scoring_state_evidence_id": state_evidence.evidence_id,
+                "primary_scoring_state_evidence_hash": state_evidence.evidence_hash,
                 "scoring_rule_id": rule.rule_id,
                 "scoring_rule_condition": rule.condition,
                 "scoring_rule_source_id": rule.source_id,
@@ -2365,6 +2371,7 @@ class MissionScoringPolicy:
         turn_start_states: tuple[PrimaryObjectiveTurnStartState, ...],
         terrain_trap_states: tuple[PrimaryTerrainTrapState, ...],
         unit_destruction_states: tuple[PrimaryUnitDestructionState, ...],
+        state_evidence: _state.PrimaryScoringStateEvidence,
         spatial_evidence: PrimaryScoringSpatialEvidence | None,
         end_of_battle: bool,
     ) -> dict[str, JsonValue]:
@@ -2407,6 +2414,7 @@ class MissionScoringPolicy:
                         )
                         for state in unit_destruction_states
                     ),
+                    state_evidence=state_evidence,
                     spatial_evidence=spatial_evidence,
                     end_of_battle=end_of_battle,
                 ),
@@ -2501,6 +2509,9 @@ class MissionScoringPolicy:
             scoring_timing="secondary_mission_score",
             hidden=hidden,
             metadata={
+                "secondary_scoring_provider_kind": (
+                    SecondaryScoringProviderKind.LEGACY_PHASE11F.value
+                ),
                 "secondary_mission_id": requested_secondary_id,
                 "scoring_rule_id": rule.rule_id,
                 "scoring_rule_condition": rule.condition,
@@ -2617,6 +2628,9 @@ class MissionScoringPolicy:
             hidden=hidden,
             metadata=validate_json_value(
                 {
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL.value
+                    ),
                     "secondary_mission_id": requested_secondary,
                     "objective_control_record_id": record.record_id,
                     "scoring_rule_ids": rule_ids,
@@ -2854,6 +2868,7 @@ class MissionScoringPolicy:
         ledger: VictoryPointLedger,
         award: VictoryPointAward,
         objective_control_records: tuple[ObjectiveControlRecord, ...],
+        primary_scoring_state_evidence_records: tuple[_state.PrimaryScoringStateEvidence, ...],
         turn_order: tuple[str, ...],
         current_active_player_id: str | None,
     ) -> tuple[int, JsonValue]:
@@ -2865,14 +2880,13 @@ class MissionScoringPolicy:
             raise GameLifecycleError("VP cap resolution player_id drift.")
         if ledger.player_id != self.player_id:
             raise GameLifecycleError("VP cap policy does not belong to this player.")
-
         ledger_policy = validate_victory_point_ledger_policy(
             policy=self,
             ledger=ledger,
             objective_control_records=objective_control_records,
+            primary_scoring_state_evidence_records=(primary_scoring_state_evidence_records),
             turn_order=turn_order,
         )
-
         cap_bucket = self.cap_bucket_for_victory_point_source(
             source_kind=award.source_kind,
             source_id=award.source_id,
@@ -2885,6 +2899,7 @@ class MissionScoringPolicy:
                 policy=self,
                 award=award,
                 objective_control_records=objective_control_records,
+                primary_scoring_state_evidence_records=(primary_scoring_state_evidence_records),
                 turn_order=turn_order,
                 expected_boundary_active_player_id=current_active_player_id,
             )
@@ -2903,95 +2918,18 @@ class MissionScoringPolicy:
             and primary_binding.cap_treatment
             is PrimaryVictoryPointCapTreatment.END_OF_BATTLE_EXEMPT
         )
-        source_points_before = self.ledger_points_from_cap_bucket(
-            ledger=ledger,
-            cap_bucket=cap_bucket,
+        from warhammer40k_core.engine.victory_point_cap_resolution import (
+            resolve_victory_point_cap,
         )
-        source_cap = self._source_cap_for_bucket(cap_bucket)
-        source_remaining = max(source_cap - source_points_before, 0)
-        fixed_secondary_points_before = 0
-        fixed_secondary_remaining = award.amount
-        fixed_secondary_cap = None
-        if award.source_kind is VictoryPointSourceKind.FIXED_SECONDARY:
-            fixed_secondary_cap = FIXED_SECONDARY_MISSION_VP_CAP
-            fixed_secondary_points_before = _ledger_points_from_source(
-                ledger=ledger,
-                source_kind=award.source_kind,
-                source_id=award.source_id,
-            )
-            fixed_secondary_remaining = max(
-                fixed_secondary_cap - fixed_secondary_points_before,
-                0,
-            )
-        primary_battle_round_cap: int | None = None
-        primary_battle_round_points_before = 0
-        primary_battle_round_remaining = award.amount
-        if (
-            cap_bucket is VictoryPointCapBucket.PRIMARY
-            and self.primary_max_vp_per_turn is not None
-            and not end_of_battle_exempt
-        ):
-            primary_battle_round_cap = self.primary_max_vp_per_turn
-            primary_battle_round_points_before = sum(
-                transaction.amount
-                for transaction in ledger.transactions
-                if transaction.battle_round == award.battle_round
-                and transaction.transaction_id not in ledger_policy.end_of_battle_transaction_ids
-                and self.cap_bucket_for_victory_point_source(
-                    source_kind=transaction.source_kind,
-                    source_id=transaction.source_id,
-                )
-                is VictoryPointCapBucket.PRIMARY
-            )
-            primary_battle_round_remaining = max(
-                primary_battle_round_cap - primary_battle_round_points_before,
-                0,
-            )
-        total_remaining = max(self.total_vp_cap - ledger.victory_points, 0)
-        applied_amount = min(
-            award.amount,
-            source_remaining,
-            fixed_secondary_remaining,
-            primary_battle_round_remaining,
-            total_remaining,
-        )
-        if applied_amount == award.amount:
-            return applied_amount, award.metadata
 
-        capped_reasons: list[str] = []
-        if source_remaining < award.amount:
-            capped_reasons.append(self._source_cap_reason(cap_bucket))
-        if fixed_secondary_remaining < award.amount:
-            capped_reasons.append("fixed_secondary_mission_vp_cap")
-        if primary_battle_round_remaining < award.amount:
-            capped_reasons.append("primary_battle_round_vp_cap")
-        if total_remaining < award.amount:
-            capped_reasons.append("total_vp_cap")
-        return (
-            applied_amount,
-            metadata_with_vp_cap_audit(
-                award.metadata,
-                requested_amount=award.amount,
-                applied_amount=applied_amount,
-                source_cap=source_cap,
-                source_points_before=source_points_before,
-                source_points_after=source_points_before + applied_amount,
-                total_cap=self.total_vp_cap,
-                total_points_before=ledger.victory_points,
-                total_points_after=ledger.victory_points + applied_amount,
-                capped_reasons=tuple(capped_reasons),
-                fixed_secondary_mission_cap=fixed_secondary_cap,
-                fixed_secondary_mission_points_before=fixed_secondary_points_before,
-                fixed_secondary_mission_points_after=(
-                    fixed_secondary_points_before + applied_amount
-                ),
-                primary_battle_round_cap=primary_battle_round_cap,
-                primary_battle_round_points_before=primary_battle_round_points_before,
-                primary_battle_round_points_after=(
-                    primary_battle_round_points_before + applied_amount
-                ),
-            ),
+        cap_resolution = resolve_victory_point_cap(
+            policy=self,
+            ledger=ledger,
+            award=award,
+            end_of_battle_transaction_ids=ledger_policy.end_of_battle_transaction_ids,
+            end_of_battle_exempt=end_of_battle_exempt,
         )
+        return cap_resolution.applied_amount, cap_resolution.metadata
 
     def to_payload(self) -> MissionScoringPolicyPayload:
         return {
@@ -3159,26 +3097,6 @@ class MissionScoringPolicy:
             )
             is requested_bucket
         )
-
-    def _source_cap_for_bucket(self, cap_bucket: VictoryPointCapBucket) -> int:
-        bucket = victory_point_cap_bucket_from_token(cap_bucket)
-        if bucket is VictoryPointCapBucket.PRIMARY:
-            return self.primary_vp_cap
-        if bucket is VictoryPointCapBucket.SECONDARY:
-            return self.secondary_vp_cap
-        if bucket is VictoryPointCapBucket.BATTLE_READY:
-            return self.battle_ready_vp
-        raise GameLifecycleError("Unsupported VictoryPointCapBucket for cap policy.")
-
-    def _source_cap_reason(self, cap_bucket: VictoryPointCapBucket) -> str:
-        bucket = victory_point_cap_bucket_from_token(cap_bucket)
-        if bucket is VictoryPointCapBucket.PRIMARY:
-            return "primary_vp_cap"
-        if bucket is VictoryPointCapBucket.SECONDARY:
-            return "secondary_vp_cap"
-        if bucket is VictoryPointCapBucket.BATTLE_READY:
-            return "battle_ready_vp_cap"
-        raise GameLifecycleError("Unsupported VictoryPointCapBucket for cap policy.")
 
     def _mission_action_scoring_rule_for_source_id(
         self,
@@ -4141,24 +4059,6 @@ def _validate_mission_action_scoring_rule_tuple(
             validated,
             key=lambda rule: rule.mission_action_id,
         )
-    )
-
-
-def _ledger_points_from_source(
-    *,
-    ledger: VictoryPointLedger,
-    source_kind: VictoryPointSourceKind,
-    source_id: str,
-) -> int:
-    if type(ledger) is not VictoryPointLedger:
-        raise GameLifecycleError("VP source accounting requires a VictoryPointLedger.")
-    requested_kind = victory_point_source_kind_from_token(source_kind)
-    requested_source_id = _validate_identifier("source_id", source_id)
-    return sum(
-        transaction.amount
-        for transaction in ledger.transactions
-        if transaction.source_kind is requested_kind
-        and transaction.source_id == requested_source_id
     )
 
 

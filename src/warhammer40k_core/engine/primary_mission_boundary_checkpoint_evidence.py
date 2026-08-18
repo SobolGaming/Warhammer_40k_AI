@@ -271,7 +271,12 @@ class PrimaryMissionBoundaryCheckpoint:
             )
         if self.schema_version != PRIMARY_MISSION_BOUNDARY_CHECKPOINT_SCHEMA:
             raise GameLifecycleError("Primary mission boundary checkpoint schema is unsupported.")
-        if self.boundary_kind not in {"action_request", "turn_end"}:
+        if self.boundary_kind not in {
+            "action_request",
+            "objective_control",
+            "turn_end",
+            "primary_scoring_commit",
+        }:
             raise GameLifecycleError("Primary mission boundary checkpoint kind is unsupported.")
         if type(self.battle_round) is not int or self.battle_round < 1:
             raise GameLifecycleError("Primary mission boundary battle_round must be positive.")

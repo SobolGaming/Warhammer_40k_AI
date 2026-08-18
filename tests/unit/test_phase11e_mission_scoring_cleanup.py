@@ -16,6 +16,7 @@ from tests.phase13b_shooting_declaration_helpers import (
     _first_weapon_profile,
     _fixed_roll_result,
 )
+from tests.phase17n_primary_mission_helpers import append_authenticated_normal_move
 from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.adapters.access_control import AuthenticatedPrincipal, PrincipalRole
@@ -207,6 +208,9 @@ from warhammer40k_core.engine.primary_scoring_conditions import (
     PrimaryUnitDestructionEvidence,
     cross_turn_destruction_comparison_evidence,
     opponent_home_control_evidence,
+)
+from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    build_primary_scoring_state_evidence,
 )
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartSnapshot,
@@ -832,14 +836,11 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
     lifecycle.start(config)
     state = _battle_state_from_config(config, decisions=lifecycle.decision_controller)
     lifecycle.state = state
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
-    state.advance_to_next_battle_phase()
-    assert state.active_player_id == "player-b"
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
-    state.advance_to_next_battle_phase()
-    assert state.battle_round == 2
-    assert state.active_player_id == "player-a"
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    flow = BattleRoundFlow(
+        phase_handlers={
+            phase: PlaceholderPhaseHandler(phase) for phase in state.battle_phase_sequence
+        }
+    )
     attacker = next(
         unit
         for army in state.army_definitions
@@ -852,6 +853,52 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
         for unit in army.units
         if unit.unit_instance_id == "army-beta:character-unit-3"
     )
+    assert state.mission_setup is not None
+    defender_home = next(
+        marker
+        for marker in state.mission_setup.objective_markers
+        if _objective_marker_matches_suffix(marker.objective_marker_id, "defender_home")
+    )
+    assert state.battlefield_state is not None
+    attacker_placement = state.battlefield_state.unit_placement_by_id(attacker.unit_instance_id)
+    attacker_anchor = attacker_placement.model_placements[0].pose
+    attacker_dx = defender_home.x_inches + 2.0 - attacker_anchor.position.x
+    attacker_dy = defender_home.y_inches - attacker_anchor.position.y
+    movement_status = flow.advance(
+        state=state,
+        decisions=lifecycle.decision_controller,
+    )
+    assert movement_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert state.current_battle_phase is not None
+    assert state.current_battle_phase.value == BattlePhase.MOVEMENT.value
+    append_authenticated_normal_move(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        unit_instance_id=attacker.unit_instance_id,
+        suffix="meatgrinder-opponent-home",
+        pose_transform=lambda pose: Pose.at(
+            pose.position.x + attacker_dx,
+            pose.position.y + attacker_dy,
+            pose.position.z,
+            facing_degrees=pose.facing.degrees,
+        ),
+    )
+    for _phase_advance in range(16):
+        if (
+            state.battle_round == 2
+            and state.active_player_id == "player-a"
+            and state.current_battle_phase is BattlePhase.SHOOTING
+        ):
+            break
+        phase_status = flow.advance(
+            state=state,
+            decisions=lifecycle.decision_controller,
+        )
+        assert phase_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    else:
+        raise AssertionError("normal lifecycle did not reach round-two player-a Shooting")
+    preexisting_transactions = state.victory_point_ledger_for_player("player-a").transactions
+    preexisting_victory_points = state.victory_point_total("player-a")
     (defender_model,) = defender.own_models
     weapon_profile = replace(
         _first_weapon_profile(lifecycle, attacker),
@@ -914,12 +961,6 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
     )
     assert remaining is None
     assert attack_status is None
-    flow = BattleRoundFlow(
-        phase_handlers={
-            BattlePhase.SHOOTING: PlaceholderPhaseHandler(BattlePhase.SHOOTING),
-            BattlePhase.FIGHT: PlaceholderPhaseHandler(BattlePhase.FIGHT),
-        }
-    )
     flow.advance(state=state, decisions=lifecycle.decision_controller)
     (destruction,) = state.primary_unit_destruction_states
     assert destruction.destroyed_unit_instance_id == defender.unit_instance_id
@@ -931,20 +972,24 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
     )
     assert len(capture_events) == 1
 
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
-    _place_unit_near_objective(
-        state,
-        unit_instance_id="army-alpha:intercessor-unit-1",
-        target_suffix="defender_home",
-    )
-
+    charge_status = flow.advance(state=state, decisions=lifecycle.decision_controller)
+    assert charge_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert state.current_battle_phase is not None
+    assert state.current_battle_phase.value == BattlePhase.FIGHT.value
     flow.advance(state=state, decisions=lifecycle.decision_controller)
 
-    transactions = state.victory_point_ledger_for_player("player-a").transactions
+    all_transactions = state.victory_point_ledger_for_player("player-a").transactions
+    transactions = all_transactions[len(preexisting_transactions) :]
     current_turn_destruction_metadata = _transaction_metadata(transactions[0])
     comparison_metadata = _transaction_metadata(transactions[1])
     home_metadata = _transaction_metadata(transactions[2])
-    assert state.victory_point_total("player-a") == 13
+    assert preexisting_victory_points == 4
+    assert state.victory_point_total("player-a") - preexisting_victory_points == 11
+    assert [transaction.amount for transaction in transactions] == [3, 5, 3]
+    home_cap_audit = cast(dict[str, JsonValue], home_metadata["vp_cap_audit"])
+    assert home_cap_audit["requested_amount"] == 5
+    assert home_cap_audit["applied_amount"] == 3
+    assert home_cap_audit["capped_reasons"] == ["primary_battle_round_vp_cap"]
     assert [
         metadata["scoring_rule_id"] for metadata in map(_transaction_metadata, transactions)
     ] == [
@@ -982,6 +1027,90 @@ def test_meatgrinder_real_attack_destruction_is_captured_and_scores_current_turn
     restored = GameLifecycle.from_payload(lifecycle.to_payload())
     assert restored.state is not None
     assert restored.state.to_payload() == state.to_payload()
+
+    forged_cap_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    forged_cap_ledger = next(
+        ledger
+        for ledger in forged_cap_payload["state"]["victory_point_ledgers"]
+        if ledger["player_id"] == "player-a"
+    )
+    forged_uncapped_transaction = next(
+        transaction
+        for transaction in forged_cap_ledger["transactions"]
+        if transaction["source_kind"] == "primary"
+        and isinstance(transaction["metadata"], dict)
+        and "vp_cap_audit" not in transaction["metadata"]
+    )
+    forged_uncapped_metadata = cast(
+        dict[str, JsonValue],
+        forged_uncapped_transaction["metadata"],
+    )
+    forged_uncapped_metadata["vp_cap_audit"] = {
+        "requested_amount": forged_uncapped_transaction["amount"],
+        "applied_amount": forged_uncapped_transaction["amount"],
+        "source_cap": 999,
+        "source_points_before": 777,
+        "source_points_after": 1,
+        "total_cap": 1,
+        "total_points_before": 999,
+        "total_points_after": 0,
+        "capped_reasons": ["forged_reason"],
+    }
+    with pytest.raises(
+        GameLifecycleError,
+        match="cap audit drifted from chronological ledger policy",
+    ):
+        GameLifecycle.from_payload(forged_cap_payload)
+
+    tampered_capped_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    tampered_capped_ledger = next(
+        ledger
+        for ledger in tampered_capped_payload["state"]["victory_point_ledgers"]
+        if ledger["player_id"] == "player-a"
+    )
+    tampered_capped_transaction = next(
+        transaction
+        for transaction in tampered_capped_ledger["transactions"]
+        if transaction["source_kind"] == "primary"
+        and isinstance(transaction["metadata"], dict)
+        and "vp_cap_audit" in transaction["metadata"]
+    )
+    tampered_capped_metadata = cast(
+        dict[str, JsonValue],
+        tampered_capped_transaction["metadata"],
+    )
+    tampered_capped_audit = cast(
+        dict[str, JsonValue],
+        tampered_capped_metadata["vp_cap_audit"],
+    )
+    tampered_capped_audit["source_points_before"] = 999
+    with pytest.raises(
+        GameLifecycleError,
+        match="cap audit drifted from chronological ledger policy",
+    ):
+        GameLifecycle.from_payload(tampered_capped_payload)
+
+    reordered_ledger_payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    reordered_ledger = next(
+        ledger
+        for ledger in reordered_ledger_payload["state"]["victory_point_ledgers"]
+        if ledger["player_id"] == "player-a"
+    )
+    reordered_ledger["transactions"] = list(reversed(reordered_ledger["transactions"]))
+    with pytest.raises(
+        GameLifecycleError,
+        match="transaction identity or chronology drifted",
+    ):
+        GameLifecycle.from_payload(reordered_ledger_payload)
 
     forged_payload = cast(
         GameLifecyclePayload,
@@ -1181,6 +1310,23 @@ def test_reserve_deadline_retires_current_transport_cargo_and_round_trips(
     assert state.battlefield_state is not None
     assert set(route_model_ids) <= set(state.battlefield_state.removed_model_ids)
     assert set(route_model_ids).isdisjoint(state.battlefield_state.placed_model_ids())
+    owner_army = state.army_definition_for_player("player-a")
+    assert owner_army is not None
+    transport_model_ids = set(owner_army.unit_by_id("army-alpha:transport-unit-2").own_model_ids())
+    passenger_model_ids = set(
+        owner_army.unit_by_id("army-alpha:intercessor-unit-1").own_model_ids()
+    )
+    historical_rows = {
+        row.model_instance_id: row
+        for authority in state.objective_control_record_authorities
+        for row in authority.boundary_checkpoint.model_states
+    }
+    assert {historical_rows[model_id].presence for model_id in transport_model_ids} == {"reserves"}
+    assert {
+        historical_rows[model_id].presence
+        for model_id in passenger_model_ids
+        if historical_rows[model_id].alive
+    } == {"embarked"}
 
     payload = cast(
         GameLifecyclePayload,
@@ -2648,10 +2794,26 @@ def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> 
     lifecycle.start(config)
     state = _battle_state_from_config(config, decisions=lifecycle.decision_controller)
     lifecycle.state = state
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
-    state.advance_to_next_battle_phase()
-    assert state.active_player_id == "player-b"
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    flow = BattleRoundFlow(
+        phase_handlers={
+            phase: PlaceholderPhaseHandler(phase) for phase in state.battle_phase_sequence
+        }
+    )
+    for _phase_advance in range(6):
+        if (
+            state.active_player_id == "player-b"
+            and state.current_battle_phase is BattlePhase.MOVEMENT
+        ):
+            break
+        phase_status = flow.advance(
+            state=state,
+            decisions=lifecycle.decision_controller,
+        )
+        assert phase_status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    if not (
+        state.active_player_id == "player-b" and state.current_battle_phase is BattlePhase.MOVEMENT
+    ):
+        raise AssertionError("normal lifecycle did not reach player-b Movement")
     assert state.current_battle_phase is BattlePhase.MOVEMENT
     assert state.battlefield_state is not None
 
@@ -2774,11 +2936,6 @@ def test_meatgrinder_captures_overwatch_destruction_before_return_on_death() -> 
             "model_destroyed_event_id": destroyed_event.event_id,
             "pending": pending.to_payload(),
         },
-    )
-    flow = BattleRoundFlow(
-        phase_handlers={
-            BattlePhase.MOVEMENT: PlaceholderPhaseHandler(BattlePhase.MOVEMENT),
-        }
     )
     waiting = flow.advance(state=state, decisions=lifecycle.decision_controller)
 
@@ -4276,6 +4433,7 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
         "scoring_timing": "secondary_mission_score",
         "hidden": False,
         "metadata": {
+            "secondary_scoring_provider_kind": "legacy_phase11f",
             "secondary_mission_id": "assassination",
             "scoring_rule_id": "assassination-fixed",
             "scoring_rule_condition": "fixed_secondary_condition",
@@ -4353,6 +4511,7 @@ def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -
         0
     ]
     assert fixed_transaction.metadata == {
+        "secondary_scoring_provider_kind": "legacy_phase11f",
         "secondary_mission_id": "bring-it-down",
         "scoring_rule_id": "bring-it-down-fixed",
         "scoring_rule_condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
@@ -4362,6 +4521,7 @@ def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -
         ),
     }
     assert tactical_transaction.metadata == {
+        "secondary_scoring_provider_kind": "legacy_phase11f",
         "secondary_mission_id": "bring-it-down",
         "scoring_rule_id": "bring-it-down-tactical",
         "scoring_rule_condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
@@ -4370,6 +4530,126 @@ def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -
             "scoring-rule:bring-it-down-tactical"
         ),
     }
+
+
+@pytest.mark.parametrize(
+    ("secondary_mode", "card_mode", "expected_secondary_vp"),
+    [
+        (SecondaryMissionMode.FIXED, SecondaryMissionCardMode.FIXED, 4),
+        (SecondaryMissionMode.TACTICAL, SecondaryMissionCardMode.TACTICAL, 5),
+    ],
+)
+def test_state_backed_secondary_scoring_closes_zero_award_primary_boundary_once(
+    secondary_mode: SecondaryMissionMode,
+    card_mode: SecondaryMissionCardMode,
+    expected_secondary_vp: int,
+) -> None:
+    config = _config()
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    state = _battle_state_from_config(
+        config,
+        player_a_secondary=secondary_mode,
+        decisions=lifecycle.decision_controller,
+    )
+    lifecycle.state = state
+    if card_mode is SecondaryMissionCardMode.TACTICAL:
+        state.record_secondary_mission_card_state(
+            SecondaryMissionCardState.active_tactical(
+                player_id="player-a",
+                secondary_mission_id="assassination",
+                battle_round=1,
+                source_result_id="phase17n-secondary-boundary-draw",
+            )
+        )
+    flow = BattleRoundFlow(
+        phase_handlers={
+            phase: PlaceholderPhaseHandler(phase) for phase in state.battle_phase_sequence
+        }
+    )
+    for _phase in (
+        BattlePhase.COMMAND,
+        BattlePhase.MOVEMENT,
+        BattlePhase.SHOOTING,
+        BattlePhase.CHARGE,
+    ):
+        status = flow.advance(state=state, decisions=lifecycle.decision_controller)
+        assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert state.current_battle_phase is BattlePhase.FIGHT
+    evidence_before = tuple(state.primary_scoring_state_evidence_records)
+
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="assassination",
+        mode=card_mode,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+
+    turn_end_records = tuple(
+        record
+        for record in state.objective_control_records
+        if record.timing is ObjectiveControlTiming.TURN_END
+        and record.battle_round == 1
+        and record.active_player_id == "player-a"
+    )
+    assert len(turn_end_records) == 1
+    new_evidence = tuple(
+        evidence
+        for evidence in state.primary_scoring_state_evidence_records
+        if evidence not in evidence_before
+    )
+    assert len(new_evidence) == 1
+    assert new_evidence[0].objective_control_record_id == turn_end_records[0].record_id
+    primary_transactions = tuple(
+        transaction
+        for ledger in state.victory_point_ledgers
+        for transaction in ledger.transactions
+        if transaction.source_kind is VictoryPointSourceKind.PRIMARY
+    )
+    assert primary_transactions == ()
+    assert state.victory_point_total("player-a") == expected_secondary_vp
+
+    state_payload = state.to_payload()
+    assert GameState.from_payload(state_payload).to_payload() == state_payload
+    lifecycle_payload = lifecycle.to_payload()
+    restored_lifecycle = GameLifecycle.from_payload(lifecycle_payload)
+    assert restored_lifecycle.state is not None
+    assert restored_lifecycle.state.to_payload() == state_payload
+    assert (
+        restored_lifecycle.decision_controller.to_payload()
+        == lifecycle.decision_controller.to_payload()
+    )
+
+    evidence_ids = tuple(
+        evidence.evidence_id for evidence in state.primary_scoring_state_evidence_records
+    )
+    transaction_ids = tuple(
+        transaction.transaction_id
+        for ledger in state.victory_point_ledgers
+        for transaction in ledger.transactions
+    )
+    status = flow.advance(state=state, decisions=lifecycle.decision_controller)
+    assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+    assert state.active_player_id == "player-b"
+    assert state.current_battle_phase is not None
+    assert state.current_battle_phase.value == BattlePhase.COMMAND.value
+    assert (
+        tuple(evidence.evidence_id for evidence in state.primary_scoring_state_evidence_records)
+        == evidence_ids
+    )
+    assert (
+        tuple(
+            transaction.transaction_id
+            for ledger in state.victory_point_ledgers
+            for transaction in ledger.transactions
+        )
+        == transaction_ids
+    )
+    completed_payload = lifecycle.to_payload()
+    completed_lifecycle = GameLifecycle.from_payload(completed_payload)
+    assert completed_lifecycle.state is not None
+    assert completed_lifecycle.state.to_payload() == state.to_payload()
 
 
 def test_bring_it_down_scores_each_destroyed_w10_model_and_caps_tactical() -> None:
@@ -4385,6 +4665,7 @@ def test_bring_it_down_scores_each_destroyed_w10_model_and_caps_tactical() -> No
         secondary_mission_id="bring-it-down",
         mode=SecondaryMissionCardMode.FIXED,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     tactical_state = _battle_state_from_config(
@@ -4410,6 +4691,7 @@ def test_bring_it_down_scores_each_destroyed_w10_model_and_caps_tactical() -> No
         secondary_mission_id="bring-it-down",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     assert fixed_state.victory_point_total("player-a") == 5
@@ -4460,6 +4742,7 @@ def test_overwhelming_force_scores_destroyed_units_that_started_on_objectives_wi
         secondary_mission_id="overwhelming-force",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     metadata = _transaction_metadata(
@@ -4493,6 +4776,7 @@ def test_no_prisoners_scores_each_destroyed_enemy_unit_with_cap() -> None:
         secondary_mission_id="no-prisoners",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     metadata = _transaction_metadata(
@@ -4525,6 +4809,7 @@ def test_a_grievous_blow_scores_destroyed_starting_strength_thirteen_units() -> 
         secondary_mission_id="a-grievous-blow",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     metadata = _transaction_metadata(
@@ -4683,6 +4968,7 @@ def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
         secondary_mission_id="cleanse",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     plunder_state = _battle_state(
@@ -4723,6 +5009,7 @@ def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
         secondary_mission_id="plunder",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     cleanse_metadata = _transaction_metadata(
@@ -4769,6 +5056,7 @@ def test_defend_stronghold_scores_at_opponent_turn_end_with_deployment_zone_bonu
         secondary_mission_id="defend-stronghold",
         mode=SecondaryMissionCardMode.TACTICAL,
         phase=BattlePhase.FIGHT,
+        event_log=EventLog(),
     )
 
     metadata = _transaction_metadata(
@@ -5456,6 +5744,7 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     assert transaction["source_kind"] == "tactical_secondary"
     assert transaction["source_id"] == active_cards[0].secondary_mission_id
     assert transaction["metadata"] == {
+        "secondary_scoring_provider_kind": "legacy_phase11f",
         "secondary_mission_id": active_cards[0].secondary_mission_id,
         "scoring_rule_id": f"{active_cards[0].secondary_mission_id}-tactical",
         "scoring_rule_condition": "tactical_secondary_condition",
@@ -6795,6 +7084,274 @@ def test_attached_rules_unit_canonical_shot_state_blocks_all_component_action_op
     )
 
 
+def test_completed_phase_replay_rejects_wholesale_objective_control_history_deletion() -> None:
+    config = _config()
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        decisions=lifecycle.decision_controller,
+    )
+
+    waiting = LocalGameSession(lifecycle=lifecycle).advance_until_decision_or_terminal()
+
+    assert waiting.decision_request is not None
+    assert waiting.decision_request.decision_type == "select_movement_unit"
+    round_tripped = GameLifecycle.from_payload(lifecycle.to_payload())
+    assert round_tripped.state is not None
+    assert lifecycle.state is not None
+    assert round_tripped.state.to_payload() == lifecycle.state.to_payload()
+    lifecycle_payload = cast(
+        dict[str, JsonValue],
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
+    assert len(cast(list[JsonValue], state_payload["objective_control_records"])) == 1
+    assert len(cast(list[JsonValue], state_payload["objective_control_record_authorities"])) == 1
+    state_payload["objective_control_records"] = []
+    state_payload["objective_control_record_authorities"] = []
+    decisions_payload = cast(dict[str, JsonValue], lifecycle_payload["decisions"])
+    event_log = cast(list[JsonValue], decisions_payload["event_log"])
+    retained_events = [
+        cast(dict[str, JsonValue], event)
+        for event in event_log
+        if cast(dict[str, JsonValue], event)["event_type"]
+        != "end_boundary_objective_control_determined"
+    ]
+    assert len(retained_events) == len(event_log) - 1
+    for event_order, event in enumerate(retained_events, start=1):
+        event["event_id"] = f"event-{event_order:06d}"
+    decisions_payload["event_log"] = cast(list[JsonValue], retained_events)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="lacks exactly one phase-end record",
+    ):
+        GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
+
+
+def test_started_next_phase_replay_rejects_coordinated_prior_completion_deletion() -> None:
+    config = _config()
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        decisions=lifecycle.decision_controller,
+    )
+
+    waiting = LocalGameSession(lifecycle=lifecycle).advance_until_decision_or_terminal()
+
+    assert waiting.decision_request is not None
+    assert waiting.decision_request.decision_type == "select_movement_unit"
+    lifecycle_payload = cast(
+        dict[str, JsonValue],
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
+    objective_control_records = cast(
+        list[JsonValue],
+        state_payload["objective_control_records"],
+    )
+    command_phase_records = [
+        cast(dict[str, JsonValue], record)
+        for record in objective_control_records
+        if cast(dict[str, JsonValue], record)["phase"] == BattlePhase.COMMAND.value
+        and cast(dict[str, JsonValue], record)["timing"] == "phase_end"
+    ]
+    assert len(command_phase_records) == 1
+    command_record_id = cast(str, command_phase_records[0]["record_id"])
+    state_payload["objective_control_records"] = [
+        record
+        for record in objective_control_records
+        if cast(dict[str, JsonValue], record)["record_id"] != command_record_id
+    ]
+    state_payload["objective_control_record_authorities"] = [
+        authority
+        for authority in cast(
+            list[JsonValue],
+            state_payload["objective_control_record_authorities"],
+        )
+        if cast(dict[str, JsonValue], authority)["objective_control_record_id"] != command_record_id
+    ]
+    state_payload["primary_scoring_state_evidence_records"] = [
+        evidence
+        for evidence in cast(
+            list[JsonValue],
+            state_payload["primary_scoring_state_evidence_records"],
+        )
+        if cast(dict[str, JsonValue], evidence)["objective_control_record_id"] != command_record_id
+    ]
+
+    decisions_payload = cast(dict[str, JsonValue], lifecycle_payload["decisions"])
+    event_log = cast(list[JsonValue], decisions_payload["event_log"])
+
+    def remove_command_completion_event(event_value: JsonValue) -> bool:
+        event = cast(dict[str, JsonValue], event_value)
+        if event["event_type"] == "end_boundary_objective_control_determined":
+            payload = cast(dict[str, JsonValue], event["payload"])
+            return payload["record_ids"] == [command_record_id]
+        if event["event_type"] == "battle_phase_completed":
+            payload = cast(dict[str, JsonValue], event["payload"])
+            return payload["completed_phase"] == BattlePhase.COMMAND.value
+        if event["event_type"] not in {
+            "timing_window_opened",
+            "timing_window_resolved",
+        }:
+            return False
+        payload = cast(dict[str, JsonValue], event["payload"])
+        timing_window = cast(dict[str, JsonValue], payload["timing_window"])
+        descriptor = cast(dict[str, JsonValue], timing_window["descriptor"])
+        return (
+            descriptor["source_rule_id"] == "core-rules-lifecycle-timing"
+            and descriptor["trigger_kind"] == "end_phase"
+            and timing_window["phase"] == BattlePhase.COMMAND.value
+        )
+
+    removed_events = [event for event in event_log if remove_command_completion_event(event)]
+    assert len(removed_events) == 4
+    retained_events = [
+        cast(dict[str, JsonValue], event)
+        for event in event_log
+        if not remove_command_completion_event(event)
+    ]
+    assert any(event["event_type"] == "movement_phase_entered" for event in retained_events)
+
+    def is_movement_phase_start_event(event: dict[str, JsonValue]) -> bool:
+        if event["event_type"] != "timing_window_opened":
+            return False
+        payload = event["payload"]
+        if not isinstance(payload, dict):
+            return False
+        timing_window = payload.get("timing_window")
+        if not isinstance(timing_window, dict):
+            return False
+        descriptor = timing_window.get("descriptor")
+        return (
+            isinstance(descriptor, dict)
+            and descriptor.get("trigger_kind") == "start_phase"
+            and timing_window.get("phase") == BattlePhase.MOVEMENT.value
+        )
+
+    assert any(is_movement_phase_start_event(event) for event in retained_events)
+    for event_order, event in enumerate(retained_events, start=1):
+        event["event_id"] = f"event-{event_order:06d}"
+    decisions_payload["event_log"] = cast(list[JsonValue], retained_events)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="phase-start history lacks exactly one prior completed phase event",
+    ):
+        GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
+
+
+def _event_binds_objective_control_record(event: JsonValue, record_id: str) -> bool:
+    if not isinstance(event, dict):
+        return False
+    payload = event["payload"]
+    if not isinstance(payload, dict):
+        return False
+    if event["event_type"] == "end_boundary_objective_control_determined":
+        return payload.get("record_ids") == [record_id]
+    if event["event_type"] == "primary_scoring_commit_checkpoint_recorded":
+        return payload.get("objective_control_record_id") == record_id
+    return False
+
+
+def test_completed_turn_replay_rejects_zero_award_boundary_history_deletion() -> None:
+    config = _config()
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        decisions=lifecycle.decision_controller,
+    )
+    state = lifecycle.state
+    assert state is not None
+    flow = BattleRoundFlow(
+        phase_handlers={
+            phase: PlaceholderPhaseHandler(phase) for phase in state.battle_phase_sequence
+        }
+    )
+
+    for _phase in state.battle_phase_sequence:
+        status = flow.advance(state=state, decisions=lifecycle.decision_controller)
+        assert status.status_kind is LifecycleStatusKind.UNSUPPORTED
+
+    assert state.active_player_id == "player-b"
+    assert state.current_battle_phase is BattlePhase.COMMAND
+    lifecycle_payload = cast(
+        dict[str, JsonValue],
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
+    objective_control_records = cast(
+        list[JsonValue],
+        state_payload["objective_control_records"],
+    )
+    turn_end_records = [
+        cast(dict[str, JsonValue], record)
+        for record in objective_control_records
+        if cast(dict[str, JsonValue], record)["timing"] == "turn_end"
+    ]
+    assert len(turn_end_records) == 1
+    turn_end_record_id = cast(str, turn_end_records[0]["record_id"])
+    scoring_evidence = cast(
+        list[JsonValue],
+        state_payload["primary_scoring_state_evidence_records"],
+    )
+    removed_evidence = [
+        cast(dict[str, JsonValue], evidence)
+        for evidence in scoring_evidence
+        if cast(dict[str, JsonValue], evidence)["objective_control_record_id"] == turn_end_record_id
+    ]
+    assert len(removed_evidence) == 1
+    assert all(
+        not cast(list[JsonValue], cast(dict[str, JsonValue], ledger)["transactions"])
+        for ledger in cast(list[JsonValue], state_payload["victory_point_ledgers"])
+    )
+    state_payload["objective_control_records"] = [
+        record
+        for record in objective_control_records
+        if cast(dict[str, JsonValue], record)["record_id"] != turn_end_record_id
+    ]
+    state_payload["objective_control_record_authorities"] = [
+        authority
+        for authority in cast(
+            list[JsonValue],
+            state_payload["objective_control_record_authorities"],
+        )
+        if cast(dict[str, JsonValue], authority)["objective_control_record_id"]
+        != turn_end_record_id
+    ]
+    state_payload["primary_scoring_state_evidence_records"] = [
+        evidence
+        for evidence in scoring_evidence
+        if cast(dict[str, JsonValue], evidence)["objective_control_record_id"] != turn_end_record_id
+    ]
+    state_payload["primary_scoring_boundary_lifecycles"] = [
+        row
+        for row in cast(list[JsonValue], state_payload["primary_scoring_boundary_lifecycles"])
+        if cast(dict[str, JsonValue], row)["objective_control_record_id"] != turn_end_record_id
+    ]
+    decisions_payload = cast(dict[str, JsonValue], lifecycle_payload["decisions"])
+    event_log = cast(list[JsonValue], decisions_payload["event_log"])
+    retained_events = [
+        cast(dict[str, JsonValue], event)
+        for event in event_log
+        if not _event_binds_objective_control_record(event, turn_end_record_id)
+    ]
+    assert len(retained_events) == len(event_log) - 2
+    for event_order, event in enumerate(retained_events, start=1):
+        event["event_id"] = f"event-{event_order:06d}"
+    decisions_payload["event_log"] = cast(list[JsonValue], retained_events)
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="completed turn history lacks exactly one turn-end record",
+    ):
+        GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
+
+
 def test_attached_action_history_survives_split_payload_round_trip_and_terminal_replay() -> None:
     config = _config_with_player_a_attached_unit(include_independent_unit=True)
     lifecycle = GameLifecycle()
@@ -6896,7 +7453,8 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
     state.battle_round = 5
     state.active_player_id = "player-b"
     state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
-    state.advance_to_next_battle_phase()
+    terminal_status = source_session.advance_until_decision_or_terminal()
+    assert terminal_status.status_kind is LifecycleStatusKind.TERMINAL
     assert state.stage is GameLifecycleStage.COMPLETE
     terminal_payload = cast(
         GameLifecyclePayload,
@@ -6911,7 +7469,12 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
             artifact_id="phase11e-terminal-attached-split-action-history"
         )
     )
+    assert terminal_artifact.schema_version == "replay-artifact-v8-phase17n-step5a"
     replay_snapshot = GameLifecycle.from_payload(terminal_artifact.initial_lifecycle_payload)
+    replay_snapshot_state = replay_snapshot.state
+    assert replay_snapshot_state is not None
+    assert replay_snapshot_state.primary_scoring_state_evidence_records
+    assert replay_snapshot_state.objective_control_record_authorities
     replay_events = tuple(
         event
         for event in replay_snapshot.decision_controller.event_log.records
@@ -6921,7 +7484,9 @@ def test_attached_action_history_survives_split_payload_round_trip_and_terminal_
     assert cast(dict[str, JsonValue], replay_events[0].payload)["action_id"] == action.action_id
     terminal_replay_result = ReplayRunner(terminal_artifact).run()
     assert terminal_replay_result.status is ReplayRunStatus.REPRODUCED
-    assert terminal_replay_result.reproduced_event_count == 4
+    assert terminal_replay_result.reproduced_event_count == len(
+        replay_snapshot.decision_controller.event_log.records
+    )
 
 
 def test_attached_action_cannot_complete_after_component_fails_battle_shock() -> None:
@@ -7827,6 +8392,15 @@ def test_mission_action_terminal_state_validation_is_fail_fast() -> None:
             interrupted_reason="unit_moved",
             score_transaction_id="victory-point:player-a:round-01:000002",
         )
+    with pytest.raises(GameLifecycleError, match="cannot predate its start battle round"):
+        replace(
+            action,
+            battle_round_started=2,
+            status=MissionActionStatus.COMPLETED,
+            completed_battle_round=1,
+            completed_phase=BattlePhase.FIGHT.value,
+            score_transaction_id="victory-point:player-a:round-01:000003",
+        )
     with pytest.raises(GameLifecycleError, match="Interrupted mission Action requires a reason"):
         replace(action, status=MissionActionStatus.INTERRUPTED)
     with pytest.raises(
@@ -8121,6 +8695,28 @@ def test_end_turn_coherency_cleanup_removes_models_without_destroyed_triggers() 
         if event.event_type == "battle_phase_completed" and index > departure_event_order
     )
     assert departure_event_order < phase_completed_order
+    phase_end_authority = next(
+        authority
+        for authority in state.objective_control_record_authorities
+        if authority.objective_control_record_id.endswith(":phase_end")
+    )
+    turn_end_authority = next(
+        authority
+        for authority in state.objective_control_record_authorities
+        if authority.objective_control_record_id.endswith(":turn_end")
+    )
+    phase_end_row = next(
+        row
+        for row in phase_end_authority.boundary_checkpoint.model_states
+        if row.model_instance_id == removed_model_id
+    )
+    turn_end_row = next(
+        row
+        for row in turn_end_authority.boundary_checkpoint.model_states
+        if row.model_instance_id == removed_model_id
+    )
+    assert (phase_end_row.presence, phase_end_row.wounds_remaining) == ("battlefield", 2)
+    assert (turn_end_row.presence, turn_end_row.wounds_remaining) == ("off_battlefield", 2)
     payload = cast(
         GameLifecyclePayload,
         json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
@@ -8331,12 +8927,19 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
     scoring_state = _battle_state()
     assert scoring_state.mission_setup is not None
     assert scoring_state.battlefield_state is not None
+    scoring_state.battle_phase_index = scoring_state.battle_phase_sequence.index(BattlePhase.FIGHT)
     record = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
             scoring_state,
             timing=ObjectiveControlTiming.TURN_END,
             phase=BattlePhase.FIGHT,
         )
+    )
+    scoring_state.record_objective_control_record(record)
+    state_evidence = build_primary_scoring_state_evidence(
+        state=scoring_state,
+        record=record,
+        end_of_battle=False,
     )
     with pytest.raises(GameLifecycleError, match="ObjectiveControlRecord"):
         policy.primary_awards_from_objective_control(
@@ -8346,6 +8949,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=(),
             unit_destruction_states=(),
+            state_evidence=state_evidence,
         )
     with pytest.raises(GameLifecycleError, match="MissionSetup"):
         policy.primary_awards_from_objective_control(
@@ -8355,6 +8959,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=(),
             unit_destruction_states=(),
+            state_evidence=state_evidence,
         )
     with pytest.raises(GameLifecycleError, match="Unsupported primary scoring rule timing"):
         replace(
@@ -8367,6 +8972,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=(),
             unit_destruction_states=(),
+            state_evidence=state_evidence,
         )
     turn_start = scoring_state.primary_objective_turn_start_states[0]
     with pytest.raises(GameLifecycleError, match="turn-start states must be a tuple"):
@@ -8377,6 +8983,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
             turn_start_states=cast(tuple[PrimaryObjectiveTurnStartState, ...], []),
             terrain_trap_states=(),
             unit_destruction_states=(),
+            state_evidence=state_evidence,
         )
     with pytest.raises(GameLifecycleError, match="turn-start states must contain"):
         policy.primary_awards_from_objective_control(
@@ -8389,6 +8996,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
             ),
             terrain_trap_states=(),
             unit_destruction_states=(),
+            state_evidence=state_evidence,
         )
     with pytest.raises(GameLifecycleError, match="turn-start states must not duplicate"):
         policy.primary_awards_from_objective_control(
@@ -8398,6 +9006,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
             turn_start_states=(turn_start, turn_start),
             terrain_trap_states=(),
             unit_destruction_states=(),
+            state_evidence=state_evidence,
         )
     with pytest.raises(GameLifecycleError, match="terrain trap states must be a tuple"):
         policy.primary_awards_from_objective_control(
@@ -8407,6 +9016,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=cast(tuple[PrimaryTerrainTrapState, ...], []),
             unit_destruction_states=(),
+            state_evidence=state_evidence,
         )
     with pytest.raises(GameLifecycleError, match="terrain trap states must contain"):
         policy.primary_awards_from_objective_control(
@@ -8416,6 +9026,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=cast(tuple[PrimaryTerrainTrapState, ...], ("not-a-trap",)),
             unit_destruction_states=(),
+            state_evidence=state_evidence,
         )
     with pytest.raises(GameLifecycleError, match="unit destruction states must be a tuple"):
         policy.primary_awards_from_objective_control(
@@ -8425,6 +9036,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
             turn_start_states=tuple(scoring_state.primary_objective_turn_start_states),
             terrain_trap_states=(),
             unit_destruction_states=cast(tuple[PrimaryUnitDestructionState, ...], []),
+            state_evidence=state_evidence,
         )
     with pytest.raises(GameLifecycleError, match="unit destruction states must contain"):
         policy.primary_awards_from_objective_control(
@@ -8437,6 +9049,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
                 tuple[PrimaryUnitDestructionState, ...],
                 ("not-a-destruction",),
             ),
+            state_evidence=state_evidence,
         )
     drifted_setup = _with_player_primary_mission(
         _event_companion_mission_setup(),
