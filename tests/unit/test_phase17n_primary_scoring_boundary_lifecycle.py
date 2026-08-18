@@ -48,13 +48,28 @@ from warhammer40k_core.engine.destruction_provenance import (
     DestructionSourceKind,
     ModelDestructionAttribution,
 )
-from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
+from warhammer40k_core.engine.event_log import (
+    EventLog,
+    JsonValue,
+    canonical_json,
+    validate_json_value,
+)
 from warhammer40k_core.engine.game_state import GameConfig, GameState, SecondaryMissionMode
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+from warhammer40k_core.engine.mission_scoring_transaction import (
+    _card_for_state_backed_scoring,  # pyright: ignore[reportPrivateUsage]
+    _emit_objective_control_boundary_event_if_missing,  # pyright: ignore[reportPrivateUsage]
+    _transaction_objective_control_record_id,  # pyright: ignore[reportPrivateUsage]
+    _validate_secondary_primary_closure,  # pyright: ignore[reportPrivateUsage]
+    score_secondary_mission_from_state,
+)
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
     ObjectiveControlTiming,
+)
+from warhammer40k_core.engine.objective_control_record_authority import (
+    ObjectiveControlRecordAuthority,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, GameLifecycleStage
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
@@ -134,19 +149,31 @@ from warhammer40k_core.engine.runtime_modifiers import (
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
+    SecondaryMissionCardStatus,
     VictoryPointAward,
     VictoryPointCapBucket,
     VictoryPointSourceKind,
     VictoryPointTransaction,
 )
 from warhammer40k_core.engine.secondary_deployment_zone_evidence import (
+    SCORING_COMMIT_CHECKPOINT_HASH_KEY,
     SCORING_COMMIT_CHECKPOINT_ID_KEY,
+    bind_state_backed_secondary_scoring_commit,
     enemy_unit_ids_in_player_deployment_zone_for_secondary_boundary,
     enemy_unit_ids_in_player_deployment_zone_from_battlefield,
+    enemy_unit_ids_in_player_deployment_zone_from_model_placements,
+    require_state_backed_secondary_scoring_commit,
 )
-from warhammer40k_core.engine.secondary_scoring_provider import SecondaryScoringProviderKind
+from warhammer40k_core.engine.secondary_scoring_provider import (
+    SecondaryScoringProviderKind,
+    is_registered_phase11f_cap_probe,
+    secondary_scoring_provider_kind_from_token,
+    validate_generic_rule_ir_secondary_award,
+    validate_legacy_phase11f_secondary_award,
+)
 from warhammer40k_core.engine.secondary_scoring_transaction_integrity import (
     _expected_state_backed_secondary_award,  # pyright: ignore[reportPrivateUsage]
+    _legacy_score_secondary_mission_award,  # pyright: ignore[reportPrivateUsage]
     _record_for_binding,  # pyright: ignore[reportPrivateUsage]
     _reject_duplicate_tactical_source,  # pyright: ignore[reportPrivateUsage]
     _uncapped_award_from_transaction,  # pyright: ignore[reportPrivateUsage]
@@ -1945,6 +1972,658 @@ def test_uncapped_secondary_award_from_transaction_validates_cap_audit() -> None
         )
 
 
+def test_secondary_scoring_provider_fail_closed_branches() -> None:
+    assert (
+        secondary_scoring_provider_kind_from_token(SecondaryScoringProviderKind.LEGACY_PHASE11F)
+        is SecondaryScoringProviderKind.LEGACY_PHASE11F
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary scoring provider kind must be a string",
+    ):
+        secondary_scoring_provider_kind_from_token(12)
+    with pytest.raises(GameLifecycleError, match="Unsupported Secondary scoring provider kind"):
+        secondary_scoring_provider_kind_from_token("not-a-provider")
+    assert is_registered_phase11f_cap_probe(
+        source_id="assassination",
+        scoring_rule_id="phase11f-secondary-cap",
+    )
+    assert not is_registered_phase11f_cap_probe(
+        source_id="bring-it-down",
+        scoring_rule_id="bring-it-down-destroyed-vehicles",
+    )
+    legacy = VictoryPointAward(
+        player_id="player-a",
+        battle_round=1,
+        phase="fight",
+        amount=5,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+        source_id="bring-it-down",
+        scoring_timing="secondary_mission_score",
+        metadata={
+            "secondary_scoring_provider_kind": SecondaryScoringProviderKind.LEGACY_PHASE11F.value,
+            "scoring_rule_id": "bring-it-down-destroyed-vehicles",
+        },
+    )
+    validate_legacy_phase11f_secondary_award(award=legacy, expected=legacy)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Legacy Phase 11F Secondary VP requires scoring_timing secondary_mission_score",
+    ):
+        validate_legacy_phase11f_secondary_award(
+            award=replace(legacy, scoring_timing="generic_rule_execution"),
+            expected=legacy,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Legacy Phase 11F Secondary VP requires scoring_rule_id",
+    ):
+        validate_legacy_phase11f_secondary_award(
+            award=replace(
+                legacy,
+                metadata={
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.LEGACY_PHASE11F.value
+                    )
+                },
+            ),
+            expected=legacy,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="not a registered probe or score_secondary_mission",
+    ):
+        validate_legacy_phase11f_secondary_award(award=legacy, expected=None)
+    with pytest.raises(
+        GameLifecycleError,
+        match="drifted from score_secondary_mission authority",
+    ):
+        validate_legacy_phase11f_secondary_award(
+            award=legacy,
+            expected=replace(legacy, amount=legacy.amount + 1),
+        )
+    with pytest.raises(GameLifecycleError, match="Secondary VP provider kind drifted"):
+        validate_legacy_phase11f_secondary_award(
+            award=replace(
+                legacy,
+                metadata={
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.GENERIC_RULE_IR.value
+                    ),
+                    "scoring_rule_id": "bring-it-down-destroyed-vehicles",
+                },
+            ),
+            expected=legacy,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="must not carry state-backed authority",
+    ):
+        validate_legacy_phase11f_secondary_award(
+            award=replace(
+                legacy,
+                metadata={
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.LEGACY_PHASE11F.value
+                    ),
+                    "scoring_rule_id": "bring-it-down-destroyed-vehicles",
+                    "objective_control_record_id": "oc-1",
+                },
+            ),
+            expected=legacy,
+        )
+    with pytest.raises(GameLifecycleError, match="Secondary VP metadata must be an object"):
+        validate_legacy_phase11f_secondary_award(
+            award=replace(legacy, metadata=["not-an-object"]),
+            expected=legacy,
+        )
+    rule_ir = VictoryPointAward(
+        player_id="player-a",
+        battle_round=1,
+        phase="fight",
+        amount=5,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+        source_id="phase17d-generic-vp",
+        scoring_timing="generic_rule_execution",
+        metadata={
+            "secondary_scoring_provider_kind": SecondaryScoringProviderKind.GENERIC_RULE_IR.value,
+            "rule_id": "phase17d-generic-vp",
+            "clause_id": "clause-1",
+            "effect": {
+                "kind": "add_victory_points",
+                "parameters": [
+                    {"key": "unit", "value": "target"},
+                    {"key": "delta", "value": 5},
+                ],
+            },
+        },
+    )
+    validate_generic_rule_ir_secondary_award(award=rule_ir)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP requires scoring_timing generic_rule_execution",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(rule_ir, scoring_timing="secondary_mission_score")
+        )
+    with pytest.raises(GameLifecycleError, match="Generic RuleIR Secondary VP requires rule_id"):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                rule_ir,
+                metadata={
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.GENERIC_RULE_IR.value
+                    ),
+                    "clause_id": "clause-1",
+                    "effect": {
+                        "kind": "add_victory_points",
+                        "parameters": [{"key": "delta", "value": 5}],
+                    },
+                },
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="Generic RuleIR Secondary VP requires clause_id"):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                rule_ir,
+                metadata={
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.GENERIC_RULE_IR.value
+                    ),
+                    "rule_id": "phase17d-generic-vp",
+                    "effect": {
+                        "kind": "add_victory_points",
+                        "parameters": [{"key": "delta", "value": 5}],
+                    },
+                },
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP effect must be an object",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                rule_ir,
+                metadata={
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.GENERIC_RULE_IR.value
+                    ),
+                    "rule_id": "phase17d-generic-vp",
+                    "clause_id": "clause-1",
+                    "effect": ["not-an-object"],
+                },
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="Generic RuleIR Secondary VP effect kind drifted"):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                rule_ir,
+                metadata={
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.GENERIC_RULE_IR.value
+                    ),
+                    "rule_id": "phase17d-generic-vp",
+                    "clause_id": "clause-1",
+                    "effect": {"kind": "other", "parameters": [{"key": "delta", "value": 5}]},
+                },
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP effect parameters must be a list",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                rule_ir,
+                metadata={
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.GENERIC_RULE_IR.value
+                    ),
+                    "rule_id": "phase17d-generic-vp",
+                    "clause_id": "clause-1",
+                    "effect": {"kind": "add_victory_points", "parameters": {"key": "delta"}},
+                },
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP effect parameter must be an object",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                rule_ir,
+                metadata={
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.GENERIC_RULE_IR.value
+                    ),
+                    "rule_id": "phase17d-generic-vp",
+                    "clause_id": "clause-1",
+                    "effect": {"kind": "add_victory_points", "parameters": ["not-an-object"]},
+                },
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP amount drifted from the RuleIR effect delta",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                rule_ir,
+                metadata={
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.GENERIC_RULE_IR.value
+                    ),
+                    "rule_id": "phase17d-generic-vp",
+                    "clause_id": "clause-1",
+                    "effect": {
+                        "kind": "add_victory_points",
+                        "parameters": [{"key": "delta", "value": 4}],
+                    },
+                },
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP amount drifted from the RuleIR effect delta",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                rule_ir,
+                metadata={
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.GENERIC_RULE_IR.value
+                    ),
+                    "rule_id": "phase17d-generic-vp",
+                    "clause_id": "clause-1",
+                    "effect": {
+                        "kind": "add_victory_points",
+                        "parameters": [{"key": "unit", "value": "target"}],
+                    },
+                },
+            )
+        )
+
+
+def test_secondary_deployment_zone_and_integrity_fail_closed_branches() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    record = state.objective_control_records[-1]
+    transaction = _secondary_transaction(
+        state,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+    )
+    award = _award_from_transaction(transaction)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Deployment-zone secondary scoring requires GameState",
+    ):
+        enemy_unit_ids_in_player_deployment_zone_from_battlefield(
+            state=cast(GameState, object()),
+            player_id="player-a",
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Deployment-zone secondary scoring requires GameState",
+    ):
+        enemy_unit_ids_in_player_deployment_zone_for_secondary_boundary(
+            state=cast(GameState, object()),
+            record=record,
+            player_id="player-a",
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Deployment-zone secondary scoring requires GameState",
+    ):
+        enemy_unit_ids_in_player_deployment_zone_from_model_placements(
+            state=cast(GameState, object()),
+            player_id="player-a",
+            model_placements=(),
+        )
+    missing_battlefield = _bring_it_down_player_a_scored_lifecycle().state
+    assert missing_battlefield is not None
+    missing_battlefield.battlefield_state = None
+    with pytest.raises(
+        GameLifecycleError,
+        match="Deployment-zone secondary scoring requires battlefield_state",
+    ):
+        enemy_unit_ids_in_player_deployment_zone_from_battlefield(
+            state=missing_battlefield,
+            player_id="player-a",
+        )
+    missing_setup = _bring_it_down_player_a_scored_lifecycle().state
+    assert missing_setup is not None
+    missing_setup.mission_setup = None
+    with pytest.raises(
+        GameLifecycleError,
+        match="Deployment-zone secondary scoring requires MissionSetup",
+    ):
+        enemy_unit_ids_in_player_deployment_zone_from_model_placements(
+            state=missing_setup,
+            player_id="player-a",
+            model_placements=(),
+        )
+    missing_zone_battlefield = _bring_it_down_player_a_scored_lifecycle().state
+    assert missing_zone_battlefield is not None
+    missing_zone_battlefield.battlefield_state = None
+    with pytest.raises(
+        GameLifecycleError,
+        match="Deployment-zone secondary scoring requires battlefield_state",
+    ):
+        enemy_unit_ids_in_player_deployment_zone_from_model_placements(
+            state=missing_zone_battlefield,
+            player_id="player-a",
+            model_placements=(),
+        )
+    with pytest.raises(GameLifecycleError, match="player_id is not in this game"):
+        enemy_unit_ids_in_player_deployment_zone_from_model_placements(
+            state=state,
+            player_id="player-z",
+            model_placements=(),
+        )
+    setup = state.mission_setup
+    assert setup is not None
+    state.mission_setup = replace(
+        setup,
+        deployment_zones=tuple(zone.with_player_id("player-b") for zone in setup.deployment_zones),
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Deployment-zone secondary scoring requires player zone",
+    ):
+        enemy_unit_ids_in_player_deployment_zone_from_model_placements(
+            state=state,
+            player_id="player-a",
+            model_placements=(),
+        )
+    state.mission_setup = setup
+    with pytest.raises(
+        GameLifecycleError,
+        match="Deployment-zone secondary scoring requires ModelPlacement rows",
+    ):
+        enemy_unit_ids_in_player_deployment_zone_from_model_placements(
+            state=state,
+            player_id="player-a",
+            model_placements=(cast(ModelPlacement, object()),),
+        )
+    with pytest.raises(GameLifecycleError, match="Secondary VP metadata must be an object"):
+        bind_state_backed_secondary_scoring_commit(
+            replace(award, metadata=["not-an-object"]),
+            state=state,
+            record=record,
+        )
+    with pytest.raises(GameLifecycleError, match="Secondary VP metadata must be an object"):
+        require_state_backed_secondary_scoring_commit(
+            metadata=["not-an-object"],
+            state=state,
+            record=record,
+        )
+    drifted_hash = {
+        **_json_map(award.metadata, label="award metadata"),
+        SCORING_COMMIT_CHECKPOINT_HASH_KEY: "0" * 64,
+    }
+    with pytest.raises(
+        GameLifecycleError,
+        match="State-backed Secondary VP scoring-boundary checkpoint hash drifted",
+    ):
+        require_state_backed_secondary_scoring_commit(
+            metadata=drifted_hash,
+            state=state,
+            record=record,
+        )
+    with pytest.raises(GameLifecycleError, match="Secondary VP metadata must be an object"):
+        _legacy_score_secondary_mission_award(
+            state=state,
+            award=replace(award, metadata=["not-an-object"]),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Legacy Phase 11F Secondary VP requires scoring_rule_id",
+    ):
+        _legacy_score_secondary_mission_award(
+            state=state,
+            award=replace(
+                award,
+                metadata={
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.LEGACY_PHASE11F.value
+                    )
+                },
+            ),
+        )
+    legacy_non_probe = replace(
+        award,
+        metadata={
+            "secondary_scoring_provider_kind": SecondaryScoringProviderKind.LEGACY_PHASE11F.value,
+            "scoring_rule_id": "bring-it-down-destroyed-vehicles",
+        },
+    )
+    missing_legacy_setup = _bring_it_down_player_a_scored_lifecycle().state
+    assert missing_legacy_setup is not None
+    missing_legacy_setup.mission_setup = None
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP semantic validation requires MissionSetup",
+    ):
+        _legacy_score_secondary_mission_award(state=missing_legacy_setup, award=legacy_non_probe)
+    state.secondary_unit_destruction_states = []
+    assert (
+        _expected_state_backed_secondary_award(
+            state=state,
+            player_id=award.player_id,
+            source_id=award.source_id,
+            source_kind=award.source_kind,
+            hidden=award.hidden,
+            record=record,
+        )
+        is None
+    )
+    cloned = replace(record, record_id=f"{record.record_id}-clone")
+    original_authority = next(
+        authority
+        for authority in state.objective_control_record_authorities
+        if authority.objective_control_record_id == record.record_id
+    )
+    state.objective_control_records = [*state.objective_control_records, cloned]
+    state.objective_control_record_authorities = [
+        *state.objective_control_record_authorities,
+        ObjectiveControlRecordAuthority.create(
+            record=cloned,
+            boundary_checkpoint=original_authority.boundary_checkpoint,
+            retained_sticky_objective_control_states=(
+                original_authority.retained_sticky_objective_control_states
+            ),
+        ),
+    ]
+    unbound_clone = replace(
+        award,
+        metadata={
+            **_json_map(award.metadata, label="award metadata"),
+            "objective_control_record_id": cloned.record_id,
+        },
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP award drifted from authoritative scoring-state semantics",
+    ):
+        validate_secondary_award_semantics(state=state, award=unbound_clone)
+    scored_fixed = SecondaryMissionCardState.active_fixed(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+    ).score(transaction_id=transaction.transaction_id)
+    _validate_scored_tactical_card_bindings(state=state, transactions=(transaction,))
+    state.secondary_mission_card_states = [scored_fixed]
+    _validate_scored_tactical_card_bindings(state=state, transactions=(transaction,))
+
+
+def test_state_backed_secondary_scoring_helpers_fail_closed() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    event_log = lifecycle.decision_controller.event_log
+    record = state.objective_control_records[-1]
+    transaction = _secondary_transaction(
+        state,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="State-backed secondary scoring requires GameState",
+    ):
+        score_secondary_mission_from_state(
+            state=cast(GameState, object()),
+            event_log=event_log,
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+            mode=SecondaryMissionCardMode.FIXED,
+            phase=BattlePhase.FIGHT,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="State-backed secondary scoring requires EventLog",
+    ):
+        score_secondary_mission_from_state(
+            state=state,
+            event_log=cast(EventLog, object()),
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+            mode=SecondaryMissionCardMode.FIXED,
+            phase=BattlePhase.FIGHT,
+        )
+    missing_setup = _bring_it_down_player_a_scored_lifecycle().state
+    assert missing_setup is not None
+    missing_setup.mission_setup = None
+    with pytest.raises(
+        GameLifecycleError,
+        match="State-backed secondary scoring requires MissionSetup",
+    ):
+        score_secondary_mission_from_state(
+            state=missing_setup,
+            event_log=event_log,
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+            mode=SecondaryMissionCardMode.FIXED,
+            phase=BattlePhase.FIGHT,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="State-backed secondary scoring phase must be a BattlePhase",
+    ):
+        score_secondary_mission_from_state(
+            state=state,
+            event_log=event_log,
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+            mode=SecondaryMissionCardMode.FIXED,
+            phase=cast(BattlePhase, object()),
+        )
+    scored_card = SecondaryMissionCardState(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+        battle_round=state.battle_round,
+        status=SecondaryMissionCardStatus.SCORED,
+        scored_transaction_id=f"{transaction.transaction_id}-scored-a",
+    )
+    state.secondary_mission_card_states = [scored_card]
+    found = _card_for_state_backed_scoring(
+        state=state,
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.FIXED,
+    )
+    assert found == scored_card
+    state.secondary_mission_card_states = [
+        scored_card,
+        replace(
+            scored_card,
+            scored_transaction_id=f"{transaction.transaction_id}-scored-b",
+        ),
+    ]
+    with pytest.raises(GameLifecycleError, match="Multiple scored secondary card states found"):
+        _card_for_state_backed_scoring(
+            state=state,
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+            mode=SecondaryMissionCardMode.FIXED,
+        )
+    state.secondary_mission_card_states = []
+    with pytest.raises(GameLifecycleError, match="Secondary mission card is not active"):
+        _card_for_state_backed_scoring(
+            state=state,
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+            mode=SecondaryMissionCardMode.FIXED,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary scoring retry requires a VictoryPointTransaction",
+    ):
+        _transaction_objective_control_record_id(object())
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary scoring transaction metadata must include objective_control_record_id",
+    ):
+        _transaction_objective_control_record_id(replace(transaction, metadata=["not-an-object"]))
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary scoring transaction metadata must include objective_control_record_id",
+    ):
+        _transaction_objective_control_record_id(
+            replace(
+                transaction,
+                metadata={
+                    **_json_map(transaction.metadata, label="secondary metadata"),
+                    "objective_control_record_id": 12,
+                },
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary scoring Primary closure requires scoring policies",
+    ):
+        _validate_secondary_primary_closure(state=state, record=record, policies=object())
+    _emit_objective_control_boundary_event_if_missing(event_log=event_log, record=record)
+    command = _scored_command_boundary_after_mutation(kind="move")
+    command_state = command.state
+    assert command_state is not None
+    assert command_state.mission_setup is not None
+    command_record = command_state.objective_control_records[-1]
+    command_policies = mission_scoring_policies_from_setup(command_state.mission_setup)
+    _validate_secondary_primary_closure(
+        state=command_state,
+        record=command_record,
+        policies=command_policies,
+    )
+    command_state.primary_scoring_state_evidence_records = []
+    with pytest.raises(
+        GameLifecycleError,
+        match="State-backed secondary scoring found a Secondary award without Primary evidence",
+    ):
+        _validate_secondary_primary_closure(
+            state=command_state,
+            record=command_record,
+            policies=command_policies,
+        )
+    restored_command = _scored_command_boundary_after_mutation(kind="move")
+    restored_state = restored_command.state
+    assert restored_state is not None
+    assert restored_state.mission_setup is not None
+    restored_record = restored_state.objective_control_records[-1]
+    restored_policies = mission_scoring_policies_from_setup(restored_state.mission_setup)
+    restored_state.primary_scoring_boundary_lifecycles = []
+    with pytest.raises(
+        GameLifecycleError,
+        match="without a resolved Primary lifecycle",
+    ):
+        _validate_secondary_primary_closure(
+            state=restored_state,
+            record=restored_record,
+            policies=restored_policies,
+        )
+
+
 def test_restore_skips_non_state_backed_secondary_rows() -> None:
     lifecycle = _bring_it_down_player_a_scored_lifecycle()
     state = lifecycle.state
@@ -2002,6 +2681,14 @@ def test_restore_skips_non_state_backed_secondary_rows() -> None:
         for stored in state.victory_point_ledgers
     ]
     validate_secondary_transaction_semantics(state=state)
+    scored_legacy = SecondaryMissionCardState.active_tactical(
+        player_id="player-a",
+        secondary_mission_id="assassination",
+        battle_round=2,
+        source_result_id="p2-legacy-tactical-bound",
+    ).score(transaction_id=legacy_tactical.transaction_id)
+    state.secondary_mission_card_states = [scored_legacy]
+    _validate_scored_tactical_card_bindings(state=state, transactions=(legacy_tactical,))
     _reject_duplicate_tactical_source(
         state=state,
         player_id="player-a",

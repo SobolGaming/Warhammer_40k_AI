@@ -67,8 +67,6 @@ def validate_secondary_award_semantics(
     if provider is SecondaryScoringProviderKind.GENERIC_RULE_IR:
         validate_generic_rule_ir_secondary_award(award=award)
         return
-    if provider is not SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL:
-        raise GameLifecycleError("Secondary VP provider kind drifted.")
     binding = validate_state_backed_secondary_award_binding(
         award=award,
         objective_control_records=tuple(state.objective_control_records),
@@ -136,8 +134,6 @@ def validate_secondary_transaction_semantics(*, state: GameState) -> None:
                 award=_uncapped_award_from_transaction(transaction),
             )
             continue
-        if provider is not SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL:
-            raise GameLifecycleError("Secondary VP provider kind drifted.")
         if state.mission_setup is None:
             raise GameLifecycleError("Secondary VP semantic validation requires MissionSetup.")
         binding = validate_state_backed_secondary_ledger_binding(
@@ -199,8 +195,8 @@ def _legacy_score_secondary_mission_award(
     if not isinstance(metadata, dict):
         raise GameLifecycleError("Secondary VP metadata must be an object.")
     scoring_rule_id = metadata.get("scoring_rule_id")
-    if type(scoring_rule_id) is not str:
-        scoring_rule_id = ""
+    if type(scoring_rule_id) is not str or not scoring_rule_id:
+        raise GameLifecycleError("Legacy Phase 11F Secondary VP requires scoring_rule_id.")
     if is_registered_phase11f_cap_probe(
         source_id=award.source_id,
         scoring_rule_id=scoring_rule_id,
@@ -326,19 +322,14 @@ def _validate_scored_tactical_card_bindings(
             raise GameLifecycleError(
                 "Scored tactical secondary card does not identify its ledger transaction."
             )
-        provider = secondary_scoring_provider_kind_from_metadata(transaction.metadata)
-        if provider is SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL:
-            identity = state_backed_secondary_binding_identity(
-                player_id=transaction.player_id,
-                source_kind=transaction.source_kind,
-                source_id=transaction.source_id,
-                metadata=transaction.metadata,
+        if (
+            secondary_scoring_provider_kind_from_metadata(transaction.metadata)
+            is SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL
+        ):
+            validate_state_backed_secondary_ledger_binding(
+                transaction=transaction,
+                objective_control_records=tuple(state.objective_control_records),
             )
-            if identity is None:
-                raise GameLifecycleError(
-                    "Scored tactical secondary card requires authenticated "
-                    "state-backed provider provenance."
-                )
 
 
 def _expected_state_backed_secondary_award(
