@@ -79,6 +79,9 @@ from warhammer40k_core.engine.primary_scoring_turn_scope import (
     primary_scoring_rule_applies_at_record,
     primary_scoring_turn_scope_for_condition,
 )
+from warhammer40k_core.engine.primary_unit_destruction_tracking import (
+    record_primary_destroyed_model_departures,
+)
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import VictoryPointSourceKind
 from warhammer40k_core.rules.mission_pack_import import (
@@ -341,6 +344,133 @@ def test_phase17n_step5d_attached_unit_requires_every_component_to_leave() -> No
     )
     assert partial["score_count"] == 0
     assert complete["score_count"] == 1
+
+
+@pytest.mark.parametrize(
+    "removal_kind",
+    [BattlefieldRemovalKind.EMBARK, BattlefieldRemovalKind.INTO_RESERVES],
+)
+def test_phase17n_step5d_mixed_attached_identities_score_after_split(
+    removal_kind: BattlefieldRemovalKind,
+) -> None:
+    setup = _punishment_setup()
+    condemned = _condemned_selection(selected_ids=("attached-enemy",))
+    historical = _departure(
+        rules_unit_instance_id="attached-enemy",
+        occurrence_id="bodyguard-destroyed",
+        component_ids=("attached-leader", "attached-bodyguard"),
+        departed_ids=("attached-bodyguard",),
+    )
+    survivor = _departure(
+        rules_unit_instance_id="attached-leader",
+        occurrence_id="leader-left",
+        component_ids=("attached-leader",),
+        departed_ids=("attached-leader",),
+        removal_kind=removal_kind,
+    )
+    evidence = evaluate_departure_scoring_condition(
+        condition_id=CONDEMNED_ENEMY_UNITS_LEFT_BATTLEFIELD_THIS_TURN,
+        progress=_progress(condemned),
+        departures=(historical, survivor),
+        mission_setup=setup,
+        player_id="player-a",
+        battle_round=1,
+        active_player_id="player-a",
+        turn_order=("player-a", "player-b"),
+    )
+    assert evidence["score_count"] == 1
+    assert evidence["departed_condemned_rules_unit_instance_ids"] == ["attached-enemy"]
+    assert evidence["matching_departure_ids"] == sorted(
+        [historical.departure_id, survivor.departure_id]
+    )
+
+
+def test_phase17n_step5d_mixed_attached_identities_score_inverse_component_order() -> None:
+    setup = _punishment_setup()
+    condemned = _condemned_selection(selected_ids=("attached-enemy",))
+    historical = _departure(
+        rules_unit_instance_id="attached-enemy",
+        occurrence_id="leader-destroyed",
+        component_ids=("attached-leader", "attached-bodyguard"),
+        departed_ids=("attached-leader",),
+    )
+    survivor = _departure(
+        rules_unit_instance_id="attached-bodyguard",
+        occurrence_id="bodyguard-embarked",
+        component_ids=("attached-bodyguard",),
+        departed_ids=("attached-bodyguard",),
+        removal_kind=BattlefieldRemovalKind.EMBARK,
+    )
+    evidence = evaluate_departure_scoring_condition(
+        condition_id=CONDEMNED_ENEMY_UNITS_LEFT_BATTLEFIELD_THIS_TURN,
+        progress=_progress(condemned),
+        departures=(historical, survivor),
+        mission_setup=setup,
+        player_id="player-a",
+        battle_round=1,
+        active_player_id="player-a",
+        turn_order=("player-a", "player-b"),
+    )
+    assert evidence["score_count"] == 1
+    assert evidence["matching_departure_ids"] == sorted(
+        [historical.departure_id, survivor.departure_id]
+    )
+
+
+def test_phase17n_step5d_mixed_attached_identities_require_every_component() -> None:
+    setup = _punishment_setup()
+    condemned = _condemned_selection(selected_ids=("attached-enemy",))
+    evidence = evaluate_departure_scoring_condition(
+        condition_id=CONDEMNED_ENEMY_UNITS_LEFT_BATTLEFIELD_THIS_TURN,
+        progress=_progress(condemned),
+        departures=(
+            _departure(
+                rules_unit_instance_id="attached-enemy",
+                occurrence_id="bodyguard-destroyed",
+                component_ids=("attached-leader", "attached-bodyguard"),
+                departed_ids=("attached-bodyguard",),
+            ),
+            _departure(
+                rules_unit_instance_id="unrelated-enemy",
+                occurrence_id="other-unit",
+            ),
+        ),
+        mission_setup=setup,
+        player_id="player-a",
+        battle_round=1,
+        active_player_id="player-a",
+        turn_order=("player-a", "player-b"),
+    )
+    assert evidence["score_count"] == 0
+    assert evidence["matching_departure_ids"] == []
+
+
+def test_phase17n_step5d_rejects_mixed_attached_component_identity_drift() -> None:
+    setup = _punishment_setup()
+    with pytest.raises(GameLifecycleError, match="component identity drifted"):
+        evaluate_departure_scoring_condition(
+            condition_id=CONDEMNED_ENEMY_UNITS_LEFT_BATTLEFIELD_THIS_TURN,
+            progress=_progress(_condemned_selection(selected_ids=("attached-enemy",))),
+            departures=(
+                _departure(
+                    rules_unit_instance_id="attached-enemy",
+                    occurrence_id="bodyguard",
+                    component_ids=("attached-leader", "attached-bodyguard"),
+                    departed_ids=("attached-bodyguard",),
+                ),
+                _departure(
+                    rules_unit_instance_id="attached-enemy",
+                    occurrence_id="other-lineage",
+                    component_ids=("attached-leader", "attached-other"),
+                    departed_ids=("attached-other",),
+                ),
+            ),
+            mission_setup=setup,
+            player_id="player-a",
+            battle_round=1,
+            active_player_id="player-a",
+            turn_order=("player-a", "player-b"),
+        )
 
 
 def test_phase17n_step5d_ignores_other_mission_round_and_player_selections() -> None:
@@ -774,6 +904,61 @@ def test_phase17n_step5d_caps_opponent_turn_condemned_award() -> None:
     assert restored.to_payload() == state.to_payload()
 
 
+@pytest.mark.parametrize(
+    ("destroyed_component", "removal_kind"),
+    [
+        ("bodyguard", BattlefieldRemovalKind.EMBARK),
+        ("bodyguard", BattlefieldRemovalKind.INTO_RESERVES),
+        ("leader", BattlefieldRemovalKind.EMBARK),
+        ("leader", BattlefieldRemovalKind.INTO_RESERVES),
+    ],
+)
+def test_phase17n_step5d_scores_mixed_attached_identity_after_split(
+    destroyed_component: str,
+    removal_kind: BattlefieldRemovalKind,
+) -> None:
+    state, record, decisions, attached_id, survivor_id = (
+        _resolved_condemned_attached_split_departure(
+            destroyed_component=destroyed_component,
+            surviving_removal_kind=removal_kind,
+        )
+    )
+    rules_ids = {
+        departure.rules_unit_instance_id for departure in state.primary_battlefield_departure_states
+    }
+    assert attached_id in rules_ids
+    assert survivor_id in rules_ids
+    _assert_condemned_boundary_path(
+        state=state,
+        record=record,
+        decisions=decisions,
+        owner_player_id="player-a",
+        expected_vp=5,
+    )
+
+
+def test_phase17n_step5d_mixed_attached_split_without_survivor_departure_scores_zero() -> None:
+    state, record, decisions, attached_id, survivor_id = (
+        _resolved_condemned_attached_split_departure(
+            destroyed_component="bodyguard",
+            surviving_removal_kind=BattlefieldRemovalKind.EMBARK,
+            depart_survivor=False,
+        )
+    )
+    rules_ids = {
+        departure.rules_unit_instance_id for departure in state.primary_battlefield_departure_states
+    }
+    assert attached_id in rules_ids
+    assert survivor_id not in rules_ids
+    _assert_condemned_boundary_path(
+        state=state,
+        record=record,
+        decisions=decisions,
+        owner_player_id="player-a",
+        expected_vp=0,
+    )
+
+
 def _punishment_setup(
     *,
     attacker_player_id: str = "player-a",
@@ -1008,6 +1193,114 @@ def _resolved_condemned_departure(
         runtime_modifier_registry=RuntimeModifierRegistry.empty(),
     )
     return state, record, decisions
+
+
+def _resolved_condemned_attached_split_departure(
+    *,
+    destroyed_component: str,
+    surviving_removal_kind: BattlefieldRemovalKind,
+    depart_survivor: bool = True,
+) -> tuple[GameState, ObjectiveControlRecord, DecisionController, str, str]:
+    player_b_units = (
+        default_unit_selection("intercessor-unit-3"),
+        default_unit_selection("intercessor-unit-4"),
+    )
+    state, decisions, request = phase17n_punishment_pending_fixture(
+        player_b_units=player_b_units,
+        attach_first_two_enemy_units=True,
+    )
+    enemy_army = next(army for army in state.army_definitions if army.player_id == "player-b")
+    (formation,) = enemy_army.attached_units
+    attached_id = formation.attached_unit_instance_id
+    bodyguard_id = formation.bodyguard_unit_instance_id
+    leader_id = formation.leader_unit_instance_ids[0]
+    if destroyed_component == "bodyguard":
+        destroyed_id = bodyguard_id
+        survivor_id = leader_id
+    elif destroyed_component == "leader":
+        destroyed_id = leader_id
+        survivor_id = bodyguard_id
+    else:
+        raise AssertionError(f"unsupported destroyed component: {destroyed_component}")
+    option = _condemn_attached_option(request, attached_id=attached_id)
+    GameLifecycle(decision_controller=decisions, state=state).submit_decision(
+        DecisionResult.for_request(
+            result_id="step5d-attached-split-condemn-result",
+            request=request,
+            selected_option_id=option.option_id,
+        )
+    )
+    _bind_force_dispositions(state)
+    state.battle_round = 1
+    state.active_player_id = "player-a"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    _destroy_component_for_scoring(
+        state=state,
+        decisions=decisions,
+        component_id=destroyed_id,
+        attached_id=attached_id,
+    )
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-b",
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=(survivor_id,),
+        event_log=decisions.event_log,
+    )
+    if depart_survivor:
+        _depart_rules_unit(
+            state=state,
+            decisions=decisions,
+            rules_unit_instance_id=survivor_id,
+            removal_kind=surviving_removal_kind,
+            occurrence_id=f"step5d-attached-survivor-{surviving_removal_kind.value}",
+            battle_round=1,
+            active_player_id="player-a",
+        )
+    record = state.record_objective_control_boundary(
+        completed_phase=BattlePhase.FIGHT,
+        timing=ObjectiveControlTiming.TURN_END,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+    return state, record, decisions, attached_id, survivor_id
+
+
+def _condemn_attached_option(request: DecisionRequest, *, attached_id: str) -> DecisionOption:
+    for candidate in request.options:
+        selected_ids = PrimaryMissionChoiceData.from_payload(candidate.payload).selected_target_ids
+        if selected_ids == (attached_id,):
+            return candidate
+    raise AssertionError("Step 5D attached fixture requires a condemned Attached Unit option.")
+
+
+def _destroy_component_for_scoring(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    component_id: str,
+    attached_id: str,
+) -> None:
+    if state.battlefield_state is None:
+        raise AssertionError("Step 5D attached fixture requires battlefield state.")
+    placement = state.battlefield_state.unit_placement_by_id(component_id)
+    removed_model_ids = tuple(
+        model_placement.model_instance_id for model_placement in placement.model_placements
+    )
+    state.battlefield_state = state.battlefield_state.with_removed_models(removed_model_ids)
+    departures = record_primary_destroyed_model_departures(
+        state=state,
+        destroyed_model_instance_ids=removed_model_ids,
+        source_id=f"step5d-attached-destroy:{component_id}",
+        occurrence_id=f"step5d-attached-destroy:{component_id}",
+    )
+    if not departures:
+        raise AssertionError("Step 5D attached fixture requires destroyed-component departure.")
+    for departure in departures:
+        assert departure.rules_unit_instance_id == attached_id
+        assert component_id in departure.departed_component_unit_instance_ids
+        record_primary_battlefield_departure_event(
+            event_log=decisions.event_log,
+            departure=departure,
+        )
 
 
 def _condemn_option(

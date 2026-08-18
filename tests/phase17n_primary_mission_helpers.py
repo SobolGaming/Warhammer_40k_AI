@@ -11,6 +11,7 @@ from tests.phase11c_command_phase_helpers import (
 )
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.engine.actions import MissionActionState
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battlefield_state import (
     BattlefieldTransitionBatch,
     ModelDisplacementKind,
@@ -98,6 +99,8 @@ from warhammer40k_core.engine.primary_unit_destruction_tracking import (
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import PrimaryObjectiveTurnStartState
+from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
+from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import (
@@ -639,6 +642,7 @@ def phase17n_punishment_pending_fixture(
     battle_round: int = 1,
     player_a_units: tuple[UnitMusterSelection, ...] | None = None,
     player_b_units: tuple[UnitMusterSelection, ...] | None = None,
+    attach_first_two_enemy_units: bool = False,
 ) -> tuple[
     GameState,
     DecisionController,
@@ -703,6 +707,8 @@ def phase17n_punishment_pending_fixture(
                 vertical_gap_inches=0.0,
             )
         )
+    if attach_first_two_enemy_units:
+        _attach_first_two_enemy_units(state, enemy_player_id=enemy_player_id)
     record = ObjectiveControlRecord(
         record_id=(
             f"phase17n-pending-punishment-turn-start-record-{battle_round:02d}-{owner_player_id}"
@@ -750,6 +756,56 @@ def phase17n_punishment_pending_fixture(
     decisions.request_decision(request)
     _record_battle_primary_choice_requested(state=state, decisions=decisions, request=request)
     return state, decisions, request
+
+
+def _attach_first_two_enemy_units(state: GameState, *, enemy_player_id: str) -> None:
+    enemy_army = next(army for army in state.army_definitions if army.player_id == enemy_player_id)
+    if len(enemy_army.units) < 2:
+        raise AssertionError("Attached Punishment fixture requires two enemy units.")
+    bodyguard = enemy_army.units[0]
+    leader = enemy_army.units[1]
+    component_ids = tuple(sorted((bodyguard.unit_instance_id, leader.unit_instance_id)))
+    attached_id = f"attached-unit:{enemy_army.army_id}:phase17n-step5d-condemned"
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=component_ids,
+        source_id="phase17n-step5d-attached-source",
+        attachment_source_ids=("phase17n-step5d-attachment-rule",),
+    )
+    unit_by_id = {unit.unit_instance_id: unit for unit in enemy_army.units}
+    state.army_definitions = [
+        replace(army, attached_units=(formation,)) if army.player_id == enemy_player_id else army
+        for army in state.army_definitions
+    ]
+    state.starting_strength_records = sorted(
+        (
+            record
+            for record in state.starting_strength_records
+            if record.unit_instance_id not in component_ids
+        ),
+        key=lambda record: record.unit_instance_id,
+    )
+    state.starting_strength_records.append(
+        StartingStrengthRecord(
+            player_id=enemy_player_id,
+            unit_instance_id=attached_id,
+            starting_model_count=sum(
+                len(unit_by_id[component_id].own_models) for component_id in component_ids
+            ),
+            single_model_starting_wounds=None,
+            source_id=formation.source_id,
+        )
+    )
+    state.starting_strength_records.sort(key=lambda record: record.unit_instance_id)
+    state.starting_attached_unit_records = [
+        StartingAttachedUnitRecord.from_formation(
+            player_id=enemy_player_id,
+            attached_unit=formation,
+            unit_by_id=unit_by_id,
+        )
+    ]
 
 
 def phase17n_consecrate_pending_fixture() -> tuple[

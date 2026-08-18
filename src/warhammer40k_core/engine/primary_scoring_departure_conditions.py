@@ -73,27 +73,22 @@ def evaluate_departure_scoring_condition(
         turn_order=turn_order,
     )
     condemned_ids = () if selection is None else selection.selected_rules_unit_instance_ids
-    departed_ids = tuple(
-        unit_id
-        for unit_id in condemned_ids
-        if _condemned_unit_fully_left_this_turn(
+    departed_ids: list[str] = []
+    matching_rows: list[PrimaryBattlefieldDepartureState] = []
+    for unit_id in condemned_ids:
+        contributing = _condemned_unit_departures_when_fully_left(
             rules_unit_instance_id=unit_id,
             departures=this_turn,
             scoring_player_id=player_id,
         )
-    )
-    departed_id_set = set(departed_ids)
+        if contributing is None:
+            continue
+        departed_ids.append(unit_id)
+        matching_rows.extend(contributing)
     evidence = primary_score_count_evidence(score_count=int(bool(departed_ids)))
     evidence["condemned_rules_unit_instance_ids"] = list(condemned_ids)
     evidence["departed_condemned_rules_unit_instance_ids"] = list(departed_ids)
-    matching_departure_ids = tuple(
-        sorted(
-            departure.departure_id
-            for departure in this_turn
-            if departure.rules_unit_instance_id in departed_id_set
-            or departed_id_set.intersection(departure.departed_component_unit_instance_ids)
-        )
-    )
+    matching_departure_ids = tuple(sorted({departure.departure_id for departure in matching_rows}))
     evidence["matching_departure_ids"] = list(matching_departure_ids)
     return evidence
 
@@ -159,45 +154,71 @@ def _active_condemned_selection(
     return matches[0]
 
 
-def _condemned_unit_fully_left_this_turn(
+def _condemned_unit_departures_when_fully_left(
     *,
     rules_unit_instance_id: str,
     departures: tuple[PrimaryBattlefieldDepartureState, ...],
     scoring_player_id: str,
-) -> bool:
-    rules_unit_matches = tuple(
+) -> tuple[PrimaryBattlefieldDepartureState, ...] | None:
+    direct_matches = tuple(
         departure
         for departure in departures
         if departure.rules_unit_instance_id == rules_unit_instance_id
     )
-    if rules_unit_matches:
+    if direct_matches:
         _assert_enemy_departures(
-            rules_unit_matches,
+            direct_matches,
             scoring_player_id=scoring_player_id,
         )
-        component_ids = {
-            component_id
-            for departure in rules_unit_matches
-            for component_id in departure.component_unit_instance_ids
+        component_lineages = {
+            frozenset(departure.component_unit_instance_ids) for departure in direct_matches
         }
+        if len(component_lineages) != 1:
+            raise GameLifecycleError("Punishment condemned departure component identity drifted.")
+        historical_components = next(iter(component_lineages))
+        if not historical_components:
+            raise GameLifecycleError("Punishment condemned departure component identity drifted.")
+        related = list(direct_matches)
+        for departure in departures:
+            if departure.rules_unit_instance_id == rules_unit_instance_id:
+                continue
+            current_identities = frozenset(
+                (departure.rules_unit_instance_id, *departure.component_unit_instance_ids)
+            )
+            departed_identities = frozenset(departure.departed_component_unit_instance_ids)
+            if (
+                not current_identities
+                or not current_identities <= historical_components
+                or not departed_identities
+                or not departed_identities <= historical_components
+            ):
+                continue
+            related.append(departure)
+        related_matches = tuple(related)
+        _assert_enemy_departures(
+            related_matches,
+            scoring_player_id=scoring_player_id,
+        )
         departed_ids = {
             component_id
-            for departure in rules_unit_matches
+            for departure in related_matches
             for component_id in departure.departed_component_unit_instance_ids
         }
-        return bool(component_ids) and component_ids <= departed_ids
+        if historical_components <= departed_ids:
+            return related_matches
+        return None
     component_matches = tuple(
         departure
         for departure in departures
         if rules_unit_instance_id in departure.departed_component_unit_instance_ids
     )
     if not component_matches:
-        return False
+        return None
     _assert_enemy_departures(
         component_matches,
         scoring_player_id=scoring_player_id,
     )
-    return True
+    return component_matches
 
 
 def _assert_enemy_departures(
