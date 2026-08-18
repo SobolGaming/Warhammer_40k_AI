@@ -71,7 +71,7 @@ DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-EXPECTED_SOURCE_IMPORT_HASH = "c724fad0b3bf86f04abcc673b06f5e3829849177de99e9f8ad71a6430c142fd4"
+EXPECTED_SOURCE_IMPORT_HASH = "ce8cf6559a2758c02abf3ee6f3009fd63aff3f51bd3042bf393ea8552c00745f"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -1021,10 +1021,6 @@ _ENGINE_IMPLEMENTED_PRIMARY_MISSION_IDS = engine_implemented_primary_mission_ids
 
 
 _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
-    "primary-consecrate": (
-        "engine_primary_condition:consecrated_objective_thresholds",
-        "engine_primary_condition:enemy_home_objective_consecrated",
-    ),
     "primary-extract-relic": (
         "engine_primary_condition:friendly_unit_performed_sensor_sweep_this_turn",
         "engine_primary_condition:single_opponent_operation_marker_terrain_area_state",
@@ -1042,15 +1038,10 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
         "engine_primary_condition:sabotage_opponent_territory_objective_bonus",
     ),
     "primary-secure-asset": ("engine_primary_condition:friendly_unit_secured_asset_this_turn",),
-    "primary-smoke-and-mirrors": (
-        "engine_primary_condition:decoy_objective_scoring",
-        "engine_primary_condition:opponent_territory_objective_bonus",
-    ),
     "primary-surveil-the-foe": (
         "engine_primary_condition:enemy_unit_surveilled_marker_exception",
         "engine_primary_condition:no_enemy_operation_markers_on_battlefield",
     ),
-    "primary-triangulation": ("engine_primary_condition:triangulated_objective_thresholds",),
     "primary-vanguard-operation": (
         "engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn",
         "engine_primary_condition:enemy_territory_terrain_area_control",

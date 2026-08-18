@@ -194,6 +194,8 @@ class MissionScoringPolicies:
         awards: list[VictoryPointAward] = []
         for player_id in player_ids:
             policy = self.policy_for_player(player_id)
+            if not policy.primary_scoring_supported:
+                continue
             awards.extend(
                 policy.primary_awards_from_objective_control(
                     record=record,

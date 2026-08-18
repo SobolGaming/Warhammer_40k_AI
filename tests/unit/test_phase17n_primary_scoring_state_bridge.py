@@ -72,6 +72,7 @@ from warhammer40k_core.engine.primary_scoring_condition_evaluator import (
     SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS,
 )
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
+    PrimaryScoringSpatialEvidence,
     objective_control_record_hash,
 )
 from warhammer40k_core.engine.primary_scoring_state_evidence import (
@@ -324,7 +325,6 @@ def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -
     step5a_mission_ids = {
         "primary-gather-intel",
         "primary-secure-asset",
-        "primary-triangulation",
         "primary-vital-link",
     }
     coverage_by_id = {
@@ -336,7 +336,7 @@ def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -
             row.status is event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED
             for row in coverage_by_id.values()
         )
-        == 13
+        == 16
     )
     assert (
         sum(
@@ -344,7 +344,7 @@ def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -
             is event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
             for row in coverage_by_id.values()
         )
-        == 12
+        == 9
     )
     for mission_id in step5a_mission_ids:
         assert coverage_by_id[mission_id].status is (
@@ -435,14 +435,22 @@ def completed_primary_scoring_boundary() -> tuple[
     )
     if len(resolved) != 1:
         raise AssertionError("Step 5A fixture requires one resolved Primary Action.")
+    score_primary_objective_control_boundary(
+        state=state,
+        record=record,
+        end_of_battle=False,
+        event_log=decisions.event_log,
+    )
+    evidence = next(
+        candidate
+        for candidate in state.primary_scoring_state_evidence_records
+        if candidate.objective_control_record_id == record.record_id
+        and candidate.scoring_boundary_kind is PrimaryScoringBoundaryKind.ORDINARY
+    )
     return (
         state,
         record,
-        build_primary_scoring_state_evidence(
-            state=state,
-            record=record,
-            end_of_battle=False,
-        ),
+        evidence,
         departed_unit.unit_instance_id,
     )
 
@@ -730,6 +738,7 @@ def test_phase17n_step5a_end_of_battle_requires_exact_final_boundary(
             evidence,
             record=record,
             scoring_boundary_kind=PrimaryScoringBoundaryKind.END_OF_BATTLE,
+            primary_scoring_spatial_evidence_by_player_id=(),
         )
         with pytest.raises(
             GameLifecycleError,
@@ -758,6 +767,7 @@ def test_phase17n_step5a_end_of_battle_requires_exact_final_boundary(
         evidence,
         record=final_record,
         scoring_boundary_kind=PrimaryScoringBoundaryKind.END_OF_BATTLE,
+        primary_scoring_spatial_evidence_by_player_id=(),
     )
     validate_primary_scoring_state_evidence_context(
         final_evidence,
@@ -2063,6 +2073,8 @@ def _rebuild_state_evidence(
     primary_unit_destruction_state_ids: tuple[str, ...] | None = None,
     current_rules_unit_position_witnesses: tuple[PrimaryScoringRulesUnitPositionWitness, ...]
     | None = None,
+    primary_scoring_spatial_evidence_by_player_id: tuple[PrimaryScoringSpatialEvidence, ...]
+    | None = None,
 ) -> PrimaryScoringStateEvidence:
     return PrimaryScoringStateEvidence.create(
         game_id=evidence.game_id,
@@ -2113,6 +2125,8 @@ def _rebuild_state_evidence(
         ),
         primary_scoring_spatial_evidence_by_player_id=(
             evidence.primary_scoring_spatial_evidence_by_player_id
+            if primary_scoring_spatial_evidence_by_player_id is None
+            else primary_scoring_spatial_evidence_by_player_id
         ),
     )
 

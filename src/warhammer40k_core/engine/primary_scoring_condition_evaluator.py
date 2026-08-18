@@ -23,6 +23,10 @@ from warhammer40k_core.engine.primary_scoring_conditions import (
     opponent_home_control_evidence,
     primary_score_count_evidence,
 )
+from warhammer40k_core.engine.primary_scoring_marker_conditions import (
+    PRIMARY_SCORING_MARKER_CONDITIONS,
+    evaluate_marker_scoring_condition,
+)
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     PrimaryScoringSpatialEvidence,
     objective_control_record_hash,
@@ -30,6 +34,7 @@ from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
 
 SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS = frozenset(
     {
+        *PRIMARY_SCORING_MARKER_CONDITIONS,
         "control_central_and_expansion_objectives",
         "control_enemy_home_objective",
         "control_four_or_more_objectives_end_of_battle",
@@ -231,6 +236,8 @@ def evaluate_primary_scoring_condition(
         raise GameLifecycleError(f"Unsupported primary scoring condition: {condition_id}.")
     if type(context) is not PrimaryScoringConditionContext:
         raise GameLifecycleError("Primary scoring condition evaluation requires a typed context.")
+    if condition_id in PRIMARY_SCORING_MARKER_CONDITIONS:
+        return _marker_condition_evidence(condition_id=condition_id, context=context)
     objective = _objective_evidence(context)
     record = context.record
 
@@ -472,6 +479,39 @@ def evaluate_primary_scoring_condition(
         )
         return evidence
     raise GameLifecycleError(f"Unsupported primary scoring condition: {condition_id}.")
+
+
+def _marker_condition_evidence(
+    *,
+    condition_id: str,
+    context: PrimaryScoringConditionContext,
+) -> dict[str, JsonValue]:
+    if context.state_evidence is None:
+        raise GameLifecycleError(
+            f"Primary scoring condition {condition_id} requires state evidence."
+        )
+    opponent_territory_objective_ids: tuple[str, ...] | None = None
+    opponent_player_id: str | None = None
+    if condition_id == "each_decoy_objective_in_opponent_territory_bonus":
+        spatial = _required_spatial_evidence(context, condition=condition_id)
+        expected_ids = _opponent_territory_objective_ids(context)
+        if spatial.opponent_territory_objective_ids != expected_ids:
+            raise GameLifecycleError(
+                "Primary scoring spatial evidence opponent-territory objectives drifted "
+                "from MissionSetup."
+            )
+        opponent_territory_objective_ids = spatial.opponent_territory_objective_ids
+        opponent_player_id = _opponent_player_id(context)
+    return evaluate_marker_scoring_condition(
+        condition_id=condition_id,
+        progress=context.state_evidence.primary_mission_progress_state,
+        mission_setup=context.mission_setup,
+        player_id=context.player_id,
+        battle_round=context.record.battle_round,
+        end_of_battle=context.end_of_battle,
+        opponent_territory_objective_ids=opponent_territory_objective_ids,
+        opponent_player_id=opponent_player_id,
+    )
 
 
 def _empty_objective_evidence(objective: _ObjectiveEvidence) -> _ObjectiveEvidence:

@@ -164,6 +164,7 @@
     "tests/unit/test_phase17n_primary_scoring_state_bridge.py": 82.919,
     "tests/unit/test_phase17n_runtime_rule_ir_oc_authority.py": 5.75,
     "tests/unit/test_phase17n_step5a_objective_predicates.py": 0.517,
+    "tests/unit/test_phase17n_step5b_marker_conditions.py": 27.98,
     "tests/unit/test_phase18a_cli_projection.py": 22.004,
     "tests/unit/test_phase18b_opportunity_windows.py": 0.015,
     "tests/unit/test_phase18c_adapter_session_facade.py": 17.255,
@@ -199,26 +200,26 @@
   "shard_count": 4,
   "shards": [
     {
-      "duration_seconds": 3458.99,
+      "duration_seconds": 3465.985,
       "shard_id": 1,
       "test_file_count": 48
     },
     {
-      "duration_seconds": 3458.991,
+      "duration_seconds": 3465.985,
       "shard_id": 2,
       "test_file_count": 49
     },
     {
-      "duration_seconds": 3458.99,
+      "duration_seconds": 3465.985,
       "shard_id": 3,
       "test_file_count": 49
     },
     {
-      "duration_seconds": 3458.99,
+      "duration_seconds": 3465.986,
       "shard_id": 4,
-      "test_file_count": 49
+      "test_file_count": 50
     }
   ],
   "strategy": "largest-processing-time-by-historical-file-duration",
-  "total_test_duration_seconds": 13835.961
+  "total_test_duration_seconds": 13863.941
 }

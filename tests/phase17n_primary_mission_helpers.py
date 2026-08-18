@@ -85,6 +85,10 @@ from warhammer40k_core.engine.primary_mission_choices import (
     punishment_choice_request,
     sensor_sweep_marker_removal_choice_request,
 )
+from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+    PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
+    mark_pending_primary_scoring_boundaries,
+)
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     build_primary_rules_unit_turn_start_snapshot,
 )
@@ -127,6 +131,7 @@ def phase17n_started_primary_action_fixture(
     current_phase: BattlePhase,
     player_unit_count: int = 1,
     vanguard_enemy_position: str | None = None,
+    target_objective_id: str | None = None,
 ) -> tuple[GameState, DecisionController, MissionActionState, str]:
     if player_unit_count == 1:
         state = battle_state()
@@ -296,11 +301,18 @@ def phase17n_started_primary_action_fixture(
             )
         )
     else:
-        target_marker = next(
-            marker
-            for marker in state.mission_setup.objective_markers
-            if marker.objective_role is ObjectiveMarkerRole.CENTRAL
-        )
+        if target_objective_id is None:
+            target_marker = next(
+                marker
+                for marker in state.mission_setup.objective_markers
+                if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+            )
+        else:
+            target_marker = next(
+                marker
+                for marker in state.mission_setup.objective_markers
+                if marker.objective_marker_id == target_objective_id
+            )
         target_id = target_marker.objective_marker_id
         placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
         state.battlefield_state = state.battlefield_state.with_unit_placement(
@@ -310,32 +322,33 @@ def phase17n_started_primary_action_fixture(
                 offsets=((0.0, 0.0), (1.0, 0.0), (2.0, 0.0), (0.0, 1.0), (1.0, 1.0)),
             )
         )
-        additional_targets = tuple(
-            marker
-            for marker in state.mission_setup.objective_markers
-            if marker.objective_role is ObjectiveMarkerRole.CENTRAL
-            and marker.objective_marker_id != target_id
-        )
-        assert len(additional_targets) >= len(units) - 1
-        for additional_unit, additional_target in zip(
-            units[1:], additional_targets[: len(units) - 1], strict=True
-        ):
-            additional_placement = state.battlefield_state.unit_placement_by_id(
-                additional_unit.unit_instance_id
+        if target_objective_id is None:
+            additional_targets = tuple(
+                marker
+                for marker in state.mission_setup.objective_markers
+                if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+                and marker.objective_marker_id != target_id
             )
-            state.battlefield_state = state.battlefield_state.with_unit_placement(
-                with_model_offsets(
-                    additional_placement,
-                    additional_target,
-                    offsets=(
-                        (0.0, 0.0),
-                        (1.0, 0.0),
-                        (2.0, 0.0),
-                        (0.0, 1.0),
-                        (1.0, 1.0),
-                    ),
+            assert len(additional_targets) >= len(units) - 1
+            for additional_unit, additional_target in zip(
+                units[1:], additional_targets[: len(units) - 1], strict=True
+            ):
+                additional_placement = state.battlefield_state.unit_placement_by_id(
+                    additional_unit.unit_instance_id
                 )
-            )
+                state.battlefield_state = state.battlefield_state.with_unit_placement(
+                    with_model_offsets(
+                        additional_placement,
+                        additional_target,
+                        offsets=(
+                            (0.0, 0.0),
+                            (1.0, 0.0),
+                            (2.0, 0.0),
+                            (0.0, 1.0),
+                            (1.0, 1.0),
+                        ),
+                    )
+                )
     decisions = DecisionController()
     status = request_mission_action_start(
         state=state,
@@ -383,24 +396,20 @@ def phase17n_action_turn_end_record(
             ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
         )
     )
-    record = replace(
-        resolved,
-        record_id=f"phase17n-action-turn-end:{action.action_id}",
-    )
-    state.record_objective_control_record(record)
+    state.record_objective_control_record(resolved)
     decisions.event_log.append(
         "end_boundary_objective_control_determined",
         {
             "game_id": state.game_id,
             "battle_round": state.battle_round,
             "phase": BattlePhase.FIGHT.value,
-            "record_ids": [record.record_id],
+            "record_ids": [resolved.record_id],
             "source_rule_id": (
                 "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
             ),
         },
     )
-    return record
+    return resolved
 
 
 def append_authenticated_normal_move(
@@ -834,6 +843,11 @@ def phase17n_consecrate_pending_fixture() -> tuple[
     assert request is not None
     decisions.request_decision(request)
     _record_battle_primary_choice_requested(state=state, decisions=decisions, request=request)
+    mark_pending_primary_scoring_boundaries(
+        state=state,
+        pending_window=PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
+        pending_decision_request_id=request.request_id,
+    )
     return state, decisions, request
 
 

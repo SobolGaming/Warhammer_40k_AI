@@ -67,7 +67,7 @@ Secondary status:
 ## Summary
 
 - Primary matrix cells: 25 of 25 `implemented`.
-- Primary scoring coverage: 13 of 25 `engine_implemented`, 12
+- Primary scoring coverage: 16 of 25 `engine_implemented`, 9
   `source_known_engine_pending`, 0 `awaiting_source`.
 - Phase 17N Step 4 exposes all ten source-backed Primary Mission Actions:
   `decoy-objective`, `triangulate-objective`, `extract-intelligence`,
@@ -89,10 +89,12 @@ Secondary status:
   and component sets are complete against authoritative history, rejects future/stale chronology and
   non-final end-of-battle claims, and keeps full rows replay-only rather than in
   viewer-scoped projections.
-  It also implements four simple source-backed objective predicates without
-  promoting any of the 12 condition-pending missions. Counts remain 13/12
-  missions and 6/15 pairings (18/45 variants), with no pairing certification
-  claimed.
+  It also implements four simple source-backed objective predicates.
+- Phase 17N Step 5B scores consecrated, decoy, and triangulated markers through
+  the shared generic condition path and `PrimaryScoringStateEvidence`. Consecrate,
+  Smoke and Mirrors, and Triangulation are now `engine_implemented`. Counts are
+  16/9 missions and 7/15 pairings (21/45 variants). Smoke does not complete a
+  two-sided pairing. Pairing-wide certification is not claimed.
 - Runtime Mission Actions: 14 total. The ten Step 4 Primary Actions join Death
   Trap's `booby-trap-terrain`, Terraform's `terraform-objective`, Cleanse's
   `cleanse-objective`, and Plunder's `plunder-terrain`. They are automatically
@@ -110,8 +112,8 @@ Secondary status:
 - Phase 17N has source-hashed executable battlefield packages for all 45 Event
   Companion layouts: all 15 Force Disposition pairings and each pairing's A/B/C
   variants. No layout identity remains geometry-pending.
-- Six of the 15 two-sided Force Disposition pairings now have executable
-  Primaries in both directions, covering 18 of the 45 A/B/C layout variants.
+- Seven of the 15 two-sided Force Disposition pairings now have executable
+  Primaries in both directions, covering 21 of the 45 A/B/C layout variants.
 - The local [Event Companion Battlefield Viewer](BATTLEFIELD_VIEWER.md)
   consumes `battlefield-view-v4-phase17n-step3` directly for every layout. It provides
   an orbitable 3D schematic of classifications, component footprints, walls,
@@ -203,12 +205,12 @@ Secondary status:
 - All 25 Primary missions' source timing, VP values, structured condition
   tokens, current engine-support status, and the ten source-backed Primary Mission
   Action descriptors are committed in `primary-scoring.json`. Its package hash
-  is `a2adf58fea80100b46e473d808c9a605be87ca71189b5815f4445c26decb4c2c`
+  is `b3a02c5991091d3b405a60abefc646e1223947d9c8475a5dd444515b9e2a0a1d`
   and its raw artifact SHA-256 is
-  `b7bde84fbe50e575a7da5dbac62e2cdb4cbcd0c3346287a8028a19cdc563caba`.
+  `219936a61ddf127df6dc8ec34aa96552f7b8d9a2b1a57762b10b9316042735b5`.
   The typed loader pins both hashes, the exact 25-mission/100-rule/10-action
   inventory, the exact nine-token timing vocabulary, the complete resolution
-  group grammar, and the honest 13 `engine_implemented` versus 12
+  group grammar, and the honest 16 `engine_implemented` versus 9
   `source_known_engine_pending` boundary. Repository reviews are pinned to PRs
   #107, #134, #136, and #379. PR #107 is the source-backed origin for Death
   Trap, Immovable Object, and Unstoppable Force. Only Meatgrinder currently
@@ -228,18 +230,19 @@ Secondary status:
   timing string is insufficient. The same validator runs for live awards and
   restored ledgers, including ordinary per-round Primary-total validation. The
   derived Event Companion source identity is
-  `c724fad0b3bf86f04abcc673b06f5e3829849177de99e9f8ad71a6430c142fd4`.
+  `ce8cf6559a2758c02abf3ee6f3009fd63aff3f51bd3042bf393ea8552c00745f`.
 - Verify that the committed battlefield artifact still matches its reviewed
   inputs without writing files with
   `uv run python tools/build_event_companion_battlefields.py --check`.
 - Completing all battlefield packages does not by itself promote Primary
-  Mission scoring. The eight Step 2 promotions are backed by generic runtime
+  Mission scoring.   The eight Step 2 promotions are backed by generic runtime
   timing/resolution and objective, territory, table-quarter, destruction, and
   turn-history evidence. Purge and Secure is the thirteenth executable Primary,
   backed by objective-at-turn-start destruction history and exact-kill
-  friendly-source objective occupancy. The other 12 missions remain fail-closed
-  until their listed card-specific scoring conditions have engine-owned
-  evidence and validation.
+  friendly-source objective occupancy. Step 5B then promotes Consecrate, Smoke
+  and Mirrors, and Triangulation on marker scoring evidence. The other 9
+  missions remain fail-closed until their listed card-specific scoring
+  conditions have engine-owned evidence and validation.
   Battlefield pages are authority for layout facts, not mission-card scoring
   clauses.
 - Component source-image placement and orientation come from reviewed
@@ -288,7 +291,7 @@ five-battle-round game, as configured by the current Event Companion package.
 | `purge-the-foe` | `purge-the-foe` | Meatgrinder | `primary-meatgrinder` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `purge-the-foe` | `take-and-hold` | Unstoppable Force | `primary-unstoppable-force` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `purge-the-foe` | `disruption` | Punishment | `primary-punishment` | `implemented` | `source_known_engine_pending` | 4 | 0 | `engine_primary_condition:condemned_enemy_units_left_battlefield` |
-| `purge-the-foe` | `reconnaissance` | Consecrate | `primary-consecrate` | `implemented` | `source_known_engine_pending` | 5 | 0 | `engine_primary_condition:consecrated_objective_thresholds`, `engine_primary_condition:enemy_home_objective_consecrated` |
+| `purge-the-foe` | `reconnaissance` | Consecrate | `primary-consecrate` | `implemented` | `engine_implemented` | 5 | 0 | None |
 | `purge-the-foe` | `priority-assets` | Destroyer's Wrath | `primary-destroyers-wrath` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `take-and-hold` | `purge-the-foe` | Immovable Object | `primary-immovable-object` | `implemented` | `engine_implemented` | 3 | 0 | None |
 | `take-and-hold` | `take-and-hold` | Battlefield Dominance | `primary-battlefield-dominance` | `implemented` | `engine_implemented` | 3 | 0 | None |
@@ -298,9 +301,9 @@ five-battle-round game, as configured by the current Event Companion package.
 | `disruption` | `purge-the-foe` | Delaying Action | `primary-delaying-action` | `implemented` | `engine_implemented` | 3 | 0 | None |
 | `disruption` | `take-and-hold` | Death Trap | `primary-death-trap` | `implemented` | `engine_implemented` | 4 | 1 | None |
 | `disruption` | `disruption` | Outmanoeuvre | `primary-outmaneuver` | `implemented` | `engine_implemented` | 4 | 0 | None |
-| `disruption` | `reconnaissance` | Smoke and Mirrors | `primary-smoke-and-mirrors` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_condition:decoy_objective_scoring`, `engine_primary_condition:opponent_territory_objective_bonus` |
+| `disruption` | `reconnaissance` | Smoke and Mirrors | `primary-smoke-and-mirrors` | `implemented` | `engine_implemented` | 4 | 1 | None |
 | `disruption` | `priority-assets` | Locate and Deny | `primary-locate-and-deny` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_condition:single_friendly_operation_marker_terrain_area_state` |
-| `reconnaissance` | `purge-the-foe` | Triangulation | `primary-triangulation` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_condition:triangulated_objective_thresholds` |
+| `reconnaissance` | `purge-the-foe` | Triangulation | `primary-triangulation` | `implemented` | `engine_implemented` | 5 | 1 | None |
 | `reconnaissance` | `take-and-hold` | Reconnaissance Sweep | `primary-reconnaissance-sweep` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `reconnaissance` | `disruption` | Surveil the Foe | `primary-surveil-the-foe` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_condition:enemy_unit_surveilled_marker_exception`, `engine_primary_condition:no_enemy_operation_markers_on_battlefield` |
 | `reconnaissance` | `reconnaissance` | Gather Intel | `primary-gather-intel` | `implemented` | `source_known_engine_pending` | 5 | 1 | `engine_primary_condition:each_friendly_unit_extracted_intelligence_this_turn`, `engine_primary_condition:gather_intel_operation_marker_end_of_battle` |
@@ -414,10 +417,10 @@ five-battle-round game, as configured by the current Event Companion package.
   choices and Surveil the Foe's engine-owned move cleanup for enemy operation
   markers.
 - Step 5A's scoring-state bridge and four simple objective predicates are
-  complete. Pairing-wide normal-lifecycle, replay, and viewer-scoped projection
-  certification remains later Phase 17N Step 5 work; neither Step 4 nor Step 5A
-  promotes the 12 condition-pending cards or claims complete pairing
-  certification.
+  complete. Step 5B promotes Consecrate, Smoke and Mirrors, and Triangulation
+  through marker scoring conditions. Pairing-wide normal-lifecycle, replay, and
+  viewer-scoped projection certification remains later Phase 17N Step 5 work.
+  Nine condition-pending cards remain fail-closed.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,
   tactical draw, scoring, retain/discard, Fixed card states that remain active
   after scoring, the 20 VP per Fixed Mission card cap, state-backed awards, and
