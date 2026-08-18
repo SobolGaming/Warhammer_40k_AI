@@ -71,7 +71,7 @@ DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-EXPECTED_SOURCE_IMPORT_HASH = "ce8cf6559a2758c02abf3ee6f3009fd63aff3f51bd3042bf393ea8552c00745f"
+EXPECTED_SOURCE_IMPORT_HASH = "ca61d092eb5bfac8ccf85fed76c12fff1eb424ec9486da823541c1425b6c4079"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -1022,29 +1022,18 @@ _ENGINE_IMPLEMENTED_PRIMARY_MISSION_IDS = engine_implemented_primary_mission_ids
 
 _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
     "primary-extract-relic": (
-        "engine_primary_condition:friendly_unit_performed_sensor_sweep_this_turn",
         "engine_primary_condition:single_opponent_operation_marker_terrain_area_state",
     ),
     "primary-gather-intel": (
-        "engine_primary_condition:each_friendly_unit_extracted_intelligence_this_turn",
         "engine_primary_condition:gather_intel_operation_marker_end_of_battle",
     ),
     "primary-locate-and-deny": (
         "engine_primary_condition:single_friendly_operation_marker_terrain_area_state",
     ),
     "primary-punishment": ("engine_primary_condition:condemned_enemy_units_left_battlefield",),
-    "primary-sabotage": (
-        "engine_primary_condition:each_friendly_unit_committed_sabotage_this_turn",
-        "engine_primary_condition:sabotage_opponent_territory_objective_bonus",
-    ),
-    "primary-secure-asset": ("engine_primary_condition:friendly_unit_secured_asset_this_turn",),
     "primary-surveil-the-foe": (
         "engine_primary_condition:enemy_unit_surveilled_marker_exception",
         "engine_primary_condition:no_enemy_operation_markers_on_battlefield",
-    ),
-    "primary-vanguard-operation": (
-        "engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn",
-        "engine_primary_condition:enemy_territory_terrain_area_control",
     ),
     "primary-vital-link": ("engine_primary_condition:central_objective_operation_marker_bonus",),
 }
