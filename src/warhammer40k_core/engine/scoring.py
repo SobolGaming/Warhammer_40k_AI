@@ -64,6 +64,7 @@ from warhammer40k_core.engine.primary_victory_point_policy import (
     validate_primary_victory_point_award,
     validate_victory_point_ledger_policy,
 )
+from warhammer40k_core.engine.secondary_scoring_provider import SecondaryScoringProviderKind
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 
 
@@ -2508,6 +2509,9 @@ class MissionScoringPolicy:
             scoring_timing="secondary_mission_score",
             hidden=hidden,
             metadata={
+                "secondary_scoring_provider_kind": (
+                    SecondaryScoringProviderKind.LEGACY_PHASE11F.value
+                ),
                 "secondary_mission_id": requested_secondary_id,
                 "scoring_rule_id": rule.rule_id,
                 "scoring_rule_condition": rule.condition,
@@ -2624,6 +2628,9 @@ class MissionScoringPolicy:
             hidden=hidden,
             metadata=validate_json_value(
                 {
+                    "secondary_scoring_provider_kind": (
+                        SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL.value
+                    ),
                     "secondary_mission_id": requested_secondary,
                     "objective_control_record_id": record.record_id,
                     "scoring_rule_ids": rule_ids,

@@ -328,7 +328,6 @@ from warhammer40k_core.engine.victory_point_policy_validation import (
     validate_victory_point_ledger_policy_sources,
     validate_victory_point_ledgers,
 )
-from warhammer40k_core.geometry import shapely_backend
 
 
 class SecondaryMissionMode(StrEnum):
@@ -5532,45 +5531,14 @@ class GameState:
         )
 
     def enemy_unit_ids_in_player_deployment_zone(self, player_id: str) -> tuple[str, ...]:
-        if self.mission_setup is None:
-            raise GameLifecycleError("Deployment-zone secondary scoring requires MissionSetup.")
-        if self.battlefield_state is None:
-            raise GameLifecycleError(
-                "Deployment-zone secondary scoring requires battlefield_state."
-            )
-        requested_player = _validate_player_id(player_id, player_ids=self.player_ids)
-        zones = tuple(
-            zone
-            for zone in self.mission_setup.deployment_zones
-            if zone.player_id == requested_player
+        from warhammer40k_core.engine.secondary_deployment_zone_evidence import (
+            enemy_unit_ids_in_player_deployment_zone_from_battlefield,
         )
-        if not zones:
-            raise GameLifecycleError("Deployment-zone secondary scoring requires player zone.")
-        scenario = BattlefieldScenario(
-            armies=tuple(self.army_definitions),
-            battlefield_state=self.battlefield_state,
+
+        return enemy_unit_ids_in_player_deployment_zone_from_battlefield(
+            state=self,
+            player_id=player_id,
         )
-        enemy_unit_ids: set[str] = set()
-        for placed_army in self.battlefield_state.placed_armies:
-            if placed_army.player_id == requested_player:
-                continue
-            for unit_placement in placed_army.unit_placements:
-                for model_placement in unit_placement.model_placements:
-                    model = geometry_model_for_placement(
-                        model=scenario.model_instance_for_placement(model_placement),
-                        placement=model_placement,
-                    )
-                    if any(
-                        shapely_backend.base_footprint_intersects_deployment_zone(
-                            model.base,
-                            model.pose,
-                            zone,
-                        )
-                        for zone in zones
-                    ):
-                        enemy_unit_ids.add(unit_placement.unit_instance_id)
-                        break
-        return tuple(sorted(enemy_unit_ids))
 
     def _resolve_end_turn_cleanup_boundary(self, *, completed_phase: BattlePhase) -> None:
         if self.battlefield_state is None:

@@ -13,9 +13,20 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
     VictoryPointTransaction,
 )
+from warhammer40k_core.engine.secondary_deployment_zone_evidence import (
+    bind_state_backed_secondary_scoring_commit,
+    enemy_unit_ids_in_player_deployment_zone_for_secondary_boundary,
+    require_state_backed_secondary_scoring_commit,
+)
+from warhammer40k_core.engine.secondary_scoring_provider import (
+    SecondaryScoringProviderKind,
+    is_registered_phase11f_cap_probe,
+    secondary_scoring_provider_kind_from_metadata,
+    validate_generic_rule_ir_secondary_award,
+    validate_legacy_phase11f_secondary_award,
+)
 from warhammer40k_core.engine.secondary_victory_point_policy import (
     state_backed_secondary_binding_identity,
-    state_backed_secondary_objective_control_record_id,
     validate_state_backed_secondary_award_binding,
     validate_state_backed_secondary_ledger_binding,
 )
@@ -46,8 +57,18 @@ def validate_secondary_award_semantics(
         raise GameLifecycleError("Secondary VP semantic validation requires an award.")
     if award.source_kind not in _SECONDARY_SOURCE_KINDS:
         raise GameLifecycleError("Secondary VP semantic validation requires a Secondary award.")
-    if state_backed_secondary_objective_control_record_id(award.metadata) is None:
+    provider = secondary_scoring_provider_kind_from_metadata(award.metadata)
+    if provider is SecondaryScoringProviderKind.LEGACY_PHASE11F:
+        validate_legacy_phase11f_secondary_award(
+            award=award,
+            expected=_legacy_score_secondary_mission_award(state=state, award=award),
+        )
         return
+    if provider is SecondaryScoringProviderKind.GENERIC_RULE_IR:
+        validate_generic_rule_ir_secondary_award(award=award)
+        return
+    if provider is not SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL:
+        raise GameLifecycleError("Secondary VP provider kind drifted.")
     binding = validate_state_backed_secondary_award_binding(
         award=award,
         objective_control_records=tuple(state.objective_control_records),
@@ -67,13 +88,19 @@ def validate_secondary_award_semantics(
         battle_round=award.battle_round,
         require_scored_transaction_id=None,
     )
+    record = _record_for_binding(state=state, binding=binding)
+    require_state_backed_secondary_scoring_commit(
+        metadata=award.metadata,
+        state=state,
+        record=record,
+    )
     expected = _expected_state_backed_secondary_award(
         state=state,
         player_id=award.player_id,
         source_id=award.source_id,
         source_kind=award.source_kind,
         hidden=award.hidden,
-        record=_record_for_binding(state=state, binding=binding),
+        record=record,
     )
     if expected is None or award != expected:
         raise GameLifecycleError(
@@ -96,8 +123,21 @@ def validate_secondary_transaction_semantics(*, state: GameState) -> None:
     seen_bindings: set[tuple[str, VictoryPointSourceKind, str, str]] = set()
     seen_tactical_sources: set[tuple[str, str]] = set()
     for transaction in transactions:
-        if state_backed_secondary_objective_control_record_id(transaction.metadata) is None:
+        provider = secondary_scoring_provider_kind_from_metadata(transaction.metadata)
+        if provider is SecondaryScoringProviderKind.LEGACY_PHASE11F:
+            actual = _uncapped_award_from_transaction(transaction)
+            validate_legacy_phase11f_secondary_award(
+                award=actual,
+                expected=_legacy_score_secondary_mission_award(state=state, award=actual),
+            )
             continue
+        if provider is SecondaryScoringProviderKind.GENERIC_RULE_IR:
+            validate_generic_rule_ir_secondary_award(
+                award=_uncapped_award_from_transaction(transaction),
+            )
+            continue
+        if provider is not SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL:
+            raise GameLifecycleError("Secondary VP provider kind drifted.")
         if state.mission_setup is None:
             raise GameLifecycleError("Secondary VP semantic validation requires MissionSetup.")
         binding = validate_state_backed_secondary_ledger_binding(
@@ -128,13 +168,19 @@ def validate_secondary_transaction_semantics(*, state: GameState) -> None:
                 else None
             ),
         )
+        record = _record_for_binding(state=state, binding=binding)
+        require_state_backed_secondary_scoring_commit(
+            metadata=transaction.metadata,
+            state=state,
+            record=record,
+        )
         expected = _expected_state_backed_secondary_award(
             state=state,
             player_id=transaction.player_id,
             source_id=transaction.source_id,
             source_kind=transaction.source_kind,
             hidden=transaction.hidden,
-            record=_record_for_binding(state=state, binding=binding),
+            record=record,
         )
         actual = _uncapped_award_from_transaction(transaction)
         if expected is None or actual != expected:
@@ -142,6 +188,35 @@ def validate_secondary_transaction_semantics(*, state: GameState) -> None:
                 "Secondary VP transactions drifted from authoritative scoring-state semantics."
             )
     _validate_scored_tactical_card_bindings(state=state, transactions=transactions)
+
+
+def _legacy_score_secondary_mission_award(
+    *,
+    state: GameState,
+    award: VictoryPointAward,
+) -> VictoryPointAward | None:
+    metadata = award.metadata
+    if not isinstance(metadata, dict):
+        raise GameLifecycleError("Secondary VP metadata must be an object.")
+    scoring_rule_id = metadata.get("scoring_rule_id")
+    if type(scoring_rule_id) is not str:
+        scoring_rule_id = ""
+    if is_registered_phase11f_cap_probe(
+        source_id=award.source_id,
+        scoring_rule_id=scoring_rule_id,
+    ):
+        return None
+    if state.mission_setup is None:
+        raise GameLifecycleError("Secondary VP semantic validation requires MissionSetup.")
+    policies = mission_scoring_policies_from_setup(state.mission_setup)
+    return policies.secondary_award(
+        player_id=award.player_id,
+        battle_round=award.battle_round,
+        phase=award.phase,
+        secondary_mission_id=award.source_id,
+        source_kind=award.source_kind,
+        hidden=award.hidden,
+    )
 
 
 def _reject_duplicate_secondary_binding(
@@ -173,7 +248,10 @@ def _reject_duplicate_tactical_source(
         for transaction in ledger.transactions:
             if transaction.source_kind is not VictoryPointSourceKind.TACTICAL_SECONDARY:
                 continue
-            if state_backed_secondary_objective_control_record_id(transaction.metadata) is None:
+            if (
+                secondary_scoring_provider_kind_from_metadata(transaction.metadata)
+                is not SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL
+            ):
                 continue
             if transaction.player_id == player_id and transaction.source_id == source_id:
                 raise GameLifecycleError(
@@ -248,6 +326,19 @@ def _validate_scored_tactical_card_bindings(
             raise GameLifecycleError(
                 "Scored tactical secondary card does not identify its ledger transaction."
             )
+        provider = secondary_scoring_provider_kind_from_metadata(transaction.metadata)
+        if provider is SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL:
+            identity = state_backed_secondary_binding_identity(
+                player_id=transaction.player_id,
+                source_kind=transaction.source_kind,
+                source_id=transaction.source_id,
+                metadata=transaction.metadata,
+            )
+            if identity is None:
+                raise GameLifecycleError(
+                    "Scored tactical secondary card requires authenticated "
+                    "state-backed provider provenance."
+                )
 
 
 def _expected_state_backed_secondary_award(
@@ -262,7 +353,7 @@ def _expected_state_backed_secondary_award(
     if state.mission_setup is None:
         raise GameLifecycleError("Secondary VP semantic validation requires MissionSetup.")
     policies = mission_scoring_policies_from_setup(state.mission_setup)
-    return policies.secondary_award_from_mission_state(
+    award = policies.secondary_award_from_mission_state(
         player_id=player_id,
         battle_round=record.battle_round,
         phase=record.phase,
@@ -275,10 +366,17 @@ def _expected_state_backed_secondary_award(
         objective_cleanse_states=tuple(state.secondary_objective_cleanse_states),
         terrain_plunder_states=tuple(state.secondary_terrain_plunder_states),
         enemy_unit_ids_in_player_deployment_zone=(
-            state.enemy_unit_ids_in_player_deployment_zone(player_id)
+            enemy_unit_ids_in_player_deployment_zone_for_secondary_boundary(
+                state=state,
+                record=record,
+                player_id=player_id,
+            )
         ),
         starting_strength_records=tuple(state.starting_strength_records),
     )
+    if award is None:
+        return None
+    return bind_state_backed_secondary_scoring_commit(award, state=state, record=record)
 
 
 def _record_for_binding(

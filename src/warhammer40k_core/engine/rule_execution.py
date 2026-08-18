@@ -53,6 +53,7 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
     VictoryPointTransactionPayload,
 )
+from warhammer40k_core.engine.secondary_scoring_provider import SecondaryScoringProviderKind
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleCondition,
@@ -900,6 +901,9 @@ def _victory_point_handler(
         scoring_timing="generic_rule_execution",
         metadata=validate_json_value(
             {
+                "secondary_scoring_provider_kind": (
+                    SecondaryScoringProviderKind.GENERIC_RULE_IR.value
+                ),
                 "rule_id": rule_ir.rule_id,
                 "clause_id": clause.clause_id,
                 "effect": resolved_effect.to_payload(),

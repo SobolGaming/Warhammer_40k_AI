@@ -4433,6 +4433,7 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
         "scoring_timing": "secondary_mission_score",
         "hidden": False,
         "metadata": {
+            "secondary_scoring_provider_kind": "legacy_phase11f",
             "secondary_mission_id": "assassination",
             "scoring_rule_id": "assassination-fixed",
             "scoring_rule_condition": "fixed_secondary_condition",
@@ -4510,6 +4511,7 @@ def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -
         0
     ]
     assert fixed_transaction.metadata == {
+        "secondary_scoring_provider_kind": "legacy_phase11f",
         "secondary_mission_id": "bring-it-down",
         "scoring_rule_id": "bring-it-down-fixed",
         "scoring_rule_condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
@@ -4519,6 +4521,7 @@ def test_secondary_scoring_uses_source_backed_fixed_and_tactical_card_values() -
         ),
     }
     assert tactical_transaction.metadata == {
+        "secondary_scoring_provider_kind": "legacy_phase11f",
         "secondary_mission_id": "bring-it-down",
         "scoring_rule_id": "bring-it-down-tactical",
         "scoring_rule_condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
@@ -5741,6 +5744,7 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     assert transaction["source_kind"] == "tactical_secondary"
     assert transaction["source_id"] == active_cards[0].secondary_mission_id
     assert transaction["metadata"] == {
+        "secondary_scoring_provider_kind": "legacy_phase11f",
         "secondary_mission_id": active_cards[0].secondary_mission_id,
         "scoring_rule_id": f"{active_cards[0].secondary_mission_id}-tactical",
         "scoring_rule_condition": "tactical_secondary_condition",

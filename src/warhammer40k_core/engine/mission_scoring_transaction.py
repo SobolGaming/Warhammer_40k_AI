@@ -29,8 +29,13 @@ from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
     SecondaryMissionCardStatus,
+    VictoryPointAward,
     VictoryPointSourceKind,
     secondary_mission_card_mode_from_token,
+)
+from warhammer40k_core.engine.secondary_deployment_zone_evidence import (
+    bind_state_backed_secondary_scoring_commit,
+    enemy_unit_ids_in_player_deployment_zone_for_secondary_boundary,
 )
 
 if TYPE_CHECKING:
@@ -112,25 +117,6 @@ def score_secondary_mission_from_state(
         policies=policy,
     ):
         return card_state
-    award = policy.secondary_award_from_mission_state(
-        player_id=card_state.player_id,
-        battle_round=state.battle_round,
-        phase=phase.value,
-        secondary_mission_id=card_state.secondary_mission_id,
-        source_kind=source_kind,
-        hidden=False,
-        record=record,
-        mission_setup=state.mission_setup,
-        unit_destruction_states=tuple(state.secondary_unit_destruction_states),
-        objective_cleanse_states=tuple(state.secondary_objective_cleanse_states),
-        terrain_plunder_states=tuple(state.secondary_terrain_plunder_states),
-        enemy_unit_ids_in_player_deployment_zone=(
-            state.enemy_unit_ids_in_player_deployment_zone(card_state.player_id)
-        ),
-        starting_strength_records=tuple(state.starting_strength_records),
-    )
-    if award is None:
-        raise GameLifecycleError("State-backed secondary mission requirements are not met.")
     snapshot = _capture_aggregate(state=state, event_log=event_log)
     try:
         commit_canonical_objective_control_proposal(
@@ -146,6 +132,32 @@ def score_secondary_mission_from_state(
             event_log=event_log,
             runtime_modifier_registry=runtime_modifier_registry,
         )
+        award = policy.secondary_award_from_mission_state(
+            player_id=card_state.player_id,
+            battle_round=state.battle_round,
+            phase=phase.value,
+            secondary_mission_id=card_state.secondary_mission_id,
+            source_kind=source_kind,
+            hidden=False,
+            record=record,
+            mission_setup=state.mission_setup,
+            unit_destruction_states=tuple(state.secondary_unit_destruction_states),
+            objective_cleanse_states=tuple(state.secondary_objective_cleanse_states),
+            terrain_plunder_states=tuple(state.secondary_terrain_plunder_states),
+            enemy_unit_ids_in_player_deployment_zone=(
+                enemy_unit_ids_in_player_deployment_zone_for_secondary_boundary(
+                    state=state,
+                    record=record,
+                    player_id=card_state.player_id,
+                )
+            ),
+            starting_strength_records=tuple(state.starting_strength_records),
+        )
+        award = bind_state_backed_secondary_scoring_commit(
+            _require_state_backed_secondary_award(award),
+            state=state,
+            record=record,
+        )
         transaction = state.award_victory_points(award)
         if requested_mode is SecondaryMissionCardMode.FIXED:
             result = card_state
@@ -158,6 +170,12 @@ def score_secondary_mission_from_state(
         raise
     else:
         return result
+
+
+def _require_state_backed_secondary_award(award: VictoryPointAward | None) -> VictoryPointAward:
+    if award is None:
+        raise GameLifecycleError("State-backed secondary mission requirements are not met.")
+    return award
 
 
 def _card_for_state_backed_scoring(

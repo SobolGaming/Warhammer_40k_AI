@@ -11,6 +11,10 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
     victory_point_source_kind_from_token,
 )
+from warhammer40k_core.engine.secondary_scoring_provider import (
+    SecondaryScoringProviderKind,
+    secondary_scoring_provider_kind_from_metadata,
+)
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
@@ -58,9 +62,14 @@ def state_backed_secondary_binding_identity(
     kind = victory_point_source_kind_from_token(source_kind)
     if kind not in _SECONDARY_SOURCE_KINDS:
         return None
+    provider = secondary_scoring_provider_kind_from_metadata(metadata)
+    if provider is not SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL:
+        return None
     record_id = state_backed_secondary_objective_control_record_id(metadata)
     if record_id is None:
-        return None
+        raise GameLifecycleError(
+            "State-backed Secondary VP metadata requires objective_control_record_id."
+        )
     return (player_id, kind, source_id, record_id)
 
 

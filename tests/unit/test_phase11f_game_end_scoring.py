@@ -52,6 +52,7 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointTransaction,
 )
 from warhammer40k_core.engine.scoring_cap_audit import metadata_with_vp_cap_audit
+from warhammer40k_core.engine.secondary_scoring_provider import SecondaryScoringProviderKind
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
@@ -156,7 +157,12 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
             source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
             source_id="assassination",
             scoring_timing="secondary_mission_score",
-            metadata={"scoring_rule_id": "phase11f-secondary-cap"},
+            metadata={
+                "secondary_scoring_provider_kind": (
+                    SecondaryScoringProviderKind.LEGACY_PHASE11F.value
+                ),
+                "scoring_rule_id": "phase11f-secondary-cap",
+            },
         )
     )
     battle_ready_transaction = state.award_victory_points(
@@ -180,7 +186,12 @@ def test_phase11f_vp_caps_are_enforced_before_winner_determination() -> None:
             source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
             source_id="assassination",
             scoring_timing="secondary_mission_score",
-            metadata={"scoring_rule_id": "phase11f-opponent-secondary-cap"},
+            metadata={
+                "secondary_scoring_provider_kind": (
+                    SecondaryScoringProviderKind.LEGACY_PHASE11F.value
+                ),
+                "scoring_rule_id": "phase11f-opponent-secondary-cap",
+            },
         )
     )
     _set_round_five_going_second_fight(state)
@@ -237,7 +248,12 @@ def test_phase11f_mission_action_cap_accounting_is_source_aware() -> None:
             source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
             source_id="cleanse",
             scoring_timing="secondary_mission_score",
-            metadata={"scoring_rule_id": "phase11f-secondary-action-base"},
+            metadata={
+                "secondary_scoring_provider_kind": (
+                    SecondaryScoringProviderKind.LEGACY_PHASE11F.value
+                ),
+                "scoring_rule_id": "phase11f-secondary-action-base",
+            },
         )
     )
 
