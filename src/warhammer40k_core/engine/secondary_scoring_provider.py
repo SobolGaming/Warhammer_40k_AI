@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
@@ -14,13 +15,13 @@ _validate_identifier = IdentifierValidator(GameLifecycleError)
 
 SECONDARY_SCORING_PROVIDER_KIND_KEY = "secondary_scoring_provider_kind"
 _GENERIC_RULE_IR_VP_EFFECT_KIND = "add_victory_points"
-_REGISTERED_PHASE11F_CAP_PROBE_RULE_IDS = frozenset(
-    {
-        ("assassination", "phase11f-secondary-cap"),
-        ("assassination", "phase11f-opponent-secondary-cap"),
-        ("cleanse", "phase11f-secondary-action-base"),
-    }
-)
+_GENERIC_RULE_IR_SOURCE_KIND = "fixed_secondary"
+_GENERIC_RULE_IR_SOURCE_ID_KEY = "source_id"
+_GENERIC_RULE_IR_HASH_KEY = "rule_ir_hash"
+_GENERIC_RULE_IR_EFFECT_INDEX_KEY = "effect_index"
+_GENERIC_RULE_IR_EXECUTION_EVENT_ID_KEY = "execution_event_id"
+_GENERIC_RULE_IR_EXECUTION_CONTEXT_KEY = "execution_context"
+_SHA256_HEX = frozenset("0123456789abcdef")
 _STATE_BACKED_METADATA_KEYS = frozenset(
     {
         "objective_control_record_id",
@@ -34,6 +35,52 @@ _STATE_BACKED_METADATA_KEYS = frozenset(
         "scoring_commit_checkpoint_hash",
     }
 )
+
+
+@dataclass(frozen=True, slots=True)
+class RegisteredPhase11FCapProbe:
+    source_id: str
+    scoring_rule_id: str
+    source_kind: str
+    scoring_timing: str
+    amount: int
+    player_id: str
+    battle_round: int
+    phase: str
+
+
+_REGISTERED_PHASE11F_CAP_PROBES = {
+    ("assassination", "phase11f-secondary-cap"): RegisteredPhase11FCapProbe(
+        source_id="assassination",
+        scoring_rule_id="phase11f-secondary-cap",
+        source_kind="tactical_secondary",
+        scoring_timing="secondary_mission_score",
+        amount=46,
+        player_id="player-a",
+        battle_round=4,
+        phase="command",
+    ),
+    ("assassination", "phase11f-opponent-secondary-cap"): RegisteredPhase11FCapProbe(
+        source_id="assassination",
+        scoring_rule_id="phase11f-opponent-secondary-cap",
+        source_kind="tactical_secondary",
+        scoring_timing="secondary_mission_score",
+        amount=60,
+        player_id="player-b",
+        battle_round=4,
+        phase="command",
+    ),
+    ("cleanse", "phase11f-secondary-action-base"): RegisteredPhase11FCapProbe(
+        source_id="cleanse",
+        scoring_rule_id="phase11f-secondary-action-base",
+        source_kind="tactical_secondary",
+        scoring_timing="secondary_mission_score",
+        amount=44,
+        player_id="player-a",
+        battle_round=4,
+        phase="command",
+    ),
+}
 
 
 class SecondaryScoringProviderKind(StrEnum):
@@ -62,8 +109,19 @@ def secondary_scoring_provider_kind_from_metadata(
     return secondary_scoring_provider_kind_from_token(raw[SECONDARY_SCORING_PROVIDER_KIND_KEY])
 
 
+def registered_phase11f_cap_probe(
+    *,
+    source_id: str,
+    scoring_rule_id: str,
+) -> RegisteredPhase11FCapProbe | None:
+    return _REGISTERED_PHASE11F_CAP_PROBES.get((source_id, scoring_rule_id))
+
+
 def is_registered_phase11f_cap_probe(*, source_id: str, scoring_rule_id: str) -> bool:
-    return (source_id, scoring_rule_id) in _REGISTERED_PHASE11F_CAP_PROBE_RULE_IDS
+    return (
+        registered_phase11f_cap_probe(source_id=source_id, scoring_rule_id=scoring_rule_id)
+        is not None
+    )
 
 
 def validate_legacy_phase11f_secondary_award(
@@ -83,8 +141,12 @@ def validate_legacy_phase11f_secondary_award(
     scoring_rule_id = raw.get("scoring_rule_id")
     if type(scoring_rule_id) is not str or not scoring_rule_id:
         raise GameLifecycleError("Legacy Phase 11F Secondary VP requires scoring_rule_id.")
-    probe_key = (award.source_id, scoring_rule_id)
-    if probe_key in _REGISTERED_PHASE11F_CAP_PROBE_RULE_IDS:
+    probe = registered_phase11f_cap_probe(
+        source_id=award.source_id,
+        scoring_rule_id=scoring_rule_id,
+    )
+    if probe is not None:
+        _validate_registered_phase11f_cap_probe(award=award, probe=probe)
         return
     if expected is None:
         raise GameLifecycleError(
@@ -102,6 +164,10 @@ def validate_generic_rule_ir_secondary_award(*, award: VictoryPointAward) -> Non
         award.metadata,
         provider=SecondaryScoringProviderKind.GENERIC_RULE_IR,
     )
+    if award.source_kind.value != _GENERIC_RULE_IR_SOURCE_KIND:
+        raise GameLifecycleError(
+            "Generic RuleIR Secondary VP requires source_kind fixed_secondary."
+        )
     if award.scoring_timing != "generic_rule_execution":
         raise GameLifecycleError(
             "Generic RuleIR Secondary VP requires scoring_timing generic_rule_execution."
@@ -136,6 +202,61 @@ def validate_generic_rule_ir_secondary_award(*, award: VictoryPointAward) -> Non
         raise GameLifecycleError(
             "Generic RuleIR Secondary VP amount drifted from the RuleIR effect delta."
         )
+    source_id = raw.get(_GENERIC_RULE_IR_SOURCE_ID_KEY)
+    if type(source_id) is not str or source_id != award.source_id:
+        raise GameLifecycleError("Generic RuleIR Secondary VP source_id drifted from the award.")
+    _validate_identifier("Generic RuleIR Secondary VP source_id", source_id)
+    rule_ir_hash = raw.get(_GENERIC_RULE_IR_HASH_KEY)
+    if (
+        type(rule_ir_hash) is not str
+        or len(rule_ir_hash) != 64
+        or any(character not in _SHA256_HEX for character in rule_ir_hash)
+    ):
+        raise GameLifecycleError("Generic RuleIR Secondary VP requires a SHA-256 rule_ir_hash.")
+    effect_index = raw.get(_GENERIC_RULE_IR_EFFECT_INDEX_KEY)
+    if type(effect_index) is not int or effect_index < 0:
+        raise GameLifecycleError(
+            "Generic RuleIR Secondary VP requires a non-negative effect_index."
+        )
+    execution_event_id = raw.get(_GENERIC_RULE_IR_EXECUTION_EVENT_ID_KEY)
+    if type(execution_event_id) is not str or not execution_event_id:
+        raise GameLifecycleError("Generic RuleIR Secondary VP requires execution_event_id.")
+    _validate_identifier(
+        "Generic RuleIR Secondary VP execution_event_id",
+        execution_event_id,
+    )
+    execution_context = raw.get(_GENERIC_RULE_IR_EXECUTION_CONTEXT_KEY)
+    if not isinstance(execution_context, dict):
+        raise GameLifecycleError("Generic RuleIR Secondary VP execution_context must be an object.")
+    if execution_context.get("player_id") != award.player_id:
+        raise GameLifecycleError("Generic RuleIR Secondary VP execution_context player_id drifted.")
+    if execution_context.get("battle_round") != award.battle_round:
+        raise GameLifecycleError(
+            "Generic RuleIR Secondary VP execution_context battle_round drifted."
+        )
+    if execution_context.get("phase") != award.phase:
+        raise GameLifecycleError("Generic RuleIR Secondary VP execution_context phase drifted.")
+
+
+def _validate_registered_phase11f_cap_probe(
+    *,
+    award: VictoryPointAward,
+    probe: RegisteredPhase11FCapProbe,
+) -> None:
+    if award.source_id != probe.source_id:
+        raise GameLifecycleError("Registered Phase 11F Secondary VP source_id drifted.")
+    if award.source_kind.value != probe.source_kind:
+        raise GameLifecycleError("Registered Phase 11F Secondary VP source_kind drifted.")
+    if award.scoring_timing != probe.scoring_timing:
+        raise GameLifecycleError("Registered Phase 11F Secondary VP scoring_timing drifted.")
+    if award.amount != probe.amount:
+        raise GameLifecycleError("Registered Phase 11F Secondary VP amount drifted.")
+    if award.player_id != probe.player_id:
+        raise GameLifecycleError("Registered Phase 11F Secondary VP player_id drifted.")
+    if award.battle_round != probe.battle_round:
+        raise GameLifecycleError("Registered Phase 11F Secondary VP battle_round drifted.")
+    if award.phase != probe.phase:
+        raise GameLifecycleError("Registered Phase 11F Secondary VP phase drifted.")
 
 
 def _non_state_backed_metadata(
@@ -163,8 +284,10 @@ def _require_metadata_object(metadata: JsonValue) -> dict[str, JsonValue]:
 
 __all__ = (
     "SECONDARY_SCORING_PROVIDER_KIND_KEY",
+    "RegisteredPhase11FCapProbe",
     "SecondaryScoringProviderKind",
     "is_registered_phase11f_cap_probe",
+    "registered_phase11f_cap_probe",
     "secondary_scoring_provider_kind_from_metadata",
     "secondary_scoring_provider_kind_from_token",
     "validate_generic_rule_ir_secondary_award",

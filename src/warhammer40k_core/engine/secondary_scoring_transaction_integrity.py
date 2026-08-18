@@ -59,10 +59,32 @@ def validate_secondary_award_semantics(
         raise GameLifecycleError("Secondary VP semantic validation requires a Secondary award.")
     provider = secondary_scoring_provider_kind_from_metadata(award.metadata)
     if provider is SecondaryScoringProviderKind.LEGACY_PHASE11F:
+        scoring_rule_id = _legacy_scoring_rule_id(award.metadata)
         validate_legacy_phase11f_secondary_award(
             award=award,
             expected=_legacy_score_secondary_mission_award(state=state, award=award),
         )
+        if is_registered_phase11f_cap_probe(
+            source_id=award.source_id,
+            scoring_rule_id=scoring_rule_id,
+        ):
+            _reject_duplicate_phase11f_probe(
+                state=state,
+                player_id=award.player_id,
+                source_id=award.source_id,
+                scoring_rule_id=scoring_rule_id,
+            )
+            return
+        card = _card_for_secondary_source(
+            state=state,
+            player_id=award.player_id,
+            source_id=award.source_id,
+            source_kind=award.source_kind,
+            battle_round=award.battle_round,
+            require_scored_transaction_id=None,
+        )
+        if card.status is not SecondaryMissionCardStatus.ACTIVE:
+            raise GameLifecycleError("Legacy Phase 11F Secondary VP requires an active card.")
         return
     if provider is SecondaryScoringProviderKind.GENERIC_RULE_IR:
         validate_generic_rule_ir_secondary_award(award=award)
@@ -120,6 +142,7 @@ def validate_secondary_transaction_semantics(*, state: GameState) -> None:
     )
     seen_bindings: set[tuple[str, VictoryPointSourceKind, str, str]] = set()
     seen_tactical_sources: set[tuple[str, str]] = set()
+    seen_probe_keys: set[tuple[str, str, str]] = set()
     for transaction in transactions:
         provider = secondary_scoring_provider_kind_from_metadata(transaction.metadata)
         if provider is SecondaryScoringProviderKind.LEGACY_PHASE11F:
@@ -128,6 +151,30 @@ def validate_secondary_transaction_semantics(*, state: GameState) -> None:
                 award=actual,
                 expected=_legacy_score_secondary_mission_award(state=state, award=actual),
             )
+            scoring_rule_id = _legacy_scoring_rule_id(actual.metadata)
+            if is_registered_phase11f_cap_probe(
+                source_id=actual.source_id,
+                scoring_rule_id=scoring_rule_id,
+            ):
+                probe_key = (actual.player_id, actual.source_id, scoring_rule_id)
+                if probe_key in seen_probe_keys:
+                    raise GameLifecycleError(
+                        "Registered Phase 11F Secondary VP probe must not repeat."
+                    )
+                seen_probe_keys.add(probe_key)
+            else:
+                _card_for_secondary_source(
+                    state=state,
+                    player_id=actual.player_id,
+                    source_id=actual.source_id,
+                    source_kind=actual.source_kind,
+                    battle_round=actual.battle_round,
+                    require_scored_transaction_id=(
+                        transaction.transaction_id
+                        if actual.source_kind is VictoryPointSourceKind.TACTICAL_SECONDARY
+                        else None
+                    ),
+                )
             continue
         if provider is SecondaryScoringProviderKind.GENERIC_RULE_IR:
             validate_generic_rule_ir_secondary_award(
@@ -186,6 +233,16 @@ def validate_secondary_transaction_semantics(*, state: GameState) -> None:
     _validate_scored_tactical_card_bindings(state=state, transactions=transactions)
 
 
+def _legacy_scoring_rule_id(metadata: JsonValue) -> str:
+    raw = metadata
+    if not isinstance(raw, dict):
+        raise GameLifecycleError("Secondary VP metadata must be an object.")
+    scoring_rule_id = raw.get("scoring_rule_id")
+    if type(scoring_rule_id) is not str or not scoring_rule_id:
+        raise GameLifecycleError("Legacy Phase 11F Secondary VP requires scoring_rule_id.")
+    return scoring_rule_id
+
+
 def _legacy_score_secondary_mission_award(
     *,
     state: GameState,
@@ -232,6 +289,26 @@ def _reject_duplicate_secondary_binding(
                 raise GameLifecycleError(
                     "Secondary VP ledger must not repeat a source at one boundary."
                 )
+
+
+def _reject_duplicate_phase11f_probe(
+    *,
+    state: GameState,
+    player_id: str,
+    source_id: str,
+    scoring_rule_id: str,
+) -> None:
+    for ledger in state.victory_point_ledgers:
+        for transaction in ledger.transactions:
+            if transaction.player_id != player_id or transaction.source_id != source_id:
+                continue
+            if (
+                secondary_scoring_provider_kind_from_metadata(transaction.metadata)
+                is not SecondaryScoringProviderKind.LEGACY_PHASE11F
+            ):
+                continue
+            if _legacy_scoring_rule_id(transaction.metadata) == scoring_rule_id:
+                raise GameLifecycleError("Registered Phase 11F Secondary VP probe must not repeat.")
 
 
 def _reject_duplicate_tactical_source(
@@ -322,10 +399,12 @@ def _validate_scored_tactical_card_bindings(
             raise GameLifecycleError(
                 "Scored tactical secondary card does not identify its ledger transaction."
             )
-        if (
-            secondary_scoring_provider_kind_from_metadata(transaction.metadata)
-            is SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL
-        ):
+        provider = secondary_scoring_provider_kind_from_metadata(transaction.metadata)
+        if provider is SecondaryScoringProviderKind.GENERIC_RULE_IR:
+            raise GameLifecycleError(
+                "Scored tactical secondary card cannot bind a generic RuleIR transaction."
+            )
+        if provider is SecondaryScoringProviderKind.STATE_BACKED_OBJECTIVE_CONTROL:
             validate_state_backed_secondary_ledger_binding(
                 transaction=transaction,
                 objective_control_records=tuple(state.objective_control_records),

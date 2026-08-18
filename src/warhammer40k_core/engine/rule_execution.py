@@ -49,11 +49,8 @@ from warhammer40k_core.engine.rule_target_resolution import (
     target_unit_instance_ids_for_clause,
 )
 from warhammer40k_core.engine.scoring import (
-    VictoryPointAward,
-    VictoryPointSourceKind,
     VictoryPointTransactionPayload,
 )
-from warhammer40k_core.engine.secondary_scoring_provider import SecondaryScoringProviderKind
 from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleCondition,
@@ -62,7 +59,6 @@ from warhammer40k_core.rules.rule_ir import (
     RuleEffectSpec,
     RuleIR,
     RuleIRPayload,
-    RuleParameterValue,
     RuleTargetKind,
     RuleTriggerKind,
     parameter_payload,
@@ -886,51 +882,15 @@ def _victory_point_handler(
     effect: RuleEffectSpec | None,
     context: RuleExecutionContext,
 ) -> RuleExecutionResult:
-    resolved_effect = _require_effect(effect)
-    state = _require_state(context)
-    amount = _positive_int_parameter(resolved_effect, "delta")
-    if context.phase is None:
-        return RuleExecutionResult.invalid(rule_ir, reason="missing_phase")
-    award = VictoryPointAward(
-        player_id=context.player_id,
-        battle_round=context.battle_round,
-        phase=context.phase.value,
-        amount=amount,
-        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
-        source_id=rule_ir.source_id,
-        scoring_timing="generic_rule_execution",
-        metadata=validate_json_value(
-            {
-                "secondary_scoring_provider_kind": (
-                    SecondaryScoringProviderKind.GENERIC_RULE_IR.value
-                ),
-                "rule_id": rule_ir.rule_id,
-                "clause_id": clause.clause_id,
-                "effect": resolved_effect.to_payload(),
-            }
-        ),
+    from warhammer40k_core.engine.secondary_rule_ir_scoring_authority import (
+        apply_generic_rule_ir_victory_points,
     )
-    transaction = state.award_victory_points(award)
-    payload = transaction.to_payload()
-    event = _emit_event(
+
+    return apply_generic_rule_ir_victory_points(
+        rule_ir=rule_ir,
+        clause=clause,
+        effect=effect,
         context=context,
-        event_type="rule_execution_victory_points_awarded",
-        payload=payload,
-        fallback_id=_fallback_event_id(rule_ir, clause, resolved_effect, "vp"),
-    )
-    return RuleExecutionResult.applied(
-        rule_ir,
-        applied_clause_ids=(clause.clause_id,),
-        effect_payloads=(
-            _effect_payload(
-                rule_ir=rule_ir,
-                clause=clause,
-                effect=resolved_effect,
-                context=context,
-            ),
-        ),
-        victory_point_transactions=(payload,),
-        event_records=(event,),
     )
 
 
@@ -1539,22 +1499,6 @@ def _require_state(context: RuleExecutionContext) -> GameState:
     if context.state is None:
         raise GameLifecycleError("Rule execution requires GameState.")
     return context.state
-
-
-def _positive_int_parameter(effect: RuleEffectSpec, key: str) -> int:
-    value = _parameter(effect, key)
-    if type(value) is not int:
-        raise GameLifecycleError(f"Rule effect parameter {key} must be an integer.")
-    if value < 1:
-        raise GameLifecycleError(f"Rule effect parameter {key} must be positive.")
-    return value
-
-
-def _parameter(effect: RuleEffectSpec, key: str) -> RuleParameterValue:
-    parameters = parameter_payload(effect.parameters)
-    if key not in parameters:
-        raise GameLifecycleError(f"Rule effect is missing {key} parameter.")
-    return parameters[key]
 
 
 def _validate_rule_ir(value: object) -> RuleIR:

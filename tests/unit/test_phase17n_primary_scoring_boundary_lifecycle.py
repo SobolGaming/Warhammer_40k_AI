@@ -25,12 +25,13 @@ from tests.phase17n_primary_mission_helpers import (
     phase17n_state_with_setup,
 )
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
+from tests.support.catalog_runtime_fixtures import SOURCE_KEYWORD_SEQUENCE_PARTS
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
 from warhammer40k_core.core.dice import DiceExpression, DiceRollResult, DiceRollSpec
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import BattlePhaseKind, RulesetDescriptor
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
 from warhammer40k_core.engine.catalog_any_phase_once_per_battle import (
     SELECT_CATALOG_ANY_PHASE_ONCE_PER_BATTLE_DECISION_TYPE,
@@ -50,6 +51,7 @@ from warhammer40k_core.engine.destruction_provenance import (
 )
 from warhammer40k_core.engine.event_log import (
     EventLog,
+    EventRecord,
     JsonValue,
     canonical_json,
     validate_json_value,
@@ -141,10 +143,20 @@ from warhammer40k_core.engine.return_on_death import (
     apply_return_on_death_placement_decision,
     resolve_pending_return_on_death_phase_end,
 )
+from warhammer40k_core.engine.rule_execution import (
+    RuleExecutionContext,
+    RuleExecutionStatus,
+    default_rule_execution_registry,
+    execute_rule_ir,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     ObjectiveControlModifierBinding,
     ObjectiveControlModifierContext,
     RuntimeModifierRegistry,
+)
+from warhammer40k_core.engine.runtime_rule_ir_authority import (
+    RuntimeRuleIRAuthorityIndex,
+    RuntimeRuleIRSourceKey,
 )
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
@@ -164,9 +176,26 @@ from warhammer40k_core.engine.secondary_deployment_zone_evidence import (
     enemy_unit_ids_in_player_deployment_zone_from_model_placements,
     require_state_backed_secondary_scoring_commit,
 )
+from warhammer40k_core.engine.secondary_rule_ir_scoring_authority import (
+    GENERIC_RULE_IR_EFFECT_INDEX_KEY,
+    GENERIC_RULE_IR_EXECUTION_CONTEXT_KEY,
+    GENERIC_RULE_IR_EXECUTION_EVENT_ID_KEY,
+    GENERIC_RULE_IR_HASH_KEY,
+    GENERIC_RULE_IR_SOURCE_ID_KEY,
+    RULE_EXECUTION_VICTORY_POINTS_AWARDED_EVENT_TYPE,
+    apply_generic_rule_ir_victory_points,
+    generic_rule_ir_secondary_award,
+    next_generic_rule_ir_victory_point_event_id,
+    require_generic_rule_ir_loaded_authority,
+    validate_secondary_generic_rule_ir_restore_authority,
+)
 from warhammer40k_core.engine.secondary_scoring_provider import (
+    RegisteredPhase11FCapProbe,
     SecondaryScoringProviderKind,
+    _validate_registered_phase11f_cap_probe,  # pyright: ignore[reportPrivateUsage]
     is_registered_phase11f_cap_probe,
+    registered_phase11f_cap_probe,
+    secondary_scoring_provider_kind_from_metadata,
     secondary_scoring_provider_kind_from_token,
     validate_generic_rule_ir_secondary_award,
     validate_legacy_phase11f_secondary_award,
@@ -194,6 +223,15 @@ from warhammer40k_core.engine.turn_end_hooks import (
 )
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
+from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.rule_ir import (
+    RuleClause,
+    RuleEffectKind,
+    RuleEffectSpec,
+    RuleIR,
+    RuleParameter,
+)
+from warhammer40k_core.rules.source_data import RuleSourceText
 
 _OC_SOURCE_RULE_ID = (
     "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
@@ -2006,6 +2044,63 @@ def test_secondary_scoring_provider_fail_closed_branches() -> None:
         },
     )
     validate_legacy_phase11f_secondary_award(award=legacy, expected=legacy)
+    probe = _registered_phase11f_cap_probe_award()
+    validate_legacy_phase11f_secondary_award(award=probe, expected=None)
+    with pytest.raises(
+        GameLifecycleError, match="Registered Phase 11F Secondary VP amount drifted"
+    ):
+        validate_legacy_phase11f_secondary_award(
+            award=replace(probe, amount=5),
+            expected=None,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Registered Phase 11F Secondary VP player_id drifted",
+    ):
+        _validate_registered_phase11f_cap_probe(
+            award=replace(probe, player_id="player-b"),
+            probe=_require_registered_phase11f_cap_probe(),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Registered Phase 11F Secondary VP battle_round drifted",
+    ):
+        _validate_registered_phase11f_cap_probe(
+            award=replace(probe, battle_round=3),
+            probe=_require_registered_phase11f_cap_probe(),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Registered Phase 11F Secondary VP phase drifted",
+    ):
+        _validate_registered_phase11f_cap_probe(
+            award=replace(probe, phase="fight"),
+            probe=_require_registered_phase11f_cap_probe(),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Registered Phase 11F Secondary VP source_kind drifted",
+    ):
+        _validate_registered_phase11f_cap_probe(
+            award=replace(probe, source_kind=VictoryPointSourceKind.FIXED_SECONDARY),
+            probe=_require_registered_phase11f_cap_probe(),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Registered Phase 11F Secondary VP source_id drifted",
+    ):
+        _validate_registered_phase11f_cap_probe(
+            award=replace(probe, source_id="cleanse"),
+            probe=_require_registered_phase11f_cap_probe(),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Registered Phase 11F Secondary VP scoring_timing drifted",
+    ):
+        _validate_registered_phase11f_cap_probe(
+            award=replace(probe, scoring_timing="generic_rule_execution"),
+            probe=_require_registered_phase11f_cap_probe(),
+        )
     with pytest.raises(
         GameLifecycleError,
         match="Legacy Phase 11F Secondary VP requires scoring_timing secondary_mission_score",
@@ -2085,18 +2180,7 @@ def test_secondary_scoring_provider_fail_closed_branches() -> None:
         source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
         source_id="phase17d-generic-vp",
         scoring_timing="generic_rule_execution",
-        metadata={
-            "secondary_scoring_provider_kind": SecondaryScoringProviderKind.GENERIC_RULE_IR.value,
-            "rule_id": "phase17d-generic-vp",
-            "clause_id": "clause-1",
-            "effect": {
-                "kind": "add_victory_points",
-                "parameters": [
-                    {"key": "unit", "value": "target"},
-                    {"key": "delta", "value": 5},
-                ],
-            },
-        },
+        metadata=_fabricated_generic_rule_ir_metadata(amount=5),
     )
     validate_generic_rule_ir_secondary_award(award=rule_ir)
     with pytest.raises(
@@ -2241,6 +2325,140 @@ def test_secondary_scoring_provider_fail_closed_branches() -> None:
                         "parameters": [{"key": "unit", "value": "target"}],
                     },
                 },
+            )
+        )
+
+
+def test_generic_rule_ir_secondary_award_requires_execution_identity() -> None:
+    award = VictoryPointAward(
+        player_id="player-a",
+        battle_round=1,
+        phase="fight",
+        amount=5,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+        source_id="phase17d-generic-vp",
+        scoring_timing="generic_rule_execution",
+        metadata=_fabricated_generic_rule_ir_metadata(amount=5),
+    )
+    validate_generic_rule_ir_secondary_award(award=award)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP requires source_kind fixed_secondary",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(award, source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY)
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP source_id drifted from the award",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                award,
+                metadata=_fabricated_generic_rule_ir_metadata(
+                    amount=5,
+                    source_id="other-source",
+                ),
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP requires a SHA-256 rule_ir_hash",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                award,
+                metadata=_fabricated_generic_rule_ir_metadata(
+                    amount=5,
+                    rule_ir_hash="not-a-hash",
+                ),
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP requires a non-negative effect_index",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                award,
+                metadata=_fabricated_generic_rule_ir_metadata(amount=5, effect_index=-1),
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP requires execution_event_id",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                award,
+                metadata=_fabricated_generic_rule_ir_metadata(
+                    amount=5,
+                    execution_event_id="",
+                ),
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP execution_context must be an object",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                award,
+                metadata=_fabricated_generic_rule_ir_metadata(
+                    amount=5,
+                    execution_context=["not-an-object"],
+                ),
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP execution_context player_id drifted",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                award,
+                metadata=_fabricated_generic_rule_ir_metadata(
+                    amount=5,
+                    execution_context={
+                        "player_id": "player-b",
+                        "battle_round": 1,
+                        "phase": "fight",
+                    },
+                ),
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP execution_context battle_round drifted",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                award,
+                metadata=_fabricated_generic_rule_ir_metadata(
+                    amount=5,
+                    execution_context={
+                        "player_id": "player-a",
+                        "battle_round": 2,
+                        "phase": "fight",
+                    },
+                ),
+            )
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP execution_context phase drifted",
+    ):
+        validate_generic_rule_ir_secondary_award(
+            award=replace(
+                award,
+                metadata=_fabricated_generic_rule_ir_metadata(
+                    amount=5,
+                    execution_context={
+                        "player_id": "player-a",
+                        "battle_round": 1,
+                        "phase": "command",
+                    },
+                ),
             )
         )
 
@@ -2624,91 +2842,46 @@ def test_state_backed_secondary_scoring_helpers_fail_closed() -> None:
         )
 
 
-def test_restore_skips_non_state_backed_secondary_rows() -> None:
-    lifecycle = _bring_it_down_player_a_scored_lifecycle()
-    state = lifecycle.state
-    assert state is not None
-    transaction = _secondary_transaction(
-        state,
-        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
-    )
-    ledger = state.victory_point_ledger_for_player("player-a")
-    legacy = replace(
-        transaction,
-        transaction_id=f"{transaction.transaction_id}-legacy",
-        source_id="assassination",
-        scoring_timing="secondary_mission_score",
-        metadata={
-            "secondary_scoring_provider_kind": SecondaryScoringProviderKind.LEGACY_PHASE11F.value,
-            "scoring_rule_id": "phase11f-secondary-cap",
-        },
-    )
-    legacy_tactical = replace(
-        transaction,
-        transaction_id=f"{transaction.transaction_id}-legacy-tactical",
-        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
-        source_id="assassination",
-        scoring_timing="secondary_mission_score",
-        metadata={
-            "secondary_scoring_provider_kind": SecondaryScoringProviderKind.LEGACY_PHASE11F.value,
-            "scoring_rule_id": "phase11f-secondary-cap",
-        },
-    )
-    rule_ir = replace(
-        transaction,
-        transaction_id=f"{transaction.transaction_id}-rule-ir",
-        scoring_timing="generic_rule_execution",
-        metadata={
-            "secondary_scoring_provider_kind": SecondaryScoringProviderKind.GENERIC_RULE_IR.value,
-            "rule_id": "phase17d-generic-vp",
-            "clause_id": "clause-1",
-            "effect": {
-                "kind": "add_victory_points",
-                "parameters": [{"key": "delta", "value": transaction.amount}],
-            },
-        },
-    )
-    state.victory_point_ledgers = [
-        replace(
-            ledger,
-            victory_points=(
-                ledger.victory_points + legacy.amount + legacy_tactical.amount + rule_ir.amount
-            ),
-            transactions=(*ledger.transactions, legacy, legacy_tactical, rule_ir),
-        )
-        if stored.player_id == ledger.player_id
-        else stored
-        for stored in state.victory_point_ledgers
-    ]
-    validate_secondary_transaction_semantics(state=state)
-    scored_legacy = SecondaryMissionCardState.active_tactical(
-        player_id="player-a",
-        secondary_mission_id="assassination",
-        battle_round=2,
-        source_result_id="p2-legacy-tactical-bound",
-    ).score(transaction_id=legacy_tactical.transaction_id)
-    state.secondary_mission_card_states = [scored_legacy]
-    _validate_scored_tactical_card_bindings(state=state, transactions=(legacy_tactical,))
-    _reject_duplicate_tactical_source(
-        state=state,
-        player_id="player-a",
-        source_id="assassination",
-    )
-    scored = SecondaryMissionCardState.active_tactical(
+def test_restore_rejects_scored_tactical_rewritten_as_generic_rule_ir() -> None:
+    lifecycle, state = _defend_stronghold_ready_lifecycle()
+    state.score_secondary_mission_from_state(
         player_id="player-a",
         secondary_mission_id="defend-stronghold",
-        battle_round=2,
-        source_result_id="p2-defend-stronghold-unbound",
-    ).score(transaction_id="victory-point:player-a:round-02:999999")
-    state.secondary_mission_card_states = [scored]
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    payload = deepcopy(lifecycle.to_payload())
+    ledger = _ledger_payload(payload, player_id="player-a")
+    secondary = _secondary_transaction_payloads(ledger, source_kind="tactical_secondary")
+    assert len(secondary) == 1
+    transaction = secondary[0]
+    amount = transaction["amount"]
+    assert isinstance(amount, int)
+    source_id = transaction["source_id"]
+    assert isinstance(source_id, str)
+    battle_round = transaction["battle_round"]
+    assert isinstance(battle_round, int)
+    phase = transaction["phase"]
+    assert isinstance(phase, str)
+    transaction["scoring_timing"] = "generic_rule_execution"
+    transaction["metadata"] = _fabricated_generic_rule_ir_metadata(
+        amount=amount,
+        source_id=source_id,
+        execution_context={
+            "player_id": "player-a",
+            "battle_round": battle_round,
+            "phase": phase,
+        },
+    )
     with pytest.raises(
         GameLifecycleError,
-        match="Scored tactical secondary card does not identify its ledger transaction",
+        match="Generic RuleIR Secondary VP requires source_kind fixed_secondary",
     ):
-        _validate_scored_tactical_card_bindings(state=state, transactions=())
+        GameLifecycle.from_payload(payload)
 
 
-def test_restore_preserves_explicit_legacy_and_rule_ir_secondary_awards() -> None:
+def test_restore_rejects_generic_rule_ir_secondary_without_execution_event() -> None:
     lifecycle = _bring_it_down_player_a_scored_lifecycle()
     state = lifecycle.state
     assert state is not None
@@ -2719,42 +2892,562 @@ def test_restore_preserves_explicit_legacy_and_rule_ir_secondary_awards() -> Non
             player_id="player-a",
             battle_round=state.battle_round,
             phase=phase.value,
-            amount=1,
-            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
-            source_id="assassination",
-            scoring_timing="secondary_mission_score",
-            metadata={
-                "secondary_scoring_provider_kind": (
-                    SecondaryScoringProviderKind.LEGACY_PHASE11F.value
-                ),
-                "scoring_rule_id": "phase11f-secondary-cap",
-            },
-        )
-    )
-    state.award_victory_points(
-        VictoryPointAward(
-            player_id="player-a",
-            battle_round=state.battle_round,
-            phase=phase.value,
-            amount=1,
+            amount=5,
             source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
             source_id="phase17d-generic-vp",
             scoring_timing="generic_rule_execution",
-            metadata={
-                "secondary_scoring_provider_kind": (
-                    SecondaryScoringProviderKind.GENERIC_RULE_IR.value
-                ),
-                "rule_id": "phase17d-generic-vp",
-                "clause_id": "clause-1",
-                "effect": {
-                    "kind": "add_victory_points",
-                    "parameters": [{"key": "delta", "value": 1}],
+            metadata=_fabricated_generic_rule_ir_metadata(
+                amount=5,
+                execution_context={
+                    "player_id": "player-a",
+                    "battle_round": state.battle_round,
+                    "phase": phase.value,
                 },
-            },
+            ),
         )
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="requires rule_execution_victory_points_awarded",
+    ):
+        GameLifecycle.from_payload(lifecycle.to_payload())
+
+
+def test_restore_rejects_generic_rule_ir_hash_and_clause_absent_from_loaded_rule() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    rule_ir = _execute_generic_vp_on_lifecycle(lifecycle)
+    transaction = _generic_rule_ir_transaction(state)
+    drifted_hash = replace(
+        transaction,
+        metadata={
+            **_json_map(transaction.metadata, label="generic metadata"),
+            GENERIC_RULE_IR_HASH_KEY: "ab" * 32,
+        },
+    )
+    _replace_player_transaction(state, drifted_hash)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP execution event drifted from the ledger transaction",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=state,
+            event_records=lifecycle.decision_controller.event_log.records,
+            rule_ir_authority_index=_rule_ir_authority_index(rule_ir, player_id="player-a"),
+        )
+    award = _award_from_transaction(transaction)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP rule_ir_hash drifted from RuleIR",
+    ):
+        require_generic_rule_ir_loaded_authority(
+            award=replace(
+                award,
+                metadata={
+                    **_json_map(award.metadata, label="award metadata"),
+                    GENERIC_RULE_IR_HASH_KEY: "ab" * 32,
+                },
+            ),
+            rule_ir=rule_ir,
+        )
+    matching_hash = replace(
+        transaction,
+        metadata={
+            **_json_map(transaction.metadata, label="generic metadata"),
+            GENERIC_RULE_IR_HASH_KEY: "ab" * 32,
+        },
+    )
+    matching_event_records = tuple(
+        EventRecord(
+            event_id=record.event_id,
+            event_type=record.event_type,
+            payload=validate_json_value(matching_hash.to_payload()),
+        )
+        if record.event_type == RULE_EXECUTION_VICTORY_POINTS_AWARDED_EVENT_TYPE
+        else record
+        for record in lifecycle.decision_controller.event_log.records
+    )
+    _replace_player_transaction(state, matching_hash)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Runtime RuleIR source is not authoritative for this bundle",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=state,
+            event_records=matching_event_records,
+            rule_ir_authority_index=_rule_ir_authority_index(rule_ir, player_id="player-a"),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP rule_id drifted from RuleIR",
+    ):
+        require_generic_rule_ir_loaded_authority(
+            award=replace(
+                award,
+                metadata={
+                    **_json_map(award.metadata, label="award metadata"),
+                    "rule_id": "other-rule",
+                },
+            ),
+            rule_ir=rule_ir,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP clause is not in the loaded RuleIR",
+    ):
+        require_generic_rule_ir_loaded_authority(
+            award=replace(
+                award,
+                metadata={
+                    **_json_map(award.metadata, label="award metadata"),
+                    "clause_id": "missing-clause",
+                },
+            ),
+            rule_ir=rule_ir,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP effect is not in the loaded RuleIR clause",
+    ):
+        require_generic_rule_ir_loaded_authority(
+            award=replace(
+                award,
+                metadata={
+                    **_json_map(award.metadata, label="award metadata"),
+                    "effect": {
+                        "kind": "add_victory_points",
+                        "parameters": [{"key": "delta", "value": award.amount}],
+                    },
+                },
+            ),
+            rule_ir=rule_ir,
+        )
+
+
+def test_restore_rejects_duplicated_generic_rule_ir_execution() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    _execute_generic_vp_on_lifecycle(lifecycle)
+    transaction = _generic_rule_ir_transaction(state)
+    _append_player_transaction_from_award(state, _award_from_transaction(transaction))
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP execution event is bound to multiple transactions",
+    ):
+        GameLifecycle.from_payload(lifecycle.to_payload())
+
+
+def test_restore_rejects_registered_phase11f_probe_with_arbitrary_amount() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    probe = _registered_phase11f_cap_probe_award()
+    _append_player_transaction_from_award(state, replace(probe, amount=5))
+    with pytest.raises(
+        GameLifecycleError,
+        match="Registered Phase 11F Secondary VP amount drifted",
+    ):
+        validate_secondary_transaction_semantics(state=state)
+
+
+def test_restore_rejects_legacy_tactical_transaction_without_scored_card() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    assert state.mission_setup is not None
+    phase = state.current_battle_phase
+    assert phase is not None
+    award = mission_scoring_policies_from_setup(state.mission_setup).secondary_award(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        phase=phase.value,
+        secondary_mission_id="behind-enemy-lines",
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+        hidden=False,
+    )
+    _append_player_transaction_from_award(state, award)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP source does not identify an active or scored card",
+    ):
+        validate_secondary_transaction_semantics(state=state)
+
+
+def test_restore_rejects_removed_generic_rule_ir_execution_event() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    _execute_generic_vp_on_lifecycle(lifecycle)
+    payload = deepcopy(lifecycle.to_payload())
+    decisions = _json_object(payload["decisions"], label="lifecycle decisions")
+    events = _json_list(decisions["event_log"], label="event log")
+    kept = [
+        event
+        for event in events
+        if _json_object(event, label="event").get("event_type")
+        != RULE_EXECUTION_VICTORY_POINTS_AWARDED_EVENT_TYPE
+    ]
+    assert len(kept) == len(events) - 1
+    decisions["event_log"] = kept
+    with pytest.raises(
+        GameLifecycleError,
+        match="requires rule_execution_victory_points_awarded",
+    ):
+        GameLifecycle.from_payload(payload)
+
+
+def test_restore_preserves_registered_phase11f_and_genuine_rule_ir_secondary_awards() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    state.award_victory_points(_registered_phase11f_cap_probe_award())
+    restored_probe = GameLifecycle.from_payload(lifecycle.to_payload())
+    assert restored_probe.to_payload() == lifecycle.to_payload()
+    rule_ir = _execute_generic_vp_on_lifecycle(lifecycle)
+    event_records = lifecycle.decision_controller.event_log.records
+    validate_secondary_generic_rule_ir_restore_authority(
+        state=state,
+        event_records=event_records,
+        rule_ir_authority_index=None,
+    )
+    validate_secondary_generic_rule_ir_restore_authority(
+        state=state,
+        event_records=event_records,
+        rule_ir_authority_index=_rule_ir_authority_index(rule_ir, player_id="player-a"),
     )
     restored = GameLifecycle.from_payload(lifecycle.to_payload())
     assert restored.to_payload() == lifecycle.to_payload()
+    with pytest.raises(
+        GameLifecycleError,
+        match="Runtime RuleIR source is not authoritative for this bundle",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=state,
+            event_records=event_records,
+            rule_ir_authority_index=RuntimeRuleIRAuthorityIndex(
+                _rule_irs_by_key={},
+                _player_ids_by_key={},
+                _ability_records_by_player_key={},
+                _stratagem_records_by_player_key={},
+            ),
+        )
+
+
+def test_generic_rule_ir_scoring_authority_fail_closed_branches() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    rule_ir = _compiled_generic_vp_rule_ir()
+    clause, effect = _generic_vp_clause_and_effect(rule_ir)
+    context = _generic_vp_execution_context(state, event_log=EventLog())
+    next_generic_rule_ir_victory_point_event_id(event_log=None, fallback_id="rule-event:fallback")
+    assert (
+        next_generic_rule_ir_victory_point_event_id(
+            event_log=EventLog(),
+            fallback_id="rule-event:fallback",
+        )
+        == "event-000001"
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP event_log must be an EventLog",
+    ):
+        next_generic_rule_ir_victory_point_event_id(
+            event_log=object(),
+            fallback_id="rule-event:fallback",
+        )
+    with pytest.raises(GameLifecycleError, match="Generic RuleIR Secondary VP requires RuleIR"):
+        generic_rule_ir_secondary_award(
+            rule_ir=cast(RuleIR, object()),
+            clause=clause,
+            effect=effect,
+            context=context,
+            amount=5,
+            execution_event_id="event-000001",
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP requires a RuleClause",
+    ):
+        generic_rule_ir_secondary_award(
+            rule_ir=rule_ir,
+            clause=cast(RuleClause, object()),
+            effect=effect,
+            context=context,
+            amount=5,
+            execution_event_id="event-000001",
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP requires a RuleEffectSpec",
+    ):
+        generic_rule_ir_secondary_award(
+            rule_ir=rule_ir,
+            clause=clause,
+            effect=cast(RuleEffectSpec, object()),
+            context=context,
+            amount=5,
+            execution_event_id="event-000001",
+        )
+    missing_phase = replace(context, phase=None)
+    with pytest.raises(GameLifecycleError, match="Generic RuleIR Secondary VP requires a phase"):
+        generic_rule_ir_secondary_award(
+            rule_ir=rule_ir,
+            clause=clause,
+            effect=effect,
+            context=missing_phase,
+            amount=5,
+            execution_event_id="event-000001",
+        )
+    empty_clause = replace(clause, effects=())
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP effect does not identify one clause",
+    ):
+        generic_rule_ir_secondary_award(
+            rule_ir=rule_ir,
+            clause=empty_clause,
+            effect=effect,
+            context=context,
+            amount=5,
+            execution_event_id="event-000001",
+        )
+    with pytest.raises(GameLifecycleError, match="Rule execution handler requires an effect"):
+        apply_generic_rule_ir_victory_points(rule_ir, clause, None, context)
+    missing_state = replace(context, state=None)
+    with pytest.raises(GameLifecycleError, match="Rule execution requires GameState"):
+        apply_generic_rule_ir_victory_points(rule_ir, clause, effect, missing_state)
+    invalid_phase = apply_generic_rule_ir_victory_points(rule_ir, clause, effect, missing_phase)
+    assert invalid_phase.status is RuleExecutionStatus.INVALID
+    assert invalid_phase.reason == "missing_phase"
+    zero_delta = replace(effect, parameters=(RuleParameter("delta", 0),))
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP requires a positive effect delta",
+    ):
+        apply_generic_rule_ir_victory_points(rule_ir, clause, zero_delta, context)
+    fallback_context = _generic_vp_execution_context(state, event_log=None)
+    fallback_result = apply_generic_rule_ir_victory_points(
+        rule_ir,
+        clause,
+        effect,
+        fallback_context,
+    )
+    assert fallback_result.status is RuleExecutionStatus.APPLIED
+    assert fallback_result.event_records[0].event_type == (
+        RULE_EXECUTION_VICTORY_POINTS_AWARDED_EVENT_TYPE
+    )
+    require_generic_rule_ir_loaded_authority(
+        award=_award_from_transaction(_generic_rule_ir_transaction(state)),
+        rule_ir=rule_ir,
+    )
+    with pytest.raises(GameLifecycleError, match="Generic RuleIR Secondary VP requires RuleIR"):
+        require_generic_rule_ir_loaded_authority(
+            award=_award_from_transaction(_generic_rule_ir_transaction(state)),
+            rule_ir=cast(RuleIR, object()),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP restore requires GameState",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=cast(GameState, object()),
+            event_records=(),
+            rule_ir_authority_index=None,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP restore requires EventRecord values",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=state,
+            event_records=cast(tuple[EventRecord, ...], [object()]),
+            rule_ir_authority_index=None,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP restore requires RuntimeRuleIRAuthorityIndex",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=state,
+            event_records=(),
+            rule_ir_authority_index=cast(RuntimeRuleIRAuthorityIndex, object()),
+        )
+    leftover_state = _bring_it_down_player_a_scored_lifecycle().state
+    assert leftover_state is not None
+    leftover = EventRecord(
+        event_id="event-000001",
+        event_type=RULE_EXECUTION_VICTORY_POINTS_AWARDED_EVENT_TYPE,
+        payload={"transaction_id": "missing"},
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP execution events must match ledger transactions",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=leftover_state,
+            event_records=(leftover,),
+            rule_ir_authority_index=None,
+        )
+    duplicate_events = (
+        leftover,
+        EventRecord(
+            event_id="event-000001",
+            event_type=RULE_EXECUTION_VICTORY_POINTS_AWARDED_EVENT_TYPE,
+            payload={"transaction_id": "other"},
+        ),
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP execution events are not unique",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=leftover_state,
+            event_records=duplicate_events,
+            rule_ir_authority_index=None,
+        )
+    authentic = _bring_it_down_player_a_scored_lifecycle()
+    authentic_state = authentic.state
+    assert authentic_state is not None
+    _execute_generic_vp_on_lifecycle(authentic)
+    generic = _generic_rule_ir_transaction(authentic_state)
+    cap_invalid = replace(
+        generic,
+        metadata={
+            **_json_map(generic.metadata, label="generic metadata"),
+            "vp_cap_audit": ["not-an-object"],
+        },
+    )
+    _replace_player_transaction(authentic_state, cap_invalid)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP transaction cap audit must be an object",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=authentic_state,
+            event_records=authentic.decision_controller.event_log.records,
+            rule_ir_authority_index=None,
+        )
+    cap_missing_amount = replace(
+        generic,
+        metadata={
+            **_json_map(generic.metadata, label="generic metadata"),
+            "vp_cap_audit": {"requested_amount": 0},
+        },
+    )
+    _replace_player_transaction(authentic_state, cap_missing_amount)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary VP transaction cap audit requires positive requested_amount",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=authentic_state,
+            event_records=authentic.decision_controller.event_log.records,
+            rule_ir_authority_index=None,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP effect_index is outside its clause",
+    ):
+        require_generic_rule_ir_loaded_authority(
+            award=replace(
+                _award_from_transaction(generic),
+                metadata={
+                    **_json_map(generic.metadata, label="generic metadata"),
+                    GENERIC_RULE_IR_EFFECT_INDEX_KEY: 99,
+                },
+            ),
+            rule_ir=rule_ir,
+        )
+    generic_metadata = _json_map(generic.metadata, label="generic metadata")
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP source_id drifted from RuleIR",
+    ):
+        require_generic_rule_ir_loaded_authority(
+            award=replace(
+                _award_from_transaction(generic),
+                source_id="other-source",
+                metadata={
+                    **generic_metadata,
+                    GENERIC_RULE_IR_SOURCE_ID_KEY: "other-source",
+                },
+            ),
+            rule_ir=rule_ir,
+        )
+
+
+def test_restore_rejects_duplicate_registered_phase11f_probe() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    probe = _registered_phase11f_cap_probe_award()
+    state.award_victory_points(probe)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Registered Phase 11F Secondary VP probe must not repeat",
+    ):
+        state.award_victory_points(probe)
+    _append_player_transaction_from_award(state, probe)
+    with pytest.raises(
+        GameLifecycleError,
+        match="Registered Phase 11F Secondary VP probe must not repeat",
+    ):
+        validate_secondary_transaction_semantics(state=state)
+
+
+def test_scored_tactical_card_rejects_generic_rule_ir_binding() -> None:
+    lifecycle, state = _defend_stronghold_ready_lifecycle()
+    state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="defend-stronghold",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    transaction = _secondary_transaction(
+        state,
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+    )
+    rewritten = replace(
+        transaction,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+        scoring_timing="generic_rule_execution",
+        metadata=_fabricated_generic_rule_ir_metadata(
+            amount=transaction.amount,
+            source_id=transaction.source_id,
+            execution_context={
+                "player_id": transaction.player_id,
+                "battle_round": transaction.battle_round,
+                "phase": transaction.phase,
+            },
+        ),
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Scored tactical secondary card does not identify its ledger transaction",
+    ):
+        _validate_scored_tactical_card_bindings(state=state, transactions=(rewritten,))
+    still_tactical = replace(
+        transaction,
+        scoring_timing="generic_rule_execution",
+        metadata=_fabricated_generic_rule_ir_metadata(
+            amount=transaction.amount,
+            source_id=transaction.source_id,
+            execution_context={
+                "player_id": transaction.player_id,
+                "battle_round": transaction.battle_round,
+                "phase": transaction.phase,
+            },
+        ),
+    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Scored tactical secondary card cannot bind a generic RuleIR transaction",
+    ):
+        _validate_scored_tactical_card_bindings(state=state, transactions=(still_tactical,))
 
 
 def test_restore_rejects_removed_objective_control_id_on_fixed_secondary() -> None:
@@ -3473,6 +4166,175 @@ def _secondary_transaction(
 
 def _award_from_transaction(transaction: VictoryPointTransaction) -> VictoryPointAward:
     return _uncapped_award_from_transaction(transaction)
+
+
+def _fabricated_generic_rule_ir_metadata(
+    *,
+    amount: int,
+    source_id: str = "phase17d-generic-vp",
+    rule_id: str = "phase17d-generic-vp",
+    rule_ir_hash: str = "ab" * 32,
+    clause_id: str = "clause-1",
+    effect_index: int = 0,
+    execution_event_id: str = "event-000001",
+    execution_context: object | None = None,
+    **overrides: object,
+) -> dict[str, JsonValue]:
+    payload: dict[str, JsonValue] = {
+        "secondary_scoring_provider_kind": SecondaryScoringProviderKind.GENERIC_RULE_IR.value,
+        "rule_id": rule_id,
+        GENERIC_RULE_IR_SOURCE_ID_KEY: source_id,
+        GENERIC_RULE_IR_HASH_KEY: rule_ir_hash,
+        "clause_id": clause_id,
+        GENERIC_RULE_IR_EFFECT_INDEX_KEY: effect_index,
+        "effect": {
+            "kind": "add_victory_points",
+            "parameters": [
+                {"key": "unit", "value": "target"},
+                {"key": "delta", "value": amount},
+            ],
+        },
+        GENERIC_RULE_IR_EXECUTION_EVENT_ID_KEY: execution_event_id,
+        GENERIC_RULE_IR_EXECUTION_CONTEXT_KEY: (
+            {
+                "player_id": "player-a",
+                "battle_round": 1,
+                "phase": "fight",
+            }
+            if execution_context is None
+            else cast(JsonValue, execution_context)
+        ),
+    }
+    for key, value in overrides.items():
+        payload[key] = cast(JsonValue, value)
+    return payload
+
+
+def _require_registered_phase11f_cap_probe() -> RegisteredPhase11FCapProbe:
+    probe = registered_phase11f_cap_probe(
+        source_id="assassination",
+        scoring_rule_id="phase11f-secondary-cap",
+    )
+    assert probe is not None
+    return probe
+
+
+def _registered_phase11f_cap_probe_award() -> VictoryPointAward:
+    probe = _require_registered_phase11f_cap_probe()
+    return VictoryPointAward(
+        player_id=probe.player_id,
+        battle_round=probe.battle_round,
+        phase=probe.phase,
+        amount=probe.amount,
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+        source_id=probe.source_id,
+        scoring_timing=probe.scoring_timing,
+        metadata={
+            "secondary_scoring_provider_kind": SecondaryScoringProviderKind.LEGACY_PHASE11F.value,
+            "scoring_rule_id": probe.scoring_rule_id,
+        },
+    )
+
+
+def _compiled_generic_vp_rule_ir() -> RuleIR:
+    return compile_rule_source_text(
+        RuleSourceText.from_raw(
+            source_id="phase17n:generic-vp-score",
+            raw_text="When this unit is destroyed, score 5VP.",
+        ),
+        source_keyword_sequence_parts=SOURCE_KEYWORD_SEQUENCE_PARTS,
+    ).rule_ir
+
+
+def _generic_vp_clause_and_effect(rule_ir: RuleIR) -> tuple[RuleClause, RuleEffectSpec]:
+    for clause in rule_ir.clauses:
+        for effect in clause.effects:
+            if effect.kind is RuleEffectKind.ADD_VICTORY_POINTS:
+                return clause, effect
+    raise AssertionError("compiled RuleIR does not award victory points")
+
+
+def _generic_vp_execution_context(
+    state: GameState,
+    *,
+    event_log: EventLog | None,
+) -> RuleExecutionContext:
+    phase = state.current_battle_phase
+    assert phase is not None
+    return RuleExecutionContext(
+        game_id=state.game_id,
+        player_id="player-a",
+        battle_round=state.battle_round,
+        phase=BattlePhaseKind(phase.value),
+        active_player_id=state.active_player_id,
+        timing_window_id="phase17n:generic-vp",
+        state=state,
+        event_log=event_log,
+    )
+
+
+def _rule_ir_authority_index(rule_ir: RuleIR, *, player_id: str) -> RuntimeRuleIRAuthorityIndex:
+    key = RuntimeRuleIRSourceKey(source_id=rule_ir.source_id, rule_ir_hash=rule_ir.ir_hash())
+    return RuntimeRuleIRAuthorityIndex(
+        _rule_irs_by_key={key: rule_ir},
+        _player_ids_by_key={key: (player_id,)},
+        _ability_records_by_player_key={},
+        _stratagem_records_by_player_key={},
+    )
+
+
+def _execute_generic_vp_on_lifecycle(lifecycle: GameLifecycle) -> RuleIR:
+    state = lifecycle.state
+    assert state is not None
+    rule_ir = _compiled_generic_vp_rule_ir()
+    result = execute_rule_ir(
+        rule_ir=rule_ir,
+        context=_generic_vp_execution_context(
+            state,
+            event_log=lifecycle.decision_controller.event_log,
+        ),
+        registry=default_rule_execution_registry(),
+    )
+    assert result.status is RuleExecutionStatus.APPLIED
+    return rule_ir
+
+
+def _generic_rule_ir_transaction(state: GameState) -> VictoryPointTransaction:
+    matches = tuple(
+        transaction
+        for ledger in state.victory_point_ledgers
+        for transaction in ledger.transactions
+        if secondary_scoring_provider_kind_from_metadata(transaction.metadata)
+        is SecondaryScoringProviderKind.GENERIC_RULE_IR
+    )
+    if len(matches) != 1:
+        raise AssertionError("expected one generic RuleIR Secondary transaction")
+    return matches[0]
+
+
+def _replace_player_transaction(state: GameState, transaction: VictoryPointTransaction) -> None:
+    ledger = state.victory_point_ledger_for_player(transaction.player_id)
+    state.victory_point_ledgers = [
+        replace(
+            ledger,
+            transactions=tuple(
+                transaction if stored_tx.transaction_id == transaction.transaction_id else stored_tx
+                for stored_tx in ledger.transactions
+            ),
+        )
+        if stored.player_id == ledger.player_id
+        else stored
+        for stored in state.victory_point_ledgers
+    ]
+
+
+def _append_player_transaction_from_award(state: GameState, award: VictoryPointAward) -> None:
+    ledger = state.victory_point_ledger_for_player(award.player_id)
+    updated, _transaction = ledger.award(award)
+    state.victory_point_ledgers = [
+        updated if stored.player_id == ledger.player_id else stored
+        for stored in state.victory_point_ledgers
+    ]
 
 
 def _defend_stronghold_ready_lifecycle() -> tuple[GameLifecycle, GameState]:

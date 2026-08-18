@@ -27,7 +27,7 @@ LEGACY_OVERSIZED_MODULE_LIMITS = {
     "src/warhammer40k_core/engine/phases/fight.py": 4065,
     "src/warhammer40k_core/engine/prebattle.py": 3546,
     "src/warhammer40k_core/engine/reserves.py": 2845,
-    "src/warhammer40k_core/engine/rule_execution.py": 1793,
+    "src/warhammer40k_core/engine/rule_execution.py": 1597,
     "src/warhammer40k_core/engine/scoring.py": 4264,
     "src/warhammer40k_core/engine/shooting_targets.py": 1683,
     "src/warhammer40k_core/engine/transports.py": 3567,

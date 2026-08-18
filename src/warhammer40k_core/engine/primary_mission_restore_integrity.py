@@ -109,6 +109,15 @@ def validate_primary_mission_restore_integrity(
         faction_rule_execution_registry=faction_rule_execution_registry,
         runtime_content_activation=runtime_content_activation,
     )
+    from warhammer40k_core.engine.secondary_rule_ir_scoring_authority import (
+        validate_secondary_generic_rule_ir_restore_authority,
+    )
+
+    validate_secondary_generic_rule_ir_restore_authority(
+        state=state,
+        event_records=event_records,
+        rule_ir_authority_index=rule_ir_authority_index,
+    )
 
 
 __all__ = ("validate_primary_mission_restore_integrity",)
