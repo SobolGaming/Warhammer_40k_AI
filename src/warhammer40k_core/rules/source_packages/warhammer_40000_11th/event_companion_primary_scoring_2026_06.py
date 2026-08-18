@@ -14,8 +14,8 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 
 ARTIFACT_SCHEMA: Final = "core-v2-phase17n-event-companion-primary-scoring-v5"
 SOURCE_PACKAGE_ID: Final = "gw-11e-warhammer-event-companion-v1-1-2026-07"
-EXPECTED_PACKAGE_HASH: Final = "bb869c3c4f57b45ad46d67fb6ce9cf0c230247d1358f2329d3e794cadb984e4a"
-EXPECTED_ARTIFACT_SHA256: Final = "c756ac167152eb7a0cdf32bbf233b76f5f5bd2346acab74e7c1b9d85a7bbe476"
+EXPECTED_PACKAGE_HASH: Final = "c2eaf24800b9cc61bdc9e6fa2e15a967ac5bdb02f43719af0f6195fa586daa42"
+EXPECTED_ARTIFACT_SHA256: Final = "d875ac76cfc4a39a3acd8c5ce7998fdcbb98927d10a613624f22229ddf7e1af6"
 _ARTIFACT_PACKAGE: Final = "warhammer40k_core.rules.source_packages.warhammer_40000_11th"
 _ARTIFACT_PATH: Final = "event_companion_2026_06_artifacts/primary-scoring.json"
 _PENDING_SCORING_KIND: Final = "event_companion_primary_source_known_engine_pending"
@@ -70,6 +70,7 @@ _EXPECTED_ENGINE_IMPLEMENTED_SCORING_KINDS: Final = {
     "primary-inescapable-dominion": "inescapable_dominion",
     "primary-meatgrinder": "meatgrinder",
     "primary-outmaneuver": "outmaneuver",
+    "primary-punishment": "punishment",
     "primary-purge-and-secure": "purge_and_secure",
     "primary-reconnaissance-sweep": "reconnaissance_sweep",
     "primary-sabotage": "sabotage",

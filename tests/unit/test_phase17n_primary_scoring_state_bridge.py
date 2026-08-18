@@ -336,7 +336,7 @@ def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -
             row.status is event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED
             for row in coverage_by_id.values()
         )
-        == 19
+        == 20
     )
     assert (
         sum(
@@ -344,7 +344,7 @@ def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -
             is event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
             for row in coverage_by_id.values()
         )
-        == 6
+        == 5
     )
     for mission_id in step5a_mission_ids:
         assert coverage_by_id[mission_id].status is (

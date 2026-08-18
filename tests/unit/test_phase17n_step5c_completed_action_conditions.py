@@ -80,7 +80,6 @@ def test_phase17n_step5c_keeps_remaining_condition_pending_missions_fail_closed(
     for mission_id in (
         "primary-gather-intel",
         "primary-extract-relic",
-        "primary-punishment",
         "primary-surveil-the-foe",
         "primary-locate-and-deny",
         "primary-vital-link",

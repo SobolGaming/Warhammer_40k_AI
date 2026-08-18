@@ -27,6 +27,10 @@ from warhammer40k_core.engine.primary_scoring_conditions import (
     opponent_home_control_evidence,
     primary_score_count_evidence,
 )
+from warhammer40k_core.engine.primary_scoring_departure_conditions import (
+    PRIMARY_SCORING_DEPARTURE_CONDITIONS,
+    evaluate_departure_scoring_condition,
+)
 from warhammer40k_core.engine.primary_scoring_marker_conditions import (
     PRIMARY_SCORING_MARKER_CONDITIONS,
     evaluate_marker_scoring_condition,
@@ -39,6 +43,7 @@ from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
 SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS = frozenset(
     {
         *PRIMARY_SCORING_ACTION_CONDITIONS,
+        *PRIMARY_SCORING_DEPARTURE_CONDITIONS,
         *PRIMARY_SCORING_MARKER_CONDITIONS,
         "control_central_and_expansion_objectives",
         "control_enemy_home_objective",
@@ -245,6 +250,8 @@ def evaluate_primary_scoring_condition(
         return _marker_condition_evidence(condition_id=condition_id, context=context)
     if condition_id in PRIMARY_SCORING_ACTION_CONDITIONS:
         return _action_condition_evidence(condition_id=condition_id, context=context)
+    if condition_id in PRIMARY_SCORING_DEPARTURE_CONDITIONS:
+        return _departure_condition_evidence(condition_id=condition_id, context=context)
     objective = _objective_evidence(context)
     record = context.record
 
@@ -550,6 +557,26 @@ def _action_condition_evidence(
         battle_round=context.record.battle_round,
         opponent_territory_objective_ids=opponent_territory_objective_ids,
         opponent_player_id=opponent_player_id,
+    )
+
+
+def _departure_condition_evidence(
+    *,
+    condition_id: str,
+    context: PrimaryScoringConditionContext,
+) -> dict[str, JsonValue]:
+    if context.state_evidence is None:
+        raise GameLifecycleError(
+            f"Primary scoring condition {condition_id} requires state evidence."
+        )
+    return evaluate_departure_scoring_condition(
+        condition_id=condition_id,
+        progress=context.state_evidence.primary_mission_progress_state,
+        departures=context.state_evidence.primary_battlefield_departure_states,
+        mission_setup=context.mission_setup,
+        player_id=context.player_id,
+        battle_round=context.record.battle_round,
+        active_player_id=context.record.active_player_id,
     )
 
 

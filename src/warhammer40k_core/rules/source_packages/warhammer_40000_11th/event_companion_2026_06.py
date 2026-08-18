@@ -71,7 +71,7 @@ DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-EXPECTED_SOURCE_IMPORT_HASH = "ca61d092eb5bfac8ccf85fed76c12fff1eb424ec9486da823541c1425b6c4079"
+EXPECTED_SOURCE_IMPORT_HASH = "32b89c03816a57cdcd97bb0aa618fab66679a8065808752c54648c98e20b091a"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -1030,7 +1030,6 @@ _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
     "primary-locate-and-deny": (
         "engine_primary_condition:single_friendly_operation_marker_terrain_area_state",
     ),
-    "primary-punishment": ("engine_primary_condition:condemned_enemy_units_left_battlefield",),
     "primary-surveil-the-foe": (
         "engine_primary_condition:enemy_unit_surveilled_marker_exception",
         "engine_primary_condition:no_enemy_operation_markers_on_battlefield",

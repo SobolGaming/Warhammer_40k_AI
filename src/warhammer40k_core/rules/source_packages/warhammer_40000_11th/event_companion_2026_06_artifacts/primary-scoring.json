@@ -900,8 +900,8 @@
     {
       "primary_mission_id": "primary-punishment",
       "mission_name": "Punishment",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "punishment",
       "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
@@ -1866,5 +1866,5 @@
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-choice-rule:punishment-condemn-enemy-units"
     }
   ],
-  "package_hash": "bb869c3c4f57b45ad46d67fb6ce9cf0c230247d1358f2329d3e794cadb984e4a"
+  "package_hash": "c2eaf24800b9cc61bdc9e6fa2e15a967ac5bdb02f43719af0f6195fa586daa42"
 }
