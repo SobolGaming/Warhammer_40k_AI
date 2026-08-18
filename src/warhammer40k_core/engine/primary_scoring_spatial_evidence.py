@@ -46,6 +46,15 @@ _CENTER_EXCLUSION_INCHES = 6.0
 PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITION = (
     "each_controlled_objective_in_opponent_territory"
 )
+PRIMARY_SCORING_DECOY_OPPONENT_TERRITORY_OBJECTIVE_CONDITION = (
+    "each_decoy_objective_in_opponent_territory_bonus"
+)
+PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITIONS = frozenset(
+    {
+        PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITION,
+        PRIMARY_SCORING_DECOY_OPPONENT_TERRITORY_OBJECTIVE_CONDITION,
+    }
+)
 PRIMARY_SCORING_THREE_TABLE_QUARTERS_CONDITION = (
     "three_or_more_friendly_units_wholly_within_three_different_table_quarters_"
     "not_within_six_of_center"
@@ -65,7 +74,7 @@ PRIMARY_SCORING_TABLE_QUARTER_CONDITIONS = frozenset(
 )
 PRIMARY_SCORING_SPATIAL_CONDITIONS = frozenset(
     {
-        PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITION,
+        *PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITIONS,
         *PRIMARY_SCORING_TABLE_QUARTER_CONDITIONS,
         PRIMARY_SCORING_NO_ENEMY_IN_OWN_TERRITORY_CONDITION,
     }
@@ -293,7 +302,9 @@ class PrimaryScoringSpatialEvidence:
                 "PrimaryScoringSpatialEvidence has unrequested territory witnesses."
             )
         if (
-            PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITION not in requested_conditions
+            not PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITIONS.intersection(
+                requested_conditions
+            )
             and self.opponent_territory_objective_ids
         ):
             raise GameLifecycleError(
@@ -416,8 +427,8 @@ def build_primary_scoring_spatial_evidence(
     needs_enemy_territory = (
         PRIMARY_SCORING_NO_ENEMY_IN_OWN_TERRITORY_CONDITION in requested_conditions
     )
-    needs_opponent_objectives = (
-        PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITION in requested_conditions
+    needs_opponent_objectives = bool(
+        PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITIONS.intersection(requested_conditions)
     )
     own_role, opponent_role = _directed_roles(
         mission_setup=mission_setup,
@@ -963,9 +974,11 @@ def validate_primary_scoring_spatial_evidence_rows(
 
 
 __all__ = (
+    "PRIMARY_SCORING_DECOY_OPPONENT_TERRITORY_OBJECTIVE_CONDITION",
     "PRIMARY_SCORING_FOUR_TABLE_QUARTERS_CONDITION",
     "PRIMARY_SCORING_NO_ENEMY_IN_OWN_TERRITORY_CONDITION",
     "PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITION",
+    "PRIMARY_SCORING_OPPONENT_TERRITORY_OBJECTIVE_CONDITIONS",
     "PRIMARY_SCORING_SPATIAL_CONDITIONS",
     "PRIMARY_SCORING_TABLE_QUARTER_CONDITIONS",
     "PRIMARY_SCORING_THREE_TABLE_QUARTERS_CONDITION",

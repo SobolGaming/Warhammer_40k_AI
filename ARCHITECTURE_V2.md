@@ -106,7 +106,7 @@ patch records, Base Size Guide source rows with geometry-resolution statuses,
 deployment remainder-drain coverage, and a static audit preventing runtime
 Event Companion PDF parsing.
 **Phase 17N is partial overall, with its battlefield-geometry scope complete and
-13 of 25 Primary Missions executable**: all 15 Event Companion Force
+16 of 25 Primary Missions executable**: all 15 Event Companion Force
 Disposition pairings and all A/B/C variants supply 45 of 45 source-hashed
 executable battlefield packages. They contain 720 physical terrain-area
 footprint pieces forming 608 logical rules areas and 1,349 physical components,
@@ -115,12 +115,14 @@ timing, cumulative/exclusive resolution, objective, territory, and table-quarter
 scoring slice promotes eight additional evidence-complete Primaries, and the
 subsequent destruction-attribution slice promotes Purge and Secure. Step 4 adds
 persistent mission markers, player choices, Surveil move cleanup, and all ten
-source-backed Primary Mission Actions; the other 12 remain source-known and
-engine-pending for their card-specific scoring conditions. Step 5A adds the
-authenticated scoring-state bridge and four source-backed generic objective
-predicates without changing the 13/12 mission boundary or the six-of-15
-pairing boundary (18 of 45 variants). Pairing-wide lifecycle, replay, and
-viewer-scoped certification remains later Step 5 work.
+source-backed Primary Mission Actions. Step 5A adds the authenticated
+scoring-state bridge and four source-backed generic objective predicates.
+Step 5B scores consecrated, decoy, and triangulated markers, promoting
+Consecrate, Smoke and Mirrors, and Triangulation. The other 9 Primaries remain
+source-known and engine-pending for their card-specific scoring conditions.
+Seven of 15 pairings now have executable Primaries in both directions (21 of 45
+variants). Pairing-wide lifecycle, replay, and viewer-scoped certification
+remains later Step 5 work.
 **Phase 18A is complete** for local CLI/human decision entry and viewer-safe
 hybrid datacard projections: `interfaces/cli.py` renders pending finite and
 parameterized requests, submits normal lifecycle `DecisionResult`s, and
@@ -398,7 +400,7 @@ Implemented foundation and partial integration baselines:
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
 | 17J | Complete | Warhammer Event Companion v1.1 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with explicit extraction status, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
-| 17N | Partial | Battlefield geometry, Step 4 marker/action/choice state, and the Step 5A content-addressed scoring-state bridge are complete, including 14 runtime Mission Actions; generic timing/resolution, objective/territory/table-quarter evidence, and Purge and Secure destruction attribution make 13 of 25 Primaries executable while 12 remain pending on card-specific scoring conditions and pairing certification remains later Step 5 work |
+| 17N | Partial | Battlefield geometry, Step 4 marker/action/choice state, the Step 5A content-addressed scoring-state bridge, and Step 5B marker scoring are complete, including 14 runtime Mission Actions; generic timing/resolution, objective/territory/table-quarter evidence, Purge and Secure destruction attribution, and consecrated/decoy/triangulated marker predicates make 16 of 25 Primaries executable while 9 remain pending on card-specific scoring conditions and pairing certification remains later Step 5 work |
 | 17O | Complete | Viewer-scoped eight-axis capability manifest with selected roster/unit/rule/mission/geometry rows, evidence, blockers, identities, and mechanically derived certification claims |
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
@@ -4763,7 +4765,7 @@ Implemented coverage:
   implemented matrix cells, 45 deployment maps, 45 terrain layout templates, and
   45 mission-pool entries.
 - `primary_mission_scoring_coverage_rows()` tracks current Primary Mission
-  scoring status: 13 of 25 missions are engine-implemented, 12 are source-known
+  scoring status: 16 of 25 missions are engine-implemented, 9 are source-known
   but still require card-specific scoring-condition implementation, and 0 await
   source scoring text.
 - All 45 source-page layout identities instantiate as 44" x 60" mission setups
@@ -4971,15 +4973,17 @@ Completion gate:
 Priority: required before certifying a visual matched-play slice.
 
 Status: Partial overall; battlefield geometry is complete and Primary scoring
-is executable for 13 of 25 missions. All 15 Event Companion Force Disposition
+is executable for 16 of 25 missions. All 15 Event Companion Force Disposition
 pairings and every A/B/C variant have source-hashed executable battlefield
-packages, for 45 of 45 layouts. Six of those 15 pairings have executable
-Primaries in both directions, covering 18 of the 45 A/B/C variants with complete
-two-sided Primary scoring. The remaining 12 Primaries stay source-known and
+packages, for 45 of 45 layouts. Seven of those 15 pairings have executable
+Primaries in both directions, covering 21 of the 45 A/B/C variants with complete
+two-sided Primary scoring. The remaining 9 Primaries stay source-known and
 engine-pending for their card-specific scoring conditions. Step 4's mission
 actions, choices, persistent marker state, and Surveil movement cleanup are
 engine-owned. Step 5A's scoring-state bridge and four simple objective
-predicates are complete; pairing-wide certification remains later Step 5 work.
+predicates are complete. Step 5B's marker scoring conditions promote Consecrate,
+Smoke and Mirrors, and Triangulation. Pairing-wide certification remains later
+Step 5 work.
 
 The battlefield Single/Separate logical-area semantics come from the page-8
 Layouts Key, while coordinates and layout facts come from pages 9-53 of
@@ -5044,11 +5048,11 @@ Mission Action descriptors retain reviewed Chapter Approved mission-deck
 provenance in the strict, versioned JSON artifact at
 `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-scoring.json`,
 with package hash
-`a2adf58fea80100b46e473d808c9a605be87ca71189b5815f4445c26decb4c2c`
+`b3a02c5991091d3b405a60abefc646e1223947d9c8475a5dd444515b9e2a0a1d`
 and raw artifact SHA-256
-`b7bde84fbe50e575a7da5dbac62e2cdb4cbcd0c3346287a8028a19cdc563caba`.
+`219936a61ddf127df6dc8ec34aa96552f7b8d9a2b1a57762b10b9316042735b5`.
 The artifact pins the reviewed transcriptions from PRs #107, #134, #136, and
-#379, including the exact 13 executable versus 12 engine-pending status boundary.
+#379, including the exact 16 executable versus 9 engine-pending status boundary.
 PR #107 is the source-backed origin for Death Trap, Immovable Object, and
 Unstoppable Force; PRs #134 and #136 complete the remaining mission/action
 transcription inventory, and PR #379 supplies the later exact Meatgrinder
@@ -5075,7 +5079,7 @@ record; the free-form timing field alone cannot claim the exemption. Live
 awards and restored ledgers use the same policy validator, and restore rejects
 ordinary Primary totals above 15VP in one battle round. The resulting complete
 mission source identity is pinned as
-`c724fad0b3bf86f04abcc673b06f5e3829849177de99e9f8ad71a6430c142fd4`.
+`ce8cf6559a2758c02abf3ee6f3009fd63aff3f51bd3042bf393ea8552c00745f`.
 
 The Phase 17N scoring schema has exactly nine source timing tokens and requires
 every scoring row to declare one of `independent`, `cumulative`, or
@@ -5182,14 +5186,25 @@ ID/hash commitments. The same slice adds the
 source-backed generic predicates for a central objective in round one, three
 objectives from round two, four objectives at battle end, and a controlled
 non-home objective that is central. Those predicates remove only their exact
-tracker blockers: no pending Primary is promoted, so the authoritative status
-remains 13 executable and 12 pending.
+tracker blockers.
+
+Step 5B scores persistent mission markers through the shared generic condition
+path. Consecrated, decoy, and triangulated markers are identified by catalog
+source identity plus ACTIVE OBJECTIVE ownership; consecrated markers also
+require a linked consumed designation. Marker thresholds fail closed without
+`PrimaryScoringStateEvidence`. The decoy opponent-territory bonus additionally
+requires spatial evidence and does not treat a generic operation marker as a
+decoy. This promotes Consecrate, Smoke and Mirrors, and Triangulation only.
+Gather Intel, Extract Relic, Locate and Deny, Vital Link, Punishment, Sabotage,
+Secure Asset, Surveil the Foe, and Vanguard Operation stay pending. Smoke does
+not complete a two-sided pairing; the new complete pairing is
+purge-the-foe versus reconnaissance.
 
 The remaining Step 5 work retains the certification boundary for every Force
 Disposition pairing through normal lifecycle execution, replay, and
-viewer-scoped projections. The 13-of-25 executable scoring count and six fully
-executable two-sided pairings remain authoritative until that condition work
-and certification are complete.
+viewer-scoped projections. The 16-of-25 executable scoring count and seven fully
+executable two-sided pairings remain authoritative until that remaining
+condition work and certification are complete.
 
 `uv run python tools/build_event_companion_battlefields.py --check` rebuilds the
 complete battlefield package in memory from its reviewed inputs, verifies its

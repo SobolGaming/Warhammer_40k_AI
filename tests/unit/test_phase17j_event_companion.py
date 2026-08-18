@@ -104,7 +104,7 @@ def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> N
 
     assert mission_pack.mission_pack_id == "11e-warhammer-event-companion-2026-07"
     assert source_package.source_commit_or_import_hash == (
-        "c724fad0b3bf86f04abcc673b06f5e3829849177de99e9f8ad71a6430c142fd4"
+        "ce8cf6559a2758c02abf3ee6f3009fd63aff3f51bd3042bf393ea8552c00745f"
     )
     assert source_package.to_payload() == {
         "edition_id": "warhammer_40000_11th",
@@ -434,7 +434,7 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
     assert punishment_choice.effect_duration == "until_start_of_own_next_turn"
     assert Counter(
         mission.engine_support_status for mission in artifact.primary_missions
-    ) == Counter({"engine_implemented": 13, "source_known_engine_pending": 12})
+    ) == Counter({"engine_implemented": 16, "source_known_engine_pending": 9})
     all_scoring_rules = tuple(
         rule for mission in artifact.primary_missions for rule in mission.scoring_rules
     )
@@ -458,6 +458,7 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
         if mission.engine_support_status == "engine_implemented"
     } == {
         "primary-battlefield-dominance",
+        "primary-consecrate",
         "primary-death-trap",
         "primary-delaying-action",
         "primary-destroyers-wrath",
@@ -469,6 +470,8 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
         "primary-purge-and-secure",
         "primary-reconnaissance-sweep",
         "primary-search-and-scour",
+        "primary-smoke-and-mirrors",
+        "primary-triangulation",
         "primary-unstoppable-force",
     }
     grouped_rule_ids: dict[str, tuple[str, ...]] = {}
@@ -637,7 +640,14 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
         )
 
     promoted_status_payload = json.loads(raw)
-    promoted_status_payload["primary_missions"][1]["engine_support_status"] = "engine_implemented"
+    pending_index = next(
+        index
+        for index, mission in enumerate(promoted_status_payload["primary_missions"])
+        if mission["engine_support_status"] == "source_known_engine_pending"
+    )
+    promoted_status_payload["primary_missions"][pending_index]["engine_support_status"] = (
+        "engine_implemented"
+    )
     with pytest.raises(ValueError, match="engine support truth drifted"):
         event_primary_scoring.event_companion_primary_scoring_artifact_from_json_bytes(
             json.dumps(promoted_status_payload).encode()
@@ -3177,6 +3187,7 @@ def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_ord
     assert complete_pair_ids == {
         "disruption-vs-disruption",
         "purge-the-foe-vs-purge-the-foe",
+        "purge-the-foe-vs-reconnaissance",
         "take-and-hold-vs-disruption",
         "take-and-hold-vs-purge-the-foe",
         "take-and-hold-vs-reconnaissance",
@@ -3193,7 +3204,7 @@ def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_ord
             ].primary_mission_id
             in executable_primary_ids
         )
-        == 18
+        == 21
     )
     assert (
         source_rows[10].source_left_force_disposition_id,
@@ -4022,8 +4033,8 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
 
     assert len(coverage_rows) == 25
     assert status_counts == {
-        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 13,
-        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 12,
+        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 16,
+        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 9,
         event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 0,
     }
     assert {
@@ -4037,16 +4048,13 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         if row.status
         is event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
     } == {
-        "primary-consecrate",
         "primary-extract-relic",
         "primary-gather-intel",
         "primary-locate-and-deny",
         "primary-punishment",
         "primary-sabotage",
         "primary-secure-asset",
-        "primary-smoke-and-mirrors",
         "primary-surveil-the-foe",
-        "primary-triangulation",
         "primary-vanguard-operation",
         "primary-vital-link",
     }
@@ -4105,6 +4113,9 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     assert primary_rows["primary-meatgrinder"].scoring_kind == ("meatgrinder")
     assert primary_rows["primary-battlefield-dominance"].scoring_kind == ("battlefield_dominance")
     assert primary_rows["primary-purge-and-secure"].scoring_kind == ("purge_and_secure")
+    assert primary_rows["primary-consecrate"].scoring_kind == "consecrate"
+    assert primary_rows["primary-smoke-and-mirrors"].scoring_kind == "smoke_and_mirrors"
+    assert primary_rows["primary-triangulation"].scoring_kind == "triangulation"
     assert coverage_rows["primary-unstoppable-force"].needed_work == ()
     assert coverage_rows["primary-meatgrinder"].needed_work == ()
     assert coverage_rows["primary-death-trap"].mission_action_count == 1
@@ -4119,6 +4130,7 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     assert coverage_rows["primary-vital-link"].mission_action_count == 1
     for implemented_mission_id in (
         "primary-battlefield-dominance",
+        "primary-consecrate",
         "primary-delaying-action",
         "primary-destroyers-wrath",
         "primary-determined-acquisition",
@@ -4127,6 +4139,8 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         "primary-purge-and-secure",
         "primary-reconnaissance-sweep",
         "primary-search-and-scour",
+        "primary-smoke-and-mirrors",
+        "primary-triangulation",
     ):
         assert coverage_rows[implemented_mission_id].needed_work == ()
     assert {
@@ -4135,10 +4149,6 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         if row.status
         is event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
     } == {
-        "primary-consecrate": (
-            "engine_primary_condition:consecrated_objective_thresholds",
-            "engine_primary_condition:enemy_home_objective_consecrated",
-        ),
         "primary-extract-relic": (
             "engine_primary_condition:friendly_unit_performed_sensor_sweep_this_turn",
             "engine_primary_condition:single_opponent_operation_marker_terrain_area_state",
@@ -4156,15 +4166,10 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
             "engine_primary_condition:sabotage_opponent_territory_objective_bonus",
         ),
         "primary-secure-asset": ("engine_primary_condition:friendly_unit_secured_asset_this_turn",),
-        "primary-smoke-and-mirrors": (
-            "engine_primary_condition:decoy_objective_scoring",
-            "engine_primary_condition:opponent_territory_objective_bonus",
-        ),
         "primary-surveil-the-foe": (
             "engine_primary_condition:enemy_unit_surveilled_marker_exception",
             "engine_primary_condition:no_enemy_operation_markers_on_battlefield",
         ),
-        "primary-triangulation": ("engine_primary_condition:triangulated_objective_thresholds",),
         "primary-vanguard-operation": (
             "engine_primary_condition:friendly_unit_performed_vanguard_operation_this_turn",
             "engine_primary_condition:enemy_territory_terrain_area_control",

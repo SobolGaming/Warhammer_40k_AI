@@ -552,10 +552,11 @@ def test_primary_policy_rejects_forged_end_of_battle_and_foreign_evidence(
         )
 
 
-def test_exact_thirteen_implemented_primaries_build_typed_runtime_rules() -> None:
+def test_exact_sixteen_implemented_primaries_build_typed_runtime_rules() -> None:
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
     implemented_ids = {
         "primary-battlefield-dominance",
+        "primary-consecrate",
         "primary-death-trap",
         "primary-delaying-action",
         "primary-destroyers-wrath",
@@ -567,6 +568,8 @@ def test_exact_thirteen_implemented_primaries_build_typed_runtime_rules() -> Non
         "primary-purge-and-secure",
         "primary-reconnaissance-sweep",
         "primary-search-and-scour",
+        "primary-smoke-and-mirrors",
+        "primary-triangulation",
         "primary-unstoppable-force",
     }
     primary_by_id = {

@@ -156,8 +156,8 @@
     {
       "primary_mission_id": "primary-consecrate",
       "mission_name": "Consecrate",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "consecrate",
       "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
@@ -1259,8 +1259,8 @@
     {
       "primary_mission_id": "primary-smoke-and-mirrors",
       "mission_name": "Smoke and Mirrors",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "smoke_and_mirrors",
       "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
@@ -1383,8 +1383,8 @@
     {
       "primary_mission_id": "primary-triangulation",
       "mission_name": "Triangulation",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "triangulation",
       "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
@@ -1866,5 +1866,5 @@
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-choice-rule:punishment-condemn-enemy-units"
     }
   ],
-  "package_hash": "a2adf58fea80100b46e473d808c9a605be87ca71189b5815f4445c26decb4c2c"
+  "package_hash": "b3a02c5991091d3b405a60abefc646e1223947d9c8475a5dd444515b9e2a0a1d"
 }

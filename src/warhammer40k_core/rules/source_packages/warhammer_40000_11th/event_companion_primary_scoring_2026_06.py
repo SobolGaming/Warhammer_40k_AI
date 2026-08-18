@@ -14,8 +14,8 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 
 ARTIFACT_SCHEMA: Final = "core-v2-phase17n-event-companion-primary-scoring-v5"
 SOURCE_PACKAGE_ID: Final = "gw-11e-warhammer-event-companion-v1-1-2026-07"
-EXPECTED_PACKAGE_HASH: Final = "a2adf58fea80100b46e473d808c9a605be87ca71189b5815f4445c26decb4c2c"
-EXPECTED_ARTIFACT_SHA256: Final = "b7bde84fbe50e575a7da5dbac62e2cdb4cbcd0c3346287a8028a19cdc563caba"
+EXPECTED_PACKAGE_HASH: Final = "b3a02c5991091d3b405a60abefc646e1223947d9c8475a5dd444515b9e2a0a1d"
+EXPECTED_ARTIFACT_SHA256: Final = "219936a61ddf127df6dc8ec34aa96552f7b8d9a2b1a57762b10b9316042735b5"
 _ARTIFACT_PACKAGE: Final = "warhammer40k_core.rules.source_packages.warhammer_40000_11th"
 _ARTIFACT_PATH: Final = "event_companion_2026_06_artifacts/primary-scoring.json"
 _PENDING_SCORING_KIND: Final = "event_companion_primary_source_known_engine_pending"
@@ -61,6 +61,7 @@ _EXPECTED_PRIMARY_MISSION_IDS: Final = (
 )
 _EXPECTED_ENGINE_IMPLEMENTED_SCORING_KINDS: Final = {
     "primary-battlefield-dominance": "battlefield_dominance",
+    "primary-consecrate": "consecrate",
     "primary-death-trap": "death_trap",
     "primary-delaying-action": "delaying_action",
     "primary-destroyers-wrath": "destroyers_wrath",
@@ -72,6 +73,8 @@ _EXPECTED_ENGINE_IMPLEMENTED_SCORING_KINDS: Final = {
     "primary-purge-and-secure": "purge_and_secure",
     "primary-reconnaissance-sweep": "reconnaissance_sweep",
     "primary-search-and-scour": "search_and_scour",
+    "primary-smoke-and-mirrors": "smoke_and_mirrors",
+    "primary-triangulation": "triangulation",
     "primary-unstoppable-force": "unstoppable_force",
 }
 _EXPECTED_RESOLUTION_GROUPS: Final = {
