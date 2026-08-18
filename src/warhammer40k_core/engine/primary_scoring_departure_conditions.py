@@ -11,6 +11,9 @@ from warhammer40k_core.engine.primary_mission_state import (
     PrimaryMissionProgressState,
 )
 from warhammer40k_core.engine.primary_scoring_conditions import primary_score_count_evidence
+from warhammer40k_core.engine.primary_scoring_turn_keys import (
+    primary_own_turn_interval_contains,
+)
 
 CONDEMNED_ENEMY_UNITS_LEFT_BATTLEFIELD_THIS_TURN = (
     "one_or_more_condemned_enemy_units_left_battlefield_this_turn"
@@ -42,6 +45,7 @@ def evaluate_departure_scoring_condition(
     player_id: str,
     battle_round: int,
     active_player_id: str,
+    turn_order: tuple[str, ...],
 ) -> dict[str, JsonValue]:
     if condition_id not in PRIMARY_SCORING_DEPARTURE_CONDITIONS:
         raise GameLifecycleError(f"Unsupported primary scoring condition: {condition_id}.")
@@ -60,11 +64,13 @@ def evaluate_departure_scoring_condition(
         battle_round=battle_round,
         active_player_id=active_player_id,
     )
-    selection = _current_turn_condemned_selection(
+    selection = _active_condemned_selection(
         progress,
         mission_setup=mission_setup,
         player_id=player_id,
         battle_round=battle_round,
+        active_player_id=active_player_id,
+        turn_order=turn_order,
     )
     condemned_ids = () if selection is None else selection.selected_rules_unit_instance_ids
     departed_ids = tuple(
@@ -114,12 +120,14 @@ def _this_turn_departures(
     return tuple(matching)
 
 
-def _current_turn_condemned_selection(
+def _active_condemned_selection(
     progress: PrimaryMissionProgressState,
     *,
     mission_setup: MissionSetup,
     player_id: str,
     battle_round: int,
+    active_player_id: str,
+    turn_order: tuple[str, ...],
 ) -> PrimaryCondemnedSelectionState | None:
     catalog_identity = condemned_selection_source_identity()
     mission_id = mission_setup.primary_mission_id_for_player(player_id)
@@ -129,12 +137,18 @@ def _current_turn_condemned_selection(
             raise GameLifecycleError(
                 "Primary scoring condemned selections must be typed PrimaryCondemnedSelectionState."
             )
-        if (
-            selection.owner_player_id != player_id
-            or selection.mission_id != mission_id
-            or selection.battle_round != battle_round
+        if selection.owner_player_id != player_id or selection.mission_id != mission_id:
+            continue
+        if not primary_own_turn_interval_contains(
+            owner_player_id=selection.owner_player_id,
+            started_battle_round=selection.battle_round,
+            query_battle_round=battle_round,
+            query_active_player_id=active_player_id,
+            turn_order=turn_order,
         ):
             continue
+        if selection.active_player_id != selection.owner_player_id:
+            raise GameLifecycleError("Punishment condemned selection was not created on own turn.")
         if (selection.source_rule_id, selection.source_descriptor_id) != catalog_identity:
             raise GameLifecycleError("Primary scoring condemned selection source identity drifted.")
         matches.append(selection)

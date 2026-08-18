@@ -1,12 +1,60 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.objective_control import ObjectiveControlRecord
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     PrimaryScoringSpatialEvidence,
+    build_primary_scoring_spatial_evidence,
     objective_control_record_hash,
 )
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
+
+
+def build_primary_scoring_spatial_rows(
+    *,
+    state: GameState,
+    record: ObjectiveControlRecord,
+    end_of_battle: bool,
+) -> tuple[PrimaryScoringSpatialEvidence, ...]:
+    from warhammer40k_core.engine.game_state import GameState as GameStateType
+    from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
+
+    if type(state) is not GameStateType:
+        raise GameLifecycleError("Primary scoring spatial rows require GameState.")
+    if type(record) is not ObjectiveControlRecord:
+        raise GameLifecycleError("Primary scoring spatial rows require an ObjectiveControlRecord.")
+    if type(end_of_battle) is not bool:
+        raise GameLifecycleError("Primary scoring end_of_battle must be a bool.")
+    mission_setup = state.mission_setup
+    if type(mission_setup) is not MissionSetup:
+        raise GameLifecycleError("Primary scoring spatial rows require MissionSetup.")
+    scoring_policies = mission_scoring_policies_from_setup(mission_setup)
+    scoring_player_ids = scoring_policies.scoring_player_ids_for_record(
+        record=record,
+        turn_order=tuple(state.turn_order),
+        end_of_battle=end_of_battle,
+    )
+    return tuple(
+        build_primary_scoring_spatial_evidence(
+            state=state,
+            player_id=player_id,
+            record=record,
+            requested_condition_ids=required_conditions,
+        )
+        for player_id in scoring_player_ids
+        for required_conditions in (
+            scoring_policies.policy_for_player(player_id).required_primary_spatial_conditions(
+                record=record,
+                end_of_battle=end_of_battle,
+            ),
+        )
+        if required_conditions
+    )
 
 
 def validate_primary_scoring_spatial_rows_context(
@@ -21,7 +69,11 @@ def validate_primary_scoring_spatial_rows_context(
     from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 
     policies = mission_scoring_policies_from_setup(mission_setup)
-    scoring_player_ids = turn_order if end_of_battle else (record.active_player_id,)
+    scoring_player_ids = policies.scoring_player_ids_for_record(
+        record=record,
+        turn_order=turn_order,
+        end_of_battle=end_of_battle,
+    )
     expected_conditions_by_player = {
         player_id: required_conditions
         for player_id in scoring_player_ids
@@ -54,4 +106,7 @@ def validate_primary_scoring_spatial_rows_context(
             )
 
 
-__all__ = ("validate_primary_scoring_spatial_rows_context",)
+__all__ = (
+    "build_primary_scoring_spatial_rows",
+    "validate_primary_scoring_spatial_rows_context",
+)

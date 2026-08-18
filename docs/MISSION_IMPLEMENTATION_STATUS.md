@@ -98,8 +98,11 @@ Secondary status:
   `engine_implemented`. Gather Intel and Extract Relic remain pending on remaining
   marker-state blockers.
 - Phase 17N Step 5D scores condemned enemy units that fully left the battlefield
-  this turn. Punishment is now `engine_implemented`. Counts are 20/5 missions and
-  11/15 pairings (33/45 variants). Pairing-wide certification is not claimed.
+  this turn, including during the opposing player's turn while condemned status
+  lasts until the start of the Punishment owner's next turn. The condemned rule
+  uses `timing: turn_end` with `turn_scope: any_player_turn`. Punishment is now
+  `engine_implemented`. Counts are 20/5 missions and 11/15 pairings (33/45
+  variants). Pairing-wide certification is not claimed.
 - Runtime Mission Actions: 14 total. The ten Step 4 Primary Actions join Death
   Trap's `booby-trap-terrain`, Terraform's `terraform-objective`, Cleanse's
   `cleanse-objective`, and Plunder's `plunder-terrain`. They are automatically
@@ -210,11 +213,11 @@ Secondary status:
 - All 25 Primary missions' source timing, VP values, structured condition
   tokens, current engine-support status, and the ten source-backed Primary Mission
   Action descriptors are committed in `primary-scoring.json`. Its package hash
-  is `c2eaf24800b9cc61bdc9e6fa2e15a967ac5bdb02f43719af0f6195fa586daa42`
+  is `eeee655d6f7c42902d0cebf4426c3758b9d88b82d120b5d88335bba49d71f3e5`
   and its raw artifact SHA-256 is
-  `d875ac76cfc4a39a3acd8c5ce7998fdcbb98927d10a613624f22229ddf7e1af6`.
+  `1a5651f8328aadaae148df60d0e388445def27384909398f6c8825c14289eb0f`.
   The typed loader pins both hashes, the exact 25-mission/100-rule/10-action
-  inventory, the exact nine-token timing vocabulary, the complete resolution
+  inventory, the exact nine-token timing vocabulary plus rule-level `turn_scope`, the complete resolution
   group grammar, and the honest 20 `engine_implemented` versus 5
   `source_known_engine_pending` boundary. Repository reviews are pinned to PRs
   #107, #134, #136, and #379. PR #107 is the source-backed origin for Death
@@ -235,7 +238,7 @@ Secondary status:
   timing string is insufficient. The same validator runs for live awards and
   restored ledgers, including ordinary per-round Primary-total validation. The
   derived Event Companion source identity is
-  `32b89c03816a57cdcd97bb0aa618fab66679a8065808752c54648c98e20b091a`.
+  `4c9f813b0c83ba62da8f0889f8cfe7acf43f2a72be34ba52d580669df6e5fc1c`.
 - Verify that the committed battlefield artifact still matches its reviewed
   inputs without writing files with
   `uv run python tools/build_event_companion_battlefields.py --check`.
@@ -363,7 +366,8 @@ five-battle-round game, as configured by the current Event Companion package.
   enemy-loss conditions classify records by the destroyed unit's owner and
   active-turn key, so authoritative transition removals count even when no
   destroying player can be attributed.
-- Primary rules use one strict nine-token timing evaluator. Every rule declares
+- Primary rules use one strict nine-token timing evaluator plus a separate
+  rule-level `turn_scope` of `own_player_turn` or `any_player_turn`. Every rule declares
   `independent`, `cumulative`, or `exclusive_highest` resolution. Cumulative
   groups emit every achieved award; exclusive groups emit only the highest-VP
   achieved award, use stable rule-ID ordering for equal-VP ties, and record the

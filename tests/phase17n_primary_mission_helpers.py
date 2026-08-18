@@ -31,6 +31,7 @@ from warhammer40k_core.engine.destruction_provenance import (
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
+from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.mission_action_options import mission_action_for_state
 from warhammer40k_core.engine.mission_decisions import (
     DECLINE_MISSION_ACTION_START_OPTION_ID,
@@ -109,14 +110,16 @@ def phase17n_event_setup(
     layout_id: str,
     attacker_force_disposition_id: str,
     defender_force_disposition_id: str,
+    attacker_player_id: str = "player-a",
+    defender_player_id: str = "player-b",
 ) -> MissionSetup:
     return MissionSetup.from_mission_pack(
         mission_pack=warhammer_event_companion_2026_07_mission_pack(),
         mission_pool_entry_id=f"mission-{layout_id}",
         terrain_layout_id=layout_id,
-        attacker_player_id="player-a",
+        attacker_player_id=attacker_player_id,
         attacker_force_disposition_id=attacker_force_disposition_id,
-        defender_player_id="player-b",
+        defender_player_id=defender_player_id,
         defender_force_disposition_id=defender_force_disposition_id,
     )
 
@@ -628,7 +631,15 @@ def phase17n_locate_pending_fixture() -> tuple[
     return state, decisions, request
 
 
-def phase17n_punishment_pending_fixture() -> tuple[
+def phase17n_punishment_pending_fixture(
+    *,
+    attacker_player_id: str = "player-a",
+    defender_player_id: str = "player-b",
+    owner_player_id: str = "player-a",
+    battle_round: int = 1,
+    player_a_units: tuple[UnitMusterSelection, ...] | None = None,
+    player_b_units: tuple[UnitMusterSelection, ...] | None = None,
+) -> tuple[
     GameState,
     DecisionController,
     DecisionRequest,
@@ -637,12 +648,16 @@ def phase17n_punishment_pending_fixture() -> tuple[
         layout_id="purge-the-foe-vs-disruption-layout-1",
         attacker_force_disposition_id="purge-the-foe",
         defender_force_disposition_id="disruption",
+        attacker_player_id=attacker_player_id,
+        defender_player_id=defender_player_id,
     )
     state = phase17n_state_with_setup(
         setup=setup,
-        active_player_id="player-a",
+        active_player_id=owner_player_id,
         phase=BattlePhase.COMMAND,
-        battle_round=1,
+        battle_round=battle_round,
+        player_a_units=player_a_units,
+        player_b_units=player_b_units,
     )
     assert state.battlefield_state is not None
     target = next(
@@ -650,35 +665,51 @@ def phase17n_punishment_pending_fixture() -> tuple[
         for marker in setup.objective_markers
         if marker.objective_role is ObjectiveMarkerRole.CENTRAL
     )
-    enemy = next(
+    enemy_player_id = next(
+        player_id for player_id in state.player_ids if player_id != owner_player_id
+    )
+    enemies = tuple(
         unit
         for army in state.army_definitions
-        if army.player_id == "player-b"
+        if army.player_id == enemy_player_id
         for unit in army.units
     )
-    placement = state.battlefield_state.unit_placement_by_id(enemy.unit_instance_id)
-    state.battlefield_state = state.battlefield_state.with_unit_placement(
-        with_model_offsets(
-            placement,
-            target,
-            offsets=((0.0, 0.0), (1.0, 0.0), (2.0, 0.0), (0.0, 1.0), (1.0, 1.0)),
+    contributions: list[ObjectiveControlContribution] = []
+    for enemy_index, enemy in enumerate(enemies):
+        placement = state.battlefield_state.unit_placement_by_id(enemy.unit_instance_id)
+        x_shift = float(enemy_index) * 3.0
+        state.battlefield_state = state.battlefield_state.with_unit_placement(
+            with_model_offsets(
+                placement,
+                target,
+                offsets=(
+                    (x_shift, 0.0),
+                    (x_shift + 1.0, 0.0),
+                    (x_shift + 2.0, 0.0),
+                    (x_shift, 1.0),
+                    (x_shift + 1.0, 1.0),
+                ),
+            )
         )
-    )
-    contribution = ObjectiveControlContribution(
-        player_id="player-b",
-        unit_instance_id=enemy.unit_instance_id,
-        model_instance_id=enemy.own_models[0].model_instance_id,
-        objective_control=1,
-        effective_objective_control=1,
-        battle_shocked=False,
-        horizontal_distance_inches=0.0,
-        vertical_gap_inches=0.0,
-    )
+        contributions.append(
+            ObjectiveControlContribution(
+                player_id=enemy_player_id,
+                unit_instance_id=enemy.unit_instance_id,
+                model_instance_id=enemy.own_models[0].model_instance_id,
+                objective_control=1,
+                effective_objective_control=1,
+                battle_shocked=False,
+                horizontal_distance_inches=0.0,
+                vertical_gap_inches=0.0,
+            )
+        )
     record = ObjectiveControlRecord(
-        record_id="phase17n-pending-punishment-turn-start-record",
+        record_id=(
+            f"phase17n-pending-punishment-turn-start-record-{battle_round:02d}-{owner_player_id}"
+        ),
         game_id=state.game_id,
         battle_round=state.battle_round,
-        active_player_id="player-a",
+        active_player_id=owner_player_id,
         timing=ObjectiveControlTiming.TURN_START,
         phase=BattlePhase.COMMAND.value,
         battlefield_id=state.battlefield_state.battlefield_id,
@@ -686,7 +717,7 @@ def phase17n_punishment_pending_fixture() -> tuple[
             ObjectiveControlResult.from_contributors(
                 objective_id=marker.objective_marker_id,
                 contributors=(
-                    (contribution,)
+                    tuple(contributions)
                     if marker.objective_marker_id == target.objective_marker_id
                     else ()
                 ),
@@ -694,15 +725,16 @@ def phase17n_punishment_pending_fixture() -> tuple[
             for marker in setup.objective_markers
         ),
     )
+    round_token = f"round-{battle_round:02d}"
     objective_state = PrimaryObjectiveTurnStartState(
-        state_id=f"primary-turn-start:{state.game_id}:round-01:player-a",
+        state_id=f"primary-turn-start:{state.game_id}:{round_token}:{owner_player_id}",
         game_id=state.game_id,
-        player_id="player-a",
-        active_player_id="player-a",
+        player_id=owner_player_id,
+        active_player_id=owner_player_id,
         battle_round=state.battle_round,
         source_objective_control_record=record,
         controlled_objective_ids=(),
-        source_id=f"{state.game_id}:primary-turn-start:round-01:player-a",
+        source_id=f"{state.game_id}:primary-turn-start:{round_token}:{owner_player_id}",
     )
     snapshot = build_primary_rules_unit_turn_start_snapshot(state=state)
     state.primary_objective_turn_start_states = [objective_state]
@@ -993,8 +1025,10 @@ def phase17n_state_with_setup(
     active_player_id: str | None,
     phase: BattlePhase | None,
     battle_round: int,
+    player_a_units: tuple[UnitMusterSelection, ...] | None = None,
+    player_b_units: tuple[UnitMusterSelection, ...] | None = None,
 ) -> GameState:
-    state = battle_state()
+    state = battle_state(player_a_units=player_a_units, player_b_units=player_b_units)
     state.mission_setup = setup
     assert state.battlefield_state is not None
     state.battlefield_state = replace(

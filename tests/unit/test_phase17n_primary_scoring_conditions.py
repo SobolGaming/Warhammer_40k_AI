@@ -1602,7 +1602,12 @@ def _run_primary_scoring_context_corruption(
         )
     else:
         raise AssertionError(f"unsupported Primary scoring context corruption: {corruption}")
-    PrimaryScoringConditionContext(**parameters)
+    context = PrimaryScoringConditionContext(**parameters)
+    if corruption == "inactive_player":
+        evaluate_primary_scoring_condition(
+            condition="control_one_or_more_central_objectives",
+            context=context,
+        )
 
 
 def test_primary_scoring_condition_evaluation_fails_closed_on_typed_context_drift(

@@ -55,9 +55,9 @@ from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     PRIMARY_SCORING_SPATIAL_CONDITIONS,
     PrimaryScoringSpatialEvidence,
 )
-from warhammer40k_core.engine.primary_scoring_timing import (
-    SUPPORTED_PRIMARY_SCORING_TIMINGS,
-    primary_scoring_timing_applies,
+from warhammer40k_core.engine.primary_scoring_timing import SUPPORTED_PRIMARY_SCORING_TIMINGS
+from warhammer40k_core.engine.primary_scoring_turn_scope import (
+    primary_scoring_rule_applies_at_record,
 )
 from warhammer40k_core.engine.primary_victory_point_policy import (
     PrimaryVictoryPointCapTreatment,
@@ -2168,7 +2168,18 @@ class MissionScoringPolicy:
         )
         if record.active_player_id not in ordered_players:
             raise GameLifecycleError("Primary scoring active player is missing from turn_order.")
-        if not end_of_battle and record.active_player_id != self.player_id:
+        if (
+            not end_of_battle
+            and record.active_player_id != self.player_id
+            and not any(
+                self._primary_rule_applies_at_record(
+                    rule=rule,
+                    record=record,
+                    end_of_battle=False,
+                )
+                for rule in self.primary_scoring_rules
+            )
+        ):
             raise GameLifecycleError("Ordinary Primary scoring requires active-player policy.")
         if end_of_battle and record.active_player_id != ordered_players[-1]:
             raise GameLifecycleError(
@@ -2273,11 +2284,11 @@ class MissionScoringPolicy:
         record: ObjectiveControlRecord,
         end_of_battle: bool,
     ) -> bool:
-        return primary_scoring_timing_applies(
+        return primary_scoring_rule_applies_at_record(
             timing=rule.timing,
-            battle_round=record.battle_round,
-            phase=record.phase,
-            objective_control_timing=record.timing,
+            condition=rule.condition,
+            record=record,
+            scoring_player_id=self.player_id,
             primary_scoring_phase=self.primary_scoring_phase,
             primary_scoring_timing=self.primary_scoring_timing,
             game_length_battle_rounds=self.game_length_battle_rounds,

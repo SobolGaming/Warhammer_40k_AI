@@ -5053,9 +5053,9 @@ Mission Action descriptors retain reviewed Chapter Approved mission-deck
 provenance in the strict, versioned JSON artifact at
 `src/warhammer40k_core/rules/source_packages/warhammer_40000_11th/event_companion_2026_06_artifacts/primary-scoring.json`,
 with package hash
-`c2eaf24800b9cc61bdc9e6fa2e15a967ac5bdb02f43719af0f6195fa586daa42`
+`eeee655d6f7c42902d0cebf4426c3758b9d88b82d120b5d88335bba49d71f3e5`
 and raw artifact SHA-256
-`d875ac76cfc4a39a3acd8c5ce7998fdcbb98927d10a613624f22229ddf7e1af6`.
+`1a5651f8328aadaae148df60d0e388445def27384909398f6c8825c14289eb0f`.
 The artifact pins the reviewed transcriptions from PRs #107, #134, #136, and
 #379, including the exact 20 executable versus 5 engine-pending status boundary.
 PR #107 is the source-backed origin for Death Trap, Immovable Object, and
@@ -5084,7 +5084,7 @@ record; the free-form timing field alone cannot claim the exemption. Live
 awards and restored ledgers use the same policy validator, and restore rejects
 ordinary Primary totals above 15VP in one battle round. The resulting complete
 mission source identity is pinned as
-`32b89c03816a57cdcd97bb0aa618fab66679a8065808752c54648c98e20b091a`.
+`4c9f813b0c83ba62da8f0889f8cfe7acf43f2a72be34ba52d580669df6e5fc1c`.
 
 The Phase 17N scoring schema has exactly nine source timing tokens and requires
 every scoring row to declare one of `independent`, `cumulative`, or
@@ -5218,10 +5218,14 @@ and reconnaissance versus priority-assets.
 Step 5D scores condemned enemy units that left the battlefield this turn
 through the same shared condition path. Condemned selections are identified by
 catalog source identity plus the scoring player's assigned Punishment mission
-and current battle round. A selected enemy rules unit scores only when this-turn
-departure evidence shows every component of that unit has left; partial model
-removal does not score. Boolean scoring awards 5 VP once. This promotes
-Punishment. The new complete pairing is purge-the-foe versus disruption.
+and remain active from that player's own-turn start until the start of that
+player's next turn. The condemned scoring rule keeps physical `turn_end` timing
+and declares `turn_scope: any_player_turn`, so boundary inventory, award
+dispatch, and condition evaluation include the Punishment owner on the opponent's
+turn. A selected enemy rules unit scores only when this-turn departure evidence
+shows every component of that unit has left; partial model removal does not
+score. Boolean scoring awards 5 VP once. This promotes Punishment. The new
+complete pairing is purge-the-foe versus disruption.
 Gather Intel, Extract Relic, Locate and Deny, Vital Link, and Surveil the Foe
 stay pending.
 

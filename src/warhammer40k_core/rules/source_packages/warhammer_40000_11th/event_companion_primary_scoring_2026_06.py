@@ -12,12 +12,18 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
     package_artifact_bytes,
 )
 
-ARTIFACT_SCHEMA: Final = "core-v2-phase17n-event-companion-primary-scoring-v5"
+ARTIFACT_SCHEMA: Final = "core-v2-phase17n-event-companion-primary-scoring-v6"
 SOURCE_PACKAGE_ID: Final = "gw-11e-warhammer-event-companion-v1-1-2026-07"
-EXPECTED_PACKAGE_HASH: Final = "c2eaf24800b9cc61bdc9e6fa2e15a967ac5bdb02f43719af0f6195fa586daa42"
-EXPECTED_ARTIFACT_SHA256: Final = "d875ac76cfc4a39a3acd8c5ce7998fdcbb98927d10a613624f22229ddf7e1af6"
+EXPECTED_PACKAGE_HASH: Final = "eeee655d6f7c42902d0cebf4426c3758b9d88b82d120b5d88335bba49d71f3e5"
+EXPECTED_ARTIFACT_SHA256: Final = "1a5651f8328aadaae148df60d0e388445def27384909398f6c8825c14289eb0f"
 _ARTIFACT_PACKAGE: Final = "warhammer40k_core.rules.source_packages.warhammer_40000_11th"
 _ARTIFACT_PATH: Final = "event_companion_2026_06_artifacts/primary-scoring.json"
+_EXPECTED_TURN_SCOPES: Final = frozenset({"own_player_turn", "any_player_turn"})
+_EXPECTED_ANY_PLAYER_TURN_CONDITIONS: Final = frozenset(
+    {
+        "one_or_more_condemned_enemy_units_left_battlefield_this_turn",
+    }
+)
 _PENDING_SCORING_KIND: Final = "event_companion_primary_source_known_engine_pending"
 _EXPECTED_TIMINGS: Final = frozenset(
     {
@@ -437,6 +443,7 @@ class PrimaryScoringRuleArtifact(
     trigger_text: str | None
     canonical_text: str | None
     timing: str
+    turn_scope: str
     source_kind: str
     victory_points: int
     cap: None
@@ -822,7 +829,21 @@ def _validate_primary_scoring_rule(
         raise EventCompanionPrimaryScoringArtifactError(
             "Event Companion primary-scoring timing grammar is unsupported."
         )
+    identifiers("turn_scope", rule.turn_scope)
+    if rule.turn_scope not in _EXPECTED_TURN_SCOPES:
+        raise EventCompanionPrimaryScoringArtifactError(
+            "Event Companion primary-scoring turn_scope is unsupported."
+        )
     identifiers("condition", rule.condition)
+    expected_turn_scope = (
+        "any_player_turn"
+        if rule.condition in _EXPECTED_ANY_PLAYER_TURN_CONDITIONS
+        else "own_player_turn"
+    )
+    if rule.turn_scope != expected_turn_scope:
+        raise EventCompanionPrimaryScoringArtifactError(
+            "Event Companion primary-scoring turn_scope drifted from its condition."
+        )
     if rule.source_kind != "primary":
         raise EventCompanionPrimaryScoringArtifactError(
             "Event Companion primary-scoring rule source_kind must be primary."

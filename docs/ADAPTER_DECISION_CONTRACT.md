@@ -15,6 +15,10 @@ Step 5A `PrimaryScoringStateEvidence` registry; public VP rows still expose
 only opaque evidence ID/hash commitments. Replay remains
 `replay-artifact-v8-phase17n-step5a`.
 
+Phase 17N Step 5C adds no new adapter-facing decision types, finite option
+families, proposal kinds, or payload shapes. Completed-action scoring consumes
+the same Step 5A evidence registry and replay artifact.
+
 Phase 17N Step 5D adds no new adapter-facing decision types, finite option
 families, proposal kinds, or payload shapes. Condemned-departure scoring
 consumes the same Step 5A evidence registry and replay artifact.
