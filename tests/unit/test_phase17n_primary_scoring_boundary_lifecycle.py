@@ -2851,34 +2851,40 @@ def test_restore_rejects_scored_tactical_rewritten_as_generic_rule_ir() -> None:
         phase=BattlePhase.FIGHT,
         event_log=lifecycle.decision_controller.event_log,
     )
-    payload = deepcopy(lifecycle.to_payload())
-    ledger = _ledger_payload(payload, player_id="player-a")
-    secondary = _secondary_transaction_payloads(ledger, source_kind="tactical_secondary")
-    assert len(secondary) == 1
-    transaction = secondary[0]
-    amount = transaction["amount"]
-    assert isinstance(amount, int)
-    source_id = transaction["source_id"]
-    assert isinstance(source_id, str)
-    battle_round = transaction["battle_round"]
-    assert isinstance(battle_round, int)
-    phase = transaction["phase"]
-    assert isinstance(phase, str)
-    transaction["scoring_timing"] = "generic_rule_execution"
-    transaction["metadata"] = _fabricated_generic_rule_ir_metadata(
-        amount=amount,
-        source_id=source_id,
-        execution_context={
-            "player_id": "player-a",
-            "battle_round": battle_round,
-            "phase": phase,
-        },
+    transaction = _secondary_transaction(
+        state,
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+    )
+    _replace_player_transaction(
+        state,
+        replace(
+            transaction,
+            scoring_timing="generic_rule_execution",
+            metadata=_fabricated_generic_rule_ir_metadata(
+                amount=transaction.amount,
+                source_id=transaction.source_id,
+                execution_context={
+                    "player_id": "player-a",
+                    "battle_round": transaction.battle_round,
+                    "phase": transaction.phase,
+                },
+            ),
+        ),
     )
     with pytest.raises(
         GameLifecycleError,
         match="Generic RuleIR Secondary VP requires source_kind fixed_secondary",
     ):
-        GameLifecycle.from_payload(payload)
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=state,
+            event_records=lifecycle.decision_controller.event_log.records,
+            rule_ir_authority_index=_empty_rule_ir_authority_index(),
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP requires source_kind fixed_secondary",
+    ):
+        GameLifecycle.from_payload(lifecycle.to_payload())
 
 
 def test_restore_rejects_generic_rule_ir_secondary_without_execution_event() -> None:
@@ -2908,9 +2914,18 @@ def test_restore_rejects_generic_rule_ir_secondary_without_execution_event() -> 
     )
     with pytest.raises(
         GameLifecycleError,
-        match="requires rule_execution_victory_points_awarded",
+        match="Generic RuleIR Secondary VP requires loaded RuleIR authority",
     ):
         GameLifecycle.from_payload(lifecycle.to_payload())
+    with pytest.raises(
+        GameLifecycleError,
+        match="requires rule_execution_victory_points_awarded",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=state,
+            event_records=lifecycle.decision_controller.event_log.records,
+            rule_ir_authority_index=_empty_rule_ir_authority_index(),
+        )
 
 
 def test_restore_rejects_generic_rule_ir_hash_and_clause_absent_from_loaded_rule() -> None:
@@ -3029,14 +3044,18 @@ def test_restore_rejects_duplicated_generic_rule_ir_execution() -> None:
     lifecycle = _bring_it_down_player_a_scored_lifecycle()
     state = lifecycle.state
     assert state is not None
-    _execute_generic_vp_on_lifecycle(lifecycle)
+    rule_ir = _execute_generic_vp_on_lifecycle(lifecycle)
     transaction = _generic_rule_ir_transaction(state)
     _append_player_transaction_from_award(state, _award_from_transaction(transaction))
     with pytest.raises(
         GameLifecycleError,
         match="Generic RuleIR Secondary VP execution event is bound to multiple transactions",
     ):
-        GameLifecycle.from_payload(lifecycle.to_payload())
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=state,
+            event_records=lifecycle.decision_controller.event_log.records,
+            rule_ir_authority_index=_rule_ir_authority_index(rule_ir, player_id="player-a"),
+        )
 
 
 def test_restore_rejects_registered_phase11f_probe_with_arbitrary_amount() -> None:
@@ -3079,23 +3098,22 @@ def test_restore_rejects_removed_generic_rule_ir_execution_event() -> None:
     lifecycle = _bring_it_down_player_a_scored_lifecycle()
     state = lifecycle.state
     assert state is not None
-    _execute_generic_vp_on_lifecycle(lifecycle)
-    payload = deepcopy(lifecycle.to_payload())
-    decisions = _json_object(payload["decisions"], label="lifecycle decisions")
-    events = _json_list(decisions["event_log"], label="event log")
-    kept = [
-        event
-        for event in events
-        if _json_object(event, label="event").get("event_type")
-        != RULE_EXECUTION_VICTORY_POINTS_AWARDED_EVENT_TYPE
-    ]
-    assert len(kept) == len(events) - 1
-    decisions["event_log"] = kept
+    rule_ir = _execute_generic_vp_on_lifecycle(lifecycle)
+    filtered_records = tuple(
+        record
+        for record in lifecycle.decision_controller.event_log.records
+        if record.event_type != RULE_EXECUTION_VICTORY_POINTS_AWARDED_EVENT_TYPE
+    )
+    assert len(filtered_records) == len(lifecycle.decision_controller.event_log.records) - 1
     with pytest.raises(
         GameLifecycleError,
         match="requires rule_execution_victory_points_awarded",
     ):
-        GameLifecycle.from_payload(payload)
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=state,
+            event_records=filtered_records,
+            rule_ir_authority_index=_rule_ir_authority_index(rule_ir, player_id="player-a"),
+        )
 
 
 def test_restore_preserves_registered_phase11f_and_genuine_rule_ir_secondary_awards() -> None:
@@ -3107,18 +3125,25 @@ def test_restore_preserves_registered_phase11f_and_genuine_rule_ir_secondary_awa
     assert restored_probe.to_payload() == lifecycle.to_payload()
     rule_ir = _execute_generic_vp_on_lifecycle(lifecycle)
     event_records = lifecycle.decision_controller.event_log.records
-    validate_secondary_generic_rule_ir_restore_authority(
-        state=state,
-        event_records=event_records,
-        rule_ir_authority_index=None,
-    )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP requires loaded RuleIR authority",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=state,
+            event_records=event_records,
+            rule_ir_authority_index=None,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Generic RuleIR Secondary VP requires loaded RuleIR authority",
+    ):
+        GameLifecycle.from_payload(lifecycle.to_payload())
     validate_secondary_generic_rule_ir_restore_authority(
         state=state,
         event_records=event_records,
         rule_ir_authority_index=_rule_ir_authority_index(rule_ir, player_id="player-a"),
     )
-    restored = GameLifecycle.from_payload(lifecycle.to_payload())
-    assert restored.to_payload() == lifecycle.to_payload()
     with pytest.raises(
         GameLifecycleError,
         match="Runtime RuleIR source is not authoritative for this bundle",
@@ -3126,12 +3151,104 @@ def test_restore_preserves_registered_phase11f_and_genuine_rule_ir_secondary_awa
         validate_secondary_generic_rule_ir_restore_authority(
             state=state,
             event_records=event_records,
-            rule_ir_authority_index=RuntimeRuleIRAuthorityIndex(
-                _rule_irs_by_key={},
-                _player_ids_by_key={},
-                _ability_records_by_player_key={},
-                _stratagem_records_by_player_key={},
-            ),
+            rule_ir_authority_index=_empty_rule_ir_authority_index(),
+        )
+
+
+def test_restore_rejects_opponent_only_generic_rule_ir_authority() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    rule_ir = _execute_generic_vp_on_lifecycle(lifecycle)
+    event_records = lifecycle.decision_controller.event_log.records
+    opponent_index = _rule_ir_authority_index(rule_ir, player_id="player-b")
+    with pytest.raises(
+        GameLifecycleError,
+        match="Runtime RuleIR source is not authoritative for this player",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=state,
+            event_records=event_records,
+            rule_ir_authority_index=opponent_index,
+        )
+    with pytest.raises(
+        GameLifecycleError,
+        match="Runtime RuleIR source is not authoritative for this player",
+    ):
+        opponent_index.rule_ir_for_scoring_player(
+            source_id=rule_ir.source_id,
+            rule_ir_hash=rule_ir.ir_hash(),
+            player_id="player-a",
+        )
+
+
+def test_restore_accepts_generic_rule_ir_authoritative_for_both_players() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    rule_ir = _execute_generic_vp_on_lifecycle(lifecycle, player_id="player-a")
+    _execute_generic_vp_on_lifecycle(lifecycle, player_id="player-b")
+    shared_index = _rule_ir_authority_index(
+        rule_ir,
+        player_ids=("player-a", "player-b"),
+    )
+    validate_secondary_generic_rule_ir_restore_authority(
+        state=state,
+        event_records=lifecycle.decision_controller.event_log.records,
+        rule_ir_authority_index=shared_index,
+    )
+    for player_id in ("player-a", "player-b"):
+        assert (
+            shared_index.rule_ir_for_scoring_player(
+                source_id=rule_ir.source_id,
+                rule_ir_hash=rule_ir.ir_hash(),
+                player_id=player_id,
+            )
+            == rule_ir
+        )
+
+
+def test_restore_accepts_explicitly_global_generic_rule_ir_authority() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    rule_ir = _execute_generic_vp_on_lifecycle(lifecycle)
+    global_index = _rule_ir_authority_index(rule_ir, globally_registered=True)
+    validate_secondary_generic_rule_ir_restore_authority(
+        state=state,
+        event_records=lifecycle.decision_controller.event_log.records,
+        rule_ir_authority_index=global_index,
+    )
+    assert (
+        global_index.rule_ir_for_scoring_player(
+            source_id=rule_ir.source_id,
+            rule_ir_hash=rule_ir.ir_hash(),
+            player_id="player-b",
+        )
+        == rule_ir
+    )
+
+
+def test_restore_rejects_empty_player_inventory_without_global_rule_ir_registration() -> None:
+    lifecycle = _bring_it_down_player_a_scored_lifecycle()
+    state = lifecycle.state
+    assert state is not None
+    rule_ir = _execute_generic_vp_on_lifecycle(lifecycle)
+    unregistered = _rule_ir_authority_index(rule_ir, player_ids=())
+    with pytest.raises(
+        GameLifecycleError,
+        match="Runtime RuleIR source is not globally registered",
+    ):
+        validate_secondary_generic_rule_ir_restore_authority(
+            state=state,
+            event_records=lifecycle.decision_controller.event_log.records,
+            rule_ir_authority_index=unregistered,
+        )
+    with pytest.raises(GameLifecycleError, match="player_id"):
+        unregistered.rule_ir_for_scoring_player(
+            source_id=rule_ir.source_id,
+            rule_ir_hash=rule_ir.ir_hash(),
+            player_id="",
         )
 
 
@@ -3313,6 +3430,7 @@ def test_generic_rule_ir_scoring_authority_fail_closed_branches() -> None:
     assert authentic_state is not None
     _execute_generic_vp_on_lifecycle(authentic)
     generic = _generic_rule_ir_transaction(authentic_state)
+    owned_index = _rule_ir_authority_index(rule_ir, player_id="player-a")
     cap_invalid = replace(
         generic,
         metadata={
@@ -3328,7 +3446,7 @@ def test_generic_rule_ir_scoring_authority_fail_closed_branches() -> None:
         validate_secondary_generic_rule_ir_restore_authority(
             state=authentic_state,
             event_records=authentic.decision_controller.event_log.records,
-            rule_ir_authority_index=None,
+            rule_ir_authority_index=owned_index,
         )
     cap_missing_amount = replace(
         generic,
@@ -3345,7 +3463,7 @@ def test_generic_rule_ir_scoring_authority_fail_closed_branches() -> None:
         validate_secondary_generic_rule_ir_restore_authority(
             state=authentic_state,
             event_records=authentic.decision_controller.event_log.records,
-            rule_ir_authority_index=None,
+            rule_ir_authority_index=owned_index,
         )
     with pytest.raises(
         GameLifecycleError,
@@ -4258,12 +4376,13 @@ def _generic_vp_execution_context(
     state: GameState,
     *,
     event_log: EventLog | None,
+    player_id: str = "player-a",
 ) -> RuleExecutionContext:
     phase = state.current_battle_phase
     assert phase is not None
     return RuleExecutionContext(
         game_id=state.game_id,
-        player_id="player-a",
+        player_id=player_id,
         battle_round=state.battle_round,
         phase=BattlePhaseKind(phase.value),
         active_player_id=state.active_player_id,
@@ -4273,17 +4392,47 @@ def _generic_vp_execution_context(
     )
 
 
-def _rule_ir_authority_index(rule_ir: RuleIR, *, player_id: str) -> RuntimeRuleIRAuthorityIndex:
-    key = RuntimeRuleIRSourceKey(source_id=rule_ir.source_id, rule_ir_hash=rule_ir.ir_hash())
+def _empty_rule_ir_authority_index() -> RuntimeRuleIRAuthorityIndex:
     return RuntimeRuleIRAuthorityIndex(
-        _rule_irs_by_key={key: rule_ir},
-        _player_ids_by_key={key: (player_id,)},
+        _rule_irs_by_key={},
+        _player_ids_by_key={},
         _ability_records_by_player_key={},
         _stratagem_records_by_player_key={},
     )
 
 
-def _execute_generic_vp_on_lifecycle(lifecycle: GameLifecycle) -> RuleIR:
+def _rule_ir_authority_index(
+    rule_ir: RuleIR,
+    *,
+    player_id: str | None = None,
+    player_ids: tuple[str, ...] | None = None,
+    globally_registered: bool = False,
+) -> RuntimeRuleIRAuthorityIndex:
+    key = RuntimeRuleIRSourceKey(source_id=rule_ir.source_id, rule_ir_hash=rule_ir.ir_hash())
+    if player_id is not None and player_ids is not None:
+        raise AssertionError("pass player_id or player_ids, not both")
+    if player_ids is not None:
+        owned = player_ids
+    elif player_id is not None:
+        owned = (player_id,)
+    elif globally_registered:
+        owned = ()
+    else:
+        owned = ("player-a",)
+    return RuntimeRuleIRAuthorityIndex(
+        _rule_irs_by_key={key: rule_ir},
+        _player_ids_by_key={key: tuple(sorted(owned))},
+        _ability_records_by_player_key={},
+        _stratagem_records_by_player_key={},
+        _global_source_keys=frozenset({key}) if globally_registered else frozenset(),
+    )
+
+
+def _execute_generic_vp_on_lifecycle(
+    lifecycle: GameLifecycle,
+    *,
+    player_id: str = "player-a",
+) -> RuleIR:
     state = lifecycle.state
     assert state is not None
     rule_ir = _compiled_generic_vp_rule_ir()
@@ -4292,6 +4441,7 @@ def _execute_generic_vp_on_lifecycle(lifecycle: GameLifecycle) -> RuleIR:
         context=_generic_vp_execution_context(
             state,
             event_log=lifecycle.decision_controller.event_log,
+            player_id=player_id,
         ),
         registry=default_rule_execution_registry(),
     )

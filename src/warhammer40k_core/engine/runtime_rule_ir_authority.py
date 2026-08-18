@@ -55,6 +55,7 @@ class RuntimeRuleIRAuthorityIndex:
     _stratagem_records_by_player_key: Mapping[
         tuple[RuntimeRuleIRSourceKey, str], tuple[StratagemCatalogRecord, ...]
     ]
+    _global_source_keys: frozenset[RuntimeRuleIRSourceKey] = frozenset()
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -88,6 +89,14 @@ class RuntimeRuleIRAuthorityIndex:
                 player_ids_by_key=self._player_ids_by_key,
             ),
         )
+        object.__setattr__(
+            self,
+            "_global_source_keys",
+            _validated_global_source_keys(
+                self._global_source_keys,
+                rule_ir_keys=frozenset(self._rule_irs_by_key),
+            ),
+        )
 
     @classmethod
     def from_runtime_sources(
@@ -99,6 +108,7 @@ class RuntimeRuleIRAuthorityIndex:
     ) -> RuntimeRuleIRAuthorityIndex:
         resolved: dict[RuntimeRuleIRSourceKey, RuleIR] = {}
         player_ids_by_key: dict[RuntimeRuleIRSourceKey, set[str]] = {}
+        global_keys: set[RuntimeRuleIRSourceKey] = set()
         ability_records_by_player_key: dict[
             tuple[RuntimeRuleIRSourceKey, str], list[AbilityCatalogRecord]
         ] = {}
@@ -156,6 +166,7 @@ class RuntimeRuleIRAuthorityIndex:
                     execution_record.execution_id
                 ),
                 player_id=None,
+                global_keys=global_keys,
             )
         return cls(
             _rule_irs_by_key=MappingProxyType(resolved),
@@ -174,6 +185,7 @@ class RuntimeRuleIRAuthorityIndex:
                     for key, records in stratagem_records_by_player_key.items()
                 }
             ),
+            _global_source_keys=frozenset(global_keys),
         )
 
     def all_rule_irs(self) -> tuple[RuleIR, ...]:
@@ -201,6 +213,27 @@ class RuntimeRuleIRAuthorityIndex:
         requested_player_id = _identifier("player_id", player_id)
         if requested_player_id not in self._player_ids_by_key[key]:
             raise GameLifecycleError("Runtime RuleIR source is not authoritative for this player.")
+        return rule_ir
+
+    def rule_ir_for_scoring_player(
+        self,
+        *,
+        source_id: str,
+        rule_ir_hash: str,
+        player_id: str,
+    ) -> RuleIR:
+        rule_ir = self.rule_ir_for(source_id=source_id, rule_ir_hash=rule_ir_hash)
+        key = RuntimeRuleIRSourceKey(source_id=source_id, rule_ir_hash=rule_ir_hash)
+        requested_player_id = _identifier("player_id", player_id)
+        player_ids = self._player_ids_by_key[key]
+        if player_ids:
+            if requested_player_id not in player_ids:
+                raise GameLifecycleError(
+                    "Runtime RuleIR source is not authoritative for this player."
+                )
+            return rule_ir
+        if key not in self._global_source_keys:
+            raise GameLifecycleError("Runtime RuleIR source is not globally registered.")
         return rule_ir
 
     def ability_records_for_player(
@@ -285,6 +318,7 @@ def _register_rule_ir(
     rule_ir: RuleIR,
     *,
     player_id: str | None,
+    global_keys: set[RuntimeRuleIRSourceKey] | None = None,
 ) -> None:
     if type(rule_ir) is not RuleIR:
         raise GameLifecycleError("Runtime RuleIR authority source is invalid.")
@@ -298,6 +332,10 @@ def _register_rule_ir(
     resolved[key] = rule_ir
     if player_id is not None:
         player_ids_by_key.setdefault(key, set()).add(_identifier("player_id", player_id))
+        return
+    if global_keys is None:
+        raise GameLifecycleError("Runtime RuleIR authority requires explicit global registration.")
+    global_keys.add(key)
 
 
 def _ability_catalog_indexes(
@@ -409,6 +447,22 @@ def _validated_provider_mapping[ProviderRecordT: (AbilityCatalogRecord, Stratage
             raise GameLifecycleError("Runtime RuleIR provider authority order drifted.")
         validated[key] = canonical
     return MappingProxyType(validated)
+
+
+def _validated_global_source_keys(
+    value: object,
+    *,
+    rule_ir_keys: frozenset[RuntimeRuleIRSourceKey],
+) -> frozenset[RuntimeRuleIRSourceKey]:
+    if type(value) is not frozenset:
+        raise GameLifecycleError("Runtime RuleIR global authority must be a frozenset.")
+    raw = cast(frozenset[object], value)
+    if any(type(key) is not RuntimeRuleIRSourceKey for key in raw):
+        raise GameLifecycleError("Runtime RuleIR global authority entry is invalid.")
+    keys = cast(frozenset[RuntimeRuleIRSourceKey], raw)
+    if not keys <= rule_ir_keys:
+        raise GameLifecycleError("Runtime RuleIR global authority inventory drifted.")
+    return keys
 
 
 def _identifier(field_name: str, value: object) -> str:

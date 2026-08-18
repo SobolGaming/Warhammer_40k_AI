@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import replace
+from typing import cast
 
 import pytest
 from tests.phase11c_command_phase_helpers import (
@@ -98,6 +99,9 @@ from warhammer40k_core.engine.runtime_rule_ir_authority import (
 )
 from warhammer40k_core.engine.runtime_rule_ir_authority import (
     _stratagem_catalog_indexes as stratagem_catalog_indexes,  # pyright: ignore[reportPrivateUsage]
+)
+from warhammer40k_core.engine.runtime_rule_ir_authority import (
+    _validated_global_source_keys as validated_global_source_keys,  # pyright: ignore[reportPrivateUsage]
 )
 from warhammer40k_core.engine.runtime_rule_ir_authority import (
     _validated_player_ids_mapping as validated_player_ids_mapping,  # pyright: ignore[reportPrivateUsage]
@@ -517,6 +521,24 @@ def test_runtime_rule_ir_authority_rejects_noncanonical_index_shapes(
                 record_type=AbilityCatalogRecord,
                 player_ids_by_key=player_ids_by_key,
             )
+    with pytest.raises(GameLifecycleError, match="global authority must be a frozenset"):
+        validated_global_source_keys(cast(object, set()), rule_ir_keys=frozenset({key}))
+    with pytest.raises(GameLifecycleError, match="global authority entry is invalid"):
+        validated_global_source_keys(
+            cast(object, frozenset({object()})),
+            rule_ir_keys=frozenset({key}),
+        )
+    with pytest.raises(GameLifecycleError, match="global authority inventory drifted"):
+        validated_global_source_keys(
+            frozenset({RuntimeRuleIRSourceKey("test:other-source", rule_ir.ir_hash())}),
+            rule_ir_keys=frozenset({key}),
+        )
+    empty_global = frozenset[RuntimeRuleIRSourceKey]()
+    assert validated_global_source_keys(empty_global, rule_ir_keys=frozenset({key})) == empty_global
+    assert validated_global_source_keys(
+        frozenset({key}),
+        rule_ir_keys=frozenset({key}),
+    ) == frozenset({key})
 
 
 def test_runtime_rule_ir_authority_rejects_invalid_runtime_sources(
@@ -554,6 +576,22 @@ def test_runtime_rule_ir_authority_rejects_invalid_runtime_sources(
             rule_ir,
             player_id="",
         )
+    with pytest.raises(GameLifecycleError, match="explicit global registration"):
+        register_rule_ir(
+            {},
+            {},
+            rule_ir,
+            player_id=None,
+        )
+    global_keys: set[RuntimeRuleIRSourceKey] = set()
+    register_rule_ir(
+        {},
+        {},
+        rule_ir,
+        player_id=None,
+        global_keys=global_keys,
+    )
+    assert RuntimeRuleIRSourceKey(rule_ir.source_id, rule_ir.ir_hash()) in global_keys
 
 
 def test_oc_source_payload_parsers_reject_noncanonical_values() -> None:

@@ -241,28 +241,34 @@ def validate_secondary_generic_rule_ir_restore_authority(
     if len(events_by_id) != len(events):
         raise GameLifecycleError("Generic RuleIR Secondary VP execution events are not unique.")
     seen_event_ids: set[str] = set()
-    for transaction in transactions:
-        award = _award_from_transaction(transaction)
-        validate_generic_rule_ir_secondary_award(award=award)
-        raw = _metadata_object(transaction.metadata)
-        event_id = raw.get(GENERIC_RULE_IR_EXECUTION_EVENT_ID_KEY)
-        if type(event_id) is not str:
-            raise GameLifecycleError("Generic RuleIR Secondary VP requires execution_event_id.")
-        if event_id in seen_event_ids:
+    if transactions:
+        if rule_ir_authority_index is None:
             raise GameLifecycleError(
-                "Generic RuleIR Secondary VP execution event is bound to multiple transactions."
+                "Generic RuleIR Secondary VP requires loaded RuleIR authority."
             )
-        seen_event_ids.add(event_id)
-        event = events_by_id.get(event_id)
-        if event is None:
-            raise GameLifecycleError(
-                "Generic RuleIR Secondary VP requires rule_execution_victory_points_awarded."
-            )
-        if event.payload != transaction.to_payload():
-            raise GameLifecycleError(
-                "Generic RuleIR Secondary VP execution event drifted from the ledger transaction."
-            )
-        if rule_ir_authority_index is not None:
+        loaded_index = rule_ir_authority_index
+        for transaction in transactions:
+            award = _award_from_transaction(transaction)
+            validate_generic_rule_ir_secondary_award(award=award)
+            raw = _metadata_object(transaction.metadata)
+            event_id = raw.get(GENERIC_RULE_IR_EXECUTION_EVENT_ID_KEY)
+            if type(event_id) is not str:
+                raise GameLifecycleError("Generic RuleIR Secondary VP requires execution_event_id.")
+            if event_id in seen_event_ids:
+                raise GameLifecycleError(
+                    "Generic RuleIR Secondary VP execution event is bound to multiple transactions."
+                )
+            seen_event_ids.add(event_id)
+            event = events_by_id.get(event_id)
+            if event is None:
+                raise GameLifecycleError(
+                    "Generic RuleIR Secondary VP requires rule_execution_victory_points_awarded."
+                )
+            if event.payload != transaction.to_payload():
+                raise GameLifecycleError(
+                    "Generic RuleIR Secondary VP execution event drifted from the ledger "
+                    "transaction."
+                )
             source_id = raw.get(GENERIC_RULE_IR_SOURCE_ID_KEY)
             rule_ir_hash = raw.get(GENERIC_RULE_IR_HASH_KEY)
             if type(source_id) is not str or type(rule_ir_hash) is not str:
@@ -271,9 +277,10 @@ def validate_secondary_generic_rule_ir_restore_authority(
                 )
             require_generic_rule_ir_loaded_authority(
                 award=award,
-                rule_ir=rule_ir_authority_index.rule_ir_for(
+                rule_ir=loaded_index.rule_ir_for_scoring_player(
                     source_id=source_id,
                     rule_ir_hash=rule_ir_hash,
+                    player_id=transaction.player_id,
                 ),
             )
     if seen_event_ids != set(events_by_id):

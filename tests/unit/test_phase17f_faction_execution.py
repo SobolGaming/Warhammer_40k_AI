@@ -1071,6 +1071,29 @@ def test_runtime_rule_ir_authority_combines_exact_active_runtime_sources() -> No
             )
             == rule_ir
         )
+    assert (
+        index.rule_ir_for_scoring_player(
+            source_id=ability_ir.source_id,
+            rule_ir_hash=ability_ir.ir_hash(),
+            player_id="player-a",
+        )
+        == ability_ir
+    )
+    with pytest.raises(GameLifecycleError, match="not authoritative for this player"):
+        index.rule_ir_for_scoring_player(
+            source_id=ability_ir.source_id,
+            rule_ir_hash=ability_ir.ir_hash(),
+            player_id="player-b",
+        )
+    for player_id in ("player-a", "player-b"):
+        assert (
+            index.rule_ir_for_scoring_player(
+                source_id=faction_ir.source_id,
+                rule_ir_hash=faction_ir.ir_hash(),
+                player_id=player_id,
+            )
+            == faction_ir
+        )
     with pytest.raises(GameLifecycleError, match="not authoritative"):
         index.rule_ir_for(source_id=ability_ir.source_id, rule_ir_hash="0" * 64)
     with pytest.raises(GameLifecycleError, match="registered resolver"):
