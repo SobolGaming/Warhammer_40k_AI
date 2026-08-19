@@ -19,6 +19,9 @@ from warhammer40k_core.engine.primary_scoring_state_evidence import (
     PrimaryScoringBoundaryKind,
     PrimaryScoringStateEvidence,
 )
+from warhammer40k_core.engine.primary_scoring_turn_scope import (
+    primary_scoring_rule_applies_at_record,
+)
 from warhammer40k_core.engine.scoring import (
     MissionScoringPolicy,
     MissionScoringPolicyPayload,
@@ -106,6 +109,38 @@ class MissionScoringPolicies:
                 return policy
         raise GameLifecycleError("Mission scoring policy does not contain player_id.")
 
+    def scoring_player_ids_for_record(
+        self,
+        *,
+        record: ObjectiveControlRecord,
+        turn_order: tuple[str, ...],
+        end_of_battle: bool,
+    ) -> tuple[str, ...]:
+        if type(record) is not ObjectiveControlRecord:
+            raise GameLifecycleError("Primary scoring requires an ObjectiveControlRecord.")
+        if type(end_of_battle) is not bool:
+            raise GameLifecycleError("Primary scoring end_of_battle must be a bool.")
+        if end_of_battle:
+            return tuple(turn_order)
+        return tuple(
+            player_id
+            for player_id in turn_order
+            for policy in (self.policy_for_player(player_id),)
+            if any(
+                primary_scoring_rule_applies_at_record(
+                    timing=rule.timing,
+                    condition=rule.condition,
+                    record=record,
+                    scoring_player_id=policy.player_id,
+                    primary_scoring_phase=policy.primary_scoring_phase,
+                    primary_scoring_timing=policy.primary_scoring_timing,
+                    game_length_battle_rounds=policy.game_length_battle_rounds,
+                    end_of_battle=False,
+                )
+                for rule in policy.primary_scoring_rules
+            )
+        )
+
     def primary_awards_from_objective_control(
         self,
         *,
@@ -162,8 +197,10 @@ class MissionScoringPolicies:
         end_of_battle = (
             state_evidence.scoring_boundary_kind is PrimaryScoringBoundaryKind.END_OF_BATTLE
         )
-        player_ids = (
-            tuple(authoritative_state.player_ids) if end_of_battle else (record.active_player_id,)
+        player_ids = self.scoring_player_ids_for_record(
+            record=record,
+            turn_order=tuple(authoritative_state.turn_order),
+            end_of_battle=end_of_battle,
         )
         turn_start_states = tuple(
             value

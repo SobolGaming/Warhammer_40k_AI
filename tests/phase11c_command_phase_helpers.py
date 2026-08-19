@@ -137,8 +137,9 @@ def battle_state(
     player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_b_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
     player_a_units: tuple[UnitMusterSelection, ...] | None = None,
+    player_b_units: tuple[UnitMusterSelection, ...] | None = None,
 ) -> GameState:
-    config = phase11c_config(player_a_units=player_a_units)
+    config = phase11c_config(player_a_units=player_a_units, player_b_units=player_b_units)
     state = GameState.from_config(config)
     for army in mustered_armies(config):
         state.record_army_definition(army)
@@ -195,7 +196,11 @@ def secondary_choice(*, player_id: str, mode: SecondaryMissionMode) -> Secondary
     )
 
 
-def phase11c_config(*, player_a_units: tuple[UnitMusterSelection, ...] | None = None) -> GameConfig:
+def phase11c_config(
+    *,
+    player_a_units: tuple[UnitMusterSelection, ...] | None = None,
+    player_b_units: tuple[UnitMusterSelection, ...] | None = None,
+) -> GameConfig:
     catalog = ArmyCatalog.phase9a_canonical_content_pack()
     return GameConfig(
         game_id="phase11c-game",
@@ -217,7 +222,11 @@ def phase11c_config(*, player_a_units: tuple[UnitMusterSelection, ...] | None = 
                 catalog=catalog,
                 player_id="player-b",
                 army_id="army-beta",
-                unit_selections=(default_unit_selection("intercessor-unit-3"),),
+                unit_selections=(
+                    (default_unit_selection("intercessor-unit-3"),)
+                    if player_b_units is None
+                    else player_b_units
+                ),
             ),
         ),
         player_ids=("player-a", "player-b"),

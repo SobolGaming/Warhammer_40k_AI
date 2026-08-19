@@ -552,7 +552,7 @@ def test_primary_policy_rejects_forged_end_of_battle_and_foreign_evidence(
         )
 
 
-def test_exact_nineteen_implemented_primaries_build_typed_runtime_rules() -> None:
+def test_exact_twenty_implemented_primaries_build_typed_runtime_rules() -> None:
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
     implemented_ids = {
         "primary-battlefield-dominance",
@@ -565,6 +565,7 @@ def test_exact_nineteen_implemented_primaries_build_typed_runtime_rules() -> Non
         "primary-inescapable-dominion",
         "primary-meatgrinder",
         "primary-outmaneuver",
+        "primary-punishment",
         "primary-purge-and-secure",
         "primary-reconnaissance-sweep",
         "primary-sabotage",
@@ -1601,7 +1602,12 @@ def _run_primary_scoring_context_corruption(
         )
     else:
         raise AssertionError(f"unsupported Primary scoring context corruption: {corruption}")
-    PrimaryScoringConditionContext(**parameters)
+    context = PrimaryScoringConditionContext(**parameters)
+    if corruption == "inactive_player":
+        evaluate_primary_scoring_condition(
+            condition="control_one_or_more_central_objectives",
+            context=context,
+        )
 
 
 def test_primary_scoring_condition_evaluation_fails_closed_on_typed_context_drift(

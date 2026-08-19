@@ -104,7 +104,7 @@ def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> N
 
     assert mission_pack.mission_pack_id == "11e-warhammer-event-companion-2026-07"
     assert source_package.source_commit_or_import_hash == (
-        "ca61d092eb5bfac8ccf85fed76c12fff1eb424ec9486da823541c1425b6c4079"
+        "4c9f813b0c83ba62da8f0889f8cfe7acf43f2a72be34ba52d580669df6e5fc1c"
     )
     assert source_package.to_payload() == {
         "edition_id": "warhammer_40000_11th",
@@ -434,7 +434,7 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
     assert punishment_choice.effect_duration == "until_start_of_own_next_turn"
     assert Counter(
         mission.engine_support_status for mission in artifact.primary_missions
-    ) == Counter({"engine_implemented": 19, "source_known_engine_pending": 6})
+    ) == Counter({"engine_implemented": 20, "source_known_engine_pending": 5})
     all_scoring_rules = tuple(
         rule for mission in artifact.primary_missions for rule in mission.scoring_rules
     )
@@ -467,6 +467,7 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
         "primary-inescapable-dominion",
         "primary-meatgrinder",
         "primary-outmaneuver",
+        "primary-punishment",
         "primary-purge-and-secure",
         "primary-reconnaissance-sweep",
         "primary-sabotage",
@@ -3190,6 +3191,7 @@ def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_ord
     assert complete_pair_ids == {
         "disruption-vs-disruption",
         "priority-assets-vs-priority-assets",
+        "purge-the-foe-vs-disruption",
         "purge-the-foe-vs-purge-the-foe",
         "purge-the-foe-vs-reconnaissance",
         "reconnaissance-vs-priority-assets",
@@ -3210,7 +3212,7 @@ def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_ord
             ].primary_mission_id
             in executable_primary_ids
         )
-        == 30
+        == 33
     )
     assert (
         source_rows[10].source_left_force_disposition_id,
@@ -4039,8 +4041,8 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
 
     assert len(coverage_rows) == 25
     assert status_counts == {
-        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 19,
-        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 6,
+        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 20,
+        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 5,
         event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 0,
     }
     assert {
@@ -4057,7 +4059,6 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         "primary-extract-relic",
         "primary-gather-intel",
         "primary-locate-and-deny",
-        "primary-punishment",
         "primary-surveil-the-foe",
         "primary-vital-link",
     }
@@ -4122,6 +4123,7 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     assert primary_rows["primary-sabotage"].scoring_kind == "sabotage"
     assert primary_rows["primary-secure-asset"].scoring_kind == "secure_asset"
     assert primary_rows["primary-vanguard-operation"].scoring_kind == "vanguard_operation"
+    assert primary_rows["primary-punishment"].scoring_kind == "punishment"
     assert coverage_rows["primary-unstoppable-force"].needed_work == ()
     assert coverage_rows["primary-meatgrinder"].needed_work == ()
     assert coverage_rows["primary-death-trap"].mission_action_count == 1
@@ -4150,6 +4152,7 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         "primary-sabotage",
         "primary-secure-asset",
         "primary-vanguard-operation",
+        "primary-punishment",
     ):
         assert coverage_rows[implemented_mission_id].needed_work == ()
     assert {
@@ -4167,7 +4170,6 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         "primary-locate-and-deny": (
             "engine_primary_condition:single_friendly_operation_marker_terrain_area_state",
         ),
-        "primary-punishment": ("engine_primary_condition:condemned_enemy_units_left_battlefield",),
         "primary-surveil-the-foe": (
             "engine_primary_condition:enemy_unit_surveilled_marker_exception",
             "engine_primary_condition:no_enemy_operation_markers_on_battlefield",
@@ -4360,9 +4362,9 @@ def test_phase17j_source_known_engine_pending_primary_scoring_fails_on_primary_p
     mission_pack = mission_pack_for_id("11e-warhammer-event-companion-2026-07")
     setup = MissionSetup.from_mission_pack(
         mission_pack=mission_pack,
-        mission_pool_entry_id="mission-purge-the-foe-vs-disruption-layout-1",
+        mission_pool_entry_id="mission-disruption-vs-reconnaissance-layout-1",
         attacker_player_id="player-alpha",
-        attacker_force_disposition_id="purge-the-foe",
+        attacker_force_disposition_id="reconnaissance",
         defender_player_id="player-beta",
         defender_force_disposition_id="disruption",
     )
@@ -4372,9 +4374,9 @@ def test_phase17j_source_known_engine_pending_primary_scoring_fails_on_primary_p
     attacker_policy = policies.policy_for_player("player-alpha")
     defender_policy = policies.policy_for_player("player-beta")
 
-    assert attacker_policy.primary_mission_id == "primary-punishment"
+    assert attacker_policy.primary_mission_id == "primary-surveil-the-foe"
     assert not attacker_policy.primary_scoring_supported
-    assert defender_policy.primary_mission_id == "primary-delaying-action"
+    assert defender_policy.primary_mission_id == "primary-smoke-and-mirrors"
     assert defender_policy.primary_scoring_supported
     with pytest.raises(
         GameLifecycleError,

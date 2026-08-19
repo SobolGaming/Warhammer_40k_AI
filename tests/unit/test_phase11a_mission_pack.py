@@ -1019,8 +1019,8 @@ def test_mission_scoring_policies_resolve_asymmetric_player_primaries() -> None:
 @pytest.mark.parametrize(
     ("attacker_force_disposition_id", "defender_force_disposition_id"),
     [
-        ("purge-the-foe", "disruption"),
-        ("disruption", "purge-the-foe"),
+        ("reconnaissance", "disruption"),
+        ("disruption", "reconnaissance"),
     ],
 )
 def test_mission_scoring_policies_defer_pending_primary_failure_to_owning_path(
@@ -1029,7 +1029,7 @@ def test_mission_scoring_policies_defer_pending_primary_failure_to_owning_path(
 ) -> None:
     setup = MissionSetup.from_mission_pack(
         mission_pack=warhammer_event_companion_2026_07_mission_pack(),
-        mission_pool_entry_id="mission-purge-the-foe-vs-disruption-layout-1",
+        mission_pool_entry_id="mission-disruption-vs-reconnaissance-layout-1",
         attacker_player_id="player-a",
         attacker_force_disposition_id=attacker_force_disposition_id,
         defender_player_id="player-b",
@@ -1044,8 +1044,8 @@ def test_mission_scoring_policies_defer_pending_primary_failure_to_owning_path(
         policy for policy in policies.player_policies if not policy.primary_scoring_supported
     )
 
-    assert implemented.primary_mission_id == "primary-delaying-action"
-    assert pending.primary_mission_id == "primary-punishment"
+    assert implemented.primary_mission_id == "primary-smoke-and-mirrors"
+    assert pending.primary_mission_id == "primary-surveil-the-foe"
     assert (
         implemented.cap_bucket_for_victory_point_source(
             source_kind=VictoryPointSourceKind.PRIMARY,

@@ -21,6 +21,10 @@ from warhammer40k_core.engine.primary_scoring_state_evidence import (
 from warhammer40k_core.engine.primary_scoring_timing import (
     primary_scoring_timing_applies,
 )
+from warhammer40k_core.engine.primary_scoring_turn_scope import (
+    primary_scoring_turn_scope_applies,
+    primary_scoring_turn_scope_for_condition,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.scoring import (
@@ -451,7 +455,12 @@ def _validate_primary_victory_point_record(
             raise GameLifecycleError(
                 "Primary VP scoring_timing drifted from its objective-control boundary."
             )
-        if boundary.active_player_id != policy.player_id:
+        if not primary_scoring_turn_scope_applies(
+            turn_scope=primary_scoring_turn_scope_for_condition(rule.condition),
+            scoring_player_id=policy.player_id,
+            active_player_id=boundary.active_player_id,
+            end_of_battle=False,
+        ):
             raise GameLifecycleError(
                 "Ordinary Primary VP scoring requires the assigned player's boundary."
             )

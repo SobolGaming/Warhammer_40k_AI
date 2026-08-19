@@ -12,7 +12,9 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_scoring_state_evidence import (
     PrimaryScoringBoundaryKind,
 )
-from warhammer40k_core.engine.primary_scoring_timing import primary_scoring_timing_applies
+from warhammer40k_core.engine.primary_scoring_turn_scope import (
+    primary_scoring_rule_applies_at_record,
+)
 
 
 def required_primary_scoring_boundary_kinds(
@@ -34,8 +36,10 @@ def required_primary_scoring_boundary_kinds(
             "Primary scoring boundary active player is missing from turn_order."
         )
     required: list[PrimaryScoringBoundaryKind] = []
-    active_policy = policies.policy_for_player(record.active_player_id)
-    if _policy_has_rule_at_record(policy=active_policy, record=record, end_of_battle=False):
+    if any(
+        _policy_has_rule_at_record(policy=policy, record=record, end_of_battle=False)
+        for policy in policies.player_policies
+    ):
         required.append(PrimaryScoringBoundaryKind.ORDINARY)
     if _is_final_end_of_battle_record(
         policies=policies,
@@ -60,11 +64,11 @@ def _policy_has_rule_at_record(
     if type(policy) is not MissionScoringPolicy:
         raise GameLifecycleError("Primary scoring boundary inventory requires a player policy.")
     return any(
-        primary_scoring_timing_applies(
+        primary_scoring_rule_applies_at_record(
             timing=rule.timing,
-            battle_round=record.battle_round,
-            phase=record.phase,
-            objective_control_timing=record.timing,
+            condition=rule.condition,
+            record=record,
+            scoring_player_id=policy.player_id,
             primary_scoring_phase=policy.primary_scoring_phase,
             primary_scoring_timing=policy.primary_scoring_timing,
             game_length_battle_rounds=policy.game_length_battle_rounds,

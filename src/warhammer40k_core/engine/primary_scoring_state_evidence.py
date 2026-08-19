@@ -41,7 +41,6 @@ from warhammer40k_core.engine.primary_scoring_position_witness import (
 from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     PrimaryScoringSpatialEvidence,
     PrimaryScoringSpatialEvidencePayload,
-    build_primary_scoring_spatial_evidence,
     objective_control_record_hash,
     validate_primary_scoring_spatial_evidence_rows,
 )
@@ -52,6 +51,7 @@ from warhammer40k_core.engine.primary_scoring_state_evidence_integrity import (
     validate_primary_scoring_state_evidence_restore_authority,
 )
 from warhammer40k_core.engine.primary_scoring_state_evidence_spatial_integrity import (
+    build_primary_scoring_spatial_rows,
     validate_primary_scoring_spatial_rows_context,
 )
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_views_from_armies
@@ -585,25 +585,10 @@ def build_primary_scoring_state_evidence(
         )
         for view in current_views
     )
-    from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
-
-    scoring_policies = mission_scoring_policies_from_setup(mission_setup)
-    scoring_player_ids = tuple(state.player_ids) if end_of_battle else (record.active_player_id,)
-    spatial_rows = tuple(
-        build_primary_scoring_spatial_evidence(
-            state=state,
-            player_id=player_id,
-            record=record,
-            requested_condition_ids=required_conditions,
-        )
-        for player_id in scoring_player_ids
-        for required_conditions in (
-            scoring_policies.policy_for_player(player_id).required_primary_spatial_conditions(
-                record=record,
-                end_of_battle=end_of_battle,
-            ),
-        )
-        if required_conditions
+    spatial_rows = build_primary_scoring_spatial_rows(
+        state=state,
+        record=record,
+        end_of_battle=end_of_battle,
     )
     owner_by_rules_unit_id, components_by_rules_unit_id = _known_rules_unit_identity_maps(
         state=state

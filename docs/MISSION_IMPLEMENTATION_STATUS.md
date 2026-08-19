@@ -67,7 +67,7 @@ Secondary status:
 ## Summary
 
 - Primary matrix cells: 25 of 25 `implemented`.
-- Primary scoring coverage: 19 of 25 `engine_implemented`, 6
+- Primary scoring coverage: 20 of 25 `engine_implemented`, 5
   `source_known_engine_pending`, 0 `awaiting_source`.
 - Phase 17N Step 4 exposes all ten source-backed Primary Mission Actions:
   `decoy-objective`, `triangulate-objective`, `extract-intelligence`,
@@ -95,9 +95,14 @@ Secondary status:
   Smoke and Mirrors, and Triangulation are now `engine_implemented`.
 - Phase 17N Step 5C scores completed Primary Mission Actions through the same
   shared path. Secure Asset, Sabotage, and Vanguard Operation are now
-  `engine_implemented`. Counts are 19/6 missions and 10/15 pairings (30/45
-  variants). Gather Intel and Extract Relic remain pending on remaining
-  marker-state blockers. Pairing-wide certification is not claimed.
+  `engine_implemented`. Gather Intel and Extract Relic remain pending on remaining
+  marker-state blockers.
+- Phase 17N Step 5D scores condemned enemy units that fully left the battlefield
+  this turn, including during the opposing player's turn while condemned status
+  lasts until the start of the Punishment owner's next turn. The condemned rule
+  uses `timing: turn_end` with `turn_scope: any_player_turn`. Punishment is now
+  `engine_implemented`. Counts are 20/5 missions and 11/15 pairings (33/45
+  variants). Pairing-wide certification is not claimed.
 - Runtime Mission Actions: 14 total. The ten Step 4 Primary Actions join Death
   Trap's `booby-trap-terrain`, Terraform's `terraform-objective`, Cleanse's
   `cleanse-objective`, and Plunder's `plunder-terrain`. They are automatically
@@ -115,8 +120,8 @@ Secondary status:
 - Phase 17N has source-hashed executable battlefield packages for all 45 Event
   Companion layouts: all 15 Force Disposition pairings and each pairing's A/B/C
   variants. No layout identity remains geometry-pending.
-- Ten of the 15 two-sided Force Disposition pairings now have executable
-  Primaries in both directions, covering 30 of the 45 A/B/C layout variants.
+- Eleven of the 15 two-sided Force Disposition pairings now have executable
+  Primaries in both directions, covering 33 of the 45 A/B/C layout variants.
 - The local [Event Companion Battlefield Viewer](BATTLEFIELD_VIEWER.md)
   consumes `battlefield-view-v4-phase17n-step3` directly for every layout. It provides
   an orbitable 3D schematic of classifications, component footprints, walls,
@@ -208,12 +213,12 @@ Secondary status:
 - All 25 Primary missions' source timing, VP values, structured condition
   tokens, current engine-support status, and the ten source-backed Primary Mission
   Action descriptors are committed in `primary-scoring.json`. Its package hash
-  is `bb869c3c4f57b45ad46d67fb6ce9cf0c230247d1358f2329d3e794cadb984e4a`
+  is `eeee655d6f7c42902d0cebf4426c3758b9d88b82d120b5d88335bba49d71f3e5`
   and its raw artifact SHA-256 is
-  `c756ac167152eb7a0cdf32bbf233b76f5f5bd2346acab74e7c1b9d85a7bbe476`.
+  `1a5651f8328aadaae148df60d0e388445def27384909398f6c8825c14289eb0f`.
   The typed loader pins both hashes, the exact 25-mission/100-rule/10-action
-  inventory, the exact nine-token timing vocabulary, the complete resolution
-  group grammar, and the honest 19 `engine_implemented` versus 6
+  inventory, the exact nine-token timing vocabulary plus rule-level `turn_scope`, the complete resolution
+  group grammar, and the honest 20 `engine_implemented` versus 5
   `source_known_engine_pending` boundary. Repository reviews are pinned to PRs
   #107, #134, #136, and #379. PR #107 is the source-backed origin for Death
   Trap, Immovable Object, and Unstoppable Force. Only Meatgrinder currently
@@ -233,7 +238,7 @@ Secondary status:
   timing string is insufficient. The same validator runs for live awards and
   restored ledgers, including ordinary per-round Primary-total validation. The
   derived Event Companion source identity is
-  `ca61d092eb5bfac8ccf85fed76c12fff1eb424ec9486da823541c1425b6c4079`.
+  `4c9f813b0c83ba62da8f0889f8cfe7acf43f2a72be34ba52d580669df6e5fc1c`.
 - Verify that the committed battlefield artifact still matches its reviewed
   inputs without writing files with
   `uv run python tools/build_event_companion_battlefields.py --check`.
@@ -284,7 +289,7 @@ five-battle-round game, as configured by the current Event Companion package.
 | `cumulative_condition` | `source_tracked`, `engine_implemented` | Every achieved branch in one typed cumulative group scores; selection evidence lists all achieved and selected rule IDs. |
 | `exclusive_or_condition` | `source_tracked`, `engine_implemented` | Only the highest-VP achieved branch in one typed exclusive group scores; rule-ID ordering breaks equal-VP ties deterministically and evidence lists suppressed branches. |
 | `exactly_one_condition` | `source_tracked` | Underlined one means exactly one, not one or more. |
-| `leaves_battlefield_event` | `source_tracked`, `engine_state_backed` | Typed battlefield-departure evidence records destroyed, embarked, and rule-removed models and rules units. Punishment's condemned-unit choice is engine-owned; its card-specific departure filter remains scoring work. |
+| `leaves_battlefield_event` | `source_tracked`, `engine_implemented` | Typed battlefield-departure evidence records destroyed, embarked, and rule-removed models and rules units. Punishment scores when one or more condemned enemy rules units fully left the battlefield this turn. |
 | `vp_up_to_limit` | `source_tracked`, `engine_guarded` | Rule caps and ledger caps ignore VP above the stated limit. |
 | `when_drawn_tactical_only` | `source_tracked` | When Drawn sections apply only to Tactical Secondary Missions and must not affect Fixed Secondary mode. |
 
@@ -294,7 +299,7 @@ five-battle-round game, as configured by the current Event Companion package.
 | --- | --- | --- | --- | --- | --- | ---: | ---: | --- |
 | `purge-the-foe` | `purge-the-foe` | Meatgrinder | `primary-meatgrinder` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `purge-the-foe` | `take-and-hold` | Unstoppable Force | `primary-unstoppable-force` | `implemented` | `engine_implemented` | 4 | 0 | None |
-| `purge-the-foe` | `disruption` | Punishment | `primary-punishment` | `implemented` | `source_known_engine_pending` | 4 | 0 | `engine_primary_condition:condemned_enemy_units_left_battlefield` |
+| `purge-the-foe` | `disruption` | Punishment | `primary-punishment` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `purge-the-foe` | `reconnaissance` | Consecrate | `primary-consecrate` | `implemented` | `engine_implemented` | 5 | 0 | None |
 | `purge-the-foe` | `priority-assets` | Destroyer's Wrath | `primary-destroyers-wrath` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `take-and-hold` | `purge-the-foe` | Immovable Object | `primary-immovable-object` | `implemented` | `engine_implemented` | 3 | 0 | None |
@@ -361,7 +366,8 @@ five-battle-round game, as configured by the current Event Companion package.
   enemy-loss conditions classify records by the destroyed unit's owner and
   active-turn key, so authoritative transition removals count even when no
   destroying player can be attributed.
-- Primary rules use one strict nine-token timing evaluator. Every rule declares
+- Primary rules use one strict nine-token timing evaluator plus a separate
+  rule-level `turn_scope` of `own_player_turn` or `any_player_turn`. Every rule declares
   `independent`, `cumulative`, or `exclusive_highest` resolution. Cumulative
   groups emit every achieved award; exclusive groups emit only the highest-VP
   achieved award, use stable rule-ID ordering for equal-VP ties, and record the
@@ -404,10 +410,11 @@ five-battle-round game, as configured by the current Event Companion package.
   administrators because those are public battlefield facts.
 - The new start-position, central-objective destruction, and battlefield-
   departure primitives are reusable by Locate and Deny, Extract Relic, and
-  Punishment. Step 4 now supplies their player choices, Mission Actions, and
-  persistent operation/condemned-unit state. Those missions remain honestly
-  engine-pending only for the card-specific scoring conditions listed in the
-  matrix.
+  Punishment. Step 4 supplies their player choices, Mission Actions, and
+  persistent operation/condemned-unit state. Punishment's condemned-departure
+  scoring condition is now engine-implemented. Locate and Deny and Extract Relic
+  remain honestly engine-pending only for the card-specific scoring conditions
+  listed in the matrix.
 - `source_known_engine_pending` primary missions must remain fail-closed until
   the listed card-specific scoring conditions have engine-owned validation and
   evidence paths.
@@ -423,10 +430,11 @@ five-battle-round game, as configured by the current Event Companion package.
 - Step 5A's scoring-state bridge and four simple objective predicates are
   complete. Step 5B promotes Consecrate, Smoke and Mirrors, and Triangulation
   through marker scoring conditions. Step 5C promotes Secure Asset, Sabotage,
-  and Vanguard Operation through completed-action scoring conditions. Gather
+  and Vanguard Operation through completed-action scoring conditions. Step 5D
+  promotes Punishment through condemned battlefield-departure scoring. Gather
   Intel and Extract Relic remain pending on remaining marker-state blockers.
   Pairing-wide normal-lifecycle, replay, and viewer-scoped projection
-  certification remains later Phase 17N Step 5 work. Six condition-pending
+  certification remains later Phase 17N Step 5 work. Five condition-pending
   cards remain fail-closed.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,
   tactical draw, scoring, retain/discard, Fixed card states that remain active
