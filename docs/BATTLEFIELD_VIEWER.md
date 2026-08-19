@@ -128,11 +128,10 @@ wall volumes and 20 floor volumes; the other layouts each have 70 wall volumes
 and 20 floor volumes. Objective counts follow the source layout and therefore
 vary between five and six.
 
-Battlefield availability does not imply that every associated Primary Mission
-scoring rule is pairing-certified. All 25 Event Companion Primary Missions are
-now `engine_implemented` for executable scoring. Pairing-wide normal-lifecycle,
-replay, and viewer-scoped certification remains later Phase 17N Step 5 work.
-See [Mission Implementation Status](MISSION_IMPLEMENTATION_STATUS.md).
+All 25 Event Companion Primary Missions are `engine_implemented` for executable
+scoring. Step 5G certifies every Force Disposition pairing through normal
+lifecycle execution, restore replay, and viewer-scoped projections. See
+[Mission Implementation Status](MISSION_IMPLEMENTATION_STATUS.md).
 
 The viewer is a schematic geometry inspection tool, not a photorealistic
 terrain renderer. Rendered pixels are non-authoritative, and no layout falls

@@ -111,8 +111,13 @@ Secondary status:
   through the same shared path, resolving historical Attached Unit targets onto
   current descendant position witnesses through persisted departure lineage.
   Surveil the Foe is now `engine_implemented`.
-  Counts are 25/0 missions and 15/15 pairings (45/45 variants). Pairing-wide
-  certification is not claimed.
+  Counts are 25/0 missions and 15/15 pairings (45/45 variants).
+- Phase 17N Step 5G certifies every Force Disposition pairing through
+  `LocalGameSession` turn-end Primary scoring, `GameLifecycle` restore replay,
+  and viewer-scoped projections that omit full scoring-state evidence rows.
+  Layout A of each pairing is the lifecycle certification row; all 45 A/B/C
+  variants instantiate two-sided scoring policies. This does not claim Phase
+  20A full-game certification.
 - Runtime Mission Actions: 14 total. The ten Step 4 Primary Actions join Death
   Trap's `booby-trap-terrain`, Terraform's `terraform-objective`, Cleanse's
   `cleanse-objective`, and Plunder's `plunder-terrain`. They are automatically
@@ -132,6 +137,8 @@ Secondary status:
   variants. No layout identity remains geometry-pending.
 - All 15 of the 15 two-sided Force Disposition pairings now have executable
   Primaries in both directions, covering 45 of the 45 A/B/C layout variants.
+  Step 5G certifies each pairing through lifecycle scoring, restore replay, and
+  viewer-scoped projections.
 - The local [Event Companion Battlefield Viewer](BATTLEFIELD_VIEWER.md)
   consumes `battlefield-view-v4-phase17n-step3` directly for every layout. It provides
   an orbitable 3D schematic of classifications, component footprints, walls,
@@ -445,8 +452,9 @@ five-battle-round game, as configured by the current Event Companion package.
   promotes Punishment through condemned battlefield-departure scoring. Step 5E
   promotes Gather Intel, Extract Relic, Locate and Deny, and Vital Link through
   operation-marker scoring. Step 5F promotes Surveil the Foe through the
-  surveilled-marker exception. Pairing-wide normal-lifecycle, replay, and
-  viewer-scoped projection certification remains later Phase 17N Step 5 work.
+  surveilled-marker exception. Step 5G certifies every Force Disposition pairing
+  through normal lifecycle execution, restore replay, and viewer-scoped
+  projections.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,
   tactical draw, scoring, retain/discard, Fixed card states that remain active
   after scoring, the 20 VP per Fixed Mission card cap, state-backed awards, and
