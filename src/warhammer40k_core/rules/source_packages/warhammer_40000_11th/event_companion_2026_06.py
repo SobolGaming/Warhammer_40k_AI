@@ -71,7 +71,7 @@ DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-EXPECTED_SOURCE_IMPORT_HASH = "4c9f813b0c83ba62da8f0889f8cfe7acf43f2a72be34ba52d580669df6e5fc1c"
+EXPECTED_SOURCE_IMPORT_HASH = "ae1f215a6eb0297f5b34313f85f7dc0574720cb6c4c3010faa33bda0f4945b27"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -1021,20 +1021,7 @@ _ENGINE_IMPLEMENTED_PRIMARY_MISSION_IDS = engine_implemented_primary_mission_ids
 
 
 _SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
-    "primary-extract-relic": (
-        "engine_primary_condition:single_opponent_operation_marker_terrain_area_state",
-    ),
-    "primary-gather-intel": (
-        "engine_primary_condition:gather_intel_operation_marker_end_of_battle",
-    ),
-    "primary-locate-and-deny": (
-        "engine_primary_condition:single_friendly_operation_marker_terrain_area_state",
-    ),
-    "primary-surveil-the-foe": (
-        "engine_primary_condition:enemy_unit_surveilled_marker_exception",
-        "engine_primary_condition:no_enemy_operation_markers_on_battlefield",
-    ),
-    "primary-vital-link": ("engine_primary_condition:central_objective_operation_marker_bonus",),
+    "primary-surveil-the-foe": ("engine_primary_condition:enemy_unit_surveilled_marker_exception",),
 }
 
 

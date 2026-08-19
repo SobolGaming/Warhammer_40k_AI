@@ -163,6 +163,9 @@ from warhammer40k_core.engine.primary_mission_state_runtime import (
 from warhammer40k_core.engine.primary_mission_state_validation import (
     validate_primary_mission_progress_state,
 )
+from warhammer40k_core.engine.primary_scoring_boundary import (
+    score_primary_objective_control_boundary,
+)
 from warhammer40k_core.engine.primary_scoring_condition_evaluator import (
     PrimaryScoringConditionContext,
     evaluate_primary_scoring_condition,
@@ -552,7 +555,7 @@ def test_primary_policy_rejects_forged_end_of_battle_and_foreign_evidence(
         )
 
 
-def test_exact_twenty_implemented_primaries_build_typed_runtime_rules() -> None:
+def test_exact_twenty_four_implemented_primaries_build_typed_runtime_rules() -> None:
     mission_pack = warhammer_event_companion_2026_07_mission_pack()
     implemented_ids = {
         "primary-battlefield-dominance",
@@ -561,8 +564,11 @@ def test_exact_twenty_implemented_primaries_build_typed_runtime_rules() -> None:
         "primary-delaying-action",
         "primary-destroyers-wrath",
         "primary-determined-acquisition",
+        "primary-extract-relic",
+        "primary-gather-intel",
         "primary-immovable-object",
         "primary-inescapable-dominion",
+        "primary-locate-and-deny",
         "primary-meatgrinder",
         "primary-outmaneuver",
         "primary-punishment",
@@ -575,6 +581,7 @@ def test_exact_twenty_implemented_primaries_build_typed_runtime_rules() -> None:
         "primary-triangulation",
         "primary-unstoppable-force",
         "primary-vanguard-operation",
+        "primary-vital-link",
     }
     primary_by_id = {
         primary.primary_mission_id: primary for primary in mission_pack.primary_missions
@@ -5325,6 +5332,17 @@ def test_phase17n_turn_end_action_commits_marker_with_completion_event_authority
     ]
     lifecycle_state.primary_objective_turn_start_states = []
     lifecycle_state.primary_rules_unit_turn_start_snapshots = []
+    lifecycle_record = next(
+        candidate
+        for candidate in lifecycle_state.objective_control_records
+        if candidate.record_id == record.record_id
+    )
+    score_primary_objective_control_boundary(
+        state=lifecycle_state,
+        record=lifecycle_record,
+        end_of_battle=False,
+        event_log=decisions.event_log,
+    )
     restored_lifecycle = GameLifecycle.from_payload(
         GameLifecycle(decision_controller=decisions, state=lifecycle_state).to_payload()
     )

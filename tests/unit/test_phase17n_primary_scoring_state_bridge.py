@@ -6,13 +6,15 @@ from inspect import signature
 from typing import cast
 
 import pytest
-from tests.phase11c_command_phase_helpers import battle_state
+from tests.phase11c_command_phase_helpers import battle_state, with_model_offsets
 from tests.phase17n_primary_mission_helpers import (
     phase17n_action_turn_end_record,
     phase17n_event_setup,
     phase17n_started_primary_action_fixture,
+    phase17n_state_with_setup,
 )
 
+from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatus
 from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.battle_shock import BattleShockedUnitState
@@ -322,10 +324,8 @@ def test_phase17n_step5a_bridge_accepts_normal_lifecycle_death_trap_action() -> 
 def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -> None:
     package = warhammer_event_companion_2026_07_mission_pack()
     primary_by_id = {primary.primary_mission_id: primary for primary in package.primary_missions}
-    step5a_mission_ids = {
-        "primary-gather-intel",
-        "primary-extract-relic",
-        "primary-vital-link",
+    remaining_pending_mission_ids = {
+        "primary-surveil-the-foe",
     }
     coverage_by_id = {
         row.primary_mission_id: row for row in event_source.primary_mission_scoring_coverage_rows()
@@ -336,7 +336,7 @@ def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -
             row.status is event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED
             for row in coverage_by_id.values()
         )
-        == 20
+        == 24
     )
     assert (
         sum(
@@ -344,9 +344,9 @@ def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -
             is event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
             for row in coverage_by_id.values()
         )
-        == 5
+        == 1
     )
-    for mission_id in step5a_mission_ids:
+    for mission_id in remaining_pending_mission_ids:
         assert coverage_by_id[mission_id].status is (
             event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
         )
@@ -483,11 +483,15 @@ def persisted_primary_scoring_boundary() -> tuple[
         )
         for army in state.army_definitions
     ]
-    action_record = phase17n_action_turn_end_record(
-        state=state,
-        decisions=decisions,
-        controlled_target_id=target_id,
-        action=action,
+    if target_id != action.target_id:
+        raise AssertionError("Step 5A persisted fixture Action target drifted.")
+    action_record = resolve_objective_control(
+        ObjectiveControlContext.from_game_state(
+            state,
+            timing=ObjectiveControlTiming.TURN_END,
+            phase=BattlePhase.FIGHT,
+            ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
+        )
     )
     resolved = resolve_primary_mission_actions_at_turn_end(
         state=state,
@@ -1442,26 +1446,39 @@ def retained_objective_control_authority() -> tuple[
     ObjectiveControlRecord,
     ObjectiveControlRecordAuthority,
 ]:
-    state, _decisions, _action, _target_id = phase17n_started_primary_action_fixture(
-        layout_id="purge-the-foe-vs-priority-assets-layout-1",
-        attacker_force_disposition_id="purge-the-foe",
-        defender_force_disposition_id="priority-assets",
-        player_id="player-b",
-        mission_action_id="maintain-control",
-        current_phase=BattlePhase.FIGHT,
+    setup = phase17n_event_setup(
+        layout_id="disruption-vs-reconnaissance-layout-1",
+        attacker_force_disposition_id="disruption",
+        defender_force_disposition_id="reconnaissance",
     )
-    mission_setup = state.mission_setup
-    if mission_setup is None:
-        raise AssertionError("Step 5A sticky fixture requires mission setup.")
-    state.army_definitions = [
-        replace(
-            army,
-            force_disposition_id=mission_setup.primary_mission_assignment_for_player(
-                army.player_id
-            ).force_disposition_id,
-        )
+    state = phase17n_state_with_setup(
+        setup=setup,
+        active_player_id="player-b",
+        phase=BattlePhase.FIGHT,
+        battle_round=1,
+    )
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise AssertionError("Step 5A sticky fixture requires battlefield state.")
+    target_marker = next(
+        marker
+        for marker in setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+    )
+    player_b_unit = next(
+        unit
         for army in state.army_definitions
-    ]
+        if army.player_id == "player-b"
+        for unit in army.units
+    )
+    placement = battlefield.unit_placement_by_id(player_b_unit.unit_instance_id)
+    state.battlefield_state = battlefield.with_unit_placement(
+        with_model_offsets(
+            placement,
+            target_marker,
+            offsets=((0.0, 0.0), (1.0, 0.0), (2.0, 0.0), (0.0, 1.0), (1.0, 1.0)),
+        )
+    )
     base_record = resolve_objective_control(
         ObjectiveControlContext.from_game_state(
             state,
@@ -1479,12 +1496,6 @@ def retained_objective_control_authority() -> tuple[
         unit
         for army in state.army_definitions
         if army.player_id == "player-a"
-        for unit in army.units
-    )
-    player_b_unit = next(
-        unit
-        for army in state.army_definitions
-        if army.player_id == "player-b"
         for unit in army.units
     )
     sticky_state = StickyObjectiveControlState(

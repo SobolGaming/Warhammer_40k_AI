@@ -14,8 +14,8 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 
 ARTIFACT_SCHEMA: Final = "core-v2-phase17n-event-companion-primary-scoring-v6"
 SOURCE_PACKAGE_ID: Final = "gw-11e-warhammer-event-companion-v1-1-2026-07"
-EXPECTED_PACKAGE_HASH: Final = "eeee655d6f7c42902d0cebf4426c3758b9d88b82d120b5d88335bba49d71f3e5"
-EXPECTED_ARTIFACT_SHA256: Final = "1a5651f8328aadaae148df60d0e388445def27384909398f6c8825c14289eb0f"
+EXPECTED_PACKAGE_HASH: Final = "176a9b7b4e44666e473364a73f6971ea381c7d4024ee7af10ca2a5b8480e362d"
+EXPECTED_ARTIFACT_SHA256: Final = "98d872468ef19f688032898a4bc8721b9e91b8972227f79ef29ddf1264aa3e26"
 _ARTIFACT_PACKAGE: Final = "warhammer40k_core.rules.source_packages.warhammer_40000_11th"
 _ARTIFACT_PATH: Final = "event_companion_2026_06_artifacts/primary-scoring.json"
 _EXPECTED_TURN_SCOPES: Final = frozenset({"own_player_turn", "any_player_turn"})
@@ -72,8 +72,11 @@ _EXPECTED_ENGINE_IMPLEMENTED_SCORING_KINDS: Final = {
     "primary-delaying-action": "delaying_action",
     "primary-destroyers-wrath": "destroyers_wrath",
     "primary-determined-acquisition": "determined_acquisition",
+    "primary-extract-relic": "extract_relic",
+    "primary-gather-intel": "gather_intel",
     "primary-immovable-object": "immovable_object",
     "primary-inescapable-dominion": "inescapable_dominion",
+    "primary-locate-and-deny": "locate_and_deny",
     "primary-meatgrinder": "meatgrinder",
     "primary-outmaneuver": "outmaneuver",
     "primary-punishment": "punishment",
@@ -86,6 +89,7 @@ _EXPECTED_ENGINE_IMPLEMENTED_SCORING_KINDS: Final = {
     "primary-triangulation": "triangulation",
     "primary-unstoppable-force": "unstoppable_force",
     "primary-vanguard-operation": "vanguard_operation",
+    "primary-vital-link": "vital_link",
 }
 _EXPECTED_RESOLUTION_GROUPS: Final = {
     "battlefield-dominance-command-primary": (
