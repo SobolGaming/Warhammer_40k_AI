@@ -87,24 +87,6 @@ def test_phase17n_step5b_promotes_marker_primary_missions() -> None:
         assert all(rule.condition in SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS for rule in rules)
 
 
-def test_phase17n_step5b_keeps_remaining_condition_pending_missions_fail_closed() -> None:
-    package = warhammer_event_companion_2026_07_mission_pack()
-    primary_by_id = {primary.primary_mission_id: primary for primary in package.primary_missions}
-    for mission_id in ("primary-surveil-the-foe",):
-        assert (
-            primary_scoring_rules_from_definition(
-                primary_by_id[mission_id],
-                require_supported=False,
-            )
-            == ()
-        )
-        with pytest.raises(
-            GameLifecycleError,
-            match="source is known but engine implementation is pending",
-        ):
-            primary_scoring_rules_from_definition(primary_by_id[mission_id])
-
-
 def test_phase17n_step5b_marker_conditions_require_state_evidence() -> None:
     setup = _consecrate_setup()
     context = _objective_context(setup=setup, battle_round=2)

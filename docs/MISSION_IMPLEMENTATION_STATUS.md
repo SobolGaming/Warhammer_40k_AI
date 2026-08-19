@@ -67,7 +67,7 @@ Secondary status:
 ## Summary
 
 - Primary matrix cells: 25 of 25 `implemented`.
-- Primary scoring coverage: 24 of 25 `engine_implemented`, 1
+- Primary scoring coverage: 25 of 25 `engine_implemented`, 0
   `source_known_engine_pending`, 0 `awaiting_source`.
 - Phase 17N Step 4 exposes all ten source-backed Primary Mission Actions:
   `decoy-objective`, `triangulate-objective`, `extract-intelligence`,
@@ -105,10 +105,12 @@ Secondary status:
   pairings (33/45 variants).
 - Phase 17N Step 5E scores operation markers through the shared generic
   condition path. Gather Intel, Extract Relic, Locate and Deny, and Vital Link
-  are now `engine_implemented`. Surveil the Foe remains pending on
-  `engine_primary_condition:enemy_unit_surveilled_marker_exception`. Counts are
-  24/1 missions and 14/15 pairings (42/45 variants). Pairing-wide certification
-  is not claimed.
+  are now `engine_implemented`. Counts after Step 5E were 24/1 missions and
+  14/15 pairings (42/45 variants). Pairing-wide certification is not claimed.
+- Phase 17N Step 5F scores the Surveil the Foe surveilled-marker exception
+  through the same shared path. Surveil the Foe is now `engine_implemented`.
+  Counts are 25/0 missions and 15/15 pairings (45/45 variants). Pairing-wide
+  certification is not claimed.
 - Runtime Mission Actions: 14 total. The ten Step 4 Primary Actions join Death
   Trap's `booby-trap-terrain`, Terraform's `terraform-objective`, Cleanse's
   `cleanse-objective`, and Plunder's `plunder-terrain`. They are automatically
@@ -126,8 +128,8 @@ Secondary status:
 - Phase 17N has source-hashed executable battlefield packages for all 45 Event
   Companion layouts: all 15 Force Disposition pairings and each pairing's A/B/C
   variants. No layout identity remains geometry-pending.
-- Fourteen of the 15 two-sided Force Disposition pairings now have executable
-  Primaries in both directions, covering 42 of the 45 A/B/C layout variants.
+- All 15 of the 15 two-sided Force Disposition pairings now have executable
+  Primaries in both directions, covering 45 of the 45 A/B/C layout variants.
 - The local [Event Companion Battlefield Viewer](BATTLEFIELD_VIEWER.md)
   consumes `battlefield-view-v4-phase17n-step3` directly for every layout. It provides
   an orbitable 3D schematic of classifications, component footprints, walls,
@@ -219,12 +221,12 @@ Secondary status:
 - All 25 Primary missions' source timing, VP values, structured condition
   tokens, current engine-support status, and the ten source-backed Primary Mission
   Action descriptors are committed in `primary-scoring.json`. Its package hash
-  is `176a9b7b4e44666e473364a73f6971ea381c7d4024ee7af10ca2a5b8480e362d`
+  is `8358cc11078b27e8773f58182e40bbf6194c54c3bda16b3aa1e286ee9b646dd1`
   and its raw artifact SHA-256 is
-  `98d872468ef19f688032898a4bc8721b9e91b8972227f79ef29ddf1264aa3e26`.
+  `4783a4013a485cc4e6ef1669be2c12c19fa44e5175a5a220c17809b8a54774b7`.
   The typed loader pins both hashes, the exact 25-mission/100-rule/10-action
   inventory, the exact nine-token timing vocabulary plus rule-level `turn_scope`, the complete resolution
-  group grammar, and the honest 24 `engine_implemented` versus 1
+  group grammar, and the honest 25 `engine_implemented` versus 0
   `source_known_engine_pending` boundary. Repository reviews are pinned to PRs
   #107, #134, #136, and #379. PR #107 is the source-backed origin for Death
   Trap, Immovable Object, and Unstoppable Force. Only Meatgrinder currently
@@ -244,7 +246,7 @@ Secondary status:
   timing string is insufficient. The same validator runs for live awards and
   restored ledgers, including ordinary per-round Primary-total validation. The
   derived Event Companion source identity is
-  `ae1f215a6eb0297f5b34313f85f7dc0574720cb6c4c3010faa33bda0f4945b27`.
+  `5a4dcccfa86bbecc8ded95275c39ee5401ce0e27e5f426c28ae4575e02114812`.
 - Verify that the committed battlefield artifact still matches its reviewed
   inputs without writing files with
   `uv run python tools/build_event_companion_battlefields.py --check`.
@@ -258,10 +260,9 @@ Secondary status:
   promotes Secure Asset, Sabotage, and Vanguard Operation on completed-action
   evidence. Step 5D then promotes Punishment on condemned-departure evidence.
   Step 5E then promotes Gather Intel, Extract Relic, Locate and Deny, and
-  Vital Link on operation-marker evidence. Surveil the Foe remains fail-closed
-  until its listed surveilled-marker exception has engine-owned evidence.
-  Battlefield pages are authority for layout facts, not mission-card scoring
-  clauses.
+  Vital Link on operation-marker evidence. Step 5F then promotes Surveil the Foe
+  on the surveilled-marker exception. Battlefield pages are authority for layout
+  facts, not mission-card scoring clauses.
 - Component source-image placement and orientation come from reviewed
   source-page affine records. Ruin and non-ruin envelopes use dimensions rounded
   to the 0.05-inch grid and checked against the reviewed source-image spans.
@@ -322,7 +323,7 @@ five-battle-round game, as configured by the current Event Companion package.
 | `disruption` | `priority-assets` | Locate and Deny | `primary-locate-and-deny` | `implemented` | `engine_implemented` | 4 | 1 | None |
 | `reconnaissance` | `purge-the-foe` | Triangulation | `primary-triangulation` | `implemented` | `engine_implemented` | 5 | 1 | None |
 | `reconnaissance` | `take-and-hold` | Reconnaissance Sweep | `primary-reconnaissance-sweep` | `implemented` | `engine_implemented` | 4 | 0 | None |
-| `reconnaissance` | `disruption` | Surveil the Foe | `primary-surveil-the-foe` | `implemented` | `source_known_engine_pending` | 4 | 1 | `engine_primary_condition:enemy_unit_surveilled_marker_exception` |
+| `reconnaissance` | `disruption` | Surveil the Foe | `primary-surveil-the-foe` | `implemented` | `engine_implemented` | 4 | 1 | None |
 | `reconnaissance` | `reconnaissance` | Gather Intel | `primary-gather-intel` | `implemented` | `engine_implemented` | 5 | 1 | None |
 | `reconnaissance` | `priority-assets` | Search and Scour | `primary-search-and-scour` | `implemented` | `engine_implemented` | 4 | 0 | None |
 | `priority-assets` | `purge-the-foe` | Vital Link | `primary-vital-link` | `implemented` | `engine_implemented` | 5 | 1 | None |
@@ -441,7 +442,7 @@ five-battle-round game, as configured by the current Event Companion package.
   and Vanguard Operation through completed-action scoring conditions. Step 5D
   promotes Punishment through condemned battlefield-departure scoring. Step 5E
   promotes Gather Intel, Extract Relic, Locate and Deny, and Vital Link through
-  operation-marker scoring. Surveil the Foe remains fail-closed on its
+  operation-marker scoring. Step 5F promotes Surveil the Foe through the
   surveilled-marker exception. Pairing-wide normal-lifecycle, replay, and
   viewer-scoped projection certification remains later Phase 17N Step 5 work.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,

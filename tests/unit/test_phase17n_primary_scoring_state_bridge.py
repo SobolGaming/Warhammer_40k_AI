@@ -68,6 +68,7 @@ from warhammer40k_core.engine.primary_scoring_boundary import (
     score_primary_objective_control_boundary,
 )
 from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
+    PrimaryScoringBoundaryLifecycle,
     resolve_primary_scoring_boundary_lifecycle,
 )
 from warhammer40k_core.engine.primary_scoring_condition_evaluator import (
@@ -321,12 +322,9 @@ def test_phase17n_step5a_bridge_accepts_normal_lifecycle_death_trap_action() -> 
     assert evidence.primary_mission_action_states == (action,)
 
 
-def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -> None:
+def test_phase17n_step5a_promotes_all_primary_missions_as_engine_implemented() -> None:
     package = warhammer_event_companion_2026_07_mission_pack()
     primary_by_id = {primary.primary_mission_id: primary for primary in package.primary_missions}
-    remaining_pending_mission_ids = {
-        "primary-surveil-the-foe",
-    }
     coverage_by_id = {
         row.primary_mission_id: row for row in event_source.primary_mission_scoring_coverage_rows()
     }
@@ -336,7 +334,7 @@ def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -
             row.status is event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED
             for row in coverage_by_id.values()
         )
-        == 24
+        == 25
     )
     assert (
         sum(
@@ -344,24 +342,13 @@ def test_phase17n_step5a_does_not_promote_condition_pending_primary_missions() -
             is event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
             for row in coverage_by_id.values()
         )
-        == 1
+        == 0
     )
-    for mission_id in remaining_pending_mission_ids:
-        assert coverage_by_id[mission_id].status is (
-            event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
-        )
-        assert (
-            primary_scoring_rules_from_definition(
-                primary_by_id[mission_id],
-                require_supported=False,
-            )
-            == ()
-        )
-        with pytest.raises(
-            GameLifecycleError,
-            match="source is known but engine implementation is pending",
-        ):
-            primary_scoring_rules_from_definition(primary_by_id[mission_id])
+    rules = primary_scoring_rules_from_definition(primary_by_id["primary-surveil-the-foe"])
+    assert rules
+    assert coverage_by_id["primary-surveil-the-foe"].status is (
+        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED
+    )
 
 
 @pytest.fixture(scope="module")
@@ -1518,6 +1505,11 @@ def retained_objective_control_authority() -> tuple[
         states=(sticky_state,),
     )
     state.record_objective_control_record(retained_record)
+    score_primary_objective_control_boundary(
+        state=state,
+        record=retained_record,
+        end_of_battle=False,
+    )
     return state, retained_record, state.objective_control_record_authorities[-1]
 
 
@@ -2028,6 +2020,41 @@ def _coordinated_objective_control_authority_payload(
             else retained_sticky_objective_control_states
         ),
     )
+    rebuilt_evidence = tuple(
+        _rebuild_state_evidence(evidence, record=forged_record)
+        if evidence.objective_control_record_id == forged_record.record_id
+        else evidence
+        for evidence in state.primary_scoring_state_evidence_records
+    )
+    evidence_id_by_previous_id = {
+        previous.evidence_id: rebuilt.evidence_id
+        for previous, rebuilt in zip(
+            state.primary_scoring_state_evidence_records,
+            rebuilt_evidence,
+            strict=True,
+        )
+    }
+    rebuilt_lifecycles = tuple(
+        PrimaryScoringBoundaryLifecycle.create(
+            objective_control_record_id=row.objective_control_record_id,
+            objective_control_record_hash=objective_control_record_hash(forged_record),
+            scoring_boundary_kind=row.scoring_boundary_kind,
+            status=row.status,
+            pending_window=row.pending_window,
+            pending_decision_request_id=row.pending_decision_request_id,
+            scoring_commit_checkpoint_id=row.scoring_commit_checkpoint_id,
+            scoring_commit_checkpoint_hash=row.scoring_commit_checkpoint_hash,
+            evidence_id=(
+                None
+                if row.evidence_id is None
+                else evidence_id_by_previous_id.get(row.evidence_id, row.evidence_id)
+            ),
+            primary_transaction_ids=row.primary_transaction_ids,
+        )
+        if row.objective_control_record_id == forged_record.record_id
+        else row
+        for row in state.primary_scoring_boundary_lifecycles
+    )
     payload = deepcopy(state.to_payload())
     payload["objective_control_records"] = [
         forged_record.to_payload() if record["record_id"] == forged_record.record_id else record
@@ -2038,6 +2065,12 @@ def _coordinated_objective_control_authority_payload(
         if stored["objective_control_record_id"] == forged_record.record_id
         else stored
         for stored in payload["objective_control_record_authorities"]
+    ]
+    payload["primary_scoring_state_evidence_records"] = [
+        evidence.to_payload() for evidence in rebuilt_evidence
+    ]
+    payload["primary_scoring_boundary_lifecycles"] = [
+        row.to_payload() for row in rebuilt_lifecycles
     ]
     return payload
 

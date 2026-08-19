@@ -1399,8 +1399,8 @@
     {
       "primary_mission_id": "primary-surveil-the-foe",
       "mission_name": "Surveil the Foe",
-      "engine_support_status": "source_known_engine_pending",
-      "scoring_kind": "event_companion_primary_source_known_engine_pending",
+      "engine_support_status": "engine_implemented",
+      "scoring_kind": "surveil_the_foe",
       "max_vp_per_turn": 15,
       "vp_per_controlled_objective": null,
       "scoring_rules": [
@@ -1966,5 +1966,5 @@
       "source_id": "gw-11e-warhammer-event-companion-v1-1-2026-07:primary-choice-rule:punishment-condemn-enemy-units"
     }
   ],
-  "package_hash": "176a9b7b4e44666e473364a73f6971ea381c7d4024ee7af10ca2a5b8480e362d"
+  "package_hash": "8358cc11078b27e8773f58182e40bbf6194c54c3bda16b3aa1e286ee9b646dd1"
 }

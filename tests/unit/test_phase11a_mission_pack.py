@@ -1023,7 +1023,7 @@ def test_mission_scoring_policies_resolve_asymmetric_player_primaries() -> None:
         ("disruption", "reconnaissance"),
     ],
 )
-def test_mission_scoring_policies_defer_pending_primary_failure_to_owning_path(
+def test_mission_scoring_policies_support_both_disruption_reconnaissance_primaries(
     attacker_force_disposition_id: str,
     defender_force_disposition_id: str,
 ) -> None:
@@ -1037,29 +1037,20 @@ def test_mission_scoring_policies_defer_pending_primary_failure_to_owning_path(
     )
 
     policies = mission_scoring_policies_from_setup(setup)
-    implemented = next(
-        policy for policy in policies.player_policies if policy.primary_scoring_supported
-    )
-    pending = next(
-        policy for policy in policies.player_policies if not policy.primary_scoring_supported
-    )
+    mission_ids = {
+        policy.primary_mission_id
+        for policy in policies.player_policies
+        if policy.primary_scoring_supported
+    }
 
-    assert implemented.primary_mission_id == "primary-smoke-and-mirrors"
-    assert pending.primary_mission_id == "primary-surveil-the-foe"
-    assert (
-        implemented.cap_bucket_for_victory_point_source(
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id=implemented.primary_mission_id,
-        ).value
-        == "primary"
-    )
-    with pytest.raises(
-        GameLifecycleError,
-        match="Primary mission scoring source is known but engine implementation is pending",
-    ):
-        pending.cap_bucket_for_victory_point_source(
-            source_kind=VictoryPointSourceKind.PRIMARY,
-            source_id=pending.primary_mission_id,
+    assert mission_ids == {"primary-smoke-and-mirrors", "primary-surveil-the-foe"}
+    for policy in policies.player_policies:
+        assert (
+            policy.cap_bucket_for_victory_point_source(
+                source_kind=VictoryPointSourceKind.PRIMARY,
+                source_id=policy.primary_mission_id,
+            ).value
+            == "primary"
         )
 
 
