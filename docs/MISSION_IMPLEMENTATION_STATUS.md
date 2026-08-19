@@ -125,9 +125,9 @@ Secondary status:
   `cleanse-objective`, and Plunder's `plunder-terrain`. They are automatically
   exposed before Shooting-unit selection only when the active player owns the
   applicable Primary or Secondary.
-- Secondary missions: 18 `source_tracked` and `policy_loaded`.
-- Secondary scoring rows: 4 fixed policy rows, 20 tactical policy rows, and 28
-  source-only branch/procedure rows.
+- Secondary missions: 18 `source_tracked`, `policy_loaded`, and `state_backed`.
+- Secondary scoring rows: 6 fixed policy rows, 26 tactical policy rows, and 8
+  source-only When Drawn/definition rows.
 - Tournament fixed secondaries: 4 cards are flagged as fixed-allowed
   (`A Grievous Blow`, `Assassination`, `Bring It Down`,
   `Engage on All Fronts`).
@@ -258,7 +258,7 @@ Secondary status:
   timing string is insufficient. The same validator runs for live awards and
   restored ledgers, including ordinary per-round Primary-total validation. The
   derived Event Companion source identity is
-  `5a4dcccfa86bbecc8ded95275c39ee5401ce0e27e5f426c28ae4575e02114812`.
+  `4b23bfe02563942bf866827c2a36eb218cb11ba3f4af7f3169c8fbc784cbb82d`.
 - Verify that the committed battlefield artifact still matches its reviewed
   inputs without writing files with
   `uv run python tools/build_event_companion_battlefields.py --check`.
@@ -349,20 +349,20 @@ five-battle-round game, as configured by the current Event Companion package.
 | Secondary Mission | Mission ID | Availability | Tournament Fixed | Fixed Rules | Tactical Rules | Other Rows | Status | Engine Notes |
 | --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |
 | A Grievous Blow | `a-grievous-blow` | `both` | Yes | 1 | 1 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Tracks `each_enemy_unit_starting_strength_13_or_more_destroyed_this_turn`; When Drawn discard row remains source-only |
-| A Tempting Target | `a-tempting-target` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track opponent target selection and target control |
-| Assassination | `assassination` | `both` | Yes | 1 | 1 | 4 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track W4+/W3-or-less Character branches and Tactical Character branches |
-| Beacon | `beacon` | `tactical` | No | 0 | 1 | 3 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track beacon choice and outside-deployment/territory branches |
-| Behind Enemy Lines | `behind-enemy-lines` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track first-round redraw and each-unit scoring |
+| A Tempting Target | `a-tempting-target` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Opponent selects one No Man's Land non-home objective; scores 5 VP if you control it at the end of your turn |
+| Assassination | `assassination` | `both` | Yes | 2 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Fixed: 3 VP per enemy CHARACTER model destroyed this turn plus 1 VP for each of those with W 4+; Tactical exclusive 5 VP for one or more this turn or all enemy CHARACTER models destroyed during the battle |
+| Beacon | `beacon` | `tactical` | No | 0 | 2 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Owner selects a battlefield or embarked-Transport unit; exclusive 3 VP outside own DZ or 5 VP outside own territory at opponent turn end or round five |
+| Behind Enemy Lines | `behind-enemy-lines` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | 3 VP per eligible friendly unit wholly within the opponent DZ, capped at 5 VP; first-round shuffle-back remains source-only |
 | Bring It Down | `bring-it-down` | `both` | Yes | 1 | 1 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Tracks `each_enemy_model_w10_or_more_destroyed_this_turn` with fixed and tactical caps; When Drawn discard row remains source-only |
-| Burden of Trust | `burden-of-trust` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track guard selection and guarded-objective scoring |
-| Centre Ground | `centre-ground` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track 3VP/5VP centre-distance branches |
+| Burden of Trust | `burden-of-trust` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Per-objective guard selection; 2 VP per guarded objective at opponent turn end or round five, capped at 5 VP |
+| Centre Ground | `centre-ground` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Exclusive 3 VP / 5 VP centre occupancy with enemy exclusion at 3" or 6" |
 | Cleanse | `cleanse` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks objective cleanse counts; runtime action `cleanse-objective` exists |
 | Defend Stronghold | `defend-stronghold` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks home objective control and enemy absence from own deployment zone |
-| Display of Might | `display-of-might` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track own-turn and opponent-turn No Man's Land unit-count branches |
-| Engage on All Fronts | `engage-on-all-fronts` | `both` | Yes | 1 | 1 | 5 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track presence definition and fixed/tactical three-/four-quarter branches |
-| Forward Position | `forward-position` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track first-round redraw and forward-objective control |
+| Display of Might | `display-of-might` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | 2 VP at own turn end or 5 VP at opponent turn end if more eligible friendly than enemy units are wholly within No Man's Land |
+| Engage on All Fronts | `engage-on-all-fronts` | `both` | Yes | 2 | 2 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Presence definition remains source-only; exactly three or four occupied table quarters score 2/4 Fixed or 3/5 Tactical |
+| Forward Position | `forward-position` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | 5 VP if you control the opponent home objective and/or each expansion objective; first-round shuffle-back remains source-only |
 | No Prisoners | `no-prisoners` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `each_enemy_unit_destroyed_this_turn` |
-| Outflank | `outflank` | `tactical` | No | 0 | 1 | 2 | `source_tracked`, `policy_loaded`, `source_only_rows` | `generic_condition`; source-only rows track one-edge and opposite-edge branches |
+| Outflank | `outflank` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Exclusive 3 VP near one or more battlefield edges outside own territory, or 5 VP on opposite parallel edges |
 | Overwhelming Force | `overwhelming-force` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `each_enemy_unit_started_turn_in_range_of_objective_destroyed` |
 | Plunder | `plunder` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks terrain plunder state; runtime action `plunder-terrain` exists |
 | Secure No Man's Land | `secure-no-mans-land` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `control_two_or_more_no_mans_land_objectives_excluding_home` through objective-control records filtered to central/No Man's Land objectives |
@@ -461,8 +461,11 @@ five-battle-round game, as configured by the current Event Companion package.
   lifecycle/restore/viewer certification row; A/B/C remain in the fail-closed
   inventory and instantiate two-sided scoring policies.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,
-  tactical draw, scoring, retain/discard, Fixed card states that remain active
-  after scoring, the 20 VP per Fixed Mission card cap, state-backed awards, and
-  source-only branch/procedure rows. Individual card achievement semantics still
-  need card-specific tests before moving from `generic_condition` or
-  `source_only_rows` to `state_backed`.
+  tactical draw, When Drawn keep/discard/shuffle, Beacon/Tempting Target/Burden
+  of Trust selections, scoring, retain/discard, Fixed card states that remain
+  active after scoring, the 20 VP per Fixed Mission card cap, and state-backed
+  awards for all 18 cards. When Drawn and Engage presence-definition rows remain
+  source-only procedure/definition text. Step 6G certifies every card/mode
+  through both players on one Layout A battlefield via `LocalGameSession`.
+  Layouts B and C are not Secondary-certified. This does not claim Phase 17N
+  overall complete or Phase 20A.

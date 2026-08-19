@@ -41,6 +41,16 @@ commitments. Coverage is a `GameLifecycle` and event-log restore round-trip,
 not `ReplayRunner` replay certification. Replay remains
 `replay-artifact-v8-phase17n-step5a`.
 
+Phase 17N Step 6 scores all 18 Secondary Mission cards through source-backed
+turn-end awards and adds four finite Command-phase setup decisions:
+`resolve_tactical_secondary_when_drawn`, `select_tempting_target_objective`,
+`select_beacon_unit`, and `select_burden_of_trust_guard`. When Drawn, Beacon,
+and Burden of Trust requests are owner-secret. Tempting Target is a public
+opponent choice. Tactical score/retain still uses
+`score_tactical_secondary_mission`. Replay remains
+`replay-artifact-v8-phase17n-step5a`. This does not claim Phase 17N overall
+complete or Phase 20A.
+
 The short rule:
 
 All clients share the same authoritative submission contract. Adapters may differ only in how they render, choose, transmit, or generate submissions. No adapter gets a private mutation path, a private rules path, or a bypass around replay-facing `DecisionRecord` and `EventRecord` generation.
@@ -863,6 +873,10 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   only resolves the current Command-phase replacement window.
 - `discard_tactical_secondary_mission`: the engine emits one option for each non-empty set of active Tactical secondary cards the player can discard. Single-card options retain the `discard:<secondary_mission_id>` option shape, while multi-card options use `discard:<secondary_mission_id>+<secondary_mission_id>`. The request payload includes `legal_secondary_mission_ids`, `legal_secondary_mission_id_sets`, `discard_cp_reward_window_id`, and `discard_cp_reward_window_used`. The selected option payload includes the game, player, active player, battle round, phase, `secondary_mission_ids`, and `discard_cp_reward_window_id`. The lifecycle applies all selected discards and emits `tactical_secondary_missions_discarded`. Under Chapter Approved 2026-27, ordinary Tactical discard awards exactly 1 CP once for the active player's own-turn discard window, even when multiple active Tactical secondaries are discarded together. After that window is consumed, additional own-turn discard requests are unsupported until the lifecycle reaches a new source-backed discard window. Opponent-turn discards are legal but emit `command_point_reward_eligible: false` and no `command_point_gain`.
 - `score_tactical_secondary_mission`: when the engine records a source-backed `TacticalSecondaryAchievementContext` proving that a Tactical Secondary Mission Card's requirements have been achieved, it emits a finite choice for that context. Merely having an active Tactical card is not sufficient to emit this decision. The selected option payload includes the `achievement_id`, card identity, scoring rule ID, scoring rule condition, scoring rule source ID, scoring timing, phase/round/actor context, and JSON-safe achievement evidence. The `score:<secondary_mission_id>` option awards the source-backed VP, marks the card scored/non-active, consumes the achievement context, and emits `tactical_secondary_mission_scored` with `discarded_after_score: true`. The `retain:<secondary_mission_id>` option awards no VP, leaves the card active, consumes the finite achievement context, and emits `tactical_secondary_mission_score_declined`. Stale score/retain submissions are rejected before queue pop if the achievement context is missing, mismatched, stale, no longer source-valid, no longer matches the active card, the phase/round/actor drifted, or the source-backed scoring metadata changed.
+- `resolve_tactical_secondary_when_drawn`: after a Tactical Secondary draw in Command, the engine may emit a keep-or-discard choice for A Grievous Blow and Bring It Down, or a first-battle-round shuffle-back choice for Behind Enemy Lines and Forward Position. Keep/remain is the first option. The engine auto-keeps Grievous Blow or Bring It Down when the discard condition is already ineligible. Shuffle-back removes the card from that player's excluded IDs so it can be redrawn. The request is owner-secret.
+- `select_tempting_target_objective`: when A Tempting Target is drawn, the opponent selects one objective in No Man's Land excluding home objectives. The request is public. Option IDs are engine-enumerated objective marker IDs.
+- `select_beacon_unit`: when Beacon is drawn, the owner selects one friendly unit on the battlefield or embarked within a TRANSPORT on the battlefield. The request is owner-secret.
+- `select_burden_of_trust_guard`: when Burden of Trust is drawn and at the start of each of the owner's later turns, the engine emits sequential per-objective unit-or-skip choices. Skip is the first option and still marks that objective resolved for the current round. The request is owner-secret.
 - `start_mission_action`: before ordinary Shooting-unit selection, the engine
   automatically enumerates the active Primary Mission's supported Actions, the
   active player's selected Fixed Secondary Actions, and the player's currently

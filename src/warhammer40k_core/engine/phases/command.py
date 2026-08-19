@@ -197,6 +197,31 @@ class CommandPhaseHandler:
                 active_player_id=active_player_id,
             )
 
+        if (
+            not command_state.tactical_secondary_resolved
+            and choice.mode is SecondaryMissionMode.TACTICAL
+        ):
+            from warhammer40k_core.engine.secondary_when_drawn import (
+                next_tactical_secondary_when_drawn_request,
+            )
+
+            when_drawn_status = next_tactical_secondary_when_drawn_request(
+                state=state,
+                decisions=decisions,
+            )
+            if when_drawn_status is not None:
+                return when_drawn_status
+            from warhammer40k_core.engine.secondary_mission_choices import (
+                next_secondary_mission_choice_request,
+            )
+
+            choice_status = next_secondary_mission_choice_request(
+                state=state,
+                decisions=decisions,
+            )
+            if choice_status is not None:
+                return choice_status
+
         if not command_state.tactical_secondary_resolved:
             state.replace_command_step_state(command_state.with_tactical_secondary_resolved())
             command_state = _command_step_state(state)
@@ -386,8 +411,6 @@ def _apply_tactical_secondary_draw(
             ],
         },
     )
-    command_state = _command_step_state(state)
-    state.replace_command_step_state(command_state.with_tactical_secondary_resolved())
 
 
 def _apply_tactical_secondary_replacement(

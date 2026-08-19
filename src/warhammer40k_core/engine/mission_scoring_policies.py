@@ -32,6 +32,7 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointLedger,
     VictoryPointSourceKind,
 )
+from warhammer40k_core.engine.secondary_scoring_conditions import SecondaryScoringConditionContext
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 
 if TYPE_CHECKING:
@@ -293,6 +294,7 @@ class MissionScoringPolicies:
         terrain_plunder_states: tuple[SecondaryTerrainPlunderState, ...],
         enemy_unit_ids_in_player_deployment_zone: tuple[str, ...],
         starting_strength_records: tuple[StartingStrengthRecord, ...] = (),
+        condition_context: SecondaryScoringConditionContext | None = None,
     ) -> VictoryPointAward | None:
         self.validate_mission_setup(mission_setup)
         return self.policy_for_player(player_id).secondary_award_from_mission_state(
@@ -309,6 +311,7 @@ class MissionScoringPolicies:
             terrain_plunder_states=terrain_plunder_states,
             enemy_unit_ids_in_player_deployment_zone=enemy_unit_ids_in_player_deployment_zone,
             starting_strength_records=starting_strength_records,
+            condition_context=condition_context,
         )
 
     def mission_action_award(

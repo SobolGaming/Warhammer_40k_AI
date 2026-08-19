@@ -347,7 +347,11 @@ def test_restore_rejects_pending_boundary_without_queue_authority() -> None:
 
 
 def test_unmet_secondary_leaves_lifecycle_payload_unchanged_when_primary_would_score() -> None:
-    lifecycle = _battlefield_dominance_lifecycle(phase=BattlePhase.FIGHT, battle_round=2)
+    lifecycle = _battlefield_dominance_lifecycle(
+        phase=BattlePhase.FIGHT,
+        battle_round=2,
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+    )
     state = lifecycle.state
     assert state is not None
     _place_player_on_role(state, player_id="player-a", role=ObjectiveMarkerRole.CENTRAL)
@@ -378,7 +382,11 @@ def test_unmet_secondary_leaves_lifecycle_payload_unchanged_when_primary_would_s
 
 
 def test_unmet_secondary_at_zero_award_primary_boundary_leaves_no_oc_or_evidence() -> None:
-    lifecycle = _battlefield_dominance_lifecycle(phase=BattlePhase.FIGHT, battle_round=1)
+    lifecycle = _battlefield_dominance_lifecycle(
+        phase=BattlePhase.FIGHT,
+        battle_round=1,
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+    )
     state = lifecycle.state
     assert state is not None
     state.record_secondary_mission_card_state(
@@ -4041,6 +4049,7 @@ def _battlefield_dominance_lifecycle(
     *,
     phase: BattlePhase,
     battle_round: int,
+    player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
 ) -> GameLifecycle:
     setup = phase17n_event_setup(
         layout_id="take-and-hold-vs-take-and-hold-layout-1",
@@ -4052,6 +4061,7 @@ def _battlefield_dominance_lifecycle(
         active_player_id="player-a",
         phase=phase,
         battle_round=battle_round,
+        player_a_secondary=player_a_secondary,
     )
     return GameLifecycle(state=state, decision_controller=DecisionController())
 

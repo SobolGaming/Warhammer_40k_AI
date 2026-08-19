@@ -17,6 +17,11 @@ from tests.phase13b_shooting_declaration_helpers import (
     _fixed_roll_result,
 )
 from tests.phase17n_primary_mission_helpers import append_authenticated_normal_move
+from tests.phase17n_secondary_mission_helpers import (
+    drain_pending_secondary_mission_setup,
+    resolved_secondary_mission_selection_for_card,
+    seed_resolved_secondary_mission_selections,
+)
 from tests.setup_completion_helpers import enter_battle_for_fixture
 
 from warhammer40k_core.adapters.access_control import AuthenticatedPrincipal, PrincipalRole
@@ -204,6 +209,9 @@ from warhammer40k_core.engine.primary_reserve_entry_provider import (
     PrimaryReserveEntryProvider,
     PrimaryReserveEntryProviderKind,
 )
+from warhammer40k_core.engine.primary_scoring_boundary import (
+    score_primary_objective_control_boundary,
+)
 from warhammer40k_core.engine.primary_scoring_conditions import (
     PrimaryUnitDestructionEvidence,
     cross_turn_destruction_comparison_evidence,
@@ -271,6 +279,10 @@ from warhammer40k_core.engine.scoring import (
     secondary_mission_card_mode_from_token,
     secondary_mission_card_status_from_token,
     victory_point_source_kind_from_token,
+)
+from warhammer40k_core.engine.secondary_tactical_achievement import (
+    expected_tactical_secondary_award_from_state,
+    tactical_secondary_achievement_context_from_award,
 )
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.shooting_types import ShootingType
@@ -4399,7 +4411,7 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
 
     scored = state.score_secondary_mission(
         player_id="player-a",
-        secondary_mission_id="assassination",
+        secondary_mission_id="bring-it-down",
         mode=SecondaryMissionCardMode.FIXED,
         phase=BattlePhase.COMMAND,
     )
@@ -4410,7 +4422,7 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
     assert (
         state.secondary_mission_card_state(
             player_id="player-a",
-            secondary_mission_id="assassination",
+            secondary_mission_id="bring-it-down",
             mode=SecondaryMissionCardMode.FIXED,
         )
         is not None
@@ -4421,7 +4433,7 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
     own_transactions = cast(list[JsonValue], own_ledger["transactions"])
     own_transaction = cast(dict[str, JsonValue], own_transactions[0])
     opponent_transactions = cast(list[JsonValue], opponent_ledger["transactions"])
-    assert own_transaction["source_id"] == "assassination"
+    assert own_transaction["source_id"] == "bring-it-down"
     assert opponent_transactions[0] == {
         "transaction_id": "victory-point:player-a:round-01:000001",
         "player_id": "player-a",
@@ -4429,23 +4441,23 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
         "phase": "command",
         "amount": 4,
         "source_kind": "fixed_secondary",
-        "source_id": "assassination",
+        "source_id": "bring-it-down",
         "scoring_timing": "secondary_mission_score",
         "hidden": False,
         "metadata": {
             "secondary_scoring_provider_kind": "legacy_phase11f",
-            "secondary_mission_id": "assassination",
-            "scoring_rule_id": "assassination-fixed",
-            "scoring_rule_condition": "fixed_secondary_condition",
+            "secondary_mission_id": "bring-it-down",
+            "scoring_rule_id": "bring-it-down-fixed",
+            "scoring_rule_condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
             "scoring_rule_source_id": (
-                "gw-11e-chapter-approved-2026-27:secondary:assassination:"
-                "scoring-rule:assassination-fixed"
+                "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
+                "scoring-rule:bring-it-down-fixed"
             ),
         },
     }
     assert any(
         card_payload["player_id"] == "player-a"
-        and card_payload["secondary_mission_id"] == "assassination"
+        and card_payload["secondary_mission_id"] == "bring-it-down"
         and card_payload["mode"] == "fixed"
         and card_payload["status"] == "active"
         and card_payload["hidden"] is False
@@ -4458,7 +4470,7 @@ def test_fixed_secondary_cards_remain_active_and_cap_at_twenty_vp_per_mission() 
     scored_cards = [
         state.score_secondary_mission(
             player_id="player-a",
-            secondary_mission_id="assassination",
+            secondary_mission_id="bring-it-down",
             mode=SecondaryMissionCardMode.FIXED,
             phase=BattlePhase.COMMAND,
         )
@@ -4544,24 +4556,29 @@ def test_state_backed_secondary_scoring_closes_zero_award_primary_boundary_once(
     card_mode: SecondaryMissionCardMode,
     expected_secondary_vp: int,
 ) -> None:
-    config = _config()
+    config = _config_with_player_b_vehicles(("vehicle-unit-3",))
     lifecycle = GameLifecycle()
     lifecycle.start(config)
     state = _battle_state_from_config(
         config,
         player_a_secondary=secondary_mode,
+        player_a_fixed_mission_ids=("bring-it-down", "assassination"),
         decisions=lifecycle.decision_controller,
     )
     lifecycle.state = state
     if card_mode is SecondaryMissionCardMode.TACTICAL:
+        tactical_card = SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="bring-it-down",
+            battle_round=1,
+            source_result_id="phase17n-secondary-boundary-draw",
+        )
         state.record_secondary_mission_card_state(
-            SecondaryMissionCardState.active_tactical(
-                player_id="player-a",
-                secondary_mission_id="assassination",
-                battle_round=1,
-                source_result_id="phase17n-secondary-boundary-draw",
+            tactical_card.with_selection(
+                resolved_secondary_mission_selection_for_card(state, tactical_card)
             )
         )
+    _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-3")
     flow = BattleRoundFlow(
         phase_handlers={
             phase: PlaceholderPhaseHandler(phase) for phase in state.battle_phase_sequence
@@ -4580,7 +4597,7 @@ def test_state_backed_secondary_scoring_closes_zero_award_primary_boundary_once(
 
     state.score_secondary_mission_from_state(
         player_id="player-a",
-        secondary_mission_id="assassination",
+        secondary_mission_id="bring-it-down",
         mode=card_mode,
         phase=BattlePhase.FIGHT,
         event_log=lifecycle.decision_controller.event_log,
@@ -5747,7 +5764,7 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
         "secondary_scoring_provider_kind": "legacy_phase11f",
         "secondary_mission_id": active_cards[0].secondary_mission_id,
         "scoring_rule_id": f"{active_cards[0].secondary_mission_id}-tactical",
-        "scoring_rule_condition": "tactical_secondary_condition",
+        "scoring_rule_condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
         "scoring_rule_source_id": (
             f"gw-11e-chapter-approved-2026-27:secondary:"
             f"{active_cards[0].secondary_mission_id}:scoring-rule:"
@@ -5956,7 +5973,7 @@ def test_phase14j_tactical_secondary_score_decision_can_score_or_retain_card() -
     assert transaction["source_kind"] == "tactical_secondary"
     assert transaction["source_id"] == score_card.secondary_mission_id
     transaction_metadata = cast(dict[str, JsonValue], transaction["metadata"])
-    assert transaction_metadata["scoring_rule_source_id"] == score_context.scoring_rule_source_id
+    assert transaction_metadata["scoring_rule_source_ids"] == [score_context.scoring_rule_source_id]
 
 
 def test_phase14j_tactical_secondary_score_rejects_drifted_lifecycle_option() -> None:
@@ -8803,7 +8820,7 @@ def test_victory_point_ledger_round_trips_without_object_reprs() -> None:
     state = _battle_state()
     state.score_secondary_mission(
         player_id="player-a",
-        secondary_mission_id="assassination",
+        secondary_mission_id="bring-it-down",
         mode=SecondaryMissionCardMode.FIXED,
         phase=BattlePhase.COMMAND,
     )
@@ -8898,6 +8915,7 @@ def test_scoring_policy_ledger_and_card_state_fail_fast_paths() -> None:
         "source_result_id": None,
         "scored_transaction_id": None,
         "discarded_result_id": None,
+        "selection_payload": None,
         "hidden": False,
     }
 
@@ -10691,9 +10709,14 @@ def _decline_stratagem_window_if_pending(
     *,
     result_id: str,
 ) -> LifecycleStatus:
-    request = status.decision_request
+    current = drain_pending_secondary_mission_setup(
+        lifecycle,
+        status,
+        result_id_prefix=f"{result_id}-secondary-setup",
+    )
+    request = current.decision_request
     if request is None or request.decision_type != STRATAGEM_DECISION_TYPE:
-        return status
+        return current
     return lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id=result_id,
@@ -10742,21 +10765,41 @@ def _battle_lifecycle_for_primary(
 
 
 def _battle_lifecycle_with_active_tactical_cards() -> GameLifecycle:
-    lifecycle = _battle_lifecycle(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    config = _config_with_player_b_vehicles(("vehicle-unit-3",))
+    lifecycle = GameLifecycle()
+    lifecycle.start(config)
+    lifecycle.state = _battle_state_from_config(
+        config,
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+        decisions=lifecycle.decision_controller,
+    )
     state = lifecycle.state
     assert state is not None
-    state.record_tactical_secondary_draw(
-        TacticalSecondaryDraw(
-            player_id="player-a",
-            battle_round=state.battle_round,
-            request_id=SEEDED_TACTICAL_DRAW_REQUEST_ID,
-            result_id=SEEDED_TACTICAL_DRAW_RESULT_ID,
-            draw_count=state.tactical_secondary_draw_count,
-        )
+    _seed_player_a_tactical_secondary_cards(state)
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    _record_secondary_vehicle_destruction(state, "army-beta:vehicle-unit-3")
+    record = state.record_objective_control_boundary(
+        completed_phase=BattlePhase.FIGHT,
+        timing=ObjectiveControlTiming.TURN_END,
+        runtime_modifier_registry=None,
     )
-    state.draw_tactical_secondary_cards(
-        player_id="player-a",
-        source_result_id=SEEDED_TACTICAL_DRAW_RESULT_ID,
+    lifecycle.decision_controller.event_log.append(
+        "end_boundary_objective_control_determined",
+        {
+            "game_id": record.game_id,
+            "battle_round": record.battle_round,
+            "phase": record.phase,
+            "record_ids": [record.record_id],
+            "source_rule_id": (
+                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+            ),
+        },
+    )
+    score_primary_objective_control_boundary(
+        state=state,
+        record=record,
+        end_of_battle=False,
+        event_log=lifecycle.decision_controller.event_log,
     )
     return lifecycle
 
@@ -10768,6 +10811,11 @@ def _event_companion_battle_lifecycle_with_active_tactical_cards() -> GameLifecy
     )
     state = lifecycle.state
     assert state is not None
+    _seed_player_a_tactical_secondary_cards(state)
+    return lifecycle
+
+
+def _seed_player_a_tactical_secondary_cards(state: GameState) -> None:
     state.record_tactical_secondary_draw(
         TacticalSecondaryDraw(
             player_id="player-a",
@@ -10777,11 +10825,9 @@ def _event_companion_battle_lifecycle_with_active_tactical_cards() -> GameLifecy
             draw_count=state.tactical_secondary_draw_count,
         )
     )
-    state.draw_tactical_secondary_cards(
-        player_id="player-a",
-        source_result_id=SEEDED_TACTICAL_DRAW_RESULT_ID,
-    )
-    return lifecycle
+    _record_active_tactical_secondary(state, secondary_mission_id="bring-it-down")
+    _record_active_tactical_secondary(state, secondary_mission_id="no-prisoners")
+    seed_resolved_secondary_mission_selections(state, player_id="player-a")
 
 
 def _active_tactical_card(state: GameState) -> SecondaryMissionCardState:
@@ -10799,13 +10845,14 @@ def _record_active_tactical_secondary(
     *,
     secondary_mission_id: str,
 ) -> None:
+    card = SecondaryMissionCardState.active_tactical(
+        player_id="player-a",
+        secondary_mission_id=secondary_mission_id,
+        battle_round=state.battle_round,
+        source_result_id=f"phase11e-hold-{secondary_mission_id}",
+    )
     state.record_secondary_mission_card_state(
-        SecondaryMissionCardState.active_tactical(
-            player_id="player-a",
-            secondary_mission_id=secondary_mission_id,
-            battle_round=state.battle_round,
-            source_result_id=f"phase11e-hold-{secondary_mission_id}",
-        )
+        card.with_selection(resolved_secondary_mission_selection_for_card(state, card))
     )
 
 
@@ -10830,42 +10877,30 @@ def _tactical_secondary_achievement_context_for_card(
     card: SecondaryMissionCardState,
     achievement_id: str,
 ) -> TacticalSecondaryAchievementContext:
-    assert state.mission_setup is not None
-    assert state.active_player_id is not None
-    phase = state.current_battle_phase
-    assert phase is not None
-    policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player(
-        card.player_id
+    current_phase = state.current_battle_phase
+    if current_phase is None:
+        raise AssertionError("Tactical secondary achievement fixture requires a phase.")
+    records = tuple(
+        record
+        for record in state.objective_control_records
+        if record.battle_round == state.battle_round
+        and record.active_player_id == state.active_player_id
+        and record.phase == current_phase.value
+        and record.timing is ObjectiveControlTiming.TURN_END
     )
-    award = policy.secondary_award(
-        player_id=card.player_id,
-        battle_round=state.battle_round,
-        phase=phase.value,
-        secondary_mission_id=card.secondary_mission_id,
-        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
-        hidden=False,
-    )
-    metadata = cast(dict[str, JsonValue], award.metadata)
-    return TacticalSecondaryAchievementContext(
+    if len(records) != 1:
+        raise AssertionError("Tactical secondary achievement fixture requires one turn-end record.")
+    award = expected_tactical_secondary_award_from_state(state=state, card_state=card)
+    if award is None:
+        raise AssertionError("Tactical secondary achievement fixture requires a current award.")
+    return replace(
+        tactical_secondary_achievement_context_from_award(
+            state=state,
+            card=card,
+            record=records[0],
+            award=award,
+        ),
         achievement_id=achievement_id,
-        game_id=state.game_id,
-        player_id=card.player_id,
-        active_player_id=state.active_player_id,
-        secondary_mission_id=card.secondary_mission_id,
-        battle_round=state.battle_round,
-        phase=phase.value,
-        card_battle_round=card.battle_round,
-        victory_points=award.amount,
-        scoring_rule_id=cast(str, metadata["scoring_rule_id"]),
-        scoring_rule_condition=cast(str, metadata["scoring_rule_condition"]),
-        scoring_rule_source_id=cast(str, metadata["scoring_rule_source_id"]),
-        scoring_timing=award.scoring_timing,
-        source_id=f"phase14j:{card.secondary_mission_id}:requirements-achieved",
-        evidence={
-            "evidence_kind": "source_backed_requirement_result",
-            "requirements_met": True,
-            "secondary_mission_id": card.secondary_mission_id,
-        },
     )
 
 
@@ -10954,6 +10989,10 @@ def _battle_state_from_config(
                 ),
             )
         )
+    seed_tactical_mission_ids: tuple[str, ...] = ()
+    if player_a_secondary is SecondaryMissionMode.FIXED and "cleanse" in player_a_fixed_mission_ids:
+        player_a_secondary = SecondaryMissionMode.TACTICAL
+        seed_tactical_mission_ids = player_a_fixed_mission_ids
     state.record_secondary_mission_choice(
         _secondary_choice(
             player_id="player-a",
@@ -10965,6 +11004,8 @@ def _battle_state_from_config(
         _secondary_choice(player_id="player-b", mode=player_b_secondary)
     )
     enter_battle_for_fixture(state, decisions=decisions)
+    for mission_id in seed_tactical_mission_ids:
+        _record_active_tactical_secondary(state, secondary_mission_id=mission_id)
     assert state.stage is GameLifecycleStage.BATTLE
     assert state.current_battle_phase is BattlePhase.COMMAND
     return state

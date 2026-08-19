@@ -349,6 +349,11 @@ def _event_record_hidden_from_context(
         "tactical_secondary_missions_drawn",
         "tactical_secondary_mission_discarded",
         "tactical_secondary_missions_discarded",
+        "tactical_secondary_when_drawn_kept",
+        "tactical_secondary_when_drawn_discarded",
+        "tactical_secondary_when_drawn_shuffled",
+        "beacon_unit_selected",
+        "burden_of_trust_guard_selected",
         "mission_action_started",
     }:
         event_payload = _json_object(f"{event_type} payload", payload)
@@ -401,6 +406,11 @@ def _public_event_payload(
     if event_type in {
         "tactical_secondary_mission_discarded",
         "tactical_secondary_missions_discarded",
+        "tactical_secondary_when_drawn_kept",
+        "tactical_secondary_when_drawn_discarded",
+        "tactical_secondary_when_drawn_shuffled",
+        "beacon_unit_selected",
+        "burden_of_trust_guard_selected",
     }:
         return _public_tactical_secondary_discarded_payload(payload, viewer=viewer)
     if event_type == "mission_action_started":

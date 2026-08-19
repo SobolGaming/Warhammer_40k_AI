@@ -15002,7 +15002,7 @@
     }
   ],
   "projection_schema": "game-view-v11-phase17n-step4",
-  "projection_state_hash": "eb579a5c7bf1b466482a3554b45a1a646458b3f7548cfc5508fec85fbaed1b0c",
+  "projection_state_hash": "8d5f7372d512643feace387948cd5e1a45c3cd5d2a73b002208f54b1c66545a9",
   "public_command_point_ledgers": [
     {
       "command_points": 1,
@@ -15044,6 +15044,7 @@
       "player_id": "player-a",
       "scored_transaction_id": null,
       "secondary_mission_id": "assassination",
+      "selection_payload": null,
       "source_result_id": null,
       "status": "active"
     },
@@ -15054,7 +15055,8 @@
       "mode": "fixed",
       "player_id": "player-a",
       "scored_transaction_id": null,
-      "secondary_mission_id": "bring_it_down",
+      "secondary_mission_id": "bring-it-down",
+      "selection_payload": null,
       "source_result_id": null,
       "status": "active"
     },
@@ -15066,6 +15068,7 @@
       "player_id": "player-b",
       "scored_transaction_id": null,
       "secondary_mission_id": "assassination",
+      "selection_payload": null,
       "source_result_id": null,
       "status": "active"
     },
@@ -15076,7 +15079,8 @@
       "mode": "fixed",
       "player_id": "player-b",
       "scored_transaction_id": null,
-      "secondary_mission_id": "bring_it_down",
+      "secondary_mission_id": "bring-it-down",
+      "selection_payload": null,
       "source_result_id": null,
       "status": "active"
     }

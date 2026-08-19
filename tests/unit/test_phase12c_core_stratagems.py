@@ -5007,7 +5007,7 @@ def _secondary_choice(*, player_id: str, mode: SecondaryMissionMode) -> Secondar
     return SecondaryMissionChoice(
         player_id=player_id,
         mode=mode,
-        fixed_mission_ids=("assassination", "cleanse"),
+        fixed_mission_ids=("assassination", "bring-it-down"),
     )
 
 

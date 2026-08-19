@@ -130,6 +130,9 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
         "resolve_fight_interrupt": InteractionSpec(InteractionKind.OPPORTUNITY_WINDOW),
         "resolve_reaction_window": InteractionSpec(InteractionKind.OPPORTUNITY_WINDOW),
         "resolve_sequencing_order": InteractionSpec(InteractionKind.ORDERED_SEQUENCING),
+        "resolve_tactical_secondary_when_drawn": InteractionSpec(
+            InteractionKind.FINITE_OPTION_LIST
+        ),
         "score_tactical_secondary_mission": InteractionSpec(InteractionKind.CONFIRMATION),
         SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE: InteractionSpec(
             InteractionKind.FINITE_OPTION_LIST
@@ -139,6 +142,11 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
             InteractionKind.WEAPON_ALLOCATION_MATRIX,
             ("weapon_group",),
         ),
+        "select_beacon_unit": InteractionSpec(
+            InteractionKind.ENTITY_SELECTION,
+            ("unit",),
+        ),
+        "select_burden_of_trust_guard": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
         "select_post_roll_attack_pool": InteractionSpec(
             InteractionKind.ORDERED_SEQUENCING,
             ("weapon_profile",),
@@ -265,6 +273,7 @@ _FINITE_INTERACTION_SPECS = MappingProxyType(
         ),
         "select_shooting_unit_grant": InteractionSpec(InteractionKind.OPPORTUNITY_WINDOW),
         "select_stratagem_cost_modifier_option": InteractionSpec(InteractionKind.CONFIRMATION),
+        "select_tempting_target_objective": InteractionSpec(InteractionKind.FINITE_OPTION_LIST),
         "select_tracked_target": InteractionSpec(
             InteractionKind.ENTITY_SELECTION,
             ("target_unit",),

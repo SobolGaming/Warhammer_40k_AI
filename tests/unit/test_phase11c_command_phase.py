@@ -6,6 +6,9 @@ from typing import Any, cast
 
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
+from tests.phase17n_secondary_mission_helpers import (
+    drain_pending_secondary_mission_setup_for_command_handler,
+)
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -183,7 +186,12 @@ def test_command_step_grants_both_players_cp_once_before_tactical_draw() -> None
         option_id="draw",
         result_id="phase11c-result-draw",
     )
-    completed = handler.begin_phase(state=state, decisions=decisions)
+    completed = drain_pending_secondary_mission_setup_for_command_handler(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        result_id_prefix="phase11c-secondary-setup",
+    )
 
     assert completed.status_kind is LifecycleStatusKind.ADVANCED
     assert state.command_point_total("player-a") == 1
@@ -2600,7 +2608,7 @@ def _secondary_choice(*, player_id: str, mode: SecondaryMissionMode) -> Secondar
     return SecondaryMissionChoice(
         player_id=player_id,
         mode=mode,
-        fixed_mission_ids=("assassination", "bring_it_down"),
+        fixed_mission_ids=("assassination", "bring-it-down"),
     )
 
 

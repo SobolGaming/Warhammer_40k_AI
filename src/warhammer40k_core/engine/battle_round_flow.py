@@ -30,6 +30,7 @@ from warhammer40k_core.engine.faction_content.events import (
 )
 from warhammer40k_core.engine.fight_on_death import remove_models_awaiting_fight_on_death
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.mission_decisions import request_tactical_secondary_score
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlRecord,
@@ -79,6 +80,10 @@ from warhammer40k_core.engine.primary_unit_destruction_tracking import (
 )
 from warhammer40k_core.engine.return_on_death import resolve_pending_return_on_death_phase_end
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
+from warhammer40k_core.engine.secondary_scoring_boundary import (
+    next_pending_tactical_secondary_achievement,
+    score_turn_end_mission_scoring_boundary,
+)
 from warhammer40k_core.engine.sticky_objective_control import (
     PhaseEndObjectiveControlContext,
     PhaseEndObjectiveControlHookRegistry,
@@ -492,6 +497,20 @@ class BattleRoundFlow:
                     current_phase=current_phase,
                     pending_request=primary_choice_request,
                     pending_window=PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
+                )
+            score_turn_end_mission_scoring_boundary(
+                state=state,
+                record=turn_end_record,
+                end_of_battle=False,
+                event_log=decisions.event_log,
+                runtime_modifier_registry=self._runtime_modifier_registry,
+            )
+            tactical_achievement = next_pending_tactical_secondary_achievement(state)
+            if tactical_achievement is not None:
+                return request_tactical_secondary_score(
+                    state=state,
+                    decisions=decisions,
+                    achievement_context=tactical_achievement,
                 )
         completed_phase = state.advance_to_next_battle_phase(
             runtime_modifier_registry=self._runtime_modifier_registry,

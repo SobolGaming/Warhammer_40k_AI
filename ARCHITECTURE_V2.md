@@ -126,6 +126,9 @@ Locate and Deny, and Vital Link. Step 5F scores the Surveil the Foe
 surveilled-marker exception, promoting Surveil the Foe. Step 5G certifies every
 Force Disposition pairing through both players' ordinary turn-end boundaries,
 GameLifecycle and event-log restore round-trips, and viewer-scoped projections.
+Step 6 scores all 18 Secondary Mission cards through source-backed turn-end
+awards and certifies every card/mode on one Layout A battlefield. This does not
+claim Phase 17N overall complete or Phase 20A.
 All 15 pairings now have executable Primaries in both directions (45 of 45
 variants). Layout A is the lifecycle/restore/viewer certification row; A/B/C
 remain in the fail-closed inventory and instantiate two-sided scoring policies.
@@ -406,7 +409,7 @@ Implemented foundation and partial integration baselines:
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
 | 17J | Complete | Warhammer Event Companion v1.1 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with explicit extraction status, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
-| 17N | Partial | Battlefield geometry, Step 4 marker/action/choice state, the Step 5A content-addressed scoring-state bridge, Step 5B marker scoring, Step 5C completed-action scoring, Step 5D condemned-departure scoring, Step 5E operation-marker scoring, Step 5F Surveil scoring, and Step 5G pairing-wide lifecycle/restore/viewer certification are complete, including 14 runtime Mission Actions; generic timing/resolution, objective/territory/table-quarter evidence, Purge and Secure destruction attribution, consecrated/decoy/triangulated marker predicates, completed-action predicates, condemned battlefield-departure predicates, operation-marker predicates, and the Surveil surveilled-marker exception make all 25 Primaries executable, and all 15 pairings are certified through both players' AdapterGameSession ordinary scoring boundaries, lifecycle and event-log restore round-trips, and viewer-scoped projections |
+| 17N | Partial | Battlefield geometry, Step 4 marker/action/choice state, the Step 5A content-addressed scoring-state bridge, Step 5B marker scoring, Step 5C completed-action scoring, Step 5D condemned-departure scoring, Step 5E operation-marker scoring, Step 5F Surveil scoring, Step 5G pairing-wide lifecycle/restore/viewer certification, and Step 6 source-backed Secondary scoring for all 18 cards are complete, including 14 runtime Mission Actions; generic timing/resolution, objective/territory/table-quarter evidence, Purge and Secure destruction attribution, consecrated/decoy/triangulated marker predicates, completed-action predicates, condemned battlefield-departure predicates, operation-marker predicates, and the Surveil surveilled-marker exception make all 25 Primaries executable, and all 15 pairings are certified through both players' AdapterGameSession ordinary scoring boundaries, lifecycle and event-log restore round-trips, and viewer-scoped projections |
 | 17O | Complete | Viewer-scoped eight-axis capability manifest with selected roster/unit/rule/mission/geometry rows, evidence, blockers, identities, and mechanically derived certification claims |
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
@@ -4984,7 +4987,10 @@ packages, for 45 of 45 layouts. All 15 pairings have executable
 Primaries in both directions, covering 45 of the 45 A/B/C variants with complete
 two-sided Primary scoring, and Step 5G certifies each pairing through both
 players' ordinary turn-end boundaries, lifecycle and event-log restore
-round-trips, and viewer-scoped projections. Step 4's mission
+round-trips, and viewer-scoped projections. Step 6 scores all 18 Secondary
+Mission cards through source-backed turn-end awards and certifies every
+card/mode on one Layout A battlefield. This does not claim Phase 17N overall
+complete or Phase 20A. Step 4's mission
 actions, choices, persistent marker state, and Surveil movement cleanup are
 engine-owned. Step 5A's scoring-state bridge and four simple objective
 predicates are complete. Step 5B's marker scoring conditions promote Consecrate,
@@ -5090,7 +5096,7 @@ record; the free-form timing field alone cannot claim the exemption. Live
 awards and restored ledgers use the same policy validator, and restore rejects
 ordinary Primary totals above 15VP in one battle round. The resulting complete
 mission source identity is pinned as
-`5a4dcccfa86bbecc8ded95275c39ee5401ce0e27e5f426c28ae4575e02114812`.
+`4b23bfe02563942bf866827c2a36eb218cb11ba3f4af7f3169c8fbc784cbb82d`.
 
 The Phase 17N scoring schema has exactly nine source timing tokens and requires
 every scoring row to declare one of `independent`, `cumulative`, or
@@ -5270,6 +5276,16 @@ inventory and instantiate two-sided scoring policies; B and C are not
 lifecycle-certified. This does not capture a `ReplayArtifact` or run
 `ReplayRunner`. This does not claim Phase 20A full-game certification.
 Replay remains `replay-artifact-v8-phase17n-step5a`.
+
+Step 6 scores all 18 Secondary Mission cards through source-backed turn-end
+awards, When Drawn keep/discard/shuffle, and Beacon, Tempting Target, and
+Burden of Trust selections. Combined Primary-then-Secondary scoring runs at
+ordinary turn end before `advance_to_next_battle_phase`. Fixed cards auto-award
+and stay active; Tactical cards record a score/retain achievement. Step 6G
+certifies 22 card/mode rows through both players on one Layout A battlefield
+via `LocalGameSession`, including restore round-trips and viewer-scoped
+selection redaction. Layouts B and C are not Secondary-certified. Replay
+remains `replay-artifact-v8-phase17n-step5a`.
 
 `uv run python tools/build_event_companion_battlefields.py --check` rebuilds the
 complete battlefield package in memory from its reviewed inputs, verifies its

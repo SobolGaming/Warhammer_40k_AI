@@ -35,7 +35,6 @@ from warhammer40k_core.engine.scoring import (
 )
 from warhammer40k_core.engine.secondary_deployment_zone_evidence import (
     bind_state_backed_secondary_scoring_commit,
-    enemy_unit_ids_in_player_deployment_zone_for_secondary_boundary,
 )
 
 if TYPE_CHECKING:
@@ -125,12 +124,31 @@ def score_secondary_mission_from_state(
             runtime_modifier_registry=runtime_modifier_registry,
         )
         _emit_objective_control_boundary_event_if_missing(event_log=event_log, record=record)
+        if _already_scored_at_boundary(
+            state=state,
+            card_state=card_state,
+            record=record,
+            source_kind=source_kind,
+            policies=policy,
+        ):
+            return card_state
+        from warhammer40k_core.engine.secondary_scoring_context import (
+            secondary_mission_selection_for_card,
+            secondary_scoring_condition_context_from_state,
+        )
+
         score_primary_objective_control_boundary(
             state=state,
             record=record,
             end_of_battle=False,
             event_log=event_log,
             runtime_modifier_registry=runtime_modifier_registry,
+        )
+        condition_context = secondary_scoring_condition_context_from_state(
+            state=state,
+            player_id=card_state.player_id,
+            record=record,
+            selection=secondary_mission_selection_for_card(card_state),
         )
         award = policy.secondary_award_from_mission_state(
             player_id=card_state.player_id,
@@ -144,14 +162,9 @@ def score_secondary_mission_from_state(
             unit_destruction_states=tuple(state.secondary_unit_destruction_states),
             objective_cleanse_states=tuple(state.secondary_objective_cleanse_states),
             terrain_plunder_states=tuple(state.secondary_terrain_plunder_states),
-            enemy_unit_ids_in_player_deployment_zone=(
-                enemy_unit_ids_in_player_deployment_zone_for_secondary_boundary(
-                    state=state,
-                    record=record,
-                    player_id=card_state.player_id,
-                )
-            ),
+            enemy_unit_ids_in_player_deployment_zone=condition_context.enemy_unit_ids_in_player_deployment_zone,
             starting_strength_records=tuple(state.starting_strength_records),
+            condition_context=condition_context,
         )
         award = bind_state_backed_secondary_scoring_commit(
             _require_state_backed_secondary_award(award),
@@ -165,6 +178,7 @@ def score_secondary_mission_from_state(
             scored = card_state.score(transaction_id=transaction.transaction_id)
             state.replace_secondary_mission_card_state(scored)
             result = scored
+            _consume_tactical_achievements_for_card(state=state, card_state=card_state)
     except GameLifecycleError:
         _restore_aggregate(state=state, event_log=event_log, snapshot=snapshot)
         raise
@@ -176,6 +190,22 @@ def _require_state_backed_secondary_award(award: VictoryPointAward | None) -> Vi
     if award is None:
         raise GameLifecycleError("State-backed secondary mission requirements are not met.")
     return award
+
+
+def _consume_tactical_achievements_for_card(
+    *,
+    state: GameState,
+    card_state: SecondaryMissionCardState,
+) -> None:
+    matching_ids = tuple(
+        context.achievement_id
+        for context in state.tactical_secondary_achievement_contexts
+        if context.player_id == card_state.player_id
+        and context.secondary_mission_id == card_state.secondary_mission_id
+        and context.card_battle_round == card_state.battle_round
+    )
+    for achievement_id in matching_ids:
+        state.consume_tactical_secondary_achievement_context(achievement_id)
 
 
 def _card_for_state_backed_scoring(

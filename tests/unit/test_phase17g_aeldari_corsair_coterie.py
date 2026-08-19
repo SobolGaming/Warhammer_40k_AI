@@ -5140,7 +5140,7 @@ def _record_lifecycle_secondary_choices(state: GameState) -> None:
             SecondaryMissionChoice(
                 player_id=player_id,
                 mode=SecondaryMissionMode.FIXED,
-                fixed_mission_ids=("area-denial", "assassination"),
+                fixed_mission_ids=("assassination", "bring-it-down"),
             )
         )
 
@@ -5622,7 +5622,7 @@ def _corsair_game_config(
         ),
         player_ids=("player-a", "player-b"),
         turn_order=("player-a", "player-b"),
-        fixed_secondary_mission_ids=("area-denial", "assassination"),
+        fixed_secondary_mission_ids=("assassination", "bring-it-down"),
         mission_setup=_mission_setup(),
         allow_legacy_non_strict_rosters=True,
     )

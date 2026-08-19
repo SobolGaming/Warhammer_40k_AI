@@ -189,9 +189,6 @@ from warhammer40k_core.engine.primary_reserve_entry_provider import (
     primary_reserve_entry_requirements,
     validate_accepted_primary_reserve_entry_provider,
 )
-from warhammer40k_core.engine.primary_scoring_boundary import (
-    score_primary_objective_control_boundary,
-)
 from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
     PrimaryScoringBoundaryLifecycle,
     validate_primary_scoring_boundary_lifecycles,
@@ -3772,20 +3769,23 @@ class GameState:
             raise GameLifecycleError("choice must be a SecondaryMissionChoice.")
         if choice.mode is not SecondaryMissionMode.FIXED:
             return
+        from warhammer40k_core.engine.secondary_scoring_inventory import (
+            canonical_secondary_mission_id,
+        )
+
         for secondary_id in choice.fixed_mission_ids:
-            if (
-                self.secondary_mission_card_state(
-                    player_id=choice.player_id,
-                    secondary_mission_id=secondary_id,
-                    mode=SecondaryMissionCardMode.FIXED,
-                )
-                is not None
+            recorded_id = canonical_secondary_mission_id(secondary_id)
+            if any(
+                stored.player_id == choice.player_id
+                and stored.mode is SecondaryMissionCardMode.FIXED
+                and canonical_secondary_mission_id(stored.secondary_mission_id) == recorded_id
+                for stored in self.secondary_mission_card_states
             ):
                 continue
             self.record_secondary_mission_card_state(
                 SecondaryMissionCardState.active_fixed(
                     player_id=choice.player_id,
-                    secondary_mission_id=secondary_id,
+                    secondary_mission_id=recorded_id,
                 )
             )
 
@@ -3803,17 +3803,21 @@ class GameState:
             card_state.mode,
             card_state.battle_round,
         )
-        if any(
-            (
+        matches = tuple(
+            stored
+            for stored in self.secondary_mission_card_states
+            if (
                 stored.player_id,
                 stored.secondary_mission_id,
                 stored.mode,
                 stored.battle_round,
             )
             == key
-            for stored in self.secondary_mission_card_states
-        ):
-            raise GameLifecycleError("SecondaryMissionCardState already exists.")
+        )
+        if matches:
+            if len(matches) != 1 or matches[0] != card_state:
+                raise GameLifecycleError("SecondaryMissionCardState already exists.")
+            return
         self.secondary_mission_card_states.append(card_state)
         self.secondary_mission_card_states.sort(
             key=lambda state: (
@@ -3974,60 +3978,11 @@ class GameState:
         self,
         context: TacticalSecondaryAchievementContext,
     ) -> None:
-        if context.game_id != self.game_id:
-            raise GameLifecycleError("Tactical secondary achievement context game_id drift.")
-        if context.player_id not in self.player_ids:
-            raise GameLifecycleError(
-                "Tactical secondary achievement context player_id is not in this game."
-            )
-        if context.active_player_id != self.active_player_id:
-            raise GameLifecycleError(
-                "Tactical secondary achievement context active_player_id drift."
-            )
-        if context.battle_round != self.battle_round:
-            raise GameLifecycleError("Tactical secondary achievement context battle_round drift.")
-        current_phase = self.current_battle_phase
-        if current_phase is None:
-            raise GameLifecycleError("Tactical secondary achievement context requires a phase.")
-        if context.phase != current_phase.value:
-            raise GameLifecycleError("Tactical secondary achievement context phase drift.")
-        card_state = self.secondary_mission_card_state(
-            player_id=context.player_id,
-            secondary_mission_id=context.secondary_mission_id,
-            mode=SecondaryMissionCardMode.TACTICAL,
+        from warhammer40k_core.engine.secondary_tactical_achievement import (
+            validate_tactical_secondary_achievement_context,
         )
-        if card_state is None:
-            raise GameLifecycleError(
-                "Tactical secondary achievement context requires an active card."
-            )
-        if context.card_battle_round != card_state.battle_round:
-            raise GameLifecycleError(
-                "Tactical secondary achievement context card battle_round drift."
-            )
-        if self.mission_setup is None:
-            raise GameLifecycleError(
-                "Tactical secondary achievement context requires MissionSetup."
-            )
-        policy = mission_scoring_policies_from_setup(self.mission_setup)
-        award = policy.secondary_award(
-            player_id=context.player_id,
-            battle_round=self.battle_round,
-            phase=current_phase.value,
-            secondary_mission_id=context.secondary_mission_id,
-            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
-            hidden=False,
-        )
-        metadata = cast(dict[str, JsonValue], award.metadata)
-        if context.victory_points != award.amount:
-            raise GameLifecycleError("Tactical secondary achievement context VP drift.")
-        if context.scoring_rule_id != metadata["scoring_rule_id"]:
-            raise GameLifecycleError("Tactical secondary achievement context rule ID drift.")
-        if context.scoring_rule_condition != metadata["scoring_rule_condition"]:
-            raise GameLifecycleError("Tactical secondary achievement context condition drift.")
-        if context.scoring_rule_source_id != metadata["scoring_rule_source_id"]:
-            raise GameLifecycleError("Tactical secondary achievement context source ID drift.")
-        if context.scoring_timing != award.scoring_timing:
-            raise GameLifecycleError("Tactical secondary achievement context timing drift.")
+
+        validate_tactical_secondary_achievement_context(state=self, context=context)
 
     def discard_tactical_secondary(
         self,
@@ -4099,6 +4054,30 @@ class GameState:
                     )
                 )
                 return
+        raise GameLifecycleError("SecondaryMissionCardState does not exist.")
+
+    def forget_secondary_mission_card_state(self, card_state: SecondaryMissionCardState) -> None:
+        if type(card_state) is not SecondaryMissionCardState:
+            raise GameLifecycleError("card_state must be a SecondaryMissionCardState.")
+        key = (
+            card_state.player_id,
+            card_state.secondary_mission_id,
+            card_state.mode,
+            card_state.battle_round,
+        )
+        for index, stored in enumerate(self.secondary_mission_card_states):
+            stored_key = (
+                stored.player_id,
+                stored.secondary_mission_id,
+                stored.mode,
+                stored.battle_round,
+            )
+            if stored_key != key:
+                continue
+            if stored.status is not SecondaryMissionCardStatus.ACTIVE:
+                raise GameLifecycleError("Only active secondary cards can be forgotten.")
+            del self.secondary_mission_card_states[index]
+            return
         raise GameLifecycleError("SecondaryMissionCardState does not exist.")
 
     def record_objective_control_record(
@@ -5510,7 +5489,11 @@ class GameState:
         *,
         event_log: EventLog | None = None,
     ) -> None:
-        score_primary_objective_control_boundary(
+        from warhammer40k_core.engine.secondary_scoring_boundary import (
+            score_turn_end_mission_scoring_boundary,
+        )
+
+        score_turn_end_mission_scoring_boundary(
             state=self,
             record=record,
             end_of_battle=False,
@@ -5523,7 +5506,11 @@ class GameState:
         *,
         event_log: EventLog | None = None,
     ) -> None:
-        score_primary_objective_control_boundary(
+        from warhammer40k_core.engine.secondary_scoring_boundary import (
+            score_turn_end_mission_scoring_boundary,
+        )
+
+        score_turn_end_mission_scoring_boundary(
             state=self,
             record=record,
             end_of_battle=True,

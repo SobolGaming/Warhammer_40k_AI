@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from enum import StrEnum
-from typing import Self, TypedDict, cast
+from typing import NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.mission_scoring_resolution import (
     MissionScoringResolutionMode,
     validate_mission_scoring_resolution_groups,
 )
-from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine import primary_scoring_state_evidence as _state
 from warhammer40k_core.engine.destruction_provenance import (
@@ -20,7 +19,6 @@ from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlRecord,
     ObjectiveControlRecordPayload,
-    ObjectiveControlStatus,
     ObjectiveControlTiming,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
@@ -38,9 +36,6 @@ from warhammer40k_core.engine.primary_scoring_condition_evaluator import (
 )
 from warhammer40k_core.engine.primary_scoring_conditions import (
     PrimaryUnitDestructionEvidence,
-)
-from warhammer40k_core.engine.primary_scoring_conditions import (
-    home_objective_ids as _home_objective_ids,
 )
 from warhammer40k_core.engine.primary_scoring_conditions import (
     primary_score_count_evidence as _score_count_evidence,
@@ -63,6 +58,12 @@ from warhammer40k_core.engine.primary_victory_point_policy import (
     PrimaryVictoryPointCapTreatment,
     validate_primary_victory_point_award,
     validate_victory_point_ledger_policy,
+)
+from warhammer40k_core.engine.secondary_scoring_conditions import (
+    SUPPORTED_SECONDARY_SCORING_RULE_CONDITIONS,
+    SecondaryScoringConditionContext,
+    evaluate_secondary_scoring_condition,
+    secondary_scoring_rule_applies_at_record,
 )
 from warhammer40k_core.engine.secondary_scoring_provider import SecondaryScoringProviderKind
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
@@ -99,24 +100,6 @@ class SecondaryMissionCardStatus(StrEnum):
 class SecondaryMissionCardMode(StrEnum):
     FIXED = "fixed"
     TACTICAL = "tactical"
-
-
-_SUPPORTED_SECONDARY_SCORING_RULE_CONDITIONS = frozenset(
-    {
-        "fixed_secondary_condition",
-        "tactical_secondary_condition",
-        "each_enemy_model_w10_or_more_destroyed_this_turn",
-        "control_home_objective",
-        "no_enemy_units_within_own_deployment_zone",
-        "each_enemy_unit_starting_strength_13_or_more_destroyed_this_turn",
-        "each_enemy_unit_destroyed_this_turn",
-        "each_enemy_unit_started_turn_in_range_of_objective_destroyed",
-        "one_or_more_objectives_cleansed_this_turn",
-        "two_or_more_objectives_cleansed_this_turn",
-        "one_or_more_terrain_areas_plundered_this_turn",
-        "control_two_or_more_no_mans_land_objectives_excluding_home",
-    }
-)
 
 
 class VictoryPointTransactionPayload(TypedDict):
@@ -311,6 +294,7 @@ class SecondaryMissionCardStatePayload(TypedDict):
     source_result_id: str | None
     scored_transaction_id: str | None
     discarded_result_id: str | None
+    selection_payload: NotRequired[JsonValue | None]
 
 
 class TacticalSecondaryAchievementContextPayload(TypedDict):
@@ -1700,7 +1684,7 @@ class SecondaryMissionScoringRule:
             "source_id",
             _validate_identifier("SecondaryMissionScoringRule source_id", self.source_id),
         )
-        if self.condition not in _SUPPORTED_SECONDARY_SCORING_RULE_CONDITIONS:
+        if self.condition not in SUPPORTED_SECONDARY_SCORING_RULE_CONDITIONS:
             raise GameLifecycleError("Unsupported secondary scoring rule condition.")
 
     def to_payload(self) -> SecondaryMissionScoringRulePayload:
@@ -2546,6 +2530,7 @@ class MissionScoringPolicy:
         terrain_plunder_states: tuple[SecondaryTerrainPlunderState, ...],
         enemy_unit_ids_in_player_deployment_zone: tuple[str, ...],
         starting_strength_records: tuple[StartingStrengthRecord, ...] = (),
+        condition_context: SecondaryScoringConditionContext | None = None,
     ) -> VictoryPointAward | None:
         if type(record) is not ObjectiveControlRecord:
             raise GameLifecycleError("State-backed secondary scoring requires objective record.")
@@ -2562,6 +2547,11 @@ class MissionScoringPolicy:
         requested_round = _validate_positive_int("battle_round", battle_round)
         requested_phase = _validate_identifier("phase", phase)
         requested_secondary = _validate_identifier("secondary_mission_id", secondary_mission_id)
+        from warhammer40k_core.engine.secondary_scoring_inventory import (
+            canonical_secondary_mission_id,
+        )
+
+        requested_secondary = canonical_secondary_mission_id(requested_secondary)
         kind = victory_point_source_kind_from_token(source_kind)
         if kind not in {
             VictoryPointSourceKind.FIXED_SECONDARY,
@@ -2571,8 +2561,8 @@ class MissionScoringPolicy:
         destructions = _validate_secondary_unit_destruction_state_tuple(unit_destruction_states)
         cleanses = _validate_secondary_objective_cleanse_state_tuple(objective_cleanse_states)
         plunders = _validate_secondary_terrain_plunder_state_tuple(terrain_plunder_states)
-        starting_strength_by_unit_id = _starting_strength_record_by_unit_id(
-            starting_strength_records
+        starting_strength_records = tuple(
+            _starting_strength_record_by_unit_id(starting_strength_records).values()
         )
         enemy_zone_unit_ids = _validate_identifier_tuple(
             "enemy_unit_ids_in_player_deployment_zone",
@@ -2580,19 +2570,35 @@ class MissionScoringPolicy:
         )
         if record.battle_round != requested_round or record.phase != requested_phase:
             raise GameLifecycleError("State-backed secondary scoring record timing drift.")
-        matching_rules = tuple(
+        mission_rules = tuple(
             rule
             for rule in self.secondary_scoring_rules
-            if rule.secondary_mission_id == requested_secondary
-            and rule.source_kind is kind
-            and self._secondary_rule_applies_at_record(
+            if rule.secondary_mission_id == requested_secondary and rule.source_kind is kind
+        )
+        if not mission_rules:
+            raise GameLifecycleError("State-backed secondary scoring rule is not source-backed.")
+        matching_rules = tuple(
+            rule
+            for rule in mission_rules
+            if self._secondary_rule_applies_at_record(
                 rule=rule,
                 record=record,
                 player_id=player_id,
             )
         )
         if not matching_rules:
-            raise GameLifecycleError("State-backed secondary scoring rule is not source-backed.")
+            return None
+
+        evidence_context = condition_context or SecondaryScoringConditionContext(
+            record=record,
+            mission_setup=mission_setup,
+            player_id=requested_player,
+            unit_destruction_states=destructions,
+            objective_cleanse_states=cleanses,
+            terrain_plunder_states=plunders,
+            enemy_unit_ids_in_player_deployment_zone=enemy_zone_unit_ids,
+            starting_strength_records=starting_strength_records,
+        )
 
         total = 0
         rule_ids: list[str] = []
@@ -2602,17 +2608,7 @@ class MissionScoringPolicy:
         victory_points_by_rule: dict[str, int] = {}
         evidence_by_rule: dict[str, JsonValue] = {}
         for rule in matching_rules:
-            evidence = self._secondary_rule_evidence(
-                rule=rule,
-                record=record,
-                mission_setup=mission_setup,
-                player_id=requested_player,
-                unit_destruction_states=destructions,
-                objective_cleanse_states=cleanses,
-                terrain_plunder_states=plunders,
-                enemy_unit_ids_in_player_deployment_zone=enemy_zone_unit_ids,
-                starting_strength_by_unit_id=starting_strength_by_unit_id,
-            )
+            evidence = self._secondary_rule_evidence(rule=rule, context=evidence_context)
             score_count = _metadata_score_count(evidence)
             if score_count == 0:
                 continue
@@ -2661,184 +2657,20 @@ class MissionScoringPolicy:
         record: ObjectiveControlRecord,
         player_id: str,
     ) -> bool:
-        requested_player = _validate_identifier("player_id", player_id)
-        if rule.timing == "mission_condition_met":
-            return True
-        if rule.timing == "turn_end":
-            return record.timing is ObjectiveControlTiming.TURN_END
-        if rule.timing == "your_turn_end":
-            return (
-                record.timing is ObjectiveControlTiming.TURN_END
-                and record.active_player_id == requested_player
-            )
-        if rule.timing == "opponent_turn_end_or_round_five_turn_end":
-            return record.timing is ObjectiveControlTiming.TURN_END and (
-                record.active_player_id != requested_player
-                or record.battle_round == self.game_length_battle_rounds
-            )
-        raise GameLifecycleError("Unsupported secondary scoring rule timing.")
+        return secondary_scoring_rule_applies_at_record(
+            timing=rule.timing,
+            record=record,
+            player_id=player_id,
+            game_length_battle_rounds=self.game_length_battle_rounds,
+        )
 
     def _secondary_rule_evidence(
         self,
         *,
         rule: SecondaryMissionScoringRule,
-        record: ObjectiveControlRecord,
-        mission_setup: MissionSetup,
-        player_id: str,
-        unit_destruction_states: tuple[SecondaryUnitDestructionState, ...],
-        objective_cleanse_states: tuple[SecondaryObjectiveCleanseState, ...],
-        terrain_plunder_states: tuple[SecondaryTerrainPlunderState, ...],
-        enemy_unit_ids_in_player_deployment_zone: tuple[str, ...],
-        starting_strength_by_unit_id: dict[str, StartingStrengthRecord],
+        context: SecondaryScoringConditionContext,
     ) -> dict[str, JsonValue]:
-        requested_player = _validate_identifier("player_id", player_id)
-        controlled_objective_ids = _controlled_objective_ids(record, player_id=requested_player)
-        home_objective_ids = _home_objective_ids(mission_setup, player_id=requested_player)
-        central_objective_ids = _central_objective_ids(mission_setup)
-        if rule.condition == "each_enemy_model_w10_or_more_destroyed_this_turn":
-            matching = _secondary_enemy_unit_destructions_this_turn(
-                unit_destruction_states,
-                player_id=requested_player,
-                battle_round=record.battle_round,
-                active_player_id=record.active_player_id,
-            )
-            model_ids = tuple(
-                model.model_instance_id
-                for state in matching
-                for model in state.destroyed_models
-                if model.starting_wounds >= 10
-            )
-            return _secondary_score_count_evidence(
-                score_count=len(model_ids),
-                destroyed_unit_instance_ids=tuple(
-                    state.destroyed_unit_instance_id for state in matching
-                ),
-                destroyed_model_instance_ids=model_ids,
-            )
-        if rule.condition == "each_enemy_unit_starting_strength_13_or_more_destroyed_this_turn":
-            matching = tuple(
-                state
-                for state in _secondary_enemy_unit_destructions_this_turn(
-                    unit_destruction_states,
-                    player_id=requested_player,
-                    battle_round=record.battle_round,
-                    active_player_id=record.active_player_id,
-                )
-                if _starting_strength_for_destroyed_unit(
-                    state.destroyed_unit_instance_id,
-                    starting_strength_by_unit_id=starting_strength_by_unit_id,
-                )
-                >= 13
-            )
-            return _secondary_score_count_evidence(
-                score_count=len(matching),
-                destroyed_unit_instance_ids=tuple(
-                    state.destroyed_unit_instance_id for state in matching
-                ),
-            )
-        if rule.condition == "each_enemy_unit_destroyed_this_turn":
-            matching = _secondary_enemy_unit_destructions_this_turn(
-                unit_destruction_states,
-                player_id=requested_player,
-                battle_round=record.battle_round,
-                active_player_id=record.active_player_id,
-            )
-            return _secondary_score_count_evidence(
-                score_count=len(matching),
-                destroyed_unit_instance_ids=tuple(
-                    state.destroyed_unit_instance_id for state in matching
-                ),
-            )
-        if rule.condition == "control_home_objective":
-            controlled_home_ids = tuple(
-                objective_id
-                for objective_id in controlled_objective_ids
-                if objective_id in home_objective_ids
-            )
-            return _secondary_score_count_evidence(
-                score_count=1 if controlled_home_ids else 0,
-                controlled_objective_ids=controlled_home_ids,
-                home_objective_ids=home_objective_ids,
-            )
-        if rule.condition == "no_enemy_units_within_own_deployment_zone":
-            return _secondary_score_count_evidence(
-                score_count=0 if enemy_unit_ids_in_player_deployment_zone else 1,
-                enemy_unit_instance_ids=enemy_unit_ids_in_player_deployment_zone,
-            )
-        if rule.condition == "each_enemy_unit_started_turn_in_range_of_objective_destroyed":
-            matching = tuple(
-                state
-                for state in _secondary_enemy_unit_destructions_this_turn(
-                    unit_destruction_states,
-                    player_id=requested_player,
-                    battle_round=record.battle_round,
-                    active_player_id=record.active_player_id,
-                )
-                if state.started_turn_objective_marker_ids
-            )
-            objective_ids = tuple(
-                sorted(
-                    {
-                        objective_id
-                        for state in matching
-                        for objective_id in state.started_turn_objective_marker_ids
-                    }
-                )
-            )
-            return _secondary_score_count_evidence(
-                score_count=len(matching),
-                destroyed_unit_instance_ids=tuple(
-                    state.destroyed_unit_instance_id for state in matching
-                ),
-                objective_marker_ids=objective_ids,
-            )
-        if rule.condition == "control_two_or_more_no_mans_land_objectives_excluding_home":
-            no_mans_land_objective_ids = tuple(
-                objective_id
-                for objective_id in controlled_objective_ids
-                if objective_id in central_objective_ids
-            )
-            return _secondary_score_count_evidence(
-                score_count=1 if len(no_mans_land_objective_ids) >= 2 else 0,
-                controlled_objective_ids=no_mans_land_objective_ids,
-                home_objective_ids=home_objective_ids,
-            )
-        if rule.condition == "one_or_more_objectives_cleansed_this_turn":
-            cleanses = _secondary_objective_cleanses_this_turn(
-                objective_cleanse_states,
-                player_id=requested_player,
-                battle_round=record.battle_round,
-                active_player_id=record.active_player_id,
-            )
-            return _secondary_score_count_evidence(
-                score_count=1 if cleanses else 0,
-                objective_marker_ids=tuple(state.objective_marker_id for state in cleanses),
-            )
-        if rule.condition == "two_or_more_objectives_cleansed_this_turn":
-            cleanses = _secondary_objective_cleanses_this_turn(
-                objective_cleanse_states,
-                player_id=requested_player,
-                battle_round=record.battle_round,
-                active_player_id=record.active_player_id,
-            )
-            return _secondary_score_count_evidence(
-                score_count=1 if len(cleanses) >= 2 else 0,
-                objective_marker_ids=tuple(state.objective_marker_id for state in cleanses),
-            )
-        if rule.condition == "one_or_more_terrain_areas_plundered_this_turn":
-            plunders = _secondary_terrain_plunders_this_turn(
-                terrain_plunder_states,
-                player_id=requested_player,
-                battle_round=record.battle_round,
-                active_player_id=record.active_player_id,
-            )
-            return _secondary_score_count_evidence(
-                score_count=1 if plunders else 0,
-                terrain_feature_ids=tuple(state.terrain_feature_id for state in plunders),
-            )
-        if rule.condition in {"fixed_secondary_condition", "tactical_secondary_condition"}:
-            return _secondary_score_count_evidence(score_count=1)
-        raise GameLifecycleError("Unsupported secondary scoring rule condition.")
+        return evaluate_secondary_scoring_condition(condition=rule.condition, context=context)
 
     def mission_action_award(
         self,
@@ -3139,8 +2971,13 @@ class MissionScoringPolicy:
         source_kind: VictoryPointSourceKind,
     ) -> SecondaryMissionScoringRule:
         match: SecondaryMissionScoringRule | None = None
+        from warhammer40k_core.engine.secondary_scoring_inventory import (
+            canonical_secondary_mission_id,
+        )
+
+        requested_secondary = canonical_secondary_mission_id(secondary_mission_id)
         for rule in self.secondary_scoring_rules:
-            if rule.secondary_mission_id != secondary_mission_id or rule.source_kind is not (
+            if rule.secondary_mission_id != requested_secondary or rule.source_kind is not (
                 source_kind
             ):
                 continue
@@ -3162,6 +2999,7 @@ class SecondaryMissionCardState:
     source_result_id: str | None = None
     scored_transaction_id: str | None = None
     discarded_result_id: str | None = None
+    selection_payload: JsonValue | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -3220,6 +3058,12 @@ class SecondaryMissionCardState:
             self.scored_transaction_id is not None or self.discarded_result_id is not None
         ):
             raise GameLifecycleError("Active secondary card must not have terminal IDs.")
+        if self.selection_payload is not None:
+            object.__setattr__(
+                self,
+                "selection_payload",
+                validate_json_value(self.selection_payload),
+            )
 
     @classmethod
     def active_fixed(cls, *, player_id: str, secondary_mission_id: str) -> Self:
@@ -3259,6 +3103,7 @@ class SecondaryMissionCardState:
             source_result_id=self.source_result_id,
             scored_transaction_id=transaction_id,
             discarded_result_id=None,
+            selection_payload=self.selection_payload,
         )
 
     def discard(self, *, result_id: str) -> Self:
@@ -3275,6 +3120,7 @@ class SecondaryMissionCardState:
             source_result_id=self.source_result_id,
             scored_transaction_id=None,
             discarded_result_id=result_id,
+            selection_payload=self.selection_payload,
         )
 
     def to_payload(self) -> SecondaryMissionCardStatePayload:
@@ -3287,6 +3133,7 @@ class SecondaryMissionCardState:
             "source_result_id": self.source_result_id,
             "scored_transaction_id": self.scored_transaction_id,
             "discarded_result_id": self.discarded_result_id,
+            "selection_payload": self.selection_payload,
         }
 
     def to_public_payload(
@@ -3307,6 +3154,8 @@ class SecondaryMissionCardState:
             }
         payload = cast(dict[str, JsonValue], self.to_payload())
         payload["hidden"] = False
+        if viewer != self.player_id:
+            payload["selection_payload"] = None
         return payload
 
     @classmethod
@@ -3320,6 +3169,24 @@ class SecondaryMissionCardState:
             source_result_id=payload["source_result_id"],
             scored_transaction_id=payload["scored_transaction_id"],
             discarded_result_id=payload["discarded_result_id"],
+            selection_payload=payload.get("selection_payload"),
+        )
+
+    def with_selection(self, selection: object) -> Self:
+        from warhammer40k_core.engine.secondary_mission_selection import SecondaryMissionSelection
+
+        if type(selection) is not SecondaryMissionSelection:
+            raise GameLifecycleError("selection must be a SecondaryMissionSelection.")
+        return type(self)(
+            player_id=self.player_id,
+            secondary_mission_id=self.secondary_mission_id,
+            mode=self.mode,
+            battle_round=self.battle_round,
+            status=self.status,
+            source_result_id=self.source_result_id,
+            scored_transaction_id=self.scored_transaction_id,
+            discarded_result_id=self.discarded_result_id,
+            selection_payload=selection.to_json_value(),
         )
 
 
@@ -3560,30 +3427,6 @@ def objective_control_timing_from_token(token: object) -> ObjectiveControlTiming
         raise GameLifecycleError(f"Unsupported ObjectiveControlTiming token: {token}.") from exc
 
 
-def _controlled_objective_ids(
-    record: ObjectiveControlRecord,
-    *,
-    player_id: str,
-) -> tuple[str, ...]:
-    requested_player = _validate_identifier("player_id", player_id)
-    return tuple(
-        result.objective_id
-        for result in record.results
-        if result.status is ObjectiveControlStatus.CONTROLLED
-        and result.controlled_by_player_id == requested_player
-    )
-
-
-def _central_objective_ids(mission_setup: MissionSetup) -> tuple[str, ...]:
-    return tuple(
-        sorted(
-            marker.objective_marker_id
-            for marker in mission_setup.objective_markers
-            if marker.objective_role is ObjectiveMarkerRole.CENTRAL
-        )
-    )
-
-
 def _turn_start_state_for_player(
     states: tuple[PrimaryObjectiveTurnStartState, ...],
     *,
@@ -3684,26 +3527,6 @@ def _enemy_unit_destructions_this_turn(
     )
 
 
-def _secondary_enemy_unit_destructions_this_turn(
-    states: tuple[SecondaryUnitDestructionState, ...],
-    *,
-    player_id: str,
-    battle_round: int,
-    active_player_id: str,
-) -> tuple[SecondaryUnitDestructionState, ...]:
-    requested_player = _validate_identifier("player_id", player_id)
-    requested_round = _validate_positive_int("battle_round", battle_round)
-    requested_active = _validate_identifier("active_player_id", active_player_id)
-    return tuple(
-        state
-        for state in states
-        if state.destroying_player_id == requested_player
-        and state.destroyed_player_id != requested_player
-        and state.active_player_id == requested_active
-        and state.battle_round == requested_round
-    )
-
-
 def _terrain_traps_this_turn(
     states: tuple[PrimaryTerrainTrapState, ...],
     *,
@@ -3711,44 +3534,6 @@ def _terrain_traps_this_turn(
     battle_round: int,
     active_player_id: str,
 ) -> tuple[PrimaryTerrainTrapState, ...]:
-    requested_player = _validate_identifier("player_id", player_id)
-    requested_round = _validate_positive_int("battle_round", battle_round)
-    requested_active = _validate_identifier("active_player_id", active_player_id)
-    return tuple(
-        state
-        for state in states
-        if state.player_id == requested_player
-        and state.active_player_id == requested_active
-        and state.battle_round == requested_round
-    )
-
-
-def _secondary_objective_cleanses_this_turn(
-    states: tuple[SecondaryObjectiveCleanseState, ...],
-    *,
-    player_id: str,
-    battle_round: int,
-    active_player_id: str,
-) -> tuple[SecondaryObjectiveCleanseState, ...]:
-    requested_player = _validate_identifier("player_id", player_id)
-    requested_round = _validate_positive_int("battle_round", battle_round)
-    requested_active = _validate_identifier("active_player_id", active_player_id)
-    return tuple(
-        state
-        for state in states
-        if state.player_id == requested_player
-        and state.active_player_id == requested_active
-        and state.battle_round == requested_round
-    )
-
-
-def _secondary_terrain_plunders_this_turn(
-    states: tuple[SecondaryTerrainPlunderState, ...],
-    *,
-    player_id: str,
-    battle_round: int,
-    active_player_id: str,
-) -> tuple[SecondaryTerrainPlunderState, ...]:
     requested_player = _validate_identifier("player_id", player_id)
     requested_round = _validate_positive_int("battle_round", battle_round)
     requested_active = _validate_identifier("active_player_id", active_player_id)
@@ -3776,55 +3561,6 @@ def _starting_strength_record_by_unit_id(
             raise GameLifecycleError("starting_strength_records must not duplicate units.")
         mapped[record.unit_instance_id] = record
     return mapped
-
-
-def _starting_strength_for_destroyed_unit(
-    unit_instance_id: str,
-    *,
-    starting_strength_by_unit_id: dict[str, StartingStrengthRecord],
-) -> int:
-    requested_unit = _validate_identifier("unit_instance_id", unit_instance_id)
-    record = starting_strength_by_unit_id.get(requested_unit)
-    if record is None:
-        raise GameLifecycleError("Secondary scoring missing StartingStrengthRecord.")
-    return record.starting_model_count
-
-
-def _secondary_score_count_evidence(
-    *,
-    score_count: int,
-    controlled_objective_ids: tuple[str, ...] = (),
-    home_objective_ids: tuple[str, ...] = (),
-    objective_marker_ids: tuple[str, ...] = (),
-    terrain_feature_ids: tuple[str, ...] = (),
-    destroyed_unit_instance_ids: tuple[str, ...] = (),
-    destroyed_model_instance_ids: tuple[str, ...] = (),
-    enemy_unit_instance_ids: tuple[str, ...] = (),
-) -> dict[str, JsonValue]:
-    return {
-        "score_count": _validate_non_negative_int("score_count", score_count),
-        "controlled_objective_ids": list(
-            _validate_identifier_tuple("controlled_objective_ids", controlled_objective_ids)
-        ),
-        "home_objective_ids": list(
-            _validate_identifier_tuple("home_objective_ids", home_objective_ids)
-        ),
-        "objective_marker_ids": list(
-            _validate_identifier_tuple("objective_marker_ids", objective_marker_ids)
-        ),
-        "terrain_feature_ids": list(
-            _validate_identifier_tuple("terrain_feature_ids", terrain_feature_ids)
-        ),
-        "destroyed_unit_instance_ids": list(
-            _validate_identifier_tuple("destroyed_unit_instance_ids", destroyed_unit_instance_ids)
-        ),
-        "destroyed_model_instance_ids": list(
-            _validate_identifier_tuple("destroyed_model_instance_ids", destroyed_model_instance_ids)
-        ),
-        "enemy_unit_instance_ids": list(
-            _validate_identifier_tuple("enemy_unit_instance_ids", enemy_unit_instance_ids)
-        ),
-    }
 
 
 def _metadata_score_count(metadata: dict[str, JsonValue]) -> int:

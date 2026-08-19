@@ -70,6 +70,16 @@
     },
     {
       "coverage_status": "envelope_only",
+      "decision_type": "resolve_tactical_secondary_when_drawn",
+      "example_path": null,
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
       "decision_type": "score_tactical_secondary_mission",
       "example_path": null,
       "interaction_kinds": [
@@ -94,6 +104,26 @@
       "example_path": null,
       "interaction_kinds": [
         "weapon_allocation_matrix"
+      ],
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_beacon_unit",
+      "example_path": null,
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
+      "decision_type": "select_burden_of_trust_guard",
+      "example_path": null,
+      "interaction_kinds": [
+        "finite_option_list"
       ],
       "registry_scope": "registered",
       "submission_kind": "finite"
@@ -580,6 +610,16 @@
     },
     {
       "coverage_status": "envelope_only",
+      "decision_type": "select_tempting_target_objective",
+      "example_path": null,
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "registry_scope": "registered",
+      "submission_kind": "finite"
+    },
+    {
+      "coverage_status": "envelope_only",
       "decision_type": "select_tracked_target",
       "example_path": null,
       "interaction_kinds": [
@@ -761,9 +801,9 @@
     }
   ],
   "interaction_kind_count": 13,
-  "known_external_token_count": 76,
+  "known_external_token_count": 80,
   "live_scenario_count": 4,
-  "registered_decision_type_count": 74,
+  "registered_decision_type_count": 78,
   "schema_version": "decision-family-coverage-v2-interactions",
   "standard_interaction_kinds": [
     "battlefield_point_placement",

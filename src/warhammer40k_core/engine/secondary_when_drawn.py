@@ -1,0 +1,360 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatus,
+)
+from warhammer40k_core.engine.scoring import (
+    SecondaryMissionCardMode,
+    SecondaryMissionCardState,
+    SecondaryMissionCardStatus,
+)
+from warhammer40k_core.engine.secondary_mission_selection import SecondaryMissionSelection
+from warhammer40k_core.engine.secondary_scoring_context import secondary_mission_selection_for_card
+
+if TYPE_CHECKING:
+    from warhammer40k_core.engine.game_state import GameState
+
+RESOLVE_TACTICAL_SECONDARY_WHEN_DRAWN_DECISION_TYPE = "resolve_tactical_secondary_when_drawn"
+_validate_identifier = IdentifierValidator(GameLifecycleError)
+_OPTIONAL_DISCARD_MISSION_IDS = frozenset({"a-grievous-blow", "bring-it-down"})
+_FIRST_ROUND_SHUFFLE_MISSION_IDS = frozenset({"behind-enemy-lines", "forward-position"})
+
+
+def next_tactical_secondary_when_drawn_request(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+) -> LifecycleStatus | None:
+    from warhammer40k_core.engine.game_state import GameState as _GameState
+
+    if type(state) is not _GameState:
+        raise GameLifecycleError("When Drawn resolution requires GameState.")
+    if state.stage is not GameLifecycleStage.BATTLE:
+        return None
+    if state.current_battle_phase is not BattlePhase.COMMAND:
+        return None
+    active_player_id = state.active_player_id
+    if active_player_id is None:
+        raise GameLifecycleError("When Drawn resolution requires an active player.")
+    pending = _pending_when_drawn_card(state=state, player_id=active_player_id)
+    if pending is None:
+        return None
+    _auto_resolve_if_ineligible(state=state, card=pending)
+    pending = _pending_when_drawn_card(state=state, player_id=active_player_id)
+    if pending is None:
+        return None
+    action = _when_drawn_action(pending.secondary_mission_id)
+    if action is None:
+        _mark_when_drawn_resolved(state=state, card=pending)
+        return next_tactical_secondary_when_drawn_request(state=state, decisions=decisions)
+    request = _when_drawn_request(state=state, card=pending, action=action)
+    decisions.request_decision(request)
+    return LifecycleStatus.waiting_for_decision(
+        stage=state.stage,
+        decision_request=request,
+        payload={
+            "game_id": state.game_id,
+            "player_id": active_player_id,
+            "secondary_mission_id": pending.secondary_mission_id,
+            "decision_type": RESOLVE_TACTICAL_SECONDARY_WHEN_DRAWN_DECISION_TYPE,
+        },
+    )
+
+
+def invalid_tactical_secondary_when_drawn_status(
+    *,
+    state: GameState,
+    result: DecisionResult,
+) -> LifecycleStatus | None:
+    payload = _payload_object(result.payload)
+    player_id = _payload_string(payload, "player_id")
+    secondary_mission_id = _payload_string(payload, "secondary_mission_id")
+    if result.actor_id != player_id or player_id != state.active_player_id:
+        return _invalid(state, player_id, secondary_mission_id, "actor_player_drift")
+    if _payload_string(payload, "game_id") != state.game_id:
+        return _invalid(state, player_id, secondary_mission_id, "game_id_drift")
+    if _payload_int(payload, "battle_round") != state.battle_round:
+        return _invalid(state, player_id, secondary_mission_id, "battle_round_drift")
+    card = state.secondary_mission_card_state(
+        player_id=player_id,
+        secondary_mission_id=secondary_mission_id,
+        mode=SecondaryMissionCardMode.TACTICAL,
+    )
+    if card is None:
+        return _invalid(state, player_id, secondary_mission_id, "card_not_active")
+    selection = secondary_mission_selection_for_card(card)
+    if selection is not None and selection.when_drawn_resolved:
+        return _invalid(state, player_id, secondary_mission_id, "when_drawn_already_resolved")
+    return None
+
+
+def apply_tactical_secondary_when_drawn(
+    *,
+    state: GameState,
+    result: DecisionResult,
+    decisions: DecisionController,
+) -> None:
+    payload = _payload_object(result.payload)
+    player_id = _payload_string(payload, "player_id")
+    secondary_mission_id = _payload_string(payload, "secondary_mission_id")
+    action = _payload_string(payload, "action")
+    card = state.secondary_mission_card_state(
+        player_id=player_id,
+        secondary_mission_id=secondary_mission_id,
+        mode=SecondaryMissionCardMode.TACTICAL,
+    )
+    if card is None:
+        raise GameLifecycleError("When Drawn apply requires an active card.")
+    if action == "keep":
+        _mark_when_drawn_resolved(state=state, card=card)
+        decisions.event_log.append(
+            "tactical_secondary_when_drawn_kept",
+            _event_payload(state=state, card=card, result=result, action="keep"),
+        )
+        return
+    if action == "discard":
+        discarded = state.discard_tactical_secondary(
+            player_id=player_id,
+            secondary_mission_id=secondary_mission_id,
+            result_id=result.result_id,
+        )
+        drawn = state.draw_tactical_secondary_cards(
+            player_id=player_id,
+            source_result_id=result.result_id,
+            draw_count=1,
+        )
+        decisions.event_log.append(
+            "tactical_secondary_when_drawn_discarded",
+            {
+                **_event_payload(state=state, card=discarded, result=result, action="discard"),
+                "drawn_secondary_mission_card_states": [
+                    validate_json_value(drawn_card.to_payload()) for drawn_card in drawn
+                ],
+            },
+        )
+        return
+    if action == "shuffle":
+        state.forget_secondary_mission_card_state(card)
+        drawn = state.draw_tactical_secondary_cards(
+            player_id=player_id,
+            source_result_id=result.result_id,
+            draw_count=1,
+        )
+        decisions.event_log.append(
+            "tactical_secondary_when_drawn_shuffled",
+            {
+                **_event_payload(state=state, card=card, result=result, action="shuffle"),
+                "drawn_secondary_mission_card_states": [
+                    validate_json_value(drawn_card.to_payload()) for drawn_card in drawn
+                ],
+            },
+        )
+        return
+    raise GameLifecycleError("When Drawn action is unsupported.")
+
+
+def _pending_when_drawn_card(
+    *,
+    state: GameState,
+    player_id: str,
+) -> SecondaryMissionCardState | None:
+    matches = tuple(
+        card
+        for card in state.secondary_mission_card_states
+        if card.player_id == player_id
+        and card.mode is SecondaryMissionCardMode.TACTICAL
+        and card.status is SecondaryMissionCardStatus.ACTIVE
+        and not _when_drawn_resolved(card)
+        and _when_drawn_action(card.secondary_mission_id) is not None
+    )
+    if not matches:
+        return None
+    return sorted(matches, key=lambda card: card.secondary_mission_id)[0]
+
+
+def _when_drawn_action(secondary_mission_id: str) -> str | None:
+    if secondary_mission_id in _OPTIONAL_DISCARD_MISSION_IDS:
+        return "discard"
+    if secondary_mission_id in _FIRST_ROUND_SHUFFLE_MISSION_IDS:
+        return "shuffle"
+    return None
+
+
+def _auto_resolve_if_ineligible(*, state: GameState, card: SecondaryMissionCardState) -> None:
+    mission_id = card.secondary_mission_id
+    if mission_id in _FIRST_ROUND_SHUFFLE_MISSION_IDS and state.battle_round != 1:
+        _mark_when_drawn_resolved(state=state, card=card)
+        return
+    if mission_id == "a-grievous-blow" and _enemy_starting_strength_13_present(
+        state,
+        card.player_id,
+    ):
+        _mark_when_drawn_resolved(state=state, card=card)
+        return
+    if mission_id == "bring-it-down" and _enemy_wounds_10_present(state, card.player_id):
+        _mark_when_drawn_resolved(state=state, card=card)
+
+
+def _enemy_starting_strength_13_present(state: GameState, player_id: str) -> bool:
+    records = {
+        record.unit_instance_id: record.starting_model_count
+        for record in state.starting_strength_records
+    }
+    embarked = _embarked_unit_ids(state)
+    for army in state.army_definitions:
+        if army.player_id == player_id:
+            continue
+        for unit in army.units:
+            if unit.unit_instance_id in embarked:
+                continue
+            if state.battlefield_state is None or not state.battlefield_state.is_unit_placed(
+                unit.unit_instance_id
+            ):
+                continue
+            starting = records.get(unit.unit_instance_id)
+            if starting is None:
+                continue
+            if starting >= 13:
+                return True
+    return False
+
+
+def _enemy_wounds_10_present(state: GameState, player_id: str) -> bool:
+    embarked = _embarked_unit_ids(state)
+    for army in state.army_definitions:
+        if army.player_id == player_id:
+            continue
+        for unit in army.units:
+            if unit.unit_instance_id in embarked:
+                continue
+            if state.battlefield_state is None or not state.battlefield_state.is_unit_placed(
+                unit.unit_instance_id
+            ):
+                continue
+            if any(model.is_alive and model.starting_wounds >= 10 for model in unit.own_models):
+                return True
+    return False
+
+
+def _embarked_unit_ids(state: GameState) -> frozenset[str]:
+    embarked: set[str] = set()
+    for cargo in state.transport_cargo_states:
+        embarked.update(cargo.embarked_unit_instance_ids)
+    return frozenset(embarked)
+
+
+def _when_drawn_resolved(card: SecondaryMissionCardState) -> bool:
+    selection = secondary_mission_selection_for_card(card)
+    return selection is not None and selection.when_drawn_resolved
+
+
+def _mark_when_drawn_resolved(*, state: GameState, card: SecondaryMissionCardState) -> None:
+    selection = secondary_mission_selection_for_card(card) or SecondaryMissionSelection()
+    state.replace_secondary_mission_card_state(
+        card.with_selection(selection.with_when_drawn_resolved())
+    )
+
+
+def _when_drawn_request(
+    *,
+    state: GameState,
+    card: SecondaryMissionCardState,
+    action: str,
+) -> DecisionRequest:
+    keep_id = f"keep:{card.secondary_mission_id}"
+    action_id = f"{action}:{card.secondary_mission_id}"
+    context: dict[str, JsonValue] = {
+        "game_id": state.game_id,
+        "player_id": card.player_id,
+        "active_player_id": card.player_id,
+        "battle_round": state.battle_round,
+        "phase": BattlePhase.COMMAND.value,
+        "secondary_mission_id": card.secondary_mission_id,
+        "secret": True,
+        "legal_option_ids": [keep_id, action_id],
+    }
+    return DecisionRequest(
+        request_id=state.next_decision_request_id(),
+        decision_type=RESOLVE_TACTICAL_SECONDARY_WHEN_DRAWN_DECISION_TYPE,
+        actor_id=card.player_id,
+        payload=context,
+        options=(
+            DecisionOption(
+                option_id=keep_id,
+                label=f"Keep {card.secondary_mission_id}",
+                payload={**context, "action": "keep"},
+            ),
+            DecisionOption(
+                option_id=action_id,
+                label=f"{action.title()} {card.secondary_mission_id}",
+                payload={**context, "action": action},
+            ),
+        ),
+    )
+
+
+def _event_payload(
+    *,
+    state: GameState,
+    card: SecondaryMissionCardState,
+    result: DecisionResult,
+    action: str,
+) -> dict[str, JsonValue]:
+    return {
+        "game_id": state.game_id,
+        "player_id": card.player_id,
+        "active_player_id": card.player_id,
+        "battle_round": state.battle_round,
+        "phase": BattlePhase.COMMAND.value,
+        "secondary_mission_id": card.secondary_mission_id,
+        "action": action,
+        "result_id": result.result_id,
+        "hidden": True,
+        "secondary_mission_card_state": validate_json_value(card.to_payload()),
+    }
+
+
+def _invalid(
+    state: GameState,
+    player_id: str,
+    secondary_mission_id: str,
+    reason: str,
+) -> LifecycleStatus:
+    return LifecycleStatus.invalid(
+        stage=state.stage,
+        message="Tactical secondary When Drawn option drifted.",
+        payload={
+            "game_id": state.game_id,
+            "player_id": player_id,
+            "secondary_mission_id": secondary_mission_id,
+            "invalid_reason": reason,
+        },
+    )
+
+
+def _payload_object(payload: JsonValue) -> dict[str, JsonValue]:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("When Drawn payload must be an object.")
+    return payload
+
+
+def _payload_string(payload: dict[str, JsonValue], key: str) -> str:
+    value = payload.get(key)
+    return _validate_identifier(key, value)
+
+
+def _payload_int(payload: dict[str, JsonValue], key: str) -> int:
+    value = payload.get(key)
+    if type(value) is not int:
+        raise GameLifecycleError(f"{key} must be an int.")
+    return value

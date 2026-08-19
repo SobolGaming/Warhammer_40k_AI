@@ -99,6 +99,13 @@
         "submission_kind": "finite"
       },
       {
+        "decision_type": "resolve_tactical_secondary_when_drawn",
+        "interaction_kinds": [
+          "finite_option_list"
+        ],
+        "submission_kind": "finite"
+      },
+      {
         "decision_type": "score_tactical_secondary_mission",
         "interaction_kinds": [
           "confirmation"
@@ -116,6 +123,20 @@
         "decision_type": "select_attack_weapon_group",
         "interaction_kinds": [
           "weapon_allocation_matrix"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_beacon_unit",
+        "interaction_kinds": [
+          "entity_selection"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_burden_of_trust_guard",
+        "interaction_kinds": [
+          "finite_option_list"
         ],
         "submission_kind": "finite"
       },
@@ -452,6 +473,13 @@
         "decision_type": "select_stratagem_cost_modifier_option",
         "interaction_kinds": [
           "confirmation"
+        ],
+        "submission_kind": "finite"
+      },
+      {
+        "decision_type": "select_tempting_target_objective",
+        "interaction_kinds": [
+          "finite_option_list"
         ],
         "submission_kind": "finite"
       },
@@ -942,7 +970,7 @@
         "identity_id": "warhammer40k-core-v2:0.1.0"
       },
       "mission_pack": {
-        "identity_hash": "fd2a930a488ee1d8b9f4d975cdf319d05c65bd8743836d5cd0a2ff4ef17aca15",
+        "identity_hash": "b07a00abb37e4c59a9068192c758cd03e52536df20328d88bcb7c46c7350f1eb",
         "identity_id": "11e-warhammer-event-companion-2026-07"
       },
       "ruleset": {
@@ -956,7 +984,7 @@
           "source_kind": "army_catalog"
         },
         {
-          "identity_hash": "5a4dcccfa86bbecc8ded95275c39ee5401ce0e27e5f426c28ae4575e02114812",
+          "identity_hash": "4b23bfe02563942bf866827c2a36eb218cb11ba3f4af7f3169c8fbc784cbb82d",
           "identity_id": "gw-11e-warhammer-event-companion-v1-1-2026-07",
           "source_kind": "mission_pack"
         }
@@ -1067,7 +1095,7 @@
             "evidence_refs": [
               "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object",
               "mission-setup-sha256:9bac6ada15611ebbe97bcc4d46ab5523b71b706e93c02f2d454c58397f5973a8",
-              "mission-source-package-hash:5a4dcccfa86bbecc8ded95275c39ee5401ce0e27e5f426c28ae4575e02114812"
+              "mission-source-package-hash:4b23bfe02563942bf866827c2a36eb218cb11ba3f4af7f3169c8fbc784cbb82d"
             ],
             "reason_code": null,
             "source_ids": [
@@ -1117,7 +1145,7 @@
           "force_disposition_id": "take-and-hold",
           "mission_pack_id": "11e-warhammer-event-companion-2026-07",
           "mission_setup_hash": "9bac6ada15611ebbe97bcc4d46ab5523b71b706e93c02f2d454c58397f5973a8",
-          "mission_source_package_hash": "5a4dcccfa86bbecc8ded95275c39ee5401ce0e27e5f426c28ae4575e02114812",
+          "mission_source_package_hash": "4b23bfe02563942bf866827c2a36eb218cb11ba3f4af7f3169c8fbc784cbb82d",
           "primary_mission_id": "primary-immovable-object",
           "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
         },
@@ -1215,7 +1243,7 @@
             "evidence_refs": [
               "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-unstoppable-force",
               "mission-setup-sha256:9bac6ada15611ebbe97bcc4d46ab5523b71b706e93c02f2d454c58397f5973a8",
-              "mission-source-package-hash:5a4dcccfa86bbecc8ded95275c39ee5401ce0e27e5f426c28ae4575e02114812"
+              "mission-source-package-hash:4b23bfe02563942bf866827c2a36eb218cb11ba3f4af7f3169c8fbc784cbb82d"
             ],
             "reason_code": null,
             "source_ids": [
@@ -1265,7 +1293,7 @@
           "force_disposition_id": "purge-the-foe",
           "mission_pack_id": "11e-warhammer-event-companion-2026-07",
           "mission_setup_hash": "9bac6ada15611ebbe97bcc4d46ab5523b71b706e93c02f2d454c58397f5973a8",
-          "mission_source_package_hash": "5a4dcccfa86bbecc8ded95275c39ee5401ce0e27e5f426c28ae4575e02114812",
+          "mission_source_package_hash": "4b23bfe02563942bf866827c2a36eb218cb11ba3f4af7f3169c8fbc784cbb82d",
           "primary_mission_id": "primary-unstoppable-force",
           "terrain_layout_id": "take-and-hold-vs-purge-the-foe-layout-3"
         },
@@ -1473,7 +1501,7 @@
           "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-immovable-object",
           "gw-11e-warhammer-event-companion-v1-1-2026-07:primary:primary-unstoppable-force",
           "mission-setup-sha256:9bac6ada15611ebbe97bcc4d46ab5523b71b706e93c02f2d454c58397f5973a8",
-          "mission-source-package-hash:5a4dcccfa86bbecc8ded95275c39ee5401ce0e27e5f426c28ae4575e02114812",
+          "mission-source-package-hash:4b23bfe02563942bf866827c2a36eb218cb11ba3f4af7f3169c8fbc784cbb82d",
           "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3:player-a:primary-immovable-object",
           "mission:11e-warhammer-event-companion-2026-07:mission-take-and-hold-vs-purge-the-foe-layout-3:player-b:primary-unstoppable-force",
           "phase9a-canonical/core-deep-strike-unit/core/core-deep-strike/none",
@@ -2683,6 +2711,13 @@
       "submission_kind": "finite"
     },
     {
+      "decision_type": "resolve_tactical_secondary_when_drawn",
+      "interaction_kinds": [
+        "finite_option_list"
+      ],
+      "submission_kind": "finite"
+    },
+    {
       "decision_type": "score_tactical_secondary_mission",
       "interaction_kinds": [
         "confirmation"
@@ -2700,6 +2735,20 @@
       "decision_type": "select_attack_weapon_group",
       "interaction_kinds": [
         "weapon_allocation_matrix"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_beacon_unit",
+      "interaction_kinds": [
+        "entity_selection"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_burden_of_trust_guard",
+      "interaction_kinds": [
+        "finite_option_list"
       ],
       "submission_kind": "finite"
     },
@@ -3036,6 +3085,13 @@
       "decision_type": "select_stratagem_cost_modifier_option",
       "interaction_kinds": [
         "confirmation"
+      ],
+      "submission_kind": "finite"
+    },
+    {
+      "decision_type": "select_tempting_target_objective",
+      "interaction_kinds": [
+        "finite_option_list"
       ],
       "submission_kind": "finite"
     },

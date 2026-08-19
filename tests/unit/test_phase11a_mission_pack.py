@@ -536,11 +536,9 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "control_two_or_more_no_mans_land_objectives_excluding_home"
         ),
     }
-    assert {
-        rule.rule_id for rule in assassination.scoring_rules if rule.source_kind == "secondary"
-    } == {
+    assert {rule.rule_id for rule in assassination.scoring_rules} == {
+        "assassination-fixed-character-destroyed",
         "assassination-fixed-character-w4-plus",
-        "assassination-fixed-character-w3-or-less",
         "assassination-tactical-all-characters-destroyed",
         "assassination-tactical-character-destroyed",
     }
