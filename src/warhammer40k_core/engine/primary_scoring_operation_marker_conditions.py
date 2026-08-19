@@ -184,6 +184,7 @@ def evaluate_operation_marker_scoring_condition(
             mission_id=mission_setup.primary_mission_id_for_player(player_id),
             source_identity=maintain_control_marker_source_identity(),
             mission_setup=mission_setup,
+            require_unique_objective_anchors=False,
         )
         return _controlled_central_range_evidence(
             matching=matching,
@@ -196,6 +197,7 @@ def evaluate_operation_marker_scoring_condition(
         mission_id=mission_setup.primary_mission_id_for_player(player_id),
         source_identity=extract_intelligence_marker_source_identity(),
         mission_setup=mission_setup,
+        require_unique_objective_anchors=True,
     )
     if condition_id not in _EXTRACT_INTELLIGENCE_OPERATION_MARKER_CONDITIONS:
         raise GameLifecycleError(f"Unsupported primary scoring condition: {condition_id}.")
@@ -234,7 +236,12 @@ def _active_objective_operation_markers_for_identity(
     mission_id: str,
     source_identity: tuple[str, str],
     mission_setup: MissionSetup,
+    require_unique_objective_anchors: bool,
 ) -> tuple[PrimaryMissionMarkerState, ...]:
+    if type(require_unique_objective_anchors) is not bool:
+        raise GameLifecycleError(
+            "Primary scoring operation-marker uniqueness policy must be a bool."
+        )
     expected_objective_ids = {
         marker.objective_marker_id for marker in mission_setup.objective_markers
     }
@@ -258,11 +265,12 @@ def _active_objective_operation_markers_for_identity(
             raise GameLifecycleError(
                 "Primary scoring operation marker references an unknown objective."
             )
-        if objective_id in seen_objectives:
-            raise GameLifecycleError(
-                "Primary scoring operation markers must not duplicate an objective."
-            )
-        seen_objectives.add(objective_id)
+        if require_unique_objective_anchors:
+            if objective_id in seen_objectives:
+                raise GameLifecycleError(
+                    "Primary scoring operation markers must not duplicate an objective."
+                )
+            seen_objectives.add(objective_id)
         matching.append(marker)
     return tuple(sorted(matching, key=lambda marker: marker.marker_id))
 

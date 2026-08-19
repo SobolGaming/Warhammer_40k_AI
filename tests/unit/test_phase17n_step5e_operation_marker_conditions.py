@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import math
+from copy import deepcopy
 from dataclasses import replace
+from typing import cast
 
 import pytest
 from tests.phase17n_primary_mission_helpers import (
@@ -12,9 +14,13 @@ from tests.phase17n_primary_mission_helpers import (
 
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.engine.actions import MissionActionState
-from warhammer40k_core.engine.event_log import EventLog
+from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.mission_action_policies import mission_action_policy_for_id
+from warhammer40k_core.engine.mission_decisions import request_mission_action_start
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.mission_terrain import (
     MissionLogicalTerrainArea,
@@ -25,9 +31,11 @@ from warhammer40k_core.engine.missions import (
     primary_scoring_rules_from_definition,
 )
 from warhammer40k_core.engine.objective_control import (
+    ObjectiveControlContext,
     ObjectiveControlRecord,
     ObjectiveControlResult,
     ObjectiveControlTiming,
+    resolve_objective_control,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_mission_action_resolution import (
@@ -36,6 +44,7 @@ from warhammer40k_core.engine.primary_mission_action_resolution import (
 from warhammer40k_core.engine.primary_mission_state import (
     MarkerAnchorKind,
     PrimaryMissionMarkerState,
+    PrimaryMissionMarkerStatus,
     PrimaryMissionProgressState,
     primary_mission_marker_id,
 )
@@ -338,6 +347,69 @@ def test_phase17n_step5e_vital_link_counts_markers_in_range_of_controlled_centra
     assert far["score_count"] == 0
 
 
+def test_phase17n_step5e_vital_link_counts_accumulated_markers_on_same_central() -> None:
+    setup = _vital_link_setup()
+    central_id = _central_objective_ids(setup)[0]
+    matching = evaluate_operation_marker_scoring_condition(
+        condition_id=EACH_FRIENDLY_OPERATION_MARKER_WITHIN_CONTROLLED_CENTRAL_RANGE,
+        progress=_objective_marker_progress(
+            setup,
+            owner_player_id="player-b",
+            mission_id="primary-vital-link",
+            source_identity=maintain_control_marker_source_identity(),
+            objective_ids=(central_id, central_id),
+        ),
+        mission_setup=setup,
+        player_id="player-b",
+        battle_round=2,
+        end_of_battle=False,
+        controlled_objective_ids=(central_id,),
+    )
+    lost_control = evaluate_operation_marker_scoring_condition(
+        condition_id=EACH_FRIENDLY_OPERATION_MARKER_WITHIN_CONTROLLED_CENTRAL_RANGE,
+        progress=_objective_marker_progress(
+            setup,
+            owner_player_id="player-b",
+            mission_id="primary-vital-link",
+            source_identity=maintain_control_marker_source_identity(),
+            objective_ids=(central_id, central_id),
+        ),
+        mission_setup=setup,
+        player_id="player-b",
+        battle_round=2,
+        end_of_battle=False,
+        controlled_objective_ids=(),
+    )
+    assert matching["score_count"] == 2
+    matching_ids = matching["operation_marker_ids"]
+    assert type(matching_ids) is list
+    assert len(matching_ids) == 2
+    assert matching_ids[0] != matching_ids[1]
+    assert matching["objective_marker_ids"] == [central_id, central_id]
+    assert lost_control["score_count"] == 0
+    assert lost_control["operation_marker_ids"] == []
+
+
+def test_phase17n_step5e_gather_intel_rejects_duplicate_objective_anchors() -> None:
+    setup = _gather_intel_setup()
+    objective_id = _non_home_objective_ids(setup)[0]
+    with pytest.raises(GameLifecycleError, match="must not duplicate an objective"):
+        evaluate_operation_marker_scoring_condition(
+            condition_id=THREE_OR_MORE_FRIENDLY_OPERATION_MARKERS_END_OF_BATTLE,
+            progress=_objective_marker_progress(
+                setup,
+                owner_player_id="player-a",
+                mission_id="primary-gather-intel",
+                source_identity=extract_intelligence_marker_source_identity(),
+                objective_ids=(objective_id, objective_id),
+            ),
+            mission_setup=setup,
+            player_id="player-a",
+            battle_round=5,
+            end_of_battle=True,
+        )
+
+
 def test_phase17n_step5e_locate_and_extract_terrain_occupancy_is_exclusive() -> None:
     setup = _locate_setup()
     terrain_id = _first_logical_terrain_id(setup)
@@ -522,6 +594,108 @@ def test_phase17n_step5e_scores_vital_link_marker_bonus_through_shared_boundary(
     )
 
 
+def test_phase17n_step5e_vital_link_scores_accumulated_same_central_markers() -> None:
+    state, record, target_id, marker_ids = _two_turn_maintain_control_same_central()
+    _assert_operation_marker_boundary_path(
+        state=state,
+        record=record,
+        player_id="player-b",
+        condition_id=EACH_FRIENDLY_OPERATION_MARKER_WITHIN_CONTROLLED_CENTRAL_RANGE,
+        expected_vp=2,
+        end_of_battle=False,
+    )
+    awards = _primary_awards_by_condition(state, player_id="player-b", battle_round=2)
+    assert awards[EACH_FRIENDLY_OPERATION_MARKER_WITHIN_CONTROLLED_CENTRAL_RANGE] == 2
+    assert awards["control_one_or_more_central_objectives"] == 2
+    round_total = sum(
+        transaction.amount
+        for ledger in state.victory_point_ledgers
+        for transaction in ledger.transactions
+        if (
+            transaction.player_id == "player-b"
+            and transaction.source_kind is VictoryPointSourceKind.PRIMARY
+            and transaction.battle_round == 2
+        )
+    )
+    assert round_total == 4
+    evidence = next(
+        row
+        for row in state.primary_scoring_state_evidence_records
+        if row.objective_control_record_id == record.record_id
+    )
+    setup = state.mission_setup
+    if setup is None:
+        raise AssertionError("Step 5E accumulated Vital Link scoring requires MissionSetup.")
+    reevaluated = evaluate_operation_marker_scoring_condition(
+        condition_id=EACH_FRIENDLY_OPERATION_MARKER_WITHIN_CONTROLLED_CENTRAL_RANGE,
+        progress=evidence.primary_mission_progress_state,
+        mission_setup=setup,
+        player_id="player-b",
+        battle_round=2,
+        end_of_battle=False,
+        controlled_objective_ids=tuple(
+            result.objective_id
+            for result in record.results
+            if result.controlled_by_player_id == "player-b"
+        ),
+    )
+    assert reevaluated["score_count"] == 2
+    assert reevaluated["operation_marker_ids"] == list(marker_ids)
+    assert reevaluated["objective_marker_ids"] == [target_id, target_id]
+
+    lost_control = deepcopy(state)
+    lost_control.battle_round = 3
+    _place_player_unit_at(lost_control, player_id="player-b", x_inches=2.0, y_inches=2.0)
+    lost_record = lost_control.record_objective_control_boundary(
+        completed_phase=BattlePhase.FIGHT,
+        timing=ObjectiveControlTiming.TURN_END,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+    score_primary_objective_control_boundary(
+        state=lost_control,
+        record=lost_record,
+        end_of_battle=False,
+        event_log=EventLog(),
+    )
+    lost_awards = _primary_awards_by_condition(
+        lost_control,
+        player_id="player-b",
+        battle_round=3,
+    )
+    assert all(
+        result.objective_id != target_id or result.controlled_by_player_id != "player-b"
+        for result in lost_record.results
+    )
+    assert EACH_FRIENDLY_OPERATION_MARKER_WITHIN_CONTROLLED_CENTRAL_RANGE not in lost_awards
+
+    remaining_id = marker_ids[0]
+    removed_marker = next(
+        marker
+        for marker in state.primary_mission_progress_state.markers
+        if marker.marker_id == marker_ids[1]
+    )
+    reduced_progress = state.primary_mission_progress_state.replace_marker(
+        removed_marker.removed(
+            battle_round=2,
+            phase=BattlePhase.FIGHT.value,
+            active_player_id="player-b",
+            source_id=maintain_control_marker_source_identity()[0],
+            event_id="step5e-vital-link-accumulated-tombstone",
+        )
+    )
+    reduced = evaluate_operation_marker_scoring_condition(
+        condition_id=EACH_FRIENDLY_OPERATION_MARKER_WITHIN_CONTROLLED_CENTRAL_RANGE,
+        progress=reduced_progress,
+        mission_setup=setup,
+        player_id="player-b",
+        battle_round=2,
+        end_of_battle=False,
+        controlled_objective_ids=(target_id,),
+    )
+    assert reduced["score_count"] == 1
+    assert reduced["operation_marker_ids"] == [remaining_id]
+
+
 def test_phase17n_step5e_scores_gather_intel_end_of_battle_through_shared_boundary() -> None:
     state, _ordinary_record = _resolved_primary_action(
         layout_id="reconnaissance-vs-reconnaissance-layout-1",
@@ -694,7 +868,12 @@ def _objective_context(
     )
 
 
-def _primary_awards_by_condition(state: GameState, *, player_id: str) -> dict[str, int]:
+def _primary_awards_by_condition(
+    state: GameState,
+    *,
+    player_id: str,
+    battle_round: int | None = None,
+) -> dict[str, int]:
     awards: dict[str, int] = {}
     for ledger in state.victory_point_ledgers:
         for transaction in ledger.transactions:
@@ -703,6 +882,8 @@ def _primary_awards_by_condition(state: GameState, *, player_id: str) -> dict[st
                 or transaction.source_kind is not VictoryPointSourceKind.PRIMARY
                 or type(transaction.metadata) is not dict
             ):
+                continue
+            if battle_round is not None and transaction.battle_round != battle_round:
                 continue
             condition = transaction.metadata.get("scoring_rule_condition")
             if type(condition) is not str:
@@ -820,6 +1001,178 @@ def _resolved_primary_action(
     )
     assert len(resolved) == 1
     return state, record
+
+
+def _two_turn_maintain_control_same_central() -> tuple[
+    GameState,
+    ObjectiveControlRecord,
+    str,
+    tuple[str, ...],
+]:
+    state, decisions, action, target_id = phase17n_started_primary_action_fixture(
+        layout_id="purge-the-foe-vs-priority-assets-layout-1",
+        attacker_force_disposition_id="purge-the-foe",
+        defender_force_disposition_id="priority-assets",
+        player_id="player-b",
+        mission_action_id=MAINTAIN_CONTROL_ACTION_ID,
+        current_phase=BattlePhase.FIGHT,
+        target_objective_id=None,
+    )
+    _bind_force_dispositions(state)
+    if target_id != action.target_id:
+        raise AssertionError("Step 5E accumulated Maintain Control target drifted.")
+    _complete_started_maintain_control(
+        state=state,
+        decisions=decisions,
+        store_record=False,
+    )
+    first_markers = _active_maintain_control_markers(state)
+    assert len(first_markers) == 1
+    assert first_markers[0].objective_marker_id == target_id
+
+    state.battle_round = 2
+    _start_maintain_control(
+        state=state,
+        decisions=decisions,
+        unit_instance_id=action.unit_instance_id,
+        target_id=target_id,
+        result_id="phase17n-action-result:maintain-control:player-b:round-2",
+    )
+    record = _complete_started_maintain_control(
+        state=state,
+        decisions=decisions,
+        store_record=True,
+    )
+    assert record is not None
+    markers = _active_maintain_control_markers(state)
+    assert len(markers) == 2
+    marker_ids = tuple(marker.marker_id for marker in markers)
+    assert marker_ids[0] != marker_ids[1]
+    assert {marker.objective_marker_id for marker in markers} == {target_id}
+    return state, record, target_id, marker_ids
+
+
+def _complete_started_maintain_control(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    store_record: bool,
+) -> ObjectiveControlRecord | None:
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    if store_record:
+        record = state.record_objective_control_boundary(
+            completed_phase=BattlePhase.FIGHT,
+            timing=ObjectiveControlTiming.TURN_END,
+            runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+        )
+        decisions.event_log.append(
+            "end_boundary_objective_control_determined",
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.FIGHT.value,
+                "record_ids": [record.record_id],
+                "source_rule_id": (
+                    "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+                ),
+            },
+        )
+    else:
+        record = resolve_objective_control(
+            ObjectiveControlContext.from_game_state(
+                state,
+                timing=ObjectiveControlTiming.TURN_END,
+                phase=BattlePhase.FIGHT,
+                ruleset_descriptor=state.ruleset_descriptor_for_runtime_policy(),
+            )
+        )
+    resolved = resolve_primary_mission_actions_at_turn_end(
+        state=state,
+        decisions=decisions,
+        completed_phase=BattlePhase.FIGHT,
+        turn_end_record=record,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+    assert len(resolved) == 1
+    return record if store_record else None
+
+
+def _start_maintain_control(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    unit_instance_id: str,
+    target_id: str,
+    result_id: str,
+) -> None:
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    status = request_mission_action_start(
+        state=state,
+        decisions=decisions,
+        player_id="player-b",
+        mission_action_id=MAINTAIN_CONTROL_ACTION_ID,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+    request = status.decision_request
+    assert request is not None
+    selected_option = next(
+        option
+        for option in request.options
+        if option.option_id != "continue_to_shooting"
+        and cast(dict[str, JsonValue], option.payload)["unit_instance_id"] == unit_instance_id
+        and cast(dict[str, JsonValue], option.payload)["target_id"] == target_id
+    )
+    result = DecisionResult.for_request(
+        result_id=result_id,
+        request=request,
+        selected_option_id=selected_option.option_id,
+    )
+    GameLifecycle(decision_controller=decisions, state=state).submit_decision(result)
+
+
+def _active_maintain_control_markers(state: GameState) -> tuple[PrimaryMissionMarkerState, ...]:
+    identity = maintain_control_marker_source_identity()
+    matching = tuple(
+        marker
+        for marker in state.primary_mission_progress_state.markers
+        if marker.status is PrimaryMissionMarkerStatus.ACTIVE
+        and (marker.source_rule_id, marker.source_descriptor_id) == identity
+    )
+    return tuple(sorted(matching, key=lambda marker: marker.marker_id))
+
+
+def _place_player_unit_at(
+    state: GameState,
+    *,
+    player_id: str,
+    x_inches: float,
+    y_inches: float,
+) -> None:
+    assert state.battlefield_state is not None
+    unit = next(
+        candidate
+        for army in state.army_definitions
+        if army.player_id == player_id
+        for candidate in army.units
+    )
+    placement = state.battlefield_state.unit_placement_by_id(unit.unit_instance_id)
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        replace(
+            placement,
+            model_placements=tuple(
+                replace(
+                    model_placement,
+                    pose=Pose.at(
+                        x_inches + (index * 0.1),
+                        y_inches,
+                        model_placement.pose.position.z,
+                        facing_degrees=model_placement.pose.facing.degrees,
+                    ),
+                )
+                for index, model_placement in enumerate(placement.model_placements)
+            ),
+        )
+    )
 
 
 def _bind_force_dispositions(state: GameState) -> None:
