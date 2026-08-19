@@ -87,6 +87,9 @@ from warhammer40k_core.engine.primary_mission_choices import (
     punishment_choice_request,
     sensor_sweep_marker_removal_choice_request,
 )
+from warhammer40k_core.engine.primary_scoring_boundary import (
+    score_primary_objective_control_boundary,
+)
 from warhammer40k_core.engine.primary_scoring_boundary_lifecycle import (
     PRIMARY_SCORING_PENDING_WINDOW_PRIMARY_MISSION_CHOICE,
     mark_pending_primary_scoring_boundaries,
@@ -1026,6 +1029,12 @@ def phase17n_sensor_pending_fixture() -> tuple[
     )
     assert len(completed) == 1
     assert completed[0].action_id == action.action_id
+    score_primary_objective_control_boundary(
+        state=state,
+        record=record,
+        end_of_battle=False,
+        event_log=decisions.event_log,
+    )
     request = sensor_sweep_marker_removal_choice_request(
         state=state,
         decisions=decisions,

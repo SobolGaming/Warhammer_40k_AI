@@ -104,7 +104,7 @@ def test_phase17j_event_companion_package_identity_and_payload_round_trip() -> N
 
     assert mission_pack.mission_pack_id == "11e-warhammer-event-companion-2026-07"
     assert source_package.source_commit_or_import_hash == (
-        "4c9f813b0c83ba62da8f0889f8cfe7acf43f2a72be34ba52d580669df6e5fc1c"
+        "ae1f215a6eb0297f5b34313f85f7dc0574720cb6c4c3010faa33bda0f4945b27"
     )
     assert source_package.to_payload() == {
         "edition_id": "warhammer_40000_11th",
@@ -434,7 +434,7 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
     assert punishment_choice.effect_duration == "until_start_of_own_next_turn"
     assert Counter(
         mission.engine_support_status for mission in artifact.primary_missions
-    ) == Counter({"engine_implemented": 20, "source_known_engine_pending": 5})
+    ) == Counter({"engine_implemented": 24, "source_known_engine_pending": 1})
     all_scoring_rules = tuple(
         rule for mission in artifact.primary_missions for rule in mission.scoring_rules
     )
@@ -463,8 +463,11 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
         "primary-delaying-action",
         "primary-destroyers-wrath",
         "primary-determined-acquisition",
+        "primary-extract-relic",
+        "primary-gather-intel",
         "primary-immovable-object",
         "primary-inescapable-dominion",
+        "primary-locate-and-deny",
         "primary-meatgrinder",
         "primary-outmaneuver",
         "primary-punishment",
@@ -477,6 +480,7 @@ def test_phase17n_primary_scoring_artifact_is_source_hashed_strict_and_consumed(
         "primary-triangulation",
         "primary-unstoppable-force",
         "primary-vanguard-operation",
+        "primary-vital-link",
     }
     grouped_rule_ids: dict[str, tuple[str, ...]] = {}
     for group_id in sorted(
@@ -3190,11 +3194,14 @@ def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_ord
     }
     assert complete_pair_ids == {
         "disruption-vs-disruption",
+        "disruption-vs-priority-assets",
         "priority-assets-vs-priority-assets",
         "purge-the-foe-vs-disruption",
+        "purge-the-foe-vs-priority-assets",
         "purge-the-foe-vs-purge-the-foe",
         "purge-the-foe-vs-reconnaissance",
         "reconnaissance-vs-priority-assets",
+        "reconnaissance-vs-reconnaissance",
         "take-and-hold-vs-disruption",
         "take-and-hold-vs-priority-assets",
         "take-and-hold-vs-purge-the-foe",
@@ -3212,7 +3219,7 @@ def test_phase17j_event_matrix_uses_pdf_source_pairings_not_chapter_approved_ord
             ].primary_mission_id
             in executable_primary_ids
         )
-        == 33
+        == 42
     )
     assert (
         source_rows[10].source_left_force_disposition_id,
@@ -4041,8 +4048,8 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
 
     assert len(coverage_rows) == 25
     assert status_counts == {
-        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 20,
-        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 5,
+        event_source.PrimaryMissionScoringCoverageStatus.ENGINE_IMPLEMENTED: 24,
+        event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING: 1,
         event_source.PrimaryMissionScoringCoverageStatus.AWAITING_SOURCE: 0,
     }
     assert {
@@ -4056,11 +4063,7 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         if row.status
         is event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
     } == {
-        "primary-extract-relic",
-        "primary-gather-intel",
-        "primary-locate-and-deny",
         "primary-surveil-the-foe",
-        "primary-vital-link",
     }
     assert {
         mission_id: len(primary_rows[mission_id].scoring_rules)
@@ -4124,6 +4127,10 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
     assert primary_rows["primary-secure-asset"].scoring_kind == "secure_asset"
     assert primary_rows["primary-vanguard-operation"].scoring_kind == "vanguard_operation"
     assert primary_rows["primary-punishment"].scoring_kind == "punishment"
+    assert primary_rows["primary-extract-relic"].scoring_kind == "extract_relic"
+    assert primary_rows["primary-gather-intel"].scoring_kind == "gather_intel"
+    assert primary_rows["primary-locate-and-deny"].scoring_kind == "locate_and_deny"
+    assert primary_rows["primary-vital-link"].scoring_kind == "vital_link"
     assert coverage_rows["primary-unstoppable-force"].needed_work == ()
     assert coverage_rows["primary-meatgrinder"].needed_work == ()
     assert coverage_rows["primary-death-trap"].mission_action_count == 1
@@ -4153,6 +4160,10 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         "primary-secure-asset",
         "primary-vanguard-operation",
         "primary-punishment",
+        "primary-extract-relic",
+        "primary-gather-intel",
+        "primary-locate-and-deny",
+        "primary-vital-link",
     ):
         assert coverage_rows[implemented_mission_id].needed_work == ()
     assert {
@@ -4161,21 +4172,8 @@ def test_phase17j_primary_scoring_coverage_tracks_known_pending_and_missing_rows
         if row.status
         is event_source.PrimaryMissionScoringCoverageStatus.SOURCE_KNOWN_ENGINE_PENDING
     } == {
-        "primary-extract-relic": (
-            "engine_primary_condition:single_opponent_operation_marker_terrain_area_state",
-        ),
-        "primary-gather-intel": (
-            "engine_primary_condition:gather_intel_operation_marker_end_of_battle",
-        ),
-        "primary-locate-and-deny": (
-            "engine_primary_condition:single_friendly_operation_marker_terrain_area_state",
-        ),
         "primary-surveil-the-foe": (
             "engine_primary_condition:enemy_unit_surveilled_marker_exception",
-            "engine_primary_condition:no_enemy_operation_markers_on_battlefield",
-        ),
-        "primary-vital-link": (
-            "engine_primary_condition:central_objective_operation_marker_bonus",
         ),
     }
 

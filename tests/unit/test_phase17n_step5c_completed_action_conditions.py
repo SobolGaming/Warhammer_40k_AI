@@ -77,13 +77,7 @@ def test_phase17n_step5c_promotes_completed_action_primary_missions() -> None:
 def test_phase17n_step5c_keeps_remaining_condition_pending_missions_fail_closed() -> None:
     package = warhammer_event_companion_2026_07_mission_pack()
     primary_by_id = {primary.primary_mission_id: primary for primary in package.primary_missions}
-    for mission_id in (
-        "primary-gather-intel",
-        "primary-extract-relic",
-        "primary-surveil-the-foe",
-        "primary-locate-and-deny",
-        "primary-vital-link",
-    ):
+    for mission_id in ("primary-surveil-the-foe",):
         assert (
             primary_scoring_rules_from_definition(
                 primary_by_id[mission_id],
