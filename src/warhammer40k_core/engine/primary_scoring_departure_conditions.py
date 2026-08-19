@@ -11,6 +11,10 @@ from warhammer40k_core.engine.primary_mission_state import (
     PrimaryMissionProgressState,
 )
 from warhammer40k_core.engine.primary_scoring_conditions import primary_score_count_evidence
+from warhammer40k_core.engine.primary_scoring_persisted_lineage import (
+    frozen_component_lineage_from_departures,
+    related_departures_for_frozen_components,
+)
 from warhammer40k_core.engine.primary_scoring_turn_keys import (
     primary_own_turn_interval_contains,
 )
@@ -170,31 +174,18 @@ def _condemned_unit_departures_when_fully_left(
             direct_matches,
             scoring_player_id=scoring_player_id,
         )
-        component_lineages = {
-            frozenset(departure.component_unit_instance_ids) for departure in direct_matches
-        }
-        if len(component_lineages) != 1:
+        lineage = frozen_component_lineage_from_departures(
+            historical_unit_instance_id=rules_unit_instance_id,
+            departures=departures,
+        )
+        if lineage is None:
             raise GameLifecycleError("Punishment condemned departure component identity drifted.")
-        historical_components = next(iter(component_lineages))
-        if not historical_components:
-            raise GameLifecycleError("Punishment condemned departure component identity drifted.")
-        related = list(direct_matches)
-        for departure in departures:
-            if departure.rules_unit_instance_id == rules_unit_instance_id:
-                continue
-            current_identities = frozenset(
-                (departure.rules_unit_instance_id, *departure.component_unit_instance_ids)
-            )
-            departed_identities = frozenset(departure.departed_component_unit_instance_ids)
-            if (
-                not current_identities
-                or not current_identities <= historical_components
-                or not departed_identities
-                or not departed_identities <= historical_components
-            ):
-                continue
-            related.append(departure)
-        related_matches = tuple(related)
+        _owner_player_id, historical_components = lineage
+        related_matches = related_departures_for_frozen_components(
+            historical_unit_instance_id=rules_unit_instance_id,
+            frozen_components=historical_components,
+            departures=departures,
+        )
         _assert_enemy_departures(
             related_matches,
             scoring_player_id=scoring_player_id,

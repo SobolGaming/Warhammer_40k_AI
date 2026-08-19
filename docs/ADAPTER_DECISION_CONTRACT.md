@@ -29,7 +29,8 @@ the same Step 5A evidence registry and replay artifact.
 
 Phase 17N Step 5F adds no new adapter-facing decision types, finite option
 families, proposal kinds, or payload shapes. Surveil scoring consumes
-the same Step 5A evidence registry and replay artifact.
+the same Step 5A evidence registry and replay artifact, including persisted
+battlefield-departure lineage when a surveilled Attached Unit later splits.
 
 The short rule:
 

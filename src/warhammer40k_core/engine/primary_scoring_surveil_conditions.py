@@ -5,6 +5,9 @@ from typing import TYPE_CHECKING
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.primary_battlefield_departure import (
+    PrimaryBattlefieldDepartureState,
+)
 from warhammer40k_core.engine.primary_mission_state import (
     MarkerAnchorKind,
     PrimaryMissionMarkerState,
@@ -12,6 +15,11 @@ from warhammer40k_core.engine.primary_mission_state import (
     PrimaryMissionProgressState,
 )
 from warhammer40k_core.engine.primary_scoring_conditions import primary_score_count_evidence
+from warhammer40k_core.engine.primary_scoring_persisted_lineage import (
+    PrimaryScoringPersistedRulesUnitLineage,
+    resolve_persisted_rules_unit_position_witnesses,
+    validate_primary_scoring_persisted_departures,
+)
 from warhammer40k_core.engine.primary_scoring_position_witness import (
     PrimaryScoringRulesUnitPositionWitness,
     validate_primary_scoring_position_witnesses,
@@ -44,6 +52,7 @@ def evaluate_surveil_scoring_condition(
     mission_setup: MissionSetup,
     player_id: str,
     battle_round: int,
+    departures: tuple[PrimaryBattlefieldDepartureState, ...] = (),
     position_witnesses: tuple[PrimaryScoringRulesUnitPositionWitness, ...] | None = None,
 ) -> dict[str, JsonValue]:
     if condition_id not in PRIMARY_SCORING_SURVEIL_CONDITIONS:
@@ -56,6 +65,7 @@ def evaluate_surveil_scoring_condition(
         raise GameLifecycleError("Primary surveil scoring requires MissionSetup.")
     if type(battle_round) is not int or battle_round < 1:
         raise GameLifecycleError("Primary surveil scoring battle_round must be a positive int.")
+    validated_departures = validate_primary_scoring_persisted_departures(departures)
     mission_id = mission_setup.primary_mission_id_for_player(player_id)
     matching = _completed_surveil_actions_this_turn(
         actions,
@@ -72,6 +82,7 @@ def evaluate_surveil_scoring_condition(
             completed_action_ids=(),
             surveilled_unit_instance_ids=(),
             excepted_unit_instance_ids=(),
+            resolved_lineages=(),
             operation_objective_ids=(),
             operation_marker_ids=(),
         )
@@ -95,12 +106,20 @@ def evaluate_surveil_scoring_condition(
     )
     operation_marker_ids = tuple(sorted(marker.marker_id for marker in operation_markers))
     marked_objectives = frozenset(operation_objective_ids)
-    excepted_unit_ids = tuple(
-        unit_id
-        for unit_id in surveilled_unit_ids
-        if _surveilled_unit_is_within_marked_objective_range(
-            unit_id,
+    resolved_lineages = tuple(
+        _resolve_surveilled_lineage(
+            unit_instance_id,
             witnesses=validated_witnesses,
+            departures=validated_departures,
+            scoring_player_id=player_id,
+        )
+        for unit_instance_id in surveilled_unit_ids
+    )
+    excepted_unit_ids = tuple(
+        lineage.historical_unit_instance_id
+        for lineage in resolved_lineages
+        if _lineage_is_within_marked_objective_range(
+            lineage,
             marked_objective_ids=marked_objectives,
             mission_setup=mission_setup,
         )
@@ -111,6 +130,7 @@ def evaluate_surveil_scoring_condition(
         completed_action_ids=completed_action_ids,
         surveilled_unit_instance_ids=surveilled_unit_ids,
         excepted_unit_instance_ids=excepted_unit_ids,
+        resolved_lineages=resolved_lineages,
         operation_objective_ids=operation_objective_ids,
         operation_marker_ids=operation_marker_ids,
     )
@@ -189,45 +209,45 @@ def _active_objective_operation_markers(
     return tuple(sorted(matching, key=lambda marker: marker.marker_id))
 
 
-def _surveilled_unit_is_within_marked_objective_range(
+def _resolve_surveilled_lineage(
     unit_instance_id: str,
     *,
     witnesses: tuple[PrimaryScoringRulesUnitPositionWitness, ...],
+    departures: tuple[PrimaryBattlefieldDepartureState, ...],
+    scoring_player_id: str,
+) -> PrimaryScoringPersistedRulesUnitLineage:
+    lineage = resolve_persisted_rules_unit_position_witnesses(
+        historical_unit_instance_id=unit_instance_id,
+        position_witnesses=witnesses,
+        departures=departures,
+    )
+    if lineage.owner_player_id == scoring_player_id:
+        raise GameLifecycleError("Primary scoring Surveil lineage owner drifted.")
+    return lineage
+
+
+def _lineage_is_within_marked_objective_range(
+    lineage: PrimaryScoringPersistedRulesUnitLineage,
+    *,
     marked_objective_ids: frozenset[str],
     mission_setup: MissionSetup,
 ) -> bool:
-    matching = tuple(
-        witness
-        for witness in witnesses
-        if _witness_covers_unit(witness, unit_instance_id=unit_instance_id)
-    )
-    if len(matching) > 1:
-        raise GameLifecycleError(
-            "Primary scoring Surveil target matched multiple position witnesses."
-        )
-    if not matching:
+    if not lineage.current_witnesses:
         return False
     expected_objective_ids = {
         marker.objective_marker_id for marker in mission_setup.objective_markers
     }
-    witness_objective_ids = matching[0].rules_unit_membership.objective_marker_ids
-    if any(objective_id not in expected_objective_ids for objective_id in witness_objective_ids):
-        raise GameLifecycleError(
-            "Primary scoring Surveil position witness references an unknown objective."
-        )
-    return bool(marked_objective_ids.intersection(witness_objective_ids))
-
-
-def _witness_covers_unit(
-    witness: PrimaryScoringRulesUnitPositionWitness,
-    *,
-    unit_instance_id: str,
-) -> bool:
-    membership = witness.rules_unit_membership
-    return (
-        membership.rules_unit_instance_id == unit_instance_id
-        or unit_instance_id in membership.component_unit_instance_ids
-    )
+    for witness in lineage.current_witnesses:
+        witness_objective_ids = witness.rules_unit_membership.objective_marker_ids
+        if any(
+            objective_id not in expected_objective_ids for objective_id in witness_objective_ids
+        ):
+            raise GameLifecycleError(
+                "Primary scoring Surveil position witness references an unknown objective."
+            )
+        if not marked_objective_ids.intersection(witness_objective_ids):
+            return False
+    return True
 
 
 def _surveil_evidence(
@@ -236,6 +256,7 @@ def _surveil_evidence(
     completed_action_ids: tuple[str, ...],
     surveilled_unit_instance_ids: tuple[str, ...],
     excepted_unit_instance_ids: tuple[str, ...],
+    resolved_lineages: tuple[PrimaryScoringPersistedRulesUnitLineage, ...],
     operation_objective_ids: tuple[str, ...],
     operation_marker_ids: tuple[str, ...],
 ) -> dict[str, JsonValue]:
@@ -244,6 +265,14 @@ def _surveil_evidence(
     evidence["completed_action_ids"] = list(completed_action_ids)
     evidence["surveilled_unit_instance_ids"] = list(surveilled_unit_instance_ids)
     evidence["excepted_unit_instance_ids"] = list(excepted_unit_instance_ids)
+    evidence["resolved_lineages"] = [
+        {
+            "historical_unit_instance_id": lineage.historical_unit_instance_id,
+            "frozen_component_unit_instance_ids": list(lineage.frozen_component_unit_instance_ids),
+            "current_witness_unit_instance_ids": list(lineage.current_witness_unit_instance_ids),
+        }
+        for lineage in resolved_lineages
+    ]
     evidence["operation_objective_ids"] = list(operation_objective_ids)
     evidence["operation_marker_ids"] = list(operation_marker_ids)
     return evidence

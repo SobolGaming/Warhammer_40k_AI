@@ -646,6 +646,7 @@ def _surveil_condition_evidence(
         mission_setup=context.mission_setup,
         player_id=context.player_id,
         battle_round=context.record.battle_round,
+        departures=context.state_evidence.primary_battlefield_departure_states,
         position_witnesses=context.state_evidence.current_rules_unit_position_witnesses,
     )
 

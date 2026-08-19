@@ -5242,10 +5242,13 @@ versus priority-assets, and reconnaissance versus reconnaissance.
 Step 5F scores the Surveil the Foe surveilled-marker exception through the same
 shared condition path. Completed `surveil-enemy-unit` Actions score 4 VP at
 turn end unless every surveilled enemy unit is currently within 3" of an
-objective that still has an active operation marker. Same-turn marker removal
-is evaluated against current ACTIVE markers at scoring time. This promotes
-Surveil the Foe. The new complete pairing is disruption versus
-reconnaissance. All 25 Primaries and all 15 pairings are now executable.
+objective that still has an active operation marker. Historical Attached Unit
+targets keep their identity after a same-turn split: scoring resolves them onto
+current descendant position witnesses through persisted battlefield-departure
+lineage, not raw ID equality. Same-turn marker removal is evaluated against
+current ACTIVE markers at scoring time. This promotes Surveil the Foe. The new
+complete pairing is disruption versus reconnaissance. All 25 Primaries and all
+15 pairings are now executable.
 
 The remaining Step 5 work retains the certification boundary for every Force
 Disposition pairing through normal lifecycle execution, replay, and

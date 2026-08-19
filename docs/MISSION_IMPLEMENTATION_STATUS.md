@@ -108,7 +108,9 @@ Secondary status:
   are now `engine_implemented`. Counts after Step 5E were 24/1 missions and
   14/15 pairings (42/45 variants). Pairing-wide certification is not claimed.
 - Phase 17N Step 5F scores the Surveil the Foe surveilled-marker exception
-  through the same shared path. Surveil the Foe is now `engine_implemented`.
+  through the same shared path, resolving historical Attached Unit targets onto
+  current descendant position witnesses through persisted departure lineage.
+  Surveil the Foe is now `engine_implemented`.
   Counts are 25/0 missions and 15/15 pairings (45/45 variants). Pairing-wide
   certification is not claimed.
 - Runtime Mission Actions: 14 total. The ten Step 4 Primary Actions join Death
