@@ -14,8 +14,8 @@ from warhammer40k_core.rules.source_packages.artifact_loader import (
 
 ARTIFACT_SCHEMA: Final = "core-v2-phase17n-event-companion-primary-scoring-v6"
 SOURCE_PACKAGE_ID: Final = "gw-11e-warhammer-event-companion-v1-1-2026-07"
-EXPECTED_PACKAGE_HASH: Final = "176a9b7b4e44666e473364a73f6971ea381c7d4024ee7af10ca2a5b8480e362d"
-EXPECTED_ARTIFACT_SHA256: Final = "98d872468ef19f688032898a4bc8721b9e91b8972227f79ef29ddf1264aa3e26"
+EXPECTED_PACKAGE_HASH: Final = "8358cc11078b27e8773f58182e40bbf6194c54c3bda16b3aa1e286ee9b646dd1"
+EXPECTED_ARTIFACT_SHA256: Final = "4783a4013a485cc4e6ef1669be2c12c19fa44e5175a5a220c17809b8a54774b7"
 _ARTIFACT_PACKAGE: Final = "warhammer40k_core.rules.source_packages.warhammer_40000_11th"
 _ARTIFACT_PATH: Final = "event_companion_2026_06_artifacts/primary-scoring.json"
 _EXPECTED_TURN_SCOPES: Final = frozenset({"own_player_turn", "any_player_turn"})
@@ -86,6 +86,7 @@ _EXPECTED_ENGINE_IMPLEMENTED_SCORING_KINDS: Final = {
     "primary-search-and-scour": "search_and_scour",
     "primary-secure-asset": "secure_asset",
     "primary-smoke-and-mirrors": "smoke_and_mirrors",
+    "primary-surveil-the-foe": "surveil_the_foe",
     "primary-triangulation": "triangulation",
     "primary-unstoppable-force": "unstoppable_force",
     "primary-vanguard-operation": "vanguard_operation",

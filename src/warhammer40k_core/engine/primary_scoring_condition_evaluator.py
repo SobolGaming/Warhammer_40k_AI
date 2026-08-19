@@ -43,6 +43,10 @@ from warhammer40k_core.engine.primary_scoring_spatial_evidence import (
     PrimaryScoringSpatialEvidence,
     objective_control_record_hash,
 )
+from warhammer40k_core.engine.primary_scoring_surveil_conditions import (
+    PRIMARY_SCORING_SURVEIL_CONDITIONS,
+    evaluate_surveil_scoring_condition,
+)
 from warhammer40k_core.engine.primary_scoring_turn_scope import (
     ANY_PLAYER_TURN,
     primary_scoring_turn_scope_for_condition,
@@ -54,6 +58,7 @@ SUPPORTED_GENERIC_PRIMARY_SCORING_CONDITIONS = frozenset(
         *PRIMARY_SCORING_DEPARTURE_CONDITIONS,
         *PRIMARY_SCORING_MARKER_CONDITIONS,
         *PRIMARY_SCORING_OPERATION_MARKER_CONDITIONS,
+        *PRIMARY_SCORING_SURVEIL_CONDITIONS,
         "control_central_and_expansion_objectives",
         "control_enemy_home_objective",
         "control_four_or_more_objectives_end_of_battle",
@@ -267,6 +272,8 @@ def evaluate_primary_scoring_condition(
         return _departure_condition_evidence(condition_id=condition_id, context=context)
     if condition_id in PRIMARY_SCORING_OPERATION_MARKER_CONDITIONS:
         return _operation_marker_condition_evidence(condition_id=condition_id, context=context)
+    if condition_id in PRIMARY_SCORING_SURVEIL_CONDITIONS:
+        return _surveil_condition_evidence(condition_id=condition_id, context=context)
     objective = _objective_evidence(context)
     record = context.record
 
@@ -619,6 +626,27 @@ def _operation_marker_condition_evidence(
         battle_round=context.record.battle_round,
         end_of_battle=context.end_of_battle,
         controlled_objective_ids=controlled_ids,
+        position_witnesses=context.state_evidence.current_rules_unit_position_witnesses,
+    )
+
+
+def _surveil_condition_evidence(
+    *,
+    condition_id: str,
+    context: PrimaryScoringConditionContext,
+) -> dict[str, JsonValue]:
+    if context.state_evidence is None:
+        raise GameLifecycleError(
+            f"Primary scoring condition {condition_id} requires state evidence."
+        )
+    return evaluate_surveil_scoring_condition(
+        condition_id=condition_id,
+        actions=context.state_evidence.primary_mission_action_states,
+        progress=context.state_evidence.primary_mission_progress_state,
+        mission_setup=context.mission_setup,
+        player_id=context.player_id,
+        battle_round=context.record.battle_round,
+        departures=context.state_evidence.primary_battlefield_departure_states,
         position_witnesses=context.state_evidence.current_rules_unit_position_witnesses,
     )
 

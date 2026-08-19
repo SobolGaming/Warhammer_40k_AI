@@ -71,7 +71,7 @@ DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-EXPECTED_SOURCE_IMPORT_HASH = "ae1f215a6eb0297f5b34313f85f7dc0574720cb6c4c3010faa33bda0f4945b27"
+EXPECTED_SOURCE_IMPORT_HASH = "5a4dcccfa86bbecc8ded95275c39ee5401ce0e27e5f426c28ae4575e02114812"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -1020,9 +1020,7 @@ def mission_pack_scoring_row() -> chapter_approved.SourceMissionPackScoringRow:
 _ENGINE_IMPLEMENTED_PRIMARY_MISSION_IDS = engine_implemented_primary_mission_ids()
 
 
-_SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {
-    "primary-surveil-the-foe": ("engine_primary_condition:enemy_unit_surveilled_marker_exception",),
-}
+_SOURCE_KNOWN_ENGINE_PENDING_WORK: dict[str, tuple[str, ...]] = {}
 
 
 def _event_primary_mission_rows_by_id() -> dict[str, chapter_approved.SourcePrimaryMissionRow]:
