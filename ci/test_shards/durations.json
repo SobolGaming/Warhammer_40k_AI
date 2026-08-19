@@ -169,7 +169,7 @@
     "tests/unit/test_phase17n_step5d_condemned_departure_conditions.py": 45.0,
     "tests/unit/test_phase17n_step5e_operation_marker_conditions.py": 45.0,
     "tests/unit/test_phase17n_step5f_surveil_conditions.py": 40.0,
-    "tests/unit/test_phase17n_step5g_pairing_certification.py": 683.254,
+    "tests/unit/test_phase17n_step5g_pairing_certification.py": 1379.039,
     "tests/unit/test_phase18a_cli_projection.py": 22.004,
     "tests/unit/test_phase18b_opportunity_windows.py": 0.015,
     "tests/unit/test_phase18c_adapter_session_facade.py": 17.255,
@@ -205,26 +205,26 @@
   "shard_count": 4,
   "shards": [
     {
-      "duration_seconds": 3679.541,
+      "duration_seconds": 3853.488,
       "shard_id": 1,
       "test_file_count": 50
     },
     {
-      "duration_seconds": 3679.541,
+      "duration_seconds": 3853.487,
       "shard_id": 2,
       "test_file_count": 50
     },
     {
-      "duration_seconds": 3679.542,
+      "duration_seconds": 3853.488,
       "shard_id": 3,
       "test_file_count": 51
     },
     {
-      "duration_seconds": 3679.541,
+      "duration_seconds": 3853.487,
       "shard_id": 4,
       "test_file_count": 50
     }
   ],
   "strategy": "largest-processing-time-by-historical-file-duration",
-  "total_test_duration_seconds": 14718.165
+  "total_test_duration_seconds": 15413.95
 }

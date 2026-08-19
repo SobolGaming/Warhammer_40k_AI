@@ -77,8 +77,9 @@ Page 9 contains the source-backed 29-component exception, while every other
 layout contains 30. See
 [docs/BATTLEFIELD_VIEWER.md](docs/BATTLEFIELD_VIEWER.md) for controls, data
 authority, complete battlefield geometry, executable Primary scoring for all 25
-Event Companion missions, and Step 5G pairing-wide lifecycle certification.
-Secondary scoring semantics remain pending.
+Event Companion missions, and Step 5G pairing-wide lifecycle certification of
+both players' ordinary scoring boundaries on Layout A. Secondary scoring
+semantics remain pending.
 
 CI uploads each shard's JUnit report for future median-duration profiles. Full behavioral shards
 run for ready pull requests, merge candidates, and pushes to `main`; draft pull requests keep the

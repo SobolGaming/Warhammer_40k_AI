@@ -25,16 +25,24 @@ from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
+from warhammer40k_core.engine.objective_control import ObjectiveControlTiming
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, LifecycleStatusKind
 from warhammer40k_core.engine.primary_mission_choices import (
     SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
 )
 from warhammer40k_core.engine.primary_scoring_pairing_certification import (
-    EVENT_COMPANION_CERTIFIED_LAYOUT_COUNT,
+    EVENT_COMPANION_LAYOUT_INVENTORY_COUNT,
     EVENT_COMPANION_LAYOUT_VARIANT_COUNT,
+    EVENT_COMPANION_LIFECYCLE_CERTIFICATION_COUNT,
     EVENT_COMPANION_PAIRING_COUNT,
-    EventCompanionPairingCertificationRow,
-    event_companion_pairing_certification_rows,
+    EventCompanionPairingLayoutInventoryRow,
+    EventCompanionPairingLifecycleCertificationRow,
+    event_companion_pairing_layout_inventory_rows,
+    event_companion_pairing_lifecycle_certification_rows,
+)
+from warhammer40k_core.engine.primary_scoring_state_evidence import (
+    PrimaryScoringBoundaryKind,
+    PrimaryScoringStateEvidence,
 )
 from warhammer40k_core.engine.scoring import VictoryPointSourceKind
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th.event_companion_2026_06 import (
@@ -51,22 +59,21 @@ _EVENT_COMPANION_FORCE_DISPOSITION_IDS = (
     "reconnaissance",
     "priority-assets",
 )
-_PAIRING_CERTIFICATION_ROWS = event_companion_pairing_certification_rows()
-_PAIRING_LAYOUT_A_ROWS = tuple(
-    row for row in _PAIRING_CERTIFICATION_ROWS if row.layout_variant == "a"
-)
+_SCORING_PLAYER_IDS = ("player-a", "player-b")
+_LAYOUT_INVENTORY_ROWS = event_companion_pairing_layout_inventory_rows()
+_LIFECYCLE_CERTIFICATION_ROWS = event_companion_pairing_lifecycle_certification_rows()
 
 
 def test_phase17n_step5g_inventory_covers_every_source_pairing_and_layout() -> None:
-    rows = _PAIRING_CERTIFICATION_ROWS
+    rows = _LAYOUT_INVENTORY_ROWS
     source_rows = event_primary_mission_matrix_source_rows()
     implemented_ids = engine_implemented_primary_mission_ids()
 
     assert len(source_rows) == EVENT_COMPANION_PAIRING_COUNT
-    assert len(rows) == EVENT_COMPANION_CERTIFIED_LAYOUT_COUNT
+    assert len(rows) == EVENT_COMPANION_LAYOUT_INVENTORY_COUNT
     assert {row.layout_pair_id for row in rows} == {source.layout_pair_id for source in source_rows}
     assert {row.layout_variant for row in rows} == {"a", "b", "c"}
-    assert len({row.layout_id for row in rows}) == EVENT_COMPANION_CERTIFIED_LAYOUT_COUNT
+    assert len({row.layout_id for row in rows}) == EVENT_COMPANION_LAYOUT_INVENTORY_COUNT
     assert all(
         row.attacker_primary_mission_id in implemented_ids
         and row.defender_primary_mission_id in implemented_ids
@@ -77,7 +84,6 @@ def test_phase17n_step5g_inventory_covers_every_source_pairing_and_layout() -> N
         for source in source_rows
     }
     assert set(pair_counts.values()) == {EVENT_COMPANION_LAYOUT_VARIANT_COUNT}
-    assert len(_PAIRING_LAYOUT_A_ROWS) == EVENT_COMPANION_PAIRING_COUNT
     source_by_pair = {source.layout_pair_id: source for source in source_rows}
     for row in rows:
         source = source_by_pair[row.layout_pair_id]
@@ -90,9 +96,33 @@ def test_phase17n_step5g_inventory_covers_every_source_pairing_and_layout() -> N
         )
 
 
+def test_phase17n_step5g_lifecycle_rows_are_layout_a_only() -> None:
+    lifecycle_rows = _LIFECYCLE_CERTIFICATION_ROWS
+    layout_a_ids = {row.layout_id for row in _LAYOUT_INVENTORY_ROWS if row.layout_variant == "a"}
+    layout_bc_ids = {
+        row.layout_id for row in _LAYOUT_INVENTORY_ROWS if row.layout_variant in {"b", "c"}
+    }
+
+    assert len(lifecycle_rows) == EVENT_COMPANION_LIFECYCLE_CERTIFICATION_COUNT
+    assert {row.layout_id for row in lifecycle_rows} == layout_a_ids
+    assert layout_a_ids.isdisjoint(layout_bc_ids)
+    assert {row.layout_pair_id for row in lifecycle_rows} == {
+        row.layout_pair_id for row in _LAYOUT_INVENTORY_ROWS
+    }
+    scored_mission_ids = {
+        mission_id
+        for row in lifecycle_rows
+        for mission_id in (
+            row.attacker_primary_mission_id,
+            row.defender_primary_mission_id,
+        )
+    }
+    assert scored_mission_ids == engine_implemented_primary_mission_ids()
+
+
 def test_phase17n_step5g_every_layout_instantiates_two_sided_scoring_policies() -> None:
-    for row in _PAIRING_CERTIFICATION_ROWS:
-        setup = _setup_for_row(row)
+    for row in _LAYOUT_INVENTORY_ROWS:
+        setup = _setup_for_inventory_row(row)
         policies = mission_scoring_policies_from_setup(setup)
         assert policies.policy_for_player("player-a").primary_scoring_supported, row.layout_id
         assert policies.policy_for_player("player-b").primary_scoring_supported, row.layout_id
@@ -102,39 +132,67 @@ def test_phase17n_step5g_every_layout_instantiates_two_sided_scoring_policies() 
 
 @pytest.mark.parametrize(
     "row",
-    _PAIRING_LAYOUT_A_ROWS,
-    ids=tuple(row.layout_pair_id for row in _PAIRING_LAYOUT_A_ROWS),
+    _LIFECYCLE_CERTIFICATION_ROWS,
+    ids=tuple(row.layout_pair_id for row in _LIFECYCLE_CERTIFICATION_ROWS),
 )
-def test_phase17n_step5g_pairing_scores_through_lifecycle_replay_and_views(
-    row: EventCompanionPairingCertificationRow,
+@pytest.mark.parametrize("scoring_player_id", _SCORING_PLAYER_IDS)
+def test_phase17n_step5g_pairing_scores_through_lifecycle_restore_and_views(
+    row: EventCompanionPairingLifecycleCertificationRow,
+    scoring_player_id: str,
 ) -> None:
-    session, initial_payload = _pairing_certification_session(row)
-    _drive_pairing_scoring_through_facade(session)
+    session, initial_payload = _pairing_certification_session(
+        row,
+        scoring_player_id=scoring_player_id,
+    )
+    initial_state = session.lifecycle.state
+    assert initial_state is not None
+    assert initial_state.active_player_id == scoring_player_id
+    _drive_pairing_scoring_through_facade(session, scoring_player_id=scoring_player_id)
 
     state = session.lifecycle.state
     assert state is not None
-    assert state.primary_scoring_state_evidence_records
-    assert all(
-        evidence.scoring_boundary_kind.value in {"ordinary", "end_of_battle"}
-        for evidence in state.primary_scoring_state_evidence_records
+    setup = _setup_for_lifecycle_row(row)
+    expected_mission_id = (
+        row.attacker_primary_mission_id
+        if scoring_player_id == "player-a"
+        else row.defender_primary_mission_id
     )
-    policies = mission_scoring_policies_from_setup(_setup_for_row(row))
-    assert policies.policy_for_player("player-a").primary_scoring_supported
-    assert policies.policy_for_player("player-b").primary_scoring_supported
+    assert setup.primary_mission_id_for_player(scoring_player_id) == expected_mission_id
+    policies = mission_scoring_policies_from_setup(setup)
+    evidence = _ordinary_turn_end_evidence_for_player(state, scoring_player_id)
+    record = next(
+        (
+            stored
+            for stored in state.objective_control_records
+            if stored.record_id == evidence.objective_control_record_id
+        ),
+        None,
+    )
+    if record is None:
+        raise AssertionError(
+            "Step 5G pairing certification ordinary evidence is missing its "
+            "objective-control record."
+        )
+    scoring_player_ids = policies.scoring_player_ids_for_record(
+        record=record,
+        turn_order=tuple(state.turn_order),
+        end_of_battle=False,
+    )
+    assert scoring_player_id in scoring_player_ids
 
-    initial_lifecycle = GameLifecycle.from_payload(initial_payload)
-    initial_state = initial_lifecycle.state
-    assert initial_state is not None
-    assert initial_state.primary_scoring_state_evidence_records == []
+    restored_initial = GameLifecycle.from_payload(initial_payload)
+    restored_initial_state = restored_initial.state
+    assert restored_initial_state is not None
+    assert restored_initial_state.primary_scoring_state_evidence_records == []
     restored = GameLifecycle.from_payload(deepcopy(session.lifecycle.to_payload()))
     assert restored.to_payload() == session.lifecycle.to_payload()
     restored_state = restored.state
     assert restored_state is not None
     assert restored_state.to_payload() == state.to_payload()
-    replayed_log = EventLog.from_payload(
+    restored_log = EventLog.from_payload(
         session.lifecycle.decision_controller.event_log.to_payload()
     )
-    assert replayed_log.to_payload() == session.lifecycle.decision_controller.event_log.to_payload()
+    assert restored_log.to_payload() == session.lifecycle.decision_controller.event_log.to_payload()
 
     for viewer_player_id in state.player_ids:
         public_payload = state.to_public_payload(viewer_player_id=viewer_player_id)
@@ -156,12 +214,16 @@ def test_phase17n_step5g_pairing_scores_through_lifecycle_replay_and_views(
 
 
 def _pairing_certification_session(
-    row: EventCompanionPairingCertificationRow,
+    row: EventCompanionPairingLifecycleCertificationRow,
+    *,
+    scoring_player_id: str,
 ) -> tuple[LocalGameSession, GameLifecyclePayload]:
-    setup = _setup_for_row(row)
+    if scoring_player_id not in _SCORING_PLAYER_IDS:
+        raise AssertionError("Step 5G pairing fixture scoring_player_id is unsupported.")
+    setup = _setup_for_lifecycle_row(row)
     state = phase17n_state_with_setup(
         setup=setup,
-        active_player_id="player-a",
+        active_player_id=scoring_player_id,
         phase=BattlePhase.FIGHT,
         battle_round=2,
     )
@@ -184,10 +246,17 @@ def _pairing_certification_session(
     return LocalGameSession(lifecycle=lifecycle), initial_payload
 
 
-def _drive_pairing_scoring_through_facade(session: LocalGameSession) -> None:
+def _drive_pairing_scoring_through_facade(
+    session: LocalGameSession,
+    *,
+    scoring_player_id: str,
+) -> None:
     for step_index in range(24):
         state = session.lifecycle.state
-        if state is not None and state.primary_scoring_state_evidence_records:
+        if state is not None and _ordinary_turn_end_evidence_for_player_or_none(
+            state,
+            scoring_player_id,
+        ):
             return
         pending = session.lifecycle.pending_decision_request()
         if pending is not None:
@@ -203,7 +272,7 @@ def _drive_pairing_scoring_through_facade(session: LocalGameSession) -> None:
             status = session.submit_option(
                 request_id=pending.request_id,
                 option_id=pending.options[0].option_id,
-                result_id=f"phase17n-step5g-choice-{step_index:02d}",
+                result_id=(f"phase17n-step5g-{scoring_player_id}-choice-{step_index:02d}"),
             )
             if status.status_kind is LifecycleStatusKind.INVALID:
                 raise AssertionError("Step 5G pairing certification rejected a legal choice.")
@@ -215,15 +284,18 @@ def _drive_pairing_scoring_through_facade(session: LocalGameSession) -> None:
             raise AssertionError("Step 5G pairing certification lifecycle advance was unsupported.")
         if status.status_kind is LifecycleStatusKind.TERMINAL:
             return
-    raise AssertionError("Step 5G pairing certification did not persist scoring-state evidence.")
+    raise AssertionError(
+        "Step 5G pairing certification did not persist the scoring player's ordinary "
+        "turn-end evidence."
+    )
 
 
 def _pairing_certification_config(
     *,
-    row: EventCompanionPairingCertificationRow,
+    row: EventCompanionPairingLifecycleCertificationRow,
     setup_game_id: str,
 ) -> GameConfig:
-    setup = _setup_for_row(row)
+    setup = _setup_for_lifecycle_row(row)
     base = phase11c_config()
     catalog = replace(
         base.army_catalog,
@@ -272,7 +344,15 @@ def _pairing_certification_config(
     )
 
 
-def _setup_for_row(row: EventCompanionPairingCertificationRow) -> MissionSetup:
+def _setup_for_inventory_row(row: EventCompanionPairingLayoutInventoryRow) -> MissionSetup:
+    return phase17n_event_setup(
+        layout_id=row.layout_id,
+        attacker_force_disposition_id=row.attacker_force_disposition_id,
+        defender_force_disposition_id=row.defender_force_disposition_id,
+    )
+
+
+def _setup_for_lifecycle_row(row: EventCompanionPairingLifecycleCertificationRow) -> MissionSetup:
     return phase17n_event_setup(
         layout_id=row.layout_id,
         attacker_force_disposition_id=row.attacker_force_disposition_id,
@@ -292,6 +372,40 @@ def _seed_completed_fight_phase(state: GameState) -> None:
     ).with_phase_complete()
     state.replace_fight_phase_state(fight_state)
     state.stage = GameLifecycleStage.BATTLE
+
+
+def _ordinary_turn_end_evidence_for_player_or_none(
+    state: GameState,
+    scoring_player_id: str,
+) -> PrimaryScoringStateEvidence | None:
+    matches = [
+        evidence
+        for evidence in state.primary_scoring_state_evidence_records
+        if evidence.scoring_boundary_kind is PrimaryScoringBoundaryKind.ORDINARY
+        and evidence.active_player_id == scoring_player_id
+        and evidence.timing is ObjectiveControlTiming.TURN_END
+    ]
+    if len(matches) > 1:
+        raise AssertionError(
+            "Step 5G pairing certification found multiple ordinary turn-end evidence "
+            f"records for {scoring_player_id}."
+        )
+    if not matches:
+        return None
+    return matches[0]
+
+
+def _ordinary_turn_end_evidence_for_player(
+    state: GameState,
+    scoring_player_id: str,
+) -> PrimaryScoringStateEvidence:
+    evidence = _ordinary_turn_end_evidence_for_player_or_none(state, scoring_player_id)
+    if evidence is None:
+        raise AssertionError(
+            "Step 5G pairing certification did not persist ordinary turn-end evidence "
+            f"for {scoring_player_id}."
+        )
+    return evidence
 
 
 def _assert_public_primary_commitments_are_opaque(
@@ -334,8 +448,8 @@ def _assert_public_primary_commitments_are_opaque(
 
 
 def test_phase17n_step5g_capability_rows_are_semantically_executable() -> None:
-    row = _PAIRING_CERTIFICATION_ROWS[0]
-    session, _initial = _pairing_certification_session(row)
+    row = _LIFECYCLE_CERTIFICATION_ROWS[0]
+    session, _initial = _pairing_certification_session(row, scoring_player_id="player-a")
     profile = session.support_profile()
     mission_rows = [
         mission_row

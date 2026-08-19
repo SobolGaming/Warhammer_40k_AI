@@ -129,8 +129,10 @@ and 20 floor volumes. Objective counts follow the source layout and therefore
 vary between five and six.
 
 All 25 Event Companion Primary Missions are `engine_implemented` for executable
-scoring. Step 5G certifies every Force Disposition pairing through normal
-lifecycle execution, restore replay, and viewer-scoped projections. See
+scoring. Step 5G certifies every Force Disposition pairing through both players'
+ordinary turn-end boundaries, lifecycle and event-log restore round-trips, and
+viewer-scoped projections. Layout A is the lifecycle certification row; A/B/C
+remain in the fail-closed inventory. See
 [Mission Implementation Status](MISSION_IMPLEMENTATION_STATUS.md).
 
 The viewer is a schematic geometry inspection tool, not a photorealistic
