@@ -32,6 +32,15 @@ families, proposal kinds, or payload shapes. Surveil scoring consumes
 the same Step 5A evidence registry and replay artifact, including persisted
 battlefield-departure lineage when a surveilled Attached Unit later splits.
 
+Phase 17N Step 5G adds no new adapter-facing decision types, finite option
+families, proposal kinds, or payload shapes. Pairing certification drives the
+existing Step 4 choice family and Step 5A evidence registry through
+`LocalGameSession` for every Force Disposition pairing in both ordinary
+scoring directions. Public VP rows still expose only opaque evidence ID/hash
+commitments. Coverage is a `GameLifecycle` and event-log restore round-trip,
+not `ReplayRunner` replay certification. Replay remains
+`replay-artifact-v8-phase17n-step5a`.
+
 The short rule:
 
 All clients share the same authoritative submission contract. Adapters may differ only in how they render, choose, transmit, or generate submissions. No adapter gets a private mutation path, a private rules path, or a bypass around replay-facing `DecisionRecord` and `EventRecord` generation.

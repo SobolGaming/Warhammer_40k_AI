@@ -123,9 +123,12 @@ Primary Mission Actions, promoting Secure Asset, Sabotage, and Vanguard
 Operation. Step 5D scores condemned battlefield departures, promoting Punishment.
 Step 5E scores operation markers, promoting Gather Intel, Extract Relic,
 Locate and Deny, and Vital Link. Step 5F scores the Surveil the Foe
-surveilled-marker exception, promoting Surveil the Foe. All 15 pairings now
-have executable Primaries in both directions (45 of 45 variants). Pairing-wide
-lifecycle, replay, and viewer-scoped certification remains later Step 5 work.
+surveilled-marker exception, promoting Surveil the Foe. Step 5G certifies every
+Force Disposition pairing through both players' ordinary turn-end boundaries,
+GameLifecycle and event-log restore round-trips, and viewer-scoped projections.
+All 15 pairings now have executable Primaries in both directions (45 of 45
+variants). Layout A is the lifecycle/restore/viewer certification row; A/B/C
+remain in the fail-closed inventory and instantiate two-sided scoring policies.
 **Phase 18A is complete** for local CLI/human decision entry and viewer-safe
 hybrid datacard projections: `interfaces/cli.py` renders pending finite and
 parameterized requests, submits normal lifecycle `DecisionResult`s, and
@@ -403,7 +406,7 @@ Implemented foundation and partial integration baselines:
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
 | 17J | Complete | Warhammer Event Companion v1.1 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with explicit extraction status, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
-| 17N | Partial | Battlefield geometry, Step 4 marker/action/choice state, the Step 5A content-addressed scoring-state bridge, Step 5B marker scoring, Step 5C completed-action scoring, Step 5D condemned-departure scoring, Step 5E operation-marker scoring, and Step 5F Surveil scoring are complete, including 14 runtime Mission Actions; generic timing/resolution, objective/territory/table-quarter evidence, Purge and Secure destruction attribution, consecrated/decoy/triangulated marker predicates, completed-action predicates, condemned battlefield-departure predicates, operation-marker predicates, and the Surveil surveilled-marker exception make all 25 Primaries executable while pairing certification remains later Step 5 work |
+| 17N | Partial | Battlefield geometry, Step 4 marker/action/choice state, the Step 5A content-addressed scoring-state bridge, Step 5B marker scoring, Step 5C completed-action scoring, Step 5D condemned-departure scoring, Step 5E operation-marker scoring, Step 5F Surveil scoring, and Step 5G pairing-wide lifecycle/restore/viewer certification are complete, including 14 runtime Mission Actions; generic timing/resolution, objective/territory/table-quarter evidence, Purge and Secure destruction attribution, consecrated/decoy/triangulated marker predicates, completed-action predicates, condemned battlefield-departure predicates, operation-marker predicates, and the Surveil surveilled-marker exception make all 25 Primaries executable, and all 15 pairings are certified through both players' AdapterGameSession ordinary scoring boundaries, lifecycle and event-log restore round-trips, and viewer-scoped projections |
 | 17O | Complete | Viewer-scoped eight-axis capability manifest with selected roster/unit/rule/mission/geometry rows, evidence, blockers, identities, and mechanically derived certification claims |
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
@@ -4979,7 +4982,9 @@ is executable for all 25 missions. All 15 Event Companion Force Disposition
 pairings and every A/B/C variant have source-hashed executable battlefield
 packages, for 45 of 45 layouts. All 15 pairings have executable
 Primaries in both directions, covering 45 of the 45 A/B/C variants with complete
-two-sided Primary scoring. Step 4's mission
+two-sided Primary scoring, and Step 5G certifies each pairing through both
+players' ordinary turn-end boundaries, lifecycle and event-log restore
+round-trips, and viewer-scoped projections. Step 4's mission
 actions, choices, persistent marker state, and Surveil movement cleanup are
 engine-owned. Step 5A's scoring-state bridge and four simple objective
 predicates are complete. Step 5B's marker scoring conditions promote Consecrate,
@@ -4988,7 +4993,8 @@ promote Secure Asset, Sabotage, and Vanguard Operation. Step 5D's condemned
 battlefield-departure predicate promotes Punishment. Step 5E's operation-marker
 predicates promote Gather Intel, Extract Relic, Locate and Deny, and Vital Link.
 Step 5F's surveilled-marker exception promotes Surveil the Foe.
-Pairing-wide certification remains later Step 5 work.
+Step 5G certifies every Force Disposition pairing through both players'
+ordinary scoring boundaries.
 
 The battlefield Single/Separate logical-area semantics come from the page-8
 Layouts Key, while coordinates and layout facts come from pages 9-53 of
@@ -5250,11 +5256,20 @@ current ACTIVE markers at scoring time. This promotes Surveil the Foe. The new
 complete pairing is disruption versus reconnaissance. All 25 Primaries and all
 15 pairings are now executable.
 
-The remaining Step 5 work retains the certification boundary for every Force
-Disposition pairing through normal lifecycle execution, replay, and
-viewer-scoped projections. The 25-of-25 executable scoring count and fifteen
-fully executable two-sided pairings remain authoritative until that pairing
-certification is complete.
+Step 5G certifies every Force Disposition pairing through the shared
+`AdapterGameSession` / `LocalGameSession` path. Layout A of each pairing is
+driven independently in both scoring directions: player-a (source-left
+attacker) and player-b (source-right defender) each receive an ordinary
+turn-end Primary boundary through `BattleRoundFlow`. That covers the ten
+asymmetric right-hand Primaries that never appear as the attacker policy.
+Each directional fixture round-trips `GameLifecycle` and event-log payloads
+and keeps full `PrimaryScoringStateEvidence` rows out of viewer-scoped game
+views and public payloads. Public VP rows still expose only opaque evidence
+ID/hash commitments. Layouts A/B/C remain in the fail-closed 45-layout
+inventory and instantiate two-sided scoring policies; B and C are not
+lifecycle-certified. This does not capture a `ReplayArtifact` or run
+`ReplayRunner`. This does not claim Phase 20A full-game certification.
+Replay remains `replay-artifact-v8-phase17n-step5a`.
 
 `uv run python tools/build_event_companion_battlefields.py --check` rebuilds the
 complete battlefield package in memory from its reviewed inputs, verifies its
