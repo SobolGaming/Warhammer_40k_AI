@@ -104,9 +104,18 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointSourceKind,
     VictoryPointTransaction,
 )
+from warhammer40k_core.engine.secondary_mission_choices import (
+    SELECT_BEACON_UNIT_DECISION_TYPE,
+    SELECT_BURDEN_OF_TRUST_GUARD_DECISION_TYPE,
+    SELECT_TEMPTING_TARGET_OBJECTIVE_DECISION_TYPE,
+    next_secondary_mission_choice_request,
+)
 from warhammer40k_core.engine.secondary_mission_selection import SecondaryMissionSelection
 from warhammer40k_core.engine.secondary_scoring_boundary import (
     score_turn_end_mission_scoring_boundary,
+)
+from warhammer40k_core.engine.secondary_scoring_context import (
+    secondary_mission_selection_for_card,
 )
 from warhammer40k_core.engine.secondary_scoring_inventory import (
     SECONDARY_CARD_MODE_CERTIFICATION_COUNT,
@@ -176,6 +185,109 @@ def test_phase17n_step6g_inventory_covers_every_secondary_card_and_mode() -> Non
     assert {row.scoring_player_id for row in _LIFECYCLE_CERTIFICATION_ROWS} == set(
         _SCORING_PLAYER_IDS
     )
+
+
+@pytest.mark.parametrize(
+    ("secondary_mission_id", "decision_type", "event_type"),
+    [
+        (
+            "a-tempting-target",
+            SELECT_TEMPTING_TARGET_OBJECTIVE_DECISION_TYPE,
+            "tempting_target_objective_selected",
+        ),
+        ("beacon", SELECT_BEACON_UNIT_DECISION_TYPE, "beacon_unit_selected"),
+        (
+            "burden-of-trust",
+            SELECT_BURDEN_OF_TRUST_GUARD_DECISION_TYPE,
+            "burden_of_trust_guard_selected",
+        ),
+    ],
+)
+def test_phase17n_step6g_secondary_selection_uses_adapter_decision_path(
+    secondary_mission_id: str,
+    decision_type: str,
+    event_type: str,
+) -> None:
+    state = phase17n_state_with_setup(
+        setup=_setup_for_layout(),
+        active_player_id="player-a",
+        phase=BattlePhase.COMMAND,
+        battle_round=2,
+        player_a_units=certification_unit_selections(player_id="player-a"),
+        player_b_units=certification_unit_selections(player_id="player-b"),
+    )
+    state.secondary_mission_choices = [
+        choice for choice in state.secondary_mission_choices if choice.player_id != "player-a"
+    ]
+    state.secondary_mission_card_states = [
+        card for card in state.secondary_mission_card_states if card.player_id != "player-a"
+    ]
+    state.record_secondary_mission_choice(
+        SecondaryMissionChoice(player_id="player-a", mode=SecondaryMissionMode.TACTICAL)
+    )
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id=secondary_mission_id,
+            battle_round=state.battle_round,
+            source_result_id=f"phase17n-choice-{secondary_mission_id}",
+        )
+    )
+    lifecycle = _configured_step6g_lifecycle(
+        state=state,
+        decisions=DecisionController(),
+    )
+    lifecycle_state = lifecycle.state
+    assert lifecycle_state is not None
+
+    waiting = next_secondary_mission_choice_request(
+        state=lifecycle_state,
+        decisions=lifecycle.decision_controller,
+    )
+
+    assert waiting is not None
+    assert waiting.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = lifecycle.pending_decision_request()
+    assert request is not None
+    assert request.decision_type == decision_type
+    assert request.actor_id == (
+        "player-b"
+        if decision_type == SELECT_TEMPTING_TARGET_OBJECTIVE_DECISION_TYPE
+        else "player-a"
+    )
+    option = (
+        next(candidate for candidate in request.options if candidate.option_id.startswith("guard:"))
+        if decision_type == SELECT_BURDEN_OF_TRUST_GUARD_DECISION_TYPE
+        else request.options[0]
+    )
+    status = LocalGameSession(lifecycle=lifecycle).submit_option(
+        request_id=request.request_id,
+        option_id=option.option_id,
+        result_id=f"phase17n-choice-result-{secondary_mission_id}",
+    )
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    updated = lifecycle_state.secondary_mission_card_state(
+        player_id="player-a",
+        secondary_mission_id=secondary_mission_id,
+        mode=SecondaryMissionCardMode.TACTICAL,
+    )
+    assert updated is not None
+    selection = secondary_mission_selection_for_card(updated)
+    assert selection is not None
+    if secondary_mission_id == "a-tempting-target":
+        assert selection.tempting_objective_id == option.option_id.removeprefix("tempting:")
+    elif secondary_mission_id == "beacon":
+        assert selection.beacon_unit_instance_id == option.option_id.removeprefix("beacon:")
+    else:
+        objective_id, unit_id = option.option_id.removeprefix("guard:").split(":", maxsplit=1)
+        assert selection.resolved_guard_objective_ids == (objective_id,)
+        assert selection.guarded_objective_unit_ids == ((objective_id, unit_id),)
+    assert any(
+        event.event_type == event_type for event in lifecycle.decision_controller.event_log.records
+    )
+    restored = GameLifecycle.from_payload(deepcopy(lifecycle.to_payload()))
+    assert restored.to_payload() == lifecycle.to_payload()
 
 
 @pytest.mark.parametrize(
