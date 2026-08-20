@@ -155,6 +155,7 @@ class SourceMissionPackScoringRow:
     primary_vp_cap: int
     secondary_vp_cap: int
     total_vp_cap: int
+    secondary_max_vp_per_turn: int
     end_of_round_scoring_windows: tuple[str, ...]
     end_of_game_scoring_windows: tuple[str, ...]
     reserve_destruction_timing: str
@@ -172,6 +173,7 @@ class SourceMissionPackScoringRow:
             "primary_vp_cap": self.primary_vp_cap,
             "secondary_vp_cap": self.secondary_vp_cap,
             "total_vp_cap": self.total_vp_cap,
+            "secondary_max_vp_per_turn": self.secondary_max_vp_per_turn,
             "end_of_round_scoring_windows": list(self.end_of_round_scoring_windows),
             "end_of_game_scoring_windows": list(self.end_of_game_scoring_windows),
             "reserve_destruction_timing": self.reserve_destruction_timing,
@@ -949,6 +951,7 @@ def mission_pack_scoring_row() -> SourceMissionPackScoringRow:
         primary_vp_cap=45,
         secondary_vp_cap=45,
         total_vp_cap=100,
+        secondary_max_vp_per_turn=15,
         end_of_round_scoring_windows=("battle_round_end",),
         end_of_game_scoring_windows=("turn_end_round_five_going_second", "end_of_battle"),
         reserve_destruction_timing="end_of_battle_round_n",
@@ -1206,27 +1209,36 @@ def _secondary_centre_ground() -> SourceSecondaryMissionRow:
 
 
 def _secondary_cleanse() -> SourceSecondaryMissionRow:
-    rules: list[SourceScoringRuleRow] = []
-    for suffix, victory_points, condition in (
-        ("one-objective", 2, "one_or_more_objectives_cleansed_this_turn"),
-        ("two-objectives", 3, "two_or_more_objectives_cleansed_this_turn"),
-    ):
-        rules.append(
-            _rule(
-                f"cleanse-tactical-{suffix}",
-                "your_turn_end",
-                "tactical_secondary",
-                victory_points,
-                None,
-                condition,
-            )
-        )
     return SourceSecondaryMissionRow(
         secondary_mission_id="cleanse",
         name="Cleanse",
         availability="tactical",
         tournament_fixed_allowed=False,
-        scoring_rules=tuple(rules),
+        scoring_rules=(
+            _source_only_secondary_rule(
+                "cleanse-when-drawn-plunder-active",
+                "when_drawn",
+                None,
+                None,
+                "may_shuffle_back_if_plunder_active",
+            ),
+            _rule(
+                "cleanse-tactical-one-objective",
+                "your_turn_end",
+                "tactical_secondary",
+                2,
+                None,
+                "one_or_more_objectives_cleansed_this_turn",
+            ),
+            _rule(
+                "cleanse-tactical-two-objectives",
+                "your_turn_end",
+                "tactical_secondary",
+                5,
+                None,
+                "two_or_more_objectives_cleansed_this_turn",
+            ),
+        ),
     )
 
 
@@ -1237,6 +1249,13 @@ def _secondary_defend_stronghold() -> SourceSecondaryMissionRow:
         availability="tactical",
         tournament_fixed_allowed=False,
         scoring_rules=(
+            _source_only_secondary_rule(
+                "defend-stronghold-when-drawn-first-round",
+                "when_drawn",
+                None,
+                None,
+                "first_battle_round_must_shuffle_card_back_and_draw_one",
+            ),
             _rule(
                 "defend-stronghold-home-objective",
                 "opponent_turn_end_or_round_five_turn_end",
@@ -1432,6 +1451,13 @@ def _secondary_plunder() -> SourceSecondaryMissionRow:
         availability="tactical",
         tournament_fixed_allowed=False,
         scoring_rules=(
+            _source_only_secondary_rule(
+                "plunder-when-drawn-cleanse-active",
+                "when_drawn",
+                None,
+                None,
+                "may_shuffle_back_if_cleanse_active",
+            ),
             _rule(
                 "plunder-tactical",
                 "your_turn_end",

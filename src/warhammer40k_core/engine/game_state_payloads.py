@@ -67,6 +67,9 @@ from warhammer40k_core.engine.scoring import (
     TacticalSecondaryAchievementContextPayload,
     VictoryPointLedgerPayload,
 )
+from warhammer40k_core.engine.secondary_scoring_state_evidence import (
+    SecondaryScoringStateEvidencePayload,
+)
 from warhammer40k_core.engine.sticky_objective_control import (
     StickyObjectiveControlStatePayload,
 )
@@ -197,6 +200,7 @@ class GameStatePayload(TypedDict):
     objective_control_records: list[ObjectiveControlRecordPayload]
     objective_control_record_authorities: list[ObjectiveControlRecordAuthorityPayload]
     primary_scoring_state_evidence_records: list[PrimaryScoringStateEvidencePayload]
+    secondary_scoring_state_evidence_records: list[SecondaryScoringStateEvidencePayload]
     primary_scoring_boundary_lifecycles: list[PrimaryScoringBoundaryLifecyclePayload]
     sticky_objective_control_states: list[StickyObjectiveControlStatePayload]
     primary_objective_turn_start_states: list[PrimaryObjectiveTurnStartStatePayload]

@@ -160,6 +160,7 @@ class MissionScoringPolicyPayload(TypedDict):
     secondary_vp_cap: int
     battle_ready_vp: int
     total_vp_cap: int
+    secondary_max_vp_per_turn: int
     end_of_round_scoring_windows: list[str]
     end_of_game_scoring_windows: list[str]
     source_id: str
@@ -250,7 +251,7 @@ class SecondaryDestroyedModelStatePayload(TypedDict):
 class SecondaryUnitDestructionStatePayload(TypedDict):
     destruction_id: str
     game_id: str
-    destroying_player_id: str
+    destroying_player_id: str | None
     destroyed_player_id: str
     active_player_id: str
     battle_round: int
@@ -1308,7 +1309,7 @@ class SecondaryDestroyedModelState:
 class SecondaryUnitDestructionState:
     destruction_id: str
     game_id: str
-    destroying_player_id: str
+    destroying_player_id: str | None
     destroyed_player_id: str
     active_player_id: str
     battle_round: int
@@ -1335,7 +1336,7 @@ class SecondaryUnitDestructionState:
         object.__setattr__(
             self,
             "destroying_player_id",
-            _validate_identifier(
+            _validate_optional_identifier(
                 "SecondaryUnitDestructionState destroying_player_id",
                 self.destroying_player_id,
             ),
@@ -1348,8 +1349,6 @@ class SecondaryUnitDestructionState:
                 self.destroyed_player_id,
             ),
         )
-        if self.destroying_player_id == self.destroyed_player_id:
-            raise GameLifecycleError("Secondary unit destruction must target an enemy unit.")
         object.__setattr__(
             self,
             "active_player_id",
@@ -1886,6 +1885,7 @@ class MissionScoringPolicy:
     secondary_vp_cap: int
     battle_ready_vp: int
     total_vp_cap: int
+    secondary_max_vp_per_turn: int
     end_of_round_scoring_windows: tuple[str, ...]
     end_of_game_scoring_windows: tuple[str, ...]
     source_id: str
@@ -2064,6 +2064,14 @@ class MissionScoringPolicy:
             _validate_positive_int(
                 "MissionScoringPolicy secondary_vp_cap",
                 self.secondary_vp_cap,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "secondary_max_vp_per_turn",
+            _validate_positive_int(
+                "MissionScoringPolicy secondary_max_vp_per_turn",
+                self.secondary_max_vp_per_turn,
             ),
         )
         object.__setattr__(
@@ -2640,6 +2648,7 @@ class MissionScoringPolicy:
                     ),
                     "secondary_mission_id": requested_secondary,
                     "objective_control_record_id": record.record_id,
+                    "scoring_turn_active_player_id": record.active_player_id,
                     "scoring_rule_ids": rule_ids,
                     "scoring_rule_conditions": rule_conditions,
                     "scoring_rule_source_ids": rule_source_ids,
@@ -2808,6 +2817,7 @@ class MissionScoringPolicy:
             "secondary_vp_cap": self.secondary_vp_cap,
             "battle_ready_vp": self.battle_ready_vp,
             "total_vp_cap": self.total_vp_cap,
+            "secondary_max_vp_per_turn": self.secondary_max_vp_per_turn,
             "end_of_round_scoring_windows": list(self.end_of_round_scoring_windows),
             "end_of_game_scoring_windows": list(self.end_of_game_scoring_windows),
             "source_id": self.source_id,
@@ -2842,6 +2852,7 @@ class MissionScoringPolicy:
             "secondary_vp_cap",
             "battle_ready_vp",
             "total_vp_cap",
+            "secondary_max_vp_per_turn",
             "end_of_round_scoring_windows",
             "end_of_game_scoring_windows",
             "source_id",
@@ -2889,6 +2900,7 @@ class MissionScoringPolicy:
             secondary_vp_cap=payload["secondary_vp_cap"],
             battle_ready_vp=payload["battle_ready_vp"],
             total_vp_cap=payload["total_vp_cap"],
+            secondary_max_vp_per_turn=payload["secondary_max_vp_per_turn"],
             end_of_round_scoring_windows=tuple(payload["end_of_round_scoring_windows"]),
             end_of_game_scoring_windows=tuple(payload["end_of_game_scoring_windows"]),
             source_id=payload["source_id"],

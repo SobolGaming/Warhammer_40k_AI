@@ -250,7 +250,6 @@ from warhammer40k_core.engine.scoring import (
     PrimaryUnitDestructionState,
     ScoringWindowKind,
     ScoringWindowState,
-    SecondaryDestroyedModelState,
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
     SecondaryMissionCardStatus,
@@ -264,6 +263,10 @@ from warhammer40k_core.engine.scoring import (
     VictoryPointTransaction,
     initial_victory_point_ledgers,
     secondary_mission_card_mode_from_token,
+)
+from warhammer40k_core.engine.secondary_scoring_state_evidence import (
+    SecondaryScoringStateEvidence,
+    validate_secondary_scoring_state_evidence_records,
 )
 from warhammer40k_core.engine.starting_attached_units import (
     StartingAttachedUnitRecord,
@@ -1152,6 +1155,9 @@ class GameState:
     primary_scoring_state_evidence_records: list[PrimaryScoringStateEvidence] = field(
         default_factory=lambda: list[PrimaryScoringStateEvidence]()
     )
+    secondary_scoring_state_evidence_records: list[SecondaryScoringStateEvidence] = field(
+        default_factory=lambda: list[SecondaryScoringStateEvidence]()
+    )
     primary_scoring_boundary_lifecycles: list[PrimaryScoringBoundaryLifecycle] = field(
         default_factory=lambda: list[PrimaryScoringBoundaryLifecycle]()
     )
@@ -1430,6 +1436,12 @@ class GameState:
                 mission_setup=self.mission_setup,
                 turn_order=self.turn_order,
                 objective_control_records=tuple(self.objective_control_records),
+            )
+        )
+        self.secondary_scoring_state_evidence_records = (
+            validate_secondary_scoring_state_evidence_records(
+                self.secondary_scoring_state_evidence_records,
+                game_id=self.game_id,
             )
         )
         validate_victory_point_ledger_policy_sources(
@@ -2679,6 +2691,9 @@ class GameState:
         self.primary_scoring_state_evidence_records = list(
             snapshot.primary_scoring_state_evidence_records
         )
+        self.secondary_scoring_state_evidence_records = list(
+            snapshot.secondary_scoring_state_evidence_records
+        )
         self.victory_point_ledgers = list(snapshot.victory_point_ledgers)
         self.secondary_mission_card_states = list(snapshot.secondary_mission_card_states)
         self.primary_scoring_boundary_lifecycles = list(
@@ -2953,86 +2968,24 @@ class GameState:
     def record_secondary_unit_destruction(
         self,
         *,
-        destroying_player_id: str,
+        destroying_player_id: str | None,
         destroyed_unit_instance_id: str,
         destroyed_model_instance_ids: tuple[str, ...],
         started_turn_objective_marker_ids: tuple[str, ...],
         source_id: str,
     ) -> SecondaryUnitDestructionState:
-        if self.mission_setup is None:
-            raise GameLifecycleError("Secondary unit destruction tracking requires MissionSetup.")
-        if self.active_player_id is None:
-            raise GameLifecycleError(
-                "Secondary unit destruction tracking requires an active player."
-            )
-        phase = self.current_battle_phase
-        if phase is None:
-            raise GameLifecycleError("Secondary unit destruction tracking requires a battle phase.")
-        requested_destroyer = _validate_player_id(destroying_player_id, player_ids=self.player_ids)
-        requested_unit = _validate_identifier(
-            "destroyed_unit_instance_id", destroyed_unit_instance_id
+        from warhammer40k_core.engine.secondary_unit_destruction_tracking import (
+            record_secondary_unit_destruction as record_destruction,
         )
-        owner_by_unit_id = _unit_owner_by_id(self.army_definitions)
-        if requested_unit not in owner_by_unit_id:
-            raise GameLifecycleError("Secondary unit destruction references an unknown unit.")
-        destroyed_player_id = owner_by_unit_id[requested_unit]
-        if destroyed_player_id == requested_destroyer:
-            raise GameLifecycleError("Secondary unit destruction must target an enemy unit.")
-        destroyed_unit = self._unit_by_id(requested_unit)
-        requested_model_ids = _validate_identifier_tuple(
-            "destroyed_model_instance_ids",
-            destroyed_model_instance_ids,
-            min_length=0,
-            sort_values=True,
+
+        return record_destruction(
+            self,
+            destroying_player_id=destroying_player_id,
+            destroyed_unit_instance_id=destroyed_unit_instance_id,
+            destroyed_model_instance_ids=destroyed_model_instance_ids,
+            started_turn_objective_marker_ids=started_turn_objective_marker_ids,
+            source_id=source_id,
         )
-        model_by_id = {model.model_instance_id: model for model in destroyed_unit.own_models}
-        if any(model_id not in model_by_id for model_id in requested_model_ids):
-            raise GameLifecycleError(
-                "Secondary unit destruction references a model outside the destroyed unit."
-            )
-        objective_ids = _validate_identifier_tuple(
-            "started_turn_objective_marker_ids",
-            started_turn_objective_marker_ids,
-            min_length=0,
-            sort_values=True,
-        )
-        known_objective_ids = {
-            marker.objective_marker_id for marker in self.mission_setup.objective_markers
-        }
-        if any(objective_id not in known_objective_ids for objective_id in objective_ids):
-            raise GameLifecycleError(
-                "Secondary unit destruction references an unknown started-turn objective."
-            )
-        if any(
-            state.destroyed_unit_instance_id == requested_unit
-            for state in self.secondary_unit_destruction_states
-        ):
-            raise GameLifecycleError("Secondary unit destruction already exists for this unit.")
-        state = SecondaryUnitDestructionState(
-            destruction_id=(
-                f"secondary-unit-destruction:{self.game_id}:round-{self.battle_round:02d}:"
-                f"{self.active_player_id}:{requested_unit}"
-            ),
-            game_id=self.game_id,
-            destroying_player_id=requested_destroyer,
-            destroyed_player_id=destroyed_player_id,
-            active_player_id=self.active_player_id,
-            battle_round=self.battle_round,
-            phase=phase.value,
-            destroyed_unit_instance_id=requested_unit,
-            destroyed_models=tuple(
-                SecondaryDestroyedModelState(
-                    model_instance_id=model_id,
-                    starting_wounds=model_by_id[model_id].starting_wounds,
-                )
-                for model_id in requested_model_ids
-            ),
-            started_turn_objective_marker_ids=objective_ids,
-            source_id=_validate_identifier("source_id", source_id),
-        )
-        self.secondary_unit_destruction_states.append(state)
-        self.secondary_unit_destruction_states.sort(key=lambda stored: stored.destruction_id)
-        return state
 
     def record_secondary_objective_cleanse(
         self,
@@ -4861,6 +4814,9 @@ class GameState:
             "primary_scoring_state_evidence_records": [
                 evidence.to_payload() for evidence in self.primary_scoring_state_evidence_records
             ],
+            "secondary_scoring_state_evidence_records": [
+                evidence.to_payload() for evidence in self.secondary_scoring_state_evidence_records
+            ],
             "primary_scoring_boundary_lifecycles": [
                 row.to_payload() for row in self.primary_scoring_boundary_lifecycles
             ],
@@ -4953,6 +4909,7 @@ class GameState:
         payload = cast(dict[str, JsonValue], self.to_payload())
         payload["objective_control_record_authorities"] = []
         payload["primary_scoring_state_evidence_records"] = []
+        payload["secondary_scoring_state_evidence_records"] = []
         payload["primary_scoring_boundary_lifecycles"] = []
         payload["secondary_mission_choices"] = cast(JsonValue, public_choices)
         payload["victory_point_ledgers"] = [
@@ -4993,7 +4950,7 @@ class GameState:
             [
                 cast(JsonValue, state.to_payload())
                 for state in self.secondary_unit_destruction_states
-                if secondary_mission_choices_revealed or state.destroying_player_id == viewer
+                if secondary_mission_choices_revealed or state.destroyed_player_id != viewer
             ],
         )
         payload["secondary_objective_cleanse_states"] = cast(
@@ -5218,6 +5175,10 @@ class GameState:
             primary_scoring_state_evidence_records=[
                 PrimaryScoringStateEvidence.from_payload(evidence)
                 for evidence in payload["primary_scoring_state_evidence_records"]
+            ],
+            secondary_scoring_state_evidence_records=[
+                SecondaryScoringStateEvidence.from_payload(evidence)
+                for evidence in payload["secondary_scoring_state_evidence_records"]
             ],
             primary_scoring_boundary_lifecycles=[
                 PrimaryScoringBoundaryLifecycle.from_payload(row)
@@ -6877,7 +6838,10 @@ def _validate_secondary_unit_destruction_states(
         if state.game_id != game_id:
             raise GameLifecycleError("SecondaryUnitDestructionState game_id drift.")
         if (
-            state.destroying_player_id not in player_ids
+            (
+                state.destroying_player_id is not None
+                and state.destroying_player_id not in player_ids
+            )
             or state.destroyed_player_id not in player_ids
             or state.active_player_id not in player_ids
         ):

@@ -1726,7 +1726,7 @@ Implemented coverage:
 
 - game length is consumed from mission scoring policy;
 - end-of-round and end-of-game scoring windows are recorded once as replay-safe state;
-- 11th Edition primary, secondary, Battle Ready, per-round Primary, per-round Secondary, and total VP caps are enforced at award time;
+- 11th Edition primary, secondary, Battle Ready, per-battle-round Primary, per-player-turn Secondary, and total VP caps are enforced at award time;
 - final scoring result payloads include public capped scores, winner/draw determination, and scoring audit data;
 - final scoring payloads round-trip without Python object reprs.
 
@@ -1735,7 +1735,7 @@ Invariants:
 - game length is mission/ruleset data;
 - end-of-round and end-of-game scoring windows are explicit;
 - final VP ledger audit verifies winner/draw payloads;
-- 11th Edition 45 VP Primary cap, 45 VP Secondary cap, 10 VP Battle Ready cap, 15 VP per-round Primary and Secondary caps, 100 VP total cap, and per-source caps are represented in scoring policy;
+- 11th Edition 45 VP Primary cap, 45 VP Secondary cap, 10 VP Battle Ready cap, 15 VP Primary per battle round, 15 VP Secondary per player turn (scoring player + battle round + active player), 100 VP total cap, and per-source caps are represented in scoring policy;
 - game-end payload includes public final score and replay-safe scoring audit.
 
 Required tests:
@@ -3013,8 +3013,8 @@ Invariants:
   those descriptors through the existing decision path rather than adding a
   parallel Secondary Mission adapter route;
 - scoring source data caps Primary at 45 VP, Secondary at 45 VP, Battle Ready at
-  10 VP, total score at 100 VP, and Primary and Secondary scoring at 15 VP per
-  battle round;
+  10 VP, total score at 100 VP, Primary scoring at 15 VP per battle round, and
+  Secondary scoring at 15 VP per player turn;
 - source imports reuse the existing normalization/ETL boundary but produce 11th Edition package IDs and hashes;
 - old source snapshots are not selectable as active game content;
 - catalog/reporting distinguishes implemented, unsupported, and awaiting-source rows without silently substituting retired data.
@@ -5096,7 +5096,7 @@ record; the free-form timing field alone cannot claim the exemption. Live
 awards and restored ledgers use the same policy validator, and restore rejects
 ordinary Primary totals above 15VP in one battle round. The resulting complete
 mission source identity is pinned as
-`4b23bfe02563942bf866827c2a36eb218cb11ba3f4af7f3169c8fbc784cbb82d`.
+`9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5`.
 
 The Phase 17N scoring schema has exactly nine source timing tokens and requires
 every scoring row to declare one of `independent`, `cumulative`, or

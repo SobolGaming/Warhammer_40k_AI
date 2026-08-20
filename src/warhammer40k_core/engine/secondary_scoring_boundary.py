@@ -30,6 +30,10 @@ from warhammer40k_core.engine.secondary_mission_selection import (
 from warhammer40k_core.engine.secondary_scoring_context import (
     secondary_scoring_condition_context_from_state,
 )
+from warhammer40k_core.engine.secondary_scoring_state_evidence import (
+    bind_secondary_scoring_state_evidence,
+    capture_secondary_scoring_state_evidence,
+)
 from warhammer40k_core.engine.secondary_tactical_achievement import (
     tactical_secondary_achievement_context_from_award,
 )
@@ -185,8 +189,19 @@ def _score_or_record_secondary_card(
     )
     if award is None:
         return
+    evidence = capture_secondary_scoring_state_evidence(
+        state=state,
+        card=card,
+        record=record,
+        context=context,
+        award=award,
+    )
+    bound = bind_state_backed_secondary_scoring_commit(
+        bind_secondary_scoring_state_evidence(award, evidence),
+        state=state,
+        record=record,
+    )
     if card.mode is SecondaryMissionCardMode.FIXED:
-        bound = bind_state_backed_secondary_scoring_commit(award, state=state, record=record)
         state.award_victory_points(bound)
         _mark_card_record_resolved(state=state, card=card, record=record)
         return
@@ -196,7 +211,7 @@ def _score_or_record_secondary_card(
         state=state,
         card=card,
         record=record,
-        award=award,
+        award=bound,
     )
     state.record_tactical_secondary_achievement_context(achievement)
     _mark_card_record_resolved(state=state, card=card, record=record)

@@ -4837,14 +4837,22 @@ def test_a_grievous_blow_scores_destroyed_starting_strength_thirteen_units() -> 
     assert metadata["victory_points_by_rule"] == {"a-grievous-blow-tactical": 5}
 
 
-def test_secure_no_mans_land_scores_two_central_objectives_from_control_record() -> None:
-    state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
+def test_secure_no_mans_land_scores_two_no_mans_land_objectives_from_control_record() -> None:
+    state = _battle_state(
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+        mission_setup=_event_companion_mission_setup(),
+    )
     assert state.mission_setup is not None
     policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
-    home_objective_id = "take-and-hold-vs-purge-the-foe-layout-3-left-home"
-    controlled_central_ids = (
-        "take-and-hold-vs-purge-the-foe-layout-3-center-central",
-        "take-and-hold-vs-purge-the-foe-layout-3-upper-central",
+    no_mans_land_ids = _no_mans_land_non_home_objective_ids(
+        state.mission_setup,
+        player_id="player-a",
+    )
+    assert len(no_mans_land_ids) >= 2
+    home_objective_ids = tuple(
+        marker.objective_marker_id
+        for marker in state.mission_setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.ATTACKER_HOME
     )
     record = ObjectiveControlRecord(
         record_id="phase17-secondary-secure-no-mans-land-record",
@@ -4855,10 +4863,13 @@ def test_secure_no_mans_land_scores_two_central_objectives_from_control_record()
         phase=BattlePhase.FIGHT.value,
         battlefield_id="phase17-secondary-secure-no-mans-land-battlefield",
         results=(
-            _controlled_objective_result(home_objective_id, player_id="player-a"),
             *(
                 _controlled_objective_result(objective_id, player_id="player-a")
-                for objective_id in controlled_central_ids
+                for objective_id in home_objective_ids
+            ),
+            *(
+                _controlled_objective_result(objective_id, player_id="player-a")
+                for objective_id in no_mans_land_ids[:2]
             ),
         ),
     )
@@ -4884,29 +4895,87 @@ def test_secure_no_mans_land_scores_two_central_objectives_from_control_record()
     evidence = cast(dict[str, JsonValue], metadata["evidence_by_rule"])
     assert award.amount == 5
     assert metadata["score_count_by_rule"] == {"secure-no-mans-land-tactical": 1}
-    assert evidence["secure-no-mans-land-tactical"] == {
-        "score_count": 1,
-        "controlled_objective_ids": list(controlled_central_ids),
-        "home_objective_ids": [home_objective_id],
-        "objective_marker_ids": [],
-        "terrain_feature_ids": [],
-        "destroyed_unit_instance_ids": [],
-        "destroyed_model_instance_ids": [],
-        "enemy_unit_instance_ids": [],
-    }
+    assert evidence["secure-no-mans-land-tactical"]["score_count"] == 1
+    assert set(
+        cast(list[object], evidence["secure-no-mans-land-tactical"]["controlled_objective_ids"])
+    ) == (set(no_mans_land_ids[:2]))
+
+
+def test_secure_no_mans_land_scores_expansion_objectives_in_no_mans_land() -> None:
+    state = _battle_state(
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+        mission_setup=_event_companion_mission_setup(),
+    )
+    assert state.mission_setup is not None
+    policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
+    nml_ids = _no_mans_land_non_home_objective_ids(state.mission_setup, player_id="player-a")
+    expansion_in_nml = tuple(
+        marker.objective_marker_id
+        for marker in state.mission_setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.EXPANSION
+        and marker.objective_marker_id in nml_ids
+    )
+    other_nml = tuple(
+        objective_id for objective_id in nml_ids if objective_id not in expansion_in_nml
+    )
+    if len(expansion_in_nml) >= 2:
+        controlled_ids = expansion_in_nml[:2]
+    else:
+        controlled_ids = (expansion_in_nml + other_nml)[:2]
+    assert expansion_in_nml
+    assert len(controlled_ids) >= 2
+    record = ObjectiveControlRecord(
+        record_id="phase17-secondary-secure-no-mans-land-expansion-record",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        timing=ObjectiveControlTiming.TURN_END,
+        phase=BattlePhase.FIGHT.value,
+        battlefield_id="phase17-secondary-secure-no-mans-land-expansion-battlefield",
+        results=tuple(
+            _controlled_objective_result(objective_id, player_id="player-a")
+            for objective_id in controlled_ids
+        ),
+    )
+
+    award = policy.secondary_award_from_mission_state(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        phase=BattlePhase.FIGHT.value,
+        secondary_mission_id="secure-no-mans-land",
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+        hidden=False,
+        record=record,
+        mission_setup=state.mission_setup,
+        unit_destruction_states=(),
+        objective_cleanse_states=(),
+        terrain_plunder_states=(),
+        enemy_unit_ids_in_player_deployment_zone=(),
+        starting_strength_records=tuple(state.starting_strength_records),
+    )
+
+    assert award is not None
+    assert award.amount == 5
 
 
 def test_secure_no_mans_land_does_not_score_opponent_home_as_no_mans_land() -> None:
-    state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    state = _battle_state(
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+        mission_setup=_event_companion_mission_setup(),
+    )
     assert state.mission_setup is not None
     policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
-    central_objective_id = "take-and-hold-vs-purge-the-foe-layout-3-center-central"
-    opponent_home_objective_id = "take-and-hold-vs-purge-the-foe-layout-3-right-home"
-    objective_marker_ids = {
-        marker.objective_marker_id for marker in state.mission_setup.objective_markers
-    }
-    assert central_objective_id in objective_marker_ids
-    assert opponent_home_objective_id in objective_marker_ids
+    no_mans_land_ids = _no_mans_land_non_home_objective_ids(
+        state.mission_setup,
+        player_id="player-a",
+    )
+    assert no_mans_land_ids
+    opponent_home_ids = tuple(
+        marker.objective_marker_id
+        for marker in state.mission_setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.DEFENDER_HOME
+    )
+    assert opponent_home_ids
     record = ObjectiveControlRecord(
         record_id="phase17-secondary-secure-no-mans-land-opponent-home-record",
         game_id=state.game_id,
@@ -4916,8 +4985,8 @@ def test_secure_no_mans_land_does_not_score_opponent_home_as_no_mans_land() -> N
         phase=BattlePhase.FIGHT.value,
         battlefield_id="phase17-secondary-secure-no-mans-land-opponent-home-battlefield",
         results=(
-            _controlled_objective_result(central_objective_id, player_id="player-a"),
-            _controlled_objective_result(opponent_home_objective_id, player_id="player-a"),
+            _controlled_objective_result(no_mans_land_ids[0], player_id="player-a"),
+            _controlled_objective_result(opponent_home_ids[0], player_id="player-a"),
         ),
     )
 
@@ -4938,6 +5007,48 @@ def test_secure_no_mans_land_does_not_score_opponent_home_as_no_mans_land() -> N
     )
 
     assert award is None
+
+
+def test_secure_no_mans_land_requires_no_mans_land_region() -> None:
+    state = _battle_state(player_a_secondary=SecondaryMissionMode.TACTICAL)
+    assert state.mission_setup is not None
+    assert not any(
+        region.region_kind is BattlefieldRegionKind.NO_MANS_LAND
+        for region in state.mission_setup.battlefield_regions
+    )
+    policy = mission_scoring_policies_from_setup(state.mission_setup).policy_for_player("player-a")
+    home_objective_id = next(
+        marker.objective_marker_id
+        for marker in state.mission_setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.ATTACKER_HOME
+    )
+    record = ObjectiveControlRecord(
+        record_id="phase17-secondary-secure-no-mans-land-missing-region-record",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        timing=ObjectiveControlTiming.TURN_END,
+        phase=BattlePhase.FIGHT.value,
+        battlefield_id="phase17-secondary-secure-no-mans-land-missing-region-battlefield",
+        results=(_controlled_objective_result(home_objective_id, player_id="player-a"),),
+    )
+
+    with pytest.raises(GameLifecycleError, match="No Man's Land"):
+        policy.secondary_award_from_mission_state(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            phase=BattlePhase.FIGHT.value,
+            secondary_mission_id="secure-no-mans-land",
+            source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+            hidden=False,
+            record=record,
+            mission_setup=state.mission_setup,
+            unit_destruction_states=(),
+            objective_cleanse_states=(),
+            terrain_plunder_states=(),
+            enemy_unit_ids_in_player_deployment_zone=(),
+            starting_strength_records=tuple(state.starting_strength_records),
+        )
 
 
 def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
@@ -5037,8 +5148,7 @@ def test_cleanse_and_plunder_score_from_recorded_action_evidence() -> None:
     )
     assert cleanse_state.victory_point_total("player-a") == 5
     assert cleanse_metadata["victory_points_by_rule"] == {
-        "cleanse-tactical-one-objective": 2,
-        "cleanse-tactical-two-objectives": 3,
+        "cleanse-tactical-two-objectives": 5,
     }
     assert plunder_state.victory_point_total("player-a") == 5
     assert plunder_metadata["victory_points_by_rule"] == {"plunder-tactical": 5}
@@ -5144,20 +5254,36 @@ def test_secondary_scoring_evidence_payloads_round_trip_and_fail_fast() -> None:
     assert SecondaryObjectiveCleanseState.from_payload(cleanse.to_payload()) == cleanse
     assert SecondaryTerrainPlunderState.from_payload(plunder.to_payload()) == plunder
     assert SecondaryMissionScoringRule.from_payload(rule.to_payload()) == rule
-    with pytest.raises(GameLifecycleError, match="enemy unit"):
-        SecondaryUnitDestructionState(
-            destruction_id="secondary-unit-destruction:phase11e-game:round-01:friendly",
-            game_id="phase11e-game",
-            destroying_player_id="player-a",
-            destroyed_player_id="player-a",
-            active_player_id="player-a",
-            battle_round=1,
-            phase=BattlePhase.FIGHT.value,
-            destroyed_unit_instance_id="army-alpha:intercessor-unit-1",
-            destroyed_models=(model,),
-            started_turn_objective_marker_ids=(),
-            source_id="phase16:test-friendly-destruction",
-        )
+    self_destruction = SecondaryUnitDestructionState(
+        destruction_id="secondary-unit-destruction:phase11e-game:round-01:self",
+        game_id="phase11e-game",
+        destroying_player_id="player-a",
+        destroyed_player_id="player-a",
+        active_player_id="player-a",
+        battle_round=1,
+        phase=BattlePhase.FIGHT.value,
+        destroyed_unit_instance_id="army-alpha:intercessor-unit-1",
+        destroyed_models=(model,),
+        started_turn_objective_marker_ids=(),
+        source_id="phase16:test-self-destruction",
+    )
+    unattributed = SecondaryUnitDestructionState(
+        destruction_id="secondary-unit-destruction:phase11e-game:round-01:unattributed",
+        game_id="phase11e-game",
+        destroying_player_id=None,
+        destroyed_player_id="player-b",
+        active_player_id="player-a",
+        battle_round=1,
+        phase=BattlePhase.FIGHT.value,
+        destroyed_unit_instance_id="army-beta:vehicle-unit-3",
+        destroyed_models=(model,),
+        started_turn_objective_marker_ids=(),
+        source_id="phase16:test-unattributed-destruction",
+    )
+    assert SecondaryUnitDestructionState.from_payload(self_destruction.to_payload()) == (
+        self_destruction
+    )
+    assert SecondaryUnitDestructionState.from_payload(unattributed.to_payload()) == unattributed
     with pytest.raises(GameLifecycleError, match="owner's turn"):
         SecondaryObjectiveCleanseState(
             cleanse_id="secondary-objective-cleanse:phase11e-game:round-01:player-a:bad",
@@ -11459,6 +11585,40 @@ def _mission_setup() -> MissionSetup:
         attacker_force_disposition_id="purge-the-foe",
         defender_player_id="player-b",
         defender_force_disposition_id="take-and-hold",
+    )
+
+
+def _no_mans_land_non_home_objective_ids(
+    mission_setup: MissionSetup,
+    *,
+    player_id: str,
+) -> tuple[str, ...]:
+    nml_regions = tuple(
+        region
+        for region in mission_setup.battlefield_regions
+        if region.region_kind is BattlefieldRegionKind.NO_MANS_LAND
+    )
+    if not nml_regions:
+        raise AssertionError("Event Companion fixture is missing a No Man's Land region.")
+    home_role = (
+        ObjectiveMarkerRole.ATTACKER_HOME
+        if player_id == mission_setup.attacker_player_id
+        else ObjectiveMarkerRole.DEFENDER_HOME
+    )
+    home_ids = {
+        marker.objective_marker_id
+        for marker in mission_setup.objective_markers
+        if marker.objective_role is home_role
+    }
+    return tuple(
+        sorted(
+            marker.objective_marker_id
+            for marker in mission_setup.objective_markers
+            if marker.objective_marker_id not in home_ids
+            and any(
+                region.contains_point(marker.x_inches, marker.y_inches) for region in nml_regions
+            )
+        )
     )
 
 

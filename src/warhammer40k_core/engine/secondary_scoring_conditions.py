@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
 from warhammer40k_core.core.missions import ObjectiveMarkerRole
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.event_log import JsonValue
@@ -174,7 +175,6 @@ def evaluate_secondary_scoring_condition(
     player_id = context.player_id
     controlled_objective_ids = _controlled_objective_ids(record, player_id=player_id)
     home_objective_ids = _home_objective_ids(context.mission_setup, player_id=player_id)
-    central_objective_ids = _central_objective_ids(context.mission_setup)
     if requested_condition == "each_enemy_model_w10_or_more_destroyed_this_turn":
         matching = _enemy_destructions_this_turn(context)
         model_ids = tuple(
@@ -260,20 +260,24 @@ def evaluate_secondary_scoring_condition(
             objective_marker_ids=objective_ids,
         )
     if requested_condition == "control_two_or_more_no_mans_land_objectives_excluding_home":
-        no_mans_land_objective_ids = tuple(
+        no_mans_land_objective_ids = _no_mans_land_objective_ids(
+            context.mission_setup,
+            player_id=player_id,
+        )
+        controlled_no_mans_land_ids = tuple(
             objective_id
             for objective_id in controlled_objective_ids
-            if objective_id in central_objective_ids
+            if objective_id in no_mans_land_objective_ids
         )
         return _score_count_evidence(
-            score_count=1 if len(no_mans_land_objective_ids) >= 2 else 0,
-            controlled_objective_ids=no_mans_land_objective_ids,
+            score_count=1 if len(controlled_no_mans_land_ids) >= 2 else 0,
+            controlled_objective_ids=controlled_no_mans_land_ids,
             home_objective_ids=home_objective_ids,
         )
     if requested_condition == "one_or_more_objectives_cleansed_this_turn":
         cleanses = _cleanses_this_turn(context)
         return _score_count_evidence(
-            score_count=1 if cleanses else 0,
+            score_count=1 if len(cleanses) == 1 else 0,
             objective_marker_ids=tuple(state.objective_marker_id for state in cleanses),
         )
     if requested_condition == "two_or_more_objectives_cleansed_this_turn":
@@ -358,15 +362,18 @@ def _evaluate_promoted_condition(
         )
     if condition == "all_enemy_character_models_destroyed_during_battle":
         roster = _require_occupancy(occupancy, condition=condition).enemy_character_models
-        all_destroyed = bool(roster) and all(model.wounds_remaining == 0 for model in roster)
+        destroyed_ids = _enemy_character_model_ids_destroyed_during_battle(context)
+        roster_ids = tuple(model.model_instance_id for model in roster)
+        all_destroyed = bool(roster_ids) and set(roster_ids) <= destroyed_ids
         return _score_count_evidence(
             score_count=1 if all_destroyed else 0,
-            destroyed_model_instance_ids=tuple(model.model_instance_id for model in roster),
+            destroyed_model_instance_ids=roster_ids,
         )
     if condition == "one_or_more_enemy_character_models_destroyed_this_turn":
         character_roster = () if occupancy is None else occupancy.enemy_character_models
-        all_destroyed = bool(character_roster) and all(
-            model.wounds_remaining == 0 for model in character_roster
+        roster_ids = tuple(model.model_instance_id for model in character_roster)
+        all_destroyed = bool(roster_ids) and set(roster_ids) <= (
+            _enemy_character_model_ids_destroyed_during_battle(context)
         )
         score_count = 1 if destroyed_character_models and not all_destroyed else 0
         return _score_count_evidence(
@@ -525,13 +532,36 @@ def _enemy_destructions_this_turn(
                 "Secondary scoring requires SecondaryUnitDestructionState values."
             )
         if (
-            value.destroying_player_id == requested_player
-            and value.destroyed_player_id != requested_player
+            value.destroyed_player_id != requested_player
             and value.active_player_id == requested_active
             and value.battle_round == requested_round
         ):
             matching.append(value)
     return tuple(matching)
+
+
+def _enemy_character_model_ids_destroyed_during_battle(
+    context: SecondaryScoringConditionContext,
+) -> set[str]:
+    from warhammer40k_core.engine.scoring import SecondaryUnitDestructionState
+
+    occupancy = _require_occupancy(
+        context.occupancy,
+        condition="all_enemy_character_models_destroyed_during_battle",
+    )
+    roster_ids = {model.model_instance_id for model in occupancy.enemy_character_models}
+    destroyed_ids: set[str] = set()
+    for value in context.unit_destruction_states:
+        if type(value) is not SecondaryUnitDestructionState:
+            raise GameLifecycleError(
+                "Secondary scoring requires SecondaryUnitDestructionState values."
+            )
+        if value.destroyed_player_id == context.player_id:
+            continue
+        for model in value.destroyed_models:
+            if model.model_instance_id in roster_ids:
+                destroyed_ids.add(model.model_instance_id)
+    return destroyed_ids
 
 
 def _cleanses_this_turn(
@@ -633,14 +663,28 @@ def _opponent_home_objective_ids(mission_setup: MissionSetup, *, player_id: str)
     )
 
 
-def _central_objective_ids(mission_setup: MissionSetup) -> tuple[str, ...]:
-    return tuple(
-        sorted(
-            marker.objective_marker_id
-            for marker in mission_setup.objective_markers
-            if marker.objective_role is ObjectiveMarkerRole.CENTRAL
-        )
+def _no_mans_land_objective_ids(
+    mission_setup: MissionSetup,
+    *,
+    player_id: str,
+) -> tuple[str, ...]:
+    nml_regions = tuple(
+        region
+        for region in mission_setup.battlefield_regions
+        if region.region_kind is BattlefieldRegionKind.NO_MANS_LAND
     )
+    if not nml_regions:
+        raise GameLifecycleError(
+            "Secure No Man's Land scoring requires a No Man's Land battlefield region."
+        )
+    home_ids = set(_home_objective_ids(mission_setup, player_id=player_id))
+    eligible: list[str] = []
+    for marker in mission_setup.objective_markers:
+        if marker.objective_marker_id in home_ids:
+            continue
+        if any(region.contains_point(marker.x_inches, marker.y_inches) for region in nml_regions):
+            eligible.append(marker.objective_marker_id)
+    return tuple(sorted(eligible))
 
 
 def _expansion_objective_ids(mission_setup: MissionSetup) -> tuple[str, ...]:

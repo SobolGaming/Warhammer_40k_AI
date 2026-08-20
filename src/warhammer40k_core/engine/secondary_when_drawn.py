@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -26,8 +27,28 @@ if TYPE_CHECKING:
 
 RESOLVE_TACTICAL_SECONDARY_WHEN_DRAWN_DECISION_TYPE = "resolve_tactical_secondary_when_drawn"
 _validate_identifier = IdentifierValidator(GameLifecycleError)
-_OPTIONAL_DISCARD_MISSION_IDS = frozenset({"a-grievous-blow", "bring-it-down"})
-_FIRST_ROUND_SHUFFLE_MISSION_IDS = frozenset({"behind-enemy-lines", "forward-position"})
+_OPTIONAL_DISCARD_CONDITIONS = frozenset(
+    {
+        "may_discard_if_no_enemy_units_starting_strength_13_or_more_on_battlefield",
+        "may_discard_if_no_enemy_models_w10_or_more_on_battlefield",
+    }
+)
+_OPTIONAL_FIRST_ROUND_SHUFFLE_CONDITIONS = frozenset(
+    {"first_battle_round_may_shuffle_card_back_and_draw_one"}
+)
+_MANDATORY_FIRST_ROUND_SHUFFLE_CONDITIONS = frozenset(
+    {"first_battle_round_must_shuffle_card_back_and_draw_one"}
+)
+_OPTIONAL_SHUFFLE_IF_PLUNDER_CONDITIONS = frozenset({"may_shuffle_back_if_plunder_active"})
+_OPTIONAL_SHUFFLE_IF_CLEANSE_CONDITIONS = frozenset({"may_shuffle_back_if_cleanse_active"})
+_WHEN_DRAWN_ACTION_TIMINGS = frozenset({"when_drawn", "when_drawn_or_start_of_your_turn"})
+
+
+@dataclass(frozen=True, slots=True)
+class _WhenDrawnPolicy:
+    action: str
+    eligible: bool
+    mandatory: bool
 
 
 def next_tactical_secondary_when_drawn_request(
@@ -46,29 +67,28 @@ def next_tactical_secondary_when_drawn_request(
     active_player_id = state.active_player_id
     if active_player_id is None:
         raise GameLifecycleError("When Drawn resolution requires an active player.")
-    pending = _pending_when_drawn_card(state=state, player_id=active_player_id)
-    if pending is None:
-        return None
-    _auto_resolve_if_ineligible(state=state, card=pending)
-    pending = _pending_when_drawn_card(state=state, player_id=active_player_id)
-    if pending is None:
-        return None
-    action = _when_drawn_action(pending.secondary_mission_id)
-    if action is None:
-        _mark_when_drawn_resolved(state=state, card=pending)
-        return next_tactical_secondary_when_drawn_request(state=state, decisions=decisions)
-    request = _when_drawn_request(state=state, card=pending, action=action)
-    decisions.request_decision(request)
-    return LifecycleStatus.waiting_for_decision(
-        stage=state.stage,
-        decision_request=request,
-        payload={
-            "game_id": state.game_id,
-            "player_id": active_player_id,
-            "secondary_mission_id": pending.secondary_mission_id,
-            "decision_type": RESOLVE_TACTICAL_SECONDARY_WHEN_DRAWN_DECISION_TYPE,
-        },
-    )
+    for _step in range(64):
+        pending = _pending_when_drawn_card(state=state, player_id=active_player_id)
+        if pending is None:
+            return None
+        if _auto_apply_when_drawn(state=state, card=pending, decisions=decisions):
+            continue
+        policy = _when_drawn_policy(state=state, card=pending)
+        if policy is None:
+            raise GameLifecycleError("When Drawn pending card is missing a source policy.")
+        request = _when_drawn_request(state=state, card=pending, action=policy.action)
+        decisions.request_decision(request)
+        return LifecycleStatus.waiting_for_decision(
+            stage=state.stage,
+            decision_request=request,
+            payload={
+                "game_id": state.game_id,
+                "player_id": active_player_id,
+                "secondary_mission_id": pending.secondary_mission_id,
+                "decision_type": RESOLVE_TACTICAL_SECONDARY_WHEN_DRAWN_DECISION_TYPE,
+            },
+        )
+    raise GameLifecycleError("When Drawn resolution did not terminate.")
 
 
 def invalid_tactical_secondary_when_drawn_status(
@@ -144,11 +164,10 @@ def apply_tactical_secondary_when_drawn(
         )
         return
     if action == "shuffle":
-        state.forget_secondary_mission_card_state(card)
-        drawn = state.draw_tactical_secondary_cards(
-            player_id=player_id,
+        drawn = _draw_replacement_then_forget(
+            state=state,
+            card=card,
             source_result_id=result.result_id,
-            draw_count=1,
         )
         decisions.event_log.append(
             "tactical_secondary_when_drawn_shuffled",
@@ -175,34 +194,199 @@ def _pending_when_drawn_card(
         and card.mode is SecondaryMissionCardMode.TACTICAL
         and card.status is SecondaryMissionCardStatus.ACTIVE
         and not _when_drawn_resolved(card)
-        and _when_drawn_action(card.secondary_mission_id) is not None
+        and _when_drawn_policy(state=state, card=card) is not None
     )
     if not matches:
         return None
     return sorted(matches, key=lambda card: card.secondary_mission_id)[0]
 
 
-def _when_drawn_action(secondary_mission_id: str) -> str | None:
-    if secondary_mission_id in _OPTIONAL_DISCARD_MISSION_IDS:
-        return "discard"
-    if secondary_mission_id in _FIRST_ROUND_SHUFFLE_MISSION_IDS:
-        return "shuffle"
-    return None
+def _when_drawn_policy(
+    *,
+    state: GameState,
+    card: SecondaryMissionCardState,
+) -> _WhenDrawnPolicy | None:
+    conditions = _when_drawn_source_conditions(
+        state=state,
+        secondary_mission_id=card.secondary_mission_id,
+    )
+    action_conditions = tuple(condition for condition in conditions if _action_condition(condition))
+    if not action_conditions:
+        return None
+    if len(action_conditions) != 1:
+        raise GameLifecycleError("Secondary When Drawn source describes multiple actions.")
+    condition = action_conditions[0]
+    if condition in _OPTIONAL_DISCARD_CONDITIONS:
+        return _WhenDrawnPolicy(
+            action="discard",
+            eligible=_discard_is_eligible(state=state, card=card, condition=condition),
+            mandatory=False,
+        )
+    if condition in _OPTIONAL_FIRST_ROUND_SHUFFLE_CONDITIONS:
+        return _WhenDrawnPolicy(
+            action="shuffle",
+            eligible=state.battle_round == 1,
+            mandatory=False,
+        )
+    if condition in _MANDATORY_FIRST_ROUND_SHUFFLE_CONDITIONS:
+        return _WhenDrawnPolicy(
+            action="shuffle",
+            eligible=state.battle_round == 1,
+            mandatory=True,
+        )
+    if condition in _OPTIONAL_SHUFFLE_IF_PLUNDER_CONDITIONS:
+        return _WhenDrawnPolicy(
+            action="shuffle",
+            eligible=_player_has_active_tactical(
+                state,
+                player_id=card.player_id,
+                secondary_mission_id="plunder",
+            ),
+            mandatory=False,
+        )
+    if condition in _OPTIONAL_SHUFFLE_IF_CLEANSE_CONDITIONS:
+        return _WhenDrawnPolicy(
+            action="shuffle",
+            eligible=_player_has_active_tactical(
+                state,
+                player_id=card.player_id,
+                secondary_mission_id="cleanse",
+            ),
+            mandatory=False,
+        )
+    raise GameLifecycleError("Unsupported When Drawn source condition.")
 
 
-def _auto_resolve_if_ineligible(*, state: GameState, card: SecondaryMissionCardState) -> None:
-    mission_id = card.secondary_mission_id
-    if mission_id in _FIRST_ROUND_SHUFFLE_MISSION_IDS and state.battle_round != 1:
+def _action_condition(condition: str) -> bool:
+    return condition in (
+        _OPTIONAL_DISCARD_CONDITIONS
+        | _OPTIONAL_FIRST_ROUND_SHUFFLE_CONDITIONS
+        | _MANDATORY_FIRST_ROUND_SHUFFLE_CONDITIONS
+        | _OPTIONAL_SHUFFLE_IF_PLUNDER_CONDITIONS
+        | _OPTIONAL_SHUFFLE_IF_CLEANSE_CONDITIONS
+    )
+
+
+def _when_drawn_source_conditions(
+    *,
+    state: GameState,
+    secondary_mission_id: str,
+) -> tuple[str, ...]:
+    from warhammer40k_core.engine.missions import mission_pack_for_id
+
+    if state.mission_setup is None:
+        raise GameLifecycleError("When Drawn resolution requires MissionSetup.")
+    mission_pack = mission_pack_for_id(state.mission_setup.mission_pack_id)
+    matches = tuple(
+        mission
+        for mission in mission_pack.secondary_missions
+        if mission.secondary_mission_id == secondary_mission_id
+    )
+    if len(matches) != 1:
+        raise GameLifecycleError("When Drawn source mission is missing.")
+    return tuple(
+        rule.condition
+        for rule in matches[0].scoring_rules
+        if rule.timing in _WHEN_DRAWN_ACTION_TIMINGS
+    )
+
+
+def _auto_apply_when_drawn(
+    *,
+    state: GameState,
+    card: SecondaryMissionCardState,
+    decisions: DecisionController,
+) -> bool:
+    policy = _when_drawn_policy(state=state, card=card)
+    if policy is None:
         _mark_when_drawn_resolved(state=state, card=card)
-        return
-    if mission_id == "a-grievous-blow" and _enemy_starting_strength_13_present(
-        state,
-        card.player_id,
-    ):
+        return True
+    if not policy.eligible:
         _mark_when_drawn_resolved(state=state, card=card)
-        return
-    if mission_id == "bring-it-down" and _enemy_wounds_10_present(state, card.player_id):
-        _mark_when_drawn_resolved(state=state, card=card)
+        return True
+    if not policy.mandatory:
+        return False
+    _apply_mandatory_shuffle(state=state, card=card, decisions=decisions)
+    return True
+
+
+def _apply_mandatory_shuffle(
+    *,
+    state: GameState,
+    card: SecondaryMissionCardState,
+    decisions: DecisionController,
+) -> None:
+    source_id = (
+        f"when-drawn-mandatory:{state.game_id}:{card.player_id}:"
+        f"{card.secondary_mission_id}:round-{state.battle_round:02d}"
+    )
+    drawn = _draw_replacement_then_forget(
+        state=state,
+        card=card,
+        source_result_id=source_id,
+    )
+    decisions.event_log.append(
+        "tactical_secondary_when_drawn_shuffled",
+        {
+            "game_id": state.game_id,
+            "player_id": card.player_id,
+            "active_player_id": card.player_id,
+            "battle_round": state.battle_round,
+            "phase": BattlePhase.COMMAND.value,
+            "secondary_mission_id": card.secondary_mission_id,
+            "action": "shuffle",
+            "result_id": source_id,
+            "mandatory": True,
+            "hidden": True,
+            "secondary_mission_card_state": validate_json_value(card.to_payload()),
+            "drawn_secondary_mission_card_states": [
+                validate_json_value(drawn_card.to_payload()) for drawn_card in drawn
+            ],
+        },
+    )
+
+
+def _draw_replacement_then_forget(
+    *,
+    state: GameState,
+    card: SecondaryMissionCardState,
+    source_result_id: str,
+) -> tuple[SecondaryMissionCardState, ...]:
+    drawn = state.draw_tactical_secondary_cards(
+        player_id=card.player_id,
+        source_result_id=source_result_id,
+        draw_count=1,
+    )
+    state.forget_secondary_mission_card_state(card)
+    return drawn
+
+
+def _discard_is_eligible(
+    *,
+    state: GameState,
+    card: SecondaryMissionCardState,
+    condition: str,
+) -> bool:
+    if condition == "may_discard_if_no_enemy_units_starting_strength_13_or_more_on_battlefield":
+        return not _enemy_starting_strength_13_present(state, card.player_id)
+    if condition == "may_discard_if_no_enemy_models_w10_or_more_on_battlefield":
+        return not _enemy_wounds_10_present(state, card.player_id)
+    raise GameLifecycleError("Unsupported When Drawn discard condition.")
+
+
+def _player_has_active_tactical(
+    state: GameState,
+    *,
+    player_id: str,
+    secondary_mission_id: str,
+) -> bool:
+    return any(
+        card.player_id == player_id
+        and card.secondary_mission_id == secondary_mission_id
+        and card.mode is SecondaryMissionCardMode.TACTICAL
+        and card.status is SecondaryMissionCardStatus.ACTIVE
+        for card in state.secondary_mission_card_states
+    )
 
 
 def _enemy_starting_strength_13_present(state: GameState, player_id: str) -> bool:

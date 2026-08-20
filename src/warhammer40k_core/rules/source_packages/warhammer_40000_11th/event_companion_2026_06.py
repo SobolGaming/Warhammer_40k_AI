@@ -71,7 +71,7 @@ DOCUMENT_VERSION = "1.1"
 SOURCE_KIND = "warhammer_event_companion"
 EVENT_MODE = "warhammer_event"
 IMPORTED_AT_SCHEMA_VERSION = "core-v2-event-companion-source-v1"
-EXPECTED_SOURCE_IMPORT_HASH = "4b23bfe02563942bf866827c2a36eb218cb11ba3f4af7f3169c8fbc784cbb82d"
+EXPECTED_SOURCE_IMPORT_HASH = "9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5"
 BATTLEFIELD_WIDTH_INCHES = 44.0
 BATTLEFIELD_DEPTH_INCHES = 60.0
 BATTLEFIELD_SIZE = "44x60_inches"
@@ -1004,6 +1004,7 @@ def mission_pack_scoring_row() -> chapter_approved.SourceMissionPackScoringRow:
         primary_vp_cap=45,
         secondary_vp_cap=45,
         total_vp_cap=100,
+        secondary_max_vp_per_turn=chapter_approved_scoring.secondary_max_vp_per_turn,
         end_of_round_scoring_windows=chapter_approved_scoring.end_of_round_scoring_windows,
         end_of_game_scoring_windows=chapter_approved_scoring.end_of_game_scoring_windows,
         reserve_destruction_timing=chapter_approved_scoring.reserve_destruction_timing,

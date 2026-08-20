@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import TYPE_CHECKING, Protocol, Self, TypedDict, cast
 
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegion, BattlefieldRegionKind
 from warhammer40k_core.core.objectives import DEFAULT_OBJECTIVE_CONTROL_HORIZONTAL_INCHES
@@ -63,6 +63,38 @@ class _Footprint(Protocol):
     def intersects(self, other: object) -> bool: ...
 
 
+class SecondaryCharacterModelPayload(TypedDict):
+    model_instance_id: str
+    unit_instance_id: str
+    owner_player_id: str
+    starting_wounds: int
+    wounds_remaining: int
+
+
+class SecondaryBattlefieldOccupancyPayload(TypedDict):
+    player_id: str
+    presence_quarter_ids: list[str]
+    friendly_within_three_of_center_unit_ids: list[str]
+    enemy_within_three_of_center_unit_ids: list[str]
+    enemy_within_six_of_center_unit_ids: list[str]
+    friendly_wholly_within_no_mans_land_unit_ids: list[str]
+    enemy_wholly_within_no_mans_land_unit_ids: list[str]
+    friendly_wholly_within_opponent_deployment_zone_unit_ids: list[str]
+    friendly_near_edge_unit_ids: list[str]
+    friendly_near_edge_outside_own_territory_unit_ids: list[str]
+    opposite_edge_unit_ids: list[str]
+    beacon_on_battlefield: bool
+    beacon_within_own_deployment_zone: bool
+    beacon_within_own_territory: bool
+    guarded_objective_ids: list[str]
+    tempting_objective_id: str | None
+    enemy_character_models: list[SecondaryCharacterModelPayload]
+    own_territory_resolved: bool
+    own_deployment_resolved: bool
+    opponent_deployment_resolved: bool
+    no_mans_land_resolved: bool
+
+
 @dataclass(frozen=True, slots=True)
 class SecondaryCharacterModel:
     model_instance_id: str
@@ -91,6 +123,25 @@ class SecondaryCharacterModel:
             raise GameLifecycleError("character starting_wounds must be a positive int.")
         if type(self.wounds_remaining) is not int or self.wounds_remaining < 0:
             raise GameLifecycleError("character wounds_remaining must be a non-negative int.")
+
+    def to_payload(self) -> SecondaryCharacterModelPayload:
+        return {
+            "model_instance_id": self.model_instance_id,
+            "unit_instance_id": self.unit_instance_id,
+            "owner_player_id": self.owner_player_id,
+            "starting_wounds": self.starting_wounds,
+            "wounds_remaining": self.wounds_remaining,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: SecondaryCharacterModelPayload) -> Self:
+        return cls(
+            model_instance_id=payload["model_instance_id"],
+            unit_instance_id=payload["unit_instance_id"],
+            owner_player_id=payload["owner_player_id"],
+            starting_wounds=payload["starting_wounds"],
+            wounds_remaining=payload["wounds_remaining"],
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -127,6 +178,48 @@ class SecondaryBattlefieldOccupancy:
         if any(quarter_id not in TABLE_QUARTER_IDS for quarter_id in self.presence_quarter_ids):
             raise GameLifecycleError("presence_quarter_ids contains an unsupported quarter.")
         for field_name, value in (
+            (
+                "friendly_within_three_of_center_unit_ids",
+                self.friendly_within_three_of_center_unit_ids,
+            ),
+            (
+                "enemy_within_three_of_center_unit_ids",
+                self.enemy_within_three_of_center_unit_ids,
+            ),
+            (
+                "enemy_within_six_of_center_unit_ids",
+                self.enemy_within_six_of_center_unit_ids,
+            ),
+            (
+                "friendly_wholly_within_no_mans_land_unit_ids",
+                self.friendly_wholly_within_no_mans_land_unit_ids,
+            ),
+            (
+                "enemy_wholly_within_no_mans_land_unit_ids",
+                self.enemy_wholly_within_no_mans_land_unit_ids,
+            ),
+            (
+                "friendly_wholly_within_opponent_deployment_zone_unit_ids",
+                self.friendly_wholly_within_opponent_deployment_zone_unit_ids,
+            ),
+            ("friendly_near_edge_unit_ids", self.friendly_near_edge_unit_ids),
+            (
+                "friendly_near_edge_outside_own_territory_unit_ids",
+                self.friendly_near_edge_outside_own_territory_unit_ids,
+            ),
+            ("opposite_edge_unit_ids", self.opposite_edge_unit_ids),
+            ("guarded_objective_ids", self.guarded_objective_ids),
+        ):
+            object.__setattr__(self, field_name, _validate_identifier_tuple(field_name, value))
+        object.__setattr__(
+            self,
+            "tempting_objective_id",
+            _validate_optional_identifier("tempting_objective_id", self.tempting_objective_id),
+        )
+        for field_name, value in (
+            ("beacon_on_battlefield", self.beacon_on_battlefield),
+            ("beacon_within_own_deployment_zone", self.beacon_within_own_deployment_zone),
+            ("beacon_within_own_territory", self.beacon_within_own_territory),
             ("own_territory_resolved", self.own_territory_resolved),
             ("own_deployment_resolved", self.own_deployment_resolved),
             ("opponent_deployment_resolved", self.opponent_deployment_resolved),
@@ -134,6 +227,86 @@ class SecondaryBattlefieldOccupancy:
         ):
             if type(value) is not bool:
                 raise GameLifecycleError(f"{field_name} must be a bool.")
+
+    def to_payload(self) -> SecondaryBattlefieldOccupancyPayload:
+        return {
+            "player_id": self.player_id,
+            "presence_quarter_ids": list(self.presence_quarter_ids),
+            "friendly_within_three_of_center_unit_ids": list(
+                self.friendly_within_three_of_center_unit_ids
+            ),
+            "enemy_within_three_of_center_unit_ids": list(
+                self.enemy_within_three_of_center_unit_ids
+            ),
+            "enemy_within_six_of_center_unit_ids": list(self.enemy_within_six_of_center_unit_ids),
+            "friendly_wholly_within_no_mans_land_unit_ids": list(
+                self.friendly_wholly_within_no_mans_land_unit_ids
+            ),
+            "enemy_wholly_within_no_mans_land_unit_ids": list(
+                self.enemy_wholly_within_no_mans_land_unit_ids
+            ),
+            "friendly_wholly_within_opponent_deployment_zone_unit_ids": list(
+                self.friendly_wholly_within_opponent_deployment_zone_unit_ids
+            ),
+            "friendly_near_edge_unit_ids": list(self.friendly_near_edge_unit_ids),
+            "friendly_near_edge_outside_own_territory_unit_ids": list(
+                self.friendly_near_edge_outside_own_territory_unit_ids
+            ),
+            "opposite_edge_unit_ids": list(self.opposite_edge_unit_ids),
+            "beacon_on_battlefield": self.beacon_on_battlefield,
+            "beacon_within_own_deployment_zone": self.beacon_within_own_deployment_zone,
+            "beacon_within_own_territory": self.beacon_within_own_territory,
+            "guarded_objective_ids": list(self.guarded_objective_ids),
+            "tempting_objective_id": self.tempting_objective_id,
+            "enemy_character_models": [model.to_payload() for model in self.enemy_character_models],
+            "own_territory_resolved": self.own_territory_resolved,
+            "own_deployment_resolved": self.own_deployment_resolved,
+            "opponent_deployment_resolved": self.opponent_deployment_resolved,
+            "no_mans_land_resolved": self.no_mans_land_resolved,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: SecondaryBattlefieldOccupancyPayload) -> Self:
+        return cls(
+            player_id=payload["player_id"],
+            presence_quarter_ids=tuple(payload["presence_quarter_ids"]),
+            friendly_within_three_of_center_unit_ids=tuple(
+                payload["friendly_within_three_of_center_unit_ids"]
+            ),
+            enemy_within_three_of_center_unit_ids=tuple(
+                payload["enemy_within_three_of_center_unit_ids"]
+            ),
+            enemy_within_six_of_center_unit_ids=tuple(
+                payload["enemy_within_six_of_center_unit_ids"]
+            ),
+            friendly_wholly_within_no_mans_land_unit_ids=tuple(
+                payload["friendly_wholly_within_no_mans_land_unit_ids"]
+            ),
+            enemy_wholly_within_no_mans_land_unit_ids=tuple(
+                payload["enemy_wholly_within_no_mans_land_unit_ids"]
+            ),
+            friendly_wholly_within_opponent_deployment_zone_unit_ids=tuple(
+                payload["friendly_wholly_within_opponent_deployment_zone_unit_ids"]
+            ),
+            friendly_near_edge_unit_ids=tuple(payload["friendly_near_edge_unit_ids"]),
+            friendly_near_edge_outside_own_territory_unit_ids=tuple(
+                payload["friendly_near_edge_outside_own_territory_unit_ids"]
+            ),
+            opposite_edge_unit_ids=tuple(payload["opposite_edge_unit_ids"]),
+            beacon_on_battlefield=payload["beacon_on_battlefield"],
+            beacon_within_own_deployment_zone=payload["beacon_within_own_deployment_zone"],
+            beacon_within_own_territory=payload["beacon_within_own_territory"],
+            guarded_objective_ids=tuple(payload["guarded_objective_ids"]),
+            tempting_objective_id=payload["tempting_objective_id"],
+            enemy_character_models=tuple(
+                SecondaryCharacterModel.from_payload(model)
+                for model in payload["enemy_character_models"]
+            ),
+            own_territory_resolved=payload["own_territory_resolved"],
+            own_deployment_resolved=payload["own_deployment_resolved"],
+            opponent_deployment_resolved=payload["opponent_deployment_resolved"],
+            no_mans_land_resolved=payload["no_mans_land_resolved"],
+        )
 
 
 def build_secondary_battlefield_occupancy(
@@ -286,7 +459,7 @@ def build_secondary_battlefield_occupancy(
     beacon_within_own_dz = False
     beacon_within_own_territory = False
     if selection is not None and selection.beacon_unit_instance_id is not None:
-        beacon_ids = _beacon_current_unit_ids(
+        beacon_ids = current_unit_ids_from_historical_selection(
             state=state,
             historical_unit_instance_id=selection.beacon_unit_instance_id,
         )
@@ -395,7 +568,6 @@ def _guarded_objective_ids(
         if result.status is ObjectiveControlStatus.CONTROLLED
         and result.controlled_by_player_id == player_id
     }
-    placed_by_id = {view.unit_instance_id: (view, placements) for view, placements in placed_units}
     if state.mission_setup is None:
         raise GameLifecycleError("Burden of Trust guard evaluation requires MissionSetup.")
     objective_by_id = {
@@ -405,14 +577,25 @@ def _guarded_objective_ids(
     for objective_id, unit_id in selection.guarded_objective_unit_ids:
         if objective_id not in mission_objective_ids or objective_id not in controlled:
             continue
-        placed = placed_by_id.get(unit_id)
-        if placed is None:
+        current_ids = current_unit_ids_from_historical_selection(
+            state=state,
+            historical_unit_instance_id=unit_id,
+        )
+        descendants = tuple(
+            (view, placements)
+            for view, placements in placed_units
+            if view.unit_instance_id in current_ids or _shares_component(view, current_ids)
+        )
+        if not descendants:
             continue
-        view, placements = placed
-        if view.owner_player_id != player_id:
+        if any(view.owner_player_id != player_id for view, _placements in descendants):
             raise GameLifecycleError("Burden of Trust guard unit is not friendly.")
         marker = objective_by_id[objective_id]
-        geometry_models = _geometry_models(view=view, placements=placements)
+        geometry_models = tuple(
+            model
+            for view, placements in descendants
+            for model in _geometry_models(view=view, placements=placements)
+        )
         if not _within_distance_of_point(
             geometry_models,
             x=marker.x_inches,
@@ -424,19 +607,18 @@ def _guarded_objective_ids(
     return tuple(sorted(set(guarded)))
 
 
-def _beacon_current_unit_ids(
+def current_unit_ids_from_historical_selection(
     *,
     state: GameState,
     historical_unit_instance_id: str,
 ) -> frozenset[str]:
-    requested = _validate_identifier("beacon_unit_instance_id", historical_unit_instance_id)
-    departure_lineage = frozen_component_lineage_from_departures(
+    requested = _validate_identifier("historical_unit_instance_id", historical_unit_instance_id)
+    frozen_components = _frozen_components_for_historical_selection(
+        state=state,
         historical_unit_instance_id=requested,
-        departures=tuple(state.primary_battlefield_departure_states),
     )
-    if departure_lineage is None:
+    if frozen_components is None:
         return frozenset({requested})
-    _owner, frozen_components = departure_lineage
     current_ids = {
         view.unit_instance_id
         for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
@@ -445,6 +627,33 @@ def _beacon_current_unit_ids(
     if current_ids:
         return frozenset(current_ids)
     return frozenset({requested})
+
+
+def _frozen_components_for_historical_selection(
+    *,
+    state: GameState,
+    historical_unit_instance_id: str,
+) -> frozenset[str] | None:
+    departure_lineage = frozen_component_lineage_from_departures(
+        historical_unit_instance_id=historical_unit_instance_id,
+        departures=tuple(state.primary_battlefield_departure_states),
+    )
+    if departure_lineage is not None:
+        _owner, frozen_components = departure_lineage
+        return frozen_components
+    attached_matches = tuple(
+        record
+        for record in state.starting_attached_unit_records
+        if record.attached_unit_instance_id == historical_unit_instance_id
+        or historical_unit_instance_id in record.component_unit_instance_ids
+    )
+    if len(attached_matches) > 1:
+        raise GameLifecycleError(
+            "Historical Secondary selection matched multiple Attached Unit lineages."
+        )
+    if not attached_matches:
+        return None
+    return frozenset(attached_matches[0].component_unit_instance_ids)
 
 
 def _shares_component(view: RulesUnitView, unit_ids: frozenset[str]) -> bool:
@@ -685,3 +894,9 @@ def _validate_identifier_tuple(field_name: str, values: object) -> tuple[str, ..
         seen.add(identifier)
         identifiers.append(identifier)
     return tuple(identifiers)
+
+
+def _validate_optional_identifier(field_name: str, value: object | None) -> str | None:
+    if value is None:
+        return None
+    return _validate_identifier(field_name, value)

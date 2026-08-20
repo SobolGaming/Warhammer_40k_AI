@@ -150,6 +150,9 @@ def score_primary_objective_control_boundary(
                 ),
                 sticky_objective_control_states=tuple(state.sticky_objective_control_states),
                 primary_scoring_state_evidence_records=evidence_records_before,
+                secondary_scoring_state_evidence_records=tuple(
+                    state.secondary_scoring_state_evidence_records
+                ),
                 victory_point_ledgers=ledgers_before,
                 secondary_mission_card_states=tuple(state.secondary_mission_card_states),
                 primary_scoring_boundary_lifecycles=lifecycles_before,

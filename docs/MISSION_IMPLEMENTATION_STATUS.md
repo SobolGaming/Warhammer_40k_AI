@@ -258,7 +258,7 @@ Secondary status:
   timing string is insufficient. The same validator runs for live awards and
   restored ledgers, including ordinary per-round Primary-total validation. The
   derived Event Companion source identity is
-  `4b23bfe02563942bf866827c2a36eb218cb11ba3f4af7f3169c8fbc784cbb82d`.
+  `9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5`.
 - Verify that the committed battlefield artifact still matches its reviewed
   inputs without writing files with
   `uv run python tools/build_event_companion_battlefields.py --check`.
@@ -356,16 +356,16 @@ five-battle-round game, as configured by the current Event Companion package.
 | Bring It Down | `bring-it-down` | `both` | Yes | 1 | 1 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Tracks `each_enemy_model_w10_or_more_destroyed_this_turn` with fixed and tactical caps; When Drawn discard row remains source-only |
 | Burden of Trust | `burden-of-trust` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Per-objective guard selection; 2 VP per guarded objective at opponent turn end or round five, capped at 5 VP |
 | Centre Ground | `centre-ground` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Exclusive 3 VP / 5 VP centre occupancy with enemy exclusion at 3" or 6" |
-| Cleanse | `cleanse` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks objective cleanse counts; runtime action `cleanse-objective` exists |
-| Defend Stronghold | `defend-stronghold` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks home objective control and enemy absence from own deployment zone |
+| Cleanse | `cleanse` | `tactical` | No | 0 | 2 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Exclusive 2 VP for exactly one cleansed objective or 5 VP for two or more; When Drawn may shuffle back while Plunder is active; runtime action `cleanse-objective` exists |
+| Defend Stronghold | `defend-stronghold` | `tactical` | No | 0 | 2 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Tracks home objective control and enemy absence from own deployment zone; battle round 1 When Drawn is a mandatory shuffle-and-draw with no keep option |
 | Display of Might | `display-of-might` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | 2 VP at own turn end or 5 VP at opponent turn end if more eligible friendly than enemy units are wholly within No Man's Land |
 | Engage on All Fronts | `engage-on-all-fronts` | `both` | Yes | 2 | 2 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Presence definition remains source-only; exactly three or four occupied table quarters score 2/4 Fixed or 3/5 Tactical |
 | Forward Position | `forward-position` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | 5 VP if you control the opponent home objective and/or each expansion objective; first-round shuffle-back remains source-only |
 | No Prisoners | `no-prisoners` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `each_enemy_unit_destroyed_this_turn` |
 | Outflank | `outflank` | `tactical` | No | 0 | 2 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Exclusive 3 VP near one or more battlefield edges outside own territory, or 5 VP on opposite parallel edges |
 | Overwhelming Force | `overwhelming-force` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `each_enemy_unit_started_turn_in_range_of_objective_destroyed` |
-| Plunder | `plunder` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks terrain plunder state; runtime action `plunder-terrain` exists |
-| Secure No Man's Land | `secure-no-mans-land` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Tracks `control_two_or_more_no_mans_land_objectives_excluding_home` through objective-control records filtered to central/No Man's Land objectives |
+| Plunder | `plunder` | `tactical` | No | 0 | 1 | 1 | `source_tracked`, `policy_loaded`, `state_backed`, `source_only_rows` | Tracks terrain plunder state; When Drawn may shuffle back while Cleanse is active; runtime action `plunder-terrain` exists |
+| Secure No Man's Land | `secure-no-mans-land` | `tactical` | No | 0 | 1 | 0 | `source_tracked`, `policy_loaded`, `state_backed` | Awards 5 VP for controlling two or more objectives whose markers lie in the No Man's Land region, excluding the scoring player's home; fails closed if that region is missing |
 
 ## Runtime Caveats
 
@@ -461,11 +461,15 @@ five-battle-round game, as configured by the current Event Companion package.
   lifecycle/restore/viewer certification row; A/B/C remain in the fail-closed
   inventory and instantiate two-sided scoring policies.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,
-  tactical draw, When Drawn keep/discard/shuffle, Beacon/Tempting Target/Burden
-  of Trust selections, scoring, retain/discard, Fixed card states that remain
-  active after scoring, the 20 VP per Fixed Mission card cap, and state-backed
-  awards for all 18 cards. When Drawn and Engage presence-definition rows remain
-  source-only procedure/definition text. Step 6G certifies every card/mode
-  through both players on one Layout A battlefield via `LocalGameSession`.
-  Layouts B and C are not Secondary-certified. This does not claim Phase 17N
-  overall complete or Phase 20A.
+  tactical draw, When Drawn keep/discard/shuffle including Cleanse/Plunder
+  reciprocal shuffle and Defend Stronghold's mandatory first-round shuffle,
+  Beacon/Tempting Target/Burden of Trust selections, scoring, retain/discard,
+  Fixed card states that remain active after scoring, the 20 VP per Fixed
+  Mission card cap, the 15 VP Secondary cap per player turn, frozen
+  `SecondaryScoringStateEvidence` restore authentication, and state-backed
+  awards for all 18 cards. Engage presence-definition rows remain source-only
+  procedure/definition text. Step 6G certifies every card/mode through both
+  players on one Layout A battlefield via `LocalGameSession`, requiring a
+  card-specific Secondary transaction or Tactical achievement path rather than
+  Primary coexistence alone. Layouts B and C are not Secondary-certified. This
+  does not claim Phase 17N overall complete or Phase 20A.

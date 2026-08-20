@@ -36,6 +36,10 @@ from warhammer40k_core.engine.scoring import (
 from warhammer40k_core.engine.secondary_deployment_zone_evidence import (
     bind_state_backed_secondary_scoring_commit,
 )
+from warhammer40k_core.engine.secondary_scoring_state_evidence import (
+    bind_secondary_scoring_state_evidence,
+    capture_secondary_scoring_state_evidence,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -47,6 +51,9 @@ if TYPE_CHECKING:
     )
     from warhammer40k_core.engine.primary_scoring_state_evidence import PrimaryScoringStateEvidence
     from warhammer40k_core.engine.scoring import VictoryPointLedger
+    from warhammer40k_core.engine.secondary_scoring_state_evidence import (
+        SecondaryScoringStateEvidence,
+    )
     from warhammer40k_core.engine.sticky_objective_control import StickyObjectiveControlState
 
 _OBJECTIVE_CONTROL_BOUNDARY_EVENT_TYPE = "end_boundary_objective_control_determined"
@@ -61,6 +68,7 @@ class MissionScoringAggregateSnapshot:
     objective_control_record_authorities: tuple[ObjectiveControlRecordAuthority, ...]
     sticky_objective_control_states: tuple[StickyObjectiveControlState, ...]
     primary_scoring_state_evidence_records: tuple[PrimaryScoringStateEvidence, ...]
+    secondary_scoring_state_evidence_records: tuple[SecondaryScoringStateEvidence, ...]
     victory_point_ledgers: tuple[VictoryPointLedger, ...]
     secondary_mission_card_states: tuple[SecondaryMissionCardState, ...]
     primary_scoring_boundary_lifecycles: tuple[PrimaryScoringBoundaryLifecycle, ...]
@@ -166,8 +174,16 @@ def score_secondary_mission_from_state(
             starting_strength_records=tuple(state.starting_strength_records),
             condition_context=condition_context,
         )
+        required_award = _require_state_backed_secondary_award(award)
+        evidence = capture_secondary_scoring_state_evidence(
+            state=state,
+            card=card_state,
+            record=record,
+            context=condition_context,
+            award=required_award,
+        )
         award = bind_state_backed_secondary_scoring_commit(
-            _require_state_backed_secondary_award(award),
+            bind_secondary_scoring_state_evidence(required_award, evidence),
             state=state,
             record=record,
         )
@@ -367,6 +383,9 @@ def _capture_aggregate(
         objective_control_record_authorities=tuple(state.objective_control_record_authorities),
         sticky_objective_control_states=tuple(state.sticky_objective_control_states),
         primary_scoring_state_evidence_records=tuple(state.primary_scoring_state_evidence_records),
+        secondary_scoring_state_evidence_records=tuple(
+            state.secondary_scoring_state_evidence_records
+        ),
         victory_point_ledgers=tuple(state.victory_point_ledgers),
         secondary_mission_card_states=tuple(state.secondary_mission_card_states),
         primary_scoring_boundary_lifecycles=tuple(state.primary_scoring_boundary_lifecycles),
