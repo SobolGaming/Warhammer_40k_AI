@@ -40,6 +40,9 @@ from warhammer40k_core.engine.secondary_scoring_state_evidence import (
     bind_secondary_scoring_state_evidence,
     capture_secondary_scoring_state_evidence,
 )
+from warhammer40k_core.engine.secondary_tactical_achievement import (
+    require_positive_tactical_secondary_score_transaction,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -191,6 +194,7 @@ def score_secondary_mission_from_state(
         if requested_mode is SecondaryMissionCardMode.FIXED:
             result = card_state
         else:
+            require_positive_tactical_secondary_score_transaction(transaction)
             scored = card_state.score(transaction_id=transaction.transaction_id)
             state.replace_secondary_mission_card_state(scored)
             result = scored

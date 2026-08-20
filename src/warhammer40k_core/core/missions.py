@@ -18,6 +18,9 @@ from warhammer40k_core.core.deployment_zones import (
     DeploymentZonePayload,
     DeploymentZoneShape,
 )
+from warhammer40k_core.core.mission_definition_validation import (
+    validate_identifier_tuple as _validate_identifier_tuple,
+)
 from warhammer40k_core.core.mission_errors import MissionPackError as MissionPackError
 from warhammer40k_core.core.mission_matrix import (
     ForceDispositionDefinition as ForceDispositionDefinition,
@@ -3478,30 +3481,6 @@ def _validate_unprefixed_identifier(
     if identifier.startswith(reserved_prefix):
         raise MissionPackError(f"{field_name} must not include the stable identity prefix.")
     return identifier
-
-
-def _validate_identifier_tuple(
-    field_name: str,
-    values: object,
-    *,
-    min_length: int,
-    sort_values: bool,
-) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise MissionPackError(f"{field_name} must be a tuple.")
-    validated: list[str] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        identifier = _validate_identifier(f"{field_name} value", value)
-        if identifier in seen:
-            raise MissionPackError(f"{field_name} must not contain duplicates.")
-        seen.add(identifier)
-        validated.append(identifier)
-    if len(validated) < min_length:
-        raise MissionPackError(f"{field_name} must contain at least {min_length} values.")
-    if sort_values:
-        return tuple(sorted(validated))
-    return tuple(validated)
 
 
 _validate_identifier = IdentifierValidator(MissionPackError)

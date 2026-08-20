@@ -268,6 +268,10 @@ from warhammer40k_core.engine.secondary_scoring_state_evidence import (
     SecondaryScoringStateEvidence,
     validate_secondary_scoring_state_evidence_records,
 )
+from warhammer40k_core.engine.secondary_unit_destruction_tracking import (
+    secondary_unit_destruction_from_primary,
+    validate_secondary_unit_destruction_states,
+)
 from warhammer40k_core.engine.starting_attached_units import (
     StartingAttachedUnitRecord,
 )
@@ -1509,10 +1513,9 @@ class GameState:
         )
         validate_primary_scoring_boundary_lifecycles(state=self)
         _primary_vp_integrity.validate_primary_transaction_semantics(state=self)
-        self.secondary_unit_destruction_states = _validate_secondary_unit_destruction_states(
+        self.secondary_unit_destruction_states = validate_secondary_unit_destruction_states(
             self.secondary_unit_destruction_states,
-            game_id=self.game_id,
-            player_ids=self.player_ids,
+            state=self,
         )
         self.secondary_objective_cleanse_states = (
             _scoring_evidence_validation.validate_secondary_objective_cleanse_states(
@@ -2673,6 +2676,28 @@ class GameState:
         )
         return transaction
 
+    def record_secondary_scoring_state_evidence(
+        self,
+        evidence: SecondaryScoringStateEvidence,
+    ) -> None:
+        if type(evidence) is not SecondaryScoringStateEvidence:
+            raise GameLifecycleError(
+                "Secondary scoring state evidence must be SecondaryScoringStateEvidence."
+            )
+        if evidence.game_id != self.game_id:
+            raise GameLifecycleError("Secondary scoring state evidence game_id drift.")
+        matches = tuple(
+            stored
+            for stored in self.secondary_scoring_state_evidence_records
+            if stored.evidence_id == evidence.evidence_id
+        )
+        if matches:
+            if matches == (evidence,):
+                return
+            raise GameLifecycleError("Secondary scoring state evidence identity is duplicated.")
+        self.secondary_scoring_state_evidence_records.append(evidence)
+        self.secondary_scoring_state_evidence_records.sort(key=lambda stored: stored.evidence_id)
+
     def replace_primary_scoring_boundary_lifecycles(
         self, rows: list[PrimaryScoringBoundaryLifecycle]
     ) -> None:
@@ -2960,31 +2985,24 @@ class GameState:
             destroyed_unit_instance_id=destroyed_unit_instance_id,
             source_id=source_id,
         )
+        secondary_destruction = secondary_unit_destruction_from_primary(
+            state=self,
+            primary_destruction=destruction,
+        )
         self.primary_unit_destruction_states.append(destruction)
         self.primary_unit_destruction_states.sort(key=lambda stored: stored.destruction_id)
+        self.record_secondary_unit_destruction_projection(secondary_destruction)
         record_consecration_designation_for_destruction(state=self, destruction=destruction)
         return destruction
 
-    def record_secondary_unit_destruction(
+    def record_secondary_unit_destruction_projection(
         self,
-        *,
-        destroying_player_id: str | None,
-        destroyed_unit_instance_id: str,
-        destroyed_model_instance_ids: tuple[str, ...],
-        started_turn_objective_marker_ids: tuple[str, ...],
-        source_id: str,
-    ) -> SecondaryUnitDestructionState:
-        from warhammer40k_core.engine.secondary_unit_destruction_tracking import (
-            record_secondary_unit_destruction as record_destruction,
-        )
-
-        return record_destruction(
-            self,
-            destroying_player_id=destroying_player_id,
-            destroyed_unit_instance_id=destroyed_unit_instance_id,
-            destroyed_model_instance_ids=destroyed_model_instance_ids,
-            started_turn_objective_marker_ids=started_turn_objective_marker_ids,
-            source_id=source_id,
+        destruction: SecondaryUnitDestructionState,
+    ) -> None:
+        """Store the authenticated Secondary projection of a Primary occurrence."""
+        self.secondary_unit_destruction_states = validate_secondary_unit_destruction_states(
+            [*self.secondary_unit_destruction_states, destruction],
+            state=self,
         )
 
     def record_secondary_objective_cleanse(
@@ -3831,18 +3849,26 @@ class GameState:
             if requested_mode is SecondaryMissionCardMode.FIXED
             else VictoryPointSourceKind.TACTICAL_SECONDARY
         )
-        transaction = self.award_victory_points(
-            policy.secondary_award(
+        updated_ledgers, transaction = _vp_awards.resolve_victory_point_award_for_game_state(
+            state=self,
+            award=policy.secondary_award(
                 player_id=card_state.player_id,
                 battle_round=self.battle_round,
                 phase=phase.value,
                 secondary_mission_id=card_state.secondary_mission_id,
                 source_kind=source_kind,
                 hidden=False,
-            )
+            ),
         )
         if requested_mode is SecondaryMissionCardMode.FIXED:
+            self.victory_point_ledgers = updated_ledgers
             return card_state
+        from warhammer40k_core.engine.secondary_tactical_achievement import (
+            require_positive_tactical_secondary_score_transaction,
+        )
+
+        require_positive_tactical_secondary_score_transaction(transaction)
+        self.victory_point_ledgers = updated_ledgers
         scored = card_state.score(transaction_id=transaction.transaction_id)
         self.replace_secondary_mission_card_state(scored)
         return scored
@@ -6817,45 +6843,6 @@ def _validate_sticky_objective_control_states(
         holder_by_objective[state.objective_id] = state.player_id
         validated.append(state)
     return sorted(validated, key=lambda stored: stored.state_id)
-
-
-def _validate_secondary_unit_destruction_states(
-    states: object,
-    *,
-    game_id: str,
-    player_ids: tuple[str, ...],
-) -> list[SecondaryUnitDestructionState]:
-    if not isinstance(states, list):
-        raise GameLifecycleError("GameState secondary unit destruction states must be a list.")
-    validated: list[SecondaryUnitDestructionState] = []
-    seen_ids: set[str] = set()
-    seen_units: set[str] = set()
-    for state in cast(list[object], states):
-        if type(state) is not SecondaryUnitDestructionState:
-            raise GameLifecycleError(
-                "GameState secondary unit destruction states must contain state values."
-            )
-        if state.game_id != game_id:
-            raise GameLifecycleError("SecondaryUnitDestructionState game_id drift.")
-        if (
-            (
-                state.destroying_player_id is not None
-                and state.destroying_player_id not in player_ids
-            )
-            or state.destroyed_player_id not in player_ids
-            or state.active_player_id not in player_ids
-        ):
-            raise GameLifecycleError("SecondaryUnitDestructionState player_id is not in this game.")
-        if state.destruction_id in seen_ids:
-            raise GameLifecycleError("GameState secondary unit destruction states must be unique.")
-        if state.destroyed_unit_instance_id in seen_units:
-            raise GameLifecycleError(
-                "GameState secondary unit destruction states must be unique per destroyed unit."
-            )
-        seen_ids.add(state.destruction_id)
-        seen_units.add(state.destroyed_unit_instance_id)
-        validated.append(state)
-    return sorted(validated, key=lambda state: state.destruction_id)
 
 
 def _validate_mission_action_states(

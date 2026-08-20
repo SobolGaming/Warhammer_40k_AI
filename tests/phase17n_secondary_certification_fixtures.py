@@ -4,9 +4,12 @@ from dataclasses import dataclass
 
 from tests.phase11c_command_phase_helpers import default_unit_selection, unit_selection
 from tests.phase17n_secondary_mission_helpers import resolved_secondary_mission_selection_for_card
+from tests.secondary_destruction_helpers import record_secondary_destruction_for_fixture
 from warhammer40k_core.core.battlefield_regions import BattlefieldRegionKind
-from warhammer40k_core.core.missions import ObjectiveMarkerRole
+from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
 from warhammer40k_core.engine.actions import MissionActionState
+from warhammer40k_core.engine.battlefield_state import ModelPlacement
+from warhammer40k_core.engine.event_log import EventLog
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.mission_terrain import (
@@ -38,9 +41,9 @@ _OPPONENT_TURN_CARD_IDS = frozenset(
 )
 TURN_CAP_TACTICAL_IDS = (
     "a-tempting-target",
-    "assassination",
     "centre-ground",
     "plunder",
+    "behind-enemy-lines",
 )
 _QUARTER_IDS = (
     TABLE_QUARTER_NORTH_WEST,
@@ -100,10 +103,16 @@ def opponent_player_id(player_id: str) -> str:
 def seed_positive_secondary_condition(
     state: GameState,
     row: SecondaryMissionLifecycleCertificationRow,
+    *,
+    event_log: EventLog | None = None,
 ) -> SecondaryPositiveExpectation:
     _park_units_in_safe_zones(state, scoring_player_id=row.scoring_player_id)
-    seeder = _SEEDERS[row.secondary_mission_id]
-    expectation = seeder(state, row)
+    destruction_seeder = _DESTRUCTION_SEEDERS.get(row.secondary_mission_id)
+    expectation = (
+        _SEEDERS[row.secondary_mission_id](state, row)
+        if destruction_seeder is None
+        else destruction_seeder(state, row, event_log)
+    )
     _bind_card_selection(state, row)
     return expectation
 
@@ -126,19 +135,18 @@ def seed_sequential_tactical_turn_cap_conditions(state: GameState) -> None:
         state.mission_setup.battlefield_width_inches / 2.0,
         state.mission_setup.battlefield_depth_inches / 2.0,
     )
-    _record_destruction(
-        state,
-        destroyed_unit=_unit_by_datasheet(
-            state,
-            player_id=opponent_player_id(scoring_player_id),
-            datasheet_id="core-character-leader",
-        ),
-    )
     area = _first_plunderable_area(state, player_id=scoring_player_id)
     _record_plunder(
         state,
         player_id=scoring_player_id,
         terrain_feature_id=area.logical_terrain_area_id,
+    )
+    opponent_home = _home_marker(state, player_id=opponent_player_id(scoring_player_id))
+    _place_unit_at(
+        state,
+        intercessors[2].unit_instance_id,
+        opponent_home.x_inches,
+        opponent_home.y_inches,
     )
     tempting_card = state.secondary_mission_card_state(
         player_id=scoring_player_id,
@@ -200,13 +208,14 @@ def _bind_card_selection(
 def _seed_grievous(
     state: GameState,
     row: SecondaryMissionLifecycleCertificationRow,
+    event_log: EventLog | None,
 ) -> SecondaryPositiveExpectation:
     horde = _unit_by_datasheet(
         state,
         player_id=opponent_player_id(row.scoring_player_id),
         datasheet_id="core-boyz-like-infantry",
     )
-    _record_destruction(state, destroyed_unit=horde)
+    _record_destruction(state, destroyed_unit=horde, event_log=event_log)
     rule_id = "a-grievous-blow-fixed" if row.mode == "fixed" else "a-grievous-blow-tactical"
     amount = 4 if row.mode == "fixed" else 5
     return SecondaryPositiveExpectation(
@@ -233,13 +242,14 @@ def _seed_tempting(
 def _seed_assassination(
     state: GameState,
     row: SecondaryMissionLifecycleCertificationRow,
+    event_log: EventLog | None,
 ) -> SecondaryPositiveExpectation:
     character = _unit_by_datasheet(
         state,
         player_id=opponent_player_id(row.scoring_player_id),
         datasheet_id="core-character-leader",
     )
-    _record_destruction(state, destroyed_unit=character)
+    _record_destruction(state, destroyed_unit=character, event_log=event_log)
     if row.mode == "fixed":
         return SecondaryPositiveExpectation(
             expected_amount=4,
@@ -289,13 +299,14 @@ def _seed_behind_enemy_lines(
 def _seed_bring_it_down(
     state: GameState,
     row: SecondaryMissionLifecycleCertificationRow,
+    event_log: EventLog | None,
 ) -> SecondaryPositiveExpectation:
     vehicle = _unit_by_datasheet(
         state,
         player_id=opponent_player_id(row.scoring_player_id),
         datasheet_id="core-vehicle-monster",
     )
-    _record_destruction(state, destroyed_unit=vehicle)
+    _record_destruction(state, destroyed_unit=vehicle, event_log=event_log)
     rule_id = "bring-it-down-fixed" if row.mode == "fixed" else "bring-it-down-tactical"
     amount = 4 if row.mode == "fixed" else 5
     return SecondaryPositiveExpectation(
@@ -452,13 +463,14 @@ def _seed_forward_position(
 def _seed_no_prisoners(
     state: GameState,
     row: SecondaryMissionLifecycleCertificationRow,
+    event_log: EventLog | None,
 ) -> SecondaryPositiveExpectation:
     vehicle = _unit_by_datasheet(
         state,
         player_id=opponent_player_id(row.scoring_player_id),
         datasheet_id="core-vehicle-monster",
     )
-    _record_destruction(state, destroyed_unit=vehicle)
+    _record_destruction(state, destroyed_unit=vehicle, event_log=event_log)
     return SecondaryPositiveExpectation(
         expected_amount=2,
         expected_rule_ids=frozenset({"no-prisoners-tactical"}),
@@ -486,6 +498,7 @@ def _seed_outflank(
 def _seed_overwhelming_force(
     state: GameState,
     row: SecondaryMissionLifecycleCertificationRow,
+    event_log: EventLog | None,
 ) -> SecondaryPositiveExpectation:
     marker = _no_mans_land_non_home_markers(state, player_id=row.scoring_player_id)[0]
     vehicle = _unit_by_datasheet(
@@ -493,10 +506,17 @@ def _seed_overwhelming_force(
         player_id=opponent_player_id(row.scoring_player_id),
         datasheet_id="core-vehicle-monster",
     )
+    _place_unit_at(
+        state,
+        vehicle.unit_instance_id,
+        marker.x_inches,
+        marker.y_inches,
+    )
     _record_destruction(
         state,
         destroyed_unit=vehicle,
         started_turn_objective_marker_ids=(marker.objective_marker_id,),
+        event_log=event_log,
     )
     return SecondaryPositiveExpectation(
         expected_amount=3,
@@ -607,17 +627,17 @@ def _record_destruction(
     state: GameState,
     *,
     destroyed_unit: UnitInstance,
-    started_turn_objective_marker_ids: tuple[str, ...] = (),
+    started_turn_objective_marker_ids: tuple[str, ...] | None = None,
     destroying_player_id: str | None = None,
+    event_log: EventLog | None = None,
 ) -> None:
-    state.record_secondary_unit_destruction(
+    record_secondary_destruction_for_fixture(
+        state,
         destroying_player_id=destroying_player_id,
         destroyed_unit_instance_id=destroyed_unit.unit_instance_id,
-        destroyed_model_instance_ids=tuple(
-            model.model_instance_id for model in destroyed_unit.own_models
-        ),
-        started_turn_objective_marker_ids=started_turn_objective_marker_ids,
         source_id=f"phase17n-step6g:{destroyed_unit.unit_instance_id}:destroyed",
+        event_log=event_log,
+        expected_started_turn_objective_marker_ids=started_turn_objective_marker_ids,
     )
 
 
@@ -724,7 +744,7 @@ def _place_unit_at(
     if state.battlefield_state is None:
         raise AssertionError("Step 6G placement requires battlefield state.")
     unit_placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
-    placements = []
+    placements: list[ModelPlacement] = []
     columns = 5
     for index, placement in enumerate(unit_placement.model_placements):
         column = index % columns
@@ -744,7 +764,7 @@ def _place_unit_at(
     )
 
 
-def _home_marker(state: GameState, *, player_id: str):
+def _home_marker(state: GameState, *, player_id: str) -> ObjectiveMarkerDefinition:
     if state.mission_setup is None:
         raise AssertionError("Step 6G home-objective fixture requires MissionSetup.")
     role = (
@@ -758,7 +778,11 @@ def _home_marker(state: GameState, *, player_id: str):
     raise AssertionError("Step 6G fixture is missing a home objective.")
 
 
-def _no_mans_land_non_home_markers(state: GameState, *, player_id: str):
+def _no_mans_land_non_home_markers(
+    state: GameState,
+    *,
+    player_id: str,
+) -> tuple[ObjectiveMarkerDefinition, ...]:
     if state.mission_setup is None:
         raise AssertionError("Step 6G No Man's Land fixture requires MissionSetup.")
     nml_regions = tuple(
@@ -801,13 +825,18 @@ def _units_for_player(state: GameState, player_id: str) -> tuple[UnitInstance, .
     raise AssertionError(f"Step 6G fixture is missing army for {player_id}.")
 
 
-_SEEDERS = {
+_DESTRUCTION_SEEDERS = {
     "a-grievous-blow": _seed_grievous,
-    "a-tempting-target": _seed_tempting,
     "assassination": _seed_assassination,
+    "bring-it-down": _seed_bring_it_down,
+    "no-prisoners": _seed_no_prisoners,
+    "overwhelming-force": _seed_overwhelming_force,
+}
+
+_SEEDERS = {
+    "a-tempting-target": _seed_tempting,
     "beacon": _seed_beacon,
     "behind-enemy-lines": _seed_behind_enemy_lines,
-    "bring-it-down": _seed_bring_it_down,
     "burden-of-trust": _seed_burden,
     "centre-ground": _seed_centre_ground,
     "cleanse": _seed_cleanse,
@@ -815,9 +844,7 @@ _SEEDERS = {
     "display-of-might": _seed_display_of_might,
     "engage-on-all-fronts": _seed_engage,
     "forward-position": _seed_forward_position,
-    "no-prisoners": _seed_no_prisoners,
     "outflank": _seed_outflank,
-    "overwhelming-force": _seed_overwhelming_force,
     "plunder": _seed_plunder,
     "secure-no-mans-land": _seed_secure_no_mans_land,
 }

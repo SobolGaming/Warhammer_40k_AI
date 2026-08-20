@@ -14,6 +14,7 @@ from warhammer40k_core.engine.phase import (
     GameLifecycleStage,
     LifecycleStatus,
 )
+from warhammer40k_core.engine.rules_units import placed_alive_rules_unit_views
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
@@ -390,51 +391,22 @@ def _player_has_active_tactical(
 
 
 def _enemy_starting_strength_13_present(state: GameState, player_id: str) -> bool:
-    records = {
-        record.unit_instance_id: record.starting_model_count
-        for record in state.starting_strength_records
-    }
-    embarked = _embarked_unit_ids(state)
-    for army in state.army_definitions:
-        if army.player_id == player_id:
+    for rules_unit in placed_alive_rules_unit_views(state=state):
+        if rules_unit.owner_player_id == player_id:
             continue
-        for unit in army.units:
-            if unit.unit_instance_id in embarked:
-                continue
-            if state.battlefield_state is None or not state.battlefield_state.is_unit_placed(
-                unit.unit_instance_id
-            ):
-                continue
-            starting = records.get(unit.unit_instance_id)
-            if starting is None:
-                continue
-            if starting >= 13:
-                return True
+        starting = state.starting_strength_record_for_unit(rules_unit.unit_instance_id)
+        if starting.starting_model_count >= 13:
+            return True
     return False
 
 
 def _enemy_wounds_10_present(state: GameState, player_id: str) -> bool:
-    embarked = _embarked_unit_ids(state)
-    for army in state.army_definitions:
-        if army.player_id == player_id:
+    for rules_unit in placed_alive_rules_unit_views(state=state):
+        if rules_unit.owner_player_id == player_id:
             continue
-        for unit in army.units:
-            if unit.unit_instance_id in embarked:
-                continue
-            if state.battlefield_state is None or not state.battlefield_state.is_unit_placed(
-                unit.unit_instance_id
-            ):
-                continue
-            if any(model.is_alive and model.starting_wounds >= 10 for model in unit.own_models):
-                return True
+        if any(model.starting_wounds >= 10 for model in rules_unit.alive_models()):
+            return True
     return False
-
-
-def _embarked_unit_ids(state: GameState) -> frozenset[str]:
-    embarked: set[str] = set()
-    for cargo in state.transport_cargo_states:
-        embarked.update(cargo.embarked_unit_instance_ids)
-    return frozenset(embarked)
 
 
 def _when_drawn_resolved(card: SecondaryMissionCardState) -> bool:

@@ -22,8 +22,10 @@ from warhammer40k_core.engine.scoring import (
     SecondaryUnitDestructionState,
     SecondaryUnitDestructionStatePayload,
     VictoryPointAward,
+    VictoryPointSourceKind,
     secondary_mission_card_mode_from_token,
     secondary_mission_card_status_from_token,
+    victory_point_source_kind_from_token,
 )
 from warhammer40k_core.engine.secondary_scoring_conditions import SecondaryScoringConditionContext
 from warhammer40k_core.engine.secondary_scoring_occupancy import (
@@ -389,8 +391,6 @@ def capture_secondary_scoring_state_evidence(
     metadata = award.metadata
     if not isinstance(metadata, dict):
         raise GameLifecycleError("Secondary scoring evidence requires object award metadata.")
-    if record.active_player_id is None:
-        raise GameLifecycleError("Secondary scoring evidence requires an active player.")
     evidence = SecondaryScoringStateEvidence.create(
         game_id=state.game_id,
         scoring_player_id=card.player_id,
@@ -432,14 +432,7 @@ def capture_secondary_scoring_state_evidence(
             "scoring_rule_source_ids",
         ),
     )
-    records = list(state.secondary_scoring_state_evidence_records)
-    if any(stored.evidence_id == evidence.evidence_id for stored in records):
-        return evidence
-    records.append(evidence)
-    state.secondary_scoring_state_evidence_records = sorted(
-        records,
-        key=lambda stored: stored.evidence_id,
-    )
+    state.record_secondary_scoring_state_evidence(evidence)
     return evidence
 
 
@@ -488,6 +481,11 @@ def require_bound_secondary_scoring_state_evidence(
     *,
     metadata: JsonValue,
     state: GameState,
+    player_id: str,
+    source_id: str,
+    source_kind: VictoryPointSourceKind,
+    card: SecondaryMissionCardState,
+    record: ObjectiveControlRecord,
 ) -> SecondaryScoringStateEvidence:
     if not isinstance(metadata, dict):
         raise GameLifecycleError("Secondary VP metadata must be an object.")
@@ -505,7 +503,104 @@ def require_bound_secondary_scoring_state_evidence(
     evidence = matches[0]
     if evidence.evidence_hash != evidence_hash:
         raise GameLifecycleError("Secondary scoring-state evidence hash drifted.")
+    validate_secondary_scoring_state_evidence_binding(
+        evidence=evidence,
+        metadata=metadata,
+        state=state,
+        player_id=player_id,
+        source_id=source_id,
+        source_kind=source_kind,
+        card=card,
+        record=record,
+    )
     return evidence
+
+
+def validate_secondary_scoring_state_evidence_binding(
+    *,
+    evidence: SecondaryScoringStateEvidence,
+    metadata: JsonValue,
+    state: GameState,
+    player_id: str,
+    source_id: str,
+    source_kind: VictoryPointSourceKind,
+    card: SecondaryMissionCardState,
+    record: ObjectiveControlRecord,
+) -> None:
+    """Bind immutable condition evidence to one scoring principal, card, and boundary."""
+    from warhammer40k_core.engine.game_state import GameState
+    from warhammer40k_core.engine.secondary_scoring_inventory import (
+        canonical_secondary_mission_id,
+    )
+
+    if type(evidence) is not SecondaryScoringStateEvidence:
+        raise GameLifecycleError("Secondary scoring evidence binding requires typed evidence.")
+    if type(state) is not GameState:
+        raise GameLifecycleError("Secondary scoring evidence binding requires GameState.")
+    if type(card) is not SecondaryMissionCardState:
+        raise GameLifecycleError("Secondary scoring evidence binding requires a card.")
+    if type(record) is not ObjectiveControlRecord:
+        raise GameLifecycleError("Secondary scoring evidence binding requires an objective record.")
+    if not isinstance(metadata, dict):
+        raise GameLifecycleError("Secondary VP metadata must be an object.")
+
+    requested_player = _validate_identifier("player_id", player_id)
+    requested_secondary = canonical_secondary_mission_id(source_id)
+    requested_kind = victory_point_source_kind_from_token(source_kind)
+    if requested_kind is VictoryPointSourceKind.FIXED_SECONDARY:
+        expected_mode = SecondaryMissionCardMode.FIXED
+    elif requested_kind is VictoryPointSourceKind.TACTICAL_SECONDARY:
+        expected_mode = SecondaryMissionCardMode.TACTICAL
+    else:
+        raise GameLifecycleError("Secondary scoring evidence requires a Secondary source kind.")
+
+    if record.game_id != state.game_id or evidence.game_id != state.game_id:
+        raise GameLifecycleError("Secondary scoring evidence game identity drifted.")
+    if card.player_id != requested_player or evidence.scoring_player_id != requested_player:
+        raise GameLifecycleError("Secondary scoring evidence player identity drifted.")
+    if (
+        canonical_secondary_mission_id(card.secondary_mission_id) != requested_secondary
+        or evidence.secondary_mission_id != requested_secondary
+    ):
+        raise GameLifecycleError("Secondary scoring evidence mission identity drifted.")
+    if card.mode is not expected_mode or evidence.card_mode is not expected_mode:
+        raise GameLifecycleError("Secondary scoring evidence card mode drifted.")
+    if evidence.card_battle_round != card.battle_round:
+        raise GameLifecycleError("Secondary scoring evidence card battle round drifted.")
+    if evidence.card_status is not SecondaryMissionCardStatus.ACTIVE:
+        raise GameLifecycleError("Secondary scoring evidence card was not active at capture.")
+    if evidence.active_player_id != record.active_player_id:
+        raise GameLifecycleError("Secondary scoring evidence active player drifted.")
+    if evidence.battle_round != record.battle_round:
+        raise GameLifecycleError("Secondary scoring evidence battle round drifted.")
+    if evidence.phase != record.phase:
+        raise GameLifecycleError("Secondary scoring evidence phase drifted.")
+    if evidence.objective_control_record_id != record.record_id:
+        raise GameLifecycleError("Secondary scoring evidence record identity drifted.")
+    if evidence.objective_control_record_hash != objective_control_record_hash(record):
+        raise GameLifecycleError("Secondary scoring evidence record hash drifted.")
+
+    if evidence.scoring_rule_ids != _string_tuple(
+        metadata.get("scoring_rule_ids"),
+        "scoring_rule_ids",
+    ):
+        raise GameLifecycleError("Secondary scoring evidence scoring rule IDs drifted.")
+    if evidence.scoring_rule_conditions != _string_tuple(
+        metadata.get("scoring_rule_conditions"),
+        "scoring_rule_conditions",
+    ):
+        raise GameLifecycleError("Secondary scoring evidence scoring rule conditions drifted.")
+    if evidence.scoring_rule_source_ids != _string_tuple(
+        metadata.get("scoring_rule_source_ids"),
+        "scoring_rule_source_ids",
+    ):
+        raise GameLifecycleError("Secondary scoring evidence scoring rule source IDs drifted.")
+    scoring_turn_active_player_id = metadata.get("scoring_turn_active_player_id")
+    if (
+        type(scoring_turn_active_player_id) is not str
+        or scoring_turn_active_player_id != evidence.active_player_id
+    ):
+        raise GameLifecycleError("Secondary scoring evidence scoring-turn active player drifted.")
 
 
 def validate_secondary_scoring_state_evidence_records(
@@ -532,9 +627,9 @@ def validate_secondary_scoring_state_evidence_records(
 
 
 def _string_tuple(value: object, field_name: str) -> tuple[str, ...]:
-    if not isinstance(value, list) or not value:
+    if type(value) is not list or not value:
         raise GameLifecycleError(f"Secondary scoring evidence requires {field_name}.")
-    return _identifier_tuple(field_name, tuple(value))
+    return _identifier_tuple(field_name, tuple(cast(list[object], value)))
 
 
 def _identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
@@ -567,5 +662,6 @@ __all__ = (
     "capture_secondary_scoring_state_evidence",
     "require_bound_secondary_scoring_state_evidence",
     "secondary_scoring_condition_context_from_evidence",
+    "validate_secondary_scoring_state_evidence_binding",
     "validate_secondary_scoring_state_evidence_records",
 )

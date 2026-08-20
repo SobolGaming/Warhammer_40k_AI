@@ -26,15 +26,28 @@ from tests.phase17n_secondary_certification_fixtures import (
     seed_sequential_tactical_turn_cap_conditions,
 )
 from tests.phase17n_secondary_mission_helpers import resolved_secondary_mission_selection_for_card
-from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
+from tests.secondary_destruction_helpers import record_secondary_destruction_for_fixture
+from tests.secondary_when_drawn_rules_unit_helpers import (
+    RulesUnitPresence,
+    attached_when_drawn_state,
+    record_unresolved_when_drawn_card,
+)
+from tests.setup_completion_helpers import (
+    record_existing_primary_turn_start_evidence_events_for_fixture,
+    record_primary_turn_start_evidence_for_fixture,
+)
 
+from warhammer40k_core.adapters.contracts import FiniteOptionSubmission
 from warhammer40k_core.adapters.event_stream import EventStreamCursor
 from warhammer40k_core.adapters.local_session import LocalGameSession
-from warhammer40k_core.core.missions import ObjectiveMarkerRole
+from warhammer40k_core.core.missions import ObjectiveMarkerDefinition, ObjectiveMarkerRole
+from warhammer40k_core.engine.army_mustering import ArmyDefinition
 from warhammer40k_core.engine.attached_unit_reconciliation import (
     split_attached_rules_unit_if_required,
 )
+from warhammer40k_core.engine.battlefield_state import ModelPlacement
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.decision_request import DecisionError
 from warhammer40k_core.engine.decision_result import DecisionResult
 from warhammer40k_core.engine.event_log import EventLog
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
@@ -46,11 +59,27 @@ from warhammer40k_core.engine.game_state import (
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import AttachmentDeclaration
-from warhammer40k_core.engine.mission_decisions import TACTICAL_SECONDARY_SCORE_DECISION_TYPE
+from warhammer40k_core.engine.mission_decisions import (
+    TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
+    request_tactical_secondary_discard,
+    request_tactical_secondary_score,
+)
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.objective_control import ObjectiveControlTiming
-from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleStage, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    GameLifecycleStage,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.primary_destruction_evidence import (
+    PrimaryUnattributedDestructionCause,
+)
+from warhammer40k_core.engine.primary_historical_events import (
+    record_new_primary_battlefield_departure_events,
+    record_new_primary_unit_destruction_events,
+)
 from warhammer40k_core.engine.primary_mission_choices import (
     SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
 )
@@ -64,6 +93,10 @@ from warhammer40k_core.engine.primary_scoring_state_evidence import (
     PrimaryScoringBoundaryKind,
     PrimaryScoringStateEvidence,
 )
+from warhammer40k_core.engine.reserve_arrival_requirements import (
+    reposition_destruction_policy,
+)
+from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
@@ -87,6 +120,7 @@ from warhammer40k_core.engine.secondary_when_drawn import (
     apply_tactical_secondary_when_drawn,
     next_tactical_secondary_when_drawn_request,
 )
+from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
 
 _SCORING_PLAYER_IDS = ("player-a", "player-b")
@@ -254,10 +288,20 @@ def _secondary_certification_session(
         player_a_units=certification_unit_selections(player_id="player-a"),
         player_b_units=certification_unit_selections(player_id="player-b"),
     )
+    decisions = DecisionController()
     _seed_certified_secondary(state, row)
     _seed_completed_fight_phase(state)
-    expectation = seed_positive_secondary_condition(state, row)
-    decisions = record_primary_turn_start_evidence_for_fixture(state)
+    expectation = seed_positive_secondary_condition(
+        state,
+        row,
+        event_log=decisions.event_log,
+    )
+    if not any(
+        snapshot.active_player_id == state.active_player_id
+        and snapshot.battle_round == state.battle_round
+        for snapshot in state.primary_rules_unit_turn_start_snapshots
+    ):
+        record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
     config = _secondary_certification_config(setup_game_id=state.game_id)
     lifecycle = GameLifecycle.from_payload(
         cast(
@@ -385,6 +429,26 @@ def _drive_secondary_scoring_through_facade(
     )
 
 
+def _configured_step6g_lifecycle(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+) -> GameLifecycle:
+    config = _secondary_certification_config(setup_game_id=state.game_id)
+    return GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            {
+                "config": config.to_payload(),
+                "parameterized_movement_proposals": True,
+                "state": state.to_payload(),
+                "decisions": decisions.to_payload(),
+                "reaction_queue": {"frames": []},
+            },
+        )
+    )
+
+
 def _secondary_certification_config(*, setup_game_id: str) -> GameConfig:
     setup = _setup_for_layout()
     base = phase11c_config()
@@ -475,7 +539,7 @@ def _ordinary_turn_end_evidence_for_player_or_none(
         )
     if not matches:
         return None
-    return matches[0]
+    return next(iter(matches))
 
 
 def _ordinary_turn_end_evidence_for_player(
@@ -511,7 +575,7 @@ def _certified_card_or_none(
     mode = (
         SecondaryMissionCardMode.FIXED if row.mode == "fixed" else SecondaryMissionCardMode.TACTICAL
     )
-    matches = tuple(
+    matches: tuple[SecondaryMissionCardState, ...] = tuple(
         card
         for card in state.secondary_mission_card_states
         if card.player_id == row.scoring_player_id
@@ -522,7 +586,7 @@ def _certified_card_or_none(
         return None
     if len(matches) > 1:
         raise AssertionError("Step 6G found multiple certified cards for one row.")
-    return matches[0]
+    return next(iter(matches))
 
 
 def _certified_card(
@@ -745,11 +809,10 @@ def _assert_opponent_selection_payloads_are_redacted(
         assert card.get("selection_payload") is None
 
 
-def test_secondary_turn_cap_limits_sequential_tactical_scores_to_fifteen_vp() -> None:
+def test_zero_secondary_turn_capacity_cannot_score_or_discard_an_achieved_tactical() -> None:
     state = _turn_cap_state()
-    decisions = record_primary_turn_start_evidence_for_fixture(state)
-    amounts: list[int] = []
-    for secondary_mission_id in TURN_CAP_TACTICAL_IDS:
+    decisions = _decisions_for_seeded_secondary_state(state)
+    for secondary_mission_id in TURN_CAP_TACTICAL_IDS[:3]:
         state.score_secondary_mission_from_state(
             player_id="player-a",
             secondary_mission_id=secondary_mission_id,
@@ -763,27 +826,317 @@ def test_secondary_turn_cap_limits_sequential_tactical_scores_to_fifteen_vp() ->
             source_id=secondary_mission_id,
         )
         assert len(transactions) == 1
-        amounts.append(transactions[0].amount)
-    assert amounts[:3] == [5, 5, 5]
-    assert amounts[3] == 0
-    assert sum(amounts) == 15
-    final_metadata = _secondary_transactions(
+        assert transactions[0].amount == 5
+    capped_secondary_id = TURN_CAP_TACTICAL_IDS[-1]
+    current_records = tuple(
+        record
+        for record in state.objective_control_records
+        if record.battle_round == state.battle_round
+        and record.active_player_id == state.active_player_id
+        and record.phase == BattlePhase.FIGHT.value
+        and record.timing is ObjectiveControlTiming.TURN_END
+    )
+    assert len(current_records) == 1
+    ordinary_discard_state_payload = deepcopy(state.to_payload())
+    ordinary_discard_decisions_payload = deepcopy(decisions.to_payload())
+    score_turn_end_mission_scoring_boundary(
+        state=state,
+        record=current_records[0],
+        end_of_battle=False,
+        event_log=decisions.event_log,
+    )
+    achievement = next(
+        context
+        for context in state.tactical_secondary_achievement_contexts
+        if context.player_id == "player-a" and context.secondary_mission_id == capped_secondary_id
+    )
+    ledger_before = state.victory_point_ledger_for_player("player-a")
+
+    with pytest.raises(GameLifecycleError, match="must award at least 1 VP"):
+        state.score_secondary_mission_from_state(
+            player_id="player-a",
+            secondary_mission_id=capped_secondary_id,
+            mode=SecondaryMissionCardMode.TACTICAL,
+            phase=BattlePhase.FIGHT,
+            event_log=decisions.event_log,
+        )
+
+    assert state.victory_point_ledger_for_player("player-a") == ledger_before
+    assert (
+        _secondary_transactions(
+            state,
+            player_id="player-a",
+            source_id=capped_secondary_id,
+        )
+        == ()
+    )
+    active = state.secondary_mission_card_state(
+        player_id="player-a",
+        secondary_mission_id=capped_secondary_id,
+        mode=SecondaryMissionCardMode.TACTICAL,
+    )
+    assert active is not None
+    assert active.status is SecondaryMissionCardStatus.ACTIVE
+    assert state.tactical_secondary_achievement_context(achievement.achievement_id) == achievement
+
+    waiting = request_tactical_secondary_score(
+        state=state,
+        decisions=decisions,
+        achievement_context=achievement,
+    )
+    assert waiting.decision_request is not None
+    score_session = LocalGameSession(
+        lifecycle=_configured_step6g_lifecycle(state=state, decisions=decisions)
+    )
+    score_state = score_session.lifecycle.state
+    assert score_state is not None
+    request = score_session.lifecycle.pending_decision_request()
+    assert request is not None
+    assert [option.option_id for option in request.options] == [f"retain:{capped_secondary_id}"]
+    with pytest.raises(DecisionError, match="finite action space"):
+        score_session.submit_option(
+            request_id=request.request_id,
+            option_id=f"score:{capped_secondary_id}",
+            result_id="phase17n-zero-cap-illegal-score",
+        )
+    assert score_session.lifecycle.pending_decision_request() == request
+    assert (
+        score_state.tactical_secondary_achievement_context(achievement.achievement_id)
+        == achievement
+    )
+    assert (
+        score_state.secondary_mission_card_state(
+            player_id="player-a",
+            secondary_mission_id=capped_secondary_id,
+            mode=SecondaryMissionCardMode.TACTICAL,
+        )
+        == active
+    )
+    assert [option.option_id for option in request.options] == [f"retain:{capped_secondary_id}"]
+    assert (
+        _secondary_transactions(
+            score_state,
+            player_id="player-a",
+            source_id=capped_secondary_id,
+        )
+        == ()
+    )
+    GameLifecycle.from_payload(deepcopy(score_session.lifecycle.to_payload()))
+
+    discard_state = GameState.from_payload(ordinary_discard_state_payload)
+    discard_card_battle_round = discard_state.battle_round
+    discard_decisions = DecisionController.from_payload(ordinary_discard_decisions_payload)
+    discard_waiting = request_tactical_secondary_discard(
+        state=discard_state,
+        decisions=discard_decisions,
+        player_id="player-a",
+    )
+    assert discard_waiting.decision_request is not None
+    discard_session = LocalGameSession(
+        lifecycle=_configured_step6g_lifecycle(
+            state=discard_state,
+            decisions=discard_decisions,
+        )
+    )
+    discard_request = discard_session.lifecycle.pending_decision_request()
+    assert discard_request is not None
+    discard_option = next(
+        option.option_id
+        for option in discard_request.options
+        if option.option_id == f"discard:{capped_secondary_id}"
+    )
+    discard_session.submit_option(
+        request_id=discard_request.request_id,
+        option_id=discard_option,
+        result_id="phase17n-zero-cap-ordinary-discard",
+    )
+    discarded_state = discard_session.lifecycle.state
+    assert discarded_state is not None
+    discarded = next(
+        card
+        for card in discarded_state.secondary_mission_card_states
+        if card.player_id == "player-a"
+        and card.secondary_mission_id == capped_secondary_id
+        and card.battle_round == discard_card_battle_round
+    )
+    assert discarded.status is SecondaryMissionCardStatus.DISCARDED
+    assert (
+        _secondary_transactions(
+            discarded_state,
+            player_id="player-a",
+            source_id=capped_secondary_id,
+        )
+        == ()
+    )
+    assert not any(
+        event.event_type == "tactical_secondary_mission_scored"
+        for event in discard_session.lifecycle.decision_controller.event_log.records
+    )
+    GameLifecycle.from_payload(deepcopy(discard_session.lifecycle.to_payload()))
+
+
+def test_tactical_score_rejects_stale_result_after_other_cards_exhaust_turn_cap() -> None:
+    state = _turn_cap_state()
+    decisions = _decisions_for_seeded_secondary_state(state)
+    record = state.prepare_current_turn_end_boundary(
+        completed_phase=BattlePhase.FIGHT,
+        runtime_modifier_registry=None,
+    )
+    decisions.event_log.append(
+        "end_boundary_objective_control_determined",
+        {
+            "game_id": record.game_id,
+            "battle_round": record.battle_round,
+            "phase": record.phase,
+            "record_ids": [record.record_id],
+            "source_rule_id": (
+                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+            ),
+        },
+    )
+    score_turn_end_mission_scoring_boundary(
+        state=state,
+        record=record,
+        end_of_battle=False,
+        event_log=decisions.event_log,
+    )
+    target_secondary_id = TURN_CAP_TACTICAL_IDS[-1]
+    target_achievement = next(
+        context
+        for context in state.tactical_secondary_achievement_contexts
+        if context.player_id == "player-a" and context.secondary_mission_id == target_secondary_id
+    )
+    waiting = request_tactical_secondary_score(
+        state=state,
+        decisions=decisions,
+        achievement_context=target_achievement,
+    )
+    request = waiting.decision_request
+    assert request is not None
+    assert {option.option_id for option in request.options} == {
+        f"score:{target_secondary_id}",
+        f"retain:{target_secondary_id}",
+    }
+    stale_score_result = FiniteOptionSubmission(
+        request_id=request.request_id,
+        selected_option_id=f"score:{target_secondary_id}",
+        result_id="phase17n-stale-tactical-score-after-turn-cap",
+    ).to_result(request)
+
+    for secondary_mission_id in TURN_CAP_TACTICAL_IDS[:3]:
+        state.score_secondary_mission_from_state(
+            player_id="player-a",
+            secondary_mission_id=secondary_mission_id,
+            mode=SecondaryMissionCardMode.TACTICAL,
+            phase=BattlePhase.FIGHT,
+            event_log=decisions.event_log,
+        )
+    assert (
+        sum(
+            transaction.amount
+            for secondary_mission_id in TURN_CAP_TACTICAL_IDS[:3]
+            for transaction in _secondary_transactions(
+                state,
+                player_id="player-a",
+                source_id=secondary_mission_id,
+            )
+        )
+        == 15
+    )
+    lifecycle = _configured_step6g_lifecycle(state=state, decisions=decisions)
+    lifecycle_state = lifecycle.state
+    assert lifecycle_state is not None
+    pending_before = lifecycle.pending_decision_request()
+    assert pending_before == request
+    ledger_before = lifecycle_state.victory_point_ledger_for_player("player-a")
+    records_before = lifecycle.decision_controller.records
+    active_before = lifecycle_state.secondary_mission_card_state(
+        player_id="player-a",
+        secondary_mission_id=target_secondary_id,
+        mode=SecondaryMissionCardMode.TACTICAL,
+    )
+    assert active_before is not None
+    achievement_before = lifecycle_state.tactical_secondary_achievement_context(
+        target_achievement.achievement_id
+    )
+    assert achievement_before is not None
+
+    status = lifecycle.submit_decision(stale_score_result)
+
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert isinstance(status.payload, dict)
+    assert status.payload["invalid_reason"] == "victory_point_capacity_exhausted"
+    assert lifecycle.pending_decision_request() == pending_before
+    assert lifecycle.decision_controller.records == records_before
+    assert lifecycle_state.victory_point_ledger_for_player("player-a") == ledger_before
+    assert (
+        _secondary_transactions(
+            lifecycle_state,
+            player_id="player-a",
+            source_id=target_secondary_id,
+        )
+        == ()
+    )
+    assert (
+        lifecycle_state.secondary_mission_card_state(
+            player_id="player-a",
+            secondary_mission_id=target_secondary_id,
+            mode=SecondaryMissionCardMode.TACTICAL,
+        )
+        == active_before
+    )
+    assert (
+        lifecycle_state.tactical_secondary_achievement_context(target_achievement.achievement_id)
+        == achievement_before
+    )
+
+
+def test_positive_partial_tactical_award_scores_and_discards_the_card() -> None:
+    state = _turn_cap_state()
+    decisions = _decisions_for_seeded_secondary_state(state)
+    for secondary_mission_id, expected_amount in (
+        ("a-tempting-target", 5),
+        ("centre-ground", 5),
+        ("behind-enemy-lines", 3),
+    ):
+        state.score_secondary_mission_from_state(
+            player_id="player-a",
+            secondary_mission_id=secondary_mission_id,
+            mode=SecondaryMissionCardMode.TACTICAL,
+            phase=BattlePhase.FIGHT,
+            event_log=decisions.event_log,
+        )
+        assert (
+            _secondary_transactions(
+                state,
+                player_id="player-a",
+                source_id=secondary_mission_id,
+            )[0].amount
+            == expected_amount
+        )
+
+    scored = state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="plunder",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=decisions.event_log,
+    )
+    transaction = _secondary_transactions(
         state,
         player_id="player-a",
-        source_id=TURN_CAP_TACTICAL_IDS[-1],
-    )[0].metadata
-    if type(final_metadata) is not dict:
-        raise AssertionError("Capped Secondary transaction metadata must be an object.")
-    audit = final_metadata["vp_cap_audit"]
-    if type(audit) is not dict:
-        raise AssertionError("Capped Secondary transaction must include vp_cap_audit.")
+        source_id="plunder",
+    )[0]
+    assert scored.status is SecondaryMissionCardStatus.SCORED
+    assert transaction.amount == 2
+    assert isinstance(transaction.metadata, dict)
+    audit = transaction.metadata["vp_cap_audit"]
+    assert isinstance(audit, dict)
     assert audit["requested_amount"] == 5
-    assert audit["applied_amount"] == 0
-    assert audit["secondary_turn_vp_cap"] == 15
-    assert audit["secondary_turn_points_before"] == 15
+    assert audit["applied_amount"] == 2
+    assert audit["secondary_turn_points_before"] == 13
     assert audit["secondary_turn_points_after"] == 15
     assert audit["secondary_turn_remaining_capacity"] == 0
-    assert "secondary_turn_vp_cap" in cast(list[object], audit["capped_reasons"])
     GameState.from_payload(state.to_payload())
 
 
@@ -803,19 +1156,100 @@ def test_spatial_secondary_restore_survives_later_qualifying_unit_mutation() -> 
 
 
 def test_unattributed_and_self_destruction_score_bring_it_down() -> None:
-    unattributed_row = _lifecycle_row(
-        "bring-it-down",
-        mode="tactical",
-        scoring_player_id="player-a",
+    unattributed_state = _tactical_fight_state()
+    unattributed_state.battle_round = 3
+    unattributed_state.active_player_id = "player-b"
+    _seed_completed_fight_phase(unattributed_state)
+    _seed_single_tactical_card(unattributed_state, "bring-it-down")
+    reserve_vehicle = _unit_for(
+        unattributed_state,
+        player_id="player-b",
+        datasheet_id="core-vehicle-monster",
     )
-    unattributed_state, _event_log, expectation = _score_certified_row_from_state(unattributed_row)
-    assert unattributed_state.secondary_unit_destruction_states[0].destroying_player_id is None
+    battlefield = unattributed_state.battlefield_state
+    mission_setup = unattributed_state.mission_setup
+    assert battlefield is not None
+    assert mission_setup is not None
+    unattributed_state.replace_battlefield_state(
+        battlefield.without_unit_placement(reserve_vehicle.unit_instance_id)
+    )
+    declared_reserve = ReserveState.declared_before_battle(
+        player_id="player-b",
+        unit_instance_id=reserve_vehicle.unit_instance_id,
+        reserve_kind=ReserveKind.STRATEGIC_RESERVES,
+        destruction_deadline_policy=reposition_destruction_policy(
+            mission_setup=mission_setup,
+            destruction_deadline_policy=None,
+        ),
+    )
+    unattributed_state.record_reserve_state(declared_reserve)
+    unattributed_decisions = DecisionController()
+    unattributed_decisions.event_log.append(
+        "reserve_unit_declared",
+        {
+            "game_id": unattributed_state.game_id,
+            "player_id": declared_reserve.player_id,
+            "unit_instance_id": declared_reserve.unit_instance_id,
+            "reserve_state": declared_reserve.to_payload(),
+        },
+    )
+    record_primary_turn_start_evidence_for_fixture(
+        unattributed_state,
+        decisions=unattributed_decisions,
+    )
+    destruction_ids_before = tuple(
+        destruction.destruction_id
+        for destruction in unattributed_state.primary_unit_destruction_states
+    )
+    unattributed_state._resolve_unarrived_reserve_destruction_boundary(  # pyright: ignore[reportPrivateUsage]
+        end_of_battle=False
+    )
+    record_new_primary_unit_destruction_events(
+        state=unattributed_state,
+        event_log=unattributed_decisions.event_log,
+        destruction_ids_before=destruction_ids_before,
+    )
+    (unattributed_destruction,) = tuple(
+        destruction
+        for destruction in unattributed_state.secondary_unit_destruction_states
+        if destruction.destroyed_unit_instance_id == reserve_vehicle.unit_instance_id
+    )
+    assert unattributed_destruction.destroying_player_id is None
+    primary_destruction = next(
+        destruction
+        for destruction in unattributed_state.primary_unit_destruction_states
+        if destruction.destruction_id == unattributed_destruction.source_primary_destruction_id
+    )
+    assert (
+        primary_destruction.unattributed_cause
+        is PrimaryUnattributedDestructionCause.RESERVE_DEADLINE
+    )
+    unattributed_state.score_secondary_mission_from_state(
+        player_id="player-a",
+        secondary_mission_id="bring-it-down",
+        mode=SecondaryMissionCardMode.TACTICAL,
+        phase=BattlePhase.FIGHT,
+        event_log=unattributed_decisions.event_log,
+    )
     unattributed_transactions = _secondary_transactions(
         unattributed_state,
         player_id="player-a",
         source_id="bring-it-down",
     )
-    assert unattributed_transactions[0].amount == expectation.expected_amount
+    assert unattributed_transactions[0].amount == 5
+    restored_unattributed_lifecycle = _configured_step6g_lifecycle(
+        state=unattributed_state,
+        decisions=unattributed_decisions,
+    )
+    restored_unattributed_state = restored_unattributed_lifecycle.state
+    assert restored_unattributed_state is not None
+    assert restored_unattributed_state.to_payload() == unattributed_state.to_payload()
+    assert (
+        GameLifecycle.from_payload(
+            deepcopy(restored_unattributed_lifecycle.to_payload())
+        ).to_payload()
+        == restored_unattributed_lifecycle.to_payload()
+    )
 
     self_kill_state = _tactical_fight_state()
     _seed_single_tactical_card(self_kill_state, "bring-it-down")
@@ -824,14 +1258,14 @@ def test_unattributed_and_self_destruction_score_bring_it_down() -> None:
         player_id="player-b",
         datasheet_id="core-vehicle-monster",
     )
-    self_kill_state.record_secondary_unit_destruction(
+    decisions = record_primary_turn_start_evidence_for_fixture(self_kill_state)
+    record_secondary_destruction_for_fixture(
+        self_kill_state,
         destroying_player_id="player-b",
         destroyed_unit_instance_id=vehicle.unit_instance_id,
-        destroyed_model_instance_ids=tuple(model.model_instance_id for model in vehicle.own_models),
-        started_turn_objective_marker_ids=(),
         source_id="phase17n-self-kill-bring-it-down",
+        event_log=decisions.event_log,
     )
-    decisions = record_primary_turn_start_evidence_for_fixture(self_kill_state)
     self_kill_state.score_secondary_mission_from_state(
         player_id="player-a",
         secondary_mission_id="bring-it-down",
@@ -880,7 +1314,9 @@ def test_cleanse_when_drawn_shuffle_is_optional_while_plunder_is_active() -> Non
     assert status is not None
     request = status.decision_request
     assert request is not None
-    assert request.payload["secondary_mission_id"] == "cleanse"
+    request_payload = request.payload
+    assert isinstance(request_payload, dict)
+    assert request_payload["secondary_mission_id"] == "cleanse"
     assert [option.option_id for option in request.options] == [
         "keep:cleanse",
         "shuffle:cleanse",
@@ -931,7 +1367,9 @@ def test_plunder_when_drawn_shuffle_is_optional_while_cleanse_is_active() -> Non
     second = next_tactical_secondary_when_drawn_request(state=state, decisions=decisions)
     assert second is not None
     assert second.decision_request is not None
-    assert second.decision_request.payload["secondary_mission_id"] == "plunder"
+    second_payload = second.decision_request.payload
+    assert isinstance(second_payload, dict)
+    assert second_payload["secondary_mission_id"] == "plunder"
     assert [option.option_id for option in second.decision_request.options] == [
         "keep:plunder",
         "shuffle:plunder",
@@ -981,11 +1419,158 @@ def test_defend_stronghold_first_round_when_drawn_shuffles_without_keep_option()
     assert payload["mandatory"] is True
     assert payload["secondary_mission_id"] == "defend-stronghold"
     if status is not None and status.decision_request is not None:
-        assert status.decision_request.payload["secondary_mission_id"] != "defend-stronghold"
+        status_payload = status.decision_request.payload
+        assert isinstance(status_payload, dict)
+        assert status_payload["secondary_mission_id"] != "defend-stronghold"
         assert all(
             not option.option_id.startswith("keep:defend-stronghold")
             for option in status.decision_request.options
         )
+
+
+@pytest.mark.parametrize(
+    "card_player_id",
+    ["player-a", "player-b"],
+    ids=("attacker-owns-card", "defender-owns-card"),
+)
+def test_a_grievous_blow_when_drawn_sees_enemy_attached_unit(
+    card_player_id: str,
+) -> None:
+    state = attached_when_drawn_state(
+        setup=_setup_for_layout(),
+        card_player_id=card_player_id,
+        bodyguard_model_count=12,
+        secondary_mission_id="a-grievous-blow",
+    )
+    enemy_army = next(army for army in state.army_definitions if army.player_id != card_player_id)
+    formation = enemy_army.attached_units[0]
+    assert len(enemy_army.unit_by_id(formation.bodyguard_unit_instance_id).own_models) == 12
+    assert len(enemy_army.unit_by_id(formation.leader_unit_instance_ids[0]).own_models) == 1
+    assert (
+        state.starting_strength_record_for_unit(
+            formation.attached_unit_instance_id
+        ).starting_model_count
+        == 13
+    )
+
+    assert (
+        next_tactical_secondary_when_drawn_request(
+            state=state,
+            decisions=DecisionController(),
+        )
+        is None
+    )
+
+
+def test_a_grievous_blow_when_drawn_allows_discard_below_13_models() -> None:
+    state = attached_when_drawn_state(
+        setup=_setup_for_layout(),
+        card_player_id="player-a",
+        bodyguard_model_count=11,
+        secondary_mission_id="a-grievous-blow",
+    )
+    status = next_tactical_secondary_when_drawn_request(
+        state=state,
+        decisions=DecisionController(),
+    )
+    assert status is not None
+    assert status.decision_request is not None
+    assert {option.option_id for option in status.decision_request.options} == {
+        "keep:a-grievous-blow",
+        "discard:a-grievous-blow",
+    }
+
+
+@pytest.mark.parametrize("presence", ["reserves", "embarked"])
+def test_a_grievous_blow_when_drawn_excludes_off_battlefield_attached_units(
+    presence: RulesUnitPresence,
+) -> None:
+    state = attached_when_drawn_state(
+        setup=_setup_for_layout(),
+        card_player_id="player-a",
+        bodyguard_model_count=12,
+        secondary_mission_id="a-grievous-blow",
+        presence=presence,
+    )
+    status = next_tactical_secondary_when_drawn_request(
+        state=state,
+        decisions=DecisionController(),
+    )
+    assert status is not None
+    assert status.decision_request is not None
+    assert "discard:a-grievous-blow" in {
+        option.option_id for option in status.decision_request.options
+    }
+
+
+@pytest.mark.parametrize(
+    ("bodyguard_model_count", "discard_available"),
+    [(12, True), (13, False)],
+)
+def test_a_grievous_blow_when_drawn_uses_post_split_descendant_starting_strength(
+    bodyguard_model_count: int,
+    discard_available: bool,
+) -> None:
+    state = attached_when_drawn_state(
+        setup=_setup_for_layout(),
+        card_player_id="player-a",
+        bodyguard_model_count=bodyguard_model_count,
+        secondary_mission_id="a-grievous-blow",
+        record_card=False,
+    )
+    formation = state.army_definitions[1].attached_units[0]
+    leader_id = formation.leader_unit_instance_ids[0]
+    _zero_and_remove_unit(state, leader_id)
+    assert split_attached_rules_unit_if_required(
+        state=state,
+        event_log=EventLog(),
+        rules_unit_instance_id=formation.attached_unit_instance_id,
+    ) == (formation.bodyguard_unit_instance_id,)
+    assert (
+        state.starting_strength_record_for_unit(
+            formation.bodyguard_unit_instance_id
+        ).starting_model_count
+        == bodyguard_model_count
+    )
+    record_unresolved_when_drawn_card(
+        state,
+        player_id="player-a",
+        secondary_mission_id="a-grievous-blow",
+    )
+
+    status = next_tactical_secondary_when_drawn_request(
+        state=state,
+        decisions=DecisionController(),
+    )
+    if discard_available:
+        assert status is not None
+        assert status.decision_request is not None
+        assert "discard:a-grievous-blow" in {
+            option.option_id for option in status.decision_request.options
+        }
+    else:
+        assert status is None
+
+
+def test_bring_it_down_when_drawn_sees_w10_model_inside_attached_unit() -> None:
+    state = attached_when_drawn_state(
+        setup=_setup_for_layout(),
+        card_player_id="player-a",
+        bodyguard_model_count=5,
+        secondary_mission_id="bring-it-down",
+        leader_starting_wounds=10,
+    )
+    enemy_army = state.army_definitions[1]
+    formation = enemy_army.attached_units[0]
+    leader = enemy_army.unit_by_id(formation.leader_unit_instance_ids[0])
+    assert leader.own_models[0].starting_wounds == 10
+    assert (
+        next_tactical_secondary_when_drawn_request(
+            state=state,
+            decisions=DecisionController(),
+        )
+        is None
+    )
 
 
 def test_burden_of_trust_still_scores_after_attached_unit_split() -> None:
@@ -1096,6 +1681,33 @@ def _turn_cap_state() -> GameState:
         )
     seed_sequential_tactical_turn_cap_conditions(state)
     return state
+
+
+def _decisions_for_seeded_secondary_state(state: GameState) -> DecisionController:
+    decisions = DecisionController()
+    current_turn_has_snapshot = any(
+        snapshot.active_player_id == state.active_player_id
+        and snapshot.battle_round == state.battle_round
+        for snapshot in state.primary_rules_unit_turn_start_snapshots
+    )
+    if current_turn_has_snapshot:
+        record_existing_primary_turn_start_evidence_events_for_fixture(
+            state,
+            decisions=decisions,
+        )
+    else:
+        record_primary_turn_start_evidence_for_fixture(state, decisions=decisions)
+    record_new_primary_battlefield_departure_events(
+        state=state,
+        event_log=decisions.event_log,
+        departure_ids_before=(),
+    )
+    record_new_primary_unit_destruction_events(
+        state=state,
+        event_log=decisions.event_log,
+        destruction_ids_before=(),
+    )
+    return decisions
 
 
 def _tactical_fight_state() -> GameState:
@@ -1234,7 +1846,7 @@ def _place_unit(state: GameState, unit_instance_id: str, x_inches: float, y_inch
     if state.battlefield_state is None:
         raise AssertionError("Review fixture placement requires battlefield state.")
     unit_placement = state.battlefield_state.unit_placement_by_id(unit_instance_id)
-    placements = []
+    placements: list[ModelPlacement] = []
     for index, placement in enumerate(unit_placement.model_placements):
         placements.append(
             placement.with_pose(
@@ -1251,7 +1863,7 @@ def _place_unit(state: GameState, unit_instance_id: str, x_inches: float, y_inch
     )
 
 
-def _home_objective(state: GameState, *, player_id: str):
+def _home_objective(state: GameState, *, player_id: str) -> ObjectiveMarkerDefinition:
     if state.mission_setup is None:
         raise AssertionError("Review fixture requires MissionSetup.")
     role = (
@@ -1266,10 +1878,10 @@ def _home_objective(state: GameState, *, player_id: str):
 
 
 def _zero_and_remove_unit(state: GameState, unit_instance_id: str) -> None:
-    armies = []
+    armies: list[ArmyDefinition] = []
     removed_ids: list[str] = []
     for army in state.army_definitions:
-        units = []
+        units: list[UnitInstance] = []
         for unit in army.units:
             if unit.unit_instance_id == unit_instance_id:
                 removed_ids.extend(model.model_instance_id for model in unit.own_models)
@@ -1289,9 +1901,9 @@ def _zero_and_remove_unit(state: GameState, unit_instance_id: str) -> None:
 
 
 def _restore_unit_wounds(state: GameState, unit_instance_id: str) -> None:
-    armies = []
+    armies: list[ArmyDefinition] = []
     for army in state.army_definitions:
-        units = []
+        units: list[UnitInstance] = []
         for unit in army.units:
             if unit.unit_instance_id == unit_instance_id:
                 unit = replace(
@@ -1306,7 +1918,7 @@ def _restore_unit_wounds(state: GameState, unit_instance_id: str) -> None:
     state.army_definitions = armies
 
 
-def _first_intercessor(state: GameState, *, player_id: str):
+def _first_intercessor(state: GameState, *, player_id: str) -> UnitInstance:
     return _unit_for(
         state,
         player_id=player_id,
@@ -1314,7 +1926,7 @@ def _first_intercessor(state: GameState, *, player_id: str):
     )
 
 
-def _unit_for(state: GameState, *, player_id: str, datasheet_id: str):
+def _unit_for(state: GameState, *, player_id: str, datasheet_id: str) -> UnitInstance:
     matches = tuple(
         unit
         for army in state.army_definitions
@@ -1327,7 +1939,7 @@ def _unit_for(state: GameState, *, player_id: str, datasheet_id: str):
     return matches[0]
 
 
-def _unit_by_id(state: GameState, unit_instance_id: str):
+def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
     for army in state.army_definitions:
         for unit in army.units:
             if unit.unit_instance_id == unit_instance_id:

@@ -12,6 +12,7 @@ from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError, Game
 from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardMode,
     SecondaryMissionCardState,
+    SecondaryMissionCardStatus,
     TacticalSecondaryAchievementContext,
     VictoryPointAward,
     VictoryPointSourceKind,
@@ -185,6 +186,64 @@ def expected_tactical_secondary_award_from_state(
         starting_strength_records=tuple(state.starting_strength_records),
         condition_context=context,
     )
+
+
+def tactical_secondary_score_applied_amount_from_state(
+    *,
+    state: GameState,
+    card_state: SecondaryMissionCardState,
+) -> int:
+    """Preview the VP that a currently achieved Tactical card would actually apply."""
+    from warhammer40k_core.engine.game_state import GameState as _GameState
+
+    if type(state) is not _GameState:
+        raise GameLifecycleError("Tactical secondary score preview requires GameState.")
+    if type(card_state) is not SecondaryMissionCardState:
+        raise GameLifecycleError(
+            "Tactical secondary score preview requires SecondaryMissionCardState."
+        )
+    if (
+        card_state.mode is not SecondaryMissionCardMode.TACTICAL
+        or card_state.status is not SecondaryMissionCardStatus.ACTIVE
+    ):
+        raise GameLifecycleError("Tactical secondary score preview requires an active card.")
+    award = expected_tactical_secondary_award_from_state(
+        state=state,
+        card_state=card_state,
+    )
+    if award is None:
+        raise GameLifecycleError("Tactical secondary score preview requires a current award.")
+    if state.mission_setup is None:
+        raise GameLifecycleError("Tactical secondary score preview requires MissionSetup.")
+    policies = mission_scoring_policies_from_setup(state.mission_setup)
+    applied_amount, _metadata = policies.capped_award_for_ledger(
+        ledger=state.victory_point_ledger_for_player(card_state.player_id),
+        award=award,
+        objective_control_records=tuple(state.objective_control_records),
+        primary_scoring_state_evidence_records=tuple(state.primary_scoring_state_evidence_records),
+        turn_order=state.turn_order,
+        current_active_player_id=state.active_player_id,
+    )
+    return applied_amount
+
+
+def require_positive_tactical_secondary_score_transaction(
+    transaction: VictoryPointTransaction,
+) -> VictoryPointTransaction:
+    """Reject Tactical card-score transitions that did not actually apply VP."""
+    if type(transaction) is not VictoryPointTransaction:
+        raise GameLifecycleError(
+            "Tactical secondary score commit requires a VictoryPointTransaction."
+        )
+    if transaction.source_kind is not VictoryPointSourceKind.TACTICAL_SECONDARY:
+        raise GameLifecycleError(
+            "Tactical secondary score commit requires a Tactical Secondary transaction."
+        )
+    if transaction.amount <= 0:
+        raise GameLifecycleError(
+            "Tactical secondary score must award at least 1 VP before the card is scored."
+        )
+    return transaction
 
 
 def apply_tactical_secondary_score_result(

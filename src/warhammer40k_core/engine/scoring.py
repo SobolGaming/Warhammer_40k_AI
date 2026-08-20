@@ -250,6 +250,7 @@ class SecondaryDestroyedModelStatePayload(TypedDict):
 
 class SecondaryUnitDestructionStatePayload(TypedDict):
     destruction_id: str
+    source_primary_destruction_id: str
     game_id: str
     destroying_player_id: str | None
     destroyed_player_id: str
@@ -1308,6 +1309,7 @@ class SecondaryDestroyedModelState:
 @dataclass(frozen=True, slots=True)
 class SecondaryUnitDestructionState:
     destruction_id: str
+    source_primary_destruction_id: str
     game_id: str
     destroying_player_id: str | None
     destroyed_player_id: str
@@ -1326,6 +1328,14 @@ class SecondaryUnitDestructionState:
             _validate_identifier(
                 "SecondaryUnitDestructionState destruction_id",
                 self.destruction_id,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "source_primary_destruction_id",
+            _validate_identifier(
+                "SecondaryUnitDestructionState source_primary_destruction_id",
+                self.source_primary_destruction_id,
             ),
         )
         object.__setattr__(
@@ -1397,6 +1407,7 @@ class SecondaryUnitDestructionState:
     def to_payload(self) -> SecondaryUnitDestructionStatePayload:
         return {
             "destruction_id": self.destruction_id,
+            "source_primary_destruction_id": self.source_primary_destruction_id,
             "game_id": self.game_id,
             "destroying_player_id": self.destroying_player_id,
             "destroyed_player_id": self.destroyed_player_id,
@@ -1411,8 +1422,27 @@ class SecondaryUnitDestructionState:
 
     @classmethod
     def from_payload(cls, payload: SecondaryUnitDestructionStatePayload) -> Self:
+        payload_object = cast(object, payload)
+        if not isinstance(payload_object, dict) or set(
+            cast(dict[object, object], payload_object)
+        ) != {
+            "destruction_id",
+            "source_primary_destruction_id",
+            "game_id",
+            "destroying_player_id",
+            "destroyed_player_id",
+            "active_player_id",
+            "battle_round",
+            "phase",
+            "destroyed_unit_instance_id",
+            "destroyed_models",
+            "started_turn_objective_marker_ids",
+            "source_id",
+        }:
+            raise GameLifecycleError("SecondaryUnitDestructionState payload fields are invalid.")
         return cls(
             destruction_id=payload["destruction_id"],
+            source_primary_destruction_id=payload["source_primary_destruction_id"],
             game_id=payload["game_id"],
             destroying_player_id=payload["destroying_player_id"],
             destroyed_player_id=payload["destroyed_player_id"],
@@ -2578,6 +2608,23 @@ class MissionScoringPolicy:
         )
         if record.battle_round != requested_round or record.phase != requested_phase:
             raise GameLifecycleError("State-backed secondary scoring record timing drift.")
+        if condition_context is not None:
+            if type(condition_context) is not SecondaryScoringConditionContext:
+                raise GameLifecycleError(
+                    "State-backed secondary scoring condition context is invalid."
+                )
+            if condition_context.player_id != requested_player:
+                raise GameLifecycleError(
+                    "State-backed secondary scoring condition context player drift."
+                )
+            if condition_context.record != record:
+                raise GameLifecycleError(
+                    "State-backed secondary scoring condition context record drift."
+                )
+            if condition_context.mission_setup != mission_setup:
+                raise GameLifecycleError(
+                    "State-backed secondary scoring condition context mission setup drift."
+                )
         mission_rules = tuple(
             rule
             for rule in self.secondary_scoring_rules

@@ -373,30 +373,52 @@ def request_tactical_secondary_score(
                 "unsupported_reason": drift_reason,
             },
         )
+    card_state = state.secondary_mission_card_state(
+        player_id=requested_player,
+        secondary_mission_id=requested_secondary_id,
+        mode=SecondaryMissionCardMode.TACTICAL,
+    )
+    if card_state is None:
+        raise GameLifecycleError("Tactical secondary score requires an active card.")
+    from warhammer40k_core.engine.secondary_tactical_achievement import (
+        tactical_secondary_score_applied_amount_from_state,
+    )
+
+    score_applies_vp = (
+        tactical_secondary_score_applied_amount_from_state(
+            state=state,
+            card_state=card_state,
+        )
+        > 0
+    )
     context = _tactical_secondary_score_context(recorded_context)
+    options = (
+        *(
+            (
+                DecisionOption(
+                    option_id=f"score:{requested_secondary_id}",
+                    label=f"Score {requested_secondary_id}",
+                    payload={**context, "score": True},
+                ),
+            )
+            if score_applies_vp
+            else ()
+        ),
+        DecisionOption(
+            option_id=f"retain:{requested_secondary_id}",
+            label=f"Retain {requested_secondary_id}",
+            payload={**context, "score": False},
+        ),
+    )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
         decision_type=TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
         actor_id=requested_player,
         payload={
             **context,
-            "legal_option_ids": [
-                f"score:{requested_secondary_id}",
-                f"retain:{requested_secondary_id}",
-            ],
+            "legal_option_ids": [option.option_id for option in options],
         },
-        options=(
-            DecisionOption(
-                option_id=f"score:{requested_secondary_id}",
-                label=f"Score {requested_secondary_id}",
-                payload={**context, "score": True},
-            ),
-            DecisionOption(
-                option_id=f"retain:{requested_secondary_id}",
-                label=f"Retain {requested_secondary_id}",
-                payload={**context, "score": False},
-            ),
-        ),
+        options=options,
     )
     decisions.request_decision(request)
     return LifecycleStatus.waiting_for_decision(
@@ -1245,6 +1267,22 @@ def tactical_secondary_score_drift_reason(
         return "card_not_active"
     if _payload_int(payload, key="card_battle_round") != card_state.battle_round:
         return "card_battle_round_drift"
+    score = payload.get("score")
+    if type(score) is not bool:
+        raise GameLifecycleError("Tactical secondary score payload requires a score bool.")
+    if score:
+        from warhammer40k_core.engine.secondary_tactical_achievement import (
+            tactical_secondary_score_applied_amount_from_state,
+        )
+
+        if (
+            tactical_secondary_score_applied_amount_from_state(
+                state=state,
+                card_state=card_state,
+            )
+            == 0
+        ):
+            return "victory_point_capacity_exhausted"
     return None
 
 

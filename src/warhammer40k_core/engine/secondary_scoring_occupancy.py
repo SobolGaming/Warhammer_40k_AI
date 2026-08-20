@@ -216,7 +216,7 @@ class SecondaryBattlefieldOccupancy:
             "tempting_objective_id",
             _validate_optional_identifier("tempting_objective_id", self.tempting_objective_id),
         )
-        for field_name, value in (
+        for boolean_field_name, boolean_value in (
             ("beacon_on_battlefield", self.beacon_on_battlefield),
             ("beacon_within_own_deployment_zone", self.beacon_within_own_deployment_zone),
             ("beacon_within_own_territory", self.beacon_within_own_territory),
@@ -225,8 +225,8 @@ class SecondaryBattlefieldOccupancy:
             ("opponent_deployment_resolved", self.opponent_deployment_resolved),
             ("no_mans_land_resolved", self.no_mans_land_resolved),
         ):
-            if type(value) is not bool:
-                raise GameLifecycleError(f"{field_name} must be a bool.")
+            if type(boolean_value) is not bool:
+                raise GameLifecycleError(f"{boolean_field_name} must be a bool.")
 
     def to_payload(self) -> SecondaryBattlefieldOccupancyPayload:
         return {

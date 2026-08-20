@@ -9,6 +9,10 @@ from typing import cast
 
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
+from tests.secondary_destruction_helpers import (
+    append_secondary_destruction_projection_payload_from_existing,
+    synchronize_secondary_destruction_projection_payload,
+)
 
 from warhammer40k_core.adapters.contracts import FiniteOptionSubmission, ParameterizedSubmission
 from warhammer40k_core.adapters.projection import (
@@ -43,6 +47,7 @@ from warhammer40k_core.engine.fight_resolution import PILE_IN_ACTION, FightMovem
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
+    GameStatePayload,
     SecondaryMissionChoice,
     SecondaryMissionMode,
 )
@@ -140,7 +145,10 @@ from warhammer40k_core.engine.replay import (
     decision_request_options_fingerprint,
 )
 from warhammer40k_core.engine.reserves import ReserveKind, ReserveState
-from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
+from warhammer40k_core.engine.scoring import (
+    PrimaryUnitDestructionState,
+    PrimaryUnitDestructionStatePayload,
+)
 from warhammer40k_core.engine.setup_flow import (
     SECONDARY_MISSION_DECISION_TYPE,
     army_mustered_event_payload,
@@ -563,7 +571,9 @@ def test_replay_v6_rejects_missing_destroyed_battlefield_departure() -> None:
         ReplayArtifact.from_payload(payload)
 
     assert isinstance(exc_info.value.__cause__, GameLifecycleError)
-    assert "lacks its exact battlefield departure" in str(exc_info.value.__cause__)
+    assert "Secondary unit destruction Primary lineage lacks departure evidence" in str(
+        exc_info.value.__cause__
+    )
 
 
 def test_replay_v6_rejects_invented_reserve_deadline_destruction() -> None:
@@ -572,7 +582,9 @@ def test_replay_v6_rejects_invented_reserve_deadline_destruction() -> None:
     state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
     destructions = cast(list[JsonValue], state_payload["primary_unit_destruction_states"])
     assert len(destructions) == 1
-    forged = cast(dict[str, JsonValue], json.loads(json.dumps(destructions[0])))
+    existing = cast(dict[str, JsonValue], destructions[0])
+    existing_primary_destruction_id = cast(str, existing["destruction_id"])
+    forged = cast(dict[str, JsonValue], json.loads(json.dumps(existing)))
     forged_source_id = "phase18b:invented:reserve-deadline"
     forged["destroying_player_id"] = None
     forged["destruction_attribution"] = None
@@ -588,6 +600,11 @@ def test_replay_v6_rejects_invented_reserve_deadline_destruction() -> None:
         destroyed_unit_instance_id=cast(str, forged["destroyed_unit_instance_id"]),
     )
     destructions.append(forged)
+    append_secondary_destruction_projection_payload_from_existing(
+        state_payload=cast(GameStatePayload, state_payload),
+        existing_primary_destruction_id=existing_primary_destruction_id,
+        primary_destruction_payload=cast(PrimaryUnitDestructionStatePayload, forged),
+    )
 
     with pytest.raises(ReplayArtifactError, match="lifecycle payload is invalid") as exc_info:
         ReplayArtifact.from_payload(payload)
@@ -686,9 +703,11 @@ def test_replay_v6_rejects_duplicate_destruction_completion_without_restore() ->
 
     destructions = cast(list[JsonValue], state_payload["primary_unit_destruction_states"])
     assert len(destructions) == 1
+    existing = cast(dict[str, JsonValue], destructions[0])
+    existing_primary_destruction_id = cast(str, existing["destruction_id"])
     duplicated_destruction = cast(
         dict[str, JsonValue],
-        json.loads(json.dumps(destructions[0], sort_keys=True)),
+        json.loads(json.dumps(existing, sort_keys=True)),
     )
     final_model_destroyed_event_id = new_model_destroyed_event_ids[-1]
     destroyed_unit_id = cast(str, duplicated_destruction["destroyed_unit_instance_id"])
@@ -707,6 +726,14 @@ def test_replay_v6_rejects_duplicate_destruction_completion_without_restore() ->
         destroyed_unit_instance_id=destroyed_unit_id,
     )
     destructions.append(duplicated_destruction)
+    append_secondary_destruction_projection_payload_from_existing(
+        state_payload=cast(GameStatePayload, state_payload),
+        existing_primary_destruction_id=existing_primary_destruction_id,
+        primary_destruction_payload=cast(
+            PrimaryUnitDestructionStatePayload,
+            duplicated_destruction,
+        ),
+    )
     events.append(
         {
             "event_id": f"event-{len(events) + 1:06d}",
@@ -965,6 +992,7 @@ def test_replay_v6_rejects_attributed_destruction_relabelled_with_forged_deadlin
     assert len(destructions) == 1
     destruction = cast(dict[str, JsonValue], destructions[0])
     destroyed_unit_id = cast(str, destruction["destroyed_unit_instance_id"])
+    previous_primary_destruction_id = cast(str, destruction["destruction_id"])
 
     cast(list[JsonValue], state_payload["primary_battlefield_departure_states"]).clear()
     for event_value in events:
@@ -1020,6 +1048,11 @@ def test_replay_v6_rejects_attributed_destruction_relabelled_with_forged_deadlin
         game_id=cast(str, destruction["game_id"]),
         source_id=destruction_source_id,
         destroyed_unit_instance_id=destroyed_unit_id,
+    )
+    synchronize_secondary_destruction_projection_payload(
+        state_payload=cast(GameStatePayload, state_payload),
+        previous_primary_destruction_id=previous_primary_destruction_id,
+        primary_destruction_payload=cast(PrimaryUnitDestructionStatePayload, destruction),
     )
     recorded_event = next(
         cast(dict[str, JsonValue], event)
@@ -1116,7 +1149,10 @@ def test_replay_v6_rejects_frozen_attached_mapping_replaced_by_materialized_mode
         "army-beta:target-leader:phase18b-added-model"
     )
 
-    with pytest.raises(GameLifecycleError, match="muster mapping drift"):
+    with pytest.raises(
+        GameLifecycleError,
+        match="Secondary unit destruction departure evidence left its starting lineage",
+    ):
         GameLifecycle.from_payload(cast(GameLifecyclePayload, lifecycle_payload))
 
 
@@ -1150,6 +1186,7 @@ def test_replay_v6_rejects_attached_destruction_with_omitted_component_edge() ->
     destruction = _primary_destruction_payload(payload)
     departure_ids = cast(list[JsonValue], destruction["source_battlefield_departure_ids"])
     assert len(departure_ids) == 6
+    primary_destruction_id_before_tamper = cast(str, destruction["destruction_id"])
     lifecycle_payload = cast(dict[str, JsonValue], payload["initial_lifecycle"])
     state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
     departures = cast(list[JsonValue], state_payload["primary_battlefield_departure_states"])
@@ -1172,6 +1209,11 @@ def test_replay_v6_rejects_attached_destruction_with_omitted_component_edge() ->
         list[JsonValue], recorded_state["source_battlefield_departure_ids"]
     )
     recorded_departure_ids.remove(bodyguard_departure_id)
+    synchronize_secondary_destruction_projection_payload(
+        state_payload=cast(GameStatePayload, state_payload),
+        previous_primary_destruction_id=primary_destruction_id_before_tamper,
+        primary_destruction_payload=cast(PrimaryUnitDestructionStatePayload, destruction),
+    )
 
     with pytest.raises(ReplayArtifactError, match="lifecycle payload is invalid") as exc_info:
         ReplayArtifact.from_payload(payload)
@@ -1193,6 +1235,7 @@ def test_replay_v6_rejects_nonfinal_attached_model_event_as_completion() -> None
     ]
     first_event_id = cast(str, model_destroyed_events[0]["event_id"])
     logical_unit_id = cast(str, destruction["destroyed_unit_instance_id"])
+    previous_primary_destruction_id = cast(str, destruction["destruction_id"])
     source_id = f"core-rules:primary-unit-destruction-tracking:{first_event_id}:{logical_unit_id}"
     destruction["source_model_destroyed_event_id"] = first_event_id
     destruction["source_id"] = source_id
@@ -1200,6 +1243,12 @@ def test_replay_v6_rejects_nonfinal_attached_model_event_as_completion() -> None
         game_id=cast(str, destruction["game_id"]),
         source_id=source_id,
         destroyed_unit_instance_id=logical_unit_id,
+    )
+    state_payload = cast(dict[str, JsonValue], lifecycle_payload["state"])
+    synchronize_secondary_destruction_projection_payload(
+        state_payload=cast(GameStatePayload, state_payload),
+        previous_primary_destruction_id=previous_primary_destruction_id,
+        primary_destruction_payload=cast(PrimaryUnitDestructionStatePayload, destruction),
     )
     recorded_event = next(
         cast(dict[str, JsonValue], event)
@@ -1339,6 +1388,7 @@ def test_replay_v6_accepts_reserve_deadline_destruction_without_departure() -> N
     assert len(destructions) == 1
     destruction = cast(dict[str, JsonValue], destructions[0])
     destroyed_unit_id = cast(str, destruction["destroyed_unit_instance_id"])
+    previous_primary_destruction_id = cast(str, destruction["destruction_id"])
     mutation_id = f"{forged_policy_source_id}:round-03:round-boundary"
     source_id = f"{mutation_id}:{destroyed_unit_id}"
     destruction["source_mutation_id"] = mutation_id
@@ -1347,6 +1397,11 @@ def test_replay_v6_accepts_reserve_deadline_destruction_without_departure() -> N
         game_id=cast(str, destruction["game_id"]),
         source_id=source_id,
         destroyed_unit_instance_id=destroyed_unit_id,
+    )
+    synchronize_secondary_destruction_projection_payload(
+        state_payload=cast(GameStatePayload, state_payload),
+        previous_primary_destruction_id=previous_primary_destruction_id,
+        primary_destruction_payload=cast(PrimaryUnitDestructionStatePayload, destruction),
     )
     decisions_payload = cast(dict[str, JsonValue], forged_payload["decisions"])
     recorded_events = tuple(

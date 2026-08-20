@@ -392,6 +392,10 @@ def _validate_scored_tactical_card_bindings(
             raise GameLifecycleError(
                 "Scored tactical secondary card does not identify its ledger transaction."
             )
+        if transaction.amount <= 0:
+            raise GameLifecycleError(
+                "Scored tactical secondary card requires a positive VP transaction."
+            )
         if (
             transaction.player_id != card.player_id
             or transaction.source_kind is not VictoryPointSourceKind.TACTICAL_SECONDARY
@@ -431,7 +435,7 @@ def _expected_state_backed_secondary_award(
     )
 
     policies = mission_scoring_policies_from_setup(state.mission_setup)
-    _card_for_secondary_source(
+    card = _card_for_secondary_source(
         state=state,
         player_id=player_id,
         source_id=source_id,
@@ -442,6 +446,11 @@ def _expected_state_backed_secondary_award(
     evidence = require_bound_secondary_scoring_state_evidence(
         metadata=cast(JsonValue, metadata),
         state=state,
+        player_id=player_id,
+        source_id=source_id,
+        source_kind=source_kind,
+        card=card,
+        record=record,
     )
     context = secondary_scoring_condition_context_from_evidence(
         evidence=evidence,
