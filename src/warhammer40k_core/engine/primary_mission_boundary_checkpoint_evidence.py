@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Self, cast
 
 from warhammer40k_core.core.descriptor_hash import (
@@ -14,6 +14,53 @@ from warhammer40k_core.engine.phase import GameLifecycleError
 
 PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT = "primary_mission_boundary_checkpoint_recorded"
 PRIMARY_MISSION_BOUNDARY_CHECKPOINT_SCHEMA = "primary-mission-boundary-checkpoint-v1"
+
+_SECONDARY_MISSION_CARD_STATE_KEYS = frozenset(
+    {
+        "player_id",
+        "secondary_mission_id",
+        "mode",
+        "battle_round",
+        "status",
+        "source_result_id",
+        "scored_transaction_id",
+        "discarded_result_id",
+        "selection_payload",
+    }
+)
+_MISSION_ACTION_STATE_KEYS = frozenset(
+    {
+        "action_id",
+        "mission_action_id",
+        "player_id",
+        "unit_instance_id",
+        "target_id",
+        "condition_target_id",
+        "mission_id",
+        "battle_round_started",
+        "phase_started",
+        "start_timing",
+        "completion_timing",
+        "eligible_unit_instance_ids",
+        "interruption_conditions",
+        "scoring_source_id",
+        "victory_points",
+        "status",
+        "completed_battle_round",
+        "completed_phase",
+        "interrupted_reason",
+        "score_transaction_id",
+    }
+)
+_STARTING_STRENGTH_RECORD_KEYS = frozenset(
+    {
+        "player_id",
+        "unit_instance_id",
+        "starting_model_count",
+        "single_model_starting_wounds",
+        "source_id",
+    }
+)
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
@@ -249,10 +296,34 @@ class PrimaryMissionBoundaryCheckpoint:
     shot_unit_instance_ids: tuple[str, ...]
     objective_control_modifier_sources: tuple[PrimaryMissionObjectiveControlModifierSource, ...]
     active_primary_marker_jsons: tuple[str, ...]
+    active_secondary_mission_card_jsons: tuple[str, ...]
+    completed_mission_action_state_jsons: tuple[str, ...]
+    primary_unit_destruction_state_jsons: tuple[str, ...]
+    starting_strength_record_jsons: tuple[str, ...]
     active_secondary_mission_ids: tuple[str, ...]
     mission_action_prior_use_jsons: tuple[str, ...]
     checkpoint_id: str
     checkpoint_hash: str
+    _active_secondary_mission_card_jsons_present: bool = field(
+        default=True,
+        compare=False,
+        repr=False,
+    )
+    _completed_mission_action_state_jsons_present: bool = field(
+        default=True,
+        compare=False,
+        repr=False,
+    )
+    _primary_unit_destruction_state_jsons_present: bool = field(
+        default=True,
+        compare=False,
+        repr=False,
+    )
+    _starting_strength_record_jsons_present: bool = field(
+        default=True,
+        compare=False,
+        repr=False,
+    )
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -310,6 +381,62 @@ class PrimaryMissionBoundaryCheckpoint:
         )
         object.__setattr__(
             self,
+            "active_secondary_mission_card_jsons",
+            _active_secondary_mission_card_jsons(self.active_secondary_mission_card_jsons),
+        )
+        object.__setattr__(
+            self,
+            "completed_mission_action_state_jsons",
+            _completed_mission_action_state_jsons(self.completed_mission_action_state_jsons),
+        )
+        object.__setattr__(
+            self,
+            "primary_unit_destruction_state_jsons",
+            _primary_unit_destruction_state_jsons(self.primary_unit_destruction_state_jsons),
+        )
+        object.__setattr__(
+            self,
+            "starting_strength_record_jsons",
+            _starting_strength_record_jsons(self.starting_strength_record_jsons),
+        )
+        if (
+            type(self._active_secondary_mission_card_jsons_present) is not bool
+            or type(self._completed_mission_action_state_jsons_present) is not bool
+            or type(self._primary_unit_destruction_state_jsons_present) is not bool
+            or type(self._starting_strength_record_jsons_present) is not bool
+        ):
+            raise GameLifecycleError(
+                "Primary mission boundary Secondary authority witness presence must be a bool."
+            )
+        if (
+            not self._active_secondary_mission_card_jsons_present
+            and self.active_secondary_mission_card_jsons
+        ):
+            raise GameLifecycleError(
+                "A legacy Primary mission boundary checkpoint cannot carry hidden card evidence."
+            )
+        if (
+            not self._completed_mission_action_state_jsons_present
+            and self.completed_mission_action_state_jsons
+        ):
+            raise GameLifecycleError(
+                "A legacy Primary mission boundary checkpoint cannot carry completed Action "
+                "evidence."
+            )
+        if (
+            not self._primary_unit_destruction_state_jsons_present
+            and self.primary_unit_destruction_state_jsons
+        ):
+            raise GameLifecycleError(
+                "A legacy Primary mission boundary checkpoint cannot carry destruction evidence."
+            )
+        if not self._starting_strength_record_jsons_present and self.starting_strength_record_jsons:
+            raise GameLifecycleError(
+                "A legacy Primary mission boundary checkpoint cannot carry Starting Strength "
+                "evidence."
+            )
+        object.__setattr__(
+            self,
             "checkpoint_hash",
             validate_sha256_hex(
                 self.checkpoint_hash,
@@ -328,6 +455,23 @@ class PrimaryMissionBoundaryCheckpoint:
         if self.checkpoint_id != f"primary-mission-boundary:{expected_hash}":
             raise GameLifecycleError("Primary mission boundary checkpoint identity drifted.")
         _validate_modifier_references(self)
+        if self._active_secondary_mission_card_jsons_present:
+            _validate_active_secondary_mission_card_references(self)
+        if self._primary_unit_destruction_state_jsons_present:
+            _validate_primary_unit_destruction_references(self)
+
+    @property
+    def has_active_secondary_mission_card_witness(self) -> bool:
+        return self._active_secondary_mission_card_jsons_present
+
+    @property
+    def has_secondary_scoring_authority_witnesses(self) -> bool:
+        return (
+            self._active_secondary_mission_card_jsons_present
+            and self._completed_mission_action_state_jsons_present
+            and self._primary_unit_destruction_state_jsons_present
+            and self._starting_strength_record_jsons_present
+        )
 
     @classmethod
     def create(
@@ -350,9 +494,14 @@ class PrimaryMissionBoundaryCheckpoint:
             PrimaryMissionObjectiveControlModifierSource, ...
         ],
         active_primary_marker_jsons: tuple[str, ...],
+        active_secondary_mission_card_jsons: tuple[str, ...],
+        completed_mission_action_state_jsons: tuple[str, ...],
+        primary_unit_destruction_state_jsons: tuple[str, ...],
+        starting_strength_record_jsons: tuple[str, ...],
         active_secondary_mission_ids: tuple[str, ...],
         mission_action_prior_use_jsons: tuple[str, ...],
     ) -> Self:
+        include_secondary_scoring_authority_witnesses = boundary_kind == "objective_control"
         canonical_models = _model_states(model_states)
         canonical_attached = _canonical_json_tuple(
             "attached_unit_formation_jsons", attached_unit_formation_jsons
@@ -371,12 +520,35 @@ class PrimaryMissionBoundaryCheckpoint:
         canonical_markers = _canonical_json_tuple(
             "active_primary_marker_jsons", active_primary_marker_jsons
         )
+        canonical_secondary_cards = _active_secondary_mission_card_jsons(
+            active_secondary_mission_card_jsons
+        )
+        canonical_completed_actions = _completed_mission_action_state_jsons(
+            completed_mission_action_state_jsons
+        )
+        canonical_destructions = _primary_unit_destruction_state_jsons(
+            primary_unit_destruction_state_jsons
+        )
+        canonical_starting_strength = _starting_strength_record_jsons(
+            starting_strength_record_jsons
+        )
         canonical_secondaries = _identifier_tuple(
             "active_secondary_mission_ids", active_secondary_mission_ids
         )
         canonical_prior_uses = _canonical_json_tuple(
             "mission_action_prior_use_jsons", mission_action_prior_use_jsons
         )
+        if not include_secondary_scoring_authority_witnesses and any(
+            (
+                canonical_secondary_cards,
+                canonical_completed_actions,
+                canonical_destructions,
+                canonical_starting_strength,
+            )
+        ):
+            raise GameLifecycleError(
+                "Primary mission boundary cannot omit non-empty Secondary authority witnesses."
+            )
         provisional: dict[str, object] = {
             "schema_version": PRIMARY_MISSION_BOUNDARY_CHECKPOINT_SCHEMA,
             "boundary_kind": boundary_kind,
@@ -397,6 +569,15 @@ class PrimaryMissionBoundaryCheckpoint:
             "active_secondary_mission_ids": list(canonical_secondaries),
             "mission_action_prior_use_jsons": list(canonical_prior_uses),
         }
+        if include_secondary_scoring_authority_witnesses:
+            provisional.update(
+                {
+                    "active_secondary_mission_card_jsons": list(canonical_secondary_cards),
+                    "completed_mission_action_state_jsons": list(canonical_completed_actions),
+                    "primary_unit_destruction_state_jsons": list(canonical_destructions),
+                    "starting_strength_record_jsons": list(canonical_starting_strength),
+                }
+            )
         digest = canonical_payload_sha256(provisional)
         return cls(
             schema_version=PRIMARY_MISSION_BOUNDARY_CHECKPOINT_SCHEMA,
@@ -415,10 +596,24 @@ class PrimaryMissionBoundaryCheckpoint:
             shot_unit_instance_ids=canonical_shot,
             objective_control_modifier_sources=canonical_modifiers,
             active_primary_marker_jsons=canonical_markers,
+            active_secondary_mission_card_jsons=canonical_secondary_cards,
+            completed_mission_action_state_jsons=canonical_completed_actions,
+            primary_unit_destruction_state_jsons=canonical_destructions,
+            starting_strength_record_jsons=canonical_starting_strength,
             active_secondary_mission_ids=canonical_secondaries,
             mission_action_prior_use_jsons=canonical_prior_uses,
             checkpoint_id=f"primary-mission-boundary:{digest}",
             checkpoint_hash=digest,
+            _active_secondary_mission_card_jsons_present=(
+                include_secondary_scoring_authority_witnesses
+            ),
+            _completed_mission_action_state_jsons_present=(
+                include_secondary_scoring_authority_witnesses
+            ),
+            _primary_unit_destruction_state_jsons_present=(
+                include_secondary_scoring_authority_witnesses
+            ),
+            _starting_strength_record_jsons_present=(include_secondary_scoring_authority_witnesses),
         )
 
     def reference(self, *, event_id: str) -> PrimaryMissionBoundaryCheckpointReference:
@@ -429,7 +624,7 @@ class PrimaryMissionBoundaryCheckpoint:
         )
 
     def _content_payload(self) -> dict[str, object]:
-        return {
+        payload: dict[str, object] = {
             "schema_version": self.schema_version,
             "boundary_kind": self.boundary_kind,
             "game_id": self.game_id,
@@ -451,6 +646,21 @@ class PrimaryMissionBoundaryCheckpoint:
             "active_secondary_mission_ids": list(self.active_secondary_mission_ids),
             "mission_action_prior_use_jsons": list(self.mission_action_prior_use_jsons),
         }
+        if self._active_secondary_mission_card_jsons_present:
+            payload["active_secondary_mission_card_jsons"] = list(
+                self.active_secondary_mission_card_jsons
+            )
+        if self._completed_mission_action_state_jsons_present:
+            payload["completed_mission_action_state_jsons"] = list(
+                self.completed_mission_action_state_jsons
+            )
+        if self._primary_unit_destruction_state_jsons_present:
+            payload["primary_unit_destruction_state_jsons"] = list(
+                self.primary_unit_destruction_state_jsons
+            )
+        if self._starting_strength_record_jsons_present:
+            payload["starting_strength_record_jsons"] = list(self.starting_strength_record_jsons)
+        return payload
 
     def to_payload(self) -> dict[str, JsonValue]:
         return cast(
@@ -466,7 +676,7 @@ class PrimaryMissionBoundaryCheckpoint:
 
     @classmethod
     def from_payload(cls, payload: object) -> Self:
-        keys = (
+        required_keys = (
             "schema_version",
             "boundary_kind",
             "game_id",
@@ -488,7 +698,21 @@ class PrimaryMissionBoundaryCheckpoint:
             "checkpoint_id",
             "checkpoint_hash",
         )
-        raw = _object(payload, label="Primary mission boundary checkpoint", keys=keys)
+        raw = _object_with_optional(
+            payload,
+            label="Primary mission boundary checkpoint",
+            required_keys=required_keys,
+            optional_keys=(
+                "active_secondary_mission_card_jsons",
+                "completed_mission_action_state_jsons",
+                "primary_unit_destruction_state_jsons",
+                "starting_strength_record_jsons",
+            ),
+        )
+        has_secondary_card_witness = "active_secondary_mission_card_jsons" in raw
+        has_completed_action_witness = "completed_mission_action_state_jsons" in raw
+        has_primary_destruction_witness = "primary_unit_destruction_state_jsons" in raw
+        has_starting_strength_witness = "starting_strength_record_jsons" in raw
         return cls(
             schema_version=_string(raw, "schema_version"),
             boundary_kind=_string(raw, "boundary_kind"),
@@ -512,10 +736,34 @@ class PrimaryMissionBoundaryCheckpoint:
                 for row in _list(raw, "objective_control_modifier_sources")
             ),
             active_primary_marker_jsons=_string_tuple(raw, "active_primary_marker_jsons"),
+            active_secondary_mission_card_jsons=(
+                _string_tuple(raw, "active_secondary_mission_card_jsons")
+                if has_secondary_card_witness
+                else ()
+            ),
+            completed_mission_action_state_jsons=(
+                _string_tuple(raw, "completed_mission_action_state_jsons")
+                if has_completed_action_witness
+                else ()
+            ),
+            primary_unit_destruction_state_jsons=(
+                _string_tuple(raw, "primary_unit_destruction_state_jsons")
+                if has_primary_destruction_witness
+                else ()
+            ),
+            starting_strength_record_jsons=(
+                _string_tuple(raw, "starting_strength_record_jsons")
+                if has_starting_strength_witness
+                else ()
+            ),
             active_secondary_mission_ids=_string_tuple(raw, "active_secondary_mission_ids"),
             mission_action_prior_use_jsons=_string_tuple(raw, "mission_action_prior_use_jsons"),
             checkpoint_id=_string(raw, "checkpoint_id"),
             checkpoint_hash=_string(raw, "checkpoint_hash"),
+            _active_secondary_mission_card_jsons_present=has_secondary_card_witness,
+            _completed_mission_action_state_jsons_present=has_completed_action_witness,
+            _primary_unit_destruction_state_jsons_present=has_primary_destruction_witness,
+            _starting_strength_record_jsons_present=has_starting_strength_witness,
         )
 
 
@@ -534,6 +782,48 @@ def _validate_modifier_references(checkpoint: PrimaryMissionBoundaryCheckpoint) 
         if resolved.get("final") != source.get("final") and not added:
             raise GameLifecycleError(
                 "Primary mission boundary Objective Control change lacks source identity."
+            )
+
+
+def _validate_active_secondary_mission_card_references(
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+) -> None:
+    from warhammer40k_core.engine.scoring import (
+        SecondaryMissionCardState,
+        SecondaryMissionCardStatePayload,
+    )
+
+    cards = tuple(
+        SecondaryMissionCardState.from_payload(
+            cast(SecondaryMissionCardStatePayload, _json_object(value))
+        )
+        for value in checkpoint.active_secondary_mission_card_jsons
+    )
+    if checkpoint.active_secondary_mission_ids != tuple(
+        sorted(
+            card.secondary_mission_id for card in cards if card.player_id == checkpoint.player_id
+        )
+    ):
+        raise GameLifecycleError(
+            "Primary mission boundary active Secondary card references drifted."
+        )
+
+
+def _validate_primary_unit_destruction_references(
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+) -> None:
+    from warhammer40k_core.engine.scoring import (
+        PrimaryUnitDestructionState,
+        PrimaryUnitDestructionStatePayload,
+    )
+
+    for value in checkpoint.primary_unit_destruction_state_jsons:
+        destruction = PrimaryUnitDestructionState.from_payload(
+            cast(PrimaryUnitDestructionStatePayload, _json_object(value))
+        )
+        if destruction.game_id != checkpoint.game_id:
+            raise GameLifecycleError(
+                "Primary mission boundary destruction witness game identity drifted."
             )
 
 
@@ -567,6 +857,146 @@ def _modifier_sources(
     return ordered
 
 
+def _active_secondary_mission_card_jsons(values: tuple[str, ...]) -> tuple[str, ...]:
+    from warhammer40k_core.engine.scoring import (
+        SecondaryMissionCardMode,
+        SecondaryMissionCardState,
+        SecondaryMissionCardStatePayload,
+        SecondaryMissionCardStatus,
+    )
+
+    canonical = _canonical_json_tuple("active_secondary_mission_card_jsons", values)
+    seen: set[tuple[str, str, SecondaryMissionCardMode, int]] = set()
+    for value in canonical:
+        payload = _json_object(value)
+        if frozenset(payload) != _SECONDARY_MISSION_CARD_STATE_KEYS:
+            raise GameLifecycleError(
+                "Primary mission boundary active Secondary card fields drifted."
+            )
+        card = SecondaryMissionCardState.from_payload(
+            cast(SecondaryMissionCardStatePayload, payload)
+        )
+        if card.status is not SecondaryMissionCardStatus.ACTIVE:
+            raise GameLifecycleError(
+                "Primary mission boundary Secondary card snapshot must be active."
+            )
+        if value != json.dumps(
+            card.to_payload(),
+            ensure_ascii=True,
+            separators=(",", ":"),
+            sort_keys=True,
+        ):
+            raise GameLifecycleError(
+                "Primary mission boundary active Secondary card payload drifted."
+            )
+        identity = (
+            card.player_id,
+            card.secondary_mission_id,
+            card.mode,
+            card.battle_round,
+        )
+        if identity in seen:
+            raise GameLifecycleError(
+                "Primary mission boundary active Secondary card inventory is duplicated."
+            )
+        seen.add(identity)
+    return canonical
+
+
+def _completed_mission_action_state_jsons(values: tuple[str, ...]) -> tuple[str, ...]:
+    from warhammer40k_core.engine.actions import (
+        MissionActionState,
+        MissionActionStatePayload,
+        MissionActionStatus,
+    )
+
+    canonical = _canonical_json_tuple("completed_mission_action_state_jsons", values)
+    seen_action_ids: set[str] = set()
+    for value in canonical:
+        payload = _json_object(value)
+        if frozenset(payload) != _MISSION_ACTION_STATE_KEYS:
+            raise GameLifecycleError(
+                "Primary mission boundary completed Mission Action fields drifted."
+            )
+        action = MissionActionState.from_payload(cast(MissionActionStatePayload, payload))
+        if action.status is not MissionActionStatus.COMPLETED:
+            raise GameLifecycleError(
+                "Primary mission boundary Mission Action witness must be completed."
+            )
+        if value != json.dumps(
+            action.to_payload(),
+            ensure_ascii=True,
+            separators=(",", ":"),
+            sort_keys=True,
+        ):
+            raise GameLifecycleError(
+                "Primary mission boundary completed Mission Action payload drifted."
+            )
+        if action.action_id in seen_action_ids:
+            raise GameLifecycleError(
+                "Primary mission boundary completed Mission Action inventory is duplicated."
+            )
+        seen_action_ids.add(action.action_id)
+    return canonical
+
+
+def _primary_unit_destruction_state_jsons(values: tuple[str, ...]) -> tuple[str, ...]:
+    from warhammer40k_core.engine.scoring import (
+        PrimaryUnitDestructionState,
+        PrimaryUnitDestructionStatePayload,
+    )
+
+    canonical = _canonical_json_tuple("primary_unit_destruction_state_jsons", values)
+    seen_destruction_ids: set[str] = set()
+    for value in canonical:
+        destruction = PrimaryUnitDestructionState.from_payload(
+            cast(PrimaryUnitDestructionStatePayload, _json_object(value))
+        )
+        if value != json.dumps(
+            destruction.to_payload(),
+            ensure_ascii=True,
+            separators=(",", ":"),
+            sort_keys=True,
+        ):
+            raise GameLifecycleError(
+                "Primary mission boundary destruction witness payload drifted."
+            )
+        if destruction.destruction_id in seen_destruction_ids:
+            raise GameLifecycleError(
+                "Primary mission boundary destruction witness inventory is duplicated."
+            )
+        seen_destruction_ids.add(destruction.destruction_id)
+    return canonical
+
+
+def _starting_strength_record_jsons(values: tuple[str, ...]) -> tuple[str, ...]:
+    from warhammer40k_core.engine.unit_state import (
+        StartingStrengthRecord,
+        StartingStrengthRecordPayload,
+    )
+
+    canonical = _canonical_json_tuple("starting_strength_record_jsons", values)
+    seen_unit_ids: set[str] = set()
+    for value in canonical:
+        payload = _json_object(value)
+        if frozenset(payload) != _STARTING_STRENGTH_RECORD_KEYS:
+            raise GameLifecycleError("Primary mission boundary Starting Strength fields drifted.")
+        record = StartingStrengthRecord.from_payload(cast(StartingStrengthRecordPayload, payload))
+        if value != json.dumps(
+            record.to_payload(),
+            ensure_ascii=True,
+            separators=(",", ":"),
+            sort_keys=True,
+        ):
+            raise GameLifecycleError("Primary mission boundary Starting Strength payload drifted.")
+        if record.unit_instance_id in seen_unit_ids:
+            raise GameLifecycleError(
+                "Primary mission boundary Starting Strength inventory is duplicated."
+            )
+        seen_unit_ids.add(record.unit_instance_id)
+    return canonical
+
+
 def _object(
     payload: object,
     *,
@@ -580,6 +1010,26 @@ def _object(
         raise GameLifecycleError(f"{label} must be an object.")
     raw = cast(dict[str, object], raw_object)
     if frozenset(raw) != frozenset(keys):
+        raise GameLifecycleError(f"{label} fields drifted.")
+    return cast(dict[str, JsonValue], validate_json_value(raw))
+
+
+def _object_with_optional(
+    payload: object,
+    *,
+    label: str,
+    required_keys: tuple[str, ...],
+    optional_keys: tuple[str, ...],
+) -> dict[str, JsonValue]:
+    if not isinstance(payload, dict):
+        raise GameLifecycleError(f"{label} must be an object.")
+    raw_object = cast(dict[object, object], payload)
+    if any(type(key) is not str for key in raw_object):
+        raise GameLifecycleError(f"{label} must be an object.")
+    raw = cast(dict[str, object], raw_object)
+    actual_keys = frozenset(raw)
+    required = frozenset(required_keys)
+    if not required <= actual_keys or not actual_keys <= required.union(optional_keys):
         raise GameLifecycleError(f"{label} fields drifted.")
     return cast(dict[str, JsonValue], validate_json_value(raw))
 

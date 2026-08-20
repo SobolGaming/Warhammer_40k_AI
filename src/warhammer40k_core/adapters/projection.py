@@ -15,7 +15,9 @@ from warhammer40k_core.adapters.redaction import (
     HIDDEN_REQUEST_ID,
     battle_formation_declarations_are_unresolved,
     decision_request_hidden_from_context,
+    public_decision_request_payload,
     public_primary_rules_unit_turn_start_snapshots,
+    public_victory_point_ledger_payload,
     redacted_decision_type_for_hidden_viewer,
 )
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -536,7 +538,9 @@ def project_game_view(
         viewer=context,
     )
     pending_decision_view = (
-        None if pending_request is None else _decision_request_view(pending_request, viewer=context)
+        None
+        if pending_request is None
+        else public_decision_request_view(pending_request, viewer=context)
     )
     pending_interaction = (
         None if pending_decision_view is None else pending_decision_view["interaction"]
@@ -606,10 +610,10 @@ def project_game_view(
         ],
         "public_victory_point_ledgers": [
             validate_json_value(
-                ledger.to_public_payload(
-                    viewer_player_id=(
-                        ledger.player_id if context.policy.omniscient else domain_viewer
-                    ),
+                public_victory_point_ledger_payload(
+                    ledger,
+                    viewer=context,
+                    domain_viewer_player_id=domain_viewer,
                     secondary_mission_choices_revealed=secondary_mission_choices_revealed,
                 )
             )
@@ -1139,7 +1143,7 @@ def _insert_unique[T](
     target[key] = value
 
 
-def _decision_request_view(
+def public_decision_request_view(
     request: DecisionRequest,
     *,
     viewer: ViewerContext,
@@ -1158,13 +1162,29 @@ def _decision_request_view(
             "is_parameterized": False,
             "interaction": None,
         }
+    public_request = public_decision_request_payload(request, viewer=viewer)
+    raw_options = public_request.get("options")
+    if not isinstance(raw_options, list):
+        raise GameLifecycleError("Public DecisionRequest options must be a list.")
+    raw_actor_id = public_request["actor_id"]
+    actor_id = (
+        None
+        if raw_actor_id is None
+        else _validate_identifier("public DecisionRequest actor_id", raw_actor_id)
+    )
     return {
         "schema_version": DECISION_REQUEST_VIEW_SCHEMA_VERSION,
-        "request_id": request.request_id,
-        "decision_type": request.decision_type,
-        "actor_id": request.actor_id,
-        "payload": request.payload,
-        "options": [option.to_payload() for option in request.options],
+        "request_id": _validate_identifier(
+            "public DecisionRequest request_id",
+            public_request["request_id"],
+        ),
+        "decision_type": _validate_identifier(
+            "public DecisionRequest decision_type",
+            public_request["decision_type"],
+        ),
+        "actor_id": actor_id,
+        "payload": public_request["payload"],
+        "options": cast(list[DecisionOptionPayload], raw_options),
         "is_parameterized": request.is_parameterized_submission_request(),
         "interaction": interaction_descriptor_for_request(request),
     }

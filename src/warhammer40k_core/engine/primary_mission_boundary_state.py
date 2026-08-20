@@ -41,6 +41,9 @@ from warhammer40k_core.engine.primary_mission_action_lifecycle_evidence import (
 from warhammer40k_core.engine.primary_mission_action_request_authority import (
     validate_recomputed_primary_mission_action_request_authority,
 )
+from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
+    active_secondary_mission_card_states_from_checkpoint,
+)
 from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
     PrimaryMissionBoundaryCheckpoint,
     PrimaryMissionBoundaryModelState,
@@ -92,32 +95,23 @@ def validate_checkpoint_backed_primary_mission_action_start_authority(
     _validate_selected_option_authority(evidence=evidence)
 
 
-def primary_mission_action_boundary_state_from_checkpoint(
+def primary_mission_boundary_state_from_checkpoint(
     *,
     state: GameState,
     checkpoint: PrimaryMissionBoundaryCheckpoint,
 ) -> GameState:
-    """Rebuild the Action-opportunity state from an engine boundary checkpoint."""
+    """Rebuild authoritative boundary state from an engine-owned checkpoint."""
 
     from warhammer40k_core.engine.game_state import GameState
 
     if type(state) is not GameState:
-        raise GameLifecycleError(
-            "Primary Mission Action checkpoint reconstruction requires GameState."
-        )
+        raise GameLifecycleError("Primary mission checkpoint reconstruction requires GameState.")
     if type(checkpoint) is not PrimaryMissionBoundaryCheckpoint:
-        raise GameLifecycleError("Primary Mission Action checkpoint reconstruction is invalid.")
-    if checkpoint.boundary_kind != "action_request" or checkpoint.phase != (
-        BattlePhase.SHOOTING.value
-    ):
-        raise GameLifecycleError(
-            "Primary Mission Action checkpoint reconstruction requires an Action request."
-        )
+        raise GameLifecycleError("Primary mission checkpoint reconstruction is invalid.")
+    phase = _checkpoint_battle_phase(state=state, checkpoint=checkpoint)
     battlefield = state.battlefield_state
     if battlefield is None or battlefield.battlefield_id != checkpoint.battlefield_id:
-        raise GameLifecycleError(
-            "Primary Mission Action checkpoint reconstruction battlefield drifted."
-        )
+        raise GameLifecycleError("Primary mission checkpoint reconstruction battlefield drifted.")
 
     current_model_ids = {
         model.model_instance_id
@@ -127,9 +121,7 @@ def primary_mission_action_boundary_state_from_checkpoint(
     }
     rows_by_model_id = {row.model_instance_id: row for row in checkpoint.model_states}
     if set(rows_by_model_id) != current_model_ids:
-        raise GameLifecycleError(
-            "Primary Mission Action checkpoint reconstruction model inventory drifted."
-        )
+        raise GameLifecycleError("Primary mission checkpoint reconstruction model drifted.")
 
     formations = tuple(
         AttachedUnitFormation.from_payload(cast(AttachedUnitFormationPayload, _json_object(value)))
@@ -149,14 +141,10 @@ def primary_mission_action_boundary_state_from_checkpoint(
             for component_id in formation.component_unit_instance_ids
         }
         if len(owners) != 1 or None in owners:
-            raise GameLifecycleError(
-                "Primary Mission Action checkpoint reconstruction attachment drifted."
-            )
+            raise GameLifecycleError("Primary mission checkpoint attachment drifted.")
         owner = next(iter(owners))
         if owner is None:
-            raise GameLifecycleError(
-                "Primary Mission Action checkpoint reconstruction attachment drifted."
-            )
+            raise GameLifecycleError("Primary mission checkpoint attachment drifted.")
         formations_by_player[owner].append(formation)
 
     rebuilt_armies: list[ArmyDefinition] = []
@@ -233,6 +221,9 @@ def primary_mission_action_boundary_state_from_checkpoint(
             )
         ),
     )
+    # Checkpoint placements and presence are the historical battlefield authority. Current
+    # cargo rows may describe a later embark or disembark and must not suppress those poses.
+    clone.transport_cargo_states = []
     clone.primary_mission_progress_state = replace(
         clone.primary_mission_progress_state,
         markers=tuple(
@@ -243,7 +234,7 @@ def primary_mission_action_boundary_state_from_checkpoint(
     clone.battle_shocked_unit_ids = list(checkpoint.battle_shocked_unit_instance_ids)
     clone.active_player_id = checkpoint.active_player_id
     clone.battle_round = checkpoint.battle_round
-    clone.battle_phase_index = clone.battle_phase_sequence.index(BattlePhase.SHOOTING)
+    clone.battle_phase_index = clone.battle_phase_sequence.index(phase)
     clone.advanced_unit_states = [
         AdvancedUnitState.from_payload(cast(AdvancedUnitStatePayload, _json_object(value)))
         for value in checkpoint.advanced_unit_state_jsons
@@ -252,10 +243,14 @@ def primary_mission_action_boundary_state_from_checkpoint(
         FellBackUnitState.from_payload(cast(FellBackUnitStatePayload, _json_object(value)))
         for value in checkpoint.fell_back_unit_state_jsons
     ]
-    clone.shooting_phase_state = ShootingPhaseState(
-        battle_round=checkpoint.battle_round,
-        active_player_id=checkpoint.active_player_id,
-        shot_unit_ids=checkpoint.shot_unit_instance_ids,
+    clone.shooting_phase_state = (
+        ShootingPhaseState(
+            battle_round=checkpoint.battle_round,
+            active_player_id=checkpoint.active_player_id,
+            shot_unit_ids=checkpoint.shot_unit_instance_ids,
+        )
+        if phase is BattlePhase.SHOOTING
+        else None
     )
     clone.persisting_effects = [
         effect
@@ -263,34 +258,69 @@ def primary_mission_action_boundary_state_from_checkpoint(
         if not _is_generic_objective_control_effect(effect)
     ]
 
-    active_secondary_matches = {
-        secondary_id: tuple(
+    if checkpoint.has_active_secondary_mission_card_witness:
+        secondary_cards = active_secondary_mission_card_states_from_checkpoint(checkpoint)
+        if any(card.player_id not in state.player_ids for card in secondary_cards):
+            raise GameLifecycleError("Primary mission checkpoint Secondary player drifted.")
+        if checkpoint.active_secondary_mission_ids != tuple(
+            sorted(
+                card.secondary_mission_id
+                for card in secondary_cards
+                if card.player_id == checkpoint.player_id
+            )
+        ):
+            raise GameLifecycleError("Primary mission checkpoint Secondary inventory drifted.")
+        clone.secondary_mission_card_states = list(secondary_cards)
+    else:
+        active_secondary_matches = {
+            secondary_id: tuple(
+                card
+                for card in state.secondary_mission_card_states
+                if card.player_id == checkpoint.player_id
+                and card.secondary_mission_id == secondary_id
+                and (
+                    card.mode is SecondaryMissionCardMode.FIXED
+                    or card.battle_round == checkpoint.battle_round
+                )
+            )
+            for secondary_id in checkpoint.active_secondary_mission_ids
+        }
+        if any(len(matches) != 1 for matches in active_secondary_matches.values()):
+            raise GameLifecycleError("Primary mission checkpoint Secondary inventory drifted.")
+        clone.secondary_mission_card_states = [
             card
             for card in state.secondary_mission_card_states
-            if card.player_id == checkpoint.player_id
-            and card.secondary_mission_id == secondary_id
-            and (
-                card.mode is SecondaryMissionCardMode.FIXED
-                or card.battle_round == checkpoint.battle_round
+            if card.player_id != checkpoint.player_id
+        ] + [
+            replace(
+                active_secondary_matches[secondary_id][0],
+                status=SecondaryMissionCardStatus.ACTIVE,
+                scored_transaction_id=None,
+                discarded_result_id=None,
             )
+            for secondary_id in checkpoint.active_secondary_mission_ids
+        ]
+    return clone
+
+
+def primary_mission_action_boundary_state_from_checkpoint(
+    *,
+    state: GameState,
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+) -> GameState:
+    """Rebuild an Action-opportunity state from its boundary checkpoint."""
+
+    if type(checkpoint) is not PrimaryMissionBoundaryCheckpoint or (
+        checkpoint.boundary_kind != "action_request"
+        or checkpoint.phase != BattlePhase.SHOOTING.value
+    ):
+        raise GameLifecycleError(
+            "Primary Mission Action checkpoint reconstruction requires an Action request."
         )
-        for secondary_id in checkpoint.active_secondary_mission_ids
-    }
-    if any(len(matches) != 1 for matches in active_secondary_matches.values()):
-        raise GameLifecycleError("Primary Mission Action checkpoint secondary inventory drifted.")
-    clone.secondary_mission_card_states = [
-        card
-        for card in state.secondary_mission_card_states
-        if card.player_id != checkpoint.player_id
-    ] + [
-        replace(
-            active_secondary_matches[secondary_id][0],
-            status=SecondaryMissionCardStatus.ACTIVE,
-            scored_transaction_id=None,
-            discarded_result_id=None,
-        )
-        for secondary_id in checkpoint.active_secondary_mission_ids
-    ]
+    clone = primary_mission_boundary_state_from_checkpoint(
+        state=state,
+        checkpoint=checkpoint,
+    )
 
     prior_uses = tuple(
         MissionActionPriorUseEvidence.from_payload(_json_object(value))
@@ -319,6 +349,19 @@ def primary_mission_action_boundary_state_from_checkpoint(
         row for row in state.secondary_terrain_plunder_states if row.action_id in prior_action_ids
     ]
     return clone
+
+
+def _checkpoint_battle_phase(
+    *,
+    state: GameState,
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+) -> BattlePhase:
+    matches = tuple(
+        phase for phase in state.battle_phase_sequence if phase.value == checkpoint.phase
+    )
+    if len(matches) != 1:
+        raise GameLifecycleError("Primary mission checkpoint phase is unsupported.")
+    return matches[0]
 
 
 def _validate_selected_option_authority(*, evidence: PrimaryMissionActionStartEvidence) -> None:
@@ -411,5 +454,6 @@ def _json_object(value: str) -> dict[str, object]:
 
 __all__ = (
     "primary_mission_action_boundary_state_from_checkpoint",
+    "primary_mission_boundary_state_from_checkpoint",
     "validate_checkpoint_backed_primary_mission_action_start_authority",
 )

@@ -380,7 +380,7 @@ class SecondaryScoringStateEvidence:
         )
 
 
-def capture_secondary_scoring_state_evidence(
+def build_secondary_scoring_state_evidence(
     *,
     state: GameState,
     card: SecondaryMissionCardState,
@@ -391,7 +391,7 @@ def capture_secondary_scoring_state_evidence(
     metadata = award.metadata
     if not isinstance(metadata, dict):
         raise GameLifecycleError("Secondary scoring evidence requires object award metadata.")
-    evidence = SecondaryScoringStateEvidence.create(
+    return SecondaryScoringStateEvidence.create(
         game_id=state.game_id,
         scoring_player_id=card.player_id,
         active_player_id=record.active_player_id,
@@ -401,7 +401,7 @@ def capture_secondary_scoring_state_evidence(
         card_mode=card.mode,
         card_status=card.status,
         card_battle_round=card.battle_round,
-        selection_payload=card.selection_payload,
+        selection_payload=_selection_payload_at_record_boundary(card=card, record=record),
         occupancy=context.occupancy,
         unit_destruction_states=tuple(
             value
@@ -432,6 +432,37 @@ def capture_secondary_scoring_state_evidence(
             "scoring_rule_source_ids",
         ),
     )
+
+
+def capture_secondary_scoring_state_evidence(
+    *,
+    state: GameState,
+    card: SecondaryMissionCardState,
+    record: ObjectiveControlRecord,
+    context: SecondaryScoringConditionContext,
+    award: VictoryPointAward,
+) -> SecondaryScoringStateEvidence:
+    evidence = build_secondary_scoring_state_evidence(
+        state=state,
+        card=card,
+        record=record,
+        context=context,
+        award=award,
+    )
+    from warhammer40k_core.engine.secondary_scoring_state_evidence_authority import (
+        validate_secondary_scoring_state_evidence_authority,
+    )
+
+    validate_secondary_scoring_state_evidence_authority(evidence, state=state)
+    matches = tuple(
+        stored
+        for stored in state.secondary_scoring_state_evidence_records
+        if stored.evidence_id == evidence.evidence_id
+    )
+    if matches:
+        if len(matches) != 1 or matches[0] != evidence:
+            raise GameLifecycleError("Secondary scoring evidence identity is ambiguous.")
+        return matches[0]
     state.record_secondary_scoring_state_evidence(evidence)
     return evidence
 
@@ -632,6 +663,28 @@ def _string_tuple(value: object, field_name: str) -> tuple[str, ...]:
     return _identifier_tuple(field_name, tuple(cast(list[object], value)))
 
 
+def _selection_payload_at_record_boundary(
+    *,
+    card: SecondaryMissionCardState,
+    record: ObjectiveControlRecord,
+) -> JsonValue | None:
+    from warhammer40k_core.engine.secondary_mission_selection import (
+        secondary_mission_selection_from_json,
+    )
+
+    selection = secondary_mission_selection_from_json(card.selection_payload)
+    if selection is None or record.record_id not in selection.resolved_objective_control_record_ids:
+        return card.selection_payload
+    return replace(
+        selection,
+        resolved_objective_control_record_ids=tuple(
+            record_id
+            for record_id in selection.resolved_objective_control_record_ids
+            if record_id != record.record_id
+        ),
+    ).to_json_value()
+
+
 def _identifier_tuple(field_name: str, values: object) -> tuple[str, ...]:
     if type(values) is not tuple:
         raise GameLifecycleError(f"{field_name} must be a tuple.")
@@ -659,6 +712,7 @@ __all__ = (
     "SecondaryScoringStateEvidence",
     "SecondaryScoringStateEvidencePayload",
     "bind_secondary_scoring_state_evidence",
+    "build_secondary_scoring_state_evidence",
     "capture_secondary_scoring_state_evidence",
     "require_bound_secondary_scoring_state_evidence",
     "secondary_scoring_condition_context_from_evidence",

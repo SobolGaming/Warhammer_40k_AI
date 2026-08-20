@@ -160,6 +160,18 @@
           "uniqueItems": true
         },
         "active_primary_marker_jsons": {"$ref": "#/$defs/canonical_json_object_strings"},
+        "active_secondary_mission_card_jsons": {
+          "$ref": "#/$defs/canonical_json_object_strings"
+        },
+        "completed_mission_action_state_jsons": {
+          "$ref": "#/$defs/canonical_json_object_strings"
+        },
+        "primary_unit_destruction_state_jsons": {
+          "$ref": "#/$defs/canonical_json_object_strings"
+        },
+        "starting_strength_record_jsons": {
+          "$ref": "#/$defs/canonical_json_object_strings"
+        },
         "active_secondary_mission_ids": {"$ref": "#/$defs/identifier_array"},
         "mission_action_prior_use_jsons": {"$ref": "#/$defs/canonical_json_object_strings"},
         "checkpoint_id": {

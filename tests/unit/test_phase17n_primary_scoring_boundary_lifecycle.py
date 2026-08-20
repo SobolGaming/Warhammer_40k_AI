@@ -59,6 +59,7 @@ from warhammer40k_core.engine.event_log import (
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState, SecondaryMissionMode
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+from warhammer40k_core.engine.mission_decisions import request_mission_action_start
 from warhammer40k_core.engine.mission_scoring_transaction import (
     _card_for_state_backed_scoring,  # pyright: ignore[reportPrivateUsage]
     _emit_objective_control_boundary_event_if_missing,  # pyright: ignore[reportPrivateUsage]
@@ -87,6 +88,7 @@ from warhammer40k_core.engine.primary_historical_events import (
     record_primary_battlefield_departure_event,
 )
 from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
+    PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT,
     PrimaryMissionBoundaryCheckpoint,
     PrimaryMissionBoundaryModelState,
     PrimaryMissionObjectiveControlModifierSource,
@@ -352,6 +354,64 @@ def test_restore_rejects_pending_boundary_without_queue_authority() -> None:
         match=escape("Pending Primary scoring boundary has no corresponding queue authority."),
     ):
         GameLifecycle.from_payload(payload)
+
+
+def test_tactical_action_request_checkpoint_omits_secondary_scoring_authority_witnesses() -> None:
+    lifecycle = _battlefield_dominance_lifecycle(
+        phase=BattlePhase.SHOOTING,
+        battle_round=2,
+        player_a_secondary=SecondaryMissionMode.TACTICAL,
+    )
+    state = lifecycle.state
+    assert state is not None
+    state.record_secondary_mission_card_state(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="cleanse",
+            battle_round=2,
+            source_result_id="phase17n-non-oc-secondary-action",
+        )
+    )
+    _place_player_on_role(state, player_id="player-a", role=ObjectiveMarkerRole.CENTRAL)
+
+    waiting = request_mission_action_start(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        player_id="player-a",
+        mission_action_id="cleanse-objective",
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+
+    request = waiting.decision_request
+    assert request is not None
+    checkpoint_events = tuple(
+        event
+        for event in lifecycle.decision_controller.event_log.records
+        if event.event_type == PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT
+    )
+    assert len(checkpoint_events) == 1
+    checkpoint_payload = checkpoint_events[0].payload
+    assert isinstance(checkpoint_payload, dict)
+    assert checkpoint_payload["boundary_kind"] == "action_request"
+    assert {
+        "active_secondary_mission_card_jsons",
+        "completed_mission_action_state_jsons",
+        "primary_unit_destruction_state_jsons",
+        "starting_strength_record_jsons",
+    }.isdisjoint(checkpoint_payload)
+
+    lifecycle.submit_decision(
+        DecisionResult.for_request(
+            result_id="phase17n-non-oc-secondary-action-start",
+            request=request,
+            selected_option_id=request.options[0].option_id,
+        )
+    )
+    action_id = "mission-action:phase17n-non-oc-secondary-action-start"
+    assert state.mission_action_state_by_id(action_id).status.value == "started"
+    restored = GameLifecycle.from_payload(lifecycle.to_payload())
+    assert restored.state is not None
+    assert restored.state.mission_action_state_by_id(action_id).status.value == "started"
 
 
 def test_unmet_secondary_leaves_lifecycle_payload_unchanged_when_primary_would_score() -> None:
@@ -747,6 +807,10 @@ def test_coordinated_rewrite_of_post_oc_mutation_and_scoring_checkpoint_fails() 
         shot_unit_instance_ids=checkpoint.shot_unit_instance_ids,
         objective_control_modifier_sources=checkpoint.objective_control_modifier_sources,
         active_primary_marker_jsons=checkpoint.active_primary_marker_jsons,
+        active_secondary_mission_card_jsons=checkpoint.active_secondary_mission_card_jsons,
+        completed_mission_action_state_jsons=checkpoint.completed_mission_action_state_jsons,
+        primary_unit_destruction_state_jsons=checkpoint.primary_unit_destruction_state_jsons,
+        starting_strength_record_jsons=checkpoint.starting_strength_record_jsons,
         active_secondary_mission_ids=checkpoint.active_secondary_mission_ids,
         mission_action_prior_use_jsons=checkpoint.mission_action_prior_use_jsons,
     )
@@ -1076,6 +1140,10 @@ def test_forged_commit_checkpoint_modifier_source_fails_registry_restore() -> No
             ),
         ),
         active_primary_marker_jsons=checkpoint.active_primary_marker_jsons,
+        active_secondary_mission_card_jsons=checkpoint.active_secondary_mission_card_jsons,
+        completed_mission_action_state_jsons=checkpoint.completed_mission_action_state_jsons,
+        primary_unit_destruction_state_jsons=checkpoint.primary_unit_destruction_state_jsons,
+        starting_strength_record_jsons=checkpoint.starting_strength_record_jsons,
         active_secondary_mission_ids=checkpoint.active_secondary_mission_ids,
         mission_action_prior_use_jsons=checkpoint.mission_action_prior_use_jsons,
     )
@@ -5656,6 +5724,10 @@ def _checkpoint_with_model_states(
         shot_unit_instance_ids=checkpoint.shot_unit_instance_ids,
         objective_control_modifier_sources=checkpoint.objective_control_modifier_sources,
         active_primary_marker_jsons=checkpoint.active_primary_marker_jsons,
+        active_secondary_mission_card_jsons=checkpoint.active_secondary_mission_card_jsons,
+        completed_mission_action_state_jsons=checkpoint.completed_mission_action_state_jsons,
+        primary_unit_destruction_state_jsons=checkpoint.primary_unit_destruction_state_jsons,
+        starting_strength_record_jsons=checkpoint.starting_strength_record_jsons,
         active_secondary_mission_ids=checkpoint.active_secondary_mission_ids,
         mission_action_prior_use_jsons=checkpoint.mission_action_prior_use_jsons,
     )

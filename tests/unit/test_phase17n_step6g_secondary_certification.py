@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from copy import deepcopy
 from dataclasses import replace
 from typing import cast
@@ -336,6 +337,11 @@ def test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views(
         public_payload = state.to_public_payload(viewer_player_id=viewer_player_id)
         assert public_payload["primary_scoring_state_evidence_records"] == []
         assert public_payload["secondary_scoring_state_evidence_records"] == []
+        _assert_public_primary_commitments_are_opaque(
+            public_payload["victory_point_ledgers"],
+            state,
+        )
+        _assert_private_scoring_authority_commitments_are_absent(public_payload, state=state)
         _assert_opponent_selection_payloads_are_redacted(
             public_payload["secondary_mission_card_states"],
             viewer_player_id=viewer_player_id,
@@ -344,6 +350,7 @@ def test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views(
         assert "primary_scoring_state_evidence_records" not in view
         assert view["viewer_player_id"] == viewer_player_id
         _assert_public_primary_commitments_are_opaque(view["public_victory_point_ledgers"], state)
+        _assert_private_scoring_authority_commitments_are_absent(view, state=state)
 
     player_a_events = session.events_since(EventStreamCursor(0), viewer_player_id="player-a")
     player_b_events = session.events_since(EventStreamCursor(0), viewer_player_id="player-b")
@@ -351,6 +358,8 @@ def test_phase17n_step6g_secondary_scores_through_lifecycle_restore_and_views(
     assert player_b_events["viewer_player_id"] == "player-b"
     assert player_a_events["events"]
     assert player_b_events["events"]
+    _assert_private_scoring_authority_commitments_are_absent(player_a_events, state=state)
+    _assert_private_scoring_authority_commitments_are_absent(player_b_events, state=state)
 
 
 @pytest.mark.parametrize(
@@ -903,6 +912,42 @@ def _assert_public_primary_commitments_are_opaque(
             assert "primary_mission_action_states" not in metadata
 
 
+def _assert_private_scoring_authority_commitments_are_absent(
+    payload: object,
+    *,
+    state: GameState,
+) -> None:
+    private_values = {
+        value
+        for authority in state.objective_control_record_authorities
+        for value in (
+            authority.boundary_checkpoint.checkpoint_id,
+            authority.boundary_checkpoint.checkpoint_hash,
+        )
+    }
+    private_values.update(
+        value
+        for evidence in state.secondary_scoring_state_evidence_records
+        for value in (evidence.evidence_id, evidence.evidence_hash)
+    )
+    for ledger in state.victory_point_ledgers:
+        for transaction in ledger.transactions:
+            metadata = transaction.metadata
+            if not isinstance(metadata, dict):
+                continue
+            for key in (
+                "scoring_commit_checkpoint_id",
+                "scoring_commit_checkpoint_hash",
+                "secondary_scoring_state_evidence_id",
+                "secondary_scoring_state_evidence_hash",
+            ):
+                value = metadata.get(key)
+                if type(value) is str:
+                    private_values.add(value)
+    serialized = json.dumps(payload, sort_keys=True)
+    assert all(value not in serialized for value in private_values)
+
+
 def _assert_opponent_selection_payloads_are_redacted(
     public_cards: object,
     *,
@@ -1201,6 +1246,98 @@ def test_tactical_score_rejects_stale_result_after_other_cards_exhaust_turn_cap(
         lifecycle_state.tactical_secondary_achievement_context(target_achievement.achievement_id)
         == achievement_before
     )
+
+
+def test_delayed_tactical_score_reuses_boundary_evidence_after_selection_resolution() -> None:
+    state = _turn_cap_state()
+    decisions = _decisions_for_seeded_secondary_state(state)
+    record = state.prepare_current_turn_end_boundary(
+        completed_phase=BattlePhase.FIGHT,
+        runtime_modifier_registry=None,
+    )
+    decisions.event_log.append(
+        "end_boundary_objective_control_determined",
+        {
+            "game_id": record.game_id,
+            "battle_round": record.battle_round,
+            "phase": record.phase,
+            "record_ids": [record.record_id],
+            "source_rule_id": (
+                "gw-11e-rules-and-event-updates-2026-07-22:app-core-rules:14.02.01-control-first"
+            ),
+        },
+    )
+
+    score_turn_end_mission_scoring_boundary(
+        state=state,
+        record=record,
+        end_of_battle=False,
+        event_log=decisions.event_log,
+    )
+
+    target_secondary_id = TURN_CAP_TACTICAL_IDS[-1]
+    achievement = next(
+        context
+        for context in state.tactical_secondary_achievement_contexts
+        if context.player_id == "player-a" and context.secondary_mission_id == target_secondary_id
+    )
+    active_card = state.secondary_mission_card_state(
+        player_id="player-a",
+        secondary_mission_id=target_secondary_id,
+        mode=SecondaryMissionCardMode.TACTICAL,
+    )
+    assert active_card is not None
+    resolved_selection = secondary_mission_selection_for_card(active_card)
+    assert resolved_selection is not None
+    assert record.record_id in resolved_selection.resolved_objective_control_record_ids
+    evidence_before = tuple(
+        evidence
+        for evidence in state.secondary_scoring_state_evidence_records
+        if evidence.scoring_player_id == "player-a"
+        and evidence.secondary_mission_id == target_secondary_id
+        and evidence.objective_control_record_id == record.record_id
+    )
+    assert len(evidence_before) == 1
+    assert evidence_before[0].selection_payload != active_card.selection_payload
+
+    waiting = request_tactical_secondary_score(
+        state=state,
+        decisions=decisions,
+        achievement_context=achievement,
+    )
+    request = waiting.decision_request
+    assert request is not None
+    session = LocalGameSession(
+        lifecycle=_configured_step6g_lifecycle(state=state, decisions=decisions)
+    )
+
+    status = session.submit_option(
+        request_id=request.request_id,
+        option_id=f"score:{target_secondary_id}",
+        result_id="phase17n-delayed-tactical-score-reuses-boundary-evidence",
+    )
+
+    assert status.status_kind is not LifecycleStatusKind.INVALID
+    scored_state = session.lifecycle.state
+    assert scored_state is not None
+    evidence_after = tuple(
+        evidence
+        for evidence in scored_state.secondary_scoring_state_evidence_records
+        if evidence.scoring_player_id == "player-a"
+        and evidence.secondary_mission_id == target_secondary_id
+        and evidence.objective_control_record_id == record.record_id
+    )
+    assert evidence_after == evidence_before
+    transactions = _secondary_transactions(
+        scored_state,
+        player_id="player-a",
+        source_id=target_secondary_id,
+    )
+    assert len(transactions) == 1
+    metadata = transactions[0].metadata
+    assert isinstance(metadata, dict)
+    assert metadata["secondary_scoring_state_evidence_id"] == evidence_before[0].evidence_id
+    assert metadata["secondary_scoring_state_evidence_hash"] == evidence_before[0].evidence_hash
 
 
 def test_positive_partial_tactical_award_scores_and_discards_the_card() -> None:

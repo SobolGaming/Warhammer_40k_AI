@@ -1,6 +1,6 @@
 # CORE V2 external contract
 
-Contract version: `10.0.0`
+Contract version: `10.1.0`
 
 This directory is the canonical, language-neutral Phase 17O capability and
 Phase 18D contract, Phase 18E session protocol, Phase 18F
@@ -119,6 +119,17 @@ also binds `mission_pack_id` to the authoritative mission source package hash;
 both fields are non-null when a mission is bound and both are null otherwise.
 Loading rejects a partial pair or any hash drift from the reconstructed
 lifecycle.
+
+Contract 10.1 adds the optional `active_secondary_mission_card_jsons`,
+`completed_mission_action_state_jsons`, `primary_unit_destruction_state_jsons`,
+and `starting_strength_record_jsons` members to the closed Primary boundary
+checkpoint. New Objective Control checkpoints always emit the complete
+active-card, completed Mission Action, Primary destruction, and Starting
+Strength snapshots so restored Secondary scoring can authenticate selection,
+Cleanse/Plunder, destruction, and static unit-strength facts. Contract 10.0
+checkpoints without these members retain their original hash and remain valid
+for their existing Primary authority use, but they cannot authorize new restored
+Secondary scoring evidence.
 
 The scoring-state registry is inverse-complete: every Objective Control
 boundary with at least one applicable assigned-Primary rule has exactly one row

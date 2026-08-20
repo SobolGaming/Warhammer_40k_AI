@@ -1587,6 +1587,14 @@ class GameState:
             self.secondary_mission_card_states,
             player_ids=self.player_ids,
         )
+        from warhammer40k_core.engine.secondary_scoring_state_evidence_authority import (
+            validate_secondary_scoring_state_evidence_records_authority,
+        )
+
+        validate_secondary_scoring_state_evidence_records_authority(
+            self.secondary_scoring_state_evidence_records,
+            state=self,
+        )
         _vp_awards.validate_secondary_transaction_semantics(state=self)
         self.tactical_secondary_achievement_contexts = (
             _validate_tactical_secondary_achievement_contexts(
@@ -6261,6 +6269,14 @@ def _starting_strength_records_for_army(
             )
         )
     return tuple(sorted(records, key=lambda record: record.unit_instance_id))
+
+
+def starting_strength_records_for_army(
+    army_definition: ArmyDefinition,
+) -> tuple[StartingStrengthRecord, ...]:
+    """Build the canonical static Starting Strength inventory for one army."""
+
+    return _starting_strength_records_for_army(army_definition)
 
 
 def _starting_strength_record_for_attached_unit(

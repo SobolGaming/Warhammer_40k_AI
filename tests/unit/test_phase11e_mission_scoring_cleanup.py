@@ -4479,16 +4479,7 @@ def test_fixed_secondary_scoring_is_public_after_secondary_reveal() -> None:
         "source_id": "bring-it-down",
         "scoring_timing": "secondary_mission_score",
         "hidden": False,
-        "metadata": {
-            "secondary_scoring_provider_kind": "legacy_phase11f",
-            "secondary_mission_id": "bring-it-down",
-            "scoring_rule_id": "bring-it-down-fixed",
-            "scoring_rule_condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
-            "scoring_rule_source_id": (
-                "gw-11e-chapter-approved-2026-27:secondary:bring-it-down:"
-                "scoring-rule:bring-it-down-fixed"
-            ),
-        },
+        "metadata": None,
     }
     assert any(
         card_payload["player_id"] == "player-a"
@@ -6090,17 +6081,7 @@ def test_tactical_secondary_draw_score_discard_flow_is_public_after_reveal() -> 
     )
     assert transaction["source_kind"] == "tactical_secondary"
     assert transaction["source_id"] == active_cards[0].secondary_mission_id
-    assert transaction["metadata"] == {
-        "secondary_scoring_provider_kind": "legacy_phase11f",
-        "secondary_mission_id": active_cards[0].secondary_mission_id,
-        "scoring_rule_id": f"{active_cards[0].secondary_mission_id}-tactical",
-        "scoring_rule_condition": "each_enemy_model_w10_or_more_destroyed_this_turn",
-        "scoring_rule_source_id": (
-            f"gw-11e-chapter-approved-2026-27:secondary:"
-            f"{active_cards[0].secondary_mission_id}:scoring-rule:"
-            f"{active_cards[0].secondary_mission_id}-tactical"
-        ),
-    }
+    assert transaction["metadata"] is None
     round_tripped = GameLifecycle.from_payload(discard_lifecycle.to_payload())
     encoded = json.dumps(round_tripped.to_payload(), sort_keys=True)
     assert "<" not in encoded

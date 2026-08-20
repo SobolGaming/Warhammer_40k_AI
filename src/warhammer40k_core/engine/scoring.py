@@ -439,6 +439,7 @@ class VictoryPointTransaction:
         payload = cast(dict[str, JsonValue], self.to_payload())
         if self.hidden and viewer != self.player_id:
             payload["hidden"] = False
+        payload["metadata"] = None
         return payload
 
     @classmethod

@@ -190,6 +190,7 @@
     "tests/unit/test_rule_text_normalization.py": 5.559,
     "tests/unit/test_ruleset_descriptor.py": 0.033,
     "tests/unit/test_runtime_hook_bindings.py": 0.004,
+    "tests/unit/test_secondary_scoring_state_evidence_authority.py": 109.296,
     "tests/unit/test_skull_altar_runtime_regressions.py": 0.138,
     "tests/unit/test_terrain_areas.py": 0.027,
     "tests/unit/test_terrain_display.py": 0.004,
@@ -206,26 +207,26 @@
   "shard_count": 4,
   "shards": [
     {
-      "duration_seconds": 4054.503,
+      "duration_seconds": 4081.826,
       "shard_id": 1,
       "test_file_count": 50
     },
     {
-      "duration_seconds": 4054.503,
+      "duration_seconds": 4081.827,
       "shard_id": 2,
-      "test_file_count": 50
+      "test_file_count": 51
     },
     {
-      "duration_seconds": 4054.502,
+      "duration_seconds": 4081.827,
       "shard_id": 3,
       "test_file_count": 51
     },
     {
-      "duration_seconds": 4054.502,
+      "duration_seconds": 4081.826,
       "shard_id": 4,
       "test_file_count": 51
     }
   ],
   "strategy": "largest-processing-time-by-historical-file-duration",
-  "total_test_duration_seconds": 16218.01
+  "total_test_duration_seconds": 16327.306
 }

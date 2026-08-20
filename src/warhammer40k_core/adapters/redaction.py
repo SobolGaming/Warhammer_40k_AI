@@ -7,9 +7,17 @@ from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.capability_manifest import project_capability_manifest
 from warhammer40k_core.adapters.external_contract import ERROR_ENVELOPE_SCHEMA_VERSION
 from warhammer40k_core.adapters.support_profile import SupportProfilePayload
+from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
 from warhammer40k_core.engine.decision_request import DecisionRequest
-from warhammer40k_core.engine.event_log import EventRecordPayload, JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import (
+    EventRecordPayload,
+    JsonValue,
+    validate_json_value,
+)
 from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.mission_decisions import (
+    TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
+)
 from warhammer40k_core.engine.phase import (
     GameLifecycleError,
     GameLifecycleStage,
@@ -25,15 +33,35 @@ from warhammer40k_core.engine.primary_mission_action_decline_integrity import (
 )
 from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence import (
     PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT,
+    PrimaryMissionBoundaryCheckpoint,
+)
+from warhammer40k_core.engine.primary_scoring_commit_checkpoint import (
+    PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT,
 )
 from warhammer40k_core.engine.primary_turn_start_evidence import (
     PrimaryRulesUnitTurnStartSnapshot,
     PrimaryRulesUnitTurnStartSnapshotPayload,
 )
+from warhammer40k_core.engine.scoring import (
+    SecondaryMissionCardState,
+    SecondaryMissionCardStatePayload,
+    VictoryPointLedger,
+    VictoryPointTransaction,
+    VictoryPointTransactionPayload,
+)
 
 HIDDEN_DECISION_TYPE = "hidden_decision"
 HIDDEN_REQUEST_ID = "hidden-request"
 HIDDEN_RESULT_ID = "hidden-result"
+_TACTICAL_SECONDARY_SCORE_DECLINED_EVENT_TYPE = "tactical_secondary_mission_score_declined"
+_INTERNAL_SECONDARY_AUTHORITY_COMMITMENT_KEYS = frozenset(
+    {
+        "scoring_commit_checkpoint_id",
+        "scoring_commit_checkpoint_hash",
+        "secondary_scoring_state_evidence_id",
+        "secondary_scoring_state_evidence_hash",
+    }
+)
 
 
 class RedactedLifecycleStatusPayload(TypedDict):
@@ -66,6 +94,60 @@ def public_primary_rules_unit_turn_start_snapshots(
     if any(type(snapshot) is not PrimaryRulesUnitTurnStartSnapshot for snapshot in snapshots):
         raise GameLifecycleError("Turn-start snapshot redaction requires typed snapshots.")
     return [snapshot.to_payload() for snapshot in snapshots]
+
+
+def public_victory_point_transaction_payload(
+    transaction: VictoryPointTransaction,
+    *,
+    viewer: ViewerContext,
+    domain_viewer_player_id: str,
+    secondary_mission_choices_revealed: bool,
+) -> dict[str, JsonValue]:
+    """Project one transaction without exposing internal authority commitments."""
+
+    if type(transaction) is not VictoryPointTransaction:
+        raise GameLifecycleError("Victory-point redaction requires a typed transaction.")
+    if type(viewer) is not ViewerContext:
+        raise GameLifecycleError("Victory-point redaction requires a ViewerContext.")
+    if viewer.policy.omniscient:
+        return cast(dict[str, JsonValue], transaction.to_payload())
+    payload = transaction.to_public_payload(
+        viewer_player_id=domain_viewer_player_id,
+        secondary_mission_choices_revealed=secondary_mission_choices_revealed,
+    )
+    if "source_kind" in payload:
+        payload["metadata"] = _without_internal_secondary_authority_commitments(
+            transaction.metadata
+        )
+    return cast(dict[str, JsonValue], validate_json_value(payload))
+
+
+def public_victory_point_ledger_payload(
+    ledger: VictoryPointLedger,
+    *,
+    viewer: ViewerContext,
+    domain_viewer_player_id: str,
+    secondary_mission_choices_revealed: bool,
+) -> dict[str, JsonValue]:
+    """Project one ledger through the shared transaction redaction path."""
+
+    if type(ledger) is not VictoryPointLedger:
+        raise GameLifecycleError("Victory-point redaction requires a typed ledger.")
+    if type(viewer) is not ViewerContext:
+        raise GameLifecycleError("Victory-point redaction requires a ViewerContext.")
+    return {
+        "player_id": ledger.player_id,
+        "victory_points": ledger.victory_points,
+        "transactions": [
+            public_victory_point_transaction_payload(
+                transaction,
+                viewer=viewer,
+                domain_viewer_player_id=domain_viewer_player_id,
+                secondary_mission_choices_revealed=secondary_mission_choices_revealed,
+            )
+            for transaction in ledger.transactions
+        ],
+    }
 
 
 def public_error_envelope(*, code: str, message: str) -> dict[str, JsonValue]:
@@ -163,6 +245,10 @@ def decision_request_hidden_from_context(
 ) -> bool:
     if type(request) is not DecisionRequest:
         raise GameLifecycleError("DecisionRequest redaction requires a DecisionRequest.")
+    if type(viewer) is not ViewerContext:
+        raise GameLifecycleError("DecisionRequest redaction requires a ViewerContext.")
+    if request.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
+        return not (viewer.policy.omniscient or viewer.owns_player(request.actor_id))
     return secret_payload_hidden_from_context(
         actor_id=request.actor_id,
         payload=request.payload,
@@ -175,7 +261,12 @@ def decision_request_payload_hidden_from_context(
     request_payload: Mapping[str, JsonValue],
     viewer: ViewerContext,
 ) -> bool:
+    if type(viewer) is not ViewerContext:
+        raise GameLifecycleError("DecisionRequest redaction requires a ViewerContext.")
     actor_id = _optional_string(request_payload, key="actor_id")
+    decision_type = _required_string(request_payload, key="decision_type")
+    if decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
+        return not (viewer.policy.omniscient or viewer.owns_player(actor_id))
     return secret_payload_hidden_from_context(
         actor_id=actor_id,
         payload=request_payload["payload"],
@@ -227,6 +318,24 @@ def decision_request_payload_hidden_from_viewer(
 
 def redacted_decision_type_for_hidden_viewer() -> str:
     return HIDDEN_DECISION_TYPE
+
+
+def public_decision_request_payload(
+    request: DecisionRequest,
+    *,
+    viewer: ViewerContext,
+) -> dict[str, JsonValue]:
+    """Project one request through the shared viewer-safe event/pending path."""
+
+    if type(request) is not DecisionRequest:
+        raise GameLifecycleError("DecisionRequest redaction requires a DecisionRequest.")
+    payload = _public_decision_request_payload(
+        validate_json_value(request.to_payload()),
+        viewer=viewer,
+    )
+    if not isinstance(payload, dict):
+        raise GameLifecycleError("Public DecisionRequest payload must be an object.")
+    return payload
 
 
 def redacted_lifecycle_status(
@@ -345,6 +454,16 @@ def _event_record_hidden_from_context(
             viewer.policy.omniscient
             or viewer.owns_player(_required_string(event_payload, key="player_id"))
         )
+    if event_type == PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT:
+        event_payload = _json_object(f"{event_type} payload", payload)
+        checkpoint = PrimaryMissionBoundaryCheckpoint.from_payload(event_payload["checkpoint"])
+        return not (viewer.policy.omniscient or viewer.owns_player(checkpoint.player_id))
+    if event_type == _TACTICAL_SECONDARY_SCORE_DECLINED_EVENT_TYPE:
+        event_payload = _json_object(f"{event_type} payload", payload)
+        return not (
+            viewer.policy.omniscient
+            or viewer.owns_player(_required_string(event_payload, key="player_id"))
+        )
     if event_type in {
         "tactical_secondary_missions_drawn",
         "tactical_secondary_mission_discarded",
@@ -395,6 +514,10 @@ def _public_event_payload(
     payload: JsonValue,
     viewer: ViewerContext,
 ) -> JsonValue:
+    if event_type == PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT:
+        return _public_primary_mission_boundary_checkpoint_payload(payload, viewer=viewer)
+    if event_type == PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT:
+        return _public_primary_scoring_commit_checkpoint_payload(payload, viewer=viewer)
     if event_type == "decision_requested":
         return _public_decision_request_payload(payload, viewer=viewer)
     if event_type == "decision_recorded":
@@ -419,9 +542,149 @@ def _public_event_payload(
             payload,
             viewer=viewer,
         )
+    if event_type == "tactical_secondary_mission_scored":
+        return _public_tactical_secondary_mission_scored_payload(payload, viewer=viewer)
+    if event_type == _TACTICAL_SECONDARY_SCORE_DECLINED_EVENT_TYPE:
+        return _public_tactical_secondary_mission_score_declined_payload(
+            payload,
+            viewer=viewer,
+        )
     if event_type == "model_destroyed":
         return _public_model_destroyed_payload(payload)
     return validate_json_value(payload)
+
+
+def _public_primary_mission_boundary_checkpoint_payload(
+    payload: JsonValue,
+    *,
+    viewer: ViewerContext,
+) -> JsonValue:
+    checkpoint = PrimaryMissionBoundaryCheckpoint.from_payload(payload)
+    return _viewer_safe_primary_mission_boundary_checkpoint_payload(
+        checkpoint,
+        viewer=viewer,
+    )
+
+
+def _viewer_safe_primary_mission_boundary_checkpoint_payload(
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+    *,
+    viewer: ViewerContext,
+) -> JsonValue:
+    if type(checkpoint) is not PrimaryMissionBoundaryCheckpoint:
+        raise GameLifecycleError("Checkpoint redaction requires a typed checkpoint.")
+    if viewer.policy.omniscient:
+        return checkpoint.to_payload()
+    if not viewer.owns_player(checkpoint.player_id):
+        raise GameLifecycleError(
+            "Primary mission boundary checkpoint viewer does not own the checkpoint."
+        )
+    public_payload = checkpoint.to_payload()
+    public_payload.pop("active_secondary_mission_card_jsons", None)
+    public_payload.pop("completed_mission_action_state_jsons", None)
+    public_payload.pop("primary_unit_destruction_state_jsons", None)
+    public_payload.pop("starting_strength_record_jsons", None)
+    public_payload.pop("checkpoint_id")
+    public_payload.pop("checkpoint_hash")
+    digest = canonical_payload_sha256(public_payload)
+    public_payload["checkpoint_id"] = f"primary-mission-boundary:{digest}"
+    public_payload["checkpoint_hash"] = digest
+    return validate_json_value(public_payload)
+
+
+def _public_primary_scoring_commit_checkpoint_payload(
+    payload: JsonValue,
+    *,
+    viewer: ViewerContext,
+) -> JsonValue:
+    event_payload = _json_object("primary scoring-commit checkpoint payload", payload)
+    checkpoint = PrimaryMissionBoundaryCheckpoint.from_payload(event_payload["checkpoint"])
+    public_payload = dict(event_payload)
+    public_payload["checkpoint"] = _viewer_safe_primary_mission_boundary_checkpoint_payload(
+        checkpoint,
+        viewer=viewer,
+    )
+    return validate_json_value(public_payload)
+
+
+def _public_tactical_secondary_mission_scored_payload(
+    payload: JsonValue,
+    *,
+    viewer: ViewerContext,
+) -> JsonValue:
+    event_payload = _json_object("tactical secondary scored payload", payload)
+    player_id = _required_string(event_payload, key="player_id")
+    transaction = VictoryPointTransaction.from_payload(
+        cast(VictoryPointTransactionPayload, event_payload["victory_point_transaction"])
+    )
+    card = SecondaryMissionCardState.from_payload(
+        cast(SecondaryMissionCardStatePayload, event_payload["secondary_mission_card_state"])
+    )
+    if transaction.player_id != player_id or card.player_id != player_id:
+        raise GameLifecycleError("Tactical secondary scored event player drifted.")
+    if viewer.policy.omniscient:
+        return validate_json_value(event_payload)
+    domain_viewer_player_id = viewer.viewer_player_id or "redacted-viewer"
+    public_payload = dict(event_payload)
+    public_payload["victory_point_transaction"] = public_victory_point_transaction_payload(
+        transaction,
+        viewer=viewer,
+        domain_viewer_player_id=domain_viewer_player_id,
+        secondary_mission_choices_revealed=True,
+    )
+    public_payload["secondary_mission_card_state"] = card.to_public_payload(
+        viewer_player_id=domain_viewer_player_id,
+        secondary_mission_choices_revealed=True,
+    )
+    if viewer.owns_player(player_id):
+        public_payload["achievement_context"] = (
+            _public_tactical_secondary_achievement_context_payload(
+                event_payload["achievement_context"]
+            )
+        )
+    else:
+        public_payload.pop("achievement_context", None)
+    return validate_json_value(public_payload)
+
+
+def _public_tactical_secondary_mission_score_declined_payload(
+    payload: JsonValue,
+    *,
+    viewer: ViewerContext,
+) -> JsonValue:
+    event_payload = _json_object("tactical secondary score-declined payload", payload)
+    player_id = _required_string(event_payload, key="player_id")
+    if viewer.policy.omniscient:
+        return validate_json_value(event_payload)
+    if not viewer.owns_player(player_id):
+        raise GameLifecycleError("Tactical secondary score-declined viewer does not own the event.")
+    card = SecondaryMissionCardState.from_payload(
+        cast(SecondaryMissionCardStatePayload, event_payload["secondary_mission_card_state"])
+    )
+    if card.player_id != player_id:
+        raise GameLifecycleError("Tactical secondary score-declined card player drifted.")
+    public_payload = dict(event_payload)
+    public_payload["achievement_context"] = _public_tactical_secondary_achievement_context_payload(
+        event_payload["achievement_context"]
+    )
+    return validate_json_value(public_payload)
+
+
+def _public_tactical_secondary_achievement_context_payload(payload: JsonValue) -> JsonValue:
+    context = _json_object("tactical secondary achievement context", payload)
+    return validate_json_value(_without_internal_secondary_authority_commitments(context))
+
+
+def _without_internal_secondary_authority_commitments(value: JsonValue) -> JsonValue:
+    if isinstance(value, dict):
+        return {
+            key: _without_internal_secondary_authority_commitments(nested)
+            for key, nested in value.items()
+            if key not in _INTERNAL_SECONDARY_AUTHORITY_COMMITMENT_KEYS
+        }
+    if isinstance(value, list):
+        return [_without_internal_secondary_authority_commitments(nested) for nested in value]
+    return value
 
 
 def _public_model_destroyed_payload(
@@ -458,6 +721,12 @@ def _public_decision_request_payload(
         viewer=viewer,
     ):
         return _redacted_request_payload()
+    if (
+        not viewer.policy.omniscient
+        and _required_string(request_payload, key="decision_type")
+        == TACTICAL_SECONDARY_SCORE_DECISION_TYPE
+    ):
+        return _public_tactical_secondary_score_request_payload(request_payload)
     return validate_json_value(request_payload)
 
 
@@ -468,16 +737,57 @@ def _public_decision_record_payload(
 ) -> JsonValue:
     record_payload = _json_object("decision_recorded payload", payload)
     request_payload = _json_object("decision_recorded request payload", record_payload["request"])
-    if not decision_request_payload_hidden_from_context(
+    if decision_request_payload_hidden_from_context(
         request_payload=request_payload,
         viewer=viewer,
     ):
-        return validate_json_value(record_payload)
-    return {
-        "record_id": "hidden-record",
-        "request": _redacted_request_payload(),
-        "result": _redacted_result_payload(),
-    }
+        return {
+            "record_id": "hidden-record",
+            "request": _redacted_request_payload(),
+            "result": _redacted_result_payload(),
+        }
+    if (
+        not viewer.policy.omniscient
+        and _required_string(request_payload, key="decision_type")
+        == TACTICAL_SECONDARY_SCORE_DECISION_TYPE
+    ):
+        public_record = dict(record_payload)
+        public_record["request"] = _public_tactical_secondary_score_request_payload(request_payload)
+        result_payload = _json_object(
+            "decision_recorded tactical score result payload",
+            record_payload["result"],
+        )
+        public_result = dict(result_payload)
+        public_result["payload"] = _without_internal_secondary_authority_commitments(
+            result_payload["payload"]
+        )
+        public_record["result"] = public_result
+        return validate_json_value(public_record)
+    return validate_json_value(record_payload)
+
+
+def _public_tactical_secondary_score_request_payload(
+    request_payload: Mapping[str, JsonValue],
+) -> JsonValue:
+    public_request = dict(request_payload)
+    public_request["payload"] = _without_internal_secondary_authority_commitments(
+        request_payload["payload"]
+    )
+    raw_options = request_payload.get("options")
+    if not isinstance(raw_options, list):
+        raise GameLifecycleError("Tactical secondary score request options must be a list.")
+    public_options: list[JsonValue] = []
+    for raw_option in raw_options:
+        option = _json_object("tactical secondary score option", raw_option)
+        if "payload" not in option:
+            raise GameLifecycleError("Tactical secondary score option lacks a payload.")
+        public_option = dict(option)
+        public_option["payload"] = _without_internal_secondary_authority_commitments(
+            option["payload"]
+        )
+        public_options.append(validate_json_value(public_option))
+    public_request["options"] = public_options
+    return validate_json_value(public_request)
 
 
 def _public_secondary_mission_choice_recorded_payload(

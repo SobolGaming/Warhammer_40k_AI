@@ -2100,6 +2100,10 @@ def _rebuild_objective_control_checkpoint(
         shot_unit_instance_ids=checkpoint.shot_unit_instance_ids,
         objective_control_modifier_sources=checkpoint.objective_control_modifier_sources,
         active_primary_marker_jsons=checkpoint.active_primary_marker_jsons,
+        active_secondary_mission_card_jsons=checkpoint.active_secondary_mission_card_jsons,
+        completed_mission_action_state_jsons=checkpoint.completed_mission_action_state_jsons,
+        primary_unit_destruction_state_jsons=checkpoint.primary_unit_destruction_state_jsons,
+        starting_strength_record_jsons=checkpoint.starting_strength_record_jsons,
         active_secondary_mission_ids=checkpoint.active_secondary_mission_ids,
         mission_action_prior_use_jsons=checkpoint.mission_action_prior_use_jsons,
     )

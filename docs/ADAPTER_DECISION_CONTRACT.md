@@ -1046,11 +1046,27 @@ Action history; Surveil's no-repeat target rule is enforced independently of
 its unlimited Action count.
 
 The engine's `primary_mission_boundary_checkpoint_recorded` events are internal
-replay-authority records, not public battlefield events. Their payload can
-contain the owning player's hidden active-Secondary identities and prior-use
-inventory. Shared adapter redaction therefore exposes a checkpoint only to its
-owning player and an omniscient administrator; opponents receive no checkpoint
-payload through projections, event deltas, server responses, or reconnects.
+replay-authority records, not public battlefield events. Their authoritative
+payload includes immutable active-Secondary card snapshots for both players,
+including selection state, completed Mission Action snapshots, Primary
+destruction history, Starting Strength records, and prior-use inventory. An
+omniscient administrator receives that exact checkpoint. The owning player's
+event view retains the earlier checkpoint shape without any internal Secondary
+authority snapshot field and is re-addressed from that viewer-safe content; it
+never exposes an opponent card, selection, count, completed Action witness,
+destruction witness, Starting Strength witness, or a hash derived from hidden
+snapshots. Opponents receive no checkpoint payload
+through projections, event deltas, server responses, or reconnects.
+
+For Secondary scoring, restore treats the objective-control checkpoint
+snapshots as authority rather than as another copy of the stored scoring row.
+Before transaction semantics are accepted, the engine rebuilds the active card
+and selection, battlefield and deployment-zone occupancy, exact Primary-to-
+Secondary destruction projections, completed Cleanse and Plunder projections,
+and static Starting Strength inventory. The rebuilt rule-relevant evidence must
+equal the stored `SecondaryScoringStateEvidence`; replacing that row together
+with its derived ID, hash, rule metadata, transaction amount, and ledger total
+does not authorize different scoring facts.
 
 Restore authenticates every `primary_mission_boundary_checkpoint_recorded`
 event in chronological order. Each checkpoint's complete physical state is
