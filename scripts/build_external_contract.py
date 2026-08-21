@@ -10,6 +10,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from dataclasses import replace
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
@@ -49,6 +51,7 @@ from warhammer40k_core.adapters.external_contract import (
     SESSION_COMMAND_RESULT_SCHEMA_VERSION,
     SESSION_CREATE_SCHEMA_VERSION,
     SESSION_METADATA_SCHEMA_VERSION,
+    SESSION_PERSISTENCE_SCHEMA_VERSION,
     SESSION_PROJECTION_SCHEMA_VERSION,
 )
 from warhammer40k_core.adapters.projection import (
@@ -106,6 +109,7 @@ EVENT_EXAMPLE_DIR = EXAMPLE_DIR / "events"
 ERROR_EXAMPLE_DIR = EXAMPLE_DIR / "errors"
 STATUS_EXAMPLE_DIR = EXAMPLE_DIR / "statuses"
 SESSION_EXAMPLE_DIR = EXAMPLE_DIR / "sessions"
+PERSISTENCE_EXAMPLE_DIR = EXAMPLE_DIR / "persistence"
 COMPATIBILITY_DIR = CONTRACT_ROOT / "compatibility"
 MANIFEST_PATH = CONTRACT_ROOT / "manifest.json"
 OPENAPI_PATH = CONTRACT_ROOT / "openapi.yaml"
@@ -195,6 +199,10 @@ PAYLOAD_SCHEMA_VERSION_BY_NAME = {
     ),
     "session-create.schema.json": ("schema_version", SESSION_CREATE_SCHEMA_VERSION),
     "session-metadata.schema.json": ("schema_version", SESSION_METADATA_SCHEMA_VERSION),
+    "session-persistence.schema.json": (
+        "schema_version",
+        SESSION_PERSISTENCE_SCHEMA_VERSION,
+    ),
     "session-projection.schema.json": (
         "schema_version",
         SESSION_PROJECTION_SCHEMA_VERSION,
@@ -208,7 +216,7 @@ class ExternalContractError(ValueError):
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Build or verify the versioned Phase 18D external contract bundle."
+        description="Build or verify the versioned Phase 18D-18L contract bundle."
     )
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--write-baseline", action="store_true")
@@ -289,11 +297,80 @@ def write_contract_examples() -> None:
     _write_json(DECISION_EXAMPLE_DIR / "finite-submission.json", finite_submission)
 
     _write_server_read_examples(server=server, game_id=config.game_id)
+    _write_json(
+        PERSISTENCE_EXAMPLE_DIR / "session-persistence.json",
+        _phase18l_persistence_example(),
+    )
     _write_decision_family_examples()
     _write_parameterized_submission_examples()
     _write_interaction_conformance_examples()
     _write_status_examples(game_id=config.game_id)
     _write_error_examples()
+
+
+def _phase18l_persistence_example() -> JsonValue:
+    base_config = canonical_setup_prebattle_smoke_config(game_id="phase18l-contract-persistence")
+    mission_setup = base_config.mission_setup
+    if mission_setup is None:
+        raise ExternalContractError("Phase 18L persistence example requires mission setup.")
+    compact_mission_setup = replace(
+        mission_setup,
+        battlefield_layout_id=None,
+        deployment_map_id="phase18l-contract-custom-deployment",
+        terrain_layout_id="phase18l-contract-custom-terrain",
+        objective_markers=(),
+        deployment_zones=(),
+        battlefield_regions=(),
+        terrain_areas=(),
+        objective_terrain_areas=(),
+        terrain_features=(),
+    )
+    config = replace(base_config, mission_setup=compact_mission_setup)
+    timestamp = datetime(2026, 8, 21, 16, 0, tzinfo=UTC)
+    server = AdapterGameServer(
+        clock=lambda: timestamp,
+        cursor_codec=SessionCursorCodec(secret=b"core-v2-contract-persistence-cursor-key"),
+    )
+    created = _successful_response(
+        server.handle(
+            method="POST",
+            path="/sessions",
+            body={
+                "schema_version": SESSION_CREATE_SCHEMA_VERSION,
+                "config": config.to_payload(),
+            },
+            authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+        ),
+        expected_status=201,
+    )
+    session_id = _required_string(created, "session_id")
+    _successful_response(
+        server.handle(
+            method="POST",
+            path=f"/sessions/{session_id}/commands",
+            body={
+                "schema_version": SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
+                "command_id": "phase18l-contract-start-000001",
+                "session_id": session_id,
+                "expected_session_revision": 0,
+                "request_id": None,
+                "result_id": None,
+                "submission": {"submission_kind": "start_session"},
+            },
+            authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+        ),
+        expected_status=200,
+    )
+    for token in (DEV_PLAYER_A_TOKEN, DEV_PLAYER_B_TOKEN, DEV_ADMIN_TOKEN):
+        _successful_response(
+            server.handle(
+                method="GET",
+                path=f"/sessions/{session_id}/projection",
+                authorization=bearer_authorization(token),
+            ),
+            expected_status=200,
+        )
+    return server.persistence_payload()
 
 
 def verify_contract_bundle(*, base_ref: str | None = None) -> None:
@@ -1250,6 +1327,7 @@ def _example_schema_bindings() -> dict[str, JsonValue]:
     bindings["examples/sessions/session-command-outcome.json"] = (
         "session-command-outcome.schema.json"
     )
+    bindings["examples/persistence/session-persistence.json"] = "session-persistence.schema.json"
     bindings["examples/support-profile.json"] = "support-profile.schema.json"
     bindings["examples/support-profile-player-a-redacted.json"] = "support-profile.schema.json"
     bindings["examples/support-profile-player-b-redacted.json"] = "support-profile.schema.json"

@@ -6,7 +6,6 @@ from collections.abc import Iterable, Mapping
 from enum import StrEnum
 from typing import Literal, TypedDict, cast
 
-from warhammer40k_core import __version__ as ENGINE_VERSION
 from warhammer40k_core.adapters.capability_manifest_runtime import (
     runtime_rule_semantics as _runtime_rule_semantics,
 )
@@ -26,6 +25,7 @@ from warhammer40k_core.adapters.capability_manifest_runtime import (
     validate_selected_runtime_manifest_identity as _validate_selected_runtime_manifest_identity,
 )
 from warhammer40k_core.adapters.external_contract import EXTERNAL_CONTRACT_VERSION
+from warhammer40k_core.build_identity import current_engine_build_id
 from warhammer40k_core.core.datasheet import DatasheetAbilityDescriptor
 from warhammer40k_core.core.missions import MissionPackDefinition, PrimaryMissionDefinition
 from warhammer40k_core.engine.ability_coverage import (
@@ -71,7 +71,7 @@ CAPABILITY_MANIFEST_SCHEMA_ID = (
 CAPABILITY_MANIFEST_SCHEMA_SHA256 = (
     "906ac27ffc6c6fa969dfa48b99b1d7b56fa514122cde358f2a4ba4741c8a853d"
 )
-ENGINE_BUILD_ID = f"warhammer40k-core-v2:{ENGINE_VERSION}"
+ENGINE_BUILD_ID = current_engine_build_id()
 
 
 class CapabilityDimension(StrEnum):

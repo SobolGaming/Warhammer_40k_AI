@@ -1,8 +1,8 @@
 # Adapter Decision Contract
 
-Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout and catalog RuleIR pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog once-per-battle ability choices, Phase 17K catalog named-weapon and Shooting-start selected-target ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog move/setup-completed mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window and interface-intent requirements, Phase 18C shared adapter session facade requirements, Phase 18E formal session/transport semantics, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]`. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
+Status: Phase 11D contract with Phase 11E scoring projection/event-stream additions, Phase 12A reaction/sequencing decisions, Phase 12B Stratagem decision requirements, Phase 12C supported Core Stratagem handler requirements, Phase 13/14H shooting decision requirements, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout and catalog RuleIR pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog once-per-battle ability choices, Phase 17K catalog named-weapon and Shooting-start selected-target ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog move/setup-completed mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window and interface-intent requirements, Phase 18C shared adapter session facade requirements, Phase 18E-18H formal session, command, reconnect, and authorization semantics, Phase 18I interaction metadata, Phase 18J battlefield coordinates, Phase 18L persistence/recovery semantics, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]`. This document is authoritative for adapter/proposal modules shipped with Phase 11D and future decision work.
 
-This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout and catalog RuleIR pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog named-weapon and Shooting-start selected-target ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog move/setup-completed mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window/interface-intent requirements, Phase 18C shared adapter session facade requirements, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]` for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
+This document is the Phase 11D submission contract, extended with Phase 11E scoring visibility rules, Phase 12A timing/reaction/sequencing rules, Phase 12B Stratagem decision rules, Phase 12C supported Core Stratagem handler rules, Phase 13/14H shooting decision rules, Phase 14B End of Opponent's Movement phase reaction timing, Phase 14J Tactical secondary score/retain decisions, Phase 14L ranged attack target/group gathering decisions, Phase 15A charge declaration decisions, Phase 15B Charge Move proposal decisions, Phase 15C fight activation/pass/interrupt decisions, Phase 16A deployment setup decisions, Phase 16B redeploy/Scout and catalog RuleIR pre-battle decisions, Phase 16C reserve declaration decisions, Phase 16E setup completion gate requirements, Phase 17G setup faction-rule decisions, Phase 17G Cult Ambush Resurgence and marker ingress decisions, Phase 17G fight activation ability decisions, Phase 17G Fight-start faction-rule and catalog RuleIR decisions, Phase 17G Shooting-start faction-rule decisions, Phase 17K catalog named-weapon and Shooting-start selected-target ability choices, Phase 17K catalog post-shoot hit-target status/effect choices, Phase 17K catalog move/setup-completed mortal-wound target choices, Phase 17K catalog setup-reactive shoot/charge choices, Phase 17G Movement-end surge decisions, Phase 17G phase-end objective-control retention, Phase 17G advance-triggered and selected-to-shoot/fight grant decisions, Phase 18A hybrid catalog/live unit-model display projection requirements including datasheet ability display, InSv display, and per-model wargear IDs, Phase 18B trigger opportunity-window/interface-intent requirements, Phase 18C shared adapter session facade requirements, Phase 18E-18H formal session semantics, Phase 18I interaction metadata, Phase 18J battlefield coordinates, Phase 18L persistence/recovery semantics, and weapon keyword gap updates for `[PSYCHIC]`, `[ONE SHOT]`, slash-separated `[ANTI]`, and `[ANTI-NON-X]` for teams building UI, CLI, headless, network, replay, or AI adapters around CORE V2.
 
 Phase 17N Step 4 extends that scoring contract with public persistent Primary
 Mission progress, the shared finite Primary Mission choice family, the ten
@@ -249,6 +249,16 @@ The shared contract uses these objects and payloads:
   producer adapters. It is the adapter-facing route to lifecycle advancement,
   viewer-safe projection, source-hashed catalog projection, viewer-scoped event
   deltas, finite submissions, and parameterized payload submissions.
+- `SessionPersistenceArtifact`: closed, content-addressed operator-only root
+  containing the verified runtime-tree build identity, contract identities,
+  authorization bindings, protected cursor state, complete authoritative
+  sessions and unpruned revision commitments, the game/session index, and one
+  canonical content hash. It is not adapter-visible wire state.
+- `LocalGameSession` persistence checkpoint: adapter-owned recovery payload
+  binding the current lifecycle, optional initial replay lifecycle, source
+  identity, RNG state, latest replay artifact, and deterministic lifecycle,
+  decision, event, RNG, and content hashes. Transport code does not reconstruct
+  lifecycle internals itself.
 - `PlayerArmyList`: versioned, fail-fast pre-session roster artifact containing
   normalized roster selections, one explicit Force Disposition, declared point
   totals, deterministic pricing order, and source/app provenance; post-game
@@ -383,6 +393,11 @@ Relevant modules:
 - `src/warhammer40k_core/adapters/projection.py`
 - `src/warhammer40k_core/adapters/event_stream.py`
 - `src/warhammer40k_core/adapters/local_session.py`
+- `src/warhammer40k_core/adapters/server.py`
+- `src/warhammer40k_core/adapters/session_persistence.py`
+- `src/warhammer40k_core/adapters/session_revision.py`
+- `src/warhammer40k_core/adapters/session_recovery.py`
+- `src/warhammer40k_core/build_identity.py`
 - `src/warhammer40k_core/engine/decision_request.py`
 - `src/warhammer40k_core/engine/player_army_list.py`
 - `src/warhammer40k_core/engine/army_mustering.py`
@@ -477,6 +492,9 @@ reference server currently requires:
 - `session-create-v4`, `session-metadata-v10-contract`,
   `session-command-result-v10-contract`, and `session-command-outcome-v10-contract` for the
   authenticated formal session protocol;
+- `session-persistence-v2-phase18l` for the closed operator-only durable server
+  artifact. It is included in the Contract 10.2 schema bundle and examples but
+  deliberately absent from OpenAPI operations and client payloads;
 - `capability-manifest-v2-directed-primary` inside
   `support-profile-v4-directed-primary` for viewer-scoped capability evidence
   whose public mission identity includes both assignments;
@@ -491,6 +509,12 @@ reference server currently requires:
   destruction-history membership, and explicit
   logical terrain-area identities;
 - `error-envelope-v1` for typed transport errors.
+
+Phase 18L adds no player-facing decision type, finite-option family, proposal
+kind, public response field, or visibility exception. It advances the additive
+bundle to Contract 10.2 because trusted deployment tooling gains a new schema
+and normative recovery semantics; all existing Contract 10.1 HTTP families keep
+their current shapes and discriminators.
 
 The Contract 10 replay loader accepts only `replay-artifact-v8-phase17n-step5a`;
 v7 artifacts require the retained 9.x deployment. It never infers directed
@@ -3571,6 +3595,16 @@ Replay-facing payloads must remain deterministic and JSON-safe:
 
 Phase 11D must ensure replay/resume preserves pending parameterized proposal requests. Restoring after a finite movement-action result has been accepted but before the proposal has been submitted must reproduce the same pending proposal request and validation context.
 
+Phase 18L durable recovery is distinct from exporting a `ReplayArtifact` to a
+client. The operator artifact retains a verified adapter checkpoint plus any
+accepted decision tail, protected command-journal idempotency results,
+authorization bindings, and cursor state. The adapter-owned recovery factory
+restores the checkpoint, routes the decision tail through the same facade and
+lifecycle decision path, and proves exact decision, event, projection, RNG, package, and revision
+agreement before the transport registers the recovered session. The transport
+must not deserialize `GameLifecycle` directly or partially continue after a
+failed check.
+
 Contract 10 replay uses `replay-artifact-v8-phase17n-step5a`. It preserves a
 pending `select_primary_mission_choice` request, deterministic finite option
 IDs/payloads, the complete `primary_mission_progress_state`, the mandatory
@@ -3721,7 +3755,9 @@ projections and event deltas. Every response is principal scoped, and transport
 errors contain stable public text rather than caught engine exception details.
 Phase 18H owns principal-to-role authentication and authorization. Phase 18F
 owns command idempotency and expected-revision concurrency checks, while Phase
-18G owns protected opaque cursor/reconnect/resynchronization behavior.
+18G owns protected opaque cursor/reconnect/resynchronization behavior. Phase
+18L owns atomic durable publication and verified recovery of that same
+authority unit.
 
 ## Formal Phase 18F Commands
 
@@ -3824,6 +3860,106 @@ principal's role, player binding, policy, or registry authorization epoch
 changes its cursor scope and invalidates old cursors. Raw active-session replay
 remains available only to the omniscient administrator; a replay viewer cannot
 use the replay route as a live information feed.
+
+## Formal Phase 18L Persistence and Recovery
+
+The reference server persists one closed
+`session-persistence-v2-phase18l` operator artifact. The root contains exact
+server/engine-build/external-contract/persistence-schema identities, the
+principal binding set and authorization epoch, protected cursor secret and
+token registry, retention policy, complete authoritative sessions, and the
+game/session index. A canonical `content_hash` covers every preceding state
+member and excludes only itself. Bearer credentials are never serialized, and
+this artifact is not served by an OpenAPI operation.
+
+The semantic package `engine_version` is not a build identity. The separate
+`engine_build_id` is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:<sha256>` and comes from a generated
+manifest of the complete authoritative packaged Python, JSON, `py.typed`, and
+contract-schema resource inventory. The runtime verifies that manifest before
+publishing its identity. Missing manifest data or a dirty resource tree fails
+closed, and recovery rejects another build even when both builds use the same
+package version.
+
+Session persistence includes normalized game configuration and exact ruleset,
+overlay, catalog, and source-package identities; deterministic RNG state;
+accepted command envelopes and authorization contexts; decision and event
+records; monotonic revision and cached idempotency outcomes; terminal state;
+retained revision snapshots; and the adapter-owned current/initial
+lifecycle/replay checkpoint with deterministic verification hashes. Every
+operator wrapper object is closed and versioned. Engine-private lifecycle
+content still passes its typed fail-fast runtime loader; schema acceptance
+alone does not authorize recovery.
+
+Every revision from zero through the current head has an unpruned
+`session-revision-commitment-v2` row. It commits to the previous revision,
+typed command or non-command origin, exact decision/event/RNG prefixes,
+adapter checkpoint, viewer-independent authoritative state, explicit `started`
+and `closed` flags, journal entry and response when applicable, and
+authenticated before/after cursor states. Those flags keep creation, start, and
+final close transition semantics verifiable after their full snapshots are
+pruned.
+Recovery recomputes the chain against current authoritative history, checks
+retained snapshots exactly, requires each protocol-command revision to have its
+one matching journal entry, validates its envelope against the resulting
+`DecisionRecord`, and recomputes retained response projections and cursor
+positions. Pruning a full historical snapshot does not prune the revision or
+idempotency commitment.
+
+Store creation is an explicit operation, separate from recovery. A server
+constructed with a store always requires an initialized root; a missing file or
+singleton row is corruption/storage loss, never an empty first boot. A new
+server invokes `initialize_persistence(...)` against empty in-memory state and
+an exclusively reserved database path, then transactionally installs the exact
+schema and initial empty root before accepting sessions. An interrupted
+initialization leaves a non-loadable path that requires deliberate operator
+repair or replacement; it is not inferred as a fresh authority. Session
+creation is then durably committed before the new session enters the server
+registry.
+
+For a mutation, the server stages the facade, journal outcome, revision
+snapshots and commitment, and cursor registry, commits them in one durable
+transaction, then replaces the in-memory authority and publishes the response.
+It arms fail-stop state before calling the store and clears it only after
+successful return, including normalization of custom-store `OSError` and
+`RuntimeError` commit failures. A crash before the transaction therefore
+exposes only the previous complete revision. A crash after it recovers the new
+revision and returns the persisted byte-equivalent public outcome for an exact
+command retry.
+
+The SQLite v2 implementation holds `BEGIN IMMEDIATE` while validating WAL mode,
+`user_version = 2`, the exact STRICT singleton table and constraints, and the
+absence of unexpected tables, indexes, foreign keys, views, or triggers. It
+validates the old row, writes, then selects and compares the exact new row before
+commit. Suppressed or rewritten writes, a deleted singleton row, schema drift,
+or a schema mutation racing the write cannot be reported as successful.
+
+Recovery validates schema, root and checkpoint hashes, package/ruleset/catalog/
+source identities, engine/build/contract versions, principal bindings, cursor
+authentication, the full revision chain, and the game/session index before
+registering anything. It
+loads the latest adapter checkpoint, replays its accepted decision tail through
+the adapter-owned recovery path and ultimately `GameLifecycle.submit_decision(...)`,
+restores and cross-validates the command journal without reapplying command
+envelopes, and compares decision records,
+authoritative events and sequence, RNG state, replay artifact, viewer
+projection hashes, and session revision. Any corruption or drift is a typed
+fail-closed result; no partially reconstructed session is addressable.
+
+Exactly one process or actor owns mutation for a session and serializes its
+commands. Immutable viewer-scoped projections may serve reads. Failover may
+transfer ownership only at a verified checkpoint/replay boundary, with exact
+role, player, authorization-epoch, cursor-scope, retention, and finalization
+state so recovery cannot widen visibility.
+
+These content hashes, revision commitments, and build fingerprints are an
+internal-consistency boundary. They detect accidental corruption, partial
+writes, history mismatches, and runtime drift; they are not keyed storage
+attestations. A malicious database writer can rewrite a complete coherent
+artifact, and an older valid database can be rolled back undetectably without
+state outside that database. Deployments that include either threat need a
+trusted external monotonic, signed, or append-only anchor. Phase 18L does not
+claim malicious-writer or rollback resistance.
 
 ## Suggested Adapter Loop
 

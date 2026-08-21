@@ -120,6 +120,24 @@ A role, player binding, policy, or registry authorization-epoch change changes
 cursor scope and invalidates previously issued cursors. Delayed spectators read a retained historical revision snapshot;
 they do not receive current hidden state with fields merely omitted.
 
+The Phase 18L persistence artifact, cursor signing secret, protected cursor
+registry, authoritative checkpoints, unredacted revision snapshots, revision
+commitments, command journal, and recovery diagnostics are operator-only. They
+must never appear in
+a projection, status, event page, error body, support profile, replay-viewer
+response, or any derived count or hash beyond the existing viewer-scoped public
+commitments. Public corruption/drift errors use stable text and must not echo a
+secret, raw cursor state, hidden command body, checkpoint fragment, storage
+path, or caught exception detail.
+
+Recovery restores the exact principal/role/player bindings, role policy,
+authorization epoch, cursor signing key, and retained cursor scopes before any
+session becomes addressable. It must reject drift rather than substitute a
+default role, drop a binding, manufacture an empty cursor registry, or widen an
+old scope. Bearer credentials themselves are not written to the persistence
+artifact; the injected credential registry must agree with the persisted
+bindings and epoch.
+
 `examples/projections/hidden_secondary_redaction_view.json`,
 `examples/support-profile.json`, both
 `examples/support-profile-player-*-redacted.json` files, and the generated

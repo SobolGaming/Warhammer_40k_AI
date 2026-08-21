@@ -179,7 +179,9 @@ class SessionCommandJournalEntry:
     command_id: str
     principal_id: str
     authorization_context: AuthorizationContext
+    command_envelope: SessionCommandEnvelope
     envelope_fingerprint: str
+    committed_session_revision: int
     status_code: int
     response_payload: JsonValue
 
@@ -196,11 +198,27 @@ class SessionCommandJournalEntry:
             raise SessionCommandProtocolError(
                 "Command journal principal and authorization context differ."
             )
+        if type(self.command_envelope) is not SessionCommandEnvelope:
+            raise SessionCommandProtocolError("Command journal envelope is invalid.")
+        if self.command_envelope.command_id != self.command_id:
+            raise SessionCommandProtocolError(
+                "Command journal command and envelope identifiers differ."
+            )
         object.__setattr__(
             self,
             "envelope_fingerprint",
             _validate_sha256("envelope_fingerprint", self.envelope_fingerprint),
         )
+        if self.command_envelope.fingerprint() != self.envelope_fingerprint:
+            raise SessionCommandProtocolError("Command journal envelope fingerprint drifted.")
+        if type(self.committed_session_revision) is not int or self.committed_session_revision < 1:
+            raise SessionCommandProtocolError(
+                "Command journal committed revision must be positive."
+            )
+        if self.command_envelope.expected_session_revision + 1 != self.committed_session_revision:
+            raise SessionCommandProtocolError(
+                "Command journal committed revision does not follow its expected revision."
+            )
         if type(self.status_code) is not int or not 200 <= self.status_code <= 599:
             raise SessionCommandProtocolError("Command journal status code is invalid.")
         object.__setattr__(
@@ -211,6 +229,59 @@ class SessionCommandJournalEntry:
 
     def public_payload(self) -> JsonValue:
         return copy.deepcopy(self.response_payload)
+
+    def to_persistence_payload(self) -> dict[str, JsonValue]:
+        return {
+            "command_id": self.command_id,
+            "principal_id": self.principal_id,
+            "authorization_context": self.authorization_context.to_payload(),
+            "command_envelope": self.command_envelope.to_payload(),
+            "envelope_fingerprint": self.envelope_fingerprint,
+            "committed_session_revision": self.committed_session_revision,
+            "status_code": self.status_code,
+            "response_payload": copy.deepcopy(self.response_payload),
+        }
+
+    @classmethod
+    def from_persistence_payload(cls, payload: JsonValue) -> Self:
+        if not isinstance(payload, dict):
+            raise SessionCommandProtocolError("Persisted command journal entry must be an object.")
+        if set(payload) != {
+            "command_id",
+            "principal_id",
+            "authorization_context",
+            "command_envelope",
+            "envelope_fingerprint",
+            "committed_session_revision",
+            "status_code",
+            "response_payload",
+        }:
+            raise SessionCommandProtocolError("Persisted command journal keys are invalid.")
+        command_id = payload["command_id"]
+        principal_id = payload["principal_id"]
+        envelope_fingerprint = payload["envelope_fingerprint"]
+        committed_revision = payload["committed_session_revision"]
+        status_code = payload["status_code"]
+        if (
+            type(command_id) is not str
+            or type(principal_id) is not str
+            or type(envelope_fingerprint) is not str
+            or type(committed_revision) is not int
+            or type(status_code) is not int
+        ):
+            raise SessionCommandProtocolError("Persisted command journal field is invalid.")
+        return cls(
+            command_id=command_id,
+            principal_id=principal_id,
+            authorization_context=AuthorizationContext.from_payload(
+                payload["authorization_context"]
+            ),
+            command_envelope=SessionCommandEnvelope.from_payload(payload["command_envelope"]),
+            envelope_fingerprint=envelope_fingerprint,
+            committed_session_revision=committed_revision,
+            status_code=status_code,
+            response_payload=payload["response_payload"],
+        )
 
 
 def _validate_schema_version(value: object) -> str:

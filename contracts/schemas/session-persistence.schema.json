@@ -1,0 +1,549 @@
+{
+  "$id": "https://warhammer40k-core.local/contracts/v2/session-persistence.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Closed Phase 18L operator-only server persistence artifact. This schema is not an HTTP or viewer-facing payload. Runtime recovery additionally verifies every canonical content hash and reconstructs engine-private lifecycle state through typed fail-fast loaders.",
+  "properties": {
+    "authorization_bindings": {"$ref": "#/$defs/authorization_bindings"},
+    "content_hash": {"$ref": "#/$defs/sha256"},
+    "cursor_codec": {"$ref": "#/$defs/cursor_codec"},
+    "engine_build_id": {
+      "pattern": "^warhammer40k-core-v2:runtime-tree-sha256-v1:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "engine_version": {"minLength": 1, "type": "string"},
+    "event_retention_limit": {"minimum": 1, "type": "integer"},
+    "external_contract_version": {"const": "10.2.0", "type": "string"},
+    "game_session_index": {
+      "items": {"$ref": "#/$defs/game_session_index_entry"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema_version": {
+      "const": "session-persistence-v2-phase18l",
+      "type": "string"
+    },
+    "sessions": {
+      "items": {"$ref": "#/$defs/authoritative_session"},
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "engine_version",
+    "engine_build_id",
+    "external_contract_version",
+    "authorization_bindings",
+    "cursor_codec",
+    "event_retention_limit",
+    "sessions",
+    "game_session_index",
+    "content_hash"
+  ],
+  "title": "CORE V2 Phase 18L SessionPersistenceArtifact",
+  "type": "object",
+  "$defs": {
+    "authorization_bindings": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization_epoch": {"minimum": 0, "type": "integer"},
+        "principals": {
+          "items": {"$ref": "#/$defs/principal_binding"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": ["authorization_epoch", "principals"],
+      "type": "object"
+    },
+    "authorization_context": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization_epoch": {"minimum": 0, "type": "integer"},
+        "cursor_scope": {"minLength": 1, "type": "string"},
+        "delay_revisions": {"minimum": 0, "type": "integer"},
+        "may_export_replay": {"type": "boolean"},
+        "may_mutate_lifecycle": {"type": "boolean"},
+        "may_submit_decision": {"type": "boolean"},
+        "may_view_catalog": {"type": "boolean"},
+        "may_view_live": {"type": "boolean"},
+        "may_view_support": {"type": "boolean"},
+        "omniscient": {"type": "boolean"},
+        "player_id": {"type": ["string", "null"]},
+        "principal_id": {"minLength": 1, "type": "string"},
+        "role": {"$ref": "#/$defs/principal_role"}
+      },
+      "required": [
+        "principal_id",
+        "role",
+        "player_id",
+        "cursor_scope",
+        "authorization_epoch",
+        "may_mutate_lifecycle",
+        "may_submit_decision",
+        "may_view_live",
+        "may_view_catalog",
+        "may_view_support",
+        "may_export_replay",
+        "omniscient",
+        "delay_revisions"
+      ],
+      "type": "object"
+    },
+    "authoritative_session": {
+      "additionalProperties": false,
+      "properties": {
+        "adapter_session": {"$ref": "#/$defs/local_game_session_checkpoint"},
+        "catalog_id": {"minLength": 1, "type": "string"},
+        "closed": {"type": "boolean"},
+        "command_journal": {
+          "items": {"$ref": "#/$defs/command_journal_entry"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "created_at": {"format": "date-time", "type": "string"},
+        "cursor_registry_finalized": {"type": "boolean"},
+        "event_retention_limit": {"minimum": 1, "type": "integer"},
+        "game_id": {"minLength": 1, "type": "string"},
+        "history_head": {"$ref": "#/$defs/sha256"},
+        "last_activity_at": {"format": "date-time", "type": "string"},
+        "lifecycle_status": {"$ref": "#/$defs/internal_lifecycle_status"},
+        "player_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "minItems": 2,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "revision_retention_limit": {"minimum": 1, "type": "integer"},
+        "revision_history": {
+          "items": {"$ref": "#/$defs/revision_commitment"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "revision_snapshots": {
+          "items": {"$ref": "#/$defs/revision_snapshot"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "rules_overlay_ids": {
+          "items": {"minLength": 1, "type": "string"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "ruleset_descriptor_hash": {"$ref": "#/$defs/sha256"},
+        "ruleset_id": {"minProperties": 1, "type": "object"},
+        "session_id": {"minLength": 1, "type": "string"},
+        "session_revision": {"minimum": 0, "type": "integer"},
+        "source_hash": {"$ref": "#/$defs/sha256"},
+        "source_package_id": {"minLength": 1, "type": "string"},
+        "started": {"type": "boolean"}
+      },
+      "required": [
+        "session_id",
+        "game_id",
+        "adapter_session",
+        "player_ids",
+        "ruleset_id",
+        "ruleset_descriptor_hash",
+        "rules_overlay_ids",
+        "catalog_id",
+        "source_package_id",
+        "source_hash",
+        "lifecycle_status",
+        "created_at",
+        "last_activity_at",
+        "event_retention_limit",
+        "revision_retention_limit",
+        "session_revision",
+        "started",
+        "closed",
+        "cursor_registry_finalized",
+        "command_journal",
+        "revision_snapshots",
+        "revision_history",
+        "history_head"
+      ],
+      "type": "object"
+    },
+    "command_journal_entry": {
+      "additionalProperties": false,
+      "properties": {
+        "authorization_context": {"$ref": "#/$defs/authorization_context"},
+        "command_envelope": {
+          "$ref": "https://warhammer40k-core.local/contracts/v1/session-command-envelope.schema.json"
+        },
+        "command_id": {"minLength": 1, "type": "string"},
+        "committed_session_revision": {"minimum": 1, "type": "integer"},
+        "envelope_fingerprint": {"$ref": "#/$defs/sha256"},
+        "principal_id": {"minLength": 1, "type": "string"},
+        "response_payload": {
+          "$ref": "https://warhammer40k-core.local/contracts/v10/session-command-outcome.schema.json"
+        },
+        "status_code": {"enum": [200, 422], "type": "integer"}
+      },
+      "required": [
+        "command_id",
+        "principal_id",
+        "authorization_context",
+        "command_envelope",
+        "envelope_fingerprint",
+        "committed_session_revision",
+        "status_code",
+        "response_payload"
+      ],
+      "type": "object"
+    },
+    "cursor": {
+      "additionalProperties": false,
+      "properties": {
+        "c": {"minLength": 1, "type": "string"},
+        "h": {"$ref": "#/$defs/sha256"},
+        "o": {"minimum": 0, "type": "integer"},
+        "p": {"minLength": 1, "type": "string"},
+        "q": {"minimum": 0, "type": "integer"},
+        "r": {"minimum": 0, "type": "integer"},
+        "s": {"minLength": 1, "type": "string"},
+        "v": {"const": 1, "type": "integer"}
+      },
+      "required": ["v", "s", "p", "c", "o", "q", "r", "h"],
+      "type": "object"
+    },
+    "cursor_codec": {
+      "additionalProperties": false,
+      "properties": {
+        "cursors": {
+          "items": {"$ref": "#/$defs/cursor_entry"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "secret_hex": {
+          "pattern": "^(?:[0-9a-f]{2}){16,}$",
+          "type": "string"
+        }
+      },
+      "required": ["secret_hex", "cursors"],
+      "type": "object"
+    },
+    "cursor_entry": {
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {"$ref": "#/$defs/cursor"},
+        "token": {"maxLength": 2048, "minLength": 1, "type": "string"}
+      },
+      "required": ["token", "cursor"],
+      "type": "object"
+    },
+    "game_session_index_entry": {
+      "additionalProperties": false,
+      "properties": {
+        "game_id": {"minLength": 1, "type": "string"},
+        "session_id": {"minLength": 1, "type": "string"}
+      },
+      "required": ["game_id", "session_id"],
+      "type": "object"
+    },
+    "internal_decision_option": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {"minLength": 1, "type": "string"},
+        "option_id": {"minLength": 1, "type": "string"},
+        "payload": {}
+      },
+      "required": ["option_id", "label", "payload"],
+      "type": "object"
+    },
+    "internal_decision_request": {
+      "additionalProperties": false,
+      "properties": {
+        "actor_id": {"type": ["string", "null"]},
+        "decision_type": {"minLength": 1, "type": "string"},
+        "options": {
+          "items": {"$ref": "#/$defs/internal_decision_option"},
+          "type": "array",
+          "uniqueItems": true
+        },
+        "payload": {},
+        "request_id": {"minLength": 1, "type": "string"}
+      },
+      "required": ["request_id", "decision_type", "actor_id", "payload", "options"],
+      "type": "object"
+    },
+    "internal_lifecycle_status": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {"status_kind": {"const": "waiting_for_decision"}},
+            "required": ["status_kind"]
+          },
+          "then": {
+            "properties": {
+              "decision_request": {"$ref": "#/$defs/internal_decision_request"}
+            }
+          },
+          "else": {"properties": {"decision_request": {"const": null}}}
+        }
+      ],
+      "properties": {
+        "decision_request": {
+          "oneOf": [
+            {"$ref": "#/$defs/internal_decision_request"},
+            {"type": "null"}
+          ]
+        },
+        "message": {"type": ["string", "null"]},
+        "payload": {},
+        "stage": {"enum": ["setup", "battle", "complete"], "type": "string"},
+        "status_kind": {
+          "enum": [
+            "advanced",
+            "waiting_for_decision",
+            "terminal",
+            "invalid",
+            "unsupported"
+          ],
+          "type": "string"
+        }
+      },
+      "required": ["stage", "status_kind", "decision_request", "message", "payload"],
+      "type": "object"
+    },
+    "lifecycle_payload": {
+      "additionalProperties": true,
+      "properties": {
+        "config": {
+          "$ref": "https://warhammer40k-core.local/contracts/v3/create-session.schema.json#/properties/config"
+        },
+        "state": {"type": ["object", "null"]}
+      },
+      "required": ["config", "state"],
+      "type": "object"
+    },
+    "local_game_session_checkpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {"$ref": "#/$defs/sha256"},
+        "decision_records_hash": {"$ref": "#/$defs/sha256"},
+        "event_log_hash": {"$ref": "#/$defs/sha256"},
+        "initial_replay_lifecycle": {
+          "oneOf": [
+            {"$ref": "#/$defs/lifecycle_payload"},
+            {"type": "null"}
+          ]
+        },
+        "lifecycle": {"$ref": "#/$defs/lifecycle_payload"},
+        "lifecycle_hash": {"$ref": "#/$defs/sha256"},
+        "replay_artifact": {
+          "$ref": "https://warhammer40k-core.local/contracts/v8/replay-metadata.schema.json"
+        },
+        "rng_state": {"$ref": "#/$defs/rng_state"},
+        "rng_state_hash": {"$ref": "#/$defs/sha256"},
+        "schema_version": {
+          "const": "local-game-session-persistence-v1",
+          "type": "string"
+        },
+        "source_identity": {
+          "$ref": "https://warhammer40k-core.local/contracts/v8/replay-metadata.schema.json#/$defs/source_identity"
+        }
+      },
+      "required": [
+        "schema_version",
+        "lifecycle",
+        "initial_replay_lifecycle",
+        "source_identity",
+        "rng_state",
+        "replay_artifact",
+        "lifecycle_hash",
+        "decision_records_hash",
+        "event_log_hash",
+        "rng_state_hash",
+        "content_hash"
+      ],
+      "type": "object"
+    },
+    "principal_binding": {
+      "additionalProperties": false,
+      "properties": {
+        "player_id": {"type": ["string", "null"]},
+        "principal_id": {"minLength": 1, "type": "string"},
+        "role": {"$ref": "#/$defs/principal_role"}
+      },
+      "required": ["principal_id", "role", "player_id"],
+      "type": "object"
+    },
+    "principal_role": {
+      "enum": [
+        "player",
+        "coach",
+        "delayed_spectator",
+        "administrator",
+        "replay_viewer"
+      ],
+      "type": "string"
+    },
+    "revision_snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "adapter_session": {"$ref": "#/$defs/local_game_session_checkpoint"},
+        "closed": {"type": "boolean"},
+        "event_count": {"minimum": 0, "type": "integer"},
+        "last_activity_at": {"format": "date-time", "type": "string"},
+        "lifecycle_status": {"$ref": "#/$defs/internal_lifecycle_status"},
+        "session_revision": {"minimum": 0, "type": "integer"},
+        "started": {"type": "boolean"}
+      },
+      "required": [
+        "session_revision",
+        "adapter_session",
+        "lifecycle_status",
+        "event_count",
+        "last_activity_at",
+        "started",
+        "closed"
+      ],
+      "type": "object"
+    },
+    "revision_cursor_commitment": {
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {"$ref": "#/$defs/cursor"},
+        "token": {"maxLength": 2048, "minLength": 1, "type": "string"}
+      },
+      "required": ["token", "cursor"],
+      "type": "object"
+    },
+    "revision_origin": {
+      "additionalProperties": false,
+      "properties": {
+        "command_envelope": {
+          "oneOf": [
+            {
+              "$ref": "https://warhammer40k-core.local/contracts/v1/session-command-envelope.schema.json"
+            },
+            {"type": "null"}
+          ]
+        },
+        "envelope_fingerprint": {
+          "oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+        },
+        "operation": {
+          "enum": [
+            "session_created",
+            "session_closed",
+            "legacy_advance_session",
+            "legacy_finite_decision",
+            "legacy_parameterized_decision",
+            "start_session",
+            "advance_session",
+            "close_session",
+            "finite_option",
+            "parameterized_payload"
+          ],
+          "type": "string"
+        },
+        "origin_kind": {
+          "enum": ["noncommand", "protocol_command"],
+          "type": "string"
+        }
+      },
+      "required": [
+        "origin_kind",
+        "operation",
+        "command_envelope",
+        "envelope_fingerprint"
+      ],
+      "type": "object"
+    },
+    "revision_commitment": {
+      "additionalProperties": false,
+      "properties": {
+        "authoritative_session_hash": {"$ref": "#/$defs/sha256"},
+        "authoritative_state_hash": {"$ref": "#/$defs/sha256"},
+        "checkpoint_hash": {"$ref": "#/$defs/sha256"},
+        "closed": {"type": "boolean"},
+        "decision_count": {"minimum": 0, "type": "integer"},
+        "decision_records_hash": {"$ref": "#/$defs/sha256"},
+        "event_count": {"minimum": 0, "type": "integer"},
+        "event_records_hash": {"$ref": "#/$defs/sha256"},
+        "from_cursor": {
+          "oneOf": [
+            {"$ref": "#/$defs/revision_cursor_commitment"},
+            {"type": "null"}
+          ]
+        },
+        "journal_entry_hash": {
+          "oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+        },
+        "origin": {"$ref": "#/$defs/revision_origin"},
+        "previous_revision_commitment": {
+          "oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+        },
+        "response_hash": {
+          "oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+        },
+        "revision_commitment": {"$ref": "#/$defs/sha256"},
+        "rng_draw_count": {"minimum": 0, "type": "integer"},
+        "rng_history_count": {"minimum": 0, "type": "integer"},
+        "rng_history_hash": {"$ref": "#/$defs/sha256"},
+        "rng_state_hash": {"$ref": "#/$defs/sha256"},
+        "schema_version": {
+          "const": "session-revision-commitment-v2",
+          "type": "string"
+        },
+        "session_id": {"minLength": 1, "type": "string"},
+        "session_revision": {"minimum": 0, "type": "integer"},
+        "started": {"type": "boolean"},
+        "to_cursor": {
+          "oneOf": [
+            {"$ref": "#/$defs/revision_cursor_commitment"},
+            {"type": "null"}
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "session_id",
+        "session_revision",
+        "previous_revision_commitment",
+        "origin",
+        "decision_count",
+        "decision_records_hash",
+        "event_count",
+        "event_records_hash",
+        "rng_history_count",
+        "rng_history_hash",
+        "rng_draw_count",
+        "rng_state_hash",
+        "checkpoint_hash",
+        "authoritative_state_hash",
+        "authoritative_session_hash",
+        "started",
+        "closed",
+        "journal_entry_hash",
+        "response_hash",
+        "from_cursor",
+        "to_cursor",
+        "revision_commitment"
+      ],
+      "type": "object"
+    },
+    "rng_state": {
+      "additionalProperties": false,
+      "properties": {
+        "draw_count": {"minimum": 0, "type": "integer"},
+        "history": {
+          "items": {"minLength": 1, "type": "string"},
+          "type": "array"
+        },
+        "seed": {"minLength": 1, "type": "string"}
+      },
+      "required": ["seed", "history", "draw_count"],
+      "type": "object"
+    },
+    "sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+  }
+}

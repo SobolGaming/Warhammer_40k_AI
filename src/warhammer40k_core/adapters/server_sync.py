@@ -136,7 +136,7 @@ def session_event_delta_payload(
     try:
         cursor = cursor_codec.decode(supplied_cursor)
         cursor_codec.validate_binding(cursor, session_id=record.session_id, viewer=viewer)
-        _validate_cursor_position(
+        validate_cursor_position(
             record=record,
             viewer=viewer,
             cursor=cursor,
@@ -225,7 +225,7 @@ def session_event_delta_payload(
     return payload
 
 
-def _validate_cursor_position(
+def validate_cursor_position(
     *,
     record: AuthoritativeSession,
     viewer: ViewerContext,

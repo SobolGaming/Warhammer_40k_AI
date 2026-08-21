@@ -78,6 +78,8 @@ FORBIDDEN_PARAMETERIZED_HELPER_TOKENS = frozenset(
 SESSION_PROTOCOL_METHODS = frozenset(
     (
         "advance_until_decision_or_terminal",
+        "authoritative_history_payload",
+        "authoritative_identity_payload",
         "decision_record_count",
         "event_page_for_context",
         "event_record_count",
@@ -90,6 +92,7 @@ SESSION_PROTOCOL_METHODS = frozenset(
         "submit_option",
         "submit_parameterized_payload",
         "support_profile",
+        "to_persistence_payload",
         "view",
         "view_for_context",
         "visible_event_count_for_context",

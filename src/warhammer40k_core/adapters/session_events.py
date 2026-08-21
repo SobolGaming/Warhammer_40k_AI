@@ -7,7 +7,7 @@ import hmac
 import secrets
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import TypedDict
+from typing import Self, TypedDict
 
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.core.validation import IdentifierValidator
@@ -133,6 +133,47 @@ class SessionCursor:
             "h": self.projection_state_hash,
         }
 
+    @classmethod
+    def from_payload(cls, payload: JsonValue) -> Self:
+        if not isinstance(payload, dict):
+            raise SessionEventProtocolError("Persisted cursor must be a JSON object.")
+        if set(payload) != {"v", "s", "p", "c", "o", "q", "r", "h"}:
+            raise SessionEventProtocolError("Persisted cursor keys are invalid.")
+        if type(payload["v"]) is not int or payload["v"] != CURSOR_TOKEN_VERSION:
+            raise SessionEventProtocolError("Persisted cursor version is unsupported.")
+        session_id = payload["s"]
+        principal_id = payload["p"]
+        cursor_scope = payload["c"]
+        offset = payload["o"]
+        visible_sequence = payload["q"]
+        session_revision = payload["r"]
+        projection_state_hash = payload["h"]
+        string_fields = (session_id, principal_id, cursor_scope, projection_state_hash)
+        if any(type(value) is not str for value in string_fields):
+            raise SessionEventProtocolError("Persisted cursor string field is invalid.")
+        integer_fields = (offset, visible_sequence, session_revision)
+        if any(type(value) is not int for value in integer_fields):
+            raise SessionEventProtocolError("Persisted cursor integer field is invalid.")
+        if (
+            type(session_id) is not str
+            or type(principal_id) is not str
+            or type(cursor_scope) is not str
+            or type(projection_state_hash) is not str
+            or type(offset) is not int
+            or type(visible_sequence) is not int
+            or type(session_revision) is not int
+        ):
+            raise SessionEventProtocolError("Persisted cursor field type is invalid.")
+        return cls(
+            session_id=session_id,
+            principal_id=principal_id,
+            cursor_scope=cursor_scope,
+            offset=offset,
+            visible_sequence=visible_sequence,
+            session_revision=session_revision,
+            projection_state_hash=projection_state_hash,
+        )
+
 
 def _new_cursor_registry() -> dict[str, SessionCursor]:
     return {}
@@ -151,6 +192,52 @@ class SessionCursorCodec:
     def __post_init__(self) -> None:
         if type(self.secret) is not bytes or len(self.secret) < 16:
             raise SessionEventProtocolError("Cursor secret must contain 16 bytes.")
+
+    def fork(self) -> Self:
+        clone = type(self)(secret=self.secret)
+        clone._cursor_by_token.update(self._cursor_by_token)
+        return clone
+
+    def to_persistence_payload(self) -> dict[str, JsonValue]:
+        return {
+            "secret_hex": self.secret.hex(),
+            "cursors": [
+                {"token": token, "cursor": cursor.to_payload()}
+                for token, cursor in sorted(self._cursor_by_token.items())
+            ],
+        }
+
+    @classmethod
+    def from_persistence_payload(cls, payload: JsonValue) -> Self:
+        if not isinstance(payload, dict) or set(payload) != {"secret_hex", "cursors"}:
+            raise SessionEventProtocolError("Persisted cursor codec keys are invalid.")
+        secret_hex = payload["secret_hex"]
+        cursor_payloads = payload["cursors"]
+        if type(secret_hex) is not str:
+            raise SessionEventProtocolError("Persisted cursor secret is invalid.")
+        try:
+            secret = bytes.fromhex(secret_hex)
+        except ValueError as exc:
+            raise SessionEventProtocolError("Persisted cursor secret is invalid.") from exc
+        if secret.hex() != secret_hex:
+            raise SessionEventProtocolError("Persisted cursor secret is not canonical hex.")
+        if not isinstance(cursor_payloads, list):
+            raise SessionEventProtocolError("Persisted cursor registry must be a list.")
+        codec = cls(secret=secret)
+        for item in cursor_payloads:
+            if not isinstance(item, dict) or set(item) != {"token", "cursor"}:
+                raise SessionEventProtocolError("Persisted cursor entry keys are invalid.")
+            token = item["token"]
+            if type(token) is not str:
+                raise SessionEventProtocolError("Persisted cursor token is invalid.")
+            cursor = SessionCursor.from_payload(item["cursor"])
+            expected_token = _token_for_cursor(secret=secret, cursor=cursor)
+            if not hmac.compare_digest(token, expected_token):
+                raise SessionEventProtocolError("Persisted cursor state authentication drifted.")
+            if token in codec._cursor_by_token:
+                raise SessionEventProtocolError("Persisted cursor token is duplicated.")
+            codec._cursor_by_token[token] = cursor
+        return codec
 
     def issue(
         self,
@@ -184,18 +271,7 @@ class SessionCursorCodec:
             minimum_offset=event_floor,
             minimum_revision=revision_floor,
         )
-        protected_state = canonical_json(cursor.to_payload()).encode("utf-8")
-        identifier = hmac.new(
-            self.secret,
-            b"core-v2-session-cursor-state\x00" + protected_state,
-            hashlib.sha256,
-        ).digest()
-        authentication_tag = hmac.new(
-            self.secret,
-            b"core-v2-session-cursor-auth\x00" + identifier,
-            hashlib.sha256,
-        ).digest()[:CURSOR_AUTHENTICATION_TAG_BYTES]
-        token = _urlsafe_encode(identifier + authentication_tag)
+        token = _token_for_cursor(secret=self.secret, cursor=cursor)
         existing = self._cursor_by_token.get(token)
         if existing is not None and existing != cursor:
             raise SessionEventProtocolError("Opaque cursor identifier collision detected.")
@@ -224,6 +300,24 @@ class SessionCursorCodec:
         if cursor is None:
             raise CursorValidationError(CursorResyncReason.EXPIRED)
         return cursor
+
+    def committed_cursor(self, token: str) -> SessionCursor:
+        """Return a currently registered cursor for durable response commitment."""
+        return self.decode(token)
+
+    def verify_committed_cursor(self, token: str, expected_cursor: SessionCursor) -> None:
+        """Authenticate a durable cursor even after registry retention has pruned it."""
+        if type(expected_cursor) is not SessionCursor:
+            raise SessionEventProtocolError("Committed cursor state is invalid.")
+        expected_token = _token_for_cursor(secret=self.secret, cursor=expected_cursor)
+        if not hmac.compare_digest(token, expected_token):
+            raise SessionEventProtocolError("Committed cursor authentication drifted.")
+        retained = self._cursor_by_token.get(token)
+        if retained is not None and retained != expected_cursor:
+            raise SessionEventProtocolError("Committed cursor registry state drifted.")
+
+    def retained_entries(self) -> tuple[tuple[str, SessionCursor], ...]:
+        return tuple(sorted(self._cursor_by_token.items()))
 
     def finalize_session(self, session_id: str) -> None:
         session = _validate_identifier("session_id", session_id)
@@ -331,6 +425,21 @@ def retention_floor(*, event_count: int, retention_limit: int) -> int:
 
 def _urlsafe_encode(value: bytes) -> str:
     return base64.urlsafe_b64encode(value).decode("ascii").rstrip("=")
+
+
+def _token_for_cursor(*, secret: bytes, cursor: SessionCursor) -> str:
+    protected_state = canonical_json(cursor.to_payload()).encode("utf-8")
+    identifier = hmac.new(
+        secret,
+        b"core-v2-session-cursor-state\x00" + protected_state,
+        hashlib.sha256,
+    ).digest()
+    authentication_tag = hmac.new(
+        secret,
+        b"core-v2-session-cursor-auth\x00" + identifier,
+        hashlib.sha256,
+    ).digest()[:CURSOR_AUTHENTICATION_TAG_BYTES]
+    return _urlsafe_encode(identifier + authentication_tag)
 
 
 def _urlsafe_decode(value: str) -> bytes:

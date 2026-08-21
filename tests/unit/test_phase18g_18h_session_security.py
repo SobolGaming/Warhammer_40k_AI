@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import base64
+import copy
+import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 from typing import Protocol, cast
 
+import pytest
 from jsonschema import Draft202012Validator
 
 from warhammer40k_core.adapters.access_control import (
@@ -18,8 +22,12 @@ from warhammer40k_core.adapters.access_control import (
     PrincipalCredential,
     PrincipalRegistry,
     PrincipalRole,
+    ViewerContext,
     bearer_authorization,
+    default_principal_registry,
 )
+from warhammer40k_core.adapters.command_protocol import SessionCommandEnvelope
+from warhammer40k_core.adapters.contracts import AdapterGameSession
 from warhammer40k_core.adapters.external_contract import (
     SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
     SESSION_CREATE_SCHEMA_VERSION,
@@ -27,10 +35,28 @@ from warhammer40k_core.adapters.external_contract import (
 from warhammer40k_core.adapters.redaction import HIDDEN_REQUEST_ID
 from warhammer40k_core.adapters.server import AdapterGameServer
 from warhammer40k_core.adapters.server_types import ServerResponse
-from warhammer40k_core.adapters.session_events import CURSOR_TOKEN_LENGTH
-from warhammer40k_core.adapters.session_protocol import DEFAULT_REVISION_RETENTION_LIMIT
+from warhammer40k_core.adapters.session_events import CURSOR_TOKEN_LENGTH, SessionCursor
+from warhammer40k_core.adapters.session_protocol import (
+    DEFAULT_REVISION_RETENTION_LIMIT,
+    AuthoritativeSession,
+    SessionProtocolError,
+)
+from warhammer40k_core.adapters.session_recovery import (
+    SessionRecoveryError,
+    recover_server_persistence_payload,
+    server_persistence_payload,
+)
+from warhammer40k_core.adapters.session_revision import (
+    SessionNonCommandOrigin,
+    SessionRevisionCommitment,
+    SessionRevisionCursorCommitment,
+    SessionRevisionIntegrityError,
+    SessionRevisionOrigin,
+    SessionRevisionOriginKind,
+)
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json
+from warhammer40k_core.engine.phase import LifecycleStatus
 
 PLAYER_A = "player-a"
 PLAYER_B = "player-b"
@@ -39,6 +65,325 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 class _PayloadValidator(Protocol):
     def validate(self, instance: object) -> None: ...
+
+
+@pytest.fixture(scope="module")
+def phase18l_security_checkpoint() -> tuple[AdapterGameServer, str, dict[str, JsonValue]]:
+    server = AdapterGameServer()
+    session_id = _create_session(server, game_id="phase18l-security-coverage")
+    _submit_lifecycle_command(
+        server,
+        session_id=session_id,
+        command_id="phase18l-security-start",
+        expected_revision=0,
+        submission_kind="start_session",
+    )
+    return server, session_id, server.persistence_payload()
+
+
+def test_phase18l_revision_value_objects_reject_malformed_integrity_evidence(
+    phase18l_security_checkpoint: tuple[AdapterGameServer, str, dict[str, JsonValue]],
+) -> None:
+    server, session_id, _payload = phase18l_security_checkpoint
+    record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
+    command_origin = record.revision_history[1].origin
+    envelope = command_origin.envelope
+    assert envelope is not None
+
+    with pytest.raises(SessionRevisionIntegrityError):
+        SessionRevisionOrigin(
+            origin_kind=cast(SessionRevisionOriginKind, "noncommand"),
+            operation=SessionNonCommandOrigin.SESSION_CREATED.value,
+        )
+    with pytest.raises(SessionRevisionIntegrityError):
+        SessionRevisionOrigin(
+            origin_kind=SessionRevisionOriginKind.NONCOMMAND,
+            operation="unsupported-noncommand-origin",
+        )
+    with pytest.raises(SessionRevisionIntegrityError):
+        SessionRevisionOrigin(
+            origin_kind=SessionRevisionOriginKind.NONCOMMAND,
+            operation=SessionNonCommandOrigin.SESSION_CREATED.value,
+            envelope_fingerprint="0" * 64,
+        )
+    with pytest.raises(SessionRevisionIntegrityError):
+        SessionRevisionOrigin(
+            origin_kind=SessionRevisionOriginKind.PROTOCOL_COMMAND,
+            operation="start_session",
+        )
+    with pytest.raises(SessionRevisionIntegrityError):
+        SessionRevisionOrigin(
+            origin_kind=SessionRevisionOriginKind.PROTOCOL_COMMAND,
+            operation="close_session",
+            command_envelope=cast(JsonValue, envelope.to_payload()),
+            envelope_fingerprint=envelope.fingerprint(),
+        )
+    with pytest.raises(SessionRevisionIntegrityError):
+        SessionRevisionOrigin(
+            origin_kind=SessionRevisionOriginKind.PROTOCOL_COMMAND,
+            operation="start_session",
+            command_envelope=cast(JsonValue, envelope.to_payload()),
+            envelope_fingerprint="0" * 64,
+        )
+    with pytest.raises(SessionRevisionIntegrityError):
+        SessionRevisionOrigin.noncommand(cast(SessionNonCommandOrigin, "session_created"))
+    with pytest.raises(SessionRevisionIntegrityError):
+        SessionRevisionOrigin.protocol_command(cast(SessionCommandEnvelope, object()))
+
+    creation_origin = SessionRevisionOrigin.noncommand(SessionNonCommandOrigin.SESSION_CREATED)
+    assert creation_origin.envelope is None
+    malformed_origin_payloads: list[JsonValue] = []
+    for field_name, field_value in (
+        ("origin_kind", False),
+        ("operation", False),
+        ("envelope_fingerprint", False),
+        ("origin_kind", "unsupported-origin-kind"),
+    ):
+        origin_payload = cast(dict[str, JsonValue], copy.deepcopy(creation_origin.to_payload()))
+        origin_payload[field_name] = cast(JsonValue, field_value)
+        malformed_origin_payloads.append(origin_payload)
+    malformed_origin_payloads.extend((None, {"origin_kind": "noncommand"}))
+    for malformed in malformed_origin_payloads:
+        with pytest.raises(SessionRevisionIntegrityError):
+            SessionRevisionOrigin.from_payload(malformed)
+
+    cursor_commitment = record.revision_history[1].from_cursor
+    assert cursor_commitment is not None
+    with pytest.raises(SessionRevisionIntegrityError):
+        SessionRevisionCursorCommitment(token="", cursor=cursor_commitment.cursor)
+    with pytest.raises(SessionRevisionIntegrityError):
+        SessionRevisionCursorCommitment(
+            token=cursor_commitment.token,
+            cursor=cast(SessionCursor, object()),
+        )
+    malformed_cursor_payload = cast(
+        dict[str, JsonValue], copy.deepcopy(cursor_commitment.to_payload())
+    )
+    malformed_cursor_payload["token"] = False
+    with pytest.raises(SessionRevisionIntegrityError):
+        SessionRevisionCursorCommitment.from_payload(malformed_cursor_payload)
+
+
+def test_phase18l_revision_commitments_reject_partial_and_malformed_evidence(
+    phase18l_security_checkpoint: tuple[AdapterGameServer, str, dict[str, JsonValue]],
+) -> None:
+    server, session_id, _payload = phase18l_security_checkpoint
+    record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
+    initial = record.revision_history[0]
+    command = record.revision_history[1]
+    assert command.journal_entry_hash is not None
+    assert command.response_hash is not None
+    assert command.from_cursor is not None
+    assert command.to_cursor is not None
+
+    invalid_commitments = (
+        {"session_revision": -1},
+        {"previous_revision_commitment": "0" * 64},
+        {"origin": cast(SessionRevisionOrigin, object())},
+        {"decision_count": -1},
+        {"started": cast(bool, 0)},
+        {"journal_entry_hash": "0" * 64},
+        {
+            "journal_entry_hash": command.journal_entry_hash,
+            "response_hash": command.response_hash,
+            "from_cursor": command.from_cursor,
+            "to_cursor": command.to_cursor,
+        },
+    )
+    for changes in invalid_commitments:
+        with pytest.raises(SessionRevisionIntegrityError):
+            replace(initial, **changes)
+    with pytest.raises(SessionRevisionIntegrityError):
+        replace(command, from_cursor=cast(SessionRevisionCursorCommitment, object()))
+
+    malformed_payloads: list[dict[str, JsonValue]] = []
+    for field_name, field_value in (
+        ("schema_version", "unsupported-revision-commitment"),
+        ("session_revision", False),
+        ("session_id", False),
+        ("started", 0),
+        ("previous_revision_commitment", False),
+        ("decision_records_hash", False),
+        ("revision_commitment", "0" * 64),
+    ):
+        commitment_payload = cast(dict[str, JsonValue], copy.deepcopy(initial.to_payload()))
+        commitment_payload[field_name] = cast(JsonValue, field_value)
+        malformed_payloads.append(commitment_payload)
+    malformed_payloads.append(
+        {**cast(dict[str, JsonValue], copy.deepcopy(initial.to_payload())), "extra": True}
+    )
+    for malformed in malformed_payloads:
+        with pytest.raises(SessionRevisionIntegrityError):
+            SessionRevisionCommitment.from_payload(malformed)
+
+
+def test_phase18l_canonical_session_recovery_rejects_malformed_collections(
+    phase18l_security_checkpoint: tuple[AdapterGameServer, str, dict[str, JsonValue]],
+) -> None:
+    server, _session_id, root_payload = phase18l_security_checkpoint
+    persisted = _object(_list(root_payload, "sessions")[0])
+
+    malformed_payloads: list[JsonValue] = [None]
+    missing_key = copy.deepcopy(persisted)
+    missing_key.pop("history_head")
+    malformed_payloads.append(missing_key)
+    field_changes: tuple[tuple[str, JsonValue], ...] = (
+        ("session_id", False),
+        ("session_revision", False),
+        ("closed", 0),
+        ("player_ids", "player-a"),
+        ("rules_overlay_ids", [False]),
+        ("command_journal", cast(JsonValue, {})),
+        ("history_head", False),
+    )
+    for field_name, field_value in field_changes:
+        candidate = copy.deepcopy(persisted)
+        candidate[field_name] = field_value
+        malformed_payloads.append(candidate)
+
+    for field_name, field_value in (
+        ("session_revision", False),
+        ("last_activity_at", False),
+        ("started", 0),
+    ):
+        malformed_snapshot = copy.deepcopy(persisted)
+        first_snapshot = _object(_list(malformed_snapshot, "revision_snapshots")[0])
+        first_snapshot[field_name] = cast(JsonValue, field_value)
+        malformed_payloads.append(malformed_snapshot)
+
+    for malformed in malformed_payloads:
+        with pytest.raises(SessionProtocolError):
+            AuthoritativeSession.from_persistence_payload(
+                malformed,
+                session_recovery_factory=server.session_recovery_factory,
+            )
+
+
+def test_phase18l_snapshot_and_live_session_guards_reject_invalid_domain_state(
+    phase18l_security_checkpoint: tuple[AdapterGameServer, str, dict[str, JsonValue]],
+) -> None:
+    server, session_id, _payload = phase18l_security_checkpoint
+    record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
+    snapshot = record.current_snapshot()
+    with pytest.raises(SessionProtocolError):
+        replace(snapshot, session_revision=-1)
+    with pytest.raises(SessionProtocolError):
+        replace(snapshot, adapter_session=cast(AdapterGameSession, object()))
+    with pytest.raises(SessionProtocolError):
+        replace(snapshot, lifecycle_status=cast(LifecycleStatus, object()))
+    with pytest.raises(SessionProtocolError):
+        replace(snapshot, event_count=-1)
+    with pytest.raises(SessionProtocolError):
+        replace(snapshot, started=cast(bool, 0))
+
+    with pytest.raises(SessionProtocolError):
+        replace(record, lifecycle_status=cast(LifecycleStatus, object()))
+    with pytest.raises(SessionProtocolError):
+        replace(record, last_activity_at="2000-01-01T00:00:00Z")
+    with pytest.raises(SessionProtocolError):
+        replace(record, session_revision=-1)
+    with pytest.raises(SessionProtocolError):
+        replace(record, started=cast(bool, 0))
+    with pytest.raises(SessionProtocolError):
+        replace(record, cursor_registry_finalized=cast(bool, 0))
+
+    with pytest.raises(SessionProtocolError):
+        record.snapshot(cast(int, False))
+    with pytest.raises(SessionProtocolError):
+        record.snapshot(record.session_revision + 1)
+    with pytest.raises(SessionProtocolError):
+        record.snapshot_for_viewer(cast(ViewerContext, "player-a"))
+    with pytest.raises(SessionProtocolError):
+        record.snapshot_at_event_offset(offset=-1, maximum_revision=-1)
+
+    duplicate_snapshot = record.fork_for_command()
+    with pytest.raises(SessionProtocolError):
+        duplicate_snapshot.capture_current_revision(
+            origin=SessionRevisionOrigin.noncommand(SessionNonCommandOrigin.LEGACY_ADVANCE_SESSION)
+        )
+    missing_snapshot = record.fork_for_command()
+    missing_snapshot.revision_snapshots.pop(missing_snapshot.session_revision)
+    with pytest.raises(SessionProtocolError):
+        missing_snapshot.snapshot(missing_snapshot.session_revision)
+    with pytest.raises(SessionProtocolError):
+        record.commit_status(
+            cast(LifecycleStatus, object()),
+            timestamp=record.last_activity_at,
+            origin=SessionRevisionOrigin.noncommand(SessionNonCommandOrigin.LEGACY_ADVANCE_SESSION),
+        )
+
+
+def test_phase18l_root_recovery_and_serialization_fail_closed_on_registry_drift(
+    phase18l_security_checkpoint: tuple[AdapterGameServer, str, dict[str, JsonValue]],
+) -> None:
+    server, session_id, root_payload = phase18l_security_checkpoint
+    registry = default_principal_registry()
+
+    malformed_roots: list[JsonValue] = [None]
+    missing_key = copy.deepcopy(root_payload)
+    missing_key.pop("content_hash")
+    malformed_roots.append(missing_key)
+    invalid_hash_type = copy.deepcopy(root_payload)
+    invalid_hash_type["content_hash"] = False
+    malformed_roots.append(invalid_hash_type)
+    invalid_hash_value = copy.deepcopy(root_payload)
+    invalid_hash_value["content_hash"] = "z" * 64
+    malformed_roots.append(invalid_hash_value)
+    drifted_hash = copy.deepcopy(root_payload)
+    drifted_hash["content_hash"] = "0" * 64
+    malformed_roots.append(drifted_hash)
+
+    root_field_changes: tuple[tuple[str, JsonValue], ...] = (
+        ("event_retention_limit", False),
+        ("sessions", cast(JsonValue, {})),
+    )
+    for field_name, field_value in root_field_changes:
+        candidate = copy.deepcopy(root_payload)
+        candidate[field_name] = field_value
+        _rehash_persistence_root(candidate)
+        malformed_roots.append(candidate)
+    for malformed in malformed_roots:
+        with pytest.raises(SessionRecoveryError):
+            recover_server_persistence_payload(
+                malformed,
+                principal_registry=registry,
+                session_recovery_factory=server.session_recovery_factory,
+            )
+
+    record = server._sessions[session_id]  # pyright: ignore[reportPrivateUsage]
+    expected_index = {record.game_id: record.session_id}
+    with pytest.raises(SessionRecoveryError):
+        server_persistence_payload(
+            sessions={"first": record, "second": record},
+            session_id_by_game_id=expected_index,
+            cursor_codec=server.cursor_codec,
+            principal_registry=registry,
+            event_retention_limit=record.event_retention_limit,
+        )
+    with pytest.raises(SessionRecoveryError):
+        server_persistence_payload(
+            sessions={session_id: record},
+            session_id_by_game_id={},
+            cursor_codec=server.cursor_codec,
+            principal_registry=registry,
+            event_retention_limit=record.event_retention_limit,
+        )
+    with pytest.raises(SessionRecoveryError):
+        server_persistence_payload(
+            sessions={"wrong-registry-key": record},
+            session_id_by_game_id=expected_index,
+            cursor_codec=server.cursor_codec,
+            principal_registry=registry,
+            event_retention_limit=record.event_retention_limit,
+        )
+    with pytest.raises(SessionRecoveryError):
+        server_persistence_payload(
+            sessions={session_id: record},
+            session_id_by_game_id=expected_index,
+            cursor_codec=server.cursor_codec,
+            principal_registry=registry,
+            event_retention_limit=record.event_retention_limit + 1,
+        )
 
 
 def test_phase18g_paginates_authoritative_offsets_and_resumes_from_projection() -> None:
@@ -278,7 +623,11 @@ def test_phase18g_publishes_revision_retention_and_bounds_cursor_state() -> None
     initial_event_count = record.adapter_session.event_record_count()
 
     for _ in range(DEFAULT_REVISION_RETENTION_LIMIT + 1):
-        record.commit_status(record.lifecycle_status, timestamp=record.last_activity_at)
+        record.commit_status(
+            record.lifecycle_status,
+            timestamp=record.last_activity_at,
+            origin=SessionRevisionOrigin.noncommand(SessionNonCommandOrigin.LEGACY_ADVANCE_SESSION),
+        )
         _projection(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN)
 
     assert record.session_revision == DEFAULT_REVISION_RETENTION_LIMIT + 1
@@ -984,6 +1333,13 @@ def _integer(value: dict[str, JsonValue], key: str) -> int:
     target = value[key]
     assert type(target) is int
     return target
+
+
+def _rehash_persistence_root(payload: dict[str, JsonValue]) -> None:
+    content = {key: value for key, value in payload.items() if key != "content_hash"}
+    payload["content_hash"] = hashlib.sha256(
+        canonical_json(cast(JsonValue, content)).encode("utf-8")
+    ).hexdigest()
 
 
 def _validate_event_delta(payload: dict[str, JsonValue]) -> None:

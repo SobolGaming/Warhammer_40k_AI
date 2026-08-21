@@ -6,12 +6,13 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self, TypedDict, cast
 
-from warhammer40k_core.core.rng import RandomSource, RandomSourcePayload
+from warhammer40k_core.core.rng import RandomSource, RandomSourceError, RandomSourcePayload
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision import DiceRollManager
 from warhammer40k_core.engine.decision_record import DecisionRecord, DecisionRecordPayload
 from warhammer40k_core.engine.decision_request import DecisionError, DecisionRequest
 from warhammer40k_core.engine.event_log import (
+    EventLogError,
     EventRecord,
     EventRecordPayload,
     JsonValue,
@@ -450,8 +451,9 @@ class ReplayArtifact:
         object.__setattr__(self, "initial_lifecycle_payload", initial_payload)
 
         rng_state = _rng_state_payload(self.initial_rng_state)
-        RandomSource.from_payload(rng_state)
-        if rng_state != _initial_rng_state_payload(initial_lifecycle):
+        if canonical_json(cast(JsonValue, rng_state)) != canonical_json(
+            cast(JsonValue, _initial_rng_state_payload(initial_lifecycle))
+        ):
             raise ReplayArtifactError("ReplayArtifact initial_rng_state drifted from snapshot.")
         object.__setattr__(self, "initial_rng_state", rng_state)
 
@@ -547,6 +549,8 @@ class ReplayArtifact:
             )
         except GameLifecycleError as exc:
             raise ReplayArtifactError("ReplayArtifact lifecycle payload is invalid.") from exc
+        except (DecisionError, EventLogError) as exc:
+            raise ReplayArtifactError("ReplayArtifact nested record payload is invalid.") from exc
         except KeyError as exc:
             raise ReplayArtifactError(
                 f"ReplayArtifact payload is missing required field: {exc.args[0]}."
@@ -1156,7 +1160,8 @@ def _validate_replay_artifact_payload(payload: object) -> ReplayArtifactPayload:
     schema_version = raw_payload.get("schema_version")
     if type(schema_version) is not str:
         raise ReplayArtifactError("ReplayArtifact schema_version must be a string.")
-    required_keys = (
+    required_keys = {
+        "schema_version",
         "artifact_id",
         "source_identity",
         "initial_rng_state",
@@ -1164,12 +1169,9 @@ def _validate_replay_artifact_payload(payload: object) -> ReplayArtifactPayload:
         "decision_records",
         "event_records",
         "projection_checkpoints",
-    )
-    missing_keys = tuple(key for key in required_keys if key not in raw_payload)
-    if missing_keys:
-        raise ReplayArtifactError(
-            f"ReplayArtifact payload is missing required field: {missing_keys[0]}."
-        )
+    }
+    if set(raw_payload) != required_keys:
+        raise ReplayArtifactError("ReplayArtifact payload fields are invalid.")
     if schema_version == REPLAY_ARTIFACT_SCHEMA_VERSION:
         return cast(ReplayArtifactPayload, raw_payload)
     raise ReplayArtifactError("ReplayArtifact schema_version is unsupported.")
@@ -1180,7 +1182,11 @@ def _lifecycle_payload(payload: GameLifecyclePayload) -> GameLifecyclePayload:
 
 
 def _rng_state_payload(payload: RandomSourcePayload) -> RandomSourcePayload:
-    return cast(RandomSourcePayload, validate_json_value(payload))
+    try:
+        validated = cast(RandomSourcePayload, validate_json_value(payload))
+        return RandomSource.from_payload(validated).to_payload()
+    except RandomSourceError as exc:
+        raise ReplayArtifactError("ReplayArtifact initial_rng_state is invalid.") from exc
 
 
 def _initial_rng_state_payload(lifecycle: GameLifecycle) -> RandomSourcePayload:

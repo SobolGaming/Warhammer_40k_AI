@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Protocol, Self, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, Self, TypedDict, runtime_checkable
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_request import (
@@ -26,10 +26,43 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.replay import ReplayArtifactPayload
 
 
+class AdapterSessionIdentityPayload(TypedDict):
+    game_id: str
+    player_ids: list[str]
+    ruleset_id: JsonValue
+    ruleset_descriptor_hash: str
+    rules_overlay_ids: list[str]
+    catalog_id: str
+    source_package_id: str
+    source_hash: str
+
+
+class AdapterSessionHistoryPayload(TypedDict):
+    decision_records: list[JsonValue]
+    event_records: list[JsonValue]
+    rng_seed: str
+    rng_history: list[str]
+    rng_draw_count: int
+    checkpoint_hash: str
+    authoritative_state_hash: str
+
+
 @runtime_checkable
 class AdapterGameSession(Protocol):
     def fork(self) -> Self:
         """Return an isolated copy for an atomic transport transaction."""
+        ...
+
+    def to_persistence_payload(self) -> JsonValue:
+        """Return a versioned, integrity-protected authoritative session checkpoint."""
+        ...
+
+    def authoritative_identity_payload(self) -> AdapterSessionIdentityPayload:
+        """Return exact engine-owned identities bound into a persistence checkpoint."""
+        ...
+
+    def authoritative_history_payload(self) -> AdapterSessionHistoryPayload:
+        """Return exact authoritative histories and hashes for revision commitments."""
         ...
 
     def start(self, config: GameConfig) -> LifecycleStatus:

@@ -34,11 +34,12 @@ EXPECTED_SCHEMA_NAMES = frozenset(
         "session-command-result.schema.json",
         "session-create.schema.json",
         "session-metadata.schema.json",
+        "session-persistence.schema.json",
         "session-projection.schema.json",
         "support-profile.schema.json",
     }
 )
-SMOKE_PROGRAM = r"""
+_SMOKE_PROGRAM_TEMPLATE = r"""
 import json
 from importlib.resources import files
 from pathlib import Path
@@ -55,8 +56,15 @@ from warhammer40k_core.adapters.external_contract import (
     SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
     SESSION_CREATE_SCHEMA_NAME,
     SESSION_CREATE_SCHEMA_VERSION,
+    SESSION_PERSISTENCE_SCHEMA_NAME,
+    SESSION_PERSISTENCE_SCHEMA_VERSION,
     ExternalContractValidationError,
     validate_external_request_payload,
+)
+from warhammer40k_core.build_identity import (
+    ENGINE_BUILD_ID_PREFIX,
+    current_engine_build_id,
+    verified_engine_build_identity,
 )
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.engine.event_log import validate_json_value
@@ -68,6 +76,21 @@ if repository_candidate.is_dir():
     raise RuntimeError("Installed-wheel smoke unexpectedly found a repository schema copy.")
 
 schema_directory = files("warhammer40k_core").joinpath("contracts", "schemas")
+build_manifest_resource = files("warhammer40k_core").joinpath(
+    "_engine_build_manifest.json"
+)
+if not build_manifest_resource.is_file():
+    raise RuntimeError("Installed wheel does not contain the engine build manifest.")
+build_manifest = json.loads(build_manifest_resource.read_text(encoding="utf-8"))
+build_identity = verified_engine_build_identity()
+engine_build_id = current_engine_build_id()
+if (
+    not engine_build_id.startswith(ENGINE_BUILD_ID_PREFIX)
+    or build_manifest.get("build_id") != engine_build_id
+    or build_manifest.get("fingerprint") != build_identity.fingerprint
+    or build_manifest.get("resource_count") != build_identity.resource_count
+):
+    raise RuntimeError("Installed wheel engine build identity did not verify exactly.")
 schema_names = {
     entry.name
     for entry in schema_directory.iterdir()
@@ -75,6 +98,14 @@ schema_names = {
 }
 if schema_names != expected_schema_names:
     raise RuntimeError("Installed wheel does not contain the complete canonical schema bundle.")
+
+persistence_schema = json.loads(
+    schema_directory.joinpath(SESSION_PERSISTENCE_SCHEMA_NAME).read_text(encoding="utf-8")
+)
+if persistence_schema["properties"]["schema_version"]["const"] != (
+    SESSION_PERSISTENCE_SCHEMA_VERSION
+):
+    raise RuntimeError("Installed persistence schema version drifted from runtime constants.")
 
 create_payload = validate_json_value(
     {
@@ -183,6 +214,8 @@ print(
     json.dumps(
         {
             "package_path": module_path.as_posix(),
+            "engine_build_id": engine_build_id,
+            "engine_resource_count": build_identity.resource_count,
             "schema_count": len(schema_names),
             "validated_request_families": [
                 "create",
@@ -197,7 +230,7 @@ print(
     )
 )
 """
-SMOKE_PROGRAM = SMOKE_PROGRAM.replace(
+SMOKE_PROGRAM = _SMOKE_PROGRAM_TEMPLATE.replace(
     "__EXPECTED_SCHEMA_NAMES_JSON__",
     repr(json.dumps(sorted(EXPECTED_SCHEMA_NAMES))),
 )
@@ -250,6 +283,13 @@ def main() -> int:
         result = json.loads(completed.stdout)
         if result.get("schema_count") != len(EXPECTED_SCHEMA_NAMES):
             raise RuntimeError("Installed contract smoke returned an invalid schema count.")
+        engine_build_id = result.get("engine_build_id")
+        if (
+            not isinstance(engine_build_id, str)
+            or not engine_build_id.startswith("warhammer40k-core-v2:runtime-tree-sha256-v1:")
+            or result.get("engine_resource_count", 0) < 1
+        ):
+            raise RuntimeError("Installed contract smoke returned an invalid build identity.")
         print(completed.stdout.strip())
     return 0
 

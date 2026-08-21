@@ -176,7 +176,18 @@ descriptors and the versioned, viewer-scoped battlefield coordinate contract.
 The battlefield projection separates authoritative model/terrain/objective/zone
 geometry and hashes from advisory interaction overlays and render hints while
 preserving the shared engine decision and redaction paths.
-Persistence and recovery remain Phase 18L work.
+**Phase 18L is complete** for the single-authority durable session store,
+explicit first-boot initialization, atomic and read-back-verified SQLite v2
+command-state/journal/cursor commits, content-addressed checkpoints, verified
+decision-tail replay recovery, and an unpruned per-revision commitment chain
+that binds typed mutation origins, authoritative decision/event/RNG prefixes,
+adapter checkpoints, lifecycle `started`/`closed` flags, journal outcomes, and
+authenticated cursor transitions. The flags preserve typed creation, start,
+and final close validation after old full snapshots are pruned.
+Recovery also requires the generated runtime-tree build fingerprint and exact
+package/schema identities, and fails closed on missing state, corruption, or
+drift. The local hashes are an internal-consistency boundary, not resistance to
+a malicious database writer or rollback without an external trusted anchor.
 **Phase 16A is
 complete** for source-backed Deploy Armies: lifecycle setup now creates an empty
 source-backed battlefield at Create Battlefield, deploys units through
@@ -420,9 +431,14 @@ Implemented foundation and partial integration baselines:
 | 18G | Complete | Signed role-bound event cursors, deterministic pagination/retention, typed resynchronization, and full-projection reconnect checkpoints |
 | 18H | Complete | Authenticated server-owned principal roles, explicit authorization policy, delayed spectators, and shared differential redaction |
 | 18I | Complete | Engine-authored neutral interaction descriptors, exact registered-family coverage, typed submission schema references, and generated TypeScript renderer selection |
+| 18J | Complete | Versioned battlefield coordinate contract with separated authoritative, interaction, and render geometry |
+| 18L | Complete | Explicit durable initialization, exact SQLite v2 validation plus transactional read-back, immutable runtime-tree build identity, unpruned revision commitments, exact recovery, and fail-stop publication |
 | 18M-A | Complete | HTTP/OpenAPI-only TypeScript conformance client for the first certified setup/deployment, reconnect, terminal, and replay-equivalence scenario |
 
 Next / planned sequence:
+
+Completed adapter phases such as 18J and 18L remain in the completed table
+above; this table contains only unfinished work.
 
 | Phase | Status | Purpose |
 |---|---:|---|
@@ -430,9 +446,8 @@ Next / planned sequence:
 | 17H | Planned | Datasheet, wargear, weapon ability, generated source-row coverage, and execution for covered ability items |
 | 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
 | 17M | Planned | Source-backed generic semantic completion organized by reusable mechanic family |
-| 17N | Planned | Mission, terrain, deployment, objective, and battlefield package completion |
-| 18J | Complete | Versioned battlefield coordinate contract with separated authoritative, interaction, and render geometry |
-| 18K-18L | Planned | Interface intent and persistence |
+| 17N | Partial | Phase 20A matrix selection and end-to-end setup/replay/viewer certification; battlefield geometry and all Primary/Secondary scoring slices are complete |
+| 18K | Planned | Interface intent and opportunity UX |
 | 18M-B+ | Planned | Remaining decision-family, race, golden-corpus, persistence-claim, and Phase 20A backend certification coverage |
 | 19A-19F | Planned | Performance, AI orchestration, self-play, training corpus generation, and observability |
 | 20A-20D | Planned | Certified vertical slice, full-game regression, adversarial soak, and release gates |
@@ -460,14 +475,14 @@ by the adapter decision contract untouched. This review does not assign Phase
 | Persistence and recovery | Phase 18L | New single-authority persistence, checkpoint, replay, and recovery contract. |
 | Backend conformance/reference server | Phase 18M | Promotes the current development server into a contract proof and backend handoff boundary. |
 | Generic semantic mechanic families | Phase 17M | Adds a source-backed, generic-first completion track without authorizing speculative hooks. |
-| Mission/terrain/battlefield completion | Phase 17N | Completes the source inventories and pending geometry/scoring execution needed by a visual product. |
+| Mission/terrain/battlefield completion | Phase 17N | Completes Phase 20A matrix selection and end-to-end setup/replay/viewer certification; geometry and Primary/Secondary scoring execution are complete. |
 | Capability/support manifest | Phase 17O | Replaces a single support answer with distinct load, display, muster, physical, semantic, full-game, network, and replay capabilities. |
 | Interactive/headless performance budgets | Phase 19A | Extends the existing performance owner rather than creating a duplicate phase. |
 | Observability and rule tracing | Phase 19F | Phase 19B already owns legal-candidate generation, so tracing receives a new non-conflicting owner. |
 | Certified full-game vertical slice | Phase 20A | Becomes the first constrained certification row in the existing compliance matrix. |
 | Long-running/adversarial testing | Phase 20C | Extends the existing soak owner; Phase 20B remains the deterministic regression suite. |
 
-The recommended implementation order is:
+The integration review's historical implementation order was:
 
 1. Phase 18D external contract baseline.
 2. Phase 18E session and transport semantics.
@@ -484,9 +499,11 @@ The recommended implementation order is:
 13. Phase 20A certified full-game slice.
 14. Phase 20C long-running and adversarial soak.
 
-Phase 17M and Phase 17O proceed as source-backed engine work alongside this
-sequence. They do not authorize UI/backend code to treat loadable content as
-semantically executable or to bypass typed unsupported results.
+That sequence is complete through Phase 18L except for the independently
+planned Phase 18K interface-intent surface. Phase 17M and the remaining Phase
+17N work proceed as source-backed engine work alongside Phase 18M-B+; they do
+not authorize UI/backend code to treat loadable content as semantically
+executable or to bypass typed unsupported results.
 
 ## Cross-cutting architectural rules
 
@@ -5770,8 +5787,9 @@ Status: Complete. `AdapterGameServer` and its local HTTP wrapper expose the
 formal reference session protocol while keeping create, advance, view, catalog,
 event, decision submission, replay export, typed errors, redaction, and
 engine-owned dice paths behind `AdapterGameSession`. Durable resynchronization
-and authentication are completed by Phases 18G and 18H; persistence remains
-assigned to Phase 18L rather than being implied by this phase.
+and authentication are completed by Phases 18G and 18H. Phase 18L now persists
+and recovers this same facade-owned authoritative state without transferring
+engine ownership to the transport.
 
 Required operations:
 
@@ -5942,7 +5960,9 @@ retries, stale revisions and requests, wrong principals, malformed envelopes,
 illegal finite and parameterized proposals, closed sessions, injected
 pre-commit failure, terminal and closed sessions, and exact
 replay/event/projection reproduction. Phase 18L
-still owns durable persistence of the same atomic unit across process failure.
+persists that same atomic unit before publication and restores idempotent
+outcomes, cursors, replay state, and authoritative checkpoints across process
+failure.
 
 ## Phase 18G: event stream and resynchronization contract
 
@@ -6304,25 +6324,71 @@ Required tests:
 
 Priority: P1 for hosted backends.
 
+Status: Complete. The reference adapter server can use the Phase 18L durable
+store to write one closed, content-addressed `session-persistence-v2-phase18l`
+operator artifact. First boot is an explicit initialization operation that
+exclusively reserves a new database path and transactionally installs the exact
+schema plus initial empty-server root; ordinary server construction with a store
+always performs recovery, and a missing file or singleton row is never treated
+as an empty authority. An interrupted initialization requires deliberate
+operator repair or replacement rather than implicit retry.
+
+Every committed command publishes the staged authoritative session,
+idempotency outcome, revision snapshots and unpruned revision commitment,
+cursor registry, and server index only after their atomic durable transaction
+succeeds. Recorded rejected attempts and successful reads that update
+operational activity metadata use the same transaction. Session creation is
+also durable before the new session becomes addressable, and the store maintains
+one serialized writer per authority. The process arms fail-stop state before it
+calls the commit boundary and clears it only after success, including when a
+custom store reports an `OSError` or `RuntimeError`. Only a fresh owner may
+resume after loading and verifying the durable checkpoint, so an ambiguous
+post-commit failure cannot be overwritten by stale in-memory state.
+
+The SQLite reference store uses `server-persistence-store-v2` and
+`PRAGMA user_version = 2`. It holds `BEGIN IMMEDIATE` across exact schema
+validation, existing-row validation, UPSERT, and exact read-back. Recovery and
+commit require the one expected STRICT singleton table, WAL mode, the exact
+column and constraint definition, and no extra tables, indexes, foreign keys,
+views, or triggers. A suppressed or rewritten write cannot be reported as a
+successful durable commit.
+
 Persist:
 
 - normalized game configuration and exact ruleset/catalog/source identities;
 - RNG seed and deterministic RNG state;
-- accepted command and decision records;
+- committed command-journal outcomes and decision records, including recorded
+  rejected attempts;
 - authoritative event records;
-- session revision and idempotency results;
+- session revision, idempotency results, and every unpruned per-revision
+  commitment;
 - latest replay inputs/artifact and periodic verified state checkpoint;
 - participant/role bindings and cursor policy state;
-- server/engine/contract versions and terminal status.
+- server/engine/contract versions, immutable runtime-tree build fingerprint,
+  and terminal status.
+
+Each domain-separated revision commitment binds the preceding revision,
+typed command or non-command origin, exact decision/event/RNG prefixes,
+resulting adapter checkpoint and viewer-independent authoritative state,
+explicit `started`/`closed` flags, journal outcome, and authenticated
+before/after cursor state. Those flags keep creation, start, and final close
+transition validation independent of full-snapshot retention. Full historical
+snapshots remain bounded by retention, but their commitments do not. Recovery
+can therefore prove command/journal coverage and prefix membership even after
+the corresponding full snapshot is pruned.
 
 Recovery procedure:
 
-1. Load the latest verified checkpoint.
-2. Replay subsequent accepted decisions through
+1. Load the latest verified checkpoint and require exact persistence, package,
+   runtime-build, authorization, schema, cursor, and root identities.
+2. Validate the contiguous revision chain, typed origins, journal bijection,
+   historical prefixes, retained checkpoints, command-to-decision linkage, and
+   authenticated cursor transitions.
+3. Replay subsequent accepted decisions through
    `GameLifecycle.submit_decision(...)` via the session owner.
-3. Verify decision, event, projection, RNG, and package hashes plus deterministic
+4. Verify decision, event, projection, RNG, and package hashes plus deterministic
    event sequence/revision.
-4. Resume service only on exact agreement; otherwise return typed corruption or
+5. Resume service only on exact agreement; otherwise return typed corruption or
    drift diagnostics.
 
 Do not silently continue from partially reconstructed state.
@@ -6340,9 +6406,39 @@ Required tests:
 
 - restart from checkpoints at setup and each major phase boundary;
 - crash before and after atomic command commit;
-- replay tail recovery with exact projection/event/RNG hashes;
-- package, engine, schema, and checkpoint drift fail closed;
-- participant roles and viewer cursors restore without visibility widening.
+- explicit initialization versus missing-file/missing-root recovery;
+- SQLite ignored/rewritten writes, exact STRICT/singleton schema drift, and a
+  schema mutation racing the write transaction;
+- decision-tail replay recovery with exact projection/event/RNG hashes;
+- package, immutable engine-build, schema, and checkpoint drift fail closed;
+- alternate-branch snapshot, removed journal, changed envelope, coherent
+  response-projection, and valid-but-wrong cursor drift fail closed;
+- participant roles and authenticated viewer cursors restore without visibility
+  widening;
+- typed and untyped custom-store commit-boundary errors latch fail-stop state.
+
+Completion gate: met. Focused real-session regressions restart from created,
+setup, Movement, Shooting, Charge, Fight, terminal, and closed checkpoints;
+exercise failures immediately before and after durable replacement; replay a
+non-empty accepted decision tail through the adapter-owned recovery path;
+separately restore and validate the command journal without reapplying command
+envelopes; validate the exact revision chain and command-to-history evidence;
+and compare session revision, decision/event records, RNG state, replay artifact,
+projection hashes, authenticated cursor scopes, and idempotent response bytes.
+Independent missing-root, SQLite schema/write, corruption, package, ruleset,
+catalog, source, runtime-build, external-contract, persistence-schema,
+revision-chain, and checkpoint-hash drift cases fail before a session is
+registered.
+Recovered participant bindings retain their authorization epoch and cursor
+policy exactly, so restart cannot widen viewer access.
+
+The content-addressed root, SQLite row hash, revision commitments, and build
+fingerprint provide deterministic internal consistency. They are not keyed
+storage attestations and cannot, by themselves, detect a malicious writer that
+replaces the complete artifact and recomputes its hashes or rolls storage back
+to an older valid root. Deployments whose threat model includes hostile storage
+or rollback require a trusted external monotonic, signed, or append-only anchor;
+Phase 18L does not claim that protection.
 
 ## Phase 18M: backend conformance harness and reference server
 
