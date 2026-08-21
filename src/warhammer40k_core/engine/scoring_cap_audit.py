@@ -23,6 +23,10 @@ def metadata_with_vp_cap_audit(
     primary_battle_round_cap: int | None = None,
     primary_battle_round_points_before: int = 0,
     primary_battle_round_points_after: int = 0,
+    secondary_turn_vp_cap: int | None = None,
+    secondary_turn_points_before: int = 0,
+    secondary_turn_points_after: int = 0,
+    secondary_turn_remaining_capacity: int | None = None,
 ) -> JsonValue:
     audit = {
         "requested_amount": _positive_int("requested_amount", requested_amount),
@@ -60,6 +64,28 @@ def metadata_with_vp_cap_audit(
         audit["primary_battle_round_points_after"] = _non_negative_int(
             "primary_battle_round_points_after",
             primary_battle_round_points_after,
+        )
+    if secondary_turn_vp_cap is not None:
+        remaining = (
+            secondary_turn_remaining_capacity
+            if secondary_turn_remaining_capacity is not None
+            else max(secondary_turn_vp_cap - secondary_turn_points_after, 0)
+        )
+        audit["secondary_turn_vp_cap"] = _positive_int(
+            "secondary_turn_vp_cap",
+            secondary_turn_vp_cap,
+        )
+        audit["secondary_turn_points_before"] = _non_negative_int(
+            "secondary_turn_points_before",
+            secondary_turn_points_before,
+        )
+        audit["secondary_turn_points_after"] = _non_negative_int(
+            "secondary_turn_points_after",
+            secondary_turn_points_after,
+        )
+        audit["secondary_turn_remaining_capacity"] = _non_negative_int(
+            "secondary_turn_remaining_capacity",
+            remaining,
         )
     validated_metadata = validate_json_value(metadata)
     if validated_metadata is None:

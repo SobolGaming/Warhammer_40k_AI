@@ -40,7 +40,6 @@ from warhammer40k_core.engine.mission_action_policies import (
     mission_action_policy_descriptors,
     mission_action_policy_for_id,
 )
-from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
@@ -75,8 +74,16 @@ from warhammer40k_core.engine.scoring import (
     SecondaryMissionCardState,
     SecondaryMissionCardStatus,
     TacticalSecondaryAchievementContext,
-    VictoryPointSourceKind,
-    VictoryPointTransaction,
+)
+from warhammer40k_core.engine.secondary_mission_choices import (
+    SECONDARY_CHOICE_DECISION_TYPES,
+    apply_secondary_mission_choice,
+    invalid_secondary_mission_choice_status,
+)
+from warhammer40k_core.engine.secondary_when_drawn import (
+    RESOLVE_TACTICAL_SECONDARY_WHEN_DRAWN_DECISION_TYPE,
+    apply_tactical_secondary_when_drawn,
+    invalid_tactical_secondary_when_drawn_status,
 )
 
 if TYPE_CHECKING:
@@ -94,6 +101,8 @@ MISSION_DECISION_TYPES = frozenset(
         TACTICAL_SECONDARY_DISCARD_DECISION_TYPE,
         START_MISSION_ACTION_DECISION_TYPE,
         SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
+        RESOLVE_TACTICAL_SECONDARY_WHEN_DRAWN_DECISION_TYPE,
+        *SECONDARY_CHOICE_DECISION_TYPES,
     )
 )
 _PRIMARY_MISSION_ACTION_IDS = frozenset(
@@ -364,30 +373,52 @@ def request_tactical_secondary_score(
                 "unsupported_reason": drift_reason,
             },
         )
+    card_state = state.secondary_mission_card_state(
+        player_id=requested_player,
+        secondary_mission_id=requested_secondary_id,
+        mode=SecondaryMissionCardMode.TACTICAL,
+    )
+    if card_state is None:
+        raise GameLifecycleError("Tactical secondary score requires an active card.")
+    from warhammer40k_core.engine.secondary_tactical_achievement import (
+        tactical_secondary_score_applied_amount_from_state,
+    )
+
+    score_applies_vp = (
+        tactical_secondary_score_applied_amount_from_state(
+            state=state,
+            card_state=card_state,
+        )
+        > 0
+    )
     context = _tactical_secondary_score_context(recorded_context)
+    options = (
+        *(
+            (
+                DecisionOption(
+                    option_id=f"score:{requested_secondary_id}",
+                    label=f"Score {requested_secondary_id}",
+                    payload={**context, "score": True},
+                ),
+            )
+            if score_applies_vp
+            else ()
+        ),
+        DecisionOption(
+            option_id=f"retain:{requested_secondary_id}",
+            label=f"Retain {requested_secondary_id}",
+            payload={**context, "score": False},
+        ),
+    )
     request = DecisionRequest(
         request_id=state.next_decision_request_id(),
         decision_type=TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
         actor_id=requested_player,
         payload={
             **context,
-            "legal_option_ids": [
-                f"score:{requested_secondary_id}",
-                f"retain:{requested_secondary_id}",
-            ],
+            "legal_option_ids": [option.option_id for option in options],
         },
-        options=(
-            DecisionOption(
-                option_id=f"score:{requested_secondary_id}",
-                label=f"Score {requested_secondary_id}",
-                payload={**context, "score": True},
-            ),
-            DecisionOption(
-                option_id=f"retain:{requested_secondary_id}",
-                label=f"Retain {requested_secondary_id}",
-                payload={**context, "score": False},
-            ),
-        ),
+        options=options,
     )
     decisions.request_decision(request)
     return LifecycleStatus.waiting_for_decision(
@@ -539,11 +570,15 @@ def invalid_mission_decision_status(
             request=request,
             runtime_modifier_registry=runtime_modifier_registry,
         )
+    if request.decision_type == RESOLVE_TACTICAL_SECONDARY_WHEN_DRAWN_DECISION_TYPE:
+        return invalid_tactical_secondary_when_drawn_status(state=state, result=result)
+    if request.decision_type in SECONDARY_CHOICE_DECISION_TYPES:
+        return invalid_secondary_mission_choice_status(state=state, result=result)
     if request.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
         payload = _payload_object(result.payload)
         player_id = _payload_string(payload, key="player_id")
         secondary_mission_id = _payload_string(payload, key="secondary_mission_id")
-        drift_reason = _tactical_secondary_score_drift_reason(
+        drift_reason = tactical_secondary_score_drift_reason(
             state=state,
             payload=payload,
             player_id=player_id,
@@ -761,8 +796,18 @@ def apply_mission_decision(
         ):
             raise GameLifecycleError("Primary mission choice was not handled.")
         return
+    if result.decision_type == RESOLVE_TACTICAL_SECONDARY_WHEN_DRAWN_DECISION_TYPE:
+        apply_tactical_secondary_when_drawn(state=state, result=result, decisions=decisions)
+        return
+    if result.decision_type in SECONDARY_CHOICE_DECISION_TYPES:
+        apply_secondary_mission_choice(state=state, result=result, decisions=decisions)
+        return
     if result.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
-        _apply_tactical_secondary_score(state=state, result=result, decisions=decisions)
+        from warhammer40k_core.engine.secondary_tactical_achievement import (
+            apply_tactical_secondary_score_result,
+        )
+
+        apply_tactical_secondary_score_result(state=state, result=result, decisions=decisions)
         return
     if result.decision_type == TACTICAL_SECONDARY_DISCARD_DECISION_TYPE:
         _apply_tactical_secondary_discard(state=state, result=result, decisions=decisions)
@@ -791,83 +836,6 @@ def apply_mission_decision(
         )
         return
     raise GameLifecycleError("Mission decision handler received unsupported decision_type.")
-
-
-def _apply_tactical_secondary_score(
-    *,
-    state: GameState,
-    result: DecisionResult,
-    decisions: DecisionController,
-) -> None:
-    _assert_battle_state(state)
-    payload = _payload_object(result.payload)
-    player_id = _payload_string(payload, key="player_id")
-    secondary_mission_id = _payload_string(payload, key="secondary_mission_id")
-    achievement_id = _payload_string(payload, key="achievement_id")
-    drift_reason = _tactical_secondary_score_drift_reason(
-        state=state,
-        payload=payload,
-        player_id=player_id,
-        secondary_mission_id=secondary_mission_id,
-        result=result,
-    )
-    if drift_reason is not None:
-        raise GameLifecycleError(f"Tactical secondary score option drifted: {drift_reason}.")
-    achievement_context = state.tactical_secondary_achievement_context(achievement_id)
-    if achievement_context is None:
-        raise GameLifecycleError("Tactical secondary achievement context is missing.")
-    achievement_payload = validate_json_value(achievement_context.to_payload())
-    if _payload_bool(payload, key="score"):
-        scored = state.score_secondary_mission(
-            player_id=player_id,
-            secondary_mission_id=secondary_mission_id,
-            mode=SecondaryMissionCardMode.TACTICAL,
-            phase=_current_phase(state),
-        )
-        if scored.scored_transaction_id is None:
-            raise GameLifecycleError("Scored Tactical secondary requires a transaction ID.")
-        transaction = _victory_point_transaction_by_id(
-            state=state,
-            player_id=player_id,
-            transaction_id=scored.scored_transaction_id,
-        )
-        decisions.event_log.append(
-            "tactical_secondary_mission_scored",
-            {
-                "game_id": state.game_id,
-                "player_id": player_id,
-                "active_player_id": _active_player_id(state),
-                "battle_round": state.battle_round,
-                "phase": _current_phase(state).value,
-                "achievement_context": achievement_payload,
-                "secondary_mission_card_state": validate_json_value(scored.to_payload()),
-                "victory_point_transaction": validate_json_value(transaction.to_payload()),
-                "discarded_after_score": True,
-            },
-        )
-        state.consume_tactical_secondary_achievement_context(achievement_id)
-        return
-    card_state = state.secondary_mission_card_state(
-        player_id=player_id,
-        secondary_mission_id=secondary_mission_id,
-        mode=SecondaryMissionCardMode.TACTICAL,
-    )
-    if card_state is None:
-        raise GameLifecycleError("Retained Tactical secondary card is not active.")
-    decisions.event_log.append(
-        "tactical_secondary_mission_score_declined",
-        {
-            "game_id": state.game_id,
-            "player_id": player_id,
-            "active_player_id": _active_player_id(state),
-            "battle_round": state.battle_round,
-            "phase": _current_phase(state).value,
-            "achievement_context": achievement_payload,
-            "secondary_mission_card_state": validate_json_value(card_state.to_payload()),
-            "retained": True,
-        },
-    )
-    state.consume_tactical_secondary_achievement_context(achievement_id)
 
 
 def _apply_tactical_secondary_discard(
@@ -1228,32 +1196,37 @@ def _tactical_secondary_achievement_context_drift_reason(
         return "card_not_active"
     if context.card_battle_round != card_state.battle_round:
         return "card_battle_round_drift"
-    if state.mission_setup is None:
-        raise GameLifecycleError("Tactical secondary achievement context requires MissionSetup.")
-    policy = mission_scoring_policies_from_setup(state.mission_setup)
-    award = policy.secondary_award(
-        player_id=context.player_id,
-        battle_round=state.battle_round,
-        phase=_current_phase(state).value,
-        secondary_mission_id=context.secondary_mission_id,
-        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
-        hidden=False,
+    from warhammer40k_core.engine.secondary_tactical_achievement import (
+        expected_tactical_secondary_award_from_state,
     )
-    metadata = _payload_object(award.metadata)
-    if context.victory_points != award.amount:
-        return "victory_points_drift"
-    if context.scoring_rule_id != _payload_string(metadata, key="scoring_rule_id"):
+
+    expected = expected_tactical_secondary_award_from_state(state=state, card_state=card_state)
+    if expected is None:
+        return "award_missing"
+    metadata = _payload_object(expected.metadata)
+    rule_ids = metadata.get("scoring_rule_ids")
+    conditions = metadata.get("scoring_rule_conditions")
+    source_ids = metadata.get("scoring_rule_source_ids")
+    if not isinstance(rule_ids, list) or not rule_ids:
         return "scoring_rule_id_drift"
-    if context.scoring_rule_condition != _payload_string(metadata, key="scoring_rule_condition"):
+    if not isinstance(conditions, list) or not conditions:
         return "scoring_rule_condition_drift"
-    if context.scoring_rule_source_id != _payload_string(metadata, key="scoring_rule_source_id"):
+    if not isinstance(source_ids, list) or not source_ids:
         return "scoring_rule_source_id_drift"
-    if context.scoring_timing != award.scoring_timing:
+    if context.victory_points != expected.amount:
+        return "victory_points_drift"
+    if context.scoring_rule_id != rule_ids[0]:
+        return "scoring_rule_id_drift"
+    if context.scoring_rule_condition != conditions[0]:
+        return "scoring_rule_condition_drift"
+    if context.scoring_rule_source_id != source_ids[0]:
+        return "scoring_rule_source_id_drift"
+    if context.scoring_timing != expected.scoring_timing:
         return "scoring_timing_drift"
     return None
 
 
-def _tactical_secondary_score_drift_reason(
+def tactical_secondary_score_drift_reason(
     *,
     state: GameState,
     payload: dict[str, JsonValue],
@@ -1294,21 +1267,23 @@ def _tactical_secondary_score_drift_reason(
         return "card_not_active"
     if _payload_int(payload, key="card_battle_round") != card_state.battle_round:
         return "card_battle_round_drift"
+    score = payload.get("score")
+    if type(score) is not bool:
+        raise GameLifecycleError("Tactical secondary score payload requires a score bool.")
+    if score:
+        from warhammer40k_core.engine.secondary_tactical_achievement import (
+            tactical_secondary_score_applied_amount_from_state,
+        )
+
+        if (
+            tactical_secondary_score_applied_amount_from_state(
+                state=state,
+                card_state=card_state,
+            )
+            == 0
+        ):
+            return "victory_point_capacity_exhausted"
     return None
-
-
-def _victory_point_transaction_by_id(
-    *,
-    state: GameState,
-    player_id: str,
-    transaction_id: str,
-) -> VictoryPointTransaction:
-    requested_transaction_id = _validate_identifier("transaction_id", transaction_id)
-    ledger = state.victory_point_ledger_for_player(player_id)
-    for transaction in ledger.transactions:
-        if transaction.transaction_id == requested_transaction_id:
-            return transaction
-    raise GameLifecycleError("Victory point transaction was not found.")
 
 
 def _apply_tactical_secondary_discard_cp_reward(
@@ -1447,13 +1422,6 @@ def _payload_int(payload: dict[str, JsonValue], *, key: str) -> int:
     value = payload[key]
     if type(value) is not int:
         raise GameLifecycleError(f"Mission decision payload key must be an integer: {key}.")
-    return value
-
-
-def _payload_bool(payload: dict[str, JsonValue], *, key: str) -> bool:
-    value = payload[key]
-    if type(value) is not bool:
-        raise GameLifecycleError(f"Mission decision payload key must be a bool: {key}.")
     return value
 
 

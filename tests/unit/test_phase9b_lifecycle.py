@@ -8,6 +8,7 @@ from typing import cast
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
 from tests.model_geometry_helpers import accepted_model_geometry
+from tests.phase17n_secondary_mission_helpers import drain_pending_secondary_mission_setup
 from tests.setup_completion_helpers import ensure_army_mustered_events_for_fixture
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
@@ -260,9 +261,14 @@ def _decline_stratagem_window_if_pending(
     *,
     result_number: int,
 ) -> LifecycleStatus:
-    request = status.decision_request
+    current = drain_pending_secondary_mission_setup(
+        lifecycle,
+        status,
+        result_id_prefix=f"decision-result-{result_number:06d}-secondary-setup",
+    )
+    request = current.decision_request
     if request is None or request.decision_type != STRATAGEM_DECISION_TYPE:
-        return status
+        return current
     return lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id=f"decision-result-{result_number:06d}",
@@ -1220,12 +1226,21 @@ def test_lifecycle_and_command_handler_fail_fast_on_invalid_entry_points() -> No
 
     _advance_to_battle(lifecycle)
     assert CommandPhaseHandler().phase is BattlePhase.COMMAND
-    _submit_pending(lifecycle, option_id="draw", result_number=3)
-    _submit_pending(
+    draw_status = _submit_pending(lifecycle, option_id="draw", result_number=3)
+    draw_status = drain_pending_secondary_mission_setup(
         lifecycle,
-        option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
-        result_number=4,
+        draw_status,
+        result_id_prefix="decision-result-secondary-setup",
     )
+    if (
+        draw_status.decision_request is not None
+        and draw_status.decision_request.decision_type == STRATAGEM_DECISION_TYPE
+    ):
+        _submit_pending(
+            lifecycle,
+            option_id=DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+            result_number=4,
+        )
     assert lifecycle.state is not None
     assert lifecycle.state.current_battle_phase is BattlePhase.MOVEMENT
     with pytest.raises(GameLifecycleError, match="only in the COMMAND phase"):

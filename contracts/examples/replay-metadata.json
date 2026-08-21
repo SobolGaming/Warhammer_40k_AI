@@ -15584,6 +15584,7 @@
       "secondary_mission_card_states": [],
       "secondary_mission_choices": [],
       "secondary_objective_cleanse_states": [],
+      "secondary_scoring_state_evidence_records": [],
       "secondary_terrain_plunder_states": [],
       "secondary_unit_destruction_states": [],
       "setup_sequence": [
@@ -15684,7 +15685,7 @@
     "game_config_hash": "0f4bea564150afae66c86c23b8289a04bfe2bde2bae0463752717825e9a62291",
     "game_id": "phase18d-contract-session",
     "mission_pack_id": "11e-warhammer-event-companion-2026-07",
-    "mission_source_package_hash": "5a4dcccfa86bbecc8ded95275c39ee5401ce0e27e5f426c28ae4575e02114812",
+    "mission_source_package_hash": "9e86c81513efe6f0842db2ff14df8a026d085818cc2df3abf9fbff7662d8e9e5",
     "rules_overlay_ids": [],
     "ruleset_descriptor_hash": "50ca2851b6f30ff2891ef55d1cd5bebee425fd47c17a3c3807362ce99e6c3e4e",
     "source_ids": [

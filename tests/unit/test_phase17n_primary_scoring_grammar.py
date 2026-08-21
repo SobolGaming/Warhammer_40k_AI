@@ -2224,6 +2224,7 @@ def _runtime_policy(
         secondary_vp_cap=40,
         battle_ready_vp=10,
         total_vp_cap=100,
+        secondary_max_vp_per_turn=15,
         end_of_round_scoring_windows=("end-of-round",),
         end_of_game_scoring_windows=("end-of-game",),
         source_id="source:mission-policy",

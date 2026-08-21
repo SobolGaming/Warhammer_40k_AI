@@ -463,14 +463,14 @@ def _dedicated_transport_state_without_transport_reconciliation(config: GameConf
         SecondaryMissionChoice(
             player_id="player-a",
             mode=SecondaryMissionMode.FIXED,
-            fixed_mission_ids=("area-denial", "assassination"),
+            fixed_mission_ids=("assassination", "bring_it_down"),
         )
     )
     state.record_secondary_mission_choice(
         SecondaryMissionChoice(
             player_id="player-b",
             mode=SecondaryMissionMode.FIXED,
-            fixed_mission_ids=("area-denial", "assassination"),
+            fixed_mission_ids=("assassination", "bring_it_down"),
         )
     )
     _advance_setup_state_to_step(state, SetupStep.CREATE_BATTLEFIELD)

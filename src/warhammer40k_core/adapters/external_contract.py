@@ -12,7 +12,7 @@ from referencing.jsonschema import Schema
 
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 
-EXTERNAL_CONTRACT_VERSION = "10.0.0"
+EXTERNAL_CONTRACT_VERSION = "10.1.0"
 
 CREATE_SESSION_SCHEMA_VERSION = "create-session-v3"
 DECISION_FAMILY_COVERAGE_SCHEMA_VERSION = "decision-family-coverage-v2-interactions"

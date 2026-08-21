@@ -53,6 +53,7 @@ from warhammer40k_core.engine.primary_mission_action_start_authority import (
     terrain_intersections_from_model_inventory,
 )
 from warhammer40k_core.engine.primary_mission_boundary_checkpoint import (
+    active_secondary_mission_card_states_from_checkpoint,
     capture_primary_mission_boundary_checkpoint,
     record_primary_mission_boundary_checkpoint,
     terrain_model_inventory_from_checkpoint,
@@ -65,10 +66,62 @@ from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence impor
 from warhammer40k_core.engine.primary_mission_boundary_physical_authority import (
     validate_primary_mission_boundary_physical_authority,
 )
+from warhammer40k_core.engine.primary_mission_boundary_state import (
+    primary_mission_boundary_state_from_checkpoint,
+)
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import SecondaryMissionCardState
 from warhammer40k_core.engine.unit_factory import UnitInstance
 from warhammer40k_core.geometry.pose import Pose
+
+
+def test_checkpoint_snapshots_all_players_active_secondary_cards_and_rebuilds_fight_state() -> None:
+    state, _decisions, action, _target_id = phase17n_started_primary_action_fixture(
+        layout_id="purge-the-foe-vs-priority-assets-layout-1",
+        attacker_force_disposition_id="purge-the-foe",
+        defender_force_disposition_id="priority-assets",
+        player_id="player-b",
+        mission_action_id="maintain-control",
+        current_phase=BattlePhase.FIGHT,
+    )
+    player_a_card = replace(
+        SecondaryMissionCardState.active_fixed(
+            player_id="player-a",
+            secondary_mission_id="engage-on-all-fronts",
+        ),
+        selection_payload={"selected_quarter_id": "north-east"},
+    )
+    player_b_card = replace(
+        SecondaryMissionCardState.active_fixed(
+            player_id="player-b",
+            secondary_mission_id="cleanse",
+        ),
+        selection_payload={"selected_objective_id": "objective-1"},
+    )
+    expected_cards = (player_a_card, player_b_card)
+    state.secondary_mission_card_states = list(expected_cards)
+    checkpoint = capture_primary_mission_boundary_checkpoint(
+        state=state,
+        boundary_kind="objective_control",
+        player_id=action.player_id,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+
+    assert active_secondary_mission_card_states_from_checkpoint(checkpoint) == expected_cards
+    assert checkpoint.active_secondary_mission_ids == (player_b_card.secondary_mission_id,)
+
+    state.secondary_mission_card_states = [
+        card.score(transaction_id=f"later-score-{card.player_id}") for card in expected_cards
+    ]
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.COMMAND)
+    boundary_state = primary_mission_boundary_state_from_checkpoint(
+        state=state,
+        checkpoint=checkpoint,
+    )
+
+    assert boundary_state.current_battle_phase is BattlePhase.FIGHT
+    assert tuple(boundary_state.secondary_mission_card_states) == expected_cards
+    assert boundary_state.transport_cargo_states == []
 
 
 @pytest.mark.parametrize(
@@ -537,6 +590,10 @@ def test_restore_rejects_action_checkpoint_active_player_drift() -> None:
         shot_unit_instance_ids=checkpoint.shot_unit_instance_ids,
         objective_control_modifier_sources=checkpoint.objective_control_modifier_sources,
         active_primary_marker_jsons=checkpoint.active_primary_marker_jsons,
+        active_secondary_mission_card_jsons=checkpoint.active_secondary_mission_card_jsons,
+        completed_mission_action_state_jsons=checkpoint.completed_mission_action_state_jsons,
+        primary_unit_destruction_state_jsons=checkpoint.primary_unit_destruction_state_jsons,
+        starting_strength_record_jsons=checkpoint.starting_strength_record_jsons,
         active_secondary_mission_ids=checkpoint.active_secondary_mission_ids,
         mission_action_prior_use_jsons=checkpoint.mission_action_prior_use_jsons,
     )
@@ -835,6 +892,10 @@ def _forge_vanguard_success(
         shot_unit_instance_ids=checkpoint.shot_unit_instance_ids,
         objective_control_modifier_sources=checkpoint.objective_control_modifier_sources,
         active_primary_marker_jsons=checkpoint.active_primary_marker_jsons,
+        active_secondary_mission_card_jsons=checkpoint.active_secondary_mission_card_jsons,
+        completed_mission_action_state_jsons=checkpoint.completed_mission_action_state_jsons,
+        primary_unit_destruction_state_jsons=checkpoint.primary_unit_destruction_state_jsons,
+        starting_strength_record_jsons=checkpoint.starting_strength_record_jsons,
         active_secondary_mission_ids=checkpoint.active_secondary_mission_ids,
         mission_action_prior_use_jsons=checkpoint.mission_action_prior_use_jsons,
     )

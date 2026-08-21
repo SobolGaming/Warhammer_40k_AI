@@ -963,7 +963,7 @@ def _record_checkpoint(*, state: GameState, decisions: DecisionController) -> No
             SecondaryMissionChoice(
                 player_id=player_id,
                 mode=SecondaryMissionMode.FIXED,
-                fixed_mission_ids=("bring_it_down", "cleanse"),
+                fixed_mission_ids=("bring-it-down", "assassination"),
             ),
         ),
         key=lambda choice: choice.player_id,
@@ -974,13 +974,15 @@ def _record_checkpoint(*, state: GameState, decisions: DecisionController) -> No
     state.record_secondary_mission_card_state(
         SecondaryMissionCardState.active_fixed(
             player_id=player_id,
-            secondary_mission_id="bring_it_down",
+            secondary_mission_id="bring-it-down",
         )
     )
     state.record_secondary_mission_card_state(
-        SecondaryMissionCardState.active_fixed(
+        SecondaryMissionCardState.active_tactical(
             player_id=player_id,
             secondary_mission_id="cleanse",
+            battle_round=state.battle_round,
+            source_result_id="phase17n-runtime-cleanse-hold",
         )
     )
     central = next(

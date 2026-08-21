@@ -1029,6 +1029,10 @@ export interface components {
             shot_unit_instance_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
             objective_control_modifier_sources: components["schemas"]["replay-metadata--primary_mission_objective_control_modifier_source.schema"][];
             active_primary_marker_jsons: components["schemas"]["replay-metadata--canonical_json_object_strings.schema"];
+            active_secondary_mission_card_jsons?: components["schemas"]["replay-metadata--canonical_json_object_strings.schema"];
+            completed_mission_action_state_jsons?: components["schemas"]["replay-metadata--canonical_json_object_strings.schema"];
+            primary_unit_destruction_state_jsons?: components["schemas"]["replay-metadata--canonical_json_object_strings.schema"];
+            starting_strength_record_jsons?: components["schemas"]["replay-metadata--canonical_json_object_strings.schema"];
             active_secondary_mission_ids: components["schemas"]["replay-metadata--identifier_array.schema"];
             mission_action_prior_use_jsons: components["schemas"]["replay-metadata--canonical_json_object_strings.schema"];
             checkpoint_id: string; checkpoint_hash: string;

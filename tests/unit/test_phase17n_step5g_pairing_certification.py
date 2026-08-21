@@ -23,6 +23,7 @@ from warhammer40k_core.engine.event_log import EventLog
 from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
+from warhammer40k_core.engine.mission_decisions import TACTICAL_SECONDARY_SCORE_DECISION_TYPE
 from warhammer40k_core.engine.mission_setup import MissionSetup
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
 from warhammer40k_core.engine.objective_control import ObjectiveControlTiming
@@ -246,37 +247,55 @@ def _pairing_certification_session(
     return LocalGameSession(lifecycle=lifecycle), initial_payload
 
 
+_ALLOWED_SCORING_DECISION_TYPES = frozenset(
+    {
+        SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE,
+        TACTICAL_SECONDARY_SCORE_DECISION_TYPE,
+    }
+)
+
+
 def _drive_pairing_scoring_through_facade(
     session: LocalGameSession,
     *,
     scoring_player_id: str,
 ) -> None:
     for step_index in range(24):
+        pending = session.lifecycle.pending_decision_request()
+        if pending is not None and pending.decision_type in _ALLOWED_SCORING_DECISION_TYPES:
+            if not pending.options:
+                raise AssertionError(
+                    "Step 5G pairing certification requires a finite choice option."
+                )
+            option_id = pending.options[0].option_id
+            if pending.decision_type == TACTICAL_SECONDARY_SCORE_DECISION_TYPE:
+                option_id = next(
+                    (
+                        option.option_id
+                        for option in pending.options
+                        if option.option_id.startswith("retain:")
+                    ),
+                    option_id,
+                )
+            status = session.submit_option(
+                request_id=pending.request_id,
+                option_id=option_id,
+                result_id=(f"phase17n-step5g-{scoring_player_id}-choice-{step_index:02d}"),
+            )
+            if status.status_kind is LifecycleStatusKind.INVALID:
+                raise AssertionError("Step 5G pairing certification rejected a legal choice.")
+            continue
         state = session.lifecycle.state
         if state is not None and _ordinary_turn_end_evidence_for_player_or_none(
             state,
             scoring_player_id,
         ):
             return
-        pending = session.lifecycle.pending_decision_request()
         if pending is not None:
-            if pending.decision_type != SELECT_PRIMARY_MISSION_CHOICE_DECISION_TYPE:
-                raise AssertionError(
-                    "Step 5G pairing certification encountered an unexpected pending decision "
-                    f"{pending.decision_type} before scoring."
-                )
-            if not pending.options:
-                raise AssertionError(
-                    "Step 5G pairing certification requires a finite choice option."
-                )
-            status = session.submit_option(
-                request_id=pending.request_id,
-                option_id=pending.options[0].option_id,
-                result_id=(f"phase17n-step5g-{scoring_player_id}-choice-{step_index:02d}"),
+            raise AssertionError(
+                "Step 5G pairing certification encountered an unexpected pending decision "
+                f"{pending.decision_type} before scoring."
             )
-            if status.status_kind is LifecycleStatusKind.INVALID:
-                raise AssertionError("Step 5G pairing certification rejected a legal choice.")
-            continue
         status = session.advance_until_decision_or_terminal()
         if status.status_kind is LifecycleStatusKind.INVALID:
             raise AssertionError("Step 5G pairing certification lifecycle advance was invalid.")

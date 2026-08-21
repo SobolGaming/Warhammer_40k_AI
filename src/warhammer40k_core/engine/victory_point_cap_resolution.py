@@ -109,12 +109,39 @@ def resolve_victory_point_cap(
             0,
         )
 
+    secondary_turn_cap: int | None = None
+    secondary_turn_points_before = 0
+    secondary_turn_remaining = award.amount
+    turn_active_player_id = _optional_scoring_turn_active_player_id(award.metadata)
+    if (
+        award.source_kind
+        in {
+            VictoryPointSourceKind.FIXED_SECONDARY,
+            VictoryPointSourceKind.TACTICAL_SECONDARY,
+        }
+        and turn_active_player_id is not None
+    ):
+        secondary_turn_cap = policy.secondary_max_vp_per_turn
+        secondary_turn_points_before = sum(
+            transaction.amount
+            for transaction in ledger.transactions
+            if transaction.source_kind
+            in {
+                VictoryPointSourceKind.FIXED_SECONDARY,
+                VictoryPointSourceKind.TACTICAL_SECONDARY,
+            }
+            and transaction.battle_round == award.battle_round
+            and _transaction_scoring_turn_active_player_id(transaction) == turn_active_player_id
+        )
+        secondary_turn_remaining = max(secondary_turn_cap - secondary_turn_points_before, 0)
+
     total_remaining = max(policy.total_vp_cap - ledger.victory_points, 0)
     applied_amount = min(
         award.amount,
         source_remaining,
         fixed_secondary_remaining,
         primary_battle_round_remaining,
+        secondary_turn_remaining,
         total_remaining,
     )
     if applied_amount == award.amount:
@@ -130,6 +157,8 @@ def resolve_victory_point_cap(
         capped_reasons.append("fixed_secondary_mission_vp_cap")
     if primary_battle_round_remaining < award.amount:
         capped_reasons.append("primary_battle_round_vp_cap")
+    if secondary_turn_remaining < award.amount:
+        capped_reasons.append("secondary_turn_vp_cap")
     if total_remaining < award.amount:
         capped_reasons.append("total_vp_cap")
     return VictoryPointCapResolution(
@@ -151,6 +180,14 @@ def resolve_victory_point_cap(
             primary_battle_round_cap=primary_battle_round_cap,
             primary_battle_round_points_before=primary_battle_round_points_before,
             primary_battle_round_points_after=(primary_battle_round_points_before + applied_amount),
+            secondary_turn_vp_cap=secondary_turn_cap,
+            secondary_turn_points_before=secondary_turn_points_before,
+            secondary_turn_points_after=secondary_turn_points_before + applied_amount,
+            secondary_turn_remaining_capacity=(
+                None
+                if secondary_turn_cap is None
+                else max(secondary_turn_cap - (secondary_turn_points_before + applied_amount), 0)
+            ),
         ),
     )
 
@@ -169,6 +206,32 @@ def _source_cap_and_reason(
     if cap_bucket is VictoryPointCapBucket.BATTLE_READY:
         return policy.battle_ready_vp, "battle_ready_vp_cap"
     raise GameLifecycleError("Unsupported VictoryPointCapBucket for cap resolution.")
+
+
+def _optional_scoring_turn_active_player_id(metadata: JsonValue) -> str | None:
+    if not isinstance(metadata, dict) or "scoring_turn_active_player_id" not in metadata:
+        return None
+    return _metadata_active_player_id(metadata)
+
+
+def _transaction_scoring_turn_active_player_id(transaction: object) -> str | None:
+    from warhammer40k_core.engine.scoring import VictoryPointTransaction
+
+    if type(transaction) is not VictoryPointTransaction:
+        raise GameLifecycleError("VP cap resolution requires VictoryPointTransaction values.")
+    metadata = transaction.metadata
+    if not isinstance(metadata, dict) or "scoring_turn_active_player_id" not in metadata:
+        return None
+    return _metadata_active_player_id(metadata)
+
+
+def _metadata_active_player_id(metadata: JsonValue) -> str:
+    if not isinstance(metadata, dict):
+        raise GameLifecycleError("Secondary turn VP cap requires object metadata.")
+    value = metadata.get("scoring_turn_active_player_id")
+    if type(value) is not str or not value:
+        raise GameLifecycleError("Secondary turn VP cap requires scoring_turn_active_player_id.")
+    return value
 
 
 __all__ = (

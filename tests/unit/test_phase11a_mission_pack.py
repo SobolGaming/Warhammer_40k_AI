@@ -536,21 +536,38 @@ def test_chapter_approved_11th_edition_scoring_action_source_snapshot() -> None:
             "control_two_or_more_no_mans_land_objectives_excluding_home"
         ),
     }
-    assert {
-        rule.rule_id for rule in assassination.scoring_rules if rule.source_kind == "secondary"
-    } == {
+    assert {rule.rule_id for rule in assassination.scoring_rules} == {
+        "assassination-fixed-character-destroyed",
         "assassination-fixed-character-w4-plus",
-        "assassination-fixed-character-w3-or-less",
         "assassination-tactical-all-characters-destroyed",
         "assassination-tactical-character-destroyed",
     }
     assert cleanse.availability is SecondaryMissionAvailability.TACTICAL
     assert cleanse.tournament_fixed_allowed is False
     assert {rule.rule_id for rule in cleanse.scoring_rules} == {
+        "cleanse-when-drawn-plunder-active",
         "cleanse-tactical-one-objective",
         "cleanse-tactical-two-objectives",
     }
-    assert {rule.rule_id for rule in plunder.scoring_rules} == {"plunder-tactical"}
+    assert {rule.rule_id: rule.victory_points for rule in cleanse.scoring_rules} == {
+        "cleanse-when-drawn-plunder-active": None,
+        "cleanse-tactical-one-objective": 2,
+        "cleanse-tactical-two-objectives": 5,
+    }
+    assert {rule.rule_id for rule in plunder.scoring_rules} == {
+        "plunder-when-drawn-cleanse-active",
+        "plunder-tactical",
+    }
+    defend_stronghold = mission_pack.secondary_mission("defend-stronghold")
+    assert {rule.rule_id: rule.condition for rule in defend_stronghold.scoring_rules} == {
+        "defend-stronghold-when-drawn-first-round": (
+            "first_battle_round_must_shuffle_card_back_and_draw_one"
+        ),
+        "defend-stronghold-home-objective": "control_home_objective",
+        "defend-stronghold-no-enemy-in-deployment-zone": (
+            "no_enemy_units_within_own_deployment_zone"
+        ),
+    }
     assert cleanse_action.start_phase == "shooting"
     assert cleanse_action.target_policy == "objective_marker"
     assert cleanse_action.victory_points == 0

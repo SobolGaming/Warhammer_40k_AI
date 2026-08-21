@@ -1,12 +1,21 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 from warhammer40k_core.adapters.access_control import (
     ROLE_POLICY_BY_ROLE,
     PrincipalRole,
     ViewerContext,
 )
-from warhammer40k_core.adapters.redaction import public_event_record_payload
-from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.adapters.projection import public_decision_request_view
+from warhammer40k_core.adapters.redaction import (
+    public_event_record_payload,
+    public_victory_point_transaction_payload,
+)
+from warhammer40k_core.core.descriptor_hash import canonical_payload_sha256
+from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.primary_mission_action_decline_integrity import (
     MISSION_ACTION_OPPORTUNITY_DECLINED_EVENT,
 )
@@ -14,11 +23,112 @@ from warhammer40k_core.engine.primary_mission_boundary_checkpoint_evidence impor
     PRIMARY_MISSION_BOUNDARY_CHECKPOINT_EVENT,
     PrimaryMissionBoundaryCheckpoint,
 )
+from warhammer40k_core.engine.primary_scoring_commit_checkpoint import (
+    PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT,
+)
+from warhammer40k_core.engine.scoring import (
+    SecondaryMissionCardState,
+    VictoryPointSourceKind,
+    VictoryPointTransaction,
+)
+
+
+def test_phase17n_public_fixed_secondary_metadata_excludes_only_authority_commitments() -> None:
+    public_metadata = {
+        "secondary_scoring_provider_kind": "legacy_phase11f",
+        "secondary_mission_id": "bring-it-down",
+        "scoring_rule_id": "bring-it-down-fixed",
+    }
+    transaction = VictoryPointTransaction(
+        transaction_id="victory-point:player-a:round-01:000001",
+        player_id="player-a",
+        battle_round=1,
+        phase="command",
+        amount=4,
+        source_kind=VictoryPointSourceKind.FIXED_SECONDARY,
+        source_id="bring-it-down",
+        scoring_timing="secondary_mission_score",
+        hidden=True,
+        metadata={
+            **public_metadata,
+            "scoring_commit_checkpoint_id": "primary-mission-boundary:secret",
+            "scoring_commit_checkpoint_hash": "a" * 64,
+            "secondary_scoring_state_evidence_id": "secondary-evidence:secret",
+            "secondary_scoring_state_evidence_hash": "b" * 64,
+        },
+    )
+
+    payload = public_victory_point_transaction_payload(
+        transaction,
+        viewer=ViewerContext.for_player("player-b"),
+        domain_viewer_player_id="player-b",
+        secondary_mission_choices_revealed=True,
+    )
+
+    assert payload["hidden"] is False
+    assert payload["metadata"] == public_metadata
+
+
+def test_contract_10_checkpoint_without_card_witness_preserves_legacy_hash() -> None:
+    card = SecondaryMissionCardState.active_fixed(
+        player_id="player-a",
+        secondary_mission_id="legacy-secondary-card",
+    )
+    checkpoint = PrimaryMissionBoundaryCheckpoint.create(
+        boundary_kind="objective_control",
+        game_id="phase17n-legacy-checkpoint-game",
+        player_id="player-a",
+        active_player_id="player-a",
+        battle_round=1,
+        phase="command",
+        battlefield_id="phase17n-legacy-checkpoint-battlefield",
+        model_states=(),
+        attached_unit_formation_jsons=(),
+        battle_shocked_unit_instance_ids=(),
+        advanced_unit_state_jsons=(),
+        fell_back_unit_state_jsons=(),
+        shot_unit_instance_ids=(),
+        objective_control_modifier_sources=(),
+        active_primary_marker_jsons=(),
+        active_secondary_mission_card_jsons=(canonical_json(card.to_payload()),),
+        completed_mission_action_state_jsons=(),
+        primary_unit_destruction_state_jsons=(),
+        starting_strength_record_jsons=(),
+        active_secondary_mission_ids=("legacy-secondary-card",),
+        mission_action_prior_use_jsons=(),
+    )
+    legacy_payload = checkpoint.to_payload()
+    del legacy_payload["active_secondary_mission_card_jsons"]
+    del legacy_payload["completed_mission_action_state_jsons"]
+    del legacy_payload["primary_unit_destruction_state_jsons"]
+    del legacy_payload["starting_strength_record_jsons"]
+    legacy_content = dict(legacy_payload)
+    del legacy_content["checkpoint_id"]
+    del legacy_content["checkpoint_hash"]
+    legacy_hash = canonical_payload_sha256(legacy_content)
+    legacy_payload["checkpoint_id"] = f"primary-mission-boundary:{legacy_hash}"
+    legacy_payload["checkpoint_hash"] = legacy_hash
+
+    restored = PrimaryMissionBoundaryCheckpoint.from_payload(legacy_payload)
+
+    assert restored.active_secondary_mission_card_jsons == ()
+    assert restored.completed_mission_action_state_jsons == ()
+    assert restored.primary_unit_destruction_state_jsons == ()
+    assert restored.starting_strength_record_jsons == ()
+    assert restored.to_payload() == legacy_payload
 
 
 def test_phase17n_boundary_checkpoint_is_owner_and_administrator_only() -> None:
+    owner_card = SecondaryMissionCardState.active_fixed(
+        player_id="player-a",
+        secondary_mission_id="secret-secondary-card",
+    )
+    opponent_card = SecondaryMissionCardState.active_fixed(
+        player_id="player-b",
+        secondary_mission_id="opponent-secret-secondary-card",
+    )
     checkpoint = PrimaryMissionBoundaryCheckpoint.create(
-        boundary_kind="action_request",
+        boundary_kind="objective_control",
         game_id="phase17n-redaction-game",
         player_id="player-a",
         active_player_id="player-a",
@@ -33,6 +143,13 @@ def test_phase17n_boundary_checkpoint_is_owner_and_administrator_only() -> None:
         shot_unit_instance_ids=(),
         objective_control_modifier_sources=(),
         active_primary_marker_jsons=(),
+        active_secondary_mission_card_jsons=(
+            canonical_json(owner_card.to_payload()),
+            canonical_json(opponent_card.to_payload()),
+        ),
+        completed_mission_action_state_jsons=(),
+        primary_unit_destruction_state_jsons=(),
+        starting_strength_record_jsons=(),
         active_secondary_mission_ids=("secret-secondary-card",),
         mission_action_prior_use_jsons=(),
     )
@@ -45,7 +162,19 @@ def test_phase17n_boundary_checkpoint_is_owner_and_administrator_only() -> None:
         viewer=ViewerContext.for_player("player-a"),
     )
     assert owner_event is not None
-    assert owner_event["payload"] == payload
+    owner_payload = owner_event["payload"]
+    assert isinstance(owner_payload, dict)
+    assert owner_payload != payload
+    owner_checkpoint = PrimaryMissionBoundaryCheckpoint.from_payload(owner_payload)
+    assert "active_secondary_mission_card_jsons" not in owner_payload
+    assert "completed_mission_action_state_jsons" not in owner_payload
+    assert "primary_unit_destruction_state_jsons" not in owner_payload
+    assert "starting_strength_record_jsons" not in owner_payload
+    assert owner_checkpoint.active_secondary_mission_card_jsons == ()
+    assert owner_checkpoint.completed_mission_action_state_jsons == ()
+    assert owner_checkpoint.primary_unit_destruction_state_jsons == ()
+    assert owner_checkpoint.starting_strength_record_jsons == ()
+    assert owner_checkpoint.active_secondary_mission_ids == (owner_card.secondary_mission_id,)
 
     assert (
         public_event_record_payload(
@@ -122,3 +251,432 @@ def test_phase17n_action_decline_evidence_is_owner_and_administrator_only() -> N
     )
     assert administrator_event is not None
     assert administrator_event["payload"] == payload
+
+
+def test_phase17n_nested_scoring_commit_checkpoint_is_viewer_scoped() -> None:
+    owner_card = replace(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="beacon",
+            battle_round=2,
+            source_result_id="phase17n-owner-card",
+        ),
+        selection_payload={"beacon_unit_instance_id": "secret-owner-unit"},
+    )
+    checkpoint = PrimaryMissionBoundaryCheckpoint.create(
+        boundary_kind="primary_scoring_commit",
+        game_id="phase17n-scoring-commit-redaction",
+        player_id="player-a",
+        active_player_id="player-a",
+        battle_round=2,
+        phase="fight",
+        battlefield_id="phase17n-redaction-battlefield",
+        model_states=(),
+        attached_unit_formation_jsons=(),
+        battle_shocked_unit_instance_ids=(),
+        advanced_unit_state_jsons=(),
+        fell_back_unit_state_jsons=(),
+        shot_unit_instance_ids=(),
+        objective_control_modifier_sources=(),
+        active_primary_marker_jsons=(),
+        active_secondary_mission_card_jsons=(),
+        completed_mission_action_state_jsons=(),
+        primary_unit_destruction_state_jsons=(),
+        starting_strength_record_jsons=(),
+        active_secondary_mission_ids=(owner_card.secondary_mission_id,),
+        mission_action_prior_use_jsons=(),
+    )
+    payload: dict[str, JsonValue] = {
+        "objective_control_record_id": "phase17n-objective-control-record",
+        "scoring_boundary_kind": "ordinary",
+        "checkpoint": checkpoint.to_payload(),
+    }
+
+    owner_event = public_event_record_payload(
+        event_id="phase17n-scoring-commit-event",
+        event_type=PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT,
+        payload=payload,
+        viewer=ViewerContext.for_player("player-a"),
+    )
+    assert owner_event is not None
+    owner_payload = owner_event["payload"]
+    assert isinstance(owner_payload, dict)
+    owner_checkpoint_payload = owner_payload["checkpoint"]
+    assert isinstance(owner_checkpoint_payload, dict)
+    assert "active_secondary_mission_card_jsons" not in owner_checkpoint_payload
+    assert owner_checkpoint_payload == checkpoint.to_payload()
+
+    assert (
+        public_event_record_payload(
+            event_id="phase17n-scoring-commit-event",
+            event_type=PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT,
+            payload=payload,
+            viewer=ViewerContext.for_player("player-b"),
+        )
+        is None
+    )
+
+    administrator = ViewerContext(
+        principal_id="phase17n-administrator",
+        role=PrincipalRole.ADMINISTRATOR,
+        viewer_player_id=None,
+        policy=ROLE_POLICY_BY_ROLE[PrincipalRole.ADMINISTRATOR],
+    )
+    administrator_event = public_event_record_payload(
+        event_id="phase17n-scoring-commit-event",
+        event_type=PRIMARY_SCORING_COMMIT_CHECKPOINT_EVENT,
+        payload=payload,
+        viewer=administrator,
+    )
+    assert administrator_event is not None
+    assert administrator_event["payload"] == payload
+
+
+def test_phase17n_tactical_score_event_hides_internal_authority_and_opponent_selection() -> None:
+    transaction = VictoryPointTransaction(
+        transaction_id="victory-point:player-a:round-02:000001",
+        player_id="player-a",
+        battle_round=2,
+        phase="fight",
+        amount=5,
+        source_kind=VictoryPointSourceKind.TACTICAL_SECONDARY,
+        source_id="beacon",
+        scoring_timing="turn_end",
+        metadata={
+            "scoring_commit_checkpoint_id": "primary-mission-boundary:secret-checkpoint",
+            "scoring_commit_checkpoint_hash": "a" * 64,
+            "secondary_scoring_state_evidence_id": "secondary-evidence:secret",
+            "secondary_scoring_state_evidence_hash": "b" * 64,
+        },
+    )
+    active_card = replace(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="beacon",
+            battle_round=2,
+            source_result_id="phase17n-beacon-draw",
+        ),
+        selection_payload={"beacon_unit_instance_id": "secret-owner-unit"},
+    )
+    scored_card = active_card.score(transaction_id=transaction.transaction_id)
+    raw_payload = validate_json_value(
+        {
+            "game_id": "phase17n-tactical-score-redaction",
+            "player_id": "player-a",
+            "active_player_id": "player-a",
+            "battle_round": 2,
+            "phase": "fight",
+            "achievement_context": _tactical_score_context(),
+            "secondary_mission_card_state": scored_card.to_payload(),
+            "victory_point_transaction": transaction.to_payload(),
+            "discarded_after_score": True,
+        }
+    )
+    assert isinstance(raw_payload, dict)
+    payload = raw_payload
+
+    owner_event = public_event_record_payload(
+        event_id="phase17n-tactical-score-event",
+        event_type="tactical_secondary_mission_scored",
+        payload=payload,
+        viewer=ViewerContext.for_player("player-a"),
+    )
+    assert owner_event is not None
+    owner_payload = owner_event["payload"]
+    assert isinstance(owner_payload, dict)
+    owner_transaction = owner_payload["victory_point_transaction"]
+    assert isinstance(owner_transaction, dict)
+    owner_metadata = owner_transaction["metadata"]
+    assert isinstance(owner_metadata, dict)
+    _assert_internal_secondary_authority_absent(owner_metadata)
+    owner_achievement = owner_payload["achievement_context"]
+    assert isinstance(owner_achievement, dict)
+    _assert_internal_secondary_authority_absent(owner_achievement)
+    owner_evidence = owner_achievement["evidence"]
+    assert isinstance(owner_evidence, dict)
+    assert owner_evidence["evidence_by_rule"] == {
+        "beacon": {"selected_unit_instance_ids": ["secret-owner-unit"]}
+    }
+    owner_card_payload = owner_payload["secondary_mission_card_state"]
+    assert isinstance(owner_card_payload, dict)
+    assert owner_card_payload["selection_payload"] == active_card.selection_payload
+
+    opponent_event = public_event_record_payload(
+        event_id="phase17n-tactical-score-event",
+        event_type="tactical_secondary_mission_scored",
+        payload=payload,
+        viewer=ViewerContext.for_player("player-b"),
+    )
+    assert opponent_event is not None
+    opponent_payload = opponent_event["payload"]
+    assert isinstance(opponent_payload, dict)
+    assert "achievement_context" not in opponent_payload
+    opponent_transaction = opponent_payload["victory_point_transaction"]
+    assert isinstance(opponent_transaction, dict)
+    opponent_metadata = opponent_transaction["metadata"]
+    assert isinstance(opponent_metadata, dict)
+    _assert_internal_secondary_authority_absent(opponent_metadata)
+    opponent_card_payload = opponent_payload["secondary_mission_card_state"]
+    assert isinstance(opponent_card_payload, dict)
+    assert opponent_card_payload["selection_payload"] is None
+
+    administrator = ViewerContext(
+        principal_id="phase17n-administrator",
+        role=PrincipalRole.ADMINISTRATOR,
+        viewer_player_id=None,
+        policy=ROLE_POLICY_BY_ROLE[PrincipalRole.ADMINISTRATOR],
+    )
+    administrator_event = public_event_record_payload(
+        event_id="phase17n-tactical-score-event",
+        event_type="tactical_secondary_mission_scored",
+        payload=payload,
+        viewer=administrator,
+    )
+    assert administrator_event is not None
+    assert administrator_event["payload"] == payload
+
+
+def test_phase17n_tactical_score_decision_is_viewer_safe_in_events_and_projection() -> None:
+    request = _tactical_score_request()
+    result = DecisionResult.for_request(
+        result_id="phase17n-tactical-score-result",
+        request=request,
+        selected_option_id="score:beacon",
+    )
+    owner = ViewerContext.for_player("player-a")
+    opponent = ViewerContext.for_player("player-b")
+    administrator = _administrator_viewer()
+    raw_request_payload = validate_json_value(request.to_payload())
+    assert isinstance(raw_request_payload, dict)
+
+    owner_requested = public_event_record_payload(
+        event_id="phase17n-tactical-score-requested-event",
+        event_type="decision_requested",
+        payload=raw_request_payload,
+        viewer=owner,
+    )
+    assert owner_requested is not None
+    owner_request_payload = owner_requested["payload"]
+    assert isinstance(owner_request_payload, dict)
+    _assert_internal_secondary_authority_absent(owner_request_payload)
+    _assert_owner_score_context_preserved(owner_request_payload["payload"])
+    options = owner_request_payload["options"]
+    assert isinstance(options, list)
+    assert options
+    for option in options:
+        assert isinstance(option, dict)
+        _assert_owner_score_context_preserved(option["payload"])
+
+    assert (
+        public_event_record_payload(
+            event_id="phase17n-tactical-score-requested-event",
+            event_type="decision_requested",
+            payload=raw_request_payload,
+            viewer=opponent,
+        )
+        is None
+    )
+    administrator_requested = public_event_record_payload(
+        event_id="phase17n-tactical-score-requested-event",
+        event_type="decision_requested",
+        payload=raw_request_payload,
+        viewer=administrator,
+    )
+    assert administrator_requested is not None
+    assert administrator_requested["payload"] == request.to_payload()
+
+    raw_record_payload = validate_json_value(
+        {
+            "record_id": "phase17n-tactical-score-record",
+            "request": request.to_payload(),
+            "result": result.to_payload(),
+        }
+    )
+    assert isinstance(raw_record_payload, dict)
+    record_payload = raw_record_payload
+    owner_recorded = public_event_record_payload(
+        event_id="phase17n-tactical-score-recorded-event",
+        event_type="decision_recorded",
+        payload=record_payload,
+        viewer=owner,
+    )
+    assert owner_recorded is not None
+    owner_record_payload = owner_recorded["payload"]
+    assert isinstance(owner_record_payload, dict)
+    _assert_internal_secondary_authority_absent(owner_record_payload)
+    recorded_result = owner_record_payload["result"]
+    assert isinstance(recorded_result, dict)
+    _assert_owner_score_context_preserved(recorded_result["payload"])
+
+    assert (
+        public_event_record_payload(
+            event_id="phase17n-tactical-score-recorded-event",
+            event_type="decision_recorded",
+            payload=record_payload,
+            viewer=opponent,
+        )
+        is None
+    )
+    administrator_recorded = public_event_record_payload(
+        event_id="phase17n-tactical-score-recorded-event",
+        event_type="decision_recorded",
+        payload=record_payload,
+        viewer=administrator,
+    )
+    assert administrator_recorded is not None
+    assert administrator_recorded["payload"] == record_payload
+
+    owner_projection = public_decision_request_view(request, viewer=owner)
+    _assert_internal_secondary_authority_absent(owner_projection)
+    _assert_owner_score_context_preserved(owner_projection["payload"])
+    opponent_projection = public_decision_request_view(request, viewer=opponent)
+    assert opponent_projection["decision_type"] == "hidden_decision"
+    assert opponent_projection["options"] == []
+    administrator_projection = public_decision_request_view(request, viewer=administrator)
+    assert administrator_projection["payload"] == request.payload
+    assert administrator_projection["options"] == [
+        option.to_payload() for option in request.options
+    ]
+
+
+def test_phase17n_tactical_score_decline_event_is_owner_safe_and_opponent_hidden() -> None:
+    card = replace(
+        SecondaryMissionCardState.active_tactical(
+            player_id="player-a",
+            secondary_mission_id="beacon",
+            battle_round=2,
+            source_result_id="phase17n-beacon-draw",
+        ),
+        selection_payload={"beacon_unit_instance_id": "secret-owner-unit"},
+    )
+    raw_payload = validate_json_value(
+        {
+            "game_id": "phase17n-tactical-score-redaction",
+            "player_id": "player-a",
+            "active_player_id": "player-a",
+            "battle_round": 2,
+            "phase": "fight",
+            "achievement_context": _tactical_score_context(),
+            "secondary_mission_card_state": card.to_payload(),
+            "retained": True,
+        }
+    )
+    assert isinstance(raw_payload, dict)
+    payload = raw_payload
+
+    owner_event = public_event_record_payload(
+        event_id="phase17n-tactical-score-declined-event",
+        event_type="tactical_secondary_mission_score_declined",
+        payload=payload,
+        viewer=ViewerContext.for_player("player-a"),
+    )
+    assert owner_event is not None
+    owner_payload = owner_event["payload"]
+    assert isinstance(owner_payload, dict)
+    _assert_internal_secondary_authority_absent(owner_payload)
+    owner_card = owner_payload["secondary_mission_card_state"]
+    assert isinstance(owner_card, dict)
+    assert owner_card["selection_payload"] == card.selection_payload
+    _assert_owner_score_context_preserved(owner_payload["achievement_context"])
+
+    assert (
+        public_event_record_payload(
+            event_id="phase17n-tactical-score-declined-event",
+            event_type="tactical_secondary_mission_score_declined",
+            payload=payload,
+            viewer=ViewerContext.for_player("player-b"),
+        )
+        is None
+    )
+    administrator_event = public_event_record_payload(
+        event_id="phase17n-tactical-score-declined-event",
+        event_type="tactical_secondary_mission_score_declined",
+        payload=payload,
+        viewer=_administrator_viewer(),
+    )
+    assert administrator_event is not None
+    assert administrator_event["payload"] == payload
+
+
+def _tactical_score_request() -> DecisionRequest:
+    context = _tactical_score_context()
+    options = (
+        DecisionOption(
+            option_id="score:beacon",
+            label="Score beacon",
+            payload={**context, "score": True},
+        ),
+        DecisionOption(
+            option_id="retain:beacon",
+            label="Retain beacon",
+            payload={**context, "score": False},
+        ),
+    )
+    return DecisionRequest(
+        request_id="phase17n-tactical-score-request",
+        decision_type="score_tactical_secondary_mission",
+        actor_id="player-a",
+        payload={
+            **context,
+            "legal_option_ids": [option.option_id for option in options],
+        },
+        options=options,
+    )
+
+
+def _tactical_score_context() -> dict[str, JsonValue]:
+    return {
+        "achievement_id": "phase17n-tactical-achievement",
+        "game_id": "phase17n-tactical-score-redaction",
+        "player_id": "player-a",
+        "active_player_id": "player-a",
+        "secondary_mission_id": "beacon",
+        "mode": "tactical",
+        "battle_round": 2,
+        "phase": "fight",
+        "card_battle_round": 2,
+        "victory_points": 5,
+        "scoring_rule_id": "beacon-rule",
+        "scoring_rule_condition": "beacon-condition",
+        "scoring_rule_source_id": "beacon-source",
+        "scoring_timing": "turn_end",
+        "source_id": "beacon",
+        "evidence": {
+            "scoring_commit_checkpoint_id": "primary-mission-boundary:secret",
+            "scoring_commit_checkpoint_hash": "a" * 64,
+            "secondary_scoring_state_evidence_id": "secondary-evidence:secret",
+            "secondary_scoring_state_evidence_hash": "b" * 64,
+            "evidence_by_rule": {"beacon": {"selected_unit_instance_ids": ["secret-owner-unit"]}},
+        },
+    }
+
+
+def _assert_internal_secondary_authority_absent(payload: object) -> None:
+    encoded = canonical_json(validate_json_value(payload))
+    for key in (
+        "scoring_commit_checkpoint_id",
+        "scoring_commit_checkpoint_hash",
+        "secondary_scoring_state_evidence_id",
+        "secondary_scoring_state_evidence_hash",
+    ):
+        assert f'"{key}"' not in encoded
+
+
+def _assert_owner_score_context_preserved(payload: JsonValue) -> None:
+    assert isinstance(payload, dict)
+    assert payload["achievement_id"] == "phase17n-tactical-achievement"
+    assert payload["secondary_mission_id"] == "beacon"
+    evidence = payload["evidence"]
+    assert isinstance(evidence, dict)
+    assert evidence["evidence_by_rule"] == {
+        "beacon": {"selected_unit_instance_ids": ["secret-owner-unit"]}
+    }
+
+
+def _administrator_viewer() -> ViewerContext:
+    return ViewerContext(
+        principal_id="phase17n-administrator",
+        role=PrincipalRole.ADMINISTRATOR,
+        viewer_player_id=None,
+        policy=ROLE_POLICY_BY_ROLE[PrincipalRole.ADMINISTRATOR],
+    )

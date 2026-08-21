@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`10.0.0`, declared in `openapi.yaml`, `manifest.json`, and
+`10.1.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -71,6 +71,16 @@ row even when evaluation awards zero VP, every row maps back to such a
 boundary, and every awarded transaction matches deterministic re-evaluation.
 Contract 10 therefore rejects removal of transactions together with their
 evidence when the underlying applicable Objective Control boundary remains.
+
+Contract 10.1 adds the optional `active_secondary_mission_card_jsons`,
+`completed_mission_action_state_jsons`, `primary_unit_destruction_state_jsons`,
+and `starting_strength_record_jsons` witnesses to the Primary mission boundary
+checkpoint schema. Newly emitted Objective Control checkpoints include the
+complete active-card, completed Mission Action, Primary destruction, and
+Starting Strength snapshots used to authenticate Secondary scoring. Contract
+10.0 checkpoints remain loadable with their original content hash when those
+optional witnesses are absent, but missing witnesses cannot authenticate
+restored Secondary scoring evidence.
 
 Deployers upgrading a hosted 9.x service must retain a separately deployed 9.x
 adapter through at least 2027-08-16 and one released 10.x minor line, whichever

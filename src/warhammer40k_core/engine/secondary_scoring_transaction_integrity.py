@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.missions import mission_scoring_policies_from_setup
@@ -15,7 +15,6 @@ from warhammer40k_core.engine.scoring import (
 )
 from warhammer40k_core.engine.secondary_deployment_zone_evidence import (
     bind_state_backed_secondary_scoring_commit,
-    enemy_unit_ids_in_player_deployment_zone_for_secondary_boundary,
     require_state_backed_secondary_scoring_commit,
 )
 from warhammer40k_core.engine.secondary_scoring_provider import (
@@ -121,6 +120,7 @@ def validate_secondary_award_semantics(
         source_kind=award.source_kind,
         hidden=award.hidden,
         record=record,
+        metadata=award.metadata,
     )
     if expected is None or award != expected:
         raise GameLifecycleError(
@@ -224,6 +224,7 @@ def validate_secondary_transaction_semantics(*, state: GameState) -> None:
             source_kind=transaction.source_kind,
             hidden=transaction.hidden,
             record=record,
+            metadata=transaction.metadata,
         )
         actual = _uncapped_award_from_transaction(transaction)
         if expected is None or actual != expected:
@@ -353,11 +354,11 @@ def _card_for_secondary_source(
         and card.secondary_mission_id == source_id
         and card.mode is mode
         and card.status in {SecondaryMissionCardStatus.ACTIVE, SecondaryMissionCardStatus.SCORED}
-        and (
-            source_kind is VictoryPointSourceKind.FIXED_SECONDARY
-            or card.battle_round == battle_round
-        )
     )
+    if len(matches) > 1:
+        round_matches = tuple(card for card in matches if card.battle_round == battle_round)
+        if len(round_matches) == 1:
+            matches = round_matches
     if len(matches) != 1:
         raise GameLifecycleError("Secondary VP source does not identify an active or scored card.")
     card = matches[0]
@@ -391,6 +392,10 @@ def _validate_scored_tactical_card_bindings(
             raise GameLifecycleError(
                 "Scored tactical secondary card does not identify its ledger transaction."
             )
+        if transaction.amount <= 0:
+            raise GameLifecycleError(
+                "Scored tactical secondary card requires a positive VP transaction."
+            )
         if (
             transaction.player_id != card.player_id
             or transaction.source_kind is not VictoryPointSourceKind.TACTICAL_SECONDARY
@@ -419,10 +424,39 @@ def _expected_state_backed_secondary_award(
     source_kind: VictoryPointSourceKind,
     hidden: bool,
     record: ObjectiveControlRecord,
+    metadata: object,
 ) -> VictoryPointAward | None:
     if state.mission_setup is None:
         raise GameLifecycleError("Secondary VP semantic validation requires MissionSetup.")
+    from warhammer40k_core.engine.secondary_scoring_state_evidence import (
+        bind_secondary_scoring_state_evidence,
+        require_bound_secondary_scoring_state_evidence,
+        secondary_scoring_condition_context_from_evidence,
+    )
+
     policies = mission_scoring_policies_from_setup(state.mission_setup)
+    card = _card_for_secondary_source(
+        state=state,
+        player_id=player_id,
+        source_id=source_id,
+        source_kind=source_kind,
+        battle_round=record.battle_round,
+        require_scored_transaction_id=None,
+    )
+    evidence = require_bound_secondary_scoring_state_evidence(
+        metadata=cast(JsonValue, metadata),
+        state=state,
+        player_id=player_id,
+        source_id=source_id,
+        source_kind=source_kind,
+        card=card,
+        record=record,
+    )
+    context = secondary_scoring_condition_context_from_evidence(
+        evidence=evidence,
+        record=record,
+        mission_setup=state.mission_setup,
+    )
     award = policies.secondary_award_from_mission_state(
         player_id=player_id,
         battle_round=record.battle_round,
@@ -432,21 +466,20 @@ def _expected_state_backed_secondary_award(
         hidden=hidden,
         record=record,
         mission_setup=state.mission_setup,
-        unit_destruction_states=tuple(state.secondary_unit_destruction_states),
-        objective_cleanse_states=tuple(state.secondary_objective_cleanse_states),
-        terrain_plunder_states=tuple(state.secondary_terrain_plunder_states),
-        enemy_unit_ids_in_player_deployment_zone=(
-            enemy_unit_ids_in_player_deployment_zone_for_secondary_boundary(
-                state=state,
-                record=record,
-                player_id=player_id,
-            )
-        ),
-        starting_strength_records=tuple(state.starting_strength_records),
+        unit_destruction_states=evidence.unit_destruction_states,
+        objective_cleanse_states=evidence.objective_cleanse_states,
+        terrain_plunder_states=evidence.terrain_plunder_states,
+        enemy_unit_ids_in_player_deployment_zone=evidence.enemy_unit_ids_in_player_deployment_zone,
+        starting_strength_records=evidence.starting_strength_records,
+        condition_context=context,
     )
     if award is None:
         return None
-    return bind_state_backed_secondary_scoring_commit(award, state=state, record=record)
+    return bind_state_backed_secondary_scoring_commit(
+        bind_secondary_scoring_state_evidence(award, evidence),
+        state=state,
+        record=record,
+    )
 
 
 def _record_for_binding(

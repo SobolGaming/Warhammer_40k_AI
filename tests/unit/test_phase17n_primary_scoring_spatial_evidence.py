@@ -1686,6 +1686,32 @@ def _relabel_primary_departure(
     _event_payload(recorded_event)["primary_battlefield_departure_state"] = cast(
         dict[str, JsonValue], updated.to_payload()
     )
+    linked_destructions = tuple(
+        destruction
+        for destruction in payload["state"]["primary_unit_destruction_states"]
+        if original.departure_id in destruction["source_battlefield_departure_ids"]
+    )
+    if len(linked_destructions) != 1:
+        raise AssertionError("historical evidence test requires one linked destruction")
+    linked_destruction = linked_destructions[0]
+    linked_destruction["source_battlefield_departure_ids"] = [
+        updated.departure_id if departure_id == original.departure_id else departure_id
+        for departure_id in linked_destruction["source_battlefield_departure_ids"]
+    ]
+    destruction_event = _recorded_event_for_corruption(
+        payload=payload,
+        event_type=PRIMARY_UNIT_DESTRUCTION_RECORDED_EVENT,
+    )
+    event_destruction = _event_payload(destruction_event).get("primary_unit_destruction_state")
+    if not isinstance(event_destruction, dict):
+        raise TypeError("historical evidence test requires a recorded destruction payload")
+    event_departure_ids = event_destruction.get("source_battlefield_departure_ids")
+    if not isinstance(event_departure_ids, list):
+        raise TypeError("historical evidence test requires destruction departure IDs")
+    event_destruction["source_battlefield_departure_ids"] = [
+        updated.departure_id if departure_id == original.departure_id else departure_id
+        for departure_id in event_departure_ids
+    ]
 
 
 def _recorded_event_for_corruption(

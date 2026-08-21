@@ -18,6 +18,9 @@ from warhammer40k_core.core.deployment_zones import (
     DeploymentZonePayload,
     DeploymentZoneShape,
 )
+from warhammer40k_core.core.mission_definition_validation import (
+    validate_identifier_tuple as _validate_identifier_tuple,
+)
 from warhammer40k_core.core.mission_errors import MissionPackError as MissionPackError
 from warhammer40k_core.core.mission_matrix import (
     ForceDispositionDefinition as ForceDispositionDefinition,
@@ -260,6 +263,7 @@ class MissionPackScoringDefinitionPayload(TypedDict):
     primary_vp_cap: int
     secondary_vp_cap: int
     total_vp_cap: int
+    secondary_max_vp_per_turn: int
     end_of_round_scoring_windows: list[str]
     end_of_game_scoring_windows: list[str]
     reserve_destruction_timing: str
@@ -1680,6 +1684,7 @@ class MissionPackScoringDefinition:
     primary_vp_cap: int
     secondary_vp_cap: int
     total_vp_cap: int
+    secondary_max_vp_per_turn: int
     end_of_round_scoring_windows: tuple[str, ...]
     end_of_game_scoring_windows: tuple[str, ...]
     reserve_destruction_timing: str
@@ -1743,6 +1748,14 @@ class MissionPackScoringDefinition:
             _validate_positive_int(
                 "MissionPackScoringDefinition secondary_vp_cap",
                 self.secondary_vp_cap,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "secondary_max_vp_per_turn",
+            _validate_positive_int(
+                "MissionPackScoringDefinition secondary_max_vp_per_turn",
+                self.secondary_max_vp_per_turn,
             ),
         )
         object.__setattr__(
@@ -1822,6 +1835,7 @@ class MissionPackScoringDefinition:
             "primary_vp_cap": self.primary_vp_cap,
             "secondary_vp_cap": self.secondary_vp_cap,
             "total_vp_cap": self.total_vp_cap,
+            "secondary_max_vp_per_turn": self.secondary_max_vp_per_turn,
             "end_of_round_scoring_windows": list(self.end_of_round_scoring_windows),
             "end_of_game_scoring_windows": list(self.end_of_game_scoring_windows),
             "reserve_destruction_timing": self.reserve_destruction_timing,
@@ -1846,6 +1860,7 @@ class MissionPackScoringDefinition:
             primary_vp_cap=payload["primary_vp_cap"],
             secondary_vp_cap=payload["secondary_vp_cap"],
             total_vp_cap=payload["total_vp_cap"],
+            secondary_max_vp_per_turn=payload["secondary_max_vp_per_turn"],
             end_of_round_scoring_windows=tuple(payload["end_of_round_scoring_windows"]),
             end_of_game_scoring_windows=tuple(payload["end_of_game_scoring_windows"]),
             reserve_destruction_timing=payload["reserve_destruction_timing"],
@@ -3466,30 +3481,6 @@ def _validate_unprefixed_identifier(
     if identifier.startswith(reserved_prefix):
         raise MissionPackError(f"{field_name} must not include the stable identity prefix.")
     return identifier
-
-
-def _validate_identifier_tuple(
-    field_name: str,
-    values: object,
-    *,
-    min_length: int,
-    sort_values: bool,
-) -> tuple[str, ...]:
-    if type(values) is not tuple:
-        raise MissionPackError(f"{field_name} must be a tuple.")
-    validated: list[str] = []
-    seen: set[str] = set()
-    for value in cast(tuple[object, ...], values):
-        identifier = _validate_identifier(f"{field_name} value", value)
-        if identifier in seen:
-            raise MissionPackError(f"{field_name} must not contain duplicates.")
-        seen.add(identifier)
-        validated.append(identifier)
-    if len(validated) < min_length:
-        raise MissionPackError(f"{field_name} must contain at least {min_length} values.")
-    if sort_values:
-        return tuple(sorted(validated))
-    return tuple(validated)
 
 
 _validate_identifier = IdentifierValidator(MissionPackError)

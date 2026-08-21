@@ -170,6 +170,7 @@
     "tests/unit/test_phase17n_step5e_operation_marker_conditions.py": 45.0,
     "tests/unit/test_phase17n_step5f_surveil_conditions.py": 40.0,
     "tests/unit/test_phase17n_step5g_pairing_certification.py": 1379.039,
+    "tests/unit/test_phase17n_step6g_secondary_certification.py": 804.06,
     "tests/unit/test_phase18a_cli_projection.py": 22.004,
     "tests/unit/test_phase18b_opportunity_windows.py": 0.015,
     "tests/unit/test_phase18c_adapter_session_facade.py": 17.255,
@@ -189,6 +190,7 @@
     "tests/unit/test_rule_text_normalization.py": 5.559,
     "tests/unit/test_ruleset_descriptor.py": 0.033,
     "tests/unit/test_runtime_hook_bindings.py": 0.004,
+    "tests/unit/test_secondary_scoring_state_evidence_authority.py": 109.296,
     "tests/unit/test_skull_altar_runtime_regressions.py": 0.138,
     "tests/unit/test_terrain_areas.py": 0.027,
     "tests/unit/test_terrain_display.py": 0.004,
@@ -205,26 +207,26 @@
   "shard_count": 4,
   "shards": [
     {
-      "duration_seconds": 3853.488,
+      "duration_seconds": 4081.826,
       "shard_id": 1,
       "test_file_count": 50
     },
     {
-      "duration_seconds": 3853.487,
+      "duration_seconds": 4081.827,
       "shard_id": 2,
-      "test_file_count": 50
+      "test_file_count": 51
     },
     {
-      "duration_seconds": 3853.488,
+      "duration_seconds": 4081.827,
       "shard_id": 3,
       "test_file_count": 51
     },
     {
-      "duration_seconds": 3853.487,
+      "duration_seconds": 4081.826,
       "shard_id": 4,
-      "test_file_count": 50
+      "test_file_count": 51
     }
   ],
   "strategy": "largest-processing-time-by-historical-file-duration",
-  "total_test_duration_seconds": 15413.95
+  "total_test_duration_seconds": 16327.306
 }

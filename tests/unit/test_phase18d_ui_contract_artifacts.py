@@ -546,7 +546,6 @@ def test_replay_metadata_schema_requires_closed_step5a_scoring_state_evidence() 
     )
     for definition_name in (
         "objective_control_record_authority",
-        "primary_mission_boundary_checkpoint",
         "primary_mission_boundary_model_state",
         "primary_mission_objective_control_modifier_source",
         "sticky_objective_control_state",
@@ -560,6 +559,17 @@ def test_replay_metadata_schema_requires_closed_step5a_scoring_state_evidence() 
         assert {_json_string(value) for value in _json_list(definition["required"])} == set(
             _json_object(definition["properties"])
         )
+
+    checkpoint = _json_object(definitions["primary_mission_boundary_checkpoint"])
+    assert checkpoint["additionalProperties"] is False
+    checkpoint_properties = set(_json_object(checkpoint["properties"]))
+    checkpoint_required = {_json_string(value) for value in _json_list(checkpoint["required"])}
+    assert checkpoint_properties - checkpoint_required == {
+        "active_secondary_mission_card_jsons",
+        "completed_mission_action_state_jsons",
+        "primary_unit_destruction_state_jsons",
+        "starting_strength_record_jsons",
+    }
 
     game_view_schema = _json_object(
         _read_json(REPO_ROOT / Path("contracts/schemas/game-view.schema.json"))

@@ -289,6 +289,36 @@ def rules_unit_views_from_armies(
     return tuple(sorted(views, key=lambda view: view.unit_instance_id))
 
 
+def placed_alive_rules_unit_views(*, state: GameState) -> tuple[RulesUnitView, ...]:
+    """Enumerate current rules units that are physically present on the battlefield."""
+    battlefield = state.battlefield_state
+    if battlefield is None:
+        raise GameLifecycleError("Placed rules-unit enumeration requires battlefield_state.")
+    placed_model_ids = frozenset(battlefield.placed_model_ids())
+    unavailable_unit_ids = {
+        unit_id
+        for cargo_state in state.transport_cargo_states
+        for unit_id in cargo_state.embarked_unit_instance_ids
+    }
+    for reserve_state in state.reserve_states:
+        if not reserve_state.is_unarrived:
+            continue
+        unavailable_unit_ids.add(reserve_state.unit_instance_id)
+        unavailable_unit_ids.update(reserve_state.embarked_unit_instance_ids)
+
+    present: list[RulesUnitView] = []
+    for view in rules_unit_views_from_armies(armies=tuple(state.army_definitions)):
+        identity_ids = {view.unit_instance_id, *view.component_unit_instance_ids}
+        if identity_ids.intersection(unavailable_unit_ids):
+            continue
+        if any(
+            model.is_alive and model.model_instance_id in placed_model_ids
+            for model in view.own_models
+        ):
+            present.append(view)
+    return tuple(present)
+
+
 def current_rules_unit_views_for_identity(
     *,
     state: GameState,

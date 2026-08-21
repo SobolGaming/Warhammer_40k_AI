@@ -41,6 +41,16 @@ commitments. Coverage is a `GameLifecycle` and event-log restore round-trip,
 not `ReplayRunner` replay certification. Replay remains
 `replay-artifact-v8-phase17n-step5a`.
 
+Phase 17N Step 6 scores all 18 Secondary Mission cards through source-backed
+turn-end awards and adds four finite Command-phase setup decisions:
+`resolve_tactical_secondary_when_drawn`, `select_tempting_target_objective`,
+`select_beacon_unit`, and `select_burden_of_trust_guard`. When Drawn, Beacon,
+and Burden of Trust requests are owner-secret. Tempting Target is a public
+opponent choice. Tactical score/retain still uses
+`score_tactical_secondary_mission`. Replay remains
+`replay-artifact-v8-phase17n-step5a`. This does not claim Phase 17N overall
+complete or Phase 20A.
+
 The short rule:
 
 All clients share the same authoritative submission contract. Adapters may differ only in how they render, choose, transmit, or generate submissions. No adapter gets a private mutation path, a private rules path, or a bypass around replay-facing `DecisionRecord` and `EventRecord` generation.
@@ -862,7 +872,11 @@ Phase 11E mission-scoring decisions that are player-facing are finite decisions:
   once-per-battle ledger has drifted. Decline records no CP/card mutation and
   only resolves the current Command-phase replacement window.
 - `discard_tactical_secondary_mission`: the engine emits one option for each non-empty set of active Tactical secondary cards the player can discard. Single-card options retain the `discard:<secondary_mission_id>` option shape, while multi-card options use `discard:<secondary_mission_id>+<secondary_mission_id>`. The request payload includes `legal_secondary_mission_ids`, `legal_secondary_mission_id_sets`, `discard_cp_reward_window_id`, and `discard_cp_reward_window_used`. The selected option payload includes the game, player, active player, battle round, phase, `secondary_mission_ids`, and `discard_cp_reward_window_id`. The lifecycle applies all selected discards and emits `tactical_secondary_missions_discarded`. Under Chapter Approved 2026-27, ordinary Tactical discard awards exactly 1 CP once for the active player's own-turn discard window, even when multiple active Tactical secondaries are discarded together. After that window is consumed, additional own-turn discard requests are unsupported until the lifecycle reaches a new source-backed discard window. Opponent-turn discards are legal but emit `command_point_reward_eligible: false` and no `command_point_gain`.
-- `score_tactical_secondary_mission`: when the engine records a source-backed `TacticalSecondaryAchievementContext` proving that a Tactical Secondary Mission Card's requirements have been achieved, it emits a finite choice for that context. Merely having an active Tactical card is not sufficient to emit this decision. The selected option payload includes the `achievement_id`, card identity, scoring rule ID, scoring rule condition, scoring rule source ID, scoring timing, phase/round/actor context, and JSON-safe achievement evidence. The `score:<secondary_mission_id>` option awards the source-backed VP, marks the card scored/non-active, consumes the achievement context, and emits `tactical_secondary_mission_scored` with `discarded_after_score: true`. The `retain:<secondary_mission_id>` option awards no VP, leaves the card active, consumes the finite achievement context, and emits `tactical_secondary_mission_score_declined`. Stale score/retain submissions are rejected before queue pop if the achievement context is missing, mismatched, stale, no longer source-valid, no longer matches the active card, the phase/round/actor drifted, or the source-backed scoring metadata changed.
+- `score_tactical_secondary_mission`: when the engine records a source-backed `TacticalSecondaryAchievementContext` proving that a Tactical Secondary Mission Card's requirements have been achieved, it emits a finite choice for that context. Merely having an active Tactical card is not sufficient to emit this decision. The selected option payload includes the `achievement_id`, card identity, scoring rule ID, scoring rule condition, scoring rule source ID, scoring timing, phase/round/actor context, and JSON-safe achievement evidence. The `score:<secondary_mission_id>` option is present only when cap resolution would apply at least 1 VP; it awards the source-backed VP, marks the card scored/non-active, consumes the achievement context, and emits `tactical_secondary_mission_scored` with `discarded_after_score: true`. A positive partial award is a legal score. The `retain:<secondary_mission_id>` option remains available at zero VP capacity, awards no VP, leaves the card active, consumes the finite achievement context, and emits `tactical_secondary_mission_score_declined`. Stale score submissions are rejected before queue pop if intervening scoring exhausts VP capacity. Score/retain submissions are also rejected before queue pop if the achievement context is missing, mismatched, stale, no longer source-valid, no longer matches the active card, the phase/round/actor drifted, or the source-backed scoring metadata changed. Ordinary Tactical discard remains a separate decision path.
+- `resolve_tactical_secondary_when_drawn`: after a Tactical Secondary draw in Command, the engine may emit a keep-or-discard choice for A Grievous Blow and Bring It Down, a first-battle-round shuffle-back choice for Behind Enemy Lines and Forward Position, or a shuffle-back choice for Cleanse while Plunder is active and for Plunder while Cleanse is active. Keep/remain is the first option on those optional requests. The engine auto-keeps Grievous Blow or Bring It Down when the discard condition is already ineligible. Defend Stronghold drawn in battle round 1 is a mandatory engine shuffle-and-draw: it emits `tactical_secondary_when_drawn_shuffled` with `mandatory: true` and does not expose a keep option. Shuffle-back draws a replacement while the shuffled card is still held (so it cannot be redrawn as that replacement), then forgets the shuffled card so later draws can select it. The request is owner-secret.
+- `select_tempting_target_objective`: when A Tempting Target is drawn, the opponent selects one objective in No Man's Land excluding home objectives. The request is public. Option IDs are engine-enumerated objective marker IDs.
+- `select_beacon_unit`: when Beacon is drawn, the owner selects one friendly unit on the battlefield or embarked within a TRANSPORT on the battlefield. The request is owner-secret.
+- `select_burden_of_trust_guard`: when Burden of Trust is drawn and at the start of each of the owner's later turns, the engine emits sequential per-objective unit-or-skip choices. Skip is the first option and still marks that objective resolved for the current round. The request is owner-secret.
 - `start_mission_action`: before ordinary Shooting-unit selection, the engine
   automatically enumerates the active Primary Mission's supported Actions, the
   active player's selected Fixed Secondary Actions, and the player's currently
@@ -1032,11 +1046,27 @@ Action history; Surveil's no-repeat target rule is enforced independently of
 its unlimited Action count.
 
 The engine's `primary_mission_boundary_checkpoint_recorded` events are internal
-replay-authority records, not public battlefield events. Their payload can
-contain the owning player's hidden active-Secondary identities and prior-use
-inventory. Shared adapter redaction therefore exposes a checkpoint only to its
-owning player and an omniscient administrator; opponents receive no checkpoint
-payload through projections, event deltas, server responses, or reconnects.
+replay-authority records, not public battlefield events. Their authoritative
+payload includes immutable active-Secondary card snapshots for both players,
+including selection state, completed Mission Action snapshots, Primary
+destruction history, Starting Strength records, and prior-use inventory. An
+omniscient administrator receives that exact checkpoint. The owning player's
+event view retains the earlier checkpoint shape without any internal Secondary
+authority snapshot field and is re-addressed from that viewer-safe content; it
+never exposes an opponent card, selection, count, completed Action witness,
+destruction witness, Starting Strength witness, or a hash derived from hidden
+snapshots. Opponents receive no checkpoint payload
+through projections, event deltas, server responses, or reconnects.
+
+For Secondary scoring, restore treats the objective-control checkpoint
+snapshots as authority rather than as another copy of the stored scoring row.
+Before transaction semantics are accepted, the engine rebuilds the active card
+and selection, battlefield and deployment-zone occupancy, exact Primary-to-
+Secondary destruction projections, completed Cleanse and Plunder projections,
+and static Starting Strength inventory. The rebuilt rule-relevant evidence must
+equal the stored `SecondaryScoringStateEvidence`; replacing that row together
+with its derived ID, hash, rule metadata, transaction amount, and ledger total
+does not authorize different scoring facts.
 
 Restore authenticates every `primary_mission_boundary_checkpoint_recorded`
 event in chronological order. Each checkpoint's complete physical state is

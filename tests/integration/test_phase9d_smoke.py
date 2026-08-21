@@ -5,6 +5,7 @@ from typing import cast
 
 import pytest
 from tests.deployment_submission_helpers import submit_all_deployments_if_pending
+from tests.phase17n_secondary_mission_helpers import drain_pending_secondary_mission_setup
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic
@@ -222,9 +223,14 @@ def _decline_stratagem_window_if_pending(
     status: LifecycleStatus,
     result_id: str,
 ) -> LifecycleStatus:
-    request = status.decision_request
+    current = drain_pending_secondary_mission_setup(
+        lifecycle,
+        status,
+        result_id_prefix=f"{result_id}-secondary-setup",
+    )
+    request = current.decision_request
     if request is None or request.decision_type != STRATAGEM_DECISION_TYPE:
-        return status
+        return current
     return lifecycle.submit_decision(
         DecisionResult.for_request(
             result_id=result_id,

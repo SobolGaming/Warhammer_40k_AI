@@ -30,7 +30,7 @@ from warhammer40k_core.engine.destruction_provenance import (
     ModelDestructionAttribution,
 )
 from warhammer40k_core.engine.event_log import EventRecord, JsonValue, validate_json_value
-from warhammer40k_core.engine.game_state import GameState
+from warhammer40k_core.engine.game_state import GameState, SecondaryMissionMode
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.mission_action_options import mission_action_for_state
@@ -1092,8 +1092,13 @@ def phase17n_state_with_setup(
     battle_round: int,
     player_a_units: tuple[UnitMusterSelection, ...] | None = None,
     player_b_units: tuple[UnitMusterSelection, ...] | None = None,
+    player_a_secondary: SecondaryMissionMode = SecondaryMissionMode.FIXED,
 ) -> GameState:
-    state = battle_state(player_a_units=player_a_units, player_b_units=player_b_units)
+    state = battle_state(
+        player_a_units=player_a_units,
+        player_b_units=player_b_units,
+        player_a_secondary=player_a_secondary,
+    )
     state.mission_setup = setup
     assert state.battlefield_state is not None
     state.battlefield_state = replace(

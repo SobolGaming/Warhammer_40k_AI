@@ -4,6 +4,11 @@ import json
 from dataclasses import replace
 from typing import TYPE_CHECKING, cast
 
+from warhammer40k_core.engine.actions import (
+    MissionActionState,
+    MissionActionStatePayload,
+    MissionActionStatus,
+)
 from warhammer40k_core.engine.attached_unit_formation import (
     AttachedUnitFormation,
     AttachedUnitFormationPayload,
@@ -68,8 +73,16 @@ from warhammer40k_core.engine.primary_mission_state import (
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import (
+    PrimaryUnitDestructionState,
+    PrimaryUnitDestructionStatePayload,
     SecondaryMissionCardMode,
+    SecondaryMissionCardState,
+    SecondaryMissionCardStatePayload,
     SecondaryMissionCardStatus,
+)
+from warhammer40k_core.engine.unit_state import (
+    StartingStrengthRecord,
+    StartingStrengthRecordPayload,
 )
 
 if TYPE_CHECKING:
@@ -131,6 +144,7 @@ def capture_primary_mission_boundary_checkpoint(
         applied_modifier_ids=_inventory_applied_oc_modifier_ids(inventory),
     )
     model_states = tuple(_boundary_model_state(state=state, row=row) for row in inventory)
+    include_secondary_scoring_authority = boundary_kind == "objective_control"
     checkpoint = PrimaryMissionBoundaryCheckpoint.create(
         boundary_kind=boundary_kind,
         game_id=state.game_id,
@@ -167,6 +181,28 @@ def capture_primary_mission_boundary_checkpoint(
             canonical_json(marker.to_payload())
             for marker in state.primary_mission_progress_state.markers
             if marker.status is PrimaryMissionMarkerStatus.ACTIVE
+        ),
+        active_secondary_mission_card_jsons=tuple(
+            canonical_json(card.to_payload())
+            for card in state.secondary_mission_card_states
+            if include_secondary_scoring_authority
+            and card.status is SecondaryMissionCardStatus.ACTIVE
+        ),
+        completed_mission_action_state_jsons=tuple(
+            canonical_json(action.to_payload())
+            for action in state.mission_action_states
+            if include_secondary_scoring_authority
+            and action.status is MissionActionStatus.COMPLETED
+        ),
+        primary_unit_destruction_state_jsons=tuple(
+            canonical_json(destruction.to_payload())
+            for destruction in state.primary_unit_destruction_states
+            if include_secondary_scoring_authority
+        ),
+        starting_strength_record_jsons=tuple(
+            canonical_json(record.to_payload())
+            for record in state.starting_strength_records
+            if include_secondary_scoring_authority
         ),
         active_secondary_mission_ids=tuple(
             card.secondary_mission_id
@@ -796,6 +832,78 @@ def active_primary_marker_ids_from_checkpoint(
     )
 
 
+def active_secondary_mission_card_states_from_checkpoint(
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+) -> tuple[SecondaryMissionCardState, ...]:
+    if type(checkpoint) is not PrimaryMissionBoundaryCheckpoint:
+        raise GameLifecycleError(
+            "Primary mission boundary Secondary card parser requires a checkpoint."
+        )
+    cards = tuple(
+        SecondaryMissionCardState.from_payload(
+            cast(SecondaryMissionCardStatePayload, _json_object(value))
+        )
+        for value in checkpoint.active_secondary_mission_card_jsons
+    )
+    return tuple(
+        sorted(
+            cards,
+            key=lambda card: (
+                card.player_id,
+                card.battle_round,
+                card.mode.value,
+                card.secondary_mission_id,
+            ),
+        )
+    )
+
+
+def completed_mission_action_states_from_checkpoint(
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+) -> tuple[MissionActionState, ...]:
+    if type(checkpoint) is not PrimaryMissionBoundaryCheckpoint:
+        raise GameLifecycleError(
+            "Primary mission boundary completed Action parser requires a checkpoint."
+        )
+    actions = tuple(
+        MissionActionState.from_payload(cast(MissionActionStatePayload, _json_object(value)))
+        for value in checkpoint.completed_mission_action_state_jsons
+    )
+    return tuple(sorted(actions, key=lambda action: action.action_id))
+
+
+def primary_unit_destruction_states_from_checkpoint(
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+) -> tuple[PrimaryUnitDestructionState, ...]:
+    if type(checkpoint) is not PrimaryMissionBoundaryCheckpoint:
+        raise GameLifecycleError(
+            "Primary mission boundary destruction parser requires a checkpoint."
+        )
+    destructions = tuple(
+        PrimaryUnitDestructionState.from_payload(
+            cast(PrimaryUnitDestructionStatePayload, _json_object(value))
+        )
+        for value in checkpoint.primary_unit_destruction_state_jsons
+    )
+    return tuple(sorted(destructions, key=lambda destruction: destruction.destruction_id))
+
+
+def starting_strength_records_from_checkpoint(
+    checkpoint: PrimaryMissionBoundaryCheckpoint,
+) -> tuple[StartingStrengthRecord, ...]:
+    if type(checkpoint) is not PrimaryMissionBoundaryCheckpoint:
+        raise GameLifecycleError(
+            "Primary mission boundary Starting Strength parser requires a checkpoint."
+        )
+    records = tuple(
+        StartingStrengthRecord.from_payload(
+            cast(StartingStrengthRecordPayload, _json_object(value))
+        )
+        for value in checkpoint.starting_strength_record_jsons
+    )
+    return tuple(sorted(records, key=lambda record: record.unit_instance_id))
+
+
 def mission_action_prior_uses_from_checkpoint(
     checkpoint: PrimaryMissionBoundaryCheckpoint,
 ) -> tuple[MissionActionPriorUseEvidence, ...]:
@@ -1096,19 +1204,50 @@ def _validate_marker_inventory(
 def _validate_action_opportunity_history(
     *, state: GameState, checkpoint: PrimaryMissionBoundaryCheckpoint
 ) -> None:
-    for secondary_id in checkpoint.active_secondary_mission_ids:
+    if not checkpoint.has_active_secondary_mission_card_witness:
+        for secondary_id in checkpoint.active_secondary_mission_ids:
+            matches = tuple(
+                card
+                for card in state.secondary_mission_card_states
+                if card.player_id == checkpoint.player_id
+                and card.secondary_mission_id == secondary_id
+                and (
+                    card.mode is SecondaryMissionCardMode.FIXED
+                    or card.battle_round == checkpoint.battle_round
+                )
+            )
+            if len(matches) != 1:
+                raise GameLifecycleError("Primary mission boundary secondary inventory drifted.")
+        _validate_action_prior_use_history(state=state, checkpoint=checkpoint)
+        return
+    snapshot_cards = active_secondary_mission_card_states_from_checkpoint(checkpoint)
+    if any(card.player_id not in state.player_ids for card in snapshot_cards):
+        raise GameLifecycleError("Primary mission boundary secondary player drifted.")
+    if checkpoint.active_secondary_mission_ids != tuple(
+        sorted(
+            card.secondary_mission_id
+            for card in snapshot_cards
+            if card.player_id == checkpoint.player_id
+        )
+    ):
+        raise GameLifecycleError("Primary mission boundary secondary inventory drifted.")
+    for snapshot in snapshot_cards:
         matches = tuple(
             card
             for card in state.secondary_mission_card_states
-            if card.player_id == checkpoint.player_id
-            and card.secondary_mission_id == secondary_id
-            and (
-                card.mode is SecondaryMissionCardMode.FIXED
-                or card.battle_round == checkpoint.battle_round
-            )
+            if card.player_id == snapshot.player_id
+            and card.secondary_mission_id == snapshot.secondary_mission_id
+            and card.mode is snapshot.mode
+            and card.battle_round == snapshot.battle_round
         )
         if len(matches) != 1:
             raise GameLifecycleError("Primary mission boundary secondary inventory drifted.")
+    _validate_action_prior_use_history(state=state, checkpoint=checkpoint)
+
+
+def _validate_action_prior_use_history(
+    *, state: GameState, checkpoint: PrimaryMissionBoundaryCheckpoint
+) -> None:
     current_action_by_id = {action.action_id: action for action in state.mission_action_states}
     for row in mission_action_prior_uses_from_checkpoint(checkpoint):
         action = current_action_by_id.get(row.action_id)
@@ -1251,10 +1390,14 @@ def _unit_ids_from_state_jsons(values: tuple[str, ...]) -> tuple[str, ...]:
 
 __all__ = (
     "active_primary_marker_ids_from_checkpoint",
+    "active_secondary_mission_card_states_from_checkpoint",
     "capture_primary_mission_boundary_checkpoint",
+    "completed_mission_action_states_from_checkpoint",
     "primary_mission_boundary_checkpoint_for_reference",
     "primary_mission_boundary_checkpoint_for_request",
+    "primary_unit_destruction_states_from_checkpoint",
     "record_primary_mission_boundary_checkpoint",
+    "starting_strength_records_from_checkpoint",
     "terrain_model_inventory_from_checkpoint",
     "validate_primary_mission_action_request_checkpoint",
     "validate_primary_mission_action_start_checkpoint_evidence",
