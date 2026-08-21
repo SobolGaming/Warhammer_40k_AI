@@ -1,8 +1,8 @@
 # Session semantics
 
-The Phase 18E-18H reference server exposes a formal authenticated session,
-optimistic-concurrency command, and reconnect protocol around the Phase 18C
-`AdapterGameSession` facade.
+The Phase 18E-18L reference server exposes a formal authenticated session,
+optimistic-concurrency command, reconnect, and durable recovery protocol around
+the Phase 18C `AdapterGameSession` facade.
 `session_id` identifies the server-owned transport session and is distinct from
 the authoritative engine `game_id`.
 Session metadata records ruleset, catalog, source-package, contract, engine,
@@ -70,9 +70,9 @@ alternatives and return-on-death payload.
   delta with `resync_required: true`, no events, and a stable `resync_reason`.
   The client then replaces all derived state from `GET /projection` and resumes
   from that projection's cursor.
-- The reference in-memory server generates a cryptographically random cursor
-  key per server instance and retains the protected token-to-state map in
-  memory. Each token carries a server-verifiable authentication tag, so a
+- The server generates a cryptographically random cursor key and retains the
+  protected token-to-state map as authority-private state. Each token carries a
+  server-verifiable authentication tag, so a
   tampered or foreign token is malformed while an authentic token whose state
   was evicted is expired. Issuance evicts states below the session-wide revision
   floor and below the issuing viewer scope's event floor; an authorization-
@@ -80,8 +80,11 @@ alternatives and return-on-death payload.
   transition compacts each principal/scope to its newest pre-terminal checkpoint
   before issuing final checkpoints. That preserves terminal-boundary resume
   while discarding historical cursor states; final cursors remain valid as long
-  as the completed session remains addressable. Phase 18L owns durable protected
-  state/key storage when sessions and cursors must survive process recovery.
+  as the completed session remains addressable. The Phase 18L atomic checkpoint
+  includes the exact cursor key and retained token registry. Recovery accepts
+  that state only when its authenticated token payloads, session identities,
+  revision floors, principal bindings, and authorization epoch verify exactly;
+  otherwise it fails closed without exposing the session.
 - Only the current pending request may be answered. `request_id`, `actor_id`,
   `result_id`, option ID, proposal request context, and schema version are
   validated before engine mutation.
@@ -141,11 +144,63 @@ An advance at an existing `waiting_for_decision` boundary returns
 `advance_not_required` without forking the facade, changing state, advancing the
 revision, or reserving the command ID.
 
-The in-memory command journal proves Phase 18F ordering and retry semantics;
-Phase 18G adds protected opaque cursor, retention, pagination, delayed-snapshot, and
-reconnect resynchronization semantics over retained in-memory revision
-snapshots. Phase 18L still owns durable journal/state persistence, durable
-cursor-key management, compaction storage, and crash recovery.
+The command journal proves Phase 18F ordering and retry semantics; Phase 18G
+adds protected opaque cursor, retention, pagination, delayed-snapshot, and
+reconnect resynchronization semantics over retained revision snapshots. Phase
+18L persists those structures as one atomic authority checkpoint. An accepted
+command's complete envelope and authorization context, committed revision,
+cached public status/response, staged adapter state, revision snapshots, and
+cursor registry become durable before the response is published or the
+in-memory authority pointer is replaced. A failure before replacement leaves
+the previous checkpoint authoritative; a restart after replacement returns the
+cached byte-equivalent outcome for an exact retry. Because a store error may be
+reported after durable replacement, any commit-boundary error puts the current
+authority into fail-stop mode. A fresh process must load and verify the store
+before serving again, so stale in-memory state cannot overwrite an ambiguous
+successful commit.
+
+## Persistence, recovery, and authority
+
+`session-persistence-v1-phase18l` is a closed operator-only artifact. It is not
+an HTTP request or response and is never a client mutation surface. Its root
+binds the server, engine build, external-contract, and persistence-schema
+versions to the authorization bindings, protected cursor codec, retention
+policy, complete authoritative sessions, and the game-to-session index. A
+canonical SHA-256 covers every state member preceding that hash. Bearer
+credentials are deliberately absent; a deployer re-injects its credential
+registry and recovery verifies the principal/role/player bindings and
+authorization epoch against the checkpoint.
+
+Each persisted session retains normalized `GameConfig` input, exact ruleset,
+overlay, catalog, source-package, and source hashes, RNG state, lifecycle
+status, terminal flags, accepted decision and event history, monotonic revision,
+idempotency journal, retained revision snapshots, and adapter-owned recovery
+checkpoint. The checkpoint carries the current lifecycle, initial replay input,
+latest replay artifact, and deterministic decision/event/projection/RNG/package
+commitments. Operational timestamps are restored but never determine
+simulation order. A successful read advances the session-level
+`last_activity_at` value without rewriting a retained revision snapshot; the
+timestamp inside each snapshot remains the immutable activity boundary at
+which that revision was captured. Recovery therefore requires the current
+session timestamp to be at least as recent as the latest retained snapshot.
+
+Recovery validates the closed artifact and root hash before registering any
+session. It loads the latest verified adapter checkpoint, replays any accepted
+decision tail carried by the replay artifact through the adapter-owned session
+recovery path and therefore through `GameLifecycle.submit_decision(...)`, then
+compares the complete decision records, authoritative events and sequence, RNG
+state, replay artifact, projection hashes, package identities, and session
+revision. The command journal is restored and cross-validated as an idempotency
+cache; recovery does not reapply its command envelopes. A
+schema, package, build, checkpoint, or deterministic-content mismatch produces
+a typed corruption or drift diagnostic and leaves the session unavailable;
+there is no partial reconstruction or permissive fallback.
+
+One process or actor owns mutation for a session and serializes its commands.
+Reads may use immutable viewer-scoped projections, but no second writer may
+advance the same session. Failover transfers ownership only after the complete
+checkpoint, decision tail, and command journal verify. The store uses one atomic transaction for
+the authority artifact and indexes sessions by validated identities.
 
 ## Lifecycle outcomes
 

@@ -6,6 +6,7 @@ from enum import StrEnum
 from typing import Self
 
 from warhammer40k_core.core.validation import IdentifierValidator
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json
 
 
 class AccessControlError(ValueError):
@@ -211,10 +212,11 @@ class ViewerContext:
 
     @property
     def cursor_scope(self) -> str:
-        player_scope = "shared" if self.viewer_player_id is None else self.viewer_player_id
-        return (
-            f"{self.role.value}:{player_scope}:{self.policy.delay_revisions}:"
-            f"{self.authorization_epoch}"
+        return _cursor_scope(
+            role=self.role,
+            player_id=self.viewer_player_id,
+            delay_revisions=self.policy.delay_revisions,
+            authorization_epoch=self.authorization_epoch,
         )
 
     @property
@@ -279,6 +281,120 @@ class AuthorizationContext:
             raise AccessControlError("Authorization context permissions must be bool values.")
         if type(self.delay_revisions) is not int or self.delay_revisions < 0:
             raise AccessControlError("Authorization context delay must be non-negative.")
+        policy = ROLE_POLICY_BY_ROLE[self.role]
+        expected_scope = _cursor_scope(
+            role=self.role,
+            player_id=self.player_id,
+            delay_revisions=policy.delay_revisions,
+            authorization_epoch=self.authorization_epoch,
+        )
+        if self.cursor_scope != expected_scope:
+            raise AccessControlError("Authorization context cursor scope drifted.")
+        expected_flags = (
+            policy.may_mutate_lifecycle,
+            policy.may_submit_decision,
+            policy.may_view_live,
+            policy.may_view_catalog,
+            policy.may_view_support,
+            policy.may_export_replay,
+            policy.omniscient,
+            policy.delay_revisions,
+        )
+        actual_flags = (
+            self.may_mutate_lifecycle,
+            self.may_submit_decision,
+            self.may_view_live,
+            self.may_view_catalog,
+            self.may_view_support,
+            self.may_export_replay,
+            self.omniscient,
+            self.delay_revisions,
+        )
+        if actual_flags != expected_flags:
+            raise AccessControlError("Authorization context role policy drifted.")
+
+    def to_payload(self) -> dict[str, JsonValue]:
+        return {
+            "principal_id": self.principal_id,
+            "role": self.role.value,
+            "player_id": self.player_id,
+            "cursor_scope": self.cursor_scope,
+            "authorization_epoch": self.authorization_epoch,
+            "may_mutate_lifecycle": self.may_mutate_lifecycle,
+            "may_submit_decision": self.may_submit_decision,
+            "may_view_live": self.may_view_live,
+            "may_view_catalog": self.may_view_catalog,
+            "may_view_support": self.may_view_support,
+            "may_export_replay": self.may_export_replay,
+            "omniscient": self.omniscient,
+            "delay_revisions": self.delay_revisions,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: JsonValue) -> Self:
+        if not isinstance(payload, dict):
+            raise AccessControlError("Persisted authorization context must be an object.")
+        expected_keys = {
+            "principal_id",
+            "role",
+            "player_id",
+            "cursor_scope",
+            "authorization_epoch",
+            "may_mutate_lifecycle",
+            "may_submit_decision",
+            "may_view_live",
+            "may_view_catalog",
+            "may_view_support",
+            "may_export_replay",
+            "omniscient",
+            "delay_revisions",
+        }
+        if set(payload) != expected_keys:
+            raise AccessControlError("Persisted authorization context keys are invalid.")
+        role_value = payload["role"]
+        if type(role_value) is not str:
+            raise AccessControlError("Persisted authorization role is invalid.")
+        try:
+            role = PrincipalRole(role_value)
+        except ValueError as exc:
+            raise AccessControlError("Persisted authorization role is unsupported.") from exc
+        principal_id = payload["principal_id"]
+        player_id = payload["player_id"]
+        cursor_scope = payload["cursor_scope"]
+        epoch = payload["authorization_epoch"]
+        delay = payload["delay_revisions"]
+        bool_names = (
+            "may_mutate_lifecycle",
+            "may_submit_decision",
+            "may_view_live",
+            "may_view_catalog",
+            "may_view_support",
+            "may_export_replay",
+            "omniscient",
+        )
+        if type(principal_id) is not str or type(cursor_scope) is not str:
+            raise AccessControlError("Persisted authorization identifiers are invalid.")
+        if player_id is not None and type(player_id) is not str:
+            raise AccessControlError("Persisted authorization player is invalid.")
+        if type(epoch) is not int or type(delay) is not int:
+            raise AccessControlError("Persisted authorization integer field is invalid.")
+        if any(type(payload[name]) is not bool for name in bool_names):
+            raise AccessControlError("Persisted authorization permission is invalid.")
+        return cls(
+            principal_id=principal_id,
+            role=role,
+            player_id=player_id,
+            cursor_scope=cursor_scope,
+            authorization_epoch=epoch,
+            may_mutate_lifecycle=payload["may_mutate_lifecycle"] is True,
+            may_submit_decision=payload["may_submit_decision"] is True,
+            may_view_live=payload["may_view_live"] is True,
+            may_view_catalog=payload["may_view_catalog"] is True,
+            may_view_support=payload["may_view_support"] is True,
+            may_export_replay=payload["may_export_replay"] is True,
+            omniscient=payload["omniscient"] is True,
+            delay_revisions=delay,
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -331,6 +447,26 @@ class PrincipalRegistry:
         }
         if bound_players != set(players):
             raise AuthorizationError("Every session player requires a server-owned principal.")
+
+    def binding_payload(self) -> dict[str, JsonValue]:
+        return {
+            "authorization_epoch": self.authorization_epoch,
+            "principals": [
+                {
+                    "principal_id": credential.principal.principal_id,
+                    "role": credential.principal.role.value,
+                    "player_id": credential.principal.player_id,
+                }
+                for credential in sorted(
+                    self.credentials,
+                    key=lambda credential: credential.principal.principal_id,
+                )
+            ],
+        }
+
+    def validate_binding_payload(self, payload: JsonValue) -> None:
+        if canonical_json(payload) != canonical_json(self.binding_payload()):
+            raise AccessControlError("Persisted principal bindings drifted.")
 
 
 DEV_ADMIN_TOKEN = "core-v2-dev-administrator"
@@ -428,3 +564,14 @@ def _validated_player_ids(values: tuple[str, ...]) -> tuple[str, ...]:
 
 
 _validate_identifier = IdentifierValidator(AccessControlError)
+
+
+def _cursor_scope(
+    *,
+    role: PrincipalRole,
+    player_id: str | None,
+    delay_revisions: int,
+    authorization_epoch: int,
+) -> str:
+    player_scope = "shared" if player_id is None else player_id
+    return f"{role.value}:{player_scope}:{delay_revisions}:{authorization_epoch}"

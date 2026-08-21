@@ -55,6 +55,7 @@ from warhammer40k_core.adapters.external_contract import (
     SESSION_COMMAND_OUTCOME_SCHEMA_VERSION,
     SESSION_COMMAND_RESULT_SCHEMA_VERSION,
     SESSION_METADATA_SCHEMA_VERSION,
+    SESSION_PERSISTENCE_SCHEMA_VERSION,
     SESSION_PROJECTION_SCHEMA_VERSION,
 )
 from warhammer40k_core.adapters.projection import (
@@ -69,7 +70,7 @@ from warhammer40k_core.core.detachment import StratagemDefinition
 from warhammer40k_core.core.ruleset_descriptor import TerrainFeatureKind
 from warhammer40k_core.core.terrain_areas import TerrainAreaClassification
 from warhammer40k_core.core.terrain_display import TerrainDisplayGeometry
-from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
+from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.interaction_metadata import (
     InteractionKind,
     registered_interaction_decision_types,
@@ -114,6 +115,7 @@ SCHEMA_FILES = (
     Path("contracts/schemas/replay-metadata.schema.json"),
     Path("contracts/schemas/rules-catalog.schema.json"),
     Path("contracts/schemas/session-metadata.schema.json"),
+    Path("contracts/schemas/session-persistence.schema.json"),
 )
 FIXTURE_FILES = (
     "hidden_secondary_redaction_view.json",
@@ -408,12 +410,53 @@ def test_session_metadata_contract_version_accepts_compatible_major_ten_releases
     metadata = _read_json(
         REPO_ROOT / Path("contracts/examples/sessions/session-metadata-created.json")
     )
-    compatible = {**_json_object(metadata), "server_contract_version": "10.1.0"}
+    compatible = {**_json_object(metadata), "server_contract_version": "10.2.0"}
     incompatible = {**_json_object(metadata), "server_contract_version": "9.3.0"}
 
     validator.validate(compatible)
     with pytest.raises(ValidationError):
         validator.validate(incompatible)
+
+
+def test_phase18l_persistence_artifact_is_closed_operator_only_and_content_addressed() -> None:
+    schema = _json_object(
+        _read_json(REPO_ROOT / Path("contracts/schemas/session-persistence.schema.json"))
+    )
+    properties = _json_object(schema["properties"])
+    definitions = _json_object(schema["$defs"])
+    assert schema["additionalProperties"] is False
+    assert _json_object(properties["schema_version"])["const"] == (
+        SESSION_PERSISTENCE_SCHEMA_VERSION
+    )
+    for definition_name in (
+        "authorization_bindings",
+        "authorization_context",
+        "authoritative_session",
+        "command_journal_entry",
+        "cursor",
+        "cursor_codec",
+        "cursor_entry",
+        "game_session_index_entry",
+        "internal_decision_option",
+        "internal_decision_request",
+        "internal_lifecycle_status",
+        "local_game_session_checkpoint",
+        "principal_binding",
+        "revision_snapshot",
+        "rng_state",
+    ):
+        assert _json_object(definitions[definition_name])["additionalProperties"] is False
+
+    example = _read_json(
+        REPO_ROOT / Path("contracts/examples/persistence/session-persistence.json")
+    )
+    committed_hash = _json_string(example.pop("content_hash"))
+    assert committed_hash == hashlib.sha256(canonical_json(example).encode("utf-8")).hexdigest()
+    encoded = json.dumps(example, sort_keys=True)
+    assert "core-v2-dev-" not in encoded
+
+    openapi = _read_json(REPO_ROOT / Path("contracts/openapi.yaml"))
+    assert "session-persistence.schema.json" not in json.dumps(openapi, sort_keys=True)
 
 
 def test_contract_ten_advances_only_affected_session_wrapper_families() -> None:
@@ -1582,8 +1625,9 @@ def test_contract_manifest_hashes_baseline_with_canonical_line_endings() -> None
     ).hexdigest()
 
     assert len(baseline_schema_names) == 15
-    assert len(canonical_schema_names) == 26
+    assert len(canonical_schema_names) == 27
     assert "capability-manifest.schema.json" in canonical_schema_names
+    assert "session-persistence.schema.json" in canonical_schema_names
     assert baseline_schema_names < canonical_schema_names
     assert hashes["compatibility/1.0.0-shape.json"] == canonical_hash
 

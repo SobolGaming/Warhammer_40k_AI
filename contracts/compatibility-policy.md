@@ -1,7 +1,7 @@
 # Compatibility policy
 
 The external contract uses semantic versioning. Its current version is
-`10.1.0`, declared in `openapi.yaml`, `manifest.json`, and
+`10.2.0`, declared in `openapi.yaml`, `manifest.json`, and
 `warhammer40k_core.adapters.external_contract`.
 
 Payload families also carry an explicit `schema_version`. A payload-family
@@ -81,6 +81,14 @@ Starting Strength snapshots used to authenticate Secondary scoring. Contract
 10.0 checkpoints remain loadable with their original content hash when those
 optional witnesses are absent, but missing witnesses cannot authenticate
 restored Secondary scoring evidence.
+
+Contract 10.2 adds the closed, backend-private
+`session-persistence-v1-phase18l` schema and normative atomic persistence,
+verified recovery, cursor/role restoration, and single-authority transfer
+semantics. It adds no public HTTP operation and does not change any existing
+client request or response family. Contract 10.1 clients may continue to use
+the same Contract 10 operations and payload shapes; only operators that claim
+Phase 18L durability consume the new schema and recovery requirements.
 
 Deployers upgrading a hosted 9.x service must retain a separately deployed 9.x
 adapter through at least 2027-08-16 and one released 10.x minor line, whichever

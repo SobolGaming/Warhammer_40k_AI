@@ -47,6 +47,16 @@ schemas and the ordinary `AdapterGameSession` path.
     payloads as immutable audit artifacts.
 12. Reject a response that fails its declared schema, contains an unknown major
     version, or contradicts the coordinate/session/redaction semantics.
+13. When a backend claims Phase 18L persistence, restart at session creation,
+    setup, and each major phase boundary and require exact revision,
+    decision/event sequence, RNG, replay, projection, role, and cursor
+    commitments. An exact command retry after restart must return the original
+    byte-equivalent public outcome without mutation. Inject failures before and
+    after atomic commit and require respectively the complete old or new
+    checkpoint, never a mixed state. Corrupt checkpoint content or drift the
+    package, engine build, external-contract, persistence-schema, or authority
+    identity and require typed fail-closed recovery before the session is
+    addressable. Restored role bindings and cursors must not widen visibility.
 
 The generated coverage directories are:
 
@@ -56,6 +66,8 @@ The generated coverage directories are:
 - `examples/decisions/parameterized/` for every supported proposal kind;
 - `examples/projections/`, `examples/events/`, `examples/statuses/`, and
   `examples/errors/` for read, lifecycle, and failure behavior.
+- `examples/persistence/session-persistence.json` for the closed operator-only
+  Phase 18L checkpoint shape. It is schema evidence, not a client wire payload.
 
 The repository contract check validates that the inventory and proposal sets
 remain complete as new registered decision metadata or proposal kinds are
@@ -88,3 +100,8 @@ decision path. It does not promote `envelope_only` inventory rows to
 concurrent-race, every-decision-family, complete golden-corpus, coach,
 delayed-spectator, or live rejected `rule_path_unsupported` coverage. Those
 backend-executable cases remain Phase 18M-B+ work.
+
+Phase 18L support in the reference server and its schema/example therefore does
+not by itself expand the Phase 18M-A certificate. A backend claiming equivalent
+durability still owes the executable restart, crash-boundary, corruption,
+drift, and no-visibility-widening cases above in Phase 18M-B+.

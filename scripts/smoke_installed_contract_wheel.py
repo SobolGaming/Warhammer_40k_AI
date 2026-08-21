@@ -34,6 +34,7 @@ EXPECTED_SCHEMA_NAMES = frozenset(
         "session-command-result.schema.json",
         "session-create.schema.json",
         "session-metadata.schema.json",
+        "session-persistence.schema.json",
         "session-projection.schema.json",
         "support-profile.schema.json",
     }
@@ -55,6 +56,8 @@ from warhammer40k_core.adapters.external_contract import (
     SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION,
     SESSION_CREATE_SCHEMA_NAME,
     SESSION_CREATE_SCHEMA_VERSION,
+    SESSION_PERSISTENCE_SCHEMA_NAME,
+    SESSION_PERSISTENCE_SCHEMA_VERSION,
     ExternalContractValidationError,
     validate_external_request_payload,
 )
@@ -75,6 +78,14 @@ schema_names = {
 }
 if schema_names != expected_schema_names:
     raise RuntimeError("Installed wheel does not contain the complete canonical schema bundle.")
+
+persistence_schema = json.loads(
+    schema_directory.joinpath(SESSION_PERSISTENCE_SCHEMA_NAME).read_text(encoding="utf-8")
+)
+if persistence_schema["properties"]["schema_version"]["const"] != (
+    SESSION_PERSISTENCE_SCHEMA_VERSION
+):
+    raise RuntimeError("Installed persistence schema version drifted from runtime constants.")
 
 create_payload = validate_json_value(
     {

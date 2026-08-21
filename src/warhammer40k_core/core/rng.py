@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 from hashlib import sha256
-from typing import Self, TypedDict
+from typing import Self, TypedDict, cast
 
 
 class RandomSourceError(ValueError):
@@ -87,11 +87,30 @@ class RandomSource:
         }
 
     @classmethod
-    def from_payload(cls, payload: RandomSourcePayload) -> Self:
+    def from_payload(cls, payload: object) -> Self:
+        if type(payload) is not dict:
+            raise RandomSourceError("RandomSource payload must be an object.")
+        value = cast(dict[str, object], payload)
+        if set(value) != {"seed", "history", "draw_count"}:
+            raise RandomSourceError("RandomSource payload fields are invalid.")
+        seed = value["seed"]
+        history = value["history"]
+        draw_count = value["draw_count"]
+        if type(seed) is not str or not seed:
+            raise RandomSourceError("RandomSource payload seed must be a non-empty string.")
+        if type(history) is not list:
+            raise RandomSourceError("RandomSource payload history must contain non-empty strings.")
+        history_items = cast(list[object], history)
+        if any(type(token) is not str or token == "" for token in history_items):
+            raise RandomSourceError("RandomSource payload history must contain non-empty strings.")
+        if type(draw_count) is not int or draw_count < 0:
+            raise RandomSourceError(
+                "RandomSource payload draw_count must be a non-negative integer."
+            )
         return cls(
-            seed=payload["seed"],
-            history=payload["history"],
-            draw_count=payload["draw_count"],
+            seed=seed,
+            history=cast(list[str], history_items),
+            draw_count=draw_count,
         )
 
     def _digest(self, stream_label: str, nonce: int) -> bytes:

@@ -78,8 +78,10 @@ layout contains 30. See
 [docs/BATTLEFIELD_VIEWER.md](docs/BATTLEFIELD_VIEWER.md) for controls, data
 authority, complete battlefield geometry, executable Primary scoring for all 25
 Event Companion missions, and Step 5G pairing-wide lifecycle certification of
-both players' ordinary scoring boundaries on Layout A. Secondary scoring
-semantics remain pending.
+both players' ordinary scoring boundaries on Layout A. All 18 Secondary Mission
+cards are source-backed and executable through turn-end scoring with
+replay/restore evidence. The broader mission runtime exposes all 14 Mission
+Actions.
 
 CI uploads each shard's JUnit report for future median-duration profiles. Full behavioral shards
 run for ready pull requests, merge candidates, and pushes to `main`; draft pull requests keep the
@@ -91,13 +93,15 @@ encoding matrix shard names in the protection rule.
 
 ## External adapter contract
 
-The canonical Phase 18D language-neutral baseline and completed Phase 18E-18H
-session, command, reconnect, authentication, authorization, and redaction
-contracts are in [`contracts/`](contracts/README.md). The
+The canonical Phase 18D language-neutral baseline and completed Phase 18E-18J
+session, command, reconnect, authentication, authorization, redaction,
+interaction, and battlefield contracts are in [`contracts/`](contracts/README.md).
+Phase 18L adds the closed operator-only persistence checkpoint contract and
+fail-closed recovery semantics. The
 bundle includes Draft 2020-12 schemas, OpenAPI 3.1, real session-derived examples with explicit
 decision-family coverage status, proposal examples, versioned session metadata and idempotent
 command outcomes, protected opaque role-bound cursor/resync payloads, explicit principal-role policy,
-compatibility/redaction/session/coordinate semantics, and conformance scenarios.
+compatibility/redaction/session/coordinate/persistence semantics, and conformance scenarios.
 Verify schema, example, OpenAPI, Python-version, coverage, manifest, and compatibility drift with:
 
 ```bash
@@ -276,6 +280,11 @@ Current status:
   selected rosters, units, rules, mission, and geometry. Player views omit every
   opponent-owned row, unsupported reason, count, and derived selection hash;
   current full-game and release claims remain false without certified evidence.
+- Phase 18L persists the complete single-authority adapter server state as one
+  content-addressed operator artifact. Atomic checkpoints retain authoritative
+  session state, accepted command outcomes, replay inputs, RNG state, role
+  bindings, and protected cursor state; restart verifies every identity and
+  deterministic checkpoint before exposing a recovered session.
 - The checked-in Chaos Daemons Strike Force reprices to 2,075 points under the
   July 2026 MFM package and is correctly rejected as 75 points over the
   2,000-point limit; the original three six-model Bloodcrusher units remain
