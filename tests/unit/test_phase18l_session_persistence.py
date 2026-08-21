@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import json
 import sqlite3
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from http import HTTPStatus
@@ -18,6 +20,7 @@ from tests.phase15c_fight_order_helpers import fight_config, fight_lifecycle
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 
 from warhammer40k_core import __version__ as ENGINE_VERSION
+from warhammer40k_core import build_identity
 from warhammer40k_core.adapters import session_recovery as session_recovery_module
 from warhammer40k_core.adapters.access_control import (
     DEV_ADMIN_TOKEN,
@@ -55,6 +58,7 @@ from warhammer40k_core.adapters.session_persistence import (
     SessionPersistenceStorageError,
     SessionPersistenceStore,
     SQLiteSessionPersistenceStore,
+    commit_persistence_store,
 )
 from warhammer40k_core.adapters.session_protocol import (
     AuthoritativeSession,
@@ -99,6 +103,479 @@ PLAYER_A = "player-a"
 PLAYER_B = "player-b"
 FIXED_SECONDARY_OPTION_ID = "fixed:assassination:bring_it_down"
 FROZEN_TIME = datetime(2026, 8, 21, 16, 0, tzinfo=UTC)
+
+
+@dataclass(frozen=True, slots=True)
+class _MemoryResource:
+    name: str
+    resource_kind: Literal["directory", "file", "unsupported"]
+    children: tuple[_MemoryResource, ...] = ()
+    content: bytes = b""
+    unreadable: bool = False
+    enumeration_error: bool = False
+
+    @classmethod
+    def directory(
+        cls,
+        name: str,
+        *children: _MemoryResource,
+        enumeration_error: bool = False,
+    ) -> _MemoryResource:
+        return cls(
+            name=name,
+            resource_kind="directory",
+            children=children,
+            enumeration_error=enumeration_error,
+        )
+
+    @classmethod
+    def file(
+        cls,
+        name: str,
+        content: bytes,
+        *,
+        unreadable: bool = False,
+    ) -> _MemoryResource:
+        return cls(
+            name=name,
+            resource_kind="file",
+            content=content,
+            unreadable=unreadable,
+        )
+
+    @classmethod
+    def unsupported(cls, name: str) -> _MemoryResource:
+        return cls(name=name, resource_kind="unsupported")
+
+    @classmethod
+    def packaged_schema_directory(cls) -> _MemoryResource:
+        return cls.directory(
+            "contracts",
+            cls.directory("schemas", cls.file("session.schema.json", b"{}\n")),
+        )
+
+    def is_dir(self) -> bool:
+        return self.resource_kind == "directory"
+
+    def is_file(self) -> bool:
+        return self.resource_kind == "file"
+
+    def iterdir(self) -> Iterator[_MemoryResource]:
+        if self.enumeration_error:
+            raise OSError("injected enumeration failure")
+        return iter(self.children)
+
+    def joinpath(self, *descendants: str) -> _MemoryResource:
+        selected = self
+        for descendant in descendants:
+            match = next((child for child in selected.children if child.name == descendant), None)
+            if match is None:
+                return self.unsupported(descendant)
+            selected = match
+        return selected
+
+    def read_bytes(self) -> bytes:
+        if self.unreadable:
+            raise OSError("injected resource read failure")
+        return self.content
+
+
+def _runtime_package_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    package_root = tmp_path / "warhammer40k_core"
+    schema_root = package_root / "contracts" / "schemas"
+    schema_root.mkdir(parents=True)
+    (package_root / "runtime.py").write_bytes(b"RUNTIME_RULE = 1\r\n")
+    (package_root / "py.typed").write_bytes(b"")
+    (schema_root / "session.schema.json").write_text("{}\n", encoding="utf-8")
+    cache_root = package_root / "__pycache__"
+    cache_root.mkdir()
+    (cache_root / "ignored.py").write_text("IGNORED = True\n", encoding="utf-8")
+
+    def package_files(_package_name: str) -> Path:
+        return package_root
+
+    monkeypatch.setattr(build_identity, "files", package_files)
+    return package_root
+
+
+def _write_runtime_manifest(
+    package_root: Path,
+    manifest: build_identity.EngineBuildManifestPayload,
+) -> None:
+    (package_root / "_engine_build_manifest.json").write_text(
+        build_identity.canonical_engine_build_manifest_text(manifest),
+        encoding="utf-8",
+        newline="",
+    )
+
+
+@pytest.fixture
+def isolated_engine_build_identity_cache() -> Iterator[None]:
+    build_identity.verified_engine_build_identity.cache_clear()
+    yield
+    build_identity.verified_engine_build_identity.cache_clear()
+
+
+@pytest.mark.stubbed
+def test_phase18l_runtime_tree_identity_verifies_and_changes_with_runtime_content(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    isolated_engine_build_identity_cache: None,
+) -> None:
+    package_root = _runtime_package_root(tmp_path, monkeypatch)
+    runtime_path = package_root / "runtime.py"
+    first_manifest = build_identity.build_engine_manifest_payload()
+    _write_runtime_manifest(package_root, first_manifest)
+
+    identity = build_identity.verified_engine_build_identity()
+
+    assert build_identity.current_engine_build_id() == identity.build_id
+    assert identity.build_id == first_manifest["build_id"]
+    assert identity.resource_count == first_manifest["resource_count"]
+    assert identity.build_id != f"warhammer40k-core-v2:{ENGINE_VERSION}"
+    assert "warhammer40k_core/__pycache__/ignored.py" not in {
+        resource["path"] for resource in first_manifest["resources"]
+    }
+
+    runtime_path.write_text("RUNTIME_RULE = 2\n", encoding="utf-8")
+    second_manifest = build_identity.build_engine_manifest_payload()
+    assert second_manifest["fingerprint"] != first_manifest["fingerprint"]
+    assert second_manifest["build_id"] != first_manifest["build_id"]
+
+    build_identity.verified_engine_build_identity.cache_clear()
+    with pytest.raises(build_identity.EngineBuildIdentityDriftError, match="drifted"):
+        build_identity.verified_engine_build_identity()
+
+
+@pytest.mark.stubbed
+def test_phase18l_runtime_tree_identity_requires_a_readable_generated_manifest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    isolated_engine_build_identity_cache: None,
+) -> None:
+    package_root = _runtime_package_root(tmp_path, monkeypatch)
+
+    with pytest.raises(build_identity.EngineBuildIdentityUnavailableError, match="unavailable"):
+        build_identity.verified_engine_build_identity()
+
+    manifest_path = package_root / "_engine_build_manifest.json"
+    _write_runtime_manifest(package_root, build_identity.build_engine_manifest_payload())
+    original_read_bytes = Path.read_bytes
+
+    def unreadable_manifest(path: Path) -> bytes:
+        if path == manifest_path:
+            raise OSError("injected manifest read failure")
+        return original_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", unreadable_manifest)
+    build_identity.verified_engine_build_identity.cache_clear()
+    with pytest.raises(
+        build_identity.EngineBuildIdentityUnavailableError, match="could not be read"
+    ):
+        build_identity.verified_engine_build_identity()
+
+
+@pytest.mark.parametrize(
+    "tamper_kind",
+    [
+        "non_utf8",
+        "invalid_json",
+        "noncanonical_json",
+        "invalid_shape",
+        "invalid_identity",
+        "invalid_resource_shape",
+        "invalid_resource_identity",
+    ],
+)
+@pytest.mark.stubbed
+def test_phase18l_runtime_tree_identity_rejects_malformed_generated_manifests(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    isolated_engine_build_identity_cache: None,
+    tamper_kind: str,
+) -> None:
+    package_root = _runtime_package_root(tmp_path, monkeypatch)
+    manifest = build_identity.build_engine_manifest_payload()
+    manifest_path = package_root / "_engine_build_manifest.json"
+    if tamper_kind == "non_utf8":
+        raw = b"\xff"
+    elif tamper_kind == "invalid_json":
+        raw = b"{"
+    elif tamper_kind == "noncanonical_json":
+        raw = json.dumps(manifest, sort_keys=True).encode("utf-8")
+    else:
+        malformed = cast(dict[str, object], copy.deepcopy(manifest))
+        if tamper_kind == "invalid_shape":
+            del malformed["algorithm"]
+        elif tamper_kind == "invalid_identity":
+            malformed["resource_count"] = 0
+        elif tamper_kind == "invalid_resource_shape":
+            resources = cast(list[dict[str, object]], malformed["resources"])
+            resources[0]["unexpected"] = "field"
+        else:
+            assert tamper_kind == "invalid_resource_identity"
+            resources = cast(list[dict[str, object]], malformed["resources"])
+            resources[0]["sha256"] = "not-a-sha256"
+        raw = (json.dumps(malformed, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode()
+    manifest_path.write_bytes(raw)
+
+    with pytest.raises(build_identity.EngineBuildIdentityDriftError):
+        build_identity.verified_engine_build_identity()
+
+
+@pytest.mark.parametrize(
+    ("resource_tree", "expected_message"),
+    [
+        pytest.param(
+            _MemoryResource.directory(
+                "warhammer40k_core",
+                _MemoryResource.directory("contracts", _MemoryResource.directory("schemas")),
+            ),
+            "inventory is empty",
+            id="empty-inventory",
+        ),
+        pytest.param(
+            _MemoryResource.directory(
+                "warhammer40k_core",
+                _MemoryResource.file("same.py", b"FIRST = 1\n"),
+                _MemoryResource.file("same.py", b"SECOND = 2\n"),
+                _MemoryResource.packaged_schema_directory(),
+            ),
+            "duplicate path",
+            id="duplicate-path",
+        ),
+        pytest.param(
+            _MemoryResource.directory(
+                "warhammer40k_core",
+                _MemoryResource.file("Case.py", b"FIRST = 1\n"),
+                _MemoryResource.file("case.py", b"SECOND = 2\n"),
+                _MemoryResource.packaged_schema_directory(),
+            ),
+            "not case-portable",
+            id="case-colliding-path",
+        ),
+        pytest.param(
+            _MemoryResource.directory(
+                "warhammer40k_core",
+                _MemoryResource.unsupported("runtime.py"),
+                _MemoryResource.packaged_schema_directory(),
+            ),
+            "unsupported entry",
+            id="unsupported-entry",
+        ),
+        pytest.param(
+            _MemoryResource.directory(
+                "warhammer40k_core",
+                _MemoryResource.file("runtime.txt", b"not classified"),
+                _MemoryResource.packaged_schema_directory(),
+            ),
+            "Unclassified packaged runtime resource",
+            id="unclassified-file",
+        ),
+        pytest.param(
+            _MemoryResource.directory(
+                "warhammer40k_core",
+                _MemoryResource.file("bad name.py", b"RUNTIME = 1\n"),
+                _MemoryResource.packaged_schema_directory(),
+            ),
+            "non-portable path",
+            id="nonportable-path",
+        ),
+        pytest.param(
+            _MemoryResource.directory(
+                "warhammer40k_core",
+                _MemoryResource.file("runtime.py", b"RUNTIME = 1\n", unreadable=True),
+                _MemoryResource.packaged_schema_directory(),
+            ),
+            "could not be read",
+            id="unreadable-resource",
+        ),
+        pytest.param(
+            _MemoryResource.directory("warhammer40k_core", enumeration_error=True),
+            "could not be enumerated",
+            id="unreadable-root",
+        ),
+        pytest.param(
+            _MemoryResource.directory(
+                "warhammer40k_core",
+                _MemoryResource.file("runtime.py", b"RUNTIME = 1\n"),
+            ),
+            "missing its packaged contract schemas",
+            id="installed-tree-missing-packaged-schemas",
+        ),
+        pytest.param(
+            _MemoryResource.file("warhammer40k_core", b"not a directory"),
+            "root is unavailable",
+            id="missing-root",
+        ),
+    ],
+)
+@pytest.mark.stubbed
+def test_phase18l_runtime_tree_inventory_fails_closed(
+    monkeypatch: pytest.MonkeyPatch,
+    resource_tree: _MemoryResource,
+    expected_message: str,
+) -> None:
+    def package_files(_package_name: str) -> _MemoryResource:
+        return resource_tree
+
+    monkeypatch.setattr(build_identity, "files", package_files)
+
+    with pytest.raises(build_identity.EngineBuildIdentityUnavailableError, match=expected_message):
+        build_identity.build_engine_manifest_payload()
+
+
+@pytest.mark.parametrize("checkout_kind", ["installed", "untrusted", "missing_schemas"])
+@pytest.mark.stubbed
+def test_phase18l_runtime_tree_requires_trustworthy_canonical_schema_fallback(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    checkout_kind: str,
+) -> None:
+    if checkout_kind == "installed":
+        package_root = tmp_path / "installed" / "warhammer40k_core"
+        module_path = Path(build_identity.__file__)
+    elif checkout_kind == "untrusted":
+        package_root = tmp_path / "checkout" / "warhammer40k_core"
+        module_path = package_root / "build_identity.py"
+    else:
+        package_root = tmp_path / "checkout" / "src" / "warhammer40k_core"
+        module_path = package_root / "build_identity.py"
+        (tmp_path / "checkout" / "pyproject.toml").parent.mkdir(parents=True)
+        (tmp_path / "checkout" / "pyproject.toml").write_text("[project]\n", encoding="utf-8")
+    package_root.mkdir(parents=True)
+    (package_root / "runtime.py").write_text("RUNTIME = 1\n", encoding="utf-8")
+
+    def package_files(_package_name: str) -> Path:
+        return package_root
+
+    monkeypatch.setattr(build_identity, "files", package_files)
+    monkeypatch.setattr(build_identity, "__file__", str(module_path))
+
+    with pytest.raises(build_identity.EngineBuildIdentityUnavailableError):
+        build_identity.build_engine_manifest_payload()
+
+
+@pytest.mark.stubbed
+def test_phase18l_runtime_tree_rejects_symbolic_links(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    package_root = tmp_path / "warhammer40k_core"
+    package_root.mkdir()
+    runtime_path = package_root / "runtime.py"
+    runtime_path.write_text("RUNTIME = 1\n", encoding="utf-8")
+    original_is_symlink = Path.is_symlink
+
+    def injected_symbolic_link(path: Path) -> bool:
+        return path == runtime_path or original_is_symlink(path)
+
+    def package_files(_package_name: str) -> Path:
+        return package_root
+
+    monkeypatch.setattr(Path, "is_symlink", injected_symbolic_link)
+    monkeypatch.setattr(build_identity, "files", package_files)
+
+    with pytest.raises(build_identity.EngineBuildIdentityUnavailableError, match="symbolic links"):
+        build_identity.build_engine_manifest_payload()
+
+
+def test_phase18l_sqlite_store_rejects_invalid_paths_and_payloads(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(SessionPersistenceStorageError, match=r"pathlib\.Path"):
+        SQLiteSessionPersistenceStore(database_path=cast(Path, "persistence.sqlite3"))
+    with pytest.raises(SessionPersistenceStorageError, match="parent directory"):
+        SQLiteSessionPersistenceStore(database_path=tmp_path / "missing" / "persistence.sqlite3")
+    with pytest.raises(SessionPersistenceStorageError, match="regular file"):
+        SQLiteSessionPersistenceStore(database_path=tmp_path)
+
+    database_path = tmp_path / "invalid-payload.sqlite3"
+    store = SQLiteSessionPersistenceStore(database_path=database_path)
+    invalid_payload = cast(JsonValue, {"unsupported": object()})
+    with pytest.raises(SessionPersistenceError, match="JSON-safe payload"):
+        store.initialize(invalid_payload)
+    assert not database_path.exists()
+
+
+def test_phase18l_sqlite_store_rejects_a_corrupt_database_file(tmp_path: Path) -> None:
+    database_path = tmp_path / "corrupt.sqlite3"
+    corrupt_bytes = b"not a SQLite database"
+    database_path.write_bytes(corrupt_bytes)
+    store = SQLiteSessionPersistenceStore(database_path=database_path)
+
+    with pytest.raises(SessionPersistenceCorruptionError) as caught:
+        store.load()
+
+    assert isinstance(caught.value.__cause__, sqlite3.DatabaseError)
+    assert database_path.read_bytes() == corrupt_bytes
+
+
+def test_phase18l_commit_boundary_rejects_nonconforming_custom_store() -> None:
+    with pytest.raises(SessionPersistenceError, match="does not conform"):
+        commit_persistence_store(cast(SessionPersistenceStore, object()), {"generation": 1})
+
+
+@pytest.mark.parametrize("drift_kind", ["user_version", "journal_mode"])
+def test_phase18l_sqlite_store_rejects_database_mode_drift(
+    tmp_path: Path,
+    drift_kind: str,
+) -> None:
+    database_path = tmp_path / f"database-mode-{drift_kind}.sqlite3"
+    store = SQLiteSessionPersistenceStore(database_path=database_path)
+    store.initialize({"generation": 1})
+    with closing(sqlite3.connect(database_path)) as connection:
+        if drift_kind == "user_version":
+            connection.execute("PRAGMA user_version=99")
+        else:
+            journal_mode = connection.execute("PRAGMA journal_mode=DELETE").fetchone()
+            assert journal_mode == ("delete",)
+
+    with pytest.raises(SessionPersistenceDriftError):
+        store.load()
+
+
+@pytest.mark.parametrize(
+    ("tamper_kind", "expected_error"),
+    [
+        ("schema_version", SessionPersistenceDriftError),
+        ("non_json_value", SessionPersistenceCorruptionError),
+        ("noncanonical_json", SessionPersistenceCorruptionError),
+        ("short_hash", SessionPersistenceCorruptionError),
+        ("uppercase_hash", SessionPersistenceCorruptionError),
+    ],
+)
+def test_phase18l_sqlite_store_rejects_canonical_row_and_digest_corruption(
+    tmp_path: Path,
+    tamper_kind: str,
+    expected_error: type[SessionPersistenceError],
+) -> None:
+    database_path = tmp_path / f"row-corruption-{tamper_kind}.sqlite3"
+    store = SQLiteSessionPersistenceStore(database_path=database_path)
+    store.initialize({"generation": 1})
+    with closing(sqlite3.connect(database_path)) as connection:
+        if tamper_kind == "schema_version":
+            connection.execute(
+                f"UPDATE {SQLITE_SESSION_STATE_TABLE} SET schema_version = ?",
+                ("server-persistence-store-forged",),
+            )
+        elif tamper_kind in {"non_json_value", "noncanonical_json"}:
+            payload_json = "NaN" if tamper_kind == "non_json_value" else '{ "generation": 1 }'
+            content_hash = hashlib.sha256(payload_json.encode("utf-8")).hexdigest()
+            connection.execute(
+                f"UPDATE {SQLITE_SESSION_STATE_TABLE} SET payload_json = ?, content_hash = ?",
+                (payload_json, content_hash),
+            )
+        else:
+            content_hash = "0" * 63 if tamper_kind == "short_hash" else "A" * 64
+            connection.execute(
+                f"UPDATE {SQLITE_SESSION_STATE_TABLE} SET content_hash = ?",
+                (content_hash,),
+            )
+        connection.commit()
+
+    with pytest.raises(expected_error):
+        store.load()
 
 
 def test_phase18l_local_session_checkpoint_round_trips_exact_replay_projection_events_and_rng() -> (

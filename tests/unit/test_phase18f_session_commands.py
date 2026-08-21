@@ -12,6 +12,7 @@ from threading import Barrier, Thread
 from typing import Protocol, cast
 from urllib.request import Request, urlopen
 
+import pytest
 from jsonschema import Draft202012Validator
 from referencing import Resource
 from referencing.jsonschema import DRAFT202012, EMPTY_REGISTRY, Schema, SchemaRegistry
@@ -33,6 +34,11 @@ from warhammer40k_core.adapters.external_contract import (
 from warhammer40k_core.adapters.projection import project_game_view
 from warhammer40k_core.adapters.server import AdapterGameServer
 from warhammer40k_core.adapters.server_types import ServerResponse
+from warhammer40k_core.adapters.session_persistence import (
+    SessionPersistenceError,
+    SessionPersistenceStore,
+    SQLiteSessionPersistenceStore,
+)
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.ruleset_descriptor import (
@@ -936,6 +942,41 @@ def test_phase18f_command_schema_rejects_client_actor_and_invalid_boolean_outcom
             "submission": {"submission_kind": "parameterized_payload", "payload": invalid_payload},
         }
         assert list(envelope_validator.iter_errors(invalid_envelope))
+
+
+def test_phase18l_persisted_transaction_fails_closed_on_invalid_checkpoint(
+    tmp_path: Path,
+) -> None:
+    server = AdapterGameServer()
+    with pytest.raises(SessionPersistenceError, match="does not conform"):
+        server.initialize_persistence(cast(SessionPersistenceStore, object()))
+
+    store = SQLiteSessionPersistenceStore(database_path=tmp_path / "phase18l-server.sqlite3")
+    server.initialize_persistence(store)
+    durable_before = store.load()
+    server.event_retention_limit = 0
+
+    rejected = server.handle(
+        method="GET",
+        path="/rules-catalog",
+        authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+    )
+
+    assert rejected.status_code == 503
+    assert _error_code(rejected) == "session_persistence_unavailable"
+    assert store.load() == durable_before
+    assert (
+        _error_code(
+            server.handle(
+                method="GET",
+                path="/rules-catalog",
+                authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+            )
+        )
+        == "session_persistence_unavailable"
+    )
+    with pytest.raises(SessionPersistenceError, match="cannot export a checkpoint"):
+        server.persistence_payload()
 
 
 def _create_session(server: AdapterGameServer, *, game_id: str) -> str:
