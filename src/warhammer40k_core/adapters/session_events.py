@@ -301,6 +301,21 @@ class SessionCursorCodec:
             raise CursorValidationError(CursorResyncReason.EXPIRED)
         return cursor
 
+    def committed_cursor(self, token: str) -> SessionCursor:
+        """Return a currently registered cursor for durable response commitment."""
+        return self.decode(token)
+
+    def verify_committed_cursor(self, token: str, expected_cursor: SessionCursor) -> None:
+        """Authenticate a durable cursor even after registry retention has pruned it."""
+        if type(expected_cursor) is not SessionCursor:
+            raise SessionEventProtocolError("Committed cursor state is invalid.")
+        expected_token = _token_for_cursor(secret=self.secret, cursor=expected_cursor)
+        if not hmac.compare_digest(token, expected_token):
+            raise SessionEventProtocolError("Committed cursor authentication drifted.")
+        retained = self._cursor_by_token.get(token)
+        if retained is not None and retained != expected_cursor:
+            raise SessionEventProtocolError("Committed cursor registry state drifted.")
+
     def retained_entries(self) -> tuple[tuple[str, SessionCursor], ...]:
         return tuple(sorted(self._cursor_by_token.items()))
 

@@ -22,6 +22,20 @@ from warhammer40k_core.adapters.external_contract import (
 )
 from warhammer40k_core.adapters.redaction import redacted_lifecycle_status
 from warhammer40k_core.adapters.session_events import DEFAULT_EVENT_RETENTION_LIMIT
+from warhammer40k_core.adapters.session_revision import (
+    SessionNonCommandOrigin,
+    SessionRevisionCommitment,
+    SessionRevisionCursorCommitment,
+    SessionRevisionIntegrityError,
+    SessionRevisionOrigin,
+    SessionRevisionOriginKind,
+    build_revision_commitment,
+    validate_command_binding,
+    validate_exact_history,
+    validate_history_prefix,
+    validate_origin_transition,
+)
+from warhammer40k_core.build_identity import current_engine_build_id
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_request import DecisionError
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
@@ -33,7 +47,7 @@ from warhammer40k_core.engine.phase import (
     LifecycleStatusPayload,
 )
 
-ENGINE_BUILD_ID = f"warhammer40k-core-v2:{ENGINE_VERSION}"
+ENGINE_BUILD_ID = current_engine_build_id()
 DEFAULT_REVISION_RETENTION_LIMIT = 128
 
 type OperationalClock = Callable[[], datetime]
@@ -45,6 +59,10 @@ def _new_command_journal() -> dict[str, SessionCommandJournalEntry]:
 
 
 def _new_revision_snapshots() -> dict[int, SessionRevisionSnapshot]:
+    return {}
+
+
+def _new_revision_history() -> dict[int, SessionRevisionCommitment]:
     return {}
 
 
@@ -241,6 +259,9 @@ class AuthoritativeSession:
     revision_snapshots: dict[int, SessionRevisionSnapshot] = field(
         default_factory=_new_revision_snapshots
     )
+    revision_history: dict[int, SessionRevisionCommitment] = field(
+        default_factory=_new_revision_history
+    )
 
     def __post_init__(self) -> None:
         self.session_id = _validate_identifier("session_id", self.session_id)
@@ -279,6 +300,7 @@ class AuthoritativeSession:
             raise SessionProtocolError("Cursor registry finalization flag must be bool.")
         self._validate_journal()
         self._validate_snapshots()
+        self._validate_revision_history(require_finalized=False)
 
     @classmethod
     def create(
@@ -290,9 +312,12 @@ class AuthoritativeSession:
         lifecycle_status: LifecycleStatus,
         created_at: str,
         event_retention_limit: int = DEFAULT_EVENT_RETENTION_LIMIT,
+        started: bool = False,
     ) -> AuthoritativeSession:
         if type(config) is not GameConfig:
             raise SessionProtocolError("Session creation requires GameConfig.")
+        if type(started) is not bool:
+            raise SessionProtocolError("Session creation started flag must be bool.")
         catalog_view = adapter_session.rules_catalog_view()
         if catalog_view["catalog_id"] != config.army_catalog.catalog_id:
             raise SessionProtocolError("Session catalog identity drifted during creation.")
@@ -313,8 +338,11 @@ class AuthoritativeSession:
             created_at=created_at,
             last_activity_at=created_at,
             event_retention_limit=event_retention_limit,
+            started=started,
         )
-        record.capture_current_revision()
+        record.capture_current_revision(
+            origin=SessionRevisionOrigin.noncommand(SessionNonCommandOrigin.SESSION_CREATED)
+        )
         return record
 
     @property
@@ -333,12 +361,19 @@ class AuthoritativeSession:
             adapter_session=self.adapter_session.fork(),
             command_journal=dict(self.command_journal),
             revision_snapshots=dict(self.revision_snapshots),
+            revision_history=dict(self.revision_history),
         )
 
     def command_entry(self, command_id: str) -> SessionCommandJournalEntry | None:
         return self.command_journal.get(_validate_identifier("command_id", command_id))
 
-    def record_command(self, entry: SessionCommandJournalEntry) -> None:
+    def record_command(
+        self,
+        entry: SessionCommandJournalEntry,
+        *,
+        from_cursor: SessionRevisionCursorCommitment,
+        to_cursor: SessionRevisionCursorCommitment,
+    ) -> None:
         if type(entry) is not SessionCommandJournalEntry:
             raise SessionProtocolError("Session command journal requires a typed entry.")
         if entry.command_id in self.command_journal:
@@ -352,34 +387,47 @@ class AuthoritativeSession:
             for retained in self.command_journal.values()
         ):
             raise SessionProtocolError("Session command journal revision is duplicated.")
+        commitment = self.revision_history.get(self.session_revision)
+        if commitment is None:
+            raise SessionProtocolError("Session command revision commitment is missing.")
+        try:
+            finalized = commitment.bind_command_response(
+                entry=entry,
+                from_cursor=from_cursor,
+                to_cursor=to_cursor,
+            )
+        except SessionRevisionIntegrityError as exc:
+            raise SessionProtocolError("Session command revision could not be finalized.") from exc
+        self.revision_history[self.session_revision] = finalized
         self.command_journal[entry.command_id] = entry
 
-    def commit_status(self, status: LifecycleStatus, *, timestamp: str) -> None:
+    def commit_status(
+        self,
+        status: LifecycleStatus,
+        *,
+        timestamp: str,
+        origin: SessionRevisionOrigin,
+    ) -> None:
         if type(status) is not LifecycleStatus:
             raise SessionProtocolError("Committed session status is invalid.")
         self.lifecycle_status = status
         self.session_revision += 1
         self.touch(timestamp)
-        self.capture_current_revision()
+        self.capture_current_revision(origin=origin)
 
-    def observe_uncommitted_status(self, status: LifecycleStatus, *, timestamp: str) -> None:
-        if type(status) is not LifecycleStatus:
-            raise SessionProtocolError("Uncommitted session status is invalid.")
-        self.lifecycle_status = status
-        self.touch(timestamp)
-        self.capture_current_revision(replace_existing=True)
-
-    def close(self, *, timestamp: str) -> None:
+    def close(self, *, timestamp: str, origin: SessionRevisionOrigin) -> None:
         self.closed = True
         self.session_revision += 1
         self.touch(timestamp)
-        self.capture_current_revision()
+        self.capture_current_revision(origin=origin)
 
-    def capture_current_revision(self, *, replace_existing: bool = False) -> None:
-        if self.session_revision in self.revision_snapshots and not replace_existing:
+    def capture_current_revision(self, *, origin: SessionRevisionOrigin) -> None:
+        if self.session_revision in self.revision_snapshots:
             raise SessionProtocolError("Session revision snapshot already exists.")
+        if self.session_revision in self.revision_history:
+            raise SessionProtocolError("Session revision commitment already exists.")
         event_count = self.adapter_session.event_record_count()
-        self.revision_snapshots[self.session_revision] = SessionRevisionSnapshot(
+        snapshot = SessionRevisionSnapshot(
             session_revision=self.session_revision,
             adapter_session=self.adapter_session.fork(),
             lifecycle_status=self.lifecycle_status,
@@ -388,6 +436,21 @@ class AuthoritativeSession:
             started=self.started,
             closed=self.closed,
         )
+        previous = self.revision_history.get(self.session_revision - 1)
+        previous_hash = None if previous is None else previous.revision_commitment
+        try:
+            commitment = build_revision_commitment(
+                session_id=self.session_id,
+                session_revision=self.session_revision,
+                previous_revision_commitment=previous_hash,
+                origin=origin,
+                history=snapshot.adapter_session.authoritative_history_payload(),
+                authoritative_session_payload=self._snapshot_state_payload(snapshot),
+            )
+        except SessionRevisionIntegrityError as exc:
+            raise SessionProtocolError("Session revision commitment could not be built.") from exc
+        self.revision_snapshots[self.session_revision] = snapshot
+        self.revision_history[self.session_revision] = commitment
         self._prune_snapshots()
 
     def current_snapshot(self) -> SessionRevisionSnapshot:
@@ -423,6 +486,7 @@ class AuthoritativeSession:
         return max(candidates, key=lambda snapshot: snapshot.session_revision)
 
     def to_persistence_payload(self) -> dict[str, JsonValue]:
+        self._validate_authoritative_state()
         return {
             "session_id": self.session_id,
             "game_id": self.game_id,
@@ -454,6 +518,11 @@ class AuthoritativeSession:
                 self.revision_snapshots[revision].to_persistence_payload()
                 for revision in sorted(self.revision_snapshots)
             ],
+            "revision_history": [
+                cast(JsonValue, self.revision_history[revision].to_payload())
+                for revision in sorted(self.revision_history)
+            ],
+            "history_head": self.revision_history[self.session_revision].revision_commitment,
         }
 
     @classmethod
@@ -485,6 +554,8 @@ class AuthoritativeSession:
             "cursor_registry_finalized",
             "command_journal",
             "revision_snapshots",
+            "revision_history",
+            "history_head",
         }
         value = _persistence_object(
             payload,
@@ -520,7 +591,14 @@ class AuthoritativeSession:
         )
         journal_payload = value["command_journal"]
         snapshot_payload = value["revision_snapshots"]
-        if not isinstance(journal_payload, list) or not isinstance(snapshot_payload, list):
+        history_payload = value["revision_history"]
+        history_head = value["history_head"]
+        if (
+            not isinstance(journal_payload, list)
+            or not isinstance(snapshot_payload, list)
+            or not isinstance(history_payload, list)
+            or type(history_head) is not str
+        ):
             raise SessionProtocolError("Persisted session collections are invalid.")
         journal_entries = [
             SessionCommandJournalEntry.from_persistence_payload(item) for item in journal_payload
@@ -532,6 +610,10 @@ class AuthoritativeSession:
             )
             for item in snapshot_payload
         ]
+        try:
+            commitments = [SessionRevisionCommitment.from_payload(item) for item in history_payload]
+        except SessionRevisionIntegrityError as exc:
+            raise SessionProtocolError("Persisted session revision history is invalid.") from exc
         if len({entry.command_id for entry in journal_entries}) != len(journal_entries):
             raise SessionProtocolError(
                 "Persisted session command journal contains duplicate command IDs."
@@ -539,6 +621,10 @@ class AuthoritativeSession:
         if len({snapshot.session_revision for snapshot in snapshots}) != len(snapshots):
             raise SessionProtocolError(
                 "Persisted session revision snapshots contain duplicate revisions."
+            )
+        if len({item.session_revision for item in commitments}) != len(commitments):
+            raise SessionProtocolError(
+                "Persisted session revision history contains duplicate revisions."
             )
         session_id = value["session_id"]
         game_id = value["game_id"]
@@ -593,8 +679,12 @@ class AuthoritativeSession:
             cursor_registry_finalized=finalized,
             command_journal={entry.command_id: entry for entry in journal_entries},
             revision_snapshots={snapshot.session_revision: snapshot for snapshot in snapshots},
+            revision_history={item.session_revision: item for item in commitments},
         )
-        record._validate_recovered_state()
+        current_commitment = record.revision_history.get(record.session_revision)
+        if current_commitment is None or history_head != current_commitment.revision_commitment:
+            raise SessionProtocolError("Persisted session history head drifted.")
+        record._validate_authoritative_state()
         return record
 
     @property
@@ -658,6 +748,17 @@ class AuthoritativeSession:
             return {"code": "game_complete", "message": message}
         return None
 
+    @staticmethod
+    def _snapshot_state_payload(snapshot: SessionRevisionSnapshot) -> JsonValue:
+        return {
+            "session_revision": snapshot.session_revision,
+            "lifecycle_status": cast(JsonValue, snapshot.lifecycle_status.to_payload()),
+            "event_count": snapshot.event_count,
+            "last_activity_at": snapshot.last_activity_at,
+            "started": snapshot.started,
+            "closed": snapshot.closed,
+        }
+
     def _prune_snapshots(self) -> None:
         if len(self.revision_snapshots) <= self.revision_retention_limit:
             return
@@ -665,6 +766,89 @@ class AuthoritativeSession:
         self.revision_snapshots = {
             revision: self.revision_snapshots[revision] for revision in retained_revisions
         }
+
+    def _validate_revision_history(self, *, require_finalized: bool) -> None:
+        if type(self.revision_history) is not dict:
+            raise SessionProtocolError("Session revision history must be a dictionary.")
+        if not self.revision_history:
+            if self.session_revision == 0 and not self.revision_snapshots:
+                return
+            raise SessionProtocolError("Session revision history is missing.")
+        expected_revisions = set(range(self.session_revision + 1))
+        if set(self.revision_history) != expected_revisions:
+            raise SessionProtocolError("Session revision history range is not contiguous.")
+        current_history = self.adapter_session.authoritative_history_payload()
+        decision_records = current_history["decision_records"]
+        journal_by_revision = {
+            entry.committed_session_revision: entry for entry in self.command_journal.values()
+        }
+        previous: SessionRevisionCommitment | None = None
+        previous_counts = (-1, -1, -1, -1)
+        try:
+            for revision in range(self.session_revision + 1):
+                commitment = self.revision_history[revision]
+                if (
+                    type(commitment) is not SessionRevisionCommitment
+                    or commitment.session_id != self.session_id
+                    or commitment.session_revision != revision
+                ):
+                    raise SessionProtocolError("Session revision commitment is invalid.")
+                expected_previous = None if previous is None else previous.revision_commitment
+                if commitment.previous_revision_commitment != expected_previous:
+                    raise SessionProtocolError("Session revision commitment chain drifted.")
+                counts = (
+                    commitment.decision_count,
+                    commitment.event_count,
+                    commitment.rng_history_count,
+                    commitment.rng_draw_count,
+                )
+                if any(
+                    current < prior for current, prior in zip(counts, previous_counts, strict=True)
+                ):
+                    raise SessionProtocolError("Session revision histories moved backwards.")
+                validate_history_prefix(commitment, current_history)
+                validate_origin_transition(
+                    commitment=commitment,
+                    previous=previous,
+                    decision_records=decision_records,
+                    is_final_revision=revision == self.session_revision,
+                    session_closed=self.closed,
+                )
+                entry = journal_by_revision.get(revision)
+                if commitment.origin.origin_kind is SessionRevisionOriginKind.PROTOCOL_COMMAND:
+                    if previous is None or entry is None:
+                        raise SessionProtocolError(
+                            "Protocol revision is missing its command journal entry."
+                        )
+                    if require_finalized and not commitment.is_finalized:
+                        raise SessionProtocolError(
+                            "Protocol revision response commitment is unfinished."
+                        )
+                    if commitment.is_finalized:
+                        validate_command_binding(
+                            commitment=commitment,
+                            previous=previous,
+                            entry=entry,
+                            decision_records=decision_records,
+                        )
+                elif entry is not None:
+                    raise SessionProtocolError(
+                        "Noncommand revision cannot own a command journal entry."
+                    )
+                snapshot = self.revision_snapshots.get(revision)
+                if snapshot is not None:
+                    validate_exact_history(
+                        commitment,
+                        snapshot.adapter_session.authoritative_history_payload(),
+                        authoritative_session_payload=self._snapshot_state_payload(snapshot),
+                    )
+                previous = commitment
+                previous_counts = counts
+        except SessionRevisionIntegrityError as exc:
+            raise SessionProtocolError("Session revision history drifted.") from exc
+        current = self.revision_history[self.session_revision]
+        if not current.is_finalized and require_finalized:
+            raise SessionProtocolError("Current protocol revision is unfinished.")
 
     def _validate_journal(self) -> None:
         if type(self.command_journal) is not dict:
@@ -847,8 +1031,10 @@ class AuthoritativeSession:
         if type(activity) is not str:
             raise SessionProtocolError("Recovered command journal activity timestamp drifted.")
         activity_time = _parse_timestamp(activity)
-        if activity_time < _parse_timestamp(self.created_at) or (
-            retained is not None and activity_time > _parse_timestamp(retained.last_activity_at)
+        if (
+            activity_time < _parse_timestamp(self.created_at)
+            or activity_time > _parse_timestamp(self.last_activity_at)
+            or (retained is not None and activity != retained.last_activity_at)
         ):
             raise SessionProtocolError("Recovered command journal activity timestamp drifted.")
         if (
@@ -921,7 +1107,8 @@ class AuthoritativeSession:
             ):
                 raise SessionProtocolError("Session revision snapshot is invalid.")
 
-    def _validate_recovered_state(self) -> None:
+    def _validate_authoritative_state(self) -> None:
+        self._validate_revision_history(require_finalized=True)
         snapshot = self.current_snapshot()
         if snapshot.lifecycle_status != self.lifecycle_status:
             raise SessionProtocolError("Recovered current lifecycle status drifted.")

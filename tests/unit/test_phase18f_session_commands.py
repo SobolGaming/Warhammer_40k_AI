@@ -75,6 +75,7 @@ FIXED_SECONDARY_OPTION_ID = "fixed:assassination:bring_it_down"
 NORMAL_MOVE_ACTION_OPTION_ID = "normal_move"
 SELECT_DEPLOYMENT_UNIT = "select_deployment_unit"
 SUBMIT_DEPLOYMENT_PLACEMENT = "submit_deployment_placement"
+HTTP_REQUEST_TIMEOUT_SECONDS = 30.0
 
 
 class _PayloadValidator(Protocol):
@@ -1445,7 +1446,10 @@ def _http_server(server: AdapterGameServer) -> ThreadingHTTPServer:
 
 
 def _http_json(request: Request) -> dict[str, JsonValue]:
-    response = cast(HTTPResponse, urlopen(request, timeout=10.0))
+    response = cast(
+        HTTPResponse,
+        urlopen(request, timeout=HTTP_REQUEST_TIMEOUT_SECONDS),
+    )
     try:
         return _json_object(validate_json_value(json.loads(response.read().decode("utf-8"))))
     finally:
@@ -1466,7 +1470,10 @@ def _http_command_bytes(
         },
         method="POST",
     )
-    response = cast(HTTPResponse, urlopen(request, timeout=10.0))
+    response = cast(
+        HTTPResponse,
+        urlopen(request, timeout=HTTP_REQUEST_TIMEOUT_SECONDS),
+    )
     try:
         return response.status, response.read()
     finally:

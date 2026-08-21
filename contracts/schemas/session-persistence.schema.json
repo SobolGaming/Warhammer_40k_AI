@@ -1,5 +1,5 @@
 {
-  "$id": "https://warhammer40k-core.local/contracts/v1/session-persistence.schema.json",
+  "$id": "https://warhammer40k-core.local/contracts/v2/session-persistence.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Closed Phase 18L operator-only server persistence artifact. This schema is not an HTTP or viewer-facing payload. Runtime recovery additionally verifies every canonical content hash and reconstructs engine-private lifecycle state through typed fail-fast loaders.",
@@ -7,7 +7,10 @@
     "authorization_bindings": {"$ref": "#/$defs/authorization_bindings"},
     "content_hash": {"$ref": "#/$defs/sha256"},
     "cursor_codec": {"$ref": "#/$defs/cursor_codec"},
-    "engine_build_id": {"minLength": 1, "type": "string"},
+    "engine_build_id": {
+      "pattern": "^warhammer40k-core-v2:runtime-tree-sha256-v1:[0-9a-f]{64}$",
+      "type": "string"
+    },
     "engine_version": {"minLength": 1, "type": "string"},
     "event_retention_limit": {"minimum": 1, "type": "integer"},
     "external_contract_version": {"const": "10.2.0", "type": "string"},
@@ -17,7 +20,7 @@
       "uniqueItems": true
     },
     "schema_version": {
-      "const": "session-persistence-v1-phase18l",
+      "const": "session-persistence-v2-phase18l",
       "type": "string"
     },
     "sessions": {
@@ -104,6 +107,7 @@
         "cursor_registry_finalized": {"type": "boolean"},
         "event_retention_limit": {"minimum": 1, "type": "integer"},
         "game_id": {"minLength": 1, "type": "string"},
+        "history_head": {"$ref": "#/$defs/sha256"},
         "last_activity_at": {"format": "date-time", "type": "string"},
         "lifecycle_status": {"$ref": "#/$defs/internal_lifecycle_status"},
         "player_ids": {
@@ -113,6 +117,12 @@
           "uniqueItems": true
         },
         "revision_retention_limit": {"minimum": 1, "type": "integer"},
+        "revision_history": {
+          "items": {"$ref": "#/$defs/revision_commitment"},
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
         "revision_snapshots": {
           "items": {"$ref": "#/$defs/revision_snapshot"},
           "minItems": 1,
@@ -153,7 +163,9 @@
         "closed",
         "cursor_registry_finalized",
         "command_journal",
-        "revision_snapshots"
+        "revision_snapshots",
+        "revision_history",
+        "history_head"
       ],
       "type": "object"
     },
@@ -392,6 +404,130 @@
         "last_activity_at",
         "started",
         "closed"
+      ],
+      "type": "object"
+    },
+    "revision_cursor_commitment": {
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {"$ref": "#/$defs/cursor"},
+        "token": {"maxLength": 2048, "minLength": 1, "type": "string"}
+      },
+      "required": ["token", "cursor"],
+      "type": "object"
+    },
+    "revision_origin": {
+      "additionalProperties": false,
+      "properties": {
+        "command_envelope": {
+          "oneOf": [
+            {
+              "$ref": "https://warhammer40k-core.local/contracts/v1/session-command-envelope.schema.json"
+            },
+            {"type": "null"}
+          ]
+        },
+        "envelope_fingerprint": {
+          "oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+        },
+        "operation": {
+          "enum": [
+            "session_created",
+            "session_closed",
+            "legacy_advance_session",
+            "legacy_finite_decision",
+            "legacy_parameterized_decision",
+            "start_session",
+            "advance_session",
+            "close_session",
+            "finite_option",
+            "parameterized_payload"
+          ],
+          "type": "string"
+        },
+        "origin_kind": {
+          "enum": ["noncommand", "protocol_command"],
+          "type": "string"
+        }
+      },
+      "required": [
+        "origin_kind",
+        "operation",
+        "command_envelope",
+        "envelope_fingerprint"
+      ],
+      "type": "object"
+    },
+    "revision_commitment": {
+      "additionalProperties": false,
+      "properties": {
+        "authoritative_session_hash": {"$ref": "#/$defs/sha256"},
+        "authoritative_state_hash": {"$ref": "#/$defs/sha256"},
+        "checkpoint_hash": {"$ref": "#/$defs/sha256"},
+        "closed": {"type": "boolean"},
+        "decision_count": {"minimum": 0, "type": "integer"},
+        "decision_records_hash": {"$ref": "#/$defs/sha256"},
+        "event_count": {"minimum": 0, "type": "integer"},
+        "event_records_hash": {"$ref": "#/$defs/sha256"},
+        "from_cursor": {
+          "oneOf": [
+            {"$ref": "#/$defs/revision_cursor_commitment"},
+            {"type": "null"}
+          ]
+        },
+        "journal_entry_hash": {
+          "oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+        },
+        "origin": {"$ref": "#/$defs/revision_origin"},
+        "previous_revision_commitment": {
+          "oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+        },
+        "response_hash": {
+          "oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]
+        },
+        "revision_commitment": {"$ref": "#/$defs/sha256"},
+        "rng_draw_count": {"minimum": 0, "type": "integer"},
+        "rng_history_count": {"minimum": 0, "type": "integer"},
+        "rng_history_hash": {"$ref": "#/$defs/sha256"},
+        "rng_state_hash": {"$ref": "#/$defs/sha256"},
+        "schema_version": {
+          "const": "session-revision-commitment-v2",
+          "type": "string"
+        },
+        "session_id": {"minLength": 1, "type": "string"},
+        "session_revision": {"minimum": 0, "type": "integer"},
+        "started": {"type": "boolean"},
+        "to_cursor": {
+          "oneOf": [
+            {"$ref": "#/$defs/revision_cursor_commitment"},
+            {"type": "null"}
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "session_id",
+        "session_revision",
+        "previous_revision_commitment",
+        "origin",
+        "decision_count",
+        "decision_records_hash",
+        "event_count",
+        "event_records_hash",
+        "rng_history_count",
+        "rng_history_hash",
+        "rng_draw_count",
+        "rng_state_hash",
+        "checkpoint_hash",
+        "authoritative_state_hash",
+        "authoritative_session_hash",
+        "started",
+        "closed",
+        "journal_entry_hash",
+        "response_hash",
+        "from_cursor",
+        "to_cursor",
+        "revision_commitment"
       ],
       "type": "object"
     },

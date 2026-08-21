@@ -96,8 +96,12 @@ encoding matrix shard names in the protection rule.
 The canonical Phase 18D language-neutral baseline and completed Phase 18E-18J
 session, command, reconnect, authentication, authorization, redaction,
 interaction, and battlefield contracts are in [`contracts/`](contracts/README.md).
-Phase 18L adds the closed operator-only persistence checkpoint contract and
-fail-closed recovery semantics. The
+Phase 18L adds the closed `session-persistence-v2-phase18l` operator-only
+persistence checkpoint contract and fail-closed recovery semantics. Its
+runtime-tree build fingerprint, explicit first-boot initialization, locked and
+verified SQLite v2 transaction, and unpruned per-revision commitment chain keep
+missing, stale, or internally inconsistent durable state from being accepted as
+a recovered authority. The
 bundle includes Draft 2020-12 schemas, OpenAPI 3.1, real session-derived examples with explicit
 decision-family coverage status, proposal examples, versioned session metadata and idempotent
 command outcomes, protected opaque role-bound cursor/resync payloads, explicit principal-role policy,
@@ -105,9 +109,16 @@ compatibility/redaction/session/coordinate/persistence semantics, and conformanc
 Verify schema, example, OpenAPI, Python-version, coverage, manifest, and compatibility drift with:
 
 ```bash
+uv run --no-sync python scripts/build_engine_build_identity.py --check
 uv run --no-sync python scripts/build_external_contract.py --check
 uv run --no-sync python scripts/smoke_installed_contract_wheel.py
 ```
+
+After an intentional change to packaged runtime Python/JSON resources or the
+packaged contract schemas, regenerate
+`src/warhammer40k_core/_engine_build_manifest.json` with
+`uv run python scripts/build_engine_build_identity.py` before regenerating the
+external examples that publish that build ID.
 
 The Phase 18M-A TypeScript client in
 [`conformance/typescript/`](conformance/typescript/README.md) generates models
@@ -281,10 +292,17 @@ Current status:
   opponent-owned row, unsupported reason, count, and derived selection hash;
   current full-game and release claims remain false without certified evidence.
 - Phase 18L persists the complete single-authority adapter server state as one
-  content-addressed operator artifact. Atomic checkpoints retain authoritative
-  session state, accepted command outcomes, replay inputs, RNG state, role
-  bindings, and protected cursor state; restart verifies every identity and
-  deterministic checkpoint before exposing a recovered session.
+  content-addressed operator artifact. The store distinguishes explicit
+  initialization from recovery, validates the exact SQLite v2 schema while
+  holding the writer transaction, and verifies the written singleton row before
+  publication. Checkpoints retain authoritative session state, accepted command
+  outcomes, replay inputs, RNG state, role bindings, protected cursor state, and
+  an unpruned revision commitment chain; restart verifies those histories plus
+  the generated immutable runtime-tree build fingerprint before exposing a
+  recovered session. These hashes detect accidental corruption and internal
+  inconsistency. They do not resist a malicious storage writer or prove that an
+  older, otherwise valid database was not rolled back; that threat requires an
+  external trusted anchor.
 - The checked-in Chaos Daemons Strike Force reprices to 2,075 points under the
   July 2026 MFM package and is correctly rejected as 75 points over the
   2,000-point limit; the original three six-model Bloodcrusher units remain

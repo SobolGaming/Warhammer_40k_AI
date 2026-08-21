@@ -8,6 +8,7 @@ from typing import Self, TypedDict, cast
 from warhammer40k_core.adapters.access_control import ViewerContext
 from warhammer40k_core.adapters.contracts import (
     AdapterGameSession,
+    AdapterSessionHistoryPayload,
     AdapterSessionIdentityPayload,
 )
 from warhammer40k_core.adapters.decisions import submit_option, submit_parameterized_payload
@@ -162,6 +163,31 @@ class LocalGameSession(AdapterGameSession):
             "catalog_id": catalog["catalog_id"],
             "source_package_id": catalog["source_package_id"],
             "source_hash": catalog["source_hash"],
+        }
+
+    def authoritative_history_payload(self) -> AdapterSessionHistoryPayload:
+        checkpoint = self.to_persistence_payload()
+        if not isinstance(checkpoint, dict):
+            raise LocalGameSessionPersistenceError(
+                "LocalGameSession persistence checkpoint must be an object."
+            )
+        rng_state = _current_rng_state(self.lifecycle)
+        return {
+            "decision_records": [
+                validate_json_value(cast(JsonValue, record.to_payload()))
+                for record in self.lifecycle.decision_controller.records
+            ],
+            "event_records": [
+                validate_json_value(cast(JsonValue, record.to_payload()))
+                for record in self.lifecycle.decision_controller.event_log.records
+            ],
+            "rng_seed": rng_state["seed"],
+            "rng_history": list(rng_state["history"]),
+            "rng_draw_count": rng_state["draw_count"],
+            "checkpoint_hash": _payload_sha256(validate_json_value(checkpoint)),
+            "authoritative_state_hash": _payload_sha256(
+                cast(JsonValue, self.lifecycle.to_payload())
+            ),
         }
 
     @classmethod

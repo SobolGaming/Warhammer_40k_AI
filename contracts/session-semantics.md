@@ -149,19 +149,21 @@ adds protected opaque cursor, retention, pagination, delayed-snapshot, and
 reconnect resynchronization semantics over retained revision snapshots. Phase
 18L persists those structures as one atomic authority checkpoint. An accepted
 command's complete envelope and authorization context, committed revision,
-cached public status/response, staged adapter state, revision snapshots, and
-cursor registry become durable before the response is published or the
-in-memory authority pointer is replaced. A failure before replacement leaves
-the previous checkpoint authoritative; a restart after replacement returns the
-cached byte-equivalent outcome for an exact retry. Because a store error may be
-reported after durable replacement, any commit-boundary error puts the current
-authority into fail-stop mode. A fresh process must load and verify the store
-before serving again, so stale in-memory state cannot overwrite an ambiguous
-successful commit.
+cached public status/response, staged adapter state, revision snapshots,
+revision commitment, and cursor registry become durable before the response is
+published or the in-memory authority pointer is replaced. A failure before
+replacement leaves the previous checkpoint authoritative; a restart after
+replacement returns the cached byte-equivalent outcome for an exact retry.
+Because a store error may be reported after durable replacement, the server
+arms fail-stop state immediately before invoking the commit boundary and clears
+it only after the store returns success. Typed storage failures and normalized
+custom-store `OSError`/`RuntimeError` failures therefore leave the authority
+latched. A fresh process must load and verify the store before serving again, so
+stale in-memory state cannot overwrite an ambiguous successful commit.
 
 ## Persistence, recovery, and authority
 
-`session-persistence-v1-phase18l` is a closed operator-only artifact. It is not
+`session-persistence-v2-phase18l` is a closed operator-only artifact. It is not
 an HTTP request or response and is never a client mutation surface. Its root
 binds the server, engine build, external-contract, and persistence-schema
 versions to the authorization bindings, protected cursor codec, retention
@@ -170,6 +172,16 @@ canonical SHA-256 covers every state member preceding that hash. Bearer
 credentials are deliberately absent; a deployer re-injects its credential
 registry and recovery verifies the principal/role/player bindings and
 authorization epoch against the checkpoint.
+
+`engine_version` remains the semantic package version. `engine_build_id` is
+separate and has the form
+`warhammer40k-core-v2:runtime-tree-sha256-v1:<sha256>`. A generated manifest
+hashes the exact packaged Python, JSON, `py.typed`, and packaged contract-schema
+resource inventory. Runtime startup recomputes and compares that complete
+inventory; an absent manifest or any resource drift is untrusted and fails
+closed. Recovery then requires the checkpoint's verified build ID exactly, so
+two builds with the same package version but different runtime content cannot
+share durable state.
 
 Each persisted session retains normalized `GameConfig` input, exact ruleset,
 overlay, catalog, source-package, and source hashes, RNG state, lifecycle
@@ -184,23 +196,74 @@ timestamp inside each snapshot remains the immutable activity boundary at
 which that revision was captured. Recovery therefore requires the current
 session timestamp to be at least as recent as the latest retained snapshot.
 
+The session also retains a contiguous, unpruned commitment for every revision
+from zero through the current head. Each domain-separated commitment names a
+typed protocol-command or legacy/non-command origin and commits to the previous
+revision, exact decision-record and event-record prefixes, RNG history/draw/state,
+the adapter checkpoint, the viewer-independent authoritative session state,
+and explicit `started`/`closed` lifecycle flags. The flags bind creation, start,
+and final close transitions even after their full revision snapshots are
+pruned. Protocol-command revisions additionally bind the
+complete command envelope and fingerprint, journal entry and cached response,
+and authenticated before/after cursor states. Recovery recomputes these values
+from the current authoritative histories and every still-retained snapshot,
+requires a one-to-one command-revision/journal relationship, and checks finite
+or parameterized envelopes against the `DecisionRecord` they produced. Snapshot
+retention may discard old full checkpoints, but it never discards their revision
+commitments or durable idempotency linkage.
+
 Recovery validates the closed artifact and root hash before registering any
 session. It loads the latest verified adapter checkpoint, replays any accepted
 decision tail carried by the replay artifact through the adapter-owned session
 recovery path and therefore through `GameLifecycle.submit_decision(...)`, then
 compares the complete decision records, authoritative events and sequence, RNG
-state, replay artifact, projection hashes, package identities, and session
-revision. The command journal is restored and cross-validated as an idempotency
+state, replay artifact, projection hashes, package identities, session revision,
+revision history head, and authenticated historical cursor commitments. Where
+a full snapshot remains retained, cached journal projections and cursor
+positions are recomputed against that exact snapshot and saved authorization
+context. The command journal is restored and cross-validated as an idempotency
 cache; recovery does not reapply its command envelopes. A
 schema, package, build, checkpoint, or deterministic-content mismatch produces
 a typed corruption or drift diagnostic and leaves the session unavailable;
 there is no partial reconstruction or permissive fallback.
 
+Initialization is an explicit operator action. Constructing a server with a
+persistence store always means recovery and requires one complete durable root;
+neither a missing database nor a database with a missing singleton row is
+interpreted as first boot. A new authority starts without a store and invokes
+`initialize_persistence(...)`, which exclusively reserves a new database path
+and transactionally installs its schema and initial empty-server root before
+attaching it. If initialization is interrupted after the path is reserved, the
+existing path is not silently retried or recovered as empty; operator repair or
+replacement is required.
+
+The SQLite reference store uses schema version
+`server-persistence-store-v2` and `PRAGMA user_version = 2`. `initialize`,
+`load`, and `commit` use a write transaction; load and commit open only an
+existing database. While holding `BEGIN IMMEDIATE`, the store checks WAL mode,
+the exact STRICT singleton table SQL and extended column metadata, and the
+absence of extra schema objects, indexes, foreign keys, views, and triggers.
+Commit verifies the existing row, performs the UPSERT, requires exactly one
+affected singleton row, and selects and compares the exact new version, JSON,
+and content hash before transaction commit. A deleted root, missing singleton
+constraint, non-STRICT table, suppressed or rewritten write, or concurrent
+schema mutation fails closed.
+
 One process or actor owns mutation for a session and serializes its commands.
 Reads may use immutable viewer-scoped projections, but no second writer may
 advance the same session. Failover transfers ownership only after the complete
-checkpoint, decision tail, and command journal verify. The store uses one atomic transaction for
-the authority artifact and indexes sessions by validated identities.
+checkpoint, decision tail, revision chain, and command journal verify. The store
+uses one atomic transaction for the authority artifact and indexes sessions by
+validated identities.
+
+This integrity design detects accidental corruption, incomplete writes,
+internally inconsistent revisions, and code/build drift. Its content hashes and
+revision commitments are not keyed attestations. An actor able to rewrite the
+entire database can recompute a coherent root and chain, and replacement by an
+older valid database is not detectable from that database alone. Resistance to
+a malicious storage writer or rollback therefore requires a trusted external
+monotonic, signed, or append-only anchor; Phase 18L does not claim that threat
+model.
 
 ## Lifecycle outcomes
 

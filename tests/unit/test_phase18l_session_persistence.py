@@ -3,10 +3,13 @@ from __future__ import annotations
 import copy
 import hashlib
 import sqlite3
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from http import HTTPStatus
 from pathlib import Path
+from threading import Event
 from typing import Literal, cast
 
 import pytest
@@ -14,6 +17,8 @@ from tests.movement_submission_helpers import straight_line_witness_for_unit
 from tests.phase15c_fight_order_helpers import fight_config, fight_lifecycle
 from tests.setup_completion_helpers import record_primary_turn_start_evidence_for_fixture
 
+from warhammer40k_core import __version__ as ENGINE_VERSION
+from warhammer40k_core.adapters import session_recovery as session_recovery_module
 from warhammer40k_core.adapters.access_control import (
     DEV_ADMIN_TOKEN,
     DEV_COACH_A_TOKEN,
@@ -29,6 +34,7 @@ from warhammer40k_core.adapters.access_control import (
 )
 from warhammer40k_core.adapters.command_protocol import (
     SessionCommandEnvelope,
+    SessionCommandJournalEntry,
     SessionCommandSubmissionKind,
 )
 from warhammer40k_core.adapters.external_contract import SESSION_CREATE_SCHEMA_VERSION
@@ -40,17 +46,29 @@ from warhammer40k_core.adapters.server import AdapterGameServer
 from warhammer40k_core.adapters.server_types import ServerResponse
 from warhammer40k_core.adapters.session_events import SessionCursorCodec
 from warhammer40k_core.adapters.session_persistence import (
+    SESSION_PERSISTENCE_STORE_SCHEMA_VERSION,
+    SQLITE_SESSION_PERSISTENCE_USER_VERSION,
     SQLITE_SESSION_STATE_TABLE,
     SessionPersistenceCorruptionError,
+    SessionPersistenceDriftError,
+    SessionPersistenceError,
     SessionPersistenceStorageError,
     SessionPersistenceStore,
     SQLiteSessionPersistenceStore,
 )
-from warhammer40k_core.adapters.session_protocol import AuthoritativeSession
+from warhammer40k_core.adapters.session_protocol import (
+    AuthoritativeSession,
+    SessionProtocolError,
+)
 from warhammer40k_core.adapters.session_recovery import (
     SessionRecoveryError,
     recover_server_persistence_payload,
     server_persistence_payload,
+)
+from warhammer40k_core.adapters.session_revision import (
+    SessionNonCommandOrigin,
+    SessionRevisionCommitment,
+    SessionRevisionOrigin,
 )
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.core.ruleset_descriptor import MovementMode
@@ -134,12 +152,11 @@ def test_phase18l_local_session_round_trips_each_major_phase_boundary(
         config=session.lifecycle.config,
         lifecycle_status=status,
         created_at="2026-08-21T16:00:00Z",
+        started=True,
     )
-    record.started = True
-    record.capture_current_revision(replace_existing=True)
     checkpoint = _server_checkpoint_payload(record)
     database_path = tmp_path / f"phase18l-checkpoint-{boundary}.sqlite3"
-    SQLiteSessionPersistenceStore(database_path=database_path).commit(checkpoint)
+    SQLiteSessionPersistenceStore(database_path=database_path).initialize(checkpoint)
 
     recovered_server = _server(SQLiteSessionPersistenceStore(database_path=database_path))
     recovered_checkpoint = recovered_server.persistence_payload()
@@ -179,14 +196,16 @@ def test_phase18l_authoritative_closed_checkpoint_round_trips(tmp_path: Path) ->
         config=session.lifecycle.config,
         lifecycle_status=status,
         created_at="2026-08-21T16:00:00Z",
+        started=True,
     )
     record.revision_retention_limit = 1
-    record.started = True
-    record.capture_current_revision(replace_existing=True)
-    record.close(timestamp="2026-08-21T16:00:01Z")
+    record.close(
+        timestamp="2026-08-21T16:00:01Z",
+        origin=SessionRevisionOrigin.noncommand(SessionNonCommandOrigin.SESSION_CLOSED),
+    )
     checkpoint = _server_checkpoint_payload(record)
     database_path = tmp_path / "phase18l-checkpoint-closed.sqlite3"
-    SQLiteSessionPersistenceStore(database_path=database_path).commit(checkpoint)
+    SQLiteSessionPersistenceStore(database_path=database_path).initialize(checkpoint)
 
     recovered_server = _server(SQLiteSessionPersistenceStore(database_path=database_path))
     recovered_checkpoint = recovered_server.persistence_payload()
@@ -297,12 +316,13 @@ def test_phase18l_restart_tolerates_retained_cursor_expired_for_another_principa
     tmp_path: Path,
 ) -> None:
     database_path = tmp_path / "phase18l-expired-cross-principal-cursor.sqlite3"
+    store = SQLiteSessionPersistenceStore(database_path=database_path)
     first_server = AdapterGameServer(
-        persistence_store=SQLiteSessionPersistenceStore(database_path=database_path),
         principal_registry=default_principal_registry(),
         event_retention_limit=2,
         clock=lambda: FROZEN_TIME,
     )
+    first_server.initialize_persistence(store)
     session_id = _create_session(
         first_server,
         game_id="phase18l-expired-cross-principal-cursor",
@@ -357,10 +377,10 @@ def test_phase18l_restart_restores_latest_activity_after_successful_reads(
 
     store = SQLiteSessionPersistenceStore(database_path=database_path)
     first_server = AdapterGameServer(
-        persistence_store=store,
         principal_registry=default_principal_registry(),
         clock=advancing_clock,
     )
+    first_server.initialize_persistence(store)
     session_id = _create_session(first_server, game_id="phase18l-read-touch")
     _metadata(first_server, session_id=session_id)
     _projection(first_server, session_id=session_id, token=DEV_PLAYER_A_TOKEN)
@@ -392,10 +412,10 @@ def test_phase18l_restart_accepts_journal_timestamp_before_later_read_touch(
         database_path=tmp_path / "phase18l-journal-read-touch.sqlite3"
     )
     server = AdapterGameServer(
-        persistence_store=store,
         principal_registry=default_principal_registry(),
         clock=advancing_clock,
     )
+    server.initialize_persistence(store)
     session_id = _create_session(server, game_id="phase18l-journal-read-touch")
     _command(
         server,
@@ -532,6 +552,8 @@ def test_phase18l_crash_before_or_after_atomic_commit_recovers_exactly_once(
     )
     assert unavailable.status_code == HTTPStatus.SERVICE_UNAVAILABLE
     assert _error_code(unavailable) == "session_persistence_unavailable"
+    with pytest.raises(SessionPersistenceError, match="cannot export a checkpoint"):
+        crashing_server.persistence_payload()
 
     recovered_server = _server(SQLiteSessionPersistenceStore(database_path=database_path))
     recovered_before_retry = _metadata(recovered_server, session_id=session_id)
@@ -545,6 +567,41 @@ def test_phase18l_crash_before_or_after_atomic_commit_recovers_exactly_once(
     assert _integer(_metadata(recovered_server, session_id=session_id), "session_revision") == 1
     replay_after_commit = _replay(recovered_server, session_id=session_id)
     assert _replay(recovered_server, session_id=session_id) == replay_after_commit
+
+
+@pytest.mark.parametrize("error_type", [OSError, RuntimeError])
+def test_phase18l_untyped_custom_store_post_commit_failure_latches_fail_stop(
+    tmp_path: Path,
+    error_type: type[OSError] | type[RuntimeError],
+) -> None:
+    database_path = tmp_path / f"phase18l-untyped-{error_type.__name__}.sqlite3"
+    delegate = SQLiteSessionPersistenceStore(database_path=database_path)
+    store = _UntypedAfterCommitStore(delegate=delegate, error_type=error_type)
+    server = _server(store)
+    game_id = f"phase18l-untyped-{error_type.__name__}"
+    response = server.handle(
+        method="POST",
+        path="/sessions",
+        authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+        body={
+            "schema_version": SESSION_CREATE_SCHEMA_VERSION,
+            "config": cast(
+                JsonValue,
+                canonical_setup_prebattle_smoke_config(game_id=game_id).to_payload(),
+            ),
+        },
+    )
+
+    assert response.status_code == HTTPStatus.SERVICE_UNAVAILABLE
+    assert _error_code(response) == "session_persistence_unavailable"
+    unavailable = server.handle(
+        method="GET",
+        path="/rules-catalog",
+        authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+    )
+    assert unavailable.status_code == HTTPStatus.SERVICE_UNAVAILABLE
+    recovered = _server(delegate)
+    assert _string(_metadata(recovered, session_id=f"session-{game_id}"), "game_id") == game_id
 
 
 @pytest.mark.parametrize("tamper_kind", ["payload_json", "content_hash"])
@@ -574,6 +631,226 @@ def test_phase18l_sqlite_tampering_fails_closed(
         SQLiteSessionPersistenceStore(database_path=database_path).load()
     with pytest.raises(SessionRecoveryError):
         _server(SQLiteSessionPersistenceStore(database_path=database_path))
+
+
+def test_phase18l_sqlite_requires_explicit_first_boot_initialization(tmp_path: Path) -> None:
+    database_path = tmp_path / "phase18l-explicit-initialize.sqlite3"
+    store = SQLiteSessionPersistenceStore(database_path=database_path)
+
+    assert not database_path.exists()
+    with pytest.raises(SessionPersistenceStorageError):
+        store.load()
+    assert not database_path.exists()
+
+    server = AdapterGameServer(
+        principal_registry=default_principal_registry(),
+        clock=lambda: FROZEN_TIME,
+    )
+    initial_root = server.persistence_payload()
+    server.initialize_persistence(store)
+
+    assert store.load() == initial_root
+    assert (
+        AdapterGameServer(
+            persistence_store=store,
+            principal_registry=default_principal_registry(),
+            clock=lambda: FROZEN_TIME,
+        ).persistence_payload()
+        == initial_root
+    )
+    with pytest.raises(SessionPersistenceDriftError):
+        store.initialize(initial_root)
+
+
+def test_phase18l_persistence_initialization_cannot_escape_fail_stop_or_replace_falsey_store(
+    tmp_path: Path,
+) -> None:
+    first_delegate = SQLiteSessionPersistenceStore(
+        database_path=tmp_path / "phase18l-ambiguous-initialize.sqlite3"
+    )
+    replacement = SQLiteSessionPersistenceStore(
+        database_path=tmp_path / "phase18l-replacement-initialize.sqlite3"
+    )
+    server = AdapterGameServer(
+        principal_registry=default_principal_registry(),
+        clock=lambda: FROZEN_TIME,
+    )
+    initial_root = server.persistence_payload()
+
+    with pytest.raises(OSError, match="after durable initialization"):
+        server.initialize_persistence(_UntypedAfterInitializeStore(first_delegate))
+    with pytest.raises(SessionPersistenceError, match="fresh server authority"):
+        server.initialize_persistence(replacement)
+    with pytest.raises(SessionPersistenceError, match="cannot export a checkpoint"):
+        server.persistence_payload()
+
+    assert not replacement.database_path.exists()
+    unavailable = server.handle(
+        method="GET",
+        path="/rules-catalog",
+        authorization=bearer_authorization(DEV_ADMIN_TOKEN),
+    )
+    assert unavailable.status_code == HTTPStatus.SERVICE_UNAVAILABLE
+    assert _error_code(unavailable) == "session_persistence_unavailable"
+    assert first_delegate.load() == initial_root
+
+    attached_delegate = SQLiteSessionPersistenceStore(
+        database_path=tmp_path / "phase18l-falsey-attached.sqlite3"
+    )
+    attached_store = _FalseyPersistenceStore(attached_delegate)
+    attached_server = AdapterGameServer(
+        principal_registry=default_principal_registry(),
+        clock=lambda: FROZEN_TIME,
+    )
+    attached_server.initialize_persistence(attached_store)
+    with pytest.raises(SessionPersistenceError, match="requires empty state"):
+        attached_server.initialize_persistence(replacement)
+
+    assert attached_server.persistence_store is attached_store
+
+
+def test_phase18l_deleted_sqlite_singleton_root_is_corruption_not_first_boot(
+    tmp_path: Path,
+) -> None:
+    database_path = tmp_path / "phase18l-deleted-root.sqlite3"
+    store = SQLiteSessionPersistenceStore(database_path=database_path)
+    server = _server(store)
+    _create_session(server, game_id="phase18l-deleted-root")
+    with sqlite3.connect(database_path) as connection:
+        connection.execute(f"DELETE FROM {SQLITE_SESSION_STATE_TABLE}")
+        connection.commit()
+
+    with pytest.raises(SessionPersistenceCorruptionError):
+        store.load()
+    with pytest.raises(SessionRecoveryError):
+        AdapterGameServer(
+            persistence_store=store,
+            principal_registry=default_principal_registry(),
+            clock=lambda: FROZEN_TIME,
+        )
+
+
+@pytest.mark.parametrize(
+    ("trigger_name", "trigger_timing", "trigger_operation", "trigger_body"),
+    [
+        pytest.param(
+            "forged_ignore_insert",
+            "BEFORE",
+            "INSERT",
+            "SELECT RAISE(IGNORE);",
+            id="before-insert-raise-ignore",
+        ),
+        pytest.param(
+            "forged_rewrite_update",
+            "AFTER",
+            "UPDATE",
+            (
+                f"UPDATE {SQLITE_SESSION_STATE_TABLE} "
+                "SET payload_json = 'null', content_hash = '"
+                + hashlib.sha256(b"null").hexdigest()
+                + "' WHERE singleton_id = 1;"
+            ),
+            id="after-update-rewrite",
+        ),
+    ],
+)
+def test_phase18l_sqlite_commit_rejects_ignore_and_rewrite_triggers(
+    tmp_path: Path,
+    trigger_name: str,
+    trigger_timing: Literal["BEFORE", "AFTER"],
+    trigger_operation: Literal["INSERT", "UPDATE"],
+    trigger_body: str,
+) -> None:
+    database_path = tmp_path / "phase18l-trigger.sqlite3"
+    store = SQLiteSessionPersistenceStore(database_path=database_path)
+    server = _server(store)
+    before = store.load()
+    with sqlite3.connect(database_path) as connection:
+        connection.execute(
+            f"CREATE TRIGGER {trigger_name} {trigger_timing} {trigger_operation} "
+            f"ON {SQLITE_SESSION_STATE_TABLE} "
+            f"BEGIN {trigger_body} END"
+        )
+        connection.commit()
+
+    with pytest.raises(SessionPersistenceDriftError):
+        store.commit({"forged": True})
+    with sqlite3.connect(database_path) as connection:
+        connection.execute(f"DROP TRIGGER {trigger_name}")
+        connection.commit()
+    assert store.load() == before
+    assert server.persistence_payload() == before
+
+
+@pytest.mark.parametrize("missing_constraint", ["strict", "singleton_check"])
+def test_phase18l_sqlite_rejects_missing_strict_or_singleton_check(
+    tmp_path: Path,
+    missing_constraint: Literal["strict", "singleton_check"],
+) -> None:
+    database_path = tmp_path / f"phase18l-missing-{missing_constraint}.sqlite3"
+    payload: JsonValue = {"initialized": True}
+    payload_json = canonical_json(payload)
+    content_hash = hashlib.sha256(payload_json.encode("utf-8")).hexdigest()
+    check_sql = "" if missing_constraint == "singleton_check" else " CHECK(singleton_id = 1)"
+    strict_sql = "" if missing_constraint == "strict" else " STRICT"
+    with sqlite3.connect(database_path) as connection:
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute(
+            f"CREATE TABLE {SQLITE_SESSION_STATE_TABLE} ("
+            f"singleton_id INTEGER NOT NULL PRIMARY KEY{check_sql}, "
+            "schema_version TEXT NOT NULL, payload_json TEXT NOT NULL, "
+            f"content_hash TEXT NOT NULL){strict_sql}"
+        )
+        connection.execute(f"PRAGMA user_version={SQLITE_SESSION_PERSISTENCE_USER_VERSION}")
+        connection.execute(
+            f"INSERT INTO {SQLITE_SESSION_STATE_TABLE} VALUES (1, ?, ?, ?)",
+            (SESSION_PERSISTENCE_STORE_SCHEMA_VERSION, payload_json, content_hash),
+        )
+        connection.commit()
+
+    with pytest.raises(SessionPersistenceDriftError):
+        SQLiteSessionPersistenceStore(database_path=database_path).load()
+
+
+def test_phase18l_sqlite_schema_cannot_change_between_validation_and_write(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_path = tmp_path / "phase18l-schema-race.sqlite3"
+    store = SQLiteSessionPersistenceStore(database_path=database_path)
+    _server(store)
+    entered_validation = Event()
+    release_commit = Event()
+    original_validation = cast(
+        Callable[[SQLiteSessionPersistenceStore, sqlite3.Connection], None],
+        vars(SQLiteSessionPersistenceStore)["_validate_database_schema"],
+    )
+
+    def paused_validation(
+        target: SQLiteSessionPersistenceStore,
+        connection: sqlite3.Connection,
+    ) -> None:
+        original_validation(target, connection)
+        entered_validation.set()
+        assert release_commit.wait(timeout=5)
+
+    monkeypatch.setattr(
+        SQLiteSessionPersistenceStore,
+        "_validate_database_schema",
+        paused_validation,
+    )
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        commit = executor.submit(store.commit, {"generation": 2})
+        assert entered_validation.wait(timeout=5)
+        try:
+            with sqlite3.connect(database_path, timeout=0.05) as concurrent:
+                concurrent.execute("PRAGMA busy_timeout=50")
+                with pytest.raises(sqlite3.OperationalError, match="locked"):
+                    concurrent.execute("CREATE TABLE raced_schema(value TEXT) STRICT")
+        finally:
+            release_commit.set()
+        commit.result(timeout=5)
+    assert store.load() == {"generation": 2}
 
 
 @pytest.fixture(scope="module")
@@ -637,6 +914,112 @@ def phase18l_journaled_root_checkpoint_payload() -> dict[str, JsonValue]:
     return server.persistence_payload()
 
 
+@pytest.fixture(scope="module")
+def phase18l_legacy_revision_root_checkpoint_payload() -> dict[str, JsonValue]:
+    config = canonical_setup_prebattle_smoke_config(game_id="phase18l-legacy-origins")
+    session = LocalGameSession()
+    initial_status = session.start(config)
+    record = AuthoritativeSession.create(
+        session_id="session:phase18l-legacy-origins",
+        adapter_session=session,
+        config=config,
+        lifecycle_status=initial_status,
+        created_at="2026-08-21T16:00:00Z",
+    )
+    decision_status = session.advance_until_decision_or_terminal()
+    record.started = True
+    record.commit_status(
+        decision_status,
+        timestamp="2026-08-21T16:00:01Z",
+        origin=SessionRevisionOrigin.noncommand(SessionNonCommandOrigin.LEGACY_ADVANCE_SESSION),
+    )
+    request = decision_status.decision_request
+    assert request is not None
+    next_status = session.submit_option(
+        request_id=request.request_id,
+        option_id=FIXED_SECONDARY_OPTION_ID,
+        result_id="phase18l-legacy-origin-finite-result",
+    )
+    record.commit_status(
+        next_status,
+        timestamp="2026-08-21T16:00:02Z",
+        origin=SessionRevisionOrigin.noncommand(SessionNonCommandOrigin.LEGACY_FINITE_DECISION),
+    )
+    return _server_checkpoint_payload(record)
+
+
+@pytest.mark.parametrize(
+    "origin_tamper",
+    [
+        "creation_moved_off_revision_zero",
+        "legacy_finite_relabelled_parameterized",
+        "close_origin_without_closed_state",
+    ],
+)
+def test_phase18l_coherent_typed_origin_swaps_fail_closed(
+    phase18l_legacy_revision_root_checkpoint_payload: dict[str, JsonValue],
+    origin_tamper: str,
+) -> None:
+    payload = copy.deepcopy(phase18l_legacy_revision_root_checkpoint_payload)
+    session_payload = _first_session_payload(payload)
+    revision_zero = _revision_item(session_payload, "revision_history", revision=0)
+    revision_one = _revision_item(session_payload, "revision_history", revision=1)
+    revision_two = _revision_item(session_payload, "revision_history", revision=2)
+    if origin_tamper == "creation_moved_off_revision_zero":
+        revision_zero["origin"] = copy.deepcopy(_object(revision_one, "origin"))
+        revision_one["origin"] = cast(
+            JsonValue,
+            SessionRevisionOrigin.noncommand(SessionNonCommandOrigin.SESSION_CREATED).to_payload(),
+        )
+    elif origin_tamper == "legacy_finite_relabelled_parameterized":
+        revision_two["origin"] = cast(
+            JsonValue,
+            SessionRevisionOrigin.noncommand(
+                SessionNonCommandOrigin.LEGACY_PARAMETERIZED_DECISION
+            ).to_payload(),
+        )
+    else:
+        assert origin_tamper == "close_origin_without_closed_state"
+        assert session_payload["closed"] is False
+        revision_one["origin"] = cast(
+            JsonValue,
+            SessionRevisionOrigin.noncommand(SessionNonCommandOrigin.SESSION_CLOSED).to_payload(),
+        )
+    _rehash_revision_chain(session_payload)
+    _assert_revision_chain_hashes_are_self_consistent(session_payload)
+    _rehash_content_addressed_payload(payload)
+
+    with pytest.raises(SessionRecoveryError):
+        recover_server_persistence_payload(
+            payload,
+            principal_registry=default_principal_registry(),
+            session_recovery_factory=LocalGameSession.from_persistence_payload,
+        )
+
+
+def test_phase18l_serialization_rejects_live_history_beyond_latest_commitment() -> None:
+    config = canonical_setup_prebattle_smoke_config(game_id="phase18l-live-history-drift")
+    session = LocalGameSession()
+    initial_status = session.start(config)
+    record = AuthoritativeSession.create(
+        session_id="session:phase18l-live-history-drift",
+        adapter_session=session,
+        config=config,
+        lifecycle_status=initial_status,
+        created_at="2026-08-21T16:00:00Z",
+    )
+    latest_snapshot = record.current_snapshot()
+    captured_checkpoint = latest_snapshot.adapter_session.to_persistence_payload()
+    captured_event_count = latest_snapshot.event_count
+
+    session.advance_until_decision_or_terminal()
+
+    assert session.event_record_count() > captured_event_count
+    assert canonical_json(session.to_persistence_payload()) != canonical_json(captured_checkpoint)
+    with pytest.raises(SessionProtocolError):
+        _server_checkpoint_payload(record)
+
+
 @pytest.mark.parametrize(
     "tamper_kind",
     [
@@ -678,6 +1061,31 @@ def test_phase18l_root_identity_drift_fails_closed(
             principal_registry=default_principal_registry(),
             session_recovery_factory=LocalGameSession.from_persistence_payload,
         )
+
+
+def test_phase18l_same_package_version_different_build_fingerprint_fails_before_recovery(
+    phase18l_root_checkpoint_payload: dict[str, JsonValue],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    payload = copy.deepcopy(phase18l_root_checkpoint_payload)
+    persisted_build_id = _string(payload, "engine_build_id")
+    changed_fingerprint = "0" if persisted_build_id[-1] != "0" else "1"
+    other_build_id = f"{persisted_build_id[:-1]}{changed_fingerprint}"
+    recovery_calls: list[JsonValue] = []
+
+    def unexpected_recovery(checkpoint: JsonValue) -> LocalGameSession:
+        recovery_calls.append(checkpoint)
+        return LocalGameSession.from_persistence_payload(checkpoint)
+
+    assert payload["engine_version"] == ENGINE_VERSION
+    monkeypatch.setattr(session_recovery_module, "ENGINE_BUILD_ID", other_build_id)
+    with pytest.raises(SessionRecoveryError):
+        recover_server_persistence_payload(
+            payload,
+            principal_registry=default_principal_registry(),
+            session_recovery_factory=unexpected_recovery,
+        )
+    assert recovery_calls == []
 
 
 @pytest.mark.parametrize(
@@ -755,6 +1163,317 @@ def test_phase18l_retained_snapshot_from_another_game_fails_closed(
     other = _phase_boundary_session("movement")
     other.advance_until_decision_or_terminal()
     _object(snapshots[0])["adapter_session"] = other.to_persistence_payload()
+    _rehash_content_addressed_payload(payload)
+
+    with pytest.raises(SessionRecoveryError):
+        recover_server_persistence_payload(
+            payload,
+            principal_registry=default_principal_registry(),
+            session_recovery_factory=LocalGameSession.from_persistence_payload,
+        )
+
+
+def test_phase18l_valid_alternate_branch_snapshot_fails_exact_history_chain() -> None:
+    game_id = "phase18l-alternate-valid-branch"
+    original_server = _server_with_fixed_secondary_choice(game_id=game_id, option_index=0)
+    alternate_server = _server_with_fixed_secondary_choice(game_id=game_id, option_index=1)
+    payload = copy.deepcopy(original_server.persistence_payload())
+    original_session = _first_session_payload(payload)
+    alternate_session = _first_session_payload(alternate_server.persistence_payload())
+    current_revision = _integer(original_session, "session_revision")
+    assert current_revision >= 3
+    current_snapshot = _revision_item(
+        original_session,
+        "revision_snapshots",
+        revision=current_revision,
+    )
+    current_snapshot_before_tamper = copy.deepcopy(current_snapshot)
+    current_adapter_before_tamper = copy.deepcopy(_object(original_session, "adapter_session"))
+    original_snapshot = _revision_item(original_session, "revision_snapshots", revision=2)
+    alternate_snapshot = _revision_item(alternate_session, "revision_snapshots", revision=2)
+    original_snapshot.clear()
+    original_snapshot.update(copy.deepcopy(alternate_snapshot))
+    commitment = _revision_item(original_session, "revision_history", revision=2)
+    _bind_snapshot_evidence(commitment=commitment, snapshot=original_snapshot)
+    _rehash_revision_chain(original_session)
+    _assert_revision_chain_hashes_are_self_consistent(original_session)
+    assert current_snapshot == current_snapshot_before_tamper
+    assert _object(original_session, "adapter_session") == current_adapter_before_tamper
+    _rehash_content_addressed_payload(payload)
+
+    with pytest.raises(SessionRecoveryError):
+        recover_server_persistence_payload(
+            payload,
+            principal_registry=default_principal_registry(),
+            session_recovery_factory=LocalGameSession.from_persistence_payload,
+        )
+
+
+def test_phase18l_coherent_projection_and_authenticated_cursor_drift_fails_closed(
+    phase18l_journaled_root_checkpoint_payload: dict[str, JsonValue],
+) -> None:
+    payload = copy.deepcopy(phase18l_journaled_root_checkpoint_payload)
+    session_payload = _first_session_payload(payload)
+    journal_entry = _object(_list(session_payload, "command_journal")[-1])
+    revision = _integer(journal_entry, "committed_session_revision")
+    commitment = _revision_item(session_payload, "revision_history", revision=revision)
+    to_cursor = _object(commitment, "to_cursor")
+    cursor_state = _object(to_cursor, "cursor")
+    codec = SessionCursorCodec.from_persistence_payload(_object(payload, "cursor_codec"))
+    registry = default_principal_registry()
+    principal = registry.authenticate(bearer_authorization(DEV_PLAYER_A_TOKEN))
+    viewer = principal.bind_to_session(
+        player_ids=tuple(_string_list(session_payload, "player_ids")),
+        authorization_epoch=registry.authorization_epoch,
+    )
+    forged_hash = "0" * 64
+    forged_token = codec.issue(
+        session_id=_string(cursor_state, "s"),
+        viewer=viewer,
+        offset=_integer(cursor_state, "o"),
+        visible_sequence=_integer(cursor_state, "q"),
+        session_revision=_integer(cursor_state, "r"),
+        projection_state_hash=forged_hash,
+        minimum_offset=0,
+        minimum_revision=0,
+    )
+    forged_cursor = codec.committed_cursor(forged_token)
+    codec_payload = codec.to_persistence_payload()
+    codec_payload["cursors"] = [
+        item
+        for item in _list(codec_payload, "cursors")
+        if _string(_object(item), "token") != forged_token
+    ]
+    payload["cursor_codec"] = cast(JsonValue, codec_payload)
+    to_cursor["token"] = forged_token
+    to_cursor["cursor"] = cast(JsonValue, forged_cursor.to_payload())
+    response = _object(journal_entry, "response_payload")
+    metadata = _object(response, "session")
+    checkpoint = _object(response, "checkpoint")
+    event_range = _object(response, "event_range")
+    metadata["projection_state_hash"] = forged_hash
+    metadata["event_cursor"] = forged_token
+    checkpoint["projection_state_hash"] = forged_hash
+    checkpoint["event_cursor"] = forged_token
+    event_range["to_cursor"] = forged_token
+    _rehash_command_revision(session_payload, journal_entry=journal_entry)
+    _assert_revision_chain_hashes_are_self_consistent(session_payload)
+    _assert_command_hashes_are_self_consistent(
+        session_payload,
+        journal_entry=journal_entry,
+    )
+    _rehash_content_addressed_payload(payload)
+
+    with pytest.raises(SessionRecoveryError):
+        recover_server_persistence_payload(
+            payload,
+            principal_registry=registry,
+            session_recovery_factory=LocalGameSession.from_persistence_payload,
+        )
+
+
+def test_phase18l_another_authenticated_cursor_cannot_replace_command_cursor(
+    phase18l_journaled_root_checkpoint_payload: dict[str, JsonValue],
+) -> None:
+    payload = copy.deepcopy(phase18l_journaled_root_checkpoint_payload)
+    session_payload = _first_session_payload(payload)
+    journal_entry = _object(_list(session_payload, "command_journal")[-1])
+    revision = _integer(journal_entry, "committed_session_revision")
+    commitment = _revision_item(session_payload, "revision_history", revision=revision)
+    from_cursor = copy.deepcopy(_object(commitment, "from_cursor"))
+    commitment["to_cursor"] = cast(JsonValue, from_cursor)
+    replacement_token = _string(from_cursor, "token")
+    replacement_hash = _string(_object(from_cursor, "cursor"), "h")
+    response = _object(journal_entry, "response_payload")
+    metadata = _object(response, "session")
+    checkpoint = _object(response, "checkpoint")
+    metadata["projection_state_hash"] = replacement_hash
+    metadata["event_cursor"] = replacement_token
+    checkpoint["projection_state_hash"] = replacement_hash
+    checkpoint["event_cursor"] = replacement_token
+    _object(response, "event_range")["to_cursor"] = replacement_token
+    _rehash_command_revision(session_payload, journal_entry=journal_entry)
+    _assert_revision_chain_hashes_are_self_consistent(session_payload)
+    _assert_command_hashes_are_self_consistent(
+        session_payload,
+        journal_entry=journal_entry,
+    )
+    _rehash_content_addressed_payload(payload)
+
+    with pytest.raises(SessionRecoveryError):
+        recover_server_persistence_payload(
+            payload,
+            principal_registry=default_principal_registry(),
+            session_recovery_factory=LocalGameSession.from_persistence_payload,
+        )
+
+
+def test_phase18l_missing_journal_is_detected_after_origin_snapshot_pruned() -> None:
+    server = AdapterGameServer(
+        principal_registry=default_principal_registry(),
+        clock=lambda: FROZEN_TIME,
+    )
+    session_id = _create_session(server, game_id="phase18l-pruned-journal")
+    server._sessions[session_id].revision_retention_limit = 1  # pyright: ignore[reportPrivateUsage]
+    _command(
+        server,
+        token=DEV_ADMIN_TOKEN,
+        envelope=_lifecycle_envelope(
+            session_id=session_id,
+            command_id="phase18l-pruned-journal-start",
+            expected_revision=0,
+            submission_kind=SessionCommandSubmissionKind.START_SESSION,
+        ),
+    )
+    pending = _pending_decision(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN)
+    options = _list(pending, "options")
+    _command(
+        server,
+        token=DEV_PLAYER_A_TOKEN,
+        envelope=_finite_envelope(
+            session_id=session_id,
+            command_id="phase18l-pruned-journal-choice",
+            expected_revision=1,
+            request_id=_string(pending, "request_id"),
+            result_id="phase18l-pruned-journal-choice-result",
+            option_id=_string(_object(options[0]), "option_id"),
+        ),
+    )
+    payload = copy.deepcopy(server.persistence_payload())
+    session_payload = _first_session_payload(payload)
+    snapshots = _list(session_payload, "revision_snapshots")
+    assert [_integer(_object(item), "session_revision") for item in snapshots] == [2]
+    journal = _list(session_payload, "command_journal")
+    journal.pop(0)
+    _assert_revision_chain_hashes_are_self_consistent(session_payload)
+    _rehash_content_addressed_payload(payload)
+
+    with pytest.raises(SessionRecoveryError):
+        recover_server_persistence_payload(
+            payload,
+            principal_registry=default_principal_registry(),
+            session_recovery_factory=LocalGameSession.from_persistence_payload,
+        )
+
+
+def test_phase18l_changed_envelope_and_fingerprint_must_match_decision_history(
+    phase18l_journaled_root_checkpoint_payload: dict[str, JsonValue],
+) -> None:
+    payload = copy.deepcopy(phase18l_journaled_root_checkpoint_payload)
+    session_payload = _first_session_payload(payload)
+    journal_entry = _object(_list(session_payload, "command_journal")[-1])
+    envelope_payload = _object(journal_entry, "command_envelope")
+    submission = _object(envelope_payload, "submission")
+    submission["option_id"] = "syntactically-valid-but-unselected-option"
+    changed_envelope = SessionCommandEnvelope.from_payload(envelope_payload)
+    changed_fingerprint = changed_envelope.fingerprint()
+    journal_entry["envelope_fingerprint"] = changed_fingerprint
+    revision = _integer(journal_entry, "committed_session_revision")
+    commitment = _revision_item(session_payload, "revision_history", revision=revision)
+    origin = _object(commitment, "origin")
+    origin["command_envelope"] = copy.deepcopy(envelope_payload)
+    origin["envelope_fingerprint"] = changed_fingerprint
+    _rehash_command_revision(session_payload, journal_entry=journal_entry)
+    _assert_revision_chain_hashes_are_self_consistent(session_payload)
+    _assert_command_hashes_are_self_consistent(
+        session_payload,
+        journal_entry=journal_entry,
+    )
+    _rehash_content_addressed_payload(payload)
+
+    with pytest.raises(SessionRecoveryError):
+        recover_server_persistence_payload(
+            payload,
+            principal_registry=default_principal_registry(),
+            session_recovery_factory=LocalGameSession.from_persistence_payload,
+        )
+
+
+def test_phase18l_coherent_start_to_advance_relabel_fails_transition_semantics(
+    phase18l_journaled_root_checkpoint_payload: dict[str, JsonValue],
+) -> None:
+    payload = copy.deepcopy(phase18l_journaled_root_checkpoint_payload)
+    session_payload = _first_session_payload(payload)
+    journal_entry = _object(_list(session_payload, "command_journal")[0])
+    assert _integer(journal_entry, "committed_session_revision") == 1
+    envelope_payload = _object(journal_entry, "command_envelope")
+    submission = _object(envelope_payload, "submission")
+    submission["submission_kind"] = SessionCommandSubmissionKind.ADVANCE_SESSION.value
+    changed_envelope = SessionCommandEnvelope.from_payload(envelope_payload)
+    changed_fingerprint = changed_envelope.fingerprint()
+    journal_entry["envelope_fingerprint"] = changed_fingerprint
+    response = _object(journal_entry, "response_payload")
+    response["operation"] = "advance_session"
+    commitment = _revision_item(session_payload, "revision_history", revision=1)
+    origin = _object(commitment, "origin")
+    origin["operation"] = SessionCommandSubmissionKind.ADVANCE_SESSION.value
+    origin["command_envelope"] = copy.deepcopy(envelope_payload)
+    origin["envelope_fingerprint"] = changed_fingerprint
+    assert commitment["started"] is True
+    assert _revision_item(session_payload, "revision_history", revision=0)["started"] is False
+    _rehash_command_revision(session_payload, journal_entry=journal_entry)
+    _assert_revision_chain_hashes_are_self_consistent(session_payload)
+    _assert_command_hashes_are_self_consistent(
+        session_payload,
+        journal_entry=journal_entry,
+    )
+    _rehash_content_addressed_payload(payload)
+
+    with pytest.raises(SessionRecoveryError):
+        recover_server_persistence_payload(
+            payload,
+            principal_registry=default_principal_registry(),
+            session_recovery_factory=LocalGameSession.from_persistence_payload,
+        )
+
+
+def test_phase18l_coherent_journal_activity_drift_fails_retained_snapshot_timestamp() -> None:
+    tick = 0
+
+    def advancing_clock() -> datetime:
+        nonlocal tick
+        value = FROZEN_TIME + timedelta(seconds=tick)
+        tick += 1
+        return value
+
+    server = AdapterGameServer(
+        principal_registry=default_principal_registry(),
+        clock=advancing_clock,
+    )
+    session_id = _create_session(server, game_id="phase18l-journal-activity-drift")
+    _command(
+        server,
+        token=DEV_ADMIN_TOKEN,
+        envelope=_lifecycle_envelope(
+            session_id=session_id,
+            command_id="phase18l-journal-activity-drift-start",
+            expected_revision=0,
+            submission_kind=SessionCommandSubmissionKind.START_SESSION,
+        ),
+    )
+    _metadata(server, session_id=session_id)
+    payload = copy.deepcopy(server.persistence_payload())
+    session_payload = _first_session_payload(payload)
+    journal_entry = _object(_list(session_payload, "command_journal")[0])
+    revision = _integer(journal_entry, "committed_session_revision")
+    retained_snapshot = _revision_item(
+        session_payload,
+        "revision_snapshots",
+        revision=revision,
+    )
+    response_metadata = _object(
+        _object(journal_entry, "response_payload"),
+        "session",
+    )
+    assert response_metadata["last_activity_at"] == retained_snapshot["last_activity_at"]
+    assert session_payload["last_activity_at"] != retained_snapshot["last_activity_at"]
+    response_metadata["last_activity_at"] = session_payload["last_activity_at"]
+    _rehash_command_revision(session_payload, journal_entry=journal_entry)
+    _assert_revision_chain_hashes_are_self_consistent(session_payload)
+    _assert_command_hashes_are_self_consistent(
+        session_payload,
+        journal_entry=journal_entry,
+    )
     _rehash_content_addressed_payload(payload)
 
     with pytest.raises(SessionRecoveryError):
@@ -867,7 +1586,10 @@ class _FaultingPersistenceStore:
     def arm(self, failure_point: Literal["before", "after"]) -> None:
         self._failure_point = failure_point
 
-    def load(self) -> JsonValue | None:
+    def initialize(self, payload: JsonValue) -> None:
+        self.delegate.initialize(payload)
+
+    def load(self) -> JsonValue:
         return self.delegate.load()
 
     def commit(self, payload: JsonValue) -> None:
@@ -878,6 +1600,54 @@ class _FaultingPersistenceStore:
         self.delegate.commit(payload)
         if failure_point == "after":
             raise SessionPersistenceStorageError("Injected failure after durable commit.")
+
+
+@dataclass(slots=True)
+class _UntypedAfterCommitStore:
+    delegate: SessionPersistenceStore
+    error_type: type[OSError] | type[RuntimeError]
+
+    def initialize(self, payload: JsonValue) -> None:
+        self.delegate.initialize(payload)
+
+    def load(self) -> JsonValue:
+        return self.delegate.load()
+
+    def commit(self, payload: JsonValue) -> None:
+        self.delegate.commit(payload)
+        raise self.error_type("Injected untyped failure after durable commit.")
+
+
+@dataclass(slots=True)
+class _UntypedAfterInitializeStore:
+    delegate: SessionPersistenceStore
+
+    def initialize(self, payload: JsonValue) -> None:
+        self.delegate.initialize(payload)
+        raise OSError("Injected failure after durable initialization.")
+
+    def load(self) -> JsonValue:
+        return self.delegate.load()
+
+    def commit(self, payload: JsonValue) -> None:
+        self.delegate.commit(payload)
+
+
+@dataclass(slots=True)
+class _FalseyPersistenceStore:
+    delegate: SessionPersistenceStore
+
+    def __bool__(self) -> bool:
+        return False
+
+    def initialize(self, payload: JsonValue) -> None:
+        self.delegate.initialize(payload)
+
+    def load(self) -> JsonValue:
+        return self.delegate.load()
+
+    def commit(self, payload: JsonValue) -> None:
+        self.delegate.commit(payload)
 
 
 def _phase_boundary_session(boundary: str) -> LocalGameSession:
@@ -950,11 +1720,10 @@ def _movement_proposal_server(
         config=session.lifecycle.config,
         lifecycle_status=status,
         created_at="2026-08-21T16:00:00Z",
+        started=True,
     )
-    record.started = True
-    record.capture_current_revision(replace_existing=True)
     store = SQLiteSessionPersistenceStore(database_path=database_path)
-    store.commit(_server_checkpoint_payload(record))
+    store.initialize(_server_checkpoint_payload(record))
     server = _server(store)
     session_id = record.session_id
 
@@ -1039,18 +1808,248 @@ def _rehash_content_addressed_payload(payload: dict[str, JsonValue]) -> None:
     ).hexdigest()
 
 
+def _revision_domain_hash(payload: JsonValue, *, domain: str) -> str:
+    digest = hashlib.sha256()
+    digest.update(b"warhammer40k-core-v2-session-revision-v1\x00")
+    digest.update(domain.encode("ascii"))
+    digest.update(b"\x00")
+    digest.update(canonical_json(payload).encode("utf-8"))
+    return digest.hexdigest()
+
+
+def _revision_item(
+    session_payload: dict[str, JsonValue],
+    collection_name: str,
+    *,
+    revision: int,
+) -> dict[str, JsonValue]:
+    matches = [
+        item
+        for value in _list(session_payload, collection_name)
+        if _integer(item := _object(value), "session_revision") == revision
+    ]
+    assert len(matches) == 1
+    return matches[0]
+
+
+def _bind_snapshot_evidence(
+    *,
+    commitment: dict[str, JsonValue],
+    snapshot: dict[str, JsonValue],
+) -> None:
+    adapter_session = LocalGameSession.from_persistence_payload(
+        copy.deepcopy(_object(snapshot, "adapter_session"))
+    )
+    history = adapter_session.authoritative_history_payload()
+    decision_records = history["decision_records"]
+    event_records = history["event_records"]
+    rng_history = history["rng_history"]
+    commitment["decision_count"] = len(decision_records)
+    commitment["decision_records_hash"] = _revision_domain_hash(
+        decision_records,
+        domain="decision-prefix",
+    )
+    commitment["event_count"] = len(event_records)
+    commitment["event_records_hash"] = _revision_domain_hash(
+        event_records,
+        domain="event-prefix",
+    )
+    commitment["rng_history_count"] = len(rng_history)
+    commitment["rng_history_hash"] = _revision_domain_hash(
+        cast(JsonValue, rng_history),
+        domain="rng-history-prefix",
+    )
+    commitment["rng_draw_count"] = history["rng_draw_count"]
+    commitment["rng_state_hash"] = _revision_domain_hash(
+        {
+            "seed": history["rng_seed"],
+            "history": list(rng_history),
+            "draw_count": history["rng_draw_count"],
+        },
+        domain="rng-state",
+    )
+    commitment["checkpoint_hash"] = history["checkpoint_hash"]
+    commitment["authoritative_state_hash"] = history["authoritative_state_hash"]
+    commitment["started"] = snapshot["started"]
+    commitment["closed"] = snapshot["closed"]
+    commitment["authoritative_session_hash"] = _revision_domain_hash(
+        {
+            "session_revision": snapshot["session_revision"],
+            "lifecycle_status": snapshot["lifecycle_status"],
+            "event_count": snapshot["event_count"],
+            "last_activity_at": snapshot["last_activity_at"],
+            "started": snapshot["started"],
+            "closed": snapshot["closed"],
+        },
+        domain="authoritative-session-state",
+    )
+
+
+def _rehash_revision_chain(session_payload: dict[str, JsonValue]) -> None:
+    previous_commitment: str | None = None
+    history = _list(session_payload, "revision_history")
+    assert history
+    for expected_revision, value in enumerate(history):
+        commitment = _object(value)
+        assert _integer(commitment, "session_revision") == expected_revision
+        commitment["previous_revision_commitment"] = previous_commitment
+        content = {key: item for key, item in commitment.items() if key != "revision_commitment"}
+        previous_commitment = _revision_domain_hash(
+            cast(JsonValue, content),
+            domain="revision-commitment",
+        )
+        commitment["revision_commitment"] = previous_commitment
+    assert previous_commitment is not None
+    session_payload["history_head"] = previous_commitment
+
+
+def _assert_revision_chain_hashes_are_self_consistent(
+    session_payload: dict[str, JsonValue],
+) -> None:
+    previous_commitment: str | None = None
+    history = _list(session_payload, "revision_history")
+    assert history
+    for expected_revision, value in enumerate(history):
+        commitment = SessionRevisionCommitment.from_payload(copy.deepcopy(value))
+        assert commitment.session_revision == expected_revision
+        assert commitment.previous_revision_commitment == previous_commitment
+        previous_commitment = commitment.revision_commitment
+    assert session_payload["history_head"] == previous_commitment
+
+
+def _rehash_command_revision(
+    session_payload: dict[str, JsonValue],
+    *,
+    journal_entry: dict[str, JsonValue],
+) -> None:
+    revision = _integer(journal_entry, "committed_session_revision")
+    commitment = _revision_item(session_payload, "revision_history", revision=revision)
+    commitment["journal_entry_hash"] = _revision_domain_hash(
+        cast(JsonValue, journal_entry),
+        domain="command-journal-entry",
+    )
+    commitment["response_hash"] = _revision_domain_hash(
+        cast(JsonValue, _object(journal_entry, "response_payload")),
+        domain="command-response",
+    )
+    _rehash_revision_chain(session_payload)
+
+
+def _assert_command_hashes_are_self_consistent(
+    session_payload: dict[str, JsonValue],
+    *,
+    journal_entry: dict[str, JsonValue],
+) -> None:
+    entry = SessionCommandJournalEntry.from_persistence_payload(copy.deepcopy(journal_entry))
+    commitment = SessionRevisionCommitment.from_payload(
+        copy.deepcopy(
+            _revision_item(
+                session_payload,
+                "revision_history",
+                revision=entry.committed_session_revision,
+            )
+        )
+    )
+    assert commitment.journal_entry_hash == _revision_domain_hash(
+        cast(JsonValue, entry.to_persistence_payload()),
+        domain="command-journal-entry",
+    )
+    assert commitment.response_hash == _revision_domain_hash(
+        entry.response_payload,
+        domain="command-response",
+    )
+
+
+def _server_with_fixed_secondary_choice(
+    *,
+    game_id: str,
+    option_index: int,
+) -> AdapterGameServer:
+    server = AdapterGameServer(
+        principal_registry=default_principal_registry(),
+        clock=lambda: FROZEN_TIME,
+    )
+    session_id = _create_session(server, game_id=game_id)
+    _command(
+        server,
+        token=DEV_ADMIN_TOKEN,
+        envelope=_lifecycle_envelope(
+            session_id=session_id,
+            command_id="phase18l-alternate-valid-branch-start",
+            expected_revision=0,
+            submission_kind=SessionCommandSubmissionKind.START_SESSION,
+        ),
+    )
+    pending = _pending_decision(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN)
+    option_ids = [_string(_object(option), "option_id") for option in _list(pending, "options")]
+    assert len(option_ids) >= 2
+    assert len(set(option_ids)) == len(option_ids)
+    assert 0 <= option_index < len(option_ids)
+    _command(
+        server,
+        token=DEV_PLAYER_A_TOKEN,
+        envelope=_finite_envelope(
+            session_id=session_id,
+            command_id="phase18l-alternate-valid-branch-choice",
+            expected_revision=1,
+            request_id=_string(pending, "request_id"),
+            result_id="phase18l-alternate-valid-branch-result",
+            option_id=option_ids[option_index],
+        ),
+    )
+    player_b_pending = _pending_decision(
+        server,
+        session_id=session_id,
+        token=DEV_PLAYER_B_TOKEN,
+    )
+    assert _string(player_b_pending, "actor_id") == PLAYER_B
+    player_b_option_ids = [
+        _string(_object(option), "option_id") for option in _list(player_b_pending, "options")
+    ]
+    assert FIXED_SECONDARY_OPTION_ID in player_b_option_ids
+    _command(
+        server,
+        token=DEV_PLAYER_B_TOKEN,
+        envelope=_finite_envelope(
+            session_id=session_id,
+            command_id="phase18l-alternate-valid-branch-common-choice",
+            expected_revision=2,
+            request_id=_string(player_b_pending, "request_id"),
+            result_id="phase18l-alternate-valid-branch-common-result",
+            option_id=FIXED_SECONDARY_OPTION_ID,
+        ),
+    )
+    return server
+
+
 def _server(
     persistence_store: SessionPersistenceStore,
     *,
     principal_registry: PrincipalRegistry | None = None,
 ) -> AdapterGameServer:
+    registry = default_principal_registry() if principal_registry is None else principal_registry
+    if _store_requires_initialization(persistence_store):
+        server = AdapterGameServer(
+            principal_registry=registry,
+            clock=lambda: FROZEN_TIME,
+        )
+        server.initialize_persistence(persistence_store)
+        return server
     return AdapterGameServer(
         persistence_store=persistence_store,
-        principal_registry=(
-            default_principal_registry() if principal_registry is None else principal_registry
-        ),
+        principal_registry=registry,
         clock=lambda: FROZEN_TIME,
     )
+
+
+def _store_requires_initialization(store: SessionPersistenceStore) -> bool:
+    if isinstance(store, SQLiteSessionPersistenceStore):
+        return not store.database_path.exists()
+    if isinstance(store, _FaultingPersistenceStore):
+        return _store_requires_initialization(store.delegate)
+    if isinstance(store, _UntypedAfterCommitStore):
+        return _store_requires_initialization(store.delegate)
+    return False
 
 
 def _create_session(server: AdapterGameServer, *, game_id: str) -> str:
@@ -1298,6 +2297,14 @@ def _list(value: dict[str, JsonValue], key: str) -> list[JsonValue]:
     selected = value[key]
     assert isinstance(selected, list)
     return selected
+
+
+def _string_list(value: dict[str, JsonValue], key: str) -> list[str]:
+    result: list[str] = []
+    for item in _list(value, key):
+        assert type(item) is str
+        result.append(item)
+    return result
 
 
 def _string(

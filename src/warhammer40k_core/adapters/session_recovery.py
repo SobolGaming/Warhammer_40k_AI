@@ -8,8 +8,12 @@ from warhammer40k_core.adapters.access_control import (
     AccessControlError,
     AuthenticatedPrincipal,
     PrincipalRegistry,
+    ViewerContext,
 )
-from warhammer40k_core.adapters.command_protocol import SessionCommandProtocolError
+from warhammer40k_core.adapters.command_protocol import (
+    SessionCommandJournalEntry,
+    SessionCommandProtocolError,
+)
 from warhammer40k_core.adapters.external_contract import (
     EXTERNAL_CONTRACT_VERSION,
     SESSION_PERSISTENCE_SCHEMA_VERSION,
@@ -32,6 +36,7 @@ from warhammer40k_core.adapters.session_protocol import (
     SessionProtocolError,
     SessionRecoveryFactory,
 )
+from warhammer40k_core.adapters.session_revision import SessionRevisionCommitment
 from warhammer40k_core.engine.event_log import JsonValue, canonical_json, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
 from warhammer40k_core.engine.replay import ReplayArtifactError
@@ -251,6 +256,14 @@ def _validate_recovered_authority(
             )
             if entry.authorization_context != viewer.authorization_context:
                 raise SessionRecoveryError("Command journal authorization context drifted.")
+            _validate_committed_command_cursors(
+                record=record,
+                commitment=record.revision_history[entry.committed_session_revision],
+                entry=entry,
+                cursor_codec=cursor_codec,
+                viewer=viewer,
+                event_retention_limit=event_retention_limit,
+            )
     for _token, cursor in cursor_codec.retained_entries():
         cursor_record = sessions.get(cursor.session_id)
         if cursor_record is None:
@@ -278,6 +291,66 @@ def _validate_recovered_authority(
         except CursorValidationError as exc:
             if exc.reason is not CursorResyncReason.EXPIRED:
                 raise
+
+
+def _validate_committed_command_cursors(
+    *,
+    record: AuthoritativeSession,
+    commitment: SessionRevisionCommitment,
+    entry: SessionCommandJournalEntry,
+    cursor_codec: SessionCursorCodec,
+    viewer: ViewerContext,
+    event_retention_limit: int,
+) -> None:
+    if commitment.from_cursor is None or commitment.to_cursor is None:
+        raise SessionRecoveryError("Command revision cursor commitments are missing.")
+    before = commitment.from_cursor
+    after = commitment.to_cursor
+    cursor_codec.verify_committed_cursor(before.token, before.cursor)
+    cursor_codec.verify_committed_cursor(after.token, after.cursor)
+    cursor_codec.validate_binding(before.cursor, session_id=record.session_id, viewer=viewer)
+    cursor_codec.validate_binding(after.cursor, session_id=record.session_id, viewer=viewer)
+    previous = record.revision_history.get(commitment.session_revision - 1)
+    if previous is None:
+        raise SessionRecoveryError("Command revision predecessor is missing.")
+    if (
+        before.cursor.session_revision != previous.session_revision
+        or before.cursor.offset != previous.event_count
+        or after.cursor.session_revision != commitment.session_revision
+        or after.cursor.offset != commitment.event_count
+    ):
+        raise SessionRecoveryError("Command revision cursor position drifted.")
+    response = entry.response_payload
+    if not isinstance(response, dict):
+        raise SessionRecoveryError("Command revision response is invalid.")
+    metadata = response["session"]
+    checkpoint = response["checkpoint"]
+    if not isinstance(metadata, dict) or not isinstance(checkpoint, dict):
+        raise SessionRecoveryError("Command revision response checkpoint is invalid.")
+    projection_hash = checkpoint["projection_state_hash"]
+    if (
+        projection_hash != metadata["projection_state_hash"]
+        or projection_hash != after.cursor.projection_state_hash
+    ):
+        raise SessionRecoveryError("Command revision projection commitment drifted.")
+    before_snapshot = record.revision_snapshots.get(previous.session_revision)
+    after_snapshot = record.revision_snapshots.get(commitment.session_revision)
+    if before_snapshot is not None:
+        validate_cursor_position(
+            record=record,
+            viewer=viewer,
+            cursor=before.cursor,
+            target=before_snapshot,
+            retention_limit=event_retention_limit,
+        )
+    if after_snapshot is not None:
+        validate_cursor_position(
+            record=record,
+            viewer=viewer,
+            cursor=after.cursor,
+            target=after_snapshot,
+            retention_limit=event_retention_limit,
+        )
 
 
 def _principal_by_id(registry: PrincipalRegistry) -> dict[str, AuthenticatedPrincipal]:

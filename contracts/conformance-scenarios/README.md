@@ -50,13 +50,18 @@ schemas and the ordinary `AdapterGameSession` path.
 13. When a backend claims Phase 18L persistence, restart at session creation,
     setup, and each major phase boundary and require exact revision,
     decision/event sequence, RNG, replay, projection, role, and cursor
-    commitments. An exact command retry after restart must return the original
-    byte-equivalent public outcome without mutation. Inject failures before and
-    after atomic commit and require respectively the complete old or new
-    checkpoint, never a mixed state. Corrupt checkpoint content or drift the
-    package, engine build, external-contract, persistence-schema, or authority
-    identity and require typed fail-closed recovery before the session is
-    addressable. Restored role bindings and cursors must not widen visibility.
+    commitments. Require an explicit first-boot initialization and reject a
+    missing database/root during ordinary recovery. An exact command retry
+    after restart must return the original byte-equivalent public outcome
+    without mutation. Inject failures before and after atomic commit and require
+    respectively the complete old or new checkpoint, never a mixed state.
+    Corrupt checkpoint content; suppress or rewrite a storage write; replace a
+    retained snapshot with another legal branch; remove a journal entry; change
+    an envelope, response projection, or authenticated cursor; or drift the
+    package, immutable runtime-build fingerprint, external-contract,
+    persistence-schema, or authority identity. Every case must produce typed
+    fail-closed recovery before the session is addressable. Restored role
+    bindings and cursors must not widen visibility.
 
 The generated coverage directories are:
 
@@ -105,3 +110,8 @@ Phase 18L support in the reference server and its schema/example therefore does
 not by itself expand the Phase 18M-A certificate. A backend claiming equivalent
 durability still owes the executable restart, crash-boundary, corruption,
 drift, and no-visibility-widening cases above in Phase 18M-B+.
+
+The reference artifact's hashes and revision commitments certify internal
+consistency, not hostile storage. Equivalent malicious-writer or rollback
+resistance requires a separately trusted monotonic, signed, or append-only
+anchor and is outside the Phase 18L claim.

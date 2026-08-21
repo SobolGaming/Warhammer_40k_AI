@@ -29,6 +29,10 @@ from warhammer40k_core.adapters.server import AdapterGameServer
 from warhammer40k_core.adapters.server_types import ServerResponse
 from warhammer40k_core.adapters.session_events import CURSOR_TOKEN_LENGTH
 from warhammer40k_core.adapters.session_protocol import DEFAULT_REVISION_RETENTION_LIMIT
+from warhammer40k_core.adapters.session_revision import (
+    SessionNonCommandOrigin,
+    SessionRevisionOrigin,
+)
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.engine.event_log import JsonValue
 
@@ -278,7 +282,11 @@ def test_phase18g_publishes_revision_retention_and_bounds_cursor_state() -> None
     initial_event_count = record.adapter_session.event_record_count()
 
     for _ in range(DEFAULT_REVISION_RETENTION_LIMIT + 1):
-        record.commit_status(record.lifecycle_status, timestamp=record.last_activity_at)
+        record.commit_status(
+            record.lifecycle_status,
+            timestamp=record.last_activity_at,
+            origin=SessionRevisionOrigin.noncommand(SessionNonCommandOrigin.LEGACY_ADVANCE_SESSION),
+        )
         _projection(server, session_id=session_id, token=DEV_PLAYER_A_TOKEN)
 
     assert record.session_revision == DEFAULT_REVISION_RETENTION_LIMIT + 1

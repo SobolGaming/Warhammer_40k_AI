@@ -75,6 +75,18 @@ from warhammer40k_core.adapters.server_commands import (
 from warhammer40k_core.adapters.server_commands import (
     session_id_for_game as _session_id_for_game,
 )
+from warhammer40k_core.adapters.server_mutations import (
+    SessionCommandResponse as _SessionCommandResponse,
+)
+from warhammer40k_core.adapters.server_mutations import (
+    commit_submission_status as _commit_submission_status,
+)
+from warhammer40k_core.adapters.server_mutations import (
+    decision_record_count as _decision_record_count,
+)
+from warhammer40k_core.adapters.server_mutations import (
+    session_command_response as _session_command_response,
+)
 from warhammer40k_core.adapters.server_responses import (
     access_denied_response as _access_denied_response,
 )
@@ -141,6 +153,7 @@ from warhammer40k_core.adapters.session_events import (
 from warhammer40k_core.adapters.session_persistence import (
     SessionPersistenceError,
     SessionPersistenceStore,
+    commit_persistence_store,
 )
 from warhammer40k_core.adapters.session_protocol import (
     AuthoritativeSession,
@@ -148,13 +161,16 @@ from warhammer40k_core.adapters.session_protocol import (
     SessionProtocolError,
     SessionRecoveryFactory,
     operational_timestamp,
-    session_command_result_payload,
     utc_operational_clock,
 )
 from warhammer40k_core.adapters.session_recovery import (
     SessionRecoveryError,
     recover_server_persistence_payload,
     server_persistence_payload,
+)
+from warhammer40k_core.adapters.session_revision import (
+    SessionNonCommandOrigin,
+    SessionRevisionOrigin,
 )
 from warhammer40k_core.adapters.setup_smoke import canonical_setup_prebattle_smoke_config
 from warhammer40k_core.engine.event_log import EventLogError, JsonValue, validate_json_value
@@ -234,8 +250,6 @@ class AdapterGameServer:
             payload = self.persistence_store.load()
         except SessionPersistenceError as exc:
             raise SessionRecoveryError("Durable server state could not be loaded.") from exc
-        if payload is None:
-            return
         recovered = recover_server_persistence_payload(
             payload,
             principal_registry=self.principal_registry,
@@ -246,9 +260,37 @@ class AdapterGameServer:
         self.cursor_codec = recovered.cursor_codec
         self.event_retention_limit = recovered.event_retention_limit
 
+    def initialize_persistence(self, store: SessionPersistenceStore) -> None:
+        with self._lock:
+            if not isinstance(  # pyright: ignore[reportUnnecessaryIsInstance]
+                store, SessionPersistenceStore
+            ):
+                raise SessionPersistenceError("Persistence store does not conform.")
+            if self._persistence_failed:
+                raise SessionPersistenceError(
+                    "Persistence initialization requires a fresh server authority."
+                )
+            if self.persistence_store is not None or self._sessions or self._session_id_by_game_id:
+                raise SessionPersistenceError("Persistence initialization requires empty state.")
+            payload = server_persistence_payload(
+                sessions=self._sessions,
+                session_id_by_game_id=self._session_id_by_game_id,
+                cursor_codec=self.cursor_codec,
+                principal_registry=self.principal_registry,
+                event_retention_limit=self.event_retention_limit,
+            )
+            self._persistence_failed = True
+            store.initialize(payload)
+            self.persistence_store = store
+            self._persistence_failed = False
+
     def persistence_payload(self) -> dict[str, JsonValue]:
         """Return the private operator checkpoint for the current authoritative state."""
         with self._lock:
+            if self._persistence_failed:
+                raise SessionPersistenceError(
+                    "Latched persistence authority cannot export a checkpoint."
+                )
             return server_persistence_payload(
                 sessions=self._sessions,
                 session_id_by_game_id=self._session_id_by_game_id,
@@ -266,9 +308,6 @@ class AdapterGameServer:
         body: JsonValue = None,
         authorization: str | None = None,
     ) -> ServerResponse:
-        # Phase 18E keeps the local dev server authoritative by serializing access to
-        # the in-memory session registry. A production server can replace this with
-        # an explicit session store or per-game actor loop.
         with self._lock:
             try:
                 principal = self.principal_registry.authenticate(authorization)
@@ -390,7 +429,8 @@ class AdapterGameServer:
                     principal_registry=self.principal_registry,
                     event_retention_limit=self.event_retention_limit,
                 )
-                store.commit(payload)
+                self._persistence_failed = True
+                commit_persistence_store(store, payload)
             except SessionPersistenceError:
                 self._persistence_failed = True
                 raise
@@ -408,6 +448,7 @@ class AdapterGameServer:
                     "Authoritative session checkpoint construction failed."
                 ) from exc
             published = True
+            self._persistence_failed = False
             return response
         finally:
             if not published:
@@ -456,7 +497,13 @@ class AdapterGameServer:
             _ensure_session_open(record)
             status = session.advance_until_decision_or_terminal()
             record.started = True
-            record.commit_status(status, timestamp=self._timestamp())
+            record.commit_status(
+                status,
+                timestamp=self._timestamp(),
+                origin=SessionRevisionOrigin.noncommand(
+                    SessionNonCommandOrigin.LEGACY_ADVANCE_SESSION
+                ),
+            )
             return _status_response(
                 game_id=game_id,
                 status=status,
@@ -700,7 +747,7 @@ class AdapterGameServer:
         self.cursor_codec = original_cursor_codec.fork()
         published = False
         try:
-            response = self._apply_protocol_command(
+            response, from_cursor, to_cursor = self._apply_protocol_command(
                 record=staged,
                 envelope=envelope,
                 player_id=player_id,
@@ -720,17 +767,20 @@ class AdapterGameServer:
                     code="proposal_invalid",
                     message="Submitted proposal was invalid.",
                 )
+            entry = SessionCommandJournalEntry(
+                command_id=envelope.command_id,
+                principal_id=principal.principal_id,
+                authorization_context=viewer.authorization_context,
+                command_envelope=envelope,
+                envelope_fingerprint=fingerprint,
+                committed_session_revision=staged.session_revision,
+                status_code=response.status_code,
+                response_payload=response.payload,
+            )
             staged.record_command(
-                SessionCommandJournalEntry(
-                    command_id=envelope.command_id,
-                    principal_id=principal.principal_id,
-                    authorization_context=viewer.authorization_context,
-                    command_envelope=envelope,
-                    envelope_fingerprint=fingerprint,
-                    committed_session_revision=staged.session_revision,
-                    status_code=response.status_code,
-                    response_payload=response.payload,
-                )
+                entry,
+                from_cursor=from_cursor,
+                to_cursor=to_cursor,
             )
             self._sessions[record.session_id] = staged
             published = True
@@ -746,14 +796,27 @@ class AdapterGameServer:
         envelope: SessionCommandEnvelope,
         player_id: str,
         viewer: ViewerContext,
-    ) -> ServerResponse:
+    ) -> _SessionCommandResponse:
         kind = envelope.submission_kind
+        revision_origin = SessionRevisionOrigin.protocol_command(envelope)
         if kind is SessionCommandSubmissionKind.START_SESSION:
-            response = self._start_protocol_session(record=record, viewer=viewer)
+            response = self._start_protocol_session(
+                record=record,
+                viewer=viewer,
+                revision_origin=revision_origin,
+            )
         elif kind is SessionCommandSubmissionKind.ADVANCE_SESSION:
-            response = self._advance_protocol_session(record=record, viewer=viewer)
+            response = self._advance_protocol_session(
+                record=record,
+                viewer=viewer,
+                revision_origin=revision_origin,
+            )
         elif kind is SessionCommandSubmissionKind.CLOSE_SESSION:
-            response = self._close_protocol_session(record=record, viewer=viewer)
+            response = self._close_protocol_session(
+                record=record,
+                viewer=viewer,
+                revision_origin=revision_origin,
+            )
         else:
             _ensure_session_active(record)
             request_id = _command_request_id(envelope)
@@ -777,6 +840,7 @@ class AdapterGameServer:
                     },
                     require_started=True,
                     viewer=viewer,
+                    revision_origin=revision_origin,
                 )
                 operation = "submit_finite_decision"
             else:
@@ -793,6 +857,7 @@ class AdapterGameServer:
                     },
                     require_started=True,
                     viewer=viewer,
+                    revision_origin=revision_origin,
                 )
                 operation = "submit_parameterized_decision"
             response = _session_command_response(
@@ -803,13 +868,19 @@ class AdapterGameServer:
                 viewer=viewer,
                 cursor_codec=self.cursor_codec,
                 from_cursor=outcome.from_cursor,
+                attempt_status=outcome.status,
                 status_code=(
                     HTTPStatus.OK if outcome.accepted else HTTPStatus.UNPROCESSABLE_ENTITY
                 ),
             )
-        return _session_command_outcome_response(
-            command_id=envelope.command_id,
-            response=response,
+        command_response, from_cursor, to_cursor = response
+        return (
+            _session_command_outcome_response(
+                command_id=envelope.command_id,
+                response=command_response,
+            ),
+            from_cursor,
+            to_cursor,
         )
 
     def _create_protocol_session(
@@ -920,7 +991,8 @@ class AdapterGameServer:
         *,
         record: AuthoritativeSession,
         viewer: ViewerContext,
-    ) -> ServerResponse:
+        revision_origin: SessionRevisionOrigin,
+    ) -> _SessionCommandResponse:
         _ensure_session_open(record)
         if record.started:
             raise ServerApiError(
@@ -935,7 +1007,11 @@ class AdapterGameServer:
         )
         status = record.adapter_session.advance_until_decision_or_terminal()
         record.started = True
-        record.commit_status(status, timestamp=self._timestamp())
+        record.commit_status(
+            status,
+            timestamp=self._timestamp(),
+            origin=revision_origin,
+        )
         return _session_command_response(
             record=record,
             operation="start_session",
@@ -951,7 +1027,8 @@ class AdapterGameServer:
         *,
         record: AuthoritativeSession,
         viewer: ViewerContext,
-    ) -> ServerResponse:
+        revision_origin: SessionRevisionOrigin,
+    ) -> _SessionCommandResponse:
         _ensure_session_active(record)
         before = session_checkpoint(
             record=record,
@@ -959,7 +1036,11 @@ class AdapterGameServer:
             cursor_codec=self.cursor_codec,
         )
         status = record.adapter_session.advance_until_decision_or_terminal()
-        record.commit_status(status, timestamp=self._timestamp())
+        record.commit_status(
+            status,
+            timestamp=self._timestamp(),
+            origin=revision_origin,
+        )
         return _session_command_response(
             record=record,
             operation="advance_session",
@@ -975,14 +1056,15 @@ class AdapterGameServer:
         *,
         record: AuthoritativeSession,
         viewer: ViewerContext,
-    ) -> ServerResponse:
+        revision_origin: SessionRevisionOrigin,
+    ) -> _SessionCommandResponse:
         _ensure_session_open(record)
         before = session_checkpoint(
             record=record,
             viewer=viewer,
             cursor_codec=self.cursor_codec,
         )
-        record.close(timestamp=self._timestamp())
+        record.close(timestamp=self._timestamp(), origin=revision_origin)
         return _session_command_response(
             record=record,
             operation="close_session",
@@ -1009,6 +1091,9 @@ class AdapterGameServer:
             body=body,
             require_started=False,
             viewer=viewer,
+            revision_origin=SessionRevisionOrigin.noncommand(
+                SessionNonCommandOrigin.LEGACY_FINITE_DECISION
+            ),
         )
         return _status_response(
             game_id=game_id,
@@ -1025,6 +1110,7 @@ class AdapterGameServer:
         body: JsonValue,
         require_started: bool,
         viewer: ViewerContext,
+        revision_origin: SessionRevisionOrigin,
     ) -> _MutationOutcome:
         payload = _json_object("finite option submission body", body)
         _require_exact_keys(
@@ -1081,6 +1167,7 @@ class AdapterGameServer:
             status=status,
             record_count_before=record_count_before,
             timestamp=self._timestamp(),
+            revision_origin=revision_origin,
         )
         return _MutationOutcome(
             actor_id=actor_id,
@@ -1106,6 +1193,9 @@ class AdapterGameServer:
             body=body,
             require_started=False,
             viewer=viewer,
+            revision_origin=SessionRevisionOrigin.noncommand(
+                SessionNonCommandOrigin.LEGACY_PARAMETERIZED_DECISION
+            ),
         )
         return _status_response(
             game_id=game_id,
@@ -1122,6 +1212,7 @@ class AdapterGameServer:
         body: JsonValue,
         require_started: bool,
         viewer: ViewerContext,
+        revision_origin: SessionRevisionOrigin,
     ) -> _MutationOutcome:
         payload = _json_object("parameterized submission body", body)
         _require_exact_keys(
@@ -1179,6 +1270,7 @@ class AdapterGameServer:
             status=status,
             record_count_before=record_count_before,
             timestamp=self._timestamp(),
+            revision_origin=revision_origin,
         )
         return _MutationOutcome(
             actor_id=actor_id,
@@ -1271,81 +1363,6 @@ def _ensure_session_active(record: AuthoritativeSession) -> None:
         )
 
 
-def _drain_after_submission(
-    *,
-    session: AdapterGameSession,
-    status: LifecycleStatus,
-) -> LifecycleStatus:
-    if status.status_kind is not LifecycleStatusKind.ADVANCED:
-        return status
-    drained = session.advance_until_decision_or_terminal()
-    if drained.status_kind is LifecycleStatusKind.ADVANCED:
-        raise ServerApiError(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            code="drain_boundary_missing",
-            message="Session drain did not reach an adapter-visible boundary.",
-        )
-    return drained
-
-
-def _commit_submission_status(
-    *,
-    record: AuthoritativeSession,
-    session: AdapterGameSession,
-    status: LifecycleStatus,
-    record_count_before: int,
-    timestamp: str,
-) -> tuple[LifecycleStatus, bool, bool]:
-    committed = _decision_history_advanced(
-        record=record,
-        record_count_before=record_count_before,
-    )
-    accepted = _submission_was_applied(status=status, committed=committed)
-    committed_status = (
-        _drain_after_submission(session=session, status=status) if accepted else status
-    )
-    if committed:
-        record.commit_status(committed_status, timestamp=timestamp)
-    else:
-        record.observe_uncommitted_status(committed_status, timestamp=timestamp)
-    return committed_status, committed, accepted
-
-
-def _submission_was_applied(*, status: LifecycleStatus, committed: bool) -> bool:
-    if status.status_kind is LifecycleStatusKind.INVALID:
-        return False
-    if status.status_kind is LifecycleStatusKind.UNSUPPORTED:
-        return committed and _is_transition_budget_boundary(status)
-    if not committed:
-        raise SessionProtocolError("Accepted session submission was not recorded.")
-    return True
-
-
-def _is_transition_budget_boundary(status: LifecycleStatus) -> bool:
-    payload = status.payload
-    if not isinstance(payload, dict) or "unsupported_reason" not in payload:
-        return False
-    return payload["unsupported_reason"] == "transition_budget_exhausted"
-
-
-def _decision_record_count(record: AuthoritativeSession) -> int:
-    count = record.adapter_session.decision_record_count()
-    if type(count) is not int or count < 0:
-        raise SessionProtocolError("Session decision record count is invalid.")
-    return count
-
-
-def _decision_history_advanced(
-    *,
-    record: AuthoritativeSession,
-    record_count_before: int,
-) -> bool:
-    record_count_after = _decision_record_count(record)
-    if record_count_after < record_count_before:
-        raise SessionProtocolError("Session decision history moved backwards.")
-    return record_count_after > record_count_before
-
-
 def _session_metadata_response(
     *,
     record: AuthoritativeSession,
@@ -1365,41 +1382,6 @@ def _session_metadata_response(
                 ),
             )
         ),
-    )
-
-
-def _session_command_response(
-    *,
-    record: AuthoritativeSession,
-    operation: str,
-    committed: bool,
-    accepted: bool,
-    viewer: ViewerContext,
-    cursor_codec: SessionCursorCodec,
-    from_cursor: str,
-    status_code: HTTPStatus = HTTPStatus.OK,
-) -> ServerResponse:
-    checkpoint = session_checkpoint(
-        record=record,
-        viewer=viewer,
-        cursor_codec=cursor_codec,
-    )
-    metadata = session_metadata_payload(
-        record=record,
-        viewer=viewer,
-        cursor_codec=cursor_codec,
-    )
-    payload = session_command_result_payload(
-        operation=operation,
-        committed=committed,
-        accepted=accepted,
-        session=metadata,
-        checkpoint=checkpoint,
-        from_cursor=from_cursor,
-    )
-    return ServerResponse(
-        status_code=int(status_code),
-        payload=validate_json_value(cast(JsonValue, payload)),
     )
 
 

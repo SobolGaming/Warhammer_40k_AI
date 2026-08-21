@@ -37,6 +37,16 @@ class AdapterSessionIdentityPayload(TypedDict):
     source_hash: str
 
 
+class AdapterSessionHistoryPayload(TypedDict):
+    decision_records: list[JsonValue]
+    event_records: list[JsonValue]
+    rng_seed: str
+    rng_history: list[str]
+    rng_draw_count: int
+    checkpoint_hash: str
+    authoritative_state_hash: str
+
+
 @runtime_checkable
 class AdapterGameSession(Protocol):
     def fork(self) -> Self:
@@ -49,6 +59,10 @@ class AdapterGameSession(Protocol):
 
     def authoritative_identity_payload(self) -> AdapterSessionIdentityPayload:
         """Return exact engine-owned identities bound into a persistence checkpoint."""
+        ...
+
+    def authoritative_history_payload(self) -> AdapterSessionHistoryPayload:
+        """Return exact authoritative histories and hashes for revision commitments."""
         ...
 
     def start(self, config: GameConfig) -> LifecycleStatus:

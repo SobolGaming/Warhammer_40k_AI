@@ -132,15 +132,37 @@ checkpoints without these members retain their original hash and remain valid
 for their existing Primary authority use, but they cannot authorize new restored
 Secondary scoring evidence.
 
-Contract 10.2 adds the closed `session-persistence-v1-phase18l` operator
-artifact and the normative Phase 18L atomicity, recovery, authority-transfer,
-and no-visibility-widening semantics. The artifact binds the complete
-authoritative session/checkpoint and command journal to exact engine, build,
-ruleset, catalog, source, external-contract, authorization, cursor, RNG, replay,
-event, projection, and revision identities under one canonical state hash.
+Contract 10.2 adds the closed `session-persistence-v2-phase18l` operator
+artifact and the normative Phase 18L initialization, atomicity, recovery,
+authority-transfer, and no-visibility-widening semantics. The artifact binds the
+complete authoritative session/checkpoint and command journal to exact engine,
+runtime-tree build, ruleset, catalog, source, external-contract, authorization,
+cursor, RNG, replay, event, projection, and revision identities under one
+canonical state hash. Every revision from zero through the current revision also
+has an unpruned, domain-separated commitment. It records a typed command or
+non-command origin and binds exact decision/event/RNG prefixes, the resulting
+adapter and authoritative-state hashes, explicit `started`/`closed` lifecycle
+flags, journal response, and authenticated before/after cursor commitments. The
+flags preserve creation/start/final-close transition validation, and bounded
+revision snapshots can therefore be pruned without erasing the
+command-to-history evidence.
 Bearer credentials are not persisted. The protected cursor secret and registry
 are authority-private fields used only to preserve existing cursor validity and
 scope across restart.
+
+The SQLite reference store uses an explicit initialization operation that
+reserves a new database path with exclusive creation, then transactionally
+installs its exact schema and first complete root. An interrupted or rejected
+initialization leaves no loadable empty authority: reinitialization refuses the
+existing path until the operator deliberately repairs or replaces it. Ordinary
+load and commit operations require an already initialized database with exactly
+one singleton row. While holding `BEGIN IMMEDIATE`, the store validates WAL mode,
+`user_version = 2`, the exact STRICT table definition and column metadata, and
+the absence of unexpected schema objects, indexes, foreign keys, views, or
+triggers. It validates the old row, writes the new one, and compares an exact
+read-back before the transaction can commit. A missing file, missing row, stale
+schema, suppressed write, or rewritten write is an error, never implicit first
+boot.
 
 This new family is intentionally absent from OpenAPI paths and client-visible
 components. It is a storage/interchange contract for trusted operators, not an
@@ -148,6 +170,13 @@ HTTP request, response, replay-viewer feed, or alternate mutation API. Existing
 Contract 10.1 HTTP payload families and operations are unchanged; the additive
 bundle minor lets deployment and conformance tooling discover the new schema
 and deterministic example without making it safe to expose.
+
+The artifact hash, revision commitments, SQLite content hash, and runtime-tree
+fingerprint provide deterministic internal consistency and build-drift checks.
+They are not keyed attestations and do not protect against a malicious actor who
+can rewrite the complete database, recompute all hashes, or replace it with an
+older valid copy. Deployments with adversarial-writer or rollback threats need a
+separate trusted monotonic, signed, or append-only anchor outside this store.
 
 The scoring-state registry is inverse-complete: every Objective Control
 boundary with at least one applicable assigned-Primary rule has exactly one row
@@ -202,10 +231,13 @@ evidence is present.
 Run:
 
 ```bash
+uv run --no-sync python scripts/build_engine_build_identity.py --check
 uv run --no-sync python scripts/build_external_contract.py --check
 ```
 
-The check fails if schemas are invalid, examples drift, OpenAPI references a
+The first check fails when the generated runtime-resource inventory or any
+packaged Python/JSON/schema content drifts. The contract check fails if schemas
+are invalid, examples drift, OpenAPI references a
 non-canonical definition, registered decision metadata or proposal coverage
 drifts, a bundle hash changes without regeneration, or a breaking public-shape
 change is made without the required contract-version change. Pull-request CI
@@ -227,8 +259,12 @@ To refresh deterministic fixtures and the manifest after an intentional
 compatible change:
 
 ```bash
+uv run python scripts/build_engine_build_identity.py
 uv run python scripts/build_external_contract.py
 ```
+
+The build-identity generator runs first because session/support-profile examples
+publish its verified immutable runtime-tree ID.
 
 `--write-baseline --base-ref <sha>` writes the first baseline of an explicitly
 reviewed compatibility major. It may refresh that baseline until it appears on

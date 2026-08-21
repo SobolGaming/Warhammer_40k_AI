@@ -250,9 +250,10 @@ The shared contract uses these objects and payloads:
   viewer-safe projection, source-hashed catalog projection, viewer-scoped event
   deltas, finite submissions, and parameterized payload submissions.
 - `SessionPersistenceArtifact`: closed, content-addressed operator-only root
-  containing build/contract identities, authorization bindings, protected
-  cursor state, complete authoritative sessions, the game/session index, and
-  one canonical content hash. It is not adapter-visible wire state.
+  containing the verified runtime-tree build identity, contract identities,
+  authorization bindings, protected cursor state, complete authoritative
+  sessions and unpruned revision commitments, the game/session index, and one
+  canonical content hash. It is not adapter-visible wire state.
 - `LocalGameSession` persistence checkpoint: adapter-owned recovery payload
   binding the current lifecycle, optional initial replay lifecycle, source
   identity, RNG state, latest replay artifact, and deterministic lifecycle,
@@ -394,7 +395,9 @@ Relevant modules:
 - `src/warhammer40k_core/adapters/local_session.py`
 - `src/warhammer40k_core/adapters/server.py`
 - `src/warhammer40k_core/adapters/session_persistence.py`
+- `src/warhammer40k_core/adapters/session_revision.py`
 - `src/warhammer40k_core/adapters/session_recovery.py`
+- `src/warhammer40k_core/build_identity.py`
 - `src/warhammer40k_core/engine/decision_request.py`
 - `src/warhammer40k_core/engine/player_army_list.py`
 - `src/warhammer40k_core/engine/army_mustering.py`
@@ -489,7 +492,7 @@ reference server currently requires:
 - `session-create-v4`, `session-metadata-v10-contract`,
   `session-command-result-v10-contract`, and `session-command-outcome-v10-contract` for the
   authenticated formal session protocol;
-- `session-persistence-v1-phase18l` for the closed operator-only durable server
+- `session-persistence-v2-phase18l` for the closed operator-only durable server
   artifact. It is included in the Contract 10.2 schema bundle and examples but
   deliberately absent from OpenAPI operations and client payloads;
 - `capability-manifest-v2-directed-primary` inside
@@ -3861,13 +3864,22 @@ use the replay route as a live information feed.
 ## Formal Phase 18L Persistence and Recovery
 
 The reference server persists one closed
-`session-persistence-v1-phase18l` operator artifact. The root contains exact
+`session-persistence-v2-phase18l` operator artifact. The root contains exact
 server/engine-build/external-contract/persistence-schema identities, the
 principal binding set and authorization epoch, protected cursor secret and
 token registry, retention policy, complete authoritative sessions, and the
 game/session index. A canonical `content_hash` covers every preceding state
 member and excludes only itself. Bearer credentials are never serialized, and
 this artifact is not served by an OpenAPI operation.
+
+The semantic package `engine_version` is not a build identity. The separate
+`engine_build_id` is
+`warhammer40k-core-v2:runtime-tree-sha256-v1:<sha256>` and comes from a generated
+manifest of the complete authoritative packaged Python, JSON, `py.typed`, and
+contract-schema resource inventory. The runtime verifies that manifest before
+publishing its identity. Missing manifest data or a dirty resource tree fails
+closed, and recovery rejects another build even when both builds use the same
+package version.
 
 Session persistence includes normalized game configuration and exact ruleset,
 overlay, catalog, and source-package identities; deterministic RNG state;
@@ -3879,17 +3891,53 @@ operator wrapper object is closed and versioned. Engine-private lifecycle
 content still passes its typed fail-fast runtime loader; schema acceptance
 alone does not authorize recovery.
 
-Creation is durably committed before a new session enters the server registry.
+Every revision from zero through the current head has an unpruned
+`session-revision-commitment-v2` row. It commits to the previous revision,
+typed command or non-command origin, exact decision/event/RNG prefixes,
+adapter checkpoint, viewer-independent authoritative state, explicit `started`
+and `closed` flags, journal entry and response when applicable, and
+authenticated before/after cursor states. Those flags keep creation, start, and
+final close transition semantics verifiable after their full snapshots are
+pruned.
+Recovery recomputes the chain against current authoritative history, checks
+retained snapshots exactly, requires each protocol-command revision to have its
+one matching journal entry, validates its envelope against the resulting
+`DecisionRecord`, and recomputes retained response projections and cursor
+positions. Pruning a full historical snapshot does not prune the revision or
+idempotency commitment.
+
+Store creation is an explicit operation, separate from recovery. A server
+constructed with a store always requires an initialized root; a missing file or
+singleton row is corruption/storage loss, never an empty first boot. A new
+server invokes `initialize_persistence(...)` against empty in-memory state and
+an exclusively reserved database path, then transactionally installs the exact
+schema and initial empty root before accepting sessions. An interrupted
+initialization leaves a non-loadable path that requires deliberate operator
+repair or replacement; it is not inferred as a fresh authority. Session
+creation is then durably committed before the new session enters the server
+registry.
+
 For a mutation, the server stages the facade, journal outcome, revision
-snapshots, and cursor registry, commits them in one durable transaction, then
-replaces the in-memory authority and publishes the response. A crash before
-the transaction therefore exposes only the previous complete revision. A crash
-after it recovers the new revision and returns the persisted byte-equivalent
-public outcome for an exact command retry.
+snapshots and commitment, and cursor registry, commits them in one durable
+transaction, then replaces the in-memory authority and publishes the response.
+It arms fail-stop state before calling the store and clears it only after
+successful return, including normalization of custom-store `OSError` and
+`RuntimeError` commit failures. A crash before the transaction therefore
+exposes only the previous complete revision. A crash after it recovers the new
+revision and returns the persisted byte-equivalent public outcome for an exact
+command retry.
+
+The SQLite v2 implementation holds `BEGIN IMMEDIATE` while validating WAL mode,
+`user_version = 2`, the exact STRICT singleton table and constraints, and the
+absence of unexpected tables, indexes, foreign keys, views, or triggers. It
+validates the old row, writes, then selects and compares the exact new row before
+commit. Suppressed or rewritten writes, a deleted singleton row, schema drift,
+or a schema mutation racing the write cannot be reported as successful.
 
 Recovery validates schema, root and checkpoint hashes, package/ruleset/catalog/
 source identities, engine/build/contract versions, principal bindings, cursor
-authentication, and the game/session index before registering anything. It
+authentication, the full revision chain, and the game/session index before
+registering anything. It
 loads the latest adapter checkpoint, replays its accepted decision tail through
 the adapter-owned recovery path and ultimately `GameLifecycle.submit_decision(...)`,
 restores and cross-validates the command journal without reapplying command
@@ -3903,6 +3951,15 @@ commands. Immutable viewer-scoped projections may serve reads. Failover may
 transfer ownership only at a verified checkpoint/replay boundary, with exact
 role, player, authorization-epoch, cursor-scope, retention, and finalization
 state so recovery cannot widen visibility.
+
+These content hashes, revision commitments, and build fingerprints are an
+internal-consistency boundary. They detect accidental corruption, partial
+writes, history mismatches, and runtime drift; they are not keyed storage
+attestations. A malicious database writer can rewrite a complete coherent
+artifact, and an older valid database can be rolled back undetectably without
+state outside that database. Deployments that include either threat need a
+trusted external monotonic, signed, or append-only anchor. Phase 18L does not
+claim malicious-writer or rollback resistance.
 
 ## Suggested Adapter Loop
 

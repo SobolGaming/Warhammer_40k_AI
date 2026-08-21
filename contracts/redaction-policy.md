@@ -121,8 +121,9 @@ cursor scope and invalidates previously issued cursors. Delayed spectators read 
 they do not receive current hidden state with fields merely omitted.
 
 The Phase 18L persistence artifact, cursor signing secret, protected cursor
-registry, authoritative checkpoints, unredacted revision snapshots, command
-journal, and recovery diagnostics are operator-only. They must never appear in
+registry, authoritative checkpoints, unredacted revision snapshots, revision
+commitments, command journal, and recovery diagnostics are operator-only. They
+must never appear in
 a projection, status, event page, error body, support profile, replay-viewer
 response, or any derived count or hash beyond the existing viewer-scoped public
 commitments. Public corruption/drift errors use stable text and must not echo a

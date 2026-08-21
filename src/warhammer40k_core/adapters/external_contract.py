@@ -27,7 +27,7 @@ SESSION_COMMAND_ENVELOPE_SCHEMA_VERSION = "session-command-envelope-v1"
 SESSION_COMMAND_OUTCOME_SCHEMA_VERSION = "session-command-outcome-v10-contract"
 SESSION_CREATE_SCHEMA_VERSION = "session-create-v4"
 SESSION_METADATA_SCHEMA_VERSION = "session-metadata-v10-contract"
-SESSION_PERSISTENCE_SCHEMA_VERSION = "session-persistence-v1-phase18l"
+SESSION_PERSISTENCE_SCHEMA_VERSION = "session-persistence-v2-phase18l"
 SESSION_PROJECTION_SCHEMA_VERSION = "session-projection-v7-phase17n-step4"
 
 CREATE_SESSION_SCHEMA_NAME = "create-session.schema.json"

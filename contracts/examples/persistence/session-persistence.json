@@ -34,7 +34,7 @@
       }
     ]
   },
-  "content_hash": "a7fcdb5ab72f94bbbd2caf67c47d1e6b033a8b5720220448213fca10a45a4ead",
+  "content_hash": "9040305985ba76aeb2e21713d1115bedd8889d082331825333af1b5eb30dd56d",
   "cursor_codec": {
     "cursors": [
       {
@@ -92,7 +92,7 @@
     ],
     "secret_hex": "636f72652d76322d636f6e74726163742d70657273697374656e63652d637572736f722d6b6579"
   },
-  "engine_build_id": "warhammer40k-core-v2:0.1.0",
+  "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:922e13745af85f9a3986dfdf4d586b41e367b92e72a90c3d69d370875ee829a2",
   "engine_version": "0.1.0",
   "event_retention_limit": 4096,
   "external_contract_version": "10.2.0",
@@ -102,7 +102,7 @@
       "session_id": "session-phase18l-contract-persistence"
     }
   ],
-  "schema_version": "session-persistence-v1-phase18l",
+  "schema_version": "session-persistence-v2-phase18l",
   "sessions": [
     {
       "adapter_session": {
@@ -14305,7 +14305,7 @@
             "session": {
               "catalog_id": "phase9a-canonical",
               "created_at": "2026-08-21T16:00:00Z",
-              "engine_build_id": "warhammer40k-core-v2:0.1.0",
+              "engine_build_id": "warhammer40k-core-v2:runtime-tree-sha256-v1:922e13745af85f9a3986dfdf4d586b41e367b92e72a90c3d69d370875ee829a2",
               "engine_version": "0.1.0",
               "event_cursor": "388W53mqNJ9kUCV-Fj9fODjzD11j4q3iMJSAvsKPs-8cRXX5bVPD1YUATMEGNWi2",
               "game_id": "phase18l-contract-persistence",
@@ -14352,6 +14352,7 @@
       "cursor_registry_finalized": false,
       "event_retention_limit": 4096,
       "game_id": "phase18l-contract-persistence",
+      "history_head": "d938574ce08a6d148e7173b2593e38c28e581a94e95859bdbf0d958547e38445",
       "last_activity_at": "2026-08-21T16:00:00Z",
       "lifecycle_status": {
         "decision_request": {
@@ -14419,6 +14420,102 @@
       "player_ids": [
         "player-a",
         "player-b"
+      ],
+      "revision_history": [
+        {
+          "authoritative_session_hash": "c38eb540cf17b11566cbfa75adbb082d964860608d03a09f9c30e817d064fb86",
+          "authoritative_state_hash": "07d8cdd70c07333c8179c655d19d0afbfc93e7ef3e6753d6bd58a81b665ac70e",
+          "checkpoint_hash": "c812d091778ab6f9bf720416c263f36b10bdca3345bfb7e1339d2c69f1510603",
+          "closed": false,
+          "decision_count": 0,
+          "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
+          "event_count": 1,
+          "event_records_hash": "1858af3429e0325c3ee15421eefe6115a7689f4415236eea94686b72808bde66",
+          "from_cursor": null,
+          "journal_entry_hash": null,
+          "origin": {
+            "command_envelope": null,
+            "envelope_fingerprint": null,
+            "operation": "session_created",
+            "origin_kind": "noncommand"
+          },
+          "previous_revision_commitment": null,
+          "response_hash": null,
+          "revision_commitment": "0c36c036d97a28a0a03637db4d6849e1cb7872f6e748052c6b71bfbf4a7a8671",
+          "rng_draw_count": 0,
+          "rng_history_count": 1,
+          "rng_history_hash": "10a4a308c4fb6572a61f45013b44f29472aacf7a4e5b9278b520218a02112bbc",
+          "rng_state_hash": "621d908ff04d388d0188ab1e6d34fa550fc99ef54410cd595518ce2a83a65616",
+          "schema_version": "session-revision-commitment-v2",
+          "session_id": "session-phase18l-contract-persistence",
+          "session_revision": 0,
+          "started": false,
+          "to_cursor": null
+        },
+        {
+          "authoritative_session_hash": "8635775287d84aa963eb2c53bf0424b848dd9e8d1b5eb3e40fdc719f1dbb1ceb",
+          "authoritative_state_hash": "7f6a943fdbebc7b25b06f2598a353a6129c7788c0464800bfab1e6d1bb6c45ae",
+          "checkpoint_hash": "1c80333f23471d132f852f109ad276ae960bf0d89771eed0f27e73b63f1b0d22",
+          "closed": false,
+          "decision_count": 0,
+          "decision_records_hash": "bb1abcdc69a9d832cbef84467ab747b2f5f0fff5460be869066cfb1a6949990a",
+          "event_count": 9,
+          "event_records_hash": "a54cf345827bd75e7d6fd059f7c6ef8b6ef79bec570483764b1594b16d829d04",
+          "from_cursor": {
+            "cursor": {
+              "c": "administrator:shared:0:0",
+              "h": "d4a7fb8e20c70cdc4dfa2ded6bdacbb4efa414e7e671401ef3a0cc3cc8780d13",
+              "o": 1,
+              "p": "principal-administrator",
+              "q": 1,
+              "r": 0,
+              "s": "session-phase18l-contract-persistence",
+              "v": 1
+            },
+            "token": "YZJA38OJu5UyOZl4J5q7ELsstxFF_7eq5djAo-dtBx66u9ie5C6doHWxiFyJT5O1"
+          },
+          "journal_entry_hash": "8c1215e09ffe49382ef8a5b782e607cd339568dc00c8bff86a3dd9bbbb5253cc",
+          "origin": {
+            "command_envelope": {
+              "command_id": "phase18l-contract-start-000001",
+              "expected_session_revision": 0,
+              "request_id": null,
+              "result_id": null,
+              "schema_version": "session-command-envelope-v1",
+              "session_id": "session-phase18l-contract-persistence",
+              "submission": {
+                "submission_kind": "start_session"
+              }
+            },
+            "envelope_fingerprint": "9d97b1a080df78a044c340aa6ed6bb5b7ee1686cd13b5d6989cd06f43270512a",
+            "operation": "start_session",
+            "origin_kind": "protocol_command"
+          },
+          "previous_revision_commitment": "0c36c036d97a28a0a03637db4d6849e1cb7872f6e748052c6b71bfbf4a7a8671",
+          "response_hash": "2e9e4f05fc8d5e5156a93cec71189d7a9b3d310c21dae35cf3b4872e7081045c",
+          "revision_commitment": "d938574ce08a6d148e7173b2593e38c28e581a94e95859bdbf0d958547e38445",
+          "rng_draw_count": 0,
+          "rng_history_count": 10,
+          "rng_history_hash": "1f0eb0a254f87b110c185b5c19aeeb3caf0e4b654229473de740ca2157b726eb",
+          "rng_state_hash": "4e918802f57a7912b0acddf27c8168e239e3fe86acff1ab2b1999500ec734c3a",
+          "schema_version": "session-revision-commitment-v2",
+          "session_id": "session-phase18l-contract-persistence",
+          "session_revision": 1,
+          "started": true,
+          "to_cursor": {
+            "cursor": {
+              "c": "administrator:shared:0:0",
+              "h": "ff15bdb0c68b57f7b0676b367f116913f9d06a964b7b7df4bbc40d4e10b74adf",
+              "o": 9,
+              "p": "principal-administrator",
+              "q": 9,
+              "r": 1,
+              "s": "session-phase18l-contract-persistence",
+              "v": 1
+            },
+            "token": "388W53mqNJ9kUCV-Fj9fODjzD11j4q3iMJSAvsKPs-8cRXX5bVPD1YUATMEGNWi2"
+          }
+        }
       ],
       "revision_retention_limit": 128,
       "revision_snapshots": [
