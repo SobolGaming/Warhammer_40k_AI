@@ -65,6 +65,95 @@ def test_base_overlap_and_distance_are_deterministic() -> None:
     assert not bases_overlap(first, first_pose, second, separated_pose)
 
 
+def test_base_footprint_cache_is_value_keyed_and_canonical_for_2d_geometry() -> None:
+    base = OvalBase(length=4.0, width=2.0)
+    pose = Pose.at(1.0, 2.0, z=3.0, facing_degrees=4.0)
+
+    first = shapely_backend.footprint_for_base(base, pose)
+    equal_value = shapely_backend.footprint_for_base(
+        OvalBase(length=4.0, width=2.0),
+        Pose.at(1.0, 2.0, z=3.0, facing_degrees=4.0),
+    )
+    changed_height = shapely_backend.footprint_for_base(
+        base,
+        Pose.at(1.0, 2.0, z=3.1, facing_degrees=4.0),
+    )
+    circular = shapely_backend.footprint_for_base(
+        CircularBase(radius=2.0),
+        Pose.at(1.0, 2.0, z=3.0, facing_degrees=4.0),
+    )
+    rotated_circular = shapely_backend.footprint_for_base(
+        CircularBase(radius=2.0),
+        Pose.at(1.0, 2.0, z=9.0, facing_degrees=94.0),
+    )
+
+    assert equal_value is first
+    assert changed_height is first
+    assert rotated_circular is circular
+
+    changed_footprints = (
+        shapely_backend.footprint_for_base(
+            OvalBase(length=4.1, width=2.0),
+            pose,
+        ),
+        shapely_backend.footprint_for_base(
+            OvalBase(length=4.0, width=2.1),
+            pose,
+        ),
+        shapely_backend.footprint_for_base(
+            RectangularBase(length=4.0, width=2.0),
+            pose,
+        ),
+        shapely_backend.footprint_for_base(base, Pose.at(1.1, 2.0, z=3.0, facing_degrees=4.0)),
+        shapely_backend.footprint_for_base(base, Pose.at(1.0, 2.1, z=3.0, facing_degrees=4.0)),
+        shapely_backend.footprint_for_base(base, Pose.at(1.0, 2.0, z=3.0, facing_degrees=4.1)),
+    )
+
+    assert all(footprint is not first for footprint in changed_footprints)
+
+
+def test_polygon_union_footprint_cache_reuses_canonical_values_and_misses_changes() -> None:
+    polygons = (
+        ((0.0, 0.0), (4.0, 0.0), (4.0, 4.0), (0.0, 4.0)),
+        ((4.0, 0.0), (8.0, 0.0), (8.0, 4.0), (4.0, 4.0)),
+    )
+
+    first = shapely_backend.footprint_for_polygon_union(polygons)
+    equal_value = shapely_backend.footprint_for_polygon_union(
+        tuple(tuple((x, y) for x, y in polygon) for polygon in polygons)
+    )
+    changed = shapely_backend.footprint_for_polygon_union(
+        (
+            polygons[0],
+            ((4.0, 0.0), (8.1, 0.0), (8.0, 4.0), (4.0, 4.0)),
+        )
+    )
+
+    assert equal_value is first
+    assert changed is not first
+
+
+def test_footprint_caches_preserve_public_invalid_diagnostics_without_caching_errors() -> None:
+    for _ in range(2):
+        with pytest.raises(GeometryError, match=r"base must be a BaseShape\."):
+            shapely_backend.footprint_for_base(
+                cast(BaseShape, "not-a-base"),
+                Pose.at(0.0, 0.0),
+            )
+        with pytest.raises(GeometryError, match=r"pose must be a Pose\."):
+            shapely_backend.footprint_for_base(
+                CircularBase(radius=1.0),
+                cast(Pose, "not-a-pose"),
+            )
+        with pytest.raises(
+            GeometryError,
+            match=r"polygon union member 0 must contain at least three points\.",
+        ):
+            shapely_backend.footprint_for_polygon_union((((0.0, 0.0), (1.0, 0.0)),))
+        with pytest.raises(GeometryError, match=r"polygon union must be a non-empty tuple\."):
+            shapely_backend.footprint_for_polygon_union(())
+
+
 def test_deployment_zone_footprint_intersection_uses_shape_not_bounds() -> None:
     triangular_zone = DeploymentZone(
         deployment_zone_id="triangle",

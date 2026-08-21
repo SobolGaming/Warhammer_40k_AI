@@ -88,6 +88,84 @@ def certification_unit_selections(*, player_id: str) -> tuple[UnitMusterSelectio
     )
 
 
+def certification_unit_selections_for_row(
+    row: SecondaryMissionLifecycleCertificationRow,
+    *,
+    player_id: str,
+) -> tuple[UnitMusterSelection, ...]:
+    if row.secondary_mission_id not in {*_DESTRUCTION_SEEDERS, *_SEEDERS}:
+        raise AssertionError(
+            "Step 6G matrix roster has no fixture for Secondary mission "
+            f"{row.secondary_mission_id}."
+        )
+    if player_id not in {"player-a", "player-b"}:
+        raise AssertionError(f"Step 6G matrix roster has unsupported player {player_id}.")
+
+    scoring_intercessor_counts = {
+        "engage-on-all-fronts": 4,
+        "outflank": 2,
+        "secure-no-mans-land": 2,
+    }
+    intercessor_count = (
+        scoring_intercessor_counts.get(row.secondary_mission_id, 1)
+        if player_id == row.scoring_player_id
+        else 1
+    )
+    prefix = "a" if player_id == "player-a" else "b"
+    selections = tuple(
+        default_unit_selection(f"intercessor-unit-{prefix}{index}")
+        for index in range(1, intercessor_count + 1)
+    )
+    if player_id == row.scoring_player_id:
+        return selections
+
+    destruction_target_specs = {
+        "a-grievous-blow": (
+            "horde-unit",
+            "core-boyz-like-infantry",
+            "core-boyz-like",
+            20,
+        ),
+        "assassination": (
+            "character-unit",
+            "core-character-leader",
+            "core-character-leader",
+            1,
+        ),
+        "bring-it-down": (
+            "vehicle-unit",
+            "core-vehicle-monster",
+            "core-vehicle-monster",
+            1,
+        ),
+        "no-prisoners": (
+            "vehicle-unit",
+            "core-vehicle-monster",
+            "core-vehicle-monster",
+            1,
+        ),
+        "overwhelming-force": (
+            "vehicle-unit",
+            "core-vehicle-monster",
+            "core-vehicle-monster",
+            1,
+        ),
+    }
+    target_spec = destruction_target_specs.get(row.secondary_mission_id)
+    if target_spec is None:
+        return selections
+    selection_prefix, datasheet_id, model_profile_id, model_count = target_spec
+    return (
+        *selections,
+        unit_selection(
+            unit_selection_id=f"{selection_prefix}-{prefix}",
+            datasheet_id=datasheet_id,
+            model_profile_id=model_profile_id,
+            model_count=model_count,
+        ),
+    )
+
+
 def active_player_id_for_row(row: SecondaryMissionLifecycleCertificationRow) -> str:
     if row.secondary_mission_id in _OPPONENT_TURN_CARD_IDS:
         return opponent_player_id(row.scoring_player_id)
@@ -855,6 +933,7 @@ __all__ = [
     "SecondaryPositiveExpectation",
     "active_player_id_for_row",
     "certification_unit_selections",
+    "certification_unit_selections_for_row",
     "opponent_player_id",
     "seed_positive_secondary_condition",
     "seed_sequential_tactical_turn_cap_conditions",
