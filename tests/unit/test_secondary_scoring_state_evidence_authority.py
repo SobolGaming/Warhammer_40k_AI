@@ -6,13 +6,13 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.phase11c_command_phase_helpers import default_unit_selection, unit_selection
 from tests.phase17n_primary_mission_helpers import (
     phase17n_event_setup,
     phase17n_state_with_setup,
 )
 from tests.phase17n_secondary_certification_fixtures import (
     active_player_id_for_row,
-    certification_unit_selections,
     seed_positive_secondary_condition,
 )
 from tests.phase17n_secondary_mission_helpers import (
@@ -30,6 +30,7 @@ from warhammer40k_core.engine.game_state import (
     SecondaryMissionMode,
 )
 from warhammer40k_core.engine.game_state_payloads import GameStatePayload
+from warhammer40k_core.engine.list_validation import UnitMusterSelection
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_battlefield_departure import (
     PrimaryBattlefieldDepartureState,
@@ -585,6 +586,7 @@ def test_beacon_selection_cannot_be_rehashed_to_an_unselected_unit() -> None:
 
     def place_second_valid_beacon_unit(state: GameState) -> None:
         units = _intercessors(state, player_id=_SCORING_PLAYER_ID)
+        assert len(units) == 2
         selected_unit_ids["selected"] = units[0].unit_instance_id
         selected_unit_ids["fabricated"] = units[1].unit_instance_id
         _place_near_unit(
@@ -643,8 +645,14 @@ def _scored_secondary_state(
         active_player_id=active_player_id_for_row(row),
         phase=BattlePhase.FIGHT,
         battle_round=2,
-        player_a_units=certification_unit_selections(player_id="player-a"),
-        player_b_units=certification_unit_selections(player_id="player-b"),
+        player_a_units=_authority_unit_selections(
+            secondary_mission_id=secondary_mission_id,
+            player_id="player-a",
+        ),
+        player_b_units=_authority_unit_selections(
+            secondary_mission_id=secondary_mission_id,
+            player_id="player-b",
+        ),
         player_a_secondary=SecondaryMissionMode.TACTICAL,
     )
     state.secondary_mission_choices = [
@@ -688,6 +696,52 @@ def _scored_secondary_state(
         event_log=decisions.event_log,
     )
     return state
+
+
+def _authority_unit_selections(
+    *,
+    secondary_mission_id: str,
+    player_id: str,
+) -> tuple[UnitMusterSelection, ...]:
+    prefix = "a" if player_id == "player-a" else "b"
+    intercessor_count_by_mission = {
+        "beacon": 2 if player_id == _SCORING_PLAYER_ID else 1,
+        "bring-it-down": 1,
+        "cleanse": 1,
+        "engage-on-all-fronts": 4 if player_id == _SCORING_PLAYER_ID else 1,
+    }
+    intercessor_count = intercessor_count_by_mission[secondary_mission_id]
+    selections = [
+        default_unit_selection(f"intercessor-unit-{prefix}{index}")
+        for index in range(1, intercessor_count + 1)
+    ]
+    if secondary_mission_id == "engage-on-all-fronts" and player_id == _SCORING_PLAYER_ID:
+        selections.append(
+            unit_selection(
+                unit_selection_id="character-unit-a",
+                datasheet_id="core-character-leader",
+                model_profile_id="core-character-leader",
+                model_count=1,
+            )
+        )
+    if secondary_mission_id == "bring-it-down" and player_id != _SCORING_PLAYER_ID:
+        selections.extend(
+            (
+                unit_selection(
+                    unit_selection_id="character-unit-b",
+                    datasheet_id="core-character-leader",
+                    model_profile_id="core-character-leader",
+                    model_count=1,
+                ),
+                unit_selection(
+                    unit_selection_id="vehicle-unit-b",
+                    datasheet_id="core-vehicle-monster",
+                    model_profile_id="core-vehicle-monster",
+                    model_count=1,
+                ),
+            )
+        )
+    return tuple(selections)
 
 
 def _coordinated_rehash(
@@ -866,6 +920,7 @@ def _required_string_list(value: object, *, name: str) -> list[str]:
 
 def _reduce_engage_presence_to_three_quarters(state: GameState) -> None:
     units = _intercessors(state, player_id=_SCORING_PLAYER_ID)
+    assert len(units) == 4
     _place_near_unit(
         state,
         moving_unit_id=units[3].unit_instance_id,
@@ -925,5 +980,5 @@ def _intercessors(state: GameState, *, player_id: str) -> tuple[UnitInstance, ..
         for unit in army_matches[0].units
         if unit.datasheet_id == "core-intercessor-like-infantry"
     )
-    assert len(units) == 4
+    assert units
     return units

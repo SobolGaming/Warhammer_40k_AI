@@ -25,9 +25,13 @@ if TYPE_CHECKING:
     from warhammer40k_core.geometry.volume import Model
 
 _FOOTPRINT_QUAD_SEGS = 64
+_FOOTPRINT_CACHE_MAXSIZE = 4096
 _EPSILON = 1e-9
 _cached_geometry_module: _GeometryModule | None = None
 _cached_affinity_module: _AffinityModule | None = None
+
+type _BaseFootprintKey = tuple[str, float, float | None, float, float, float]
+type _PolygonUnionFootprintKey = tuple[tuple[Point2D, ...], ...]
 
 
 class _Geometry(Protocol):
@@ -97,39 +101,31 @@ def footprint_for_base(base: BaseShape, pose: Pose) -> _Geometry:
 
     valid_base = validate_base_shape("base", base)
     valid_pose = validate_pose("pose", pose)
-    geometry = _geometry_module()
-    origin = (valid_pose.position.x, valid_pose.position.y)
-
+    dimensions: tuple[float, float | None]
     if type(valid_base) is CircularBase:
-        return geometry.Point(*origin).buffer(valid_base.radius, quad_segs=_FOOTPRINT_QUAD_SEGS)
-    if type(valid_base) is OvalBase:
-        unit_circle = geometry.Point(*origin).buffer(1.0, quad_segs=_FOOTPRINT_QUAD_SEGS)
-        scaled = _affinity_module().scale(
-            unit_circle,
-            xfact=valid_base.length / 2.0,
-            yfact=valid_base.width / 2.0,
-            origin=origin,
+        dimensions = (valid_base.radius, None)
+        base_kind = "circular"
+        facing_degrees = 0.0
+    elif type(valid_base) is OvalBase:
+        dimensions = (valid_base.length, valid_base.width)
+        base_kind = "oval"
+        facing_degrees = valid_pose.facing.degrees
+    elif type(valid_base) is RectangularBase:
+        dimensions = (valid_base.length, valid_base.width)
+        base_kind = "rectangular"
+        facing_degrees = valid_pose.facing.degrees
+    else:
+        raise GeometryError("Unsupported BaseShape for Shapely footprint.")
+    return _cached_base_footprint(
+        (
+            base_kind,
+            dimensions[0],
+            dimensions[1],
+            valid_pose.position.x,
+            valid_pose.position.y,
+            facing_degrees,
         )
-        return _affinity_module().rotate(
-            scaled,
-            angle=valid_pose.facing.degrees,
-            origin=origin,
-        )
-    if type(valid_base) is RectangularBase:
-        half_length = valid_base.length / 2.0
-        half_width = valid_base.width / 2.0
-        rectangle = geometry.box(
-            origin[0] - half_length,
-            origin[1] - half_width,
-            origin[0] + half_length,
-            origin[1] + half_width,
-        )
-        return _affinity_module().rotate(
-            rectangle,
-            angle=valid_pose.facing.degrees,
-            origin=origin,
-        )
-    raise GeometryError("Unsupported BaseShape for Shapely footprint.")
+    )
 
 
 def footprint_for_terrain(terrain: TerrainVolume) -> _Geometry:
@@ -181,10 +177,58 @@ def footprint_for_polygon_union(
 ) -> _Geometry:
     if type(polygons) is not tuple or not polygons:
         raise GeometryError("polygon union must be a non-empty tuple.")
-    footprints = tuple(
-        footprint_for_polygon(_validate_polygon(f"polygon union member {index}", polygon))
+    validated_polygons = tuple(
+        _validate_polygon(f"polygon union member {index}", polygon)
         for index, polygon in enumerate(cast(tuple[object, ...], polygons))
     )
+    return _cached_polygon_union_footprint(validated_polygons)
+
+
+@lru_cache(maxsize=_FOOTPRINT_CACHE_MAXSIZE)
+def _cached_base_footprint(key: _BaseFootprintKey) -> _Geometry:
+    base_kind, first_dimension, second_dimension, x, y, facing_degrees = key
+    geometry = _geometry_module()
+    origin = (x, y)
+    if base_kind == "circular":
+        return geometry.Point(*origin).buffer(
+            first_dimension,
+            quad_segs=_FOOTPRINT_QUAD_SEGS,
+        )
+    if second_dimension is None:
+        raise GeometryError("Non-circular cached base footprint must include two dimensions.")
+    if base_kind == "oval":
+        unit_circle = geometry.Point(*origin).buffer(1.0, quad_segs=_FOOTPRINT_QUAD_SEGS)
+        scaled = _affinity_module().scale(
+            unit_circle,
+            xfact=first_dimension / 2.0,
+            yfact=second_dimension / 2.0,
+            origin=origin,
+        )
+        return _affinity_module().rotate(
+            scaled,
+            angle=facing_degrees,
+            origin=origin,
+        )
+    if base_kind == "rectangular":
+        half_length = first_dimension / 2.0
+        half_width = second_dimension / 2.0
+        rectangle = geometry.box(
+            origin[0] - half_length,
+            origin[1] - half_width,
+            origin[0] + half_length,
+            origin[1] + half_width,
+        )
+        return _affinity_module().rotate(
+            rectangle,
+            angle=facing_degrees,
+            origin=origin,
+        )
+    raise GeometryError("Unsupported cached BaseShape kind for Shapely footprint.")
+
+
+@lru_cache(maxsize=_FOOTPRINT_CACHE_MAXSIZE)
+def _cached_polygon_union_footprint(polygons: _PolygonUnionFootprintKey) -> _Geometry:
+    footprints = tuple(_geometry_module().Polygon(polygon) for polygon in polygons)
     footprint = footprints[0]
     for member in footprints[1:]:
         footprint = footprint.union(member)
