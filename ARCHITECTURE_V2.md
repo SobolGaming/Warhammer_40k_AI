@@ -124,14 +124,17 @@ Operation. Step 5D scores condemned battlefield departures, promoting Punishment
 Step 5E scores operation markers, promoting Gather Intel, Extract Relic,
 Locate and Deny, and Vital Link. Step 5F scores the Surveil the Foe
 surveilled-marker exception, promoting Surveil the Foe. Step 5G certifies every
-Force Disposition pairing through both players' ordinary turn-end boundaries,
-GameLifecycle and event-log restore round-trips, and viewer-scoped projections.
-Step 6 scores all 18 Secondary Mission cards through source-backed turn-end
-awards and certifies every card/mode on one Layout A battlefield. This does not
-claim Phase 17N overall complete or Phase 20A.
-All 15 pairings now have executable Primaries in both directions (45 of 45
-variants). Layout A is the lifecycle/restore/viewer certification row; A/B/C
-remain in the fail-closed inventory and instantiate two-sided scoring policies.
+Force Disposition pairing and all 45 A/B/C layouts through both players'
+ordinary turn-end boundaries, GameLifecycle and event-log restore round-trips,
+and viewer-scoped projections. Its 90 layout/direction cases also round-trip
+`ReplayArtifact` payloads and require exact `ReplayRunner` reproduction from an
+engine-owned fight-activation decision boundary. Step 6 scores all 18 Secondary
+Mission cards through source-backed turn-end awards and certifies every
+card/mode on one Layout A battlefield. Layouts B and C remain outside Secondary
+lifecycle certification. This does not claim Phase 17N overall complete or
+Phase 20A. All 15 pairings now have executable Primaries in both directions (45
+of 45 variants), and every variant is a Primary lifecycle, restore, viewer, and
+replay certification row while remaining in the fail-closed inventory.
 **Phase 18A is complete** for local CLI/human decision entry and viewer-safe
 hybrid datacard projections: `interfaces/cli.py` renders pending finite and
 parameterized requests, submits normal lifecycle `DecisionResult`s, and
@@ -420,7 +423,7 @@ Implemented foundation and partial integration baselines:
 | 17E | Complete | All-faction PDF manifest validation, faction/detachment coverage rows, named-handler gates, and approved unsupported diagnostics |
 | 17F | Complete | Faction execution dispatch and typed execution status for every Phase 17E coverage row |
 | 17J | Complete | Warhammer Event Companion v1.1 source package, mission sequence, Tactical/Fixed Secondary procedure, all 45 layout source-page identities with explicit extraction status, FAQ patches, Base Size Guide source rows, and setup/scoring compliance hardening |
-| 17N | Partial | Battlefield geometry, Step 4 marker/action/choice state, the Step 5A content-addressed scoring-state bridge, Step 5B marker scoring, Step 5C completed-action scoring, Step 5D condemned-departure scoring, Step 5E operation-marker scoring, Step 5F Surveil scoring, Step 5G pairing-wide lifecycle/restore/viewer certification, and Step 6 source-backed Secondary scoring for all 18 cards are complete, including 14 runtime Mission Actions; generic timing/resolution, objective/territory/table-quarter evidence, Purge and Secure destruction attribution, consecrated/decoy/triangulated marker predicates, completed-action predicates, condemned battlefield-departure predicates, operation-marker predicates, and the Surveil surveilled-marker exception make all 25 Primaries executable, and all 15 pairings are certified through both players' AdapterGameSession ordinary scoring boundaries, lifecycle and event-log restore round-trips, and viewer-scoped projections |
+| 17N | Partial | Battlefield geometry, Step 4 marker/action/choice state, the Step 5A content-addressed scoring-state bridge, Step 5B marker scoring, Step 5C completed-action scoring, Step 5D condemned-departure scoring, Step 5E operation-marker scoring, Step 5F Surveil scoring, Step 5G all-layout lifecycle/restore/viewer/replay certification, and Step 6 source-backed Secondary scoring for all 18 cards are complete, including 14 runtime Mission Actions; generic timing/resolution, objective/territory/table-quarter evidence, Purge and Secure destruction attribution, consecrated/decoy/triangulated marker predicates, completed-action predicates, condemned battlefield-departure predicates, operation-marker predicates, and the Surveil surveilled-marker exception make all 25 Primaries executable, and all 45 A/B/C layouts are certified in both Primary scoring directions through AdapterGameSession ordinary scoring boundaries, lifecycle and event-log restore round-trips, viewer-scoped projections, ReplayArtifact payload round-trips, and exact ReplayRunner reproduction |
 | 17O | Complete | Viewer-scoped eight-axis capability manifest with selected roster/unit/rule/mission/geometry rows, evidence, blockers, identities, and mechanically derived certification claims |
 | 18A | Complete | Local CLI/human DecisionRecord entry and hybrid catalog/live unit-model display projection |
 | 18B | Complete | ReplayArtifact, ReplayRunner, drift diagnostics, projection hash checkpoints, and DecisionRecord corpus export |
@@ -446,7 +449,7 @@ above; this table contains only unfinished work.
 | 17H | Planned | Datasheet, wargear, weapon ability, generated source-row coverage, and execution for covered ability items |
 | 17I | Planned | Source-content coverage, execution-status audit, and unsupported-descriptor audit |
 | 17M | Planned | Source-backed generic semantic completion organized by reusable mechanic family |
-| 17N | Partial | Phase 20A matrix selection and end-to-end setup/replay/viewer certification; battlefield geometry and all Primary/Secondary scoring slices are complete |
+| 17N | Partial | Remaining Phase 20A matrix selection and setup-to-terminal certification plus Secondary lifecycle certification beyond Layout A; battlefield geometry, all Primary/Secondary scoring slices, and all-layout Primary scoring-boundary lifecycle/restore/viewer/replay certification are complete |
 | 18K | Planned | Interface intent and opportunity UX |
 | 18M-B+ | Planned | Remaining decision-family, race, golden-corpus, persistence-claim, and Phase 20A backend certification coverage |
 | 19A-19F | Planned | Performance, AI orchestration, self-play, training corpus generation, and observability |
@@ -475,7 +478,7 @@ by the adapter decision contract untouched. This review does not assign Phase
 | Persistence and recovery | Phase 18L | New single-authority persistence, checkpoint, replay, and recovery contract. |
 | Backend conformance/reference server | Phase 18M | Promotes the current development server into a contract proof and backend handoff boundary. |
 | Generic semantic mechanic families | Phase 17M | Adds a source-backed, generic-first completion track without authorizing speculative hooks. |
-| Mission/terrain/battlefield completion | Phase 17N | Completes Phase 20A matrix selection and end-to-end setup/replay/viewer certification; geometry and Primary/Secondary scoring execution are complete. |
+| Mission/terrain/battlefield completion | Phase 17N | Completes the remaining Phase 20A matrix selection, setup-to-terminal certification, and Secondary certification beyond Layout A; geometry, Primary/Secondary scoring execution, and all-layout Primary scoring-boundary lifecycle/restore/viewer/replay certification are complete. |
 | Capability/support manifest | Phase 17O | Replaces a single support answer with distinct load, display, muster, physical, semantic, full-game, network, and replay capabilities. |
 | Interactive/headless performance budgets | Phase 19A | Extends the existing performance owner rather than creating a duplicate phase. |
 | Observability and rule tracing | Phase 19F | Phase 19B already owns legal-candidate generation, so tracing receives a new non-conflicting owner. |
@@ -5000,14 +5003,17 @@ Priority: required before certifying a visual matched-play slice.
 Status: Partial overall; battlefield geometry is complete and Primary scoring
 is executable for all 25 missions. All 15 Event Companion Force Disposition
 pairings and every A/B/C variant have source-hashed executable battlefield
-packages, for 45 of 45 layouts. All 15 pairings have executable
-Primaries in both directions, covering 45 of the 45 A/B/C variants with complete
-two-sided Primary scoring, and Step 5G certifies each pairing through both
-players' ordinary turn-end boundaries, lifecycle and event-log restore
-round-trips, and viewer-scoped projections. Step 6 scores all 18 Secondary
+packages, for 45 of 45 layouts. All 15 pairings have executable Primaries in
+both directions, covering 45 of the 45 A/B/C variants with complete two-sided
+Primary scoring. Step 5G certifies all 45 layouts through both players' ordinary
+turn-end boundaries, lifecycle and event-log restore round-trips, and
+viewer-scoped projections. Its 90 layout/direction cases also payload-round-trip
+`ReplayArtifact` and require exact `ReplayRunner` reproduction from an
+engine-owned fight-activation decision boundary. Step 6 scores all 18 Secondary
 Mission cards through source-backed turn-end awards and certifies every
-card/mode on one Layout A battlefield. This does not claim Phase 17N overall
-complete or Phase 20A. Step 4's mission
+card/mode on one Layout A battlefield; Layouts B and C remain outside Secondary
+lifecycle certification. This does not claim Phase 17N overall complete or
+Phase 20A. Step 4's mission
 actions, choices, persistent marker state, and Surveil movement cleanup are
 engine-owned. Step 5A's scoring-state bridge and four simple objective
 predicates are complete. Step 5B's marker scoring conditions promote Consecrate,
@@ -5017,7 +5023,7 @@ battlefield-departure predicate promotes Punishment. Step 5E's operation-marker
 predicates promote Gather Intel, Extract Relic, Locate and Deny, and Vital Link.
 Step 5F's surveilled-marker exception promotes Surveil the Foe.
 Step 5G certifies every Force Disposition pairing through both players'
-ordinary scoring boundaries.
+ordinary scoring boundaries on all three layouts.
 
 The battlefield Single/Separate logical-area semantics come from the page-8
 Layouts Key, while coordinates and layout facts come from pages 9-53 of
@@ -5280,19 +5286,22 @@ complete pairing is disruption versus reconnaissance. All 25 Primaries and all
 15 pairings are now executable.
 
 Step 5G certifies every Force Disposition pairing through the shared
-`AdapterGameSession` / `LocalGameSession` path. Layout A of each pairing is
-driven independently in both scoring directions: player-a (source-left
-attacker) and player-b (source-right defender) each receive an ordinary
-turn-end Primary boundary through `BattleRoundFlow`. That covers the ten
-asymmetric right-hand Primaries that never appear as the attacker policy.
-Each directional fixture round-trips `GameLifecycle` and event-log payloads
-and keeps full `PrimaryScoringStateEvidence` rows out of viewer-scoped game
-views and public payloads. Public VP rows still expose only opaque evidence
-ID/hash commitments. Layouts A/B/C remain in the fail-closed 45-layout
-inventory and instantiate two-sided scoring policies; B and C are not
-lifecycle-certified. This does not capture a `ReplayArtifact` or run
-`ReplayRunner`. This does not claim Phase 20A full-game certification.
-Replay remains `replay-artifact-v8-phase17n-step5a`.
+`AdapterGameSession` / `LocalGameSession` path. Every A/B/C layout of each
+pairing is driven independently in both scoring directions: player-a
+(source-left attacker) and player-b (source-right defender) each receive an
+ordinary turn-end Primary boundary through `BattleRoundFlow`. That produces 90
+layout/direction cases and covers the ten asymmetric right-hand Primaries that
+never appear as the attacker policy. Each fixture round-trips `GameLifecycle`
+and event-log payloads and keeps full `PrimaryScoringStateEvidence` rows out of
+viewer-scoped game views and public payloads. Public VP rows still expose only
+opaque evidence ID/hash commitments. Each case begins at an engine-owned
+fight-activation decision boundary, captures and payload-round-trips a
+`replay-artifact-v8-phase17n-step5a` `ReplayArtifact`, and requires
+`ReplayRunner` to reproduce its decision and event histories exactly through
+the ordinary scoring boundary. Layouts A/B/C remain in the fail-closed
+45-layout inventory and instantiate two-sided scoring policies. This is
+scoring-boundary certification, not Phase 20A setup-to-terminal or full-game
+certification.
 
 Step 6 scores all 18 Secondary Mission cards through source-backed turn-end
 awards, When Drawn keep/discard/shuffle, and Beacon, Tempting Target, and

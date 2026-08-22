@@ -116,10 +116,12 @@ Secondary status:
   `LocalGameSession` turn-end Primary scoring in both ordinary scoring
   directions, `GameLifecycle` and event-log restore round-trips, and
   viewer-scoped projections that omit full scoring-state evidence rows.
-  Layout A of each pairing is the lifecycle certification row; all 45 A/B/C
-  variants instantiate two-sided scoring policies. Layouts B and C are not
-  lifecycle-certified. This does not capture a `ReplayArtifact` or run
-  `ReplayRunner`. This does not claim Phase 20A full-game certification.
+  All 45 A/B/C pairing-layout rows are certified independently in both
+  directions, for 90 lifecycle cases. Each case starts at an engine-owned
+  fight-activation decision boundary, captures and payload-round-trips a
+  `ReplayArtifact`, and requires exact `ReplayRunner` reproduction of its
+  decision and event histories through the ordinary scoring boundary. This
+  does not claim Phase 20A full-game certification.
 - Runtime Mission Actions: 14 total. The ten Step 4 Primary Actions join Death
   Trap's `booby-trap-terrain`, Terraform's `terraform-objective`, Cleanse's
   `cleanse-objective`, and Plunder's `plunder-terrain`. They are automatically
@@ -141,7 +143,8 @@ Secondary status:
   Primaries in both directions, covering 45 of the 45 A/B/C layout variants.
   Step 5G certifies each pairing through both players' ordinary scoring
   boundaries, lifecycle and event-log restore round-trips, and viewer-scoped
-  projections. Layout A is the lifecycle row; A/B/C remain inventory coverage.
+  projections. All 45 A/B/C layouts are lifecycle and replay certification rows,
+  covering 90 independent layout/direction cases.
 - The local [Event Companion Battlefield Viewer](BATTLEFIELD_VIEWER.md)
   consumes `battlefield-view-v4-phase17n-step3` directly for every layout. It provides
   an orbitable 3D schematic of classifications, component footprints, walls,
@@ -457,9 +460,11 @@ five-battle-round game, as configured by the current Event Companion package.
   operation-marker scoring. Step 5F promotes Surveil the Foe through the
   surveilled-marker exception. Step 5G certifies every Force Disposition pairing
   through both players' ordinary turn-end boundaries, lifecycle and event-log
-  restore round-trips, and viewer-scoped projections. Layout A is the
-  lifecycle/restore/viewer certification row; A/B/C remain in the fail-closed
-  inventory and instantiate two-sided scoring policies.
+  restore round-trips, and viewer-scoped projections on every A/B/C layout. Its
+  90 layout/direction cases also payload-round-trip `ReplayArtifact` and require
+  exact `ReplayRunner` reproduction from an engine-owned fight-activation
+  decision boundary. All layouts remain in the fail-closed inventory and
+  instantiate two-sided scoring policies.
 - Secondary lifecycle support exists for source rows, fixed/tactical modes,
   tactical draw, When Drawn keep/discard/shuffle including Cleanse/Plunder
   reciprocal shuffle and Defend Stronghold's mandatory first-round shuffle,
