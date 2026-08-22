@@ -3,12 +3,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from warhammer40k_core.engine.decision_controller import DecisionController
+from warhammer40k_core.engine.fight_rules_unit_movement_types import (
+    fight_rules_unit_movement_endpoint_from_completed_event,
+    rules_unit_views_for_completed_move_event,
+)
 from warhammer40k_core.engine.mission_action_policies import (
     primary_mission_state_rule_for_id,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.primary_destruction_evidence import (
     rules_unit_objective_proximity_witness,
+    rules_unit_objective_proximity_witness_from_placements,
 )
 from warhammer40k_core.engine.primary_mission_marker_integrity import (
     SURVEIL_MOVE_COMPLETION_EVENT_TYPES,
@@ -23,9 +28,9 @@ from warhammer40k_core.engine.primary_mission_state import (
     primary_consecration_designation_id,
 )
 from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
     current_rules_unit_views_for_identity,
     rules_unit_identities_share_lineage,
-    rules_unit_view_by_id,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.scoring import PrimaryUnitDestructionState
@@ -152,23 +157,60 @@ def resolve_surveil_marker_removal_for_completed_moves(
         unit_id = surveil_move_event_unit_id(payload)
         if unit_id is None:
             continue
-        mover = rules_unit_view_by_id(state=state, unit_instance_id=unit_id)
+        mover_views = rules_unit_views_for_completed_move_event(
+            state=state,
+            event_type=trigger.event_type,
+            unit_instance_id=unit_id,
+        )
+        mover_id = _canonical_move_event_rules_unit_id(
+            event_type=trigger.event_type,
+            event_unit_instance_id=unit_id,
+            mover_views=mover_views,
+        )
+        mover_owner_ids = {view.owner_player_id for view in mover_views}
+        if len(mover_owner_ids) != 1:
+            raise GameLifecycleError("Surveil mover owner identity is ambiguous.")
+        mover_owner_id = next(iter(mover_owner_ids))
         if (
-            mission_setup.primary_mission_id_for_player(mover.owner_player_id)
+            mission_setup.primary_mission_id_for_player(mover_owner_id)
             != descriptor.primary_mission_id
         ):
             continue
-        mover_id = mover.unit_instance_id
-        objective_proximity_witness = rules_unit_objective_proximity_witness(
-            state=state,
-            rules_unit_instance_id=mover_id,
+        component_ids = tuple(
+            sorted(
+                {
+                    component_id
+                    for view in mover_views
+                    for component_id in view.component_unit_instance_ids
+                }
+            )
+        )
+        endpoint = (
+            fight_rules_unit_movement_endpoint_from_completed_event(
+                payload=payload,
+                component_unit_instance_ids=component_ids,
+            )
+            if trigger.event_type == "fight_movement_completed"
+            else None
+        )
+        objective_proximity_witness = (
+            rules_unit_objective_proximity_witness(
+                state=state,
+                rules_unit_instance_id=mover_id,
+            )
+            if endpoint is None
+            else rules_unit_objective_proximity_witness_from_placements(
+                state=state,
+                rules_unit_instance_id=mover_id,
+                model_placements=endpoint.model_placements,
+            )
         )
         objective_ids = objective_proximity_witness.objective_marker_ids
         removed: list[PrimaryMissionMarkerState] = []
         for marker in state.primary_mission_progress_state.markers:
             if (
                 marker.status is not PrimaryMissionMarkerStatus.ACTIVE
-                or marker.owner_player_id == mover.owner_player_id
+                or marker.owner_player_id == mover_owner_id
                 or marker.marker_kind != "operation"
                 or marker.objective_marker_id not in objective_ids
             ):
@@ -191,7 +233,7 @@ def resolve_surveil_marker_removal_for_completed_moves(
                 "battle_round": state.battle_round,
                 "active_player_id": _active_player_id(state),
                 "phase": completed_phase.value,
-                "player_id": mover.owner_player_id,
+                "player_id": mover_owner_id,
                 "moving_rules_unit_instance_id": mover_id,
                 "moving_rules_unit_objective_proximity_witness": (
                     objective_proximity_witness.to_payload()
@@ -214,6 +256,17 @@ def _surveil_move_already_processed(
         and record.payload.get("trigger_event_id") == trigger_event_id
         for record in decisions.event_log.records
     )
+
+
+def _canonical_move_event_rules_unit_id(
+    *,
+    event_type: str,
+    event_unit_instance_id: str,
+    mover_views: tuple[RulesUnitView, ...],
+) -> str:
+    if event_type == "fight_movement_completed" or len(mover_views) != 1:
+        return event_unit_instance_id
+    return mover_views[0].unit_instance_id
 
 
 def _active_player_id(state: GameState) -> str:

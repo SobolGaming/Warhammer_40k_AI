@@ -36,6 +36,14 @@ from warhammer40k_core.engine.charge_declaration import (
     ChargeTargetCandidate,
     ChargeTargetCandidatePayload,
 )
+from warhammer40k_core.engine.charge_declaration_hooks import (
+    DECLINE_CHARGE_DECLARATION_GRANT_OPTION_ID,
+    SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE,
+    ChargeDeclarationContext,
+    ChargeDeclarationGrant,
+    ChargeDeclarationHookBinding,
+    ChargeDeclarationHookRegistry,
+)
 from warhammer40k_core.engine.charge_required_targets import (
     CHARGE_MOVE_REQUIRED_TARGET_UNIT_INSTANCE_IDS_KEY,
 )
@@ -77,6 +85,7 @@ from warhammer40k_core.engine.phases.charge import (
     ChargeEndpointWitness,
     ChargeMoveProposal,
     ChargeMoveResolution,
+    ChargePhaseHandler,
     ChargePhaseState,
     ChargingUnitSelection,
     legal_charge_target_unit_instance_ids,
@@ -114,6 +123,514 @@ from warhammer40k_core.rules.mission_pack_import import (
 )
 
 _ATTACHED_CHARGE_TARGET_ID = "attached-unit:army-beta:marked-bodyguard"
+_END_PHASE_CHARGE_GRANT_ID = "phase15a:test-charge-grant:end-phase"
+_END_TURN_CHARGE_GRANT_ID = "phase15a:test-charge-grant:end-turn"
+
+
+def test_charge_declaration_grant_selection_records_end_phase_unit_effect() -> None:
+    lifecycle, units = _charge_lifecycle_with_declaration_grants(
+        game_id="phase15a-charge-grant-end-phase"
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    grant_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=selection_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase15a-charge-grant-end-phase-selection",
+        )
+    )
+
+    assert grant_request.decision_type == SELECT_CHARGE_DECLARATION_GRANT_DECISION_TYPE
+    assert {option.option_id for option in grant_request.options} == {
+        DECLINE_CHARGE_DECLARATION_GRANT_OPTION_ID,
+        _END_PHASE_CHARGE_GRANT_ID,
+        _END_TURN_CHARGE_GRANT_ID,
+    }
+
+    continued = _submit_option(
+        lifecycle,
+        request=grant_request,
+        option_id=_END_PHASE_CHARGE_GRANT_ID,
+        result_id="phase15a-charge-grant-end-phase-result",
+    )
+
+    assert continued.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    effects = _state(lifecycle).persisting_effects_for_unit(units["intercessor-1"].unit_instance_id)
+    assert len(effects) == 1
+    assert effects[0].source_rule_id == "phase15a:test-charge-grant-source:end-phase"
+    assert effects[0].expiration.expiration_kind.value == "end_phase"
+    resolved = _last_event_payload(lifecycle, "charge_declaration_grant_decision_resolved")
+    assert resolved["selected_option_id"] == _END_PHASE_CHARGE_GRANT_ID
+    assert len(cast(list[object], resolved["persisting_effects"])) == 1
+
+
+def test_charge_declaration_grant_selection_honors_explicit_targets_and_end_turn() -> None:
+    lifecycle, units = _charge_lifecycle_with_declaration_grants(
+        game_id="phase15a-charge-grant-end-turn"
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    grant_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=selection_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase15a-charge-grant-end-turn-selection",
+        )
+    )
+
+    continued = _submit_option(
+        lifecycle,
+        request=grant_request,
+        option_id=_END_TURN_CHARGE_GRANT_ID,
+        result_id="phase15a-charge-grant-end-turn-result",
+    )
+
+    assert continued.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    target_effects = _state(lifecycle).persisting_effects_for_unit(units["enemy"].unit_instance_id)
+    assert len(target_effects) == 1
+    assert target_effects[0].source_rule_id == "phase15a:test-charge-grant-source:end-turn"
+    assert target_effects[0].target_unit_instance_ids == (units["enemy"].unit_instance_id,)
+    assert target_effects[0].expiration.expiration_kind.value == "end_turn"
+
+
+def test_declining_charge_declaration_grant_resumes_roll_without_effect() -> None:
+    lifecycle, units = _charge_lifecycle_with_declaration_grants(
+        game_id="phase15a-charge-grant-decline"
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    grant_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=selection_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase15a-charge-grant-decline-selection",
+        )
+    )
+
+    continued = _submit_option(
+        lifecycle,
+        request=grant_request,
+        option_id=DECLINE_CHARGE_DECLARATION_GRANT_OPTION_ID,
+        result_id="phase15a-charge-grant-decline-result",
+    )
+
+    assert continued.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert (
+        _state(lifecycle).persisting_effects_for_unit(units["intercessor-1"].unit_instance_id) == ()
+    )
+    resolved = _last_event_payload(lifecycle, "charge_declaration_grant_decision_resolved")
+    assert resolved["selected_charge_declaration_grants"] == []
+    assert resolved["persisting_effects"] == []
+    assert _event_payloads(lifecycle, "charge_roll_resolved")
+
+
+def test_charge_declaration_grant_rejects_source_ineligibility_without_queue_pop() -> None:
+    lifecycle, units = _charge_lifecycle_with_declaration_grants(
+        game_id="phase15a-charge-grant-ineligible"
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    grant_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=selection_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase15a-charge-grant-ineligible-selection",
+        )
+    )
+    state = _state(lifecycle)
+    state.record_advanced_unit_state(_advanced_unit_state(units["intercessor-1"].unit_instance_id))
+    records_before = len(lifecycle.decision_controller.records)
+
+    invalid = _submit_option(
+        lifecycle,
+        request=grant_request,
+        option_id=_END_PHASE_CHARGE_GRANT_ID,
+        result_id="phase15a-charge-grant-ineligible-result",
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, object], invalid.payload)["field"] == "eligibility_context"
+    assert lifecycle.decision_controller.queue.pending_requests == (grant_request,)
+    assert len(lifecycle.decision_controller.records) == records_before
+    assert state.persisting_effects_for_unit(units["intercessor-1"].unit_instance_id) == ()
+
+
+def test_charge_declaration_grant_rejects_missing_active_selection_without_queue_pop() -> None:
+    lifecycle, units = _charge_lifecycle_with_declaration_grants(
+        game_id="phase15a-charge-grant-missing-selection"
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    grant_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=selection_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase15a-charge-grant-missing-selection-select",
+        )
+    )
+    state = _state(lifecycle)
+    state.replace_charge_phase_state(
+        ChargePhaseState(battle_round=state.battle_round, active_player_id="player-a")
+    )
+    records_before = len(lifecycle.decision_controller.records)
+
+    invalid = _submit_option(
+        lifecycle,
+        request=grant_request,
+        option_id=_END_PHASE_CHARGE_GRANT_ID,
+        result_id="phase15a-charge-grant-missing-selection-result",
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, object], invalid.payload)["field"] == "charge_phase_state"
+    assert lifecycle.decision_controller.queue.pending_requests == (grant_request,)
+    assert len(lifecycle.decision_controller.records) == records_before
+
+
+def test_charge_declaration_grant_rejects_provider_drift_without_queue_pop() -> None:
+    lifecycle, units = _charge_lifecycle_with_declaration_grants(
+        game_id="phase15a-charge-grant-provider-drift"
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    grant_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=selection_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase15a-charge-grant-provider-drift-selection",
+        )
+    )
+    _install_charge_declaration_registry(lifecycle, ChargeDeclarationHookRegistry.empty())
+    records_before = len(lifecycle.decision_controller.records)
+
+    invalid = _submit_option(
+        lifecycle,
+        request=grant_request,
+        option_id=_END_PHASE_CHARGE_GRANT_ID,
+        result_id="phase15a-charge-grant-provider-drift-result",
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert "not available" in cast(str, cast(dict[str, object], invalid.payload)["detail"])
+    assert lifecycle.decision_controller.queue.pending_requests == (grant_request,)
+    assert len(lifecycle.decision_controller.records) == records_before
+
+
+def test_charge_declaration_grant_rejects_malformed_finite_result_without_queue_pop() -> None:
+    lifecycle, units = _charge_lifecycle_with_declaration_grants(
+        game_id="phase15a-charge-grant-malformed-result"
+    )
+    selection_request = _decision_request(lifecycle.advance_until_decision_or_terminal())
+    grant_request = _decision_request(
+        _submit_option(
+            lifecycle,
+            request=selection_request,
+            option_id=units["intercessor-1"].unit_instance_id,
+            result_id="phase15a-charge-grant-malformed-selection",
+        )
+    )
+    result = FiniteOptionSubmission(
+        request_id=grant_request.request_id,
+        selected_option_id=_END_PHASE_CHARGE_GRANT_ID,
+        result_id="phase15a-charge-grant-malformed-result",
+    ).to_result(grant_request)
+    records_before = len(lifecycle.decision_controller.records)
+
+    invalid = lifecycle.submit_decision(replace(result, payload=None))
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert "payload must match" in cast(str, cast(dict[str, object], invalid.payload)["detail"])
+    assert lifecycle.decision_controller.queue.pending_requests == (grant_request,)
+    assert len(lifecycle.decision_controller.records) == records_before
+
+
+@pytest.mark.parametrize(
+    ("schema_case", "expected_field"),
+    [
+        ("non_object", "payload"),
+        ("proposal_kind", "proposal_kind"),
+        ("movement_mode", "movement_mode"),
+        ("movement_phase_action", "movement_phase_action"),
+        ("charge_targets", "charge_target_unit_instance_ids"),
+        ("witness", "witness"),
+    ],
+)
+def test_charge_move_submission_reports_precise_schema_field_without_queue_pop(
+    schema_case: str,
+    expected_field: str,
+) -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(20.0, 20.0),
+            model_count=5,
+        ),
+        game_id="phase15a-success-charge",
+    )
+    request = _charge_move_request_after_selection(
+        lifecycle,
+        unit_instance_id=units["intercessor-1"].unit_instance_id,
+        result_id=f"phase15a-charge-schema-{schema_case}-selection",
+    )
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    proposal = ChargeMoveProposal(
+        proposal_request_id=proposal_request.request_id,
+        proposal_kind=proposal_request.proposal_kind,
+        unit_instance_id=proposal_request.unit_instance_id,
+        movement_phase_action="charge_move",
+        movement_mode=MovementMode.CHARGE,
+        charge_target_unit_instance_ids=(units["enemy"].unit_instance_id,),
+        witness=_charge_path_witness_for_unit(
+            lifecycle,
+            unit_instance_id=units["intercessor-1"].unit_instance_id,
+            dx=3.0,
+        ),
+    )
+    payload: JsonValue = cast(
+        JsonValue,
+        json.loads(json.dumps(proposal.to_payload(), sort_keys=True)),
+    )
+    if schema_case == "non_object":
+        payload = None
+    else:
+        payload_object = cast(dict[str, JsonValue], payload)
+        if schema_case == "proposal_kind":
+            payload_object["proposal_kind"] = ProposalKind.NORMAL_MOVE.value
+        elif schema_case == "movement_mode":
+            payload_object["movement_mode"] = MovementMode.NORMAL.value
+        elif schema_case == "movement_phase_action":
+            payload_object["movement_phase_action"] = "normal_move"
+        elif schema_case == "charge_targets":
+            payload_object["charge_target_unit_instance_ids"] = [
+                units["enemy"].unit_instance_id,
+                units["enemy"].unit_instance_id,
+            ]
+        elif schema_case == "witness":
+            payload_object["witness"] = {"model_paths": []}
+    records_before = len(lifecycle.decision_controller.records)
+
+    invalid = lifecycle.submit_decision(
+        ParameterizedSubmission(
+            request_id=request.request_id,
+            result_id=f"phase15a-charge-schema-{schema_case}-result",
+            payload=payload,
+        ).to_result(request)
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    violation = _first_proposal_validation_violation(invalid)
+    assert violation["violation_code"] == "proposal_payload_malformed"
+    assert violation["field"] == expected_field
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert len(lifecycle.decision_controller.records) == records_before
+
+
+@pytest.mark.parametrize(
+    ("stale_case", "expected_violation"),
+    [
+        ("phase_state_missing", "charge_phase_state_missing"),
+        ("distance_state_missing", "charge_distance_state_missing"),
+        ("required_target_drift", "charge_required_targets_drift"),
+        ("witness_unit_drift", "charge_witness_unit_drift"),
+        ("witness_start_drift", "charge_witness_start_drift"),
+    ],
+)
+def test_charge_move_submission_rejects_stale_context_without_authoritative_mutation(
+    stale_case: str,
+    expected_violation: str,
+) -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(20.0, 20.0),
+            model_count=5,
+        ),
+        game_id="phase15a-success-charge",
+    )
+    charger_id = units["intercessor-1"].unit_instance_id
+    target_id = units["enemy"].unit_instance_id
+    request = _charge_move_request_after_selection(
+        lifecycle,
+        unit_instance_id=charger_id,
+        result_id=f"phase15a-charge-stale-{stale_case}-selection",
+    )
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    state = _state(lifecycle)
+    target_ids: tuple[str, ...] = ()
+    witness: PathWitness | None = None
+    if stale_case == "phase_state_missing":
+        state.replace_charge_phase_state(None)
+    elif stale_case == "distance_state_missing":
+        state.replace_charge_phase_state(
+            ChargePhaseState(
+                battle_round=state.battle_round,
+                active_player_id="player-a",
+                selected_unit_ids=(charger_id,),
+            )
+        )
+    elif stale_case == "required_target_drift":
+        state.record_persisting_effect(
+            selected_target_charge_persisting_effect(
+                state=state,
+                effect_id=f"phase15a-charge-stale-{stale_case}:effect",
+                owner_player_id="player-a",
+                source_rules_unit_instance_id=charger_id,
+                source_component_unit_instance_id=charger_id,
+                selected_target_unit_instance_id=target_id,
+            )
+        )
+    elif stale_case == "witness_unit_drift":
+        target_ids = (target_id,)
+        witness = _charge_path_witness_for_unit(
+            lifecycle,
+            unit_instance_id=target_id,
+            dx=-0.25,
+        )
+    elif stale_case == "witness_start_drift":
+        target_ids = (target_id,)
+        current_witness = _charge_path_witness_for_unit(
+            lifecycle,
+            unit_instance_id=charger_id,
+            dx=0.25,
+        )
+        witness = PathWitness.for_paths(
+            tuple(
+                (
+                    model_id,
+                    (
+                        Pose.at(
+                            poses[0].position.x + 0.1,
+                            poses[0].position.y,
+                            poses[0].position.z,
+                            facing_degrees=poses[0].facing.degrees,
+                        ),
+                        *poses[1:],
+                    ),
+                )
+                for model_id, poses in current_witness.model_paths
+            )
+        )
+    records_before = len(lifecycle.decision_controller.records)
+
+    invalid = _submit_charge_move_proposal(
+        lifecycle,
+        request=request,
+        result_id=f"phase15a-charge-stale-{stale_case}-result",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            unit_instance_id=proposal_request.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=target_ids,
+            witness=witness,
+        ),
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert _first_proposal_validation_violation(invalid)["violation_code"] == (expected_violation)
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
+    assert len(lifecycle.decision_controller.records) == records_before
+
+
+@pytest.mark.parametrize(
+    ("endpoint_case", "expected_violation"),
+    [
+        ("not_closer", "charge_not_closer_to_target"),
+        ("not_engaged", "charge_target_not_engaged"),
+        ("distance_exceeded", "movement_distance_exceeded"),
+        ("coherency_broken", "unit_coherency_broken"),
+    ],
+)
+def test_charge_move_submission_records_rule_invalid_endpoint_and_emits_retry(
+    endpoint_case: str,
+    expected_violation: str,
+) -> None:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(20.0, 20.0),
+            model_count=5,
+        ),
+        game_id="phase15a-success-charge",
+    )
+    charger_id = units["intercessor-1"].unit_instance_id
+    target_id = units["enemy"].unit_instance_id
+    request = _charge_move_request_after_selection(
+        lifecycle,
+        unit_instance_id=charger_id,
+        result_id=f"phase15a-charge-endpoint-{endpoint_case}-selection",
+    )
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    context = cast(dict[str, JsonValue], proposal_request.context)
+    maximum_distance = context["maximum_distance_inches"]
+    assert type(maximum_distance) is int
+    if endpoint_case == "not_closer":
+        witness = _charge_path_witness_for_unit(lifecycle, unit_instance_id=charger_id, dx=-0.5)
+    elif endpoint_case == "not_engaged":
+        witness = _charge_path_witness_for_unit(lifecycle, unit_instance_id=charger_id, dx=0.5)
+    elif endpoint_case == "distance_exceeded":
+        witness = _charge_path_witness_for_unit(
+            lifecycle,
+            unit_instance_id=charger_id,
+            dx=-(maximum_distance + 0.5),
+        )
+    else:
+        baseline = _charge_path_witness_for_unit(
+            lifecycle,
+            unit_instance_id=charger_id,
+            dx=3.0,
+        )
+        last_model_id = baseline.model_ids()[-1]
+        witness = PathWitness.for_paths(
+            tuple(
+                (
+                    model_id,
+                    (
+                        poses
+                        if model_id != last_model_id
+                        else (
+                            poses[0],
+                            Pose.at(
+                                poses[1].position.x,
+                                poses[1].position.y + 1.5,
+                                poses[1].position.z,
+                            ),
+                            Pose.at(
+                                poses[2].position.x,
+                                poses[2].position.y + 3.0,
+                                poses[2].position.z,
+                            ),
+                        )
+                    ),
+                )
+                for model_id, poses in baseline.model_paths
+            )
+        )
+    records_before = len(lifecycle.decision_controller.records)
+
+    invalid = _submit_charge_move_proposal(
+        lifecycle,
+        request=request,
+        result_id=f"phase15a-charge-endpoint-{endpoint_case}-result",
+        proposal=ChargeMoveProposal(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=proposal_request.proposal_kind,
+            unit_instance_id=proposal_request.unit_instance_id,
+            movement_phase_action="charge_move",
+            movement_mode=MovementMode.CHARGE,
+            charge_target_unit_instance_ids=(target_id,),
+            witness=witness,
+        ),
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert cast(dict[str, object], invalid.payload)["violation_code"] == expected_violation
+    retry = lifecycle.decision_controller.queue.pending_requests[0]
+    assert retry.request_id != request.request_id
+    assert lifecycle.decision_controller.queue.pending_requests == (retry,)
+    assert len(lifecycle.decision_controller.records) == records_before + 1
 
 
 def test_charging_unit_selection_rolls_immediately_and_uses_lifecycle_records() -> None:
@@ -2134,6 +2651,86 @@ def _charge_lifecycle(
     return GameLifecycle.from_payload(payload), units
 
 
+def _charge_lifecycle_with_declaration_grants(
+    *,
+    game_id: str,
+) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
+    lifecycle, units = _charge_lifecycle(
+        alpha_unit_ids=("intercessor-1",),
+        enemy_model_poses=_compact_test_unit_poses(
+            origin=Pose.at(20.0, 20.0),
+            model_count=5,
+        ),
+        game_id=game_id,
+    )
+    registry = ChargeDeclarationHookRegistry.from_bindings(
+        (
+            ChargeDeclarationHookBinding(
+                hook_id=_END_PHASE_CHARGE_GRANT_ID,
+                source_id="phase15a:test-charge-grant-source:end-phase",
+                handler=_end_phase_charge_declaration_grant,
+            ),
+            ChargeDeclarationHookBinding(
+                hook_id=_END_TURN_CHARGE_GRANT_ID,
+                source_id="phase15a:test-charge-grant-source:end-turn",
+                handler=_end_turn_charge_declaration_grant,
+            ),
+        )
+    )
+    _install_charge_declaration_registry(lifecycle, registry)
+    return lifecycle, units
+
+
+def _end_phase_charge_declaration_grant(
+    context: ChargeDeclarationContext,
+) -> ChargeDeclarationGrant:
+    return ChargeDeclarationGrant(
+        hook_id=_END_PHASE_CHARGE_GRANT_ID,
+        source_id="phase15a:test-charge-grant-source:end-phase",
+        label="Test end-phase Charge grant",
+        replay_payload={
+            "unit_instance_id": context.unit_instance_id,
+            "selection_result_id": context.selection_result_id,
+        },
+        unit_effect_payload={"effect_kind": "phase15a_test_charge_grant"},
+        unit_effect_expiration="end_phase",
+    )
+
+
+def _end_turn_charge_declaration_grant(
+    context: ChargeDeclarationContext,
+) -> ChargeDeclarationGrant:
+    return ChargeDeclarationGrant(
+        hook_id=_END_TURN_CHARGE_GRANT_ID,
+        source_id="phase15a:test-charge-grant-source:end-turn",
+        label="Test end-turn Charge grant",
+        replay_payload={
+            "unit_instance_id": context.unit_instance_id,
+            "selection_result_id": context.selection_result_id,
+        },
+        unit_effect_payload={
+            "effect_kind": "phase15a_test_target_charge_grant",
+            "target_unit_instance_ids": ["army-beta:enemy"],
+        },
+        unit_effect_expiration="end_turn",
+    )
+
+
+def _install_charge_declaration_registry(
+    lifecycle: GameLifecycle,
+    registry: ChargeDeclarationHookRegistry,
+) -> None:
+    handler = replace(
+        lifecycle._charge_phase_handler,  # pyright: ignore[reportPrivateUsage]
+        charge_declaration_hooks=registry,
+    )
+    assert isinstance(handler, ChargePhaseHandler)
+    lifecycle._charge_phase_handler = handler  # pyright: ignore[reportPrivateUsage]
+    flow = lifecycle._battle_round_flow  # pyright: ignore[reportPrivateUsage]
+    assert flow is not None
+    flow._phase_handlers[BattlePhase.CHARGE] = handler  # pyright: ignore[reportPrivateUsage]
+
+
 def _charge_roll_request(*, player_id: str, unit_instance_id: str) -> ChargeRollRequest:
     return ChargeRollRequest(
         request_id=f"charge-roll-{player_id}-{unit_instance_id}",
@@ -2444,6 +3041,16 @@ def _submit_charge_move_proposal(
             payload=cast(JsonValue, proposal.to_payload()),
         ).to_result(request)
     )
+
+
+def _first_proposal_validation_violation(
+    status: LifecycleStatus,
+) -> dict[str, object]:
+    payload = cast(dict[str, object], status.payload)
+    validation = cast(dict[str, object], payload["proposal_validation"])
+    violations = cast(list[dict[str, object]], validation["violations"])
+    assert violations
+    return violations[0]
 
 
 def _charge_path_witness_for_unit(

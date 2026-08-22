@@ -77,9 +77,23 @@ def reconcile_after_attack_sequence(
     state: GameState,
     event_log: EventLog,
     attack_sequence: AttackSequence,
+    *,
+    deferred_rules_unit_instance_ids: tuple[str, ...] = (),
 ) -> tuple[str, ...]:
     if type(attack_sequence) is not AttackSequence:
         raise GameLifecycleError("Attached-unit reconciliation requires AttackSequence.")
+    if type(deferred_rules_unit_instance_ids) is not tuple:
+        raise GameLifecycleError("Deferred attached-unit reconciliation ids must be a tuple.")
+    deferred_ids: set[str] = set()
+    for deferred_id in deferred_rules_unit_instance_ids:
+        deferred_view = rules_unit_view_by_id(state=state, unit_instance_id=deferred_id)
+        if deferred_view.unit_instance_id != deferred_id:
+            raise GameLifecycleError(
+                "Deferred attached-unit reconciliation requires canonical rules-unit ids."
+            )
+        if deferred_id in deferred_ids:
+            raise GameLifecycleError("Deferred attached-unit reconciliation ids must be unique.")
+        deferred_ids.add(deferred_id)
     candidate_ids = {attack_sequence.attacking_unit_instance_id}
     for record in event_log.records:
         if record.event_type != "model_destroyed":
@@ -100,6 +114,8 @@ def reconcile_after_attack_sequence(
         if rules_unit.unit_instance_id in reconciled_ids:
             continue
         reconciled_ids.add(rules_unit.unit_instance_id)
+        if rules_unit.unit_instance_id in deferred_ids:
+            continue
         surviving_ids.update(
             split_attached_rules_unit_if_required(
                 state=state,

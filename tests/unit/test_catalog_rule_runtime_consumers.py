@@ -9,7 +9,7 @@ import pytest
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
-from warhammer40k_core.core.dice import RerollComponentSelectionPolicy
+from warhammer40k_core.core.dice import DiceExpression, RerollComponentSelectionPolicy
 from warhammer40k_core.core.ruleset_descriptor import (
     BattlePhaseKind,
     FightEligibilityKind,
@@ -40,6 +40,7 @@ from warhammer40k_core.engine.abilities import (
     AbilitySourceKind,
     AbilityTimingDescriptor,
 )
+from warhammer40k_core.engine.advance_eligibility_hooks import AdvanceEligibilityContext
 from warhammer40k_core.engine.allocated_attack_damage_modifiers import (
     AllocatedAttackDamageModifierContext,
 )
@@ -122,7 +123,17 @@ from warhammer40k_core.engine.catalog_rule_consumption import (
     CATALOG_IR_BATTLE_SHOCK_REROLL_CONSUMER_ID,
     CATALOG_IR_POST_SHOOT_HIT_TARGET_EFFECT_CONSUMER_ID,
     CATALOG_IR_SELECTED_TARGET_EFFECT_CONSUMER_ID,
+    CatalogAdvanceEligibilityRuntime,
+    CatalogFallBackEligibilityRuntime,
+    CatalogNamedWeaponAbilityChoiceGroup,
+    CatalogNamedWeaponAbilityChoiceOption,
+    CatalogPostShootHitTargetStatusGroup,
+    CatalogPostShootHitTargetStatusOption,
+    CatalogRuleIrHookDefinition,
+    CatalogUnitMoveCompletedMortalWoundsGroup,
+    CatalogUnitMoveCompletedMortalWoundsTargetOption,
     catalog_rule_clauses_from_record,
+    catalog_rule_ir_consumer_ids_for_effect,
     catalog_rule_ir_consumers_for_rule,
     catalog_rule_ir_hook_ids_for_rule,
 )
@@ -199,6 +210,7 @@ from warhammer40k_core.engine.faction_content.events import (
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons import (
     july_2026_updates as chaos_daemons_july_updates,
 )
+from warhammer40k_core.engine.fall_back_hooks import FallBackEligibilityContext
 from warhammer40k_core.engine.fight_activation_abilities import (
     FIGHT_ACTIVATION_MOVEMENT_DISTANCE_EFFECT_KIND,
     FightActivationAbilityContext,
@@ -268,6 +280,9 @@ from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.source_backed_rerolls import (
     source_backed_reroll_permission_context_for_unit,
 )
+from warhammer40k_core.engine.stratagem_catalog import (
+    eleventh_edition_stratagem_catalog_records,
+)
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     StratagemCostChoiceRequestContext,
     StratagemCostChoiceResultContext,
@@ -277,14 +292,33 @@ from warhammer40k_core.engine.stratagem_cost_modifiers import (
     StratagemCostModifierRegistry,
 )
 from warhammer40k_core.engine.stratagems import (
+    CORE_GO_TO_GROUND_HANDLER_ID,
+    FALL_BACK_UNIT_CONTEXT_KEY,
+    FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY,
+    GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+    GENERIC_INGRESS_MOVE_HANDLER_ID,
+    GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
     STRATAGEM_DECISION_TYPE,
+    TARGET_BINDING_UNIT_CONTEXT_KEY,
+    VISIBLE_ENEMY_RANGE_INCHES_KEY,
+    VISIBLE_ENEMY_SOURCE_UNIT_CONTEXT_KEY,
+    VISIBLE_ENEMY_UNIT_CONTEXT_KEY,
+    VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND,
     StratagemCategory,
     StratagemDefinition,
     StratagemEligibilityContext,
     StratagemTargetBinding,
     StratagemTargetKind,
+    StratagemTargetSpec,
     StratagemTimingDescriptor,
     StratagemUseRecord,
+    _handler_unavailable_reason,
+)
+from warhammer40k_core.engine.stratagems_generic_metadata import (
+    EFFECT_SELECTION_KIND_KEY,
+    REQUIRED_TRIGGER_CONTEXT_KEYS_KEY,
+    TARGET_REQUIRED_REINFORCEMENT_ARRIVAL_THIS_TURN_KEY,
+    TARGET_REQUIRED_TRIGGER_CONTEXT_LIST_KEY,
 )
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
 from warhammer40k_core.engine.triggered_movement import (
@@ -5718,6 +5752,1095 @@ def test_catalog_command_point_runtime_helpers_fail_fast_on_contract_drift() -> 
         runtime.apply_stratagem_cost_choice_result(cast(Any, object()))
 
 
+@pytest.mark.parametrize(
+    (
+        "stratagem_id",
+        "handler_id",
+        "trigger_kind",
+        "phase",
+        "active_player_id",
+        "trigger_payload_kind",
+        "has_target_binding",
+        "expected_reason",
+    ),
+    [
+        (
+            "ingress-move",
+            GENERIC_INGRESS_MOVE_HANDLER_ID,
+            TimingTriggerKind.START_PHASE,
+            BattlePhaseKind.MOVEMENT,
+            "player-b",
+            "none",
+            False,
+            "ingress_move_requires_end_phase",
+        ),
+        (
+            "ingress-move",
+            GENERIC_INGRESS_MOVE_HANDLER_ID,
+            TimingTriggerKind.END_PHASE,
+            BattlePhaseKind.SHOOTING,
+            "player-b",
+            "none",
+            False,
+            "ingress_move_requires_movement_phase",
+        ),
+        (
+            "ingress-move",
+            GENERIC_INGRESS_MOVE_HANDLER_ID,
+            TimingTriggerKind.END_PHASE,
+            BattlePhaseKind.MOVEMENT,
+            "player-b",
+            "none",
+            False,
+            "no_eligible_strategic_reserve_unit",
+        ),
+        (
+            "ingress-move",
+            GENERIC_INGRESS_MOVE_HANDLER_ID,
+            TimingTriggerKind.END_PHASE,
+            BattlePhaseKind.MOVEMENT,
+            "player-b",
+            "none",
+            True,
+            None,
+        ),
+        (
+            "force-desperate-escape",
+            GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+            TimingTriggerKind.START_PHASE,
+            BattlePhaseKind.MOVEMENT,
+            "player-b",
+            "fall-back",
+            False,
+            "force_desperate_escape_requires_fall_back_selection_trigger",
+        ),
+        (
+            "force-desperate-escape",
+            GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+            TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+            BattlePhaseKind.SHOOTING,
+            "player-b",
+            "fall-back",
+            False,
+            "force_desperate_escape_requires_movement_phase",
+        ),
+        (
+            "force-desperate-escape",
+            GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+            TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+            BattlePhaseKind.MOVEMENT,
+            "player-a",
+            "fall-back",
+            False,
+            "force_desperate_escape_requires_opponent_turn",
+        ),
+        (
+            "force-desperate-escape",
+            GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+            TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+            BattlePhaseKind.MOVEMENT,
+            "player-b",
+            "none",
+            False,
+            "missing_fall_back_unit_context",
+        ),
+        (
+            "force-desperate-escape",
+            GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+            TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+            BattlePhaseKind.MOVEMENT,
+            "player-b",
+            "fall-back",
+            False,
+            "no_eligible_engaged_unit",
+        ),
+        (
+            "force-desperate-escape",
+            GENERIC_FORCE_DESPERATE_ESCAPE_HANDLER_ID,
+            TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+            BattlePhaseKind.MOVEMENT,
+            "player-b",
+            "fall-back",
+            True,
+            None,
+        ),
+        (
+            "fire-overwatch",
+            None,
+            TimingTriggerKind.START_PHASE,
+            BattlePhaseKind.MOVEMENT,
+            "player-b",
+            "fire-overwatch",
+            False,
+            "fire_overwatch_requires_end_opponent_movement_phase",
+        ),
+        (
+            "fire-overwatch",
+            None,
+            TimingTriggerKind.END_PHASE,
+            BattlePhaseKind.SHOOTING,
+            "player-b",
+            "fire-overwatch",
+            False,
+            "fire_overwatch_requires_movement_phase",
+        ),
+        (
+            "fire-overwatch",
+            None,
+            TimingTriggerKind.END_PHASE,
+            BattlePhaseKind.MOVEMENT,
+            "player-b",
+            "none",
+            False,
+            "missing_fire_overwatch_trigger_unit",
+        ),
+        (
+            "heroic-intervention",
+            None,
+            TimingTriggerKind.START_PHASE,
+            BattlePhaseKind.CHARGE,
+            "player-b",
+            "none",
+            False,
+            "heroic_intervention_requires_end_charge_phase",
+        ),
+        (
+            "heroic-intervention",
+            None,
+            TimingTriggerKind.END_PHASE,
+            BattlePhaseKind.FIGHT,
+            "player-b",
+            "none",
+            False,
+            "heroic_intervention_requires_charge_phase",
+        ),
+        (
+            "heroic-intervention",
+            None,
+            TimingTriggerKind.END_PHASE,
+            BattlePhaseKind.CHARGE,
+            "player-a",
+            "none",
+            False,
+            "heroic_intervention_requires_opponent_turn",
+        ),
+        (
+            "counteroffensive",
+            None,
+            TimingTriggerKind.START_PHASE,
+            BattlePhaseKind.FIGHT,
+            "player-b",
+            "none",
+            False,
+            "counteroffensive_requires_enemy_fought_trigger",
+        ),
+        (
+            "counteroffensive",
+            None,
+            TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT,
+            BattlePhaseKind.CHARGE,
+            "player-b",
+            "none",
+            False,
+            "counteroffensive_requires_fight_phase",
+        ),
+        (
+            "counteroffensive",
+            None,
+            TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_HAS_FOUGHT,
+            BattlePhaseKind.FIGHT,
+            None,
+            "none",
+            False,
+            "counteroffensive_requires_active_player",
+        ),
+        (
+            "crushing-impact",
+            None,
+            TimingTriggerKind.START_PHASE,
+            BattlePhaseKind.CHARGE,
+            "player-a",
+            "none",
+            False,
+            "crushing_impact_requires_charge_move_trigger",
+        ),
+        (
+            "crushing-impact",
+            None,
+            TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+            BattlePhaseKind.FIGHT,
+            "player-a",
+            "none",
+            False,
+            "crushing_impact_requires_charge_phase",
+        ),
+        (
+            "crushing-impact",
+            None,
+            TimingTriggerKind.AFTER_UNIT_ENDS_CHARGE_MOVE,
+            BattlePhaseKind.CHARGE,
+            "player-b",
+            "none",
+            False,
+            "crushing_impact_requires_own_charge_phase",
+        ),
+        (
+            "epic-challenge",
+            None,
+            TimingTriggerKind.START_PHASE,
+            BattlePhaseKind.FIGHT,
+            "player-a",
+            "none",
+            False,
+            "epic_challenge_requires_selected_to_fight_trigger",
+        ),
+        (
+            "epic-challenge",
+            None,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+            BattlePhaseKind.CHARGE,
+            "player-a",
+            "none",
+            False,
+            "epic_challenge_requires_fight_phase",
+        ),
+    ],
+)
+def test_catalog_stratagem_handler_runtime_rejects_wrong_windows(
+    stratagem_id: str,
+    handler_id: str | None,
+    trigger_kind: TimingTriggerKind,
+    phase: BattlePhaseKind,
+    active_player_id: str | None,
+    trigger_payload_kind: str,
+    has_target_binding: bool,
+    expected_reason: str | None,
+) -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    battlefield = _battlefield_for_units(
+        source_army=source_army,
+        source_unit=source_unit,
+        source_x=5.0,
+        target_army=target_army,
+        target_unit=target_unit,
+        target_x=35.0,
+    )
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=battlefield,
+        active_player_id="player-a",
+        phase=BattlePhase.MOVEMENT,
+    )
+    trigger_payload: JsonValue = None
+    if trigger_payload_kind == "fall-back":
+        trigger_payload = {FALL_BACK_UNIT_CONTEXT_KEY: target_unit.unit_instance_id}
+    elif trigger_payload_kind == "fire-overwatch":
+        trigger_payload = {FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY: target_unit.unit_instance_id}
+    context = _catalog_stratagem_context(
+        state=state,
+        player_id="player-a",
+        trigger_kind=trigger_kind,
+        phase=phase,
+        active_player_id=active_player_id,
+        trigger_payload=trigger_payload,
+    )
+    if handler_id is None:
+        definition = _core_stratagem_definition(stratagem_id)
+    else:
+        definition = replace(
+            _test_stratagem_definition(command_point_cost=1),
+            stratagem_id=stratagem_id,
+            source_id=f"source:{stratagem_id}",
+            handler_id=handler_id,
+        )
+    target_binding = StratagemTargetBinding.none() if has_target_binding else None
+
+    assert (
+        _handler_unavailable_reason(
+            state=state,
+            definition=definition,
+            context=context,
+            target_binding=target_binding,
+            effect_selection=None,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        )
+        == expected_reason
+    )
+
+
+def test_catalog_generic_stratagem_runtime_enforces_source_backed_metadata() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+
+    def state_with_target_x(target_x: float) -> GameState:
+        return _state_with_battlefield(
+            armies=(source_army, target_army),
+            battlefield=_battlefield_for_units(
+                source_army=source_army,
+                source_unit=source_unit,
+                source_x=5.0,
+                target_army=target_army,
+                target_unit=target_unit,
+                target_x=target_x,
+            ),
+            active_player_id="player-a",
+            phase=BattlePhase.SHOOTING,
+        )
+
+    far_state = state_with_target_x(35.0)
+    close_state = state_with_target_x(12.0)
+    source_binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id=source_army.player_id,
+        target_unit_instance_id=source_unit.unit_instance_id,
+    )
+
+    def reason(
+        *,
+        metadata: dict[str, JsonValue],
+        state: GameState = far_state,
+        active_player_id: str | None = "player-a",
+        trigger_payload: JsonValue = None,
+        target_binding: StratagemTargetBinding | None = source_binding,
+        effect_selection: JsonValue = None,
+    ) -> str | None:
+        return _handler_unavailable_reason(
+            state=state,
+            definition=_generic_stratagem_definition(metadata=metadata),
+            context=_catalog_stratagem_context(
+                state=state,
+                player_id="player-a",
+                trigger_kind=TimingTriggerKind.START_PHASE,
+                phase=BattlePhaseKind.SHOOTING,
+                active_player_id=active_player_id,
+                trigger_payload=trigger_payload,
+            ),
+            target_binding=target_binding,
+            effect_selection=effect_selection,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        )
+
+    assert reason(metadata={"requires_own_turn": True}, active_player_id="player-b") == (
+        "stratagem_requires_own_turn"
+    )
+    assert reason(metadata={"requires_opponent_turn": True}) == ("stratagem_requires_opponent_turn")
+    with pytest.raises(GameLifecycleError, match="requires_own_turn must be a bool"):
+        reason(metadata={"requires_own_turn": 1})
+
+    far_state.battle_shocked_unit_ids = [source_unit.unit_instance_id]
+    assert reason(metadata={"target_forbidden_if_battle_shocked": True}) == (
+        "target_battle_shocked"
+    )
+    far_state.battle_shocked_unit_ids = []
+    assert (
+        reason(
+            metadata={"target_forbidden_if_within_engagement_range": True},
+            state=close_state,
+        )
+        == "target_within_engagement_range"
+    )
+
+    target_list_metadata: dict[str, JsonValue] = {
+        TARGET_REQUIRED_TRIGGER_CONTEXT_LIST_KEY: "eligible_unit_ids"
+    }
+    assert reason(metadata=target_list_metadata) == "missing_trigger_payload"
+    assert (
+        reason(
+            metadata=target_list_metadata,
+            trigger_payload={"eligible_unit_ids": [target_unit.unit_instance_id]},
+        )
+        == "target_unit_not_in_trigger_context"
+    )
+    assert (
+        reason(
+            metadata=target_list_metadata,
+            trigger_payload={"eligible_unit_ids": [source_unit.unit_instance_id]},
+        )
+        is None
+    )
+    assert (
+        reason(metadata={TARGET_REQUIRED_REINFORCEMENT_ARRIVAL_THIS_TURN_KEY: True})
+        == "target_unit_not_arrived_from_reserves_this_turn"
+    )
+    far_state.battle_shocked_unit_ids = [target_unit.unit_instance_id]
+    assert (
+        reason(
+            metadata={"effect_selection_unit_forbidden_if_battle_shocked": "selected_unit_id"},
+            effect_selection={"selected_unit_id": target_unit.unit_instance_id},
+        )
+        == "target_already_battle_shocked"
+    )
+    assert (
+        reason(
+            metadata={"effect_selection_unit_forbidden_if_battle_shocked": "selected_unit_id"},
+            effect_selection=None,
+        )
+        is None
+    )
+
+
+def test_catalog_generic_stratagem_required_trigger_context_is_fail_closed() -> None:
+    state = _state_without_battlefield(
+        active_player_id="player-a",
+        phase=BattlePhase.SHOOTING,
+    )
+
+    def reason(*, metadata: dict[str, JsonValue], trigger_payload: JsonValue) -> str | None:
+        return _handler_unavailable_reason(
+            state=state,
+            definition=_generic_stratagem_definition(metadata=metadata),
+            context=_catalog_stratagem_context(
+                state=state,
+                player_id="player-a",
+                trigger_kind=TimingTriggerKind.START_PHASE,
+                phase=BattlePhaseKind.SHOOTING,
+                active_player_id="player-a",
+                trigger_payload=trigger_payload,
+            ),
+            target_binding=None,
+            effect_selection=None,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        )
+
+    with pytest.raises(GameLifecycleError, match="required trigger context keys must be a list"):
+        reason(
+            metadata={REQUIRED_TRIGGER_CONTEXT_KEYS_KEY: "required_key"},
+            trigger_payload={},
+        )
+    assert (
+        reason(
+            metadata={REQUIRED_TRIGGER_CONTEXT_KEYS_KEY: ["required_key"]},
+            trigger_payload=None,
+        )
+        == "missing_trigger_payload"
+    )
+    with pytest.raises(GameLifecycleError, match="context key must be a string"):
+        reason(
+            metadata={REQUIRED_TRIGGER_CONTEXT_KEYS_KEY: [1]},
+            trigger_payload={},
+        )
+    assert (
+        reason(
+            metadata={REQUIRED_TRIGGER_CONTEXT_KEYS_KEY: ["required_key"]},
+            trigger_payload={},
+        )
+        == "required_key_required"
+    )
+    empty_trigger_values: tuple[JsonValue, ...] = (None, "", [], {})
+    for empty_value in empty_trigger_values:
+        assert (
+            reason(
+                metadata={REQUIRED_TRIGGER_CONTEXT_KEYS_KEY: ["required_key"]},
+                trigger_payload={"required_key": empty_value},
+            )
+            == "required_key_required"
+        )
+    assert (
+        reason(
+            metadata={REQUIRED_TRIGGER_CONTEXT_KEYS_KEY: ["required_key"]},
+            trigger_payload={"required_key": 0},
+        )
+        is None
+    )
+
+    non_empty_key = "required_non_empty_trigger_context_keys"
+    with pytest.raises(GameLifecycleError, match="required trigger context keys must be a list"):
+        reason(metadata={non_empty_key: "destroyed_unit_ids"}, trigger_payload={})
+    assert (
+        reason(
+            metadata={non_empty_key: ["destroyed_unit_ids"]},
+            trigger_payload=None,
+        )
+        == "missing_trigger_payload"
+    )
+    with pytest.raises(GameLifecycleError, match="context key must be a string"):
+        reason(metadata={non_empty_key: [1]}, trigger_payload={})
+    assert (
+        reason(
+            metadata={non_empty_key: ["destroyed_enemy_unit_instance_ids"]},
+            trigger_payload={},
+        )
+        == "no_enemy_unit_destroyed"
+    )
+    assert (
+        reason(
+            metadata={non_empty_key: ["destroyed_target_unit_instance_ids"]},
+            trigger_payload={},
+        )
+        == "target_models_not_destroyed"
+    )
+    assert (
+        reason(
+            metadata={non_empty_key: ["selected_unit_ids"]},
+            trigger_payload={},
+        )
+        == "selected_unit_ids_required"
+    )
+    with pytest.raises(GameLifecycleError, match="must be a list"):
+        reason(
+            metadata={non_empty_key: ["selected_unit_ids"]},
+            trigger_payload={"selected_unit_ids": "army-alpha"},
+        )
+    with pytest.raises(GameLifecycleError, match="must not contain duplicates"):
+        reason(
+            metadata={non_empty_key: ["selected_unit_ids"]},
+            trigger_payload={"selected_unit_ids": ["unit-a", "unit-a"]},
+        )
+    assert (
+        reason(
+            metadata={non_empty_key: ["selected_unit_ids"]},
+            trigger_payload={"selected_unit_ids": ["unit-a"]},
+        )
+        is None
+    )
+
+
+def test_catalog_generic_visible_enemy_selection_uses_real_battlefield_geometry() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+
+    def make_state(target_x: float, *, with_battlefield: bool = True) -> GameState:
+        if not with_battlefield:
+            state = _state_without_battlefield(
+                active_player_id="player-a",
+                phase=BattlePhase.SHOOTING,
+            )
+            state.army_definitions = [source_army, target_army]
+            return state
+        return _state_with_battlefield(
+            armies=(source_army, target_army),
+            battlefield=_battlefield_for_units(
+                source_army=source_army,
+                source_unit=source_unit,
+                source_x=5.0,
+                target_army=target_army,
+                target_unit=target_unit,
+                target_x=target_x,
+            ),
+            active_player_id="player-a",
+            phase=BattlePhase.SHOOTING,
+        )
+
+    metadata: dict[str, JsonValue] = {
+        EFFECT_SELECTION_KIND_KEY: VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+        VISIBLE_ENEMY_SOURCE_UNIT_CONTEXT_KEY: TARGET_BINDING_UNIT_CONTEXT_KEY,
+        VISIBLE_ENEMY_RANGE_INCHES_KEY: 12,
+    }
+    source_binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id=source_army.player_id,
+        target_unit_instance_id=source_unit.unit_instance_id,
+    )
+
+    def reason(
+        *,
+        state: GameState,
+        target_binding: StratagemTargetBinding | None,
+        effect_selection: JsonValue,
+        metadata_override: dict[str, JsonValue] | None = None,
+    ) -> str | None:
+        return _handler_unavailable_reason(
+            state=state,
+            definition=_generic_stratagem_definition(
+                metadata=metadata if metadata_override is None else metadata_override
+            ),
+            context=_catalog_stratagem_context(
+                state=state,
+                player_id="player-a",
+                trigger_kind=TimingTriggerKind.START_PHASE,
+                phase=BattlePhaseKind.SHOOTING,
+                active_player_id="player-a",
+            ),
+            target_binding=target_binding,
+            effect_selection=effect_selection,
+            ruleset_descriptor=RulesetDescriptor.warhammer_40000_eleventh(),
+        )
+
+    close_state = make_state(12.0)
+    far_state = make_state(35.0)
+    with pytest.raises(GameLifecycleError, match="target binding source metadata"):
+        reason(
+            state=close_state,
+            target_binding=source_binding,
+            effect_selection=None,
+            metadata_override={
+                **metadata,
+                VISIBLE_ENEMY_SOURCE_UNIT_CONTEXT_KEY: "wrong_source",
+            },
+        )
+    with pytest.raises(GameLifecycleError, match="positive range metadata"):
+        reason(
+            state=close_state,
+            target_binding=source_binding,
+            effect_selection=None,
+            metadata_override={**metadata, VISIBLE_ENEMY_RANGE_INCHES_KEY: 0},
+        )
+    assert (
+        reason(
+            state=close_state,
+            target_binding=None,
+            effect_selection=None,
+        )
+        is None
+    )
+    assert (
+        reason(
+            state=close_state,
+            target_binding=StratagemTargetBinding.none(),
+            effect_selection=None,
+        )
+        == "target_unit_required"
+    )
+    enemy_binding = StratagemTargetBinding(
+        target_kind=StratagemTargetKind.ANY_UNIT,
+        target_player_id=target_army.player_id,
+        target_unit_instance_id=target_unit.unit_instance_id,
+    )
+    assert (
+        reason(
+            state=close_state,
+            target_binding=enemy_binding,
+            effect_selection=None,
+        )
+        == "target_not_friendly"
+    )
+    assert (
+        reason(
+            state=make_state(12.0, with_battlefield=False),
+            target_binding=source_binding,
+            effect_selection=None,
+        )
+        == "visible_enemy_requires_battlefield"
+    )
+    assert (
+        reason(
+            state=close_state,
+            target_binding=source_binding,
+            effect_selection=None,
+        )
+        == "visible_enemy_unit_required"
+    )
+    assert (
+        reason(
+            state=far_state,
+            target_binding=source_binding,
+            effect_selection=None,
+        )
+        == "no_visible_enemy_unit"
+    )
+
+    def selection(unit_instance_id: str) -> JsonValue:
+        return {
+            EFFECT_SELECTION_KIND_KEY: VISIBLE_ENEMY_UNIT_EFFECT_SELECTION_KIND,
+            VISIBLE_ENEMY_UNIT_CONTEXT_KEY: unit_instance_id,
+        }
+
+    assert (
+        reason(
+            state=close_state,
+            target_binding=source_binding,
+            effect_selection=selection("unknown-unit"),
+        )
+        == "unknown_visible_enemy_unit"
+    )
+    assert (
+        reason(
+            state=close_state,
+            target_binding=source_binding,
+            effect_selection=selection(source_unit.unit_instance_id),
+        )
+        == "visible_enemy_unit_not_enemy"
+    )
+    assert (
+        reason(
+            state=far_state,
+            target_binding=source_binding,
+            effect_selection=selection(target_unit.unit_instance_id),
+        )
+        == "visible_enemy_unit_not_visible_and_within_range"
+    )
+    assert (
+        reason(
+            state=close_state,
+            target_binding=source_binding,
+            effect_selection=selection(target_unit.unit_instance_id),
+        )
+        is None
+    )
+
+
+def test_catalog_advance_and_fall_back_runtime_exposes_all_source_backed_permissions() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    state = _state_with_battlefield(
+        armies=(source_army, target_army),
+        battlefield=_battlefield_for_units(
+            source_army=source_army,
+            source_unit=source_unit,
+            source_x=5.0,
+            target_army=target_army,
+            target_unit=target_unit,
+            target_x=35.0,
+        ),
+        active_player_id=source_army.player_id,
+        phase=BattlePhase.MOVEMENT,
+    )
+    clause = RuleClause(
+        clause_id="test:catalog-movement-permissions:clause",
+        source_span=_span(),
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=_span()),
+        effects=tuple(
+            _effect(RuleEffectKind.GRANT_ABILITY, ("ability", ability))
+            for ability in (
+                "can_advance_and_charge",
+                "can_advance_and_shoot_and_charge",
+                "can_fall_back_and_charge",
+                "can_fall_back_and_shoot",
+            )
+        ),
+    )
+    record = _ability_record(
+        record_id="record:catalog-movement-permissions",
+        rule_ir=_rule_ir(
+            source_id="test:catalog-movement-permissions",
+            clauses=(clause,),
+        ),
+        trigger_kind=TimingTriggerKind.PASSIVE_QUERY,
+    )
+    indexes = {
+        source_army.player_id: AbilityCatalogIndex.from_records((record,)),
+        target_army.player_id: AbilityCatalogIndex.from_records(()),
+    }
+    advance_runtime = CatalogAdvanceEligibilityRuntime(
+        ability_indexes_by_player_id=indexes,
+        armies=(source_army, target_army),
+    )
+    fall_back_runtime = CatalogFallBackEligibilityRuntime(
+        ability_indexes_by_player_id=indexes,
+        armies=(source_army, target_army),
+    )
+    advance_context = AdvanceEligibilityContext(
+        state=state,
+        player_id=source_army.player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=source_unit.unit_instance_id,
+        movement_request_id="request:catalog-advance-permissions",
+        movement_result_id="result:catalog-advance-permissions",
+    )
+    fall_back_context = FallBackEligibilityContext(
+        state=state,
+        player_id=source_army.player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=source_unit.unit_instance_id,
+        movement_request_id="request:catalog-fall-back-permissions",
+        movement_result_id="result:catalog-fall-back-permissions",
+    )
+
+    advance_grants = (
+        advance_runtime.advance_and_charge_handler(advance_context),
+        advance_runtime.advance_shoot_and_charge_handler(advance_context),
+    )
+    fall_back_grants = (
+        fall_back_runtime.fall_back_and_charge_handler(fall_back_context),
+        fall_back_runtime.fall_back_and_shoot_handler(fall_back_context),
+    )
+
+    assert len(advance_runtime.bindings()) == 2
+    assert len(fall_back_runtime.bindings()) == 2
+    assert tuple(
+        (grant.can_shoot, grant.can_declare_charge) for grant in advance_grants if grant
+    ) == (
+        (False, True),
+        (True, True),
+    )
+    assert tuple(
+        (grant.can_shoot, grant.can_declare_charge) for grant in fall_back_grants if grant
+    ) == (
+        (False, True),
+        (True, False),
+    )
+    assert (
+        advance_runtime.advance_and_charge_handler(
+            replace(
+                advance_context,
+                player_id=target_army.player_id,
+                unit_instance_id=target_unit.unit_instance_id,
+            )
+        )
+        is None
+    )
+    assert (
+        fall_back_runtime.fall_back_and_charge_handler(
+            replace(
+                fall_back_context,
+                player_id=target_army.player_id,
+                unit_instance_id=target_unit.unit_instance_id,
+            )
+        )
+        is None
+    )
+    with pytest.raises(GameLifecycleError, match="advance eligibility requires context"):
+        advance_runtime.advance_and_charge_handler(cast(AdvanceEligibilityContext, object()))
+    with pytest.raises(GameLifecycleError, match="Fall Back eligibility requires context"):
+        fall_back_runtime.fall_back_and_charge_handler(cast(FallBackEligibilityContext, object()))
+    with pytest.raises(GameLifecycleError, match="missing player ability index"):
+        CatalogAdvanceEligibilityRuntime(
+            ability_indexes_by_player_id={source_army.player_id: indexes[source_army.player_id]},
+            armies=(source_army, target_army),
+        )
+    with pytest.raises(GameLifecycleError, match="missing player ability index"):
+        CatalogFallBackEligibilityRuntime(
+            ability_indexes_by_player_id={source_army.player_id: indexes[source_army.player_id]},
+            armies=(source_army, target_army),
+        )
+
+
+def test_catalog_runtime_choice_descriptors_reject_domain_drift() -> None:
+    source_army, target_army = _mustered_core_armies()
+    source_unit = source_army.units[0]
+    target_unit = target_army.units[0]
+    clause = RuleClause(
+        clause_id="test:catalog-choice-contracts:clause",
+        source_span=_span(),
+        target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=_span()),
+        effects=(
+            _effect(
+                RuleEffectKind.GRANT_WEAPON_ABILITY,
+                ("weapon_ability", WeaponKeyword.LETHAL_HITS.value),
+            ),
+        ),
+    )
+    record = _ability_record(
+        record_id="record:catalog-choice-contracts",
+        rule_ir=_rule_ir(
+            source_id="test:catalog-choice-contracts",
+            clauses=(clause,),
+        ),
+        trigger_kind=TimingTriggerKind.START_PHASE,
+        phase=BattlePhaseKind.SHOOTING,
+    )
+    named_option = CatalogNamedWeaponAbilityChoiceOption(
+        option_id="catalog-choice:lethal-hits",
+        selection_option_id="catalog-choice:option-lethal-hits",
+        selection_option_index=1,
+        keyword=WeaponKeyword.LETHAL_HITS,
+        weapon_ability_value=None,
+        ability=None,
+        effect_index=0,
+    )
+    named_group = CatalogNamedWeaponAbilityChoiceGroup(
+        record=record,
+        unit=source_unit,
+        clause=clause,
+        selection_group_id="catalog-choice:group",
+        target_scope="models_in_this_unit",
+        weapon_names=("Bolt rifle",),
+        target_model_instance_ids=(source_unit.own_models[0].model_instance_id,),
+        options=(named_option,),
+    )
+    profile = _first_catalog_weapon_profile()
+    sequence = AttackSequence(
+        sequence_id="attack-sequence:catalog-choice-contracts",
+        attacker_player_id=source_army.player_id,
+        attacking_unit_instance_id=source_unit.unit_instance_id,
+        source_phase=BattlePhase.SHOOTING,
+        attack_pools=(
+            RangedAttackPool(
+                attacker_model_instance_id=source_unit.own_models[0].model_instance_id,
+                wargear_id="wargear:catalog-choice-contracts",
+                weapon_profile_id=profile.profile_id,
+                weapon_profile=profile,
+                target_unit_instance_id=target_unit.unit_instance_id,
+                shooting_type=ShootingType.NORMAL,
+                attacks=1,
+                target_visible_model_ids=target_unit.own_model_ids(),
+                target_in_range_model_ids=target_unit.own_model_ids(),
+            ),
+        ),
+    )
+    status_option = CatalogPostShootHitTargetStatusOption(
+        option_id="catalog-choice:status-target",
+        target_unit_instance_id=target_unit.unit_instance_id,
+    )
+    status_group = CatalogPostShootHitTargetStatusGroup(
+        record=record,
+        unit=source_unit,
+        clause=clause,
+        effect_index=0,
+        status="cannot_target_with_stratagem",
+        status_label="cannot be targeted with a Stratagem",
+        target_scope="hit_target_unit",
+        source_model_instance_id=None,
+        attack_sequence=sequence,
+        attack_sequence_completed_event_id="event:catalog-choice-contracts",
+        options=(status_option,),
+    )
+    mortal_option = CatalogUnitMoveCompletedMortalWoundsTargetOption(
+        option_id="catalog-choice:mortal-target",
+        target_unit_instance_id=target_unit.unit_instance_id,
+        target_player_id=target_army.player_id,
+    )
+    mortal_group = CatalogUnitMoveCompletedMortalWoundsGroup(
+        record=record,
+        source_unit=source_unit,
+        source_rules_unit_instance_id=source_unit.unit_instance_id,
+        player_id=source_army.player_id,
+        clause=clause,
+        effect_index=0,
+        roll_threshold=4,
+        mortal_wounds_expression=DiceExpression(quantity=1, sides=3),
+        maximum_mortal_wounds=6,
+        optional=True,
+        forbidden_stratagem_handler_ids=(CORE_GO_TO_GROUND_HANDLER_ID,),
+        target_range_inches=6,
+        target_requires_visibility=True,
+        roll_model_instance_ids=(source_unit.own_models[0].model_instance_id,),
+        trigger_event_id="event:catalog-choice-move-completed",
+        movement_action="normal_move",
+        options=(mortal_option,),
+    )
+
+    assert CatalogRuleIrHookDefinition("catalog-choice:hook").hook_id == "catalog-choice:hook"
+    assert named_group.options == (named_option,)
+    assert status_group.options == (status_option,)
+    assert mortal_group.options == (mortal_option,)
+    for invalid_hook_id in ("", " catalog-choice:hook"):
+        with pytest.raises(GameLifecycleError, match="hook definition hook_id"):
+            CatalogRuleIrHookDefinition(invalid_hook_id)
+    with pytest.raises(GameLifecycleError, match="finite options"):
+        replace(named_group, options=())
+    with pytest.raises(GameLifecycleError, match="must not duplicate IDs"):
+        replace(named_group, options=(named_option, named_option))
+    with pytest.raises(GameLifecycleError, match="selection options must be unique"):
+        replace(
+            named_group,
+            options=(
+                named_option,
+                replace(named_option, option_id="catalog-choice:sustained-hits"),
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="requires finite options"):
+        replace(status_group, options=())
+    with pytest.raises(GameLifecycleError, match="must not duplicate IDs"):
+        replace(status_group, options=(status_option, status_option))
+    for field_name, invalid_value, expected in (
+        ("effect_index", -1, "effect_index must be non-negative"),
+        ("roll_threshold", 1, "roll_threshold must be 2-6"),
+        ("mortal_wounds_expression", 0, "positive fixed or dice value"),
+        ("maximum_mortal_wounds", 0, "maximum must be positive"),
+        ("optional", 1, "optional must be bool"),
+        ("target_range_inches", 0, "target range must be positive"),
+        ("target_requires_visibility", 1, "visibility flag must be bool"),
+        ("options", (), "requires target options"),
+    ):
+        with pytest.raises(GameLifecycleError, match=expected):
+            replace(mortal_group, **cast(Any, {field_name: invalid_value}))
+    with pytest.raises(GameLifecycleError, match="must not duplicate IDs"):
+        replace(mortal_group, options=(mortal_option, mortal_option))
+
+
+def test_catalog_rule_effect_consumers_classify_supported_and_fail_closed_shapes() -> None:
+    supported_cases = (
+        (
+            _effect(RuleEffectKind.MATERIALIZE_MODELS),
+            ("catalog-ir:model-materialization",),
+        ),
+        (
+            _effect(
+                RuleEffectKind.MODIFY_DICE_ROLL,
+                ("roll_type", "charge"),
+            ),
+            ("catalog-ir:charge-roll-modifier",),
+        ),
+        (
+            _effect(
+                RuleEffectKind.SET_CHARACTERISTIC,
+                ("characteristic", Characteristic.LEADERSHIP.value),
+            ),
+            ("catalog-ir:leadership-characteristic-query",),
+        ),
+        (
+            _effect(
+                RuleEffectKind.MODIFY_CHARACTERISTIC,
+                ("characteristic", Characteristic.MOVEMENT.value),
+            ),
+            ("catalog-ir:movement-characteristic-modifier",),
+        ),
+        (
+            _effect(RuleEffectKind.MOVEMENT_TRANSIT_PERMISSION),
+            ("catalog-ir:movement-transit-permission",),
+        ),
+    )
+    unsupported_cases = (
+        _effect(
+            RuleEffectKind.MODIFY_DICE_ROLL,
+            ("roll_type", "unsupported_roll"),
+        ),
+        _effect(
+            RuleEffectKind.REROLL_PERMISSION,
+            ("roll_type", "charge"),
+            ("target_reference", "selected_unit"),
+        ),
+        _effect(
+            RuleEffectKind.REROLL_PERMISSION,
+            ("roll_type", "unsupported_roll"),
+        ),
+        _effect(RuleEffectKind.OUT_OF_PHASE_ACTION),
+        _effect(
+            RuleEffectKind.GRANT_ABILITY,
+            ("ability", "unsupported_ability"),
+        ),
+        _effect(
+            RuleEffectKind.PLACEMENT_PERMISSION,
+            ("placement_kind", 1),
+        ),
+        _effect(
+            RuleEffectKind.PLACEMENT_PERMISSION,
+            ("placement_kind", "unsupported_placement"),
+        ),
+    )
+
+    for effect, expected_consumer_ids in supported_cases:
+        assert catalog_rule_ir_consumer_ids_for_effect(effect) == expected_consumer_ids
+    for effect in unsupported_cases:
+        assert catalog_rule_ir_consumer_ids_for_effect(effect) == ()
+
+    with pytest.raises(GameLifecycleError, match="requires RuleEffectSpec"):
+        catalog_rule_ir_consumer_ids_for_effect(cast(RuleEffectSpec, object()))
+    for malformed_effect, expected in (
+        (
+            _effect(RuleEffectKind.MODIFY_DICE_ROLL),
+            "roll_type must be a non-empty string",
+        ),
+        (
+            _effect(
+                RuleEffectKind.SET_CHARACTERISTIC,
+                ("characteristic", "unsupported_characteristic"),
+            ),
+            "characteristic parameter is invalid",
+        ),
+        (
+            _effect(
+                RuleEffectKind.GRANT_WEAPON_ABILITY,
+                ("weapon_ability", "unsupported_weapon_keyword"),
+                ("weapon_scope", "all"),
+            ),
+            "unsupported keyword",
+        ),
+        (
+            _effect(RuleEffectKind.GRANT_ABILITY),
+            "ability must be a non-empty string",
+        ),
+    ):
+        with pytest.raises(GameLifecycleError, match=expected):
+            catalog_rule_ir_consumer_ids_for_effect(malformed_effect)
+
+
 def _command_point_record(
     *,
     record_id: str,
@@ -5812,6 +6935,72 @@ def _test_stratagem_definition(*, command_point_cost: int) -> StratagemDefinitio
         timing=StratagemTimingDescriptor(
             trigger_kind=TimingTriggerKind.START_PHASE,
             phase=BattlePhaseKind.SHOOTING,
+        ),
+    )
+
+
+def _core_stratagem_definition(stratagem_id: str) -> StratagemDefinition:
+    return next(
+        record.definition
+        for record in eleventh_edition_stratagem_catalog_records()
+        if record.definition.stratagem_id == stratagem_id
+    )
+
+
+def _catalog_stratagem_context(
+    *,
+    state: GameState,
+    player_id: str,
+    trigger_kind: TimingTriggerKind,
+    phase: BattlePhaseKind,
+    active_player_id: str | None,
+    trigger_payload: JsonValue = None,
+) -> StratagemEligibilityContext:
+    return StratagemEligibilityContext(
+        game_id=state.game_id,
+        player_id=player_id,
+        battle_round=state.battle_round,
+        phase=phase,
+        active_player_id=active_player_id,
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+    )
+
+
+def _generic_stratagem_definition(
+    *,
+    metadata: dict[str, JsonValue],
+) -> StratagemDefinition:
+    rule_ir = _rule_ir(
+        source_id="test:catalog-generic-stratagem",
+        clauses=(
+            RuleClause(
+                clause_id="test:catalog-generic-stratagem:clause",
+                source_span=_span(),
+                target=RuleTargetSpec(kind=RuleTargetKind.THIS_UNIT, source_span=_span()),
+                effects=(
+                    _effect(
+                        RuleEffectKind.GRANT_ABILITY,
+                        ("ability", "can_fall_back_and_shoot"),
+                    ),
+                ),
+            ),
+        ),
+    )
+    return replace(
+        _test_stratagem_definition(command_point_cost=1),
+        stratagem_id="catalog-generic-runtime",
+        source_id=rule_ir.source_id,
+        handler_id=GENERIC_RULE_IR_STRATAGEM_HANDLER_ID,
+        target_spec=StratagemTargetSpec(
+            target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+            target_policy_id="test:catalog-generic-runtime-target",
+        ),
+        effect_payload=validate_json_value(
+            {
+                "rule_ir": rule_ir.to_payload(),
+                **metadata,
+            }
         ),
     )
 

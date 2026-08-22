@@ -3771,6 +3771,10 @@ def _validate_fight_phase_state_consistency(*, state: GameState) -> None:
         rules_unit.unit_instance_id: rules_unit.owner_player_id
         for rules_unit in rules_unit_views_from_armies(armies=tuple(state.army_definitions))
     }
+    historical_attached_owner_by_id = {
+        record.attached_unit_instance_id: record.player_id
+        for record in state.starting_attached_unit_records
+    }
     known_unit_ids = set(unit_owner_by_id)
     for unit_id in (
         *fight_order_state.engaged_at_fight_step_start_unit_ids,
@@ -3784,6 +3788,8 @@ def _validate_fight_phase_state_consistency(*, state: GameState) -> None:
             raise GameLifecycleError("fight_phase_state passed player is not in this game.")
     for selection in fight_order_state.activation_selections:
         owner = unit_owner_by_id.get(selection.unit_instance_id)
+        if owner is None:
+            owner = historical_attached_owner_by_id.get(selection.unit_instance_id)
         if owner is None:
             raise GameLifecycleError("fight_phase_state activation unit is unknown.")
         if owner != selection.player_id:

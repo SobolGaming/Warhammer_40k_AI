@@ -13,20 +13,17 @@ from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.fight_on_death import (
     fight_on_death_model_ids_for_activation,
+    model_is_present_on_battlefield,
 )
-from warhammer40k_core.engine.fight_order import (
-    FightActivationSelection,
-    FightPhaseState,
-)
+from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.phase import GameLifecycleError, LifecycleStatus
 from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
     defer_attached_split_from_rule_destruction_context,
 )
 from warhammer40k_core.engine.rules_units import (
-    current_placed_alive_rules_unit_view_for_identity,
+    RulesUnitView,
     rules_unit_view_by_id,
 )
-from warhammer40k_core.engine.unit_factory import UnitInstance
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -34,127 +31,46 @@ if TYPE_CHECKING:
 _validate_identifier = IdentifierValidator(error_factory=GameLifecycleError)
 
 
-def active_fight_activation_surviving_component(
+def active_fight_activation_rules_unit(
     *,
     state: GameState,
     activation: FightActivationSelection,
-) -> UnitInstance | None:
-    rules_unit = current_placed_alive_rules_unit_view_for_identity(
-        state=state,
-        unit_instance_id=activation.unit_instance_id,
-    )
-    if rules_unit is None:
-        return None
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Fight activation survivor resolution requires battlefield_state.")
-    placed_model_ids = frozenset(battlefield_state.placed_model_ids())
-    placed_alive_components = tuple(
-        component.unit
-        for component in rules_unit.components
-        if any(
-            model.is_alive and model.model_instance_id in placed_model_ids
-            for model in component.unit.own_models
-        )
-    )
-    original_components = tuple(
-        unit
-        for unit in placed_alive_components
-        if unit.unit_instance_id == activation.unit_instance_id
-    )
-    if original_components:
-        if len(original_components) != 1:
-            raise GameLifecycleError(
-                "Active fight activation resolves to duplicate physical components."
-            )
-        return original_components[0]
-    if len(placed_alive_components) != 1:
-        raise GameLifecycleError(
-            "Active fight activation requires exactly one surviving placed physical component."
-        )
-    return placed_alive_components[0]
-
-
-def active_fight_on_death_melee_component(
-    *,
-    state: GameState,
-    activation: FightActivationSelection,
-) -> UnitInstance | None:
-    awaiting_model_ids = fight_on_death_model_ids_for_activation(
-        state=state,
-        activation_result_id=activation.result_id,
-    )
-    if awaiting_model_ids is None:
-        return None
-    if not awaiting_model_ids:
-        raise GameLifecycleError("Fight On Death activation has no awaiting models.")
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        raise GameLifecycleError("Fight On Death melee activation requires battlefield_state.")
-    placed_model_ids = frozenset(battlefield_state.placed_model_ids())
-    if not set(awaiting_model_ids).issubset(placed_model_ids):
-        raise GameLifecycleError("Fight On Death awaiting model is not placed.")
+) -> RulesUnitView | None:
     rules_unit = rules_unit_view_by_id(
         state=state,
         unit_instance_id=activation.unit_instance_id,
     )
-    awaiting_model_id_set = frozenset(awaiting_model_ids)
-    matching_components = tuple(
-        component.unit
-        for component in rules_unit.components
-        if awaiting_model_id_set.intersection(
-            model.model_instance_id for model in component.unit.own_models
-        )
+    awaiting_model_ids = fight_on_death_model_ids_for_activation(
+        state=state,
+        activation_result_id=activation.result_id,
     )
-    matched_model_ids = frozenset(
-        model.model_instance_id
-        for unit in matching_components
-        for model in unit.own_models
-        if model.model_instance_id in awaiting_model_id_set
-    )
-    if matched_model_ids != awaiting_model_id_set:
+    rules_unit_model_ids = frozenset(model.model_instance_id for model in rules_unit.own_models)
+    if awaiting_model_ids is not None and not set(awaiting_model_ids).issubset(
+        rules_unit_model_ids
+    ):
         raise GameLifecycleError("Fight On Death awaiting model is outside its activation unit.")
-    if len(matching_components) != 1:
-        raise GameLifecycleError(
-            "Fight On Death melee activation requires exactly one physical component."
+    present_model_ids = frozenset(
+        model.model_instance_id
+        for model in rules_unit.own_models
+        if model_is_present_on_battlefield(
+            state=state,
+            model_instance_id=model.model_instance_id,
         )
-    return matching_components[0]
-
-
-def record_active_fight_activation_unit_alias(
-    *,
-    state: GameState,
-    fight_state: FightPhaseState,
-    activation: FightActivationSelection,
-    unit_instance_id: str,
-) -> FightPhaseState:
-    if fight_state.active_activation != activation:
-        raise GameLifecycleError("Fight activation unit alias active activation drift.")
-    selected_unit_ids = fight_state.fight_order_state.selected_to_fight_unit_ids
-    if activation.unit_instance_id not in selected_unit_ids:
-        if (
-            fight_on_death_model_ids_for_activation(
-                state=state,
-                activation_result_id=activation.result_id,
-            )
-            is None
-        ):
-            raise GameLifecycleError(
-                "Fight activation unit alias source was not selected to fight."
-            )
-        return fight_state
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    if requested_unit_id in selected_unit_ids:
-        raise GameLifecycleError("Fight activation unit alias was already selected to fight.")
-    updated = replace(
-        fight_state,
-        fight_order_state=replace(
-            fight_state.fight_order_state,
-            selected_to_fight_unit_ids=(*selected_unit_ids, requested_unit_id),
-        ),
     )
-    state.replace_fight_phase_state(updated)
-    return updated
+    if not present_model_ids:
+        return None
+    missing_alive_ids = tuple(
+        sorted(
+            model.model_instance_id
+            for model in rules_unit.own_models
+            if model.is_alive and model.model_instance_id not in present_model_ids
+        )
+    )
+    if missing_alive_ids:
+        raise GameLifecycleError("Active fight rules unit has unplaced living models.")
+    if awaiting_model_ids is not None and not set(awaiting_model_ids).issubset(present_model_ids):
+        raise GameLifecycleError("Fight On Death awaiting model is not placed.")
+    return rules_unit
 
 
 def reconcile_fight_phase_state_after_attached_split(
@@ -322,10 +238,8 @@ def _replace_fight_unit_identity(
 
 
 __all__ = (
-    "active_fight_activation_surviving_component",
-    "active_fight_on_death_melee_component",
+    "active_fight_activation_rules_unit",
     "finalize_rule_destruction_after_fight_activation",
     "reconcile_fight_phase_state_after_attached_split",
-    "record_active_fight_activation_unit_alias",
     "split_attached_rules_unit_after_fight_activation",
 )

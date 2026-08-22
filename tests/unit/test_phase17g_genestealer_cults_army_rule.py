@@ -8,6 +8,10 @@ from dataclasses import replace
 from typing import cast
 
 import pytest
+from tests.fight_movement_event_helpers import (
+    grouped_fight_movement_resolution_payload,
+    standalone_fight_movement_event_evidence,
+)
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
@@ -98,6 +102,7 @@ from warhammer40k_core.engine.reserves import (
     ReserveState,
     ReserveStatus,
 )
+from warhammer40k_core.engine.starting_attached_units import StartingAttachedUnitRecord
 from warhammer40k_core.engine.stratagems import (
     _rapid_ingress_unit_ids,
     _strategic_reserves_ingress_unit_ids,
@@ -1041,8 +1046,8 @@ def test_enemy_non_aircraft_move_removes_marker_but_aircraft_move_does_not() -> 
         enemy_y=10.0,
     )
     marker = _marker(replacement_unit_instance_id=ACOLYTE_UNIT_ID, x_inches=10.0, y_inches=10.0)
-    state.record_cult_ambush_marker(marker)
     decisions = DecisionController()
+    _record_marker_placement_evidence(state=state, decisions=decisions, marker=marker)
     trigger_event = decisions.event_log.append(
         "movement_activation_completed",
         validate_json_value(
@@ -1065,7 +1070,12 @@ def test_enemy_non_aircraft_move_removes_marker_but_aircraft_move_does_not() -> 
     assert state.cult_ambush_markers == []
     removed_payloads = _event_payloads(decisions, "genestealer_cults_cult_ambush_marker_removed")
     assert removed_payloads[0]["trigger_event_id"] == trigger_event.event_id
-    state.record_cult_ambush_marker(marker)
+    later_marker = replace(marker, marker_id=f"{marker.marker_id}:later")
+    _record_marker_placement_evidence(
+        state=state,
+        decisions=decisions,
+        marker=later_marker,
+    )
 
     resolve_cult_ambush_marker_removal_for_completed_moves(
         state=state,
@@ -1073,7 +1083,7 @@ def test_enemy_non_aircraft_move_removes_marker_but_aircraft_move_does_not() -> 
         completed_phase=BattlePhase.MOVEMENT,
     )
 
-    assert state.cult_ambush_markers == [marker]
+    assert state.cult_ambush_markers == [later_marker]
 
     aircraft_state, _gsc_unit, aircraft_unit = _battle_state(
         gsc_unit_id=ACOLYTE_UNIT_ID,
@@ -1091,8 +1101,12 @@ def test_enemy_non_aircraft_move_removes_marker_but_aircraft_move_does_not() -> 
         x_inches=10.0,
         y_inches=10.0,
     )
-    aircraft_state.record_cult_ambush_marker(aircraft_marker)
     aircraft_decisions = DecisionController()
+    _record_marker_placement_evidence(
+        state=aircraft_state,
+        decisions=aircraft_decisions,
+        marker=aircraft_marker,
+    )
     aircraft_decisions.event_log.append(
         "movement_activation_completed",
         validate_json_value(
@@ -1115,6 +1129,519 @@ def test_enemy_non_aircraft_move_removes_marker_but_aircraft_move_does_not() -> 
     assert aircraft_state.cult_ambush_markers == [aircraft_marker]
 
 
+def test_attached_enemy_normal_move_accepts_physical_component_event_identity() -> None:
+    state, _gsc_unit, enemy_unit = _battle_state(
+        gsc_unit_id=ACOLYTE_UNIT_ID,
+        gsc_datasheet_id="acolyte-hybrids-with-autopistols",
+        gsc_unit_name="Acolyte Hybrids with Autopistols",
+        gsc_model_count=5,
+        phase=BattlePhase.MOVEMENT,
+        active_player_id=ENEMY_PLAYER_ID,
+        enemy_x=20.0,
+        enemy_y=20.0,
+    )
+    _attached_id, _component_ids = _attach_enemy_test_leader(
+        state=state,
+        enemy_unit=enemy_unit,
+        leader_x_inches=10.0,
+        leader_y_inches=10.0,
+    )
+    marker = _marker(
+        replacement_unit_instance_id=ACOLYTE_UNIT_ID,
+        x_inches=10.0,
+        y_inches=10.0,
+    )
+    decisions = DecisionController()
+    _record_marker_placement_evidence(state=state, decisions=decisions, marker=marker)
+    trigger = decisions.event_log.append(
+        "movement_activation_completed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.MOVEMENT.value,
+                "unit_instance_id": enemy_unit.unit_instance_id,
+                "movement_phase_action": "normal_move",
+            }
+        ),
+    )
+
+    resolve_cult_ambush_marker_removal_for_completed_moves(
+        state=state,
+        decisions=decisions,
+        completed_phase=BattlePhase.MOVEMENT,
+    )
+
+    assert state.cult_ambush_markers == []
+    removed = _event_payloads(decisions, "genestealer_cults_cult_ambush_marker_removed")
+    assert removed[0]["trigger_event_id"] == trigger.event_id
+    assert removed[0]["enemy_unit_instance_id"] == enemy_unit.unit_instance_id
+
+
+def test_standalone_enemy_fight_move_uses_authenticated_event_time_endpoint() -> None:
+    state, _gsc_unit, enemy_unit = _battle_state(
+        gsc_unit_id=ACOLYTE_UNIT_ID,
+        gsc_datasheet_id="acolyte-hybrids-with-autopistols",
+        gsc_unit_name="Acolyte Hybrids with Autopistols",
+        gsc_model_count=5,
+        phase=BattlePhase.FIGHT,
+        active_player_id=ENEMY_PLAYER_ID,
+        enemy_x=10.0,
+        enemy_y=10.0,
+    )
+    marker = _marker(
+        replacement_unit_instance_id=ACOLYTE_UNIT_ID,
+        x_inches=10.0,
+        y_inches=10.0,
+    )
+    assert state.battlefield_state is not None
+    endpoint = state.battlefield_state.unit_placement_by_id(enemy_unit.unit_instance_id)
+    before = replace(
+        endpoint,
+        model_placements=tuple(
+            replace(
+                placement,
+                pose=Pose.at(
+                    placement.pose.position.x - 0.5,
+                    placement.pose.position.y,
+                    placement.pose.position.z,
+                    facing_degrees=placement.pose.facing.degrees,
+                ),
+            )
+            for placement in endpoint.model_placements
+        ),
+    )
+    decisions = DecisionController()
+    _record_marker_placement_evidence(state=state, decisions=decisions, marker=marker)
+    trigger = decisions.event_log.append(
+        "fight_movement_completed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "unit_instance_id": enemy_unit.unit_instance_id,
+                **standalone_fight_movement_event_evidence(
+                    before=before,
+                    attempted=endpoint,
+                ),
+            }
+        ),
+    )
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        replace(
+            endpoint,
+            model_placements=tuple(
+                replace(
+                    placement,
+                    pose=Pose.at(
+                        40.0 + index,
+                        30.0,
+                        placement.pose.position.z,
+                        facing_degrees=placement.pose.facing.degrees,
+                    ),
+                )
+                for index, placement in enumerate(endpoint.model_placements)
+            ),
+        )
+    )
+
+    resolve_cult_ambush_marker_removal_for_completed_moves(
+        state=state,
+        decisions=decisions,
+        completed_phase=BattlePhase.FIGHT,
+    )
+
+    assert state.cult_ambush_markers == []
+    removed = _event_payloads(decisions, "genestealer_cults_cult_ambush_marker_removed")
+    assert removed[0]["trigger_event_id"] == trigger.event_id
+
+
+def test_fight_move_cannot_remove_marker_placed_after_moving_unit_is_destroyed() -> None:
+    state, _gsc_unit, enemy_unit = _battle_state(
+        gsc_unit_id=ACOLYTE_UNIT_ID,
+        gsc_datasheet_id="acolyte-hybrids-with-autopistols",
+        gsc_unit_name="Acolyte Hybrids with Autopistols",
+        gsc_model_count=5,
+        phase=BattlePhase.FIGHT,
+        active_player_id=ENEMY_PLAYER_ID,
+        enemy_x=10.0,
+        enemy_y=10.0,
+    )
+    assert state.battlefield_state is not None
+    endpoint = state.battlefield_state.unit_placement_by_id(enemy_unit.unit_instance_id)
+    decisions = DecisionController()
+    trigger = decisions.event_log.append(
+        "fight_movement_completed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "unit_instance_id": enemy_unit.unit_instance_id,
+                **standalone_fight_movement_event_evidence(
+                    before=endpoint,
+                    attempted=endpoint,
+                ),
+            }
+        ),
+    )
+    state.battlefield_state = state.battlefield_state.without_unit_placement(
+        enemy_unit.unit_instance_id
+    )
+    decisions.event_log.append(
+        "model_destroyed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "unit_instance_id": enemy_unit.unit_instance_id,
+                "model_instance_id": enemy_unit.own_models[0].model_instance_id,
+            }
+        ),
+    )
+    later_marker = replace(
+        _marker(
+            replacement_unit_instance_id=ACOLYTE_UNIT_ID,
+            x_inches=10.0,
+            y_inches=10.0,
+        ),
+        marker_id="cult-ambush-marker:phase17g-after-fight-move",
+        created_phase=BattlePhase.FIGHT,
+    )
+    _record_marker_placement_evidence(
+        state=state,
+        decisions=decisions,
+        marker=later_marker,
+    )
+
+    resolve_cult_ambush_marker_removal_for_completed_moves(
+        state=state,
+        decisions=decisions,
+        completed_phase=BattlePhase.FIGHT,
+    )
+
+    assert state.cult_ambush_markers == [later_marker]
+    assert not any(
+        payload["trigger_event_id"] == trigger.event_id
+        for payload in _event_payloads(
+            decisions,
+            "genestealer_cults_cult_ambush_marker_removed",
+        )
+    )
+
+
+def test_standalone_enemy_fight_move_requires_event_time_endpoint_evidence() -> None:
+    state, _gsc_unit, enemy_unit = _battle_state(
+        gsc_unit_id=ACOLYTE_UNIT_ID,
+        gsc_datasheet_id="acolyte-hybrids-with-autopistols",
+        gsc_unit_name="Acolyte Hybrids with Autopistols",
+        gsc_model_count=5,
+        phase=BattlePhase.FIGHT,
+        active_player_id=ENEMY_PLAYER_ID,
+        enemy_x=10.0,
+        enemy_y=10.0,
+    )
+    marker = _marker(
+        replacement_unit_instance_id=ACOLYTE_UNIT_ID,
+        x_inches=10.0,
+        y_inches=10.0,
+    )
+    assert state.battlefield_state is not None
+    endpoint = state.battlefield_state.unit_placement_by_id(enemy_unit.unit_instance_id)
+    evidence = standalone_fight_movement_event_evidence(before=endpoint, attempted=endpoint)
+    del evidence["movement_endpoint_placement"]
+    decisions = DecisionController()
+    _record_marker_placement_evidence(state=state, decisions=decisions, marker=marker)
+    decisions.event_log.append(
+        "fight_movement_completed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "unit_instance_id": enemy_unit.unit_instance_id,
+                **evidence,
+            }
+        ),
+    )
+
+    with pytest.raises(GameLifecycleError, match="requires event-time endpoint evidence"):
+        resolve_cult_ambush_marker_removal_for_completed_moves(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.FIGHT,
+        )
+
+
+def test_attached_enemy_fight_move_removes_marker_by_historical_canonical_endpoint() -> None:
+    state, _gsc_unit, enemy_unit = _battle_state(
+        gsc_unit_id=ACOLYTE_UNIT_ID,
+        gsc_datasheet_id="acolyte-hybrids-with-autopistols",
+        gsc_unit_name="Acolyte Hybrids with Autopistols",
+        gsc_model_count=5,
+        phase=BattlePhase.FIGHT,
+        active_player_id=ENEMY_PLAYER_ID,
+        enemy_x=10.0,
+        enemy_y=10.0,
+    )
+    attached_id, component_ids = _attach_enemy_test_leader(
+        state=state,
+        enemy_unit=enemy_unit,
+        leader_x_inches=11.0,
+        leader_y_inches=10.0,
+    )
+    marker = _marker(
+        replacement_unit_instance_id=ACOLYTE_UNIT_ID,
+        x_inches=10.0,
+        y_inches=10.0,
+    )
+    assert state.battlefield_state is not None
+    event_endpoint = tuple(
+        state.battlefield_state.unit_placement_by_id(component_id) for component_id in component_ids
+    )
+    decisions = DecisionController()
+    _record_marker_placement_evidence(state=state, decisions=decisions, marker=marker)
+    trigger = decisions.event_log.append(
+        "fight_movement_completed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "unit_instance_id": attached_id,
+                "proposal_kind": ProposalKind.PILE_IN.value,
+                "transition_batch": {
+                    "placements": [],
+                    "displacements": [],
+                    "removals": [],
+                },
+                "resolution": grouped_fight_movement_resolution_payload(
+                    rules_unit_instance_id=attached_id,
+                    before_component_placements=event_endpoint,
+                ),
+            }
+        ),
+    )
+
+    _split_attached_test_unit_and_move_components_away(
+        state=state,
+        component_ids=component_ids,
+    )
+    resolve_cult_ambush_marker_removal_for_completed_moves(
+        state=state,
+        decisions=decisions,
+        completed_phase=BattlePhase.FIGHT,
+    )
+
+    assert state.cult_ambush_markers == []
+    removed = _event_payloads(decisions, "genestealer_cults_cult_ambush_marker_removed")
+    assert removed[0]["trigger_event_id"] == trigger.event_id
+    assert removed[0]["enemy_unit_instance_id"] == attached_id
+
+
+@pytest.mark.parametrize(
+    ("tamper_kind", "expected_message"),
+    [
+        ("outer_context", "Grouped Fight movement resolution context drifted"),
+        ("witness_shape", "Grouped Fight movement endpoint witness shape drifted"),
+        (
+            "witness_duplicate",
+            "Grouped Fight movement target_unit_instance_ids must be sorted and unique",
+        ),
+        ("witness_type", "Grouped Fight movement target_unit_instance_ids must be a list"),
+    ],
+)
+def test_attached_enemy_fight_move_rejects_grouped_event_tampering(
+    tamper_kind: str,
+    expected_message: str,
+) -> None:
+    state, _gsc_unit, enemy_unit = _battle_state(
+        gsc_unit_id=ACOLYTE_UNIT_ID,
+        gsc_datasheet_id="acolyte-hybrids-with-autopistols",
+        gsc_unit_name="Acolyte Hybrids with Autopistols",
+        gsc_model_count=5,
+        phase=BattlePhase.FIGHT,
+        active_player_id=ENEMY_PLAYER_ID,
+        enemy_x=10.0,
+        enemy_y=10.0,
+    )
+    attached_id, component_ids = _attach_enemy_test_leader(
+        state=state,
+        enemy_unit=enemy_unit,
+        leader_x_inches=11.0,
+        leader_y_inches=10.0,
+    )
+    marker = _marker(
+        replacement_unit_instance_id=ACOLYTE_UNIT_ID,
+        x_inches=10.0,
+        y_inches=10.0,
+    )
+    assert state.battlefield_state is not None
+    endpoint = tuple(
+        state.battlefield_state.unit_placement_by_id(component_id) for component_id in component_ids
+    )
+    resolution = grouped_fight_movement_resolution_payload(
+        rules_unit_instance_id=attached_id,
+        before_component_placements=endpoint,
+    )
+    outer_proposal_kind = ProposalKind.PILE_IN.value
+    if tamper_kind == "outer_context":
+        outer_proposal_kind = ProposalKind.CONSOLIDATE.value
+    else:
+        endpoint_witness = cast(dict[str, JsonValue], resolution["endpoint_witness"])
+        if tamper_kind == "witness_shape":
+            endpoint_witness["unexpected"] = True
+        elif tamper_kind == "witness_duplicate":
+            endpoint_witness["target_unit_instance_ids"] = ["target", "target"]
+        elif tamper_kind == "witness_type":
+            endpoint_witness["target_unit_instance_ids"] = "target"
+        else:
+            raise AssertionError(f"Unhandled grouped Fight tamper kind {tamper_kind}.")
+    decisions = DecisionController()
+    _record_marker_placement_evidence(state=state, decisions=decisions, marker=marker)
+    decisions.event_log.append(
+        "fight_movement_completed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "unit_instance_id": attached_id,
+                "proposal_kind": outer_proposal_kind,
+                "transition_batch": {
+                    "placements": [],
+                    "displacements": [],
+                    "removals": [],
+                },
+                "resolution": resolution,
+            }
+        ),
+    )
+
+    with pytest.raises(GameLifecycleError, match=expected_message):
+        resolve_cult_ambush_marker_removal_for_completed_moves(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.FIGHT,
+        )
+
+
+def test_attached_enemy_fight_move_rejects_physical_component_event_identity() -> None:
+    state, _gsc_unit, enemy_unit = _battle_state(
+        gsc_unit_id=ACOLYTE_UNIT_ID,
+        gsc_datasheet_id="acolyte-hybrids-with-autopistols",
+        gsc_unit_name="Acolyte Hybrids with Autopistols",
+        gsc_model_count=5,
+        phase=BattlePhase.FIGHT,
+        active_player_id=ENEMY_PLAYER_ID,
+        enemy_x=10.0,
+        enemy_y=10.0,
+    )
+    attached_id, component_ids = _attach_enemy_test_leader(
+        state=state,
+        enemy_unit=enemy_unit,
+        leader_x_inches=11.0,
+        leader_y_inches=10.0,
+    )
+    marker = _marker(
+        replacement_unit_instance_id=ACOLYTE_UNIT_ID,
+        x_inches=10.0,
+        y_inches=10.0,
+    )
+    assert state.battlefield_state is not None
+    event_endpoint = tuple(
+        state.battlefield_state.unit_placement_by_id(component_id) for component_id in component_ids
+    )
+    decisions = DecisionController()
+    _record_marker_placement_evidence(state=state, decisions=decisions, marker=marker)
+    decisions.event_log.append(
+        "fight_movement_completed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "unit_instance_id": enemy_unit.unit_instance_id,
+                "proposal_kind": ProposalKind.PILE_IN.value,
+                "transition_batch": {
+                    "placements": [],
+                    "displacements": [],
+                    "removals": [],
+                },
+                "resolution": grouped_fight_movement_resolution_payload(
+                    rules_unit_instance_id=attached_id,
+                    before_component_placements=event_endpoint,
+                ),
+            }
+        ),
+    )
+
+    with pytest.raises(GameLifecycleError, match="identity must be canonical"):
+        resolve_cult_ambush_marker_removal_for_completed_moves(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.FIGHT,
+        )
+
+
+def test_attached_enemy_fight_move_requires_grouped_endpoint_evidence() -> None:
+    state, _gsc_unit, enemy_unit = _battle_state(
+        gsc_unit_id=ACOLYTE_UNIT_ID,
+        gsc_datasheet_id="acolyte-hybrids-with-autopistols",
+        gsc_unit_name="Acolyte Hybrids with Autopistols",
+        gsc_model_count=5,
+        phase=BattlePhase.FIGHT,
+        active_player_id=ENEMY_PLAYER_ID,
+        enemy_x=10.0,
+        enemy_y=10.0,
+    )
+    attached_id, _component_ids = _attach_enemy_test_leader(
+        state=state,
+        enemy_unit=enemy_unit,
+        leader_x_inches=11.0,
+        leader_y_inches=10.0,
+    )
+    marker = _marker(
+        replacement_unit_instance_id=ACOLYTE_UNIT_ID,
+        x_inches=10.0,
+        y_inches=10.0,
+    )
+    decisions = DecisionController()
+    _record_marker_placement_evidence(state=state, decisions=decisions, marker=marker)
+    decisions.event_log.append(
+        "fight_movement_completed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "unit_instance_id": attached_id,
+                "transition_batch": {
+                    "placements": [],
+                    "displacements": [],
+                    "removals": [],
+                },
+                "resolution": {},
+            }
+        ),
+    )
+
+    with pytest.raises(GameLifecycleError, match="requires grouped endpoint evidence"):
+        resolve_cult_ambush_marker_removal_for_completed_moves(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.FIGHT,
+        )
+
+
 def test_marker_removal_rejects_non_object_move_event_payload() -> None:
     state, _gsc_unit, _enemy_unit = _battle_state(
         gsc_unit_id=ACOLYTE_UNIT_ID,
@@ -1124,20 +1651,60 @@ def test_marker_removal_rejects_non_object_move_event_payload() -> None:
         phase=BattlePhase.MOVEMENT,
         active_player_id=ENEMY_PLAYER_ID,
     )
-    state.record_cult_ambush_marker(
-        _marker(
-            replacement_unit_instance_id=ACOLYTE_UNIT_ID,
-            x_inches=10.0,
-            y_inches=10.0,
-        )
+    marker = _marker(
+        replacement_unit_instance_id=ACOLYTE_UNIT_ID,
+        x_inches=10.0,
+        y_inches=10.0,
     )
     decisions = DecisionController()
+    _record_marker_placement_evidence(state=state, decisions=decisions, marker=marker)
     decisions.event_log.append(
         "movement_activation_completed",
         validate_json_value(["not-object"]),
     )
 
     with pytest.raises(GameLifecycleError, match="payload must be an object"):
+        resolve_cult_ambush_marker_removal_for_completed_moves(
+            state=state,
+            decisions=decisions,
+            completed_phase=BattlePhase.MOVEMENT,
+        )
+
+
+def test_marker_removal_rejects_malformed_marker_placement_evidence() -> None:
+    state, _gsc_unit, enemy_unit = _battle_state(
+        gsc_unit_id=ACOLYTE_UNIT_ID,
+        gsc_datasheet_id="acolyte-hybrids-with-autopistols",
+        gsc_unit_name="Acolyte Hybrids with Autopistols",
+        gsc_model_count=5,
+        phase=BattlePhase.MOVEMENT,
+        active_player_id=ENEMY_PLAYER_ID,
+    )
+    marker = _marker(
+        replacement_unit_instance_id=ACOLYTE_UNIT_ID,
+        x_inches=10.0,
+        y_inches=10.0,
+    )
+    state.record_cult_ambush_marker(marker)
+    decisions = DecisionController()
+    decisions.event_log.append(
+        "genestealer_cults_cult_ambush_marker_placed",
+        validate_json_value({"marker": marker.to_payload()}),
+    )
+    decisions.event_log.append(
+        "movement_activation_completed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.MOVEMENT.value,
+                "unit_instance_id": enemy_unit.unit_instance_id,
+            }
+        ),
+    )
+
+    with pytest.raises(GameLifecycleError, match="placement event payload shape drifted"):
         resolve_cult_ambush_marker_removal_for_completed_moves(
             state=state,
             decisions=decisions,
@@ -1198,8 +1765,8 @@ def test_marker_removal_ignores_unmatched_events_and_missing_context() -> None:
         x_inches=1.0,
         y_inches=1.0,
     )
-    state.record_cult_ambush_marker(marker)
     decisions = DecisionController()
+    _record_marker_placement_evidence(state=state, decisions=decisions, marker=marker)
     event_payloads = (
         ("unrelated_event", {"game_id": state.game_id}),
         (
@@ -2159,6 +2726,101 @@ def _battle_state(
     return state, gsc_unit, enemy_unit
 
 
+def _attach_enemy_test_leader(
+    *,
+    state: GameState,
+    enemy_unit: UnitInstance,
+    leader_x_inches: float,
+    leader_y_inches: float,
+) -> tuple[str, tuple[str, ...]]:
+    leader_id = f"{ENEMY_ARMY_ID}:enemy-leader"
+    leader = replace(
+        enemy_unit,
+        unit_instance_id=leader_id,
+        name="Enemy Leader",
+        own_models=tuple(
+            replace(
+                model,
+                model_instance_id=f"{leader_id}:model-{index:03d}",
+                name=f"Enemy Leader model {index}",
+            )
+            for index, model in enumerate(enemy_unit.own_models, start=1)
+        ),
+    )
+    attached_id = f"attached-unit:{ENEMY_ARMY_ID}:enemy-with-leader"
+    component_ids = tuple(sorted((enemy_unit.unit_instance_id, leader.unit_instance_id)))
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=enemy_unit.unit_instance_id,
+        leader_unit_instance_ids=(leader.unit_instance_id,),
+        component_unit_instance_ids=component_ids,
+        source_id="phase17g-gsc-enemy-attached-source",
+        attachment_source_ids=("phase17g-gsc-enemy-leader-source",),
+    )
+    enemy_army = next(army for army in state.army_definitions if army.player_id == ENEMY_PLAYER_ID)
+    unit_by_id = {unit.unit_instance_id: unit for unit in (*enemy_army.units, leader)}
+    state.army_definitions = [
+        replace(
+            army,
+            units=(*army.units, leader),
+            attached_units=(formation,),
+        )
+        if army.player_id == ENEMY_PLAYER_ID
+        else army
+        for army in state.army_definitions
+    ]
+    state.starting_attached_unit_records = [
+        *state.starting_attached_unit_records,
+        StartingAttachedUnitRecord.from_formation(
+            player_id=ENEMY_PLAYER_ID,
+            attached_unit=formation,
+            unit_by_id=unit_by_id,
+        ),
+    ]
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.with_added_unit_placement(
+        _unit_placement(
+            army_id=ENEMY_ARMY_ID,
+            player_id=ENEMY_PLAYER_ID,
+            unit=leader,
+            x_inches=leader_x_inches,
+            y_inches=leader_y_inches,
+        )
+    )
+    return attached_id, component_ids
+
+
+def _split_attached_test_unit_and_move_components_away(
+    *,
+    state: GameState,
+    component_ids: tuple[str, ...],
+) -> None:
+    state.army_definitions = [
+        replace(army, attached_units=()) if army.player_id == ENEMY_PLAYER_ID else army
+        for army in state.army_definitions
+    ]
+    assert state.battlefield_state is not None
+    for component_index, component_id in enumerate(component_ids):
+        placement = state.battlefield_state.unit_placement_by_id(component_id)
+        state.battlefield_state = state.battlefield_state.with_unit_placement(
+            replace(
+                placement,
+                model_placements=tuple(
+                    replace(
+                        model_placement,
+                        pose=Pose.at(
+                            45.0 + component_index + (model_index * 0.5),
+                            35.0,
+                            model_placement.pose.position.z,
+                            facing_degrees=model_placement.pose.facing.degrees,
+                        ),
+                    )
+                    for model_index, model_placement in enumerate(placement.model_placements)
+                ),
+            )
+        )
+
+
 def _mission_setup(
     *,
     battlefield_width_inches: float,
@@ -2415,6 +3077,31 @@ def _marker(
         created_active_player_id=ENEMY_PLAYER_ID,
         x_inches=x_inches,
         y_inches=y_inches,
+    )
+
+
+def _record_marker_placement_evidence(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    marker: CultAmbushMarker,
+) -> EventRecord:
+    state.record_cult_ambush_marker(marker)
+    return decisions.event_log.append(
+        "genestealer_cults_cult_ambush_marker_placed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": marker.created_battle_round,
+                "active_player_id": marker.created_active_player_id,
+                "phase": marker.created_phase.value,
+                "player_id": marker.player_id,
+                "request_id": f"{marker.marker_id}:request",
+                "result_id": f"{marker.marker_id}:result",
+                "marker": marker.to_payload(),
+                "source_rule_id": SOURCE_RULE_ID,
+            }
+        ),
     )
 
 

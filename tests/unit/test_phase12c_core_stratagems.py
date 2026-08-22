@@ -17,6 +17,7 @@ from warhammer40k_core.core.wargear import Wargear
 from warhammer40k_core.core.weapon_profiles import WeaponKeyword, WeaponProfile
 from warhammer40k_core.engine.ability_catalog import catalog_ability_records_from_catalog
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.attached_unit_formation import AttachedUnitFormation
 from warhammer40k_core.engine.attack_sequence import (
     attack_sequence_hit_roll_spec,
     attack_sequence_wound_roll_spec,
@@ -45,6 +46,7 @@ from warhammer40k_core.engine.decision_request import (
     parameterized_decision_option,
 )
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
@@ -122,27 +124,50 @@ from warhammer40k_core.engine.stratagems import (
     CRUSHING_IMPACT_ENEMY_TARGET_CONTEXT_KEY,
     CRUSHING_IMPACT_MODEL_CONTEXT_KEY,
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
+    DESTROYED_TARGET_BY_JUST_SHOT_UNIT_TARGET_POLICY_ID,
+    DESTROYED_TARGET_UNIT_CONTEXT_KEY,
+    ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY,
+    ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID,
     EPIC_CHALLENGE_CHARACTER_MODEL_CONTEXT_KEY,
     EXPLOSIVES_TARGET_CONTEXT_KEY,
+    FALL_BACK_UNIT_CONTEXT_KEY,
+    FIRE_OVERWATCH_TARGET_POLICY_ID,
     FIRE_OVERWATCH_TRIGGER_CONTEXT_KEY,
     HEROIC_INTERVENTION_MODE_CONTEXT_KEY,
     HEROIC_INTERVENTION_MODE_INTO_THE_FRAY,
+    JUST_FELL_BACK_UNIT_CONTEXT_KEY,
+    JUST_FELL_BACK_UNIT_TARGET_POLICY_ID,
+    JUST_SHOT_UNIT_CONTEXT_KEY,
+    JUST_SHOT_UNIT_TARGET_POLICY_ID,
+    NOT_SELECTED_TO_FIGHT_TARGET_POLICY_ID,
+    NOT_SELECTED_TO_SHOOT_TARGET_POLICY_ID,
     SELECTED_TARGET_UNIT_CONTEXT_KEY,
+    SELECTED_TO_FIGHT_CHARGED_TARGET_POLICY_ID,
+    SELECTED_TO_FIGHT_TARGET_POLICY_ID,
+    SELECTED_TO_FIGHT_UNIT_CONTEXT_KEY,
+    SELECTED_TO_MOVE_TARGET_POLICY_ID,
+    SELECTED_TO_MOVE_UNIT_CONTEXT_KEY,
+    SELECTED_TO_SHOOT_TARGET_POLICY_ID,
+    SELECTED_TO_SHOOT_UNIT_CONTEXT_KEY,
     STRATAGEM_DECISION_TYPE,
     STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE,
     StratagemAvailabilityKind,
     StratagemCatalogRecord,
     StratagemCategory,
     StratagemEligibilityContext,
+    StratagemRestrictionPolicy,
     StratagemTargetBinding,
     StratagemTargetKind,
     StratagemTargetProposal,
     StratagemTargetProposalPayload,
+    StratagemTargetSpec,
+    StratagemTimingDescriptor,
     StratagemUseRecord,
     _handler_unavailable_reason,
     create_stratagem_target_proposal_decision_request,
     create_stratagem_use_decision_request,
     invalid_heroic_intervention_charge_move_status,
+    invalid_stratagem_target_proposal_status,
     is_heroic_intervention_charge_move_request,
     is_stratagem_window_decline_result,
     request_stratagem_target_proposal,
@@ -4355,6 +4380,921 @@ def test_rapid_ingress_malformed_placement_payload_rejects_before_queue_pop() ->
     assert state.reserve_state_for_unit(reserve_state.unit_instance_id) == reserve_state
 
 
+@pytest.mark.parametrize(
+    (
+        "target_policy_id",
+        "phase",
+        "trigger_kind",
+        "trigger_payload",
+        "target_kind",
+        "target_player_id",
+        "target_unit_id",
+        "expected_reason",
+    ),
+    [
+        (
+            SELECTED_TO_MOVE_TARGET_POLICY_ID,
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.DURING_PHASE,
+            {SELECTED_TO_MOVE_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "selected_to_move_requires_unit_selection_trigger",
+        ),
+        (
+            SELECTED_TO_MOVE_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_MOVE,
+            {SELECTED_TO_MOVE_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "selected_to_move_requires_movement_phase",
+        ),
+        (
+            SELECTED_TO_MOVE_TARGET_POLICY_ID,
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_MOVE,
+            None,
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "missing_selected_to_move_context",
+        ),
+        (
+            SELECTED_TO_MOVE_TARGET_POLICY_ID,
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_MOVE,
+            {SELECTED_TO_MOVE_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit-2",
+            "unit_not_selected_to_move",
+        ),
+        (
+            SELECTED_TO_MOVE_TARGET_POLICY_ID,
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_MOVE,
+            {SELECTED_TO_MOVE_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            None,
+        ),
+        (
+            SELECTED_TO_SHOOT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.DURING_PHASE,
+            {SELECTED_TO_SHOOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "selected_to_shoot_requires_unit_selection_trigger",
+        ),
+        (
+            SELECTED_TO_SHOOT_TARGET_POLICY_ID,
+            BattlePhase.FIGHT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_SHOOT,
+            {SELECTED_TO_SHOOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "selected_to_shoot_requires_shooting_phase",
+        ),
+        (
+            SELECTED_TO_SHOOT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_SHOOT,
+            {},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "missing_selected_to_shoot_context",
+        ),
+        (
+            SELECTED_TO_SHOOT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_SHOOT,
+            {SELECTED_TO_SHOOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit-2",
+            "unit_not_selected_to_shoot",
+        ),
+        (
+            SELECTED_TO_SHOOT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_SHOOT,
+            {SELECTED_TO_SHOOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            None,
+        ),
+        (
+            SELECTED_TO_FIGHT_TARGET_POLICY_ID,
+            BattlePhase.FIGHT,
+            TimingTriggerKind.DURING_PHASE,
+            {SELECTED_TO_FIGHT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "selected_to_fight_requires_unit_selection_trigger",
+        ),
+        (
+            SELECTED_TO_FIGHT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+            {SELECTED_TO_FIGHT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "selected_to_fight_requires_fight_phase",
+        ),
+        (
+            SELECTED_TO_FIGHT_TARGET_POLICY_ID,
+            BattlePhase.FIGHT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+            None,
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "missing_selected_to_fight_context",
+        ),
+        (
+            SELECTED_TO_FIGHT_TARGET_POLICY_ID,
+            BattlePhase.FIGHT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+            {"selected_unit_instance_id": "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            None,
+        ),
+        (
+            SELECTED_TO_FIGHT_TARGET_POLICY_ID,
+            BattlePhase.FIGHT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+            {SELECTED_TO_FIGHT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit-2",
+            "unit_not_selected_to_fight",
+        ),
+        (
+            SELECTED_TO_FIGHT_TARGET_POLICY_ID,
+            BattlePhase.FIGHT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+            {SELECTED_TO_FIGHT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            None,
+        ),
+        (
+            JUST_SHOT_UNIT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.DURING_PHASE,
+            {JUST_SHOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "just_shot_requires_unit_has_shot_trigger",
+        ),
+        (
+            JUST_SHOT_UNIT_TARGET_POLICY_ID,
+            BattlePhase.FIGHT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            {JUST_SHOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "just_shot_requires_shooting_phase",
+        ),
+        (
+            JUST_SHOT_UNIT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            {},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "missing_just_shot_unit_context",
+        ),
+        (
+            JUST_SHOT_UNIT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            {JUST_SHOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit-2",
+            "unit_not_just_shot",
+        ),
+        (
+            JUST_SHOT_UNIT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            {JUST_SHOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            None,
+        ),
+        (
+            JUST_FELL_BACK_UNIT_TARGET_POLICY_ID,
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.DURING_PHASE,
+            {JUST_FELL_BACK_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "fell_back_unit_requires_fall_back_trigger",
+        ),
+        (
+            JUST_FELL_BACK_UNIT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+            {JUST_FELL_BACK_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "fell_back_unit_requires_movement_phase",
+        ),
+        (
+            JUST_FELL_BACK_UNIT_TARGET_POLICY_ID,
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+            None,
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            "missing_fell_back_unit_context",
+        ),
+        (
+            JUST_FELL_BACK_UNIT_TARGET_POLICY_ID,
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+            {JUST_FELL_BACK_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit-2",
+            "unit_not_fell_back",
+        ),
+        (
+            JUST_FELL_BACK_UNIT_TARGET_POLICY_ID,
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_FALLS_BACK,
+            {JUST_FELL_BACK_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.FRIENDLY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit",
+            None,
+        ),
+        (
+            DESTROYED_TARGET_BY_JUST_SHOT_UNIT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.DURING_PHASE,
+            {
+                JUST_SHOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit",
+                DESTROYED_TARGET_UNIT_CONTEXT_KEY: ["army-alpha:intercessor-unit-1"],
+            },
+            StratagemTargetKind.ANY_UNIT,
+            "player-a",
+            "army-alpha:intercessor-unit-1",
+            "destroyed_target_requires_unit_has_shot_trigger",
+        ),
+        (
+            DESTROYED_TARGET_BY_JUST_SHOT_UNIT_TARGET_POLICY_ID,
+            BattlePhase.FIGHT,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            {
+                JUST_SHOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit",
+                DESTROYED_TARGET_UNIT_CONTEXT_KEY: ["army-alpha:intercessor-unit-1"],
+            },
+            StratagemTargetKind.ANY_UNIT,
+            "player-a",
+            "army-alpha:intercessor-unit-1",
+            "destroyed_target_requires_shooting_phase",
+        ),
+        (
+            DESTROYED_TARGET_BY_JUST_SHOT_UNIT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            {DESTROYED_TARGET_UNIT_CONTEXT_KEY: ["army-alpha:intercessor-unit-1"]},
+            StratagemTargetKind.ANY_UNIT,
+            "player-a",
+            "army-alpha:intercessor-unit-1",
+            "missing_just_shot_unit_context",
+        ),
+        (
+            DESTROYED_TARGET_BY_JUST_SHOT_UNIT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            {JUST_SHOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            StratagemTargetKind.ANY_UNIT,
+            "player-a",
+            "army-alpha:intercessor-unit-1",
+            "missing_destroyed_target_context",
+        ),
+        (
+            DESTROYED_TARGET_BY_JUST_SHOT_UNIT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            {
+                JUST_SHOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit",
+                DESTROYED_TARGET_UNIT_CONTEXT_KEY: ["army-alpha:intercessor-unit-1"],
+            },
+            StratagemTargetKind.ANY_UNIT,
+            "player-b",
+            "army-beta:enemy-unit-2",
+            "unit_not_destroyed_target_of_just_shot_unit",
+        ),
+        (
+            DESTROYED_TARGET_BY_JUST_SHOT_UNIT_TARGET_POLICY_ID,
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_HAS_SHOT,
+            {
+                JUST_SHOT_UNIT_CONTEXT_KEY: "army-beta:enemy-unit",
+                DESTROYED_TARGET_UNIT_CONTEXT_KEY: ["army-alpha:intercessor-unit-1"],
+            },
+            StratagemTargetKind.ANY_UNIT,
+            "player-a",
+            "army-alpha:intercessor-unit-1",
+            None,
+        ),
+    ],
+)
+def test_parameterized_target_policies_validate_real_timing_contexts(
+    target_policy_id: str,
+    phase: BattlePhase,
+    trigger_kind: TimingTriggerKind,
+    trigger_payload: JsonValue,
+    target_kind: StratagemTargetKind,
+    target_player_id: str,
+    target_unit_id: str,
+    expected_reason: str | None,
+) -> None:
+    lifecycle = _battle_lifecycle(
+        config=_config(beta_unit_selection_ids=("enemy-unit", "enemy-unit-2"))
+    )
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, phase)
+
+    status = _target_policy_validation_status(
+        lifecycle=lifecycle,
+        target_policy_id=target_policy_id,
+        phase=phase,
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+        target_kind=target_kind,
+        target_player_id=target_player_id,
+        target_unit_id=target_unit_id,
+    )
+
+    assert _invalid_reason_or_none(status) == expected_reason
+
+
+@pytest.mark.parametrize(
+    ("phase", "has_fight_state", "selected_history_id", "expected_reason"),
+    [
+        (
+            BattlePhase.SHOOTING,
+            True,
+            None,
+            "not_selected_to_fight_requires_fight_phase",
+        ),
+        (BattlePhase.FIGHT, False, None, "missing_fight_phase_state"),
+        (BattlePhase.FIGHT, True, None, None),
+        (
+            BattlePhase.FIGHT,
+            True,
+            "attached-unit:army-beta:enemy-command",
+            "unit_already_selected_to_fight",
+        ),
+        (
+            BattlePhase.FIGHT,
+            True,
+            "army-beta:enemy-unit-2",
+            "unit_already_selected_to_fight",
+        ),
+    ],
+)
+def test_not_selected_to_fight_policy_reconciles_attached_unit_selection_history(
+    phase: BattlePhase,
+    has_fight_state: bool,
+    selected_history_id: str | None,
+    expected_reason: str | None,
+) -> None:
+    lifecycle = _battle_lifecycle(
+        config=_config(beta_unit_selection_ids=("enemy-unit", "enemy-unit-2"))
+    )
+    state = _state(lifecycle)
+    attached_id = "attached-unit:army-beta:enemy-command"
+    _attach_test_units(
+        state,
+        player_id="player-b",
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id="army-beta:enemy-unit",
+        leader_unit_instance_id="army-beta:enemy-unit-2",
+    )
+    _set_current_battle_phase(state, phase)
+    if has_fight_state:
+        fight_state = FightPhaseState.start(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            policy=lifecycle.config.ruleset_descriptor.fight_policy,
+            engaged_at_fight_step_start_unit_ids=(attached_id,),
+            fights_first_registry=FightsFirstRegistry(),
+        )
+        state.fight_phase_state = replace(
+            fight_state,
+            fight_order_state=replace(
+                fight_state.fight_order_state,
+                selected_to_fight_unit_ids=(
+                    () if selected_history_id is None else (selected_history_id,)
+                ),
+            ),
+        )
+
+    status = _target_policy_validation_status(
+        lifecycle=lifecycle,
+        target_policy_id=NOT_SELECTED_TO_FIGHT_TARGET_POLICY_ID,
+        phase=phase,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+        trigger_payload=None,
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-b",
+        target_unit_id="army-beta:enemy-unit",
+    )
+
+    assert _invalid_reason_or_none(status) == expected_reason
+
+
+@pytest.mark.parametrize(
+    ("phase", "shooting_history", "expected_reason"),
+    [
+        (
+            BattlePhase.FIGHT,
+            "empty",
+            "not_selected_to_shoot_requires_shooting_phase",
+        ),
+        (BattlePhase.SHOOTING, None, "missing_shooting_phase_state"),
+        (BattlePhase.SHOOTING, "empty", None),
+        (BattlePhase.SHOOTING, "selected", "unit_already_selected_to_shoot"),
+        (BattlePhase.SHOOTING, "shot", "unit_already_shot"),
+        (BattlePhase.SHOOTING, "skipped", "unit_already_skipped_shooting"),
+    ],
+)
+def test_not_selected_to_shoot_policy_uses_phase_selection_history(
+    phase: BattlePhase,
+    shooting_history: str | None,
+    expected_reason: str | None,
+) -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, phase)
+    target_unit_id = "army-beta:enemy-unit"
+    if shooting_history is not None:
+        state.shooting_phase_state = ShootingPhaseState(
+            battle_round=state.battle_round,
+            active_player_id="player-a",
+            selected_unit_ids=(target_unit_id,) if shooting_history == "selected" else (),
+            shot_unit_ids=(target_unit_id,) if shooting_history == "shot" else (),
+            skipped_unit_ids=(target_unit_id,) if shooting_history == "skipped" else (),
+        )
+
+    status = _target_policy_validation_status(
+        lifecycle=lifecycle,
+        target_policy_id=NOT_SELECTED_TO_SHOOT_TARGET_POLICY_ID,
+        phase=phase,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+        trigger_payload=None,
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-b",
+        target_unit_id=target_unit_id,
+    )
+
+    assert _invalid_reason_or_none(status) == expected_reason
+
+
+@pytest.mark.parametrize(
+    ("has_charge_move_effect", "expected_reason"),
+    [
+        (False, "unit_did_not_make_charge_move"),
+        (True, None),
+    ],
+)
+def test_selected_to_fight_charged_policy_requires_recorded_charge_move(
+    has_charge_move_effect: bool,
+    expected_reason: str | None,
+) -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    target_unit_id = "army-beta:enemy-unit"
+    if has_charge_move_effect:
+        state.record_persisting_effect(
+            PersistingEffect(
+                effect_id="phase12c-selected-to-fight-charge-move",
+                source_rule_id="phase12c:selected-to-fight:charge-move",
+                owner_player_id="player-b",
+                target_unit_instance_ids=(target_unit_id,),
+                started_battle_round=state.battle_round,
+                started_phase=BattlePhase.CHARGE,
+                expiration=EffectExpiration.end_turn(
+                    battle_round=state.battle_round,
+                    player_id="player-b",
+                ),
+                effect_payload={"effect_kind": "charge_grants_fights_first"},
+            )
+        )
+
+    status = _target_policy_validation_status(
+        lifecycle=lifecycle,
+        target_policy_id=SELECTED_TO_FIGHT_CHARGED_TARGET_POLICY_ID,
+        phase=BattlePhase.FIGHT,
+        trigger_kind=TimingTriggerKind.JUST_AFTER_FRIENDLY_UNIT_SELECTED_TO_FIGHT,
+        trigger_payload={SELECTED_TO_FIGHT_UNIT_CONTEXT_KEY: target_unit_id},
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-b",
+        target_unit_id=target_unit_id,
+    )
+
+    assert _invalid_reason_or_none(status) == expected_reason
+
+
+@pytest.mark.parametrize(
+    (
+        "phase",
+        "trigger_kind",
+        "trigger_payload",
+        "player_id",
+        "target_player_id",
+        "target_unit_id",
+        "expected_reason",
+    ),
+    [
+        (
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.DURING_PHASE,
+            {FALL_BACK_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            "player-a",
+            "player-a",
+            "army-alpha:intercessor-unit-1",
+            "fall_back_engagement_requires_fall_back_selection_trigger",
+        ),
+        (
+            BattlePhase.SHOOTING,
+            TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+            {FALL_BACK_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            "player-a",
+            "player-a",
+            "army-alpha:intercessor-unit-1",
+            "fall_back_engagement_requires_movement_phase",
+        ),
+        (
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+            {},
+            "player-a",
+            "player-a",
+            "army-alpha:intercessor-unit-1",
+            "missing_fall_back_unit_context",
+        ),
+        (
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+            {FALL_BACK_UNIT_CONTEXT_KEY: "army-beta:unknown-unit"},
+            "player-a",
+            "player-a",
+            "army-alpha:intercessor-unit-1",
+            "unknown_fall_back_unit",
+        ),
+        (
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.JUST_AFTER_ENEMY_UNIT_SELECTED_TO_FALL_BACK,
+            {FALL_BACK_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            "player-b",
+            "player-b",
+            "army-beta:enemy-unit",
+            "fall_back_unit_not_enemy",
+        ),
+        (
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+            {FALL_BACK_UNIT_CONTEXT_KEY: "army-beta:enemy-unit"},
+            "player-a",
+            "player-a",
+            "army-alpha:intercessor-unit-1",
+            "unit_not_engaged_with_fall_back_unit",
+        ),
+        (
+            BattlePhase.MOVEMENT,
+            TimingTriggerKind.AFTER_ENEMY_UNIT_ENDS_MOVE,
+            {
+                FALL_BACK_UNIT_CONTEXT_KEY: "army-beta:enemy-unit",
+                ENGAGED_ENEMY_UNIT_IDS_CONTEXT_KEY: ["army-alpha:intercessor-unit-1"],
+            },
+            "player-a",
+            "player-a",
+            "army-alpha:intercessor-unit-1",
+            None,
+        ),
+    ],
+)
+def test_engaged_fall_back_policy_validates_snapshot_and_enemy_context(
+    phase: BattlePhase,
+    trigger_kind: TimingTriggerKind,
+    trigger_payload: JsonValue,
+    player_id: str,
+    target_player_id: str,
+    target_unit_id: str,
+    expected_reason: str | None,
+) -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, phase)
+
+    status = _target_policy_validation_status(
+        lifecycle=lifecycle,
+        target_policy_id=ENGAGED_WITH_FALL_BACK_UNIT_TARGET_POLICY_ID,
+        phase=phase,
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id=target_player_id,
+        target_unit_id=target_unit_id,
+        player_id=player_id,
+    )
+
+    assert _invalid_reason_or_none(status) == expected_reason
+
+
+@pytest.mark.parametrize(
+    ("scenario", "expected_reason"),
+    [
+        ("missing_trigger", "missing_fire_overwatch_trigger_unit"),
+        ("unknown_trigger", "unknown_fire_overwatch_trigger_unit"),
+        ("friendly_trigger", "fire_overwatch_trigger_unit_not_enemy"),
+        ("forbidden_trigger", "fire_overwatch_target_forbidden"),
+        ("missing_battlefield", "fire_overwatch_requires_battlefield"),
+    ],
+)
+def test_fire_overwatch_policy_rejects_invalid_triggering_unit_state(
+    scenario: str,
+    expected_reason: str,
+) -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    triggering_unit_id = "army-beta:enemy-unit"
+    trigger_payload: JsonValue = _fire_overwatch_trigger_payload(triggering_unit_id)
+    if scenario == "missing_trigger":
+        trigger_payload = {}
+    elif scenario == "unknown_trigger":
+        trigger_payload = _fire_overwatch_trigger_payload("army-beta:unknown-unit")
+    elif scenario == "friendly_trigger":
+        trigger_payload = _fire_overwatch_trigger_payload("army-alpha:intercessor-unit-1")
+    elif scenario == "forbidden_trigger":
+        state.record_persisting_effect(
+            PersistingEffect(
+                effect_id="phase12c-fire-overwatch-forbidden",
+                source_rule_id="phase12c:fire-overwatch:forbidden",
+                owner_player_id="player-b",
+                target_unit_instance_ids=(triggering_unit_id,),
+                started_battle_round=state.battle_round,
+                started_phase=BattlePhase.MOVEMENT,
+                expiration=EffectExpiration.end_turn(
+                    battle_round=state.battle_round,
+                    player_id="player-a",
+                ),
+                effect_payload={"fire_overwatch_forbidden": True},
+            )
+        )
+    elif scenario == "missing_battlefield":
+        state.battlefield_state = None
+
+    status = _target_policy_validation_status(
+        lifecycle=lifecycle,
+        target_policy_id=FIRE_OVERWATCH_TARGET_POLICY_ID,
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.END_PHASE,
+        trigger_payload=trigger_payload,
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-a",
+        target_unit_id="army-alpha:intercessor-unit-1",
+        player_id="player-a",
+    )
+
+    assert _invalid_reason_or_none(status) == expected_reason
+
+
+@pytest.mark.parametrize(
+    (
+        "required_keywords",
+        "required_keywords_any",
+        "required_faction_keywords",
+        "excluded_keywords",
+        "excluded_faction_keywords",
+        "expected_reason",
+    ),
+    [
+        (("INFANTRY", "BATTLELINE"), (), (), (), (), None),
+        (("MONSTER",), (), (), (), (), "unit_missing_required_keyword"),
+        ((), ("MONSTER", "INFANTRY"), (), (), (), None),
+        ((), ("MONSTER", "VEHICLE"), (), (), (), "unit_missing_required_keyword"),
+        ((), (), ("ADEPTUS_ASTARTES",), (), (), None),
+        (
+            (),
+            (),
+            ("LEGIONES_DAEMONICA",),
+            (),
+            (),
+            "unit_missing_required_faction_keyword",
+        ),
+        ((), (), (), ("VEHICLE", "INFANTRY"), (), "unit_has_excluded_keyword"),
+        ((), (), (), ("VEHICLE",), (), None),
+        (
+            (),
+            (),
+            (),
+            (),
+            ("ADEPTUS_ASTARTES",),
+            "unit_has_excluded_faction_keyword",
+        ),
+        ((), (), (), (), ("LEGIONES_DAEMONICA",), None),
+    ],
+)
+def test_friendly_unit_policy_enforces_canonical_keyword_constraints(
+    required_keywords: tuple[str, ...],
+    required_keywords_any: tuple[str, ...],
+    required_faction_keywords: tuple[str, ...],
+    excluded_keywords: tuple[str, ...],
+    excluded_faction_keywords: tuple[str, ...],
+    expected_reason: str | None,
+) -> None:
+    lifecycle = _battle_lifecycle()
+    state = _state(lifecycle)
+    _set_current_battle_phase(state, BattlePhase.MOVEMENT)
+    target_unit_id = "army-beta:enemy-unit"
+    _replace_unit_keywords(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("Infantry", "Battleline", "Phase12c Marker"),
+    )
+    _replace_unit_faction_keywords(
+        state,
+        unit_instance_id=target_unit_id,
+        faction_keywords=("Adeptus Astartes", "Phase12c Faction"),
+    )
+
+    status = _target_policy_validation_status(
+        lifecycle=lifecycle,
+        target_policy_id="friendly_unit",
+        phase=BattlePhase.MOVEMENT,
+        trigger_kind=TimingTriggerKind.DURING_PHASE,
+        trigger_payload=None,
+        target_kind=StratagemTargetKind.FRIENDLY_UNIT,
+        target_player_id="player-b",
+        target_unit_id=target_unit_id,
+        required_keywords=required_keywords,
+        required_keywords_any=required_keywords_any,
+        required_faction_keywords=required_faction_keywords,
+        excluded_keywords=excluded_keywords,
+        excluded_faction_keywords=excluded_faction_keywords,
+    )
+
+    assert _invalid_reason_or_none(status) == expected_reason
+
+
+def _target_policy_validation_status(
+    *,
+    lifecycle: GameLifecycle,
+    target_policy_id: str,
+    phase: BattlePhase,
+    trigger_kind: TimingTriggerKind,
+    trigger_payload: JsonValue,
+    target_kind: StratagemTargetKind,
+    target_player_id: str,
+    target_unit_id: str,
+    player_id: str = "player-b",
+    required_keywords: tuple[str, ...] = (),
+    required_keywords_any: tuple[str, ...] = (),
+    required_faction_keywords: tuple[str, ...] = (),
+    excluded_keywords: tuple[str, ...] = (),
+    excluded_faction_keywords: tuple[str, ...] = (),
+) -> LifecycleStatus | None:
+    state = _state(lifecycle)
+    record = _target_policy_record(
+        target_policy_id=target_policy_id,
+        phase=phase,
+        trigger_kind=trigger_kind,
+        target_kind=target_kind,
+        required_keywords=required_keywords,
+        required_keywords_any=required_keywords_any,
+        required_faction_keywords=required_faction_keywords,
+        excluded_keywords=excluded_keywords,
+        excluded_faction_keywords=excluded_faction_keywords,
+    )
+    context = _context(
+        state=state,
+        player_id=player_id,
+        trigger_kind=trigger_kind,
+        trigger_payload=trigger_payload,
+    )
+    proposal_request = StratagemTargetProposal.for_request(
+        context=context,
+        catalog_record=record,
+    )
+    waiting = request_stratagem_target_proposal(
+        state=state,
+        decisions=lifecycle.decision_controller,
+        proposal_request=proposal_request,
+    )
+    request = _decision_request(waiting)
+    submitted_proposal = _proposal_request_from_decision(request).with_binding(
+        StratagemTargetBinding(
+            target_kind=target_kind,
+            target_player_id=target_player_id,
+            target_unit_instance_id=target_unit_id,
+        )
+    )
+    return invalid_stratagem_target_proposal_status(
+        state=state,
+        request=request,
+        result=_target_proposal_result(
+            request=request,
+            result_id=f"phase12c-target-policy-{target_policy_id}",
+            proposal=submitted_proposal,
+        ),
+        ruleset_descriptor=lifecycle.config.ruleset_descriptor,
+        army_catalog=lifecycle.config.army_catalog,
+        decisions=lifecycle.decision_controller,
+    )
+
+
+def _target_policy_record(
+    *,
+    target_policy_id: str,
+    phase: BattlePhase,
+    trigger_kind: TimingTriggerKind,
+    target_kind: StratagemTargetKind,
+    required_keywords: tuple[str, ...] = (),
+    required_keywords_any: tuple[str, ...] = (),
+    required_faction_keywords: tuple[str, ...] = (),
+    excluded_keywords: tuple[str, ...] = (),
+    excluded_faction_keywords: tuple[str, ...] = (),
+) -> StratagemCatalogRecord:
+    base = _source_stratagem_record("counteroffensive")
+    definition = replace(
+        base.definition,
+        stratagem_id=f"phase12c-target-policy-{target_policy_id}",
+        name=f"Phase 12C target policy {target_policy_id}",
+        source_id=f"phase12c:target-policy:{target_policy_id}",
+        command_point_cost=0,
+        timing=StratagemTimingDescriptor(
+            trigger_kind=trigger_kind,
+            phase=phase,
+        ),
+        restriction_policy=StratagemRestrictionPolicy(
+            same_stratagem_per_phase=False,
+            same_unit_target_per_phase=False,
+        ),
+        target_spec=StratagemTargetSpec(
+            target_kind=target_kind,
+            enumerable=False,
+            target_policy_id=target_policy_id,
+            required_keywords=required_keywords,
+            required_keywords_any=required_keywords_any,
+            required_faction_keywords=required_faction_keywords,
+            excluded_keywords=excluded_keywords,
+            excluded_faction_keywords=excluded_faction_keywords,
+        ),
+        handler_id="record_only",
+        effect_payload=None,
+    )
+    return replace(
+        base,
+        record_id=(f"phase12c:target-policy:{target_policy_id}:{trigger_kind.value}:{phase.value}"),
+        definition=definition,
+        availability_kind=StratagemAvailabilityKind.CORE,
+        detachment_id=None,
+        disabled=False,
+    )
+
+
+def _invalid_reason_or_none(status: LifecycleStatus | None) -> str | None:
+    if status is None:
+        return None
+    assert status.status_kind is LifecycleStatusKind.INVALID
+    assert isinstance(status.payload, dict)
+    reason = status.payload.get("invalid_reason")
+    assert type(reason) is str
+    return reason
+
+
 def _source_stratagem_record(stratagem_id: str) -> StratagemCatalogRecord:
     for record in eleventh_edition_stratagem_catalog_records():
         if record.definition.stratagem_id == stratagem_id:
@@ -4661,6 +5601,27 @@ def _replace_unit_keywords(
     raise AssertionError(f"Missing unit {unit_instance_id}.")
 
 
+def _replace_unit_faction_keywords(
+    state: GameState,
+    *,
+    unit_instance_id: str,
+    faction_keywords: tuple[str, ...],
+) -> None:
+    for army_index, army in enumerate(state.army_definitions):
+        units = tuple(
+            (
+                replace(unit, faction_keywords=faction_keywords)
+                if unit.unit_instance_id == unit_instance_id
+                else unit
+            )
+            for unit in army.units
+        )
+        if units != army.units:
+            state.army_definitions[army_index] = replace(army, units=units)
+            return
+    raise AssertionError(f"Missing unit {unit_instance_id}.")
+
+
 def _replace_unit_poses(
     state: GameState,
     *,
@@ -4756,6 +5717,35 @@ def _mark_attached_unit_join(
         updated_records,
         key=lambda record: record.unit_instance_id,
     )
+
+
+def _attach_test_units(
+    state: GameState,
+    *,
+    player_id: str,
+    attached_unit_instance_id: str,
+    bodyguard_unit_instance_id: str,
+    leader_unit_instance_id: str,
+) -> None:
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_unit_instance_id,
+        bodyguard_unit_instance_id=bodyguard_unit_instance_id,
+        leader_unit_instance_ids=(leader_unit_instance_id,),
+        component_unit_instance_ids=tuple(
+            sorted((bodyguard_unit_instance_id, leader_unit_instance_id))
+        ),
+        source_id=f"phase12c:attachment:{attached_unit_instance_id}",
+        attachment_source_ids=(f"phase12c:attachment:{attached_unit_instance_id}:eligibility",),
+    )
+    for army_index, army in enumerate(state.army_definitions):
+        if army.player_id != player_id:
+            continue
+        state.army_definitions[army_index] = replace(
+            army,
+            attached_units=(*army.attached_units, formation),
+        )
+        return
+    raise AssertionError(f"Missing army for player {player_id}.")
 
 
 def _clear_terrain(state: GameState) -> None:

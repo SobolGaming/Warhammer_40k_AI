@@ -360,6 +360,29 @@ def current_rules_unit_views_for_identity(
     return tuple(sorted(descendants, key=lambda view: view.unit_instance_id))
 
 
+def current_rules_unit_views_for_canonical_identity(
+    *,
+    state: GameState,
+    unit_instance_id: str,
+) -> tuple[RulesUnitView, ...]:
+    """Resolve one canonical current or historical attached rules-unit identity."""
+    requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    current_views = current_rules_unit_views_for_identity(
+        state=state,
+        unit_instance_id=requested_id,
+    )
+    if any(view.unit_instance_id == requested_id for view in current_views):
+        return current_views
+    if any(
+        record.attached_unit_instance_id == requested_id
+        for record in state.starting_attached_unit_records
+    ):
+        return current_views
+    raise GameLifecycleError(
+        "Rules-unit identity must be canonical; canonical rules-unit identity required."
+    )
+
+
 def rules_unit_identities_share_lineage(
     *,
     state: GameState,
@@ -391,6 +414,30 @@ def rules_unit_identities_share_lineage(
         component_id for view in second_views for component_id in view.component_unit_instance_ids
     }
     return bool(first_component_ids.intersection(second_component_ids))
+
+
+def rules_unit_identity_history_contains(
+    *,
+    state: GameState,
+    identity_ids: tuple[str, ...],
+    unit_instance_id: str,
+) -> bool:
+    """Return whether current or historical rules-unit identity history contains a unit."""
+    if type(identity_ids) is not tuple:
+        raise GameLifecycleError("Rules-unit identity history must be a tuple.")
+    requested_id = _validate_identifier("unit_instance_id", unit_instance_id)
+    historical_ids = tuple(
+        _validate_identifier("identity_id", identity_id) for identity_id in identity_ids
+    )
+    return any(
+        historical_id == requested_id
+        or rules_unit_identities_share_lineage(
+            state=state,
+            first_unit_instance_id=historical_id,
+            second_unit_instance_id=requested_id,
+        )
+        for historical_id in historical_ids
+    )
 
 
 def reconcile_rules_unit_identity(

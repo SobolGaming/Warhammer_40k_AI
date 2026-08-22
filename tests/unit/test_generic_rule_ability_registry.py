@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import copy
+from collections.abc import Callable
 from dataclasses import replace
 from typing import cast
 
@@ -16,20 +18,30 @@ from warhammer40k_core.engine import (
 from warhammer40k_core.engine import (
     generic_rule_advance_move_lifecycle_hooks as advance_move_lifecycle_hooks,
 )
+from warhammer40k_core.engine import (
+    generic_rule_lifecycle_hook_handlers,
+    generic_rule_lifecycle_hooks,
+    generic_rule_selected_to_fight_effects,
+)
 from warhammer40k_core.engine.advance_eligibility_hooks import AdvanceEligibilityContext
 from warhammer40k_core.engine.advance_hooks import AdvanceMoveContext, AdvanceMoveGrant
 from warhammer40k_core.engine.army_mustering import (
     ArmyDefinition,
     ArmyMusterRequest,
+    EnhancementAssignment,
 )
-from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
+from warhammer40k_core.engine.battle_formation_hooks import (
+    BattleFormationRequestContext,
+    BattleFormationResultContext,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.effects import (
     EffectExpiration,
     PersistingEffect,
     generic_rule_persisting_effect,
 )
-from warhammer40k_core.engine.event_log import validate_json_value
+from warhammer40k_core.engine.enhancement_effects import EnhancementEffectContext
+from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.activation import RuntimeContentActivation
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.aeldari.detachments.corsair_coterie import (  # noqa: E501
     enhancements as corsair_enhancements,
@@ -40,6 +52,13 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_m
 from warhammer40k_core.engine.faction_content.warhammer_40000_11th.emperors_children.detachments.court_of_the_phoenician import (  # noqa: E501
     rule as court_rule,
 )
+from warhammer40k_core.engine.fall_back_hooks import FallBackEligibilityContext
+from warhammer40k_core.engine.fight_activation_abilities import FightActivationAbilityContext
+from warhammer40k_core.engine.fight_phase_start_hooks import (
+    FightPhaseStartRequestContext,
+    FightPhaseStartResultContext,
+)
+from warhammer40k_core.engine.fight_unit_selected_hooks import FightUnitSelectedContext
 from warhammer40k_core.engine.game_state import GameConfig, GameState
 from warhammer40k_core.engine.generic_rule_ability_effects import (
     generic_rule_ability_effects_for_unit,
@@ -57,11 +76,24 @@ from warhammer40k_core.engine.list_validation import (
     DetachmentSelection,
     UnitMusterSelection,
 )
+from warhammer40k_core.engine.movement_end_surge_hooks import MovementEndSurgeContext
 from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
     SetupStep,
+)
+from warhammer40k_core.engine.reserve_arrival_hooks import ReserveArrivalDistanceContext
+from warhammer40k_core.engine.rule_execution import RuleExecutionResult, RuleExecutionStatus
+from warhammer40k_core.engine.runtime_modifiers import (
+    ObjectiveControlModifierContext,
+    SaveOptionModifierContext,
+)
+from warhammer40k_core.engine.shooting_unit_selected_hooks import ShootingUnitSelectedContext
+from warhammer40k_core.engine.sticky_objective_control import PhaseEndObjectiveControlContext
+from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
+    StratagemCostChoiceRequestContext,
+    StratagemCostChoiceResultContext,
 )
 from warhammer40k_core.engine.stratagem_cost_modifiers import StratagemCostModifierContext
 from warhammer40k_core.engine.stratagems import (
@@ -74,14 +106,17 @@ from warhammer40k_core.engine.stratagems import (
     StratagemTargetSpec,
     StratagemTimingDescriptor,
 )
+from warhammer40k_core.engine.target_restriction_hooks import ShootingTargetRestrictionContext
 from warhammer40k_core.engine.timing_windows import TimingTriggerKind
+from warhammer40k_core.engine.turn_end_hooks import TurnEndRequestContext, TurnEndResultContext
+from warhammer40k_core.engine.unit_destroyed_hooks import UnitDestroyedContext
 from warhammer40k_core.engine.unit_factory import ModelInstance, UnitInstance
 from warhammer40k_core.engine.unit_state import StartingStrengthRecord
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
 from warhammer40k_core.geometry.model_geometry import ModelGeometry
-from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleIR, RuleTargetKind
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_corsair_coterie_ir_support_2026_27 as corsair_ir,
 )
@@ -985,6 +1020,799 @@ def test_generic_rule_ability_effects_for_unit_rejects_empty_required_keyword_an
             unit_instance_id=_RANGERS_UNIT_ID,
             ability=path_outcast_ir.ASSASSINS_EYE_CHARACTER_AP_BONUS_ABILITY,
         )
+
+
+@pytest.mark.parametrize(
+    ("case", "expected_error"),
+    [
+        ("missing_effect", "payload must be an object"),
+        ("missing_kind", "effect kind must be a string"),
+        ("unknown_kind", "effect kind is unsupported"),
+        ("parameters_not_list", "effect parameters must be a list"),
+        ("parameter_not_object", "payload must be an object"),
+        ("parameter_missing_key", "effect parameter requires key"),
+        ("duplicate_parameter", "effect parameters are duplicated"),
+        ("wrong_target", "effects must target this model"),
+        ("wrong_dice_quantity", "mortal wounds require one die"),
+        ("wrong_dice_sides", "mortal wounds require a D3"),
+        ("wrong_modifier", r"mortal wounds require a \+1 modifier"),
+        ("missing_duration", "payload must be an object"),
+        ("wrong_duration_kind", "reroll duration is unsupported"),
+        ("duration_parameters_not_list", "duration parameters must be a list"),
+        ("duration_parameter_not_object", "payload must be an object"),
+        ("wrong_duration_endpoint", "rerolls must expire at phase end"),
+    ],
+)
+def test_selected_to_fight_rule_ir_payload_validation_fails_closed(
+    case: str,
+    expected_error: str,
+) -> None:
+    payload = _selected_to_fight_effect_payload()
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        _raise_selected_to_fight_payload_error(case=case, payload=payload)
+
+
+def test_selected_to_fight_rule_ir_payload_helpers_accept_canonical_payload() -> None:
+    payload = _selected_to_fight_effect_payload()
+
+    assert (
+        generic_rule_selected_to_fight_effects._effect_kind(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+        is RuleEffectKind.INFLICT_MORTAL_WOUNDS
+    )
+    parameters = generic_rule_selected_to_fight_effects._effect_parameters(  # pyright: ignore[reportPrivateUsage]
+        payload
+    )
+    generic_rule_selected_to_fight_effects._require_this_model_target(  # pyright: ignore[reportPrivateUsage]
+        payload
+    )
+    generic_rule_selected_to_fight_effects._validate_self_mortal_wound_parameters(  # pyright: ignore[reportPrivateUsage]
+        parameters
+    )
+    generic_rule_selected_to_fight_effects._require_end_phase_duration(  # pyright: ignore[reportPrivateUsage]
+        payload
+    )
+
+
+@pytest.mark.parametrize(
+    ("case", "expected_error"),
+    [
+        ("missing_effect", "requires effect object"),
+        ("parameters_not_list", "requires parameters"),
+        ("parameter_not_object", "parameter must be an object"),
+        ("parameter_missing_key", "parameter requires key"),
+        ("duplicate_parameter", "parameters must be unique"),
+    ],
+)
+def test_generic_lifecycle_effect_parameter_validation_fails_closed(
+    case: str,
+    expected_error: str,
+) -> None:
+    payload: dict[str, JsonValue] = {
+        "effect": {"parameters": [{"key": "model_proximity_inches", "value": 3.0}]}
+    }
+    effect = cast(dict[str, JsonValue], payload["effect"])
+    if case == "missing_effect":
+        payload["effect"] = None
+    elif case == "parameters_not_list":
+        effect["parameters"] = None
+    elif case == "parameter_not_object":
+        effect["parameters"] = ["invalid"]
+    elif case == "parameter_missing_key":
+        effect["parameters"] = [{"value": 3.0}]
+    elif case == "duplicate_parameter":
+        effect["parameters"] = [
+            {"key": "model_proximity_inches", "value": 3.0},
+            {"key": "model_proximity_inches", "value": 4.0},
+        ]
+    else:
+        raise AssertionError(f"Unhandled test case: {case}")
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        generic_rule_lifecycle_hooks._effect_parameters(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+
+
+def test_generic_lifecycle_scalar_parameter_validation_is_typed_and_positive() -> None:
+    assert (
+        generic_rule_lifecycle_hooks._optional_bool_parameter(  # pyright: ignore[reportPrivateUsage]
+            {}, "requires_charge_move"
+        )
+        is False
+    )
+    assert (
+        generic_rule_lifecycle_hooks._optional_bool_parameter(  # pyright: ignore[reportPrivateUsage]
+            {"requires_charge_move": True}, "requires_charge_move"
+        )
+        is True
+    )
+    with pytest.raises(GameLifecycleError, match="must be a bool"):
+        generic_rule_lifecycle_hooks._optional_bool_parameter(  # pyright: ignore[reportPrivateUsage]
+            {"requires_charge_move": 1}, "requires_charge_move"
+        )
+
+    assert (
+        generic_rule_lifecycle_hooks._positive_float_parameter(  # pyright: ignore[reportPrivateUsage]
+            {"distance": 3}, "distance"
+        )
+        == 3.0
+    )
+    assert (
+        generic_rule_lifecycle_hooks._positive_float_parameter(  # pyright: ignore[reportPrivateUsage]
+            {"distance": 3.5}, "distance"
+        )
+        == 3.5
+    )
+    with pytest.raises(GameLifecycleError, match="must be numeric"):
+        generic_rule_lifecycle_hooks._positive_float_parameter(  # pyright: ignore[reportPrivateUsage]
+            {"distance": "three"}, "distance"
+        )
+    with pytest.raises(GameLifecycleError, match="must be positive"):
+        generic_rule_lifecycle_hooks._positive_float_parameter(  # pyright: ignore[reportPrivateUsage]
+            {"distance": 0}, "distance"
+        )
+
+
+def test_generic_lifecycle_record_and_assignment_validation_fails_closed() -> None:
+    source = _shadow_legion_source()
+    missing_rule_id = replace(source.record, rule_id=None)
+    missing_hash = copy.copy(source.record)
+    object.__setattr__(missing_hash, "rule_ir_hash", None)
+    stale_hash = copy.copy(source.record)
+    object.__setattr__(stale_hash, "rule_ir_hash", "stale-rule-ir-hash")
+
+    with pytest.raises(GameLifecycleError, match="requires rule_id"):
+        generic_rule_lifecycle_hooks._record_rule_id(  # pyright: ignore[reportPrivateUsage]
+            missing_rule_id
+        )
+    with pytest.raises(GameLifecycleError, match="requires rule_ir_hash"):
+        generic_rule_lifecycle_hooks._validate_record_rule_ir_hash(  # pyright: ignore[reportPrivateUsage]
+            record=missing_hash,
+            rule_ir=source.rule_ir,
+        )
+    with pytest.raises(GameLifecycleError, match="stale RuleIR hash"):
+        generic_rule_lifecycle_hooks._validate_record_rule_ir_hash(  # pyright: ignore[reportPrivateUsage]
+            record=stale_hash,
+            rule_ir=source.rule_ir,
+        )
+    with pytest.raises(GameLifecycleError, match="resolver must be callable"):
+        generic_rule_lifecycle_hooks._rule_ir_for_record(  # pyright: ignore[reportPrivateUsage]
+            source.record,
+            rule_ir_resolver=cast(Callable[[str], RuleIR], object()),
+        )
+    with pytest.raises(GameLifecycleError, match="must grant exactly one ability"):
+        generic_rule_lifecycle_hooks._single_grant_ability_payload(  # pyright: ignore[reportPrivateUsage]
+            (),
+            ability="fight_activation_melee_targeting_distance",
+        )
+    with pytest.raises(GameLifecycleError, match="assignments must be a mapping"):
+        generic_rule_lifecycle_hooks._validate_assignment_mapping(  # pyright: ignore[reportPrivateUsage]
+            object()
+        )
+    with pytest.raises(GameLifecycleError, match="requires runtime assignments"):
+        generic_rule_lifecycle_hooks._validate_assignment_mapping(  # pyright: ignore[reportPrivateUsage]
+            {"army-a:bearer": object()}
+        )
+
+
+def test_generic_lifecycle_binding_inputs_fail_closed() -> None:
+    activation = _warptide_activation()
+
+    with pytest.raises(GameLifecycleError, match="Fall Back bindings require activation"):
+        generic_rule_lifecycle_hooks.fall_back_eligibility_hook_bindings(
+            activation=cast(RuntimeContentActivation, object()),
+            execution_records=(),
+        )
+    with pytest.raises(GameLifecycleError, match="Fall Back bindings require execution records"):
+        generic_rule_lifecycle_hooks.fall_back_eligibility_hook_bindings(
+            activation=activation,
+            execution_records=cast(
+                tuple[faction_execution_2026_27.Phase17FExecutionRecord, ...],
+                [],
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="Fall Back bindings require execution records"):
+        generic_rule_lifecycle_hooks.fall_back_eligibility_hook_bindings(
+            activation=activation,
+            execution_records=(cast(faction_execution_2026_27.Phase17FExecutionRecord, object()),),
+        )
+    with pytest.raises(GameLifecycleError, match="fight activation bindings require activation"):
+        generic_rule_lifecycle_hooks.fight_activation_ability_hook_bindings(
+            activation=cast(RuntimeContentActivation, object()),
+            execution_records=(),
+        )
+    with pytest.raises(
+        GameLifecycleError, match="fight activation bindings require execution records"
+    ):
+        generic_rule_lifecycle_hooks.fight_activation_ability_hook_bindings(
+            activation=activation,
+            execution_records=cast(
+                tuple[faction_execution_2026_27.Phase17FExecutionRecord, ...],
+                [],
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="RuleIR resolver must be callable"):
+        generic_rule_lifecycle_hooks.fight_activation_ability_hook_bindings(
+            activation=activation,
+            execution_records=(),
+            rule_ir_resolver=cast(Callable[[str], RuleIR], object()),
+        )
+    with pytest.raises(
+        GameLifecycleError, match="fight activation bindings require execution records"
+    ):
+        generic_rule_lifecycle_hooks.fight_activation_ability_hook_bindings(
+            activation=activation,
+            execution_records=(cast(faction_execution_2026_27.Phase17FExecutionRecord, object()),),
+        )
+
+
+def test_selected_to_fight_enhancement_bearer_and_entrypoints_require_exact_types() -> None:
+    state = _keyword_any_state()
+    state = replace(
+        state,
+        battle_phase_index=state.battle_phase_sequence.index(BattlePhase.FIGHT),
+    )
+    army = state.army_definitions[0]
+    unit = army.units[0]
+    model = unit.own_models[0]
+    assignment = EnhancementAssignment(
+        enhancement_id="selected-to-fight-test",
+        target_unit_selection_id="selected-to-fight-unit",
+        source_id="selected-to-fight-assignment",
+    )
+    bearer = generic_rule_selected_to_fight_effects.SelectedToFightEnhancementBearer(
+        army=army,
+        assignment=assignment,
+        physical_unit=unit,
+        model=model,
+        selected_rules_unit_instance_id=unit.unit_instance_id,
+    )
+    assert bearer.model is model
+
+    with pytest.raises(GameLifecycleError, match="requires ArmyDefinition"):
+        generic_rule_selected_to_fight_effects.SelectedToFightEnhancementBearer(
+            army=cast(ArmyDefinition, object()),
+            assignment=assignment,
+            physical_unit=unit,
+            model=model,
+            selected_rules_unit_instance_id=unit.unit_instance_id,
+        )
+    with pytest.raises(GameLifecycleError, match="requires assignment"):
+        generic_rule_selected_to_fight_effects.SelectedToFightEnhancementBearer(
+            army=army,
+            assignment=cast(EnhancementAssignment, object()),
+            physical_unit=unit,
+            model=model,
+            selected_rules_unit_instance_id=unit.unit_instance_id,
+        )
+    with pytest.raises(GameLifecycleError, match="requires physical unit"):
+        generic_rule_selected_to_fight_effects.SelectedToFightEnhancementBearer(
+            army=army,
+            assignment=assignment,
+            physical_unit=cast(UnitInstance, object()),
+            model=model,
+            selected_rules_unit_instance_id=unit.unit_instance_id,
+        )
+    with pytest.raises(GameLifecycleError, match="requires model"):
+        generic_rule_selected_to_fight_effects.SelectedToFightEnhancementBearer(
+            army=army,
+            assignment=assignment,
+            physical_unit=unit,
+            model=cast(ModelInstance, object()),
+            selected_rules_unit_instance_id=unit.unit_instance_id,
+        )
+
+    context = FightUnitSelectedContext(
+        state=state,
+        player_id=army.player_id,
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        fight_type="normal",
+        ordering_band="remaining_combats",
+        request_id="selected-to-fight-request",
+        result_id="selected-to-fight-result",
+    )
+    source = _shadow_legion_source()
+    with pytest.raises(GameLifecycleError, match="lookup requires context"):
+        generic_rule_selected_to_fight_effects.selected_to_fight_enhancement_bearer_is_alive(
+            cast(FightUnitSelectedContext, object()),
+            source,
+            (),
+        )
+    with pytest.raises(GameLifecycleError, match="lookup requires source"):
+        generic_rule_selected_to_fight_effects.selected_to_fight_enhancement_bearer_is_alive(
+            context,
+            cast(GenericRuleAbilitySource, object()),
+            (),
+        )
+    with pytest.raises(GameLifecycleError, match="matching effects must be a tuple"):
+        generic_rule_selected_to_fight_effects.selected_to_fight_enhancement_bearer_is_alive(
+            context,
+            source,
+            cast(tuple[PersistingEffect, ...], []),
+        )
+
+    with pytest.raises(GameLifecycleError, match="grant requires context"):
+        generic_rule_selected_to_fight_effects.build_selected_to_fight_self_mortal_wounds_and_rerolls_grant(
+            cast(FightUnitSelectedContext, object()),
+            source,
+            (),
+            ability_id="selected-to-fight-ability",
+            hook_id="selected-to-fight-hook",
+            label="Selected to Fight",
+        )
+    with pytest.raises(GameLifecycleError, match="grant requires source"):
+        generic_rule_selected_to_fight_effects.build_selected_to_fight_self_mortal_wounds_and_rerolls_grant(
+            context,
+            cast(GenericRuleAbilitySource, object()),
+            (),
+            ability_id="selected-to-fight-ability",
+            hook_id="selected-to-fight-hook",
+            label="Selected to Fight",
+        )
+    with pytest.raises(GameLifecycleError, match="grant effects must be a tuple"):
+        generic_rule_selected_to_fight_effects.build_selected_to_fight_self_mortal_wounds_and_rerolls_grant(
+            context,
+            source,
+            cast(tuple[PersistingEffect, ...], []),
+            ability_id="selected-to-fight-ability",
+            hook_id="selected-to-fight-hook",
+            label="Selected to Fight",
+        )
+    with pytest.raises(GameLifecycleError, match="grant label must be non-empty"):
+        generic_rule_selected_to_fight_effects.build_selected_to_fight_self_mortal_wounds_and_rerolls_grant(
+            context,
+            source,
+            (),
+            ability_id="selected-to-fight-ability",
+            hook_id="selected-to-fight-hook",
+            label=" ",
+        )
+
+
+@pytest.mark.parametrize(
+    ("case", "expected_error"),
+    [
+        ("unrelated_grant", "unrelated ability grant"),
+        ("invalid_reroll_type", "must be for Hit or Wound"),
+        ("specific_reroll", "must permit the whole roll"),
+        ("duplicate_reroll", "permissions are duplicated"),
+        ("unsupported_effect", "contains an unsupported effect"),
+        ("missing_grant", "requires one hook ability grant"),
+        ("missing_immediate", "requires one immediate effect"),
+        ("missing_wound_reroll", "requires Hit and Wound rerolls"),
+    ],
+)
+def test_selected_to_fight_effect_set_validation_fails_closed(
+    case: str,
+    expected_error: str,
+) -> None:
+    source = _shadow_legion_source()
+    ability_id = "selected-to-fight-ability"
+    assignment = EnhancementAssignment(
+        enhancement_id="selected-to-fight-test",
+        target_unit_selection_id="selected-to-fight-unit",
+        source_id="selected-to-fight-assignment",
+    )
+    grant = _selected_to_fight_grant_payload(ability_id)
+    mortal_wounds = _selected_to_fight_effect_payload()
+    hit_reroll = _selected_to_fight_reroll_payload("hit")
+    wound_reroll = _selected_to_fight_reroll_payload("wound")
+    effect_payloads: list[dict[str, JsonValue]] = [
+        grant,
+        mortal_wounds,
+        hit_reroll,
+        wound_reroll,
+    ]
+    if case == "unrelated_grant":
+        effect_payloads[0] = _selected_to_fight_grant_payload("unrelated-ability")
+    elif case == "invalid_reroll_type":
+        effect_payloads[2] = _selected_to_fight_reroll_payload("save")
+    elif case == "specific_reroll":
+        hit_effect = cast(dict[str, JsonValue], hit_reroll["effect"])
+        hit_parameters = cast(list[JsonValue], hit_effect["parameters"])
+        hit_parameters.append({"key": "reroll_unmodified_value", "value": 1})
+    elif case == "duplicate_reroll":
+        effect_payloads[3] = _selected_to_fight_reroll_payload("hit")
+    elif case == "unsupported_effect":
+        unsupported_effect: dict[str, JsonValue] = {
+            "target": {"kind": RuleTargetKind.THIS_MODEL.value},
+            "effect": {
+                "kind": RuleEffectKind.MODIFY_CHARACTERISTIC.value,
+                "parameters": [],
+            },
+        }
+        effect_payloads = [unsupported_effect]
+    elif case == "missing_grant":
+        effect_payloads = [mortal_wounds, hit_reroll, wound_reroll]
+    elif case == "missing_immediate":
+        effect_payloads = [grant, hit_reroll, wound_reroll]
+    elif case == "missing_wound_reroll":
+        effect_payloads = [grant, mortal_wounds, hit_reroll]
+    else:
+        raise AssertionError(f"Unhandled test case: {case}")
+    result = RuleExecutionResult(
+        rule_id="selected-to-fight-rule",
+        source_id="selected-to-fight-source",
+        rule_ir_hash="selected-to-fight-rule-ir-hash",
+        status=RuleExecutionStatus.APPLIED,
+        effect_payloads=tuple(effect_payloads),
+    )
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        generic_rule_selected_to_fight_effects._selected_to_fight_effects(  # pyright: ignore[reportPrivateUsage]
+            source=source,
+            result=result,
+            assignment=assignment,
+            ability_id=ability_id,
+        )
+
+
+def test_generic_lifecycle_generated_handlers_reject_wrong_context_types() -> None:
+    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
+    source = _shadow_legion_source()
+
+    advance = generic_rule_lifecycle_hooks._advance_eligibility_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+        source,
+        registry.advance_eligibility_abilities[0],
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        advance(cast(AdvanceEligibilityContext, object()))
+
+    target_restriction = (
+        generic_rule_lifecycle_hooks._shooting_target_restriction_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+            source,
+            registry.shooting_target_restriction_abilities[0],
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        target_restriction(cast(ShootingTargetRestrictionContext, object()))
+
+    shooting_grant = (
+        generic_rule_lifecycle_hooks._shooting_unit_selected_grant_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+            source,
+            registry.shooting_unit_selected_grant_abilities[0],
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        shooting_grant(cast(ShootingUnitSelectedContext, object()))
+
+    movement_surge = generic_rule_lifecycle_hooks._movement_end_surge_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+        source,
+        registry.movement_end_surge_abilities[0],
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        movement_surge(cast(MovementEndSurgeContext, object()))
+
+    reserve_arrival = generic_rule_lifecycle_hooks._reserve_arrival_distance_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+        source,
+        registry.reserve_arrival_distance_abilities[0],
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        reserve_arrival(cast(ReserveArrivalDistanceContext, object()))
+
+    phase_end_objective = (
+        generic_rule_lifecycle_hooks._phase_end_objective_control_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+            source,
+            registry.phase_end_objective_control_abilities[0],
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        phase_end_objective(cast(PhaseEndObjectiveControlContext, object()))
+
+    enhancement = generic_rule_lifecycle_hooks._enhancement_effect_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+        source,
+        registry.enhancement_effect_abilities[0],
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        enhancement(cast(EnhancementEffectContext, object()))
+
+    objective_modifier = (
+        generic_rule_lifecycle_hooks._objective_control_modifier_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+            source,
+            registry.objective_control_modifier_abilities[0],
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        objective_modifier(cast(ObjectiveControlModifierContext, object()))
+
+    unit_destroyed = generic_rule_lifecycle_hooks._unit_destroyed_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+        source,
+        registry.unit_destroyed_abilities[0],
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        unit_destroyed(cast(UnitDestroyedContext, object()))
+
+    turn_end_request = generic_rule_lifecycle_hooks._turn_end_request_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+        source,
+        registry.turn_end_abilities[0],
+    )
+    turn_end_result = generic_rule_lifecycle_hooks._turn_end_result_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+        source,
+        registry.turn_end_abilities[0],
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        turn_end_request(cast(TurnEndRequestContext, object()))
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        turn_end_result(cast(TurnEndResultContext, object()))
+
+    fight_start_request = (
+        generic_rule_lifecycle_hooks._fight_phase_start_request_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+            source,
+            registry.fight_phase_start_abilities[0],
+        )
+    )
+    fight_start_result = (
+        generic_rule_lifecycle_hooks._fight_phase_start_result_handler_for_descriptor(  # pyright: ignore[reportPrivateUsage]
+            source,
+            registry.fight_phase_start_abilities[0],
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        fight_start_request(cast(FightPhaseStartRequestContext, object()))
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        fight_start_result(cast(FightPhaseStartResultContext, object()))
+
+    fall_back_source = generic_rule_lifecycle_hooks._GenericFallBackEligibilitySource(  # pyright: ignore[reportPrivateUsage]
+        record=source.record,
+        rule_ir=source.rule_ir,
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        generic_rule_lifecycle_hooks._fall_back_grant_for_context(  # pyright: ignore[reportPrivateUsage]
+            context=cast(FallBackEligibilityContext, object()),
+            source=fall_back_source,
+        )
+
+    fight_activation_rule_source = _aeldari_path_of_the_outcast_source(
+        path_outcast_ir.ASSASSINS_EYE_ENHANCEMENT_DESCRIPTOR_ID
+    )
+    fight_activation_source = generic_rule_lifecycle_hooks._GenericFightActivationAbilitySource(  # pyright: ignore[reportPrivateUsage]
+        record=fight_activation_rule_source.record,
+        rule_ir=fight_activation_rule_source.rule_ir,
+        assignments_by_bearer_unit_id={},
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        generic_rule_lifecycle_hooks._fight_activation_option_for_context(  # pyright: ignore[reportPrivateUsage]
+            context=cast(FightActivationAbilityContext, object()),
+            source=fight_activation_source,
+        )
+
+
+def test_generic_lifecycle_shared_handlers_reject_wrong_context_types() -> None:
+    registry = DEFAULT_GENERIC_RULE_ABILITY_REGISTRY
+    source = _shadow_legion_source()
+
+    fight_grant = (
+        generic_rule_lifecycle_hook_handlers.fight_unit_selected_grant_handler_for_descriptor(
+            source,
+            registry.fight_unit_selected_grant_abilities[0],
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        fight_grant(cast(FightUnitSelectedContext, object()))
+
+    battle_request = (
+        generic_rule_lifecycle_hook_handlers.battle_formation_request_handler_for_descriptor(
+            source,
+            registry.battle_formation_abilities[0],
+        )
+    )
+    battle_result = (
+        generic_rule_lifecycle_hook_handlers.battle_formation_result_handler_for_descriptor(
+            source,
+            registry.battle_formation_abilities[0],
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        battle_request(cast(BattleFormationRequestContext, object()))
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        battle_result(cast(BattleFormationResultContext, object()))
+
+    cost_choice_request = (
+        generic_rule_lifecycle_hook_handlers.stratagem_cost_choice_request_handler_for_descriptor(
+            source,
+            registry.stratagem_cost_choice_abilities[0],
+        )
+    )
+    cost_choice_result = (
+        generic_rule_lifecycle_hook_handlers.stratagem_cost_choice_result_handler_for_descriptor(
+            source,
+            registry.stratagem_cost_choice_abilities[0],
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        cost_choice_request(cast(StratagemCostChoiceRequestContext, object()))
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        cost_choice_result(cast(StratagemCostChoiceResultContext, object()))
+
+    cost_modifier = (
+        generic_rule_lifecycle_hook_handlers.stratagem_cost_modifier_handler_for_descriptor(
+            source,
+            registry.stratagem_cost_modifier_abilities[0],
+        )
+    )
+    save_modifier = (
+        generic_rule_lifecycle_hook_handlers.save_option_modifier_handler_for_descriptor(
+            source,
+            registry.save_option_modifier_abilities[0],
+        )
+    )
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        cost_modifier(cast(StratagemCostModifierContext, object()))
+    with pytest.raises(GameLifecycleError, match="requires context"):
+        save_modifier(cast(SaveOptionModifierContext, object()))
+
+
+def test_generic_lifecycle_internal_sources_require_exact_types_and_rule_id() -> None:
+    source = _shadow_legion_source()
+
+    with pytest.raises(GameLifecycleError, match="requires execution record"):
+        generic_rule_lifecycle_hooks._GenericFallBackEligibilitySource(  # pyright: ignore[reportPrivateUsage]
+            record=cast(faction_execution_2026_27.Phase17FExecutionRecord, object()),
+            rule_ir=source.rule_ir,
+        )
+    with pytest.raises(GameLifecycleError, match="requires RuleIR"):
+        generic_rule_lifecycle_hooks._GenericFallBackEligibilitySource(  # pyright: ignore[reportPrivateUsage]
+            record=source.record,
+            rule_ir=cast(RuleIR, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="requires execution record"):
+        generic_rule_lifecycle_hooks._GenericFightActivationAbilitySource(  # pyright: ignore[reportPrivateUsage]
+            record=cast(faction_execution_2026_27.Phase17FExecutionRecord, object()),
+            rule_ir=source.rule_ir,
+            assignments_by_bearer_unit_id={},
+        )
+    with pytest.raises(GameLifecycleError, match="requires RuleIR"):
+        generic_rule_lifecycle_hooks._GenericFightActivationAbilitySource(  # pyright: ignore[reportPrivateUsage]
+            record=source.record,
+            rule_ir=cast(RuleIR, object()),
+            assignments_by_bearer_unit_id={},
+        )
+    with pytest.raises(GameLifecycleError, match="requires rule_id"):
+        generic_rule_lifecycle_hooks._GenericFightActivationAbilitySource(  # pyright: ignore[reportPrivateUsage]
+            record=replace(source.record, rule_id=None),
+            rule_ir=source.rule_ir,
+            assignments_by_bearer_unit_id={},
+        )
+
+
+def _raise_selected_to_fight_payload_error(
+    *,
+    case: str,
+    payload: dict[str, JsonValue],
+) -> None:
+    effect = cast(dict[str, JsonValue], payload["effect"])
+    parameters = cast(list[JsonValue], effect["parameters"])
+    if case == "missing_effect":
+        payload["effect"] = None
+        generic_rule_selected_to_fight_effects._effect_kind(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    elif case == "missing_kind":
+        effect["kind"] = None
+        generic_rule_selected_to_fight_effects._effect_kind(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    elif case == "unknown_kind":
+        effect["kind"] = "unsupported"
+        generic_rule_selected_to_fight_effects._effect_kind(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    elif case == "parameters_not_list":
+        effect["parameters"] = None
+        generic_rule_selected_to_fight_effects._effect_parameters(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    elif case == "parameter_not_object":
+        effect["parameters"] = ["invalid"]
+        generic_rule_selected_to_fight_effects._effect_parameters(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    elif case == "parameter_missing_key":
+        effect["parameters"] = [{"value": 1}]
+        generic_rule_selected_to_fight_effects._effect_parameters(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    elif case == "duplicate_parameter":
+        parameters.append({"key": "mortal_wounds_dice_quantity", "value": 1})
+        generic_rule_selected_to_fight_effects._effect_parameters(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    elif case == "wrong_target":
+        payload["target"] = {"kind": RuleTargetKind.THIS_UNIT.value}
+        generic_rule_selected_to_fight_effects._require_this_model_target(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    elif case == "wrong_dice_quantity":
+        generic_rule_selected_to_fight_effects._validate_self_mortal_wound_parameters(  # pyright: ignore[reportPrivateUsage]
+            {"mortal_wounds_dice_quantity": 2}
+        )
+    elif case == "wrong_dice_sides":
+        generic_rule_selected_to_fight_effects._validate_self_mortal_wound_parameters(  # pyright: ignore[reportPrivateUsage]
+            {"mortal_wounds_dice_quantity": 1, "mortal_wounds_dice_sides": 6}
+        )
+    elif case == "wrong_modifier":
+        generic_rule_selected_to_fight_effects._validate_self_mortal_wound_parameters(  # pyright: ignore[reportPrivateUsage]
+            {
+                "mortal_wounds_dice_quantity": 1,
+                "mortal_wounds_dice_sides": 3,
+                "mortal_wounds_modifier": 0,
+            }
+        )
+    elif case == "missing_duration":
+        payload["duration"] = None
+        generic_rule_selected_to_fight_effects._require_end_phase_duration(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    elif case == "wrong_duration_kind":
+        payload["duration"] = {"kind": "end_phase"}
+        generic_rule_selected_to_fight_effects._require_end_phase_duration(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    elif case == "duration_parameters_not_list":
+        duration = cast(dict[str, JsonValue], payload["duration"])
+        duration["parameters"] = None
+        generic_rule_selected_to_fight_effects._require_end_phase_duration(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    elif case == "duration_parameter_not_object":
+        duration = cast(dict[str, JsonValue], payload["duration"])
+        duration["parameters"] = ["invalid"]
+        generic_rule_selected_to_fight_effects._require_end_phase_duration(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    elif case == "wrong_duration_endpoint":
+        duration = cast(dict[str, JsonValue], payload["duration"])
+        duration["parameters"] = [{"key": "endpoint", "value": "turn"}]
+        generic_rule_selected_to_fight_effects._require_end_phase_duration(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+    else:
+        raise AssertionError(f"Unhandled test case: {case}")
+
+
+def _selected_to_fight_grant_payload(ability_id: str) -> dict[str, JsonValue]:
+    return {
+        "target": {"kind": RuleTargetKind.THIS_MODEL.value},
+        "effect": {
+            "kind": RuleEffectKind.GRANT_ABILITY.value,
+            "parameters": [{"key": "ability", "value": ability_id}],
+        },
+    }
+
+
+def _selected_to_fight_reroll_payload(roll_type: str) -> dict[str, JsonValue]:
+    return {
+        "target": {"kind": RuleTargetKind.THIS_MODEL.value},
+        "effect": {
+            "kind": RuleEffectKind.REROLL_PERMISSION.value,
+            "parameters": [{"key": "roll_type", "value": roll_type}],
+        },
+        "duration": {
+            "kind": "until_timing_endpoint",
+            "parameters": [{"key": "endpoint", "value": "phase"}],
+        },
+    }
+
+
+def _selected_to_fight_effect_payload() -> dict[str, JsonValue]:
+    return {
+        "target": {"kind": RuleTargetKind.THIS_MODEL.value},
+        "effect": {
+            "kind": RuleEffectKind.INFLICT_MORTAL_WOUNDS.value,
+            "parameters": [
+                {"key": "mortal_wounds_dice_quantity", "value": 1},
+                {"key": "mortal_wounds_dice_sides", "value": 3},
+                {"key": "mortal_wounds_modifier", "value": 1},
+            ],
+        },
+        "duration": {
+            "kind": "until_timing_endpoint",
+            "parameters": [{"key": "endpoint", "value": "phase"}],
+        },
+    }
 
 
 def _shadow_legion_source() -> GenericRuleAbilitySource:

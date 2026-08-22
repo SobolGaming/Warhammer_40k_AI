@@ -5,6 +5,7 @@ from collections.abc import Callable
 from dataclasses import replace
 from typing import cast
 
+import pytest
 from tests.phase11c_command_phase_helpers import (
     battle_state,
     battle_state_with_center_objective_positions,
@@ -53,6 +54,7 @@ from warhammer40k_core.engine.battlefield_state import (
     UnitPlacement,
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
+from warhammer40k_core.engine.damage_allocation import FeelNoPainSource
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import (
     PARAMETERIZED_DECISION_OPTION_ID,
@@ -91,9 +93,16 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
-from warhammer40k_core.engine.phase import BattlePhase, LifecycleStatus, LifecycleStatusKind
+from warhammer40k_core.engine.phase import (
+    BattlePhase,
+    GameLifecycleError,
+    LifecycleStatus,
+    LifecycleStatusKind,
+)
 from warhammer40k_core.engine.phases.command import CommandPhaseHandler
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.rule_execution import RuleExecutionResult
+from warhammer40k_core.engine.sticky_objective_control import StickyObjectiveControlState
 from warhammer40k_core.engine.stratagem_cost_choice_hooks import (
     SELECT_STRATAGEM_COST_MODIFIER_OPTION_DECISION_TYPE,
 )
@@ -115,6 +124,7 @@ from warhammer40k_core.engine.wargear_selections import (
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
 from warhammer40k_core.rules.rule_compiler import compile_rule_source_text
+from warhammer40k_core.rules.rule_ir import RuleConditionKind
 from warhammer40k_core.rules.source_data import RuleSourceText
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     datasheet_keyword_lexicon_2026_06_14 as datasheet_keyword_lexicon_source,
@@ -149,6 +159,220 @@ def test_shadow_of_chaos_marks_no_mans_land_when_daemons_control_half_objectives
 
     assert army_rule.ShadowRegion.OWN_DEPLOYMENT_ZONE in regions
     assert army_rule.ShadowRegion.NO_MANS_LAND in regions
+    assert army_rule.unit_within_shadow_of_chaos(
+        state=state,
+        player_id="player-a",
+        unit_instance_id="army-alpha:intercessor-unit-1",
+    )
+
+
+def test_shadow_of_chaos_marks_and_reaches_controlled_opponent_deployment_zone() -> None:
+    state = battle_state()
+    _mark_player_as_chaos_daemons(state, player_id="player-a")
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    opponent_objective_ids = army_rule._opponent_deployment_objective_ids(  # pyright: ignore[reportPrivateUsage]
+        state,
+        player_id="player-a",
+    )
+    assert opponent_objective_ids
+    assert state.mission_setup is not None
+    marker = next(
+        marker
+        for marker in state.mission_setup.objective_markers
+        if marker.objective_marker_id == opponent_objective_ids[0]
+    )
+    _relocate_unit(
+        state=state,
+        unit_instance_id=target_unit_id,
+        x=marker.x_inches,
+        y=marker.y_inches,
+    )
+
+    regions = army_rule.shadow_regions_for_player(state=state, player_id="player-a")
+
+    assert army_rule.ShadowRegion.OPPONENT_DEPLOYMENT_ZONE in regions
+    assert army_rule.unit_within_shadow_of_chaos(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+    )
+
+
+def test_corrupted_realspace_shadow_routes_owned_controlled_objective_and_round_trips() -> None:
+    state = battle_state()
+    _mark_player_as_chaos_daemons(state, player_id="player-a")
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    assert state.mission_setup is not None
+    center = center_marker_definition(state)
+    other_markers = tuple(
+        marker
+        for marker in state.mission_setup.objective_markers
+        if marker.objective_marker_id != center.objective_marker_id
+    )
+    assert len(other_markers) >= 3
+    _relocate_unit(
+        state=state,
+        unit_instance_id=target_unit_id,
+        x=center.x_inches,
+        y=center.y_inches,
+    )
+    states = (
+        _corrupted_realspace_sticky_state(
+            state=state,
+            state_id="phase17g-corrupted-realspace-foreign",
+            player_id="player-b",
+            objective_id=other_markers[0].objective_marker_id,
+            target_unit_instance_id="army-beta:intercessor-unit-3",
+        ),
+        replace(
+            _corrupted_realspace_sticky_state(
+                state=state,
+                state_id="phase17g-corrupted-realspace-wrong-kind",
+                player_id="player-a",
+                objective_id=other_markers[1].objective_marker_id,
+                target_unit_instance_id=target_unit_id,
+            ),
+            replay_payload={"effect_kind": "another_sticky_effect"},
+        ),
+        _corrupted_realspace_sticky_state(
+            state=state,
+            state_id="phase17g-corrupted-realspace-uncontrolled",
+            player_id="player-a",
+            objective_id=other_markers[2].objective_marker_id,
+            target_unit_instance_id=target_unit_id,
+        ),
+        _corrupted_realspace_sticky_state(
+            state=state,
+            state_id="phase17g-corrupted-realspace-valid",
+            player_id="player-a",
+            objective_id=center.objective_marker_id,
+            target_unit_instance_id=target_unit_id,
+        ),
+    )
+    state.sticky_objective_control_states = list(states)
+
+    assert army_rule._unit_within_corrupted_realspace_shadow(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+    )
+    assert army_rule.unit_within_shadow_of_chaos(
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+    )
+    assert (
+        tuple(StickyObjectiveControlState.from_payload(sticky.to_payload()) for sticky in states)
+        == states
+    )
+
+
+def test_corrupted_realspace_shadow_rejects_malformed_replay_payload_and_invalid_range() -> None:
+    state = battle_state()
+    _mark_player_as_chaos_daemons(state, player_id="player-a")
+    target_unit_id = "army-alpha:intercessor-unit-1"
+    center = center_marker_definition(state)
+    _relocate_unit(
+        state=state,
+        unit_instance_id=target_unit_id,
+        x=center.x_inches,
+        y=center.y_inches,
+    )
+    sticky = _corrupted_realspace_sticky_state(
+        state=state,
+        state_id="phase17g-corrupted-realspace-payload-validation",
+        player_id="player-a",
+        objective_id=center.objective_marker_id,
+        target_unit_instance_id=target_unit_id,
+    )
+    state_before = state.to_payload()
+
+    state.sticky_objective_control_states = [replace(sticky, replay_payload=[])]
+    with pytest.raises(GameLifecycleError, match="sticky payload must be an object"):
+        army_rule._unit_within_corrupted_realspace_shadow(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            player_id="player-a",
+            unit_instance_id=target_unit_id,
+        )
+    state.sticky_objective_control_states = [
+        replace(
+            sticky,
+            replay_payload={
+                "effect_kind": army_rule.CORRUPTED_REALSPACE_STICKY_EFFECT_KIND,
+                "shadow_of_chaos_aura_inches": "six",
+            },
+        )
+    ]
+    with pytest.raises(GameLifecycleError, match="payload must contain inches"):
+        army_rule._unit_within_corrupted_realspace_shadow(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            player_id="player-a",
+            unit_instance_id=target_unit_id,
+        )
+    state.sticky_objective_control_states = [
+        replace(
+            sticky,
+            replay_payload={
+                "effect_kind": army_rule.CORRUPTED_REALSPACE_STICKY_EFFECT_KIND,
+                "shadow_of_chaos_aura_inches": 0,
+            },
+        )
+    ]
+    with pytest.raises(GameLifecycleError, match="aura inches must be positive"):
+        army_rule._unit_within_corrupted_realspace_shadow(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            player_id="player-a",
+            unit_instance_id=target_unit_id,
+        )
+    assert {
+        key: value
+        for key, value in state.to_payload().items()
+        if key != "sticky_objective_control_states"
+    } == {
+        key: value
+        for key, value in state_before.items()
+        if key != "sticky_objective_control_states"
+    }
+
+
+def test_corrupted_realspace_shadow_returns_false_outside_controlled_objective_aura() -> None:
+    state = battle_state()
+    _mark_player_as_chaos_daemons(state, player_id="player-a")
+    controlling_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-beta:intercessor-unit-3"
+    center = center_marker_definition(state)
+    _relocate_unit(
+        state=state,
+        unit_instance_id=controlling_unit_id,
+        x=center.x_inches,
+        y=center.y_inches,
+    )
+    assert state.battlefield_state is not None
+    far_x, far_y = _farthest_battlefield_point(
+        battlefield=state.battlefield_state,
+        points=((center.x_inches, center.y_inches),),
+    )
+    _relocate_unit(
+        state=state,
+        unit_instance_id=target_unit_id,
+        x=far_x,
+        y=far_y,
+    )
+    state.sticky_objective_control_states = [
+        _corrupted_realspace_sticky_state(
+            state=state,
+            state_id="phase17g-corrupted-realspace-outside-aura",
+            player_id="player-a",
+            objective_id=center.objective_marker_id,
+            target_unit_instance_id=controlling_unit_id,
+        )
+    ]
+
+    assert not army_rule._unit_within_corrupted_realspace_shadow(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+    )
 
 
 def test_daemonic_manifestation_modifies_battle_shock_and_heals_one_model() -> None:
@@ -285,6 +509,421 @@ def test_daemonic_manifestation_uses_source_backed_greater_daemon_shadow_aura() 
     )
     assert manifestation_payload["unit_instance_id"] == target_unit_id
     assert manifestation_payload["source_rule_id"] == army_rule.SOURCE_RULE_ID
+
+
+def test_greater_daemon_shadow_aura_filters_ownership_faction_keyword_range_and_source_kind() -> (
+    None
+):
+    state = battle_state(
+        player_a_units=(
+            default_unit_selection("intercessor-unit-1"),
+            default_unit_selection("intercessor-unit-2"),
+        )
+    )
+    _mark_player_as_chaos_daemons(state, player_id="player-a", remove_battleline=True)
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-alpha:intercessor-unit-2"
+    source = unit_by_id(state, source_unit_id)
+    target = unit_by_id(state, target_unit_id)
+    wargear_id = source.own_models[0].wargear_ids[0]
+    wargear_ability = replace(
+        _semantic_shadow_aura_ability(allegiance="Khorne"),
+        ability_id="phase17g-shadow-aura-wargear-source-kind",
+        source_id="phase17g:test:shadow-aura-wargear-source-kind",
+        source_kind=CatalogAbilitySourceKind.WARGEAR,
+        source_wargear_id=wargear_id,
+    )
+    source_ability = _datasheet_ability(datasheets.BLOODTHIRSTER_GREATER_DAEMON_ABILITY_ID)
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Character", "Monster", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(wargear_ability, source_ability),
+    )
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("Infantry", "Khorne"),
+        faction_keywords=(),
+    )
+    assert not army_rule._unit_within_greater_daemon_shadow_aura(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+    )
+
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("Infantry", "Tzeentch"),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    assert not army_rule._unit_within_greater_daemon_shadow_aura(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+    )
+
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("Infantry", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    assert state.battlefield_state is not None
+    far_x, far_y = _farthest_battlefield_point(
+        battlefield=state.battlefield_state,
+        points=tuple(
+            (
+                placement.pose.position.x,
+                placement.pose.position.y,
+            )
+            for placement in state.battlefield_state.unit_placement_by_id(
+                source_unit_id
+            ).model_placements
+        ),
+    )
+    _relocate_unit(state=state, unit_instance_id=target_unit_id, x=far_x, y=far_y)
+    assert not army_rule._unit_within_greater_daemon_shadow_aura(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+    )
+
+    source_position = (
+        state.battlefield_state.unit_placement_by_id(source_unit_id)
+        .model_placements[0]
+        .pose.position
+    )
+    near_x, near_y = _nearby_battlefield_point(
+        battlefield=state.battlefield_state,
+        x=source_position.x,
+        y=source_position.y,
+    )
+    _relocate_unit(state=state, unit_instance_id=target_unit_id, x=near_x, y=near_y)
+    assert army_rule._unit_within_greater_daemon_shadow_aura(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+    )
+    assert (
+        army_rule._greater_daemon_shadow_aura_keyword(  # pyright: ignore[reportPrivateUsage]
+            unit_by_id(state, source_unit_id)
+        )
+        == "KHORNE"
+    )
+    assert target.unit_instance_id == target_unit_id
+
+
+def test_semantic_shadow_aura_executes_rule_ir_and_honours_wargear_bearer_state() -> None:
+    state = battle_state(
+        player_a_units=(
+            default_unit_selection("intercessor-unit-1"),
+            default_unit_selection("intercessor-unit-2"),
+        )
+    )
+    _mark_player_as_chaos_daemons(state, player_id="player-a", remove_battleline=True)
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-alpha:intercessor-unit-2"
+    semantic_ability = _semantic_unit_shadow_aura_ability(allegiance="Khorne")
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Character", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(semantic_ability,),
+    )
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("Infantry", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    _place_unit_near_center(state, unit_instance_id=source_unit_id, offset=(16.0, 0.0))
+    _place_unit_near_center(state, unit_instance_id=target_unit_id, offset=(18.0, 0.0))
+
+    assert army_rule._unit_within_semantic_shadow_aura(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+    )
+    rule_ir = army_rule._semantic_rule_ir_for_ability(  # pyright: ignore[reportPrivateUsage]
+        semantic_ability
+    )
+    assert army_rule._rule_ir_sets_shadow_of_chaos_status(  # pyright: ignore[reportPrivateUsage]
+        rule_ir
+    )
+
+    source = unit_by_id(state, source_unit_id)
+    source_wargear_id = source.own_models[0].wargear_ids[0]
+    equipped = replace(
+        semantic_ability,
+        ability_id="phase17g-semantic-shadow-equipped-wargear",
+        source_id="phase17g:test:semantic-shadow-equipped-wargear",
+        source_kind=CatalogAbilitySourceKind.WARGEAR,
+        source_wargear_id=source_wargear_id,
+    )
+    unequipped = replace(
+        equipped,
+        ability_id="phase17g-semantic-shadow-unequipped-wargear",
+        source_id="phase17g:test:semantic-shadow-unequipped-wargear",
+        source_wargear_id="phase17g-missing-wargear",
+    )
+    faction_source = replace(
+        semantic_ability,
+        ability_id="phase17g-semantic-shadow-faction-source",
+        source_id="phase17g:test:semantic-shadow-faction-source",
+        source_kind=CatalogAbilitySourceKind.FACTION,
+    )
+    assert army_rule._semantic_shadow_aura_ability_active(  # pyright: ignore[reportPrivateUsage]
+        unit=source,
+        ability=equipped,
+    )
+    assert not army_rule._semantic_shadow_aura_ability_active(  # pyright: ignore[reportPrivateUsage]
+        unit=source,
+        ability=unequipped,
+    )
+    assert not army_rule._semantic_shadow_aura_ability_active(  # pyright: ignore[reportPrivateUsage]
+        unit=source,
+        ability=faction_source,
+    )
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+
+
+def test_semantic_shadow_aura_skips_self_unplaced_sources_and_non_shadow_rule_ir() -> None:
+    state = battle_state(
+        player_a_units=(
+            default_unit_selection("intercessor-unit-1"),
+            default_unit_selection("intercessor-unit-2"),
+        )
+    )
+    _mark_player_as_chaos_daemons(state, player_id="player-a", remove_battleline=True)
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-alpha:intercessor-unit-2"
+    semantic = _semantic_unit_shadow_aura_ability(allegiance="Khorne")
+    semantic_rule = army_rule._semantic_rule_ir_for_ability(  # pyright: ignore[reportPrivateUsage]
+        semantic
+    )
+    clause = semantic_rule.clauses[0]
+    effect = clause.effects[0]
+    non_shadow_effect = replace(
+        effect,
+        parameters=tuple(
+            replace(parameter, value="opponent_army") if parameter.key == "owner" else parameter
+            for parameter in effect.parameters
+        ),
+    )
+    non_shadow_rule = replace(
+        semantic_rule,
+        clauses=(replace(clause, effects=(non_shadow_effect,)),),
+    )
+    non_shadow = replace(
+        semantic,
+        ability_id="phase17g-semantic-non-shadow-status",
+        source_id="phase17g:test:semantic-non-shadow-status",
+        rule_ir_payload=cast(CatalogJsonObject, non_shadow_rule.to_payload()),
+    )
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Character", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(non_shadow,),
+    )
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("Infantry", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    _place_unit_near_center(state, unit_instance_id=source_unit_id, offset=(16.0, 0.0))
+    _place_unit_near_center(state, unit_instance_id=target_unit_id, offset=(18.0, 0.0))
+
+    assert not army_rule._unit_within_semantic_shadow_aura(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        player_id="player-a",
+        unit_instance_id=source_unit_id,
+    )
+    assert not army_rule._unit_within_semantic_shadow_aura(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+    )
+    rule_ir = army_rule._semantic_rule_ir_for_ability(non_shadow)  # pyright: ignore[reportPrivateUsage]
+    assert not army_rule._rule_ir_sets_shadow_of_chaos_status(  # pyright: ignore[reportPrivateUsage]
+        rule_ir
+    )
+
+    assert state.battlefield_state is not None
+    state.battlefield_state = state.battlefield_state.without_unit_placement(source_unit_id)
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Character", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(_semantic_unit_shadow_aura_ability(allegiance="Khorne"),),
+    )
+    assert not army_rule._unit_within_semantic_shadow_aura(  # pyright: ignore[reportPrivateUsage]
+        state=state,
+        player_id="player-a",
+        unit_instance_id=target_unit_id,
+    )
+
+
+def test_semantic_shadow_aura_execution_payload_is_target_scoped_and_fail_closed() -> None:
+    ability = _semantic_unit_shadow_aura_ability(allegiance="Khorne")
+    rule_ir = army_rule._semantic_rule_ir_for_ability(  # pyright: ignore[reportPrivateUsage]
+        ability
+    )
+    effect = rule_ir.clauses[0].effects[0]
+    target_id = "army-alpha:semantic-shadow-target"
+    other_id = "army-alpha:semantic-shadow-other"
+    matching_payload: dict[str, JsonValue] = {
+        "target_unit_instance_ids": [target_id],
+        "effect": cast(dict[str, JsonValue], effect.to_payload()),
+    }
+    matching = RuleExecutionResult.applied(
+        rule_ir,
+        applied_clause_ids=(rule_ir.clauses[0].clause_id,),
+        effect_payloads=(matching_payload,),
+    )
+    assert army_rule._execution_result_sets_shadow_status_for_unit(  # pyright: ignore[reportPrivateUsage]
+        matching,
+        unit_instance_id=target_id,
+    )
+
+    nonmatching = RuleExecutionResult.applied(
+        rule_ir,
+        effect_payloads=(
+            {
+                **matching_payload,
+                "target_unit_instance_ids": [other_id],
+            },
+        ),
+    )
+    assert not army_rule._execution_result_sets_shadow_status_for_unit(  # pyright: ignore[reportPrivateUsage]
+        nonmatching,
+        unit_instance_id=target_id,
+    )
+
+    non_shadow_effect = replace(
+        effect,
+        parameters=tuple(
+            replace(parameter, value="opponent_army") if parameter.key == "owner" else parameter
+            for parameter in effect.parameters
+        ),
+    )
+    non_shadow_result = RuleExecutionResult.applied(
+        rule_ir,
+        effect_payloads=(
+            {
+                "target_unit_instance_ids": [target_id],
+                "effect": cast(dict[str, JsonValue], non_shadow_effect.to_payload()),
+            },
+        ),
+    )
+    assert not army_rule._execution_result_sets_shadow_status_for_unit(  # pyright: ignore[reportPrivateUsage]
+        non_shadow_result,
+        unit_instance_id=target_id,
+    )
+
+    missing_effect = RuleExecutionResult.applied(
+        rule_ir,
+        effect_payloads=({"target_unit_instance_ids": [target_id]},),
+    )
+    with pytest.raises(GameLifecycleError, match="payload is missing effect"):
+        army_rule._execution_result_sets_shadow_status_for_unit(  # pyright: ignore[reportPrivateUsage]
+            missing_effect,
+            unit_instance_id=target_id,
+        )
+    invalid_effect = RuleExecutionResult.applied(
+        rule_ir,
+        effect_payloads=(
+            {
+                "target_unit_instance_ids": [target_id],
+                "effect": {
+                    **cast(dict[str, JsonValue], effect.to_payload()),
+                    "kind": "not-a-rule-effect",
+                },
+            },
+        ),
+    )
+    with pytest.raises(GameLifecycleError, match="effect payload is invalid"):
+        army_rule._execution_result_sets_shadow_status_for_unit(  # pyright: ignore[reportPrivateUsage]
+            invalid_effect,
+            unit_instance_id=target_id,
+        )
+    with pytest.raises(GameLifecycleError, match="requires target_unit_instance_ids"):
+        army_rule._payload_identifier_list({}, key="target_unit_instance_ids")  # pyright: ignore[reportPrivateUsage]
+
+
+def test_semantic_shadow_aura_reports_unsupported_multi_effect_execution() -> None:
+    state = battle_state(
+        player_a_units=(
+            default_unit_selection("intercessor-unit-1"),
+            default_unit_selection("intercessor-unit-2"),
+        )
+    )
+    _mark_player_as_chaos_daemons(state, player_id="player-a", remove_battleline=True)
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-alpha:intercessor-unit-2"
+    semantic = _semantic_unit_shadow_aura_ability(allegiance="Khorne")
+    rule_ir = army_rule._semantic_rule_ir_for_ability(semantic)  # pyright: ignore[reportPrivateUsage]
+    clause = rule_ir.clauses[0]
+    keyword_condition = clause.conditions[1]
+    unsupported_condition = replace(
+        keyword_condition,
+        kind=RuleConditionKind.TARGET_CONSTRAINT,
+        parameters=(
+            replace(
+                keyword_condition.parameters[0],
+                key="relationship",
+                value="phase17g_unknown_relationship",
+            ),
+        ),
+    )
+    unsupported_rule = replace(
+        rule_ir,
+        clauses=(
+            replace(
+                clause,
+                conditions=(
+                    clause.conditions[0],
+                    unsupported_condition,
+                    *clause.conditions[2:],
+                ),
+            ),
+        ),
+    )
+    unsupported_ability = replace(
+        semantic,
+        ability_id="phase17g-semantic-shadow-unsupported-multi-effect",
+        source_id="phase17g:test:semantic-shadow-unsupported-multi-effect",
+        rule_ir_payload=cast(CatalogJsonObject, unsupported_rule.to_payload()),
+    )
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Character", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(unsupported_ability,),
+    )
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=target_unit_id,
+        keywords=("Infantry", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+    )
+    _place_unit_near_center(state, unit_instance_id=source_unit_id, offset=(16.0, 0.0))
+    _place_unit_near_center(state, unit_instance_id=target_unit_id, offset=(18.0, 0.0))
+
+    with pytest.raises(GameLifecycleError, match="semantic aura execution failed"):
+        army_rule._unit_within_semantic_shadow_aura(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            player_id="player-a",
+            unit_instance_id=target_unit_id,
+        )
 
 
 def test_greater_daemon_shadow_aura_host_table_covers_all_datasheet_sources() -> None:
@@ -1019,6 +1658,151 @@ def test_daemonic_terror_modifies_enemy_battle_shock_and_applies_mortal_wounds()
     assert final_wounds < starting_wounds
 
 
+def test_daemonic_manifestation_records_no_effect_and_multiple_wound_choice_boundaries() -> None:
+    no_effect_state = battle_state()
+    _mark_player_as_chaos_daemons(
+        no_effect_state,
+        player_id="player-a",
+        remove_battleline=True,
+    )
+    unit_id = "army-alpha:intercessor-unit-1"
+    no_effect_decisions = DecisionController()
+    army_rule.resolve_battle_shock_outcome(
+        _battle_shock_outcome_context(
+            state=no_effect_state,
+            decisions=no_effect_decisions,
+            player_id="player-a",
+            unit_instance_id=unit_id,
+            passed=True,
+            result_id="phase17g-manifestation-no-wounded-models",
+        )
+    )
+
+    no_effect = _event_payload(
+        no_effect_decisions,
+        "chaos_daemons_daemonic_manifestation_no_effect",
+    )
+    assert no_effect["no_effect_reason"] == "unit_has_no_wounded_models"
+    assert no_effect["unit_instance_id"] == unit_id
+    assert DecisionController.from_payload(no_effect_decisions.to_payload()) == no_effect_decisions
+
+    choice_state = battle_state()
+    _mark_player_as_chaos_daemons(
+        choice_state,
+        player_id="player-a",
+        remove_battleline=True,
+    )
+    wounded_ids = _placed_model_ids(choice_state, unit_id)[:2]
+    for model_id in wounded_ids:
+        _replace_model_wounds(choice_state, model_instance_id=model_id, wounds_remaining=1)
+    choice_decisions = DecisionController()
+    army_rule.resolve_battle_shock_outcome(
+        _battle_shock_outcome_context(
+            state=choice_state,
+            decisions=choice_decisions,
+            player_id="player-a",
+            unit_instance_id=unit_id,
+            passed=True,
+            result_id="phase17g-manifestation-multiple-wounded-models",
+        )
+    )
+
+    unsupported = _event_payload(
+        choice_decisions,
+        "chaos_daemons_daemonic_manifestation_unsupported",
+    )
+    assert unsupported["unsupported_reason"] == "multiple_wounded_models_require_decision"
+    assert _event_payloads(choice_decisions, "healing_step_resolved") == ()
+    assert (
+        GameState.from_payload(choice_state.to_payload()).to_payload() == choice_state.to_payload()
+    )
+
+
+def test_daemonic_terror_noops_for_pass_or_ineligible_target_and_reports_fnp_choice() -> None:
+    state = battle_state()
+    _mark_player_as_chaos_daemons(state, player_id="player-a")
+    source_unit_id = "army-alpha:intercessor-unit-1"
+    target_unit_id = "army-beta:intercessor-unit-3"
+    _replace_unit_keywords_and_abilities(
+        state,
+        unit_instance_id=source_unit_id,
+        keywords=("Character", "Monster", "Khorne"),
+        faction_keywords=("Legiones Daemonica",),
+        datasheet_abilities=(
+            _datasheet_ability(datasheets.BLOODTHIRSTER_GREATER_DAEMON_ABILITY_ID),
+        ),
+    )
+    _place_units_near_center(
+        state,
+        source_unit_id=source_unit_id,
+        target_unit_id=target_unit_id,
+    )
+    target_model_id = _placed_model_ids(state, target_unit_id)[0]
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=target_model_id,
+        sources=(FeelNoPainSource(source_id="phase17g-terror-fnp", threshold=5),),
+        decline_allowed=True,
+    )
+    decisions = DecisionController()
+
+    army_rule.resolve_battle_shock_outcome(
+        _battle_shock_outcome_context(
+            state=state,
+            decisions=decisions,
+            player_id="player-b",
+            unit_instance_id=target_unit_id,
+            passed=True,
+            result_id="phase17g-terror-passed-noop",
+        )
+    )
+    assert _event_payloads(decisions, "chaos_daemons_daemonic_terror_unsupported") == ()
+
+    army_rule.resolve_battle_shock_outcome(
+        _battle_shock_outcome_context(
+            state=state,
+            decisions=decisions,
+            player_id="player-b",
+            unit_instance_id=target_unit_id,
+            passed=False,
+            result_id="phase17g-terror-fnp-unsupported",
+        )
+    )
+    unsupported = _event_payload(decisions, "chaos_daemons_daemonic_terror_unsupported")
+    assert unsupported["unsupported_reason"] == "mortal_wound_feel_no_pain_requires_decision"
+    assert unsupported["target_unit_instance_id"] == target_unit_id
+    assert _event_payloads(decisions, "chaos_daemons_daemonic_terror_mortal_wounds_applied") == ()
+
+    ineligible_state = battle_state()
+    _mark_player_as_chaos_daemons(ineligible_state, player_id="player-a")
+    ineligible_decisions = DecisionController()
+    target = unit_by_id(ineligible_state, target_unit_id)
+    daemon_army = ineligible_state.army_definition_for_player("player-a")
+    assert daemon_army is not None
+    assert not army_rule._daemonic_terror_applies(  # pyright: ignore[reportPrivateUsage]
+        state=ineligible_state,
+        daemon_army=daemon_army,
+        target_unit=target,
+        battle_shocked_unit_ids=(),
+    )
+    army_rule.resolve_battle_shock_outcome(
+        _battle_shock_outcome_context(
+            state=ineligible_state,
+            decisions=ineligible_decisions,
+            player_id="player-b",
+            unit_instance_id=target_unit_id,
+            passed=False,
+            result_id="phase17g-terror-ineligible-noop",
+        )
+    )
+    assert (
+        _event_payloads(
+            ineligible_decisions,
+            "chaos_daemons_daemonic_terror_mortal_wounds_applied",
+        )
+        == ()
+    )
+
+
 def _chaos_daemons_battle_shock_hooks() -> BattleShockHookRegistry:
     contribution = army_rule.runtime_contribution()
     return BattleShockHookRegistry.from_bindings(contribution.battle_shock_hook_bindings)
@@ -1422,6 +2206,114 @@ def _semantic_shadow_aura_ability(*, allegiance: str) -> DatasheetAbilityDescrip
         rule_ir_payload=cast(CatalogJsonObject, compiled.rule_ir.to_payload()),
         timing_tags=("passive_query",),
         parameter_tokens=(allegiance.lower(), "shadow_of_chaos"),
+    )
+
+
+def _semantic_unit_shadow_aura_ability(*, allegiance: str) -> DatasheetAbilityDescriptor:
+    ability = _semantic_shadow_aura_ability(allegiance=allegiance)
+    rule_ir = army_rule._semantic_rule_ir_for_ability(  # pyright: ignore[reportPrivateUsage]
+        ability
+    )
+    clause = rule_ir.clauses[0]
+    conditions = tuple(
+        replace(
+            condition,
+            parameters=tuple(
+                replace(parameter, value="unit") if parameter.key == "object_kind" else parameter
+                for parameter in condition.parameters
+            ),
+        )
+        for condition in clause.conditions
+    )
+    unit_anchor_rule = replace(rule_ir, clauses=(replace(clause, conditions=conditions),))
+    return replace(
+        ability,
+        ability_id=f"{ability.ability_id}-unit-anchor",
+        source_id=f"{ability.source_id}:unit-anchor",
+        rule_ir_payload=cast(CatalogJsonObject, unit_anchor_rule.to_payload()),
+    )
+
+
+def _battle_shock_outcome_context(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    player_id: str,
+    unit_instance_id: str,
+    passed: bool,
+    result_id: str,
+    phase_start_battle_shocked_unit_ids: tuple[str, ...] = (),
+) -> BattleShockOutcomeContext:
+    unit = unit_by_id(state, unit_instance_id)
+    current_model_count = sum(model.is_alive for model in unit.own_models)
+    request = BattleShockTestRequest.for_unit(
+        request_id=f"{result_id}:request",
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        player_id=player_id,
+        unit_instance_id=unit_instance_id,
+        reason=BattleShockTestReason.FORCED_BY_ARMY_RULE,
+        leadership_target=7,
+        below_half_strength_context=BelowHalfStrengthContext(
+            player_id=player_id,
+            unit_instance_id=unit_instance_id,
+            starting_model_count=len(unit.own_models),
+            current_model_count=current_model_count,
+            single_model_starting_wounds=None,
+            single_model_wounds_remaining=None,
+        ),
+    )
+    dice_manager = DiceRollManager(state.game_id, event_log=decisions.event_log)
+    roll_state = dice_manager.roll_fixed(request.spec, (6, 6) if passed else (1, 1))
+    result = BattleShockResult.from_roll_state(
+        result_id=result_id,
+        request=request,
+        roll_state=roll_state,
+    )
+    assert result.passed is passed
+    active_player_id = state.active_player_id
+    if active_player_id is None:
+        raise AssertionError("Battle-shock outcome fixture requires an active player.")
+    return BattleShockOutcomeContext(
+        state=state,
+        decisions=decisions,
+        dice_manager=dice_manager,
+        result=result,
+        active_player_id=active_player_id,
+        phase=BattlePhase.COMMAND,
+        auto_passed=passed,
+        phase_start_battle_shocked_unit_ids=phase_start_battle_shocked_unit_ids,
+    )
+
+
+def _corrupted_realspace_sticky_state(
+    *,
+    state: GameState,
+    state_id: str,
+    player_id: str,
+    objective_id: str,
+    target_unit_instance_id: str,
+) -> StickyObjectiveControlState:
+    active_player_id = state.active_player_id
+    if active_player_id is None:
+        raise AssertionError("Corrupted Realspace fixture requires an active player.")
+    return StickyObjectiveControlState(
+        state_id=state_id,
+        game_id=state.game_id,
+        player_id=player_id,
+        objective_id=objective_id,
+        source_rule_id="phase17g:test:corrupted-realspace",
+        source_event_id=f"{state_id}:event",
+        battle_round=state.battle_round,
+        phase=(state.current_battle_phase or BattlePhase.COMMAND).value,
+        active_player_id=active_player_id,
+        originating_unit_instance_id=target_unit_instance_id,
+        destroyed_unit_instance_id=target_unit_instance_id,
+        replay_payload={
+            "effect_kind": army_rule.CORRUPTED_REALSPACE_STICKY_EFFECT_KIND,
+            "shadow_of_chaos_aura_inches": army_rule.CORRUPTED_REALSPACE_SHADOW_AURA_INCHES,
+            "target_unit_instance_id": target_unit_instance_id,
+        },
     )
 
 

@@ -23,18 +23,30 @@ from warhammer40k_core.core.ruleset_descriptor import (
     RulesetDescriptor,
 )
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind
-from warhammer40k_core.engine import rule_model_destruction
+from warhammer40k_core.engine import (
+    fight_unit_selected_grant_resolution,
+    rule_model_destruction,
+    rule_model_destruction_applied_damage,
+)
 from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatus
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldTransitionBatch,
+    ModelRemovalRecord,
+)
 from warhammer40k_core.engine.catalog_selected_target_charge_effects import (
     selected_target_charge_constraint_for_unit,
 )
 from warhammer40k_core.engine.damage_allocation import (
     DECLINE_DESTRUCTION_REACTION_OPTION_ID,
     DECLINE_FEEL_NO_PAIN_OPTION_ID,
+    DamageApplication,
+    DamageKind,
     DestructionReactionKind,
     DestructionReactionSource,
     FeelNoPainSource,
+    MortalWoundApplicationProgress,
+    apply_damage_to_model,
     model_by_id,
 )
 from warhammer40k_core.engine.deadly_demise import deadly_demise_target_unit_ids
@@ -47,6 +59,7 @@ from warhammer40k_core.engine.destruction_provenance import (
 )
 from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import (
+    GENERIC_RULE_EFFECT_KIND,
     EffectError,
     EffectExpiration,
     EffectExpirationBoundary,
@@ -56,7 +69,8 @@ from warhammer40k_core.engine.effects import (
 )
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
 from warhammer40k_core.engine.fight_activation_units import (
-    active_fight_activation_surviving_component,
+    active_fight_activation_rules_unit,
+    finalize_rule_destruction_after_fight_activation,
 )
 from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.fight_phase_end_hooks import (
@@ -66,6 +80,10 @@ from warhammer40k_core.engine.fight_phase_end_hooks import (
 from warhammer40k_core.engine.fight_resolution import (
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
 )
+from warhammer40k_core.engine.fight_unit_selected_hooks import (
+    FightUnitSelectedGrant,
+    FightUnitSelectedTimedEffect,
+)
 from warhammer40k_core.engine.game_state import GameConfig, GameState, GameStatePayload
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
@@ -73,6 +91,9 @@ from warhammer40k_core.engine.list_validation import (
     UnitMusterSelection,
 )
 from warhammer40k_core.engine.mission_setup import MissionSetup
+from warhammer40k_core.engine.mortal_wound_destruction_evidence import (
+    MortalWoundDestructionEvidence,
+)
 from warhammer40k_core.engine.opportunity_windows import (
     OpportunityActionKind,
     OpportunityLegalAction,
@@ -82,6 +103,7 @@ from warhammer40k_core.engine.phase import (
     BattlePhase,
     GameLifecycleError,
     GameLifecycleStage,
+    LifecycleStatus,
     LifecycleStatusKind,
 )
 from warhammer40k_core.engine.phases.fight import FightPhaseHandler
@@ -94,6 +116,21 @@ from warhammer40k_core.engine.reaction_queue import (
     ReactionQueue,
     ReactionQueueFrame,
     TriggeredDecisionRequest,
+)
+from warhammer40k_core.engine.rule_deadly_demise_continuation import (
+    RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
+)
+from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
+    DEFER_ATTACHED_SPLIT_FIELD,
+    continue_applied_mortal_wound_destruction_with_rule_reactions,
+    defer_attached_split_from_rule_destruction_context,
+)
+from warhammer40k_core.engine.rule_model_destruction_fight_continuation import (
+    apply_rule_destruction_reaction_and_schedule_fight_on_death,
+    remove_rule_fight_on_death_models_for_completed_activation,
+)
+from warhammer40k_core.engine.rule_model_destruction_source_liabilities import (
+    consume_rule_destruction_source_liabilities,
 )
 from warhammer40k_core.engine.sequencing import (
     SEQUENCING_DECISION_TYPE,
@@ -119,6 +156,7 @@ from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
+from warhammer40k_core.rules.rule_ir import RuleEffectKind, RuleTargetKind
 
 
 def test_reaction_window_emits_interrupt_decision_and_resumes_parent_phase() -> None:
@@ -1007,7 +1045,7 @@ def test_selected_to_fight_risk_destruction_splits_attached_unit_after_final_com
     )
 
 
-def test_fight_activation_physical_component_resolution_fails_closed_when_ambiguous() -> None:
+def test_fight_activation_resolves_canonical_attached_rules_unit() -> None:
     state, _runtime, _decisions, _bodyguard, _leader, _enemy, attached_id = (
         attached_selected_to_fight_risk_fixture(pre_split=False)
     )
@@ -1022,14 +1060,14 @@ def test_fight_activation_physical_component_resolution_fails_closed_when_ambigu
         result_id="attached-risk-ambiguous-activation-result",
     )
 
-    with pytest.raises(
-        GameLifecycleError,
-        match="exactly one surviving placed physical component",
-    ):
-        active_fight_activation_surviving_component(
-            state=state,
-            activation=activation,
-        )
+    rules_unit = active_fight_activation_rules_unit(
+        state=state,
+        activation=activation,
+    )
+
+    assert rules_unit is not None
+    assert rules_unit.unit_instance_id == attached_id
+    assert rules_unit.is_attached_rules_unit is True
 
 
 def test_selected_to_fight_risk_non_final_bodyguard_destruction_keeps_attached_unit() -> None:
@@ -1176,11 +1214,29 @@ def test_selected_to_fight_risk_fight_on_death_defers_attached_split_until_activ
     assert model_id not in state.battlefield_state.placed_model_ids()
 
 
-def test_selected_to_fight_risk_fight_on_death_exposes_only_destroyed_models_weapons() -> None:
-    state, runtime, decisions, bodyguard, _leader, _enemy, _attached_id = (
+def test_standalone_fight_on_death_after_prior_fight_is_model_only() -> None:
+    state, runtime, decisions, bodyguard, _leader, _enemy, attached_id = (
         attached_selected_to_fight_risk_fixture(
             pre_split=False,
             bodyguard_model_count=2,
+        )
+    )
+    fight_state = state.fight_phase_state
+    assert fight_state is not None
+    prior_activation = FightActivationSelection(
+        player_id="player-source",
+        battle_round=state.battle_round,
+        unit_instance_id=attached_id,
+        ordering_band=fight_state.current_ordering_band,
+        fight_type=FightTypeKind.NORMAL,
+        eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
+        request_id="attached-risk-prior-activation-request",
+        result_id="attached-risk-prior-activation-result",
+    )
+    state.replace_fight_phase_state(
+        replace(
+            fight_state,
+            fight_order_state=fight_state.fight_order_state.with_activation(prior_activation),
         )
     )
     model_id = bodyguard.own_models[1].model_instance_id
@@ -1775,6 +1831,336 @@ def test_rule_deadly_demise_collateral_fight_on_death_resumes_root_destruction()
     assert root_attribution.attacking_model_instance_id is None
 
 
+def test_applied_mortal_wound_destruction_finalizes_with_exact_damage_and_provenance() -> None:
+    decisions = DecisionController()
+    state = _battle_state(
+        unit_selection_ids=("intercessor-unit-1",),
+        decisions=decisions,
+    )
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    unit = state.army_definitions[0].units[0]
+    model = unit.own_models[0]
+    evidence = MortalWoundDestructionEvidence.for_non_attack_state(
+        state=state,
+        destroying_player_id="player-a",
+        source_rules_unit_instance_id=unit.unit_instance_id,
+        source_model_instance_id=model.model_instance_id,
+        destruction_source_kind=DestructionSourceKind.ABILITY,
+        action_phase=BattlePhase.FIGHT,
+        source_step="phase12a_applied_damage_completion",
+    )
+    damage = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=unit.unit_instance_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.MORTAL,
+        remove_destroyed_model=False,
+    )
+    state.clear_model_destruction_reaction_sources(model_instance_id=model.model_instance_id)
+
+    destruction = continue_applied_mortal_wound_destruction_with_rule_reactions(
+        state=state,
+        decisions=decisions,
+        damage_application=damage,
+        rules_unit_instance_id=unit.unit_instance_id,
+        source_rule_id="phase12a:applied-damage-completion",
+        source_result_id="phase12a:applied-damage-completion:result",
+        completion_event_type="phase12a_applied_damage_completed",
+        completion_event_payload={"application_id": "phase12a:applied-damage"},
+        destruction_evidence=evidence,
+        defer_attached_split_until_fight_activation_completion=False,
+    )
+
+    assert destruction.status is None
+    assert destruction.model_destroyed_event_id is not None
+    assert destruction.removal_record is not None
+    assert destruction.transition_batch is not None
+    assert state.battlefield_state is not None
+    assert model.model_instance_id not in state.battlefield_state.placed_model_ids()
+    destroyed_payload = _last_event_payload(decisions, "model_destroyed")
+    assert destroyed_payload["damage_application"] == damage.to_payload()
+    assert (
+        cast(dict[str, JsonValue], destroyed_payload["destruction_provenance"])[
+            "destruction_source_kind"
+        ]
+        == DestructionSourceKind.ABILITY.value
+    )
+    assert _last_event_payload(decisions, "phase12a_applied_damage_completed") == {
+        "application_id": "phase12a:applied-damage",
+        "model_destroyed_event_id": destruction.model_destroyed_event_id,
+    }
+    finalized = _last_event_payload(
+        decisions,
+        rule_model_destruction.RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
+    )
+    assert finalized["completion_kind"] == RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND
+    assert finalized[DEFER_ATTACHED_SPLIT_FIELD] is False
+    assert GameState.from_payload(state.to_payload()).to_payload() == state.to_payload()
+    assert DecisionController.from_payload(decisions.to_payload()) == decisions
+
+
+def test_applied_destruction_filters_optional_sources_then_decline_resumes_completion() -> None:
+    decisions = DecisionController()
+    state = _battle_state(
+        unit_selection_ids=("intercessor-unit-1",),
+        decisions=decisions,
+    )
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    unit = state.army_definitions[0].units[0]
+    model = unit.own_models[0]
+    eligible_source = DestructionReactionSource(
+        source_id="phase12a:applied:eligible-fight-on-death",
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+        source_rule_id="phase12a:applied:eligible-fight-on-death",
+    )
+    roll_source = DestructionReactionSource(
+        source_id="phase12a:applied:rolled-fight-on-death",
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+        source_rule_id="phase12a:applied:rolled-fight-on-death",
+        payload={
+            "trigger_roll_threshold": 2,
+            "trigger_roll_type": "phase12a_applied_optional_trigger",
+        },
+    )
+    melee_only_source = DestructionReactionSource(
+        source_id="phase12a:applied:melee-only-fight-on-death",
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+        source_rule_id="phase12a:applied:melee-only-fight-on-death",
+        payload={
+            "trigger_roll_threshold": 2,
+            "requires_destroyed_by_melee_attack": True,
+        },
+    )
+    mandatory_shoot_source = DestructionReactionSource(
+        source_id="phase12a:applied:mandatory-shoot-on-death",
+        reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
+        source_rule_id="phase12a:applied:mandatory-shoot-on-death",
+        optional=False,
+    )
+    state.clear_model_destruction_reaction_sources(model_instance_id=model.model_instance_id)
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=model.model_instance_id,
+        sources=(
+            eligible_source,
+            roll_source,
+            melee_only_source,
+            mandatory_shoot_source,
+        ),
+    )
+    evidence = MortalWoundDestructionEvidence.for_non_attack_state(
+        state=state,
+        destroying_player_id="player-a",
+        source_rules_unit_instance_id=unit.unit_instance_id,
+        source_model_instance_id=model.model_instance_id,
+        destruction_source_kind=DestructionSourceKind.ABILITY,
+        action_phase=BattlePhase.FIGHT,
+        source_step="phase12a_applied_optional_filter",
+    )
+    damage = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=unit.unit_instance_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.MORTAL,
+        remove_destroyed_model=False,
+    )
+
+    destruction = continue_applied_mortal_wound_destruction_with_rule_reactions(
+        state=state,
+        decisions=decisions,
+        damage_application=damage,
+        rules_unit_instance_id=unit.unit_instance_id,
+        source_rule_id="phase12a:applied-optional-filter",
+        source_result_id="phase12a:applied-optional-filter:result",
+        completion_event_type="phase12a_applied_optional_filter_completed",
+        completion_event_payload={"filter": "optional-sources"},
+        destruction_evidence=evidence,
+        defer_attached_split_until_fight_activation_completion=False,
+    )
+
+    assert destruction.status is not None
+    assert destruction.status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    request = decisions.queue.peek_next()
+    source_payloads = cast(
+        list[dict[str, JsonValue]], cast(dict[str, JsonValue], request.payload)["sources"]
+    )
+    offered_source_ids = {cast(str, payload["source_id"]) for payload in source_payloads}
+    assert eligible_source.source_id in offered_source_ids
+    assert melee_only_source.source_id not in offered_source_ids
+    assert any(
+        event.event_type == "destruction_reaction_trigger_rolled"
+        for event in decisions.event_log.records
+    )
+    not_applicable = _last_event_payload(decisions, "destruction_reaction_trigger_not_applicable")
+    assert cast(dict[str, JsonValue], not_applicable["selected_source"])["source_id"] == (
+        melee_only_source.source_id
+    )
+    mandatory = next(
+        cast(dict[str, JsonValue], event.payload)
+        for event in decisions.event_log.records
+        if event.event_type == "destruction_reaction_resolved"
+        and cast(dict[str, JsonValue], event.payload).get("resolution_kind") == "mandatory"
+    )
+    assert mandatory["action_host"] == "shooting"
+
+    record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="phase12a:applied-optional-filter:declined",
+            request=request,
+            selected_option_id=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+        )
+    )
+    assert (
+        rule_model_destruction.apply_rule_model_destruction_reaction_decision(
+            state=state,
+            decisions=decisions,
+            result=record.result,
+        )
+        is None
+    )
+    assert not decisions.queue.pending_requests
+    assert (
+        _last_event_payload(decisions, "destruction_reaction_resolved")["execution_status"]
+        == "declined"
+    )
+    assert (
+        _last_event_payload(decisions, "phase12a_applied_optional_filter_completed")["filter"]
+        == "optional-sources"
+    )
+
+
+def test_applied_fight_on_death_continues_active_attached_activation_then_splits() -> None:
+    state, _runtime, decisions, bodyguard, leader, _enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture(pre_split=False, enemy_x=30.0)
+    )
+    model = bodyguard.own_models[0]
+    fight_state = state.fight_phase_state
+    assert fight_state is not None
+    activation = FightActivationSelection(
+        player_id="player-source",
+        battle_round=state.battle_round,
+        unit_instance_id=attached_id,
+        ordering_band=fight_state.current_ordering_band,
+        fight_type=FightTypeKind.NORMAL,
+        eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
+        request_id="phase12a:applied-active-fight:request",
+        result_id="phase12a:applied-active-fight:result",
+    )
+    state.replace_fight_phase_state(
+        replace(
+            fight_state,
+            active_activation=activation,
+            fight_order_state=fight_state.fight_order_state.with_activation(activation),
+        )
+    )
+    source = DestructionReactionSource(
+        source_id="phase12a:applied-active-fight:fight-on-death",
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+        source_rule_id="phase12a:applied-active-fight:fight-on-death",
+    )
+    state.clear_model_destruction_reaction_sources(model_instance_id=model.model_instance_id)
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=model.model_instance_id,
+        sources=(source,),
+    )
+    evidence = MortalWoundDestructionEvidence.for_non_attack_state(
+        state=state,
+        destroying_player_id="player-source",
+        source_rules_unit_instance_id=bodyguard.unit_instance_id,
+        source_model_instance_id=model.model_instance_id,
+        destruction_source_kind=DestructionSourceKind.ABILITY,
+        action_phase=BattlePhase.FIGHT,
+        source_step="phase12a_applied_active_fight",
+    )
+    damage = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=attached_id,
+        model_instance_id=model.model_instance_id,
+        damage=model.wounds_remaining,
+        damage_kind=DamageKind.MORTAL,
+        remove_destroyed_model=False,
+    )
+
+    destruction = continue_applied_mortal_wound_destruction_with_rule_reactions(
+        state=state,
+        decisions=decisions,
+        damage_application=damage,
+        rules_unit_instance_id=attached_id,
+        source_rule_id="phase12a:applied-active-fight",
+        source_result_id="phase12a:applied-active-fight:damage-result",
+        completion_event_type="phase12a_applied_active_fight_completed",
+        completion_event_payload={"activation_result_id": activation.result_id},
+        destruction_evidence=evidence,
+        defer_attached_split_until_fight_activation_completion=True,
+    )
+    assert destruction.status is not None
+    request = decisions.queue.peek_next()
+    selected_option = next(
+        option
+        for option in request.options
+        if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
+    )
+    record = decisions.submit_result(
+        DecisionResult.for_request(
+            result_id="phase12a:applied-active-fight:fight-on-death-accepted",
+            request=request,
+            selected_option_id=selected_option.option_id,
+        )
+    )
+
+    apply_rule_destruction_reaction_and_schedule_fight_on_death(
+        state=state,
+        decisions=decisions,
+        result=record.result,
+    )
+    assert state.fight_phase_state is not None
+    assert state.fight_phase_state.active_activation == activation
+    assert not model_by_id(state=state, model_instance_id=model.model_instance_id).is_alive
+    assert state.battlefield_state is not None
+    assert model.model_instance_id in state.battlefield_state.placed_model_ids()
+    assert any(
+        formation.attached_unit_instance_id == attached_id
+        for army in state.army_definitions
+        for formation in army.attached_units
+    )
+    continued = _last_event_payload(decisions, "fight_on_death_active_activation_continued")
+    assert cast(dict[str, JsonValue], continued["activation_selection"])["result_id"] == (
+        activation.result_id
+    )
+
+    state.replace_fight_phase_state(state.fight_phase_state.with_active_activation(None))
+    completion_context = remove_rule_fight_on_death_models_for_completed_activation(
+        state=state,
+        decisions=decisions,
+        activation=activation,
+        unit_attacked=True,
+    )
+    assert completion_context is not None
+    assert (
+        finalize_rule_destruction_after_fight_activation(
+            state=state,
+            decisions=decisions,
+            context=completion_context,
+            rules_unit_instance_id=attached_id,
+        )
+        is None
+    )
+    assert state.battlefield_state is not None
+    assert model.model_instance_id not in state.battlefield_state.placed_model_ids()
+    assert all(
+        formation.attached_unit_instance_id != attached_id
+        for army in state.army_definitions
+        for formation in army.attached_units
+    )
+    assert leader.unit_instance_id in {
+        record.unit_instance_id for record in state.starting_strength_records
+    }
+    removed = _last_event_payload(decisions, "fight_on_death_models_removed")
+    assert removed["model_instance_ids"] == [model.model_instance_id]
+    assert removed["reason"] == "unit_attacked"
+
+
 @pytest.mark.parametrize(
     ("attacking_unit_kind", "expected_candidate_kind"),
     [("attached", None), ("bodyguard", "leader")],
@@ -2265,6 +2651,1002 @@ def _sequencing_participants() -> tuple[SequencingParticipant, ...]:
             payload={"priority": 2},
         ),
     )
+
+
+def test_fight_unit_selected_grant_resolution_rejects_invalid_typed_inputs() -> None:
+    state, decisions, result, activation, grant = _fight_grant_resolution_fixture()
+
+    with pytest.raises(GameLifecycleError, match="require GameState"):
+        fight_unit_selected_grant_resolution.record_fight_unit_selected_grant_effects(
+            state=cast(GameState, object()),
+            decisions=decisions,
+            result=result,
+            activation=activation,
+            grant=grant,
+        )
+    with pytest.raises(GameLifecycleError, match="require decisions"):
+        fight_unit_selected_grant_resolution.record_fight_unit_selected_grant_effects(
+            state=state,
+            decisions=cast(DecisionController, object()),
+            result=result,
+            activation=activation,
+            grant=grant,
+        )
+    with pytest.raises(GameLifecycleError, match="require result"):
+        fight_unit_selected_grant_resolution.record_fight_unit_selected_grant_effects(
+            state=state,
+            decisions=decisions,
+            result=cast(DecisionResult, object()),
+            activation=activation,
+            grant=grant,
+        )
+    with pytest.raises(GameLifecycleError, match="require activation"):
+        fight_unit_selected_grant_resolution.record_fight_unit_selected_grant_effects(
+            state=state,
+            decisions=decisions,
+            result=result,
+            activation=cast(FightActivationSelection, object()),
+            grant=grant,
+        )
+    with pytest.raises(GameLifecycleError, match="require grant"):
+        fight_unit_selected_grant_resolution.record_fight_unit_selected_grant_effects(
+            state=state,
+            decisions=decisions,
+            result=result,
+            activation=activation,
+            grant=cast(FightUnitSelectedGrant, object()),
+        )
+
+    with pytest.raises(GameLifecycleError, match="require GameState"):
+        fight_unit_selected_grant_resolution.validate_fight_unit_selected_grant_effects(
+            state=cast(GameState, object()),
+            result=result,
+            activation=activation,
+            grant=grant,
+        )
+    with pytest.raises(GameLifecycleError, match="require result"):
+        fight_unit_selected_grant_resolution.validate_fight_unit_selected_grant_effects(
+            state=state,
+            result=cast(DecisionResult, object()),
+            activation=activation,
+            grant=grant,
+        )
+    with pytest.raises(GameLifecycleError, match="require activation"):
+        fight_unit_selected_grant_resolution.validate_fight_unit_selected_grant_effects(
+            state=state,
+            result=result,
+            activation=cast(FightActivationSelection, object()),
+            grant=grant,
+        )
+    with pytest.raises(GameLifecycleError, match="require grant"):
+        fight_unit_selected_grant_resolution.validate_fight_unit_selected_grant_effects(
+            state=state,
+            result=result,
+            activation=activation,
+            grant=cast(FightUnitSelectedGrant, object()),
+        )
+
+
+def test_fight_unit_selected_timed_effects_validate_targets_expiration_and_identity() -> None:
+    state, decisions, result, activation, _grant = _fight_grant_resolution_fixture()
+    unit_id = activation.unit_instance_id
+
+    opaque_grant = _timed_fight_grant(effect_payload="opaque", expiration="end_phase")
+    fight_unit_selected_grant_resolution.validate_fight_unit_selected_grant_effects(
+        state=state,
+        result=result,
+        activation=activation,
+        grant=opaque_grant,
+    )
+    end_turn_grant = _timed_fight_grant(
+        effect_payload={"target_unit_instance_ids": [unit_id]},
+        expiration="end_turn",
+    )
+    effects = fight_unit_selected_grant_resolution.record_fight_unit_selected_grant_effects(
+        state=state,
+        decisions=decisions,
+        result=result,
+        activation=activation,
+        grant=end_turn_grant,
+    )
+    assert len(effects) == 1
+    assert effects[0].target_unit_instance_ids == (unit_id,)
+
+    with pytest.raises(GameLifecycleError, match="already exists"):
+        fight_unit_selected_grant_resolution.record_fight_unit_selected_grant_effects(
+            state=state,
+            decisions=decisions,
+            result=result,
+            activation=activation,
+            grant=end_turn_grant,
+        )
+    with pytest.raises(GameLifecycleError, match="owner is not in the game"):
+        fight_unit_selected_grant_resolution.validate_fight_unit_selected_grant_effects(
+            state=state,
+            result=replace(result, result_id="fight-grant-outsider-result"),
+            activation=replace(activation, player_id="player-outsider"),
+            grant=end_turn_grant,
+        )
+
+
+@pytest.mark.parametrize(
+    ("effect_payload", "expiration", "expected_error"),
+    [
+        (
+            {"target_unit_instance_ids": "not-a-list"},
+            "end_phase",
+            "timed target IDs must be a list",
+        ),
+        ({"target_unit_instance_ids": []}, "end_phase", "timed target IDs are empty"),
+        (
+            {
+                "target_unit_instance_ids": [
+                    "army-alpha:intercessor-unit-1",
+                    "army-alpha:intercessor-unit-1",
+                ]
+            },
+            "end_phase",
+            "timed target IDs are duplicated",
+        ),
+    ],
+)
+def test_fight_unit_selected_timed_effects_reject_invalid_payloads(
+    effect_payload: JsonValue,
+    expiration: str,
+    expected_error: str,
+) -> None:
+    state, _decisions, result, activation, _grant = _fight_grant_resolution_fixture()
+    grant = _timed_fight_grant(effect_payload=effect_payload, expiration=expiration)
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        fight_unit_selected_grant_resolution.validate_fight_unit_selected_grant_effects(
+            state=state,
+            result=result,
+            activation=activation,
+            grant=grant,
+        )
+
+
+def test_fight_unit_selected_timed_effect_resolution_rejects_unknown_expiration() -> None:
+    state, _decisions, _result, _activation, _grant = _fight_grant_resolution_fixture()
+
+    with pytest.raises(GameLifecycleError, match="timed effect expiration is unsupported"):
+        fight_unit_selected_grant_resolution._timed_effect_expiration(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            expiration="unsupported",
+        )
+
+
+@pytest.mark.parametrize(
+    ("case", "expected_error"),
+    [
+        ("not_object", "must be an object"),
+        ("wrong_payload_kind", "effect kind is unsupported"),
+        ("missing_effect", "requires an effect object"),
+        ("missing_rule_effect_kind", "requires effect kind"),
+        ("unknown_rule_effect_kind", "effect kind is unsupported"),
+        ("wrong_rule_effect_kind", "RuleIR effect is unsupported"),
+        ("missing_target", "must target this model"),
+        ("wrong_target", "must target this model"),
+        ("parameters_not_list", "parameters must be a list"),
+        ("parameter_not_object", "parameter must be an object"),
+        ("parameter_missing_key", "parameter requires key"),
+        ("duplicate_parameter", "parameters are duplicated"),
+        ("wrong_dice_quantity", "require one die"),
+        ("wrong_dice_sides", "require a D3"),
+        ("negative_modifier", "modifier must be non-negative"),
+        ("missing_source_id", "requires source_id"),
+        ("same_execution_and_source", "must be distinct"),
+        ("missing_execution_context", "requires execution context"),
+    ],
+)
+def test_generic_self_mortal_wound_effect_payload_fails_closed(
+    case: str,
+    expected_error: str,
+) -> None:
+    value: JsonValue = _generic_self_mortal_wound_effect_payload()
+    if case == "not_object":
+        value = []
+    else:
+        payload = cast(dict[str, JsonValue], value)
+        effect = cast(dict[str, JsonValue], payload["effect"])
+        parameters = cast(list[JsonValue], effect["parameters"])
+        if case == "wrong_payload_kind":
+            payload["effect_kind"] = "unsupported"
+        elif case == "missing_effect":
+            payload["effect"] = None
+        elif case == "missing_rule_effect_kind":
+            effect["kind"] = None
+        elif case == "unknown_rule_effect_kind":
+            effect["kind"] = "unsupported"
+        elif case == "wrong_rule_effect_kind":
+            effect["kind"] = RuleEffectKind.GRANT_ABILITY.value
+        elif case == "missing_target":
+            payload["target"] = None
+        elif case == "wrong_target":
+            payload["target"] = {"kind": RuleTargetKind.THIS_UNIT.value}
+        elif case == "parameters_not_list":
+            effect["parameters"] = None
+        elif case == "parameter_not_object":
+            effect["parameters"] = ["invalid"]
+        elif case == "parameter_missing_key":
+            effect["parameters"] = [{"value": 1}]
+        elif case == "duplicate_parameter":
+            parameters.append({"key": "mortal_wounds_dice_quantity", "value": 1})
+        elif case == "wrong_dice_quantity":
+            _replace_effect_parameter(parameters, key="mortal_wounds_dice_quantity", value=2)
+        elif case == "wrong_dice_sides":
+            _replace_effect_parameter(parameters, key="mortal_wounds_dice_sides", value=6)
+        elif case == "negative_modifier":
+            _replace_effect_parameter(parameters, key="mortal_wounds_modifier", value=-1)
+        elif case == "missing_source_id":
+            payload["source_id"] = None
+        elif case == "same_execution_and_source":
+            payload["execution_id"] = payload["source_id"]
+        elif case == "missing_execution_context":
+            payload["context"] = None
+        else:
+            raise AssertionError(f"Unhandled test case: {case}")
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        fight_unit_selected_grant_resolution._generic_self_mortal_wound_effect_payload(  # pyright: ignore[reportPrivateUsage]
+            value
+        )
+
+
+def test_generic_self_mortal_wound_effect_payload_accepts_canonical_payload() -> None:
+    payload = _generic_self_mortal_wound_effect_payload()
+
+    assert (
+        fight_unit_selected_grant_resolution._generic_self_mortal_wound_effect_payload(  # pyright: ignore[reportPrivateUsage]
+            payload
+        )
+        == payload
+    )
+
+
+@pytest.mark.parametrize(
+    ("value", "expected_error"),
+    [
+        ([], "source context must be an object"),
+        ({}, "source kind drift"),
+        (
+            {
+                "source_kind": (
+                    fight_unit_selected_grant_resolution.SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_SOURCE_KIND
+                )
+            },
+            "source phase drift",
+        ),
+    ],
+)
+def test_self_mortal_wound_source_context_fails_closed_early(
+    value: JsonValue,
+    expected_error: str,
+) -> None:
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        fight_unit_selected_grant_resolution._self_mortal_wound_source_context(  # pyright: ignore[reportPrivateUsage]
+            value
+        )
+
+
+def test_self_mortal_wound_nested_payload_validators_fail_closed() -> None:
+    with pytest.raises(GameLifecycleError, match="D3 result must be an object"):
+        fight_unit_selected_grant_resolution._self_mortal_wound_d3_result(  # pyright: ignore[reportPrivateUsage]
+            None
+        )
+    with pytest.raises(GameLifecycleError, match="D3 result is invalid"):
+        fight_unit_selected_grant_resolution._self_mortal_wound_d3_result(  # pyright: ignore[reportPrivateUsage]
+            {}
+        )
+    with pytest.raises(GameLifecycleError, match="destruction evidence must be an object"):
+        fight_unit_selected_grant_resolution._self_mortal_wound_destruction_evidence(  # pyright: ignore[reportPrivateUsage]
+            {}
+        )
+    with pytest.raises(GameLifecycleError, match="progress is invalid"):
+        fight_unit_selected_grant_resolution._validate_self_mortal_wound_progress(  # pyright: ignore[reportPrivateUsage]
+            object()  # type: ignore[arg-type]
+        )
+
+
+@pytest.mark.parametrize(
+    ("case", "expected_error"),
+    [
+        ("invalid_identifier", "hook_id"),
+        ("execution_identity", "execution identity drift"),
+        ("bearer_identity", "bearer identity drift"),
+        ("wound_count", "invalid wound count"),
+        ("d3_actor", "D3 actor drift"),
+        ("d3_roll_type", "D3 roll type drift"),
+        ("d3_result", "D3 result drift"),
+    ],
+)
+def test_self_mortal_wound_source_context_rejects_identity_and_roll_drift(
+    case: str,
+    expected_error: str,
+) -> None:
+    progress, context, _evidence = _self_mortal_wound_progress_fixture()
+    value = cast(dict[str, JsonValue], json.loads(json.dumps(context)))
+    if case == "invalid_identifier":
+        value["hook_id"] = ""
+    elif case == "execution_identity":
+        value["source_rule_id"] = "phase12a:drifted-execution"
+    elif case == "bearer_identity":
+        value["source_model_instance_id"] = "phase12a:drifted-model"
+    elif case == "wound_count":
+        value["mortal_wounds"] = 0
+    else:
+        d3_result = cast(dict[str, JsonValue], value["d3_result"])
+        source_d6_result = cast(dict[str, JsonValue], d3_result["source_d6_result"])
+        spec = cast(dict[str, JsonValue], source_d6_result["spec"])
+        if case == "d3_actor":
+            spec["actor_id"] = "phase12a:drifted-model"
+        elif case == "d3_roll_type":
+            spec["roll_type"] = "phase12a.drifted-roll-type"
+        elif case == "d3_result":
+            value["mortal_wounds"] = progress.mortal_wounds + 1
+        else:
+            raise AssertionError(f"Unhandled test case: {case}")
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        fight_unit_selected_grant_resolution._self_mortal_wound_source_context(  # pyright: ignore[reportPrivateUsage]
+            value
+        )
+
+
+def test_self_mortal_wound_source_context_accepts_canonical_payload() -> None:
+    _progress, context, _evidence = _self_mortal_wound_progress_fixture()
+
+    assert (
+        fight_unit_selected_grant_resolution._self_mortal_wound_source_context(  # pyright: ignore[reportPrivateUsage]
+            context
+        )
+        == context
+    )
+
+
+@pytest.mark.parametrize(
+    ("case", "expected_error"),
+    [
+        ("source_rule", "progress source rule drift"),
+        ("target_unit", "progress target unit drift"),
+        ("defender", "progress defender drift"),
+        ("wound_count", "progress wound count drift"),
+        ("spill_over", "must not spill over"),
+        ("bearer_priority", "bearer priority drift"),
+        ("destruction_evidence", "must defer destruction evidence"),
+    ],
+)
+def test_self_mortal_wound_progress_rejects_routing_drift(
+    case: str,
+    expected_error: str,
+) -> None:
+    progress, _context, evidence = _self_mortal_wound_progress_fixture()
+    if case == "source_rule":
+        value = replace(progress, source_rule_id="phase12a:drifted-rule")
+    elif case == "target_unit":
+        value = replace(progress, target_unit_instance_id="phase12a:drifted-unit")
+    elif case == "defender":
+        value = replace(progress, defender_player_id="player-b")
+    elif case == "wound_count":
+        value = replace(
+            progress,
+            mortal_wounds=progress.mortal_wounds + 1,
+            remaining_mortal_wounds=progress.remaining_mortal_wounds + 1,
+        )
+    elif case == "spill_over":
+        value = replace(progress, spill_over=True)
+    elif case == "bearer_priority":
+        value = replace(progress, priority_model_ids=("phase12a:drifted-model",))
+    elif case == "destruction_evidence":
+        value = replace(progress, destruction_evidence=evidence)
+    else:
+        raise AssertionError(f"Unhandled test case: {case}")
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        fight_unit_selected_grant_resolution._validate_self_mortal_wound_progress(  # pyright: ignore[reportPrivateUsage]
+            value
+        )
+
+
+@pytest.mark.parametrize(
+    ("case", "expected_error"),
+    [
+        ("player", "destruction player drift"),
+        ("unit", "destruction unit drift"),
+        ("model", "destruction model drift"),
+        ("source_kind", "destruction source kind drift"),
+        ("action_phase", "destruction action phase drift"),
+        ("parent_phase", "destruction parent phase drift"),
+        ("source_step", "destruction step drift"),
+    ],
+)
+def test_self_mortal_wound_progress_rejects_destruction_evidence_drift(
+    case: str,
+    expected_error: str,
+) -> None:
+    progress, context, _evidence = _self_mortal_wound_progress_fixture()
+    value = cast(dict[str, JsonValue], json.loads(json.dumps(context)))
+    evidence = cast(dict[str, JsonValue], value["mortal_wound_destruction_evidence"])
+    attribution = cast(dict[str, JsonValue], evidence["destruction_attribution"])
+    provenance = cast(dict[str, JsonValue], attribution["destruction_provenance"])
+    if case == "player":
+        attribution["destroying_player_id"] = "player-b"
+    elif case == "unit":
+        attribution["source_rules_unit_instance_id"] = "phase12a:drifted-unit"
+    elif case == "model":
+        attribution["source_model_instance_id"] = "phase12a:drifted-model"
+    elif case == "source_kind":
+        provenance["destruction_source_kind"] = DestructionSourceKind.HAZARDOUS.value
+    elif case == "action_phase":
+        evidence["action_phase"] = BattlePhase.SHOOTING.value
+    elif case == "parent_phase":
+        evidence["parent_battle_phase"] = BattlePhase.SHOOTING.value
+    elif case == "source_step":
+        evidence["source_step"] = "phase12a_drifted_step"
+    else:
+        raise AssertionError(f"Unhandled test case: {case}")
+    drifted_progress = replace(progress, source_context=value)
+
+    with pytest.raises(GameLifecycleError, match=expected_error):
+        fight_unit_selected_grant_resolution._validate_self_mortal_wound_progress(  # pyright: ignore[reportPrivateUsage]
+            drifted_progress
+        )
+
+
+def test_self_mortal_wound_progress_accepts_canonical_routing_context() -> None:
+    progress, _context, _evidence = _self_mortal_wound_progress_fixture()
+
+    fight_unit_selected_grant_resolution._validate_self_mortal_wound_progress(  # pyright: ignore[reportPrivateUsage]
+        progress
+    )
+
+
+def test_applied_damage_attached_split_context_is_fail_closed() -> None:
+    assert defer_attached_split_from_rule_destruction_context({}) is False
+    with pytest.raises(
+        GameLifecycleError,
+        match="split deferral requires applied mortal-wound destruction",
+    ):
+        defer_attached_split_from_rule_destruction_context({DEFER_ATTACHED_SPLIT_FIELD: True})
+    with pytest.raises(GameLifecycleError, match="split context is invalid"):
+        defer_attached_split_from_rule_destruction_context(
+            {
+                "completion_kind": RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
+            }
+        )
+    assert (
+        defer_attached_split_from_rule_destruction_context(
+            {
+                "completion_kind": RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
+                DEFER_ATTACHED_SPLIT_FIELD: True,
+            }
+        )
+        is True
+    )
+
+
+def test_rule_destruction_source_liabilities_reject_missing_and_wrong_target_effects() -> None:
+    state = _battle_state(unit_selection_ids=("intercessor-unit-1",))
+    alpha_unit = state.army_definitions[0].units[0]
+    enemy_unit = state.army_definitions[1].units[0]
+
+    with pytest.raises(GameLifecycleError, match="liability effect is missing"):
+        consume_rule_destruction_source_liabilities(
+            state=state,
+            source_effect_ids=("phase12a:missing-liability",),
+            rules_unit_instance_id=alpha_unit.unit_instance_id,
+        )
+
+    liability = _record_rule_destruction_liability(
+        state=state,
+        effect_id="phase12a:wrong-target-liability",
+        target_unit_instance_id=alpha_unit.unit_instance_id,
+        owner_player_id="player-a",
+    )
+    with pytest.raises(GameLifecycleError, match="liability target drift"):
+        consume_rule_destruction_source_liabilities(
+            state=state,
+            source_effect_ids=(liability.effect_id,),
+            rules_unit_instance_id=enemy_unit.unit_instance_id,
+        )
+
+
+def test_rule_destruction_source_liability_preserves_other_targets() -> None:
+    state = _battle_state(unit_selection_ids=("intercessor-unit-1",))
+    alpha_unit = state.army_definitions[0].units[0]
+    enemy_unit = state.army_definitions[1].units[0]
+    effect = _persisting_effect(
+        effect_id="phase12a:multi-target-liability",
+        target_unit_instance_ids=(alpha_unit.unit_instance_id, enemy_unit.unit_instance_id),
+        expiration=EffectExpiration.end_of_battle(),
+    )
+    state.record_persisting_effect(effect)
+
+    consume_rule_destruction_source_liabilities(
+        state=state,
+        source_effect_ids=(effect.effect_id,),
+        rules_unit_instance_id=alpha_unit.unit_instance_id,
+    )
+
+    remaining = next(
+        item for item in state.persisting_effects if item.effect_id == effect.effect_id
+    )
+    assert remaining.target_unit_instance_ids == (enemy_unit.unit_instance_id,)
+
+
+def test_rule_model_destruction_result_requires_typed_completion_artifacts() -> None:
+    with pytest.raises(GameLifecycleError, match="removal record is invalid"):
+        rule_model_destruction.RuleModelDestructionResult(
+            model_destroyed_event_id=None,
+            removal_record=cast(ModelRemovalRecord, object()),
+            transition_batch=None,
+            status=None,
+        )
+    with pytest.raises(GameLifecycleError, match="transition batch is invalid"):
+        rule_model_destruction.RuleModelDestructionResult(
+            model_destroyed_event_id=None,
+            removal_record=None,
+            transition_batch=cast(BattlefieldTransitionBatch, object()),
+            status=None,
+        )
+    with pytest.raises(GameLifecycleError, match="status must be LifecycleStatus"):
+        rule_model_destruction.RuleModelDestructionResult(
+            model_destroyed_event_id=None,
+            removal_record=None,
+            transition_batch=None,
+            status=cast(LifecycleStatus, object()),
+        )
+    with pytest.raises(GameLifecycleError, match="requires removal artifacts"):
+        rule_model_destruction.RuleModelDestructionResult(
+            model_destroyed_event_id=None,
+            removal_record=None,
+            transition_batch=None,
+            status=None,
+        )
+
+
+def test_rule_model_destruction_payload_scalar_validators_fail_closed() -> None:
+    assert (
+        rule_model_destruction._payload_string(  # pyright: ignore[reportPrivateUsage]
+            {"value": "identifier"}, "value"
+        )
+        == "identifier"
+    )
+    with pytest.raises(GameLifecycleError, match="must be a string"):
+        rule_model_destruction._payload_string({}, "value")  # pyright: ignore[reportPrivateUsage]
+
+    assert (
+        rule_model_destruction._optional_payload_string(  # pyright: ignore[reportPrivateUsage]
+            {}, "value"
+        )
+        is None
+    )
+    assert (
+        rule_model_destruction._optional_payload_string(  # pyright: ignore[reportPrivateUsage]
+            {"value": "identifier"}, "value"
+        )
+        == "identifier"
+    )
+    with pytest.raises(GameLifecycleError, match="value must be a string"):
+        rule_model_destruction._optional_payload_string(  # pyright: ignore[reportPrivateUsage]
+            {"value": 1}, "value"
+        )
+
+    assert (
+        rule_model_destruction._payload_d6_target(  # pyright: ignore[reportPrivateUsage]
+            {"value": 2}, "value"
+        )
+        == 2
+    )
+    assert (
+        rule_model_destruction._payload_d6_target(  # pyright: ignore[reportPrivateUsage]
+            {"value": 6}, "value"
+        )
+        == 6
+    )
+    with pytest.raises(GameLifecycleError, match="must be a D6 target"):
+        rule_model_destruction._payload_d6_target(  # pyright: ignore[reportPrivateUsage]
+            {"value": 1}, "value"
+        )
+
+    assert (
+        rule_model_destruction._payload_positive_int(  # pyright: ignore[reportPrivateUsage]
+            {"value": 1}, "value"
+        )
+        == 1
+    )
+    with pytest.raises(GameLifecycleError, match="must be a positive integer"):
+        rule_model_destruction._payload_positive_int(  # pyright: ignore[reportPrivateUsage]
+            {"value": 0}, "value"
+        )
+
+    assert (
+        rule_model_destruction._payload_positive_number(  # pyright: ignore[reportPrivateUsage]
+            {"value": 1}, "value"
+        )
+        == 1.0
+    )
+    assert (
+        rule_model_destruction._payload_positive_number(  # pyright: ignore[reportPrivateUsage]
+            {"value": 1.5}, "value"
+        )
+        == 1.5
+    )
+    with pytest.raises(GameLifecycleError, match="must be positive"):
+        rule_model_destruction._payload_positive_number(  # pyright: ignore[reportPrivateUsage]
+            {"value": True}, "value"
+        )
+    with pytest.raises(GameLifecycleError, match="must be positive"):
+        rule_model_destruction._payload_positive_number(  # pyright: ignore[reportPrivateUsage]
+            {"value": 0}, "value"
+        )
+
+
+def test_rule_model_destruction_payload_collection_validators_fail_closed() -> None:
+    payload_object: dict[str, JsonValue] = {"nested": {"value": 1}}
+    assert rule_model_destruction._payload_object_value(  # pyright: ignore[reportPrivateUsage]
+        payload_object, "nested"
+    ) == {"value": 1}
+    with pytest.raises(GameLifecycleError, match="must be an object"):
+        rule_model_destruction._payload_object_value(  # pyright: ignore[reportPrivateUsage]
+            {"nested": []}, "nested"
+        )
+
+    assert rule_model_destruction._payload_identifier_list(  # pyright: ignore[reportPrivateUsage]
+        {"values": ["value-b", "value-a"]}, "values"
+    ) == ("value-b", "value-a")
+    with pytest.raises(GameLifecycleError, match="must be a list"):
+        rule_model_destruction._payload_identifier_list(  # pyright: ignore[reportPrivateUsage]
+            {"values": cast(JsonValue, ())}, "values"
+        )
+    with pytest.raises(GameLifecycleError, match="contains duplicates"):
+        rule_model_destruction._payload_identifier_list(  # pyright: ignore[reportPrivateUsage]
+            {"values": ["duplicate", "duplicate"]}, "values"
+        )
+
+    assert (
+        rule_model_destruction._payload_source_tuple(  # pyright: ignore[reportPrivateUsage]
+            {"sources": []}, "sources"
+        )
+        == ()
+    )
+    with pytest.raises(GameLifecycleError, match="must be a source list"):
+        rule_model_destruction._payload_source_tuple(  # pyright: ignore[reportPrivateUsage]
+            {"sources": ["invalid"]}, "sources"
+        )
+
+    assert rule_model_destruction._validate_identifier_tuple(  # pyright: ignore[reportPrivateUsage]
+        "values", ("value-b", "value-a"), min_length=2
+    ) == ("value-a", "value-b")
+    with pytest.raises(GameLifecycleError, match="must be a tuple"):
+        rule_model_destruction._validate_identifier_tuple(  # pyright: ignore[reportPrivateUsage]
+            "values", [], min_length=1
+        )
+    with pytest.raises(GameLifecycleError, match="is invalid"):
+        rule_model_destruction._validate_identifier_tuple(  # pyright: ignore[reportPrivateUsage]
+            "values", ("duplicate", "duplicate"), min_length=1
+        )
+
+
+def test_rule_model_destruction_reaction_descriptor_and_host_helpers() -> None:
+    fight_source = DestructionReactionSource(
+        source_id="phase12a:fight-on-death",
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+        source_rule_id="phase12a:fight-on-death",
+    )
+    shoot_source = DestructionReactionSource(
+        source_id="phase12a:shoot-on-death",
+        reaction_kind=DestructionReactionKind.SHOOT_ON_DEATH,
+        source_rule_id="phase12a:shoot-on-death",
+    )
+    deadly_demise_source = _deadly_demise_source(
+        source_id="phase12a:deadly-demise",
+        mortal_wounds=1,
+    )
+    assert rule_model_destruction._reaction_action_host(None) is None  # pyright: ignore[reportPrivateUsage]
+    assert rule_model_destruction._reaction_action_host(shoot_source) == "shooting"  # pyright: ignore[reportPrivateUsage]
+    assert rule_model_destruction._reaction_action_host(fight_source) == "fight"  # pyright: ignore[reportPrivateUsage]
+    assert rule_model_destruction._reaction_action_host(deadly_demise_source) == "explosion"  # pyright: ignore[reportPrivateUsage]
+
+    no_trigger = replace(fight_source, payload={"effect_kind": "fight_on_death"})
+    assert rule_model_destruction._trigger_descriptor(fight_source) is None  # pyright: ignore[reportPrivateUsage]
+    assert rule_model_destruction._trigger_descriptor(no_trigger) is None  # pyright: ignore[reportPrivateUsage]
+    trigger_payload: dict[str, JsonValue] = {"trigger_roll_threshold": 4}
+    with_trigger = replace(fight_source, payload=trigger_payload)
+    assert rule_model_destruction._trigger_descriptor(with_trigger) == trigger_payload  # pyright: ignore[reportPrivateUsage]
+    invalid = replace(fight_source, payload=[])
+    with pytest.raises(GameLifecycleError, match="payload must be an object"):
+        rule_model_destruction._trigger_descriptor(invalid)  # pyright: ignore[reportPrivateUsage]
+
+
+def test_applied_mortal_wound_destruction_entrypoint_rejects_invalid_types() -> None:
+    state, decisions, damage, evidence = _applied_destruction_type_guard_fixture()
+
+    with pytest.raises(GameLifecycleError, match="requires GameState"):
+        _continue_applied_destruction_type_guard(
+            state=cast(GameState, object()),
+            decisions=decisions,
+            damage=damage,
+            evidence=evidence,
+            defer_attached_split=False,
+        )
+    with pytest.raises(GameLifecycleError, match="requires DecisionController"):
+        _continue_applied_destruction_type_guard(
+            state=state,
+            decisions=cast(DecisionController, object()),
+            damage=damage,
+            evidence=evidence,
+            defer_attached_split=False,
+        )
+    with pytest.raises(GameLifecycleError, match="requires DamageApplication"):
+        _continue_applied_destruction_type_guard(
+            state=state,
+            decisions=decisions,
+            damage=cast(DamageApplication, object()),
+            evidence=evidence,
+            defer_attached_split=False,
+        )
+    with pytest.raises(GameLifecycleError, match="requires typed destruction evidence"):
+        _continue_applied_destruction_type_guard(
+            state=state,
+            decisions=decisions,
+            damage=damage,
+            evidence=cast(MortalWoundDestructionEvidence, object()),
+            defer_attached_split=False,
+        )
+    with pytest.raises(GameLifecycleError, match="split deferral must be a bool"):
+        _continue_applied_destruction_type_guard(
+            state=state,
+            decisions=decisions,
+            damage=damage,
+            evidence=evidence,
+            defer_attached_split=cast(bool, 1),
+        )
+
+
+def test_applied_mortal_wound_destruction_context_and_damage_validation_fail_closed() -> None:
+    state, _decisions, damage, _evidence = _applied_destruction_type_guard_fixture()
+    with pytest.raises(GameLifecycleError, match="damage_application must be an object"):
+        rule_model_destruction_applied_damage.validate_applied_damage_rule_destruction_context(
+            state=state,
+            context={
+                "completion_kind": RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
+                DEFER_ATTACHED_SPLIT_FIELD: False,
+            },
+        )
+    with pytest.raises(GameLifecycleError, match="requires mortal damage"):
+        rule_model_destruction_applied_damage._validate_destroyed_damage_matches_state(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            damage_application=replace(damage, damage_kind=DamageKind.NORMAL),
+        )
+    with pytest.raises(GameLifecycleError, match="requires lethal damage"):
+        rule_model_destruction_applied_damage._validate_destroyed_damage_matches_state(  # pyright: ignore[reportPrivateUsage]
+            state=state,
+            damage_application=replace(
+                damage,
+                starting_wounds_remaining=2,
+                final_wounds_remaining=1,
+                destroyed=False,
+            ),
+        )
+    with pytest.raises(GameLifecycleError, match="payload must be an object"):
+        rule_model_destruction_applied_damage._object_payload(  # pyright: ignore[reportPrivateUsage]
+            [], "payload"
+        )
+
+
+def _fight_grant_resolution_fixture() -> tuple[
+    GameState,
+    DecisionController,
+    DecisionResult,
+    FightActivationSelection,
+    FightUnitSelectedGrant,
+]:
+    decisions = DecisionController()
+    state = _battle_state(
+        unit_selection_ids=("intercessor-unit-1",),
+        decisions=decisions,
+    )
+    unit = state.army_definitions[0].units[0]
+    result = DecisionResult(
+        result_id="fight-grant-result",
+        request_id="fight-grant-request",
+        decision_type="fight-grant-test",
+        actor_id="player-a",
+        selected_option_id="fight-grant-option",
+        payload=None,
+    )
+    activation = FightActivationSelection(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=unit.unit_instance_id,
+        ordering_band=FightOrderingBandKind.REMAINING_COMBATS,
+        fight_type=FightTypeKind.NORMAL,
+        eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
+        request_id="fight-activation-request",
+        result_id="fight-activation-result",
+    )
+    grant = FightUnitSelectedGrant(
+        hook_id="fight-grant-hook",
+        source_id="fight-grant-source",
+        label="fight-grant-label",
+        immediate_effect_payload={},
+    )
+    return state, decisions, result, activation, grant
+
+
+def _applied_destruction_type_guard_fixture() -> tuple[
+    GameState,
+    DecisionController,
+    DamageApplication,
+    MortalWoundDestructionEvidence,
+]:
+    decisions = DecisionController()
+    state = _battle_state(
+        unit_selection_ids=("intercessor-unit-1",),
+        decisions=decisions,
+    )
+    _set_current_battle_phase(state, BattlePhase.FIGHT)
+    unit = state.army_definitions[0].units[0]
+    model = unit.own_models[0]
+    damage = DamageApplication(
+        target_unit_instance_id=unit.unit_instance_id,
+        model_instance_id=model.model_instance_id,
+        damage_kind=DamageKind.MORTAL,
+        requested_damage=1,
+        wounds_lost=1,
+        excess_damage_lost=0,
+        starting_wounds_remaining=1,
+        final_wounds_remaining=0,
+        destroyed=True,
+    )
+    evidence = MortalWoundDestructionEvidence.for_non_attack_state(
+        state=state,
+        destroying_player_id="player-a",
+        source_rules_unit_instance_id=unit.unit_instance_id,
+        source_model_instance_id=model.model_instance_id,
+        destruction_source_kind=DestructionSourceKind.ABILITY,
+        action_phase=BattlePhase.FIGHT,
+        source_step="phase12a_applied_destruction_type_guard",
+    )
+    return state, decisions, damage, evidence
+
+
+def _continue_applied_destruction_type_guard(
+    *,
+    state: GameState,
+    decisions: DecisionController,
+    damage: DamageApplication,
+    evidence: MortalWoundDestructionEvidence,
+    defer_attached_split: bool,
+) -> object:
+    return continue_applied_mortal_wound_destruction_with_rule_reactions(
+        state=state,
+        decisions=decisions,
+        damage_application=damage,
+        rules_unit_instance_id="army-alpha:intercessor-unit-1",
+        source_rule_id="phase12a:applied-destruction",
+        source_result_id="phase12a:applied-destruction-result",
+        completion_event_type="phase12a_applied_destruction_completed",
+        completion_event_payload={},
+        destruction_evidence=evidence,
+        defer_attached_split_until_fight_activation_completion=defer_attached_split,
+    )
+
+
+def _timed_fight_grant(*, effect_payload: JsonValue, expiration: str) -> FightUnitSelectedGrant:
+    return FightUnitSelectedGrant(
+        hook_id="timed-fight-grant-hook",
+        source_id="timed-fight-grant-source",
+        label="timed-fight-grant-label",
+        timed_effects=(
+            FightUnitSelectedTimedEffect(
+                effect_payload=effect_payload,
+                expiration=expiration,
+            ),
+        ),
+    )
+
+
+def _generic_self_mortal_wound_effect_payload(
+    *,
+    source_model_instance_id: str = "phase12a:self-mortal-model",
+) -> dict[str, JsonValue]:
+    return {
+        "effect_kind": GENERIC_RULE_EFFECT_KIND,
+        "source_id": "phase12a:self-mortal-rule-ir",
+        "execution_id": "phase12a:self-mortal-execution",
+        "target": {"kind": RuleTargetKind.THIS_MODEL.value},
+        "effect": {
+            "kind": RuleEffectKind.INFLICT_MORTAL_WOUNDS.value,
+            "parameters": [
+                {"key": "mortal_wounds_dice_quantity", "value": 1},
+                {"key": "mortal_wounds_dice_sides", "value": 3},
+                {"key": "mortal_wounds_modifier", "value": 1},
+            ],
+        },
+        "context": {"source_model_instance_id": source_model_instance_id},
+    }
+
+
+def _self_mortal_wound_progress_fixture() -> tuple[
+    MortalWoundApplicationProgress,
+    dict[str, JsonValue],
+    MortalWoundDestructionEvidence,
+]:
+    state, decisions, _damage, _type_guard_evidence = _applied_destruction_type_guard_fixture()
+    unit = state.army_definitions[0].units[0]
+    model = unit.own_models[0]
+    immediate_payload = _generic_self_mortal_wound_effect_payload(
+        source_model_instance_id=model.model_instance_id
+    )
+    d3_result = DiceRollManager(
+        state.game_id,
+        event_log=decisions.event_log,
+    ).roll_d3_fixed(
+        reason="Phase 12A self-mortal-wound context fixture",
+        roll_type=(
+            fight_unit_selected_grant_resolution.SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_D3_ROLL_TYPE
+        ),
+        source_d6_value=5,
+        actor_id=model.model_instance_id,
+    )
+    mortal_wounds = d3_result.value + 1
+    evidence = MortalWoundDestructionEvidence.for_non_attack_state(
+        state=state,
+        destroying_player_id="player-a",
+        source_rules_unit_instance_id=unit.unit_instance_id,
+        source_model_instance_id=model.model_instance_id,
+        destruction_source_kind=DestructionSourceKind.ABILITY,
+        action_phase=BattlePhase.FIGHT,
+        source_step="selected_to_fight_self_mortal_wounds",
+    )
+    source_context: dict[str, JsonValue] = {
+        "source_kind": (
+            fight_unit_selected_grant_resolution.SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_SOURCE_KIND
+        ),
+        "phase": BattlePhase.FIGHT.value,
+        "source_rule_id": "phase12a:self-mortal-execution",
+        "hook_id": "phase12a:self-mortal-hook",
+        "label": "Phase 12A self mortal wounds",
+        "player_id": "player-a",
+        "unit_instance_id": unit.unit_instance_id,
+        "source_model_instance_id": model.model_instance_id,
+        "activation_request_id": "phase12a:activation-request",
+        "activation_result_id": "phase12a:activation-result",
+        "grant_request_id": "phase12a:grant-request",
+        "grant_result_id": "phase12a:grant-result",
+        "immediate_effect_payload": immediate_payload,
+        "d3_result": cast(JsonValue, d3_result.to_payload()),
+        "mortal_wounds": mortal_wounds,
+        "mortal_wound_destruction_evidence": cast(JsonValue, evidence.to_payload()),
+    }
+    progress = MortalWoundApplicationProgress.start(
+        application_id="phase12a:self-mortal-application",
+        source_rule_id="phase12a:self-mortal-execution",
+        source_context=source_context,
+        target_unit_instance_id=unit.unit_instance_id,
+        defender_player_id="player-a",
+        mortal_wounds=mortal_wounds,
+        spill_over=False,
+        destruction_evidence=None,
+        priority_model_ids=(model.model_instance_id,),
+    )
+    return progress, source_context, evidence
+
+
+def _replace_effect_parameter(
+    parameters: list[JsonValue],
+    *,
+    key: str,
+    value: JsonValue,
+) -> None:
+    for parameter in parameters:
+        if isinstance(parameter, dict) and parameter.get("key") == key:
+            parameter["value"] = value
+            return
+    raise AssertionError(f"Missing effect parameter: {key}")
 
 
 def _persisting_effect(

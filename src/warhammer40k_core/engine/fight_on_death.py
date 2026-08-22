@@ -15,7 +15,10 @@ from warhammer40k_core.engine.battlefield_state import (
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_identities_share_lineage,
+    rules_unit_view_by_id,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.decision_controller import DecisionController
@@ -240,6 +243,58 @@ def fight_on_death_model_ids_for_activation(
     if len(model_ids) != len(set(model_ids)):
         raise GameLifecycleError("Fight On Death activation has duplicate awaiting models.")
     return model_ids
+
+
+def fight_on_death_restricted_model_ids_for_activation(
+    *,
+    state: GameState,
+    activation_result_id: str,
+) -> tuple[str, ...] | None:
+    """Return the model restriction for a standalone Fight On Death activation.
+
+    A model destroyed during its rules unit's ordinary activation continues inside
+    that activation.  Its restriction must therefore not suppress the attacks of
+    other present models in the same rules unit.
+    """
+    model_ids = fight_on_death_model_ids_for_activation(
+        state=state,
+        activation_result_id=activation_result_id,
+    )
+    if model_ids is None:
+        return None
+    fight_state = state.fight_phase_state
+    if fight_state is None or fight_state.active_activation is None:
+        return model_ids
+    activation = fight_state.active_activation
+    if activation.result_id != activation_result_id:
+        return model_ids
+    matching_selections = tuple(
+        selection
+        for selection in fight_state.fight_order_state.activation_selections
+        if selection.result_id == activation_result_id
+    )
+    if not matching_selections:
+        return model_ids
+    if len(matching_selections) != 1:
+        raise GameLifecycleError("Fight On Death activation selection result is ambiguous.")
+    recorded_selection = matching_selections[0]
+    if (
+        recorded_selection.player_id != activation.player_id
+        or recorded_selection.battle_round != activation.battle_round
+        or recorded_selection.ordering_band is not activation.ordering_band
+        or recorded_selection.fight_type is not activation.fight_type
+        or recorded_selection.eligibility_reasons != activation.eligibility_reasons
+        or recorded_selection.request_id != activation.request_id
+        or recorded_selection.interrupt_id != activation.interrupt_id
+    ):
+        raise GameLifecycleError("Fight On Death active activation selection drift.")
+    if not rules_unit_identities_share_lineage(
+        state=state,
+        first_unit_instance_id=recorded_selection.unit_instance_id,
+        second_unit_instance_id=activation.unit_instance_id,
+    ):
+        raise GameLifecycleError("Fight On Death active activation rules-unit drift.")
+    return None
 
 
 def fight_on_death_completion_context_for_activation(

@@ -102,13 +102,6 @@ _RESURGENCE_POINTS_BY_BATTLE_SIZE = {
     BattleSize.STRIKE_FORCE: 10,
     BattleSize.ONSLAUGHT: 14,
 }
-_PROCESSED_MARKER_REMOVAL_MOVE_EVENTS = {
-    "movement_activation_completed",
-    "charge_move_completed",
-    "fight_movement_completed",
-    "unit_disembarked",
-    "reinforcement_unit_arrived",
-}
 
 
 class CultAmbushMarkerPayload(TypedDict):
@@ -1119,59 +1112,15 @@ def resolve_cult_ambush_marker_removal_for_completed_moves(
     decisions: DecisionController,
     completed_phase: BattlePhase,
 ) -> None:
-    if not state.cult_ambush_markers:
-        return
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        return
-    for record in tuple(decisions.event_log.records):
-        if record.event_type not in _PROCESSED_MARKER_REMOVAL_MOVE_EVENTS:
-            continue
-        if _marker_removal_already_processed(decisions, trigger_event_id=record.event_id):
-            continue
-        payload = record.payload
-        if not isinstance(payload, dict):
-            raise GameLifecycleError("Move completion event payload must be an object.")
-        if payload.get("game_id") != state.game_id:
-            continue
-        if payload.get("battle_round") != state.battle_round:
-            continue
-        if payload.get("active_player_id") != state.active_player_id:
-            continue
-        if payload.get("phase") != completed_phase.value:
-            continue
-        unit_id = _event_unit_instance_id(payload)
-        if unit_id is None:
-            continue
-        owner_id = _unit_owner(state, unit_id)
-        if _unit_has_aircraft_keyword(_unit_by_id(state, unit_id)):
-            continue
-        for marker in tuple(state.cult_ambush_markers):
-            if marker.player_id == owner_id:
-                continue
-            if _unit_is_within_marker_removal_distance(
-                state,
-                marker=marker,
-                unit_instance_id=unit_id,
-            ):
-                state.remove_cult_ambush_marker(marker.marker_id)
-                decisions.event_log.append(
-                    "genestealer_cults_cult_ambush_marker_removed",
-                    validate_json_value(
-                        {
-                            "game_id": state.game_id,
-                            "battle_round": state.battle_round,
-                            "active_player_id": state.active_player_id,
-                            "phase": completed_phase.value,
-                            "player_id": marker.player_id,
-                            "marker": marker.to_payload(),
-                            "trigger_event_id": record.event_id,
-                            "trigger_event_type": record.event_type,
-                            "enemy_unit_instance_id": unit_id,
-                            "source_rule_id": SOURCE_RULE_ID,
-                        }
-                    ),
-                )
+    from warhammer40k_core.engine.cult_ambush_marker_removal import (
+        resolve_cult_ambush_marker_removal_for_completed_moves as resolve_marker_removal,
+    )
+
+    resolve_marker_removal(
+        state=state,
+        decisions=decisions,
+        completed_phase=completed_phase,
+    )
 
 
 def reserve_state_is_cult_ambush(reserve_state: ReserveState) -> bool:
@@ -1568,52 +1517,6 @@ def _enemy_geometry_models(state: GameState, *, player_id: str) -> tuple[Geometr
     return tuple(models)
 
 
-def _unit_is_within_marker_removal_distance(
-    state: GameState,
-    *,
-    marker: CultAmbushMarker,
-    unit_instance_id: str,
-) -> bool:
-    battlefield_state = state.battlefield_state
-    if battlefield_state is None:
-        return False
-    unit_placement = battlefield_state.unit_placement_by_id(unit_instance_id)
-    for model_placement in unit_placement.model_placements:
-        model = _model_for_placement(state, unit_instance_id, model_placement.model_instance_id)
-        geometry_model = geometry_model_for_placement(model=model, placement=model_placement)
-        context = DistanceMeasurementContext.from_objective_marker_to_model(
-            marker_id=marker.marker_id,
-            marker_pose=marker.pose,
-            model=geometry_model,
-            marker_diameter_inches=marker.marker_diameter_inches,
-        )
-        if context.horizontal_distance_inches() <= CULT_AMBUSH_MARKER_REMOVAL_DISTANCE_INCHES:
-            return True
-    return False
-
-
-def _marker_removal_already_processed(
-    decisions: DecisionController,
-    *,
-    trigger_event_id: str,
-) -> bool:
-    for record in decisions.event_log.records:
-        if record.event_type != "genestealer_cults_cult_ambush_marker_removed":
-            continue
-        payload = record.payload
-        if isinstance(payload, dict) and payload.get("trigger_event_id") == trigger_event_id:
-            return True
-    return False
-
-
-def _event_unit_instance_id(payload: dict[str, JsonValue]) -> str | None:
-    for key in ("unit_instance_id", "target_unit_instance_id"):
-        value = payload.get(key)
-        if type(value) is str:
-            return _validate_identifier(key, value)
-    return None
-
-
 def _placement_transition_batch(unit_placement: UnitPlacement) -> BattlefieldTransitionBatch:
     return BattlefieldTransitionBatch(
         placements=tuple(
@@ -1658,14 +1561,6 @@ def _marker_by_id(state: GameState, marker_id: str) -> CultAmbushMarker:
     return marker
 
 
-def _unit_owner(state: GameState, unit_instance_id: str) -> str:
-    requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
-    for army in state.army_definitions:
-        if any(unit.unit_instance_id == requested_unit_id for unit in army.units):
-            return army.player_id
-    raise GameLifecycleError("Cult Ambush unit owner lookup failed.")
-
-
 def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     for army in state.army_definitions:
@@ -1673,12 +1568,6 @@ def _unit_by_id(state: GameState, unit_instance_id: str) -> UnitInstance:
             if unit.unit_instance_id == requested_unit_id:
                 return unit
     raise GameLifecycleError("Cult Ambush unit lookup failed.")
-
-
-def _unit_has_aircraft_keyword(unit: UnitInstance) -> bool:
-    return any(
-        keyword.upper() == "AIRCRAFT" for keyword in (*unit.keywords, *unit.faction_keywords)
-    )
 
 
 def _current_phase(state: GameState) -> BattlePhase:
