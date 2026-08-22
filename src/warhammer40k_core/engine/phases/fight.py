@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, cast
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.objectives import ObjectiveMarker
 from warhammer40k_core.core.ruleset_descriptor import (
-    BattlePhaseKind,
     FightOrderingBandKind,
     FightPhaseStepKind,
     FightPolicyDescriptor,
@@ -68,8 +67,6 @@ from warhammer40k_core.engine.dice import DICE_REROLL_DECISION_TYPE, DiceRollMan
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_resources import (
-    apply_faction_resource_spend_effect,
-    faction_resource_result_enriched_payload,
     resolve_faction_resource_refund_roll,
 )
 from warhammer40k_core.engine.fight_activation_abilities import (
@@ -83,6 +80,13 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     build_fight_activation_ability_request,
     fight_activation_ability_use_from_result,
     is_fight_activation_ability_decline_payload,
+)
+from warhammer40k_core.engine.fight_activation_units import (
+    active_fight_activation_surviving_component,
+    active_fight_on_death_melee_component,
+    finalize_rule_destruction_after_fight_activation,
+    record_active_fight_activation_unit_alias,
+    split_attached_rules_unit_after_fight_activation,
 )
 from warhammer40k_core.engine.fight_attack_completion import (
     advance_fight_attack_sequence_until_completion,
@@ -152,6 +156,12 @@ from warhammer40k_core.engine.fight_resolution import (
     resolve_fight_movement,
     validate_melee_declaration_rules,
 )
+from warhammer40k_core.engine.fight_unit_selected_grant_resolution import (
+    apply_fight_unit_selected_grant_immediate_effect,
+    record_fight_unit_selected_grant_effects,
+    validate_fight_unit_selected_grant_effects,
+    validate_fight_unit_selected_grant_immediate_effect,
+)
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     DECLINE_FIGHT_UNIT_GRANT_OPTION_ID,
     SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
@@ -185,6 +195,9 @@ from warhammer40k_core.engine.reaction_queue import ReactionQueue
 from warhammer40k_core.engine.rule_model_destruction_fight_continuation import (
     apply_rule_destruction_reaction_and_schedule_fight_on_death,
     remove_rule_fight_on_death_models_for_completed_activation,
+)
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_view_by_id,
 )
 from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.selected_target_stratagem_reactions import (
@@ -723,6 +736,28 @@ def _advance_active_fight_activation(
     activation = fight_state.active_activation
     if activation is None:
         raise GameLifecycleError("Active fight activation advance requires selection.")
+    surviving_component = active_fight_activation_surviving_component(
+        state=state,
+        activation=activation,
+    )
+    fight_on_death_component = active_fight_on_death_melee_component(
+        state=state,
+        activation=activation,
+    )
+    melee_unit = (
+        surviving_component if fight_on_death_component is None else fight_on_death_component
+    )
+    if melee_unit is None:
+        return _complete_active_fight_activation_without_melee_declaration(
+            handler=handler,
+            state=state,
+            decisions=decisions,
+            reaction_queue=reaction_queue,
+            policy=policy,
+            activation=activation,
+            target_unit_instance_ids=(),
+            available_weapon_count=0,
+        )
     if (
         activation.fight_type is FightTypeKind.OVERRUN
         and not fight_state.overrun_pile_in_is_completed(
@@ -738,41 +773,37 @@ def _advance_active_fight_activation(
     target_ids = melee_target_unit_ids(
         scenario=scenario,
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
-        unit_instance_id=activation.unit_instance_id,
+        unit_instance_id=melee_unit.unit_instance_id,
         state=state,
     )
-    unit = _unit_by_id(state=state, unit_instance_id=activation.unit_instance_id)
     available_weapons = available_melee_weapons_payloads(
         scenario=scenario,
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
-        unit=unit,
+        unit=melee_unit,
         army_catalog=_army_catalog_for_handler(handler),
         state=state,
         source_decision_result_id=activation.result_id,
     )
     if not target_ids or not available_weapons:
-        decisions.event_log.append(
-            "melee_declaration_not_available",
-            validate_json_value(
-                {
-                    "game_id": state.game_id,
-                    "battle_round": state.battle_round,
-                    "phase": BattlePhase.FIGHT.value,
-                    "phase_body_status": "melee_declaration_not_available",
-                    "activation_selection": activation.to_payload(),
-                    "target_unit_instance_ids": list(target_ids),
-                    "available_weapon_count": len(available_weapons),
-                }
-            ),
-        )
-        return _complete_active_fight_activation(
+        if (
+            surviving_component is not None
+            and surviving_component.unit_instance_id != activation.unit_instance_id
+        ):
+            record_active_fight_activation_unit_alias(
+                state=state,
+                fight_state=fight_state,
+                activation=activation,
+                unit_instance_id=surviving_component.unit_instance_id,
+            )
+        return _complete_active_fight_activation_without_melee_declaration(
             handler=handler,
             state=state,
             decisions=decisions,
             reaction_queue=reaction_queue,
             policy=policy,
             activation=activation,
-            unit_attacked=False,
+            target_unit_instance_ids=target_ids,
+            available_weapon_count=len(available_weapons),
         )
     ability_status = _request_fight_activation_ability_if_available(
         handler=handler,
@@ -800,13 +831,23 @@ def _advance_active_fight_activation(
     )
     if selected_to_fight_stratagem_status is not None:
         return selected_to_fight_stratagem_status
+    if (
+        surviving_component is not None
+        and surviving_component.unit_instance_id != activation.unit_instance_id
+    ):
+        fight_state = record_active_fight_activation_unit_alias(
+            state=state,
+            fight_state=fight_state,
+            activation=activation,
+            unit_instance_id=surviving_component.unit_instance_id,
+        )
     request = build_melee_declaration_request(
         request_id=state.next_decision_request_id(),
         game_id=state.game_id,
         battle_round=state.battle_round,
         active_player_id=fight_state.active_player_id,
         actor_id=activation.player_id,
-        unit_instance_id=activation.unit_instance_id,
+        unit_instance_id=melee_unit.unit_instance_id,
         source_decision_request_id=activation.request_id,
         source_decision_result_id=activation.result_id,
         ruleset_descriptor=_ruleset_descriptor_for_handler(handler),
@@ -835,9 +876,45 @@ def _advance_active_fight_activation(
         payload={
             "phase": BattlePhase.FIGHT.value,
             "phase_body_status": _MELEE_DECLARATION_REQUIRED_STATUS,
-            "unit_instance_id": activation.unit_instance_id,
+            "unit_instance_id": melee_unit.unit_instance_id,
             "proposal_kind": MELEE_DECLARATION_PROPOSAL_KIND,
         },
+    )
+
+
+def _complete_active_fight_activation_without_melee_declaration(
+    *,
+    handler: FightPhaseHandler,
+    state: GameState,
+    decisions: DecisionController,
+    reaction_queue: ReactionQueue | None,
+    policy: FightPolicyDescriptor,
+    activation: FightActivationSelection,
+    target_unit_instance_ids: tuple[str, ...],
+    available_weapon_count: int,
+) -> LifecycleStatus | None:
+    decisions.event_log.append(
+        "melee_declaration_not_available",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "phase": BattlePhase.FIGHT.value,
+                "phase_body_status": "melee_declaration_not_available",
+                "activation_selection": activation.to_payload(),
+                "target_unit_instance_ids": list(target_unit_instance_ids),
+                "available_weapon_count": available_weapon_count,
+            }
+        ),
+    )
+    return _complete_active_fight_activation(
+        handler=handler,
+        state=state,
+        decisions=decisions,
+        reaction_queue=reaction_queue,
+        policy=policy,
+        activation=activation,
+        unit_attacked=False,
     )
 
 
@@ -852,6 +929,10 @@ def _complete_active_fight_activation(
     unit_attacked: bool,
 ) -> LifecycleStatus | None:
     fight_state = _require_fight_state(state)
+    activation_rules_unit_instance_id = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=activation.unit_instance_id,
+    ).unit_instance_id
     state.replace_fight_phase_state(fight_state.with_active_activation(None))
     fight_on_death_completion = remove_rule_fight_on_death_models_for_completed_activation(
         state=state,
@@ -859,6 +940,12 @@ def _complete_active_fight_activation(
         activation=activation,
         unit_attacked=unit_attacked,
     )
+    if fight_on_death_completion is None:
+        split_attached_rules_unit_after_fight_activation(
+            state=state,
+            event_log=decisions.event_log,
+            rules_unit_instance_id=activation_rules_unit_instance_id,
+        )
     event = decisions.event_log.append(
         "unit_has_fought",
         validate_json_value(
@@ -872,10 +959,11 @@ def _complete_active_fight_activation(
         ),
     )
     if fight_on_death_completion is not None:
-        return rule_model_destruction.finalize_rule_model_destruction(
+        return finalize_rule_destruction_after_fight_activation(
             state=state,
             decisions=decisions,
             context=fight_on_death_completion,
+            rules_unit_instance_id=activation_rules_unit_instance_id,
         )
     counteroffensive_status = _request_counteroffensive_if_available(
         handler=handler,
@@ -3029,10 +3117,30 @@ def _apply_fight_unit_selected_grant_decision(
             registry=registry,
             selected_grants=selected_grants,
         )
+    immediate_grants = tuple(
+        grant for grant in selected_grants if grant.immediate_effect_payload is not None
+    )
+    if len(immediate_grants) > 1:
+        raise GameLifecycleError(
+            "Fight unit grant selection has multiple immediate-effect continuations."
+        )
+    for grant in selected_grants:
+        validate_fight_unit_selected_grant_effects(
+            state=state,
+            result=result,
+            activation=activation,
+            grant=grant,
+        )
+    if immediate_grants:
+        validate_fight_unit_selected_grant_immediate_effect(
+            state=state,
+            activation=activation,
+            grant=immediate_grants[0],
+        )
     persisting_effects = tuple(
         effect
         for grant in selected_grants
-        for effect in _record_fight_unit_selected_grant_effects(
+        for effect in record_fight_unit_selected_grant_effects(
             state=state,
             decisions=decisions,
             result=result,
@@ -3059,7 +3167,15 @@ def _apply_fight_unit_selected_grant_decision(
             }
         ),
     )
-    return None
+    if not immediate_grants:
+        return None
+    return apply_fight_unit_selected_grant_immediate_effect(
+        state=state,
+        decisions=decisions,
+        result=result,
+        activation=activation,
+        grant=immediate_grants[0],
+    )
 
 
 def _selected_fight_unit_grants_from_payload(
@@ -3102,68 +3218,6 @@ def _validate_selected_fight_unit_grants(
             raise GameLifecycleError("Selected fight unit grant payload drift.")
 
 
-def _record_fight_unit_selected_grant_effects(
-    *,
-    state: GameState,
-    decisions: DecisionController,
-    result: DecisionResult,
-    activation: FightActivationSelection,
-    grant: FightUnitSelectedGrant,
-) -> tuple[PersistingEffect, ...]:
-    effects: list[PersistingEffect] = []
-    if grant.decision_effect_payload is not None:
-        resource_spend_result = apply_faction_resource_spend_effect(
-            state=state,
-            player_id=activation.player_id,
-            source_id=f"{grant.source_id}:{result.request_id}:{result.result_id}:spend",
-            effect_payload=grant.decision_effect_payload,
-        )
-        spend_effect = PersistingEffect(
-            effect_id=f"{result.result_id}:{grant.hook_id}:decision",
-            source_rule_id=grant.source_id,
-            owner_player_id=activation.player_id,
-            target_unit_instance_ids=(activation.unit_instance_id,),
-            started_battle_round=state.battle_round,
-            started_phase=BattlePhaseKind.FIGHT,
-            expiration=EffectExpiration.end_battle_round(battle_round=state.battle_round),
-            effect_payload=faction_resource_result_enriched_payload(
-                effect_payload=grant.decision_effect_payload,
-                result=resource_spend_result,
-            ),
-        )
-        state.record_persisting_effect(spend_effect)
-        resolve_faction_resource_refund_roll(
-            state=state,
-            decisions=decisions,
-            spend_effect=spend_effect,
-        )
-        effects.append(spend_effect)
-    if grant.unit_effect_payload is None:
-        if not effects:
-            raise GameLifecycleError("Fight unit selected grant has no effect to record.")
-        return tuple(effects)
-    unit_effect = PersistingEffect(
-        effect_id=f"{result.result_id}:{grant.hook_id}:unit",
-        source_rule_id=grant.source_id,
-        owner_player_id=activation.player_id,
-        target_unit_instance_ids=_fight_unit_selected_grant_unit_effect_target_ids(
-            unit_instance_id=activation.unit_instance_id,
-            effect_payload=grant.unit_effect_payload,
-        ),
-        started_battle_round=state.battle_round,
-        started_phase=BattlePhaseKind.FIGHT,
-        expiration=_fight_unit_selected_grant_effect_expiration(
-            state=state,
-            activation=activation,
-            grant=grant,
-        ),
-        effect_payload=grant.unit_effect_payload,
-    )
-    state.record_persisting_effect(unit_effect)
-    effects.append(unit_effect)
-    return tuple(effects)
-
-
 def _fight_unit_selected_context(
     *,
     state: GameState,
@@ -3195,49 +3249,6 @@ def _validate_fight_unit_selected_grant_payload_context(
         or _payload_string(payload, key="activation_result_id") != activation.result_id
     ):
         raise GameLifecycleError("Fight unit grant activation decision drift.")
-
-
-def _fight_unit_selected_grant_unit_effect_target_ids(
-    *,
-    unit_instance_id: str,
-    effect_payload: JsonValue,
-) -> tuple[str, ...]:
-    if not isinstance(effect_payload, dict):
-        return (_validate_identifier("unit_instance_id", unit_instance_id),)
-    raw_target_ids = effect_payload.get("target_unit_instance_ids")
-    if raw_target_ids is None:
-        return (_validate_identifier("unit_instance_id", unit_instance_id),)
-    if not isinstance(raw_target_ids, list):
-        raise GameLifecycleError("Fight unit grant target_unit_instance_ids must be a list.")
-    target_ids = tuple(
-        _validate_identifier("target_unit_instance_ids", raw_id) for raw_id in raw_target_ids
-    )
-    if not target_ids:
-        raise GameLifecycleError("Fight unit grant target_unit_instance_ids is empty.")
-    if len(set(target_ids)) != len(target_ids):
-        raise GameLifecycleError("Fight unit grant target_unit_instance_ids are duplicated.")
-    return target_ids
-
-
-def _fight_unit_selected_grant_effect_expiration(
-    *,
-    state: GameState,
-    activation: FightActivationSelection,
-    grant: FightUnitSelectedGrant,
-) -> EffectExpiration:
-    expiration = grant.unit_effect_expiration
-    if expiration == "end_phase":
-        return EffectExpiration.end_phase(
-            battle_round=state.battle_round,
-            phase=BattlePhaseKind.FIGHT,
-            player_id=_active_player_id(state),
-        )
-    if expiration == "end_turn":
-        return EffectExpiration.end_turn(
-            battle_round=state.battle_round,
-            player_id=activation.player_id,
-        )
-    raise GameLifecycleError("Fight unit grant has unsupported expiration.")
 
 
 def _apply_fight_dice_reroll_decision(

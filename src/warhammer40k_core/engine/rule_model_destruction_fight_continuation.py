@@ -31,7 +31,33 @@ def apply_rule_destruction_reaction_and_schedule_fight_on_death(
     if fight_state is None:
         raise GameLifecycleError("Rule Fight On Death requires fight phase state.")
     if fight_state.active_activation is not None:
-        raise GameLifecycleError("Rule Fight On Death cannot replace an active fight activation.")
+        active_activation = fight_state.active_activation
+        bound_context = fight_on_death_completion_context_for_activation(
+            state=state,
+            activation_result_id=active_activation.result_id,
+        )
+        if bound_context != completion_context:
+            raise GameLifecycleError("Rule Fight On Death active continuation context drift.")
+        decisions.event_log.append(
+            "fight_on_death_active_activation_continued",
+            validate_json_value(
+                {
+                    "game_id": state.game_id,
+                    "battle_round": state.battle_round,
+                    "phase": BattlePhase.FIGHT.value,
+                    "activation_selection": active_activation.to_payload(),
+                    "model_instance_id": _payload_string(
+                        completion_context,
+                        key="model_instance_id",
+                    ),
+                    "model_destroyed_event_id": _payload_string(
+                        completion_context,
+                        key="model_destroyed_event_id",
+                    ),
+                }
+            ),
+        )
+        return
     activation = FightActivationSelection(
         player_id=_payload_string(completion_context, key="destroyed_model_controller_player_id"),
         battle_round=state.battle_round,

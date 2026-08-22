@@ -119,6 +119,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedGrant,
     FightUnitSelectedGrantBinding,
     FightUnitSelectedGrantRegistry,
+    FightUnitSelectedTimedEffect,
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.lifecycle import GameLifecycle
@@ -682,27 +683,28 @@ def test_selected_to_fight_grant_registry_validates_handler_contract() -> None:
 
     with pytest.raises(GameLifecycleError, match="hook IDs must be unique"):
         FightUnitSelectedGrantRegistry.from_bindings((empty_binding, empty_binding))
-    with pytest.raises(GameLifecycleError, match="expiration requires an effect"):
+    with pytest.raises(GameLifecycleError, match="requires at least one effect"):
         FightUnitSelectedGrant(
-            hook_id="drukhari-test:fight-bad-expiration",
-            source_id="drukhari-test:fight-bad-expiration-source",
-            label="Bad expiration",
-            unit_effect_expiration="end_phase",
+            hook_id="drukhari-test:fight-empty-grant",
+            source_id="drukhari-test:fight-empty-grant-source",
+            label="Empty grant",
         )
-    with pytest.raises(GameLifecycleError, match="effect requires expiration"):
-        FightUnitSelectedGrant(
-            hook_id="drukhari-test:fight-bad-effect",
-            source_id="drukhari-test:fight-bad-effect-source",
-            label="Bad effect",
-            unit_effect_payload={"effect_kind": "drukhari-test:effect"},
+    with pytest.raises(GameLifecycleError, match="timed effect requires a payload"):
+        FightUnitSelectedTimedEffect(
+            effect_payload=None,
+            expiration="end_phase",
         )
     with pytest.raises(GameLifecycleError, match="end_phase or end_turn"):
+        FightUnitSelectedTimedEffect(
+            effect_payload={"effect_kind": "drukhari-test:effect"},
+            expiration="end_battle_round",
+        )
+    with pytest.raises(GameLifecycleError, match="timed_effects must be a tuple"):
         FightUnitSelectedGrant(
-            hook_id="drukhari-test:fight-bad-expiration-token",
-            source_id="drukhari-test:fight-bad-expiration-token-source",
-            label="Bad expiration token",
-            unit_effect_payload={"effect_kind": "drukhari-test:effect"},
-            unit_effect_expiration="end_battle_round",
+            hook_id="drukhari-test:fight-bad-timed-effects",
+            source_id="drukhari-test:fight-bad-timed-effects-source",
+            label="Bad timed effects",
+            timed_effects=cast(tuple[FightUnitSelectedTimedEffect, ...], []),
         )
     with pytest.raises(GameLifecycleError, match="must be a string"):
         FightUnitSelectedGrant(
@@ -758,6 +760,7 @@ def test_selected_to_fight_grant_registry_validates_handler_contract() -> None:
             hook_id="drukhari-test:fight-drifted-hook",
             source_id="drukhari-test:fight-hook-source",
             label="Hook drift",
+            decision_effect_payload={"effect_kind": "drukhari-test:fight-effect"},
         )
 
     with pytest.raises(GameLifecycleError, match="hook_id drift"):
@@ -776,6 +779,7 @@ def test_selected_to_fight_grant_registry_validates_handler_contract() -> None:
             hook_id="drukhari-test:fight-source",
             source_id="drukhari-test:fight-drifted-source",
             label="Source drift",
+            immediate_effect_payload={"effect_kind": "drukhari-test:fight-effect"},
         )
 
     with pytest.raises(GameLifecycleError, match="source_id drift"):

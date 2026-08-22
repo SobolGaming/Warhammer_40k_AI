@@ -23,6 +23,7 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
     FightUnitSelectedGrantBinding,
+    FightUnitSelectedTimedEffect,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
@@ -214,20 +215,24 @@ def _martial_katah_grant(
             "fight_type": context.fight_type,
             "ordering_band": context.ordering_band,
         },
-        unit_effect_payload=martial_katah_effect_payload(
-            unit_instance_id=context.unit_instance_id,
-            target_unit_instance_ids=target_unit_ids,
-            trigger="selected_to_fight",
-            phase=BattlePhase.FIGHT,
-            selected_martial_katah=stance,
-            source_context={
-                "activation_request_id": context.request_id,
-                "activation_result_id": context.result_id,
-                "fight_type": context.fight_type,
-                "ordering_band": context.ordering_band,
-            },
+        timed_effects=(
+            FightUnitSelectedTimedEffect(
+                effect_payload=martial_katah_effect_payload(
+                    unit_instance_id=context.unit_instance_id,
+                    target_unit_instance_ids=target_unit_ids,
+                    trigger="selected_to_fight",
+                    phase=BattlePhase.FIGHT,
+                    selected_martial_katah=stance,
+                    source_context={
+                        "activation_request_id": context.request_id,
+                        "activation_result_id": context.result_id,
+                        "fight_type": context.fight_type,
+                        "ordering_band": context.ordering_band,
+                    },
+                ),
+                expiration="end_phase",
+            ),
         ),
-        unit_effect_expiration="end_phase",
     )
 
 

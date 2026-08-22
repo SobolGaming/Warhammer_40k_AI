@@ -48,6 +48,9 @@ from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_aeldari_path_of_the_outcast_ir_support_2026_27 as path_outcast_ir,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
+    faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
+)
+from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_coverage_2026_27 as faction_coverage_source,
 )
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
@@ -383,6 +386,27 @@ def test_phase17f_fade_to_darkness_execution_record_is_generic_rule_ir() -> None
     assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
     assert record.runtime_support_status == "engine_consumed"
     assert record.runtime_consumer_ids == FADE_TO_DARKNESS_RUNTIME_CONSUMERS
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.handler_id is None
+    assert record.rule_ir_hash == (
+        generic_ir_support_source.generic_rule_ir_hash_by_coverage_descriptor_id(
+            record.coverage_descriptor_id
+        )
+    )
+    assert record.block_reason is None
+
+
+def test_phase17f_furys_cage_execution_record_is_generic_rule_ir() -> None:
+    record = next(
+        record
+        for record in faction_execution_source.phase17f_execution_package().execution_records
+        if record.coverage_descriptor_id == blood_legion_ir.FURYS_CAGE_DESCRIPTOR_ID
+    )
+
+    assert record.rule_name == "Fury's Cage"
+    assert record.coverage_status is Phase17ECoverageStatus.GENERIC_SUPPORTED
+    assert record.runtime_support_status == "engine_consumed"
+    assert record.runtime_consumer_ids == blood_legion_ir.FURYS_CAGE_RUNTIME_CONSUMER_IDS
     assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
     assert record.handler_id is None
     assert record.rule_ir_hash == (

@@ -16,7 +16,12 @@ from tests.support.selected_to_fight_risk_fixtures import (
 
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.dice import DiceRollResult, RollOffRequest
-from warhammer40k_core.core.ruleset_descriptor import RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    FightEligibilityKind,
+    FightOrderingBandKind,
+    FightTypeKind,
+    RulesetDescriptor,
+)
 from warhammer40k_core.core.weapon_profiles import RangeProfileKind
 from warhammer40k_core.engine import rule_model_destruction
 from warhammer40k_core.engine.actions import MissionActionState, MissionActionStatus
@@ -50,6 +55,10 @@ from warhammer40k_core.engine.effects import (
     effect_expiration_kind_from_token,
 )
 from warhammer40k_core.engine.event_log import EventLog, JsonValue
+from warhammer40k_core.engine.fight_activation_units import (
+    active_fight_activation_surviving_component,
+)
+from warhammer40k_core.engine.fight_order import FightActivationSelection
 from warhammer40k_core.engine.fight_phase_end_hooks import (
     FightPhaseEndRequestContext,
     FightPhaseEndResultContext,
@@ -996,6 +1005,31 @@ def test_selected_to_fight_risk_destruction_splits_attached_unit_after_final_com
         item.event_type == "catalog_failed_fight_activation_model_destroyed"
         for item in decisions.event_log.records
     )
+
+
+def test_fight_activation_physical_component_resolution_fails_closed_when_ambiguous() -> None:
+    state, _runtime, _decisions, _bodyguard, _leader, _enemy, attached_id = (
+        attached_selected_to_fight_risk_fixture(pre_split=False)
+    )
+    activation = FightActivationSelection(
+        player_id="player-a",
+        battle_round=state.battle_round,
+        unit_instance_id=attached_id,
+        ordering_band=FightOrderingBandKind.REMAINING_COMBATS,
+        fight_type=FightTypeKind.NORMAL,
+        eligibility_reasons=(FightEligibilityKind.CURRENTLY_ENGAGED,),
+        request_id="attached-risk-ambiguous-activation-request",
+        result_id="attached-risk-ambiguous-activation-result",
+    )
+
+    with pytest.raises(
+        GameLifecycleError,
+        match="exactly one surviving placed physical component",
+    ):
+        active_fight_activation_surviving_component(
+            state=state,
+            activation=activation,
+        )
 
 
 def test_selected_to_fight_risk_non_final_bodyguard_destruction_keeps_attached_unit() -> None:

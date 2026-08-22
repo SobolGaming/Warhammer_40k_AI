@@ -9,10 +9,10 @@ This page separates source data from executable rules. An `Implemented` row has 
 | Content | Total source rows | Implemented / executable | Partial | Source-only |
 | --- | ---: | ---: | ---: | ---: |
 | Detachment rules | 9 | 6 | 0 | 3 |
-| Enhancements | 29 | 16 | 0 | 13 |
+| Enhancements | 29 | 17 | 0 | 12 |
 | Stratagems | 46 | 22 | 0 | 24 |
 
-Across army, detachment, Enhancement, and Stratagem records, 45 exact source rows currently have engine consumers.
+Across army, detachment, Enhancement, and Stratagem records, 46 exact source rows currently have engine consumers.
 
 **This is not a full-game support claim.** Roster legality, selected units, model geometry, mission scoring, network safety, and replay certification are separate Phase 17O capabilities. Query the selected game's `capability_manifest` before presenting a roster or matchup as playable or certified.
 
@@ -70,7 +70,7 @@ The checked-in July 2026 matched-play roster [`cavalcade-shadow-bloodthirster.js
 
 | Detachment | Runtime executable | Still source-only / blocked |
 | --- | --- | --- |
-| Blood Legion | Brazenmaw<br>Gateway Unto Damnation<br>Slaughterthirst (Aura) | Fury's Cage |
+| Blood Legion | Brazenmaw<br>Fury's Cage<br>Gateway Unto Damnation<br>Slaughterthirst (Aura) | None |
 | Cavalcade of Chaos | Apocalyptic Steeds (Upgrade)<br>Soul-shattering Charge (Upgrade) | None |
 | Daemonic Incursion | A'rgath, the King of Blades<br>Soulstealer<br>The Endless Gift<br>The Everstave | None |
 | Legion of Excess | None | Avatar of Perfection<br>Dreaming Crown (Aura)<br>False Majesty (Aura)<br>Soul Glutton |
@@ -229,7 +229,7 @@ This section is generated from the repository-wide semantic audit. It audits por
 
 | Source members | Structured RuleIR | Equivalent groups |
 | ---: | ---: | ---: |
-| 203 | 121 | 45 |
+| 203 | 122 | 45 |
 
 | Group | Kind / surface | Basis | Equivalent source rules | Execution conclusion |
 | --- | --- | --- | --- | --- |

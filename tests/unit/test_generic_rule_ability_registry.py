@@ -150,7 +150,12 @@ def test_default_generic_rule_ability_registry_maps_shadow_legion_grants() -> No
         ),
     }
 
-    fight_grants = registry.fight_unit_selected_grant_abilities
+    fight_grants = tuple(
+        descriptor
+        for descriptor in registry.fight_unit_selected_grant_abilities
+        if descriptor.coverage_descriptor_id
+        == shadow_legion_ir.SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID
+    )
     assert {descriptor.hook_family for descriptor in fight_grants} == {
         GenericRuleAbilityHookFamily.FIGHT_UNIT_SELECTED_GRANT
     }
@@ -169,7 +174,11 @@ def test_default_generic_rule_ability_registry_maps_shadow_legion_grants() -> No
         "phase17f:phase17e:chaos-daemons:shadow-legion:rule:shadow-legion:dark-pact-completion"
     )
 
-    fnp = registry.mortal_wound_feel_no_pain_abilities[0]
+    fnp = next(
+        descriptor
+        for descriptor in registry.mortal_wound_feel_no_pain_abilities
+        if descriptor.source_kind == dark_pacts.SHADOW_LEGION_DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND
+    )
     assert fnp.hook_family is GenericRuleAbilityHookFamily.MORTAL_WOUND_FEEL_NO_PAIN_CONTINUATION
     assert fnp.source_kind == dark_pacts.SHADOW_LEGION_DARK_PACT_MORTAL_WOUNDS_SOURCE_KIND
 

@@ -17,6 +17,30 @@ def split_attached_rules_unit_if_required(
     event_log: EventLog,
     rules_unit_instance_id: str,
 ) -> tuple[str, ...]:
+    surviving_unit_ids = attached_rules_unit_split_survivor_ids(
+        state=state,
+        rules_unit_instance_id=rules_unit_instance_id,
+    )
+    if not surviving_unit_ids:
+        return ()
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=rules_unit_instance_id,
+    )
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id=rules_unit.owner_player_id,
+        attached_unit_instance_id=rules_unit.unit_instance_id,
+        surviving_unit_instance_ids=surviving_unit_ids,
+        event_log=event_log,
+    )
+    return surviving_unit_ids
+
+
+def attached_rules_unit_split_survivor_ids(
+    *,
+    state: GameState,
+    rules_unit_instance_id: str,
+) -> tuple[str, ...]:
     rules_unit = rules_unit_view_by_id(
         state=state,
         unit_instance_id=rules_unit_instance_id,
@@ -46,12 +70,6 @@ def split_attached_rules_unit_if_required(
     )
     if not surviving_unit_ids:
         raise GameLifecycleError("Attached-unit split requires surviving component units.")
-    state.recover_starting_strength_after_attached_unit_split(
-        player_id=rules_unit.owner_player_id,
-        attached_unit_instance_id=rules_unit.unit_instance_id,
-        surviving_unit_instance_ids=surviving_unit_ids,
-        event_log=event_log,
-    )
     return surviving_unit_ids
 
 
@@ -92,4 +110,8 @@ def reconcile_after_attack_sequence(
     return tuple(sorted(surviving_ids))
 
 
-__all__ = ("reconcile_after_attack_sequence", "split_attached_rules_unit_if_required")
+__all__ = (
+    "attached_rules_unit_split_survivor_ids",
+    "reconcile_after_attack_sequence",
+    "split_attached_rules_unit_if_required",
+)

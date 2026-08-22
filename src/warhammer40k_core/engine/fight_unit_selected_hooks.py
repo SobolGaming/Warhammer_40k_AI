@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, NotRequired, Self, TypedDict
+from typing import TYPE_CHECKING, NotRequired, Self, TypedDict, cast
 
 from warhammer40k_core.core.validation import IdentifierValidator
 from warhammer40k_core.engine.decision_request import DecisionOption
@@ -15,14 +15,19 @@ if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
 
 
+class FightUnitSelectedTimedEffectPayload(TypedDict):
+    effect_payload: JsonValue
+    expiration: str
+
+
 class FightUnitSelectedGrantPayload(TypedDict):
     hook_id: str
     source_id: str
     label: str
     replay_payload: JsonValue
     decision_effect_payload: JsonValue
-    unit_effect_payload: JsonValue
-    unit_effect_expiration: str | None
+    timed_effects: list[FightUnitSelectedTimedEffectPayload]
+    immediate_effect_payload: JsonValue
     decline_allowed: NotRequired[bool]
 
 
@@ -101,14 +106,44 @@ class FightUnitSelectedContext:
 
 
 @dataclass(frozen=True, slots=True)
+class FightUnitSelectedTimedEffect:
+    effect_payload: JsonValue
+    expiration: str
+
+    def __post_init__(self) -> None:
+        effect_payload = validate_json_value(self.effect_payload)
+        if effect_payload is None:
+            raise GameLifecycleError("Fight-unit-selected timed effect requires a payload.")
+        object.__setattr__(self, "effect_payload", effect_payload)
+        object.__setattr__(
+            self,
+            "expiration",
+            _validate_expiration("expiration", self.expiration),
+        )
+
+    def to_payload(self) -> FightUnitSelectedTimedEffectPayload:
+        return {
+            "effect_payload": self.effect_payload,
+            "expiration": self.expiration,
+        }
+
+    @classmethod
+    def from_payload(cls, payload: FightUnitSelectedTimedEffectPayload) -> Self:
+        return cls(
+            effect_payload=payload["effect_payload"],
+            expiration=payload["expiration"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class FightUnitSelectedGrant:
     hook_id: str
     source_id: str
     label: str
     replay_payload: JsonValue = None
     decision_effect_payload: JsonValue = None
-    unit_effect_payload: JsonValue = None
-    unit_effect_expiration: str | None = None
+    timed_effects: tuple[FightUnitSelectedTimedEffect, ...] = ()
+    immediate_effect_payload: JsonValue = None
     decline_allowed: bool = True
 
     def __post_init__(self) -> None:
@@ -121,20 +156,18 @@ class FightUnitSelectedGrant:
             "decision_effect_payload",
             validate_json_value(self.decision_effect_payload),
         )
+        object.__setattr__(self, "timed_effects", _validate_timed_effects(self.timed_effects))
         object.__setattr__(
             self,
-            "unit_effect_payload",
-            validate_json_value(self.unit_effect_payload),
+            "immediate_effect_payload",
+            validate_json_value(self.immediate_effect_payload),
         )
-        object.__setattr__(
-            self,
-            "unit_effect_expiration",
-            _validate_optional_expiration("unit_effect_expiration", self.unit_effect_expiration),
-        )
-        if self.unit_effect_payload is None and self.unit_effect_expiration is not None:
-            raise GameLifecycleError("Fight-unit-selected grant expiration requires an effect.")
-        if self.unit_effect_payload is not None and self.unit_effect_expiration is None:
-            raise GameLifecycleError("Fight-unit-selected grant effect requires expiration.")
+        if (
+            self.decision_effect_payload is None
+            and not self.timed_effects
+            and self.immediate_effect_payload is None
+        ):
+            raise GameLifecycleError("Fight-unit-selected grant requires at least one effect.")
         if type(self.decline_allowed) is not bool:
             raise GameLifecycleError("Fight-unit-selected decline_allowed must be bool.")
 
@@ -145,8 +178,8 @@ class FightUnitSelectedGrant:
             "label": self.label,
             "replay_payload": self.replay_payload,
             "decision_effect_payload": self.decision_effect_payload,
-            "unit_effect_payload": self.unit_effect_payload,
-            "unit_effect_expiration": self.unit_effect_expiration,
+            "timed_effects": [effect.to_payload() for effect in self.timed_effects],
+            "immediate_effect_payload": self.immediate_effect_payload,
         }
         if not self.decline_allowed:
             payload["decline_allowed"] = False
@@ -160,8 +193,11 @@ class FightUnitSelectedGrant:
             label=payload["label"],
             replay_payload=payload["replay_payload"],
             decision_effect_payload=payload["decision_effect_payload"],
-            unit_effect_payload=payload["unit_effect_payload"],
-            unit_effect_expiration=payload["unit_effect_expiration"],
+            timed_effects=tuple(
+                FightUnitSelectedTimedEffect.from_payload(effect)
+                for effect in payload["timed_effects"]
+            ),
+            immediate_effect_payload=payload["immediate_effect_payload"],
             decline_allowed=payload.get("decline_allowed", True),
         )
 
@@ -455,15 +491,27 @@ def _validate_grant_bindings(
     )
 
 
-def _validate_optional_expiration(field_name: str, value: object) -> str | None:
-    if value is None:
-        return None
+def _validate_expiration(field_name: str, value: object) -> str:
     expiration = _validate_identifier(field_name, value)
     if expiration not in {"end_phase", "end_turn"}:
         raise GameLifecycleError(
             f"Fight-unit-selected hook {field_name} must be end_phase or end_turn."
         )
     return expiration
+
+
+def _validate_timed_effects(value: object) -> tuple[FightUnitSelectedTimedEffect, ...]:
+    if type(value) is not tuple:
+        raise GameLifecycleError("Fight-unit-selected grant timed_effects must be a tuple.")
+    effects: list[FightUnitSelectedTimedEffect] = []
+    for effect in cast(tuple[object, ...], value):
+        if type(effect) is not FightUnitSelectedTimedEffect:
+            raise GameLifecycleError(
+                "Fight-unit-selected grant timed_effects must contain "
+                "FightUnitSelectedTimedEffect values."
+            )
+        effects.append(effect)
+    return tuple(effects)
 
 
 _validate_identifier = IdentifierValidator(GameLifecycleError)

@@ -199,7 +199,7 @@ def attached_selected_to_fight_risk_fixture(
                     phase=BattlePhaseKind.FIGHT,
                     player_id=source_army.player_id,
                 ),
-                effect_payload=grants[0].unit_effect_payload,
+                effect_payload=grants[0].timed_effects[0].effect_payload,
             )
         )
     decisions = DecisionController()

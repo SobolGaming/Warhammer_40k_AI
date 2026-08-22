@@ -126,6 +126,7 @@ from warhammer40k_core.engine.fight_activation_abilities import (
     FightActivationAbilityOption,
 )
 from warhammer40k_core.engine.fight_order import CHARGE_FIGHTS_FIRST_EFFECT_KIND
+from warhammer40k_core.engine.fight_timed_effects import end_phase_rule_effect
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
@@ -134,7 +135,6 @@ from warhammer40k_core.engine.fight_unit_selected_hooks import (
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rule_execution import (
     RuleExecutionContext,
-    generic_rule_effect_payload,
     rule_ir_from_execution_payload,
 )
 from warhammer40k_core.engine.rule_ir_weapon_modifiers import (
@@ -1235,14 +1235,15 @@ class CatalogDatasheetRuleRuntime:
                     "clause_id": source.clause.clause_id,
                     "rule_ir_hash": source.rule_ir.ir_hash(),
                 },
-                unit_effect_payload=generic_rule_effect_payload(
-                    rule_ir=source.rule_ir,
-                    clause=source.clause,
-                    effect=effect,
-                    context=execution_context,
-                    target_unit_instance_ids=(context.unit_instance_id,),
+                timed_effects=(
+                    end_phase_rule_effect(
+                        rule_ir=source.rule_ir,
+                        clause=source.clause,
+                        effect=effect,
+                        context=execution_context,
+                        target_unit_instance_ids=(context.unit_instance_id,),
+                    ),
                 ),
-                unit_effect_expiration="end_phase",
                 decline_allowed=False,
             )
 
