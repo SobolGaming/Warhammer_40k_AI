@@ -23,6 +23,37 @@ and create the pull request in that repository. A local branch or commit alone d
 not satisfy the request. If remote publication is blocked, report the blocker rather
 than presenting local-only work as a created PR.
 
+## Scope and execution discipline
+
+Correctness remains fail-closed. These rules control the order and scope of work;
+they never justify weakening an invariant, omitting required behavior, or skipping a
+required final gate.
+
+- Before implementing cross-cutting engine behavior, trace the authoritative
+  end-to-end path: source data and decisions, identity and state ownership,
+  validation and mutation, downstream events/replay/adapters, and generated
+  artifacts. Identify the owning abstraction before coding.
+- Define the smallest complete change that restores or implements the required
+  invariant. A bug-class search must distinguish additional instances of that
+  invariant from optional adjacent hardening.
+- If the required solution is materially broader than the apparent request, pause
+  before broadening it. State the violated invariant, the newly discovered scope,
+  and why a local fix would be invalid; re-plan with the user when the expansion
+  would materially change the requested work.
+- Perform a scope, architecture, and diff audit before expensive aggregate gates.
+  If a focused request has spread across adjacent subsystems or grown
+  disproportionately, re-evaluate the design and extract work that is not required
+  for the requested invariant into a follow-up.
+- Use focused tests while iterating. Run the coverage gate and full suite only after
+  the architecture and scope are stable. Any later production-code change
+  invalidates those aggregate results and requires final revalidation.
+- Cover the changed branches and invariant directly. Do not add broad unrelated
+  tests solely to move the repository-wide coverage percentage.
+- Before the first push, inspect the active CI workflow and relevant generator
+  documentation. Run applicable base-ref checks, generated-artifact checks,
+  contract-client checks, conformance scenarios, and package smokes locally, and
+  commit required generated artifacts when runtime identity changes.
+
 ## Build order
 
 Build bottom-up:
