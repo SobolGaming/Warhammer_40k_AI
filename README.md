@@ -77,11 +77,14 @@ Page 9 contains the source-backed 29-component exception, while every other
 layout contains 30. See
 [docs/BATTLEFIELD_VIEWER.md](docs/BATTLEFIELD_VIEWER.md) for controls, data
 authority, complete battlefield geometry, executable Primary scoring for all 25
-Event Companion missions, and Step 5G pairing-wide lifecycle certification of
-both players' ordinary scoring boundaries on Layout A. All 18 Secondary Mission
-cards are source-backed and executable through turn-end scoring with
-replay/restore evidence. The broader mission runtime exposes all 14 Mission
-Actions.
+Event Companion missions, and Step 5G lifecycle, restore, viewer-redaction, and
+replay certification of both players' ordinary Primary scoring boundaries on all
+45 A/B/C layouts. The 90 layout/direction cases begin at an engine-owned fight
+activation decision boundary, round-trip `replay-artifact-v8-phase17n-step5a`,
+and require exact `ReplayRunner` reproduction. All 18 Secondary Mission cards
+are source-backed and executable through turn-end scoring with lifecycle restore
+evidence; their lifecycle certification remains Layout-A-only. The broader
+mission runtime exposes all 14 Mission Actions.
 
 CI uploads each shard's JUnit report for future median-duration profiles. Full behavioral shards
 run for ready pull requests, merge candidates, and pushes to `main`; draft pull requests keep the

@@ -19,7 +19,7 @@ EVENT_COMPANION_LAYOUT_VARIANT_COUNT: Final = 3
 EVENT_COMPANION_LAYOUT_INVENTORY_COUNT: Final = (
     EVENT_COMPANION_PAIRING_COUNT * EVENT_COMPANION_LAYOUT_VARIANT_COUNT
 )
-EVENT_COMPANION_LIFECYCLE_CERTIFICATION_COUNT: Final = EVENT_COMPANION_PAIRING_COUNT
+EVENT_COMPANION_LIFECYCLE_CERTIFICATION_COUNT: Final = EVENT_COMPANION_LAYOUT_INVENTORY_COUNT
 _LAYOUT_VARIANTS: Final[tuple[LayoutVariant, ...]] = ("a", "b", "c")
 _validate_identifier = IdentifierValidator(GameLifecycleError)
 
@@ -64,8 +64,8 @@ def _layout_id_for_variant(layout_pair_id: str, layout_variant: LayoutVariant) -
 class EventCompanionPairingLayoutInventoryRow:
     """One Event Companion pairing layout in the fail-closed inventory.
 
-    Layout A is also the lifecycle/restore/viewer certification row. Layouts B
-    and C remain inventory and two-sided policy-instantiation coverage only.
+    Every A/B/C row is also certified through lifecycle, restore, replay, and
+    viewer-scoped adapter coverage.
     """
 
     layout_id: str
@@ -121,10 +121,11 @@ class EventCompanionPairingLayoutInventoryRow:
 
 @dataclass(frozen=True, slots=True)
 class EventCompanionPairingLifecycleCertificationRow:
-    """Layout A pairing certified through both players' ordinary scoring boundaries."""
+    """One A/B/C layout certified through both players' ordinary scoring boundaries."""
 
     layout_id: str
     layout_pair_id: str
+    layout_variant: LayoutVariant
     attacker_force_disposition_id: str
     defender_force_disposition_id: str
     attacker_primary_mission_id: str
@@ -161,10 +162,15 @@ class EventCompanionPairingLifecycleCertificationRow:
         )
         object.__setattr__(self, "attacker_primary_mission_id", attacker_primary_mission_id)
         object.__setattr__(self, "defender_primary_mission_id", defender_primary_mission_id)
-        expected_layout_id = _layout_id_for_variant(self.layout_pair_id, "a")
+        if self.layout_variant not in _LAYOUT_VARIANTS:
+            raise GameLifecycleError(
+                "EventCompanionPairingLifecycleCertificationRow layout_variant is unsupported."
+            )
+        expected_layout_id = _layout_id_for_variant(self.layout_pair_id, self.layout_variant)
         if self.layout_id != expected_layout_id:
             raise GameLifecycleError(
-                "EventCompanionPairingLifecycleCertificationRow requires Layout A."
+                "EventCompanionPairingLifecycleCertificationRow layout_id does not match "
+                "its pairing variant."
             )
 
 
@@ -219,22 +225,22 @@ def event_companion_pairing_layout_inventory_rows() -> tuple[
 def event_companion_pairing_lifecycle_certification_rows() -> tuple[
     EventCompanionPairingLifecycleCertificationRow, ...
 ]:
-    """Return the Layout A rows certified through both ordinary scoring directions."""
+    """Return all A/B/C rows certified through both ordinary scoring directions."""
     rows = tuple(
         EventCompanionPairingLifecycleCertificationRow(
             layout_id=inventory_row.layout_id,
             layout_pair_id=inventory_row.layout_pair_id,
+            layout_variant=inventory_row.layout_variant,
             attacker_force_disposition_id=inventory_row.attacker_force_disposition_id,
             defender_force_disposition_id=inventory_row.defender_force_disposition_id,
             attacker_primary_mission_id=inventory_row.attacker_primary_mission_id,
             defender_primary_mission_id=inventory_row.defender_primary_mission_id,
         )
         for inventory_row in event_companion_pairing_layout_inventory_rows()
-        if inventory_row.layout_variant == "a"
     )
     if len(rows) != EVENT_COMPANION_LIFECYCLE_CERTIFICATION_COUNT:
         raise GameLifecycleError(
-            "Event Companion pairing lifecycle certification requires exactly 15 Layout A rows."
+            "Event Companion pairing lifecycle certification requires exactly 45 A/B/C rows."
         )
     return rows
 

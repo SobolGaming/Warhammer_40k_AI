@@ -131,8 +131,10 @@ vary between five and six.
 All 25 Event Companion Primary Missions are `engine_implemented` for executable
 scoring. Step 5G certifies every Force Disposition pairing through both players'
 ordinary turn-end boundaries, lifecycle and event-log restore round-trips, and
-viewer-scoped projections. Layout A is the lifecycle certification row; A/B/C
-remain in the fail-closed inventory. See
+viewer-scoped projections on all 45 A/B/C layouts. Those 90 layout/direction
+cases also round-trip `ReplayArtifact` payloads and require exact `ReplayRunner`
+reproduction from an engine-owned fight-activation decision boundary. Every
+layout remains in the fail-closed inventory. See
 [Mission Implementation Status](MISSION_IMPLEMENTATION_STATUS.md).
 
 The viewer is a schematic geometry inspection tool, not a photorealistic
