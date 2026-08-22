@@ -31,7 +31,10 @@ from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.datasheet import DatasheetKeywordSet
 from warhammer40k_core.core.detachment import DetachmentDefinition, StratagemDefinition
 from warhammer40k_core.core.faction import FactionDefinition
-from warhammer40k_core.core.ruleset_descriptor import MovementMode, RulesetDescriptor
+from warhammer40k_core.core.ruleset_descriptor import (
+    MovementMode,
+    RulesetDescriptor,
+)
 from warhammer40k_core.engine.army_mustering import ArmyMusterRequest
 from warhammer40k_core.engine.command_points import CommandPointGainStatus, CommandPointSourceKind
 from warhammer40k_core.engine.decision_controller import DecisionController
@@ -47,12 +50,14 @@ from warhammer40k_core.engine.fight_order import (
     FIGHT_ACTIVATION_DECISION_TYPE,
 )
 from warhammer40k_core.engine.fight_resolution import (
+    CONSOLIDATE_ACTION,
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
     MeleeDeclarationProposalRequest,
 )
 from warhammer40k_core.engine.game_state import GameConfig, GameState, SecondaryMissionMode
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
 )
@@ -86,6 +91,7 @@ from warhammer40k_core.engine.primary_mission_choices import (
     punishment_choice_request,
 )
 from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
 from warhammer40k_core.engine.shooting_types import ShootingType
 from warhammer40k_core.engine.stratagems import (
@@ -96,6 +102,7 @@ from warhammer40k_core.engine.stratagems import (
 from warhammer40k_core.engine.wargear_selections import (
     ModelProfileSelection,
 )
+from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import (
     chapter_approved_2026_27_mission_pack,
@@ -243,6 +250,456 @@ def test_local_session_drives_fight_pass_via_projection_and_events() -> None:
     assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
     assert units["intercessor-1"].unit_instance_id in str(event_delta["events"])
     _assert_event_types(event_delta, "eligible_to_fight_pass_recorded")
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    ("scenario", "expected_violation", "records_attempt", "expects_retry"),
+    [
+        ("missing_field", "proposal_payload_missing_field", False, False),
+        ("non_object", "proposal_payload_malformed", False, False),
+        ("stale_request", "stale_proposal_request", False, False),
+        ("proposal_kind_drift", "proposal_kind_drift", False, False),
+        ("unit_drift", "proposal_unit_drift", False, False),
+        ("no_move_witness", "no_move_witness_forbidden", False, False),
+        ("target_missing_witness", "fight_movement_witness_required", False, False),
+        ("witness_model_drift", "fight_movement_witness_model_drift", False, False),
+        ("witness_start_drift", "fight_movement_witness_start_drift", False, False),
+        ("spatial_context_drift", "spatial_context_drift", False, False),
+        ("endpoint_only", "endpoint_only_path", True, True),
+        ("over_distance", "movement_distance_exceeded", True, True),
+    ],
+)
+def test_local_session_rejects_invalid_fight_movement_proposals_without_hidden_mutation(
+    scenario: str,
+    expected_violation: str,
+    records_attempt: bool,
+    expects_retry: bool,
+) -> None:
+    session, status, attacker_id, enemy_id = _fight_pile_in_facade_session(
+        game_id=f"ws13-fight-movement-{scenario}"
+    )
+    request = _assert_request(status, MOVEMENT_PROPOSAL_DECISION_TYPE)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    placement_before = state.battlefield_state.unit_placement_by_id(attacker_id).to_payload()
+    event_cursor = _cursor_after(session, viewer_player_id="player-a")
+    payload: JsonValue = _fight_pile_in_payload(
+        session,
+        proposal_request=proposal_request,
+        target_unit_ids=(),
+    )
+
+    if scenario == "missing_field":
+        payload = {}
+    elif scenario == "non_object":
+        payload = None
+    elif scenario == "stale_request":
+        payload = {
+            **_json_object(payload),
+            "proposal_request_id": f"{proposal_request.request_id}:stale",
+        }
+    elif scenario == "proposal_kind_drift":
+        payload = {
+            **_json_object(payload),
+            "proposal_kind": ProposalKind.CONSOLIDATE.value,
+            "movement_phase_action": CONSOLIDATE_ACTION,
+            "movement_mode": MovementMode.CONSOLIDATE.value,
+        }
+    elif scenario == "unit_drift":
+        payload = {**_json_object(payload), "unit_instance_id": enemy_id}
+    elif scenario == "no_move_witness":
+        payload = {
+            **_json_object(payload),
+            "witness": validate_json_value(
+                straight_line_witness_for_unit(
+                    session.lifecycle,
+                    unit_instance_id=attacker_id,
+                    dx=0.25,
+                ).to_payload()
+            ),
+        }
+    elif scenario == "target_missing_witness":
+        payload = _fight_pile_in_payload(
+            session,
+            proposal_request=proposal_request,
+            target_unit_ids=(enemy_id,),
+        )
+    elif scenario == "witness_model_drift":
+        payload = _fight_pile_in_payload(
+            session,
+            proposal_request=proposal_request,
+            target_unit_ids=(enemy_id,),
+            witness=straight_line_witness_for_unit(
+                session.lifecycle,
+                unit_instance_id=enemy_id,
+                dx=-0.25,
+            ),
+        )
+    elif scenario == "witness_start_drift":
+        witness = straight_line_witness_for_unit(
+            session.lifecycle,
+            unit_instance_id=attacker_id,
+            dx=0.25,
+        )
+        witness = PathWitness.for_paths(
+            tuple(
+                (
+                    model_id,
+                    (
+                        Pose.at(
+                            poses[0].position.x + 0.1,
+                            poses[0].position.y,
+                            poses[0].position.z,
+                            facing_degrees=poses[0].facing.degrees,
+                        ),
+                        *poses[1:],
+                    ),
+                )
+                for model_id, poses in witness.model_paths
+            )
+        )
+        payload = _fight_pile_in_payload(
+            session,
+            proposal_request=proposal_request,
+            target_unit_ids=(enemy_id,),
+            witness=witness,
+        )
+    elif scenario == "spatial_context_drift":
+        witness = straight_line_witness_for_unit(
+            session.lifecycle,
+            unit_instance_id=attacker_id,
+            dx=0.25,
+        )
+        _shift_unit_placement(session, unit_instance_id=attacker_id, dx=0.1)
+        payload = _fight_pile_in_payload(
+            session,
+            proposal_request=proposal_request,
+            target_unit_ids=(enemy_id,),
+            witness=witness,
+        )
+    elif scenario == "endpoint_only":
+        payload = _fight_pile_in_payload(
+            session,
+            proposal_request=proposal_request,
+            target_unit_ids=(enemy_id,),
+            witness=_endpoint_only_witness(
+                session,
+                unit_instance_id=attacker_id,
+                dx=0.25,
+            ),
+        )
+    elif scenario == "over_distance":
+        payload = _fight_pile_in_payload(
+            session,
+            proposal_request=proposal_request,
+            target_unit_ids=(enemy_id,),
+            witness=straight_line_witness_for_unit(
+                session.lifecycle,
+                unit_instance_id=attacker_id,
+                dx=3.5,
+            ),
+        )
+
+    invalid = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        payload=payload,
+        result_id=f"ws13-fight-movement-{scenario}-result",
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert _first_proposal_violation(invalid) == expected_violation
+    assert session.decision_record_count() == int(records_attempt)
+    assert state.battlefield_state is not None
+    if scenario != "spatial_context_drift":
+        assert (
+            state.battlefield_state.unit_placement_by_id(attacker_id).to_payload()
+            == placement_before
+        )
+    pending = session.lifecycle.pending_decision_request()
+    assert pending is not None
+    assert (pending.request_id != request.request_id) is expects_retry
+    if not expects_retry:
+        assert pending.to_payload() == request.to_payload()
+    delta = session.events_since(event_cursor, viewer_player_id="player-a")
+    if records_attempt:
+        _assert_event_types(delta, "decision_recorded", "fight_movement_invalid")
+    elif scenario == "spatial_context_drift":
+        _assert_event_types(delta, "movement_proposal_invalid")
+    else:
+        assert delta["events"] == []
+
+
+@pytest.mark.integration
+def test_local_session_accepts_no_move_fight_proposal_and_replays_continuation() -> None:
+    session, status, attacker_id, _enemy_id = _fight_pile_in_facade_session(
+        game_id="ws13-fight-movement-valid-no-move"
+    )
+    request = _assert_request(status, MOVEMENT_PROPOSAL_DECISION_TYPE)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    cursor = _cursor_after(session, viewer_player_id="player-a")
+
+    continued = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        payload=_fight_pile_in_payload(
+            session,
+            proposal_request=proposal_request,
+            target_unit_ids=(),
+        ),
+        result_id="ws13-fight-movement-valid-no-move-result",
+    )
+
+    next_request = _assert_request(continued)
+    assert next_request.request_id != request.request_id
+    assert session.decision_record_count() == 1
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    assert state.battlefield_state.unit_placement_by_id(attacker_id)
+    _assert_event_types(
+        session.events_since(cursor, viewer_player_id="player-a"),
+        "decision_recorded",
+        "fight_movement_completed",
+    )
+    completed_event = next(
+        event
+        for event in reversed(session.lifecycle.decision_controller.event_log.records)
+        if event.event_type == "fight_movement_completed"
+    )
+    completed_payload = _json_object(completed_event.payload)
+    assert completed_payload["active_player_id"] == "player-a"
+    assert "rules_unit_instance_id" not in _json_object(completed_payload["resolution"])
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="replay:ws13:fight-movement-no-move")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.integration
+def test_local_session_moves_attached_rules_unit_once_and_replays_canonical_event() -> None:
+    lifecycle, units = fight_lifecycle(
+        alpha_unit_ids=("bodyguard", "leader"),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "bodyguard": Pose.at(10.0, 20.0),
+            "leader": Pose.at(10.0, 21.7),
+            "enemy": Pose.at(10.0, 18.0),
+        },
+        game_id="ws13-attached-fight-movement",
+        alpha_unit_specs={
+            "leader": ("core-character-leader", "core-character-leader", 1),
+        },
+        alpha_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader",
+                bodyguard_unit_selection_id="bodyguard",
+            ),
+        ),
+    )
+    state = lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=units["leader"].unit_instance_id,
+    )
+    canonical_id = rules_unit.unit_instance_id
+    component_ids = rules_unit.component_unit_instance_ids
+    before_y_by_model_id = {
+        model.model_instance_id: model.pose.position.y
+        for component_id in component_ids
+        for model in state.battlefield_state.unit_placement_by_id(component_id).model_placements
+    }
+    session = LocalGameSession(lifecycle=lifecycle)
+    status = session.advance_until_decision_or_terminal()
+    request = _assert_request(status, MOVEMENT_PROPOSAL_DECISION_TYPE)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(request.payload)
+    context = _json_object(proposal_request.context)
+
+    assert proposal_request.unit_instance_id == canonical_id
+    assert context["eligible_unit_ids"] == [canonical_id]
+    assert context["legal_target_unit_instance_ids"] == [units["enemy"].unit_instance_id]
+
+    continued = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        payload=_fight_pile_in_payload(
+            session,
+            proposal_request=proposal_request,
+            target_unit_ids=(units["enemy"].unit_instance_id,),
+            witness=_straight_line_witness_for_rules_unit(
+                session,
+                unit_instance_id=canonical_id,
+                dy=-0.25,
+            ),
+        ),
+        result_id="ws13-attached-fight-movement-result",
+    )
+
+    assert continued.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert session.decision_record_count() == 1
+    assert state.battlefield_state is not None
+    for component_id in component_ids:
+        placement = state.battlefield_state.unit_placement_by_id(component_id)
+        for model in placement.model_placements:
+            assert model.pose.position.y == before_y_by_model_id[model.model_instance_id] - 0.25
+    completed_event = next(
+        event
+        for event in reversed(lifecycle.decision_controller.event_log.records)
+        if event.event_type == "fight_movement_completed"
+    )
+    completed_payload = _json_object(completed_event.payload)
+    resolution_payload = _json_object(completed_payload["resolution"])
+    transition_payload = _json_object(completed_payload["transition_batch"])
+    witness_payload = _json_object(resolution_payload["witness"])
+    witness_paths = cast(list[dict[str, JsonValue]], witness_payload["model_paths"])
+    displacement_payloads = cast(
+        list[dict[str, JsonValue]],
+        transition_payload["displacements"],
+    )
+
+    assert completed_payload["unit_instance_id"] == canonical_id
+    assert completed_payload["active_player_id"] == "player-a"
+    assert resolution_payload["rules_unit_instance_id"] == canonical_id
+    assert resolution_payload["component_unit_instance_ids"] == list(component_ids)
+    assert {cast(str, path["model_id"]) for path in witness_paths} == set(before_y_by_model_id)
+    assert {
+        cast(str, displacement["model_instance_id"]) for displacement in displacement_payloads
+    } == set(before_y_by_model_id)
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="replay:ws13:attached-fight-movement")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    ("scenario", "expected_violation"),
+    [
+        ("non_object", "proposal_payload_malformed"),
+        ("missing_fields", "proposal_payload_malformed"),
+        ("proposal_kind_invalid", "proposal_payload_malformed"),
+        ("stale_request", "stale_proposal_request"),
+        ("player_drift", "proposal_player_drift"),
+        ("battle_round_drift", "proposal_battle_round_drift"),
+        ("unit_drift", "proposal_unit_drift"),
+        ("source_request_drift", "source_decision_request_drift"),
+        ("source_result_drift", "source_decision_result_drift"),
+        ("no_declarations", "melee_declaration_required"),
+        ("duplicate_declaration", "duplicate_melee_weapon_declaration"),
+        ("unavailable_weapon", "melee_weapon_not_available"),
+        ("target_not_engaged", "melee_target_not_engaged_with_model"),
+        ("attack_count_drift", "melee_attack_count_drift"),
+        ("too_many_targets", "melee_target_count_exceeds_attacks"),
+    ],
+)
+def test_local_session_rejects_invalid_melee_declarations_before_mutation(
+    scenario: str,
+    expected_violation: str,
+) -> None:
+    session, status, attacker_id, _enemy_id = _fight_melee_facade_session(
+        game_id=f"ws13-melee-invalid-{scenario}"
+    )
+    request = _assert_request(status, SUBMIT_MELEE_DECLARATION_DECISION_TYPE)
+    payload: JsonValue = _minimal_melee_declaration_payload(request)
+    payload_object = cast(dict[str, JsonValue], json.loads(json.dumps(payload)))
+    declarations = cast(list[dict[str, JsonValue]], payload_object["declarations"])
+
+    if scenario == "non_object":
+        payload = None
+    elif scenario == "missing_fields":
+        payload = {}
+    elif scenario == "proposal_kind_invalid":
+        payload_object["proposal_kind"] = ProposalKind.PILE_IN.value
+    elif scenario == "stale_request":
+        payload_object["proposal_request_id"] = f"{request.request_id}:stale"
+    elif scenario == "player_drift":
+        payload_object["player_id"] = "player-b"
+    elif scenario == "battle_round_drift":
+        payload_object["battle_round"] = 2
+    elif scenario == "unit_drift":
+        payload_object["unit_instance_id"] = attacker_id.replace("army-alpha", "army-beta")
+    elif scenario == "source_request_drift":
+        payload_object["source_decision_request_id"] = "decision-request:stale-source"
+    elif scenario == "source_result_drift":
+        payload_object["source_decision_result_id"] = "decision-result:stale-source"
+    elif scenario == "no_declarations":
+        payload_object["declarations"] = []
+    elif scenario == "duplicate_declaration":
+        declarations.append(cast(dict[str, JsonValue], json.loads(json.dumps(declarations[0]))))
+    elif scenario == "unavailable_weapon":
+        declarations[0]["wargear_id"] = "not-an-available-melee-weapon"
+    elif scenario == "target_not_engaged":
+        allocations = cast(list[dict[str, JsonValue]], declarations[0]["target_allocations"])
+        allocations[0]["target_unit_instance_id"] = attacker_id
+    elif scenario == "attack_count_drift":
+        allocations = cast(list[dict[str, JsonValue]], declarations[0]["target_allocations"])
+        allocations[0]["attacks"] = 1
+    elif scenario == "too_many_targets":
+        declarations[0]["target_allocations"] = [
+            {"target_unit_instance_id": f"army-beta:target-{index:03d}"} for index in range(6)
+        ]
+
+    if scenario not in {"non_object", "missing_fields"}:
+        payload = validate_json_value(payload_object)
+    records_before = session.decision_record_count()
+    state = session.lifecycle.state
+    assert state is not None
+    fight_state_before = state.fight_phase_state
+    assert fight_state_before is not None
+    cursor = _cursor_after(session, viewer_player_id="player-a")
+
+    invalid = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        payload=payload,
+        result_id=f"ws13-melee-invalid-{scenario}-result",
+    )
+
+    assert invalid.status_kind is LifecycleStatusKind.INVALID
+    assert _first_proposal_violation(invalid) == expected_violation
+    assert session.decision_record_count() == records_before
+    assert state.fight_phase_state == fight_state_before
+    pending = session.lifecycle.pending_decision_request()
+    assert pending is not None
+    assert pending.to_payload() == request.to_payload()
+    assert session.events_since(cursor, viewer_player_id="player-a")["events"] == []
+
+
+@pytest.mark.integration
+def test_local_session_accepts_melee_declaration_and_replays_attack_continuation() -> None:
+    session, status, _attacker_id, _enemy_id = _fight_melee_facade_session(
+        game_id="ws13-melee-valid-replay"
+    )
+    request = _assert_request(status, SUBMIT_MELEE_DECLARATION_DECISION_TYPE)
+    cursor = _cursor_after(session, viewer_player_id="player-a")
+    records_before = session.decision_record_count()
+
+    continued = session.submit_parameterized_payload(
+        request_id=request.request_id,
+        payload=_minimal_melee_declaration_payload(request),
+        result_id="ws13-melee-valid-replay-result",
+    )
+
+    next_request = _assert_request(continued)
+    assert next_request.request_id != request.request_id
+    assert session.decision_record_count() > records_before
+    assert any(
+        record.result.result_id == "ws13-melee-valid-replay-result"
+        for record in session.lifecycle.decision_controller.records[records_before:]
+    )
+    state = session.lifecycle.state
+    assert state is not None
+    _assert_event_types(
+        session.events_since(cursor, viewer_player_id="player-a"),
+        "decision_recorded",
+        "melee_declaration_accepted",
+        "attack_sequence_completed",
+    )
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="replay:ws13:melee-declaration")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
 
 
 @pytest.mark.integration
@@ -832,6 +1289,203 @@ def _armour_of_contempt_catalog() -> ArmyCatalog:
             ),
         ),
     )
+
+
+def _fight_pile_in_facade_session(
+    *,
+    game_id: str,
+) -> tuple[LocalGameSession, LifecycleStatus, str, str]:
+    lifecycle, units = fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id=game_id,
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    status = session.advance_until_decision_or_terminal()
+    return (
+        session,
+        status,
+        units["attacker"].unit_instance_id,
+        units["enemy"].unit_instance_id,
+    )
+
+
+def _fight_melee_facade_session(
+    *,
+    game_id: str,
+) -> tuple[LocalGameSession, LifecycleStatus, str, str]:
+    lifecycle, units = fight_lifecycle(
+        alpha_unit_ids=("attacker",),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "attacker": Pose.at(10.0, 20.0),
+            "enemy": Pose.at(12.0, 20.0),
+        },
+        game_id=game_id,
+        datasheet_id="core-character-leader",
+        model_profile_id="core-character-leader",
+        model_count=1,
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    status = _drain_facade_movement_requests(
+        session,
+        session.advance_until_decision_or_terminal(),
+        result_prefix=f"{game_id}-opening-movement",
+    )
+    activation_request = _assert_request(status, FIGHT_ACTIVATION_DECISION_TYPE)
+    attacker_id = units["attacker"].unit_instance_id
+    activation_option = next(
+        option for option in activation_request.options if attacker_id in str(option.payload)
+    )
+    status = session.submit_option(
+        request_id=activation_request.request_id,
+        option_id=activation_option.option_id,
+        result_id=f"{game_id}-activation",
+    )
+    status = _drain_facade_movement_requests(
+        session,
+        status,
+        result_prefix=f"{game_id}-pile-in",
+    )
+    _assert_request(status, SUBMIT_MELEE_DECLARATION_DECISION_TYPE)
+    return session, status, attacker_id, units["enemy"].unit_instance_id
+
+
+def _fight_pile_in_payload(
+    session: LocalGameSession,
+    *,
+    proposal_request: MovementProposalRequest,
+    target_unit_ids: tuple[str, ...],
+    witness: PathWitness | None = None,
+) -> JsonValue:
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=proposal_request.unit_instance_id,
+    )
+    for component_id in rules_unit.component_unit_instance_ids:
+        state.battlefield_state.unit_placement_by_id(component_id)
+    context = cast(dict[str, JsonValue], proposal_request.context)
+    assert proposal_request.movement_phase_action is not None
+    payload: dict[str, JsonValue] = {
+        "proposal_request_id": proposal_request.request_id,
+        "proposal_kind": proposal_request.proposal_kind.value,
+        "unit_instance_id": proposal_request.unit_instance_id,
+        "movement_phase_action": proposal_request.movement_phase_action,
+        "movement_mode": cast(str, context["movement_mode"]),
+    }
+    if target_unit_ids:
+        payload["pile_in_target_unit_instance_ids"] = list(target_unit_ids)
+    if witness is not None:
+        payload["witness"] = validate_json_value(witness.to_payload())
+    return validate_json_value(payload)
+
+
+def _straight_line_witness_for_rules_unit(
+    session: LocalGameSession,
+    *,
+    unit_instance_id: str,
+    dy: float,
+) -> PathWitness:
+    state = session.lifecycle.state
+    assert state is not None
+    assert state.battlefield_state is not None
+    rules_unit = rules_unit_view_by_id(state=state, unit_instance_id=unit_instance_id)
+    model_paths: list[tuple[str, tuple[Pose, ...]]] = []
+    for component_id in rules_unit.component_unit_instance_ids:
+        placement = state.battlefield_state.unit_placement_by_id(component_id)
+        for model in placement.model_placements:
+            start = model.pose
+            middle = Pose.at(
+                start.position.x,
+                start.position.y + dy / 2.0,
+                start.position.z,
+                facing_degrees=start.facing.degrees,
+            )
+            end = Pose.at(
+                start.position.x,
+                start.position.y + dy,
+                start.position.z,
+                facing_degrees=start.facing.degrees,
+            )
+            model_paths.append((model.model_instance_id, (start, middle, end)))
+    return PathWitness.for_paths(tuple(model_paths))
+
+
+def _endpoint_only_witness(
+    session: LocalGameSession,
+    *,
+    unit_instance_id: str,
+    dx: float,
+) -> PathWitness:
+    endpoints = straight_line_witness_for_unit(
+        session.lifecycle,
+        unit_instance_id=unit_instance_id,
+        dx=dx,
+        include_midpoint=False,
+    )
+    return PathWitness.for_paths(
+        tuple(
+            (
+                model_id,
+                (
+                    endpoints.poses_for_model(model_id)[0],
+                    endpoints.poses_for_model(model_id)[-1],
+                    endpoints.poses_for_model(model_id)[-1],
+                ),
+            )
+            for model_id in endpoints.model_ids()
+        )
+    )
+
+
+def _shift_unit_placement(
+    session: LocalGameSession,
+    *,
+    unit_instance_id: str,
+    dx: float,
+) -> None:
+    state = session.lifecycle.state
+    assert state is not None
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    placement = battlefield.unit_placement_by_id(unit_instance_id)
+    state.replace_battlefield_state(
+        battlefield.with_unit_placement(
+            placement.with_model_placements(
+                tuple(
+                    model_placement.with_pose(
+                        Pose.at(
+                            model_placement.pose.position.x + dx,
+                            model_placement.pose.position.y,
+                            model_placement.pose.position.z,
+                            facing_degrees=model_placement.pose.facing.degrees,
+                        )
+                    )
+                    for model_placement in placement.model_placements
+                )
+            )
+        )
+    )
+
+
+def _first_proposal_violation(status: LifecycleStatus) -> str:
+    payload = _json_object(status.payload)
+    validation = _json_object(payload["proposal_validation"])
+    violations = cast(list[dict[str, JsonValue]], validation["violations"])
+    assert violations
+    violation_code = violations[0]["violation_code"]
+    assert type(violation_code) is str
+    return violation_code
 
 
 def _grant_facade_cp(*, state: GameState, player_id: str) -> None:

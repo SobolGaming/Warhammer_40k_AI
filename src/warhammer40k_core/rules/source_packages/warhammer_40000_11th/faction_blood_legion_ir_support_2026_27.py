@@ -8,18 +8,26 @@ from warhammer40k_core.rules.rule_ir import (
     RuleClause,
     RuleClausePayload,
     RuleConditionPayload,
+    RuleDurationKind,
     RuleDurationPayload,
+    RuleEffectKind,
     RuleEffectSpecPayload,
     RuleIR,
     RuleIRPayload,
     RuleParameterPayload,
+    RuleTargetKind,
     RuleTargetSpecPayload,
+    RuleTriggerKind,
+    RuleTriggerPayload,
+    parameter_payload,
 )
 from warhammer40k_core.rules.rule_templates import (
     AURA_TEMPLATE_ID,
     DICE_ROLL_MODIFIER_TEMPLATE_ID,
     GRANT_ABILITY_TEMPLATE_ID,
     KEYWORD_GATE_TEMPLATE_ID,
+    REROLL_PERMISSION_TEMPLATE_ID,
+    TIMING_WINDOW_TEMPLATE_ID,
 )
 
 SOURCE_PACKAGE_ID = "gw-11e-phase17e-faction-coverage-2026-27"
@@ -35,6 +43,13 @@ BRAZENMAW_SOURCE_ROW_ID = (
 )
 BRAZENMAW_DESCRIPTOR_ID = f"phase17e:{BRAZENMAW_SOURCE_ROW_ID}"
 BRAZENMAW_SOURCE_RULE_ID = f"phase17f:{BRAZENMAW_DESCRIPTOR_ID}"
+FURYS_CAGE_ENHANCEMENT_ID = "000009815003"
+FURYS_CAGE_SOURCE_ROW_ID = (
+    f"enhancement:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:"
+    f"{FURYS_CAGE_ENHANCEMENT_ID}"
+)
+FURYS_CAGE_DESCRIPTOR_ID = f"phase17e:{FURYS_CAGE_SOURCE_ROW_ID}"
+FURYS_CAGE_SOURCE_RULE_ID = f"phase17f:{FURYS_CAGE_DESCRIPTOR_ID}"
 SLAUGHTERTHIRST_ENHANCEMENT_ID = "000009815002"
 SLAUGHTERTHIRST_SOURCE_ROW_ID = (
     f"enhancement:{CHAOS_DAEMONS_FACTION_ID}:{BLOOD_LEGION_DETACHMENT_ID}:"
@@ -60,6 +75,19 @@ MURDERCALL_SURGE_ABILITY = "blood_legion_murdercall_surge"
 BLOOD_TAINTED_STICKY_OBJECTIVE_ABILITY = "blood_legion_blood_tainted_sticky_objective"
 DEADLY_DEMISE_MODIFIER_ABILITY = "deadly_demise_modifier"
 DEADLY_DEMISE_DESTROYED_ENEMY_UNIT_CONDITION = "source_model_destroyed_enemy_unit_this_battle"
+FURYS_CAGE_SELECTED_TO_FIGHT_ABILITY = "blood_legion_furys_cage_selected_to_fight"
+FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID = (
+    "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:enhancement:"
+    "furys_cage:selected-to-fight"
+)
+FURYS_CAGE_MORTAL_WOUND_FNP_CONSUMER_ID = (
+    "warhammer_40000_11th:chaos_daemons:detachment:blood_legion:enhancement:"
+    "furys_cage:mortal-wound-fnp"
+)
+FURYS_CAGE_RUNTIME_CONSUMER_IDS = (
+    FURYS_CAGE_MORTAL_WOUND_FNP_CONSUMER_ID,
+    FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+)
 
 
 class BloodLegionIrSupportError(ValueError):
@@ -81,6 +109,124 @@ def coverage_rule_ir_hash_by_descriptor_id(coverage_descriptor_id: str) -> str |
 
 def supported_coverage_descriptor_ids() -> tuple[str, ...]:
     return tuple(sorted(_COVERAGE_RULE_IR_PAYLOADS_BY_DESCRIPTOR_ID))
+
+
+def validate_furys_cage_rule_ir(rule_ir: RuleIR) -> None:
+    if type(rule_ir) is not RuleIR:
+        raise BloodLegionIrSupportError("Fury's Cage validation requires RuleIR.")
+    expected_source_id = f"{SOURCE_PACKAGE_ID}:{FURYS_CAGE_DESCRIPTOR_ID}:source-text"
+    if (
+        not rule_ir.is_supported
+        or rule_ir.diagnostics
+        or rule_ir.rule_id != expected_source_id
+        or rule_ir.source_id != expected_source_id
+        or len(rule_ir.clauses) != 4
+    ):
+        raise BloodLegionIrSupportError("Fury's Cage RuleIR identity or support drifted.")
+    gate_clause, marker_clause, mortal_clause, reroll_clause = rule_ir.clauses
+    if any(
+        clause.unsupported_reason is not None or clause.diagnostics for clause in rule_ir.clauses
+    ):
+        raise BloodLegionIrSupportError("Fury's Cage RuleIR contains unsupported diagnostics.")
+    if (
+        gate_clause.template_id != KEYWORD_GATE_TEMPLATE_ID
+        or gate_clause.trigger is not None
+        or gate_clause.target is not None
+        or gate_clause.effects
+        or gate_clause.duration is not None
+        or tuple(parameter_payload(condition.parameters) for condition in gate_clause.conditions)
+        != (
+            {"required_keyword_sequence": (LEGIONES_DAEMONICA_KEYWORD,)},
+            {"required_keyword": KHORNE_KEYWORD},
+            {"required_keyword": MONSTER_KEYWORD},
+        )
+    ):
+        raise BloodLegionIrSupportError("Fury's Cage eligibility gate drifted.")
+
+    marker_target = marker_clause.target
+    marker_duration = marker_clause.duration
+    if (
+        marker_clause.template_id != GRANT_ABILITY_TEMPLATE_ID
+        or marker_clause.trigger is not None
+        or marker_clause.conditions
+        or marker_target is None
+        or marker_target.kind is not RuleTargetKind.THIS_MODEL
+        or marker_duration is None
+        or marker_duration.kind is not RuleDurationKind.PERMANENT
+        or parameter_payload(marker_duration.parameters)
+        or len(marker_clause.effects) != 1
+        or marker_clause.effects[0].kind is not RuleEffectKind.GRANT_ABILITY
+        or parameter_payload(marker_clause.effects[0].parameters)
+        != {
+            "ability": FURYS_CAGE_SELECTED_TO_FIGHT_ABILITY,
+            "hook_family": "fight_unit_selected_grant",
+            "phase": "fight",
+            "timing_window": "selected_to_fight",
+            "optional": True,
+        }
+    ):
+        raise BloodLegionIrSupportError("Fury's Cage discovery marker drifted.")
+
+    _validate_furys_cage_triggered_clause(mortal_clause)
+    mortal_duration = mortal_clause.duration
+    if (
+        mortal_clause.template_id != TIMING_WINDOW_TEMPLATE_ID
+        or mortal_duration is None
+        or mortal_duration.kind is not RuleDurationKind.IMMEDIATE
+        or parameter_payload(mortal_duration.parameters)
+        or len(mortal_clause.effects) != 1
+        or mortal_clause.effects[0].kind is not RuleEffectKind.INFLICT_MORTAL_WOUNDS
+        or parameter_payload(mortal_clause.effects[0].parameters)
+        != {
+            "damage_kind": "mortal_wounds",
+            "mortal_wounds_expression": "D3+1",
+            "mortal_wounds_dice_quantity": 1,
+            "mortal_wounds_dice_sides": 3,
+            "mortal_wounds_modifier": 1,
+            "target_scope": "this_model",
+        }
+    ):
+        raise BloodLegionIrSupportError("Fury's Cage mortal-wound effect drifted.")
+
+    _validate_furys_cage_triggered_clause(reroll_clause)
+    reroll_duration = reroll_clause.duration
+    if (
+        reroll_clause.template_id != REROLL_PERMISSION_TEMPLATE_ID
+        or reroll_duration is None
+        or reroll_duration.kind is not RuleDurationKind.UNTIL_TIMING_ENDPOINT
+        or parameter_payload(reroll_duration.parameters) != {"endpoint": "phase"}
+        or tuple(effect.kind for effect in reroll_clause.effects)
+        != (RuleEffectKind.REROLL_PERMISSION, RuleEffectKind.REROLL_PERMISSION)
+        or tuple(parameter_payload(effect.parameters) for effect in reroll_clause.effects)
+        != (
+            {"roll_type": "hit", "attack_role": "attacker", "target_scope": "this_model"},
+            {
+                "roll_type": "wound",
+                "attack_role": "attacker",
+                "target_scope": "this_model",
+            },
+        )
+    ):
+        raise BloodLegionIrSupportError("Fury's Cage reroll permissions drifted.")
+
+
+def _validate_furys_cage_triggered_clause(clause: RuleClause) -> None:
+    trigger = clause.trigger
+    target = clause.target
+    if (
+        trigger is None
+        or trigger.kind is not RuleTriggerKind.UNIT_SELECTED
+        or parameter_payload(trigger.parameters)
+        != {
+            "phase": "fight",
+            "timing_window": "selected_to_fight",
+            "optional": True,
+        }
+        or clause.conditions
+        or target is None
+        or target.kind is not RuleTargetKind.THIS_MODEL
+    ):
+        raise BloodLegionIrSupportError("Fury's Cage selected-to-fight trigger drifted.")
 
 
 def _detachment_rule_payload() -> RuleIRPayload:
@@ -269,6 +415,130 @@ def _slaughterthirst_payload() -> RuleIRPayload:
                     ),
                 ),
                 duration=None,
+            ),
+        ),
+    )
+
+
+def _furys_cage_payload() -> RuleIRPayload:
+    normalized_text = (
+        "Legiones Daemonica Khorne Monster model only. Each time the bearer is selected "
+        "to fight, it can use this Enhancement. If it does, the bearer suffers D3+1 "
+        "mortal wounds, and until the end of the phase, each time it makes an attack, "
+        "you can re-roll the Hit roll and you can re-roll the Wound roll."
+    )
+    eligibility_text = "Legiones Daemonica Khorne Monster model only"
+    activation_text = "Each time the bearer is selected to fight, it can use this Enhancement."
+    mortal_wounds_text = "If it does, the bearer suffers D3+1 mortal wounds"
+    reroll_text = (
+        "until the end of the phase, each time it makes an attack, you can re-roll the "
+        "Hit roll and you can re-roll the Wound roll"
+    )
+    return _coverage_payload(
+        FURYS_CAGE_SOURCE_ROW_ID,
+        normalized_text,
+        (
+            _keyword_gate_clause(
+                clause_id=_coverage_clause_id(FURYS_CAGE_SOURCE_ROW_ID, "gate:001"),
+                normalized_text=normalized_text,
+                source_text=eligibility_text,
+                conditions=(
+                    _keyword_condition(
+                        normalized_text=normalized_text,
+                        source_text="Legiones Daemonica",
+                        parameter_key="required_keyword_sequence",
+                        parameter_value=(LEGIONES_DAEMONICA_KEYWORD,),
+                    ),
+                    _keyword_condition(
+                        normalized_text=normalized_text,
+                        source_text="Khorne",
+                        parameter_key="required_keyword",
+                        parameter_value=KHORNE_KEYWORD,
+                    ),
+                    _keyword_condition(
+                        normalized_text=normalized_text,
+                        source_text="Monster",
+                        parameter_key="required_keyword",
+                        parameter_value=MONSTER_KEYWORD,
+                    ),
+                ),
+            ),
+            _effect_clause(
+                clause_id=_coverage_clause_id(FURYS_CAGE_SOURCE_ROW_ID, "effect:001"),
+                template_id=GRANT_ABILITY_TEMPLATE_ID,
+                normalized_text=normalized_text,
+                source_text=activation_text,
+                target=_target("this_model", normalized_text, "the bearer"),
+                effects=(
+                    _effect(
+                        "grant_ability",
+                        normalized_text,
+                        "use this Enhancement",
+                        (
+                            _parameter("ability", FURYS_CAGE_SELECTED_TO_FIGHT_ABILITY),
+                            _parameter("hook_family", "fight_unit_selected_grant"),
+                            _parameter("phase", "fight"),
+                            _parameter("timing_window", "selected_to_fight"),
+                            _parameter("optional", True),
+                        ),
+                    ),
+                ),
+                duration=_permanent_duration(normalized_text),
+            ),
+            _effect_clause(
+                clause_id=_coverage_clause_id(FURYS_CAGE_SOURCE_ROW_ID, "effect:002"),
+                template_id=TIMING_WINDOW_TEMPLATE_ID,
+                normalized_text=normalized_text,
+                source_text=mortal_wounds_text,
+                trigger=_selected_to_fight_trigger(normalized_text, activation_text),
+                target=_target("this_model", normalized_text, mortal_wounds_text),
+                effects=(
+                    _effect(
+                        "inflict_mortal_wounds",
+                        normalized_text,
+                        "the bearer suffers D3+1 mortal wounds",
+                        (
+                            _parameter("damage_kind", "mortal_wounds"),
+                            _parameter("mortal_wounds_expression", "D3+1"),
+                            _parameter("mortal_wounds_dice_quantity", 1),
+                            _parameter("mortal_wounds_dice_sides", 3),
+                            _parameter("mortal_wounds_modifier", 1),
+                            _parameter("target_scope", "this_model"),
+                        ),
+                    ),
+                ),
+                duration=_immediate_duration(normalized_text, mortal_wounds_text),
+            ),
+            _effect_clause(
+                clause_id=_coverage_clause_id(FURYS_CAGE_SOURCE_ROW_ID, "effect:003"),
+                template_id=REROLL_PERMISSION_TEMPLATE_ID,
+                normalized_text=normalized_text,
+                source_text=reroll_text,
+                trigger=_selected_to_fight_trigger(normalized_text, activation_text),
+                target=_target("this_model", normalized_text, "it makes an attack"),
+                effects=(
+                    _effect(
+                        "reroll_permission",
+                        normalized_text,
+                        "you can re-roll the Hit roll",
+                        (
+                            _parameter("roll_type", "hit"),
+                            _parameter("attack_role", "attacker"),
+                            _parameter("target_scope", "this_model"),
+                        ),
+                    ),
+                    _effect(
+                        "reroll_permission",
+                        normalized_text,
+                        "you can re-roll the Wound roll",
+                        (
+                            _parameter("roll_type", "wound"),
+                            _parameter("attack_role", "attacker"),
+                            _parameter("target_scope", "this_model"),
+                        ),
+                    ),
+                ),
+                duration=_end_phase_duration(normalized_text),
             ),
         ),
     )
@@ -487,6 +757,7 @@ def _effect_clause(
     effects: tuple[RuleEffectSpecPayload, ...],
     duration: RuleDurationPayload | None,
     conditions: tuple[RuleConditionPayload, ...] = (),
+    trigger: RuleTriggerPayload | None = None,
 ) -> RuleClausePayload:
     return cast(
         RuleClausePayload,
@@ -494,7 +765,7 @@ def _effect_clause(
             "clause_id": clause_id,
             "template_id": template_id,
             "source_span": _span(normalized_text, source_text),
-            "trigger": None,
+            "trigger": trigger,
             "conditions": list(conditions),
             "target": target,
             "effects": list(effects),
@@ -566,6 +837,52 @@ def _permanent_duration(normalized_text: str) -> RuleDurationPayload:
     )
 
 
+def _selected_to_fight_trigger(
+    normalized_text: str,
+    source_text: str,
+) -> RuleTriggerPayload:
+    return cast(
+        RuleTriggerPayload,
+        {
+            "kind": "unit_selected",
+            "source_span": _span(normalized_text, source_text),
+            "parameters": [
+                _parameter("phase", "fight"),
+                _parameter("timing_window", "selected_to_fight"),
+                _parameter("optional", True),
+            ],
+        },
+    )
+
+
+def _immediate_duration(
+    normalized_text: str,
+    source_text: str,
+) -> RuleDurationPayload:
+    return cast(
+        RuleDurationPayload,
+        {
+            "kind": "immediate",
+            "source_span": _span(normalized_text, source_text),
+            "parameters": [],
+        },
+    )
+
+
+def _end_phase_duration(normalized_text: str) -> RuleDurationPayload:
+    source_text = "until the end of the phase"
+    return cast(
+        RuleDurationPayload,
+        {
+            "kind": "until_timing_endpoint",
+            "source_span": _span(normalized_text, source_text),
+            "parameters": [
+                _parameter("endpoint", "phase"),
+            ],
+        },
+    )
+
+
 def _parameter(key: str, value: object) -> RuleParameterPayload:
     return cast(RuleParameterPayload, {"key": key, "value": value})
 
@@ -584,6 +901,7 @@ def _coverage_payloads() -> Mapping[str, RuleIRPayload]:
         {
             BLOOD_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID: _detachment_rule_payload(),
             BRAZENMAW_DESCRIPTOR_ID: _brazenmaw_payload(),
+            FURYS_CAGE_DESCRIPTOR_ID: _furys_cage_payload(),
             GATEWAY_UNTO_DAMNATION_DESCRIPTOR_ID: _gateway_unto_damnation_payload(),
             SLAUGHTERTHIRST_DESCRIPTOR_ID: _slaughterthirst_payload(),
         }

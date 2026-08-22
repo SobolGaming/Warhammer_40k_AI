@@ -14,7 +14,10 @@ from warhammer40k_core.engine.generic_rule_effect_payloads import (
     generic_rule_effect_payload_grants_ability,
 )
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    rules_unit_identities_share_lineage,
+    rules_unit_view_by_id,
+)
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -91,7 +94,7 @@ class FightsFirstRegistry:
 
     @classmethod
     def from_state(cls, state: GameState) -> Self:
-        sources: list[FightsFirstSource] = []
+        sources_by_identity: dict[tuple[str, str], FightsFirstSource] = {}
         for effect in state.persisting_effects:
             effect_payload = effect.effect_payload
             if not isinstance(effect_payload, dict):
@@ -131,19 +134,49 @@ class FightsFirstRegistry:
                     CHARGE_FIGHTS_FIRST_EFFECT_KIND,
                 }:
                     continue
-                sources.append(
-                    FightsFirstSource(
-                        unit_instance_id=rules_unit.unit_instance_id,
-                        effect_id=effect.effect_id,
-                        source_rule_id=effect.source_rule_id,
-                        effect_kind=effect_kind,
-                    )
+                source = FightsFirstSource(
+                    unit_instance_id=rules_unit.unit_instance_id,
+                    effect_id=effect.effect_id,
+                    source_rule_id=effect.source_rule_id,
+                    effect_kind=effect_kind,
                 )
-        return cls(tuple(sources))
+                identity = (source.unit_instance_id, source.effect_id)
+                existing = sources_by_identity.get(identity)
+                if existing is not None and existing != source:
+                    raise GameLifecycleError("Canonical Fights First source identity drifted.")
+                sources_by_identity[identity] = source
+        return cls(tuple(sources_by_identity.values()))
 
     def has_unit(self, unit_instance_id: str) -> bool:
         requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
         return any(source.unit_instance_id == requested_unit_id for source in self.sources)
+
+    def has_unit_lineage(
+        self,
+        *,
+        state: GameState,
+        unit_instance_id: str,
+        effect_kind: str | None = None,
+    ) -> bool:
+        requested_rules_unit_id = rules_unit_view_by_id(
+            state=state,
+            unit_instance_id=unit_instance_id,
+        ).unit_instance_id
+        requested_effect_kind = (
+            None if effect_kind is None else _validate_identifier("effect_kind", effect_kind)
+        )
+        return any(
+            (requested_effect_kind is None or source.effect_kind == requested_effect_kind)
+            and (
+                source.unit_instance_id == requested_rules_unit_id
+                or rules_unit_identities_share_lineage(
+                    state=state,
+                    first_unit_instance_id=requested_rules_unit_id,
+                    second_unit_instance_id=source.unit_instance_id,
+                )
+            )
+            for source in self.sources
+        )
 
     def charged_unit_ids(self) -> tuple[str, ...]:
         return tuple(

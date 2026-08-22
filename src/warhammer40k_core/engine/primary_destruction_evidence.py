@@ -16,7 +16,12 @@ from warhammer40k_core.engine.destruction_provenance import (
 from warhammer40k_core.engine.event_log import EventLog
 from warhammer40k_core.engine.fight_on_death import model_is_present_on_battlefield
 from warhammer40k_core.engine.phase import GameLifecycleError
-from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    current_rules_unit_views_for_canonical_identity,
+    rules_unit_view_by_id,
+)
+from warhammer40k_core.engine.unit_factory import ModelInstance
 from warhammer40k_core.geometry.measurement import objective_marker_controls_model
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.geometry.volume import Model as GeometryModel
@@ -188,45 +193,31 @@ def rules_unit_objective_proximity_witness(
         "rules_unit_instance_id",
         rules_unit_instance_id,
     )
-    rules_unit = rules_unit_view_by_id(
+    rules_units = current_rules_unit_views_for_canonical_identity(
         state=state,
         unit_instance_id=requested_rules_unit_id,
     )
-    if rules_unit.unit_instance_id != requested_rules_unit_id:
-        raise GameLifecycleError(
-            "Objective proximity evidence requires a canonical rules-unit identity."
-        )
+    component_ids, model_by_id = _rules_unit_component_and_model_inventory(rules_units)
     battlefield = state.battlefield_state
     if battlefield is None:
         raise GameLifecycleError("Objective proximity evidence requires battlefield_state.")
-    mission_setup = state.mission_setup
-    if mission_setup is None:
-        return RulesUnitObjectiveProximityWitness(
-            rules_unit_instance_id=rules_unit.unit_instance_id,
-            component_unit_instance_ids=rules_unit.component_unit_instance_ids,
-            objective_marker_witnesses=(),
-        )
-    model_by_id = {
-        model.model_instance_id: model
-        for component in rules_unit.components
-        for model in component.unit.own_models
-    }
     geometry_models_by_id: dict[str, GeometryModel] = {}
-    for component in rules_unit.components:
-        placement = battlefield.unit_placement_or_none(component.unit.unit_instance_id)
-        if placement is None:
-            continue
-        for model_placement in placement.model_placements:
-            model = model_by_id.get(model_placement.model_instance_id)
-            if model is None or not model_is_present_on_battlefield(
-                state=state,
-                model_instance_id=model.model_instance_id,
-            ):
+    for rules_unit in rules_units:
+        for component in rules_unit.components:
+            placement = battlefield.unit_placement_or_none(component.unit.unit_instance_id)
+            if placement is None:
                 continue
-            geometry_models_by_id[model.model_instance_id] = geometry_model_for_placement(
-                model=model,
-                placement=model_placement,
-            )
+            for model_placement in placement.model_placements:
+                model = model_by_id.get(model_placement.model_instance_id)
+                if model is None or not model_is_present_on_battlefield(
+                    state=state,
+                    model_instance_id=model.model_instance_id,
+                ):
+                    continue
+                geometry_models_by_id[model.model_instance_id] = geometry_model_for_placement(
+                    model=model,
+                    placement=model_placement,
+                )
     if included_destroyed_model_placement is not None:
         if type(included_destroyed_model_placement) is not ModelPlacement:
             raise GameLifecycleError(
@@ -238,15 +229,123 @@ def rules_unit_objective_proximity_witness(
             raise GameLifecycleError(
                 "Included destroyed-model objective evidence is outside the rules unit."
             )
-        if included_destroyed_model_placement.unit_instance_id not in (
-            rules_unit.component_unit_instance_ids
-        ):
+        if included_destroyed_model_placement.unit_instance_id not in component_ids:
             raise GameLifecycleError(
                 "Included destroyed-model objective evidence component identity drift."
             )
         geometry_models_by_id[destroyed_model_id] = geometry_model_for_placement(
             model=destroyed_model,
             placement=included_destroyed_model_placement,
+        )
+    return _objective_proximity_witness_from_geometry_models(
+        state=state,
+        rules_unit_instance_id=requested_rules_unit_id,
+        component_unit_instance_ids=component_ids,
+        geometry_models_by_id=geometry_models_by_id,
+    )
+
+
+def rules_unit_objective_proximity_witness_from_placements(
+    *,
+    state: GameState,
+    rules_unit_instance_id: str,
+    model_placements: tuple[ModelPlacement, ...],
+) -> RulesUnitObjectiveProximityWitness:
+    """Capture objective proximity from authenticated event-time model endpoints."""
+    from warhammer40k_core.engine.game_state import GameState
+
+    if type(state) is not GameState:
+        raise GameLifecycleError("Objective proximity evidence requires GameState.")
+    requested_rules_unit_id = _validate_identifier(
+        "rules_unit_instance_id",
+        rules_unit_instance_id,
+    )
+    rules_units = current_rules_unit_views_for_canonical_identity(
+        state=state,
+        unit_instance_id=requested_rules_unit_id,
+    )
+    component_ids, model_by_id = _rules_unit_component_and_model_inventory(rules_units)
+    if type(model_placements) is not tuple:
+        raise GameLifecycleError("Objective proximity endpoint placements must be a tuple.")
+    component_by_model_id = {
+        model.model_instance_id: component.unit.unit_instance_id
+        for rules_unit in rules_units
+        for component in rules_unit.components
+        for model in component.unit.own_models
+    }
+    geometry_models_by_id: dict[str, GeometryModel] = {}
+    for placement in model_placements:
+        if type(placement) is not ModelPlacement:
+            raise GameLifecycleError(
+                "Objective proximity endpoint evidence must contain ModelPlacement values."
+            )
+        model = model_by_id.get(placement.model_instance_id)
+        if (
+            model is None
+            or component_by_model_id[model.model_instance_id] != placement.unit_instance_id
+            or placement.unit_instance_id not in component_ids
+        ):
+            raise GameLifecycleError("Objective proximity endpoint model identity drift.")
+        if placement.model_instance_id in geometry_models_by_id:
+            raise GameLifecycleError("Objective proximity endpoint model identity is duplicated.")
+        geometry_models_by_id[placement.model_instance_id] = geometry_model_for_placement(
+            model=model,
+            placement=placement,
+        )
+    if not geometry_models_by_id:
+        raise GameLifecycleError("Objective proximity endpoint evidence must not be empty.")
+    return _objective_proximity_witness_from_geometry_models(
+        state=state,
+        rules_unit_instance_id=requested_rules_unit_id,
+        component_unit_instance_ids=component_ids,
+        geometry_models_by_id=geometry_models_by_id,
+    )
+
+
+def _rules_unit_component_and_model_inventory(
+    rules_units: tuple[RulesUnitView, ...],
+) -> tuple[tuple[str, ...], dict[str, ModelInstance]]:
+    if type(rules_units) is not tuple or any(
+        type(rules_unit) is not RulesUnitView for rules_unit in rules_units
+    ):
+        raise GameLifecycleError("Objective proximity rules-unit inventory must be typed.")
+    component_ids = tuple(
+        sorted(
+            component.unit.unit_instance_id
+            for rules_unit in rules_units
+            for component in rules_unit.components
+        )
+    )
+    if not component_ids or len(component_ids) != len(set(component_ids)):
+        raise GameLifecycleError("Objective proximity component inventory is invalid.")
+    model_by_id = {
+        model.model_instance_id: model
+        for rules_unit in rules_units
+        for component in rules_unit.components
+        for model in component.unit.own_models
+    }
+    if len(model_by_id) != sum(
+        len(component.unit.own_models)
+        for rules_unit in rules_units
+        for component in rules_unit.components
+    ):
+        raise GameLifecycleError("Objective proximity model inventory is duplicated.")
+    return component_ids, model_by_id
+
+
+def _objective_proximity_witness_from_geometry_models(
+    *,
+    state: GameState,
+    rules_unit_instance_id: str,
+    component_unit_instance_ids: tuple[str, ...],
+    geometry_models_by_id: dict[str, GeometryModel],
+) -> RulesUnitObjectiveProximityWitness:
+    mission_setup = state.mission_setup
+    if mission_setup is None:
+        return RulesUnitObjectiveProximityWitness(
+            rules_unit_instance_id=rules_unit_instance_id,
+            component_unit_instance_ids=component_unit_instance_ids,
+            objective_marker_witnesses=(),
         )
     marker_witnesses: list[ObjectiveMarkerModelWitness] = []
     for marker_definition in mission_setup.objective_markers:
@@ -273,8 +372,8 @@ def rules_unit_objective_proximity_witness(
                 )
             )
     return RulesUnitObjectiveProximityWitness(
-        rules_unit_instance_id=rules_unit.unit_instance_id,
-        component_unit_instance_ids=rules_unit.component_unit_instance_ids,
+        rules_unit_instance_id=rules_unit_instance_id,
+        component_unit_instance_ids=component_unit_instance_ids,
         objective_marker_witnesses=tuple(marker_witnesses),
     )
 
@@ -438,4 +537,5 @@ __all__ = (
     "destruction_source_objective_proximity_witness",
     "primary_unattributed_destruction_cause_from_token",
     "rules_unit_objective_proximity_witness",
+    "rules_unit_objective_proximity_witness_from_placements",
 )

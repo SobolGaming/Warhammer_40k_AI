@@ -10,6 +10,7 @@ from warhammer40k_core.engine.destruction_provenance import (
 )
 from warhammer40k_core.engine.event_log import JsonValue
 from warhammer40k_core.engine.phase import GameLifecycleError
+from warhammer40k_core.engine.rules_units import rules_unit_identity_history_contains
 
 if TYPE_CHECKING:
     from warhammer40k_core.engine.game_state import GameState
@@ -70,9 +71,10 @@ def optional_destruction_reaction_trigger_conditions_for_target(
         return False
     if descriptor.get("requires_not_fought_this_phase") is True:
         fight_state = state.fight_phase_state
-        if (
-            fight_state is not None
-            and target_unit_instance_id in fight_state.fight_order_state.selected_to_fight_unit_ids
+        if fight_state is not None and rules_unit_identity_history_contains(
+            state=state,
+            identity_ids=fight_state.fight_order_state.selected_to_fight_unit_ids,
+            unit_instance_id=target_unit_instance_id,
         ):
             return False
     return True

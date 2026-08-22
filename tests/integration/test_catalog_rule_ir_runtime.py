@@ -629,7 +629,7 @@ def test_phase17k_harbinger_of_death_requires_generic_finite_weapon_choice() -> 
                 phase=BattlePhaseKind.FIGHT,
                 player_id=army.player_id,
             ),
-            effect_payload=sustained.unit_effect_payload,
+            effect_payload=sustained.timed_effects[0].effect_payload,
         )
     )
     strike = datasheet_weapon_profile(
@@ -1127,7 +1127,7 @@ def test_daemonic_patrons_grant_critical_wounds_and_destroy_a_model_after_no_kil
                 phase=BattlePhaseKind.FIGHT,
                 player_id="player-source",
             ),
-            effect_payload=grants[0].unit_effect_payload,
+            effect_payload=grants[0].timed_effects[0].effect_payload,
         )
     )
     state.record_persisting_effect(
@@ -1781,7 +1781,7 @@ def _record_daemonic_patrons_effect(
                 phase=BattlePhaseKind.FIGHT,
                 player_id=active_player_id,
             ),
-            effect_payload=grants[0].unit_effect_payload,
+            effect_payload=grants[0].timed_effects[0].effect_payload,
         )
     )
 

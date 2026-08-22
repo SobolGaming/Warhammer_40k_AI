@@ -26,6 +26,15 @@ CATALOG_SELECTED_TARGET_EVENT = (
 CATALOG_SELECTED_TARGET_EFFECTS_SUPPORT = (
     ROOT / "src" / "warhammer40k_core" / "engine" / "catalog_selected_target_effects_support.py"
 )
+CULT_AMBUSH_MARKER_REMOVAL = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "cult_ambush_marker_removal.py"
+)
+PRIMARY_MISSION_STATE_RUNTIME = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "primary_mission_state_runtime.py"
+)
+FIGHT_RULES_UNIT_MOVEMENT_TYPES = (
+    ROOT / "src" / "warhammer40k_core" / "engine" / "fight_rules_unit_movement_types.py"
+)
 UNIT_MODULES = (
     CORE / "unit.py",
     CORE / "attached_unit.py",
@@ -226,6 +235,45 @@ def test_selected_target_canonical_identity_expands_all_current_survivors() -> N
 
     assert "current_rules_unit_views_for_identity" in call_names
     assert "current_placed_alive_rules_unit_view_for_identity" not in call_names
+
+
+def test_completed_fight_move_consumers_use_canonical_identity_and_group_endpoints() -> None:
+    for path, function_name in (
+        (
+            CULT_AMBUSH_MARKER_REMOVAL,
+            "resolve_cult_ambush_marker_removal_for_completed_moves",
+        ),
+        (
+            PRIMARY_MISSION_STATE_RUNTIME,
+            "resolve_surveil_marker_removal_for_completed_moves",
+        ),
+    ):
+        function = _function_node(path=path, function_name=function_name)
+        call_names = {
+            node.func.id
+            for node in ast.walk(function)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+        }
+        assert "rules_unit_views_for_completed_move_event" in call_names
+        assert "fight_rules_unit_movement_endpoint_from_completed_event" in call_names
+        assert "current_rules_unit_views_for_canonical_identity" not in call_names
+        assert "current_rules_unit_views_for_identity" not in call_names
+        assert "rules_unit_view_by_id" not in call_names
+        assert "unit_placement_by_id" not in call_names
+
+    identity_resolver = _function_node(
+        path=FIGHT_RULES_UNIT_MOVEMENT_TYPES,
+        function_name="rules_unit_views_for_completed_move_event",
+    )
+    resolver_call_names = {
+        node.func.id
+        for node in ast.walk(identity_resolver)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    assert {
+        "current_rules_unit_views_for_canonical_identity",
+        "current_rules_unit_views_for_identity",
+    }.issubset(resolver_call_names)
 
 
 def _function_node(*, path: Path, function_name: str) -> ast.FunctionDef:

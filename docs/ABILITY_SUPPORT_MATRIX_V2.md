@@ -207,7 +207,7 @@ Faction-specific Detachment Rule, Enhancement, and Stratagem rows are split into
 | Death Guard | 9 | 0 | 0 | 9 | 1 | [death-guard](factions/death-guard.md) |
 | Thousand Sons | 9 | 0 | 0 | 9 | 2 | [thousand-sons](factions/thousand-sons.md) |
 | Chaos Knights | 8 | 0 | 0 | 8 | 3 | [chaos-knights](factions/chaos-knights.md) |
-| Chaos Daemons | 9 | 6 | 0 | 3 | 45 | [chaos-daemons](factions/chaos-daemons.md) |
+| Chaos Daemons | 9 | 6 | 0 | 3 | 46 | [chaos-daemons](factions/chaos-daemons.md) |
 | Astra Militarum | 11 | 0 | 0 | 11 | 3 | [astra-militarum](factions/astra-militarum.md) |
 | Adepta Sororitas | 8 | 0 | 0 | 8 | 2 | [adepta-sororitas](factions/adepta-sororitas.md) |
 | Adeptus Mechanicus | 10 | 0 | 0 | 10 | 1 | [adeptus-mechanicus](factions/adeptus-mechanicus.md) |

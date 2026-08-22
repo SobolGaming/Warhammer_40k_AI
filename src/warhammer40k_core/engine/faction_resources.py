@@ -508,6 +508,15 @@ def faction_resource_spend_effect_payload(
     )
 
 
+def validate_faction_resource_spend_effect_payload(effect_payload: JsonValue) -> None:
+    if not isinstance(effect_payload, dict):
+        raise GameLifecycleError("Faction resource spend effect payload must be an object.")
+    _faction_resource_spend_payload(effect_payload)
+    refund_payload = effect_payload.get(FACTION_RESOURCE_REFUND_ROLL_PAYLOAD_KEY)
+    if refund_payload is not None:
+        _faction_resource_refund_roll_descriptor(refund_payload)
+
+
 def apply_faction_resource_spend_effect(
     *,
     state: object,

@@ -36,6 +36,7 @@ from warhammer40k_core.engine.game_state import (
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
 )
@@ -91,6 +92,7 @@ def fight_lifecycle(
     config: GameConfig | None = None,
     battle_phase: BattlePhase = BattlePhase.FIGHT,
     poses_by_unit_key: dict[str, tuple[Pose, ...]] | None = None,
+    alpha_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     resolved_config = (
         fight_config(
@@ -107,6 +109,7 @@ def fight_lifecycle(
             alpha_detachment_ids=alpha_detachment_ids,
             enemy_faction_id=enemy_faction_id,
             enemy_detachment_ids=enemy_detachment_ids,
+            alpha_attachment_declarations=alpha_attachment_declarations,
         )
         if config is None
         else config
@@ -205,6 +208,7 @@ def fight_config(
     alpha_detachment_ids: tuple[str, ...] = ("core-combined-arms",),
     enemy_faction_id: str = "core-marine-force",
     enemy_detachment_ids: tuple[str, ...] = ("core-combined-arms",),
+    alpha_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
 ) -> GameConfig:
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
     return GameConfig(
@@ -226,6 +230,7 @@ def fight_config(
                 unit_specs=alpha_unit_specs,
                 faction_id=alpha_faction_id,
                 detachment_ids=alpha_detachment_ids,
+                attachment_declarations=alpha_attachment_declarations,
             ),
             army_muster_request(
                 catalog=resolved_catalog,
@@ -302,6 +307,7 @@ def army_muster_request(
     unit_specs: dict[str, tuple[str, str, int]] | None = None,
     faction_id: str = "core-marine-force",
     detachment_ids: tuple[str, ...] = ("core-combined-arms",),
+    attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -324,6 +330,7 @@ def army_muster_request(
             )
             for unit_id in unit_selection_ids
         ),
+        attachment_declarations=attachment_declarations,
     )
 
 

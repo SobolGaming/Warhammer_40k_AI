@@ -25,10 +25,16 @@ from warhammer40k_core.core.ruleset_descriptor import (
 )
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
+from warhammer40k_core.engine.charge_declaration import (
+    ChargeRollRequest,
+    ChargeRollResult,
+)
 from warhammer40k_core.engine.decision_controller import DecisionController
 from warhammer40k_core.engine.decision_request import DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
 from warhammer40k_core.engine.game_state import (
     DEFAULT_MAX_LIFECYCLE_TRANSITIONS,
     GameConfig,
@@ -56,11 +62,19 @@ from warhammer40k_core.engine.phase import (
     game_lifecycle_stage_from_token,
     lifecycle_status_kind_from_token,
 )
+from warhammer40k_core.engine.phases.charge import (
+    ChargePhaseState,
+    ChargingUnitSelection,
+)
 from warhammer40k_core.engine.phases.command import (
     TACTICAL_SECONDARY_DRAW_DECISION_TYPE,
     CommandPhaseHandler,
 )
-from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
+from warhammer40k_core.engine.phases.movement import (
+    SELECT_MOVEMENT_UNIT_DECISION_TYPE,
+    MovementPhaseState,
+)
+from warhammer40k_core.engine.phases.shooting import ShootingPhaseState
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
 from warhammer40k_core.engine.setup_completion import SetupCompletionGate
 from warhammer40k_core.engine.setup_flow import SECONDARY_MISSION_DECISION_TYPE
@@ -337,7 +351,11 @@ def _battle_flow() -> BattleRoundFlow:
     )
 
 
-def _battle_state(config: GameConfig | None = None) -> GameState:
+def _battle_state(
+    config: GameConfig | None = None,
+    *,
+    decisions: DecisionController | None = None,
+) -> GameState:
     resolved_config = _config() if config is None else config
     state = GameState.from_config(resolved_config)
     for request in resolved_config.army_muster_requests:
@@ -358,13 +376,116 @@ def _battle_state(config: GameConfig | None = None) -> GameState:
                 fixed_mission_ids=("assassination", "bring_it_down"),
             )
         )
-    decisions = DecisionController()
+    resolved_decisions = DecisionController() if decisions is None else decisions
     _complete_setup_through_gate(
         state=state,
-        decisions=decisions,
+        decisions=resolved_decisions,
         config=resolved_config,
     )
     return state
+
+
+def _battle_lifecycle_for_consistency() -> GameLifecycle:
+    config = _config()
+    decisions = DecisionController()
+    state = _battle_state(config, decisions=decisions)
+    return GameLifecycle.from_payload(
+        cast(
+            GameLifecyclePayload,
+            {
+                "config": config.to_payload(),
+                "parameterized_movement_proposals": True,
+                "state": state.to_payload(),
+                "decisions": decisions.to_payload(),
+                "reaction_queue": {"frames": []},
+            },
+        )
+    )
+
+
+def _phase_state_consistency_payload(
+    *,
+    phase: BattlePhase,
+) -> tuple[GameLifecyclePayload, str, str]:
+    lifecycle = _battle_lifecycle_for_consistency()
+    state = lifecycle.state
+    assert state is not None
+    alpha_unit_id = state.army_definitions[0].units[0].unit_instance_id
+    beta_unit_id = state.army_definitions[1].units[0].unit_instance_id
+    state.battle_phase_index = state.battle_phase_sequence.index(phase)
+    state.replace_command_step_state(None)
+    state.replace_movement_phase_state(None)
+    state.replace_shooting_phase_state(None)
+    state.replace_charge_phase_state(None)
+    state.replace_fight_phase_state(None)
+    if phase is BattlePhase.MOVEMENT:
+        state.replace_movement_phase_state(
+            MovementPhaseState(
+                battle_round=state.battle_round,
+                active_player_id="player-a",
+                selected_unit_ids=(alpha_unit_id,),
+            )
+        )
+    elif phase is BattlePhase.SHOOTING:
+        state.replace_shooting_phase_state(
+            ShootingPhaseState(
+                battle_round=state.battle_round,
+                active_player_id="player-a",
+                selected_unit_ids=(alpha_unit_id,),
+            )
+        )
+    elif phase is BattlePhase.CHARGE:
+        selection = ChargingUnitSelection(
+            player_id="player-a",
+            battle_round=state.battle_round,
+            unit_instance_id=alpha_unit_id,
+            request_id="phase9b-charge-selection-request",
+            result_id="phase9b-charge-selection-result",
+        )
+        roll_request = ChargeRollRequest(
+            request_id="phase9b-charge-roll-request",
+            game_id=state.game_id,
+            battle_round=state.battle_round,
+            player_id="player-a",
+            unit_instance_id=alpha_unit_id,
+            source_decision_request_id=selection.request_id,
+            source_decision_result_id=selection.result_id,
+        )
+        roll_state = DiceRollManager("phase9b-charge-consistency").roll_fixed(
+            roll_request.spec,
+            [3, 4],
+        )
+        roll_result = ChargeRollResult.from_roll_state(
+            request=roll_request,
+            roll_state=roll_state,
+            reachable_target_distances_inches={beta_unit_id: 3.0},
+        )
+        state.replace_charge_phase_state(
+            ChargePhaseState(
+                battle_round=state.battle_round,
+                active_player_id="player-a",
+            )
+            .with_unit_selection(selection)
+            .with_charge_roll_result(roll_result)
+        )
+    elif phase is BattlePhase.FIGHT:
+        state.replace_fight_phase_state(
+            FightPhaseState.start(
+                battle_round=state.battle_round,
+                active_player_id="player-a",
+                policy=lifecycle.config.ruleset_descriptor.fight_policy,
+                engaged_at_fight_step_start_unit_ids=(alpha_unit_id, beta_unit_id),
+                fights_first_registry=FightsFirstRegistry(),
+            )
+        )
+    else:
+        raise AssertionError("Phase consistency fixture requires a non-Command battle phase.")
+    payload = cast(
+        GameLifecyclePayload,
+        json.loads(json.dumps(lifecycle.to_payload(), sort_keys=True)),
+    )
+    assert GameLifecycle.from_payload(payload).to_payload() == payload
+    return payload, alpha_unit_id, beta_unit_id
 
 
 def _complete_setup_through_gate(
@@ -1175,6 +1296,186 @@ def test_lifecycle_from_payload_rejects_config_state_identity_drift() -> None:
     tactical_count_mismatch["state"]["tactical_secondary_draw_count"] = 3
     with pytest.raises(GameLifecycleError, match="tactical secondary draw count"):
         GameLifecycle.from_payload(tactical_count_mismatch)
+
+
+@pytest.mark.parametrize(
+    ("corruption", "expected_message"),
+    [
+        ("wrong_phase", "charge_phase_state requires CHARGE phase"),
+        ("active_player_drift", "charge_phase_state active player drift"),
+        ("battle_round_drift", "charge_phase_state battle round drift"),
+        ("selected_enemy", "selected unit is not active player's unit"),
+        ("roll_unit_not_selected", "roll unit was not selected"),
+        ("unknown_target", "target unit is unknown"),
+        ("friendly_target", "target unit is not an enemy"),
+    ],
+)
+def test_lifecycle_restore_rejects_corrupt_charge_phase_authority(
+    corruption: str,
+    expected_message: str,
+) -> None:
+    payload, alpha_unit_id, beta_unit_id = _phase_state_consistency_payload(
+        phase=BattlePhase.CHARGE
+    )
+    state_payload = payload["state"]
+    charge_payload = cast(dict[str, object], state_payload["charge_phase_state"])
+    selection = cast(dict[str, object], charge_payload["active_selection"])
+    distance_states = cast(list[dict[str, object]], charge_payload["distance_states"])
+    roll_result = cast(dict[str, object], distance_states[0]["roll_result"])
+
+    if corruption == "wrong_phase":
+        state_payload["battle_phase_index"] = state_payload["battle_phase_sequence"].index(
+            BattlePhase.MOVEMENT.value
+        )
+    elif corruption == "active_player_drift":
+        charge_payload["active_player_id"] = "player-b"
+        selection["player_id"] = "player-b"
+    elif corruption == "battle_round_drift":
+        charge_payload["battle_round"] = 2
+        selection["battle_round"] = 2
+    elif corruption == "selected_enemy":
+        charge_payload["selected_unit_ids"] = [alpha_unit_id, beta_unit_id]
+    elif corruption == "roll_unit_not_selected":
+        charge_payload["selected_unit_ids"] = []
+        charge_payload["active_selection"] = None
+    elif corruption == "unknown_target":
+        roll_result["reachable_target_distances_inches"] = {"unknown-target": 3.0}
+    elif corruption == "friendly_target":
+        roll_result["reachable_target_distances_inches"] = {alpha_unit_id: 3.0}
+
+    with pytest.raises(GameLifecycleError, match=expected_message):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("corruption", "expected_message"),
+    [
+        ("wrong_phase", "movement_phase_state requires MOVEMENT phase"),
+        ("active_player_drift", "movement_phase_state active player drift"),
+        ("battle_round_drift", "movement_phase_state battle round drift"),
+        ("selected_enemy", "selected unit is not active player's unit"),
+    ],
+)
+def test_lifecycle_restore_rejects_corrupt_movement_phase_authority(
+    corruption: str,
+    expected_message: str,
+) -> None:
+    payload, _alpha_unit_id, beta_unit_id = _phase_state_consistency_payload(
+        phase=BattlePhase.MOVEMENT
+    )
+    state_payload = payload["state"]
+    movement_payload = cast(dict[str, object], state_payload["movement_phase_state"])
+
+    if corruption == "wrong_phase":
+        state_payload["battle_phase_index"] = state_payload["battle_phase_sequence"].index(
+            BattlePhase.SHOOTING.value
+        )
+    elif corruption == "active_player_drift":
+        movement_payload["active_player_id"] = "player-b"
+    elif corruption == "battle_round_drift":
+        movement_payload["battle_round"] = 2
+    elif corruption == "selected_enemy":
+        movement_payload["selected_unit_ids"] = [beta_unit_id]
+
+    with pytest.raises(GameLifecycleError, match=expected_message):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("corruption", "expected_message"),
+    [
+        ("wrong_phase", "shooting_phase_state requires SHOOTING phase"),
+        ("active_player_drift", "shooting_phase_state active player drift"),
+        ("battle_round_drift", "shooting_phase_state battle round drift"),
+        ("selected_enemy", "selected unit is not active player's unit"),
+    ],
+)
+def test_lifecycle_restore_rejects_corrupt_shooting_phase_authority(
+    corruption: str,
+    expected_message: str,
+) -> None:
+    payload, _alpha_unit_id, beta_unit_id = _phase_state_consistency_payload(
+        phase=BattlePhase.SHOOTING
+    )
+    state_payload = payload["state"]
+    shooting_payload = cast(dict[str, object], state_payload["shooting_phase_state"])
+
+    if corruption == "wrong_phase":
+        state_payload["battle_phase_index"] = state_payload["battle_phase_sequence"].index(
+            BattlePhase.MOVEMENT.value
+        )
+    elif corruption == "active_player_drift":
+        shooting_payload["active_player_id"] = "player-b"
+    elif corruption == "battle_round_drift":
+        shooting_payload["battle_round"] = 2
+    elif corruption == "selected_enemy":
+        shooting_payload["selected_unit_ids"] = [beta_unit_id]
+
+    with pytest.raises(GameLifecycleError, match=expected_message):
+        GameLifecycle.from_payload(payload)
+
+
+@pytest.mark.parametrize(
+    ("corruption", "expected_message"),
+    [
+        ("wrong_phase", "fight_phase_state requires FIGHT phase"),
+        ("active_player_drift", "fight_phase_state active player drift"),
+        ("battle_round_drift", "fight_phase_state battle round drift"),
+        ("next_player_unknown", "next player is not in this game"),
+        ("unit_unknown", "fight_phase_state unit is unknown"),
+        ("passed_player_unknown", "passed player is not in this game"),
+        ("activation_unit_unknown", "activation unit is unknown"),
+        ("activation_player_drift", "activation player drift"),
+    ],
+)
+def test_lifecycle_restore_rejects_corrupt_fight_phase_authority(
+    corruption: str,
+    expected_message: str,
+) -> None:
+    payload, alpha_unit_id, _beta_unit_id = _phase_state_consistency_payload(
+        phase=BattlePhase.FIGHT
+    )
+    state_payload = payload["state"]
+    fight_payload = cast(dict[str, object], state_payload["fight_phase_state"])
+    fight_order = cast(dict[str, object], fight_payload["fight_order_state"])
+
+    if corruption == "wrong_phase":
+        state_payload["battle_phase_index"] = state_payload["battle_phase_sequence"].index(
+            BattlePhase.CHARGE.value
+        )
+    elif corruption == "active_player_drift":
+        fight_payload["active_player_id"] = "player-b"
+    elif corruption == "battle_round_drift":
+        fight_payload["battle_round"] = 2
+    elif corruption == "next_player_unknown":
+        fight_order["next_player_id"] = "player-c"
+    elif corruption == "unit_unknown":
+        fight_order["engaged_at_fight_step_start_unit_ids"] = ["unknown-fight-unit"]
+    elif corruption == "passed_player_unknown":
+        fight_order["passed_player_ids"] = ["player-c"]
+    elif corruption in {"activation_unit_unknown", "activation_player_drift"}:
+        fight_order["activation_selections"] = [
+            {
+                "player_id": (
+                    "player-b" if corruption == "activation_player_drift" else "player-a"
+                ),
+                "battle_round": 1,
+                "unit_instance_id": (
+                    alpha_unit_id
+                    if corruption == "activation_player_drift"
+                    else "unknown-fight-unit"
+                ),
+                "ordering_band": "remaining_combats",
+                "fight_type": "normal",
+                "eligibility_reasons": ["currently_engaged"],
+                "request_id": "phase9b-fight-activation-request",
+                "result_id": "phase9b-fight-activation-result",
+                "interrupt_id": None,
+            }
+        ]
+
+    with pytest.raises(GameLifecycleError, match=expected_message):
+        GameLifecycle.from_payload(payload)
 
 
 def test_lifecycle_from_payload_rejects_mustered_army_state_drift() -> None:

@@ -1044,8 +1044,14 @@ def test_aeldari_sudden_strike_fight_movement_distance_uses_lifecycle_effect() -
 
     completed_event = _last_event_payload(lifecycle, "fight_movement_completed")
     resolution = cast(dict[str, JsonValue], completed_event["resolution"])
+    endpoint_state = _state(lifecycle)
+    assert endpoint_state.battlefield_state is not None
     assert consolidate_status.status_kind is not LifecycleStatusKind.INVALID
     assert completed_event["result_id"] == "phase17g-aeldari-sudden-strike-consolidate"
+    assert completed_event["active_player_id"] == "player-a"
+    assert completed_event["movement_endpoint_placement"] == (
+        endpoint_state.battlefield_state.unit_placement_by_id(_AELDARI_UNIT_ID).to_payload()
+    )
     assert resolution["maximum_distance_inches"] == 6.0
 
 

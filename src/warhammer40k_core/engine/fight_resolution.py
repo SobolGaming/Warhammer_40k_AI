@@ -72,7 +72,7 @@ from warhammer40k_core.engine.fight_geometry import (
     unit_id_for_fight_model as _unit_id_for_model,
 )
 from warhammer40k_core.engine.fight_on_death import (
-    fight_on_death_model_ids_for_activation,
+    fight_on_death_restricted_model_ids_for_activation,
     model_is_present_on_battlefield,
 )
 from warhammer40k_core.engine.movement_legality import MovementLegalityContext
@@ -84,6 +84,11 @@ from warhammer40k_core.engine.movement_proposals import (
     proposal_kind_from_token,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
+from warhammer40k_core.engine.rules_units import (
+    RulesUnitView,
+    rules_unit_identity_ids,
+    rules_unit_view_by_id,
+)
 from warhammer40k_core.engine.runtime_modifiers import (
     RuntimeModifierRegistry,
     WeaponProfileModifierContext,
@@ -1358,7 +1363,7 @@ def available_melee_weapons_payloads(
     restricted_model_ids = (
         None
         if state is None or source_decision_result_id is None
-        else fight_on_death_model_ids_for_activation(
+        else fight_on_death_restricted_model_ids_for_activation(
             state=state,
             activation_result_id=source_decision_result_id,
         )
@@ -1480,6 +1485,7 @@ def validate_melee_declaration_rules(
             declaration=declaration,
             profile=profile,
             scenario=scenario,
+            state=state,
         )
         if attack_allocation_validation is not None:
             return attack_allocation_validation
@@ -1567,6 +1573,7 @@ def melee_attack_sequence_from_proposal(
                 profile=pool_profile,
                 single_target=single_target,
                 target_unit_instance_id=allocation.target_unit_instance_id,
+                state=state,
             )
             attacks = (
                 resolved_attacks + cleave_bonus
@@ -1580,7 +1587,7 @@ def melee_attack_sequence_from_proposal(
                     state=state,
                     unit_instance_id=proposal.unit_instance_id,
                 ),
-                extra_rule_ids=_melee_targeting_permission_sources_for_model_target(
+                extra_rule_ids=melee_targeting_permission_sources_for_model_target(
                     scenario=scenario,
                     target_unit_instance_id=allocation.target_unit_instance_id,
                     attacker_model_instance_id=declaration.attacker_model_instance_id,
@@ -1588,7 +1595,7 @@ def melee_attack_sequence_from_proposal(
                     source_decision_result_id=proposal.source_decision_result_id,
                 ),
             )
-            target_model_ids = _target_model_ids_for_melee_attack(
+            target_model_ids = target_model_ids_for_melee_attack(
                 scenario=scenario,
                 ruleset_descriptor=ruleset_descriptor,
                 unit_instance_id=proposal.unit_instance_id,
@@ -1669,7 +1676,9 @@ def _epic_challenge_profile_if_applicable(
     model_id = _validate_identifier("attacker_model_instance_id", attacker_model_instance_id)
     unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     for effect in state.persisting_effects:
-        if unit_id not in effect.target_unit_instance_ids:
+        if not set(effect.target_unit_instance_ids).intersection(
+            rules_unit_identity_ids(state=state, unit_instance_id=unit_id)
+        ):
             continue
         effect_payload = effect.effect_payload
         if not isinstance(effect_payload, dict):
@@ -1704,7 +1713,10 @@ def _modified_melee_weapon_profile(
             source_phase=BattlePhase.FIGHT,
             attacking_unit_instance_id=attacking_unit_instance_id,
             attacker_model_instance_id=attacker_model_instance_id,
-            target_unit_instance_id=target_unit_instance_id,
+            target_unit_instance_id=rules_unit_view_by_id(
+                state=state,
+                unit_instance_id=target_unit_instance_id,
+            ).unit_instance_id,
             weapon_profile=profile,
         )
     )
@@ -2492,7 +2504,7 @@ def _engaged_model_ids_for_model_and_target_unit_or_empty(
     )
 
 
-def _target_model_ids_for_melee_attack(
+def target_model_ids_for_melee_attack(
     *,
     scenario: BattlefieldScenario,
     ruleset_descriptor: RulesetDescriptor,
@@ -2542,7 +2554,7 @@ def _target_model_ids_for_melee_attack(
     return target_model_ids
 
 
-def _melee_targeting_permission_sources_for_model_target(
+def melee_targeting_permission_sources_for_model_target(
     *,
     scenario: BattlefieldScenario,
     target_unit_instance_id: str,
@@ -2601,7 +2613,9 @@ def _fight_activation_melee_targeting_effects(
     )
     effects: list[_FightActivationMeleeTargetingEffect] = []
     for effect in state.persisting_effects:
-        if requested_unit_id not in effect.target_unit_instance_ids:
+        if not set(effect.target_unit_instance_ids).intersection(
+            rules_unit_identity_ids(state=state, unit_instance_id=requested_unit_id)
+        ):
             continue
         payload = effect.effect_payload
         if not isinstance(payload, dict):
@@ -2767,7 +2781,7 @@ def _available_melee_weapons_for_unit(
     restricted_model_ids = (
         None
         if state is None or source_decision_result_id is None
-        else fight_on_death_model_ids_for_activation(
+        else fight_on_death_restricted_model_ids_for_activation(
             state=state,
             activation_result_id=source_decision_result_id,
         )
@@ -2891,6 +2905,7 @@ def _validate_melee_target_allocation_counts(
     declaration: MeleeWeaponDeclaration,
     profile: WeaponProfile,
     scenario: BattlefieldScenario,
+    state: GameState | None,
 ) -> ProposalValidationResult | None:
     target_count_validation = _validate_melee_target_count_limit(
         request=request,
@@ -2910,6 +2925,7 @@ def _validate_melee_target_allocation_counts(
                 profile=profile,
                 single_target=True,
                 target_unit_instance_id=declaration.target_allocations[0].target_unit_instance_id,
+                state=state,
             )
         if (
             declared_attacks is not None
@@ -2980,12 +2996,21 @@ def _cleave_attack_bonus_for_target(
     profile: WeaponProfile,
     single_target: bool,
     target_unit_instance_id: str,
+    state: GameState | None,
 ) -> int:
-    target_unit = _unit_by_id(scenario=scenario, unit_instance_id=target_unit_instance_id)
+    target_unit = (
+        rules_unit_view_by_id(state=state, unit_instance_id=target_unit_instance_id)
+        if state is not None
+        else _unit_by_id(scenario=scenario, unit_instance_id=target_unit_instance_id)
+    )
     return cleave_attack_bonus(
         profile,
         single_target=single_target,
-        target_model_count=len(target_unit.alive_own_models()),
+        target_model_count=len(
+            target_unit.alive_models()
+            if isinstance(target_unit, RulesUnitView)
+            else target_unit.alive_own_models()
+        ),
         target_keywords=target_unit.keywords,
     )
 
@@ -3015,7 +3040,9 @@ def _unit_made_charge_move(
         return False
     requested_unit_id = _validate_identifier("unit_instance_id", unit_instance_id)
     for effect in state.persisting_effects:
-        if requested_unit_id not in effect.target_unit_instance_ids:
+        if not set(effect.target_unit_instance_ids).intersection(
+            rules_unit_identity_ids(state=state, unit_instance_id=requested_unit_id)
+        ):
             continue
         effect_payload = effect.effect_payload
         if not isinstance(effect_payload, dict):

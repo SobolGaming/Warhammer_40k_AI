@@ -31,6 +31,7 @@ from warhammer40k_core.engine.fight_phase_start_hooks import (
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
+    FightUnitSelectedTimedEffect,
 )
 from warhammer40k_core.engine.game_state import GameState
 from warhammer40k_core.engine.generic_rule_ability_effects import (
@@ -75,6 +76,10 @@ from warhammer40k_core.engine.generic_rule_ability_registry_aeldari_defaults imp
     aeldari_corsair_coterie_stratagem_cost_modifier_abilities,
     aeldari_corsair_coterie_turn_end_abilities,
     aeldari_path_of_the_outcast_enhancement_effect_abilities,
+)
+from warhammer40k_core.engine.generic_rule_ability_registry_blood_legion_defaults import (
+    blood_legion_fight_unit_selected_grant_abilities,
+    blood_legion_mortal_wound_feel_no_pain_abilities,
 )
 from warhammer40k_core.engine.generic_rule_ability_registry_daemonic_incursion_defaults import (
     daemonic_incursion_attack_sequence_completed_abilities,
@@ -436,24 +441,28 @@ def _shadow_legion_fight_dark_pact_grant_builder(
                 unit_instance_id=context.unit_instance_id,
                 extra_context=extra_context,
             ),
-            unit_effect_payload=dark_pacts.dark_pact_effect_payload(
-                unit_instance_id=context.unit_instance_id,
-                target_unit_instance_ids=target_unit_ids,
-                trigger="selected_to_fight",
-                phase=BattlePhase.FIGHT,
-                selected_dark_pact=selected_pact,
-                source_context=generic_rule_ability_source_context_payload(
-                    source=source,
-                    matching_effects=matching_effects,
-                    source_rule_id=_SHADOW_LEGION_SOURCE_RULE_ID,
-                    extra_context=extra_context,
-                ),
-                leadership_test_auto_pass=_rules_unit_is_belakor(
-                    state=context.state,
-                    unit_instance_id=context.unit_instance_id,
+            timed_effects=(
+                FightUnitSelectedTimedEffect(
+                    effect_payload=dark_pacts.dark_pact_effect_payload(
+                        unit_instance_id=context.unit_instance_id,
+                        target_unit_instance_ids=target_unit_ids,
+                        trigger="selected_to_fight",
+                        phase=BattlePhase.FIGHT,
+                        selected_dark_pact=selected_pact,
+                        source_context=generic_rule_ability_source_context_payload(
+                            source=source,
+                            matching_effects=matching_effects,
+                            source_rule_id=_SHADOW_LEGION_SOURCE_RULE_ID,
+                            extra_context=extra_context,
+                        ),
+                        leadership_test_auto_pass=_rules_unit_is_belakor(
+                            state=context.state,
+                            unit_instance_id=context.unit_instance_id,
+                        ),
+                    ),
+                    expiration="end_phase",
                 ),
             ),
-            unit_effect_expiration="end_phase",
         )
 
     return builder
@@ -1309,7 +1318,10 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
         ),
     ),
     shooting_unit_selected_grant_abilities=_shadow_legion_shooting_dark_pact_abilities(),
-    fight_unit_selected_grant_abilities=_shadow_legion_fight_dark_pact_abilities(),
+    fight_unit_selected_grant_abilities=(
+        *_shadow_legion_fight_dark_pact_abilities(),
+        *blood_legion_fight_unit_selected_grant_abilities(),
+    ),
     attack_sequence_completed_abilities=(
         GenericRuleAttackSequenceCompletedAbility(
             ability_ids_value=_SHADOW_LEGION_DARK_PACT_ABILITY_IDS,
@@ -1321,6 +1333,7 @@ DEFAULT_GENERIC_RULE_ABILITY_REGISTRY = GenericRuleAbilityRegistry(
         *daemonic_incursion_attack_sequence_completed_abilities(),
     ),
     mortal_wound_feel_no_pain_abilities=(
+        *blood_legion_mortal_wound_feel_no_pain_abilities(),
         GenericRuleMortalWoundFeelNoPainAbility(
             ability_ids_value=_SHADOW_LEGION_DARK_PACT_ABILITY_IDS,
             coverage_descriptor_id=shadow_legion_ir.SHADOW_LEGION_DETACHMENT_RULE_DESCRIPTOR_ID,

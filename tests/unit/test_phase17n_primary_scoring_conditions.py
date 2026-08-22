@@ -6,6 +6,10 @@ from math import comb
 from typing import Any, cast
 
 import pytest
+from tests.fight_movement_event_helpers import (
+    grouped_fight_movement_resolution_payload,
+    standalone_fight_movement_event_evidence,
+)
 from tests.phase11c_command_phase_helpers import (
     battle_state,
     default_unit_selection,
@@ -72,6 +76,7 @@ from warhammer40k_core.engine.missions import (
     mission_scoring_policies_from_setup,
     primary_scoring_rules_from_definition,
 )
+from warhammer40k_core.engine.movement_proposals import ProposalKind
 from warhammer40k_core.engine.objective_control import (
     ObjectiveControlContext,
     ObjectiveControlContribution,
@@ -3477,84 +3482,7 @@ def test_phase17n_sensor_sweep_removes_policy_scoped_marker_and_tombstones_actio
 
 
 def test_phase17n_surveil_removes_operation_marker_after_heroic_intervention_move() -> None:
-    state = battle_state()
-    state.mission_setup = _phase17n_event_setup(
-        layout_id="disruption-vs-reconnaissance-layout-1",
-        attacker_force_disposition_id="disruption",
-        defender_force_disposition_id="reconnaissance",
-    )
-    state.stage = GameLifecycleStage.BATTLE
-    state.setup_step_index = None
-    state.battle_round = 1
-    state.active_player_id = "player-a"
-    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.CHARGE)
-    assert state.mission_setup.primary_mission_id_for_player("player-b") == (
-        "primary-surveil-the-foe"
-    )
-    assert state.battlefield_state is not None
-    moving_unit = next(
-        unit
-        for army in state.army_definitions
-        if army.player_id == "player-b"
-        for unit in army.units
-    )
-    objective = next(
-        marker
-        for marker in state.mission_setup.objective_markers
-        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
-    )
-    placement = state.battlefield_state.unit_placement_by_id(moving_unit.unit_instance_id)
-    state.battlefield_state = state.battlefield_state.with_unit_placement(
-        with_model_offsets(
-            placement,
-            objective,
-            offsets=((0.0, 0.0), (1.4, 0.0), (2.8, 0.0), (0.0, 1.4), (1.4, 1.4)),
-        )
-    )
-
-    marker_mission_id = state.mission_setup.primary_mission_id_for_player("player-a")
-    marker_source_rule_id = "phase17n-test:operation-marker-source"
-    marker_source_descriptor_id = "phase17n-test:operation-marker-descriptor"
-    marker_source_event_id = "phase17n-test:operation-marker-created"
-    marker = PrimaryMissionMarkerState(
-        marker_id=primary_mission_marker_id(
-            game_id=state.game_id,
-            owner_player_id="player-a",
-            mission_id=marker_mission_id,
-            source_rule_id=marker_source_rule_id,
-            source_descriptor_id=marker_source_descriptor_id,
-            marker_kind=PRIMARY_OPERATION_MARKER_KIND,
-            anchor_kind=MarkerAnchorKind.OBJECTIVE,
-            objective_marker_id=objective.objective_marker_id,
-            terrain_feature_id=None,
-            created_battle_round=1,
-            created_phase=BattlePhase.COMMAND.value,
-            created_active_player_id="player-a",
-            source_event_id=marker_source_event_id,
-            source_result_id=None,
-            source_action_id=None,
-            source_destruction_id=None,
-            source_designation_id=None,
-        ),
-        game_id=state.game_id,
-        owner_player_id="player-a",
-        mission_id=marker_mission_id,
-        source_rule_id=marker_source_rule_id,
-        source_descriptor_id=marker_source_descriptor_id,
-        marker_kind=PRIMARY_OPERATION_MARKER_KIND,
-        anchor_kind=MarkerAnchorKind.OBJECTIVE,
-        objective_marker_id=objective.objective_marker_id,
-        terrain_feature_id=None,
-        created_battle_round=1,
-        created_phase=BattlePhase.COMMAND.value,
-        created_active_player_id="player-a",
-        source_event_id=marker_source_event_id,
-        source_result_id=None,
-        source_action_id=None,
-        source_destruction_id=None,
-        source_designation_id=None,
-    )
-    state.primary_mission_progress_state = state.primary_mission_progress_state.add_marker(marker)
+    state, moving_unit_id, _objective_id = _phase17n_surveil_move_marker_state()
     decisions = DecisionController()
     trigger = decisions.event_log.append(
         "heroic_intervention_charge_move_completed",
@@ -3563,7 +3491,7 @@ def test_phase17n_surveil_removes_operation_marker_after_heroic_intervention_mov
             "player_id": "player-b",
             "battle_round": state.battle_round,
             "phase": BattlePhase.CHARGE.value,
-            "unit_instance_id": moving_unit.unit_instance_id,
+            "unit_instance_id": moving_unit_id,
         },
     )
 
@@ -3587,12 +3515,187 @@ def test_phase17n_surveil_removes_operation_marker_after_heroic_intervention_mov
     assert decisions.event_log.records[-1].event_type == (
         "primary_surveil_move_marker_removal_resolved"
     )
-    assert processed["moving_rules_unit_instance_id"] == moving_unit.unit_instance_id
+    assert processed["moving_rules_unit_instance_id"] == moving_unit_id
     assert processed["removed_primary_mission_markers"] == [removed.to_payload()]
     assert (
         PrimaryMissionProgressState.from_payload(state.primary_mission_progress_state.to_payload())
         == state.primary_mission_progress_state
     )
+    assert EventLog.from_payload(decisions.event_log.to_payload()).to_payload() == (
+        decisions.event_log.to_payload()
+    )
+
+
+def test_phase17n_surveil_normal_move_accepts_attached_component_event_identity() -> None:
+    state, bodyguard_id, objective_id = _phase17n_surveil_move_marker_state()
+    attached_id, component_ids = _phase17n_attach_test_leader(
+        state=state,
+        bodyguard_id=bodyguard_id,
+    )
+    state.active_player_id = "player-b"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.MOVEMENT)
+    decisions = DecisionController()
+    trigger = decisions.event_log.append(
+        "movement_activation_completed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.MOVEMENT.value,
+                "unit_instance_id": bodyguard_id,
+                "movement_phase_action": "normal_move",
+            }
+        ),
+    )
+
+    resolve_surveil_marker_removal_for_completed_moves(
+        state=state,
+        decisions=decisions,
+        completed_phase=BattlePhase.MOVEMENT,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+
+    removed = state.primary_mission_progress_state.markers[0]
+    assert removed.status is PrimaryMissionMarkerStatus.REMOVED
+    assert removed.objective_marker_id == objective_id
+    assert removed.removal_event_id == trigger.event_id
+    processed = cast(dict[str, JsonValue], decisions.event_log.records[-1].payload)
+    assert processed["moving_rules_unit_instance_id"] == attached_id
+    witness = cast(
+        dict[str, JsonValue],
+        processed["moving_rules_unit_objective_proximity_witness"],
+    )
+    assert witness["rules_unit_instance_id"] == attached_id
+    assert witness["component_unit_instance_ids"] == list(component_ids)
+
+
+def test_phase17n_surveil_uses_standalone_fight_event_time_endpoint() -> None:
+    state, moving_unit_id, objective_id = _phase17n_surveil_move_marker_state()
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    assert state.battlefield_state is not None
+    endpoint = state.battlefield_state.unit_placement_by_id(moving_unit_id)
+    before = replace(
+        endpoint,
+        model_placements=tuple(
+            replace(
+                placement,
+                pose=Pose.at(
+                    placement.pose.position.x - 0.5,
+                    placement.pose.position.y,
+                    placement.pose.position.z,
+                    facing_degrees=placement.pose.facing.degrees,
+                ),
+            )
+            for placement in endpoint.model_placements
+        ),
+    )
+    decisions = DecisionController()
+    trigger = decisions.event_log.append(
+        "fight_movement_completed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "unit_instance_id": moving_unit_id,
+                **standalone_fight_movement_event_evidence(
+                    before=before,
+                    attempted=endpoint,
+                ),
+            }
+        ),
+    )
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        replace(
+            endpoint,
+            model_placements=tuple(
+                replace(
+                    placement,
+                    pose=Pose.at(
+                        2.0 + (index * 0.4),
+                        2.0,
+                        placement.pose.position.z,
+                        facing_degrees=placement.pose.facing.degrees,
+                    ),
+                )
+                for index, placement in enumerate(endpoint.model_placements)
+            ),
+        )
+    )
+
+    resolve_surveil_marker_removal_for_completed_moves(
+        state=state,
+        decisions=decisions,
+        completed_phase=BattlePhase.FIGHT,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+
+    removed = state.primary_mission_progress_state.markers[0]
+    assert removed.status is PrimaryMissionMarkerStatus.REMOVED
+    assert removed.objective_marker_id == objective_id
+    assert removed.removal_event_id == trigger.event_id
+
+
+def test_phase17n_surveil_uses_historical_attached_fight_move_endpoint() -> None:
+    state, bodyguard_id, objective_id = _phase17n_surveil_move_marker_state()
+    attached_id, component_ids = _phase17n_attach_test_leader(
+        state=state,
+        bodyguard_id=bodyguard_id,
+    )
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.FIGHT)
+    assert state.battlefield_state is not None
+    event_endpoint = tuple(
+        state.battlefield_state.unit_placement_by_id(component_id) for component_id in component_ids
+    )
+    decisions = DecisionController()
+    trigger = decisions.event_log.append(
+        "fight_movement_completed",
+        validate_json_value(
+            {
+                "game_id": state.game_id,
+                "battle_round": state.battle_round,
+                "active_player_id": state.active_player_id,
+                "phase": BattlePhase.FIGHT.value,
+                "unit_instance_id": attached_id,
+                "proposal_kind": ProposalKind.PILE_IN.value,
+                "transition_batch": {
+                    "placements": [],
+                    "displacements": [],
+                    "removals": [],
+                },
+                "resolution": grouped_fight_movement_resolution_payload(
+                    rules_unit_instance_id=attached_id,
+                    before_component_placements=event_endpoint,
+                ),
+            }
+        ),
+    )
+    _phase17n_split_attached_test_unit_and_move_components_away(
+        state=state,
+        component_ids=component_ids,
+    )
+
+    resolve_surveil_marker_removal_for_completed_moves(
+        state=state,
+        decisions=decisions,
+        completed_phase=BattlePhase.FIGHT,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+
+    removed = state.primary_mission_progress_state.markers[0]
+    assert removed.status is PrimaryMissionMarkerStatus.REMOVED
+    assert removed.objective_marker_id == objective_id
+    assert removed.removal_event_id == trigger.event_id
+    processed = cast(dict[str, JsonValue], decisions.event_log.records[-1].payload)
+    assert processed["moving_rules_unit_instance_id"] == attached_id
+    witness = cast(
+        dict[str, JsonValue],
+        processed["moving_rules_unit_objective_proximity_witness"],
+    )
+    assert witness["rules_unit_instance_id"] == attached_id
+    assert witness["component_unit_instance_ids"] == list(component_ids)
     assert EventLog.from_payload(decisions.event_log.to_payload()).to_payload() == (
         decisions.event_log.to_payload()
     )
@@ -6441,6 +6544,187 @@ def _phase17n_set_model_wounds(
         )
         for army in state.army_definitions
     ]
+
+
+def _phase17n_surveil_move_marker_state() -> tuple[GameState, str, str]:
+    state = battle_state()
+    state.mission_setup = _phase17n_event_setup(
+        layout_id="disruption-vs-reconnaissance-layout-1",
+        attacker_force_disposition_id="disruption",
+        defender_force_disposition_id="reconnaissance",
+    )
+    state.stage = GameLifecycleStage.BATTLE
+    state.setup_step_index = None
+    state.battle_round = 1
+    state.active_player_id = "player-a"
+    state.battle_phase_index = state.battle_phase_sequence.index(BattlePhase.CHARGE)
+    assert state.mission_setup.primary_mission_id_for_player("player-b") == (
+        "primary-surveil-the-foe"
+    )
+    assert state.battlefield_state is not None
+    moving_unit = next(
+        unit
+        for army in state.army_definitions
+        if army.player_id == "player-b"
+        for unit in army.units
+    )
+    objective = next(
+        marker
+        for marker in state.mission_setup.objective_markers
+        if marker.objective_role is ObjectiveMarkerRole.CENTRAL
+    )
+    placement = state.battlefield_state.unit_placement_by_id(moving_unit.unit_instance_id)
+    state.battlefield_state = state.battlefield_state.with_unit_placement(
+        with_model_offsets(
+            placement,
+            objective,
+            offsets=((0.0, 0.0), (1.4, 0.0), (2.8, 0.0), (0.0, 1.4), (1.4, 1.4)),
+        )
+    )
+    marker_mission_id = state.mission_setup.primary_mission_id_for_player("player-a")
+    marker_source_rule_id = "phase17n-test:operation-marker-source"
+    marker_source_descriptor_id = "phase17n-test:operation-marker-descriptor"
+    marker_source_event_id = "phase17n-test:operation-marker-created"
+    marker = PrimaryMissionMarkerState(
+        marker_id=primary_mission_marker_id(
+            game_id=state.game_id,
+            owner_player_id="player-a",
+            mission_id=marker_mission_id,
+            source_rule_id=marker_source_rule_id,
+            source_descriptor_id=marker_source_descriptor_id,
+            marker_kind=PRIMARY_OPERATION_MARKER_KIND,
+            anchor_kind=MarkerAnchorKind.OBJECTIVE,
+            objective_marker_id=objective.objective_marker_id,
+            terrain_feature_id=None,
+            created_battle_round=1,
+            created_phase=BattlePhase.COMMAND.value,
+            created_active_player_id="player-a",
+            source_event_id=marker_source_event_id,
+            source_result_id=None,
+            source_action_id=None,
+            source_destruction_id=None,
+            source_designation_id=None,
+        ),
+        game_id=state.game_id,
+        owner_player_id="player-a",
+        mission_id=marker_mission_id,
+        source_rule_id=marker_source_rule_id,
+        source_descriptor_id=marker_source_descriptor_id,
+        marker_kind=PRIMARY_OPERATION_MARKER_KIND,
+        anchor_kind=MarkerAnchorKind.OBJECTIVE,
+        objective_marker_id=objective.objective_marker_id,
+        terrain_feature_id=None,
+        created_battle_round=1,
+        created_phase=BattlePhase.COMMAND.value,
+        created_active_player_id="player-a",
+        source_event_id=marker_source_event_id,
+        source_result_id=None,
+        source_action_id=None,
+        source_destruction_id=None,
+        source_designation_id=None,
+    )
+    state.primary_mission_progress_state = state.primary_mission_progress_state.add_marker(marker)
+    return state, moving_unit.unit_instance_id, objective.objective_marker_id
+
+
+def _phase17n_attach_test_leader(
+    *,
+    state: GameState,
+    bodyguard_id: str,
+) -> tuple[str, tuple[str, ...]]:
+    army = next(army for army in state.army_definitions if army.player_id == "player-b")
+    bodyguard = next(unit for unit in army.units if unit.unit_instance_id == bodyguard_id)
+    leader_id = f"{army.army_id}:phase17n-surveil-leader"
+    leader = replace(
+        bodyguard,
+        unit_instance_id=leader_id,
+        name="Phase 17N Surveil Leader",
+        own_models=tuple(
+            replace(
+                model,
+                model_instance_id=f"{leader_id}:model-{index:03d}",
+                name=f"Phase 17N Surveil Leader {index}",
+            )
+            for index, model in enumerate(bodyguard.own_models, start=1)
+        ),
+    )
+    attached_id = f"attached-unit:{army.army_id}:phase17n-surveil-unit"
+    component_ids = tuple(sorted((bodyguard_id, leader_id)))
+    formation = AttachedUnitFormation(
+        attached_unit_instance_id=attached_id,
+        bodyguard_unit_instance_id=bodyguard_id,
+        leader_unit_instance_ids=(leader_id,),
+        component_unit_instance_ids=component_ids,
+        source_id="phase17n-surveil-attached-source",
+        attachment_source_ids=("phase17n-surveil-leader-source",),
+    )
+    state.army_definitions = [
+        replace(candidate, units=(*candidate.units, leader), attached_units=(formation,))
+        if candidate.player_id == "player-b"
+        else candidate
+        for candidate in state.army_definitions
+    ]
+    state.starting_attached_unit_records = [
+        *state.starting_attached_unit_records,
+        StartingAttachedUnitRecord.from_formation(
+            player_id="player-b",
+            attached_unit=formation,
+            unit_by_id={unit.unit_instance_id: unit for unit in (*army.units, leader)},
+        ),
+    ]
+    assert state.battlefield_state is not None
+    bodyguard_placement = state.battlefield_state.unit_placement_by_id(bodyguard_id)
+    leader_placement = replace(
+        bodyguard_placement,
+        unit_instance_id=leader_id,
+        model_placements=tuple(
+            replace(
+                placement,
+                unit_instance_id=leader_id,
+                model_instance_id=leader.own_models[index].model_instance_id,
+                pose=Pose.at(
+                    placement.pose.position.x,
+                    placement.pose.position.y + 4.0,
+                    placement.pose.position.z,
+                    facing_degrees=placement.pose.facing.degrees,
+                ),
+            )
+            for index, placement in enumerate(bodyguard_placement.model_placements)
+        ),
+    )
+    state.battlefield_state = state.battlefield_state.with_added_unit_placement(leader_placement)
+    return attached_id, component_ids
+
+
+def _phase17n_split_attached_test_unit_and_move_components_away(
+    *,
+    state: GameState,
+    component_ids: tuple[str, ...],
+) -> None:
+    state.army_definitions = [
+        replace(army, attached_units=()) if army.player_id == "player-b" else army
+        for army in state.army_definitions
+    ]
+    assert state.battlefield_state is not None
+    for component_index, component_id in enumerate(component_ids):
+        placement = state.battlefield_state.unit_placement_by_id(component_id)
+        state.battlefield_state = state.battlefield_state.with_unit_placement(
+            replace(
+                placement,
+                model_placements=tuple(
+                    replace(
+                        model_placement,
+                        pose=Pose.at(
+                            2.0 + component_index + (model_index * 0.4),
+                            2.0,
+                            model_placement.pose.position.z,
+                            facing_degrees=model_placement.pose.facing.degrees,
+                        ),
+                    )
+                    for model_index, model_placement in enumerate(placement.model_placements)
+                ),
+            )
+        )
 
 
 def _phase17n_surveil_integrity_fixture() -> tuple[GameState, DecisionController]:

@@ -26,21 +26,30 @@ from warhammer40k_core.core.ruleset_descriptor import (
     MovementMode,
     RulesetDescriptor,
 )
+from warhammer40k_core.core.weapon_profiles import WeaponKeyword
 from warhammer40k_core.engine.army_mustering import ArmyDefinition, ArmyMusterRequest, muster_army
 from warhammer40k_core.engine.attack_sequence import (
     ATTACK_ALLOCATION_DECISION_TYPES,
     ATTACK_RESOLUTION_SELECTION_DECISION_TYPES,
 )
-from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
+from warhammer40k_core.engine.battlefield_state import (
+    BattlefieldScenario,
+    ModelPlacement,
+    UnitPlacement,
+)
 from warhammer40k_core.engine.catalog_rule_consumption import (
     record_core_fights_first_source_for_unit,
 )
 from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.decision_controller import DecisionController
-from warhammer40k_core.engine.decision_request import DecisionOption, DecisionRequest
+from warhammer40k_core.engine.decision_request import DecisionError, DecisionOption, DecisionRequest
 from warhammer40k_core.engine.decision_result import DecisionResult
+from warhammer40k_core.engine.dice import DiceRollManager
 from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
 from warhammer40k_core.engine.event_log import JsonValue
+from warhammer40k_core.engine.fight_eligibility_queries import (
+    unit_was_selected_to_fight_this_phase,
+)
 from warhammer40k_core.engine.fight_order import (
     CHARGE_FIGHTS_FIRST_EFFECT_KIND,
     DECLINE_FIGHT_INTERRUPT_OPTION_ID,
@@ -56,14 +65,27 @@ from warhammer40k_core.engine.fight_order import (
     FightsFirstRegistry,
     FightsFirstSource,
     ResolvedFightInterrupt,
+    current_fight_activation_selection_from_payload,
+    eligible_fight_contexts_for_player,
     fight_activation_option_id,
+    fight_eligibility_reasons_for_unit,
+    unit_is_currently_engaged,
 )
 from warhammer40k_core.engine.fight_resolution import (
     CONSOLIDATE_ACTION,
     PILE_IN_ACTION,
     SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
     FightMovementProposal,
+    MeleeDeclarationProposal,
     MeleeDeclarationProposalRequest,
+    MeleeTargetAllocation,
+    MeleeWeaponDeclaration,
+)
+from warhammer40k_core.engine.fight_rules_unit_melee import (
+    rules_unit_available_melee_weapons_payloads,
+    rules_unit_melee_attack_sequence_from_proposal,
+    rules_unit_melee_target_unit_ids,
+    validate_rules_unit_melee_declaration,
 )
 from warhammer40k_core.engine.game_state import (
     GameConfig,
@@ -73,6 +95,7 @@ from warhammer40k_core.engine.game_state import (
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle, GameLifecyclePayload
 from warhammer40k_core.engine.list_validation import (
+    AttachmentDeclaration,
     DetachmentSelection,
     UnitMusterSelection,
 )
@@ -98,6 +121,8 @@ from warhammer40k_core.engine.phases.fight import (
 )
 from warhammer40k_core.engine.phases.movement import SELECT_MOVEMENT_UNIT_DECISION_TYPE
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
+from warhammer40k_core.engine.runtime_modifiers import RuntimeModifierRegistry
 from warhammer40k_core.engine.stratagems import (
     DECLINE_STRATAGEM_WINDOW_OPTION_ID,
     STRATAGEM_DECISION_TYPE,
@@ -177,6 +202,372 @@ def test_fight_phase_exposes_source_steps_and_records_json_safe_activation() -> 
         FIGHT_ACTIVATION_DECISION_TYPE
     )
     assert GameLifecycle.from_payload(lifecycle_payload).to_payload() == lifecycle_payload
+
+
+def test_attached_rules_unit_fight_order_uses_one_canonical_identity() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("bodyguard", "leader"),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "bodyguard": Pose.at(10.0, 20.0),
+            "leader": Pose.at(10.0, 22.0),
+            "enemy": Pose.at(13.0, 20.0),
+        },
+        game_id="phase15c-attached-canonical-identity",
+        fights_first_unit_keys=("leader",),
+        alpha_unit_specs={
+            "leader": ("core-character-leader", "core-character-leader", 1),
+        },
+        alpha_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader",
+                bodyguard_unit_selection_id="bodyguard",
+            ),
+        ),
+    )
+    state_before_fight = _state(lifecycle)
+    multi_component_effect_id = "phase15c:attached-components:fights-first"
+    state_before_fight.record_persisting_effect(
+        PersistingEffect(
+            effect_id=multi_component_effect_id,
+            source_rule_id="phase15c:attached-components:fights-first",
+            owner_player_id="player-a",
+            target_unit_instance_ids=tuple(
+                sorted(
+                    (
+                        units["bodyguard"].unit_instance_id,
+                        units["leader"].unit_instance_id,
+                    )
+                )
+            ),
+            started_battle_round=state_before_fight.battle_round,
+            started_phase=BattlePhaseKind.CHARGE,
+            expiration=EffectExpiration.end_turn(
+                battle_round=state_before_fight.battle_round,
+                player_id="player-a",
+            ),
+            effect_payload={"effect_kind": FIGHTS_FIRST_EFFECT_KIND},
+        )
+    )
+
+    request = _advance_to_fight_order_request(lifecycle)
+    state = _state(lifecycle)
+    fight_state = state.fight_phase_state
+    source_army = state.army_definition_for_player("player-a")
+    assert fight_state is not None
+    assert source_army is not None
+    attached_unit = source_army.attached_units[0]
+    attached_id = attached_unit.attached_unit_instance_id
+    component_ids = attached_unit.component_unit_instance_ids
+    policy = state.runtime_ruleset_descriptor().fight_policy
+    canonical_option_id = fight_activation_option_id(
+        unit_instance_id=attached_id,
+        fight_type=FightTypeKind.NORMAL,
+    )
+    canonical_option = request.option_by_id(canonical_option_id)
+    selection_result = DecisionResult.for_request(
+        result_id="phase15c-attached-canonical-selection",
+        request=request,
+        selected_option_id=canonical_option_id,
+    )
+    selection = current_fight_activation_selection_from_payload(
+        result_payload=selection_result.payload,
+        request_id=selection_result.request_id,
+        result_id=selection_result.result_id,
+    )
+
+    assert _request_unit_ids(request) == [attached_id]
+    assert cast(dict[str, JsonValue], canonical_option.payload)["unit_instance_id"] == attached_id
+    assert all(
+        fight_activation_option_id(
+            unit_instance_id=component_id,
+            fight_type=FightTypeKind.NORMAL,
+        )
+        not in _request_option_ids(request)
+        for component_id in component_ids
+    )
+    for component_id in component_ids:
+        with pytest.raises(DecisionError, match="finite action space"):
+            FiniteOptionSubmission(
+                request_id=request.request_id,
+                selected_option_id=fight_activation_option_id(
+                    unit_instance_id=component_id,
+                    fight_type=FightTypeKind.NORMAL,
+                ),
+                result_id=f"phase15c-component-selection:{component_id}",
+            ).to_result(request)
+    assert {
+        source.unit_instance_id
+        for source in fight_state.fight_order_state.fights_first_registry.sources
+        if source.effect_kind == FIGHTS_FIRST_EFFECT_KIND
+    } == {attached_id}
+    assert (
+        sum(
+            source.effect_id == multi_component_effect_id
+            for source in fight_state.fight_order_state.fights_first_registry.sources
+        )
+        == 1
+    )
+    assert attached_id in fight_state.fight_order_state.engaged_at_fight_step_start_unit_ids
+    assert not set(component_ids).intersection(
+        fight_state.fight_order_state.engaged_at_fight_step_start_unit_ids
+    )
+    assert selection.unit_instance_id == attached_id
+    assert {
+        fight_eligibility_reasons_for_unit(
+            state=state,
+            fight_state=fight_state,
+            unit_instance_id=component_id,
+            policy=policy,
+        )
+        for component_id in component_ids
+    } == {selection.eligibility_reasons}
+    assert all(
+        unit_is_currently_engaged(state=state, unit_instance_id=component_id)
+        for component_id in component_ids
+    )
+
+    status = _submit_option(
+        lifecycle,
+        request=request,
+        option_id=canonical_option_id,
+        result_id=selection_result.result_id,
+    )
+    activated_fight_state = state.fight_phase_state
+    activation_event = _last_event_payload(lifecycle, "fight_activation_selected")
+    activation_payload = cast(dict[str, JsonValue], activation_event["activation_selection"])
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert activated_fight_state is not None
+    assert activated_fight_state.fight_order_state.selected_to_fight_unit_ids == (attached_id,)
+    assert activated_fight_state.fight_order_state.activation_selections[0].unit_instance_id == (
+        attached_id
+    )
+    assert activation_payload["unit_instance_id"] == attached_id
+    assert all(
+        unit_was_selected_to_fight_this_phase(
+            state=state,
+            fight_state=activated_fight_state,
+            unit_instance_id=component_id,
+        )
+        for component_id in component_ids
+    )
+
+
+def test_attached_target_identity_preserves_model_scoped_melee_evidence() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("bodyguard", "leader"),
+        enemy_unit_ids=("attacker",),
+        origins={
+            "bodyguard": Pose.at(10.0, 20.0),
+            "leader": Pose.at(10.0, 23.0),
+            "attacker": Pose.at(7.7, 20.0),
+        },
+        game_id="phase15c-attached-target-model-evidence",
+        alpha_unit_specs={
+            "leader": ("core-character-leader", "core-character-leader", 1),
+        },
+        enemy_unit_specs={
+            "attacker": ("core-character-leader", "core-character-leader", 1),
+        },
+        alpha_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader",
+                bodyguard_unit_selection_id="bodyguard",
+            ),
+        ),
+    )
+    state = _state(lifecycle)
+    battlefield = state.battlefield_state
+    assert battlefield is not None
+    scenario = BattlefieldScenario(
+        armies=tuple(state.army_definitions),
+        battlefield_state=battlefield,
+    )
+    ruleset = state.runtime_ruleset_descriptor()
+    attacker = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=units["attacker"].unit_instance_id,
+    )
+    target = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=units["bodyguard"].unit_instance_id,
+    )
+    target_ids = rules_unit_melee_target_unit_ids(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        rules_unit=attacker,
+        state=state,
+    )
+    available = rules_unit_available_melee_weapons_payloads(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        rules_unit=attacker,
+        army_catalog=lifecycle.config.army_catalog,
+        state=state,
+        source_decision_result_id="phase15c-model-evidence-source-result",
+    )
+    available_row = next(
+        row
+        for row in available
+        if isinstance(row, dict)
+        and target.unit_instance_id in cast(list[str], row["engaged_target_unit_instance_ids"])
+    )
+    attacker_model_id = cast(str, available_row["model_instance_id"])
+    request = MeleeDeclarationProposalRequest(
+        request_id="phase15c-model-evidence-request",
+        actor_id=attacker.owner_player_id,
+        game_id=state.game_id,
+        battle_round=state.battle_round,
+        active_player_id="player-a",
+        unit_instance_id=attacker.unit_instance_id,
+        source_decision_request_id="phase15c-model-evidence-source-request",
+        source_decision_result_id="phase15c-model-evidence-source-result",
+        ruleset_descriptor_hash=ruleset.descriptor_hash,
+        available_weapons=available,
+        target_unit_instance_ids=target_ids,
+    )
+    proposal = MeleeDeclarationProposal(
+        proposal_request_id=request.request_id,
+        proposal_kind=request.proposal_kind,
+        player_id=request.actor_id,
+        battle_round=request.battle_round,
+        unit_instance_id=request.unit_instance_id,
+        source_decision_request_id=request.source_decision_request_id,
+        source_decision_result_id=request.source_decision_result_id,
+        declarations=(
+            MeleeWeaponDeclaration(
+                attacker_model_instance_id=attacker_model_id,
+                wargear_id=cast(str, available_row["wargear_id"]),
+                weapon_profile_id=cast(str, available_row["weapon_profile_id"]),
+                target_allocations=(MeleeTargetAllocation(target.unit_instance_id),),
+            ),
+        ),
+    )
+    state.record_persisting_effect(
+        PersistingEffect(
+            effect_id="phase15c-model-evidence-precision",
+            source_rule_id="test:phase15c:model-evidence:precision",
+            owner_player_id=attacker.owner_player_id,
+            target_unit_instance_ids=(attacker.unit_instance_id,),
+            started_battle_round=state.battle_round,
+            started_phase=BattlePhaseKind.FIGHT,
+            expiration=EffectExpiration.end_turn(
+                battle_round=state.battle_round,
+                player_id=attacker.owner_player_id,
+            ),
+            effect_payload={
+                "effect_kind": "epic_challenge_precision",
+                "model_instance_id": attacker_model_id,
+            },
+        )
+    )
+
+    validation = validate_rules_unit_melee_declaration(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        request=request,
+        proposal=proposal,
+        army_catalog=lifecycle.config.army_catalog,
+        state=state,
+    )
+    sequence = rules_unit_melee_attack_sequence_from_proposal(
+        scenario=scenario,
+        ruleset_descriptor=ruleset,
+        proposal=proposal,
+        army_catalog=lifecycle.config.army_catalog,
+        dice_manager=DiceRollManager("phase15c-attached-target-model-evidence"),
+        sequence_id="phase15c-attached-target-model-evidence-sequence",
+        state=state,
+        runtime_modifier_registry=RuntimeModifierRegistry.empty(),
+    )
+    pool = sequence.attack_pools[0]
+    bodyguard_model_id = units["bodyguard"].own_models[0].model_instance_id
+    leader_model_id = units["leader"].own_models[0].model_instance_id
+
+    assert validation.is_valid
+    assert target.is_attached_rules_unit
+    assert target_ids == (target.unit_instance_id,)
+    assert pool.target_unit_instance_id == target.unit_instance_id
+    assert WeaponKeyword.PRECISION in pool.weapon_profile.keywords
+    assert pool.target_visible_model_ids == (bodyguard_model_id,)
+    assert pool.target_in_range_model_ids == (bodyguard_model_id,)
+    assert leader_model_id not in pool.target_visible_model_ids
+
+
+def test_attached_rules_unit_split_components_remain_consumed_after_canonical_selection() -> None:
+    lifecycle, _units = _fight_lifecycle(
+        alpha_unit_ids=("bodyguard", "leader"),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "bodyguard": Pose.at(10.0, 20.0),
+            "leader": Pose.at(10.0, 22.0),
+            "enemy": Pose.at(13.0, 20.0),
+        },
+        game_id="phase15c-attached-split-consumed",
+        fights_first_unit_keys=("leader",),
+        alpha_unit_specs={
+            "leader": ("core-character-leader", "core-character-leader", 1),
+        },
+        alpha_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader",
+                bodyguard_unit_selection_id="bodyguard",
+            ),
+        ),
+    )
+    request = _advance_to_fight_order_request(lifecycle)
+    state = _state(lifecycle)
+    fight_state = state.fight_phase_state
+    source_army = state.army_definition_for_player("player-a")
+    assert fight_state is not None
+    assert source_army is not None
+    attached_unit = source_army.attached_units[0]
+    attached_id = attached_unit.attached_unit_instance_id
+    component_ids = attached_unit.component_unit_instance_ids
+    option_id = fight_activation_option_id(
+        unit_instance_id=attached_id,
+        fight_type=FightTypeKind.NORMAL,
+    )
+    result = DecisionResult.for_request(
+        result_id="phase15c-attached-split-selection",
+        request=request,
+        selected_option_id=option_id,
+    )
+    selection = current_fight_activation_selection_from_payload(
+        result_payload=result.payload,
+        request_id=result.request_id,
+        result_id=result.result_id,
+    )
+    selected_state = fight_state.with_activation(selection)
+    state.replace_fight_phase_state(selected_state)
+
+    state.recover_starting_strength_after_attached_unit_split(
+        player_id="player-a",
+        attached_unit_instance_id=attached_id,
+        surviving_unit_instance_ids=component_ids,
+        event_log=lifecycle.decision_controller.event_log,
+    )
+    contexts = eligible_fight_contexts_for_player(
+        state=state,
+        fight_state=selected_state,
+        player_id="player-a",
+        policy=state.runtime_ruleset_descriptor().fight_policy,
+    )
+
+    assert selected_state.fight_order_state.selected_to_fight_unit_ids == (attached_id,)
+    assert selected_state.fight_order_state.activation_selections == (selection,)
+    split_army = state.army_definition_for_player("player-a")
+    assert split_army is not None
+    assert split_army.attached_units == ()
+    assert contexts == ()
+    assert all(
+        unit_was_selected_to_fight_this_phase(
+            state=state,
+            fight_state=selected_state,
+            unit_instance_id=component_id,
+        )
+        for component_id in component_ids
+    )
 
 
 def test_phase15f_fight_completion_gate_runs_for_both_players() -> None:
@@ -464,7 +855,7 @@ def test_phase15d_fight_activation_prevalidation_rejects_stale_eligible_pass_pay
 
 
 def test_phase15d_lifecycle_rejects_malformed_and_invalid_fight_movement_submission() -> None:
-    lifecycle, _units = _fight_lifecycle(
+    lifecycle, units = _fight_lifecycle(
         alpha_unit_ids=("attacker",),
         enemy_unit_ids=("enemy",),
         origins={
@@ -486,6 +877,28 @@ def test_phase15d_lifecycle_rejects_malformed_and_invalid_fight_movement_submiss
             result_id="phase15d-malformed-fight-movement",
             payload=cast(JsonValue, {}),
         ).to_result(request)
+    )
+    duplicate_target_status = _submit_fight_movement_proposal(
+        lifecycle,
+        request=request,
+        proposal=FightMovementProposal(
+            proposal_request_id=proposal_request.request_id,
+            proposal_kind=ProposalKind.PILE_IN,
+            unit_instance_id=proposal_request.unit_instance_id,
+            movement_phase_action=PILE_IN_ACTION,
+            movement_mode=MovementMode.PILE_IN,
+            pile_in_target_unit_instance_ids=(
+                units["enemy"].unit_instance_id,
+                units["enemy"].unit_instance_id,
+            ),
+            witness=_fight_movement_witness_for_unit(
+                lifecycle=lifecycle,
+                unit=units["attacker"],
+                dx=0.25,
+                endpoint_only=False,
+            ),
+        ),
+        result_id="phase15d-duplicated-pile-in-target",
     )
     missing_witness_status = lifecycle.submit_decision(
         ParameterizedSubmission(
@@ -527,6 +940,15 @@ def test_phase15d_lifecycle_rejects_malformed_and_invalid_fight_movement_submiss
         malformed_payload["proposal_validation"],
     )
     malformed_violations = cast(list[dict[str, object]], malformed_validation["violations"])
+    duplicate_target_payload = cast(dict[str, object], duplicate_target_status.payload)
+    duplicate_target_validation = cast(
+        dict[str, object],
+        duplicate_target_payload["proposal_validation"],
+    )
+    duplicate_target_violations = cast(
+        list[dict[str, object]],
+        duplicate_target_validation["violations"],
+    )
     missing_witness_payload = cast(dict[str, object], missing_witness_status.payload)
     missing_witness_validation = cast(
         dict[str, object],
@@ -546,6 +968,12 @@ def test_phase15d_lifecycle_rejects_malformed_and_invalid_fight_movement_submiss
     assert request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
     assert malformed_status.status_kind is LifecycleStatusKind.INVALID
     assert malformed_violations[0]["violation_code"] == "proposal_payload_missing_field"
+    assert duplicate_target_status.status_kind is LifecycleStatusKind.INVALID
+    assert duplicate_target_violations[0] == {
+        "violation_code": "fight_movement_target_ids_duplicated",
+        "message": "Fight movement target unit IDs must be unique.",
+        "field": "pile_in_target_unit_instance_ids",
+    }
     assert missing_witness_status.status_kind is LifecycleStatusKind.INVALID
     assert missing_witness_violations[0]["violation_code"] == "fight_movement_witness_required"
     assert stale_status.status_kind is LifecycleStatusKind.INVALID
@@ -659,6 +1087,37 @@ def test_phase15d_over_distance_consolidate_records_rejected_attempt_and_retries
             endpoint_only=False,
         ),
     )
+
+    duplicate_target_status = _submit_fight_movement_proposal(
+        lifecycle,
+        request=request,
+        proposal=replace(
+            proposal,
+            consolidate_target_unit_instance_ids=(
+                units["enemy"].unit_instance_id,
+                units["enemy"].unit_instance_id,
+            ),
+        ),
+        result_id="phase15d-duplicated-consolidate-target",
+    )
+    duplicate_target_payload = cast(dict[str, object], duplicate_target_status.payload)
+    duplicate_target_validation = cast(
+        dict[str, object],
+        duplicate_target_payload["proposal_validation"],
+    )
+    duplicate_target_violations = cast(
+        list[dict[str, object]],
+        duplicate_target_validation["violations"],
+    )
+
+    assert duplicate_target_status.status_kind is LifecycleStatusKind.INVALID
+    assert duplicate_target_violations[0] == {
+        "violation_code": "fight_movement_target_ids_duplicated",
+        "message": "Fight movement target unit IDs must be unique.",
+        "field": "consolidate_target_unit_instance_ids",
+    }
+    assert lifecycle.decision_controller.to_payload()["records"] == []
+    assert lifecycle.decision_controller.queue.pending_requests == (request,)
 
     status = _submit_fight_movement_proposal(
         lifecycle,
@@ -1144,6 +1603,80 @@ def test_phase15d_overrun_activation_requests_overrun_pile_in_proposal() -> None
     assert context["movement_mode"] == ProposalKind.PILE_IN.value
     assert event_payload["proposal_kind"] == ProposalKind.PILE_IN.value
     assert activation_payload["fight_type"] == FightTypeKind.OVERRUN.value
+
+
+def test_phase15d_attached_overrun_keeps_canonical_identity_through_movement() -> None:
+    lifecycle, units = _fight_lifecycle(
+        alpha_unit_ids=("bodyguard", "leader"),
+        enemy_unit_ids=("enemy",),
+        origins={
+            "bodyguard": Pose.at(10.0, 20.0),
+            "leader": Pose.at(10.0, 21.7),
+            "enemy": Pose.at(30.0, 20.0),
+        },
+        game_id="phase15d-attached-overrun-pile-in",
+        charge_fights_first_unit_keys=("leader",),
+        alpha_unit_specs={
+            "leader": ("core-character-leader", "core-character-leader", 1),
+        },
+        alpha_attachment_declarations=(
+            AttachmentDeclaration(
+                source_unit_selection_id="leader",
+                bodyguard_unit_selection_id="bodyguard",
+            ),
+        ),
+    )
+    request = _advance_to_fight_order_request(lifecycle)
+    state = _state(lifecycle)
+    rules_unit = rules_unit_view_by_id(
+        state=state,
+        unit_instance_id=units["leader"].unit_instance_id,
+    )
+    canonical_id = rules_unit.unit_instance_id
+    component_ids = rules_unit.component_unit_instance_ids
+    overrun_option_id = fight_activation_option_id(
+        unit_instance_id=canonical_id,
+        fight_type=FightTypeKind.OVERRUN,
+    )
+
+    assert _request_unit_ids(request) == [canonical_id]
+    assert overrun_option_id in _request_option_ids(request)
+    assert all(
+        fight_activation_option_id(
+            unit_instance_id=component_id,
+            fight_type=FightTypeKind.OVERRUN,
+        )
+        not in _request_option_ids(request)
+        for component_id in component_ids
+    )
+
+    status = _submit_option(
+        lifecycle,
+        request=request,
+        option_id=overrun_option_id,
+        result_id="phase15d-attached-overrun-activation",
+    )
+    movement_request = _decision_request(status)
+    proposal_request = MovementProposalRequest.from_decision_request_payload(
+        movement_request.payload
+    )
+    context = cast(dict[str, JsonValue], proposal_request.context)
+
+    assert proposal_request.unit_instance_id == canonical_id
+    assert context["fight_movement_timing"] == "overrun"
+    continued = _submit_fight_movement_no_move(
+        lifecycle,
+        request=movement_request,
+        result_id="phase15d-attached-overrun-no-move",
+    )
+    completed_payload = _last_event_payload(lifecycle, "fight_movement_completed")
+    resolution_payload = cast(dict[str, JsonValue], completed_payload["resolution"])
+
+    assert continued.status_kind is not LifecycleStatusKind.INVALID
+    assert completed_payload["unit_instance_id"] == canonical_id
+    assert completed_payload["active_player_id"] == "player-a"
+    assert resolution_payload["rules_unit_instance_id"] == canonical_id
+    assert resolution_payload["component_unit_instance_ids"] == list(component_ids)
 
 
 def test_fight_activation_rejects_when_engagement_context_is_stale() -> None:
@@ -2067,6 +2600,7 @@ def _fight_lifecycle(
     model_count: int = 5,
     alpha_unit_specs: dict[str, tuple[str, str, int]] | None = None,
     enemy_unit_specs: dict[str, tuple[str, str, int]] | None = None,
+    alpha_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
     catalog: ArmyCatalog | None = None,
 ) -> tuple[GameLifecycle, dict[str, UnitInstance]]:
     config = _config(
@@ -2078,6 +2612,7 @@ def _fight_lifecycle(
         model_count=model_count,
         alpha_unit_specs=alpha_unit_specs,
         enemy_unit_specs=enemy_unit_specs,
+        alpha_attachment_declarations=alpha_attachment_declarations,
         catalog=catalog,
     )
     armies = _mustered_armies(config)
@@ -2207,6 +2742,7 @@ def _config(
     model_count: int,
     alpha_unit_specs: dict[str, tuple[str, str, int]] | None = None,
     enemy_unit_specs: dict[str, tuple[str, str, int]] | None = None,
+    alpha_attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
     catalog: ArmyCatalog | None = None,
 ) -> GameConfig:
     resolved_catalog = ArmyCatalog.phase9a_canonical_content_pack() if catalog is None else catalog
@@ -2227,6 +2763,7 @@ def _config(
                 model_profile_id=model_profile_id,
                 model_count=model_count,
                 unit_specs=alpha_unit_specs,
+                attachment_declarations=alpha_attachment_declarations,
             ),
             _army_muster_request(
                 catalog=resolved_catalog,
@@ -2299,6 +2836,7 @@ def _army_muster_request(
     model_profile_id: str,
     model_count: int,
     unit_specs: dict[str, tuple[str, str, int]] | None = None,
+    attachment_declarations: tuple[AttachmentDeclaration, ...] = (),
 ) -> ArmyMusterRequest:
     return ArmyMusterRequest(
         army_id=army_id,
@@ -2321,6 +2859,7 @@ def _army_muster_request(
             )
             for unit_id in unit_selection_ids
         ),
+        attachment_declarations=attachment_declarations,
     )
 
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
 from warhammer40k_core.core.dice import DiceExpression, DiceRollSpec
@@ -71,6 +71,7 @@ from warhammer40k_core.engine.primary_destruction_evidence import (
     rules_unit_objective_proximity_witness,
 )
 from warhammer40k_core.engine.rule_deadly_demise_continuation import (
+    RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
     RULE_MODEL_DESTRUCTION_COLLATERAL_COMPLETION_KIND,
     RULE_MODEL_DESTRUCTION_CONTEXT_KIND,
     RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND,
@@ -79,6 +80,17 @@ from warhammer40k_core.engine.rule_deadly_demise_continuation import (
     damage_application_from_rule_context,
     destroyed_damage_applications,
     destruction_provenance_from_rule_context,
+)
+from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
+    DEFER_ATTACHED_SPLIT_FIELD,
+    defer_attached_split_from_rule_destruction_context,
+    validate_applied_damage_rule_destruction_context,
+)
+from warhammer40k_core.engine.rule_model_destruction_fight_on_death import (
+    fight_on_death_activation_result_id_for_rule_destruction,
+)
+from warhammer40k_core.engine.rule_model_destruction_source_liabilities import (
+    consume_rule_destruction_source_liabilities,
 )
 
 if TYPE_CHECKING:
@@ -392,21 +404,29 @@ def finalize_rule_model_destruction(
     source_effect_ids = _payload_identifier_list(context, "source_effect_ids")
     completion_kind = _payload_string(context, "completion_kind")
     if completion_kind == RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND:
-        _consume_source_liabilities(
+        consume_rule_destruction_source_liabilities(
             state=state,
             source_effect_ids=source_effect_ids,
             rules_unit_instance_id=rules_unit_id,
         )
-    elif completion_kind != RULE_MODEL_DESTRUCTION_COLLATERAL_COMPLETION_KIND:
+    elif completion_kind not in {
+        RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
+        RULE_MODEL_DESTRUCTION_COLLATERAL_COMPLETION_KIND,
+    }:
         raise GameLifecycleError("Rule destruction completion kind is unsupported.")
     elif source_effect_ids:
-        raise GameLifecycleError("Collateral rule destruction cannot consume source liabilities.")
-    split_attached_rules_unit_if_required(
-        state=state,
-        event_log=decisions.event_log,
-        rules_unit_instance_id=rules_unit_id,
-    )
-    if completion_kind == RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND:
+        raise GameLifecycleError("Applied rule destruction cannot consume source liabilities.")
+    defer_split = defer_attached_split_from_rule_destruction_context(context)
+    if not defer_split:
+        split_attached_rules_unit_if_required(
+            state=state,
+            event_log=decisions.event_log,
+            rules_unit_instance_id=rules_unit_id,
+        )
+    if completion_kind in {
+        RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
+        RULE_MODEL_DESTRUCTION_SOURCE_COMPLETION_KIND,
+    }:
         completion_payload = _payload_object_value(context, "completion_event_payload").copy()
         completion_payload["model_destroyed_event_id"] = _payload_string(
             context, "model_destroyed_event_id"
@@ -436,6 +456,7 @@ def finalize_rule_model_destruction(
                     ),
                     "rules_unit_instance_id": rules_unit_id,
                     "completion_kind": completion_kind,
+                    DEFER_ATTACHED_SPLIT_FIELD: defer_split,
                 }
             ),
         )
@@ -985,34 +1006,6 @@ def _resume_rule_deadly_demise_secondary_continuation(
     ).status
 
 
-def _consume_source_liabilities(
-    *,
-    state: GameState,
-    source_effect_ids: tuple[str, ...],
-    rules_unit_instance_id: str,
-) -> None:
-    effect_by_id = {effect.effect_id: effect for effect in state.persisting_effects}
-    missing_ids = tuple(
-        effect_id for effect_id in source_effect_ids if effect_id not in effect_by_id
-    )
-    if missing_ids:
-        raise GameLifecycleError("Rule destruction source liability effect is missing.")
-    effects = tuple(effect_by_id[effect_id] for effect_id in source_effect_ids)
-    if any(rules_unit_instance_id not in effect.target_unit_instance_ids for effect in effects):
-        raise GameLifecycleError("Rule destruction source liability target drift.")
-    state.remove_persisting_effects_by_id(source_effect_ids)
-    for effect in effects:
-        remaining_targets = tuple(
-            unit_id
-            for unit_id in effect.target_unit_instance_ids
-            if unit_id != rules_unit_instance_id
-        )
-        if remaining_targets:
-            state.record_persisting_effect(
-                replace(effect, target_unit_instance_ids=remaining_targets)
-            )
-
-
 def is_rule_model_destruction_reaction_request(request: DecisionRequest) -> bool:
     if type(request) is not DecisionRequest:
         raise GameLifecycleError("Rule destruction reaction check requires DecisionRequest.")
@@ -1097,7 +1090,13 @@ def apply_rule_model_destruction_reaction_decision(
             source_id=selected_source.source_id,
             source_rule_id=selected_source.source_rule_id,
             source_phase=BattlePhaseKind.FIGHT,
-            activation_result_id=result.result_id,
+            activation_result_id=(
+                fight_on_death_activation_result_id_for_rule_destruction(
+                    state=state,
+                    context=context,
+                    reaction_result_id=result.result_id,
+                )
+            ),
             completion_context=context,
         )
     decisions.event_log.append(
@@ -1336,6 +1335,7 @@ def _validate_rule_context_identity(
     ):
         raise GameLifecycleError("Rule destruction physical unit drift.")
     validate_non_attack_destruction_source_context(state=state, context=context)
+    validate_applied_damage_rule_destruction_context(state=state, context=context)
 
 
 def _selected_source(
@@ -1483,4 +1483,6 @@ def _validate_identifier_tuple(
     return tuple(sorted(typed))
 
 
+continue_rule_deadly_demise_sources = _continue_rule_deadly_demise_sources
+remove_rule_destroyed_model_and_continue = _remove_rule_destroyed_model_and_continue
 _validate_identifier = IdentifierValidator(GameLifecycleError)

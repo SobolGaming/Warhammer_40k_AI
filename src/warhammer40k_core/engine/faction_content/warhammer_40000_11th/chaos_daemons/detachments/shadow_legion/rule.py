@@ -18,6 +18,7 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_space_m
 from warhammer40k_core.engine.fight_unit_selected_hooks import (
     FightUnitSelectedContext,
     FightUnitSelectedGrant,
+    FightUnitSelectedTimedEffect,
 )
 from warhammer40k_core.engine.phase import BattlePhase, GameLifecycleError
 from warhammer40k_core.engine.rules_units import RulesUnitView, rules_unit_view_by_id
@@ -280,25 +281,29 @@ def _fight_dark_pact_grant(
             "ordering_band": context.ordering_band,
             "source_rule_id": SOURCE_RULE_ID,
         },
-        unit_effect_payload=dark_pacts.dark_pact_effect_payload(
-            unit_instance_id=context.unit_instance_id,
-            target_unit_instance_ids=target_unit_ids,
-            trigger="selected_to_fight",
-            phase=BattlePhase.FIGHT,
-            selected_dark_pact=pact,
-            source_context={
-                "source_rule_id": SOURCE_RULE_ID,
-                "activation_request_id": context.request_id,
-                "activation_result_id": context.result_id,
-                "fight_type": context.fight_type,
-                "ordering_band": context.ordering_band,
-            },
-            leadership_test_auto_pass=_rules_unit_is_belakor(
-                state=context.state,
-                unit_instance_id=context.unit_instance_id,
+        timed_effects=(
+            FightUnitSelectedTimedEffect(
+                effect_payload=dark_pacts.dark_pact_effect_payload(
+                    unit_instance_id=context.unit_instance_id,
+                    target_unit_instance_ids=target_unit_ids,
+                    trigger="selected_to_fight",
+                    phase=BattlePhase.FIGHT,
+                    selected_dark_pact=pact,
+                    source_context={
+                        "source_rule_id": SOURCE_RULE_ID,
+                        "activation_request_id": context.request_id,
+                        "activation_result_id": context.result_id,
+                        "fight_type": context.fight_type,
+                        "ordering_band": context.ordering_band,
+                    },
+                    leadership_test_auto_pass=_rules_unit_is_belakor(
+                        state=context.state,
+                        unit_instance_id=context.unit_instance_id,
+                    ),
+                ),
+                expiration="end_phase",
             ),
         ),
-        unit_effect_expiration="end_phase",
     )
 
 

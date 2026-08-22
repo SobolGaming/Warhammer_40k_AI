@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import importlib
 import json
 from collections.abc import Callable
 from dataclasses import replace
-from typing import cast
+from typing import Protocol, cast
 
 import pytest
 from tests.movement_submission_helpers import (
@@ -24,14 +25,21 @@ from tests.phase13b_shooting_declaration_helpers import (
     _attack_pool_for_test,
     _fixed_roll_result,
 )
+from tests.phase15c_fight_order_helpers import (
+    drain_fight_movement_requests,
+    fight_lifecycle,
+    submit_minimal_melee_declaration,
+)
 
 from warhammer40k_core.adapters.contracts import ParameterizedSubmission
+from warhammer40k_core.adapters.local_session import LocalGameSession
 from warhammer40k_core.core.army_catalog import ArmyCatalog
 from warhammer40k_core.core.attachment_eligibility import (
     AttachmentEligibility,
     AttachmentRole,
     AttachmentTargetEligibility,
 )
+from warhammer40k_core.core.attributes import Characteristic, CharacteristicValue
 from warhammer40k_core.core.datasheet import (
     CatalogAbilitySourceKind,
     CatalogAbilitySupport,
@@ -44,7 +52,9 @@ from warhammer40k_core.core.dice import DiceRollResult
 from warhammer40k_core.core.faction import FactionDefinition
 from warhammer40k_core.core.modifiers import RollModifier
 from warhammer40k_core.core.ruleset_descriptor import (
+    BattlePhaseKind,
     FightPhaseStepKind,
+    FightTypeKind,
     MovementMode,
     RulesetDescriptor,
 )
@@ -72,10 +82,19 @@ from warhammer40k_core.engine.attack_sequence_model import (
 from warhammer40k_core.engine.battle_formation_hooks import BattleFormationRequestContext
 from warhammer40k_core.engine.battle_round_flow import BattleRoundFlow
 from warhammer40k_core.engine.battlefield_state import ModelPlacement, UnitPlacement
+from warhammer40k_core.engine.command_points import CommandPointSourceKind
 from warhammer40k_core.engine.damage_allocation import (
+    DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+    DECLINE_FEEL_NO_PAIN_OPTION_ID,
+    SELECT_DESTRUCTION_REACTION_DECISION_TYPE,
+    SELECT_FEEL_NO_PAIN_DECISION_TYPE,
+    DamageKind,
     DestructionReactionKind,
     DestructionReactionSource,
+    FeelNoPainSource,
+    apply_damage_to_model,
     apply_mortal_wounds_to_unit,
+    mortal_wound_feel_no_pain_source_context,
 )
 from warhammer40k_core.engine.deadly_demise import (
     deadly_demise_mortal_wounds_for_target,
@@ -95,7 +114,11 @@ from warhammer40k_core.engine.destruction_provenance import (
     ModelDestructionAttribution,
 )
 from warhammer40k_core.engine.dice import DiceRollManager
-from warhammer40k_core.engine.effects import EffectExpiration, PersistingEffect
+from warhammer40k_core.engine.effects import (
+    EffectExpiration,
+    EffectExpirationBoundary,
+    PersistingEffect,
+)
 from warhammer40k_core.engine.event_log import JsonValue, validate_json_value
 from warhammer40k_core.engine.faction_content.bundle import RuntimeContentBundle
 from warhammer40k_core.engine.faction_content.runtime import build_runtime_content_bundle
@@ -106,12 +129,39 @@ from warhammer40k_core.engine.faction_content.warhammer_40000_11th.chaos_daemons
     enhancements,
     rule,
 )
-from warhammer40k_core.engine.fight_order import FightPhaseState, FightsFirstRegistry
+from warhammer40k_core.engine.fight_order import (
+    FIGHT_ACTIVATION_DECISION_TYPE,
+    FightPhaseState,
+    FightsFirstRegistry,
+    eligible_fight_contexts_for_player,
+    fight_activation_option_id,
+)
+from warhammer40k_core.engine.fight_resolution import (
+    SUBMIT_MELEE_DECLARATION_DECISION_TYPE,
+    MeleeDeclarationProposalRequest,
+)
+from warhammer40k_core.engine.fight_unit_selected_grant_resolution import (
+    SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_PENDING_EVENT,
+    SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
+    SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_SOURCE_KIND,
+)
+from warhammer40k_core.engine.fight_unit_selected_hooks import (
+    DECLINE_FIGHT_UNIT_GRANT_OPTION_ID,
+    SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE,
+)
 from warhammer40k_core.engine.game_state import (
     GameConfig,
     GameState,
     SecondaryMissionChoice,
     SecondaryMissionMode,
+)
+from warhammer40k_core.engine.generic_rule_ability_registry import GenericRuleAbilitySource
+from warhammer40k_core.engine.generic_rule_ability_registry_blood_legion_defaults import (
+    blood_legion_fight_unit_selected_grant_abilities,
+    blood_legion_mortal_wound_feel_no_pain_abilities,
+)
+from warhammer40k_core.engine.generic_rule_attack_hooks import (
+    generic_rule_reroll_permission_context_for_unit,
 )
 from warhammer40k_core.engine.lifecycle import GameLifecycle
 from warhammer40k_core.engine.list_validation import (
@@ -148,15 +198,26 @@ from warhammer40k_core.engine.phases.movement import (
     MovementPhaseActionKind,
 )
 from warhammer40k_core.engine.placement import create_deterministic_battlefield_scenario
+from warhammer40k_core.engine.replay import ReplayRunner, ReplayRunStatus
+from warhammer40k_core.engine.rule_deadly_demise_continuation import (
+    RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND,
+)
 from warhammer40k_core.engine.rule_model_destruction import (
+    RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND,
+    RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
     RuleModelDestructionResult,
     destroy_model_with_rule_reactions,
 )
+from warhammer40k_core.engine.rule_model_destruction_applied_damage import (
+    continue_applied_mortal_wound_destruction_with_rule_reactions,
+)
+from warhammer40k_core.engine.rules_units import rules_unit_view_by_id
 from warhammer40k_core.engine.runtime_modifiers import (
     ChargeRollModifierContext,
     WeaponProfileModifierContext,
 )
 from warhammer40k_core.engine.saves import SaveKind, saving_throw_roll_spec
+from warhammer40k_core.engine.stratagems import STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
 from warhammer40k_core.engine.triggered_movement import (
     SELECT_TRIGGERED_MOVEMENT_DECISION_TYPE,
 )
@@ -167,7 +228,13 @@ from warhammer40k_core.engine.wargear_selections import (
 from warhammer40k_core.geometry.pathing import PathWitness
 from warhammer40k_core.geometry.pose import Pose
 from warhammer40k_core.rules.mission_pack_import import chapter_approved_2026_27_mission_pack
-from warhammer40k_core.rules.rule_ir import RuleEffectKind, parameter_payload
+from warhammer40k_core.rules.rule_ir import (
+    RuleDurationKind,
+    RuleEffectKind,
+    RuleTargetKind,
+    RuleTriggerKind,
+    parameter_payload,
+)
 from warhammer40k_core.rules.source_packages.warhammer_40000_11th import (
     faction_blood_legion_ir_support_2026_27 as blood_legion_ir,
 )
@@ -192,7 +259,11 @@ _OTHER_KHORNE_UNIT_ID = "army-alpha:khorne-daemon-unit"
 _OTHER_KHORNE_MONSTER_UNIT_ID = "army-alpha:khorne-monster-unit"
 _ENEMY_UNIT_ID = "army-beta:enemy-unit"
 _OTHER_DAEMON_DETACHMENT_ID = "warptide"
-_BRAZENMAW_ATTACHED_UNIT_ID = "attached-unit:army-alpha:non-khorne-daemon-unit"
+_ATTACHED_UNIT_ID = "attached-unit:army-alpha:non-khorne-daemon-unit"
+
+
+class _EnhancementRuntimeMetadata(Protocol):
+    runtime_consumer_ids: tuple[str, ...]
 
 
 def test_blood_legion_runtime_hooks_materialize_only_for_selected_detachment() -> None:
@@ -243,6 +314,1224 @@ def test_brazenmaw_is_exact_source_backed_executable_generic_rule_ir() -> None:
     assert parameter_payload(modifier_effect.parameters) == {
         "delta": 2,
         "roll_type": "charge",
+    }
+
+
+def test_furys_cage_is_exact_source_backed_executable_generic_rule_ir() -> None:
+    rule_ir = faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id(
+        enhancements.FURYS_CAGE_DESCRIPTOR_ID
+    )
+    record = _furys_cage_execution_record()
+
+    assert rule_ir.is_supported
+    assert rule_ir.source_id == (
+        f"{blood_legion_ir.SOURCE_PACKAGE_ID}:"
+        f"{blood_legion_ir.FURYS_CAGE_DESCRIPTOR_ID}:source-text"
+    )
+    assert rule_ir.normalized_text == (
+        "Legiones Daemonica Khorne Monster model only. Each time the bearer is selected "
+        "to fight, it can use this Enhancement. If it does, the bearer suffers D3+1 "
+        "mortal wounds, and until the end of the phase, each time it makes an attack, "
+        "you can re-roll the Hit roll and you can re-roll the Wound roll."
+    )
+    assert not rule_ir.diagnostics
+    assert record.execution_status is Phase17FExecutionStatus.EXECUTABLE_GENERIC_IR
+    assert record.execution_id == enhancements.FURYS_CAGE_SOURCE_RULE_ID
+    assert record.runtime_consumer_ids == enhancements.FURYS_CAGE_RUNTIME_CONSUMER_IDS
+    assert record.handler_id is None
+    assert record.rule_ir_hash == rule_ir.ir_hash()
+
+    gate_clause = next(clause for clause in rule_ir.clauses if not clause.effects)
+    assert tuple(
+        parameter_payload(condition.parameters) for condition in gate_clause.conditions
+    ) == (
+        {"required_keyword_sequence": (blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,)},
+        {"required_keyword": blood_legion_ir.KHORNE_KEYWORD},
+        {"required_keyword": blood_legion_ir.MONSTER_KEYWORD},
+    )
+
+    marker_clause = next(
+        clause
+        for clause in rule_ir.clauses
+        if any(effect.kind is RuleEffectKind.GRANT_ABILITY for effect in clause.effects)
+    )
+    assert marker_clause.trigger is None
+    assert marker_clause.target is not None
+    assert marker_clause.target.kind is RuleTargetKind.THIS_MODEL
+    assert marker_clause.duration is not None
+    assert marker_clause.duration.kind is RuleDurationKind.PERMANENT
+    (marker_effect,) = marker_clause.effects
+    assert parameter_payload(marker_effect.parameters) == {
+        "ability": enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_ABILITY,
+        "hook_family": "fight_unit_selected_grant",
+        "phase": "fight",
+        "timing_window": "selected_to_fight",
+        "optional": True,
+    }
+
+    triggered_clauses = tuple(clause for clause in rule_ir.clauses if clause.trigger is not None)
+    assert len(triggered_clauses) == 2
+    for clause in triggered_clauses:
+        assert clause.trigger is not None
+        assert clause.trigger.kind is RuleTriggerKind.UNIT_SELECTED
+        assert parameter_payload(clause.trigger.parameters) == {
+            "phase": "fight",
+            "timing_window": "selected_to_fight",
+            "optional": True,
+        }
+        assert clause.target is not None
+        assert clause.target.kind is RuleTargetKind.THIS_MODEL
+
+    mortal_clause = next(
+        clause
+        for clause in triggered_clauses
+        if any(effect.kind is RuleEffectKind.INFLICT_MORTAL_WOUNDS for effect in clause.effects)
+    )
+    assert mortal_clause.duration is not None
+    assert mortal_clause.duration.kind is RuleDurationKind.IMMEDIATE
+    (mortal_effect,) = mortal_clause.effects
+    assert parameter_payload(mortal_effect.parameters) == {
+        "damage_kind": "mortal_wounds",
+        "mortal_wounds_expression": "D3+1",
+        "mortal_wounds_dice_quantity": 1,
+        "mortal_wounds_dice_sides": 3,
+        "mortal_wounds_modifier": 1,
+        "target_scope": "this_model",
+    }
+
+    reroll_clause = next(
+        clause
+        for clause in triggered_clauses
+        if any(effect.kind is RuleEffectKind.REROLL_PERMISSION for effect in clause.effects)
+    )
+    assert reroll_clause.duration is not None
+    assert reroll_clause.duration.kind is RuleDurationKind.UNTIL_TIMING_ENDPOINT
+    assert parameter_payload(reroll_clause.duration.parameters) == {"endpoint": "phase"}
+    assert tuple(parameter_payload(effect.parameters) for effect in reroll_clause.effects) == (
+        {"roll_type": "hit", "attack_role": "attacker", "target_scope": "this_model"},
+        {"roll_type": "wound", "attack_role": "attacker", "target_scope": "this_model"},
+    )
+
+
+def test_furys_cage_adapter_decline_inflicts_no_wounds_and_records_no_rerolls() -> None:
+    lifecycle = _furys_cage_fight_lifecycle(
+        game_id="phase17g-furys-cage-decline",
+        attached=True,
+    )
+    state = _started_state(lifecycle)
+    bearer = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    bodyguard = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
+    )
+    starting_wounds = bearer.own_models[0].wounds_remaining
+    starting_effect_ids = tuple(effect.effect_id for effect in state.persisting_effects)
+    session = LocalGameSession(lifecycle=lifecycle)
+    grant_request = _select_furys_cage_grant_request(
+        session=session,
+        selected_unit_instance_id=bearer.unit_instance_id,
+        result_id_prefix="phase17g-furys-cage-decline",
+    )
+
+    assert grant_request.decision_type == SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE
+    assert {option.option_id for option in grant_request.options} == {
+        DECLINE_FIGHT_UNIT_GRANT_OPTION_ID,
+        enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+    }
+    status = session.submit_option(
+        request_id=grant_request.request_id,
+        option_id=DECLINE_FIGHT_UNIT_GRANT_OPTION_ID,
+        result_id="phase17g-furys-cage-decline:grant",
+    )
+
+    melee_request = decision_request(status)
+    proposal = _assert_attached_melee_request(
+        request=melee_request,
+        bearer=bearer,
+        bodyguard=bodyguard,
+    )
+    attack_status = submit_minimal_melee_declaration(
+        lifecycle,
+        request=melee_request,
+        result_id="phase17g-furys-cage-decline:melee",
+    )
+    _assert_accepted_melee_declaration_models(
+        lifecycle=lifecycle,
+        expected_model_ids={
+            bearer.own_models[0].model_instance_id,
+            bodyguard.own_models[0].model_instance_id,
+        },
+    )
+    completed_status = _complete_active_fight_through_session(
+        session=session,
+        status=attack_status,
+        result_id_prefix="phase17g-furys-cage-decline:attacks",
+    )
+
+    refreshed_bearer = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=bearer.unit_instance_id,
+    )
+    assert refreshed_bearer.own_models[0].wounds_remaining == starting_wounds
+    assert tuple(effect.effect_id for effect in state.persisting_effects) == starting_effect_ids
+    assert not _events_of_type(
+        lifecycle.decision_controller,
+        SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_PENDING_EVENT,
+    )
+    assert not _events_of_type(
+        lifecycle.decision_controller,
+        SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
+    )
+    assert proposal.unit_instance_id == _ATTACHED_UNIT_ID
+    _assert_attached_activation_consumed_once(
+        state=state,
+        lifecycle=lifecycle,
+        status=completed_status,
+        component_unit_instance_ids={
+            bearer.unit_instance_id,
+            bodyguard.unit_instance_id,
+        },
+    )
+
+
+def test_furys_cage_lethal_self_wounds_complete_the_active_fight_activation() -> None:
+    lifecycle = _furys_cage_fight_lifecycle(
+        game_id="phase17g-furys-cage-lethal",
+        attached=False,
+        bearer_wounds=2,
+    )
+    state = _started_state(lifecycle)
+    bearer = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    bearer_model_id = bearer.own_models[0].model_instance_id
+    state.clear_model_destruction_reaction_sources(model_instance_id=bearer_model_id)
+    session = LocalGameSession(lifecycle=lifecycle)
+    grant_request = _select_furys_cage_grant_request(
+        session=session,
+        selected_unit_instance_id=bearer.unit_instance_id,
+        result_id_prefix="phase17g-furys-cage-lethal",
+    )
+
+    status = session.submit_option(
+        request_id=grant_request.request_id,
+        option_id=enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+        result_id="phase17g-furys-cage-lethal:grant",
+    )
+
+    refreshed_bearer = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=bearer.unit_instance_id,
+    )
+    assert not refreshed_bearer.own_models[0].is_alive
+    assert state.battlefield_state is not None
+    assert bearer_model_id not in state.battlefield_state.placed_model_ids()
+    assert state.fight_phase_state is not None
+    assert state.fight_phase_state.active_activation is None
+    assert bearer.unit_instance_id in (
+        state.fight_phase_state.fight_order_state.selected_to_fight_unit_ids
+    )
+    assert status.status_kind in {
+        LifecycleStatusKind.ADVANCED,
+        LifecycleStatusKind.WAITING_FOR_DECISION,
+    }
+    resolved_payload = _event_payload(
+        lifecycle.decision_controller,
+        SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
+    )
+    application = cast(dict[str, JsonValue], resolved_payload["mortal_wound_application"])
+    assert application["spill_over"] is False
+    assert (
+        cast(list[dict[str, JsonValue]], application["applications"])[0]["model_instance_id"]
+        == bearer.own_models[0].model_instance_id
+    )
+    destroyed_payload = next(
+        payload
+        for payload in _events_of_type(lifecycle.decision_controller, "model_destroyed")
+        if payload["model_instance_id"] == bearer_model_id
+    )
+    attribution = ModelDestructionAttribution.from_model_destroyed_payload(destroyed_payload)
+    assert destroyed_payload["destroyed_model_rules_triggered"] is True
+    assert destroyed_payload["damage_kind"] == "mortal"
+    assert (
+        destroyed_payload["damage_application"]
+        == cast(list[dict[str, JsonValue]], application["applications"])[-1]
+    )
+    assert (
+        attribution.destruction_provenance.destruction_source_kind is DestructionSourceKind.ABILITY
+    )
+    finalized_payload = _event_payload(
+        lifecycle.decision_controller,
+        RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
+    )
+    assert (
+        finalized_payload["completion_kind"]
+        == RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND
+    )
+    assert finalized_payload["defer_attached_split_until_fight_activation_completion"] is False
+    checkpoint = json.loads(json.dumps(session.to_persistence_payload(), sort_keys=True))
+    restored_session = LocalGameSession.from_persistence_payload(checkpoint)
+    assert restored_session.to_persistence_payload() == checkpoint
+
+
+def test_furys_cage_declined_fight_on_death_continues_with_surviving_bodyguard() -> None:
+    game_id = "phase17g-furys-cage-lethal-attached"
+    lifecycle = _furys_cage_fight_lifecycle(
+        game_id=game_id,
+        attached=True,
+        bearer_wounds=2,
+    )
+    state = _started_state(lifecycle)
+    bearer = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    bodyguard = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
+    )
+    bearer_model_id = bearer.own_models[0].model_instance_id
+    state.clear_model_destruction_reaction_sources(model_instance_id=bearer_model_id)
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=bearer_model_id,
+        sources=(
+            DestructionReactionSource(
+                source_id=f"{game_id}:fight-on-death",
+                reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+                source_rule_id=f"{game_id}:fight-on-death",
+            ),
+        ),
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    grant_request = _select_furys_cage_grant_request(
+        session=session,
+        selected_unit_instance_id=bodyguard.unit_instance_id,
+        result_id_prefix=game_id,
+    )
+
+    reaction_status = session.submit_option(
+        request_id=grant_request.request_id,
+        option_id=enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+        result_id=f"{game_id}:grant",
+    )
+    reaction_request = decision_request(reaction_status)
+    assert reaction_request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
+    status = session.submit_option(
+        request_id=reaction_request.request_id,
+        option_id=DECLINE_DESTRUCTION_REACTION_OPTION_ID,
+        result_id=f"{game_id}:decline-fight-on-death",
+    )
+
+    melee_request = decision_request(status)
+    proposal = MeleeDeclarationProposalRequest.from_decision_request(melee_request)
+    assert melee_request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE
+    assert proposal.unit_instance_id == _ATTACHED_UNIT_ID
+    assert {
+        cast(str, cast(dict[str, JsonValue], weapon)["component_unit_instance_id"])
+        for weapon in proposal.available_weapons
+    } == {bodyguard.unit_instance_id}
+    attack_status = submit_minimal_melee_declaration(
+        lifecycle,
+        request=melee_request,
+        result_id=f"{game_id}:melee",
+    )
+    _assert_accepted_melee_declaration_models(
+        lifecycle=lifecycle,
+        expected_model_ids={bodyguard.own_models[0].model_instance_id},
+    )
+    completed_status = _complete_active_fight_through_session(
+        session=session,
+        status=attack_status,
+        result_id_prefix=f"{game_id}:attacks",
+    )
+
+    assert state.battlefield_state is not None
+    assert bearer_model_id not in state.battlefield_state.placed_model_ids()
+    assert state.fight_phase_state is not None
+    assert state.fight_phase_state.active_activation is None
+    assert (
+        state.fight_phase_state.fight_order_state.activation_selections[-1].unit_instance_id
+        == _ATTACHED_UNIT_ID
+    )
+    assert state.fight_phase_state.fight_order_state.selected_to_fight_unit_ids == (
+        bodyguard.unit_instance_id,
+    )
+    assert not any(
+        formation.attached_unit_instance_id == _ATTACHED_UNIT_ID
+        for army in state.army_definitions
+        for formation in army.attached_units
+    )
+    _assert_attached_activation_consumed_once(
+        state=state,
+        lifecycle=lifecycle,
+        status=completed_status,
+        component_unit_instance_ids={
+            bearer.unit_instance_id,
+            bodyguard.unit_instance_id,
+        },
+    )
+    finalized_payload = _event_payload(
+        lifecycle.decision_controller,
+        RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
+    )
+    assert finalized_payload["defer_attached_split_until_fight_activation_completion"] is True
+
+
+def test_furys_cage_fight_on_death_uses_same_activation_then_removes_and_splits() -> None:
+    game_id = "phase17g-furys-cage-fight-on-death"
+    lifecycle = _furys_cage_fight_lifecycle(
+        game_id=game_id,
+        attached=True,
+        bearer_wounds=2,
+    )
+    state = _started_state(lifecycle)
+    bearer = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    bearer_model_id = bearer.own_models[0].model_instance_id
+    fight_on_death_source = DestructionReactionSource(
+        source_id="phase17g-furys-cage:fight-on-death",
+        reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+        source_rule_id="phase17g-furys-cage:fight-on-death",
+    )
+    state.clear_model_destruction_reaction_sources(model_instance_id=bearer_model_id)
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=bearer_model_id,
+        sources=(fight_on_death_source,),
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    grant_request = _select_furys_cage_grant_request(
+        session=session,
+        selected_unit_instance_id=bearer.unit_instance_id,
+        result_id_prefix=game_id,
+    )
+    assert state.fight_phase_state is not None
+    assert state.fight_phase_state.active_activation is not None
+    original_activation_result_id = state.fight_phase_state.active_activation.result_id
+
+    reaction_status = session.submit_option(
+        request_id=grant_request.request_id,
+        option_id=enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+        result_id=f"{game_id}:grant",
+    )
+
+    assert reaction_status.decision_request is not None
+    assert (
+        reaction_status.decision_request.decision_type == SELECT_DESTRUCTION_REACTION_DECISION_TYPE
+    )
+    reaction_request = session.lifecycle.decision_controller.queue.peek_next()
+    reaction_option_id = next(
+        option.option_id
+        for option in reaction_request.options
+        if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
+    )
+
+    melee_status = session.submit_option(
+        request_id=reaction_request.request_id,
+        option_id=reaction_option_id,
+        result_id=f"{game_id}:accept-fight-on-death",
+    )
+
+    melee_request = decision_request(melee_status)
+    proposal = _assert_attached_melee_request(
+        request=melee_request,
+        bearer=bearer,
+        bodyguard=_physical_unit_by_id(
+            state=state,
+            unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
+        ),
+    )
+    weapon_payloads = tuple(
+        cast(dict[str, JsonValue], weapon) for weapon in proposal.available_weapons
+    )
+    bodyguard_model_id = next(
+        cast(str, weapon["model_instance_id"])
+        for weapon in weapon_payloads
+        if cast(str, weapon["component_unit_instance_id"]) == _OTHER_FRIENDLY_UNIT_ID
+    )
+    attack_status = submit_minimal_melee_declaration(
+        lifecycle,
+        request=melee_request,
+        result_id=f"{game_id}:melee",
+    )
+    _assert_active_attack_sequence_models(
+        state=state,
+        expected_model_ids={bearer_model_id, bodyguard_model_id},
+    )
+    _assert_accepted_melee_declaration_models(
+        lifecycle=lifecycle,
+        expected_model_ids={bearer_model_id, bodyguard_model_id},
+    )
+    completed_status = _complete_active_fight_through_session(
+        session=session,
+        status=attack_status,
+        result_id_prefix=f"{game_id}:attacks",
+    )
+
+    restored_state = _started_state(session.lifecycle)
+    decisions = session.lifecycle.decision_controller
+    assert completed_status.decision_request is not None
+    assert completed_status.decision_request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE
+    assert restored_state.fight_phase_state is not None
+    assert restored_state.fight_phase_state.active_activation is None
+    assert (
+        restored_state.fight_phase_state.fight_order_state.activation_selections[
+            -1
+        ].unit_instance_id
+        == _ATTACHED_UNIT_ID
+    )
+    assert restored_state.battlefield_state is not None
+    assert bearer_model_id not in restored_state.battlefield_state.placed_model_ids()
+    assert all(
+        attached.attached_unit_instance_id != _ATTACHED_UNIT_ID
+        for army in restored_state.army_definitions
+        for attached in army.attached_units
+    )
+    continued_payload = _event_payload(
+        decisions,
+        "fight_on_death_active_activation_continued",
+    )
+    activation_payload = cast(
+        dict[str, JsonValue],
+        continued_payload["activation_selection"],
+    )
+    assert activation_payload["result_id"] == original_activation_result_id
+    removed_payload = _event_payload(decisions, "fight_on_death_models_removed")
+    assert removed_payload["model_instance_ids"] == [bearer_model_id]
+    assert removed_payload["reason"] == "unit_attacked"
+    finalized_payload = _event_payload(
+        decisions,
+        RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
+    )
+    assert finalized_payload["defer_attached_split_until_fight_activation_completion"] is True
+    resolved_payload = _event_payload(
+        decisions,
+        SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
+    )
+    assert isinstance(resolved_payload["model_destroyed_event_id"], str)
+    assert GameState.from_payload(restored_state.to_payload()).to_payload() == (
+        restored_state.to_payload()
+    )
+    assert DecisionController.from_payload(decisions.to_payload()) == decisions
+    lifecycle_payload = session.lifecycle.to_payload()
+    assert GameLifecycle.from_payload(lifecycle_payload).to_payload() == lifecycle_payload
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="replay:phase17g:furys-cage:fight-on-death-split")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+
+def test_furys_cage_fight_on_death_resumes_counteroffensive_window() -> None:
+    game_id = "phase17g-furys-cage-fight-on-death-counteroffensive"
+    lifecycle = _furys_cage_fight_lifecycle(
+        game_id=game_id,
+        attached=True,
+        bearer_wounds=2,
+    )
+    state = _started_state(lifecycle)
+    state.gain_command_points(
+        player_id="player-b",
+        amount=2,
+        source_id=f"{game_id}:counteroffensive-cp",
+        source_kind=CommandPointSourceKind.COMMAND_PHASE_START,
+        cap_exempt=True,
+    )
+    bearer = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    bodyguard = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
+    )
+    bearer_model_id = bearer.own_models[0].model_instance_id
+    state.clear_model_destruction_reaction_sources(model_instance_id=bearer_model_id)
+    state.record_model_destruction_reaction_sources(
+        model_instance_id=bearer_model_id,
+        sources=(
+            DestructionReactionSource(
+                source_id=f"{game_id}:fight-on-death",
+                reaction_kind=DestructionReactionKind.FIGHT_ON_DEATH,
+                source_rule_id=f"{game_id}:fight-on-death",
+            ),
+        ),
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    grant_request = _select_furys_cage_grant_request(
+        session=session,
+        selected_unit_instance_id=bearer.unit_instance_id,
+        result_id_prefix=game_id,
+    )
+    reaction_status = session.submit_option(
+        request_id=grant_request.request_id,
+        option_id=enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+        result_id=f"{game_id}:grant",
+    )
+    reaction_request = decision_request(reaction_status)
+    reaction_option_id = next(
+        option.option_id
+        for option in reaction_request.options
+        if option.option_id != DECLINE_DESTRUCTION_REACTION_OPTION_ID
+    )
+    melee_status = session.submit_option(
+        request_id=reaction_request.request_id,
+        option_id=reaction_option_id,
+        result_id=f"{game_id}:accept-fight-on-death",
+    )
+    melee_request = decision_request(melee_status)
+    _assert_attached_melee_request(
+        request=melee_request,
+        bearer=bearer,
+        bodyguard=bodyguard,
+    )
+    attack_status = submit_minimal_melee_declaration(
+        lifecycle,
+        request=melee_request,
+        result_id=f"{game_id}:melee",
+    )
+    counteroffensive_status = _complete_active_fight_through_session(
+        session=session,
+        status=attack_status,
+        result_id_prefix=f"{game_id}:attacks",
+        stop_at_decision_types=frozenset({STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE}),
+    )
+    counteroffensive_request = decision_request(counteroffensive_status)
+
+    assert counteroffensive_request.decision_type == STRATAGEM_TARGET_PROPOSAL_DECISION_TYPE
+    assert counteroffensive_request.actor_id == "player-b"
+    counteroffensive_payload = counteroffensive_status.payload
+    assert isinstance(counteroffensive_payload, dict)
+    assert counteroffensive_payload["phase_body_status"] == "counteroffensive_reaction_pending"
+    assert state.command_point_total("player-b") == 2
+    assert state.fight_phase_state is not None
+    assert state.fight_phase_state.active_activation is None
+    assert (
+        _event_payload(
+            lifecycle.decision_controller,
+            RULE_MODEL_DESTRUCTION_FINALIZED_EVENT,
+        )["model_instance_id"]
+        == bearer_model_id
+    )
+    assert (
+        _event_payload(
+            lifecycle.decision_controller,
+            "unit_has_fought",
+        )["activation_selection"]
+        == state.fight_phase_state.fight_order_state.activation_selections[-1].to_payload()
+    )
+
+
+def test_applied_mortal_wound_destruction_entry_fails_closed_on_state_and_provenance() -> None:
+    lifecycle = _furys_cage_fight_lifecycle(
+        game_id="phase17g-furys-cage-applied-damage-invalid",
+        attached=False,
+        bearer_wounds=5,
+    )
+    state = _started_state(lifecycle)
+    bearer = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    bearer_model_id = bearer.own_models[0].model_instance_id
+    session = LocalGameSession(lifecycle=lifecycle)
+    _select_furys_cage_grant_request(
+        session=session,
+        selected_unit_instance_id=bearer.unit_instance_id,
+        result_id_prefix="phase17g-furys-cage-applied-damage-invalid",
+    )
+    evidence = MortalWoundDestructionEvidence.for_non_attack_state(
+        state=state,
+        destroying_player_id="player-a",
+        source_rules_unit_instance_id=bearer.unit_instance_id,
+        source_model_instance_id=bearer_model_id,
+        destruction_source_kind=DestructionSourceKind.ABILITY,
+        action_phase=BattlePhase.FIGHT,
+        source_step="selected_to_fight_self_mortal_wounds",
+    )
+    nonlethal = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=bearer.unit_instance_id,
+        model_instance_id=bearer_model_id,
+        damage=1,
+        damage_kind=DamageKind.MORTAL,
+        remove_destroyed_model=False,
+    )
+    state_before = state.to_payload()
+    decisions_before = lifecycle.decision_controller.to_payload()
+
+    with pytest.raises(GameLifecycleError, match="requires lethal damage"):
+        continue_applied_mortal_wound_destruction_with_rule_reactions(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            damage_application=nonlethal,
+            rules_unit_instance_id=bearer.unit_instance_id,
+            source_rule_id=enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+            source_result_id="phase17g-furys-cage-applied-damage-invalid:nonlethal",
+            completion_event_type=SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
+            completion_event_payload={},
+            destruction_evidence=evidence,
+            defer_attached_split_until_fight_activation_completion=False,
+        )
+
+    assert state.to_payload() == state_before
+    assert lifecycle.decision_controller.to_payload() == decisions_before
+
+    lethal = apply_damage_to_model(
+        state=state,
+        target_unit_instance_id=bearer.unit_instance_id,
+        model_instance_id=bearer_model_id,
+        damage=4,
+        damage_kind=DamageKind.MORTAL,
+        remove_destroyed_model=False,
+    )
+    state_before = state.to_payload()
+    decisions_before = lifecycle.decision_controller.to_payload()
+    drifted_evidence = replace(evidence, parent_battle_phase=BattlePhase.SHOOTING)
+
+    with pytest.raises(GameLifecycleError, match="parent phase drift"):
+        continue_applied_mortal_wound_destruction_with_rule_reactions(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            damage_application=lethal,
+            rules_unit_instance_id=bearer.unit_instance_id,
+            source_rule_id=enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+            source_result_id="phase17g-furys-cage-applied-damage-invalid:phase-drift",
+            completion_event_type=SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
+            completion_event_payload={},
+            destruction_evidence=drifted_evidence,
+            defer_attached_split_until_fight_activation_completion=False,
+        )
+    with pytest.raises(GameLifecycleError, match="requires an attached rules unit"):
+        continue_applied_mortal_wound_destruction_with_rule_reactions(
+            state=state,
+            decisions=lifecycle.decision_controller,
+            damage_application=lethal,
+            rules_unit_instance_id=bearer.unit_instance_id,
+            source_rule_id=enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+            source_result_id="phase17g-furys-cage-applied-damage-invalid:split-drift",
+            completion_event_type=SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
+            completion_event_payload={},
+            destruction_evidence=evidence,
+            defer_attached_split_until_fight_activation_completion=True,
+        )
+
+    assert state.to_payload() == state_before
+    assert lifecycle.decision_controller.to_payload() == decisions_before
+    assert state.battlefield_state is not None
+    assert bearer_model_id in state.battlefield_state.placed_model_ids()
+
+
+def test_furys_cage_adapter_accept_hits_exact_bearer_and_grants_scoped_rerolls() -> None:
+    lifecycle = _furys_cage_fight_lifecycle(
+        game_id="phase17g-furys-cage-accept",
+        attached=True,
+    )
+    state = _started_state(lifecycle)
+    bearer = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    bodyguard = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_FRIENDLY_UNIT_ID,
+    )
+    bearer_model = bearer.own_models[0]
+    bodyguard_starting_wounds = {
+        model.model_instance_id: model.wounds_remaining for model in bodyguard.own_models
+    }
+    session = LocalGameSession(lifecycle=lifecycle)
+    grant_request = _select_furys_cage_grant_request(
+        session=session,
+        selected_unit_instance_id=bearer.unit_instance_id,
+        result_id_prefix="phase17g-furys-cage-accept",
+    )
+
+    status = session.submit_option(
+        request_id=grant_request.request_id,
+        option_id=enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+        result_id="phase17g-furys-cage-accept:grant",
+    )
+    decisions_after_first_grant = lifecycle.decision_controller.to_payload()
+    state_after_first_grant = state.to_payload()
+    with pytest.raises(GameLifecycleError, match="request_id does not match pending request"):
+        session.submit_option(
+            request_id=grant_request.request_id,
+            option_id=enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+            result_id="phase17g-furys-cage-accept:duplicate-grant",
+        )
+    assert lifecycle.decision_controller.to_payload() == decisions_after_first_grant
+    assert state.to_payload() == state_after_first_grant
+    melee_request = decision_request(status)
+    _assert_attached_melee_request(
+        request=melee_request,
+        bearer=bearer,
+        bodyguard=bodyguard,
+    )
+
+    resolved_payload = _event_payload(
+        lifecycle.decision_controller,
+        SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
+    )
+    d3_payload = cast(dict[str, JsonValue], resolved_payload["d3_result"])
+    expected_mortal_wounds = cast(int, d3_payload["value"]) + 1
+    application = cast(dict[str, JsonValue], resolved_payload["mortal_wound_application"])
+    applications = cast(list[dict[str, JsonValue]], application["applications"])
+    refreshed_bearer = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=bearer.unit_instance_id,
+    )
+    refreshed_bodyguard = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=bodyguard.unit_instance_id,
+    )
+
+    assert application["mortal_wounds"] == expected_mortal_wounds
+    assert application["spill_over"] is False
+    assert {cast(str, entry["model_instance_id"]) for entry in applications} == {
+        bearer_model.model_instance_id
+    }
+    assert sum(cast(int, entry["wounds_lost"]) for entry in applications) == (
+        expected_mortal_wounds
+    )
+    assert (
+        bearer_model.wounds_remaining - refreshed_bearer.own_models[0].wounds_remaining
+        == expected_mortal_wounds
+    )
+    assert {
+        model.model_instance_id: model.wounds_remaining for model in refreshed_bodyguard.own_models
+    } == bodyguard_starting_wounds
+
+    reroll_effects = _furys_cage_reroll_effects(state)
+    assert len(reroll_effects) == 2
+    assert {effect.target_unit_instance_ids for effect in reroll_effects} == {(_ATTACHED_UNIT_ID,)}
+    assert {effect.expiration for effect in reroll_effects} == {
+        EffectExpiration.end_phase(
+            battle_round=1,
+            phase=BattlePhaseKind.FIGHT,
+            player_id="player-a",
+        )
+    }
+    for roll_type in ("attack_sequence.hit", "attack_sequence.wound"):
+        bearer_permission = generic_rule_reroll_permission_context_for_unit(
+            state=state,
+            player_id="player-a",
+            unit_instance_id=_ATTACHED_UNIT_ID,
+            model_instance_id=bearer_model.model_instance_id,
+            roll_type=roll_type,
+            timing_window=roll_type,
+            target_unit_instance_id=_ENEMY_UNIT_ID,
+        )
+        assert bearer_permission is not None
+        assert bearer_permission.permission.component_selection_policy.value == "whole_roll"
+        assert bearer_permission.permission.allowed_component_selections is None
+        assert (
+            generic_rule_reroll_permission_context_for_unit(
+                state=state,
+                player_id="player-a",
+                unit_instance_id=_ATTACHED_UNIT_ID,
+                model_instance_id=bodyguard.own_models[0].model_instance_id,
+                roll_type=roll_type,
+                timing_window=roll_type,
+                target_unit_instance_id=_ENEMY_UNIT_ID,
+            )
+            is None
+        )
+        assert (
+            generic_rule_reroll_permission_context_for_unit(
+                state=state,
+                player_id="player-a",
+                unit_instance_id=_ATTACHED_UNIT_ID,
+                model_instance_id=None,
+                roll_type=roll_type,
+                timing_window=roll_type,
+                target_unit_instance_id=_ENEMY_UNIT_ID,
+            )
+            is None
+        )
+
+    attack_status = submit_minimal_melee_declaration(
+        lifecycle,
+        request=melee_request,
+        result_id="phase17g-furys-cage-accept:melee",
+    )
+    _assert_active_attack_sequence_models(
+        state=state,
+        expected_model_ids={
+            bearer_model.model_instance_id,
+            bodyguard.own_models[0].model_instance_id,
+        },
+    )
+    _assert_accepted_melee_declaration_models(
+        lifecycle=lifecycle,
+        expected_model_ids={
+            bearer_model.model_instance_id,
+            bodyguard.own_models[0].model_instance_id,
+        },
+    )
+    completed_status = _complete_active_fight_through_session(
+        session=session,
+        status=attack_status,
+        result_id_prefix="phase17g-furys-cage-accept:attacks",
+    )
+    _assert_attached_activation_consumed_once(
+        state=state,
+        lifecycle=lifecycle,
+        status=completed_status,
+        component_unit_instance_ids={
+            bearer.unit_instance_id,
+            bodyguard.unit_instance_id,
+        },
+    )
+    replay = ReplayRunner.from_payload(
+        session.replay_artifact(artifact_id="replay:phase17g:furys-cage:attached")
+    ).run()
+    assert replay.status is ReplayRunStatus.REPRODUCED
+
+    expired = state.expire_persisting_effects_at_boundary(
+        EffectExpirationBoundary.phase_end(
+            battle_round=1,
+            phase=BattlePhaseKind.FIGHT,
+            player_id="player-a",
+        )
+    )
+    assert {effect.effect_id for effect in expired} == {
+        effect.effect_id for effect in reroll_effects
+    }
+    for roll_type in ("attack_sequence.hit", "attack_sequence.wound"):
+        assert (
+            generic_rule_reroll_permission_context_for_unit(
+                state=state,
+                player_id="player-a",
+                unit_instance_id=_ATTACHED_UNIT_ID,
+                model_instance_id=bearer_model.model_instance_id,
+                roll_type=roll_type,
+                timing_window=roll_type,
+                target_unit_instance_id=_ENEMY_UNIT_ID,
+            )
+            is None
+        )
+
+
+def test_furys_cage_self_mortal_wounds_resume_through_fnp_adapter_decisions() -> None:
+    lifecycle = _furys_cage_fight_lifecycle(
+        game_id="phase17g-furys-cage-fnp",
+        attached=False,
+    )
+    state = _started_state(lifecycle)
+    bearer = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    bearer_model = bearer.own_models[0]
+    fnp_sources = (
+        FeelNoPainSource(source_id="phase17g-furys-cage-fnp-a", threshold=5),
+        FeelNoPainSource(source_id="phase17g-furys-cage-fnp-b", threshold=6),
+    )
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=bearer_model.model_instance_id,
+        sources=fnp_sources,
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    grant_request = _select_furys_cage_grant_request(
+        session=session,
+        selected_unit_instance_id=bearer.unit_instance_id,
+        result_id_prefix="phase17g-furys-cage-fnp",
+    )
+
+    status = session.submit_option(
+        request_id=grant_request.request_id,
+        option_id=enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+        result_id="phase17g-furys-cage-fnp:grant",
+    )
+    fnp_decision_count = 0
+    while (
+        status.decision_request is not None
+        and status.decision_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+    ):
+        fnp_request = status.decision_request
+        source_context = mortal_wound_feel_no_pain_source_context(fnp_request)
+        assert isinstance(source_context, dict)
+        assert source_context["source_kind"] == SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_SOURCE_KIND
+        assert source_context["source_model_instance_id"] == bearer_model.model_instance_id
+        assert {option.option_id for option in fnp_request.options} == {
+            source.source_id for source in fnp_sources
+        }
+        fnp_decision_count += 1
+        status = session.submit_option(
+            request_id=fnp_request.request_id,
+            option_id=fnp_sources[0].source_id,
+            result_id=f"phase17g-furys-cage-fnp:resolution-{fnp_decision_count:02d}",
+        )
+
+    resolved_payload = _event_payload(
+        lifecycle.decision_controller,
+        SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
+    )
+    application = cast(dict[str, JsonValue], resolved_payload["mortal_wound_application"])
+    assert fnp_decision_count == application["mortal_wounds"]
+    assert len(cast(list[JsonValue], application["feel_no_pain_resolutions"])) == (
+        fnp_decision_count
+    )
+    assert (
+        len(
+            _events_of_type(
+                lifecycle.decision_controller,
+                SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_PENDING_EVENT,
+            )
+        )
+        == fnp_decision_count
+    )
+    assert status.status_kind is LifecycleStatusKind.WAITING_FOR_DECISION
+    assert status.decision_request is not None
+    assert status.decision_request.decision_type != SELECT_FEEL_NO_PAIN_DECISION_TYPE
+
+
+def test_furys_cage_lethal_damage_routes_deadly_demise_through_nested_fnp_and_replay() -> None:
+    game_id = "phase17g-furys-cage-dd-fnp-02"
+    lifecycle = _furys_cage_fight_lifecycle(
+        game_id=game_id,
+        attached=False,
+        bearer_wounds=2,
+    )
+    state = _started_state(lifecycle)
+    bearer = _physical_unit_by_id(
+        state=state,
+        unit_instance_id=_OTHER_KHORNE_MONSTER_UNIT_ID,
+    )
+    enemy = _physical_unit_by_id(state=state, unit_instance_id=_ENEMY_UNIT_ID)
+    bearer_model_id = bearer.own_models[0].model_instance_id
+    enemy_model_id = enemy.own_models[0].model_instance_id
+    fnp_sources = (
+        FeelNoPainSource(source_id=f"{game_id}:a", threshold=5),
+        FeelNoPainSource(source_id=f"{game_id}:b", threshold=6),
+    )
+    state.record_model_feel_no_pain_sources(
+        model_instance_id=enemy_model_id,
+        sources=fnp_sources,
+        decline_allowed=True,
+    )
+    session = LocalGameSession(lifecycle=lifecycle)
+    grant_request = _select_furys_cage_grant_request(
+        session=session,
+        selected_unit_instance_id=bearer.unit_instance_id,
+        result_id_prefix=game_id,
+    )
+
+    status = session.submit_option(
+        request_id=grant_request.request_id,
+        option_id=enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,
+        result_id=f"{game_id}:grant",
+    )
+    assert status.decision_request is not None
+    source_context = mortal_wound_feel_no_pain_source_context(status.decision_request)
+    assert isinstance(source_context, dict)
+    assert source_context["source_kind"] == RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND
+    root_context = cast(dict[str, JsonValue], source_context["root_context"])
+    assert root_context["completion_kind"] == RULE_MODEL_DESTRUCTION_APPLIED_DAMAGE_COMPLETION_KIND
+    assert root_context["defer_attached_split_until_fight_activation_completion"] is False
+
+    restored_lifecycle = replace(
+        lifecycle,
+        state=GameState.from_payload(state.to_payload()),
+        decision_controller=DecisionController.from_payload(
+            lifecycle.decision_controller.to_payload()
+        ),
+    )
+    restored_session = LocalGameSession(lifecycle=restored_lifecycle)
+    restored_state = _started_state(restored_lifecycle)
+    restored_decisions = restored_lifecycle.decision_controller
+    pending_request = restored_decisions.queue.peek_next()
+    fnp_decision_count = 0
+    while (
+        pending_request.decision_type == SELECT_FEEL_NO_PAIN_DECISION_TYPE
+        and isinstance(
+            current_source_context := mortal_wound_feel_no_pain_source_context(pending_request),
+            dict,
+        )
+        and current_source_context.get("source_kind")
+        == RULE_MODEL_DESTRUCTION_DEADLY_DEMISE_SOURCE_KIND
+    ):
+        fnp_decision_count += 1
+        continuation_status = restored_session.submit_option(
+            request_id=pending_request.request_id,
+            option_id=DECLINE_FEEL_NO_PAIN_OPTION_ID,
+            result_id=f"phase17g-furys-cage-dd-fnp:decline-{fnp_decision_count:02d}",
+        )
+        if continuation_status.decision_request is None:
+            break
+        pending_request = continuation_status.decision_request
+
+    decisions = restored_decisions
+    assert fnp_decision_count == 2
+    assert restored_state.battlefield_state is not None
+    assert bearer_model_id not in restored_state.battlefield_state.placed_model_ids()
+    assert enemy_model_id not in restored_state.battlefield_state.placed_model_ids()
+    applied_payload = _event_payload(decisions, "deadly_demise_mortal_wounds_applied")
+    assert applied_payload["target_unit_instance_id"] == enemy.unit_instance_id
+    assert applied_payload["mortal_wounds"] == 2
+    destroyed_payloads = {
+        cast(str, payload["model_instance_id"]): payload
+        for payload in _events_of_type(decisions, "model_destroyed")
+    }
+    bearer_attribution = ModelDestructionAttribution.from_model_destroyed_payload(
+        destroyed_payloads[bearer_model_id]
+    )
+    enemy_attribution = ModelDestructionAttribution.from_model_destroyed_payload(
+        destroyed_payloads[enemy_model_id]
+    )
+    assert (
+        bearer_attribution.destruction_provenance.destruction_source_kind
+        is DestructionSourceKind.ABILITY
+    )
+    assert (
+        enemy_attribution.destruction_provenance.destruction_source_kind
+        is DestructionSourceKind.DEADLY_DEMISE
+    )
+    bearer_destroyed_event = next(
+        event
+        for event in decisions.event_log.records
+        if event.event_type == "model_destroyed"
+        and isinstance(event.payload, dict)
+        and event.payload.get("model_instance_id") == bearer_model_id
+    )
+    assert (
+        _event_payload(
+            decisions,
+            SELECTED_TO_FIGHT_SELF_MORTAL_WOUNDS_RESOLVED_EVENT,
+        )["model_destroyed_event_id"]
+        == bearer_destroyed_event.event_id
+    )
+    assert GameState.from_payload(restored_state.to_payload()).to_payload() == (
+        restored_state.to_payload()
+    )
+    assert DecisionController.from_payload(restored_decisions.to_payload()) == (restored_decisions)
+
+
+def test_furys_cage_source_runtime_consumer_identity_drift_fails_closed() -> None:
+    rule_ir = faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id(
+        enhancements.FURYS_CAGE_DESCRIPTOR_ID
+    )
+    record = _furys_cage_execution_record()
+    (selected_to_fight_ability,) = blood_legion_fight_unit_selected_grant_abilities()
+    (fnp_ability,) = blood_legion_mortal_wound_feel_no_pain_abilities()
+
+    with pytest.raises(GameLifecycleError, match="runtime consumer identity drift"):
+        selected_to_fight_ability.hook_id(
+            GenericRuleAbilitySource(
+                record=replace(
+                    record,
+                    runtime_consumer_ids=(enhancements.FURYS_CAGE_MORTAL_WOUND_FNP_CONSUMER_ID,),
+                ),
+                rule_ir=rule_ir,
+            )
+        )
+    with pytest.raises(GameLifecycleError, match="runtime consumer identity drift"):
+        fnp_ability.hook_id(
+            GenericRuleAbilitySource(
+                record=replace(
+                    record,
+                    runtime_consumer_ids=(enhancements.FURYS_CAGE_SELECTED_TO_FIGHT_CONSUMER_ID,),
+                ),
+                rule_ir=rule_ir,
+            )
+        )
+
+
+@pytest.mark.parametrize(
+    ("runtime_support_status", "runtime_consumer_ids", "error_match"),
+    [
+        (None, (), "source is not engine-consumed"),
+        ("source_only", (), "source is not engine-consumed"),
+        ("engine_consumed", (), "runtime consumer identity drift"),
+    ],
+)
+def test_furys_cage_source_runtime_consumer_evidence_is_required(
+    runtime_support_status: str | None,
+    runtime_consumer_ids: tuple[str, ...],
+    error_match: str,
+) -> None:
+    rule_ir = faction_rule_ir_promotion_2026_07.current_rule_ir_by_coverage_descriptor_id(
+        enhancements.FURYS_CAGE_DESCRIPTOR_ID
+    )
+    source = GenericRuleAbilitySource(
+        record=replace(
+            _furys_cage_execution_record(),
+            runtime_support_status=runtime_support_status,
+            runtime_consumer_ids=runtime_consumer_ids,
+        ),
+        rule_ir=rule_ir,
+    )
+    for ability in blood_legion_fight_unit_selected_grant_abilities():
+        with pytest.raises(GameLifecycleError, match=error_match):
+            ability.hook_id(source)
+    for fnp_ability in blood_legion_mortal_wound_feel_no_pain_abilities():
+        with pytest.raises(GameLifecycleError, match=error_match):
+            fnp_ability.hook_id(source)
+
+
+def test_furys_cage_runtime_consumers_generate_from_source_only_execution_record(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    generator = importlib.import_module("tools.generate_faction_subrule_source_package")
+    execution_records = faction_execution_2026_27.execution_records()
+    pre_runtime_record = replace(
+        _furys_cage_execution_record(),
+        runtime_support_status="source_only",
+        runtime_consumer_ids=(),
+    )
+    monkeypatch.setattr(
+        faction_execution_2026_27,
+        "execution_records",
+        lambda: tuple(
+            pre_runtime_record
+            if record.coverage_descriptor_id == enhancements.FURYS_CAGE_DESCRIPTOR_ID
+            else record
+            for record in execution_records
+        ),
+    )
+
+    metadata_builder = cast(
+        Callable[[], dict[str, _EnhancementRuntimeMetadata]],
+        generator.__dict__["_generic_enhancement_runtime_metadata_by_source_row_id"],
+    )
+    metadata = metadata_builder()
+
+    assert metadata[blood_legion_ir.FURYS_CAGE_SOURCE_ROW_ID].runtime_consumer_ids == (
+        enhancements.FURYS_CAGE_RUNTIME_CONSUMER_IDS
+    )
+
+
+def test_furys_cage_catalog_and_eligibility_reject_non_monster_bearer() -> None:
+    config = _blood_legion_config(
+        game_id="phase17g-furys-cage-invalid-bearer",
+        furys_cage_target_unit_selection_id="blood-daemon-unit",
+    )
+    enhancement = next(
+        enhancement
+        for enhancement in config.army_catalog.enhancements
+        if enhancement.enhancement_id == enhancements.FURYS_CAGE_ENHANCEMENT_ID
+    )
+
+    assert enhancement.name == "Fury's Cage"
+    assert enhancement.points == 20
+    assert enhancement.target_required_keywords == (
+        blood_legion_ir.KHORNE_KEYWORD,
+        blood_legion_ir.MONSTER_KEYWORD,
+    )
+    assert enhancement.target_required_faction_keywords == (
+        blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,
+    )
+    report = validate_roster_legality(
+        catalog=config.army_catalog,
+        request=config.army_muster_requests[0],
+    )
+    assert "enhancement_target_keyword_required" in {
+        violation.violation_code for violation in report.violations
     }
 
 
@@ -308,7 +1597,7 @@ def test_brazenmaw_follows_bearer_into_attached_rules_unit_without_duplication()
     assert _charge_roll_operands(
         bundle,
         state=state,
-        unit_instance_id=_BRAZENMAW_ATTACHED_UNIT_ID,
+        unit_instance_id=_ATTACHED_UNIT_ID,
     ) == (2,)
     assert _charge_roll_operands(
         bundle,
@@ -820,7 +2109,7 @@ def test_gateway_unto_damnation_attached_non_bearer_destruction_does_not_upgrade
     )
     attribution = ModelDestructionAttribution.from_model_destroyed_payload(destroyed_payload)
 
-    assert attribution.source_rules_unit_instance_id == _BRAZENMAW_ATTACHED_UNIT_ID
+    assert attribution.source_rules_unit_instance_id == _ATTACHED_UNIT_ID
     assert attribution.source_model_instance_id == attributed_source_model_id
     assert effective_deadly_demise_descriptor(
         state=state,
@@ -1354,6 +2643,17 @@ def _brazenmaw_execution_record() -> Phase17FExecutionRecord:
     return records[0]
 
 
+def _furys_cage_execution_record() -> Phase17FExecutionRecord:
+    records = tuple(
+        record
+        for record in faction_execution_2026_27.execution_records()
+        if record.coverage_descriptor_id == enhancements.FURYS_CAGE_DESCRIPTOR_ID
+    )
+    if len(records) != 1:
+        raise AssertionError("expected one Fury's Cage execution record")
+    return records[0]
+
+
 def _gateway_unto_damnation_execution_record() -> Phase17FExecutionRecord:
     records = tuple(
         record
@@ -1376,6 +2676,114 @@ def _slaughterthirst_execution_record() -> Phase17FExecutionRecord:
     return records[0]
 
 
+def _furys_cage_fight_lifecycle(
+    *,
+    game_id: str,
+    attached: bool,
+    bearer_wounds: int = 10,
+) -> GameLifecycle:
+    config = _blood_legion_config(
+        game_id=game_id,
+        include_slaughterthirst_targets=True,
+        furys_cage_target_unit_selection_id="khorne-monster-unit",
+        attach_furys_cage_bearer=attached,
+        khorne_monster_model_count=1,
+        khorne_monster_wounds=bearer_wounds,
+        use_melee_wargear=attached,
+        non_khorne_model_count=1,
+        enemy_model_count=1,
+    )
+    lifecycle, _units = fight_lifecycle(
+        alpha_unit_ids=("blood-daemon-unit",),
+        enemy_unit_ids=("enemy-unit",),
+        origins={
+            "blood-daemon-unit": Pose.at(42.0, 10.0),
+            "khorne-daemon-unit": Pose.at(42.0, 30.0),
+            "khorne-monster-unit": Pose.at(10.0, 21.4 if attached else 20.0),
+            **({"non-khorne-daemon-unit": Pose.at(10.0, 20.0)} if attached else {}),
+            "enemy-unit": Pose.at(8.0 if attached else 12.0, 20.0),
+        },
+        game_id=game_id,
+        config=config,
+    )
+    return lifecycle
+
+
+def _select_furys_cage_grant_request(
+    *,
+    session: LocalGameSession,
+    selected_unit_instance_id: str,
+    result_id_prefix: str,
+) -> DecisionRequest:
+    activation_status = session.advance_until_decision_or_terminal()
+    movement_number = 1
+    while (
+        activation_status.decision_request is not None
+        and activation_status.decision_request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE
+    ):
+        movement_request = activation_status.decision_request
+        proposal = MovementProposalRequest.from_decision_request_payload(movement_request.payload)
+        context = cast(dict[str, JsonValue], proposal.context)
+        activation_status = session.submit_parameterized_payload(
+            request_id=movement_request.request_id,
+            result_id=f"{result_id_prefix}:fight-movement-{movement_number:02d}",
+            payload=cast(
+                JsonValue,
+                {
+                    "proposal_request_id": proposal.request_id,
+                    "proposal_kind": proposal.proposal_kind.value,
+                    "unit_instance_id": proposal.unit_instance_id,
+                    "movement_phase_action": proposal.movement_phase_action,
+                    "movement_mode": context["movement_mode"],
+                },
+            ),
+        )
+        movement_number += 1
+    activation_request = decision_request(activation_status)
+    canonical_unit_instance_id = rules_unit_view_by_id(
+        state=_started_state(session.lifecycle),
+        unit_instance_id=selected_unit_instance_id,
+    ).unit_instance_id
+    activation_option_id = fight_activation_option_id(
+        unit_instance_id=canonical_unit_instance_id,
+        fight_type=FightTypeKind.NORMAL,
+    )
+    if activation_option_id not in {option.option_id for option in activation_request.options}:
+        raise AssertionError(
+            "Missing Fury's Cage fight activation option; received "
+            f"{tuple(option.option_id for option in activation_request.options)}"
+        )
+    grant_status = session.submit_option(
+        request_id=activation_request.request_id,
+        option_id=activation_option_id,
+        result_id=f"{result_id_prefix}:activation",
+    )
+    grant_request = decision_request(grant_status)
+    if grant_request.decision_type != SELECT_FIGHT_UNIT_GRANT_DECISION_TYPE:
+        raise AssertionError("Fury's Cage activation must request its optional grant")
+    return grant_request
+
+
+def _furys_cage_reroll_effects(state: GameState) -> tuple[PersistingEffect, ...]:
+    return tuple(
+        effect
+        for effect in state.persisting_effects
+        if effect.source_rule_id == enhancements.FURYS_CAGE_SOURCE_RULE_ID
+        and _is_rule_ir_reroll_effect(effect)
+    )
+
+
+def _is_rule_ir_reroll_effect(effect: PersistingEffect) -> bool:
+    payload = effect.effect_payload
+    if not isinstance(payload, dict):
+        return False
+    rule_effect = payload.get("effect")
+    return (
+        isinstance(rule_effect, dict)
+        and rule_effect.get("kind") == RuleEffectKind.REROLL_PERMISSION.value
+    )
+
+
 def _blood_legion_config(
     *,
     game_id: str = "phase17g-blood-legion-game",
@@ -1384,14 +2792,22 @@ def _blood_legion_config(
     include_other_friendly_unit: bool = False,
     include_slaughterthirst_targets: bool = False,
     brazenmaw_target_unit_selection_id: str | None = None,
+    furys_cage_target_unit_selection_id: str | None = None,
     slaughterthirst_target_unit_selection_id: str | None = None,
     gateway_target_unit_selection_id: str | None = None,
     attach_brazenmaw_bearer: bool = False,
+    attach_furys_cage_bearer: bool = False,
     attach_gateway_bearer: bool = False,
     khorne_monster_model_count: int = 5,
+    khorne_monster_wounds: int = 2,
+    non_khorne_model_count: int = 5,
+    use_melee_wargear: bool = False,
     enemy_model_count: int = 5,
 ) -> GameConfig:
-    catalog = _blood_legion_catalog()
+    catalog = _blood_legion_catalog(
+        khorne_monster_wounds=khorne_monster_wounds,
+        use_melee_wargear=use_melee_wargear,
+    )
     return GameConfig(
         game_id=game_id,
         allow_legacy_non_strict_rosters=True,
@@ -1412,13 +2828,17 @@ def _blood_legion_config(
                     include_other_friendly_unit=include_other_friendly_unit,
                     include_slaughterthirst_targets=include_slaughterthirst_targets,
                     attach_brazenmaw_bearer=attach_brazenmaw_bearer,
+                    attach_furys_cage_bearer=attach_furys_cage_bearer,
                     attach_gateway_bearer=attach_gateway_bearer,
                     khorne_monster_model_count=khorne_monster_model_count,
+                    non_khorne_model_count=non_khorne_model_count,
                 ),
                 brazenmaw_target_unit_selection_id=brazenmaw_target_unit_selection_id,
+                furys_cage_target_unit_selection_id=furys_cage_target_unit_selection_id,
                 slaughterthirst_target_unit_selection_id=(slaughterthirst_target_unit_selection_id),
                 gateway_target_unit_selection_id=gateway_target_unit_selection_id,
                 attach_brazenmaw_bearer=attach_brazenmaw_bearer,
+                attach_furys_cage_bearer=attach_furys_cage_bearer,
                 attach_gateway_bearer=attach_gateway_bearer,
             ),
             _army_muster_request(
@@ -1444,16 +2864,23 @@ def _blood_legion_extra_unit_selections(
     include_other_friendly_unit: bool,
     include_slaughterthirst_targets: bool,
     attach_brazenmaw_bearer: bool,
+    attach_furys_cage_bearer: bool,
     attach_gateway_bearer: bool,
     khorne_monster_model_count: int,
+    non_khorne_model_count: int,
 ) -> tuple[tuple[str, str, int], ...]:
     selections: list[tuple[str, str, int]] = []
-    if include_other_friendly_unit or attach_brazenmaw_bearer or attach_gateway_bearer:
+    if (
+        include_other_friendly_unit
+        or attach_brazenmaw_bearer
+        or attach_furys_cage_bearer
+        or attach_gateway_bearer
+    ):
         selections.append(
             (
                 "non-khorne-daemon-unit",
                 _BLOOD_LEGION_NON_KHORNE_DATASHEET_ID,
-                5,
+                non_khorne_model_count,
             )
         )
     if include_slaughterthirst_targets:
@@ -1470,18 +2897,53 @@ def _blood_legion_extra_unit_selections(
     return tuple(selections)
 
 
-def _blood_legion_catalog() -> ArmyCatalog:
+def _blood_legion_catalog(
+    *,
+    khorne_monster_wounds: int = 2,
+    use_melee_wargear: bool = False,
+) -> ArmyCatalog:
     base_catalog = ArmyCatalog.phase9a_canonical_content_pack()
     base_datasheet = base_catalog.datasheet_by_id("core-intercessor-like-infantry")
     fixture_datasheet = replace(
         base_datasheet,
+        model_profiles=(
+            tuple(
+                replace(
+                    profile,
+                    characteristics=tuple(
+                        CharacteristicValue.from_raw(Characteristic.WOUNDS, 100)
+                        if value.characteristic is Characteristic.WOUNDS
+                        else value
+                        for value in profile.characteristics
+                    ),
+                )
+                for profile in base_datasheet.model_profiles
+            )
+            if use_melee_wargear
+            else base_datasheet.model_profiles
+        ),
         composition=tuple(
             replace(composition, min_models=1) for composition in base_datasheet.composition
+        ),
+        wargear_options=(
+            tuple(
+                replace(
+                    option,
+                    default_wargear_ids=("core-leader-blade",),
+                    allowed_wargear_ids=("core-leader-blade",),
+                )
+                for option in base_datasheet.wargear_options
+            )
+            if use_melee_wargear
+            else base_datasheet.wargear_options
         ),
     )
     daemon_datasheet = _blood_legion_datasheet(fixture_datasheet)
     non_khorne_daemon_datasheet = _blood_legion_non_khorne_datasheet(fixture_datasheet)
-    khorne_monster_datasheet = _blood_legion_khorne_monster_datasheet(fixture_datasheet)
+    khorne_monster_datasheet = _blood_legion_khorne_monster_datasheet(
+        fixture_datasheet,
+        wounds=khorne_monster_wounds,
+    )
     return replace(
         base_catalog,
         datasheets=(
@@ -1519,6 +2981,7 @@ def _blood_legion_catalog() -> ArmyCatalog:
                 force_disposition_ids=("phase17g-force", "take-and-hold"),
                 enhancement_ids=(
                     blood_legion_ir.BRAZENMAW_ENHANCEMENT_ID,
+                    blood_legion_ir.FURYS_CAGE_ENHANCEMENT_ID,
                     blood_legion_ir.GATEWAY_UNTO_DAMNATION_ENHANCEMENT_ID,
                     blood_legion_ir.SLAUGHTERTHIRST_ENHANCEMENT_ID,
                 ),
@@ -1546,6 +3009,17 @@ def _blood_legion_catalog() -> ArmyCatalog:
                 source_id=blood_legion_ir.BRAZENMAW_DESCRIPTOR_ID,
                 points=15,
                 target_required_keywords=(blood_legion_ir.KHORNE_KEYWORD,),
+                target_required_faction_keywords=(blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,),
+            ),
+            EnhancementDefinition(
+                enhancement_id=blood_legion_ir.FURYS_CAGE_ENHANCEMENT_ID,
+                name="Fury's Cage",
+                source_id=blood_legion_ir.FURYS_CAGE_DESCRIPTOR_ID,
+                points=20,
+                target_required_keywords=(
+                    blood_legion_ir.KHORNE_KEYWORD,
+                    blood_legion_ir.MONSTER_KEYWORD,
+                ),
                 target_required_faction_keywords=(blood_legion_ir.LEGIONES_DAEMONICA_KEYWORD,),
             ),
             EnhancementDefinition(
@@ -1613,6 +3087,8 @@ def _blood_legion_non_khorne_datasheet(
 
 def _blood_legion_khorne_monster_datasheet(
     base_datasheet: DatasheetDefinition,
+    *,
+    wounds: int,
 ) -> DatasheetDefinition:
     return replace(
         base_datasheet,
@@ -1621,6 +3097,18 @@ def _blood_legion_khorne_monster_datasheet(
         keywords=DatasheetKeywordSet(
             keywords=("Character", "Khorne", "Monster"),
             faction_keywords=("Legiones Daemonica",),
+        ),
+        model_profiles=tuple(
+            replace(
+                profile,
+                characteristics=tuple(
+                    CharacteristicValue.from_raw(Characteristic.WOUNDS, wounds)
+                    if value.characteristic is Characteristic.WOUNDS
+                    else value
+                    for value in profile.characteristics
+                ),
+            )
+            for profile in base_datasheet.model_profiles
         ),
         attachment_eligibilities=(
             AttachmentEligibility(
@@ -1672,9 +3160,11 @@ def _army_muster_request(
     extra_unit_selections: tuple[tuple[str, str, int], ...] = (),
     unit_model_count: int = 5,
     brazenmaw_target_unit_selection_id: str | None = None,
+    furys_cage_target_unit_selection_id: str | None = None,
     slaughterthirst_target_unit_selection_id: str | None = None,
     gateway_target_unit_selection_id: str | None = None,
     attach_brazenmaw_bearer: bool = False,
+    attach_furys_cage_bearer: bool = False,
     attach_gateway_bearer: bool = False,
 ) -> ArmyMusterRequest:
     unit_selections = [
@@ -1718,6 +3208,18 @@ def _army_muster_request(
                 ),
             )
         )
+    if furys_cage_target_unit_selection_id is not None:
+        enhancement_ids.append(blood_legion_ir.FURYS_CAGE_ENHANCEMENT_ID)
+        enhancement_assignments.append(
+            EnhancementAssignment(
+                enhancement_id=blood_legion_ir.FURYS_CAGE_ENHANCEMENT_ID,
+                target_unit_selection_id=furys_cage_target_unit_selection_id,
+                source_id=(
+                    "phase17g:test:blood-legion:furys-cage-assignment:"
+                    f"{furys_cage_target_unit_selection_id}"
+                ),
+            )
+        )
     if gateway_target_unit_selection_id is not None:
         enhancement_ids.append(blood_legion_ir.GATEWAY_UNTO_DAMNATION_ENHANCEMENT_ID)
         enhancement_assignments.append(
@@ -1734,6 +3236,7 @@ def _army_muster_request(
         source_selection_id
         for selected, source_selection_id in (
             (attach_brazenmaw_bearer, "blood-daemon-unit"),
+            (attach_furys_cage_bearer, "khorne-monster-unit"),
             (attach_gateway_bearer, "khorne-monster-unit"),
         )
         if selected
@@ -2369,6 +3872,161 @@ def _destroy_enemy_unit_with_split_attackers_for_blood_tainted(
         raise AssertionError("split-attacker fixture completion source destroyed unexpected models")
 
 
+def _assert_attached_melee_request(
+    *,
+    request: DecisionRequest,
+    bearer: UnitInstance,
+    bodyguard: UnitInstance,
+) -> MeleeDeclarationProposalRequest:
+    if request.decision_type != SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
+        raise AssertionError("attached Fight activation must request a melee declaration")
+    proposal = MeleeDeclarationProposalRequest.from_decision_request(request)
+    weapon_payloads = tuple(
+        cast(dict[str, JsonValue], weapon) for weapon in proposal.available_weapons
+    )
+    expected_models_by_component = {
+        bearer.unit_instance_id: {
+            model.model_instance_id for model in bearer.own_models if model.is_alive
+        },
+        bodyguard.unit_instance_id: {
+            model.model_instance_id for model in bodyguard.own_models if model.is_alive
+        },
+    }
+    if proposal.unit_instance_id != _ATTACHED_UNIT_ID:
+        raise AssertionError("melee proposal must use the canonical attached-unit id")
+    if {cast(str, weapon["component_unit_instance_id"]) for weapon in weapon_payloads} != set(
+        expected_models_by_component
+    ):
+        raise AssertionError("melee proposal must include both physical components")
+    if any(weapon["rules_unit_instance_id"] != _ATTACHED_UNIT_ID for weapon in weapon_payloads):
+        raise AssertionError("melee weapons must retain their canonical rules-unit identity")
+    for component_id, expected_model_ids in expected_models_by_component.items():
+        actual_model_ids = {
+            cast(str, weapon["model_instance_id"])
+            for weapon in weapon_payloads
+            if weapon["component_unit_instance_id"] == component_id
+        }
+        if actual_model_ids != expected_model_ids:
+            raise AssertionError("melee proposal model provenance drifted")
+    return proposal
+
+
+def _assert_active_attack_sequence_models(
+    *,
+    state: GameState,
+    expected_model_ids: set[str],
+) -> None:
+    fight_state = state.fight_phase_state
+    if fight_state is None or fight_state.attack_sequence is None:
+        raise AssertionError("melee declaration must create an attack sequence")
+    sequence = fight_state.attack_sequence
+    actual_model_ids = tuple(pool.attacker_model_instance_id for pool in sequence.attack_pools)
+    if sequence.attacking_unit_instance_id != _ATTACHED_UNIT_ID:
+        raise AssertionError("melee attack sequence must use the canonical attached-unit id")
+    if set(actual_model_ids) != expected_model_ids or len(actual_model_ids) != len(
+        expected_model_ids
+    ):
+        raise AssertionError("each attached-unit model must contribute exactly one attack pool")
+
+
+def _assert_accepted_melee_declaration_models(
+    *,
+    lifecycle: GameLifecycle,
+    expected_model_ids: set[str],
+) -> None:
+    accepted = _event_payload(lifecycle.decision_controller, "melee_declaration_accepted")
+    proposal = cast(dict[str, JsonValue], accepted["proposal"])
+    declarations = cast(list[dict[str, JsonValue]], proposal["declarations"])
+    actual_model_ids = tuple(
+        cast(str, declaration["attacker_model_instance_id"]) for declaration in declarations
+    )
+    if set(actual_model_ids) != expected_model_ids or len(actual_model_ids) != len(
+        expected_model_ids
+    ):
+        raise AssertionError("each attached-unit model must be declared exactly once")
+
+
+def _complete_active_fight_through_session(
+    *,
+    session: LocalGameSession,
+    status: LifecycleStatus,
+    result_id_prefix: str,
+    stop_at_decision_types: frozenset[str] = frozenset(),
+) -> LifecycleStatus:
+    current = status
+    for result_index in range(1, 129):
+        request = decision_request(current)
+        if request.decision_type in stop_at_decision_types:
+            return current
+        if request.decision_type == FIGHT_ACTIVATION_DECISION_TYPE:
+            return current
+        if request.decision_type == MOVEMENT_PROPOSAL_DECISION_TYPE:
+            current = drain_fight_movement_requests(session.lifecycle, current)
+            continue
+        if request.decision_type == SUBMIT_MELEE_DECLARATION_DECISION_TYPE:
+            current = submit_minimal_melee_declaration(
+                session.lifecycle,
+                request=request,
+                result_id=f"{result_id_prefix}:melee-{result_index:03d}",
+            )
+            continue
+        if not request.options:
+            raise AssertionError("Fight attack continuation requires a finite decision option")
+        selected_option = next(
+            (option for option in request.options if "decline" in option.option_id),
+            request.options[0],
+        )
+        current = session.submit_option(
+            request_id=request.request_id,
+            option_id=selected_option.option_id,
+            result_id=f"{result_id_prefix}:{result_index:03d}",
+        )
+    raise AssertionError("Fight attack continuation did not return to activation selection")
+
+
+def _assert_attached_activation_consumed_once(
+    *,
+    state: GameState,
+    lifecycle: GameLifecycle,
+    status: LifecycleStatus,
+    component_unit_instance_ids: set[str],
+) -> None:
+    request = decision_request(status)
+    if request.decision_type != FIGHT_ACTIVATION_DECISION_TYPE:
+        raise AssertionError("completed attached activation must return to Fight selection")
+    fight_state = state.fight_phase_state
+    if fight_state is None or fight_state.active_activation is not None:
+        raise AssertionError("completed attached activation must not remain active")
+    activation_count = sum(
+        selection.unit_instance_id == _ATTACHED_UNIT_ID
+        for selection in fight_state.fight_order_state.activation_selections
+    )
+    if activation_count != 1:
+        raise AssertionError("attached rules unit must receive exactly one Fight activation")
+    fought_events = tuple(
+        payload
+        for payload in _events_of_type(lifecycle.decision_controller, "unit_has_fought")
+        if cast(dict[str, JsonValue], payload["activation_selection"])["unit_instance_id"]
+        == _ATTACHED_UNIT_ID
+    )
+    if len(fought_events) != 1:
+        raise AssertionError("attached rules unit must emit exactly one fought event")
+    pending_unit_ids = {
+        cast(str, cast(dict[str, JsonValue], option.payload)["unit_instance_id"])
+        for option in request.options
+    }
+    if component_unit_instance_ids.intersection(pending_unit_ids):
+        raise AssertionError("attached components must not receive later activation options")
+    contexts = eligible_fight_contexts_for_player(
+        state=state,
+        fight_state=fight_state,
+        player_id="player-a",
+        policy=state.runtime_ruleset_descriptor().fight_policy,
+    )
+    if component_unit_instance_ids.intersection(context.unit_instance_id for context in contexts):
+        raise AssertionError("attached components must remain consumed after their activation")
+
+
 def _event_payload(
     decisions: DecisionController,
     event_type: str,
@@ -2377,6 +4035,17 @@ def _event_payload(
         if event.event_type == event_type:
             return cast(dict[str, JsonValue], event.payload)
     raise AssertionError(f"missing event {event_type}")
+
+
+def _events_of_type(
+    decisions: DecisionController,
+    event_type: str,
+) -> tuple[dict[str, JsonValue], ...]:
+    return tuple(
+        cast(dict[str, JsonValue], event.payload)
+        for event in decisions.event_log.records
+        if event.event_type == event_type
+    )
 
 
 def _event_payload_by_id(
